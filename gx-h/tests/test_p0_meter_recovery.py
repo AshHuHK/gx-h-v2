@@ -5,11 +5,15 @@ import unittest
 from pathlib import Path
 
 from gx_core import budgets
-from gx_core.errors import BudgetExceeded, HoldActive
-from gx_core.p0 import schema
+from gx_core.domain import clock
+from gx_core.errors import BudgetExceeded, HoldActive, LeaseExpired
+from gx_core.p0 import schema, waits
 from gx_core.p0.root_delivery import RootDelivery
+from gx_core.p0.roots import Roots
 from gx_core.persistence import records, store
+from gx_core.teams.service import default_lease_seconds
 from test_p0_root_delivery import Peer
+from tests import test_p0_roots
 
 
 class TurnMeterTests(unittest.TestCase):
@@ -225,6 +229,127 @@ class TurnMeterTests(unittest.TestCase):
         self.delivery.verify_descendants(requested={"child":thread})
         self.assertEqual(budgets.state(self.db, self.budget)["spent"], {"tokens":950,"api_calls":1})
         self.assertEqual(self.db.execute("SELECT measured_tokens FROM p0_native_child_usage").fetchone()[0], 915)
+
+
+class TaskRetryMeterTests(unittest.TestCase):
+    def setUp(self):
+        fixture = self.fixture = test_p0_roots.DurableRoots()
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        self.addCleanup(clock.reset)
+        self.db, self.run, self.task = fixture.conn, fixture.run, fixture.task
+        self.budget = budgets.create_root(self.db, run_id=self.run, profile_name="p0", actor="test",
+                                          limits={"tokens":1_000_000, "api_calls":9})
+        self.db.execute("UPDATE runs SET budget_ref=? WHERE run_id=?", (self.budget, self.run))
+        self.peers = {}
+        self.starts = {}
+        self.attach(fixture.roots)
+
+    def attach(self, roots):
+        self.roots = roots
+        roots.token_budget = 65_536
+        roots._request = self.exchange
+        roots._goal_for_budget = lambda thread, grant: None
+
+    def exchange(self, method, params):
+        if method == "thread/start":
+            result = self.fixture.fake(method, params)
+            tid = result["thread"]["id"]
+            self.starts[tid] = result
+            self.peers[tid] = Peer(self.db, self.run)
+            return result
+        tid = params["threadId"]
+        peer = self.peers[tid]
+        if method == "thread/resume":
+            return {**self.starts[tid], "thread":{**self.starts[tid]["thread"], "turns":peer.turns}}
+        result = peer._request(method, params)
+        if method == "thread/read":
+            result["thread"]["id"] = tid
+        return result
+
+    def start_retry(self):
+        first = self.roots.dispatch(self.task)
+        with store.transaction(self.db):
+            store.release_lease(self.db, first["lease_id"])
+            store.transition(self.db, machine="task", subject_id=self.task, to_state="READY", actor="backend",
+                             reason="retry selected while the original turn is still streaming",
+                             extra_updates={"owner":None, "lease_id":None})
+        with self.assertRaises(HoldActive) as caught:
+            self.roots.dispatch(self.task)
+        self.assertEqual((caught.exception.details["reason"], caught.exception.details["thread_id"]),
+                         ("native_usage_pending", first["thread_id"]))
+        successor = self.roots._claim(self.task)
+        self.assertEqual(successor["attempt"], first["attempt"] + 1)
+        self.assertNotEqual(successor["thread_id"], first["thread_id"])
+        self.assertFalse(self.peers[successor["thread_id"]].sent)
+        return first, successor
+
+    def complete(self, binding, amount, *, with_total=True):
+        tid, turn = binding["thread_id"], binding["turn_id"]
+        deliver = self.roots.delivery.observe
+        deliver("turn/started", {"threadId":tid, "turn":{"id":turn}})
+        deliver("rawResponse/completed", {"threadId":tid, "turnId":turn, "responseId":tid + "-r1",
+                                          "usage":{"totalTokens":amount}})
+        self.peers[tid].turns[0]["status"] = "completed"
+        deliver("turn/completed", {"threadId":tid, "turn":self.peers[tid].turns[0]})
+        if with_total:
+            self.total(binding, amount)
+
+    def total(self, binding, amount):
+        self.roots.delivery.observe("thread/tokenUsage/updated", {"threadId":binding["thread_id"],
+            "turnId":binding["turn_id"], "tokenUsage":{"total":{"totalTokens":amount}}})
+
+    def test_reviewer_retry_waits_for_actual_charge_then_observes_exhaustion(self):
+        # Historical OAuth receipts, replayed into a fresh store without a model call.
+        budgets.spend(self.db, budget_ref=self.budget, subject_kind="test", subject_id="three-original-turns",
+                      amounts={"tokens":511_679, "api_calls":3}, actor="test")
+        first, successor = self.start_retry()
+        self.assertEqual(budgets.state(self.db, self.budget)["reserved"], {"tokens":65_536, "api_calls":1})
+        self.complete(first, 533_421)
+        self.total(first, 533_421)
+        with self.assertRaises(BudgetExceeded) as caught:
+            self.roots.dispatch(self.task)
+        self.assertEqual((caught.exception.details["reason"], caught.exception.details["key"]),
+                         ("budget_exhausted", "tokens"))
+        self.assertEqual(budgets.state(self.db, self.budget)["spent"], {"tokens":1_045_100, "api_calls":4})
+        self.assertFalse(self.peers[successor["thread_id"]].sent)
+        self.assertIsNone(self.roots.delivery._get("start:" + successor["root_key"]))
+
+    def test_other_task_runs_and_expired_successor_resumes_once_after_cold_metering(self):
+        first, successor = self.start_retry()
+        other_task = records.create_task(self.db, run_id=self.run, actor="test", kind="research_round",
+                                         role="evidence_reviewer", required_artifacts=["science_assessment"])
+        store.transition(self.db, machine="task", subject_id=other_task, to_state="READY", actor="backend",
+                         reason="independent review")
+        other = self.roots.dispatch(other_task)
+        self.complete(other, 23)
+        self.complete(first, 70, with_total=False)
+        self.assertEqual(budgets.state(self.db, self.budget)["spent"], {"tokens":23, "api_calls":1})
+        self.db.close()
+        self.db = store.open_store(Path(self.fixture.tmp.name) / "test.db")
+        self.addCleanup(self.db.close)
+        self.fixture.conn = self.db
+        for peer in self.peers.values():
+            peer.conn = self.db
+        self.attach(Roots(self.db, run_id=self.run, cwd=self.fixture.tmp.name))
+        clock.advance(default_lease_seconds() + 60)
+        self.roots.reconcile_meter(first["thread_id"])
+        with self.assertRaises(HoldActive) as caught:
+            self.roots.dispatch(self.task)
+        self.assertEqual(caught.exception.details["turn_id"], first["turn_id"])
+        wait, = waits.pending(self.db, self.run)
+        self.assertEqual((wait["reason"], wait["thread_id"], wait["lease_id"]),
+                         ("metering", successor["thread_id"], successor["lease_id"]))
+        with self.assertRaises(LeaseExpired):
+            self.roots.delivery.deliver(first["thread_id"], "revoked", event_id="old-retry")
+        self.total(first, 70)
+        resumed = self.roots.dispatch(self.task)
+        self.assertEqual(resumed["lease_id"], successor["lease_id"])
+        self.assertEqual(self.roots.dispatch(self.task)["turn_id"], resumed["turn_id"])
+        self.assertEqual(len(self.peers[resumed["thread_id"]].sent), 1)
+        self.assertEqual(waits.pending(self.db, self.run), [])
+        self.complete(resumed, 50)
+        self.assertEqual(budgets.state(self.db, self.budget)["spent"], {"tokens":143, "api_calls":3})
 
 
 if __name__ == "__main__":

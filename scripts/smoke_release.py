@@ -117,6 +117,9 @@ def smoke(out, archive):
             summary["dsh_skipped"] = len(re.findall(r"\.\.\. skipped ", dsh))
             run("geometry", [python, "-B", "acceptance/acc1_coordinate_method.py",
                              "--output", out / "geometry.json"])
+            run("coordinate-project", [python, "-B", "acceptance/acc1_research.py", "--loopback",
+                                       "--state", scratch / "coordinate-state", "--output", out / "coordinate-project",
+                                       "--timeout", "180"])
             run("loopback-doctor", [python, "-B", "acceptance/oauth_loopback.py"])
             run("loopback-protocol", [python, "-B", "acceptance/native_probe.py", "--binary", binary, "--out",
                                       out / "protocol", "session"])

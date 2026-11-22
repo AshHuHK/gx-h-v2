@@ -279,10 +279,12 @@ def prepare(ctx: Any, *, lease_id: str, operation: str, task_id: str | None = No
 
 
 def prepare_run(ctx: Any, run_id: str) -> Prepared | None:
-    from .native_context import is_native_run
-    if is_native_run(ctx.conn, run_id):
-        # A completed turn is not a destroyed worker. Ordinary lease expiry stays
-        # with GX; there is no private-record poll or synthetic native stop here.
+    from .host_policy import P0_SOURCE
+    from .native_context import SOURCE, source_of_run
+    run = ctx.conn.execute("SELECT host_json FROM runs WHERE run_id=?", (run_id,)).fetchone()
+    if run is None or source_of_run(run) in (SOURCE, P0_SOURCE):
+        # These hosts observe their own threads. A completed turn is not a dead
+        # worker and a legacy private-record poll cannot settle their leases.
         return None
     if not scoped_run(ctx.conn, run_id):
         return None

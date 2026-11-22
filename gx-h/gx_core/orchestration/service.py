@@ -84,7 +84,7 @@ _registry: WorkflowRegistry | None = None
 #: The workflow packages this tree ships (``workflows/<name>``), registered by
 #: :func:`default_registry` in this order. Each exposes ``register_all(registry)``.
 SHIPPED_PACKAGES = ("module_collaboration", "science_grid", "science_grid_v2",
-                    "tl1a_coordinate_quality", "tl1a_geometry")
+                    "tl1a_coordinate_quality", "tl1a_geometry", "tl1a_geometry_v2")
 #: Package -> why it could not be registered, for the last registry built.
 _load_errors: dict[str, str] = {}
 _registry_injected = False

@@ -282,17 +282,19 @@ class RootDelivery:
             raise LeaseExpired("the root no longer holds the task attempt")
         return binding
 
-    def _reserve(self, thread_id, event_id):
-        # Inspect every remaining hold. An older installation could admit several
-        # turns while its first cumulative baseline was still unknown.
+    def _reserve(self, thread_id, event_id, binding):
+        # A retry gets a new thread as soon as its predecessor submits. That
+        # predecessor can still be spending inside the already admitted turn.
         pending = self.conn.execute(
-            "SELECT d.event_id,d.turn_id,u.metering_reason FROM p0_root_deliveries d "
+            "SELECT d.thread_id,d.event_id,d.turn_id,u.metering_reason FROM p0_root_deliveries d "
             "JOIN budget_reservations r USING(reservation_ref) LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) "
-            "WHERE d.thread_id=? AND d.method='turn/start' AND r.status='HELD' ORDER BY r.rowid LIMIT 1",
-            (thread_id,)).fetchone()
+            "WHERE d.run_id=? AND d.method='turn/start' AND r.status='HELD' AND d.thread_id IN "
+            "(SELECT ? UNION ALL SELECT thread_id FROM p0_roots WHERE run_id=? AND task_id=? AND attempt<?) "
+            "ORDER BY r.rowid LIMIT 1",
+            (self.run_id, thread_id, self.run_id, binding.get("task_id"), binding.get("attempt"))).fetchone()
         if pending:
             raise HoldActive("waiting for the preceding Codex turn's usage and descendants",
-                             details={**dict(pending), "thread_id": thread_id, "reason": "native_usage_pending"})
+                             details={**dict(pending), "reason": "native_usage_pending"})
         previous = self.conn.execute(
             "SELECT d.event_id,d.turn_id,u.total_tokens,u.terminal_status FROM p0_root_deliveries d "
             "JOIN budget_reservations r USING(reservation_ref) LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) "
@@ -364,7 +366,7 @@ class RootDelivery:
                     return row, False
             if not interrupt:
                 waits.prepare_delivery(self.conn, thread_id, event_id)
-            self._binding(thread_id, interrupt=interrupt, human=human)
+            binding = self._binding(thread_id, interrupt=interrupt, human=human)
             if self.conn.execute("SELECT 1 FROM p0_root_deliveries WHERE thread_id=? AND state='sending' "
                                  "AND event_id<>?", (thread_id, event_id)).fetchone() and not interrupt:
                 raise HoldActive("another input to this thread still needs a delivery receipt")
@@ -377,7 +379,7 @@ class RootDelivery:
             method = "turn/interrupt" if interrupt else "turn/steer" if active else "turn/start"
             if not interrupt:
                 budgets.require_native_metering(self.conn, self.run_id)
-            ref, tokens, prior = self._reserve(thread_id, event_id) if method == "turn/start" else (None, None, None)
+            ref, tokens, prior = self._reserve(thread_id, event_id, binding) if method == "turn/start" else (None, None, None)
             state = "acknowledged" if interrupt and not active else "sending"
             self.conn.execute("UPDATE p0_root_deliveries SET method=?,target_turn=?,reservation_ref=?,token_budget=?,"
                               "prior_tokens=?,state=? WHERE run_id=? AND event_id=?",

@@ -110,6 +110,9 @@ def start(conn, directory, spec):
     allocation = spec.get("turn_token_budget", 65536)
     if type(allocation) is not int or allocation < 1:
         raise ValueError("turn_token_budget must be a positive integer")
+    budget_profile = spec.get("budget_profile", "p0")
+    if not isinstance(budget_profile, str) or not budget_profile.strip():
+        raise ValueError("budget_profile must name a configured budget profile")
     action = initial_action(spec)
     current = project(conn)
     if current and store.loads(current, "inputs_json")["inputs"]["p0_spec"] != spec:
@@ -121,7 +124,9 @@ def start(conn, directory, spec):
         from workflows.tl1a_geometry import domain
         files = [domain.coordinate_input()]
         roles = {"objective": "context", "coordinates": "execution", "job-limit": "context"}
-        version = "1"
+        version = current["workflow_version"] if current else str(spec.get("workflow_version", "2"))
+        if version not in ("1", "2"):
+            raise ValueError("Select tl1a_geometry workflow_version 1 or 2")
     elif workflow == "science_grid":
         inputs["proposal"] = spec["proposal"]
         roles = {"objective": "context", "evaluation": "evaluation"}
@@ -154,7 +159,7 @@ def start(conn, directory, spec):
         # bind their own narrower inputs where they are created.
         intent.bind_dependencies(conn, rid, "workflow", rid, roles)
     service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
-                      "budget_profile": "p0", "workflow": {"id": workflow, "version": version},
+                      "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
                       "inputs": inputs, "input_files": files, "idempotency_key": "p0-start:" + spec["project"]}, prepare_p0=bootstrap)
     return snapshot(conn)
 

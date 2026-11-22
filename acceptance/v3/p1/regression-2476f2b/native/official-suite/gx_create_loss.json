@@ -1,0 +1,588 @@
+{
+  "test": "gx_create_loss",
+  "started_utc": "2026-11-22T20:21:44.415628+00:00",
+  "provider": "local_probe",
+  "binary_version": "codex-cli 0.169.0",
+  "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "model_service": "loopback scripted Responses",
+  "gpu_seconds": 0,
+  "external_api_cost": 0,
+  "human_intervention": false,
+  "run": "gxr_01m82eqzn9ve2vx8k1",
+  "task": "gxt_01m82eqznadt2df2mh",
+  "lost_ack_oracle_thread": "01a204eb-ffab-7bc0-8710-d9f6b23da0ef",
+  "sqlite": {
+    "before_recovery": {
+      "p0_roots": [
+        {
+          "root_key": "67986486-aba8-4029-8430-e249e1a442a8",
+          "run_id": "gxr_01m82eqzn9ve2vx8k1",
+          "task_id": null,
+          "attempt": null,
+          "lease_id": null,
+          "thread_id": null,
+          "cwd": "/tmp/gx-p0-codex-0/67986486-aba8-4029-8430-e249e1a442a8",
+          "role": "main",
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh",
+          "state": "creating",
+          "wait_job_id": null,
+          "goal_desired": null,
+          "provider": "local_probe",
+          "tool_names_json": null,
+          "effective_profile_json": null
+        }
+      ],
+      "p0_root_creations": [
+        {
+          "cwd": "/tmp/gx-p0-codex-0/67986486-aba8-4029-8430-e249e1a442a8",
+          "root_key": "67986486-aba8-4029-8430-e249e1a442a8",
+          "host_pid": 3885425,
+          "host_start_ticks": "2969836748",
+          "outcome": "sending",
+          "thread_id": null
+        }
+      ],
+      "p0_root_deliveries": [],
+      "p0_root_turn_usage": [],
+      "budget_reservations": [],
+      "tasks": [
+        {
+          "task_id": "gxt_01m82eqznadt2df2mh",
+          "run_id": "gxr_01m82eqzn9ve2vx8k1",
+          "path_id": null,
+          "kind": "research_round",
+          "role": "evidence_reviewer",
+          "task_class": null,
+          "status": "READY",
+          "attempt": 0,
+          "attempts_consumed": 0,
+          "required_artifacts_json": "[]",
+          "bundle_kind": null,
+          "brief_ref": null,
+          "brief_sha256": null,
+          "max_attempts": 3,
+          "parallel_group": null,
+          "stage": null,
+          "subject_kind": null,
+          "subject_id": null,
+          "subject_sha256": null,
+          "independent_of_task_id": null,
+          "required_model": null,
+          "required_effort_json": "[]",
+          "hold_json": null,
+          "blocked_reason": null,
+          "budget_ref": null,
+          "owner": null,
+          "lease_id": null,
+          "created_at": "2026-11-22T20:21:44.746Z",
+          "updated_at": "2026-11-22T20:21:44.746Z"
+        }
+      ],
+      "leases": [],
+      "p0_root_calls": [],
+      "jobs": []
+    },
+    "after_recovery": {
+      "p0_roots": [
+        {
+          "root_key": "67986486-aba8-4029-8430-e249e1a442a8",
+          "run_id": "gxr_01m82eqzn9ve2vx8k1",
+          "task_id": null,
+          "attempt": null,
+          "lease_id": null,
+          "thread_id": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+          "cwd": "/tmp/gx-p0-codex-0/b50b6c25-87ee-42f9-900e-77e7a4eb2ee1",
+          "role": "main",
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh",
+          "state": "bound",
+          "wait_job_id": null,
+          "goal_desired": null,
+          "provider": "local_probe",
+          "tool_names_json": null,
+          "effective_profile_json": "{\"effort\":\"xhigh\",\"model\":\"gpt-6.1-sol\",\"provider\":\"local_probe\"}"
+        }
+      ],
+      "p0_root_creations": [
+        {
+          "cwd": "/tmp/gx-p0-codex-0/67986486-aba8-4029-8430-e249e1a442a8",
+          "root_key": "67986486-aba8-4029-8430-e249e1a442a8",
+          "host_pid": 3885425,
+          "host_start_ticks": "2969836748",
+          "outcome": "orphan_before_input",
+          "thread_id": null
+        },
+        {
+          "cwd": "/tmp/gx-p0-codex-0/b50b6c25-87ee-42f9-900e-77e7a4eb2ee1",
+          "root_key": "67986486-aba8-4029-8430-e249e1a442a8",
+          "host_pid": 3885474,
+          "host_start_ticks": "2969836776",
+          "outcome": "bound",
+          "thread_id": "01a204ec-006b-7832-bd58-fa1cbdff83ff"
+        }
+      ],
+      "p0_root_deliveries": [
+        {
+          "run_id": "gxr_01m82eqzn9ve2vx8k1",
+          "event_id": "human:operator-1",
+          "thread_id": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+          "client_id": "operator-1",
+          "text_sha256": "5b5a0ae5ddbab892fa55372239a8b9660ca21b0666c30f831176e50135b4e616",
+          "human": 1,
+          "interrupt": 0,
+          "state": "acknowledged",
+          "method": "turn/start",
+          "target_turn": null,
+          "turn_id": "01a204ec-0093-7fa2-ab97-504682d076f6",
+          "reservation_ref": "rsv_01m82er04f6zcnj80y",
+          "token_budget": 2000,
+          "prior_tokens": 0
+        }
+      ],
+      "p0_root_turn_usage": [
+        {
+          "thread_id": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+          "turn_id": "01a204ec-0093-7fa2-ab97-504682d076f6",
+          "terminal_status": "completed",
+          "total_tokens": 35,
+          "measured_tokens": 35,
+          "children_known": 1,
+          "metering_reason": null
+        }
+      ],
+      "budget_reservations": [
+        {
+          "reservation_ref": "rsv_01m82er04f6zcnj80y",
+          "budget_ref": "gxb_01m82eqzn9b22ef89j",
+          "subject_kind": "native_turn",
+          "subject_id": "human:operator-1",
+          "amounts_json": "{\"api_calls\":1,\"tokens\":2000}",
+          "status": "SETTLED",
+          "created_at": "2026-11-22T20:21:45.231Z",
+          "settled_at": "2026-11-22T20:21:45.364Z"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "gxt_01m82eqznadt2df2mh",
+          "run_id": "gxr_01m82eqzn9ve2vx8k1",
+          "path_id": null,
+          "kind": "research_round",
+          "role": "evidence_reviewer",
+          "task_class": null,
+          "status": "READY",
+          "attempt": 0,
+          "attempts_consumed": 0,
+          "required_artifacts_json": "[]",
+          "bundle_kind": null,
+          "brief_ref": null,
+          "brief_sha256": null,
+          "max_attempts": 3,
+          "parallel_group": null,
+          "stage": null,
+          "subject_kind": null,
+          "subject_id": null,
+          "subject_sha256": null,
+          "independent_of_task_id": null,
+          "required_model": null,
+          "required_effort_json": "[]",
+          "hold_json": null,
+          "blocked_reason": null,
+          "budget_ref": null,
+          "owner": null,
+          "lease_id": null,
+          "created_at": "2026-11-22T20:21:44.746Z",
+          "updated_at": "2026-11-22T20:21:44.746Z"
+        }
+      ],
+      "leases": [],
+      "p0_root_calls": [],
+      "jobs": []
+    }
+  },
+  "recovered_thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+  "first_turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+  "status": "PASS",
+  "log": [
+    {
+      "t": 29698367.723537583,
+      "generation": 0,
+      "direction": "request",
+      "method": "thread/start",
+      "thread": null,
+      "keys": [
+        "modelProvider",
+        "cwd",
+        "sandbox",
+        "approvalPolicy",
+        "model",
+        "config",
+        "developerInstructions",
+        "experimentalRawEvents",
+        "environments",
+        "dynamicTools"
+      ]
+    },
+    {
+      "t": 29698367.758435257,
+      "generation": 0,
+      "direction": "result",
+      "method": "thread/start",
+      "requested_goal": null,
+      "returned_goal": null,
+      "thread_status": {
+        "type": "idle"
+      },
+      "listed_turns": []
+    },
+    {
+      "t": 29698367.766027015,
+      "generation": 0,
+      "direction": "fault",
+      "method": "SIGKILL",
+      "pid": 3885425,
+      "exit": -9
+    },
+    {
+      "t": 29698367.9104528,
+      "generation": 0,
+      "direction": "request",
+      "method": "thread/list",
+      "thread": null,
+      "keys": [
+        "cwd",
+        "sourceKinds",
+        "cursor",
+        "limit"
+      ]
+    },
+    {
+      "t": 29698367.91366989,
+      "generation": 0,
+      "direction": "result",
+      "method": "thread/list",
+      "requested_goal": null,
+      "returned_goal": null,
+      "thread_status": null,
+      "listed_turns": []
+    },
+    {
+      "t": 29698367.916449852,
+      "generation": 0,
+      "direction": "request",
+      "method": "thread/start",
+      "thread": null,
+      "keys": [
+        "modelProvider",
+        "cwd",
+        "sandbox",
+        "approvalPolicy",
+        "model",
+        "config",
+        "developerInstructions",
+        "experimentalRawEvents",
+        "environments",
+        "dynamicTools"
+      ]
+    },
+    {
+      "t": 29698367.942242835,
+      "generation": 0,
+      "direction": "result",
+      "method": "thread/start",
+      "requested_goal": null,
+      "returned_goal": null,
+      "thread_status": {
+        "type": "idle"
+      },
+      "listed_turns": []
+    },
+    {
+      "t": 29698367.94398301,
+      "generation": 0,
+      "direction": "request",
+      "method": "thread/read",
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29698367.944281843,
+      "generation": 0,
+      "direction": "notification",
+      "method": "thread/started",
+      "seq": 6,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff"
+    },
+    {
+      "t": 29698367.94616893,
+      "generation": 0,
+      "direction": "result",
+      "method": "thread/read",
+      "requested_goal": null,
+      "returned_goal": null,
+      "thread_status": {
+        "type": "idle"
+      },
+      "listed_turns": []
+    },
+    {
+      "t": 29698367.96025526,
+      "generation": 0,
+      "direction": "request",
+      "method": "turn/start",
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "keys": [
+        "threadId",
+        "input",
+        "clientUserMessageId"
+      ]
+    },
+    {
+      "t": 29698367.966147553,
+      "generation": 0,
+      "direction": "result",
+      "method": "turn/start",
+      "requested_goal": null,
+      "returned_goal": null,
+      "thread_status": null,
+      "listed_turns": []
+    },
+    {
+      "t": 29698367.998131532,
+      "generation": 0,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 9,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff"
+    },
+    {
+      "t": 29698367.998341873,
+      "generation": 0,
+      "direction": "notification",
+      "method": "turn/started",
+      "seq": 10,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "status": "inProgress"
+    },
+    {
+      "t": 29698368.012643967,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponseItem/completed",
+      "seq": 11,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "additional_tools",
+      "item_id": "at_01a204ec-00bd-7f23-a4b5-8902f98902fd"
+    },
+    {
+      "t": 29698368.01309236,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponseItem/completed",
+      "seq": 12,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "message",
+      "item_id": "msg_01a204ec-00bd-7f23-a4b5-8912bfbf9948"
+    },
+    {
+      "t": 29698368.013323817,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponseItem/completed",
+      "seq": 13,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "message",
+      "item_id": "msg_01a204ec-00bd-7f23-a4b5-892b37460011"
+    },
+    {
+      "t": 29698368.013548013,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponseItem/completed",
+      "seq": 14,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "message",
+      "item_id": "msg_01a204ec-00bd-7f23-a4b5-89381806729e"
+    },
+    {
+      "t": 29698368.013702203,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponseItem/completed",
+      "seq": 15,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "message",
+      "item_id": "msg_01a204ec-00bd-7f23-a4b5-894f1c3d12e5"
+    },
+    {
+      "t": 29698368.013840888,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponseItem/completed",
+      "seq": 16,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "message",
+      "item_id": "msg_01a204ec-00bd-7f23-a4b5-895302274311"
+    },
+    {
+      "t": 29698368.023264434,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponseItem/completed",
+      "seq": 17,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "message",
+      "item_id": "msg_01a204ec-00ce-73b3-969a-1ddbc5225088"
+    },
+    {
+      "t": 29698368.02341616,
+      "generation": 0,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 18,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "userMessage",
+      "item_id": "01a204ec-00ce-73b3-969a-1de19e22c060"
+    },
+    {
+      "t": 29698368.026303407,
+      "generation": 0,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 19,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "userMessage",
+      "item_id": "01a204ec-00ce-73b3-969a-1de19e22c060"
+    },
+    {
+      "t": 29698368.072912376,
+      "generation": 0,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 20,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-1"
+    },
+    {
+      "t": 29698368.07506915,
+      "generation": 0,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 21,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-1"
+    },
+    {
+      "t": 29698368.07693787,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponseItem/completed",
+      "seq": 22,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "item_type": "message",
+      "item_id": "msg-response-1"
+    },
+    {
+      "t": 29698368.0771112,
+      "generation": 0,
+      "direction": "notification",
+      "method": "rawResponse/completed",
+      "seq": 23,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6"
+    },
+    {
+      "t": 29698368.081140082,
+      "generation": 0,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 24,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6"
+    },
+    {
+      "t": 29698368.084084377,
+      "generation": 0,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 25
+    },
+    {
+      "t": 29698368.090212185,
+      "generation": 0,
+      "direction": "notification",
+      "method": "thread/readState/changed",
+      "seq": 26,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff"
+    },
+    {
+      "t": 29698368.09039043,
+      "generation": 0,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 27,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff"
+    },
+    {
+      "t": 29698368.090546504,
+      "generation": 0,
+      "direction": "notification",
+      "method": "turn/completed",
+      "seq": 28,
+      "thread": "01a204ec-006b-7832-bd58-fa1cbdff83ff",
+      "turn": "01a204ec-0093-7fa2-ab97-504682d076f6",
+      "status": "completed"
+    }
+  ],
+  "model_requests": [
+    {
+      "id": "response-1",
+      "t": 29698368.067930445,
+      "scenario": "plain",
+      "wire_model": "gpt-6.1-sol",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": false,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "steer_samples": [],
+      "dynamic_in_catalog": false,
+      "goal_tools": [],
+      "goal_mutator_declared": false,
+      "spawn_in_catalog": false,
+      "tool_names": [],
+      "tool_outputs": [],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    }
+  ],
+  "callbacks": [],
+  "finished_utc": "2026-11-22T20:21:45.839086+00:00",
+  "fixture_tokens": 35
+}

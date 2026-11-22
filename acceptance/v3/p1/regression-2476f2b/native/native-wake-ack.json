@@ -1,0 +1,732 @@
+{
+  "scope": "Official wake ACK followed by real GX SIGKILL. Fresh default v2.1 store. Public CLI charged/replayed after wall-clock grace. The original short observation and exact-unit expectation are retained.",
+  "short_observation": {
+    "test": "single Job wake lost-ACK recovery",
+    "scope": "owner-API seeded worker, public gx-p0 run twice; official loopback; real numerical Job; injected OS death; 3-second recovery observation",
+    "provider_requests": {
+      "before_wake": 1,
+      "after_wake": 2,
+      "after_recover": 2
+    },
+    "simulated_wait_lease_expiry": true,
+    "gx_sigkill_returncode": -9,
+    "recovery_cli_exit": 75,
+    "driver_reason": "time_limit",
+    "ids": {
+      "run": "gxr_01m82enwtfad9xrntv",
+      "budget": "gxb_01m82enwteqbkgbpnw",
+      "job": "gxj_01m82enxhmm5869fcr",
+      "task": "gxt_01m82enwtg0qyvb6qk",
+      "thread": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+      "initial_turn": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+      "lease": "gxl_01m82enxdqs9psh7pb",
+      "attempt": 1
+    },
+    "initial": {
+      "ledger": {
+        "budget_ref": "gxb_01m82enwteqbkgbpnw",
+        "parent_ref": null,
+        "run_id": null,
+        "limits": {
+          "api_calls": 128,
+          "cpu_seconds": 14400,
+          "gpu_jobs": 2,
+          "gpu_minutes": 40,
+          "job_submissions": 200,
+          "tokens": 1000000,
+          "wall_hours": 24,
+          "worker_tasks": 120
+        },
+        "spent": {
+          "api_calls": 1,
+          "tokens": 35
+        },
+        "reserved": {
+          "cpu_seconds": 30,
+          "job_submissions": 1
+        },
+        "available": {
+          "api_calls": 127,
+          "cpu_seconds": 14370,
+          "gpu_jobs": 2,
+          "gpu_minutes": 40,
+          "job_submissions": 199,
+          "tokens": 999965,
+          "wall_hours": 24,
+          "worker_tasks": 120
+        },
+        "reservations": [
+          {
+            "reservation_ref": "rsv_01m82enxf46aaechgh",
+            "subject_kind": "native_turn",
+            "subject_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 2000
+            },
+            "status": "SETTLED",
+            "created_at": "2026-11-22T20:20:36.964Z",
+            "settled_at": "2026-11-22T20:20:37.245Z"
+          },
+          {
+            "reservation_ref": "rsv_01m82enxkpw42qp6mr",
+            "subject_kind": "job",
+            "subject_id": "gxj_01m82enxhmm5869fcr",
+            "amounts": {
+              "cpu_seconds": 30,
+              "job_submissions": 1
+            },
+            "status": "HELD",
+            "created_at": "2026-11-22T20:20:37.110Z",
+            "settled_at": null
+          }
+        ],
+        "open": true,
+        "funding": null
+      },
+      "deliveries": [
+        {
+          "event_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+          "state": "acknowledged",
+          "client_id": "dff7e2a7-9c9a-54d4-9a69-5f5716f556ba",
+          "method": "turn/start",
+          "reservation_ref": "rsv_01m82enxf46aaechgh"
+        }
+      ],
+      "roots": [
+        {
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "attempt": 1,
+          "wait_job_id": "gxj_01m82enxhmm5869fcr"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "status": "CLAIMED",
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "attempt": 1,
+          "attempts_consumed": 0
+        }
+      ],
+      "leases": [
+        {
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "attempt": 1,
+          "expires_at": "2026-11-22T20:20:36.799Z",
+          "released_at": null
+        }
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m82enxhmm5869fcr",
+          "status": "SUBMITTED",
+          "scheduler_ref": "runner:3878751:2969829992"
+        }
+      ],
+      "usage": [
+        {
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+          "total_tokens": 35,
+          "terminal_status": "completed"
+        }
+      ]
+    },
+    "oracle": {
+      "rpc_id": 5,
+      "thread": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+      "client_id": "7e9780c3-95be-54d9-b752-6c58c6a10d99",
+      "official_turn_ack": "01a204eb-04ed-7fc0-aee7-2e3a5dedea1a",
+      "native_completion": "completed",
+      "fault": "SIGKILL GX immediately at official ACK"
+    },
+    "after_sigkill": {
+      "ledger": {
+        "budget_ref": "gxb_01m82enwteqbkgbpnw",
+        "parent_ref": null,
+        "run_id": null,
+        "limits": {
+          "api_calls": 128,
+          "cpu_seconds": 14400,
+          "gpu_jobs": 2,
+          "gpu_minutes": 40,
+          "job_submissions": 200,
+          "tokens": 1000000,
+          "wall_hours": 24,
+          "worker_tasks": 120
+        },
+        "spent": {
+          "api_calls": 1,
+          "cpu_seconds": 1,
+          "job_submissions": 1,
+          "tokens": 35
+        },
+        "reserved": {
+          "api_calls": 1,
+          "tokens": 2000
+        },
+        "available": {
+          "api_calls": 126,
+          "cpu_seconds": 14399,
+          "gpu_jobs": 2,
+          "gpu_minutes": 40,
+          "job_submissions": 199,
+          "tokens": 997965,
+          "wall_hours": 24,
+          "worker_tasks": 120
+        },
+        "reservations": [
+          {
+            "reservation_ref": "rsv_01m82enxf46aaechgh",
+            "subject_kind": "native_turn",
+            "subject_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 2000
+            },
+            "status": "SETTLED",
+            "created_at": "2026-11-22T20:20:36.964Z",
+            "settled_at": "2026-11-22T20:20:37.245Z"
+          },
+          {
+            "reservation_ref": "rsv_01m82enxkpw42qp6mr",
+            "subject_kind": "job",
+            "subject_id": "gxj_01m82enxhmm5869fcr",
+            "amounts": {
+              "cpu_seconds": 30,
+              "job_submissions": 1
+            },
+            "status": "SETTLED",
+            "created_at": "2026-11-22T20:20:37.110Z",
+            "settled_at": "2026-11-22T20:20:39.252Z"
+          },
+          {
+            "reservation_ref": "rsv_01m82ep177aj80kb6q",
+            "subject_kind": "native_turn",
+            "subject_id": "wake:gxl_01m82enxdqs9psh7pb:gxj_01m82enxhmm5869fcr",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 2000
+            },
+            "status": "HELD",
+            "created_at": "2026-11-22T20:20:40.807Z",
+            "settled_at": null
+          }
+        ],
+        "open": true,
+        "funding": null
+      },
+      "deliveries": [
+        {
+          "event_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+          "state": "acknowledged",
+          "client_id": "dff7e2a7-9c9a-54d4-9a69-5f5716f556ba",
+          "method": "turn/start",
+          "reservation_ref": "rsv_01m82enxf46aaechgh"
+        },
+        {
+          "event_id": "wake:gxl_01m82enxdqs9psh7pb:gxj_01m82enxhmm5869fcr",
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": null,
+          "state": "sending",
+          "client_id": "7e9780c3-95be-54d9-b752-6c58c6a10d99",
+          "method": "turn/start",
+          "reservation_ref": "rsv_01m82ep177aj80kb6q"
+        }
+      ],
+      "roots": [
+        {
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "attempt": 1,
+          "wait_job_id": "gxj_01m82enxhmm5869fcr"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "status": "CLAIMED",
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "attempt": 1,
+          "attempts_consumed": 0
+        }
+      ],
+      "leases": [
+        {
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "attempt": 1,
+          "expires_at": "2026-11-22T21:20:39.252Z",
+          "released_at": null
+        }
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m82enxhmm5869fcr",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:3878751:2969829992"
+        }
+      ],
+      "usage": [
+        {
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+          "total_tokens": 35,
+          "terminal_status": "completed"
+        }
+      ]
+    },
+    "after_recovery": {
+      "ledger": {
+        "budget_ref": "gxb_01m82enwteqbkgbpnw",
+        "parent_ref": null,
+        "run_id": null,
+        "limits": {
+          "api_calls": 128,
+          "cpu_seconds": 14400,
+          "gpu_jobs": 2,
+          "gpu_minutes": 40,
+          "job_submissions": 200,
+          "tokens": 1000000,
+          "wall_hours": 24,
+          "worker_tasks": 120
+        },
+        "spent": {
+          "api_calls": 1,
+          "cpu_seconds": 1,
+          "job_submissions": 1,
+          "tokens": 35
+        },
+        "reserved": {
+          "api_calls": 1,
+          "tokens": 2000
+        },
+        "available": {
+          "api_calls": 126,
+          "cpu_seconds": 14399,
+          "gpu_jobs": 2,
+          "gpu_minutes": 40,
+          "job_submissions": 199,
+          "tokens": 997965,
+          "wall_hours": 24,
+          "worker_tasks": 120
+        },
+        "reservations": [
+          {
+            "reservation_ref": "rsv_01m82enxf46aaechgh",
+            "subject_kind": "native_turn",
+            "subject_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 2000
+            },
+            "status": "SETTLED",
+            "created_at": "2026-11-22T20:20:36.964Z",
+            "settled_at": "2026-11-22T20:20:37.245Z"
+          },
+          {
+            "reservation_ref": "rsv_01m82enxkpw42qp6mr",
+            "subject_kind": "job",
+            "subject_id": "gxj_01m82enxhmm5869fcr",
+            "amounts": {
+              "cpu_seconds": 30,
+              "job_submissions": 1
+            },
+            "status": "SETTLED",
+            "created_at": "2026-11-22T20:20:37.110Z",
+            "settled_at": "2026-11-22T20:20:39.252Z"
+          },
+          {
+            "reservation_ref": "rsv_01m82ep177aj80kb6q",
+            "subject_kind": "native_turn",
+            "subject_id": "wake:gxl_01m82enxdqs9psh7pb:gxj_01m82enxhmm5869fcr",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 2000
+            },
+            "status": "HELD",
+            "created_at": "2026-11-22T20:20:40.807Z",
+            "settled_at": null
+          }
+        ],
+        "open": true,
+        "funding": null
+      },
+      "deliveries": [
+        {
+          "event_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+          "state": "acknowledged",
+          "client_id": "dff7e2a7-9c9a-54d4-9a69-5f5716f556ba",
+          "method": "turn/start",
+          "reservation_ref": "rsv_01m82enxf46aaechgh"
+        },
+        {
+          "event_id": "wake:gxl_01m82enxdqs9psh7pb:gxj_01m82enxhmm5869fcr",
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": "01a204eb-04ed-7fc0-aee7-2e3a5dedea1a",
+          "state": "acknowledged",
+          "client_id": "7e9780c3-95be-54d9-b752-6c58c6a10d99",
+          "method": "turn/start",
+          "reservation_ref": "rsv_01m82ep177aj80kb6q"
+        }
+      ],
+      "roots": [
+        {
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "attempt": 1,
+          "wait_job_id": null
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "status": "CLAIMED",
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "attempt": 1,
+          "attempts_consumed": 0
+        }
+      ],
+      "leases": [
+        {
+          "lease_id": "gxl_01m82enxdqs9psh7pb",
+          "task_id": "gxt_01m82enwtg0qyvb6qk",
+          "attempt": 1,
+          "expires_at": "2026-11-22T21:20:39.252Z",
+          "released_at": null
+        }
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m82enxhmm5869fcr",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:3878751:2969829992"
+        }
+      ],
+      "usage": [
+        {
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+          "total_tokens": 35,
+          "terminal_status": "completed"
+        },
+        {
+          "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+          "turn_id": "01a204eb-04ed-7fc0-aee7-2e3a5dedea1a",
+          "total_tokens": 70,
+          "terminal_status": "completed"
+        }
+      ]
+    },
+    "native_wake_inputs": [
+      {
+        "turn": "01a204eb-04ed-7fc0-aee7-2e3a5dedea1a",
+        "status": "completed",
+        "clientId": "7e9780c3-95be-54d9-b752-6c58c6a10d99"
+      }
+    ],
+    "checks": {
+      "same_native_input_once": true,
+      "same_gx_receipt": true,
+      "same_original_lease_attempt": true,
+      "wait_marker_cleared": true,
+      "single_real_job": true,
+      "no_recovery_model_requests": true,
+      "single_wake_charge": false
+    },
+    "passed": false
+  },
+  "public_stop_exit": 0,
+  "paused_during_grace": true,
+  "grace_seconds": 30,
+  "additional_wait_seconds": 26.500132999999998,
+  "before_grace": {
+    "turns": [
+      {
+        "run_id": "gxr_01m82enwtfad9xrntv",
+        "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+        "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+        "event_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+        "state": "acknowledged",
+        "prior_tokens": 0,
+        "token_budget": 2000,
+        "reservation_ref": "rsv_01m82enxf46aaechgh",
+        "budget_ref": "gxb_01m82enwteqbkgbpnw",
+        "sequence": 1,
+        "budget_status": "SETTLED",
+        "terminal_status": "completed",
+        "total_tokens": 35,
+        "measured_tokens": 35,
+        "children_known": 1,
+        "metering_reason": null,
+        "terminal_at": "2026-11-22T20:20:37.245Z",
+        "confidence": "PROVIDER_CONFIRMED",
+        "settled_tokens": 35,
+        "observed_lower_bound": 35,
+        "estimate_snapshot": null,
+        "attribution": "TURN",
+        "estimated_at": null
+      },
+      {
+        "run_id": "gxr_01m82enwtfad9xrntv",
+        "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+        "turn_id": "01a204eb-04ed-7fc0-aee7-2e3a5dedea1a",
+        "event_id": "wake:gxl_01m82enxdqs9psh7pb:gxj_01m82enxhmm5869fcr",
+        "state": "acknowledged",
+        "prior_tokens": 35,
+        "token_budget": 2000,
+        "reservation_ref": "rsv_01m82ep177aj80kb6q",
+        "budget_ref": "gxb_01m82enwteqbkgbpnw",
+        "sequence": 3,
+        "budget_status": "HELD",
+        "terminal_status": "completed",
+        "total_tokens": 70,
+        "measured_tokens": null,
+        "children_known": 1,
+        "metering_reason": "cumulative usage is awaiting complete matching provider receipts",
+        "terminal_at": "2026-11-22T20:20:41.703Z",
+        "confidence": "RESERVED",
+        "settled_tokens": null,
+        "observed_lower_bound": 0,
+        "estimate_snapshot": null,
+        "attribution": null,
+        "estimated_at": null
+      }
+    ],
+    "adjustments": [],
+    "threads": [
+      {
+        "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+        "run_id": "gxr_01m82enwtfad9xrntv",
+        "root_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+        "observed_total": 70,
+        "observed_at": "2026-11-22T20:20:41.707Z",
+        "observation_source": "thread/tokenUsage/updated",
+        "reconciled_total": 35,
+        "confidence": "OBSERVED",
+        "anomaly_total": null,
+        "anomaly_at": null,
+        "unresolved_delta": 35
+      }
+    ],
+    "spent": {
+      "api_calls": 1,
+      "cpu_seconds": 1,
+      "job_submissions": 1,
+      "tokens": 35
+    },
+    "reserved": {
+      "api_calls": 1,
+      "tokens": 2000
+    },
+    "reservation_count": 3
+  },
+  "after_public_recovery": [
+    {
+      "exit": 0,
+      "model_requests": 2,
+      "ledger": {
+        "turns": [
+          {
+            "run_id": "gxr_01m82enwtfad9xrntv",
+            "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+            "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+            "event_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+            "state": "acknowledged",
+            "prior_tokens": 0,
+            "token_budget": 2000,
+            "reservation_ref": "rsv_01m82enxf46aaechgh",
+            "budget_ref": "gxb_01m82enwteqbkgbpnw",
+            "sequence": 1,
+            "budget_status": "SETTLED",
+            "terminal_status": "completed",
+            "total_tokens": 35,
+            "measured_tokens": 35,
+            "children_known": 1,
+            "metering_reason": null,
+            "terminal_at": "2026-11-22T20:20:37.245Z",
+            "confidence": "PROVIDER_CONFIRMED",
+            "settled_tokens": 35,
+            "observed_lower_bound": 35,
+            "estimate_snapshot": null,
+            "attribution": "TURN",
+            "estimated_at": null
+          },
+          {
+            "run_id": "gxr_01m82enwtfad9xrntv",
+            "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+            "turn_id": "01a204eb-04ed-7fc0-aee7-2e3a5dedea1a",
+            "event_id": "wake:gxl_01m82enxdqs9psh7pb:gxj_01m82enxhmm5869fcr",
+            "state": "acknowledged",
+            "prior_tokens": 35,
+            "token_budget": 2000,
+            "reservation_ref": "rsv_01m82ep177aj80kb6q",
+            "budget_ref": "gxb_01m82enwteqbkgbpnw",
+            "sequence": 3,
+            "budget_status": "SETTLED",
+            "terminal_status": "completed",
+            "total_tokens": 70,
+            "measured_tokens": null,
+            "children_known": 1,
+            "metering_reason": "cumulative usage is awaiting complete matching provider receipts",
+            "terminal_at": "2026-11-22T20:20:41.703Z",
+            "confidence": "ESTIMATED",
+            "settled_tokens": 2000,
+            "observed_lower_bound": 35,
+            "estimate_snapshot": 70,
+            "attribution": "PROVISIONAL_TURN",
+            "estimated_at": "2026-11-22T20:21:13.964Z"
+          }
+        ],
+        "adjustments": [],
+        "threads": [
+          {
+            "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+            "run_id": "gxr_01m82enwtfad9xrntv",
+            "root_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+            "observed_total": 70,
+            "observed_at": "2026-11-22T20:20:41.707Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": 35,
+            "confidence": "ESTIMATED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "unresolved_delta": 35
+          }
+        ],
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 1,
+          "job_submissions": 1,
+          "tokens": 2035
+        },
+        "reserved": {},
+        "reservation_count": 3
+      }
+    },
+    {
+      "exit": 0,
+      "model_requests": 2,
+      "ledger": {
+        "turns": [
+          {
+            "run_id": "gxr_01m82enwtfad9xrntv",
+            "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+            "turn_id": "01a204ea-f5e8-7c12-ba6c-3740c3cc25b0",
+            "event_id": "start:acd11f8f-117f-44b3-a688-995673d86d79",
+            "state": "acknowledged",
+            "prior_tokens": 0,
+            "token_budget": 2000,
+            "reservation_ref": "rsv_01m82enxf46aaechgh",
+            "budget_ref": "gxb_01m82enwteqbkgbpnw",
+            "sequence": 1,
+            "budget_status": "SETTLED",
+            "terminal_status": "completed",
+            "total_tokens": 35,
+            "measured_tokens": 35,
+            "children_known": 1,
+            "metering_reason": null,
+            "terminal_at": "2026-11-22T20:20:37.245Z",
+            "confidence": "PROVIDER_CONFIRMED",
+            "settled_tokens": 35,
+            "observed_lower_bound": 35,
+            "estimate_snapshot": null,
+            "attribution": "TURN",
+            "estimated_at": null
+          },
+          {
+            "run_id": "gxr_01m82enwtfad9xrntv",
+            "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+            "turn_id": "01a204eb-04ed-7fc0-aee7-2e3a5dedea1a",
+            "event_id": "wake:gxl_01m82enxdqs9psh7pb:gxj_01m82enxhmm5869fcr",
+            "state": "acknowledged",
+            "prior_tokens": 35,
+            "token_budget": 2000,
+            "reservation_ref": "rsv_01m82ep177aj80kb6q",
+            "budget_ref": "gxb_01m82enwteqbkgbpnw",
+            "sequence": 3,
+            "budget_status": "SETTLED",
+            "terminal_status": "completed",
+            "total_tokens": 70,
+            "measured_tokens": null,
+            "children_known": 1,
+            "metering_reason": "cumulative usage is awaiting complete matching provider receipts",
+            "terminal_at": "2026-11-22T20:20:41.703Z",
+            "confidence": "ESTIMATED",
+            "settled_tokens": 2000,
+            "observed_lower_bound": 35,
+            "estimate_snapshot": 70,
+            "attribution": "PROVISIONAL_TURN",
+            "estimated_at": "2026-11-22T20:21:13.964Z"
+          }
+        ],
+        "adjustments": [],
+        "threads": [
+          {
+            "thread_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+            "run_id": "gxr_01m82enwtfad9xrntv",
+            "root_id": "01a204ea-f5c4-7783-bf2e-fb0356225fa1",
+            "observed_total": 70,
+            "observed_at": "2026-11-22T20:20:41.707Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": 35,
+            "confidence": "ESTIMATED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "unresolved_delta": 35
+          }
+        ],
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 1,
+          "job_submissions": 1,
+          "tokens": 2035
+        },
+        "reserved": {},
+        "reservation_count": 3
+      }
+    }
+  ],
+  "explicit_followup": {
+    "refused": {
+      "code": "LEASE_EXPIRED",
+      "reason": "LEASE_EXPIRED: the root no longer holds the task attempt",
+      "details": {}
+    },
+    "task": {
+      "status": "READY",
+      "attempt": 1,
+      "lease_id": null
+    },
+    "checkpoint_status": "unavailable-on-original-lease"
+  },
+  "checks": {
+    "same_native_input_once": true,
+    "same_gx_receipt": true,
+    "same_original_lease_attempt": true,
+    "wait_marker_cleared": true,
+    "single_real_job": true,
+    "no_recovery_model_requests": true,
+    "observed_complete_native_wake": true,
+    "exact_attempt_charge_rows": true,
+    "default_grace_ended_before_accounting": true,
+    "wake_charged_once_at_known_confidence": true,
+    "net_accounts_explain_both_turns": true,
+    "no_extra_model_call_job_or_charge": true,
+    "released_attempt_refuses_further_charge": true
+  },
+  "version": "codex-cli 0.169.0",
+  "sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b"
+}

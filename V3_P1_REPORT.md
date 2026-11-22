@@ -18,7 +18,7 @@
 
 ## 冻结提交与离线签收
 
-P1 产品提交 `336225603dec3a1bc5efd6eccb401ccd25e63287`。测试使用该 Git 树的独立拷贝。
+首次 P1 候选为 `336225603dec3a1bc5efd6eccb401ccd25e63287`。下表为该 Git 树的独立测试记录。名额释放后的等待修正提交为 `2476f2bdd74b53e3833ce35d08287120e4fdf0c8`。
 
 | 检查 | 结果 |
 |---|---|
@@ -34,3 +34,14 @@ P1 产品提交 `336225603dec3a1bc5efd6eccb401ccd25e63287`。测试使用该 Git
 早期候选 `3362256` 的两波实测显示，上一名 worker 已完成计量并释放团队名额后，后继任务的领取中位等待从 119 ms 增至 899 ms，p95 从 128 ms 增至 2,019 ms。队列的退避定时器在名额已经可用时仍然有效。采集在第 2 波全部结算后的空闲边界停止，账本保留 4 个 Run、8 个成功 Job、12 个已对账的 turn 和 1,330,448 tokens。两波的付费数据单独列入累计开销。[停止回执](acceptance/v3/performance/p1-prior-3362256/partial-stop.json) · [同负载环回对照](acceptance/v3/performance/dispatch-control/REPORT.md)
 
 对照还发现，原平台的大量容量拒绝在几毫秒内返回，会拉低所有派发调用合在一起的 p95。用相同 Git 版本、数值输入和领取状态再分别测量，P1 的合格领取 p95 从 7.250 ms 变为 8.330 ms；容量拒绝从 1.873 ms 降至 0.811 ms。每组每类 128 次，无外部模型调用。报告同时保留总分布和按状态分组的结果。[本地领取分组测量](acceptance/v3/p1/dispatch-comparison/REPORT.md)
+
+
+### 名额可用时及时唤醒
+
+修正后保留退避，同时观察上次实际占用名额的 Root 或 Provider 回执。前一项工作真正释放资源时，后继任务可以在下一遍调度领取。历史已释放的 Root、无关团队和仍有计费 turn 的租约不会提前唤醒任务。
+
+在冻结修正版本上，70 项派发、团队、计量等待和补充证据测试通过。每类 512 次稳定等待观测均无写入。团队和 Provider 两个分组的查询 p95 分别为 17.82 µs、7.32 µs。每次仅按索引读取此前记录的实际占用者。[查询计划、原始样本和命令](acceptance/v3/p1/dispatch-release-watch/REPORT.md)
+
+使用相同插件、相同输入和相同本地 Responses 进行交错的八次对照，名额实际开放至领取的中位数/p95 从 1,826/2,965 ms 降至 127/531 ms。每组均完成 8 个 Run、16 个 CPU Job 和 24 个 turn。[交错对照](acceptance/v3/performance/dispatch-control-2476f2b/REPORT.md)
+
+修正版本的独立全量回归耗时 287.070 秒，退出码 0。385 项 Python 测试中 381 项通过、4 项沿用基线跳过，124 项 P0 子集、2 项 Node 测试、生成器和全部 30 个固定 Codex 环回场景通过。另从该提交复跑四条科研路径，89.410 秒完成，科学结论、原始测量和冻结评分与前一提交一致，每组终态重放均无新增请求。[回归核对](acceptance/v3/p1/regression-2476f2b/frozen-comparison.json) · [四组科研数据](acceptance/v3/p1/paired-grid-2476f2b.json) · [独立数值对照](acceptance/v3/p1/paired-grid-2476f2b-traces/index.json)

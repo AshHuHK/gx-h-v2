@@ -1,0 +1,215 @@
+{
+  "scenario": "active",
+  "model_provider": "scripted loopback Responses",
+  "human_intervention": false,
+  "gpu_seconds": 0,
+  "external_api_cost": 0,
+  "codex_version": "codex-cli 0.169.0",
+  "protocol": [
+    {
+      "direction": "before_request",
+      "method": "thread/read",
+      "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1",
+      "target_turn": null,
+      "client_id": null
+    },
+    {
+      "direction": "before_request",
+      "method": "thread/turns/list",
+      "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1",
+      "target_turn": null,
+      "client_id": null
+    },
+    {
+      "direction": "before_request",
+      "method": "turn/steer",
+      "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1",
+      "target_turn": "01a20130-9aa3-7133-b63c-647315030682",
+      "client_id": "07a25b6e-2212-53f1-907a-2f819f62d43a",
+      "change_id_visible_before_rpc": "gxq_01m80k16pm6bc05sht"
+    },
+    {
+      "direction": "withheld_reply",
+      "method": "turn/steer",
+      "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1",
+      "turn": "01a20130-9aa3-7133-b63c-647315030682"
+    },
+    {
+      "direction": "recovery_request",
+      "method": "thread/resume",
+      "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1"
+    },
+    {
+      "direction": "recovery_request",
+      "method": "thread/turns/list",
+      "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1"
+    },
+    {
+      "direction": "recovery_request",
+      "method": "thread/items/list",
+      "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1"
+    },
+    {
+      "direction": "recovery_request",
+      "method": "thread/turns/list",
+      "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1"
+    }
+  ],
+  "after_commit": {
+    "item": {
+      "run_id": "gxr_01m80k16625tgswcve",
+      "item_id": "reporting",
+      "version": 2,
+      "item_type": "soft_preference",
+      "sha256": "55dbdc074c0171400c116ee9316763cfcbd336d8e53dc9ee2272f1e3476a2736",
+      "status": "active",
+      "change_id": "gxq_01m80k16pm6bc05sht",
+      "source_message_id": "preference-2",
+      "created_at": "2026-11-22T02:58:12.308Z",
+      "value": "include uncertainty"
+    },
+    "change": {
+      "status": "committed",
+      "change_id": "gxq_01m80k16pm6bc05sht",
+      "committed_at": "2026-11-22T02:58:12.308Z"
+    },
+    "outbox": {
+      "outbox_id": 1,
+      "created_at": "2026-11-22T02:58:12.309Z",
+      "run_id": "gxr_01m80k16625tgswcve",
+      "topic": "p0.intent.notification",
+      "payload_json": "{\"action\":\"notify\",\"change_id\":\"gxq_01m80k16pm6bc05sht\",\"item_ids\":[\"reporting\"],\"lease_id\":\"gxl_01m80k16maembbea33\",\"run_id\":\"gxr_01m80k16625tgswcve\",\"task_id\":\"gxt_01m80k1662a51ckkw5\"}",
+      "idempotency_key": "p0.intent.notification:gxq_01m80k16pm6bc05sht:gxl_01m80k16maembbea33",
+      "consumed_at": null,
+      "consumer": null,
+      "attempts": 0,
+      "last_error": null
+    },
+    "deliveries": []
+  },
+  "oracle_turn": "01a20130-9aa3-7133-b63c-647315030682",
+  "terminated_app_server": {
+    "pid": 710426,
+    "returncode": -9
+  },
+  "failed_delivery": {
+    "item": {
+      "run_id": "gxr_01m80k16625tgswcve",
+      "item_id": "reporting",
+      "version": 2,
+      "item_type": "soft_preference",
+      "sha256": "55dbdc074c0171400c116ee9316763cfcbd336d8e53dc9ee2272f1e3476a2736",
+      "status": "active",
+      "change_id": "gxq_01m80k16pm6bc05sht",
+      "source_message_id": "preference-2",
+      "created_at": "2026-11-22T02:58:12.308Z",
+      "value": "include uncertainty"
+    },
+    "change": {
+      "status": "committed",
+      "change_id": "gxq_01m80k16pm6bc05sht",
+      "committed_at": "2026-11-22T02:58:12.308Z"
+    },
+    "outbox": {
+      "outbox_id": 1,
+      "created_at": "2026-11-22T02:58:12.309Z",
+      "run_id": "gxr_01m80k16625tgswcve",
+      "topic": "p0.intent.notification",
+      "payload_json": "{\"action\":\"notify\",\"change_id\":\"gxq_01m80k16pm6bc05sht\",\"item_ids\":[\"reporting\"],\"lease_id\":\"gxl_01m80k16maembbea33\",\"run_id\":\"gxr_01m80k16625tgswcve\",\"task_id\":\"gxt_01m80k1662a51ckkw5\"}",
+      "idempotency_key": "p0.intent.notification:gxq_01m80k16pm6bc05sht:gxl_01m80k16maembbea33",
+      "consumed_at": null,
+      "consumer": null,
+      "attempts": 1,
+      "last_error": "ReceiptLost: official App Server accepted the task change; inbound reply and frames lost"
+    },
+    "deliveries": [
+      {
+        "run_id": "gxr_01m80k16625tgswcve",
+        "event_id": "1",
+        "thread_id": "01a20130-9a94-72c2-9210-87ce5c059ea1",
+        "client_id": "07a25b6e-2212-53f1-907a-2f819f62d43a",
+        "text_sha256": "0dcca2da94a20f34b9ddac4a0ba0a7247f8b64eee9252295ca904620cd41376d",
+        "human": 0,
+        "interrupt": 0,
+        "state": "sending",
+        "method": "turn/steer",
+        "target_turn": "01a20130-9aa3-7133-b63c-647315030682",
+        "turn_id": null,
+        "reservation_ref": null,
+        "token_budget": null,
+        "prior_tokens": null
+      }
+    ]
+  },
+  "recovered": {
+    "item": {
+      "run_id": "gxr_01m80k16625tgswcve",
+      "item_id": "reporting",
+      "version": 2,
+      "item_type": "soft_preference",
+      "sha256": "55dbdc074c0171400c116ee9316763cfcbd336d8e53dc9ee2272f1e3476a2736",
+      "status": "active",
+      "change_id": "gxq_01m80k16pm6bc05sht",
+      "source_message_id": "preference-2",
+      "created_at": "2026-11-22T02:58:12.308Z",
+      "value": "include uncertainty"
+    },
+    "change": {
+      "status": "committed",
+      "change_id": "gxq_01m80k16pm6bc05sht",
+      "committed_at": "2026-11-22T02:58:12.308Z"
+    },
+    "outbox": {
+      "outbox_id": 1,
+      "created_at": "2026-11-22T02:58:12.309Z",
+      "run_id": "gxr_01m80k16625tgswcve",
+      "topic": "p0.intent.notification",
+      "payload_json": "{\"action\":\"notify\",\"change_id\":\"gxq_01m80k16pm6bc05sht\",\"item_ids\":[\"reporting\"],\"lease_id\":\"gxl_01m80k16maembbea33\",\"run_id\":\"gxr_01m80k16625tgswcve\",\"task_id\":\"gxt_01m80k1662a51ckkw5\"}",
+      "idempotency_key": "p0.intent.notification:gxq_01m80k16pm6bc05sht:gxl_01m80k16maembbea33",
+      "consumed_at": "2026-11-22T02:58:12.831Z",
+      "consumer": "gx-p0",
+      "attempts": 1,
+      "last_error": "ReceiptLost: official App Server accepted the task change; inbound reply and frames lost"
+    },
+    "deliveries": [
+      {
+        "run_id": "gxr_01m80k16625tgswcve",
+        "event_id": "1",
+        "thread_id": "01a20130-9a94-72c2-9210-87ce5c059ea1",
+        "client_id": "07a25b6e-2212-53f1-907a-2f819f62d43a",
+        "text_sha256": "0dcca2da94a20f34b9ddac4a0ba0a7247f8b64eee9252295ca904620cd41376d",
+        "human": 0,
+        "interrupt": 0,
+        "state": "acknowledged",
+        "method": "turn/steer",
+        "target_turn": "01a20130-9aa3-7133-b63c-647315030682",
+        "turn_id": "01a20130-9aa3-7133-b63c-647315030682",
+        "reservation_ref": null,
+        "token_budget": null,
+        "prior_tokens": null
+      }
+    ]
+  },
+  "official_user_messages": [
+    {
+      "turn": "01a20130-9aa3-7133-b63c-647315030682",
+      "client_id": "0f76639c-e755-5e91-a71a-6374f22d98e6",
+      "text_sha256": "59021d81dca0dbdf28470609c89e08597b3b87ca73d9d8288723ba2012bc2d7b"
+    },
+    {
+      "turn": "01a20130-9aa3-7133-b63c-647315030682",
+      "client_id": "07a25b6e-2212-53f1-907a-2f819f62d43a",
+      "text_sha256": "0dcca2da94a20f34b9ddac4a0ba0a7247f8b64eee9252295ca904620cd41376d"
+    }
+  ],
+  "replay_new_native_calls": 0,
+  "thread": "01a20130-9a94-72c2-9210-87ce5c059ea1",
+  "task": "gxt_01m80k1662a51ckkw5",
+  "lease": "gxl_01m80k16maembbea33",
+  "run": "gxr_01m80k16625tgswcve",
+  "original_turn": "01a20130-9aa3-7133-b63c-647315030682",
+  "status": "PASS",
+  "elapsed_seconds": 1.693030558526516,
+  "loopback_inferences": 4,
+  "fixture_tokens": 140
+}

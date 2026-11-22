@@ -45,3 +45,20 @@
 使用相同插件、相同输入和相同本地 Responses 进行交错的八次对照，名额实际开放至领取的中位数/p95 从 1,826/2,965 ms 降至 127/531 ms。每组均完成 8 个 Run、16 个 CPU Job 和 24 个 turn。[交错对照](acceptance/v3/performance/dispatch-control-2476f2b/operations.json)
 
 修正版本的独立全量回归耗时 287.070 秒，退出码 0。385 项 Python 测试中 381 项通过、4 项沿用基线跳过，124 项 P0 子集、2 项 Node 测试、生成器和全部 30 个固定 Codex 环回场景通过。另从该提交复跑四条科研路径，89.410 秒完成，科学结论、原始测量和冻结评分与前一提交一致，每组终态重放均无新增请求。[回归核对](acceptance/v3/p1/regression-2476f2b/frozen-comparison.json) · [四组科研数据](acceptance/v3/p1/paired-grid-2476f2b.json) · [独立数值对照](acceptance/v3/p1/paired-grid-2476f2b-traces/index.json)
+
+## 两小时真实模型比较
+
+| 观测量 | v2.1 基线 | 修正 P1 |
+|---|---:|---:|
+| 首个真实 turn 开始至末个完成（秒） | 7,321.716 | 7,344.444 |
+| 完成 Run / 科研决策 / 成功 CPU Job | 26 / 26 / 52 | 26 / 26 / 52 |
+| 已对账的真实 turn / tokens | 78 / 8,647,052 | 78 / 8,638,327 |
+| 重新核对的原始 Artifact / 独立复算数值点 | 819 / 156 | 819 / 156 |
+| 未获准的 READY 派发次数 | 7,499 | 531 |
+| 所有派发调用 p95（ms） | 6.961 | 1,213.653 |
+| 成功派发 p95（ms） | 2,310.111 | 4,341.657 |
+| 所有回调 / 提交回调 p95（ms） | 44.801 / 65.727 | 68.240 / 97.533 |
+
+修正 P1 的完成 Run 吞吐比 v2.1 低 0.34%。真实 Root 调用了 118 次网格测量工具，其中 68 次在有效提交前成功，50 次发生在任务已释放后，得到了所有权拒绝。停止的初版加上修正后的候选共结算 9,968,775 tokens，剩余预留为零。[逐波比较](acceptance/v3/performance/COMPARISON.md) · [对账与哈希](acceptance/v3/performance/p1/closeout-check.json)
+
+原始 p95 触发既定复核条件。派发样本组成发生变化，同时首次启动的官方进程出现较慢的元数据响应，部分热态领取增加了重新核对科学输入的事务。提交回调的增量主要处于原有 SQLite 写事务内。相同请求交错执行、相同文件系统的同步写入和复演真实网格工具调用顺序均未稳定复现整个付费时段的增量。原始性能比较保留 REVIEW。[原生冷启动分解](acceptance/v3/performance/cold-metadata-control/REPORT.md) · [提交事务审计](acceptance/v3/p1/callback-owner-audit/REPORT.md) · [三组工具调用复验](acceptance/v3/performance/callback-tool-history-2476f2b/REPORT.md)

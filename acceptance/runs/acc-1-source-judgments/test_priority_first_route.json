@@ -1,0 +1,103 @@
+{
+  "alternatives": [
+    "path-a",
+    "path-b"
+  ],
+  "priority": [
+    "path-a",
+    "path-b"
+  ],
+  "selection": "path-a",
+  "next_proposal": {
+    "author_principal": "worker-7631e08f-221c-4cf9-a3ac-5ba408ec9b36",
+    "evaluation_item": {
+      "item_id": "evaluation",
+      "version": 1
+    },
+    "evaluator": {
+      "id": "grid_score_fa5d7f0a32932025833abd3d851f50c08aab874c3eca7b1198fe20f3972e64f9",
+      "spec_hash": "8ad4f9a81f058cf788b08e288703f535790f12fc50609c824bfca71595290658",
+      "version": "8ad4f9a81f058cf788b08e288703f535790f12fc50609c824bfca71595290658"
+    },
+    "method": "fixture-grid@1",
+    "objective": "Test recoverable research branching on the synthetic score(x)=-(x-2)^2 function.",
+    "objective_item": {
+      "item_id": "objective",
+      "version": 1
+    },
+    "paths": [
+      {
+        "expected_reaches_threshold": true,
+        "hypothesis_id": "gxh_f0e9550b51ffa703339d4ba51ffde794ed163b00d1f5f5c460f4d91140463c7b",
+        "hypothesis_key": "path-a",
+        "id": "path-a",
+        "input_ref": "gxa_01m815ky0q8sd6qvgs",
+        "prediction": "A candidate near x=2 has score >= -0.25."
+      }
+    ],
+    "previous_decision_ref": "gxa_01m815ky03efj2mjv4",
+    "round": 1,
+    "run_id": "gxr_01m815kx1ftspsrb0h",
+    "threshold": -100.0
+  },
+  "worker_decision": {
+    "proposal_ref": "gxa_01m815kx24kbyawhkv",
+    "assessment_ref": "gxa_01m815kxyn1stkvxqw",
+    "continue_paths": [
+      "path-a"
+    ],
+    "next_grids": {
+      "path-a": {
+        "synthetic": true,
+        "method_id": "fixture-grid",
+        "method_version": "1",
+        "candidates": [
+          {
+            "candidate_id": "refined",
+            "x": 2.125
+          }
+        ]
+      }
+    },
+    "stop_reason": null,
+    "reason": "Both routes met the cutoff. Use the remaining grid near path-a's best point.",
+    "intent_responses": [
+      {
+        "item_id": "compare_first",
+        "version": 1,
+        "reason": "Test path-a first in the requested order.",
+        "evidence_refs": [
+          "gxa_01m815kxxhen029j7w"
+        ]
+      },
+      {
+        "item_id": "compare_cost",
+        "version": 1,
+        "reason": "Both paths qualified. Spend a single grid around one observed maximum.",
+        "evidence_refs": [
+          "gxa_01m815kxxhen029j7w"
+        ]
+      }
+    ]
+  },
+  "unsupported": {
+    "status": "unsupported",
+    "item_id": "unimplemented",
+    "item_type": "optimization_target",
+    "message": "For optimization_target, this project can use a textual comparison target for the research planner."
+  },
+  "run_id": "gxr_01m815kx1ftspsrb0h",
+  "worker_read_artifacts": [
+    "gxa_01m815kx24kbyawhkv",
+    "gxa_01m815kxxhen029j7w",
+    "gxa_01m815kxkd5hst0475",
+    "gxa_01m815kxvvt6pd9b7n",
+    "gxa_01m815kxx8wqb1mnkr",
+    "gxa_01m815kxxew8962trs"
+  ],
+  "submitted": [
+    "gxa_01m815kxyn1stkvxqw",
+    "gxa_01m815ky03efj2mjv4"
+  ],
+  "outbox": []
+}

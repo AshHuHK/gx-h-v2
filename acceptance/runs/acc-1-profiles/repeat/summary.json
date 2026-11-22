@@ -1,0 +1,94 @@
+{
+  "run_id": "gxr_01m814yp2z249vphqy",
+  "status": "COMPLETED",
+  "codex": "0.169.0",
+  "runtime": "official Codex, two scripted loopback Responses endpoints, production GX effort policy",
+  "external_inference": false,
+  "review_requests": 8,
+  "primary_requests": 8,
+  "after_terminal_reopen_new_requests": 0,
+  "roots": [
+    {
+      "root_key": "2dbb8081-96a1-4be7-8b13-81b60021f10f",
+      "thread_id": "01a2024f-5ac2-7203-a6a0-e54f5823b162",
+      "task_id": null,
+      "role": "main",
+      "provider": "gx_loopback",
+      "model": "gx-scripted-main",
+      "effort": "ultra",
+      "required_model": null,
+      "gx_tools": [
+        "gx_project_state",
+        "gx_propose_intent"
+      ],
+      "codex_effective": {
+        "effort": "ultra",
+        "model": "gx-scripted-main",
+        "provider": "gx_loopback"
+      }
+    },
+    {
+      "root_key": "f534bf37-bc02-4980-9e00-3ef08e64ab8f",
+      "thread_id": "01a2024f-61f3-7180-bd5f-fc674e56b5c7",
+      "task_id": "gxt_01m814yr60jzpcaerf",
+      "role": "evidence_reviewer",
+      "provider": "review_peer",
+      "model": "gx-scripted-review",
+      "effort": "max",
+      "required_model": "gx-scripted-review",
+      "gx_tools": [
+        "gx_read_artifact",
+        "gx_submit_product"
+      ],
+      "codex_effective": {
+        "effort": "max",
+        "model": "gx-scripted-review",
+        "provider": "review_peer"
+      }
+    },
+    {
+      "root_key": "539061fc-3e85-4200-b056-066387c5e6d9",
+      "thread_id": "01a2024f-651e-7f11-b210-b27d8f383d3a",
+      "task_id": "gxt_01m814ys82fbamygeq",
+      "role": "planner",
+      "provider": "gx_loopback",
+      "model": "gx-scripted-main",
+      "effort": "ultra",
+      "required_model": "gx-scripted-main",
+      "gx_tools": [
+        "gx_task_context",
+        "gx_read_artifact",
+        "gx_wait_job",
+        "gx_submit_product"
+      ],
+      "codex_effective": {
+        "effort": "ultra",
+        "model": "gx-scripted-main",
+        "provider": "gx_loopback"
+      }
+    }
+  ],
+  "turn_usage": [
+    {
+      "role": "main",
+      "thread_id": "01a2024f-5ac2-7203-a6a0-e54f5823b162",
+      "turn_id": "01a2024f-5ae4-7823-875a-73114b97cf60",
+      "total_tokens": 35,
+      "status": "SETTLED"
+    },
+    {
+      "role": "evidence_reviewer",
+      "thread_id": "01a2024f-61f3-7180-bd5f-fc674e56b5c7",
+      "turn_id": "01a2024f-6212-72b1-984b-027d56bd74cf",
+      "total_tokens": 280,
+      "status": "SETTLED"
+    },
+    {
+      "role": "planner",
+      "thread_id": "01a2024f-651e-7f11-b210-b27d8f383d3a",
+      "turn_id": "01a2024f-652b-7cd1-8c96-07ac245785e5",
+      "total_tokens": 245,
+      "status": "SETTLED"
+    }
+  ]
+}

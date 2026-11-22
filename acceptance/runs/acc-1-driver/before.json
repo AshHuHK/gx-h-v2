@@ -1,0 +1,134 @@
+{
+  "case": "contention",
+  "entry": "gx_core.p0.cli.run_until_stopped",
+  "inference": "scripted loopback Responses; synthetic numerical assessment",
+  "at": "2026-11-22T07:59:07.570163+00:00",
+  "result": "FAIL",
+  "binary": "codex-cli 0.169.0",
+  "run": "gxr_01m81486w49r8pza8f",
+  "initial": {
+    "balance": {
+      "spent": {},
+      "reserved": {},
+      "available": {
+        "api_calls": 2,
+        "cpu_seconds": 14400,
+        "gpu_jobs": 2,
+        "gpu_minutes": 40,
+        "job_submissions": 200,
+        "tokens": 100,
+        "wall_hours": 24,
+        "worker_tasks": 120
+      },
+      "reservations": []
+    },
+    "tasks": [
+      {
+        "task_id": "gxt_01m81486wanybge10r",
+        "status": "READY",
+        "attempt": 0,
+        "attempts_consumed": 0
+      },
+      {
+        "task_id": "gxt_01m81486wbwmfxzg6y",
+        "status": "READY",
+        "attempt": 0,
+        "attempts_consumed": 0
+      },
+      {
+        "task_id": "gxt_01m81486wbcpbmgbp8",
+        "status": "PENDING",
+        "attempt": 0,
+        "attempts_consumed": 0
+      }
+    ],
+    "jobs": [],
+    "roots": [],
+    "paid": [],
+    "submissions": [],
+    "failures": []
+  },
+  "after": {
+    "balance": {
+      "spent": {},
+      "reserved": {
+        "api_calls": 1,
+        "tokens": 100
+      },
+      "available": {
+        "api_calls": 1,
+        "cpu_seconds": 14400,
+        "gpu_jobs": 2,
+        "gpu_minutes": 40,
+        "job_submissions": 200,
+        "tokens": 0,
+        "wall_hours": 24,
+        "worker_tasks": 120
+      },
+      "reservations": [
+        {
+          "reservation_ref": "rsv_01m8148777vtzn3ehq",
+          "subject_kind": "native_turn",
+          "subject_id": "start:f29346ac-e6cf-46c2-998f-b69d7b9b0e21",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 100
+          },
+          "status": "HELD",
+          "created_at": "2026-11-22T07:59:08.008Z",
+          "settled_at": null
+        }
+      ]
+    },
+    "tasks": [
+      {
+        "task_id": "gxt_01m81486wanybge10r",
+        "status": "CLAIMED",
+        "attempt": 1,
+        "attempts_consumed": 0
+      },
+      {
+        "task_id": "gxt_01m81486wbwmfxzg6y",
+        "status": "CLAIMED",
+        "attempt": 1,
+        "attempts_consumed": 0
+      },
+      {
+        "task_id": "gxt_01m81486wbcpbmgbp8",
+        "status": "PENDING",
+        "attempt": 0,
+        "attempts_consumed": 0
+      }
+    ],
+    "jobs": [],
+    "roots": [
+      {
+        "task_id": "gxt_01m81486wanybge10r",
+        "attempt": 1,
+        "lease_id": "gxl_01m814875xf3qj2dkh",
+        "thread_id": "01a20244-1cc9-73f2-b36b-5a0fb4f2b919"
+      },
+      {
+        "task_id": "gxt_01m81486wbwmfxzg6y",
+        "attempt": 1,
+        "lease_id": "gxl_01m8148794vgbg57w1",
+        "thread_id": "01a20244-1d2f-7e91-8ee4-86d5d6194a61"
+      }
+    ],
+    "paid": [
+      {
+        "task_id": "gxt_01m81486wanybge10r",
+        "thread_id": "01a20244-1cc9-73f2-b36b-5a0fb4f2b919",
+        "turn_id": "01a20244-1ceb-71e2-9f25-04702c31848f",
+        "token_budget": 100,
+        "total_tokens": null,
+        "terminal_status": null
+      }
+    ],
+    "submissions": [],
+    "failures": []
+  },
+  "provider_totals": {},
+  "provider_requests": [],
+  "error": "BudgetExceeded: BUDGET_EXCEEDED: the run has no remaining tokens for this turn"
+}

@@ -1,0 +1,303 @@
+{
+  "baseline": "47165af6befa919a5fc444a7c823ea9160cfb22f",
+  "mode": "0.169.0 official App Server; scripted localhost Responses; real local CPU Jobs",
+  "installation": "in-place software replacement in the temporary release directory",
+  "start_utc": "2026-11-22T08:15:37.791672+00:00",
+  "commands": [
+    {
+      "generation": "before",
+      "action": "start",
+      "exit": 0,
+      "new_requests": 1
+    },
+    {
+      "generation": "before",
+      "action": "stop",
+      "exit": 0,
+      "new_requests": 0
+    },
+    {
+      "generation": "before",
+      "action": "active run exited at stop",
+      "exit": 0,
+      "new_requests": 15
+    },
+    {
+      "generation": "after",
+      "action": "status",
+      "exit": 0,
+      "new_requests": 0
+    },
+    {
+      "generation": "after",
+      "action": "message",
+      "exit": 0,
+      "new_requests": 1
+    },
+    {
+      "generation": "after",
+      "action": "message",
+      "exit": 0,
+      "new_requests": 1
+    },
+    {
+      "generation": "after",
+      "action": "resume",
+      "exit": 0,
+      "new_requests": 24
+    },
+    {
+      "generation": "after",
+      "action": "run",
+      "exit": 0,
+      "new_requests": 0
+    }
+  ],
+  "result": "PASS",
+  "codex": "codex-cli 0.169.0",
+  "before": {
+    "run": {
+      "run_id": "gxr_01m8156f9n598tjx88",
+      "status": "PAUSED",
+      "workflow_id": "science_grid",
+      "workflow_version": "1",
+      "workflow_sha256": "30cbe639fd6df6ee9f616412368c800295e63ede94def06f3ff722858df74ad3",
+      "agent_policy_sha256": "a4598f2b4ee640b11525df9ca4ea4bdd852582e73b901d489582bd1abcd4a3df"
+    },
+    "jobs": [
+      {
+        "job_id": "gxj_01m8156h6mdgg2ahqd",
+        "status": "SUCCEEDED",
+        "scheduler_ref": "runner:1643544:2965480414",
+        "idempotency_key": "job:gxr_01m8156f9n598tjx88:grid:science:r0:d60ef3549fc70fe97e140252a1f2135ec52ac429c8b8c2aa84773017f703a761",
+        "input_manifest_ref": "gxa_01m8156h6f8efybwvf",
+        "reservation_ref": "rsv_01m8156h8jxgxn9g04"
+      },
+      {
+        "job_id": "gxj_01m8156hbvm19zh0v4",
+        "status": "SUCCEEDED",
+        "scheduler_ref": "runner:1643551:2965480432",
+        "idempotency_key": "job:gxr_01m8156f9n598tjx88:grid:science:r0:c44e640ad5864ee56605e8ef1628d3f0150442e15ee7f4901361cf973b9f7415",
+        "input_manifest_ref": "gxa_01m8156hbqxad1n1rp",
+        "reservation_ref": "rsv_01m8156hdr23yb93at"
+      },
+      {
+        "job_id": "gxj_01m8156ph67txb3j14",
+        "status": "RUNNING",
+        "scheduler_ref": "runner:1643880:2965480980",
+        "idempotency_key": "job:gxr_01m8156f9n598tjx88:grid:science:r1:d2cd173b4b8186b3457e757770cb36c92cbb9bcadcd4a159c71fc82d445290dd",
+        "input_manifest_ref": "gxa_01m8156ph13kcfr0zp",
+        "reservation_ref": "rsv_01m8156prx41vx4cmk"
+      }
+    ],
+    "submissions": [
+      {
+        "task_id": "gxt_01m8156j1fv20yhp3w",
+        "attempt": 1,
+        "submission_id": "gxsb_01m8156ndrg5ac3rez",
+        "result": "ACCEPTED",
+        "content_sha256": "4449bbea9aa2a6c7e7bc63d721c73fff8a0b4c9117950763b8d1f0e8e3e2b0f8"
+      },
+      {
+        "task_id": "gxt_01m8156ngem13s8chq",
+        "attempt": 1,
+        "submission_id": "gxsb_01m8156pepy2k66400",
+        "result": "ACCEPTED",
+        "content_sha256": "c351c5a7e1b8cb3d5bb457e0e3e06b02bdc9e8a8cccf296fb57fbcad5d1c27d0"
+      }
+    ],
+    "charges": [
+      {
+        "event_id": 8,
+        "payload_json": "{\"actual\":{\"api_calls\":1,\"tokens\":35},\"for\":[\"native_turn\",\"human:89d92b66-8934-5823-8994-467ea45a20ef\"],\"held\":{\"api_calls\":1,\"tokens\":65536},\"reservation_ref\":\"rsv_01m8156g4f41jd5j4p\",\"unbudgeted\":{}}"
+      },
+      {
+        "event_id": 45,
+        "payload_json": "{\"actual\":{\"cpu_seconds\":1,\"job_submissions\":1},\"for\":[\"job\",\"gxj_01m8156h6mdgg2ahqd\"],\"held\":{\"cpu_seconds\":30,\"job_submissions\":1},\"reservation_ref\":\"rsv_01m8156h8jxgxn9g04\",\"unbudgeted\":{}}"
+      },
+      {
+        "event_id": 50,
+        "payload_json": "{\"actual\":{\"cpu_seconds\":1,\"job_submissions\":1},\"for\":[\"job\",\"gxj_01m8156hbvm19zh0v4\"],\"held\":{\"cpu_seconds\":30,\"job_submissions\":1},\"reservation_ref\":\"rsv_01m8156hdr23yb93at\",\"unbudgeted\":{}}"
+      },
+      {
+        "event_id": 61,
+        "payload_json": "{\"actual\":{\"worker_tasks\":0},\"for\":[\"expansion\",\"exp:gxr_01m8156f9n598tjx88:assessment:r0:science_assessment:gxa_01m8156h3twrr537ac\"],\"held\":{\"worker_tasks\":0},\"reservation_ref\":\"rsv_01m8156j1exn8wxcy1\",\"unbudgeted\":{}}"
+      },
+      {
+        "event_id": 64,
+        "payload_json": "{\"actual\":{\"worker_tasks\":1},\"for\":[\"chain_follower\",\"exp:gxr_01m8156f9n598tjx88:assessment:r0:science_assessment:gxa_01m8156h3twrr537ac:task0\"],\"held\":{\"worker_tasks\":1},\"reservation_ref\":\"rsv_01m8156j1e02mmw5fj\",\"unbudgeted\":{}}"
+      },
+      {
+        "event_id": 84,
+        "payload_json": "{\"actual\":{\"worker_tasks\":0},\"for\":[\"expansion\",\"exp:gxr_01m8156f9n598tjx88:decision:r0:science_decision:gxa_01m8156h3twrr537ac\"],\"held\":{\"worker_tasks\":0},\"reservation_ref\":\"rsv_01m8156ngdvcj1qma8\",\"unbudgeted\":{}}"
+      },
+      {
+        "event_id": 87,
+        "payload_json": "{\"actual\":{\"worker_tasks\":1},\"for\":[\"chain_follower\",\"exp:gxr_01m8156f9n598tjx88:decision:r0:science_decision:gxa_01m8156h3twrr537ac:task0\"],\"held\":{\"worker_tasks\":1},\"reservation_ref\":\"rsv_01m8156ngem4xbqx68\",\"unbudgeted\":{}}"
+      },
+      {
+        "event_id": 94,
+        "payload_json": "{\"actual\":{\"api_calls\":1,\"tokens\":280},\"for\":[\"native_turn\",\"start:dc261a1d-255d-4f0e-94c6-98eab5e2b1d1\"],\"held\":{\"api_calls\":1,\"tokens\":65536},\"reservation_ref\":\"rsv_01m8156kvhz3j83dws\",\"unbudgeted\":{}}"
+      },
+      {
+        "event_id": 116,
+        "payload_json": "{\"actual\":{\"api_calls\":1,\"tokens\":245},\"for\":[\"native_turn\",\"start:ee9de5e3-1c88-4340-8b7e-a3eadec84cbb\"],\"held\":{\"api_calls\":1,\"tokens\":65536},\"reservation_ref\":\"rsv_01m8156nnxezp254v7\",\"unbudgeted\":{}}"
+      }
+    ],
+    "paid": [
+      {
+        "subject_id": "human:89d92b66-8934-5823-8994-467ea45a20ef",
+        "reservation_ref": "rsv_01m8156g4f41jd5j4p",
+        "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+        "status": "SETTLED"
+      },
+      {
+        "subject_id": "start:dc261a1d-255d-4f0e-94c6-98eab5e2b1d1",
+        "reservation_ref": "rsv_01m8156kvhz3j83dws",
+        "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+        "status": "SETTLED"
+      },
+      {
+        "subject_id": "start:ee9de5e3-1c88-4340-8b7e-a3eadec84cbb",
+        "reservation_ref": "rsv_01m8156nnxezp254v7",
+        "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+        "status": "SETTLED"
+      }
+    ],
+    "decisions": [
+      {
+        "round_index": 0,
+        "submission_id": "gxsb_01m8156pepy2k66400",
+        "reviewer_submission_id": "gxsb_01m8156ndrg5ac3rez",
+        "decision_ref": "gxa_01m8156pej2f9kw8h0"
+      }
+    ],
+    "settlements": [
+      {
+        "settlement_id": "settlement_63d1219408ef73741c44051b7cf09f88682d710e7fe213848c20b4a8eb2aa98d",
+        "round_index": 0,
+        "eval_id": "gxe_f18168c36c0da3246d11cc20774e483f737ca877e500306f78f2ad8269476d92",
+        "artifact_ref": "gxa_01m8156hyxw081kdc2"
+      },
+      {
+        "settlement_id": "settlement_0a9849fdf0d395f45582f351734c5aef9bd37c36f21c570c97b28a37ecd10e0e",
+        "round_index": 0,
+        "eval_id": "gxe_27fe505378b8c7a174a898541947d32e481e5cef9b9659389f7e88d12686586e",
+        "artifact_ref": "gxa_01m8156hz6fqj34pg2"
+      }
+    ],
+    "roots": [
+      {
+        "task_id": null,
+        "attempt": null,
+        "lease_id": null,
+        "thread_id": "01a20253-3fe2-7c90-932f-a52e07e4e445"
+      },
+      {
+        "task_id": "gxt_01m8156j1fv20yhp3w",
+        "attempt": 1,
+        "lease_id": "gxl_01m8156k7b82je0jzn",
+        "thread_id": "01a20253-4cfd-7361-a5da-f1dbdda203ae"
+      },
+      {
+        "task_id": "gxt_01m8156ngem13s8chq",
+        "attempt": 1,
+        "lease_id": "gxl_01m8156nhhny1xr1rv",
+        "thread_id": "01a20253-5687-7012-87b7-b884576aea2d"
+      }
+    ],
+    "budget": [
+      {
+        "spent_json": "{\"api_calls\":3,\"cpu_seconds\":2,\"job_submissions\":2,\"tokens\":560,\"worker_tasks\":2}",
+        "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":30,\"job_submissions\":1,\"tokens\":0,\"worker_tasks\":0}"
+      }
+    ],
+    "artifact_index_sha256": "9556848f4c98c9cfa2316c33268b7bfe54e5226ddaa0ac479f45e10d9840a5ee"
+  },
+  "natural_input": {
+    "supplement": {
+      "artifact_ref": "gxa_01m8156sheky28kccs",
+      "message": "The original science_grid@1 review contract remains pinned. This source is saved for a source-aware judgment and has no accepted review.",
+      "reason": "pinned_version",
+      "review_status": "pending",
+      "round": 1,
+      "source_id": "gxs_01m8156sh58ctevgf6",
+      "status": "supplement_registered"
+    },
+    "preference": {
+      "item_id": "soft_preference",
+      "item_type": "soft_preference",
+      "message": "The pinned science_grid@1 judgments use the original objective and evaluation. science_grid@2 implements task-specific output preferences and route comparisons.",
+      "status": "unsupported"
+    }
+  },
+  "accounting": {
+    "tokens": 1470,
+    "native_turns": 9,
+    "reported_tokens": 1470
+  },
+  "run_id": "gxr_01m8156f9n598tjx88",
+  "same_db_inode": true,
+  "final_run": {
+    "run_id": "gxr_01m8156f9n598tjx88",
+    "status": "COMPLETED",
+    "workflow_id": "science_grid",
+    "workflow_version": "1",
+    "workflow_sha256": "30cbe639fd6df6ee9f616412368c800295e63ede94def06f3ff722858df74ad3",
+    "agent_policy_sha256": "a4598f2b4ee640b11525df9ca4ea4bdd852582e73b901d489582bd1abcd4a3df"
+  },
+  "final_jobs": [
+    {
+      "job_id": "gxj_01m8156h6mdgg2ahqd",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:1643544:2965480414",
+      "idempotency_key": "job:gxr_01m8156f9n598tjx88:grid:science:r0:d60ef3549fc70fe97e140252a1f2135ec52ac429c8b8c2aa84773017f703a761",
+      "input_manifest_ref": "gxa_01m8156h6f8efybwvf",
+      "reservation_ref": "rsv_01m8156h8jxgxn9g04"
+    },
+    {
+      "job_id": "gxj_01m8156hbvm19zh0v4",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:1643551:2965480432",
+      "idempotency_key": "job:gxr_01m8156f9n598tjx88:grid:science:r0:c44e640ad5864ee56605e8ef1628d3f0150442e15ee7f4901361cf973b9f7415",
+      "input_manifest_ref": "gxa_01m8156hbqxad1n1rp",
+      "reservation_ref": "rsv_01m8156hdr23yb93at"
+    },
+    {
+      "job_id": "gxj_01m8156ph67txb3j14",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:1643880:2965480980",
+      "idempotency_key": "job:gxr_01m8156f9n598tjx88:grid:science:r1:d2cd173b4b8186b3457e757770cb36c92cbb9bcadcd4a159c71fc82d445290dd",
+      "input_manifest_ref": "gxa_01m8156ph13kcfr0zp",
+      "reservation_ref": "rsv_01m8156prx41vx4cmk"
+    },
+    {
+      "job_id": "gxj_01m8156xq6kb810q5n",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:1645379:2965481699",
+      "idempotency_key": "job:gxr_01m8156f9n598tjx88:grid:science:r2:7fa0543ab0043a342f6b583ec1d70fe938ce185570204958f4a34a9e111ccb70",
+      "input_manifest_ref": "gxa_01m8156xpz192w08zb",
+      "reservation_ref": "rsv_01m8156xsrmzwez99t"
+    }
+  ],
+  "final_budget": [
+    {
+      "spent_json": "{\"api_calls\":9,\"cpu_seconds\":4,\"job_submissions\":4,\"tokens\":1470,\"worker_tasks\":6}",
+      "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":0,\"job_submissions\":0,\"tokens\":0,\"worker_tasks\":0}"
+    }
+  ],
+  "final_rounds": 3,
+  "preserved_artifact_hashes": 32,
+  "preserved_charge_events": 9,
+  "preserved_accepted_submissions": 2,
+  "preserved_settlements": 2,
+  "final_report_ref": "gxa_01m8156z5qzn9b77kr",
+  "final_stop_reason": "round_budget",
+  "final_unsettled_turns": [],
+  "supplement_text": "Supplement: The earlier control may have been contaminated.",
+  "supplement_disposition": "pending",
+  "model_requests": 42,
+  "replay_new_model_requests": 0,
+  "replay_state_identical": true,
+  "end_utc": "2026-11-22T08:15:56.835515+00:00"
+}

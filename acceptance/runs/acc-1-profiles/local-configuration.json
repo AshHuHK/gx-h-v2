@@ -1,0 +1,26 @@
+{
+  "command": "bin/gx-p0 profiles",
+  "operator_environment": {
+    "exit_code": 0,
+    "custom_provider_ids": [],
+    "selected_providers": {
+      "openai": {
+        "configured": true,
+        "wire_api": "responses"
+      }
+    },
+    "inference": "not_run"
+  },
+  "unconfigured_provider_control": {
+    "exit_code": 1,
+    "custom_provider_ids": [],
+    "selected_providers": {
+      "unconfigured_responses_check": {
+        "configured": false,
+        "error": "Configure model_providers.unconfigured_responses_check in the official Codex config.toml"
+      }
+    },
+    "inference": "not_run"
+  },
+  "production_second_provider": "No second provider was configured for this release. Its model, vendor response, compaction, cold recovery, and usage could not be measured."
+}

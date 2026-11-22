@@ -1,0 +1,192 @@
+{
+  "changes": [
+    {
+      "status": "committed",
+      "change_id": "gxq_01m815kwxye0whpdek",
+      "preview_sha256": "169a56e8016d59d6c46935dcee2e0e78dedd25f3ca0b8c7978d05abfed089381",
+      "preview": [
+        {
+          "item_id": "format",
+          "item_type": "soft_preference",
+          "old_version": 0,
+          "new_version": 1,
+          "old_value": null,
+          "new_value": "brief"
+        }
+      ],
+      "impact": [
+        {
+          "object_type": "task",
+          "object_id": "gxt_01m815kwx9pxg4713s",
+          "status": "CLAIMED",
+          "items": [
+            {
+              "item_id": "format",
+              "role": "context",
+              "new_version": 1
+            }
+          ],
+          "attempt": 1,
+          "lease_id": "gxl_01m815kwxw668rf6hj",
+          "outbox_id": 3,
+          "action": "notify"
+        }
+      ],
+      "resource_limits": []
+    },
+    {
+      "status": "committed",
+      "change_id": "gxq_01m815kwy2acc4egv3",
+      "preview_sha256": "db2b56c3306cbfd6b9969e6b84f19fad3dd1e291459c4b715e8ea77a35cdce88",
+      "preview": [
+        {
+          "item_id": "format",
+          "item_type": "soft_preference",
+          "old_version": 1,
+          "new_version": 2,
+          "old_value": "brief",
+          "new_value": "中文解释每项结果"
+        }
+      ],
+      "impact": [
+        {
+          "object_type": "task",
+          "object_id": "gxt_01m815kwx9pxg4713s",
+          "status": "CLAIMED",
+          "items": [
+            {
+              "item_id": "format",
+              "role": "context",
+              "new_version": 2
+            }
+          ],
+          "attempt": 1,
+          "lease_id": "gxl_01m815kwxw668rf6hj",
+          "outbox_id": 4,
+          "action": "notify"
+        }
+      ],
+      "resource_limits": []
+    }
+  ],
+  "worker_notice_payloads": [
+    {
+      "action": "notify",
+      "attempt": 1,
+      "change_id": "gxq_01m815kwxye0whpdek",
+      "instruction": "Use gx_task_context for the latest task-specific items and sources, including after a notification. Use the highest version of each item. A removed item no longer applies. For each active intent_items entry return intent_responses [{item_id,version,reason}]. Apply output preferences in the actual text. For a decision's priority or optimization response, cite the compared research artifacts in evidence_refs and explain how the comparison determined your selection. If departing from a specified path_order, explain priority_exception on that item's response. Read assigned supplement artifacts as evidence. For each one, independently record source_reviews (reviewer) or source_decisions (decision worker), entries {source_id,artifact_ref,disposition,reason,evidence_refs}. Use accepted, rejected or pending. Cite an actual reviewed research artifact in evidence_refs. Explain the bearing on the claim or chosen action, including unresolved uncertainty. A decision must cite an independent assessment that covers these sources and the same evidence.",
+      "item_ids": [
+        "format"
+      ],
+      "items": [
+        {
+          "item_id": "format",
+          "item_type": "soft_preference",
+          "status": "active",
+          "value": "brief",
+          "version": 1
+        }
+      ],
+      "lease_id": "gxl_01m815kwxw668rf6hj",
+      "run_id": "gxr_01m815kw1bnhchbj0e",
+      "task_id": "gxt_01m815kwx9pxg4713s"
+    },
+    {
+      "action": "notify",
+      "attempt": 1,
+      "change_id": "gxq_01m815kwy2acc4egv3",
+      "instruction": "Use gx_task_context for the latest task-specific items and sources, including after a notification. Use the highest version of each item. A removed item no longer applies. For each active intent_items entry return intent_responses [{item_id,version,reason}]. Apply output preferences in the actual text. For a decision's priority or optimization response, cite the compared research artifacts in evidence_refs and explain how the comparison determined your selection. If departing from a specified path_order, explain priority_exception on that item's response. Read assigned supplement artifacts as evidence. For each one, independently record source_reviews (reviewer) or source_decisions (decision worker), entries {source_id,artifact_ref,disposition,reason,evidence_refs}. Use accepted, rejected or pending. Cite an actual reviewed research artifact in evidence_refs. Explain the bearing on the claim or chosen action, including unresolved uncertainty. A decision must cite an independent assessment that covers these sources and the same evidence.",
+      "item_ids": [
+        "format"
+      ],
+      "items": [
+        {
+          "item_id": "format",
+          "item_type": "soft_preference",
+          "status": "active",
+          "value": "中文解释每项结果",
+          "version": 2
+        }
+      ],
+      "lease_id": "gxl_01m815kwxw668rf6hj",
+      "run_id": "gxr_01m815kw1bnhchbj0e",
+      "task_id": "gxt_01m815kwx9pxg4713s"
+    }
+  ],
+  "worker_submitted_product": {
+    "proposal_ref": "gxa_01m815kw1zxdkafttf",
+    "evidence_refs": [
+      "gxa_01m815kwx5q23rrrba"
+    ],
+    "findings": [
+      {
+        "path_id": "path-a",
+        "evaluation_ref": "gxa_01m815kwwyj7jh6k5s",
+        "supported": true,
+        "reason": "原始观测达到冻结的数值门槛。"
+      },
+      {
+        "path_id": "path-b",
+        "evaluation_ref": "gxa_01m815kwx345sh80w3",
+        "supported": false,
+        "reason": "原始观测未达到冻结的数值门槛。"
+      }
+    ],
+    "intent_responses": [
+      {
+        "item_id": "format",
+        "version": 2,
+        "reason": "每项结果根据独立门槛给出中文解释。"
+      }
+    ]
+  },
+  "removed_item": {
+    "run_id": "gxr_01m815kw1bnhchbj0e",
+    "item_id": "format",
+    "version": 3,
+    "item_type": "soft_preference",
+    "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "status": "removed",
+    "change_id": "gxq_01m815kwzd4pf4wcsh",
+    "source_message_id": "format-2",
+    "created_at": "2026-11-22T08:22:59.309Z",
+    "role": "context",
+    "value": null
+  },
+  "decision_ref": "gxa_01m815kwzjtchx4bwb",
+  "run_id": "gxr_01m815kw1bnhchbj0e",
+  "worker_read_artifacts": [
+    "gxa_01m815kw1zxdkafttf",
+    "gxa_01m815kwx5q23rrrba",
+    "gxa_01m815kwk2z0xcapdg",
+    "gxa_01m815kwvp1y4gg70t",
+    "gxa_01m815kwwyj7jh6k5s",
+    "gxa_01m815kwx345sh80w3",
+    "gxa_01m815kw1zxdkafttf",
+    "gxa_01m815kwx5q23rrrba",
+    "gxa_01m815kwk2z0xcapdg",
+    "gxa_01m815kwvp1y4gg70t",
+    "gxa_01m815kwy96t7pd3w5"
+  ],
+  "submitted": [
+    "gxa_01m815kwy96t7pd3w5",
+    "gxa_01m815kwzjtchx4bwb"
+  ],
+  "outbox": [
+    {
+      "outbox_id": 6,
+      "payload_json": "{\"action\":\"notify\",\"attempt\":1,\"change_id\":\"gxq_01m815kwzd4pf4wcsh\",\"instruction\":\"Use gx_task_context for the latest task-specific items and sources, including after a notification. Use the highest version of each item. A removed item no longer applies. For each active intent_items entry return intent_responses [{item_id,version,reason}]. Apply output preferences in the actual text. For a decision's priority or optimization response, cite the compared research artifacts in evidence_refs and explain how the comparison determined your selection. If departing from a specified path_order, explain priority_exception on that item's response. Read assigned supplement artifacts as evidence. For each one, independently record source_reviews (reviewer) or source_decisions (decision worker), entries {source_id,artifact_ref,disposition,reason,evidence_refs}. Use accepted, rejected or pending. Cite an actual reviewed research artifact in evidence_refs. Explain the bearing on the claim or chosen action, including unresolved uncertainty. A decision must cite an independent assessment that covers these sources and the same evidence.\",\"item_ids\":[\"format\"],\"items\":[{\"item_id\":\"format\",\"item_type\":\"soft_preference\",\"status\":\"removed\",\"value\":null,\"version\":3}],\"lease_id\":\"gxl_01m815kwzan7p6wdka\",\"run_id\":\"gxr_01m815kw1bnhchbj0e\",\"task_id\":\"gxt_01m815kwyvakj15r5q\"}",
+      "consumed_at": null
+    },
+    {
+      "outbox_id": 3,
+      "payload_json": "{\"action\":\"notify\",\"attempt\":1,\"change_id\":\"gxq_01m815kwxye0whpdek\",\"instruction\":\"Use gx_task_context for the latest task-specific items and sources, including after a notification. Use the highest version of each item. A removed item no longer applies. For each active intent_items entry return intent_responses [{item_id,version,reason}]. Apply output preferences in the actual text. For a decision's priority or optimization response, cite the compared research artifacts in evidence_refs and explain how the comparison determined your selection. If departing from a specified path_order, explain priority_exception on that item's response. Read assigned supplement artifacts as evidence. For each one, independently record source_reviews (reviewer) or source_decisions (decision worker), entries {source_id,artifact_ref,disposition,reason,evidence_refs}. Use accepted, rejected or pending. Cite an actual reviewed research artifact in evidence_refs. Explain the bearing on the claim or chosen action, including unresolved uncertainty. A decision must cite an independent assessment that covers these sources and the same evidence.\",\"item_ids\":[\"format\"],\"items\":[{\"item_id\":\"format\",\"item_type\":\"soft_preference\",\"status\":\"active\",\"value\":\"brief\",\"version\":1}],\"lease_id\":\"gxl_01m815kwxw668rf6hj\",\"run_id\":\"gxr_01m815kw1bnhchbj0e\",\"task_id\":\"gxt_01m815kwx9pxg4713s\"}",
+      "consumed_at": "2026-11-22T08:22:59.265Z"
+    },
+    {
+      "outbox_id": 4,
+      "payload_json": "{\"action\":\"notify\",\"attempt\":1,\"change_id\":\"gxq_01m815kwy2acc4egv3\",\"instruction\":\"Use gx_task_context for the latest task-specific items and sources, including after a notification. Use the highest version of each item. A removed item no longer applies. For each active intent_items entry return intent_responses [{item_id,version,reason}]. Apply output preferences in the actual text. For a decision's priority or optimization response, cite the compared research artifacts in evidence_refs and explain how the comparison determined your selection. If departing from a specified path_order, explain priority_exception on that item's response. Read assigned supplement artifacts as evidence. For each one, independently record source_reviews (reviewer) or source_decisions (decision worker), entries {source_id,artifact_ref,disposition,reason,evidence_refs}. Use accepted, rejected or pending. Cite an actual reviewed research artifact in evidence_refs. Explain the bearing on the claim or chosen action, including unresolved uncertainty. A decision must cite an independent assessment that covers these sources and the same evidence.\",\"item_ids\":[\"format\"],\"items\":[{\"item_id\":\"format\",\"item_type\":\"soft_preference\",\"status\":\"active\",\"value\":\"中文解释每项结果\",\"version\":2}],\"lease_id\":\"gxl_01m815kwxw668rf6hj\",\"run_id\":\"gxr_01m815kw1bnhchbj0e\",\"task_id\":\"gxt_01m815kwx9pxg4713s\"}",
+      "consumed_at": "2026-11-22T08:22:59.267Z"
+    }
+  ]
+}

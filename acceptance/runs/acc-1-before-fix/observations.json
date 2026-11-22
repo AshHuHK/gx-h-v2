@@ -1,0 +1,306 @@
+{
+  "purpose": "Pre-fix review reproduction. Exit 0 indicates that the diagnostic ran. It does not indicate acceptance.",
+  "commit": "47165af6befa919a5fc444a7c823ea9160cfb22f",
+  "review_zip_sha256": "9723171e879eded2840d9610976312d0c0579ca924e1a72034de0214b937e015",
+  "python": "3.11.9",
+  "scope": "Production Python paths and temporary SQLite with the protocol fixtures supplied by the reviewer. Simulated lease expiry. No external model, GPU or network.",
+  "diagnostics": {
+    "durable": {
+      "start_utc": "2026-11-22T07:27:18.136565+00:00",
+      "finish_utc": "2026-11-22T07:27:18.764594+00:00",
+      "elapsed_seconds": 0.628,
+      "returncode": 0,
+      "command": [
+        "/opt/conda/bin/python",
+        "-B",
+        "/tmp/gx-codex-review-probes.ZkRVXMRf/GX_Codex_Implementation_Review/reproductions/reproduce_durable.py",
+        "--repo",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package"
+      ],
+      "stderr": "",
+      "stdout": {
+        "budget_contention": {
+          "raised": "BudgetExceeded",
+          "message": "BUDGET_EXCEEDED: the run has no remaining tokens for this turn",
+          "trace": [
+            "dispatch:gxt_01m812dyd243g6v21e",
+            "dispatch:gxt_01m812dyd36wq3gz4e",
+            "driver.close"
+          ],
+          "active_turns": 1,
+          "budget": {
+            "budget_ref": "gxb_01m812dyd23bcyd989",
+            "parent_ref": null,
+            "run_id": "gxr_01m812dyczc0jp1bsx",
+            "limits": {
+              "api_calls": 10,
+              "tokens": 100
+            },
+            "spent": {},
+            "reserved": {
+              "api_calls": 1,
+              "tokens": 100
+            },
+            "available": {
+              "api_calls": 9,
+              "tokens": 0
+            },
+            "reservations": [
+              {
+                "reservation_ref": "rsv_01m812dyd53gvrkpbf",
+                "subject_kind": "native_turn",
+                "subject_id": "start:gxt_01m812dyd243g6v21e",
+                "amounts": {
+                  "api_calls": 1,
+                  "tokens": 100
+                },
+                "status": "HELD",
+                "created_at": "2026-11-22T07:27:18.437Z",
+                "settled_at": null
+              }
+            ],
+            "open": true,
+            "funding": null
+          }
+        },
+        "expired_wait": {
+          "before": {
+            "status": "CLAIMED",
+            "attempt": 1,
+            "lease_id": "gxl_01m812dye90jvp7s3f",
+            "attempts_consumed": 0
+          },
+          "after": {
+            "status": "READY",
+            "attempt": 1,
+            "lease_id": null,
+            "attempts_consumed": 1
+          },
+          "settle": {
+            "reconciled": [],
+            "settled": {
+              "lapsed": [
+                "gxt_01m812dydvqkeyases"
+              ],
+              "requeued": [
+                "gxt_01m812dydvqkeyases"
+              ]
+            },
+            "reactions": []
+          },
+          "old_wait_job_id": "j"
+        },
+        "missing_usage": {
+          "after_cold_reconcile": {
+            "budget_ref": "gxb_01m812dynpc8fa2q2g",
+            "parent_ref": null,
+            "run_id": "gxr_01m812dynpd4y1aff6",
+            "limits": {
+              "api_calls": 5,
+              "tokens": 300
+            },
+            "spent": {},
+            "reserved": {
+              "api_calls": 1,
+              "tokens": 100
+            },
+            "available": {
+              "api_calls": 4,
+              "tokens": 200
+            },
+            "reservations": [
+              {
+                "reservation_ref": "rsv_01m812dynqcjtvcpz4",
+                "subject_kind": "native_turn",
+                "subject_id": "run",
+                "amounts": {
+                  "api_calls": 1,
+                  "tokens": 100
+                },
+                "status": "HELD",
+                "created_at": "2026-11-22T07:27:18.711Z",
+                "settled_at": null
+              }
+            ],
+            "open": true,
+            "funding": null
+          },
+          "after_followup_with_usage": {
+            "budget_ref": "gxb_01m812dynpc8fa2q2g",
+            "parent_ref": null,
+            "run_id": "gxr_01m812dynpd4y1aff6",
+            "limits": {
+              "api_calls": 5,
+              "tokens": 300
+            },
+            "spent": {},
+            "reserved": {
+              "api_calls": 2,
+              "tokens": 200
+            },
+            "available": {
+              "api_calls": 3,
+              "tokens": 100
+            },
+            "reservations": [
+              {
+                "reservation_ref": "rsv_01m812dynqcjtvcpz4",
+                "subject_kind": "native_turn",
+                "subject_id": "run",
+                "amounts": {
+                  "api_calls": 1,
+                  "tokens": 100
+                },
+                "status": "HELD",
+                "created_at": "2026-11-22T07:27:18.711Z",
+                "settled_at": null
+              },
+              {
+                "reservation_ref": "rsv_01m812dynsym1fdr83",
+                "subject_kind": "native_turn",
+                "subject_id": "followup",
+                "amounts": {
+                  "api_calls": 1,
+                  "tokens": 100
+                },
+                "status": "HELD",
+                "created_at": "2026-11-22T07:27:18.713Z",
+                "settled_at": null
+              }
+            ],
+            "open": true,
+            "funding": null
+          },
+          "turn_usage": [
+            {
+              "thread_id": "root",
+              "turn_id": "turn-1",
+              "terminal_status": "completed",
+              "total_tokens": null
+            },
+            {
+              "thread_id": "root",
+              "turn_id": "turn-2",
+              "terminal_status": "completed",
+              "total_tokens": 30
+            }
+          ]
+        }
+      }
+    },
+    "intent": {
+      "start_utc": "2026-11-22T07:27:18.147773+00:00",
+      "finish_utc": "2026-11-22T07:27:18.480450+00:00",
+      "elapsed_seconds": 0.333,
+      "returncode": 0,
+      "command": [
+        "/opt/conda/bin/python",
+        "-B",
+        "/tmp/gx-codex-review-probes.ZkRVXMRf/GX_Codex_Implementation_Review/reproductions/reproduce_intent.py",
+        "--repo",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package"
+      ],
+      "stderr": "",
+      "stdout": {
+        "audit_mode": "local SQLite and live implementation functions; no model/network used",
+        "unbound_preference": {
+          "result": {
+            "status": "committed",
+            "change_id": "gxq_01m812dydaf9pthm46",
+            "preview_sha256": "7a26bf1169ec41239200bc1b9fe65c41ba13179bac5105765564292c6b750e68",
+            "preview": [
+              {
+                "item_id": "format",
+                "item_type": "soft_preference",
+                "old_version": 1,
+                "new_version": 2,
+                "old_value": "brief",
+                "new_value": "explain every result in Chinese"
+              }
+            ],
+            "impact": []
+          },
+          "task_intent_keys": [
+            "evaluation",
+            "objective"
+          ],
+          "worker_brief_contains_preference": false
+        },
+        "notification_without_value": {
+          "result": {
+            "status": "committed",
+            "change_id": "gxq_01m812dydpewjkpqdx",
+            "preview_sha256": "d3251a2f2221b78691b3f3e132d8c479159af19d2c55a456aea3c407ae2bfddd",
+            "preview": [
+              {
+                "item_id": "format",
+                "item_type": "soft_preference",
+                "old_version": 2,
+                "new_version": 3,
+                "old_value": "explain every result in Chinese",
+                "new_value": "include all source citations"
+              }
+            ],
+            "impact": [
+              {
+                "object_type": "task",
+                "object_id": "gxt_01m812dyd7v0j1cyfy",
+                "status": "CLAIMED",
+                "items": [
+                  {
+                    "item_id": "format",
+                    "role": "context",
+                    "new_version": 3
+                  }
+                ],
+                "attempt": 1,
+                "lease_id": "gxl_01m812dyd8fvdyb12j",
+                "outbox_id": 1,
+                "action": "notify"
+              }
+            ]
+          },
+          "delivered_notification_payload": {
+            "action": "notify",
+            "change_id": "gxq_01m812dydpewjkpqdx",
+            "item_ids": [
+              "format"
+            ],
+            "lease_id": "gxl_01m812dyd8fvdyb12j",
+            "run_id": "gxr_01m812dycq0q83avxq",
+            "task_id": "gxt_01m812dyd7v0j1cyfy"
+          },
+          "new_value_present": false,
+          "worker_tool_names": [
+            "gx_read_artifact",
+            "gx_wait_job",
+            "gx_submit_product"
+          ]
+        },
+        "supplement_without_delivery": {
+          "result": {
+            "status": "supplement_registered",
+            "source_id": "gxs_01m812dydr1ay2rf8y"
+          },
+          "source_saved": {
+            "source_id": "gxs_01m812dydr1ay2rf8y",
+            "segment_id": "note",
+            "ordinal": 0,
+            "kind": "note",
+            "label": null,
+            "text": "New measurement: the earlier control was contaminated; reconsider the conclusion.",
+            "text_sha256": "e22f3ab59b7f38791cb1244fdcd507270c6b60dae17fc68a14dbd39bc65c2444",
+            "char_count": 81
+          },
+          "new_outbox_events": 0,
+          "task_intent_keys": [
+            "evaluation",
+            "format",
+            "objective"
+          ],
+          "sources_in_worker_brief": false
+        }
+      }
+    }
+  }
+}

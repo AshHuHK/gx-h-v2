@@ -1,0 +1,304 @@
+{
+  "artifacts_rehashed": 58,
+  "codex": "codex-cli 0.169.0",
+  "commands": [
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "$STATE",
+        "--demo-grid"
+      ],
+      "exit_code": 0,
+      "name": "01-start",
+      "response_count_after": 1,
+      "response_count_before": 0,
+      "wall_seconds": 1.522
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "stop",
+        "--state",
+        "$STATE"
+      ],
+      "exit_code": 0,
+      "name": "02-pause",
+      "response_count_after": 1,
+      "response_count_before": 1,
+      "wall_seconds": 0.207
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "status",
+        "--state",
+        "$STATE"
+      ],
+      "exit_code": 0,
+      "name": "02-status",
+      "response_count_after": 1,
+      "response_count_before": 1,
+      "wall_seconds": 0.206
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "resume",
+        "--state",
+        "$STATE",
+        "--timeout",
+        "90"
+      ],
+      "exit_code": 0,
+      "name": "03-run",
+      "response_count_after": 40,
+      "response_count_before": 1,
+      "wall_seconds": 5.057
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "run",
+        "--state",
+        "$STATE",
+        "--timeout",
+        "90"
+      ],
+      "exit_code": 0,
+      "name": "05-resume-stopped",
+      "response_count_after": 40,
+      "response_count_before": 40,
+      "wall_seconds": 0.184
+    }
+  ],
+  "cost": {
+    "external_model_cost_usd": 0,
+    "external_model_requests": 0,
+    "gpu_seconds": 0,
+    "gx_budget_balances": [
+      {
+        "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":0,\"job_submissions\":0,\"tokens\":0,\"worker_tasks\":0}",
+        "spent_json": "{\"api_calls\":7,\"cpu_seconds\":4,\"job_submissions\":4,\"tokens\":1400,\"worker_tasks\":6}"
+      }
+    ],
+    "job_cpu_measurements": [
+      {
+        "cpu_seconds": 0.051,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.3,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.219
+      },
+      {
+        "cpu_seconds": 0.057,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.2,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.219
+      },
+      {
+        "cpu_seconds": 0.052,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.2,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.217
+      },
+      {
+        "cpu_seconds": 0.057,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.2,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.218
+      }
+    ],
+    "synthetic_reported_tokens": 1400,
+    "synthetic_usage_per_response": {
+      "input_tokens": 30,
+      "output_tokens": 5
+    }
+  },
+  "ended": "2026-11-22T08:03:26.116406+00:00",
+  "job_polling_calls": [],
+  "jobs": 4,
+  "manual_advancement": false,
+  "mode": "official Codex app-server, scripted loopback Responses, real local synthetic grid Jobs",
+  "reconciled_usage": {
+    "native_turns": 7,
+    "reported_tokens": 1400,
+    "tokens": 1400
+  },
+  "replay_new_jobs": 0,
+  "replay_new_model_calls": 0,
+  "replay_new_submissions": 0,
+  "responses_during_grid_jobs": [],
+  "responses_requests": 40,
+  "result": "PASS",
+  "rounds": 3,
+  "started": "2026-11-22T08:03:18.217705+00:00",
+  "unique_worker_principals": 6,
+  "run_id": "gxr_01m814fwapme969myx",
+  "workflow": {
+    "workflow_id": "science_grid",
+    "workflow_version": "2",
+    "workflow_sha256": "ecf5a2d81dad8b48c9e3111d2a1ae62244b7ee0462e379e9b9da561abad9f516",
+    "agent_policy_sha256": "69d09c532e56d689862b211512d3982708a3a86eab02f0d71c2fcb6d9b2d7b73"
+  },
+  "report_ref": "gxa_01m814g2sv0e2brnpa",
+  "stop_reason": "round_budget",
+  "start_jobs": [
+    {
+      "job_id": "gxj_01m814fx3xgx6zk3jp",
+      "scheduler_ref": "runner:1588437:2965406269",
+      "status": "SUBMITTED"
+    },
+    {
+      "job_id": "gxj_01m814fx9je3rk4jr4",
+      "scheduler_ref": "runner:1588577:2965406286",
+      "status": "SUBMITTED"
+    }
+  ],
+  "start_status": [
+    {
+      "run_id": "gxr_01m814fwapme969myx",
+      "status": "WAITING_EXTERNAL_JOB"
+    }
+  ],
+  "paused_status": [
+    {
+      "run_id": "gxr_01m814fwapme969myx",
+      "status": "PAUSED"
+    }
+  ],
+  "resumed_status": "COMPLETED",
+  "terminal_reopen_status": "COMPLETED",
+  "terminal_audit_unchanged": true,
+  "accepted_submissions": [
+    {
+      "attempt": 1,
+      "principal": "01a20247-fa79-7b90-a895-72609c59c739",
+      "round": 0,
+      "stage": "assessment",
+      "submission_id": "gxsb_01m814fz7fmgp7m6tm",
+      "task_id": "gxt_01m814fy7e6m69v2bp"
+    },
+    {
+      "attempt": 1,
+      "principal": "01a20247-fd41-7e81-9353-5eee774be624",
+      "round": 0,
+      "stage": "decision",
+      "submission_id": "gxsb_01m814fzpv8mz7gpwa",
+      "task_id": "gxt_01m814fz98skkmgp82"
+    },
+    {
+      "attempt": 1,
+      "principal": "01a20248-017b-7041-ad7a-96db70d0f67e",
+      "round": 1,
+      "stage": "assessment",
+      "submission_id": "gxsb_01m814g0nzs87qaewc",
+      "task_id": "gxt_01m814g0b1ah11f7vj"
+    },
+    {
+      "attempt": 1,
+      "principal": "01a20248-0312-7f23-b4b6-3ed3a4eef4e1",
+      "round": 1,
+      "stage": "decision",
+      "submission_id": "gxsb_01m814g12mbcvanj96",
+      "task_id": "gxt_01m814g0qqd3c5878v"
+    },
+    {
+      "attempt": 1,
+      "principal": "01a20248-07f0-7432-99d2-6665380909b5",
+      "round": 2,
+      "stage": "assessment",
+      "submission_id": "gxsb_01m814g2abdxp1pp6d",
+      "task_id": "gxt_01m814g1pv6zz2bc49"
+    },
+    {
+      "attempt": 1,
+      "principal": "01a20248-099f-7d90-8156-26143d4a0d1e",
+      "round": 2,
+      "stage": "decision",
+      "submission_id": "gxsb_01m814g2qxmpqcwrp4",
+      "task_id": "gxt_01m814g2c2wcf282se"
+    }
+  ],
+  "turn_reservations": [
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+      "status": "SETTLED",
+      "subject_id": "human:a42b04e4-e445-57d7-9485-b4b383e736b6"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+      "status": "SETTLED",
+      "subject_id": "start:46e44d96-5c07-471b-8a64-83cb4a24367b"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+      "status": "SETTLED",
+      "subject_id": "start:a52dc2d7-f826-400b-b0dc-13514fd24f19"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+      "status": "SETTLED",
+      "subject_id": "start:7b43a981-0f7b-4bb8-b2e0-e77865fdbe12"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+      "status": "SETTLED",
+      "subject_id": "start:42881077-5777-4a3f-8e3e-446195b79f08"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+      "status": "SETTLED",
+      "subject_id": "start:2bf2952b-5dca-441c-81d6-56b2e89af126"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":65536}",
+      "status": "SETTLED",
+      "subject_id": "start:6dd41f60-08d0-4a32-a245-273618aacbfb"
+    }
+  ],
+  "decisions": [
+    {
+      "actions_json": "[{\"action\":\"continue\",\"path_id\":\"path-a\"},{\"action\":\"prune\",\"path_id\":\"path-b\"}]",
+      "decision_ref": "gxa_01m814fzpnvy0q0rqp",
+      "reviewer_submission_id": "gxsb_01m814fz7fmgp7m6tm",
+      "round_index": 0,
+      "submission_id": "gxsb_01m814fzpv8mz7gpwa"
+    },
+    {
+      "actions_json": "[{\"action\":\"pivot\",\"path_id\":\"path-a\",\"successor\":\"path-a-pivot\"}]",
+      "decision_ref": "gxa_01m814g12ekvf57jkh",
+      "reviewer_submission_id": "gxsb_01m814g0nzs87qaewc",
+      "round_index": 1,
+      "submission_id": "gxsb_01m814g12mbcvanj96"
+    },
+    {
+      "actions_json": "[{\"action\":\"stop\",\"path_id\":\"path-a-pivot\"}]",
+      "decision_ref": "gxa_01m814g2qskdvtggq2",
+      "reviewer_submission_id": "gxsb_01m814g2abdxp1pp6d",
+      "round_index": 2,
+      "submission_id": "gxsb_01m814g2qxmpqcwrp4"
+    }
+  ],
+  "failed_attempts_consumed": 0
+}

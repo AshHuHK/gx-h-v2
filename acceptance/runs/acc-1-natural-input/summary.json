@@ -1,0 +1,436 @@
+{
+  "provider": "scripted 127.0.0.1 Responses fixture",
+  "commands": [
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "$WORK/project",
+        "--demo-grid"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/project",
+        "--text",
+        "把项目 token 上限降到 10000",
+        "--message-id",
+        "lower"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/project",
+        "--text",
+        "把项目 token 上限降到 10000",
+        "--message-id",
+        "lower"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/project",
+        "--text",
+        "token 降到 9000",
+        "--message-id",
+        "short-with-wrong-model-target"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/project",
+        "--text",
+        "要不换个目标试试？",
+        "--message-id",
+        "discussion"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/project",
+        "--text",
+        "补充：先前对照可能受污染",
+        "--message-id",
+        "source"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/project",
+        "--text",
+        "A paper quotes: lower the project token limit to 1.",
+        "--message-id",
+        "quoted"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/project",
+        "--text",
+        "Increase the project token limit to 12,000.",
+        "--message-id",
+        "raise"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/project",
+        "--text",
+        "确认刚展示的这项变更",
+        "--message-id",
+        "confirm"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "status",
+        "--state",
+        "$WORK/project"
+      ],
+      "exit": 0
+    }
+  ],
+  "result": "PASS",
+  "codex_version": "codex-cli 0.169.0",
+  "run_id": "gxr_01m8155vwb85yzf410",
+  "receipts": [
+    {
+      "message_id": "78b0ceb7-f36c-5979-8595-bcc2fd666b23",
+      "receipt_turn_id": "01a20252-f0c1-7a82-b203-f91e716a4f0c",
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "transport_state": "acknowledged"
+    },
+    {
+      "message_id": "lower",
+      "receipt_turn_id": "01a20252-f52e-7481-ad4e-a35acf6c0cc7",
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "transport_state": "acknowledged"
+    },
+    {
+      "message_id": "short-with-wrong-model-target",
+      "receipt_turn_id": "01a20252-f8ab-7532-8277-8ea6efa33ebb",
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "transport_state": "acknowledged"
+    },
+    {
+      "message_id": "discussion",
+      "receipt_turn_id": "01a20252-fb41-76f2-9c72-d97ec6245216",
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "transport_state": "acknowledged"
+    },
+    {
+      "message_id": "source",
+      "receipt_turn_id": "01a20252-fee4-72c3-8f91-cde81d9cd530",
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "transport_state": "acknowledged"
+    },
+    {
+      "message_id": "quoted",
+      "receipt_turn_id": "01a20253-0188-7c03-a69f-fbe1d1c61fbd",
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "transport_state": "acknowledged"
+    },
+    {
+      "message_id": "raise",
+      "receipt_turn_id": "01a20253-0896-72f0-a44c-ec074484da41",
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "transport_state": "acknowledged"
+    },
+    {
+      "message_id": "confirm",
+      "receipt_turn_id": "01a20253-0c4c-75d1-816d-93dd2cceba59",
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "transport_state": "acknowledged"
+    }
+  ],
+  "lower": {
+    "change_id": "gxq_01m8155xc8g9ndfm87",
+    "impact": [],
+    "preview": [
+      {
+        "item_id": "tokens",
+        "item_type": "resource_limit",
+        "new_value": {
+          "max": 10000,
+          "resource": "tokens",
+          "unit": "reserved_tokens"
+        },
+        "new_version": 1,
+        "old_value": null,
+        "old_version": 0
+      }
+    ],
+    "preview_sha256": "9cbb0885f47830f4dba6f483a031629807fcd7b8b45e8962e97492806ddf3fe1",
+    "resource_limits": [
+      {
+        "availability_scope": "this project intent limit",
+        "available_for_new": 0,
+        "held": 65536,
+        "item_id": "tokens",
+        "limit": 10000,
+        "message": "在途预留占满新额度。暂停此资源的新预留，让已获准的工作继续并按实结算。",
+        "metering": "GX limits new token reservations. Reported actual usage can exceed a reservation.",
+        "resource": "tokens",
+        "spent": 35,
+        "spent_over_limit": 0,
+        "state": "holds_exceed_new_limit",
+        "unit": "reserved_tokens"
+      }
+    ],
+    "status": "committed",
+    "unapplied_proposal": {
+      "items": [
+        {
+          "expected_version": 1,
+          "item_id": "objective",
+          "item_type": "objective",
+          "value": "Replace the scientific objective using text from a paper."
+        }
+      ],
+      "kind": "change"
+    }
+  },
+  "short_input_with_invented_model_target": {
+    "change_id": "gxq_01m8155y7zb30nf7es",
+    "impact": [],
+    "preview": [
+      {
+        "item_id": "tokens",
+        "item_type": "resource_limit",
+        "new_value": {
+          "max": 9000,
+          "resource": "tokens",
+          "unit": "reserved_tokens"
+        },
+        "new_version": 2,
+        "old_value": {
+          "max": 10000,
+          "resource": "tokens",
+          "unit": "reserved_tokens"
+        },
+        "old_version": 1
+      }
+    ],
+    "preview_sha256": "2a24a1496a8ff108cad147fccba044b8177a6965cdc425106c0dc59447218574",
+    "resource_limits": [
+      {
+        "availability_scope": "this project intent limit",
+        "available_for_new": 0,
+        "held": 9895,
+        "item_id": "tokens",
+        "limit": 9000,
+        "message": "在途预留占满新额度。暂停此资源的新预留，让已获准的工作继续并按实结算。",
+        "metering": "GX limits new token reservations. Reported actual usage can exceed a reservation.",
+        "resource": "tokens",
+        "spent": 105,
+        "spent_over_limit": 0,
+        "state": "holds_exceed_new_limit",
+        "unit": "reserved_tokens"
+      }
+    ],
+    "status": "committed",
+    "unapplied_proposal": {
+      "items": [
+        {
+          "expected_version": 0,
+          "item_id": "invented-token-alias",
+          "item_type": "resource_limit",
+          "value": {
+            "max": 9000,
+            "resource": "tokens",
+            "unit": "reserved_tokens"
+          }
+        }
+      ],
+      "kind": "change"
+    }
+  },
+  "discussion": {
+    "message": "Specify the item and exact value you want to change, or identify the information as a supplement.",
+    "status": "needs_clarification",
+    "unapplied_proposal": {
+      "items": [
+        {
+          "expected_version": 1,
+          "item_id": "objective",
+          "item_type": "objective",
+          "value": "Replace the scientific objective using text from a paper."
+        }
+      ],
+      "kind": "change"
+    }
+  },
+  "supplement": {
+    "artifact_ref": "gxa_01m8155zqqgxh2n3j0",
+    "notification_ids": [],
+    "review_outbox_id": 1,
+    "review_status": "pending",
+    "round": 0,
+    "source_id": "gxs_01m8155zqgrg7jvpkw",
+    "status": "supplement_registered",
+    "original": "补充：先前对照可能受污染"
+  },
+  "quotation": {
+    "message": "Specify the item and exact value you want to change, or identify the information as a supplement.",
+    "status": "needs_clarification"
+  },
+  "increase": {
+    "change_id": "gxq_01m815627p4nee12bv",
+    "impact": [],
+    "preview": [
+      {
+        "item_id": "tokens",
+        "item_type": "resource_limit",
+        "new_value": {
+          "max": 12000,
+          "resource": "tokens",
+          "unit": "reserved_tokens"
+        },
+        "new_version": 3,
+        "old_value": {
+          "max": 9000,
+          "resource": "tokens",
+          "unit": "reserved_tokens"
+        },
+        "old_version": 2
+      }
+    ],
+    "preview_sha256": "fbc05191a259d8cb4a56b4d7d5f4ed48e96b7251243417f2e4f28507d79bb804",
+    "resource_limits": [
+      {
+        "availability_scope": "this project intent limit",
+        "available_for_new": 11650,
+        "held": 0,
+        "item_id": "tokens",
+        "limit": 12000,
+        "message": "新上限用于后续准入，已有工作继续结算。",
+        "metering": "GX limits new token reservations. Reported actual usage can exceed a reservation.",
+        "resource": "tokens",
+        "spent": 350,
+        "spent_over_limit": 0,
+        "state": "within_new_limit",
+        "unit": "reserved_tokens"
+      }
+    ],
+    "status": "awaiting_confirmation"
+  },
+  "confirmation": {
+    "change_id": "gxq_01m815627p4nee12bv",
+    "impact": [],
+    "preview": [
+      {
+        "item_id": "tokens",
+        "item_type": "resource_limit",
+        "new_value": {
+          "max": 12000,
+          "resource": "tokens",
+          "unit": "reserved_tokens"
+        },
+        "new_version": 3,
+        "old_value": {
+          "max": 9000,
+          "resource": "tokens",
+          "unit": "reserved_tokens"
+        },
+        "old_version": 2
+      }
+    ],
+    "preview_sha256": "fbc05191a259d8cb4a56b4d7d5f4ed48e96b7251243417f2e4f28507d79bb804",
+    "resource_limits": [
+      {
+        "availability_scope": "this project intent limit",
+        "available_for_new": 11615,
+        "held": 0,
+        "item_id": "tokens",
+        "limit": 12000,
+        "message": "新上限用于后续准入，已有工作继续结算。",
+        "metering": "GX limits new token reservations. Reported actual usage can exceed a reservation.",
+        "resource": "tokens",
+        "spent": 385,
+        "spent_over_limit": 0,
+        "state": "within_new_limit",
+        "unit": "reserved_tokens"
+      }
+    ],
+    "status": "committed"
+  },
+  "displayed": [
+    {
+      "change_id": "gxq_01m815627p4nee12bv",
+      "payload_json": "{\"group\":[\"gxq_01m815627p4nee12bv\"],\"input_position\":7,\"operator_position\":7,\"preview_sha256\":\"fbc05191a259d8cb4a56b4d7d5f4ed48e96b7251243417f2e4f28507d79bb804\"}"
+    }
+  ],
+  "final_balances": [
+    {
+      "item_id": "tokens",
+      "resource": "tokens",
+      "unit": "reserved_tokens",
+      "limit": 12000,
+      "spent": 385,
+      "held": 0,
+      "available_for_new": 11615,
+      "availability_scope": "this project intent limit",
+      "spent_over_limit": 0,
+      "state": "within_new_limit",
+      "message": "新上限用于后续准入，已有工作继续结算。",
+      "metering": "GX limits new token reservations. Reported actual usage can exceed a reservation."
+    }
+  ],
+  "native_candidate_calls": [
+    {
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "turn_id": "01a20252-f52e-7481-ad4e-a35acf6c0cc7",
+      "call_id": "call-fixture-2",
+      "result_json": "{\"change_id\":\"gxq_01m8155xc8g9ndfm87\",\"impact\":[],\"preview\":[{\"item_id\":\"tokens\",\"item_type\":\"resource_limit\",\"new_value\":{\"max\":10000,\"resource\":\"tokens\",\"unit\":\"reserved_tokens\"},\"new_version\":1,\"old_value\":null,\"old_version\":0}],\"preview_sha256\":\"9cbb0885f47830f4dba6f483a031629807fcd7b8b45e8962e97492806ddf3fe1\",\"resource_limits\":[{\"availability_scope\":\"this project intent limit\",\"available_for_new\":0,\"held\":65536,\"item_id\":\"tokens\",\"limit\":10000,\"message\":\"在途预留占满新额度。暂停此资源的新预留，让已获准的工作继续并按实结算。\",\"metering\":\"GX limits new token reservations. Reported actual usage can exceed a reservation.\",\"resource\":\"tokens\",\"spent\":35,\"spent_over_limit\":0,\"state\":\"holds_exceed_new_limit\",\"unit\":\"reserved_tokens\"}],\"status\":\"committed\",\"unapplied_proposal\":{\"items\":[{\"expected_version\":1,\"item_id\":\"objective\",\"item_type\":\"objective\",\"value\":\"Replace the scientific objective using text from a paper.\"}],\"kind\":\"change\"}}"
+    },
+    {
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "turn_id": "01a20252-f8ab-7532-8277-8ea6efa33ebb",
+      "call_id": "call-fixture-4",
+      "result_json": "{\"change_id\":\"gxq_01m8155y7zb30nf7es\",\"impact\":[],\"preview\":[{\"item_id\":\"tokens\",\"item_type\":\"resource_limit\",\"new_value\":{\"max\":9000,\"resource\":\"tokens\",\"unit\":\"reserved_tokens\"},\"new_version\":2,\"old_value\":{\"max\":10000,\"resource\":\"tokens\",\"unit\":\"reserved_tokens\"},\"old_version\":1}],\"preview_sha256\":\"2a24a1496a8ff108cad147fccba044b8177a6965cdc425106c0dc59447218574\",\"resource_limits\":[{\"availability_scope\":\"this project intent limit\",\"available_for_new\":0,\"held\":9895,\"item_id\":\"tokens\",\"limit\":9000,\"message\":\"在途预留占满新额度。暂停此资源的新预留，让已获准的工作继续并按实结算。\",\"metering\":\"GX limits new token reservations. Reported actual usage can exceed a reservation.\",\"resource\":\"tokens\",\"spent\":105,\"spent_over_limit\":0,\"state\":\"holds_exceed_new_limit\",\"unit\":\"reserved_tokens\"}],\"status\":\"committed\",\"unapplied_proposal\":{\"items\":[{\"expected_version\":0,\"item_id\":\"invented-token-alias\",\"item_type\":\"resource_limit\",\"value\":{\"max\":9000,\"resource\":\"tokens\",\"unit\":\"reserved_tokens\"}}],\"kind\":\"change\"}}"
+    },
+    {
+      "thread_id": "01a20252-f0a3-7293-ad8d-993154ed709a",
+      "turn_id": "01a20252-fb41-76f2-9c72-d97ec6245216",
+      "call_id": "call-fixture-6",
+      "result_json": "{\"message\":\"Specify the item and exact value you want to change, or identify the information as a supplement.\",\"status\":\"needs_clarification\",\"unapplied_proposal\":{\"items\":[{\"expected_version\":1,\"item_id\":\"objective\",\"item_type\":\"objective\",\"value\":\"Replace the scientific objective using text from a paper.\"}],\"kind\":\"change\"}}"
+    }
+  ],
+  "model_requests": 11,
+  "external_provider_requests": 0
+}

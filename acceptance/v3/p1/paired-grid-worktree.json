@@ -1,0 +1,1660 @@
+{
+  "candidate_install": {
+    "files": 445,
+    "git_commit": "WORKTREE",
+    "runtime_tree_sha256": "4968da86a5cd3dc3b513b0a25e27da3ab008ed5869147e71523ad881f6bdbc44"
+  },
+  "cases": {
+    "cold-v21": {
+      "accepted_workers": [
+        {
+          "attempt": 1,
+          "principal": "01a204d1-95cc-7642-8dbb-e3317aa606aa",
+          "round": 0,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d36bycpn60kba",
+          "task_id": "gxt_01m82d34vyrvwyt7a9"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-9c5a-7b72-a47e-fac226c971e4",
+          "round": 0,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d37nsn6fkhhrw",
+          "task_id": "gxt_01m82d36ftevd3ym13"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-a358-71a0-890f-daa5630c36c3",
+          "round": 1,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d39b3ymssxyn4",
+          "task_id": "gxt_01m82d38ry590fe0at"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-a972-7881-ab00-796090ee07af",
+          "round": 1,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d3axdxcadg1mk",
+          "task_id": "gxt_01m82d39ftmppfthpx"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-af82-7541-a634-91b88a9c2460",
+          "round": 2,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d3ccgvf5ps8ys",
+          "task_id": "gxt_01m82d3btcg5h799qd"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-b576-7450-8cf2-5dcde841a0aa",
+          "round": 2,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d3dzgkmw8v1bv",
+          "task_id": "gxt_01m82d3cganwwdb3x4"
+        }
+      ],
+      "artifact_count": 58,
+      "artifact_index_sha256": "1bdff6a6bcb6f16a81de4ded9b80f42c08231e4297584f8deb3c245095b601e5",
+      "capabilities": [
+        {
+          "admission": "SHIPPED",
+          "capability_id": "fixture-grid",
+          "content_artifact_ref": "gxa_01m82d32earp7m8m1z",
+          "manifest_sha256": "5d8d513c3e6fca0e1baae3ecb1adb2ec65cc16f915c248a23a44a6af8b480102",
+          "shipped_sha256": "b69193d4546b42225261484872718eb475478c5836377de6cacd6b8c38b9f12f",
+          "status": "DRAFT",
+          "version": "1"
+        }
+      ],
+      "commands": [
+        {
+          "argv": [
+            "bin/gx-p0",
+            "start",
+            "--state",
+            "$STATE",
+            "--spec",
+            "$SPEC"
+          ],
+          "elapsed_seconds": 2.428,
+          "exit_code": 0,
+          "install": "v2.1",
+          "new_responses": 1,
+          "run_id": "gxr_01m82d3187eyqfnqe8",
+          "status": "WAITING_EXTERNAL_JOB"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "stop",
+            "--state",
+            "$STATE"
+          ],
+          "elapsed_seconds": 0.576,
+          "exit_code": 0,
+          "install": "v2.1",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d3187eyqfnqe8",
+          "status": "PAUSED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "status",
+            "--state",
+            "$STATE"
+          ],
+          "elapsed_seconds": 0.472,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d3187eyqfnqe8",
+          "status": "PAUSED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "resume",
+            "--state",
+            "$STATE",
+            "--timeout",
+            "110"
+          ],
+          "elapsed_seconds": 10.865,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 39,
+          "run_id": "gxr_01m82d3187eyqfnqe8",
+          "status": "COMPLETED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "run",
+            "--state",
+            "$STATE",
+            "--timeout",
+            "10"
+          ],
+          "elapsed_seconds": 0.589,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d3187eyqfnqe8",
+          "status": "COMPLETED"
+        }
+      ],
+      "cpu_job_sidecars": {
+        "gxj_01m82d32fr4fz05ezm": {
+          "launch.claim": "d5eb4dc8f054f4af75f5375ff6aac7e85c1db6ecbe1292680343837bd47f8c16",
+          "outcome.json": "2fa9f8ce8eeb27831ab219b5fafbb1d42243d3d63d7f5ad418ab277cc8ac3335",
+          "runner.json": "a14b4ad0abe392f4ba561836a415c564964b818504ea4d890fa810670b8de43f"
+        },
+        "gxj_01m82d32pf6m7d9dn5": {
+          "launch.claim": "058c93bc52d6546cea6fa12743e1d5bb1f5459967dd2e463d8ef15f4c86f11e8",
+          "outcome.json": "f18fff1ce0770bde522276afa3d47999852a0d5ebdcae6b00275901fda4c2257",
+          "runner.json": "cfe88952076f392cdd8ecc831f678393e0065c6369ec8dd196d8a973a6271b2f"
+        },
+        "gxj_01m82d37w4stdy8v0n": {
+          "launch.claim": "32b2536a8df19ace7b38820f93d32a23b628c93f05eb6a07fad7df624be9f061",
+          "outcome.json": "f7a6d5e0fbb147112f50d39944b029947df31413835635ad1f489090c073fec3",
+          "runner.json": "dcd613eaff6ebf68ac9e9d687633e9e1d56b46ef73be3422c23e99df85858e0e"
+        },
+        "gxj_01m82d3b2a59s0rgbg": {
+          "launch.claim": "6277ceee3a37faf560c6db05841657927193144aa85753bd797f2b8c4050c995",
+          "outcome.json": "ca0dfdc616a46a107407fa68e86a3a7d6908a56fb0fcc054c8050ad22fda9dfb",
+          "runner.json": "6634678d86b819372183cda41b18a95e1c986094a61da75bee5df13daab5df98"
+        }
+      },
+      "evidence": {
+        "rounds": [
+          {
+            "continue_paths": [
+              "path-a"
+            ],
+            "next_grids": {
+              "path-a": {
+                "candidates": [
+                  {
+                    "candidate_id": "path-a-r1-left",
+                    "x": 1.75
+                  },
+                  {
+                    "candidate_id": "path-a-r1-right",
+                    "x": 2.25
+                  }
+                ],
+                "method_id": "fixture-grid",
+                "method_version": "1",
+                "synthetic": true
+              }
+            },
+            "pivots": [],
+            "reason": "Refine the grid around x=2 on path-a, whose best observed score -0 supports its prediction.",
+            "round": 0,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path_a-1",
+                    "score": -0.25,
+                    "x": 1.5
+                  },
+                  {
+                    "candidate_id": "path_a-2",
+                    "score": -0.0,
+                    "x": 2.0
+                  },
+                  {
+                    "candidate_id": "path_a-3",
+                    "score": -0.25,
+                    "x": 2.5
+                  }
+                ],
+                "path_id": "path-a",
+                "prediction": "A candidate near x=2 has score >= -0.25.",
+                "supported": true
+              },
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path_b-1",
+                    "score": -20.25,
+                    "x": -2.5
+                  },
+                  {
+                    "candidate_id": "path_b-2",
+                    "score": -16.0,
+                    "x": -2.0
+                  },
+                  {
+                    "candidate_id": "path_b-3",
+                    "score": -12.25,
+                    "x": -1.5
+                  }
+                ],
+                "path_id": "path-b",
+                "prediction": "A candidate near x=-2 has score >= -0.25.",
+                "supported": false
+              }
+            ],
+            "stop_reason": null,
+            "threshold": -0.25
+          },
+          {
+            "continue_paths": [],
+            "next_grids": {},
+            "pivots": [
+              {
+                "from_path": "path-a",
+                "grid": {
+                  "candidates": [
+                    {
+                      "candidate_id": "pivot-lower",
+                      "x": 1.625
+                    },
+                    {
+                      "candidate_id": "pivot-upper",
+                      "x": 1.875
+                    }
+                  ],
+                  "method_id": "fixture-grid",
+                  "method_version": "1",
+                  "synthetic": true
+                },
+                "id": "path-a-pivot",
+                "prediction": "At least one of the two quarter-step samples around x=1.75, whose observed score was -0.0625, reaches the frozen threshold. Two lower scores refute this finite-grid prediction."
+              }
+            ],
+            "reason": "Refine the grid around x=1.75 on path-a, whose best observed score -0.0625 supports its prediction. Test the new finite-grid prediction.",
+            "round": 1,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path-a-r1-left",
+                    "score": -0.0625,
+                    "x": 1.75
+                  },
+                  {
+                    "candidate_id": "path-a-r1-right",
+                    "score": -0.0625,
+                    "x": 2.25
+                  }
+                ],
+                "path_id": "path-a",
+                "prediction": "A candidate near x=2 has score >= -0.25.",
+                "supported": true
+              }
+            ],
+            "stop_reason": null,
+            "threshold": -0.25
+          },
+          {
+            "continue_paths": [],
+            "next_grids": {},
+            "pivots": [],
+            "reason": "The prospective round budget has been reached.",
+            "round": 2,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "pivot-lower",
+                    "score": -0.140625,
+                    "x": 1.625
+                  },
+                  {
+                    "candidate_id": "pivot-upper",
+                    "score": -0.015625,
+                    "x": 1.875
+                  }
+                ],
+                "path_id": "path-a-pivot",
+                "prediction": "At least one of the two quarter-step samples around x=1.75, whose observed score was -0.0625, reaches the frozen threshold. Two lower scores refute this finite-grid prediction.",
+                "supported": true
+              }
+            ],
+            "stop_reason": "round_budget",
+            "threshold": -0.25
+          }
+        ],
+        "settlements": [
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a",
+            "round_index": 0
+          },
+          {
+            "direction": "refutes",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-b",
+            "round_index": 0
+          },
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a",
+            "round_index": 1
+          },
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a-pivot",
+            "round_index": 2
+          }
+        ],
+        "stop_reason": "round_budget"
+      },
+      "jobs": [
+        {
+          "finished_at": "2026-11-22T19:52:53.149Z",
+          "idempotency_key": "job:gxr_01m82d3187eyqfnqe8:grid:science:r0:39613251e12588e8e04064c68ff938a510b107b7ef98e7a532c16ff3a6286761",
+          "input_manifest_ref": "gxa_01m82d32f7f7kvj5ct",
+          "job_id": "gxj_01m82d32fr4fz05ezm",
+          "measured_json": "{\"cpu_seconds\":0.056,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.223}",
+          "scheduler_ref": "runner:3772441:2969663384",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:52:51.119Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:52:53.215Z",
+          "idempotency_key": "job:gxr_01m82d3187eyqfnqe8:grid:science:r0:4b8fff5a9faa4366ec203fb7009a81ba883738b046e6ca7e729a5aa9522958d5",
+          "input_manifest_ref": "gxa_01m82d32p4estn2emy",
+          "job_id": "gxj_01m82d32pf6m7d9dn5",
+          "measured_json": "{\"cpu_seconds\":0.058,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.8,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.217}",
+          "scheduler_ref": "runner:3772445:2969663405",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:52:51.335Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:52:57.262Z",
+          "idempotency_key": "job:gxr_01m82d3187eyqfnqe8:grid:science:r1:bf3e021581ca4c3e7d788cb52d8df2feb35e5cb3a02a77c16be7473aa0bb49ba",
+          "input_manifest_ref": "gxa_01m82d37vf9gb18kvc",
+          "job_id": "gxj_01m82d37w4stdy8v0n",
+          "measured_json": "{\"cpu_seconds\":0.056,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.8,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.221}",
+          "scheduler_ref": "runner:3773567:2969663949",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:52:56.777Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:53:00.384Z",
+          "idempotency_key": "job:gxr_01m82d3187eyqfnqe8:grid:science:r2:3af351ce046e195f588095d42dc888ed51a6de0cac904d3603601dc8accdb528",
+          "input_manifest_ref": "gxa_01m82d3b1ztn2j10ag",
+          "job_id": "gxj_01m82d3b2a59s0rgbg",
+          "measured_json": "{\"cpu_seconds\":0.065,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.8,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.223}",
+          "scheduler_ref": "runner:3773618:2969664261",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:52:59.894Z"
+        }
+      ],
+      "ledger": {
+        "native_turns": 7,
+        "reported_tokens": 1400,
+        "tokens": 1400
+      },
+      "model_visible_tool_tasks": [],
+      "plugin_binding": null,
+      "report_ref": "gxa_01m82d3ecsp5yg4xty",
+      "requests_sha256": "4bd0640e1aa6dc46a21268fa9565f36b00bd202611a1302ae22c4013b7d4ffc8",
+      "scientific_result_sha256": "76d1e21e47f8b6207cd57ab911f0ed40bb0538f72c77668e2b7a6cc1ff71f095",
+      "scientific_settlements": [
+        {
+          "artifact_refs_json": "[\"gxa_01m82d34mb7fzxxh9r\",\"gxa_01m82d34t4qcv2rent\"]",
+          "direction": "supports",
+          "eval_id": "gxe_88ec2614e11bd7e4417af58f722e97d21c717e93195d2aeaf59fc35282b1bd4e",
+          "eval_spec_id": "grid_score_e39dd3069bbb6b98ffef133be42375c779a0508a9f18ec8d8fadbe54ee88b94c",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_6b26ea311efb293d2f29d28ac9de65ccf3e33d04b0c9a8548005b03107f67ee3",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_ddc3724889efeb87d4877933b2474bf6c8e6e51479ae0cddced07394f2629297",
+          "job_id": "gxj_01m82d32fr4fz05ezm",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "6d0299667fa137fbfea80651619c3785a31622a00f7e432dad2d86cc1b97d540",
+          "path_id": "path-a",
+          "round_index": 0,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d36bycpn60kba"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d34pdr578va8f\",\"gxa_01m82d34ts6hq8h9p8\"]",
+          "direction": "refutes",
+          "eval_id": "gxe_9863adc5c684c291b1278e74fa3bbda8fa081ad6393834ac5684cc1b6a7f1472",
+          "eval_spec_id": "grid_score_e39dd3069bbb6b98ffef133be42375c779a0508a9f18ec8d8fadbe54ee88b94c",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_76710f4e916d70cc59ad3ec722538429c1a0a631dea385e5271da64825c420a9",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_5bd8d1a59920191ad4cae038b07d52ffbb95c2f8939928f77dce2cf8cb38655b",
+          "job_id": "gxj_01m82d32pf6m7d9dn5",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "576b0fa3600a8288cc36ff433255397f81b3354ac2da98a289b30fbd20c2fdcb",
+          "path_id": "path-b",
+          "round_index": 0,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d36bycpn60kba"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d38mns2pne8r5\",\"gxa_01m82d38qwvjgetwtk\"]",
+          "direction": "supports",
+          "eval_id": "gxe_5be2479de2e3a5ad850ef5f7bf16a2ffb93e83fbdf61bf0b167b966ae2e1f5c7",
+          "eval_spec_id": "grid_score_e39dd3069bbb6b98ffef133be42375c779a0508a9f18ec8d8fadbe54ee88b94c",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_0b0acffe33e92c985567ce6daf755d6ac28bd10582cab7cecdb298a76a102865",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_ddc3724889efeb87d4877933b2474bf6c8e6e51479ae0cddced07394f2629297",
+          "job_id": "gxj_01m82d37w4stdy8v0n",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "da48e4b85ad15e6c2b120be5909a83f538a80a997651519a84229517f9a4dbb2",
+          "path_id": "path-a",
+          "round_index": 1,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d39b3ymssxyn4"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d3bp8xpd0t83t\",\"gxa_01m82d3bsgf120zfpk\"]",
+          "direction": "supports",
+          "eval_id": "gxe_73ba5ff6bf3b21d0296fa6a66625e3f60a32be886736109c87e4d99900aa2d06",
+          "eval_spec_id": "grid_score_e39dd3069bbb6b98ffef133be42375c779a0508a9f18ec8d8fadbe54ee88b94c",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_28892e621a3376d935d7a24a6281fc23eabf849b83a511295001834b778b71f5",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_237c7e871ee0d478734c5e6fd8a6e9acf4d20944e18203733523aa5a13064aae",
+          "job_id": "gxj_01m82d3b2a59s0rgbg",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "5d9a0d077a7fc3cc23c1c2bc1c67099fdc3233e3d9112e0bf90522ae34767c43",
+          "path_id": "path-a-pivot",
+          "round_index": 2,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d3ccgvf5ps8ys"
+        }
+      ],
+      "spec_sha256": "6e373a6f1de33b6513ed34e511a6b3ae46913969e897990a60e3078659cc0bd3",
+      "terminal_replay_new_calls": 0,
+      "workflow": {
+        "run_id": "gxr_01m82d3187eyqfnqe8",
+        "workflow_id": "science_grid",
+        "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467",
+        "workflow_version": "2"
+      }
+    },
+    "composed": {
+      "accepted_workers": [
+        {
+          "attempt": 1,
+          "principal": "01a204d2-1086-7a73-b498-2d1714071e97",
+          "round": 0,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d44wxyam6qfnq",
+          "task_id": "gxt_01m82d43r4kaj9r7bp"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d2-1762-7b50-886c-90a2fc22434f",
+          "round": 0,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d46ecrxt7y92e",
+          "task_id": "gxt_01m82d450hg9eg402p"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d2-1dc6-7b02-b068-89a621ac7473",
+          "round": 1,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d480mjs11kvct",
+          "task_id": "gxt_01m82d47bff9mn04hd"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d2-2403-7892-b263-fe3c9a1ad483",
+          "round": 1,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d49g854ehs7a3",
+          "task_id": "gxt_01m82d484mxy0gheam"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d2-2a07-7633-bba4-50c7f313c269",
+          "round": 2,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d4b3bx7fbvrkw",
+          "task_id": "gxt_01m82d4ae694t3wn6f"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d2-3072-7571-bc81-6103dd76e12f",
+          "round": 2,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d4cwf4gv0r4w7",
+          "task_id": "gxt_01m82d4b73dh9eeprr"
+        }
+      ],
+      "artifact_count": 58,
+      "artifact_index_sha256": "f89caaa862fdd95337861b694c75d75527b115b356d97b355007b3e4968d5e9b",
+      "capabilities": [
+        {
+          "admission": "SHIPPED",
+          "capability_id": "fixture-grid",
+          "content_artifact_ref": "gxa_01m82d4099jmf8299t",
+          "manifest_sha256": "0968c6a826580504c31eb8ddd7790e1a11d57038f7bfe6af204b8a8393978fd9",
+          "shipped_sha256": "b69193d4546b42225261484872718eb475478c5836377de6cacd6b8c38b9f12f",
+          "status": "DRAFT",
+          "version": "1"
+        }
+      ],
+      "commands": [
+        {
+          "argv": [
+            "bin/gx-p0",
+            "start",
+            "--state",
+            "$STATE",
+            "--spec",
+            "$SPEC"
+          ],
+          "elapsed_seconds": 2.428,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 1,
+          "run_id": "gxr_01m82d40an0csagdmq",
+          "status": "WAITING_EXTERNAL_JOB"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "stop",
+            "--state",
+            "$STATE"
+          ],
+          "elapsed_seconds": 0.589,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d40an0csagdmq",
+          "status": "PAUSED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "status",
+            "--state",
+            "$STATE"
+          ],
+          "elapsed_seconds": 0.441,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d40an0csagdmq",
+          "status": "PAUSED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "resume",
+            "--state",
+            "$STATE",
+            "--timeout",
+            "110"
+          ],
+          "elapsed_seconds": 10.547,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 39,
+          "run_id": "gxr_01m82d40an0csagdmq",
+          "status": "COMPLETED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "run",
+            "--state",
+            "$STATE",
+            "--timeout",
+            "10"
+          ],
+          "elapsed_seconds": 0.926,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d40an0csagdmq",
+          "status": "COMPLETED"
+        }
+      ],
+      "cpu_job_sidecars": {
+        "gxj_01m82d41dh5s0t92cn": {
+          "launch.claim": "4a1dacad72bd54df1f5fb657840d9b9edbab2e1798bc61fd406795545926f7a5",
+          "outcome.json": "8f6f062b8d4cd4cc4c122fb20944312c40b812204e6178304f780dbfee0db8ed",
+          "runner.json": "72e35966d90f84b37153226c3fb76a8f60902c74f0a526ded0a02b9cd5bbdea3"
+        },
+        "gxj_01m82d41mg08ytsce7": {
+          "launch.claim": "794fa8d5d6a44d8367a56659655f98c72ce85a0f5b61849058a98c7ddd572bac",
+          "outcome.json": "4e3e7efae5ff38fe195985e2a638fbe09a4ee8a4b1b4234d662ffeb986a7cabc",
+          "runner.json": "d20e05a47317e879cd69cc6789669d74c9dd0451b75e210b18137b6419143bdb"
+        },
+        "gxj_01m82d46m42p2mcvt5": {
+          "launch.claim": "d48dae704b3a449439bf612fb8c08298158b0a38ac719f454c90866b548934d8",
+          "outcome.json": "fe9b9f948622f7ab781fa03cf6a23cb05017c1726c7eedfbcb568bb739c8b752",
+          "runner.json": "86a95a35c44ee414df3a9042f62e0c52679f5f9c19931dfb8a2cfa1f30b208f5"
+        },
+        "gxj_01m82d49nfkkqbe1na": {
+          "launch.claim": "5adc07ddbad7eaddb2cf5ea571adb5d62edfd4a5b49a8de57c6b001466d8f5ac",
+          "outcome.json": "fb2c0a6de1507b66359d51e1f6dd50689a580e20566c1dadf6bcfe892782b1a5",
+          "runner.json": "aca1c08dedf5447c2fb0e9ed7a644bbc353e3ba30282ce6b9794e072eb5019bc"
+        }
+      },
+      "evidence": {
+        "rounds": [
+          {
+            "continue_paths": [
+              "path-a"
+            ],
+            "next_grids": {
+              "path-a": {
+                "candidates": [
+                  {
+                    "candidate_id": "path-a-r1-left",
+                    "x": 1.75
+                  },
+                  {
+                    "candidate_id": "path-a-r1-right",
+                    "x": 2.25
+                  }
+                ],
+                "method_id": "fixture-grid",
+                "method_version": "1",
+                "synthetic": true
+              }
+            },
+            "pivots": [],
+            "reason": "Refine the grid around x=2 on path-a, whose best observed score -0 supports its prediction.",
+            "round": 0,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path_a-1",
+                    "score": -0.25,
+                    "x": 1.5
+                  },
+                  {
+                    "candidate_id": "path_a-2",
+                    "score": -0.0,
+                    "x": 2.0
+                  },
+                  {
+                    "candidate_id": "path_a-3",
+                    "score": -0.25,
+                    "x": 2.5
+                  }
+                ],
+                "path_id": "path-a",
+                "prediction": "A candidate near x=2 has score >= -0.25.",
+                "supported": true
+              },
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path_b-1",
+                    "score": -20.25,
+                    "x": -2.5
+                  },
+                  {
+                    "candidate_id": "path_b-2",
+                    "score": -16.0,
+                    "x": -2.0
+                  },
+                  {
+                    "candidate_id": "path_b-3",
+                    "score": -12.25,
+                    "x": -1.5
+                  }
+                ],
+                "path_id": "path-b",
+                "prediction": "A candidate near x=-2 has score >= -0.25.",
+                "supported": false
+              }
+            ],
+            "stop_reason": null,
+            "threshold": -0.25
+          },
+          {
+            "continue_paths": [],
+            "next_grids": {},
+            "pivots": [
+              {
+                "from_path": "path-a",
+                "grid": {
+                  "candidates": [
+                    {
+                      "candidate_id": "pivot-lower",
+                      "x": 1.625
+                    },
+                    {
+                      "candidate_id": "pivot-upper",
+                      "x": 1.875
+                    }
+                  ],
+                  "method_id": "fixture-grid",
+                  "method_version": "1",
+                  "synthetic": true
+                },
+                "id": "path-a-pivot",
+                "prediction": "At least one of the two quarter-step samples around x=1.75, whose observed score was -0.0625, reaches the frozen threshold. Two lower scores refute this finite-grid prediction."
+              }
+            ],
+            "reason": "Refine the grid around x=1.75 on path-a, whose best observed score -0.0625 supports its prediction. Test the new finite-grid prediction.",
+            "round": 1,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path-a-r1-left",
+                    "score": -0.0625,
+                    "x": 1.75
+                  },
+                  {
+                    "candidate_id": "path-a-r1-right",
+                    "score": -0.0625,
+                    "x": 2.25
+                  }
+                ],
+                "path_id": "path-a",
+                "prediction": "A candidate near x=2 has score >= -0.25.",
+                "supported": true
+              }
+            ],
+            "stop_reason": null,
+            "threshold": -0.25
+          },
+          {
+            "continue_paths": [],
+            "next_grids": {},
+            "pivots": [],
+            "reason": "The prospective round budget has been reached.",
+            "round": 2,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "pivot-lower",
+                    "score": -0.140625,
+                    "x": 1.625
+                  },
+                  {
+                    "candidate_id": "pivot-upper",
+                    "score": -0.015625,
+                    "x": 1.875
+                  }
+                ],
+                "path_id": "path-a-pivot",
+                "prediction": "At least one of the two quarter-step samples around x=1.75, whose observed score was -0.0625, reaches the frozen threshold. Two lower scores refute this finite-grid prediction.",
+                "supported": true
+              }
+            ],
+            "stop_reason": "round_budget",
+            "threshold": -0.25
+          }
+        ],
+        "settlements": [
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a",
+            "round_index": 0
+          },
+          {
+            "direction": "refutes",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-b",
+            "round_index": 0
+          },
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a",
+            "round_index": 1
+          },
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a-pivot",
+            "round_index": 2
+          }
+        ],
+        "stop_reason": "round_budget"
+      },
+      "jobs": [
+        {
+          "finished_at": "2026-11-22T19:53:24.758Z",
+          "idempotency_key": "job:gxr_01m82d40an0csagdmq:grid:science:r0:4d92e7391324e3e80970b06c2667873887f877b4a6c59cddd46c94b136575ce7",
+          "input_manifest_ref": "gxa_01m82d41d0s4tdy936",
+          "job_id": "gxj_01m82d41dh5s0t92cn",
+          "measured_json": "{\"cpu_seconds\":0.055,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.8,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.221}",
+          "scheduler_ref": "runner:3775164:2969666551",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:53:22.790Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:53:24.815Z",
+          "idempotency_key": "job:gxr_01m82d40an0csagdmq:grid:science:r0:0bef0857cedb75a4dc5236335c505ac73924966ec645a82bc1f972b77d13f671",
+          "input_manifest_ref": "gxa_01m82d41m2fjht7xa0",
+          "job_id": "gxj_01m82d41mg08ytsce7",
+          "measured_json": "{\"cpu_seconds\":0.056,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.8,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.22}",
+          "scheduler_ref": "runner:3775198:2969666574",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:53:23.027Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:53:28.575Z",
+          "idempotency_key": "job:gxr_01m82d40an0csagdmq:grid:science:r1:7bff6c06774914d689df86e279106a6701ca528dc3a1d88c4822b67b4e669479",
+          "input_manifest_ref": "gxa_01m82d46ks6rh090zt",
+          "job_id": "gxj_01m82d46m42p2mcvt5",
+          "measured_json": "{\"cpu_seconds\":0.057,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.222}",
+          "scheduler_ref": "runner:3775490:2969667081",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:53:28.097Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:53:31.733Z",
+          "idempotency_key": "job:gxr_01m82d40an0csagdmq:grid:science:r2:e700f7d6f09eea280111a4a433b279969390725504b40b626fec2b39009f88c5",
+          "input_manifest_ref": "gxa_01m82d49n06a4mpyjw",
+          "job_id": "gxj_01m82d49nfkkqbe1na",
+          "measured_json": "{\"cpu_seconds\":0.06,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.224}",
+          "scheduler_ref": "runner:3775556:2969667397",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:53:31.255Z"
+        }
+      ],
+      "ledger": {
+        "native_turns": 7,
+        "reported_tokens": 1400,
+        "tokens": 1400
+      },
+      "measurement": {
+        "accepted_assessment": {
+          "evidence_refs": [
+            "gxa_01m82d43qf7ym90p9v"
+          ],
+          "findings": [
+            {
+              "evaluation_ref": "gxa_01m82d43pas2b612dy",
+              "path_id": "path-a",
+              "reason": "Best measured score -0 reached the threshold -0.25.",
+              "supported": true
+            },
+            {
+              "evaluation_ref": "gxa_01m82d43q1aq226vba",
+              "path_id": "path-b",
+              "reason": "Best measured score -12.25 fell below the threshold -0.25.",
+              "supported": false
+            }
+          ],
+          "proposal_ref": "gxa_01m82d41bwb4zezrye"
+        },
+        "calls": [
+          {
+            "arguments": {
+              "path_id": "path-a",
+              "run_id": "gxr_01m82d3gfsb05dpb07"
+            },
+            "call_id": "call-fixture-4",
+            "result": {
+              "error": "SCHEMA_INVALID: invalid arguments to gx_grid_measurement: $: property 'run_id' is not allowed"
+            },
+            "task_id": "gxt_01m82d43r4kaj9r7bp"
+          },
+          {
+            "arguments": {
+              "path_id": "outside-the-assigned-round"
+            },
+            "call_id": "call-fixture-5",
+            "result": {
+              "error": "the route is absent from the assigned fixture-grid proposal"
+            },
+            "task_id": "gxt_01m82d43r4kaj9r7bp"
+          },
+          {
+            "arguments": {
+              "path_id": "path-a"
+            },
+            "call_id": "call-fixture-6",
+            "result": {
+              "evaluation_error": null,
+              "evaluation_ref": "gxa_01m82d43pas2b612dy",
+              "evidence_ref": "gxa_01m82d43qf7ym90p9v",
+              "expected_reaches_threshold": true,
+              "failure": null,
+              "input_ref": "gxa_01m82d41b3b17t2zcj",
+              "job_id": "gxj_01m82d41dh5s0t92cn",
+              "metrics": {
+                "count_at_or_above": 3,
+                "max_score": -0.0,
+                "observations": 3
+              },
+              "observations_ref": "gxa_01m82d43g3t3brywmr",
+              "outcome_kind": "valid_scientific_outcome",
+              "path_id": "path-a",
+              "prediction": "A candidate near x=2 has score >= -0.25.",
+              "proposal_ref": "gxa_01m82d41bwb4zezrye",
+              "status": "SUCCEEDED",
+              "threshold": -0.25
+            },
+            "root_receipt": {
+              "attempt": 1,
+              "lease_id": "gxl_01m82d443mz6xfe7nj",
+              "request_sha": "a2ddfe1a3ea89e59cb61d13b94b06bc65b3704772babbd07f7c637d6a5139292",
+              "role": "evidence_reviewer",
+              "task_id": "gxt_01m82d43r4kaj9r7bp",
+              "thread_id": "01a204d2-1086-7a73-b498-2d1714071e97",
+              "turn_id": "01a204d2-10c1-7e62-8b62-2c3a9e660c7d"
+            },
+            "task_id": "gxt_01m82d43r4kaj9r7bp"
+          },
+          {
+            "arguments": {
+              "path_id": "path-b"
+            },
+            "call_id": "call-fixture-7",
+            "result": {
+              "evaluation_error": null,
+              "evaluation_ref": "gxa_01m82d43q1aq226vba",
+              "evidence_ref": "gxa_01m82d43qf7ym90p9v",
+              "expected_reaches_threshold": true,
+              "failure": null,
+              "input_ref": "gxa_01m82d41bfpgb56t1a",
+              "job_id": "gxj_01m82d41mg08ytsce7",
+              "metrics": {
+                "count_at_or_above": 0,
+                "max_score": -12.25,
+                "observations": 3
+              },
+              "observations_ref": "gxa_01m82d43hyk4xsqnaz",
+              "outcome_kind": "valid_scientific_outcome",
+              "path_id": "path-b",
+              "prediction": "A candidate near x=-2 has score >= -0.25.",
+              "proposal_ref": "gxa_01m82d41bwb4zezrye",
+              "status": "SUCCEEDED",
+              "threshold": -0.25
+            },
+            "root_receipt": {
+              "attempt": 1,
+              "lease_id": "gxl_01m82d443mz6xfe7nj",
+              "request_sha": "b844fe271cb139814a03ddb25ae1fec807a536f0c7a8611f2da92310d66038d0",
+              "role": "evidence_reviewer",
+              "task_id": "gxt_01m82d43r4kaj9r7bp",
+              "thread_id": "01a204d2-1086-7a73-b498-2d1714071e97",
+              "turn_id": "01a204d2-10c1-7e62-8b62-2c3a9e660c7d"
+            },
+            "task_id": "gxt_01m82d43r4kaj9r7bp"
+          }
+        ],
+        "submitted_kind": "science_assessment",
+        "tool": "gx_grid_measurement"
+      },
+      "model_visible_tool_tasks": [
+        "gxt_01m82d43r4kaj9r7bp",
+        "gxt_01m82d450hg9eg402p",
+        "gxt_01m82d47bff9mn04hd",
+        "gxt_01m82d484mxy0gheam",
+        "gxt_01m82d4ae694t3wn6f",
+        "gxt_01m82d4b73dh9eeprr"
+      ],
+      "plugin_binding": {
+        "capabilities": [
+          {
+            "capability_version": "fixture-grid@1",
+            "content_artifact_ref": "gxa_01m82d4099jmf8299t",
+            "manifest_sha256": "0968c6a826580504c31eb8ddd7790e1a11d57038f7bfe6af204b8a8393978fd9",
+            "portable_sha256": "b69193d4546b42225261484872718eb475478c5836377de6cacd6b8c38b9f12f"
+          }
+        ],
+        "dispatch_preparation": {
+          "function": "workflows.compat_v20.grid_dispatch:prepare_dispatch",
+          "sha256": "279d09347a9c88d8fd3ee753b94c24c5417a3b23f8d8c3652b6df5fa13bc481e"
+        },
+        "packages": [
+          {
+            "api_version": "1.0",
+            "id": "org.gx.science-grid",
+            "sha256": "171e6f12272b3d6cd3a8ff2055c9e092c2512113bfdc0684da48a834a6c8d0ef",
+            "version": "2.0.0"
+          }
+        ],
+        "workflow": {
+          "id": "science_grid",
+          "sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467",
+          "version": "2"
+        }
+      },
+      "report_ref": "gxa_01m82d4d0ek0jttg3f",
+      "requests_sha256": "3831c9ffdd40018c68c48d29bf6b08d30d66c16f7053c97f9556d7511ecd536c",
+      "scientific_result_sha256": "76d1e21e47f8b6207cd57ab911f0ed40bb0538f72c77668e2b7a6cc1ff71f095",
+      "scientific_settlements": [
+        {
+          "artifact_refs_json": "[\"gxa_01m82d43g3t3brywmr\",\"gxa_01m82d43pas2b612dy\"]",
+          "direction": "supports",
+          "eval_id": "gxe_510be3dffa7513725352efc8962eecbc35280a3262de51fa0329c1de990b0c23",
+          "eval_spec_id": "grid_score_c5a0ba1a1669d083478270e40a0840fc7a8a03ca2c22e6fbd6b7066b149c527f",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_bf5e9dd239d6888284c07ff6834668e25d9d48ba2383cf8a5a1e95b222f6ff6f",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_4da8d1088b54c17ec06b241721897675d736801ed80b4adbf15a34828115629f",
+          "job_id": "gxj_01m82d41dh5s0t92cn",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "feb11b591ca88c01c0c1a1a56d07b8e14fea59e92477fc520e975bd5a5f5039d",
+          "path_id": "path-a",
+          "round_index": 0,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d44wxyam6qfnq"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d43hyk4xsqnaz\",\"gxa_01m82d43q1aq226vba\"]",
+          "direction": "refutes",
+          "eval_id": "gxe_2af8fd81d20085dba22646437ea1704ec1ec85323fe12d67b3b56b932de019b1",
+          "eval_spec_id": "grid_score_c5a0ba1a1669d083478270e40a0840fc7a8a03ca2c22e6fbd6b7066b149c527f",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_0d23e3d629fe513ab2f30301e857791466d8d845618612e5f8adea09675260ec",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_1979728a28016cbd174e2adbf4dccf666f89c0161e247207cd17a2b0d9bb176c",
+          "job_id": "gxj_01m82d41mg08ytsce7",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "81b761d131e0d38b826bf56cd034b288c96decc9befffaee394904d28da76865",
+          "path_id": "path-b",
+          "round_index": 0,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d44wxyam6qfnq"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d4775k7t7ds9j\",\"gxa_01m82d47aga1qse351\"]",
+          "direction": "supports",
+          "eval_id": "gxe_53300771b444e4165743d58d292026319971e75c9965931b1b1d44363fdd67ee",
+          "eval_spec_id": "grid_score_c5a0ba1a1669d083478270e40a0840fc7a8a03ca2c22e6fbd6b7066b149c527f",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_deb70dfec325bf5aba76a1959250a202d5742b3105dc8cd83ae83782c47319fe",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_4da8d1088b54c17ec06b241721897675d736801ed80b4adbf15a34828115629f",
+          "job_id": "gxj_01m82d46m42p2mcvt5",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "c249dd9c9ecb807f3b14a833e16bcc9f9b3f01ae198e6138cf252aa03877cd65",
+          "path_id": "path-a",
+          "round_index": 1,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d480mjs11kvct"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d4a9v9ze7xe87\",\"gxa_01m82d4ad7qp66azgz\"]",
+          "direction": "supports",
+          "eval_id": "gxe_57644c5bcd169e8d319d79cb4e204313a81d9754e9cf86500490b24d7c2ad7aa",
+          "eval_spec_id": "grid_score_c5a0ba1a1669d083478270e40a0840fc7a8a03ca2c22e6fbd6b7066b149c527f",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_d1415e3d72723d69745192040d6e5c211dab72a76afa0e0193afa4a25785828b",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_f52b7c574cdd8a3c85a57a607437a017ab8cd5b23d81d59be803c55f849dd8cb",
+          "job_id": "gxj_01m82d49nfkkqbe1na",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "f5738443ba7585c41b217b3b0daf76da00b1de8bbe805354b0788d9cac6166fa",
+          "path_id": "path-a-pivot",
+          "round_index": 2,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d4b3bx7fbvrkw"
+        }
+      ],
+      "spec_sha256": "0bfabc5fd3dd937abdef4c8fb89ebe6afa4812f4fa750ec1193d8dc5445951b7",
+      "terminal_replay_new_calls": 0,
+      "workflow": {
+        "run_id": "gxr_01m82d40an0csagdmq",
+        "workflow_id": "science_grid",
+        "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467",
+        "workflow_version": "2"
+      }
+    },
+    "legacy": {
+      "accepted_workers": [
+        {
+          "attempt": 1,
+          "principal": "01a204d1-d17e-7e02-b6d8-69794ccbd517",
+          "round": 0,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d3n54v29mae8n",
+          "task_id": "gxt_01m82d3kzrr3z1svrm"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-d895-7832-9e1f-cc04c352e020",
+          "round": 0,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d3pq92zg2rhfa",
+          "task_id": "gxt_01m82d3n91ap04t9vv"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-dfd4-7141-a63f-a13c3d5285bf",
+          "round": 1,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d3rt3tdphhvkb",
+          "task_id": "gxt_01m82d3qwpc2dnpays"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-e72d-7d80-adbf-495fc3b5c8bd",
+          "round": 1,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d3t9ave1r5ana",
+          "task_id": "gxt_01m82d3rxka221p5wy"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-ed77-7991-a3d0-a478a6d3edbd",
+          "round": 2,
+          "stage": "assessment",
+          "submission_id": "gxsb_01m82d3wfd060csd5g",
+          "task_id": "gxt_01m82d3v9kyjzc3qf8"
+        },
+        {
+          "attempt": 1,
+          "principal": "01a204d1-f5f7-7b12-a928-7c772a0fc1ff",
+          "round": 2,
+          "stage": "decision",
+          "submission_id": "gxsb_01m82d3y048qvg8d2c",
+          "task_id": "gxt_01m82d3wkhgjycvarj"
+        }
+      ],
+      "artifact_count": 58,
+      "artifact_index_sha256": "05fdca9aebe0fe56354c0905c279f83895de3a822032ced50c219e6308f4f4a1",
+      "capabilities": [
+        {
+          "admission": "SHIPPED",
+          "capability_id": "fixture-grid",
+          "content_artifact_ref": "gxa_01m82d3hmd8gxjxxrk",
+          "manifest_sha256": "209fe3f962dfd605d8ce35533c02bcb547bef186d1cf651601ec301c6f6df274",
+          "shipped_sha256": "b69193d4546b42225261484872718eb475478c5836377de6cacd6b8c38b9f12f",
+          "status": "DRAFT",
+          "version": "1"
+        }
+      ],
+      "commands": [
+        {
+          "argv": [
+            "bin/gx-p0",
+            "start",
+            "--state",
+            "$STATE",
+            "--spec",
+            "$SPEC"
+          ],
+          "elapsed_seconds": 2.367,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 1,
+          "run_id": "gxr_01m82d3gfsb05dpb07",
+          "status": "WAITING_EXTERNAL_JOB"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "stop",
+            "--state",
+            "$STATE"
+          ],
+          "elapsed_seconds": 0.546,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d3gfsb05dpb07",
+          "status": "PAUSED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "status",
+            "--state",
+            "$STATE"
+          ],
+          "elapsed_seconds": 0.436,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d3gfsb05dpb07",
+          "status": "PAUSED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "resume",
+            "--state",
+            "$STATE",
+            "--timeout",
+            "110"
+          ],
+          "elapsed_seconds": 11.41,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 39,
+          "run_id": "gxr_01m82d3gfsb05dpb07",
+          "status": "COMPLETED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "run",
+            "--state",
+            "$STATE",
+            "--timeout",
+            "10"
+          ],
+          "elapsed_seconds": 0.549,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82d3gfsb05dpb07",
+          "status": "COMPLETED"
+        }
+      ],
+      "cpu_job_sidecars": {
+        "gxj_01m82d3hnsn0kgs4px": {
+          "launch.claim": "8a64e817ccbf52d120a7aa78a54bb8a52fa842d9e0e8f9c751909472bce3e3a0",
+          "outcome.json": "c1d41527bb27e99d560242ddb2afe52e1aacd84a4b08a56cf9becbe3c4edcbf3",
+          "runner.json": "2550ef7e3500b35b5be883b550d62e15c8f51004f760e6651d9fac4e24449f03"
+        },
+        "gxj_01m82d3hxjvadbjhez": {
+          "launch.claim": "62e707d969088c54f32b41dde03a2b90764c6c5c5c1721c9c31ee2c04a619bf5",
+          "outcome.json": "808d1056935a05e4ff7c9080a72340b6eb7a484d50d873d580af06af74fa1be7",
+          "runner.json": "3fb9fb87bf63b6076a6f5ae71169dcd064f13e2b3e3eaa05859a9551585fba84"
+        },
+        "gxj_01m82d3pwxv478fvcs": {
+          "launch.claim": "4222767a96654b07dd4a2559dd54db525aee08113215fa2883263aee6d37de48",
+          "outcome.json": "0098b512e945a4e58c3338026123ebccb3e6ec43f37fe2339d497e7d19034ee8",
+          "runner.json": "9b05d31d8bb5afc5883241a2d5a0e9a5806083ba0f98293dd76892a009db6140"
+        },
+        "gxj_01m82d3tfh3rqhx6cn": {
+          "launch.claim": "74e091b87d59951a278b232a71852ef62950b6bcd2b43b71f51965f60f541b5e",
+          "outcome.json": "3174274c459440f6c53017f07f2461f9d35f67c672b11d348191b284ad063843",
+          "runner.json": "23b7c9f69154e4272d5a66039aa480ba21cce945b37a9545e7d4a3d4649a7359"
+        }
+      },
+      "evidence": {
+        "rounds": [
+          {
+            "continue_paths": [
+              "path-a"
+            ],
+            "next_grids": {
+              "path-a": {
+                "candidates": [
+                  {
+                    "candidate_id": "path-a-r1-left",
+                    "x": 1.75
+                  },
+                  {
+                    "candidate_id": "path-a-r1-right",
+                    "x": 2.25
+                  }
+                ],
+                "method_id": "fixture-grid",
+                "method_version": "1",
+                "synthetic": true
+              }
+            },
+            "pivots": [],
+            "reason": "Refine the grid around x=2 on path-a, whose best observed score -0 supports its prediction.",
+            "round": 0,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path_a-1",
+                    "score": -0.25,
+                    "x": 1.5
+                  },
+                  {
+                    "candidate_id": "path_a-2",
+                    "score": -0.0,
+                    "x": 2.0
+                  },
+                  {
+                    "candidate_id": "path_a-3",
+                    "score": -0.25,
+                    "x": 2.5
+                  }
+                ],
+                "path_id": "path-a",
+                "prediction": "A candidate near x=2 has score >= -0.25.",
+                "supported": true
+              },
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path_b-1",
+                    "score": -20.25,
+                    "x": -2.5
+                  },
+                  {
+                    "candidate_id": "path_b-2",
+                    "score": -16.0,
+                    "x": -2.0
+                  },
+                  {
+                    "candidate_id": "path_b-3",
+                    "score": -12.25,
+                    "x": -1.5
+                  }
+                ],
+                "path_id": "path-b",
+                "prediction": "A candidate near x=-2 has score >= -0.25.",
+                "supported": false
+              }
+            ],
+            "stop_reason": null,
+            "threshold": -0.25
+          },
+          {
+            "continue_paths": [],
+            "next_grids": {},
+            "pivots": [
+              {
+                "from_path": "path-a",
+                "grid": {
+                  "candidates": [
+                    {
+                      "candidate_id": "pivot-lower",
+                      "x": 1.625
+                    },
+                    {
+                      "candidate_id": "pivot-upper",
+                      "x": 1.875
+                    }
+                  ],
+                  "method_id": "fixture-grid",
+                  "method_version": "1",
+                  "synthetic": true
+                },
+                "id": "path-a-pivot",
+                "prediction": "At least one of the two quarter-step samples around x=1.75, whose observed score was -0.0625, reaches the frozen threshold. Two lower scores refute this finite-grid prediction."
+              }
+            ],
+            "reason": "Refine the grid around x=1.75 on path-a, whose best observed score -0.0625 supports its prediction. Test the new finite-grid prediction.",
+            "round": 1,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "path-a-r1-left",
+                    "score": -0.0625,
+                    "x": 1.75
+                  },
+                  {
+                    "candidate_id": "path-a-r1-right",
+                    "score": -0.0625,
+                    "x": 2.25
+                  }
+                ],
+                "path_id": "path-a",
+                "prediction": "A candidate near x=2 has score >= -0.25.",
+                "supported": true
+              }
+            ],
+            "stop_reason": null,
+            "threshold": -0.25
+          },
+          {
+            "continue_paths": [],
+            "next_grids": {},
+            "pivots": [],
+            "reason": "The prospective round budget has been reached.",
+            "round": 2,
+            "routes": [
+              {
+                "observations": [
+                  {
+                    "candidate_id": "pivot-lower",
+                    "score": -0.140625,
+                    "x": 1.625
+                  },
+                  {
+                    "candidate_id": "pivot-upper",
+                    "score": -0.015625,
+                    "x": 1.875
+                  }
+                ],
+                "path_id": "path-a-pivot",
+                "prediction": "At least one of the two quarter-step samples around x=1.75, whose observed score was -0.0625, reaches the frozen threshold. Two lower scores refute this finite-grid prediction.",
+                "supported": true
+              }
+            ],
+            "stop_reason": "round_budget",
+            "threshold": -0.25
+          }
+        ],
+        "settlements": [
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a",
+            "round_index": 0
+          },
+          {
+            "direction": "refutes",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-b",
+            "round_index": 0
+          },
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a",
+            "round_index": 1
+          },
+          {
+            "direction": "supports",
+            "kind": "valid_scientific_outcome",
+            "path_id": "path-a-pivot",
+            "round_index": 2
+          }
+        ],
+        "stop_reason": "round_budget"
+      },
+      "jobs": [
+        {
+          "finished_at": "2026-11-22T19:53:08.614Z",
+          "idempotency_key": "job:gxr_01m82d3gfsb05dpb07:grid:science:r0:0b25bc2837eaf4b1aaf16d7878576b17ed5a5e2fe4c23173890c40d0421b8614",
+          "input_manifest_ref": "gxa_01m82d3hn88d87qeww",
+          "job_id": "gxj_01m82d3hnsn0kgs4px",
+          "measured_json": "{\"cpu_seconds\":0.051,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.217}",
+          "scheduler_ref": "runner:3773814:2969664940",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:53:06.685Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:53:08.680Z",
+          "idempotency_key": "job:gxr_01m82d3gfsb05dpb07:grid:science:r0:02d2e1c9a0d075e4f92e3da1c3e65dc1d0316807336dc25b6000bfba83daf343",
+          "input_manifest_ref": "gxa_01m82d3hx3v9ww1f5c",
+          "job_id": "gxj_01m82d3hxjvadbjhez",
+          "measured_json": "{\"cpu_seconds\":0.044,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.22}",
+          "scheduler_ref": "runner:3773820:2969664965",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:53:06.930Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:53:12.535Z",
+          "idempotency_key": "job:gxr_01m82d3gfsb05dpb07:grid:science:r1:99f944161b55f79d6d6fc1cdfe8097abf024c2eac2b51700bf91d47e9f0304a0",
+          "input_manifest_ref": "gxa_01m82d3pwf7j738jrx",
+          "job_id": "gxj_01m82d3pwxv478fvcs",
+          "measured_json": "{\"cpu_seconds\":0.056,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.228}",
+          "scheduler_ref": "runner:3773990:2969665475",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:53:12.037Z"
+        },
+        {
+          "finished_at": "2026-11-22T19:53:16.224Z",
+          "idempotency_key": "job:gxr_01m82d3gfsb05dpb07:grid:science:r2:82d6a58319eb216522cc08a991fa03f071ee7076c13b8f5820c20fbd1fceac01",
+          "input_manifest_ref": "gxa_01m82d3tf20cz7xqw1",
+          "job_id": "gxj_01m82d3tfh3rqhx6cn",
+          "measured_json": "{\"cpu_seconds\":0.056,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.225}",
+          "scheduler_ref": "runner:3774133:2969665848",
+          "status": "SUCCEEDED",
+          "submitted_at": "2026-11-22T19:53:15.768Z"
+        }
+      ],
+      "ledger": {
+        "native_turns": 7,
+        "reported_tokens": 1400,
+        "tokens": 1400
+      },
+      "model_visible_tool_tasks": [],
+      "plugin_binding": null,
+      "report_ref": "gxa_01m82d3y42p4b5w09x",
+      "requests_sha256": "1cd013f86aff96611904847ca5350f2459b0bbcc76fef8a22b74d5eb94b41d25",
+      "scientific_result_sha256": "76d1e21e47f8b6207cd57ab911f0ed40bb0538f72c77668e2b7a6cc1ff71f095",
+      "scientific_settlements": [
+        {
+          "artifact_refs_json": "[\"gxa_01m82d3kqmz8fp2e5f\",\"gxa_01m82d3kxs1bbg8hny\"]",
+          "direction": "supports",
+          "eval_id": "gxe_8dbd12a25d5b9ee7cabc0f0e23f8687aaab24f7c3603f41810a1db3ad5d6920b",
+          "eval_spec_id": "grid_score_b0d04b68a7946411d8964e8dc2639751b27d723df25178d2b140e9ab4e884959",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_88dbc0d69801ffed4d77c48185f63485f5aa17e46dcd9343b1c3dede35dd8832",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_79451879a4fb025b134dfa8ebd9d9de59a3bf5af07594a17bb72c4c1a867f614",
+          "job_id": "gxj_01m82d3hnsn0kgs4px",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "0e84629210cb951037898d35d6bc18323720aaa758983d4b1e824c7939755e4c",
+          "path_id": "path-a",
+          "round_index": 0,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d3n54v29mae8n"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d3ksfdpmjs9xw\",\"gxa_01m82d3kyjyxgtr5v3\"]",
+          "direction": "refutes",
+          "eval_id": "gxe_69c74a5d8335254772e078bc99d3aa01a06ee03c864281aac027a13dfc071095",
+          "eval_spec_id": "grid_score_b0d04b68a7946411d8964e8dc2639751b27d723df25178d2b140e9ab4e884959",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_c21c7ffdffbf90ffb86efd48fe1f69d7e3e16f84c6d25b8f853170a89ef7071c",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_7183fe63e5178cccaff71d6ee5ffe47b4ce58ca334c7c882c02699373fb2782e",
+          "job_id": "gxj_01m82d3hxjvadbjhez",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "80622ec22a79160c18f909aa66569b08299188acabbc8cc49503a2aa20d902a2",
+          "path_id": "path-b",
+          "round_index": 0,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d3n54v29mae8n"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d3qhqjxjsb8dj\",\"gxa_01m82d3qvfdjqer55d\"]",
+          "direction": "supports",
+          "eval_id": "gxe_cdaae77474714e7c821fd30512abab45ac3d9639560b6d9f0f1ec85e54c2d97d",
+          "eval_spec_id": "grid_score_b0d04b68a7946411d8964e8dc2639751b27d723df25178d2b140e9ab4e884959",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_90bbf6c8599f3f5d6d301f943b0d30c73d77c8b9d643d08b31e821c2466cf905",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_79451879a4fb025b134dfa8ebd9d9de59a3bf5af07594a17bb72c4c1a867f614",
+          "job_id": "gxj_01m82d3pwxv478fvcs",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "819e33c23c8e5528b2e0e627a3ab6e35be5c7fdd023205b7ccbb9813a64d3054",
+          "path_id": "path-a",
+          "round_index": 1,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d3rt3tdphhvkb"
+        },
+        {
+          "artifact_refs_json": "[\"gxa_01m82d3v57bmmf00d3\",\"gxa_01m82d3v8c3jbysktq\"]",
+          "direction": "supports",
+          "eval_id": "gxe_98d9cb4777101f136864240118c521a7fa50fa375cf4655fe2dc98e0abfb13d2",
+          "eval_spec_id": "grid_score_b0d04b68a7946411d8964e8dc2639751b27d723df25178d2b140e9ab4e884959",
+          "eval_spec_version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "evidence_id": "gxv_cbb43071599fa19e1ada9a2d6d830ca49121d89bd37b494a1879d3db560ee12f",
+          "frozen_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "head_revision": 1,
+          "hypothesis_id": "gxh_0cf316fbea10a7e8ba545705acefe6710ab8888c3db1532dd674f232a2908a45",
+          "job_id": "gxj_01m82d3tfh3rqhx6cn",
+          "kind": "valid_scientific_outcome",
+          "manifest_hash": "7650e0f705b7a4f8262c19be9104920587737e2268f2ab570c230688bb7829c6",
+          "path_id": "path-a-pivot",
+          "round_index": 2,
+          "spec_sha": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "submission_id": "gxsb_01m82d3wfd060csd5g"
+        }
+      ],
+      "spec_sha256": "6e373a6f1de33b6513ed34e511a6b3ae46913969e897990a60e3078659cc0bd3",
+      "terminal_replay_new_calls": 0,
+      "workflow": {
+        "run_id": "gxr_01m82d3gfsb05dpb07",
+        "workflow_id": "science_grid",
+        "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467",
+        "workflow_version": "2"
+      }
+    }
+  },
+  "checkout_head": "e3481ffb85542b1be9a07c666d41f52e21396ddf",
+  "codex_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "command": [
+    "python",
+    "-B",
+    "acceptance/v3/p1/paired_grid.py",
+    "--candidate",
+    "WORKTREE",
+    "--work",
+    "var/v3-staging/p1-public-grid",
+    "--output",
+    "acceptance/v3/p1/paired-grid-worktree.json"
+  ],
+  "ended_utc": "2026-11-22T19:53:36.954249+00:00",
+  "exit_code": 0,
+  "frozen_install": {
+    "files": 418,
+    "git_commit": "61ed0067448658e02d181b3cb85d7f68e39b6616",
+    "runtime_tree_sha256": "91ee51f3cb9f02e1b601b1d098006733b0c984e14706f11fe87f7b0c34788464"
+  },
+  "mode": "official Codex 0.169.0; scripted localhost Responses; detached CPU Jobs",
+  "result": "PASS",
+  "same_process_restore": [
+    {
+      "run_id": "gxr_01m82d3gfsb05dpb07",
+      "tools": [],
+      "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467"
+    },
+    {
+      "released_attempt": {
+        "refusal": "SCOPE_DENIED: this root no longer owns the current task attempt",
+        "thread_id": "01a204d2-1086-7a73-b498-2d1714071e97"
+      },
+      "run_id": "gxr_01m82d40an0csagdmq",
+      "tools": [
+        "gx_grid_measurement"
+      ],
+      "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467"
+    },
+    {
+      "run_id": "gxr_01m82d3gfsb05dpb07",
+      "tools": [],
+      "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467"
+    },
+    {
+      "released_attempt": {
+        "refusal": "SCOPE_DENIED: this root no longer owns the current task attempt",
+        "thread_id": "01a204d2-1086-7a73-b498-2d1714071e97"
+      },
+      "run_id": "gxr_01m82d40an0csagdmq",
+      "tools": [
+        "gx_grid_measurement"
+      ],
+      "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467"
+    }
+  ],
+  "started_utc": "2026-11-22T19:52:44.488799+00:00"
+}

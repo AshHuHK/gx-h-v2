@@ -15,3 +15,16 @@
 ## 部署和回退
 
 只在独立 v3 安装和测试数据副本中运行。旧 v2.1 的项目不携带插件选择，打开时沿用原工作流。已有 v3 项目续跑需要原插件摘要、方法回执和工作流版本。恢复时可以对照公开状态中的 `plugin_binding`。原 v2.1 数据副本的回退步骤见 [冷恢复操作](acceptance/v3/staging/README.md)。
+
+## 冻结提交与离线签收
+
+P1 产品提交 `336225603dec3a1bc5efd6eccb401ccd25e63287`。测试使用该 Git 树的独立拷贝。
+
+| 检查 | 结果 |
+|---|---|
+| 真实 CPU Job，脚本驱动的官方 Codex 会话 | v2.1 原版、v2.1 冷升级、P1 兼容模式和 P1 插件模式四组得到了相同的科研输出摘要 `76d1e21e47f8b6207cd57ab911f0ed40bb0538f72c77668e2b7a6cc1ff71f095`。每组完成 4 个 Job、6 个审核或决策提交，核对 58 个 Artifact，终态重放新增请求为 0。插件模式的 Root 根据两次工具调用读到的值提交了获接受的审核。耗时 69.699 秒，退出码 0。[四组结果和原始命令](acceptance/v3/p1/paired-grid-frozen.json) · [函数调用回执](acceptance/v3/p1/paired-grid-traces/index.json) |
+| 旧项目在途恢复 | 复制既有暂停项目、原产物、3 组原始 Job 回执与 Codex 状态。可写打开和回退均通过，续跑总计 4 个 CPU Job，3 项决策获接受。原 Job 回执一致，剩余预留为 0，终态重放新请求为 0，退出码 0。[冷恢复及回退](acceptance/v3/p1/legacy-checkpoint.json) |
+| 租约、计量、任务与评分 | 覆盖容量拒绝、准备阶段竞争、Node 评分时数据库事务状态、领取前进程退出、冷恢复复用原 Job 与原评分以及科学输入并发更新。原有与新增派发用例共 67 项通过。[测试日志](acceptance/v3/p1/dispatch-tests.log) |
+| 原平台完整回归 | 281.968 秒，退出码 0。Python 发现 382 项，通过 378 项，4 项沿用原有 DSH 跳过条件。124 项 P0 子集、2 项 Node、生成器及 30 个官方 Codex 环回场景都通过。先前签收的 16 项 v3 P0 测试逐一通过。[环境与命令](acceptance/v3/p1/regression/invocation.json) · [结果](acceptance/v3/p1/regression/summary.json) · [原用例核对](acceptance/v3/p1/regression/frozen-comparison.json) · [P0 身份核对](acceptance/v3/p1/regression/p0-case-comparison.json) |
+
+同负载真实模型对照于 2026-11-22 19:57:24 UTC 开始，双方均使用 OpenAI OAuth、`gpt-6.2-astra`、`xhigh` 和原生 Codex 0.169.0。[对照口径](acceptance/v3/performance/PROTOCOL.md)

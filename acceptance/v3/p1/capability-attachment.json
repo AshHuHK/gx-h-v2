@@ -1,0 +1,50 @@
+{
+  "test": "package capability portable and workspace pins, admission, Run scoping and numerical Job replay",
+  "command": [
+    "env",
+    "PYTHONPATH=gx-h:gx-h/tests",
+    ".venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "-v",
+    "test_v3_capability_attachments",
+    "test_shipped_grid",
+    "test_grid_job_recovery",
+    "test_local_job"
+  ],
+  "exit_code": 0,
+  "result": "PASS",
+  "source_base_commit": "e3481ffb85542b1be9a07c666d41f52e21396ddf",
+  "source_state": "P1 working tree",
+  "evidence_type": "local CPU, actual script/parser/SQLite/Governance/Artifact owners; no model calls",
+  "elapsed_seconds": 6.726,
+  "platform": "Linux",
+  "python": "3.11.9",
+  "source_sha256": {
+    "gx-h/gx_core/capabilities/manifest.py": "2930bd18f07e4eede24865551d0492874b6b4864b1231c3e460d95773d771bd4",
+    "gx-h/gx_core/capabilities/registry.py": "8db80a9c746e901729114074da8b18dae66c8145615c8cd025f3389145ee064d",
+    "gx-h/gx_core/capabilities/shipped.py": "d2ab5b7b9bc78e856c3543f213eff1eec6499edf16ec3e5c8e692c6dd9aa8fe3",
+    "gx-h/gx_core/capabilities/tools.py": "e6a04ab6abadaf6af9d10ebbc462ca8445d740896885a7ea0061b40a3333057b",
+    "gx-h/gx_core/p0/compute.py": "dceb50ad2d325615b816ff0aca3f4077ae4bdbc7ea6583669c58e7c440d2e04c",
+    "gx-h/gx_core/p0/manifest.py": "de471a822f0bdded6b48cb8f8868271226b0445167824e92bf159c9e5061ce9b",
+    "gx-h/gx_core/jobs/service.py": "63b28c0988f1669118c4c0558500c933af33b87990dfa8cd337a7075cda468d1",
+    "gx-h/tests/test_local_job.py": "e43729ad746920f2167c0a74bd938aed1c4ccf47713caf40950516c8b267998f",
+    "gx-h/tests/test_v3_capability_attachments.py": "88df2f323e26a1ae7fca784f2952f1185a2b4f631956cb97b2299d5f631897eb"
+  },
+  "output": [
+    "test_approved_package_to_real_job_and_original_artifact (test_v3_capability_attachments.CapabilityAttachments.test_approved_package_to_real_job_and_original_artifact) ... ok",
+    "test_mismatched_release_pin_and_changed_script_cannot_register (test_v3_capability_attachments.CapabilityAttachments.test_mismatched_release_pin_and_changed_script_cannot_register) ... ok",
+    "test_sibling_and_different_method_pin_cannot_discover_or_launch (test_v3_capability_attachments.CapabilityAttachments.test_sibling_and_different_method_pin_cannot_discover_or_launch) ... ok",
+    "test_unreviewed_candidate_and_old_governance_decision_are_preserved (test_v3_capability_attachments.CapabilityAttachments.test_unreviewed_candidate_and_old_governance_decision_are_preserved) ... ok",
+    "test_admission_retains_real_environment_and_recovers_without_reinstall (test_shipped_grid.ShippedGrid.test_admission_retains_real_environment_and_recovers_without_reinstall) ... ok",
+    "test_existing_draft_is_not_promoted_by_using_workflow (test_shipped_grid.ShippedGrid.test_existing_draft_is_not_promoted_by_using_workflow) ... ok",
+    "test_reconnect_to_project_jobs_under_lost_receipts (test_grid_job_recovery.GridJobRecovery.test_reconnect_to_project_jobs_under_lost_receipts) ... ok",
+    "test_restart_reconciles_the_original_job_and_publishes_its_outputs_once (test_local_job.LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once) ... ok",
+    "",
+    "----------------------------------------------------------------------",
+    "Ran 8 tests in 6.317s",
+    "",
+    "OK"
+  ]
+}

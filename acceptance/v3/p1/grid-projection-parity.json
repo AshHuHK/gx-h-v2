@@ -1,0 +1,56 @@
+{
+  "scope": "Local CPU grid, late human sources, accepted worker products and historical read compatibility",
+  "command": "env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=gx-h:gx-h/tests /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python acceptance/v3/p1/grid_projections.py --workspace var/v3-staging/frozen-a05dcef/project --workspace var/v3-staging/control-replay/rollback-project --output acceptance/v3/p1/grid-projection-parity.json",
+  "release_head_at_execution": "e3481ffb85542b1be9a07c666d41f52e21396ddf",
+  "tested_source_sha256": {
+    "gx-h/gx_core/research/records.py": "7a1e977f90b427026e416c6da1038ed5869687d3e0612c0de9a4753f6bd00075",
+    "gx-h/gx_core/p0/science_inputs.py": "c5270b23b5941dce80ecf08e0ee09e52e67a09b81a435aed48b70f31571b7470",
+    "acceptance/v3/p1/grid_projections.py": "68b7b066668ab9745b3e5d4d29ba82b946f9d48ba9464fc14e27f70033b59a03",
+    "gx-h/tests/test_p0_review_sources.py": "6d6bb4aa14d86d99867f2d6ff9acae8543152aee7849437770b5b4c135abad37"
+  },
+  "source_races": {
+    "tests": [
+      "test_cold_restart_between_source_commit_and_processing",
+      "test_source_commits_after_old_review_and_while_decision_is_running",
+      "test_source_between_completed_report_checkpoint_and_run_close"
+    ],
+    "compared_calls": {
+      "source_status": 5,
+      "review_history": 3,
+      "task_context": 17
+    }
+  },
+  "historical": [
+    {
+      "workspace": "var/v3-staging/frozen-a05dcef/project",
+      "database_sha256": "35ac81b908ae1c01bdd8289e23533b839e3addaf6044b6fc41f295affe7a2b2b",
+      "runs": [
+        {
+          "run_id": "gxr_01m825ktkpt3ewxtdm",
+          "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467"
+        }
+      ],
+      "compared_calls": {
+        "source_status": 1,
+        "review_history": 1,
+        "task_context": 2
+      }
+    },
+    {
+      "workspace": "var/v3-staging/control-replay/rollback-project",
+      "database_sha256": "0a5b5c746f0837b2379291510cba6d5e58c7920ed76f166b24772bfd3a3a1fed",
+      "runs": [
+        {
+          "run_id": "gxr_01m825ktkpt3ewxtdm",
+          "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467"
+        }
+      ],
+      "compared_calls": {
+        "source_status": 1,
+        "review_history": 1,
+        "task_context": 6
+      }
+    }
+  ],
+  "exit_code": 0
+}

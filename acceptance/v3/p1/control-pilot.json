@@ -1,0 +1,97 @@
+{
+  "candidate_install": {
+    "files": 434,
+    "git_commit": "177037621d935bbac9e31618ebbc095f21e613b8",
+    "runtime_tree_sha256": "5c6bafbbbc85cbf7679e28d0e516be299f5d97afcab3caa15f8ca17e50105b0c"
+  },
+  "cases": {
+    "cold-v21": {
+      "commands": [
+        {
+          "argv": [
+            "bin/gx-p0",
+            "start",
+            "--state",
+            "$STATE",
+            "--spec",
+            "$SPEC"
+          ],
+          "elapsed_seconds": 3.454,
+          "exit_code": 0,
+          "install": "v2.1",
+          "new_responses": 1,
+          "run_id": "gxr_01m82cyw6h6ym4vndr",
+          "status": "WAITING_EXTERNAL_JOB"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "stop",
+            "--state",
+            "$STATE"
+          ],
+          "elapsed_seconds": 0.735,
+          "exit_code": 0,
+          "install": "v2.1",
+          "new_responses": 0,
+          "run_id": "gxr_01m82cyw6h6ym4vndr",
+          "status": "PAUSED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "status",
+            "--state",
+            "$STATE"
+          ],
+          "elapsed_seconds": 0.817,
+          "exit_code": 0,
+          "install": "candidate",
+          "new_responses": 0,
+          "run_id": "gxr_01m82cyw6h6ym4vndr",
+          "status": "PAUSED"
+        },
+        {
+          "argv": [
+            "bin/gx-p0",
+            "resume",
+            "--state",
+            "$STATE",
+            "--timeout",
+            "110"
+          ],
+          "elapsed_seconds": 0.443,
+          "exit_code": 1,
+          "install": "candidate",
+          "new_responses": 0
+        }
+      ],
+      "spec_sha256": "6e373a6f1de33b6513ed34e511a6b3ae46913969e897990a60e3078659cc0bd3"
+    }
+  },
+  "checkout_head": "e3481ffb85542b1be9a07c666d41f52e21396ddf",
+  "codex_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "command": [
+    "python",
+    "-B",
+    "acceptance/v3/p1/paired_grid.py",
+    "--candidate",
+    "1770376",
+    "--legacy-controls",
+    "--work",
+    "var/v3-staging/p1-control-pilot",
+    "--output",
+    "acceptance/v3/p1/control-pilot.json"
+  ],
+  "ended_utc": "2026-11-22T19:50:38.422973+00:00",
+  "error": "AssertionError: cold-v21 resume failed. ReleaseStateError: native state belongs to another release or source\n See /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/var/v3-staging/p1-control-pilot/cold-v21/04-resume.stdout",
+  "exit_code": 1,
+  "frozen_install": {
+    "files": 418,
+    "git_commit": "61ed0067448658e02d181b3cb85d7f68e39b6616",
+    "runtime_tree_sha256": "91ee51f3cb9f02e1b601b1d098006733b0c984e14706f11fe87f7b0c34788464"
+  },
+  "mode": "official Codex 0.169.0; scripted localhost Responses; detached CPU Jobs",
+  "result": "FAIL",
+  "started_utc": "2026-11-22T19:50:26.369853+00:00"
+}

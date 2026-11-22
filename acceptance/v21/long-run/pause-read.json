@@ -1,0 +1,158 @@
+{
+  "after": {
+    "attempt": 1,
+    "attempts_consumed": 0,
+    "lease_id": "gxl_01m81s4eb8g5mg8tr3",
+    "result": "ACCEPTED",
+    "status": "ACCEPTED",
+    "submission_id": "gxsb_01m81s4peb1nahbwqf",
+    "thread_id": "01a20392-3a9b-7f30-8863-3221ff263e31"
+  },
+  "attempted_read": {
+    "ref": "gxa_01m81s4d6zdq9m4148",
+    "request": "fixture-16",
+    "task_id": "gxt_01m81s4e978xb64rrx"
+  },
+  "before": {
+    "attempt": 1,
+    "lease_id": "gxl_01m81s4eb8g5mg8tr3",
+    "run_id": "gxr_01m81s45gzt0g93gb3",
+    "thread_id": "01a20392-3a9b-7f30-8863-3221ff263e31"
+  },
+  "commands": [
+    {
+      "at": "2026-11-22T14:03:54.646279+00:00",
+      "command": [
+        "start",
+        "--run-key",
+        "A",
+        "--spec",
+        "$WORK/A.json"
+      ],
+      "exit": 0,
+      "label": "start",
+      "pid": 2690932,
+      "requests_after": 0,
+      "requests_before": 0,
+      "seconds": 1.719
+    },
+    {
+      "at": "2026-11-22T14:03:56.367208+00:00",
+      "command": [
+        "run",
+        "--timeout",
+        "90"
+      ],
+      "ended": "2026-11-22T14:04:10.006304+00:00",
+      "exit": 0,
+      "label": "drive",
+      "pid": 2690947,
+      "requests_after": 17,
+      "requests_before": 0
+    },
+    {
+      "at": "2026-11-22T14:04:05.162916+00:00",
+      "command": [
+        "stop",
+        "--run-id",
+        "gxr_01m81s45gzt0g93gb3"
+      ],
+      "exit": 0,
+      "label": "stop",
+      "pid": 2691865,
+      "requests_after": 16,
+      "requests_before": 16,
+      "seconds": 0.768
+    },
+    {
+      "at": "2026-11-22T14:04:10.007627+00:00",
+      "command": [
+        "resume",
+        "--run-id",
+        "gxr_01m81s45gzt0g93gb3",
+        "--timeout",
+        "65"
+      ],
+      "ended": "2026-11-22T14:04:17.542741+00:00",
+      "exit": 0,
+      "label": "resume",
+      "pid": 2692494,
+      "requests_after": 41,
+      "requests_before": 17
+    }
+  ],
+  "decisions_after": [
+    {
+      "decision_ref": "gxa_01m81s4d09cwrfy4gf",
+      "reviewer_submission_id": "gxsb_01m81s4ayyby3qsnv6",
+      "round_index": 0,
+      "run_id": "gxr_01m81s45gzt0g93gb3",
+      "submission_id": "gxsb_01m81s4d0fab7z8c5q"
+    },
+    {
+      "decision_ref": "gxa_01m81s4qwgrbcqrp3r",
+      "reviewer_submission_id": "gxsb_01m81s4peb1nahbwqf",
+      "round_index": 1,
+      "run_id": "gxr_01m81s45gzt0g93gb3",
+      "submission_id": "gxsb_01m81s4qww45ecf0gc"
+    },
+    {
+      "decision_ref": "gxa_01m81s4tvt6154qvqw",
+      "reviewer_submission_id": "gxsb_01m81s4sxsxhq6rbdq",
+      "round_index": 2,
+      "run_id": "gxr_01m81s45gzt0g93gb3",
+      "submission_id": "gxsb_01m81s4tvzd405gych"
+    }
+  ],
+  "decisions_before": [
+    {
+      "decision_ref": "gxa_01m81s4d09cwrfy4gf",
+      "reviewer_submission_id": "gxsb_01m81s4ayyby3qsnv6",
+      "round_index": 0,
+      "run_id": "gxr_01m81s45gzt0g93gb3",
+      "submission_id": "gxsb_01m81s4d0fab7z8c5q"
+    }
+  ],
+  "denied_before_resume": [
+    {
+      "error": "SCOPE_DENIED: this root no longer owns the current task attempt",
+      "request": "fixture-17",
+      "task_id": "gxt_01m81s4e978xb64rrx"
+    }
+  ],
+  "denied_mentions": 7,
+  "ended_utc": "2026-11-22T14:04:17.729672+00:00",
+  "official_turns": [
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "event_id": "start:30fd3594-4c8a-4d80-bd3d-788140e6595d",
+      "terminal_status": "completed",
+      "turn_id": "01a20392-3ba7-7f22-acee-c602315fee44"
+    },
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "event_id": "resume:01a20392-3ba7-7f22-acee-c602315fee44",
+      "terminal_status": "completed",
+      "turn_id": "01a20392-563e-7302-a31f-fe4a14cf22cc"
+    }
+  ],
+  "provider_requests": 41,
+  "result": "PASS",
+  "retries": [
+    {
+      "ref": "gxa_01m81s4d6zdq9m4148",
+      "request": "fixture-18"
+    }
+  ],
+  "run_status": "COMPLETED",
+  "stage_sha256": "cb3f851aca6f99d6cb9227aedefdda70bc1d6db80f190806888b778936e0c5da",
+  "started_utc": "2026-11-22T14:03:54.616929+00:00",
+  "successful_reread": [
+    {
+      "ref": "gxa_01m81s4d6zdq9m4148",
+      "request": "fixture-18"
+    }
+  ]
+}

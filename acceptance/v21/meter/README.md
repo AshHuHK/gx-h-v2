@@ -15,6 +15,7 @@
 | A05、A10 反例 | 冷连接后续的两个相同 70 仍缺最终数据，在 grace 后形成第二笔估计。第三个 turn 的新累计 105 足以校正线程，重放保持 105 和三次 GX calls | [重复累计与调整](../protocol/cumulative-incomplete.json) |
 | 原生 child | 父线程先终态，父 70 加 child 183 最终按一个 GX call 结算 253。另一次 child 末响应缺失时，在 grace 后按 100 估计并保存下界 70 | [完整 child](../protocol/child-no-rollout.json) · [缺失 child](../protocol/child-missing.json) |
 | A07、A08 | 官方两个独立工作线程报告 30 和 73，硬限 100。两个原 turn 收到 `turn/interrupt` 并终态 `interrupted`，超限的完整 103 如数计量，下一次付费入场被拒 | [官方协议与真实 GX 预算](../protocol/budget.json) |
+| 软预算与 Job | 在软阈值内提交的 CPU Job 成功，重放返回原 Job。达到阈值后新增低优先级提案保留为 PROPOSED，Job 数仍为 1。测试中提高阈值后同一提案执行成功，最终只有两个 Job | [真实 CPU Job 与幂等回执](soft-jobs.json) |
 
 官方协议场景使用锁定 Codex 0.169.0 和可控 loopback 模型。GX 对原生 rollout 的 Python 文件访问在无文件场景中被禁用。新项目默认只依赖公开 App Server 事件和 GX 自己的 SQLite 收据。升级时已有付费历史的 run 保留旧诊断选项，可用 `p0_spec.metering.rollout_diagnostics=false` 关闭。[协议验收](../protocol/README.md)
 

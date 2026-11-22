@@ -1,0 +1,67 @@
+{
+  "case": "first terminal cold replay after selected resume",
+  "changed_tables": {
+    "budget_reservations": {
+      "after": {
+        "rows": 48,
+        "sha256": "99fc545211cf04a3ecfadbab4336afa20915f3fde2d468550f9c972475734d5a"
+      },
+      "before": {
+        "rows": 48,
+        "sha256": "c391ef0a9cb18a076601775098859c720fde5464a1cd21902e03e578dc6c9c8b"
+      }
+    },
+    "budgets": {
+      "after": {
+        "rows": 5,
+        "sha256": "25880405257cb4c554fafaacd20b06338dc6e008d58f5d55215826b07964ff2d"
+      },
+      "before": {
+        "rows": 5,
+        "sha256": "0197629c0bac86536f117fe7304df99ce396ea4cde7a5c6f5c16e0e60f352503"
+      }
+    }
+  },
+  "error": "AssertionError: terminal replay rewrote durable business state",
+  "last_events": [
+    [
+      "budget.released",
+      "2026-11-22T14:08:21.034Z",
+      "Run finished and all work settled"
+    ],
+    [
+      "budget.released",
+      "2026-11-22T14:08:21.034Z",
+      "Run finished and team work settled"
+    ],
+    [
+      "budget.settled",
+      "2026-11-22T14:08:20.033Z",
+      null
+    ]
+  ],
+  "stage_sha256": "c60d6e7f1ecae4ea1b65d2a050ab17ec36a303b42dc95f41fe4430501116c267",
+  "started_utc": "2026-11-22T14:07:14.621088+00:00",
+  "unchanged_tables": [
+    "artifacts",
+    "evaluations",
+    "jobs",
+    "leases",
+    "p0_attempt_waits",
+    "p0_execution_manifests",
+    "p0_meter_adjustments",
+    "p0_meter_turns",
+    "p0_root_calls",
+    "p0_root_deliveries",
+    "p0_root_turn_usage",
+    "p0_roots",
+    "p0_task_teams",
+    "p0_teams",
+    "p0_workspace_runs",
+    "runs",
+    "science_decisions",
+    "science_settlements",
+    "submissions",
+    "tasks"
+  ]
+}

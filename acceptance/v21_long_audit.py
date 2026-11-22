@@ -166,7 +166,7 @@ def business_hashes(conn):
     return digests
 
 
-def compare_install(stage, package):
+def compare_install(stage, package, revision=None):
     """Hash product sources in an isolated staged installation and the later checked-out candidate."""
     import subprocess
     roots=("bin","codex_adapter","gx-h/gx_core","gx-h/workflows","gx-h/config","gx-h/contracts",
@@ -178,14 +178,25 @@ def compare_install(stage, package):
                 if path.is_file() and not any(p in {"__pycache__","node_modules",".pytest_cache"} for p in path.parts):
                     files[str(path.relative_to(base))]=hashlib.sha256(path.read_bytes()).hexdigest()
         return files
-    old,new=inventory(stage),inventory(package)
+    old=inventory(stage)
+    exact=subprocess.check_output(["git","rev-parse","--verify",(revision or "HEAD")+"^{commit}"],cwd=package,text=True).strip()
+    if revision:
+        import io
+        import tarfile
+        raw=subprocess.check_output(["git","archive",exact,"--",*roots],cwd=package)
+        with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
+            new={entry.name:hashlib.sha256(archive.extractfile(entry).read()).hexdigest()
+                 for entry in archive if entry.isfile()}
+    else:
+        new=inventory(package)
     def digest(files):
         return hashlib.sha256(json.dumps(files,sort_keys=True,separators=(",",":")).encode()).hexdigest()
     changed={k:{"long_stage":old.get(k),"checkout":new.get(k)} for k in sorted(old.keys()|new.keys()) if old.get(k)!=new.get(k)}
     return {"staged_product_inventory_sha256":digest(old),"current_product_inventory_sha256":digest(new),
             "compared_directories":roots,"staged_files":len(old),"checkout_files":len(new),
-            "checkout_commit":subprocess.check_output(["git","rev-parse","HEAD"],cwd=package,text=True).strip(),
-            "tracked_product_changes":subprocess.check_output(["git","status","--short","--",*roots],cwd=package,text=True).splitlines(),
+            "checkout_commit":exact,
+            "source":"git archive" if revision else "working tree",
+            "tracked_product_changes":[] if revision else subprocess.check_output(["git","status","--short","--",*roots],cwd=package,text=True).splitlines(),
             "changed_files":changed}
 
 
@@ -195,6 +206,7 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description="Compare the long run's actual staged code with the current product")
     parser.add_argument("--stage",type=Path,required=True,help="The isolated cohort's install directory")
     parser.add_argument("--output",type=Path,required=True)
+    parser.add_argument("--revision",help="Compare against this exact Git commit")
     args=parser.parse_args()
     pkg=Path(__file__).resolve().parents[1]
-    args.output.write_text(json.dumps(compare_install(args.stage.resolve(),pkg),sort_keys=True,indent=2)+"\n")
+    args.output.write_text(json.dumps(compare_install(args.stage.resolve(),pkg,args.revision),sort_keys=True,indent=2)+"\n")

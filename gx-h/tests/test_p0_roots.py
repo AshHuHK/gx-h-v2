@@ -31,10 +31,11 @@ class DurableRoots(unittest.TestCase):
         tmp = patch("gx_core.p0.roots.tempfile.gettempdir", return_value=self.tmp.name)
         tmp.start()
         self.addCleanup(tmp.stop)
-        self.mock_profile = patch.dict("sys.modules", {"gx_core.p0.profiles":SimpleNamespace(
-            role_profile=lambda role:{"model":"unit-model","effort":"xhigh"},provider_name=lambda:"unit")})
-        self.mock_profile.start()
-        self.addCleanup(self.mock_profile.stop)
+        for name,value in (("p0_role_for_run",{"model":"unit-model","effort":"xhigh"}),
+                           ("p0_provider_for_run","unit")):
+            pinned = patch("gx_core.hostobs.host_policy."+name, return_value=value)
+            pinned.start()
+            self.addCleanup(pinned.stop)
         self.roots.client = SimpleNamespace(transport=SimpleNamespace(process=SimpleNamespace(pid=os.getpid())))
         self.serial = 0
 

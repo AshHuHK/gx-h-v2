@@ -10,6 +10,7 @@ from pathlib import Path
 from ..artifacts.service import ArtifactService
 from ..domain import clock, ids, machines
 from ..errors import GxError, IllegalTransition, OutcomeUnknown, ScopeDenied, SchemaInvalid
+from ..hostobs import host_policy
 from ..hostobs.app_server_client import AppServerClient, AppServerResponseError
 from ..persistence import records, store
 from ..scheduling import dispatch as scheduler, snapshot
@@ -75,12 +76,16 @@ class Roots:
                  worker_tools=(), worker_call=None, main_tools=(), main_call=None):
         from .root_delivery import RootDelivery
         self.conn, self.run_id = conn, run_id
+        self.run = conn.execute("SELECT * FROM runs WHERE run_id=?",(run_id,)).fetchone()
+        if not self.run:
+            raise ScopeDenied("unknown GX run")
         self.cwd, self.argv, self.env = Path(cwd).resolve(), argv, env
         self.token_budget = token_budget
         self.worker_tools = [*WORKER_TOOLS, *worker_tools]
         self.main_tools = list(main_tools)
         self.worker_call, self.main_call = worker_call, main_call
         self.client = None
+        self.disabled_mcp = {}
         self.loaded = set()
         self.active_turns = {}
         self._goal_queue = set()
@@ -88,10 +93,16 @@ class Roots:
 
     def __enter__(self):
         from .profiles import clash_env
-        env = clash_env() if self.env is None else self.env
+        provider = host_policy.p0_provider_for_run(self.run)
+        env = clash_env()
+        if self.env is not None:
+            proxy = {key:value for key,value in env.items() if key.lower() in
+                     ("http_proxy","https_proxy","all_proxy","no_proxy")}
+            env = {**self.env,**proxy}
         if self.argv is None:
             from .profiles import app_server_argv
-            argv = app_server_argv()
+            selection = json.loads(self.run["host_json"] or "{}").get("policy_selection",{})
+            argv = app_server_argv(test_mode=selection.get("test_mode"), provider=selection.get("model_provider"))
         else:
             argv = self.argv
         self.client = AppServerClient(argv, cwd=str(self.cwd), env=env, on_notification=self._observe,
@@ -101,6 +112,13 @@ class Roots:
             self._request("initialize", {"clientInfo": {"name": "gx_p0", "version": "1"},
                                          "capabilities": {"experimentalApi": True}})
             self.client.notify("initialized", {})
+            # Retain only the literal server names needed to close inherited MCP write paths.
+            # Raw effective configuration can contain credentials and never enters GX or a prompt.
+            effective = self._request("config/read",{"cwd":str(self.cwd),"includeLayers":False})["config"]
+            self.disabled_mcp = {name:{"enabled":False} for name in effective.get("mcp_servers",{})}
+            endpoint = json.loads(self.run["host_json"] or "{}").get("policy_selection",{}).get("test_base_url")
+            if endpoint and (effective.get("model_providers",{}).get(provider) or {}).get("base_url") != endpoint:
+                raise ScopeDenied("the official host resolved a different loopback provider endpoint")
         except BaseException:
             self.client.close()
             raise
@@ -128,6 +146,7 @@ class Roots:
     def _observe(self, received):
         msg = received.message
         method, p = msg["method"], msg.get("params", {})
+        self.delivery.observe_descendant(method,p)
         thread = p.get("threadId")
         if method == "thread/started":
             item = p["thread"]
@@ -139,6 +158,8 @@ class Roots:
             return
         if method == "turn/started":
             self.active_turns[thread] = p["turn"]["id"]
+            if self._binding(thread)["goal_desired"] == "active":
+                self._goal_queue.add(thread)
         elif method == "turn/completed":
             if self.active_turns.get(thread) == p["turn"]["id"]:
                 self.active_turns.pop(thread, None)
@@ -181,15 +202,15 @@ class Roots:
         seconds = max(seconds,0.001)
         event = self.client.run_until(lambda _: True, timeout=max(1, seconds+1), poll_interval=seconds)
         self._flush_goals()
+        self.delivery.verify_descendants()
         return bool(event)
 
     def _new_row(self, *, task=None, lease=None, attempt=None):
-        from .profiles import role_profile
         key = str(uuid.uuid4())
         rootdir = Path(tempfile.gettempdir()) / f"gx-p0-codex-{os.getuid()}" / key
         rootdir.mkdir(mode=0o700, parents=True, exist_ok=False)
         role = task["role"] if task is not None else "main"
-        profile = role_profile({"main":"lead","planner":"decision","evidence_reviewer":"reasoning"}.get(role, role))
+        profile = host_policy.p0_role_for_run(self.run, "decision" if role=="planner" else role)
         if task is None:
             brief = MAIN_INSTRUCTIONS
         else:
@@ -244,8 +265,9 @@ class Roots:
                 recovery.requeue_or_exhaust(self.conn,task_id,reason="expired P0 root lease",
                                             enter_ready=TeamService(self.conn)._enter_ready,consume=False)
                 task = self.conn.execute("SELECT * FROM tasks WHERE task_id=?",(task_id,)).fetchone()
-            if (task["status"] != "READY" or not records.dependencies_satisfied(self.conn, task_id)[0]
-                    or recovery.consumed(self.conn, task) >= task["max_attempts"]):
+            if task["status"] == "READY" and not records.dependencies_satisfied(self.conn,task_id)[0]:
+                return None
+            if (task["status"] != "READY" or recovery.consumed(self.conn, task) >= task["max_attempts"]):
                 raise IllegalTransition("this task is not ready or has spent its attempts")
             from .science_refresh import prepare_dispatch
             if not prepare_dispatch(self.conn,self.run_id,task):
@@ -265,9 +287,9 @@ class Roots:
     def _settings(self, row, *, new):
         main = row["task_id"] is None
         config = {"features.goals": not main, "features.shell_tool": False, "features.unified_exec": False,
-                  "features.multi_agent": True, "web_search":"disabled", "model_reasoning_effort":row["effort"]}
-        from .profiles import provider_name
-        params = {"modelProvider":provider_name(),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
+                  "features.multi_agent":True,"features.apps":False,"features.plugins":False,"features.hooks":False,
+                  "mcp_servers":self.disabled_mcp,"web_search":"disabled","model_reasoning_effort":row["effort"]}
+        params = {"modelProvider":host_policy.p0_provider_for_run(self.run),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
                   "config":config, "developerInstructions":row["brief"] if main else
                   WORKER_INSTRUCTIONS+"\n"+row["brief"]}
         if new:
@@ -302,9 +324,8 @@ class Roots:
         return tid
 
     def _verify_settings(self, row, response):
-        from .profiles import provider_name
         policy = response.get("sandbox") or {}
-        if (response.get("model") != row["model"] or response.get("modelProvider") != provider_name()
+        if (response.get("model") != row["model"] or response.get("modelProvider") != host_policy.p0_provider_for_run(self.run)
                 or response.get("reasoningEffort") != row["effort"]
                 or response.get("approvalPolicy") != "never" or policy.get("type") != "readOnly"
                 or policy.get("networkAccess") is not False):
@@ -385,9 +406,10 @@ class Roots:
             return self._materialize(self._row(row["root_key"]))
         try:
             result = self._request("thread/start", self._settings(row, new=True))
-        except AppServerResponseError:
-            self.conn.execute("UPDATE p0_roots SET state='prepared' WHERE root_key=? AND thread_id IS NULL",
-                              (row["root_key"],))
+        except AppServerResponseError as exc:
+            if exc.code in (-32600,-32601,-32602):
+                self.conn.execute("UPDATE p0_roots SET state='prepared' WHERE root_key=? AND thread_id IS NULL",
+                                  (row["root_key"],))
             raise
         self._verify_settings(row, result)
         tid = self._bind(row,result["thread"])
@@ -476,29 +498,55 @@ class Roots:
         row = self._binding(thread_id)
         if not row or row["task_id"] is None:
             return
+        latest = self.conn.execute("SELECT d.turn_id,u.terminal_status FROM p0_root_deliveries d "
+                                   "LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) WHERE d.thread_id=? "
+                                   "AND d.method='turn/start' AND d.state='acknowledged' ORDER BY d.rowid DESC LIMIT 1",
+                                   (thread_id,)).fetchone()
+        # The official start receipt precedes publication. Hydrating thread/read in that gap
+        # can fail on an empty rollout. Consume the start/completion event on the existing pipe.
+        if (latest and not latest["terminal_status"] and not row["wait_job_id"]
+                and self.active_turns.get(thread_id) != latest["turn_id"]):
+            def matches(frame):
+                msg = frame.message
+                p = msg.get("params",{})
+                return (msg.get("method") in ("turn/started","turn/completed")
+                        and p.get("threadId")==thread_id and p.get("turn",{}).get("id")==latest["turn_id"])
+            self.client.run_until(matches,timeout=4,poll_interval=2)
+        row = self._binding(thread_id)
+        desired = "paused" if row["wait_job_id"] else row["goal_desired"]
+        if desired not in ("complete","paused"):
+            if not latest or self.active_turns.get(thread_id) != latest["turn_id"]:
+                # A later turn/started (or cold resume's observed in-progress turn) completes
+                # projection. Never turn on an idle Goal just to provoke a model request.
+                self.conn.execute("UPDATE p0_roots SET goal_desired='active' WHERE thread_id=? "
+                                  "AND (goal_desired IS NULL OR goal_desired='active')", (thread_id,))
+                return
+            desired = "active"
         current = self._request("thread/goal/get", {"threadId":thread_id}).get("goal")
         params = {"threadId":thread_id,"origin":"automatic"}
-        # A resumed goal keeps its original accounting. Never replace an objective to update status.
+        # A resumed goal keeps its original accounting. Never overwrite an existing objective.
         if current is None:
             params.update(objective=f"Submit the independently validated product for GX task {row['task_id']}.",
                           tokenBudget=hold_tokens or None)
-        active = self.delivery.active(thread_id)
-        status = "paused" if row["wait_job_id"] or not active else "active"
-        if row["goal_desired"] in ("paused","complete"):
-            status = row["goal_desired"]
-        if current is None or current["status"] != status and current["status"] not in ("complete","budgetLimited"):
-            self._request("thread/goal/set",{**params,"status":status})
+        if current is None or current["status"] != desired and current["status"] not in ("complete","budgetLimited"):
+            self._request("thread/goal/set",{**params,"status":desired})
 
     def _flush_goals(self):
-        while self._goal_queue:
-            thread_id = next(iter(self._goal_queue))
+        for thread_id in tuple(self._goal_queue):
+            self._goal_queue.discard(thread_id)
             row = self._binding(thread_id)
-            if row and row["goal_desired"]:
-                goal = self._request("thread/goal/get",{"threadId":thread_id}).get("goal")
-                desired = row["goal_desired"]
-                if goal and goal["status"] != desired and goal["status"] not in ("complete","budgetLimited"):
-                    self._request("thread/goal/set", {"threadId":thread_id,"origin":"automatic","status":desired})
-            self._goal_queue.remove(thread_id)
+            if not row or not row["goal_desired"]:
+                continue
+            if row["goal_desired"] == "active":
+                hold = self.conn.execute("SELECT token_budget FROM p0_root_deliveries WHERE thread_id=? "
+                                         "AND method='turn/start' ORDER BY rowid DESC LIMIT 1",(thread_id,)).fetchone()
+                if hold:
+                    self._goal_for_budget(thread_id, hold["token_budget"])
+                continue
+            current = self._request("thread/goal/get",{"threadId":thread_id}).get("goal")
+            desired = self._binding(thread_id)["goal_desired"]
+            if desired in ("paused","complete") and current and current["status"] not in (desired,"complete","budgetLimited"):
+                self._request("thread/goal/set",{"threadId":thread_id,"origin":"automatic","status":desired})
 
     def _callback(self, received):
         p = received.message.get("params") or {}

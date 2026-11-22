@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "authoritative": true,
+  "holds": [],
+  "switches": {
+    "write_to_gx_harness": {
+      "value": false
+    },
+    "start_or_restart_gx_services": {
+      "value": false
+    },
+    "modify_shared_conda_envs": {
+      "value": false
+    },
+    "gpu_jobs": {
+      "value": false
+    },
+    "network_downloads": {
+      "value": false
+    },
+    "model_weight_downloads": {
+      "value": false
+    },
+    "full_dataset_downloads": {
+      "value": false
+    },
+    "paid_external_services": {
+      "value": false
+    },
+    "new_llm_api_clients": {
+      "value": false
+    },
+    "install_into_control_plane_venv": {
+      "value": false
+    },
+    "train_model_weights": {
+      "value": false
+    },
+    "expose_network_ports": {
+      "value": false
+    },
+    "read_protected_test_labels": {
+      "value": false
+    },
+    "launch_gx_stdio_backends": {
+      "value": false
+    },
+    "headless_host_sessions": {
+      "value": true,
+      "scope": "acceptance_and_adapter_verification",
+      "native_launch": {
+        "source_mode": "codex_native_events_v1",
+        "max_wall_seconds": 7200,
+        "max_turns": 96,
+        "max_workers": 10,
+        "max_callbacks": 2400,
+        "allow_mutations": true,
+        "capture_public_output": true,
+        "tool_profile": "native_v2"
+      }
+    }
+  },
+  "gpu": {
+    "preflight_required": true,
+    "preflight_max_age_seconds": 120,
+    "requires_recheck_before_each_launch": true,
+    "min_free_mib": 24576,
+    "max_self_memory_mib": 8192,
+    "max_concurrent_gpu_jobs": 1,
+    "max_wall_minutes": 20,
+    "queue_wait_seconds": 1800,
+    "queue_wait_seconds_note": "How long a GPU job may wait in the device's queue before it ends FAILED not_started (design r2.2a §7.1). Such a job is charged nothing; the wait counts against run_budget.resource_waits_per_path. A limits line since contract r5 so that a test can lower it in a relocated copy.",
+    "abort_if_preflight_missing": true,
+    "record_preflight_in_job": true
+  },
+  "engineering_budget": {
+    "max_repair_attempts_per_fingerprint": 3,
+    "max_global_repair_rounds_per_session": 6,
+    "stop_after_no_new_evidence_rounds": 2,
+    "metadata_command_timeout_seconds": 60,
+    "ordinary_test_timeout_seconds": 300,
+    "project_qualification_retry_timeout_seconds": 1200,
+    "reviewed_install_timeout_seconds": 900
+  },
+  "research_budget": {
+    "initial_candidate_paths": 3,
+    "max_concurrent_active_paths": 2,
+    "max_literature_replanning_rounds": 3,
+    "paid_external_calls": 0,
+    "automatic_gpu_job_budget": 5,
+    "automatic_new_weight_downloads": 0
+  },
+  "task_budget": {
+    "max_attempts": 3,
+    "lease_seconds": 3600,
+    "coordinator_lease_seconds": 1800
+  },
+  "run_budget": {
+    "max_parallel_workers": 10,
+    "max_overtakes": 24,
+    "resource_waits_per_path": 3,
+    "stop_after_no_progress_rounds": 2,
+    "reaction_seconds": 30
+  },
+  "budget_profiles": {
+    "default": {
+      "worker_tasks": 120,
+      "job_submissions": 200,
+      "cpu_seconds": 14400,
+      "gpu_jobs": 2,
+      "gpu_minutes": 40,
+      "wall_hours": 24
+    },
+    "cpu_only": {
+      "worker_tasks": 120,
+      "job_submissions": 200,
+      "cpu_seconds": 14400,
+      "gpu_jobs": 0,
+      "gpu_minutes": 0,
+      "wall_hours": 24
+    },
+    "tiny": {
+      "worker_tasks": 4,
+      "job_submissions": 4,
+      "cpu_seconds": 120,
+      "gpu_jobs": 0,
+      "gpu_minutes": 0,
+      "wall_hours": 1
+    },
+    "native_mvp": {
+      "worker_tasks": 6,
+      "job_submissions": 1,
+      "cpu_seconds": 60,
+      "gpu_jobs": 0,
+      "gpu_minutes": 0,
+      "wall_hours": 0.5
+    }
+  },
+  "evaluation": {
+    "heldout_looks_per_subject": 3,
+    "familywise_alpha": 0.05
+  },
+  "reference_budget": {
+    "total_new_download_budget_mb": 380,
+    "per_project_download_budget_mb": 8,
+    "include_model_weights": false,
+    "include_full_datasets": false,
+    "include_lfs": false,
+    "execute_downloaded_code": false,
+    "execute_after_static_review_in_isolated_env": true
+  },
+  "cpu": {
+    "max_quota_fraction": 0.5,
+    "max_pool_workers": 8
+  },
+  "network": {
+    "all_outbound_via_clash": true,
+    "http_proxy": "http://127.0.0.1:7890",
+    "socks5_proxy": "socks5h://127.0.0.1:7891",
+    "bypass_allowed": [
+      "localhost",
+      "127.0.0.1",
+      "::1"
+    ],
+    "forbidden": [
+      "curl --noproxy",
+      "unsetting proxy variables",
+      "widening NO_PROXY",
+      "direct-connection fallback"
+    ]
+  },
+  "approval_required_actions": [
+    "real high-cost GPU or HPC jobs beyond the gpu budget above",
+    "new model weight or large database downloads",
+    "deletion or irreversible migration",
+    "restarting any shared service",
+    "modifying global client configuration",
+    "exposing a network port",
+    "sending private data to any external service",
+    "any new paid service",
+    "widening the data scope",
+    "production plugin or evaluator updates"
+  ],
+  "host_pool": {
+    "max_slots": 13,
+    "slot_counting": "total_including_root_and_external_occupied",
+    "max_agent_depth": 4,
+    "root_depth": 0,
+    "target_concurrent_children": 10
+  },
+  "screens": {
+    "credentials": [
+      {
+        "id": "private_key_block",
+        "pattern": "-----BEGIN [A-Z ]{0,30}PRIVATE KEY-----",
+        "why": "a private key"
+      },
+      {
+        "id": "api_key_sk",
+        "pattern": "\\bsk-[A-Za-z0-9_-]{20,200}",
+        "why": "an API key"
+      },
+      {
+        "id": "github_token",
+        "pattern": "\\bgh[pousr]_[A-Za-z0-9]{20,255}",
+        "why": "a GitHub token"
+      },
+      {
+        "id": "aws_access_key",
+        "pattern": "\\bAKIA[0-9A-Z]{16}\\b",
+        "why": "an AWS access key id"
+      },
+      {
+        "id": "slack_token",
+        "pattern": "\\bxox[baprs]-[A-Za-z0-9-]{10,200}",
+        "why": "a Slack token"
+      },
+      {
+        "id": "jwt",
+        "pattern": "\\beyJ[A-Za-z0-9_-]{20,2000}\\.[A-Za-z0-9_-]{20,4000}\\.[A-Za-z0-9_-]{10,1000}",
+        "why": "a signed token"
+      },
+      {
+        "id": "bearer_header",
+        "pattern": "(?i)\\bbearer[ \\t]{1,8}[A-Za-z0-9._-]{20,2000}",
+        "why": "an authorization header"
+      }
+    ]
+  }
+}

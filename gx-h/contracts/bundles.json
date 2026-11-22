@@ -1,0 +1,728 @@
+{
+  "schema_version": 2,
+  "note": "AUTHORITATIVE schemas for the bundles a host submits for a task, and for benchmark_bundle, which only gx_ingest builds (rules.benchmark). A bundle is a JSON artifact published with gx_artifact_put and referenced by gx_task_submit. The backend validates it record by record against bytes and rows it holds, and answers per record. Nothing in a bundle is trusted because it is well formed.",
+  "why": "v1 handed the host one small task per topic and accepted the name of an artifact kind in place of an artifact. A long-horizon host does better with the whole brief and one large return; the backend's work moves to the end, where it checks each record mechanically.",
+  "notation": "Field types: str, int, num, bool, object, array, array<T>, a named type, or enum:<label axis>. A trailing ? marks an optional field. Unknown fields are refused, not ignored, so a bundle cannot carry a status or a verdict the backend would have to decide whether to believe.",
+  "limits": {
+    "max_records": 2000,
+    "max_inline_bytes": 262144,
+    "note": "A bundle larger than max_inline_bytes is placed in the run's inbox and published by path; it is never passed inline."
+  },
+  "bundles": {
+    "research_bundle": {
+      "for_task_kinds": [
+        "research_round"
+      ],
+      "fields": {
+        "sub_questions": "array<SubQuestion>",
+        "search_ids": "array<str>",
+        "source_ids": "array<str>",
+        "evidence_bundle_ref": "str?",
+        "gaps": "array<GapRecord>",
+        "negative_results": "array<NegativeResult>",
+        "summary": "str"
+      },
+      "backend_checks": [
+        "every search_id is a search the backend ran for this run",
+        "every source_id is a source the backend holds bytes for",
+        "a negative result cites at least one recorded search that returned nothing relevant",
+        "the evidence bundle, if given, is validated as an evidence_bundle"
+      ],
+      "acceptance": "Accepted when every referenced search and source resolves. Its evidence records are judged one by one and do not have to all pass."
+    },
+    "evidence_bundle": {
+      "for_task_kinds": [
+        "extract_evidence",
+        "research_round"
+      ],
+      "fields": {
+        "records": "array<EvidenceRecord>"
+      },
+      "backend_checks": [
+        "the source is PARSED and not RETRACTED",
+        "the submitting lease holds a read receipt covering the cited segment",
+        "the verbatim quote occurs in the cited segment of the bytes the backend holds",
+        "claim_grain is extractable at the source's computed text coverage",
+        "confidence_basis states grounds and is not a bare number"
+      ],
+      "per_record": "Each record comes back with its evidence_id, anchor_status and resulting state, or with the refusal and, where the quote occurs in another segment, that segment. A record carrying review_status, evidence_level or state is refused.",
+      "acceptance": "Accepted when at least the task's minimum number of records reach LOCATOR_VERIFIED or VALUE_FROM_FIGURE. Records that do not anchor are kept as LOCATOR_UNRESOLVED and reported, never silently dropped."
+    },
+    "evidence_review_bundle": {
+      "for_task_kinds": [
+        "review_evidence"
+      ],
+      "fields": {
+        "reviews": "array<EvidenceReview>"
+      },
+      "backend_checks": [
+        "the reviewing lease is not the lease that extracted the record",
+        "the reviewing principal and observed worker differ from the extractor's",
+        "the receipt belongs to the reviewing lease and covers the record's cited span",
+        "quote_sha256_seen equals the sha256 of the text the backend delivered"
+      ],
+      "per_record": "SUPPORTED moves the record to REVIEWED. OVERSTATED, NOT_SUPPORTED and CONTRADICTED move it to DISPUTED and are kept with the reviewer's note.",
+      "acceptance": "Accepted when every record the task named has a review that passed the independence and receipt checks."
+    },
+    "gap_bundle": {
+      "for_task_kinds": [
+        "research_round",
+        "reexplore_review"
+      ],
+      "fields": {
+        "gaps": "array<GapRecord>"
+      },
+      "backend_checks": [
+        "every cited search and evidence id resolves",
+        "evidence_for and evidence_against are REVIEWED",
+        "a gap marked unresolvable cites at least one recorded search",
+        "a reexplore_review gap opened from hypothesis_unsupported names in disconfirming_search_ids at least one answered search of the run, and carries reviewed evidence_against or says none found in disconfirming"
+      ],
+      "acceptance": "Accepted when every gap resolves its references."
+    },
+    "path_bundle": {
+      "for_task_kinds": [
+        "propose_paths"
+      ],
+      "fields": {
+        "paths": "array<PathSpec>"
+      },
+      "backend_checks": [
+        "the run is in a plannable state",
+        "every capability version resolves to an ACTIVE version or is declared as a gap",
+        "method identity is read from the method cards; the planner's wording is stored as a claim",
+        "distinctness is computed from those identities and the backend's equivalence table",
+        "the input manifest resolves and its content re-hashes",
+        "the eval spec exists and is FROZEN or in the builder",
+        "a branch carries its parent's eval_spec_ref@sha256, or a bridge version of it under a GRANTED eval_spec_change approval (states.json path.rules.branch)",
+        "a prediction fits its specification: a metric and a stratum the specification declares, == only for a metric whose unit is a count or a category, and not vacuous under the specification's calibration",
+        "a path at reduced scale carries scope_reduction and is recorded as a branch",
+        "supporting evidence is REVIEWED and not withdrawn",
+        "every cited skill is ACTIVE at that version and sha256",
+        "the resource estimate's basis resolves to a measurement",
+        "the budget is checked at acceptance and funded at the selection wave: a path that fails only the budget check is kept VALIDATED and unfunded, with its checked estimate and the refusal reason, and each wave funds candidates in cut order",
+        "the fingerprint is new, or the path cites evidence created after its parent"
+      ],
+      "per_record": "Each path comes back accepted with its path_id, computed identity, relationship to the run's other paths and its budget reservation, or rejected with a code. A path that failed only the budget check comes back accepted and unfunded, with the refusal reason; a funding refusal at a wave is a deferral with its reason. An accepted path that the backend classifies as a branch of another is recorded as its child, not as an independent route.",
+      "acceptance": "Accepted when at least the task's minimum number of independent paths is accepted."
+    },
+    "execution_bundle": {
+      "for_task_kinds": [
+        "execute_path"
+      ],
+      "fields": {
+        "path_id": "str",
+        "job_ids": "array<str>",
+        "outputs": "array<JobOutput>",
+        "deviations": "array<Deviation>",
+        "failure": "FailureReport?",
+        "notes": "str?"
+      },
+      "backend_checks": [
+        "every job belongs to this run, path and task and is in a terminal state the backend itself observed",
+        "every output is an artifact that job published, and its bytes re-hash",
+        "the capability versions and resolved parameters of the jobs are the ones the path was accepted with; any difference must be listed as a deviation",
+        "a failure report names a class of the failure taxonomy, and an outcome class only when an evaluation exists to carry it",
+        "a failure report never names evaluator_bug: that class is recorded only from the runner's own evidence or from an evaluation review that reproduced the defect"
+      ],
+      "per_record": "Each job and each output comes back resolved or refused. A job the bundle does not mention but the backend recorded for the path is reported, so a failed attempt cannot be left out.",
+      "acceptance": "Accepted when the jobs and outputs resolve. Acceptance says the path was executed as planned, or says how it was not. The evaluation is then run by the backend under the frozen specification; an executor reports no score."
+    },
+    "skill_bundle": {
+      "for_task_kinds": [
+        "author_skill",
+        "import_asset"
+      ],
+      "fields": {
+        "manifest": "SkillManifest",
+        "document": "str",
+        "trace_rows": "array<TraceRow>",
+        "scenarios": "array<Scenario>",
+        "scripts": "array<ScriptRef>?"
+      },
+      "backend_checks": [
+        "manifest_schema",
+        "the checks contracts/gates.json lists for DECISION_SKILL, run by the backend after intake"
+      ],
+      "acceptance": "Accepted as a candidate asset in DRAFT or QUARANTINED. Acceptance of the task is not promotion: the asset then takes its gates. A repair of a failed skill version is answered by this bundle: its manifest names that version in supersedes."
+    },
+    "workflow_bundle": {
+      "for_task_kinds": [
+        "author_workflow",
+        "import_asset"
+      ],
+      "fields": {
+        "manifest": "WorkflowManifest",
+        "definition": "object",
+        "bindings": "object"
+      },
+      "backend_checks": [
+        "manifest_schema",
+        "the checks contracts/gates.json lists for EXECUTABLE_WORKFLOW"
+      ],
+      "acceptance": "Accepted as a candidate asset. A workflow is registered for execution only at ACTIVE."
+    },
+    "capability_manifest_bundle": {
+      "for_task_kinds": [
+        "onboard_capability",
+        "import_asset"
+      ],
+      "fields": {
+        "manifest": "CapabilityManifest",
+        "entry_script": "ScriptRef?",
+        "parser": "ScriptRef?"
+      },
+      "backend_checks": [
+        "manifest_schema",
+        "the id and version are new, or the content sha256 equals the registered one",
+        "the environment exists",
+        "the checks contracts/gates.json lists for TOOL_ADAPTER"
+      ],
+      "acceptance": "Accepted as a candidate capability. It becomes callable only at ACTIVE, which requires a smoke job with a job id. A repair of a failed capability version is answered by this bundle: its manifest names that version in supersedes."
+    },
+    "evalspec_bundle": {
+      "for_task_kinds": [
+        "design_evaluation"
+      ],
+      "fields": {
+        "spec": "EvalSpec",
+        "cases": "array<EvalCase>"
+      },
+      "backend_checks": [
+        "manifest_schema",
+        "the checks contracts/gates.json lists under eval_spec_requirements, the cases being executed by the runner"
+      ],
+      "acceptance": "Accepted as a specification in DRAFT. It scores candidates only once FROZEN."
+    },
+    "asset_review_bundle": {
+      "for_task_kinds": [
+        "review_asset",
+        "review_evaluation"
+      ],
+      "fields": {
+        "subject": "SubjectRef",
+        "verdict": "enum:review_verdict",
+        "row_verdicts": "array<RowVerdict>?",
+        "rubric": "array<RubricItem>",
+        "hidden_scenarios": "array<Scenario>?",
+        "reproducing_case": "EvalCase?",
+        "notes": "str?"
+      },
+      "backend_checks": [
+        "the subject sha256 is the one the task was created for",
+        "the reviewing principal, lease and observed worker differ from the author's and, for a review of an evaluation specification, from those of every planner and executor scored under it",
+        "every trace row or case the task named has a verdict",
+        "a reproducing case is carried only by a review of an evaluation specification; the runner executes it, and evaluator_bug is recorded only when the reviewed version does not return the verdict the case expects"
+      ],
+      "acceptance": "Accepted when the independence checks pass. The verdict is recorded whatever it is; only APPROVE meets a gate, and the gate skips a defect review (contracts/gates.json review.rules.defect_review)."
+    },
+    "scenario_answers_bundle": {
+      "for_task_kinds": [
+        "answer_scenarios"
+      ],
+      "fields": {
+        "subject": "SubjectRef",
+        "answers": "array<ScenarioAnswer>"
+      },
+      "backend_checks": [
+        "the answering worker is not the skill's author",
+        "every scenario the task named has an answer"
+      ],
+      "acceptance": "Accepted when complete. The backend compares choices with the expected ones itself and writes the scenario_execution check run."
+    },
+    "strategy_bundle": {
+      "for_task_kinds": [
+        "propose_improvement"
+      ],
+      "fields": {
+        "manifest": "StrategyManifest",
+        "config": "object",
+        "scripts": "array<ScriptRef>?"
+      },
+      "backend_checks": [
+        "manifest_schema",
+        "every declared target lies inside the improvable scope and none touches permissions, budgets, approvals or held-out answers",
+        "a threshold chosen on development data is part of the content, so changing it is a new candidate"
+      ],
+      "acceptance": "Accepted as a candidate for an RSI cycle."
+    },
+    "role_bundle": {
+      "for_task_kinds": [
+        "import_asset"
+      ],
+      "fields": {
+        "manifest": "RoleManifest",
+        "instructions": "str",
+        "may_not_use": "array<str>",
+        "may_use_only": "array<str>?"
+      },
+      "backend_checks": [
+        "manifest_schema",
+        "the checks contracts/gates.json lists for ROLE_INTENT"
+      ],
+      "acceptance": "Accepted as a candidate asset. A role intent names no model and no effort: its projection takes both from config/role_policy.json for the role's class."
+    },
+    "benchmark_bundle": {
+      "for_task_kinds": [],
+      "fields": {
+        "manifest": "BenchmarkManifest",
+        "source": "object",
+        "recipe": "object",
+        "control_rule": "object",
+        "counts": "object"
+      },
+      "backend_checks": [
+        "manifest_schema",
+        "the checks contracts/gates.json lists for BENCHMARK",
+        "the content carries no list of items: every item is derived from the pinned bytes by the recipe"
+      ],
+      "acceptance": "Accepted as a candidate asset. No task kind submits one: a benchmark is registered only by gx_ingest (source_kind rsi_benchmark), which judges it by these checks, so a worker of a run never authors the benchmark it is measured by."
+    },
+    "conclusion_bundle": {
+      "for_task_kinds": [
+        "conclude"
+      ],
+      "fields": {
+        "statement": "str",
+        "layer_claimed": "int",
+        "evidence_refs": "array<str>",
+        "evaluation_refs": "array<str>",
+        "limitations": "str",
+        "negative_results": "array<str>",
+        "untested": "array<UntestedPath>?",
+        "inapplicable": "array<str>?",
+        "never_selected": "array<NeverSelected>?",
+        "budget_refused": "array<BudgetRefused>?",
+        "paired_comparison": "object?",
+        "next_objective": "str?"
+      },
+      "backend_checks": [
+        "layer_claimed is at most 3: layer 4 is never asserted through software",
+        "every evidence ref is REVIEWED and every evaluation ref exists under a frozen specification",
+        "the evaluations cited support the layer claimed, by one table: 3, a PASS with full DEVELOPMENT coverage under the objective's specification, or its STOP_RANKING successor after a full re-score, and a PASS on the confirmatory held-out read; 2, that development PASS without the confirmatory PASS, or a PASS under another specification, or with partial coverage; 0, no PASS cited, whatever was measured, with the measurements in the statement and the failures among the negative results",
+        "layer 1 is not a claim about an objective and is refused in a conclusion; a conclusion reached at a round in which no path has an outcome claims layer 0",
+        "a layer-2 claim is stated as passed on development after K attempts; K is counted from the store for that specification and split and reported with the verdict",
+        "the evidence the passing path itself rests on is still REVIEWED",
+        "a RETAINED path whose registered prediction was REFUTED is named in limitations",
+        "paths that ended in an outcome class, and inconclusive paths, are listed among the negative results, which are derived from outcome classes and never from the BLOCKED state",
+        "every path the decision carried as untested is listed in untested, with its failure class and what it needed, and not among the negative results",
+        "every path whose inputs lay outside a method's declared domain is listed in inapplicable, every VALIDATED path no wave selected in never_selected with its last deferral reason, and every proposal refused for budget in budget_refused with the reason and the checked estimate",
+        "a contrast unit is concluded by paired_comparison: its variants, compared record by record under the one specification"
+      ],
+      "acceptance": "Accepted when its references resolve and it claims no more than they support."
+    },
+    "research_update_bundle": {
+      "for_task_kinds": [
+        "research_synthesis"
+      ],
+      "fields": {
+        "round_id": "str",
+        "context_ref": "str",
+        "context_sha256": "str",
+        "sealed_sha256": "str",
+        "results": "array<object>",
+        "updates": "array<object>",
+        "next_tasks": "array<object>",
+        "interpretation": "str",
+        "limitations": "array<str>"
+      },
+      "backend_checks": [
+        "the round fixed all result identities and observed evaluations",
+        "every result is covered exactly once, with negatives, contradictions, untested and missing retained",
+        "exact hypothesis target revisions and current context; real reviewed evidence and stored evaluation refs",
+        "engineering failures cannot refute hypotheses"
+      ],
+      "acceptance": "Accepted when the immutable proposal is persisted; scientific updates wait for independent review and coordinator commit."
+    },
+    "research_update_review_bundle": {
+      "for_task_kinds": [
+        "review_research_update"
+      ],
+      "fields": {
+        "proposal_id": "str",
+        "proposal_sha256": "str",
+        "verdict": "str",
+        "note": "str"
+      },
+      "backend_checks": [
+        "live round review-task lease and actual host-recorded peer independence",
+        "exact immutable proposal digest",
+        "all cited references and fixed coverage revalidated"
+      ],
+      "acceptance": "Review is stored; APPROVE permits a separate coordinator CAS commit, never self-approval."
+    }
+  },
+  "types": {
+    "SubQuestion": {
+      "id": "str",
+      "question": "str",
+      "note": "str?"
+    },
+    "NegativeResult": {
+      "sub_question_id": "str",
+      "search_ids": "array<str>",
+      "statement": "str"
+    },
+    "GapRecord": {
+      "question": "str",
+      "gap_kind": "enum:gap_kind",
+      "search_ids": "array<str>",
+      "evidence_for": "array<str>",
+      "evidence_against": "array<str>",
+      "missing": "str",
+      "unresolvable": "bool?",
+      "failed_path_id": "str?",
+      "failure_class": "str?",
+      "disconfirming_search_ids": "array<str>?",
+      "disconfirming": "str?"
+    },
+    "Locator": {
+      "segment_id": "str",
+      "quote": "str",
+      "char_start": "int?",
+      "char_end": "int?",
+      "figure_or_table": "str?"
+    },
+    "EvidenceRecord": {
+      "claim": "str",
+      "claim_grain": "enum:claim_grain",
+      "evidence_type": "enum:evidence_type",
+      "source_id": "str",
+      "locator": "Locator",
+      "conditions": "str?",
+      "method": "str?",
+      "data": "str?",
+      "limitations": "str?",
+      "contradictory_refs": "array<str>?",
+      "confidence_basis": "str",
+      "sub_question_id": "str?"
+    },
+    "EvidenceReview": {
+      "evidence_id": "str",
+      "verdict": "enum:evidence_review_verdict",
+      "receipt_id": "str",
+      "quote_sha256_seen": "str",
+      "note": "str?"
+    },
+    "AssetRef": {
+      "asset_id": "str",
+      "version": "str",
+      "sha256": "str"
+    },
+    "SubjectRef": {
+      "kind": "str",
+      "id": "str",
+      "version": "str",
+      "sha256": "str"
+    },
+    "ScriptRef": {
+      "path": "str",
+      "artifact_ref": "str",
+      "sha256": "str"
+    },
+    "MethodStep": {
+      "capability_version": "str",
+      "parameters": "object?"
+    },
+    "ResourceEstimate": {
+      "amounts": "object",
+      "basis_ref": "str"
+    },
+    "Prediction": {
+      "metric": "str",
+      "relation": "str",
+      "value": "num",
+      "stratum": "str?",
+      "refutes": "str?"
+    },
+    "ScopeReduction": {
+      "dropped_record_ids": "array<str>",
+      "property": "str"
+    },
+    "PathSpec": {
+      "hypothesis": "str",
+      "alternative_hypotheses": "array<str>",
+      "discriminating_prediction": "str",
+      "supporting_evidence": "array<str>",
+      "conflicting_evidence": "array<str>",
+      "knowledge_gaps": "array<str>",
+      "method_sequence": "array<MethodStep>",
+      "skill_refs": "array<AssetRef>",
+      "input_manifest_ref": "str",
+      "expected_artifacts": "array<str>",
+      "eval_spec_ref": "str",
+      "controls": "array<str>",
+      "uncertainty": "str",
+      "resource_estimate": "ResourceEstimate",
+      "risk": "str",
+      "fallback_policy": "str",
+      "parent_path_id": "str?",
+      "new_evidence_refs": "array<str>?",
+      "method_claims": "object?",
+      "capability_gaps": "array<str>?",
+      "prediction": "Prediction?",
+      "scope_reduction": "ScopeReduction?"
+    },
+    "JobOutput": {
+      "job_id": "str",
+      "artifact_ref": "str",
+      "output_name": "str"
+    },
+    "Deviation": {
+      "step": "int",
+      "what": "str",
+      "why": "str"
+    },
+    "FailureReport": {
+      "failure_class": "str",
+      "job_id": "str?",
+      "error_summary": "str",
+      "root_cause_hypothesis": "str",
+      "evidence_refs": "array<str>",
+      "tried": "array<str>?"
+    },
+    "SkillManifest": {
+      "asset_id": "str",
+      "version": "str",
+      "title": "str",
+      "description": "str",
+      "applicability": "str",
+      "out_of_scope": "str",
+      "method_family": "str?",
+      "sources": "array<str>",
+      "supersedes": "AssetRef?",
+      "licence": "str",
+      "licence_basis": "str"
+    },
+    "TraceRow": {
+      "row_id": "str",
+      "source_id": "str",
+      "segment_id": "str",
+      "quote": "str",
+      "extracted": "str",
+      "used_in": "str",
+      "evidence_id": "str?",
+      "disagrees_with": "array<str>?"
+    },
+    "Scenario": {
+      "scenario_id": "str",
+      "situation": "str",
+      "expected_choice": "str",
+      "trace_rows": "array<str>",
+      "in_domain": "bool"
+    },
+    "ScenarioAnswer": {
+      "scenario_id": "str",
+      "choice": "str",
+      "reason": "str?"
+    },
+    "RowVerdict": {
+      "row_id": "str",
+      "verdict": "enum:evidence_review_verdict",
+      "note": "str?"
+    },
+    "RubricItem": {
+      "item": "str",
+      "score": "int",
+      "note": "str?"
+    },
+    "WorkflowManifest": {
+      "workflow_id": "str",
+      "version": "str",
+      "title": "str",
+      "description": "str",
+      "max_rounds": "int",
+      "budget_share": "object",
+      "checkpoint_policy": "str",
+      "licence": "str",
+      "licence_basis": "str"
+    },
+    "Entry": {
+      "argv_template": "array<str>",
+      "cwd": "str?",
+      "pythonpath": "array<str>?",
+      "launch_env": "object?"
+    },
+    "WeightFile": {
+      "path": "str",
+      "sha256": "str",
+      "bytes": "int",
+      "load_mode": "enum:weight_load_mode",
+      "upstream_digest": "str?"
+    },
+    "MethodCard": {
+      "family": "str",
+      "mechanism": "str",
+      "objective": "str",
+      "estimator": "str",
+      "training_data_lineage": "str",
+      "citation_evidence": "array<str>?",
+      "applicable_domain": "object?"
+    },
+    "GpuNeed": {
+      "memory_mib": "int",
+      "scope": "str"
+    },
+    "Resources": {
+      "cpu_threads": "int",
+      "memory_mib": "int?",
+      "gpu": "GpuNeed?",
+      "wall_seconds": "int"
+    },
+    "OutputDecl": {
+      "name": "str",
+      "kind": "str",
+      "required": "bool"
+    },
+    "SourceRef": {
+      "path": "str",
+      "commit": "str?",
+      "sha256": "str?",
+      "upstream": "str?"
+    },
+    "KnownAnswer": {
+      "kind": "str",
+      "against_capability": "str?",
+      "eval_spec_ref": "str",
+      "expected": "str"
+    },
+    "CapabilityManifest": {
+      "capability_id": "str",
+      "version": "str",
+      "kind": "enum:capability_kind",
+      "env_id": "str",
+      "entry": "Entry",
+      "weights": "array<WeightFile>",
+      "required_data": "array<str>",
+      "method_card": "MethodCard",
+      "resources": "Resources",
+      "outputs": "array<OutputDecl>",
+      "source": "SourceRef",
+      "licence": "str",
+      "licence_basis": "str",
+      "known_answer": "KnownAnswer?",
+      "limitations": "str",
+      "applicable_domain": "object?",
+      "supersedes": "AssetRef?"
+    },
+    "MetricDecl": {
+      "name": "str",
+      "unit": "str",
+      "direction": "str",
+      "definition": "str"
+    },
+    "Threshold": {
+      "metric": "str",
+      "relation": "str",
+      "value": "num",
+      "basis_artifact_ref": "str",
+      "applies_to": "str"
+    },
+    "DatasetUse": {
+      "dataset_id": "str",
+      "version": "str",
+      "split": "enum:dataset_split"
+    },
+    "EvalSpec": {
+      "eval_spec_id": "str",
+      "version": "str",
+      "objective": "str",
+      "inputs": "str",
+      "applicable_domain": "str",
+      "sources": "array<str>",
+      "metrics": "array<MetricDecl>",
+      "normalization": "str?",
+      "controls": "array<str>",
+      "thresholds": "array<Threshold>",
+      "implementation_ref": "str",
+      "error_and_limitations": "str",
+      "data_split": "array<DatasetUse>",
+      "missing_value_policy": "str",
+      "expected_artifacts": "array<str>"
+    },
+    "ExpectedOutcome": {
+      "layer": "int",
+      "verdict": "enum:eval_verdict",
+      "metric": "str?",
+      "relation": "str?",
+      "value": "num?"
+    },
+    "EvalCase": {
+      "case_id": "str",
+      "case_kind": "enum:case_kind",
+      "description": "str",
+      "artifact_refs": "array<str>",
+      "expected": "ExpectedOutcome"
+    },
+    "StrategyManifest": {
+      "strategy_kind": "str",
+      "version": "str",
+      "description": "str",
+      "changes_from": "str?",
+      "declared_knobs": "array<str>",
+      "targets": "array<str>"
+    },
+    "RoleManifest": {
+      "role_id": "str",
+      "version": "str",
+      "role": "enum:worker_role",
+      "task_class": "enum:task_class",
+      "title": "str",
+      "description": "str",
+      "hosts": "array<enum:host_kind>",
+      "supersedes": "AssetRef?",
+      "licence": "str?",
+      "licence_basis": "str?",
+      "limitations": "str?"
+    },
+    "BenchmarkManifest": {
+      "benchmark_id": "str",
+      "version": "str",
+      "title": "str",
+      "description": "str",
+      "object_kind": "str",
+      "licence": "str",
+      "licence_basis": "str"
+    },
+    "UntestedPath": {
+      "path_id": "str",
+      "failure_class": "str",
+      "needed": "str"
+    },
+    "NeverSelected": {
+      "path_id": "str",
+      "last_deferral_reason": "str"
+    },
+    "BudgetRefused": {
+      "proposal_ref": "str",
+      "reason": "str",
+      "estimate": "object"
+    },
+    "ObjectiveVariant": {
+      "capability_version": "str?",
+      "parameters": "object?"
+    },
+    "Objective": {
+      "question": "str?",
+      "statement": "str?",
+      "objective": "str?",
+      "title": "str?",
+      "screening": "object?",
+      "variants": "array<ObjectiveVariant>?"
+    }
+  },
+  "rules": {
+    "identity_not_claimed": "A bundle never states its own status, evidence level, review outcome, independence, method family or resource entitlement. Where v1 read those from the caller, v2 computes them and returns them.",
+    "prediction": "A Prediction is a claim about what the path's evaluation will show, stated in its frozen specification's terms before it runs: metric names a metric the specification declares; relation is >, >=, < or <=, and == only for a metric whose unit is a count or a category; value is the number compared; stratum, dataset:<id>@<version>/<SPLIT>[/<OVERLAP_FLAG>], must be one the specification declares, and a prediction with none means the specification's non-overlap DEVELOPMENT stratum; refutes says what a REFUTED outcome would refute. A prediction that does not fit its specification is refused at intake.",
+    "scope_reduction": "A ScopeReduction says what a path at reduced scale leaves out: dropped_record_ids, the records of the evaluation split it does not run on, and property, the input property that excludes them. Such a path is a branch and is reported only for the reduced domain.",
+    "applicable_domain": "A method card or capability manifest may declare the inputs its method applies to. Its structure is not fixed by this contract yet: until a capability declares one, the check answers NOT_CHECKABLE with its reason. An input outside the method card's declared domain is method_inapplicable for those records (a layer-2 precondition row), scoped to the property that excludes it; widening a method card's domain needs a new method-card review. An input outside only the capability manifest's declared domain, a limit of the packaging, is uncovered (a layer-1 precondition row naming the property) and counts against no method.",
+    "untested": "An UntestedPath is a path the decision carried without a scientific outcome: path_id, failure_class, the class it ended in, and needed, what it needed. The same holds for the other lists of a conclusion: inapplicable holds the ids of paths whose inputs lay outside a method's declared domain; a NeverSelected is a VALIDATED path no wave selected, with its last_deferral_reason; a BudgetRefused is a proposal refused for budget - proposal_ref names the path, or the proposal that never became one - with the reason and the estimate the backend checked, by budget line. A conclusion with nothing to list under one of them may leave it out; one whose decision carried any must list every one.",
+    "reproducing_case": "asset_review_bundle.reproducing_case is an evaluation case, an EvalCase. It has no separate provenance field: the case's own description says where the expected value comes from. The validator requires that description and runs the case before reproduced is recorded.",
+    "paired_comparison": "paired_comparison is how a contrast unit is concluded: {variants, per_record_ref, summary}. variants lists the ObjectiveVariant entries compared, per_record_ref names the artifact that holds the comparison record by record under the one specification, and summary says in words what it shows.",
+    "objective": "An Objective is what gx_run_start takes as objective when it is not a sentence. Its text is the first of question, statement, objective and title that is a non-empty string, else the whole object in canonical form. screening answers the screen's questions by id, true or false. variants names what a contrast objective compares: each ObjectiveVariant a capability_version, parameters, or both. Unlike a bundle, an objective may carry further keys: they are stored with it, read by the screen as text, and decide nothing.",
+    "benchmark": "A benchmark_bundle says where a benchmark's bytes are and how its items are derived from them, and holds no item: source pins the bytes by artifact and sha256, recipe is the rule that derives documents, queries, splits and strata from them, control_rule the decision rule its planted controls are judged by, and counts what the recipe yields.",
+    "quote": "A quote is copied from the text the backend delivered, not retyped from memory and not improved. A quote that had to be changed to fit is a claim the source does not make.",
+    "partial": "A bundle is judged record by record. Good records are kept when others fail; the answer says which and why.",
+    "resubmission": "gx_bundle_check judges a bundle without changing the state of the run, the task or the bundle, so a worker can correct records before it submits; its one record is the content-addressed verdict it publishes when the verdict does not fit its answer."
+  }
+}

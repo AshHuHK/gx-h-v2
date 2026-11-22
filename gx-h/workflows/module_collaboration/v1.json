@@ -1,0 +1,13 @@
+{
+  "workflow_id": "module_collaboration",
+  "version": "1",
+  "description": "Module leads divide a project, synthesize their workers' results and hand them to the coordinator for a project decision.",
+  "entry_transitions": ["AUDITING", "PLANNING", "ACTIVE"],
+  "nodes": [
+    {"name": "scope", "work": "mechanical", "deps": []},
+    {"name": "modules", "work": "stage", "artifact_task_kind": "research_round", "deps": ["scope"]},
+    {"name": "handoff", "work": "mechanical", "deps": ["modules"]},
+    {"name": "project_decision", "work": "stage", "deps": ["handoff"]},
+    {"name": "report", "work": "mechanical", "deps": ["project_decision"]}
+  ]
+}

@@ -1,0 +1,1102 @@
+{
+  "schema_version": 2,
+  "note": "AUTHORITATIVE state machines. Code and tests both read this file; never duplicate these strings in source. v2 (2026-11-12) keeps every v1 machine and adds the ones v1 left to module-local constants: approval, evidence, eval_spec, environment, source, gap, objective and rsi_cycle.",
+  "v2_rule": "A state is changed only by a backend service that has checked the transition's requirements against things the backend itself holds. A status, verdict or review supplied by a caller is a claim and is never written as a state.",
+  "machines": {
+    "run": {
+      "initial": "CREATED",
+      "terminal": [
+        "COMPLETED",
+        "STOPPED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "waiting": [
+        "WAITING_CLIENT",
+        "WAITING_EXTERNAL_JOB",
+        "WAITING_APPROVAL"
+      ],
+      "states": [
+        "CREATED",
+        "AUDITING",
+        "PLANNING",
+        "ACTIVE",
+        "WAITING_CLIENT",
+        "WAITING_EXTERNAL_JOB",
+        "WAITING_APPROVAL",
+        "EVALUATING",
+        "COMPLETED",
+        "STOPPED",
+        "PAUSED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "transitions": {
+        "CREATED": [
+          "AUDITING",
+          "PLANNING",
+          "WAITING_APPROVAL",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "AUDITING": [
+          "PLANNING",
+          "ACTIVE",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "PLANNING": [
+          "ACTIVE",
+          "WAITING_APPROVAL",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "ACTIVE": [
+          "WAITING_CLIENT",
+          "WAITING_EXTERNAL_JOB",
+          "WAITING_APPROVAL",
+          "EVALUATING",
+          "PLANNING",
+          "COMPLETED",
+          "STOPPED",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "WAITING_CLIENT": [
+          "ACTIVE",
+          "WAITING_EXTERNAL_JOB",
+          "WAITING_APPROVAL",
+          "PAUSED",
+          "STOPPED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "WAITING_EXTERNAL_JOB": [
+          "ACTIVE",
+          "WAITING_CLIENT",
+          "WAITING_APPROVAL",
+          "PAUSED",
+          "STOPPED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "WAITING_APPROVAL": [
+          "ACTIVE",
+          "WAITING_CLIENT",
+          "WAITING_EXTERNAL_JOB",
+          "PLANNING",
+          "PAUSED",
+          "STOPPED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "EVALUATING": [
+          "ACTIVE",
+          "COMPLETED",
+          "STOPPED",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "PAUSED": [
+          "ACTIVE",
+          "PLANNING",
+          "WAITING_CLIENT",
+          "WAITING_EXTERNAL_JOB",
+          "WAITING_APPROVAL",
+          "STOPPED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "COMPLETED": [],
+        "STOPPED": [],
+        "FAILED": [],
+        "CANCELLED": []
+      },
+      "plannable": [
+        "PLANNING",
+        "ACTIVE",
+        "WAITING_CLIENT",
+        "WAITING_EXTERNAL_JOB",
+        "WAITING_APPROVAL"
+      ],
+      "executable": [
+        "ACTIVE",
+        "WAITING_CLIENT",
+        "WAITING_EXTERNAL_JOB",
+        "WAITING_APPROVAL",
+        "EVALUATING"
+      ],
+      "rules": {
+        "COMPLETED": "Requires the completion evidence the run's workflow declares. discovery_loop: an accepted conclusion, which itself needs at least one path that reached EVALUATED, with a frozen eval_spec_version and a recorded adjudicating verdict (labels.eval_verdict adjudicating). onboarding: every asset in scope decided by the gate. Absence of a next sentence from the Main Agent is not completion. COMPLETED is a statement about evidence, never about success: a run whose every path was rejected under a frozen evaluator completes.",
+        "revision": "Every transition bumps runs.revision and appends an event carrying prev_revision and new_revision.",
+        "plannable": "gx_plan_submit is accepted only while the run is in a plannable state; a path offered to a terminal run is refused. A task of a kind that needs a plannable run (labels.task_kind needs_run) is handed out only while the run is in one.",
+        "executable": "gx_job_submit is accepted only while the run is in an executable state. A task of a kind that needs an executable run (labels.task_kind needs_run) is handed out only while the run is in one.",
+        "model_policy": "The model a task requires is its task class's model in the agent policy the run pinned, the pinned default where the class names none, stamped on the task when it is created. A worker is judged against its own task's requirement, so tasks of one run may require different models. A submission whose observed model or effort falls outside that requirement is held, and the run goes to WAITING_APPROVAL with an approval of action_kind model_switch bound to that submission and its content sha256. A refused bind, and a REFUSAL_OR_FALLBACK verdict the host recorded for a lease with no submission, become a hold in one transaction: the lease is released, the task is BLOCKED with hold reason model_policy or host_model_refusal, no attempt is consumed, and an approval of action_kind worker_refusal is bound to the task, its brief sha256 and its attempt. While a model_switch or worker_refusal approval of the run is PENDING the run is WAITING_APPROVAL and no new claim is admitted; work already claimed may still hand in and is judged as usual. An off-policy verdict recorded later for a lease whose submission is already ACCEPTED requests its model_switch approval, keyed by that submission and its content sha256; DENIED ends that chain and excludes its products. The run never continues on the other model by default. A worker whose request the host's safeguards refused under its required model is the failure class host_model_refusal: its task is held and the user decides, with a value of labels.refusal_decision, whether the brief is reworded, another model is authorized for that one task, or the task is skipped. Nothing switches on its own and nothing retries around a refusal.",
+        "coordinator": "Run-level writes (plan, resume, control) are accepted only from the holder of the unexpired coordinator lease, and each accepted write renews it. A second host takes over with gx_coordinator_claim after expiry or release; the former holder's writes are refused from then on. Workers act under task leases and need no coordinator lease.",
+        "pins": "A run pins the sha256 of the contract, of its workflow and of the agent policy it started under. The workflow's sha256 covers its definition and the source files of the modules that implement its nodes: v1 hashed the graph and the names of the functions, so a node whose body changed kept its digest. Resume compares all three with what is installed and refuses on a difference, naming both digests. Reactions and dispatch check them too, and on a difference nothing is created or handed out: a reaction records schedule.reaction_refused with both digests, gx_next_actions lists every row under blocked with reason pin, gx_task_claim answers CONTENT_HASH_MISMATCH, and the stage needs the pin. A store opened under a contract of another major version refuses to open without a named migration.",
+        "paused": "PAUSED records its cause, its needs and its pause point: the waiting status and the interrupt it left. A run pauses only on needs a person or the machine can clear. A need is {kind, what, why, clear_by, subject?, path_id?, task_id?}: kind a value of labels.pause_need_kind, what and why in words, clear_by a value of labels.clear_by, subject what it is about, path_id and task_id what waits. Each kind has one clearing predicate, which the backend re-checks: gx_run_control(continue) is refused DEPENDENCY_UNMET, with the needs still open, while any is uncleared. Once every need is cleared - a budget line raised through an approval, a hold lifted - continue returns the run to its pause point, directly to the waiting state it left, and a paused run is never left with nothing to do and no way to continue.",
+        "cancel": "CANCELLED is requested through gx_run_control. READY tasks are cancelled, running jobs get a cancel request that is not a cancellation until the scheduler confirms it, and every artifact and event is kept.",
+        "no_progress": "A run stops, with that as its reason, when run_budget.stop_after_no_progress_rounds rounds in a row made no progress, instead of spending budget on repetition. A round is one pass from investigate to analyze. Progress is one of three counters moving: reviewed evidence added, a gap covered, a path evaluated, each counted once across rounds. Accepting a task is not progress: every round that ends has accepted something. A round whose searches all failed, or whose paths were all stopped by machinery, is skipped: it neither counts nor resets the count, because an outage is not a lack of progress. engineering_budget.stop_after_no_new_evidence_rounds is an alias of the same line.",
+        "budget": "The run's worker_tasks line counts tasks, not attempts: a task is charged once, when it is created. Attempts are bounded per task, by task_budget.max_attempts against tasks.attempts_consumed, so a run consumes at most worker_tasks x max_attempts attempts; a claim whose attempt is not consumed (task rule recovery) counts against neither. A line whose limit is 0 is a prohibition, not a budget to wait for: selection and job admission refuse a step that needs it, naming the line, so it is never a need of a pause and no budget_increase is requested for it; lifting it is a change of the profile by a person. Anything spent against a prohibited line stops the run, naming the line and the spend.",
+        "stage": "A stage is a node declared work: stage, whose controller reads the store, creates what should exist through expansions and reports its completion rule. Exactly one stage of a run is open at a time, and everything inside it is parallel. A stage's tasks carry tasks.stage, a task's round is derived from the workflow.reentered events, and runs.phase and gx_run_status.phase carry the open stage's name. The open stage parks the run under one interrupt of kind stage, which names the approvals it waits on and carries a waiting state derived from what is open: WAITING_APPROVAL while a model_switch or worker_refusal approval of the run is PENDING; otherwise WAITING_CLIENT if a task is open, else WAITING_EXTERNAL_JOB if a run-level job is pending, else WAITING_APPROVAL. The state is derived again after every reaction and every settlement and moves among the three waiting states directly. A stage never completes with work in flight. A chain held for an approval other than model_switch or worker_refusal does not keep its stage open: the stage completes listing it among its needs.",
+        "reaction": "A reaction is a backend consequence of a stored fact. Its trigger is an outbox row {topic, run_id, subject} written in the transaction that causes it, topic a value of labels.trigger_topic: submission.accepted, job.terminal, approval.decided, asset.active, worker.stopped, worker.verdict. Reactions run at the end of gx_task_submit, for the acceptance it made, and in the lazy path at the start of gx_run_resume, gx_task_claim and gx_task_submit, which reconciles the run's jobs, settles, and then consumes the run's outbox rows; gx_next_actions runs none. A reaction acts as the backend with its trigger named. An expansion is keyed by what it produces - a follow-up by its fact, per-round stage work by stage, round, rule and index, design_evaluation by the objective, a shared product by the product, a recurring occurrence by the event of that occurrence - and the key, the tasks and the schedule.expanded event are written in one transaction. A reaction acts for its own stage and round only: for a closed one it records the outcome and expands nothing, except that the acceptance of a chain its stage parked creates its mandatory follower in the stage open now, where that stage takes such work. Reactions expand in ACTIVE, PLANNING, EVALUATING and the three waiting states, never in PAUSED or a terminal state: in PAUSED an acceptance is recorded and its expansion waits for continue. A pending model approval of the run stops claims, not expansions. A reaction that raises is recorded as schedule.reaction_failed and returned as a warning; one that fails twice with the same key and code, or with a code that is not retryable, becomes a stage need of kind reaction. A reaction is bounded by run_budget.reaction_seconds. Nothing calls out (memory, network, a subprocess) while the write lock is held. Content-based reactions, which read the content of an accepted bundle (a wave reading path specifications, an evaluation reading execution outputs, follow-up research from an evidence bundle), wait for a review of that bundle at independence HUMAN or DIFFERENT_HOST on host codex only, whose policy accepts REPORTED_ONLY. On other_verified, a script or a person driving the backend, they do not wait: the backend scores the artifacts itself at once, the run's records stay CLIENT_REPORTED and its reviews meet no gate. A structural expansion, such as the review task of a submission, never waits.",
+        "quiescence": "A stage is quiescent when its completion rule is false and nothing is open: no task (a BLOCKED task whose chain ended is not open, and neither is a READY task the plan withholds because its brief does not compile, which quiescence reports as a need of kind reaction), no pending job, no pending approval. gx_run_status reports it as stage.quiescent with the needs, and gx_run_resume accepts it; the controller then decides at once: it completes, carrying what is missing as untested, PAUSEs on needs a person or the machine can clear, or STOPs with the reason. A budget line with nothing left for an expansion the stage needs, and nothing open, is quiescence with need budget_line; a prohibited line never is (rule budget). A resume of a stage that is neither complete nor quiescent, with nothing changed since its controller last ran, is refused DEPENDENCY_UNMET with the needs. A plan_and_run stage that completes with nothing tested is not quiescent: it goes on to analyze, which decides (rule no_outcome_round).",
+        "no_outcome_round": "The plan_and_run stage completes when every selected path has an outcome, is inconclusive or is untested (errors.json failure_taxonomy), no VALIDATED path is left that a wave could select now, and the confirmatory held-out read was made or is not owed. A round in which no path has an outcome never rewinds. It pauses when an untested path's need is clearable; otherwise it concludes when the run holds a recorded adjudicating verdict under a FROZEN specification on a path that reached EVALUATED, and stops (no_tested_path) when it holds none. A conclusion reached at such a round claims layer 0: it says what was measured and what is missing, and supports no claim.",
+        "re_pin": "A run whose pinned contract, workflow or agent policy no longer matches what is installed is re-pinned by one approval of action_kind run_repin, whose subject is the run and whose request names the old and the new sha256 of what changed. On GRANTED the backend rewrites the run's pins and records both sha256s. A run_repin approval is never granted under a standing policy."
+      }
+    },
+    "path": {
+      "initial": "DRAFT",
+      "terminal": [
+        "SUPERSEDED"
+      ],
+      "outcome": [
+        "RETAINED",
+        "REJECTED",
+        "INCONCLUSIVE",
+        "BLOCKED"
+      ],
+      "outcome_note": "'terminal' means strictly no outgoing transition. The four outcome states end an execution attempt but are not dead: any of them may later be SUPERSEDED by a new path version, and BLOCKED may return to SELECTED once its blocker clears.",
+      "states": [
+        "DRAFT",
+        "VALIDATED",
+        "SELECTED",
+        "EXECUTING",
+        "EVALUATED",
+        "RETAINED",
+        "REJECTED",
+        "INCONCLUSIVE",
+        "BLOCKED",
+        "SUPERSEDED"
+      ],
+      "transitions": {
+        "DRAFT": [
+          "VALIDATED",
+          "REJECTED",
+          "BLOCKED",
+          "SUPERSEDED"
+        ],
+        "VALIDATED": [
+          "SELECTED",
+          "REJECTED",
+          "BLOCKED",
+          "SUPERSEDED"
+        ],
+        "SELECTED": [
+          "EXECUTING",
+          "BLOCKED",
+          "REJECTED",
+          "SUPERSEDED"
+        ],
+        "EXECUTING": [
+          "EVALUATED",
+          "BLOCKED",
+          "INCONCLUSIVE",
+          "REJECTED",
+          "SUPERSEDED"
+        ],
+        "EVALUATED": [
+          "RETAINED",
+          "REJECTED",
+          "INCONCLUSIVE",
+          "SUPERSEDED"
+        ],
+        "RETAINED": [
+          "SUPERSEDED"
+        ],
+        "REJECTED": [
+          "SUPERSEDED"
+        ],
+        "INCONCLUSIVE": [
+          "SUPERSEDED"
+        ],
+        "BLOCKED": [
+          "SELECTED",
+          "SUPERSEDED"
+        ],
+        "SUPERSEDED": []
+      },
+      "rules": {
+        "replanning": "Re-planning creates a new path_id/version with parent_path_id set; a failed path is never overwritten in place. A re-plan must cite evidence created after its parent, otherwise it is the same experiment.",
+        "fingerprint": "fingerprint = sha256 over (capability versions with their manifest sha256, resolved parameters, input manifest content sha256, eval spec frozen sha256). No free text enters it: v1 hashed the hypothesis sentence, so rewording a path made it a new experiment, and left the mechanism out, so two different methods under one family label collided.",
+        "identity": "Method identity (family, mechanism, objective, estimator, training-data lineage) is read from the method card of each capability version. What a planner writes about its own method is stored as a claim beside it and decides nothing.",
+        "distinctness": "Paths must differ in mechanism, method family, data source or discriminating prediction, as computed from method cards, the registered prediction and the equivalence table that only the backend writes. A data source is a dataset's identity, not its input bytes: when inputs resolve to registered dataset records, a subset or superset of one dataset is the same source. Parameter sweeps within one method family are branches of one path, not independent paths.",
+        "grounding": "supporting_evidence may cite only evidence in state REVIEWED whose source is not retracted.",
+        "prediction": "A path may register one prediction in its frozen specification's terms (bundles.json Prediction). It is refused at registration when the specification's calibration finds it vacuous. The backend computes its outcome, a value of labels.prediction_outcome, only under an adjudicating verdict, for a metric the specification declares, over the stratum it names with full coverage. A prediction registered after CANDIDATE rows existed on the same data under the same specification is informed by them and is never cited as a test of falsification. The prediction outcome never sets the path's outcome: the verdict under the frozen specification alone decides RETAINED or REJECTED. A PASS with a REFUTED prediction stays RETAINED: the outcome is recorded on the path and the conclusion carries a line about it. A layer-3 FAIL with a REFUTED prediction that names what it refutes is hypothesis_unsupported; every other FAIL is classed by its layer (errors.json failure_taxonomy.verdict_to_class).",
+        "branch": "A path that names parent_path_id, or that the backend classifies as a BRANCH of an earlier path, carries its parent's eval_spec_ref@sha256, or it is refused: a branch inherits its parent's specification. The one exception is a bridge version of the parent's specification (eval_spec rule bridge) whose version and sha256 hold a GRANTED eval_spec_change approval; the relationship records the bridge. A path at reduced scale carries scope_reduction, is a branch, and is reported only for the reduced domain.",
+        "restatement": "When a capability or skill version becomes ACTIVE and a VALIDATED or BLOCKED path names it as a declared gap, or names a version the new one supersedes, one propose_paths task, keyed by the path and the activated version, asks for the path restated on the active version. The planner names no parent: the backend classifies the successor and records its parent, and the old path is SUPERSEDED when the restatement is VALIDATED. The backend never re-binds a path to a version mechanically. A restatement that follows a REPAIR counts against engineering_budget.max_repair_attempts_per_fingerprint.",
+        "blocker": "A route records its blocker on the path (paths.blocker_json): an environment, a repair or onboarding task, or an input. The blocker is open while the environment does not read HEALTHY or the task is not ACCEPTED, and selection refuses a path whose blocker is open. A selection wave never moves a BLOCKED path: it returns to SELECTED through routing, once its blocker clears. When an execution chain of a SELECTED or EXECUTING path ends, the ended chain is recorded on the path (paths.ended_chains_json: class and count), the path goes to BLOCKED, which frees its slot, and it is carried as untested with that class. Selection refuses a path whose execution chains ended max_attempts times, or ended in a class whose route is none of RETRY_TASK, RETRY_PATH and WAIT.",
+        "inconclusive": "A verdict of INCONCLUSIVE under a FROZEN specification, at layer 2 or 3 or at no layer (nothing failed and required records were left uncovered), ends the execution in state INCONCLUSIVE (EXECUTING, then EVALUATED, then INCONCLUSIVE) and releases the path's reservation, with standing inconclusive: it has no outcome, and is not RETAINED, not REJECTED and not untested. It counts for or against no method, counts as a path evaluated for progress (run rule no_progress), is carried by the decision in a list of its own, apart from untested, and is listed by the conclusion among the negative results. EVAL_PROPOSED and NEEDS_DOMAIN_REVIEW, which do not adjudicate, also end the execution in state INCONCLUSIVE, with standing untested. EVALUATOR_INVALID is the class evaluator_bug: its evaluation judges nothing, and the path moves to no outcome state and stays untested until a successor specification re-scores it. Rule standing says when an INCONCLUSIVE leaves a path untested instead: a layer-1 INCONCLUSIVE, like a layer-1 FAIL, is machinery and leaves the path EXECUTING, to be run again.",
+        "standing": "A judged path's standing is evaluation's word: the path.evaluated record carries standing, a value of labels.path_standing, with its reason and eval_ids. The stop rules read it and refuse a judged path that has none. A path whose every row is an evaluator crash or a layer-1 INCONCLUSIVE is untested, not inconclusive."
+      }
+    },
+    "task": {
+      "initial": "PENDING",
+      "terminal": [
+        "ACCEPTED",
+        "CANCELLED"
+      ],
+      "states": [
+        "PENDING",
+        "READY",
+        "CLAIMED",
+        "RUNNING",
+        "SUBMITTED",
+        "VALIDATING",
+        "ACCEPTED",
+        "REJECTED",
+        "RETRYABLE",
+        "BLOCKED",
+        "CANCELLED"
+      ],
+      "transitions": {
+        "PENDING": [
+          "READY",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "READY": [
+          "CLAIMED",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "CLAIMED": [
+          "RUNNING",
+          "READY",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "RUNNING": [
+          "SUBMITTED",
+          "RETRYABLE",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "SUBMITTED": [
+          "VALIDATING",
+          "CANCELLED"
+        ],
+        "VALIDATING": [
+          "ACCEPTED",
+          "REJECTED",
+          "RETRYABLE",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "REJECTED": [
+          "READY",
+          "RETRYABLE",
+          "CANCELLED"
+        ],
+        "RETRYABLE": [
+          "READY",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "BLOCKED": [
+          "READY",
+          "VALIDATING",
+          "CANCELLED"
+        ],
+        "ACCEPTED": [],
+        "CANCELLED": []
+      },
+      "rules": {
+        "ready": "A task enters READY only when every dependency is ACCEPTED.",
+        "claim": "CLAIMED requires a READY task with no unexpired lease, an attempt left, a free worker slot that is not owed to an overdue task ranked ahead, no pending approval that withholds it, and a matching expected_attempt: the attempts the task had started when the plan was made. The precondition is scoped to the task. A claim is refused STALE_PLAN only when the task's attempt has moved or, where the claim sends the plan's as_of_event_id, when a stage move, a pause or a cancel of the run is newer than that plan. The run revision is not compared: it moves on coordinator claims, holds and node completions that change no task. The brief is compiled before the lease is issued.",
+        "recovery": "Rejection and expiry are settled in the lazy path of the next gx_task_claim, gx_task_submit or gx_run_resume, with no daemon: a lapsed lease moves its task through RETRYABLE (or straight from CLAIMED) back to READY, and a REJECTED task returns to READY, each as the next attempt with a brief recompiled to carry what was refused and why. tasks.attempt is monotonic: it numbers leases, briefs and submissions and is never reused. tasks.attempts_consumed is what max_attempts bounds: an attempt is consumed when it ends in a REJECTED submission, or lapses with no host-caused evidence; not by a host-caused lapse or stop, by a hold, or by a submission refused for a reason that cannot change within the lease. Every accepted lease-bound call by the holder renews an unexpired lease; a lapsed lease is not renewed, and the holder's next call answers LEASE_EXPIRED. A lease does not lapse while a non-terminal job submitted under it exists. Before a lapsed lease is re-queued the tied agent's record is read: a refusal, or a record that cannot be read, is a hold; a stop the host recorded - a SubagentStop with no submission, a StopFailure, a SessionEnd, a usage limit or an API error - releases the lease and consumes no attempt; a silent and clean lapse consumes the attempt. A task out of attempts, and one that failed to be dispatched max_attempts times, ends its chain in one transaction: it stays BLOCKED with its blocked_reason and every refusal listed, and counts as ended, not open; every transitive non-terminal dependent is CANCELLED; the chain's held reservations are released; and a SELECTED or EXECUTING path of the chain records the ended chain and goes to BLOCKED, which frees its slot, to be carried as untested. A person may revive the dead task by a budget_increase approval that grants attempts. v1 left both REJECTED and expired tasks with no way to be claimed again.",
+        "brief": "A task carries the reference and sha256 of the brief compiled for its current attempt, and a submission records the brief it answered, so a result is tied to what the worker was told.",
+        "held": "A held task is BLOCKED and awaits an approval: tasks.hold_json names the reason, a value of labels.hold_reason, and the approval. A submission whose worker is outside the agent policy, or cannot be observed where observation is required, is held with reason model_policy: BLOCKED returns to VALIDATING only when its model_switch approval is GRANTED for that submission's sha256, and to READY as a new attempt when it is DENIED. A refused bind (model_policy) and a refusal the host recorded for a lease with no submission (host_model_refusal) are held with the lease released, under a worker_refusal approval bound to the task, its brief sha256 and its attempt. That approval is decided with a value of labels.refusal_decision: GRANTED with reword gives the next attempt's brief the person's note and leaves out the sections the person names; GRANTED with authorize_once makes the model the person names the task's required model, for that task only; DENIED is skip, and the chain ends with blocked_reason skipped. A hold consumes no attempt, and a refusal hold is never re-queued as a plain next attempt.",
+        "blocked": "A BLOCKED task that is not held says why in tasks.blocked_reason, a value of labels.blocked_reason. With one of the reasons that axis lists as ended, the task stays BLOCKED and counts as ended and not open: with out_of_attempts, not_dispatchable or routed only a person revives it (rule recovery), and with dependency_cancelled or skipped nothing does. With waiting_need it waits on a need a route named, and returns to READY when the need is cleared.",
+        "submit": "An agent reporting completion yields SUBMITTED only. ACCEPTED requires the backend to have validated the submitted bundle record by record against bytes it holds, and the owner check.",
+        "artifact": "A required artifact is satisfied only by a published artifact of that kind whose bytes the backend re-hashed. The name of a kind is not an artifact: v1 accepted the bare string in-process and rejected real artifacts over MCP.",
+        "stale_owner": "A lease-expired former owner must not submit results over a new owner's task. The same holds for jobs: a job records the lease it was submitted under, and gx_job_submit refuses LEASE_EXPIRED when that is not the task's live lease or the caller is not its holder.",
+        "jobs_at_bind": "At the bind of a lease, the task's open jobs that are past their own deadline, and those whose lease is older than the bound lease's predecessor, are cancelled. An open job of the immediate predecessor that is inside its deadline is left for the new lease to adopt: a gx_job_status or gx_job_wait by the holder of the task's live lease, or a resubmission of the same step under it, adopts it (event job.adopted; jobs.lease_ref moves to that lease). A job that is never adopted ends at its own time limit, at the next attempt's bind, or when its chain ends or the run is cancelled.",
+        "independence": "A review task names the task or tasks it must be independent of: tasks.independent_of_task_id, and one dependencies row with relation independent_of for each further task. A claim or a hand-in by the principal, lease or observed agent of any task of that set is refused. The claimant's agent is the one the host observed for that same claim call, and an agent on record for any lease of a task of the set is refused; the comparison of subjects stays as a second test. On a strict host a review claim with no host tie is refused at once. A review that a person claims and hands in under operator scope, with the terminal confirmation, is recorded at independence HUMAN."
+      }
+    },
+    "job": {
+      "initial": "CREATED",
+      "terminal": [
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "states": [
+        "CREATED",
+        "SUBMITTING",
+        "SUBMITTED",
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCEL_REQUESTED",
+        "CANCELLED",
+        "OUTCOME_UNKNOWN"
+      ],
+      "transitions": {
+        "CREATED": [
+          "SUBMITTING",
+          "CANCELLED",
+          "FAILED"
+        ],
+        "SUBMITTING": [
+          "SUBMITTED",
+          "OUTCOME_UNKNOWN",
+          "FAILED"
+        ],
+        "SUBMITTED": [
+          "QUEUED",
+          "RUNNING",
+          "SUCCEEDED",
+          "FAILED",
+          "CANCEL_REQUESTED",
+          "OUTCOME_UNKNOWN"
+        ],
+        "QUEUED": [
+          "RUNNING",
+          "CANCEL_REQUESTED",
+          "FAILED",
+          "OUTCOME_UNKNOWN"
+        ],
+        "RUNNING": [
+          "SUCCEEDED",
+          "FAILED",
+          "CANCEL_REQUESTED",
+          "OUTCOME_UNKNOWN"
+        ],
+        "CANCEL_REQUESTED": [
+          "CANCELLED",
+          "SUCCEEDED",
+          "FAILED",
+          "OUTCOME_UNKNOWN"
+        ],
+        "OUTCOME_UNKNOWN": [
+          "SUBMITTED",
+          "QUEUED",
+          "RUNNING",
+          "SUCCEEDED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "SUCCEEDED": [],
+        "FAILED": [],
+        "CANCELLED": []
+      },
+      "rules": {
+        "idempotency": "The idempotency key and submit intent are persisted BEFORE the external scheduler is called.",
+        "no_auto_reset": "A broken connection must not reset SUBMITTING to CREATED; reconcile against the external scheduler first.",
+        "publish": "Outputs go staging -> validate -> atomic publish. Partial files are never a completed result. Staging is kept until a terminal observation has been settled and published.",
+        "cancel": "A cancel request is not a cancellation until the external state confirms it.",
+        "detached": "The tool is owned by a detached runner process, not by the submitting call. The runner enforces the time limit and writes the outcome whoever else has died, so a job outlives its submitter and can be reconciled afterwards.",
+        "requirements": "GPU need, scope, memory and wall-time limits are read from the capability manifest, never from the caller. Omitting a field cannot skip a gate.",
+        "accounting": "A job is charged what was measured, never what the caller declared. A job whose tool started, or may have, is charged one against job_submissions and its CPU seconds (user plus system, rounded up; none for a job whose start is unknown) against cpu_seconds. A GPU job whose tool is known to have started is also charged one against gpu_jobs and its wall minutes on the device (rounded up, at least one) against gpu_minutes. A lost runner whose tool is known to have started measured nothing: its job is charged the span the tool could have run, on every thread it was given, never more than its admission held; a lost runner whose start is unknown is charged one against job_submissions and nothing else. A job known never to have started is charged nothing. Its measured peak memory is recorded on the job and checked against the job's own cap; no budget profile has a memory line, so memory is charged to none."
+      }
+    },
+    "asset": {
+      "initial": "DRAFT",
+      "terminal": [
+        "DEPRECATED"
+      ],
+      "states": [
+        "DRAFT",
+        "REVIEWED",
+        "VALIDATED",
+        "APPROVED",
+        "ACTIVE",
+        "DEPRECATED",
+        "QUARANTINED"
+      ],
+      "transitions": {
+        "DRAFT": [
+          "REVIEWED",
+          "QUARANTINED",
+          "DEPRECATED"
+        ],
+        "QUARANTINED": [
+          "REVIEWED",
+          "DEPRECATED"
+        ],
+        "REVIEWED": [
+          "VALIDATED",
+          "QUARANTINED",
+          "DEPRECATED"
+        ],
+        "VALIDATED": [
+          "APPROVED",
+          "QUARANTINED",
+          "DEPRECATED"
+        ],
+        "APPROVED": [
+          "ACTIVE",
+          "QUARANTINED",
+          "DEPRECATED"
+        ],
+        "ACTIVE": [
+          "DEPRECATED"
+        ],
+        "DEPRECATED": []
+      },
+      "rules": {
+        "active_gate": "Only ACTIVE assets are callable or citable. Generating a skill, a schema or an MCP definition never implies an executable implementation.",
+        "versioning": "The content of an asset version is immutable and addressed by its sha256; changing it creates a new version. Running tasks stay pinned to the version they started with.",
+        "one_lifecycle": "Decision skills, executable workflows, tool adapters (capabilities), evaluators, benchmarks and strategies all pass through this one machine and one promotion function, with the requirements in contracts/gates.json. v1 let capabilities promote themselves in a loop while skills waited at a gate nothing called.",
+        "requirements": "Each transition's requirements are in contracts/gates.json: checks the backend ran, a review by a worker the backend can show is not the author, and an approval bound to the content sha256.",
+        "requarantine": "Returning to QUARANTINED invalidates every check run, review and approval recorded for that sha256; none of them carries over."
+      }
+    },
+    "approval": {
+      "initial": "PENDING",
+      "terminal": [
+        "DENIED",
+        "EXPIRED",
+        "REVOKED"
+      ],
+      "states": [
+        "PENDING",
+        "GRANTED",
+        "DENIED",
+        "EXPIRED",
+        "REVOKED"
+      ],
+      "transitions": {
+        "PENDING": [
+          "GRANTED",
+          "DENIED",
+          "EXPIRED"
+        ],
+        "GRANTED": [
+          "REVOKED",
+          "EXPIRED"
+        ],
+        "DENIED": [],
+        "EXPIRED": [],
+        "REVOKED": []
+      },
+      "rules": {
+        "bound": "An approval names its subject_kind, subject_id and subject_sha256 and unlocks exactly that. v1 approvals named no subject, so one grant unlocked anything.",
+        "who": "Only the operator surface writes GRANTED or DENIED. A worker requests; it never grants. A client-supplied approved=true is ignored.",
+        "standing": "A grant may be made under a standing policy in config/approvals.json. It then records granted_by as that policy's sha256 and quotes the instruction the policy rests on, so a reader can tell a person's decision from a rule applied on their behalf.",
+        "vocabulary": "GRANTED is the only word for an approval that holds. v1 had one module waiting for APPROVED and another for GRANTED.",
+        "never_standing": "An approval of action_kind model_switch, worker_refusal, run_repin or eval_spec_change is a person's decision and is never granted under a standing policy.",
+        "decision": "A decision that needs more than the word is recorded on the approval (approvals.decision_json). A worker_refusal is decided with a value of labels.refusal_decision: GRANTED carries choice reword, with the person's note and the brief sections to leave out, or choice authorize_once, with the model authorized for that one task; DENIED is skip."
+      }
+    },
+    "evidence": {
+      "initial": "EXTRACTED",
+      "terminal": [
+        "REJECTED",
+        "WITHDRAWN"
+      ],
+      "states": [
+        "EXTRACTED",
+        "IMPORTED_UNREVIEWED",
+        "LOCATOR_VERIFIED",
+        "LOCATOR_UNRESOLVED",
+        "VALUE_FROM_FIGURE",
+        "REVIEWED",
+        "DISPUTED",
+        "NEEDS_REVIEW",
+        "REJECTED",
+        "WITHDRAWN"
+      ],
+      "entry": [
+        "EXTRACTED",
+        "IMPORTED_UNREVIEWED"
+      ],
+      "grounding": [
+        "REVIEWED"
+      ],
+      "transitions": {
+        "EXTRACTED": [
+          "LOCATOR_VERIFIED",
+          "LOCATOR_UNRESOLVED",
+          "VALUE_FROM_FIGURE",
+          "REJECTED"
+        ],
+        "IMPORTED_UNREVIEWED": [
+          "LOCATOR_VERIFIED",
+          "LOCATOR_UNRESOLVED",
+          "VALUE_FROM_FIGURE",
+          "REJECTED"
+        ],
+        "LOCATOR_UNRESOLVED": [
+          "LOCATOR_VERIFIED",
+          "VALUE_FROM_FIGURE",
+          "REJECTED"
+        ],
+        "LOCATOR_VERIFIED": [
+          "REVIEWED",
+          "DISPUTED",
+          "NEEDS_REVIEW",
+          "REJECTED"
+        ],
+        "VALUE_FROM_FIGURE": [
+          "REVIEWED",
+          "DISPUTED",
+          "NEEDS_REVIEW",
+          "REJECTED"
+        ],
+        "REVIEWED": [
+          "NEEDS_REVIEW",
+          "DISPUTED",
+          "WITHDRAWN"
+        ],
+        "DISPUTED": [
+          "REVIEWED",
+          "NEEDS_REVIEW",
+          "REJECTED",
+          "WITHDRAWN"
+        ],
+        "NEEDS_REVIEW": [
+          "REVIEWED",
+          "DISPUTED",
+          "REJECTED",
+          "WITHDRAWN"
+        ],
+        "REJECTED": [],
+        "WITHDRAWN": []
+      },
+      "rules": {
+        "locator": "LOCATOR_VERIFIED means the backend found the record's verbatim quote in bytes it holds, at the segment the record cites. A quote found elsewhere is LOCATOR_UNRESOLVED and the place it was found is reported. A locator the backend cannot open is not a locator.",
+        "figure": "A value read from a figure or table that cannot be checked as text is VALUE_FROM_FIGURE and reaches REVIEWED only on two concordant extractions under different leases.",
+        "review": "REVIEWED is written only when a review arrives under a task lease different from the extraction's, from a worker whose own read receipt covers the cited span. The extractor cannot review its own record and a submitted review_status is ignored.",
+        "grounding": "Only REVIEWED evidence may ground a path, close a gap, or support a skill's choice.",
+        "retraction": "When a source is RETRACTED or SUPERSEDED every record resting on it becomes NEEDS_REVIEW, and that travels along the dependency table to the memory documents, skills, metrics and paths that cite it.",
+        "imported": "Records imported from another system enter as IMPORTED_UNREVIEWED and are never promoted silently."
+      }
+    },
+    "eval_spec": {
+      "initial": "DRAFT",
+      "terminal": [
+        "INVALIDATED",
+        "SUPERSEDED",
+        "ABANDONED"
+      ],
+      "runnable": [
+        "FROZEN"
+      ],
+      "states": [
+        "DRAFT",
+        "CASES_DECLARED",
+        "CASES_PASSED",
+        "REVIEWED",
+        "FROZEN",
+        "INVALIDATED",
+        "SUPERSEDED",
+        "ABANDONED"
+      ],
+      "transitions": {
+        "DRAFT": [
+          "CASES_DECLARED",
+          "ABANDONED"
+        ],
+        "CASES_DECLARED": [
+          "CASES_PASSED",
+          "ABANDONED"
+        ],
+        "CASES_PASSED": [
+          "REVIEWED",
+          "ABANDONED"
+        ],
+        "REVIEWED": [
+          "FROZEN",
+          "ABANDONED"
+        ],
+        "FROZEN": [
+          "INVALIDATED",
+          "SUPERSEDED"
+        ],
+        "INVALIDATED": [],
+        "SUPERSEDED": [],
+        "ABANDONED": []
+      },
+      "rules": {
+        "cases": "CASES_DECLARED needs at least one positive, one negative and one boundary case, each with the verdict it is expected to produce.",
+        "executed": "CASES_PASSED is written by the runner after it has executed every declared case and each returned its expected verdict. A case that fails means the evaluator or the specification is wrong: that is a new version, not an edit.",
+        "reviewer": "REVIEWED needs a review by a worker the backend can show is not the author.",
+        "frozen": "Frozen content is immutable and its sha256 is re-checked before every run. Only FROZEN specs score candidates. An evaluator whose known-answer run exceeds run_budget.reaction_seconds is refused at registration, until a job-backed evaluator path exists.",
+        "no_threshold": "A specification with no trustworthy threshold may still be frozen; it then yields EVAL_PROPOSED and no scientific goal may be declared met on it.",
+        "invalidated": "INVALIDATED stops ranking. Old results are kept, and every comparable candidate is re-scored under the new version rather than a chosen few.",
+        "splits": "Development records may be read freely. Every read of a held-out record is counted in a ledger keyed on hashes the backend computes.",
+        "successor": "The version that replaces one invalidated for an evaluator_bug keeps every metric, relation, threshold, calibration and case, lists every NULL and CONTROL row of its predecessor, and changes only the implementation and adds the reproducing case; anything more needs an eval_spec_change approval from a person. The stored artefacts are re-scored under the new FROZEN version, and the path keeps both outcomes.",
+        "bridge": "A bridge version, for a route whose outputs the objective's specification cannot score, is made only under an eval_spec_change approval from a person."
+      }
+    },
+    "environment": {
+      "initial": "UNPROBED",
+      "terminal": [
+        "RETIRED"
+      ],
+      "ready": [
+        "HEALTHY"
+      ],
+      "states": [
+        "UNPROBED",
+        "HEALTHY",
+        "DEGRADED",
+        "BROKEN",
+        "RETIRED"
+      ],
+      "transitions": {
+        "UNPROBED": [
+          "HEALTHY",
+          "DEGRADED",
+          "BROKEN",
+          "RETIRED"
+        ],
+        "HEALTHY": [
+          "DEGRADED",
+          "BROKEN",
+          "UNPROBED",
+          "RETIRED"
+        ],
+        "DEGRADED": [
+          "HEALTHY",
+          "BROKEN",
+          "UNPROBED",
+          "RETIRED"
+        ],
+        "BROKEN": [
+          "UNPROBED",
+          "RETIRED"
+        ],
+        "RETIRED": []
+      },
+      "rules": {
+        "observed": "HEALTHY is written only from a probe record the backend produced by running the interpreter. Readiness is an observation; a sentence saying it was checked earlier is not one.",
+        "relocation": "A dead console script is recorded as its own observation and does not by itself make an environment BROKEN: on this machine 963 console scripts point at a mount that moved while their interpreters still work.",
+        "degraded": "DEGRADED is not ready."
+      }
+    },
+    "source": {
+      "initial": "REGISTERED",
+      "terminal": [
+        "RETRACTED",
+        "SUPERSEDED"
+      ],
+      "readable": [
+        "PARSED"
+      ],
+      "states": [
+        "REGISTERED",
+        "ACQUIRED",
+        "PARSED",
+        "UNAVAILABLE",
+        "RETRACTED",
+        "SUPERSEDED"
+      ],
+      "transitions": {
+        "REGISTERED": [
+          "ACQUIRED",
+          "UNAVAILABLE",
+          "RETRACTED",
+          "SUPERSEDED"
+        ],
+        "ACQUIRED": [
+          "PARSED",
+          "UNAVAILABLE",
+          "RETRACTED",
+          "SUPERSEDED"
+        ],
+        "PARSED": [
+          "RETRACTED",
+          "SUPERSEDED"
+        ],
+        "UNAVAILABLE": [
+          "ACQUIRED",
+          "RETRACTED",
+          "SUPERSEDED"
+        ],
+        "RETRACTED": [],
+        "SUPERSEDED": []
+      },
+      "rules": {
+        "bytes": "ACQUIRED means the backend holds the bytes and their sha256. A hash of a URL and a length is not a hash of the bytes.",
+        "coverage": "text_coverage is computed from the parse, never declared.",
+        "retraction": "Retraction status is read from the upstream record at acquisition and re-checked on a schedule; RETRACTED propagates along the dependency table."
+      }
+    },
+    "gap": {
+      "initial": "OPEN",
+      "terminal": [
+        "SUPERSEDED"
+      ],
+      "states": [
+        "OPEN",
+        "COVERED",
+        "UNRESOLVABLE",
+        "SUPERSEDED"
+      ],
+      "transitions": {
+        "OPEN": [
+          "COVERED",
+          "UNRESOLVABLE",
+          "SUPERSEDED"
+        ],
+        "COVERED": [
+          "OPEN",
+          "SUPERSEDED"
+        ],
+        "UNRESOLVABLE": [
+          "OPEN",
+          "SUPERSEDED"
+        ],
+        "SUPERSEDED": []
+      },
+      "rules": {
+        "record": "A gap is a record: the sub-question, the searches that were run for it including the ones that came back empty, the reviewed evidence for and against, and what is missing. v1's gap was a substring test on a string the caller supplied.",
+        "covered": "COVERED needs reviewed evidence, and returns to OPEN when that evidence is withdrawn.",
+        "unresolvable": "UNRESOLVABLE needs at least one recorded search behind it; an unsearched question is OPEN."
+      }
+    },
+    "objective": {
+      "initial": "DRAFT",
+      "terminal": [
+        "BLOCKED"
+      ],
+      "states": [
+        "DRAFT",
+        "SCREENED",
+        "NEEDS_HUMAN_REVIEW",
+        "CONFIRMED",
+        "BLOCKED"
+      ],
+      "transitions": {
+        "DRAFT": [
+          "SCREENED",
+          "BLOCKED"
+        ],
+        "SCREENED": [
+          "CONFIRMED",
+          "NEEDS_HUMAN_REVIEW",
+          "BLOCKED"
+        ],
+        "NEEDS_HUMAN_REVIEW": [
+          "CONFIRMED",
+          "BLOCKED"
+        ],
+        "CONFIRMED": [
+          "BLOCKED"
+        ],
+        "BLOCKED": []
+      },
+      "rules": {
+        "screen": "Every objective passes a legality, privacy and biosafety applicability screen before any work is planned. A direction outside the permitted boundary stops for human review and is never planned or executed automatically.",
+        "confirmed": "CONFIRMED is written against an approval record the backend owns. Expensive work is not derived from an unconfirmed objective, and a string saying the user agreed confirms nothing.",
+        "specification": "The objective records its evaluation specification, by reference and sha256 (objectives.eval_spec_ref, objectives.eval_spec_sha256), when that is first frozen. Only evaluations under it, or under its STOP_RANKING successor after a full re-score, support a layer-3 claim about the objective; an evaluation under any other specification is exploratory, at most layer 2.",
+        "variants": "The objective the user confirms may name variants to compare: capability versions, parameter sets or both (bundles.json Objective, objectives.variants_json). A path matches a variant when its step's capability version and parameters equal it. The matching paths form one contrast unit: funded and selected together in one wave, exempt from one-family-one-slot within the unit, counted as the objective's route, and concluded by a paired comparison, record by record, under the one specification. A planner cannot declare a contrast set."
+      }
+    },
+    "rsi_cycle": {
+      "initial": "PROPOSED",
+      "terminal": [
+        "RETAINED_FAILED",
+        "ROLLED_BACK",
+        "ABANDONED"
+      ],
+      "states": [
+        "PROPOSED",
+        "CANDIDATE_REGISTERED",
+        "CHECKS_PASSED",
+        "DEV_COMPARED",
+        "FINAL_COMPARED",
+        "PROMOTED",
+        "RETAINED_FAILED",
+        "ROLLED_BACK",
+        "ABANDONED"
+      ],
+      "transitions": {
+        "PROPOSED": [
+          "CANDIDATE_REGISTERED",
+          "RETAINED_FAILED",
+          "ABANDONED"
+        ],
+        "CANDIDATE_REGISTERED": [
+          "CHECKS_PASSED",
+          "RETAINED_FAILED",
+          "ABANDONED"
+        ],
+        "CHECKS_PASSED": [
+          "DEV_COMPARED",
+          "RETAINED_FAILED",
+          "ABANDONED"
+        ],
+        "DEV_COMPARED": [
+          "FINAL_COMPARED",
+          "RETAINED_FAILED",
+          "ABANDONED"
+        ],
+        "FINAL_COMPARED": [
+          "PROMOTED",
+          "RETAINED_FAILED"
+        ],
+        "PROMOTED": [
+          "ROLLED_BACK"
+        ],
+        "RETAINED_FAILED": [],
+        "ROLLED_BACK": [],
+        "ABANDONED": []
+      },
+      "rules": {
+        "runner": "The backend runs incumbent and candidate itself, by content sha256, against a registered benchmark, and stores per-item results. Scores passed in by a caller are not results.",
+        "scope": "A cycle may change retrieval strategy, decision skills, workflow branches, team division of labour, low-risk adapters, tool choice, error handling and evaluator candidates. Permissions, budgets, production approval and held-out answers are outside it.",
+        "looks": "Every look at the final split is keyed on benchmark sha256 x candidate content sha256, both computed by the backend, against a small look budget per benchmark version. A name the caller supplies is never part of the key.",
+        "rule_first": "The decision rule - metric, minimum effect, interval method, permitted share of regressed items, cost ceiling - is stored before the final comparison and its sha256 is in the verdict.",
+        "controls": "Planted controls run first: an identical candidate must score a difference of exactly zero and a deliberately degraded one must be rejected.",
+        "reversible": "PROMOTED flips a pointer that the affected service reads, and ROLLED_BACK flips it back. A promotion that changes nothing is not one.",
+        "failures_kept": "A failed candidate is kept with its per-item results; it is never deleted to tidy the record."
+      }
+    },
+    "plugin_runtime": {
+      "initial": "DISABLED",
+      "terminal": [],
+      "states": [
+        "DISABLED",
+        "STARTING",
+        "HEALTHY",
+        "DEGRADED",
+        "STOPPING",
+        "FAILED"
+      ],
+      "transitions": {
+        "DISABLED": [
+          "STARTING"
+        ],
+        "STARTING": [
+          "HEALTHY",
+          "DEGRADED",
+          "FAILED",
+          "STOPPING"
+        ],
+        "HEALTHY": [
+          "DEGRADED",
+          "STOPPING",
+          "FAILED"
+        ],
+        "DEGRADED": [
+          "HEALTHY",
+          "STOPPING",
+          "FAILED"
+        ],
+        "STOPPING": [
+          "DISABLED",
+          "FAILED"
+        ],
+        "FAILED": [
+          "STARTING",
+          "DISABLED"
+        ]
+      },
+      "rules": {
+        "scope": "For long-lived plugin processes only. Environments have their own machine; v1 borrowed this one for them."
+      }
+    },
+    "worker_observation": {
+      "initial": "requested",
+      "terminal": [
+        "observed_finished",
+        "failed",
+        "unavailable"
+      ],
+      "finished": [
+        "reported_finished",
+        "observed_finished"
+      ],
+      "states": [
+        "requested",
+        "observed_started",
+        "reported_running",
+        "reported_finished",
+        "observed_finished",
+        "failed",
+        "unavailable"
+      ],
+      "transitions": {
+        "requested": [
+          "observed_started",
+          "reported_running",
+          "failed",
+          "unavailable"
+        ],
+        "observed_started": [
+          "reported_running",
+          "reported_finished",
+          "observed_finished",
+          "failed",
+          "unavailable"
+        ],
+        "reported_running": [
+          "reported_finished",
+          "observed_finished",
+          "failed",
+          "unavailable"
+        ],
+        "reported_finished": [
+          "observed_finished"
+        ],
+        "observed_finished": [],
+        "failed": [],
+        "unavailable": []
+      },
+      "rules": {
+        "observed": "A state named observed_* is written only from a host adapter's record or by the backend about a process it started, with the source named (labels.observation_source). A client may report; it cannot observe itself. v1 had one writer, which wrote two of the six states, and nothing ever produced observed_started.",
+        "not_native": "These are GX observations, never a mirror of a host's native status enum. Each record carries evidence_level and observed_at.",
+        "attempts": "One task may have several attempts; one worker may finish several small tasks.",
+        "model": "An observation carries the model and effort that did the work, with the evidence level each was established at: reported by the client, or observed by a host adapter from a record the host itself wrote. A model's statement about itself is a report, never an authentication."
+      }
+    },
+    "reference_review": {
+      "initial": "DISCOVERED",
+      "terminal": [
+        "ELIGIBLE_FOR_INTEGRATION",
+        "METHOD_ONLY",
+        "UNVERIFIED",
+        "REJECTED",
+        "DEFERRED"
+      ],
+      "states": [
+        "DISCOVERED",
+        "PRIMARY_SOURCE_READ",
+        "REPO_IDENTITY_VERIFIED",
+        "SOURCE_PINNED",
+        "STATIC_REVIEWED",
+        "ISOLATED_SMOKE_TESTED",
+        "ADAPTER_VALIDATED",
+        "ELIGIBLE_FOR_INTEGRATION",
+        "METHOD_ONLY",
+        "OFFICIAL_DOC_SUBSTITUTE",
+        "UNVERIFIED",
+        "REJECTED",
+        "DEFERRED"
+      ],
+      "transitions": {
+        "DISCOVERED": [
+          "PRIMARY_SOURCE_READ",
+          "OFFICIAL_DOC_SUBSTITUTE",
+          "UNVERIFIED",
+          "REJECTED",
+          "DEFERRED"
+        ],
+        "OFFICIAL_DOC_SUBSTITUTE": [
+          "REPO_IDENTITY_VERIFIED",
+          "METHOD_ONLY",
+          "UNVERIFIED",
+          "DEFERRED"
+        ],
+        "PRIMARY_SOURCE_READ": [
+          "REPO_IDENTITY_VERIFIED",
+          "METHOD_ONLY",
+          "UNVERIFIED",
+          "DEFERRED"
+        ],
+        "REPO_IDENTITY_VERIFIED": [
+          "SOURCE_PINNED",
+          "METHOD_ONLY",
+          "DEFERRED"
+        ],
+        "SOURCE_PINNED": [
+          "STATIC_REVIEWED",
+          "DEFERRED",
+          "REJECTED"
+        ],
+        "STATIC_REVIEWED": [
+          "ISOLATED_SMOKE_TESTED",
+          "ELIGIBLE_FOR_INTEGRATION",
+          "METHOD_ONLY",
+          "DEFERRED",
+          "REJECTED"
+        ],
+        "ISOLATED_SMOKE_TESTED": [
+          "ADAPTER_VALIDATED",
+          "ELIGIBLE_FOR_INTEGRATION",
+          "DEFERRED",
+          "REJECTED"
+        ],
+        "ADAPTER_VALIDATED": [
+          "ELIGIBLE_FOR_INTEGRATION",
+          "DEFERRED",
+          "REJECTED"
+        ],
+        "ELIGIBLE_FOR_INTEGRATION": [],
+        "METHOD_ONLY": [],
+        "UNVERIFIED": [],
+        "REJECTED": [],
+        "DEFERRED": []
+      },
+      "rules": {
+        "no_claim_inflation": "None of these states may be described as 'implementation reused'. METHOD_ONLY means no code was adopted."
+      }
+    },
+    "team": {
+      "initial": "CREATED",
+      "terminal": [
+        "CLOSED"
+      ],
+      "states": [
+        "CREATED",
+        "ACTIVE",
+        "PAUSED",
+        "DRAINING",
+        "CLOSED"
+      ],
+      "transitions": {
+        "CREATED": [
+          "ACTIVE",
+          "DRAINING"
+        ],
+        "ACTIVE": [
+          "PAUSED",
+          "DRAINING"
+        ],
+        "PAUSED": [
+          "ACTIVE",
+          "DRAINING"
+        ],
+        "DRAINING": [
+          "CLOSED"
+        ],
+        "CLOSED": []
+      },
+      "rules": {
+        "max_depth": 4,
+        "max_intent_bytes": 8192,
+        "max_message_bytes": 4096,
+        "max_read_rows": 100,
+        "max_leader_lease_seconds": 3600,
+        "grant_scopes": [
+          "intent",
+          "create_child",
+          "members",
+          "assign",
+          "message",
+          "lifecycle"
+        ],
+        "message_kinds": [
+          "request",
+          "challenge",
+          "finding",
+          "handoff",
+          "response",
+          "notice"
+        ],
+        "member_states": [
+          "ACTIVE",
+          "LEFT"
+        ],
+        "assignment_states": [
+          "ASSIGNED",
+          "PENDING_TRANSFER"
+        ],
+        "authority": "TeamManager owns intent, membership and assignment; TeamService owns every task state and lease. A generation-bound team management grant never grants coordinator, approval or scientific review authority.",
+        "drain": "DRAINING accepts no new task or child. Close requires every descendant CLOSED and no live assigned task lease, open task, nonterminal job, task reservation or unresolved transfer. Leaving membership or replacing leadership never revokes an existing worker lease.",
+        "migration": "Tasks with no task_assignments row retain pre-team admission behavior. No historical assignment, native identity or scientific evidence is fabricated."
+      }
+    }
+  }
+}

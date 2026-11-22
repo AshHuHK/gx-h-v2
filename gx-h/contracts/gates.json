@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "note": "AUTHORITATIVE gate requirements. One table for every governed object. A gate is met by records the backend wrote about a specific content sha256: check runs it executed, a review by a worker it can show is not the author, and an approval bound to that sha256. Nothing in this file can be satisfied by a value a caller sends.",
+  "why": "v1 gates stored attestations. A check result, a prerequisite, a test status and an implementation's evidence level were all values the caller wrote, so an author could take its own skill, and then an adapter pointing at a binary that does not exist, to ACTIVE. Meanwhile the only objects that were ACTIVE in a real store had reached it through a second lifecycle with no gate at all.",
+  "check_result": {
+    "values": ["PASS", "FAIL", "ERROR", "DIAGNOSTIC"],
+    "definitions": {
+      "PASS": "The check ran and its condition holds.",
+      "FAIL": "The check ran and its condition does not hold.",
+      "ERROR": "The check could not run. An ERROR never counts as a PASS.",
+      "DIAGNOSTIC": "The check ran and found items that need a judgement, each with a fingerprint. The gate stays unmet until every fingerprint has an adjudication."
+    },
+    "rules": {
+      "append_only": "check_runs is append-only. A later run does not erase an earlier FAIL; the gate reads the most recent run of each check for the current sha256, and the earlier ones stay on record.",
+      "writer": "Only a backend runner writes a check run. There is no tool or function through which a caller records a result.",
+      "per_sha": "A check run belongs to one subject sha256. Changing the content, or returning to QUARANTINED, leaves the asset with no check runs."
+    }
+  },
+  "checks": {
+    "manifest_schema": {"applies_to": ["DECISION_SKILL", "EXECUTABLE_WORKFLOW", "TOOL_ADAPTER", "EVALUATOR", "BENCHMARK", "STRATEGY", "ROLE_INTENT"], "runs": "Validates the manifest and its bundle against contracts/bundles.json."},
+    "byte_binding": {"applies_to": ["DECISION_SKILL", "EXECUTABLE_WORKFLOW", "TOOL_ADAPTER", "EVALUATOR", "BENCHMARK", "STRATEGY", "ROLE_INTENT"], "runs": "Re-hashes the content artifact and compares it with the sha256 recorded at intake, at review and at approval. All must be equal."},
+    "licence_recorded": {"applies_to": ["DECISION_SKILL", "TOOL_ADAPTER", "BENCHMARK"], "runs": "A licence and the local file or record it was read from are present for the asset and for each source or weight file it bundles. An unestablished licence is recorded as UNVERIFIED and limits where the asset may be projected."},
+    "scope_scan": {"applies_to": ["DECISION_SKILL", "EXECUTABLE_WORKFLOW", "TOOL_ADAPTER", "STRATEGY"], "runs": "AST scan of every bundled script: network access, subprocess, eval/exec, unpickling, writes outside the declared output directory, and reads of forbidden paths.", "skipped_when": "The asset bundles no executable code; the run then records PASS with scripts=0."},
+    "source_pinning": {"applies_to": ["DECISION_SKILL"], "runs": "Re-hashes every source the skill cites against the sha256 it pins."},
+    "locator_resolution": {"applies_to": ["DECISION_SKILL"], "runs": "For each trace row: the cited segment exists in the pinned source and the row's span occurs in it. A span that does not anchor verbatim is a DIAGNOSTIC with a fingerprint."},
+    "trace_completeness": {"applies_to": ["DECISION_SKILL"], "runs": "Every method choice, applicability condition and failure mode in the skill cites at least one trace row, and no row supporting a choice rests on evidence that is UNVERIFIED, PROPOSED or not REVIEWED."},
+    "coverage": {"applies_to": ["DECISION_SKILL"], "runs": "Every passage of each cited source's methods sections has a disposition: cited by a row, judged irrelevant with a reason, or flagged as an omitted condition. This is a named coverage check; it is not a perplexity score and is never reported as one."},
+    "scenario_execution": {"applies_to": ["DECISION_SKILL"], "runs": "A worker that is not the author, given only the skill, answers every scenario including the reviewer's hidden ones; the backend compares choice ids with the expected ones."},
+    "scenario_sensitivity": {"applies_to": ["DECISION_SKILL"], "runs": "Deletes one applicability condition at a time from a copy of the skill and re-scores the scenarios. If no scenario flips, the suite does not exercise that condition and the check fails."},
+    "graph_validation": {"applies_to": ["EXECUTABLE_WORKFLOW"], "runs": "The definition is acyclic, every declared node has an implementation and every implementation is declared, each node's mechanical/intelligent/stage label matches what it may return - a stage node reports its completion rule and parks under one stage interrupt - and input and output schemas resolve."},
+    "budget_declared": {"applies_to": ["EXECUTABLE_WORKFLOW"], "runs": "Every loop and sub-workflow declares a maximum number of rounds and a budget share inside its parent, so an inner loop cannot multiply cost unrecorded."},
+    "dry_run": {"applies_to": ["EXECUTABLE_WORKFLOW"], "runs": "Executes the workflow against a scratch store to each interrupt and to a terminal state, including one checkpoint, kill and resume, and takes each stage node to its completion and to quiescence."},
+    "method_card_present": {"applies_to": ["TOOL_ADAPTER"], "runs": "The manifest's method card names family, mechanism, objective, estimator and training-data lineage. The card is the only source of method identity from then on."},
+    "weights_digest": {"applies_to": ["TOOL_ADAPTER"], "runs": "Each weight file's sha256 is recorded and matches the file on disk. For a FULL_PICKLE load mode a recorded upstream digest must also match before any load.", "skipped_when": "The manifest declares no weights; the run then records PASS with weights=0."},
+    "probe_L0_files": {"applies_to": ["TOOL_ADAPTER"], "runs": "Code, weights and declared inputs exist at the paths the manifest resolves to."},
+    "probe_L1_metadata": {"applies_to": ["TOOL_ADAPTER"], "runs": "Package metadata in the capability's own interpreter meets the declared requirements, read without importing the package."},
+    "probe_L2_entrypoint": {"applies_to": ["TOOL_ADAPTER"], "runs": "The entry point answers under the launch recipe: interpreter, module, working directory and fixed environment values."},
+    "probe_L3_smoke": {"applies_to": ["TOOL_ADAPTER"], "runs": "A smoke job submitted through the job service finished and the adapter's parser accepted its output. The check run carries the job id."},
+    "probe_L4_known_answer": {"applies_to": ["TOOL_ADAPTER"], "runs": "A known-answer evaluation passed: an identity or cross-implementation control declared in the manifest.", "required_when": "The manifest declares a known_answer control."},
+    "probe_input_error": {"applies_to": ["TOOL_ADAPTER"], "runs": "The adapter rejects a malformed request as an input error. Timeout, cancellation and idempotency are verified by the JobService software tests, not repeated per scientific adapter."},
+    "cases_declared": {"applies_to": ["EVALUATOR"], "runs": "At least one POSITIVE, one NEGATIVE and one BOUNDARY case is declared, each with its inputs and the verdict it is expected to produce."},
+    "threshold_basis": {"applies_to": ["EVALUATOR"], "runs": "Every threshold names the calibration artifact it was derived from and the conditions it applies to. A threshold the metric cannot exceed is rejected. A specification with no threshold is accepted and can only yield EVAL_PROPOSED."},
+    "dataset_split_registered": {"applies_to": ["EVALUATOR"], "runs": "Every dataset the specification reads is registered with a split label on each record; held-out records are read only through the counted ledger.", "skipped_when": "The specification reads no dataset; the run then records PASS with datasets=0."},
+    "cases_executed": {"applies_to": ["EVALUATOR"], "runs": "The runner executed every declared case and each returned its expected verdict. The check run lists the evaluation ids."},
+    "benchmark_frozen": {"applies_to": ["BENCHMARK"], "runs": "The item set is derived from a pinned content sha256, the development and final splits are disjoint by group, and the final item list is derived inside the runner."},
+    "planted_controls": {"applies_to": ["BENCHMARK", "STRATEGY"], "runs": "An identical candidate scores a difference of exactly zero and a deliberately degraded candidate is rejected under the stored decision rule."},
+    "rsi_cycle_verdict": {"applies_to": ["STRATEGY"], "runs": "The cycle that produced this candidate reached FINAL_COMPARED with a promote verdict under a decision rule whose sha256 was stored before the final comparison."},
+    "projection_parity": {"applies_to": ["ROLE_INTENT", "DECISION_SKILL"], "runs": "Every host projection generated from the asset resolves, carries the asset id, version and sha256, and matches the canonical content."}
+  },
+  "review": {
+    "rules": {
+      "task": "A review is a task the backend creates for one content sha256. The reviewer receives what is to be judged - each trace row's span and the statement it supports, a method card, a specification with its cases - and not the author's reasoning.",
+      "independence": "The backend refuses a review whose principal, lease or observed worker matches the author's, and records the independence level it can actually support.",
+      "sufficient": "A review meets a gate only at an independence level listed as sufficient in contracts/labels.json.",
+      "verdict": "Only APPROVE meets a gate. A REQUEST_CHANGES or REJECT on record for a sha256 blocks that sha256, whoever approves it later: an objection is answered with a new version, not outvoted.",
+      "defect_review": "A defect review - a review_evaluation that a suspicion or a requires_evaluator_review flag opened on a FROZEN specification (errors.json failure_taxonomy, evaluator_bug) - is skipped by the gate: whatever its verdict, it approves and objects to no transition. What it can establish is a reproducing case, which the runner executes.",
+      "role": "A review is done under the worker role named here, which is a value of labels.worker_role. What is reviewed is told by the task kind and the subject, not by a role of its own: v1 had one role vocabulary in its workflows and another in its role files."
+    }
+  },
+  "requirements": {
+    "DECISION_SKILL": {
+      "REVIEWED": {"checks": ["manifest_schema", "byte_binding", "licence_recorded", "scope_scan", "source_pinning", "locator_resolution", "trace_completeness", "coverage"], "review": {"role": "verifier"}},
+      "VALIDATED": {"checks": ["scenario_execution", "scenario_sensitivity"]},
+      "APPROVED": {"approval": {"action_kind": "asset_activation"}},
+      "ACTIVE": {"checks": ["byte_binding"], "effects": ["index_in_skill_namespace", "project_to_hosts"]}
+    },
+    "TOOL_ADAPTER": {
+      "REVIEWED": {"checks": ["manifest_schema", "byte_binding", "licence_recorded", "scope_scan", "method_card_present", "weights_digest", "probe_L0_files", "probe_L1_metadata", "probe_L2_entrypoint"], "review": {"role": "verifier"}},
+      "VALIDATED": {"checks": ["probe_L3_smoke", "probe_input_error", "probe_L4_known_answer"]},
+      "APPROVED": {},
+      "ACTIVE": {"checks": ["byte_binding"], "effects": ["enter_capability_catalogue"]}
+    },
+    "EXECUTABLE_WORKFLOW": {
+      "REVIEWED": {"checks": ["manifest_schema", "byte_binding", "scope_scan", "graph_validation", "budget_declared"], "review": {"role": "verifier"}},
+      "VALIDATED": {"checks": ["dry_run"]},
+      "APPROVED": {"approval": {"action_kind": "asset_activation"}},
+      "ACTIVE": {"checks": ["byte_binding"], "effects": ["register_workflow_version"]}
+    },
+    "BENCHMARK": {
+      "REVIEWED": {"checks": ["manifest_schema", "byte_binding", "licence_recorded", "benchmark_frozen"], "review": {"role": "verifier"}},
+      "VALIDATED": {"checks": ["planted_controls"]},
+      "APPROVED": {"approval": {"action_kind": "asset_activation"}},
+      "ACTIVE": {"checks": ["byte_binding"]}
+    },
+    "STRATEGY": {
+      "REVIEWED": {"checks": ["manifest_schema", "byte_binding", "scope_scan"], "review": {"role": "verifier"}},
+      "VALIDATED": {"checks": ["planted_controls", "rsi_cycle_verdict"]},
+      "APPROVED": {"approval": {"action_kind": "asset_activation"}},
+      "ACTIVE": {"checks": ["byte_binding"], "effects": ["flip_strategy_pointer"]}
+    },
+    "ROLE_INTENT": {
+      "REVIEWED": {"checks": ["manifest_schema", "byte_binding"], "review": {"role": "verifier"}},
+      "VALIDATED": {"checks": ["projection_parity"]},
+      "APPROVED": {"approval": {"action_kind": "asset_activation"}},
+      "ACTIVE": {"checks": ["byte_binding"], "effects": ["project_to_hosts"]}
+    }
+  },
+  "eval_spec_requirements": {
+    "note": "An evaluator follows the eval_spec machine of contracts/states.json rather than the asset machine, and is checked by the same engine.",
+    "CASES_DECLARED": {"checks": ["manifest_schema", "cases_declared", "threshold_basis", "dataset_split_registered"]},
+    "CASES_PASSED": {"checks": ["cases_executed"]},
+    "REVIEWED": {"review": {"role": "verifier"}},
+    "FROZEN": {"checks": ["byte_binding"]}
+  },
+  "bootstrap": {
+    "note": "Where a gate cannot be met by construction, the exception is written here and nowhere else.",
+    "SHIPPED": "A workflow definition, a role intent or a strategy definition that ships in the tree is product code. It is checked the way the rest of the product is - by its tests and by review of the code - and not by the gate it helps to run, which a store that was just created could not have run. It is admitted when its sha256 equals the one pinned for it in config/shipped.json (workflows, role_intents, strategies), a lead-owned file under version control, and the admission is recorded as SHIPPED, never as ACTIVE. That sha256 covers the definition and the source files of the modules that implement it. Nothing that enters at run time - authored by a worker, imported, inherited - may use this route: it takes the gate. The release-bundled deterministic CPU test method fixture-grid@1 can also be installed as SHIPPED on first use when its manifest and both executable scripts match the capabilities pin. Its local environment must pass the Job owner readiness probe. Runtime-authored adapters and existing registrations remain subject to their recorded lifecycle.",
+    "STRATEGY": "The first strategy of a kind has no incumbent to be compared with, so it cannot carry rsi_cycle_verdict. While strategy_pointers holds no row for its strategy_kind - a fact the backend reads, not one a caller states - the operator may install one version that has met the REVIEWED gate as the baseline. It is recorded as a baseline, once per kind. Every later version reaches the pointer only through an improvement cycle and the gate, or through a rollback to a version that was active before."
+  },
+  "approval_policy": {
+    "note": "Which approvals may be granted under a standing policy is configuration, not contract: config/approvals.json. A standing grant is still a row bound to one subject sha256, written through the operator surface, and it quotes the instruction it rests on."
+  }
+}

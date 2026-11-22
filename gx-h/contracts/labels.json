@@ -1,0 +1,988 @@
+{
+  "schema_version": 2,
+  "note": "AUTHORITATIVE label vocabularies. evidence_level and completion_status are different axes and must never be mixed in one field. v2 (2026-11-12) adds the vocabularies v1 left as module-local constants, and the ones the redesign needs.",
+  "evidence_level": {
+    "values": [
+      "SOURCE_VERIFIED",
+      "LOCAL_CODE_OBSERVED",
+      "EXECUTION_OBSERVED",
+      "CLIENT_REPORTED",
+      "PROPOSED",
+      "UNVERIFIED"
+    ],
+    "definitions": {
+      "SOURCE_VERIFIED": "Read in the primary source (paper section/figure/page, or an official document) with a locator the backend resolved in bytes it holds.",
+      "LOCAL_CODE_OBSERVED": "Read in local code at a specific commit and file:symbol or line range.",
+      "EXECUTION_OBSERVED": "Observed in an actual run: command, exit status, log or artifact reference. Includes what a host adapter reads from a record the host itself wrote.",
+      "CLIENT_REPORTED": "Relayed by a host client or an agent without independent backend observation.",
+      "PROPOSED": "A design proposal of this project, not an existing upstream API.",
+      "UNVERIFIED": "Sources conflict or the claim could not be checked."
+    },
+    "rule": "A caller may lower the level of what it submits and may never raise it. The backend assigns SOURCE_VERIFIED and EXECUTION_OBSERVED itself."
+  },
+  "completion_status": {
+    "values": [
+      "DESIGN_ONLY",
+      "IMPLEMENTED",
+      "TESTED_PASS",
+      "TESTED_FAIL",
+      "UNTESTED",
+      "BLOCKED"
+    ],
+    "definitions": {
+      "DESIGN_ONLY": "Specified, no implementation.",
+      "IMPLEMENTED": "Code exists and imports, no behavioural test.",
+      "TESTED_PASS": "A named test asserts the behaviour and passes.",
+      "TESTED_FAIL": "A named test asserts the behaviour and fails.",
+      "UNTESTED": "Implemented, deliberately not tested in this round, with a reason.",
+      "BLOCKED": "Cannot proceed: permission, cost, missing input or a deliberate guard."
+    }
+  },
+  "test_status": {
+    "values": [
+      "STATIC_REVIEW_ONLY",
+      "SCHEMA_TESTED",
+      "MOCK_INTEGRATION_TESTED",
+      "REAL_TOOL_SMOKE_TESTED",
+      "CLIENT_MCP_CONNECTED",
+      "NATIVE_DELEGATION_OBSERVED",
+      "END_TO_END_TESTED",
+      "BLOCKED",
+      "SKIPPED",
+      "FAILED"
+    ],
+    "note": "An import success, a mock pass, client visibility and a real model inference are four different levels.",
+    "derived": "For a capability, test_status is derived from the highest probe rung that has a job id behind it. It is never typed in."
+  },
+  "requirement_verdict": {
+    "values": [
+      "REAL",
+      "STRUCTURAL",
+      "MISSING",
+      "BLOCKED"
+    ],
+    "definitions": {
+      "REAL": "Works end to end on real inputs, shown by a test that cannot pass on a fixture.",
+      "STRUCTURAL": "Code and tests exist, but only fixtures, test doubles or empty stores have exercised it.",
+      "MISSING": "Not there.",
+      "BLOCKED": "Cannot be exercised here, with the minimum condition that would unblock it."
+    },
+    "note": "The axis the v2 acceptance matrix is written in. A green test is not a REAL verdict."
+  },
+  "eval_layer": {
+    "values": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "definitions": {
+      "1": "The computation ran and produced a valid format.",
+      "2": "The method sequence respected its preconditions and prescribed procedure.",
+      "3": "A proxy metric met a declared threshold under declared conditions.",
+      "4": "Evidence is sufficient to support a scientific conclusion or experimental validation."
+    },
+    "rules": "Software success is layer 1 and never implies layers 3 or 4. Raw scores from different methods and thresholds from different datasets are not comparable without a bridging validation. Layer 4 is never asserted by software."
+  },
+  "eval_verdict": {
+    "values": [
+      "PASS",
+      "FAIL",
+      "INCONCLUSIVE",
+      "EVAL_PROPOSED",
+      "NEEDS_DOMAIN_REVIEW",
+      "EVALUATOR_INVALID"
+    ],
+    "adjudicating": [
+      "PASS",
+      "FAIL",
+      "INCONCLUSIVE"
+    ],
+    "note": "EVAL_PROPOSED/NEEDS_DOMAIN_REVIEW mean no trustworthy threshold exists yet; cheap reversible format and computation checks may still run, but no scientific goal may be declared met. PASS, FAIL and INCONCLUSIVE adjudicate (adjudicating): each is a judgement under the specification. EVAL_PROPOSED, NEEDS_DOMAIN_REVIEW and EVALUATOR_INVALID do not."
+  },
+  "prediction_outcome": {
+    "values": [
+      "HELD",
+      "REFUTED",
+      "NOT_TESTABLE",
+      "NOT_DISCRIMINATING"
+    ],
+    "definitions": {
+      "HELD": "Under an adjudicating verdict of the frozen specification, with its stratum fully covered, the metric over the stratum's rows satisfies the relation.",
+      "REFUTED": "Under an adjudicating verdict of the frozen specification, with its stratum fully covered, the metric over the stratum's rows does not satisfy the relation.",
+      "NOT_TESTABLE": "No adjudicating verdict, a metric the specification does not declare, or coverage of the stratum below 1. Never HELD by default.",
+      "NOT_DISCRIMINATING": "A share of evaluation.familywise_alpha (config/limits.json) or more of the specification's own NULL and CONTROL rows satisfies it, so its holding would discriminate nothing. Decided when the prediction is registered."
+    },
+    "note": "What a path's registered prediction came to, computed by the backend. It never sets the path's outcome. REFUTED is not FAILED, a word the job and run machines and the FAIL verdict already use."
+  },
+  "path_standing": {
+    "values": [
+      "outcome",
+      "inconclusive",
+      "untested"
+    ],
+    "definitions": {
+      "outcome": "An adjudicating verdict of PASS or FAIL decided the path under a FROZEN specification.",
+      "inconclusive": "The path was evaluated under a FROZEN specification and its verdict is INCONCLUSIVE at layer 2 or 3 or at no layer: it has no outcome and is not untested either.",
+      "untested": "Nothing was shown about the method: machinery stopped the path, its verdict does not adjudicate, or its every row is an evaluator crash or a layer-1 INCONCLUSIVE."
+    },
+    "note": "Where a judged path stands, in evaluation's word: the standing of its path.evaluated record, which carries reason and eval_ids beside it. The stop rules read it and refuse a judged path that has none."
+  },
+  "failure_route": {
+    "values": [
+      "RETRY_TASK",
+      "RETRY_PATH",
+      "REPAIR",
+      "WAIT",
+      "BRANCH",
+      "NEXT_PATH",
+      "REEXPLORE",
+      "STOP_RANKING",
+      "HOLD_FOR_USER",
+      "PAUSE",
+      "END_CHAIN"
+    ],
+    "definitions": {
+      "RETRY_TASK": "The same task is tried again as its next attempt, its brief recompiled with what was refused.",
+      "RETRY_PATH": "A new execute_path task for the same path, following the old one: the old task stays ACCEPTED carrying the failure, and the path stays EXECUTING.",
+      "REPAIR": "An onboard_capability or author_skill task for a version that supersedes the failed one, or, for an environment, a re-probe or a harness-local rebuild. The route records it on the path as the path's blocker, and selection refuses the path while the blocker is open.",
+      "WAIT": "Nothing is created; the work waits for what it needs, as long as its condition holds.",
+      "BRANCH": "A planner is asked for a branch of the path that cites the failure; the branch inherits the parent's evaluation specification, or a bridge version of it (states.json path.rules.branch).",
+      "NEXT_PATH": "The slot is freed, and the next wave takes a deferred path of another family.",
+      "REEXPLORE": "A gap is opened from the failure; going back to the literature is the analyze stage's decision.",
+      "STOP_RANKING": "Evaluations under the specification stop counting until a successor version is frozen and the stored artefacts are re-scored under it.",
+      "HOLD_FOR_USER": "The task or path is held and waits for a person's decision on an approval.",
+      "PAUSE": "What the failure reaches waits, with its need named: its task, its path or the run, as the scope says. A task or a path waits alone; the run itself pauses only when nothing else can proceed.",
+      "END_CHAIN": "The chain ends: its task stays BLOCKED with a blocked_reason, out_of_attempts when its own attempts were spent and routed when another bound of its route was spent (after RETRY_PATH's bound is spent every execute_path task of the path is ACCEPTED, so no task is dead and the ended chain names no need), every non-terminal dependent is cancelled, its reservations are released, and its path, if any, goes to BLOCKED, frees its slot and is carried as untested. It never counts against the method."
+    },
+    "note": "The level a failure moves the plan to. contracts/errors.json gives each failure class its route, its scope, its bounds and where it goes when a bound is spent."
+  },
+  "arrived_as": {
+    "values": [
+      "refused_bundle",
+      "lapse",
+      "run_input",
+      "accepted_report",
+      "job"
+    ],
+    "definitions": {
+      "refused_bundle": "A bundle the backend refused: the failure spends the task's own attempts.",
+      "lapse": "A lease that lapsed with no submission.",
+      "run_input": "A run input that failed its schema or existence check: the input the failure names is one of the run's inputs by its role in the input manifest, however the failure arrived.",
+      "accepted_report": "A failure reported inside an accepted execution bundle.",
+      "job": "A job's own outcome, as the backend observed it."
+    },
+    "note": "Where a failure arrived (errors.json failure_taxonomy, fact arrived_as). A failure class that asks lists the arrivals it takes under legal; any other is refused."
+  },
+  "evaluator_bug_source": {
+    "values": [
+      "runner",
+      "reproduced"
+    ],
+    "definitions": {
+      "runner": "The runner's own evidence: a known-answer case of the specification that now fails.",
+      "reproduced": "An evaluation review reproduced the defect, and its bundle carries the reproducing case."
+    },
+    "note": "Who may establish an evaluator_bug (errors.json failure_taxonomy, fact source). An executor's report is not one."
+  },
+  "pause_need_kind": {
+    "values": [
+      "budget_line",
+      "hold",
+      "approval",
+      "readiness",
+      "input",
+      "device_capacity",
+      "host_quota",
+      "host_effort",
+      "pin",
+      "path_reachability",
+      "independent_review",
+      "task_blocked",
+      "reaction"
+    ],
+    "definitions": {
+      "budget_line": "A budget line with no room for what must be created or reserved.",
+      "hold": "A hold of config/limits.json that covers the work.",
+      "approval": "A person's decision on an approval.",
+      "readiness": "A capability that is not ACTIVE at the planned sha256, or an environment that does not read HEALTHY.",
+      "input": "A run input that failed its schema or existence check.",
+      "device_capacity": "A device on which the job can start, or under which it fits.",
+      "host_quota": "A host capability or quota that is exhausted and that the host's record does not say recovers.",
+      "host_effort": "A coordinator session that serves less than the effort its rows require.",
+      "pin": "A pinned contract, workflow or agent policy that differs from what is installed.",
+      "path_reachability": "A path whose host, mount or permission could not be verified.",
+      "independent_review": "A review that no worker independent of its subject can make.",
+      "task_blocked": "A BLOCKED task whose chain ended with out_of_attempts, not_dispatchable or routed, which only a person revives.",
+      "reaction": "A reaction that failed twice with the same key and code, or with a code that is not retryable; or a READY task whose brief does not compile, named with its failure, in a run where nothing else moves."
+    },
+    "cleared_when": {
+      "budget_line": "the line has room; at the pause core calls budgets.request_increase and names the approval",
+      "hold": "no hold of that scope is in config/limits.json",
+      "approval": "the approval is decided GRANTED",
+      "readiness": "the capability is ACTIVE at the planned sha, or the environment reads HEALTHY",
+      "input": "the input file re-hashes to the recorded sha256",
+      "device_capacity": "a fresh capacity snapshot says the job can start",
+      "host_quota": "a person continues; recorded as the person's statement",
+      "host_effort": "the coordinator's session serves the rows' minimum effort",
+      "pin": "require_pins passes, or a run_repin approval is GRANTED",
+      "path_reachability": "the recorded host, mount and permission check passes",
+      "independent_review": "a HUMAN review of the subject exists, or a delegating host holds the coordinator",
+      "task_blocked": "the task is no longer BLOCKED",
+      "reaction": "the run's max event id, its pinned workflow digest or the sha256 of config/limits.json has moved since the reaction failed"
+    },
+    "predicate_from": {
+      "budget_line": [
+        "eval"
+      ],
+      "hold": [
+        "core"
+      ],
+      "approval": [
+        "govern"
+      ],
+      "readiness": [
+        "exec",
+        "govern"
+      ],
+      "input": [
+        "core"
+      ],
+      "device_capacity": [
+        "exec"
+      ],
+      "host_quota": [],
+      "host_effort": [
+        "host"
+      ],
+      "pin": [
+        "core"
+      ],
+      "path_reachability": [
+        "exec"
+      ],
+      "independent_review": [
+        "govern",
+        "host"
+      ],
+      "task_blocked": [
+        "core"
+      ],
+      "reaction": [
+        "core"
+      ]
+    },
+    "need": {
+      "required": [
+        "kind",
+        "what",
+        "why",
+        "clear_by"
+      ],
+      "optional": [
+        "subject",
+        "path_id",
+        "task_id"
+      ]
+    },
+    "note": "What a pause, a held route or an untested path may need. A need is {kind, what, why, clear_by, subject?, path_id?, task_id?} (need lists the required and the optional keys): kind a value of this axis, what and why in words, clear_by a value of labels.clear_by, subject what it is about, path_id and task_id what waits. Each kind has one clearing predicate: cleared_when says it, and predicate_from names the streams whose code answers it (none for a person's statement). The backend re-checks it; gx_run_control(continue) is refused while any need is uncleared."
+  },
+  "clear_by": {
+    "values": [
+      "person",
+      "machine"
+    ],
+    "definitions": {
+      "person": "Only a person supplies it: a decision, a statement, a file, a changed limit line.",
+      "machine": "The machine supplies it by itself as time passes: a device that frees, a check that passes."
+    },
+    "note": "Who can clear a need."
+  },
+  "pause_scope": {
+    "values": [
+      "run",
+      "path",
+      "task",
+      "dependent"
+    ],
+    "definitions": {
+      "run": "the whole run waits",
+      "path": "the failure's path waits; the run pauses only when nothing else proceeds",
+      "task": "the failure's task waits; the run pauses only when nothing else proceeds",
+      "dependent": "what a row may declare: the failure's path when it has one, else its task. A decision carries path or task, never dependent"
+    },
+    "note": "What a PAUSE reaches: the scope that a failure class, or a condition, of errors.json failure_taxonomy carries when its route is PAUSE. The definitions are the scheduling builder's own words, kept as written."
+  },
+  "hold_reason": {
+    "values": [
+      "model_policy",
+      "host_model_refusal"
+    ],
+    "definitions": {
+      "model_policy": "The worker is outside what the task requires of its model or effort, or could not be observed where observation is required: a held submission, which waits for a model_switch approval, or a refused bind, which waits for a worker_refusal approval.",
+      "host_model_refusal": "The host recorded a safeguard refusal or a model fallback for the lease, and no submission came: the task waits for a worker_refusal approval."
+    },
+    "note": "Why a task is held (tasks.hold_json.reason). A held task is BLOCKED, awaits an approval and consumes no attempt."
+  },
+  "blocked_reason": {
+    "values": [
+      "out_of_attempts",
+      "not_dispatchable",
+      "routed",
+      "dependency_cancelled",
+      "skipped",
+      "waiting_need"
+    ],
+    "definitions": {
+      "out_of_attempts": "tasks.attempts_consumed reached max_attempts; its chain ended.",
+      "not_dispatchable": "It failed to be dispatched max_attempts times since it was created - a brief that does not compile, a gate that refuses it; its chain ended.",
+      "routed": "A failure's route ended its chain when a bound was spent (END_CHAIN).",
+      "dependency_cancelled": "A task it depends on was cancelled, so it can never become READY.",
+      "skipped": "A person decided its worker_refusal approval DENIED (labels.refusal_decision skip): its chain ended.",
+      "waiting_need": "A route paused it on a need a person or the machine can clear; it returns to READY when the need is cleared."
+    },
+    "ended": [
+      "out_of_attempts",
+      "not_dispatchable",
+      "routed",
+      "dependency_cancelled",
+      "skipped"
+    ],
+    "note": "Why a BLOCKED task that is not held is blocked (tasks.blocked_reason). With a reason listed under ended the task counts as ended, not open. One ended out_of_attempts, not_dispatchable or routed is revived only by a person, by a budget_increase approval on the task that grants attempts; one ended dependency_cancelled or skipped is never revived."
+  },
+  "trigger_topic": {
+    "values": [
+      "submission.recorded",
+      "submission.accepted",
+      "job.terminal",
+      "approval.decided",
+      "asset.active",
+      "worker.stopped",
+      "worker.verdict"
+    ],
+    "definitions": {
+      "submission.recorded": "A formal submission awaits GX validation; key submission.recorded:<submission_id>.",
+      "submission.accepted": "Written by core when a submission is ACCEPTED. Idempotency key submission.accepted:<submission_id>.",
+      "job.terminal": "Written by exec when a job reaches a terminal state. Idempotency key job.terminal:<job_id>.",
+      "approval.decided": "Written by govern when an approval is decided. Idempotency key approval.decided:<approval_id>:<status>.",
+      "asset.active": "Written by govern inside the promotion's own transaction (governance's commit_promotion, the one path to ACTIVE) when an asset version becomes ACTIVE; its event_id is the transition's event id. Idempotency key asset.active:<asset_id>@<version>.",
+      "worker.stopped": "Written by host when a worker's stop is recorded. Idempotency key worker.stopped:<lease_id>:<host_event_id>. A stop the host's record does not bear out can be followed by the real one, so the event id is part of the key.",
+      "worker.verdict": "Written by host when a model-policy verdict is recorded for a worker. Idempotency key worker.verdict:<worker_observation_id>."
+    },
+    "note": "The topics of the outbox rows that trigger reactions (states.json run.rules.reaction). A trigger row is written inside the transaction that makes the fact true, by the stream that owns it; its payload always carries run_id (null for a fact no run owns), subject and event_id, and otherwise identifiers and state words, never content. A trigger says look, and the reaction reads the owner's rows."
+  },
+  "projection_state": {
+    "values": [
+      "HOST_FOLDERS",
+      "STAGED",
+      "BACKEND_ONLY",
+      "NOT_ACTIVE"
+    ],
+    "definitions": {
+      "HOST_FOLDERS": "Its host files are written in the project a host adapter was installed into, where the host loads skills and roles from.",
+      "STAGED": "Its host files are written beside the store and wait there for an installation; no host session reads them yet.",
+      "BACKEND_ONLY": "It is ACTIVE and served by the backend only: an unestablished licence keeps it out of host folders.",
+      "NOT_ACTIVE": "It is not ACTIVE, so nothing is projected."
+    },
+    "note": "Where the host files of an asset that has a host projection are: a decision skill or a role intent. Answered by gx_asset_status and gx_skill_get, so a host driver can tell a skill in its folders from one only the backend serves."
+  },
+  "eval_purpose": {
+    "values": [
+      "CASE",
+      "CONTROL",
+      "NULL",
+      "CANDIDATE",
+      "IDENTITY",
+      "REFERENCE"
+    ],
+    "note": "Why an evaluation row exists. Known-answer cases, controls and nulls are scored with the same runner as candidates and are never mixed into a candidate ranking."
+  },
+  "case_kind": {
+    "values": [
+      "POSITIVE",
+      "NEGATIVE",
+      "BOUNDARY"
+    ],
+    "note": "A specification is not frozen without at least one executed case of each kind."
+  },
+  "dataset_split": {
+    "values": [
+      "DEVELOPMENT",
+      "HELD_OUT",
+      "CONTROL"
+    ],
+    "note": "DEVELOPMENT may be read freely. Every HELD_OUT read is counted. A record with no split label is not evaluable."
+  },
+  "evidence_type": {
+    "values": [
+      "EXPERIMENTAL",
+      "COMPUTATIONAL",
+      "BENCHMARK",
+      "REVIEW",
+      "EXPERT_RULE",
+      "HYPOTHESIS"
+    ],
+    "note": "confidence_basis must state its grounds. A model's self-reported probability is not a calibrated confidence."
+  },
+  "claim_grain": {
+    "values": [
+      "FINDING",
+      "METHOD_DETAIL",
+      "NUMERIC_VALUE",
+      "CONDITION",
+      "LIMITATION"
+    ],
+    "note": "What kind of statement a record makes, which decides how much text coverage it needs: a numeric value or a method detail is not extractable from an abstract."
+  },
+  "anchor_status": {
+    "values": [
+      "VERBATIM",
+      "PREFIX",
+      "FUZZY",
+      "ELSEWHERE",
+      "NOT_ANCHORED",
+      "NOT_TEXT",
+      "PAGE_ONLY"
+    ],
+    "definitions": {
+      "VERBATIM": "The quote occurs exactly in the cited segment.",
+      "PREFIX": "A leading span of the quote occurs exactly; the rest differs in whitespace or hyphenation.",
+      "FUZZY": "No exact span, token overlap at or above the declared level. Counts as a diagnostic, not as verified.",
+      "ELSEWHERE": "The quote occurs in the source but in another segment, which is reported.",
+      "NOT_ANCHORED": "The quote was not found in the source.",
+      "NOT_TEXT": "The cited content is a figure or table that cannot be checked as text.",
+      "PAGE_ONLY": "The record cites a page and carries no quote, so there is nothing to look for. It tells a reader which page to open and verifies nothing. Nearly half of the inherited corpus's locators are of this kind, and counting them as not anchored would hide them inside a failure."
+    },
+    "verified": [
+      "VERBATIM",
+      "PREFIX"
+    ]
+  },
+  "evidence_review_verdict": {
+    "values": [
+      "SUPPORTED",
+      "OVERSTATED",
+      "NOT_SUPPORTED",
+      "CONTRADICTED"
+    ],
+    "note": "What a checker found when it read the cited span against the claim. Only SUPPORTED moves a record to REVIEWED."
+  },
+  "review_verdict": {
+    "values": [
+      "APPROVE",
+      "REQUEST_CHANGES",
+      "REJECT"
+    ],
+    "note": "Verdict of an asset or evaluator review. REQUEST_CHANGES means a new version, not an edit."
+  },
+  "independence_level": {
+    "values": [
+      "HUMAN",
+      "DIFFERENT_HOST",
+      "FRESH_CONTEXT_SAME_HOST",
+      "CLIENT_REPORTED_ONLY",
+      "NOT_INDEPENDENT"
+    ],
+    "definitions": {
+      "HUMAN": "A person recorded the review through the operator surface, or claimed and handed in the review task under operator scope with the terminal confirmation.",
+      "DIFFERENT_HOST": "The reviewing worker was observed on a different host from the author.",
+      "FRESH_CONTEXT_SAME_HOST": "A different worker on the same host, shown by two leases and two observed worker references. It did not inherit the author's context. In one user's trust domain this is what independent means, and it is called this rather than a second expert. For an asset imported unchanged by content hash there is no authoring worker here: the reviewer is then a host-recorded worker under its own lease whose principal is not the importer's. An import that rewrote the content has an author, the worker that rewrote it.",
+      "CLIENT_REPORTED_ONLY": "Two leases exist but the backend holds no observation that two workers did. No test may call this independent.",
+      "NOT_INDEPENDENT": "Same principal, lease or observed worker as the author."
+    },
+    "sufficient": [
+      "HUMAN",
+      "DIFFERENT_HOST",
+      "FRESH_CONTEXT_SAME_HOST"
+    ],
+    "note": "The backend can prove two leases, two read receipts and a quote that resolves. It cannot prove two minds."
+  },
+  "adjudication_decision": {
+    "values": [
+      "ACCEPTED",
+      "DEFECT"
+    ],
+    "definitions": {
+      "ACCEPTED": "The item a check flagged was looked at and is not a defect, with the reason. The gate may then be met.",
+      "DEFECT": "The item is a defect. The gate stays unmet for this sha256; fixing it is a new version."
+    },
+    "note": "What an adjudication says about one diagnostic fingerprint. It is made under a review at a sufficient independence level or by a person, never by the author."
+  },
+  "source_tier": {
+    "values": [
+      "PRIMARY",
+      "OFFICIAL_DOCUMENT",
+      "SECONDARY",
+      "REPORTED_EXPERIENCE"
+    ],
+    "definitions": {
+      "PRIMARY": "The original paper, preprint, technical report or dataset record.",
+      "OFFICIAL_DOCUMENT": "Official documentation or architecture notes where no paper exists.",
+      "SECONDARY": "A review, commentary or third-party summary of a primary source.",
+      "REPORTED_EXPERIENCE": "Posts, threads and practitioner reports."
+    },
+    "note": "A second-hand post is never implementation detail of the primary source."
+  },
+  "text_coverage": {
+    "values": [
+      "FULL_TEXT",
+      "PARTIAL_TEXT",
+      "ABSTRACT_ONLY",
+      "OFFICIAL_DOC_ONLY",
+      "UNAVAILABLE"
+    ],
+    "note": "Computed from what was parsed, never declared. Figures and tables must actually be viewed; when parsing is insufficient, do not guess values or procedures."
+  },
+  "retrieval_mode": {
+    "values": [
+      "HYBRID",
+      "BM25_CJK_BIGRAM",
+      "BM25_FTS5",
+      "SEMANTIC_EMBEDDING",
+      "IDENTIFIER_ROUTING",
+      "KEYWORD_SUBSTRING",
+      "EXTERNAL_SERVICE"
+    ],
+    "note": "A degraded keyword/BM25 search must be reported as such and never presented as semantic retrieval. HYBRID may be reported only when the embedding channel actually ran for this query; every response also lists the channels that contributed and the strategy version that ranked it."
+  },
+  "retrieval_channel": {
+    "values": [
+      "BM25_CJK_BIGRAM",
+      "BM25_WORD",
+      "IDENTIFIER_ROUTING",
+      "EMBEDDING"
+    ],
+    "note": "The channels a retrieval strategy fuses. A channel whose capability probe failed is listed as skipped with the reason."
+  },
+  "memory_class": {
+    "values": [
+      "RAW_SOURCE",
+      "EVIDENCE_CLAIM",
+      "PROCEDURAL",
+      "EPISODE",
+      "EXECUTION_STATE"
+    ],
+    "definitions": {
+      "RAW_SOURCE": "Papers, manuals, database snapshots. Not a validated conclusion.",
+      "EVIDENCE_CLAIM": "Located claim with conditions and conflicts. Not a free-form summary.",
+      "PROCEDURAL": "Skills and method-selection rules. Not a permission setting.",
+      "EPISODE": "One run's path, failure, repair and cost. Must not auto-generalise.",
+      "EXECUTION_STATE": "task/run/job/checkpoint. Not long-term cross-project memory."
+    }
+  },
+  "memory_outcome": {
+    "values": [
+      "SUCCESS",
+      "FAILURE",
+      "UNCERTAIN"
+    ],
+    "note": "Retrieval returns all three. A memory that only remembers successes lets a team repeat a failed approach."
+  },
+  "gap_kind": {
+    "values": [
+      "KNOWLEDGE",
+      "METHOD",
+      "DATA",
+      "CAPABILITY",
+      "EVALUATION"
+    ],
+    "note": "What is missing: a fact, a method that applies, an input, a runnable tool, or a way to judge the result."
+  },
+  "asset_kind": {
+    "values": [
+      "DECISION_SKILL",
+      "EXECUTABLE_WORKFLOW",
+      "TOOL_ADAPTER",
+      "EVALUATOR",
+      "BENCHMARK",
+      "STRATEGY",
+      "ROLE_INTENT"
+    ],
+    "definitions": {
+      "DECISION_SKILL": "Applicability conditions, method choice, failure and alternative routes. Needs sources, review, a bounded use and a version.",
+      "EXECUTABLE_WORKFLOW": "Nodes, dependencies, schemas, branches and budgets. Needs graph and code validation, tests and a checkpoint policy.",
+      "TOOL_ADAPTER": "Maps a stable schema onto a real backend. Needs a real implementation, an environment, permissions and error, timeout and idempotency tests.",
+      "EVALUATOR": "An evaluation or assay specification with its implementation and known-answer cases.",
+      "BENCHMARK": "A frozen item set with a development and a final split.",
+      "STRATEGY": "A versioned configuration a service reads through a pointer, such as a retrieval strategy.",
+      "ROLE_INTENT": "A host-neutral role definition projected into each host's own format."
+    },
+    "note": "The three generated kinds of the plan must not be confused: generating a skill is not implementing a tool, and generating a tool schema is not having a runnable model."
+  },
+  "asset_origin": {
+    "values": [
+      "AUTHORED",
+      "GENERATED",
+      "IMPORTED",
+      "DOWNLOADED"
+    ],
+    "note": "IMPORTED and DOWNLOADED content lands QUARANTINED and takes the same gates as anything written here."
+  },
+  "capability_kind": {
+    "values": [
+      "SCIENTIFIC_TOOL",
+      "SCIENTIFIC_MODEL",
+      "REFERENCE_SOURCE",
+      "PARSER",
+      "EMBEDDING",
+      "MCP_STDIO_TOOL",
+      "UTILITY"
+    ],
+    "note": "MCP_STDIO_TOOL is one tool of an external stdio server launched for the call; it is not a running service."
+  },
+  "env_kind": {
+    "values": [
+      "CONDA",
+      "VENV",
+      "UV",
+      "CONTAINER",
+      "APPTAINER",
+      "SYSTEM_BINARY",
+      "SLURM_ENTRY"
+    ],
+    "note": "The control plane is stdlib-only. Scientific work runs in its own environment, resolved by absolute interpreter path, never by activation."
+  },
+  "probe_rung": {
+    "values": [
+      "L0_FILES",
+      "L1_METADATA",
+      "L2_ENTRYPOINT",
+      "L3_SMOKE",
+      "L4_KNOWN_ANSWER"
+    ],
+    "definitions": {
+      "L0_FILES": "Code, weights and declared inputs exist.",
+      "L1_METADATA": "Package metadata meets the declared requirements, read without importing the package.",
+      "L2_ENTRYPOINT": "The entry point answers under the launch recipe.",
+      "L3_SMOKE": "A smoke job went through the job service and the adapter's parser accepted its output.",
+      "L4_KNOWN_ANSWER": "A known-answer check passed: an identity or a cross-implementation control."
+    },
+    "note": "Each rung is a backend-observed record. ACTIVE requires L3 with a job id behind it."
+  },
+  "weight_load_mode": {
+    "values": [
+      "NONE",
+      "WEIGHTS_ONLY",
+      "FULL_PICKLE",
+      "NATIVE_FORMAT"
+    ],
+    "note": "FULL_PICKLE executes code on load and requires a recorded upstream digest that matches before the first load."
+  },
+  "bundle_kind": {
+    "values": [
+      "research_bundle",
+      "evidence_bundle",
+      "evidence_review_bundle",
+      "gap_bundle",
+      "path_bundle",
+      "execution_bundle",
+      "skill_bundle",
+      "workflow_bundle",
+      "capability_manifest_bundle",
+      "evalspec_bundle",
+      "asset_review_bundle",
+      "scenario_answers_bundle",
+      "strategy_bundle",
+      "role_bundle",
+      "benchmark_bundle",
+      "conclusion_bundle",
+      "research_update_bundle",
+      "research_update_review_bundle"
+    ],
+    "note": "What a host hands back for a task, except benchmark_bundle, which no task hands in: gx_ingest (source_kind rsi_benchmark) builds and judges it. Each has a schema in contracts/bundles.json and a validator that judges it record by record against what the backend holds."
+  },
+  "artifact_origin": {
+    "values": [
+      "JOB_OUTPUT",
+      "HOST_PUT",
+      "BACKEND",
+      "INGEST",
+      "ACQUISITION"
+    ],
+    "note": "Who produced the bytes. HOST_PUT content is a claim until a validator has judged it."
+  },
+  "task_class": {
+    "values": [
+      "PLANNING",
+      "AUTHORING",
+      "EXECUTION",
+      "VERIFICATION",
+      "TESTING"
+    ],
+    "note": "What kind of work a task is. The agent policy maps each class to the model and the effort levels it may be done at."
+  },
+  "task_kind": {
+    "values": [
+      "research_round",
+      "extract_evidence",
+      "review_evidence",
+      "reexplore_review",
+      "propose_paths",
+      "design_evaluation",
+      "review_evaluation",
+      "author_skill",
+      "author_workflow",
+      "onboard_capability",
+      "import_asset",
+      "review_asset",
+      "answer_scenarios",
+      "execute_path",
+      "propose_improvement",
+      "conclude",
+      "research_synthesis",
+      "review_research_update"
+    ],
+    "needs_run": {
+      "research_round": "none",
+      "extract_evidence": "none",
+      "review_evidence": "none",
+      "reexplore_review": "none",
+      "propose_paths": "plannable",
+      "design_evaluation": "none",
+      "review_evaluation": "none",
+      "author_skill": "none",
+      "author_workflow": "none",
+      "onboard_capability": "none",
+      "import_asset": "none",
+      "review_asset": "none",
+      "answer_scenarios": "none",
+      "execute_path": "executable",
+      "propose_improvement": "none",
+      "conclude": "none",
+      "research_synthesis": "none",
+      "review_research_update": "none"
+    },
+    "note": "Every kind of task a workflow may hand to a worker. Each names the bundle it returns in contracts/bundles.json; a workflow definition that asks for a kind outside this list does not load. needs_run says what a kind needs of its run before a task of it is handed out: plannable or executable, a state list of the run machine in contracts/states.json, or none."
+  },
+  "worker_role": {
+    "values": [
+      "coordinator",
+      "researcher",
+      "evidence_reviewer",
+      "planner",
+      "evaluation_designer",
+      "skill_author",
+      "adapter_author",
+      "executor",
+      "verifier",
+      "improver"
+    ],
+    "note": "One role vocabulary for workflows, briefs, role files and claims. v1 handed out tasks for reviewer / planner / executor while its role files were named literature-reviewer / executor / evaluator / verifier, so a worker using its own role name was refused."
+  },
+  "effort_level": {
+    "values": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "note": "The host's reasoning effort for a piece of work, recorded with the model that did it."
+  },
+  "approval_action_kind": {
+    "values": [
+      "objective_confirmation",
+      "asset_activation",
+      "model_switch",
+      "gpu_job",
+      "heldout_read",
+      "external_download",
+      "environment_change",
+      "service_start",
+      "budget_increase",
+      "data_export",
+      "worker_refusal",
+      "run_repin",
+      "eval_spec_change"
+    ],
+    "note": "What an approval unlocks. An approval is bound to one subject and one content sha256. worker_refusal decides a task held because its worker was refused by the host's safeguards or turned away at bind; run_repin re-pins a run to a changed contract, workflow or agent policy; eval_spec_change lets a successor or bridge specification change more than the implementation. These three and model_switch are never granted under a standing policy."
+  },
+  "approval_decision": {
+    "values": [
+      "GRANTED",
+      "DENIED",
+      "REVOKED"
+    ],
+    "definitions": {
+      "GRANTED": "The action is allowed, for that subject and that sha256.",
+      "DENIED": "The action is refused; what was held ends, or is tried again, as its own rule says.",
+      "REVOKED": "A grant is withdrawn."
+    },
+    "note": "The word gx_approval_grant takes as decision. Any other word is refused at the schema step, on both transports."
+  },
+  "refusal_decision": {
+    "values": [
+      "reword",
+      "authorize_once",
+      "skip"
+    ],
+    "definitions": {
+      "reword": "GRANTED: the next attempt's brief carries the person's note and leaves out the sections the person names.",
+      "authorize_once": "GRANTED: the model the person names becomes the task's required model, for that task only.",
+      "skip": "DENIED: the task is skipped and its chain ends."
+    },
+    "note": "How a person decides a worker_refusal approval: the choice recorded in approvals.decision_json. A refusal hold is never re-queued as a plain next attempt."
+  },
+  "delegation_mode": {
+    "values": [
+      "native_subagents",
+      "single_agent_sequential",
+      "external_cli_provider",
+      "unavailable"
+    ],
+    "note": "Two JSON fields do not prove two independent experts. Without independent worker evidence a test shows only that two task products were processed."
+  },
+  "host_kind": {
+    "values": [
+      "claude_code",
+      "codex",
+      "other_verified"
+    ],
+    "note": "The core is written against none of them."
+  },
+  "observation_source": {
+    "values": [
+      "client_report",
+      "host_hook",
+      "host_transcript",
+      "backend_process",
+      "host_protocol"
+    ],
+    "definitions": {
+      "client_report": "The worker said so about itself. A report, never an observation.",
+      "host_hook": "The host ran a hook and the hook's own payload says so.",
+      "host_transcript": "Read from the record the host wrote of that worker's turns. Host-recorded evidence in the same trust domain: stronger than a report, not tamper-proof, and tied to the host version whose field names were observed.",
+      "backend_process": "The backend started the process and watched it.",
+      "host_protocol": "A structured callback received on the registered official Host protocol connection. Caller thread/turn/call are outside model tool arguments. Configured model/effort remain Host-applied configuration, not independent upstream model attestation. Metadata without an executing callback is not execution proof."
+    },
+    "note": "Where a worker fact came from. client_report never proves execution. host_hook, host_transcript and backend_process may establish EXECUTION_OBSERVED under their documented conditions; host_protocol may do so only for actual controlled-connection callbacks, never no-turn metadata. None independently attests the upstream served model tier."
+  },
+  "model_policy_verdict": {
+    "values": [
+      "CONFORMS",
+      "REPORTED_ONLY",
+      "UNOBSERVABLE",
+      "MISMATCH",
+      "REFUSAL_OR_FALLBACK"
+    ],
+    "definitions": {
+      "CONFORMS": "Every observed turn ran on the pinned model at an allowed effort.",
+      "REPORTED_ONLY": "The worker's own report matches the policy and no host record has been read.",
+      "UNOBSERVABLE": "The host keeps no record this adapter can read, or its format is one the adapter was not written against.",
+      "MISMATCH": "An observed or reported model or effort falls outside the policy.",
+      "REFUSAL_OR_FALLBACK": "The host recorded a safeguard refusal or a model fallback during the work."
+    },
+    "note": "How a worker stands against the run's agent policy. In strict mode only CONFORMS lets a submission through; REPORTED_ONLY and UNOBSERVABLE hold it, and MISMATCH and REFUSAL_OR_FALLBACK always wait for the user."
+  },
+  "host_event_effect": {
+    "values": [
+      "applied",
+      "reported_only"
+    ],
+    "definitions": {
+      "applied": "What the event means for state was applied, because the host's own record bears it out; also answered for an event that only records or decides.",
+      "reported_only": "The event was kept as the adapter's report and moved nothing; each withheld effect is named in the answer's warnings."
+    },
+    "note": "What gx_host_event answers as effect. An event is the adapter's proposal, and the host's own record is the observation. A refused call is an error, not a third effect."
+  },
+  "transport": {
+    "values": [
+      "mcp_stdio",
+      "cli",
+      "native_app_server"
+    ],
+    "note": "CLI, MCP stdio and controlled native App Server callbacks reach the same dispatcher. Native App Server is an official Host connection, not an LLM provider or human confirmation channel."
+  },
+  "reuse_decision": {
+    "values": [
+      "DIRECT_REUSE",
+      "ADAPTER",
+      "METHOD_ONLY_INSPIRATION",
+      "DEFER",
+      "REJECT"
+    ],
+    "note": "Every decision carries a reason and an evidence_ref."
+  },
+  "inherit_mode": {
+    "values": [
+      "VENDORED",
+      "ADAPTED",
+      "REIMPLEMENTED",
+      "REFERENCED",
+      "BLOCKED",
+      "REJECTED"
+    ],
+    "definitions": {
+      "VENDORED": "Copied with its source path and sha256 recorded.",
+      "ADAPTED": "The logic kept; where it reads and writes changed.",
+      "REIMPLEMENTED": "The same contract in our own code.",
+      "REFERENCED": "Used in place, read-only, by absolute path and content sha256.",
+      "BLOCKED": "Cannot work while the service it needs stays down.",
+      "REJECTED": "Not inherited, with the reason."
+    },
+    "note": "How a GX-harness item became working functionality here. v1 recorded 37 items and none was working."
+  },
+  "plugin_family": {
+    "values": [
+      "research",
+      "scientific_tool",
+      "evaluation",
+      "skill",
+      "workflow"
+    ]
+  },
+  "plugin_admission_state": {
+    "values": [
+      "ENABLED",
+      "DRAINING",
+      "DISABLED"
+    ]
+  },
+  "plugin_invocation_status": {
+    "values": [
+      "ADMITTED",
+      "RETURNED",
+      "FAILED",
+      "OUTCOME_UNKNOWN"
+    ]
+  },
+  "host_pool_slot_state": {
+    "values": [
+      "RESERVED",
+      "CREATING",
+      "UNKNOWN",
+      "ACTIVE",
+      "CLOSING",
+      "TERMINATED"
+    ]
+  },
+  "host_pool_state_source": {
+    "values": [
+      "host_transcript",
+      "backend_process",
+      "client_report"
+    ]
+  },
+  "host_pool_runtime_status": {
+    "values": [
+      "ACTIVE",
+      "INACTIVE",
+      "UNKNOWN"
+    ],
+    "definition": {
+      "ACTIVE": "A fresh authenticated complete Host roster says this identity is executing in a native concurrency lane.",
+      "INACTIVE": "The roster says no execution lane is active; this is not native termination and releases no GX-owned resident slot.",
+      "UNKNOWN": "Uncovered, stale or ambiguous runtime identity remains conservatively chargeable."
+    }
+  },
+  "host_pool_inventory_ownership": {
+    "values": [
+      "EXTERNAL",
+      "OWNED"
+    ],
+    "definition": {
+      "EXTERNAL": "Native runtime capacity charged outside GX resident slots; identity-level transfer is required for adoption.",
+      "OWNED": "The exact native identity belongs to one nonterminal GX slot and is counted once by the application resident ledger."
+    }
+  }
+}

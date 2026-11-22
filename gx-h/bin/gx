@@ -1,0 +1,5 @@
+#!/bin/sh
+# Inspect tools, schemas and release pins from any directory.
+here=$(readlink -f "$0" 2>/dev/null || printf '%s' "$0")
+root=$(cd "$(dirname "$here")/.." && pwd -P) || exit 2
+PYTHONPATH="$root" PYTHONDONTWRITEBYTECODE=1 exec "${GX_PYTHON:-python3}" -B -P -m gx_core.cli "$@"

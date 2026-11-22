@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import time
 import uuid
 
 from .. import budgets
@@ -29,13 +30,27 @@ class RootDelivery:
         self.roots = roots
         self.conn = roots.conn
         self.run_id = roots.run_id
+        self._verify_after = {}
 
     def _get(self, event_id):
         return self.conn.execute("SELECT * FROM p0_root_deliveries WHERE run_id=? AND event_id=?",
                                  (self.run_id, event_id)).fetchone()
 
     def active(self, thread_id):
-        thread = self.roots._request("thread/read", {"threadId": thread_id})["thread"]
+        try:
+            thread = self.roots._request("thread/read", {"threadId": thread_id})["thread"]
+        except AppServerResponseError as exc:
+            # A live, freshly created root can have a zero-byte rollout until it receives
+            # its first input. GX knows whether any input was sent on this connection.
+            known_empty = (exc.code == -32603 and exc.message.startswith("failed to read thread:")
+                           and exc.message.endswith(" is empty") and ": rollout at " in exc.message
+                           and thread_id in exc.message and thread_id in self.roots.loaded
+                           and self.roots._binding(thread_id) and thread_id not in self.roots.active_turns)
+            if known_empty and not self.conn.execute(
+                    "SELECT 1 FROM p0_root_deliveries WHERE thread_id=? AND state<>'ready' UNION ALL "
+                    "SELECT 1 FROM p0_root_turn_usage WHERE thread_id=? LIMIT 1", (thread_id,thread_id)).fetchone():
+                return None
+            raise
         if thread["id"] != thread_id:
             raise OutcomeUnknown("Codex returned a different thread")
         status = thread["status"]["type"]
@@ -137,6 +152,8 @@ class RootDelivery:
                                   "human,interrupt,state) VALUES(?,?,?,?,?,?,?,'ready')",
                                   (self.run_id, event_id, thread_id, client_id, _digest(text), human, interrupt))
             method = "turn/interrupt" if interrupt else "turn/steer" if active else "turn/start"
+            if not interrupt:
+                budgets.require_native_metering(self.conn, self.run_id)
             ref, tokens, prior = self._reserve(thread_id, event_id) if method == "turn/start" else (None, None, None)
             state = "acknowledged" if interrupt and not active else "sending"
             self.conn.execute("UPDATE p0_root_deliveries SET method=?,target_turn=?,reservation_ref=?,token_budget=?,"
@@ -171,10 +188,26 @@ class RootDelivery:
             "ON r.reservation_ref=d.reservation_ref WHERE d.thread_id=? AND d.turn_id=? "
             "AND d.state='acknowledged' AND u.terminal_status IS NOT NULL AND r.status='HELD'",
             (thread_id, turn_id)).fetchone()
-        if row and row["total_tokens"] is not None and row["prior_tokens"] is not None and row["total_tokens"] >= row["prior_tokens"]:
-            budgets.settle(self.conn, row["reservation_ref"],
-                           actual={"tokens": row["total_tokens"] - row["prior_tokens"], "api_calls": 1},
-                           actor=ACTOR)
+        if row is None or row["total_tokens"] is None or row["prior_tokens"] is None:
+            return
+        actual = row["total_tokens"] - row["prior_tokens"]
+        if actual < 0:
+            return
+        pending = self.conn.execute(
+            "SELECT 1 FROM p0_native_child_meters WHERE root_id=? AND owner_turn=? AND awaiting_turn=1 LIMIT 1",
+            (thread_id, turn_id)).fetchone()
+        if pending:
+            return
+        children = self.conn.execute(
+            "SELECT m.metadata_verified,u.* FROM p0_native_child_usage u JOIN p0_native_child_meters m USING(child_id) "
+            "WHERE m.root_id=? AND u.owner_turn=?", (thread_id, turn_id))
+        for child in children:
+            if not child["metadata_verified"] or not child["terminal"] or child["total_tokens"] is None:
+                return
+            if child["prior_tokens"] is None or child["total_tokens"] < child["prior_tokens"]:
+                return
+            actual += child["total_tokens"] - child["prior_tokens"]
+        budgets.settle(self.conn, row["reservation_ref"], actual={"tokens": actual, "api_calls": 1}, actor=ACTOR)
 
     @staticmethod
     def _receipt(row):
@@ -222,6 +255,97 @@ class RootDelivery:
                                   "WHERE run_id=? AND thread_id=? AND method='turn/interrupt' AND target_turn=? "
                                   "AND state='sending'", (self.run_id, thread_id, turn_id))
                 self._settle(thread_id, turn_id)
+
+    def observe_descendant(self, method, params):
+        """Link provider-reported child usage to an existing root turn, never to a GX task."""
+        if method not in ("item/started", "item/completed", "turn/started", "turn/completed", "thread/tokenUsage/updated"):
+            return
+        sender = params.get("threadId")
+        turn_id = params.get("turnId") or (params.get("turn") or {}).get("id")
+        if not sender or not turn_id:
+            return
+        item = params.get("item", {})
+        activity = method in ("item/started", "item/completed")
+        if activity and (item.get("type") != "subAgentActivity" or item.get("kind") != "started"):
+            return
+        child = self.conn.execute("SELECT * FROM p0_native_child_meters WHERE run_id=? AND child_id=?",
+                                  (self.run_id, sender)).fetchone()
+        if activity:
+            owner = self.roots._binding(sender)
+            if owner:
+                root_id, owner_turn = sender, turn_id
+            elif child:
+                current = self.conn.execute("SELECT owner_turn FROM p0_native_child_usage WHERE child_id=? AND "
+                                            "turn_id=?", (sender, turn_id)).fetchone()
+                if not current:
+                    return
+                root_id, owner_turn = child["root_id"], current["owner_turn"]
+            else:
+                return
+            target = item.get("agentThreadId")
+            if isinstance(target, str) and target and target != sender:
+                self.conn.execute("INSERT OR IGNORE INTO p0_native_child_meters"
+                                  "(child_id,run_id,root_id,parent_id,owner_turn) VALUES(?,?,?,?,?)",
+                                  (target,self.run_id,root_id,sender,owner_turn))
+            return
+        if child is None:
+            return
+        with store.transaction(self.conn):
+            if method == "turn/started":
+                current = self.conn.execute("SELECT 1 FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
+                                            (sender, turn_id)).fetchone()
+                if current:
+                    return
+                previous = self.conn.execute("SELECT total_tokens,terminal FROM p0_native_child_usage "
+                                             "WHERE child_id=? ORDER BY rowid DESC LIMIT 1", (sender,)).fetchone()
+                prior = (previous["total_tokens"] if previous["terminal"] else None) if previous else 0
+                owner_turn = self.roots.active_turns.get(child["root_id"]) or child["owner_turn"]
+                self.conn.execute("INSERT INTO p0_native_child_usage(child_id,turn_id,owner_turn,prior_tokens) "
+                                  "VALUES(?,?,?,?)", (sender,turn_id,owner_turn,prior))
+                self.conn.execute("UPDATE p0_native_child_meters SET awaiting_turn=0,owner_turn=? WHERE child_id=?",
+                                  (owner_turn,sender))
+                return
+            if method == "thread/tokenUsage/updated":
+                total = (params.get("tokenUsage") or {}).get("total",{}).get("totalTokens")
+                if type(total) is not int or total < 0:
+                    return
+                self.conn.execute("UPDATE p0_native_child_usage SET total_tokens=max(coalesce(total_tokens,0),?) "
+                                  "WHERE child_id=? AND turn_id=?", (total,sender,turn_id))
+            elif params["turn"]["status"] in TERMINAL:
+                self.conn.execute("UPDATE p0_native_child_usage SET terminal=1 WHERE child_id=? AND turn_id=?",
+                                  (sender,turn_id))
+            meter = self.conn.execute("SELECT owner_turn FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
+                                      (sender,turn_id)).fetchone()
+            if meter:
+                self._settle(child["root_id"], meter["owner_turn"])
+
+    def verify_descendants(self):
+        """A positive official metadata read admits only the accounting link. No child is resumed."""
+        meters = self.conn.execute("SELECT * FROM p0_native_child_meters WHERE run_id=? AND metadata_verified=0 "
+                                   "ORDER BY rowid", (self.run_id,)).fetchall()
+        for meter in meters:
+            child_id = meter["child_id"]
+            now = time.monotonic()
+            if self._verify_after.get(child_id, 0) > now:
+                continue
+            self._verify_after[child_id] = now + 5
+            try:
+                thread = self.roots._request("thread/read", {"threadId":child_id})["thread"]
+            except AppServerResponseError:
+                continue
+            source = thread.get("source")
+            parent = (source.get("subAgent", {}) if isinstance(source,dict) else {})
+            facts = parent.get("thread_spawn", {}) if isinstance(parent,dict) else {}
+            expected = meter["parent_id"]
+            if (thread["id"] != child_id or thread.get("sessionId") != meter["root_id"]
+                    or thread.get("parentThreadId") != expected or facts.get("parent_thread_id") != expected):
+                continue
+            with store.transaction(self.conn):
+                self.conn.execute("UPDATE p0_native_child_meters SET metadata_verified=1 WHERE child_id=?", (child_id,))
+                for owner in self.conn.execute("SELECT DISTINCT owner_turn FROM p0_native_child_usage WHERE child_id=?",
+                                               (child_id,)):
+                    self._settle(meter["root_id"], owner["owner_turn"])
+            self._verify_after.pop(child_id, None)
 
     def _pages(self, method, params):
         seen = set()

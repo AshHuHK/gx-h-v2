@@ -6,6 +6,7 @@ from pathlib import Path
 from gx_core import budgets
 from gx_core.errors import HoldActive, IdempotencyConflict, OutcomeUnknown, ScopeDenied
 from gx_core.hostobs.app_server_client import AppServerResponseError, ReceivedMessage
+from gx_core.p0 import schema
 from gx_core.p0.root_delivery import RootDelivery
 from gx_core.persistence import records, store
 
@@ -68,8 +69,7 @@ class RootDeliveryTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.conn = store.open_store(Path(temporary.name) / "gx.db")
         self.addCleanup(self.conn.close)
-        sql = Path(__file__).resolve().parents[1] / "gx_core/p0/root_delivery.sql"
-        self.conn.executescript(sql.read_text())
+        schema.install(self.conn)
         self.run = records.create_run(self.conn, objective="Synthetic measurements", project_ref="p0", actor="test")
         self.ref = budgets.create_root(self.conn, run_id=self.run, profile_name="p0", actor="test",
                                        limits={"tokens": 300, "api_calls": 5})
@@ -140,6 +140,31 @@ class RootDeliveryTests(unittest.TestCase):
         self.assertEqual(third["method"], "turn/start")
         self.assertEqual(len(self.budget()["reservations"]), 2)
         self.assertEqual(len(self.peer.sent), 4)
+
+    def test_child_usage_requires_official_metadata_and_is_charged_once_to_parent(self):
+        turn = self.delivery.deliver("root", "review", event_id="review")["turn_id"]
+        self.peer.active_turns = {"root": turn}
+        self.delivery.observe_descendant("item/started", {"threadId": "root","turnId": turn,
+            "item": {"type": "subAgentActivity","kind": "started","agentThreadId": "child"}})
+        self.delivery.observe_descendant("turn/started", {"threadId": "child","turn":{"id":"c"}})
+        for amount in (183, 366, 366):
+            self.delivery.observe_descendant("thread/tokenUsage/updated", {"threadId": "child","turnId":"c",
+                "tokenUsage":{"total":{"totalTokens":amount}}})
+        self.delivery.observe_descendant("turn/completed", {"threadId":"child","turn":{"id":"c","status":"completed"}})
+        self.finish(turn,105)
+        self.assertTrue(self.budget()["reserved"])
+        read = self.peer._request
+        def child_metadata(method, params):
+            if params.get("threadId") == "child":
+                return {"thread":{"id":"child","parentThreadId":"root","sessionId":"root",
+                        "source":{"subAgent":{"thread_spawn":{"parent_thread_id":"root"}}}}}
+            return read(method, params)
+        self.peer._request = child_metadata
+        self.delivery.verify_descendants()
+        self.delivery.verify_descendants()
+        self.assertEqual(self.budget()["spent"], {"tokens":471,"api_calls":1})
+        self.assertEqual(len(self.budget()["reservations"]),1)
+        self.assertEqual(self.conn.execute("SELECT count(*) FROM tasks").fetchone()[0],0)
 
     def test_definitive_protocol_refusal_releases_unsent_turn_hold(self):
         original = self.peer._request

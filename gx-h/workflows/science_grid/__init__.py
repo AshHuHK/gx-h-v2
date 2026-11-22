@@ -2,7 +2,7 @@
 from pathlib import Path
 
 from gx_core.orchestration import build, load_definition
-from gx_core.p0 import science
+from gx_core.p0 import science, science_refresh
 from gx_core.orchestration.engine import module_sources
 
 from . import nodes
@@ -14,7 +14,7 @@ def load_workflow():
         stage_rules={"experiment": nodes.experiment_rule, "assessment": nodes.assessment_rule,
                      "decision": nodes.decision_rule},
         task_product_validator=nodes.validate, completion_evidence=nodes.completion_evidence)
-    workflow.sources.update(module_sources([load_workflow, science.settle_assessment]))
+    workflow.sources.update(module_sources([load_workflow, science.settle_assessment, science_refresh.prepare_dispatch]))
     return workflow
 
 

@@ -5,9 +5,9 @@ from gx_core.artifacts import ArtifactService
 from gx_core.domain import ids, machines
 from gx_core.errors import SchemaInvalid
 from gx_core.jobs.grid_workflow import observe_grid, submit_grid
-from gx_core.orchestration import InterruptRequest, NodeResult, expansion
+from gx_core.orchestration import InterruptRequest, NodeResult, expansion, stop
 from gx_core.persistence import store
-from gx_core.p0 import science
+from gx_core.p0 import science, science_refresh
 
 TERMINAL = machines.terminal_states("job")
 BRIEFS = {
@@ -52,12 +52,20 @@ def proposal(ctx):
     evaluation = {}
     threshold = body["threshold"]
     actor = ctx.actor
+    objective = ctx.inputs["objective"]
     if p0:
+        if science_refresh.removed_requirements(ctx.conn, ctx.run_id):
+            return stop("The active research objective or criterion was removed. Preserve these results and start a new proposal.",
+                        rule="required_intent_removed")
         main = ctx.conn.execute("SELECT thread_id FROM p0_intent_main WHERE run_id=?", (ctx.run_id,)).fetchone()
         checked(main, "a P0 proposal needs the project's human-authorized root")
         actor = main["thread_id"]
         evaluator, item, threshold = science.prospective_spec(ctx.conn, ctx.run_id, ctx.inputs, threshold)
         evaluation = {"evaluator": evaluator, "evaluation_item": item}
+        obj = science_refresh.objective_item(ctx.conn, ctx.run_id, ctx.inputs.get("objective_item_id"))
+        if obj:
+            objective = obj["value"]
+            evaluation["objective_item"] = {"item_id":obj["item_id"], "version":obj["version"]}
         if previous := body.get("previous_decision_ref"):
             decision = ctx.conn.execute("SELECT l.principal FROM science_decisions d JOIN submissions s"
                                         " USING(submission_id) JOIN leases l USING(lease_id)"
@@ -76,7 +84,7 @@ def proposal(ctx):
         frozen.append({"id": path["id"], "prediction": path["prediction"], **identity,
                        "input_ref": publish(ctx, "grid_input", path["grid"])})
     ref = publish(ctx, "research_proposal", {"run_id": ctx.run_id, "round": ctx.round, "paths": frozen,
-        "objective": ctx.inputs["objective"], "method": "fixture-grid@1", "threshold": threshold, **evaluation,
+        "objective": objective, "method": "fixture-grid@1", "threshold": threshold, **evaluation,
         "previous_decision_ref": body.get("previous_decision_ref")})
     return NodeResult(outputs={"proposal_ref": ref})
 
@@ -133,10 +141,10 @@ def experiment(ctx):
 
 
 def _accepted(conn, run, stage, round_index):
-    return conn.execute("SELECT t.task_id,s.submission_id,s.artifact_refs_json FROM tasks t JOIN submissions s "
+    return conn.execute("SELECT t.task_id,t.input_json,s.submission_id,s.artifact_refs_json FROM tasks t JOIN submissions s "
         "ON s.task_id=t.task_id AND s.result='ACCEPTED' AND s.attempt=t.attempt "
-        "WHERE t.run_id=? AND t.stage=? AND t.status='ACCEPTED' AND json_extract(t.input_json,'$.round')=?",
-        (run, stage, round_index)).fetchone()
+        "WHERE t.run_id=? AND t.stage=? AND t.status='ACCEPTED' AND json_extract(t.input_json,'$.round')=?"
+        " AND json_extract(t.input_json,'$.output_kind')=?", (run, stage, round_index, "science_"+stage)).fetchone()
 
 
 def assessment_rule(conn, run, round_index):
@@ -153,7 +161,13 @@ def _judgment(ctx, role, prior=None):
     if saved:
         refs = store.loads(saved, "artifact_refs_json")
         ref = next(ref for ref in refs if ArtifactService(ctx.conn).describe(ref)["kind"] == kind)
-        return {"artifact_ref": ref, "task_id": saved["task_id"], "submission_id": saved["submission_id"]}
+        result = {"artifact_ref": ref, "task_id": saved["task_id"], "submission_id": saved["submission_id"]}
+        if ctx.inputs.get("p0"):
+            inputs = store.loads(saved, "input_json")
+            result.update(proposal_ref=inputs["proposal_ref"], evidence_ref=inputs["evidence_refs"][0])
+            if ctx.node == "decision":
+                result["assessment_ref"] = inputs["assessment_ref"]
+        return result
     evidence_ref = ctx.outputs["experiment"]["evidence_ref"]
     inputs = {"round": ctx.round, "max_rounds": ctx.inputs["max_rounds"], "output_kind": kind,
               "instruction": BRIEFS[ctx.node], "proposal_ref": ctx.outputs["proposal"]["proposal_ref"],
@@ -172,12 +186,20 @@ def _judgment(ctx, role, prior=None):
                 " With no continuation or pivot, explain stop_reason. Respect the maximum round count.")
     if prior:
         inputs["assessment_ref"] = prior["artifact_ref"]
+        if ctx.inputs.get("p0"):
+            inputs["proposal_ref"] = prior["proposal_ref"]
+            inputs["evidence_refs"] = [prior["evidence_ref"]]
     spec = {"stage": ctx.node, "kind": "research_round", "role": role, "bundle_kind": None,
             "input": inputs, "acceptance": {"validate_workflow_product": True}, "required_artifacts": [kind],
             "depends_on": [prior["task_id"]] if prior else []}
     key = expansion.round_key(ctx.run_id, ctx.node, ctx.round, kind, inputs["proposal_ref"])
-    tasks = expansion.expand(ctx.gx, ctx.run_id, rule=kind, key=key, trigger={"evidence_ref":evidence_ref},
-                             tasks=[spec], stage=ctx.node, round_index=ctx.round, teams=ctx.teams)
+    with store.transaction(ctx.conn):
+        tasks = expansion.expand(ctx.gx, ctx.run_id, rule=kind, key=key, trigger={"evidence_ref":inputs["evidence_refs"][0]},
+                                 tasks=[spec], stage=ctx.node, round_index=ctx.round, teams=ctx.teams)
+        if ctx.inputs.get("p0"):
+            proposal = ArtifactService(ctx.conn).read_json(inputs["proposal_ref"])
+            for task_id in tasks["task_ids"]:
+                science_refresh.bind_task(ctx.conn, ctx.run_id, task_id, proposal, ctx.node)
     return NodeResult(interrupt=InterruptRequest(kind="stage", tasks=tuple(tasks["task_ids"]),
         reason=BRIEFS[ctx.node], payload={"stage":ctx.node,"waiting_state":"WAITING_CLIENT"}))
 
@@ -199,6 +221,8 @@ def decision(ctx):
     decision_body = read(result["artifact_ref"])
     summary = {**result, "round": ctx.round, "assessment_ref": ctx.outputs["assessment"]["artifact_ref"],
                **ctx.outputs["proposal"], **ctx.outputs["experiment"]}
+    if ctx.inputs.get("p0"):
+        summary.update({k: result[k] for k in ("proposal_ref","assessment_ref","evidence_ref")})
     ctx.state.setdefault("history", []).append(summary)
     if ctx.inputs.get("p0"):
         body = read(summary["proposal_ref"])
@@ -243,7 +267,8 @@ def validate(conn, task, bundle):
     else:
         checked(lease and root and lease["principal"] != root["owner"], "a scientific judgment needs its assigned worker")
     if inputs["output_kind"] == "science_decision":
-        assessment = _accepted(conn, task["run_id"], "assessment", inputs["round"])
+        assessment = (science_refresh.review_for(conn, task["run_id"], inputs["assessment_ref"])
+                      if inputs.get("p0") else _accepted(conn, task["run_id"], "assessment", inputs["round"]))
         checked(assessment is not None, "decision needs an accepted independent assessment")
         prior = conn.execute("SELECT l.principal FROM submissions s JOIN leases l ON l.lease_id=s.lease_id "
             "WHERE s.submission_id=?", (assessment["submission_id"],)).fetchone()

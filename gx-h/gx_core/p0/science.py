@@ -157,9 +157,16 @@ def _spec(conn, frozen):
 
 
 def _evaluate(conn, run, path, job, source, frozen, origin=None, item=None):
-    from .manifest import validate_evidence
+    from .manifest import read_manifest, validate_evidence
     proof = validate_evidence(conn, run_id=run, job_id=job, artifact_ref=source)
-    eval_id = _id("gxe", run, job, source, frozen["spec_hash"])
+    admission = read_manifest(conn, job)["admission"]
+    raw = ArtifactService(conn).read_json(source)
+    require((raw.get("method_id"), raw.get("method_version")) ==
+            (admission["capability"]["id"], admission["capability"]["version"])
+            and raw.get("operation_id") == admission["parameters"]["operation"]
+            and [entry["sha256"] for entry in admission["inputs"] if entry["role"] == "grid"] == [raw.get("input_sha256")],
+            "observations do not originate from the declared grid, operation and method")
+    eval_id = _id("gxe", run, job, source, frozen["spec_hash"], item)
     prior = conn.execute("SELECT artifact_refs_json FROM evaluations WHERE eval_id=?", (eval_id,)).fetchone()
     if prior:
         ref = store.loads(prior, "artifact_refs_json")[-1]
@@ -235,22 +242,22 @@ def _reviewed_submission(conn, task_id):
     return row
 
 
-def _current(conn, run, row, pin):
+def _current(conn, run, row, *pins):
     from .manifest import validate_evidence
     proof = validate_evidence(conn, run_id=run, job_id=row["job_id"], artifact_ref=row["observations_ref"])
-    if pin:
+    for pin in filter(None, pins):
         from . import intent
         item = intent.read_item(conn, run, pin["item_id"])
         if item["status"] != "active" or item["version"] != pin["version"]:
-            raise SchemaInvalid("this result needs independent review under the current evaluation item",
+            raise SchemaInvalid("this result belongs to an earlier scientific requirement",
                                 details={"reason": "current_intent"})
     return proof
 
 
 def settle_assessment(ctx, result):
     assets = ArtifactService(ctx.conn)
-    proposal = assets.read_json(ctx.outputs["proposal"]["proposal_ref"])
-    outcomes = assets.read_json(ctx.outputs["experiment"]["evidence_ref"])["routes"]
+    proposal = assets.read_json(result.get("proposal_ref") or ctx.outputs["proposal"]["proposal_ref"])
+    outcomes = assets.read_json(result.get("evidence_ref") or ctx.outputs["experiment"]["evidence_ref"])["routes"]
     review = assets.read_json(result["artifact_ref"])
     findings = {f["path_id"]: f for f in review["findings"]}
     hypotheses = {p["id"]: p["hypothesis_id"] for p in proposal["paths"]}
@@ -269,7 +276,7 @@ def settle_assessment(ctx, result):
                 continue
             if kind == "valid_scientific_outcome":
                 try:
-                    proof = _current(conn, ctx.run_id, route, proposal["evaluation_item"])
+                    proof = _current(conn, ctx.run_id, route, proposal["evaluation_item"], proposal.get("objective_item"))
                 except GxError as exc:
                     if exc.details.get("reason") == "current_intent":
                         continue
@@ -328,15 +335,17 @@ def decision_routes(proposal, body):
 
 def current_evidence(conn, run_id):
     """Read the accepted outcomes still admissible under the active scientific requirements."""
-    rows = conn.execute("SELECT s.*,e.provenance_json FROM science_settlements s JOIN evaluations e USING(eval_id)"
+    rows = conn.execute("SELECT s.*,e.provenance_json,t.input_json FROM science_settlements s JOIN evaluations e USING(eval_id)"
+                        " JOIN tasks t ON t.task_id=s.task_id"
                         " WHERE s.run_id=? AND s.kind='valid_scientific_outcome' ORDER BY s.round_index,s.path_id",
                         (run_id,)).fetchall()
     valid = []
     for row in rows:
         origin = store.loads(row, "provenance_json")
+        proposal = ArtifactService(conn).read_json(store.loads(row, "input_json")["proposal_ref"])
         try:
             _current(conn, run_id, {"job_id": row["job_id"], "observations_ref": origin["input_ref"]},
-                     origin["intent_item"])
+                     origin["intent_item"], proposal.get("objective_item"))
         except GxError:
             continue
         valid.append(dict(row))
@@ -346,12 +355,13 @@ def current_evidence(conn, run_id):
 def record_decision(ctx, result, actions, stop, paths):
     with store.transaction(ctx.conn) as conn:
         decision = _reviewed_submission(conn, result["task_id"])
-        review = _reviewed_submission(conn, ctx.outputs["assessment"]["task_id"])
+        from .science_refresh import review_for
+        review = _reviewed_submission(conn, review_for(conn, ctx.run_id, result["assessment_ref"])["task_id"])
         require(decision["principal"] != review["principal"], "the reviewer and decision worker must differ")
         assets = ArtifactService(conn)
         body = assets.read_json(result["artifact_ref"])
-        proposal = assets.read_json(ctx.outputs["proposal"]["proposal_ref"])
-        outcomes = assets.read_json(ctx.outputs["experiment"]["evidence_ref"])["routes"]
+        proposal = assets.read_json(result["proposal_ref"])
+        outcomes = assets.read_json(result["evidence_ref"])["routes"]
         by_path = {r["path_id"]: r for r in outcomes}
         # A change after hand-in can make a previously successful observation inadmissible.
         # Preserve the submitted decision and record the effective disposition in the ledger.
@@ -361,7 +371,7 @@ def record_decision(ctx, result, actions, stop, paths):
                     "infrastructure_failure", "measurement_failure"):
                 continue
             try:
-                _current(conn, ctx.run_id, row, proposal["evaluation_item"])
+                _current(conn, ctx.run_id, row, proposal["evaluation_item"], proposal.get("objective_item"))
             except GxError as exc:
                 blocked = action.get("successor", action["path_id"])
                 paths = [p for p in paths if p["id"] != blocked]

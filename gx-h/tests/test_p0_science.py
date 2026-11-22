@@ -13,7 +13,7 @@ from gx_core.domain import clock, ids
 from gx_core.errors import SchemaInvalid
 from gx_core.jobs.grid_workflow import observe_grid, submit_grid
 from gx_core.jobs.service import JobService
-from gx_core.p0 import intent, science
+from gx_core.p0 import intent, science, science_refresh
 from gx_core.persistence import records, store
 from workflows.science_grid import nodes
 
@@ -139,6 +139,41 @@ class ScienceLedger(unittest.TestCase):
         self.assertEqual(self.conn.execute("SELECT count(*) FROM evidence").fetchone()[0], 1)
         self.export()
 
+    def test_replacing_objective_preserves_prior_results_and_stops_the_old_plan(self):
+        self.change("objective", "objective", 0, "Find qualifying sampled points")
+        intent.bind_dependencies(self.conn, self.run, "workflow", self.run, {"objective":"context","evaluation":"evaluation"})
+        row = self.grid("selected", 2)
+        path = {"id":"selected", "prediction":"some score qualifies", "expected_reaches_threshold":True}
+        path["hypothesis_id"] = science.register_hypothesis(self.conn, self.run, path, "test-main")
+        proposal = {"objective_item":{"item_id":"objective", "version":1}, "paths":[path], "threshold":-0.25,
+                    "evaluation_item":self.item, "evaluator":self.pin, "author_principal":"test-main"}
+        proposal_ref = self.document("research_proposal",proposal)
+        raw = self.document("research_evidence",{"proposal_ref":proposal_ref,"routes":[row]})
+        inputs = {"p0":True,"output_kind":"science_assessment","proposal_ref":proposal_ref,"evidence_refs":[raw],
+                  "round":0,"max_rounds":3}
+        review = self.submission(inputs,"reviewer",judge(self.assets,inputs))
+        ctx = SimpleNamespace(conn=self.conn,run_id=self.run,round=0,outputs={
+            "proposal":{"proposal_ref":proposal_ref},"experiment":{"evidence_ref":raw}})
+        science.settle_assessment(ctx,review)
+        self.assertEqual(len(science.current_evidence(self.conn,self.run)),1)
+        planner = records.create_task(self.conn,run_id=self.run,kind="research_round",role="planner",actor="backend",
+            task_input={**inputs,"output_kind":"science_decision","assessment_ref":review["artifact_ref"]})
+        store.transition(self.conn,machine="task",subject_id=planner,to_state="READY",actor="backend")
+        science_refresh.bind_task(self.conn,self.run,planner,proposal,"decision")
+        preview = self.change("objective","objective",1,"Investigate a different response variable")
+        self.assertEqual(preview["status"],"awaiting_confirmation")
+        intent.stage_input(self.conn,self.run,"confirm-goal",{"kind":"confirm","change_id":preview["change_id"],
+                                                            "preview_sha256":preview["preview_sha256"]})
+        intent.accept_input(self.conn,self.run,"test-main","confirm-goal-turn","confirm-goal")
+        task = self.conn.execute("SELECT * FROM tasks WHERE task_id=?",(planner,)).fetchone()
+        with store.transaction(self.conn):
+            self.assertFalse(science_refresh.prepare_dispatch(self.conn,self.run,task))
+        self.assertEqual(self.conn.execute("SELECT status FROM runs WHERE run_id=?",(self.run,)).fetchone()[0],"PAUSED")
+        self.assertFalse(science.current_evidence(self.conn,self.run))
+        self.assertEqual(self.conn.execute("SELECT count(*) FROM evidence").fetchone()[0],1)
+        self.assertEqual(self.conn.execute("SELECT count(*) FROM jobs").fetchone()[0],1)
+        self.export()
+
     def test_criterion_changes_before_original_evaluation_commits(self):
         self.change("evaluation", "evaluation_spec", 1, {"threshold": 1})
         self.assertFalse(self.conn.execute("SELECT 1 FROM outbox WHERE topic='p0.intent.reevaluate'").fetchone())
@@ -171,3 +206,101 @@ class ScienceLedger(unittest.TestCase):
         self.assertEqual(self.conn.execute("SELECT count(*) FROM evaluations WHERE purpose='CANDIDATE'").fetchone()[0], 2)
         self.assertEqual(self.conn.execute("SELECT count(*) FROM evidence").fetchone()[0], 0)
         self.export()
+
+
+class CriterionDuringReview(unittest.TestCase):
+    def test_changed_assessment_and_decision_use_fresh_products(self):
+        from gx_core.p0 import cli, driver, roots
+        from gx_core.orchestration import reactor, service
+        from gx_core.teams.service import backend_ctx
+        from gx_core.errors import ScopeDenied
+        from gx_core.native_release import native_state
+        with tempfile.TemporaryDirectory() as tmp, native_state(Path(tmp)) as state:
+            conn = store.open_store(state.db_path)
+            self.addCleanup(conn.close)
+            spec = cli.demo_spec()
+            inputs = {"p0":True,"proposal":spec["proposal"],"max_rounds":1}
+            def change(rid, msg, action):
+                intent.stage_input(conn,rid,msg,action)
+                return intent.accept_input(conn,rid,"main",msg+"-turn",msg)
+            def bootstrap(rid):
+                intent.bind_main(conn,rid,"main")
+                change(rid,"initial",cli.initial_action(spec))
+            assigned = service.run_start(driver.context(conn), {"objective":spec["objective"],
+                "project_ref":"criterion-during-work","budget_profile":"p0","workflow":{"id":"science_grid","version":"1"},
+                "inputs":inputs,"idempotency_key":"criterion-run"},prepare_p0=bootstrap)
+            run = assigned["run_id"]
+            gx = backend_ctx(conn)
+            for row in conn.execute("SELECT job_id FROM jobs WHERE run_id=?", (run,)).fetchall():
+                JobService(conn).wait(row["job_id"],timeout_seconds=15)
+            def advance():
+                reactor.lazy(gx,run)
+                reactor.drive_science(gx,run)
+            advance()
+            root = roots.Roots(conn,run_id=run,cwd=tmp)
+            def task(stage):
+                return conn.execute("SELECT * FROM tasks WHERE stage=? AND run_id=? ORDER BY rowid DESC",
+                                    (stage,run)).fetchone()
+            def claim(task_id,thread_id):
+                binding = root._claim(task_id)
+                with store.transaction(conn):
+                    conn.execute("UPDATE p0_roots SET thread_id=? WHERE root_key=?", (thread_id,binding["root_key"]))
+                    conn.execute("UPDATE leases SET principal=? WHERE lease_id=?", (thread_id,binding["lease_id"]))
+                return roots.require_binding(conn,run,thread_id)
+            def submit(binding):
+                packet = json.loads(binding["brief"].split("\n",1)[1])
+                product = judge(ArtifactService(conn),packet["input"])
+                with store.transaction(conn):
+                    root._submit(binding,product,{"thread_id":binding["thread_id"],"turn_id":"fixture",
+                                                 "call_id":ids.new_id("request")})
+                return packet, product
+            def update(version, threshold):
+                change(run,"update-"+str(version),{"kind":"change","items":[{"item_id":"evaluation",
+                    "item_type":"evaluation_spec","expected_version":version,"value":{"threshold":threshold}}]})
+            reviewer = task("assessment")
+            deps = intent.snapshot(conn,run,"task",reviewer["task_id"])
+            self.assertEqual({key: value["role"] for key,value in deps.items()},
+                             {"objective":"context","evaluation":"evaluation"})
+            first = claim(reviewer["task_id"],"review-v1")
+            update(1,0.5)
+            with self.assertRaises(ScopeDenied):
+                roots.require_binding(conn,run,"review-v1")
+            second = claim(reviewer["task_id"],"review-v2")
+            packet, findings = submit(second)
+            self.assertEqual(packet["intent"]["evaluation"]["version"],2)
+            self.assertNotEqual(json.loads(first["brief"].split("\n",1)[1])["input"]["proposal_ref"],
+                                packet["input"]["proposal_ref"])
+            self.assertEqual([f["supported"] for f in findings["findings"]],[False,False])
+            advance()
+            planner = task("decision")
+            deps = intent.snapshot(conn,run,"task",planner["task_id"])
+            self.assertEqual(deps["objective"]["role"],"execution")
+            claim(planner["task_id"],"plan-v2")
+            update(2,-0.25)
+            self.assertIsNone(root._claim(planner["task_id"]), "decision must wait for independent updated review")
+            followup = conn.execute("SELECT * FROM tasks WHERE run_id=? AND stage='decision' AND role='evidence_reviewer'",
+                                    (run,)).fetchone()
+            self.assertNotEqual(followup["task_id"],reviewer["task_id"])
+            fresh = claim(followup["task_id"],"review-v3")
+            packet, findings = submit(fresh)
+            self.assertEqual([f["supported"] for f in findings["findings"]],[True,False])
+            final = claim(planner["task_id"],"plan-v3")
+            packet, decision = submit(final)
+            self.assertEqual(ArtifactService(conn).read_json(decision["assessment_ref"]),findings)
+            advance()
+            self.assertEqual(conn.execute("SELECT status FROM runs WHERE run_id=?", (run,)).fetchone()[0],"COMPLETED")
+            current = science.current_evidence(conn,run)
+            self.assertEqual({r["direction"] for r in current},{"supports","refutes"})
+            self.assertEqual(conn.execute("SELECT count(*) FROM jobs WHERE run_id=?",(run,)).fetchone()[0],2)
+            if location := os.environ.get("GX_P0_SCIENCE_EVIDENCE"):
+                rows = lambda sql: [dict(r) for r in conn.execute(sql)]
+                snapshot = {"run_id":run,"status":"COMPLETED","jobs":rows("SELECT job_id,status FROM jobs"),
+                    "task_dependencies":rows("SELECT * FROM p0_intent_dependencies WHERE object_type='task'"),
+                    "attempts": [{"thread_id":r["thread_id"],"attempt":r["attempt"],"lease_id":r["lease_id"],
+                                  "task_id":r["task_id"],"input":json.loads(r["brief"].split("\n",1)[1])["input"]}
+                                 for r in conn.execute("SELECT * FROM p0_roots")],
+                    "scientific_settlements":rows("SELECT * FROM science_settlements"),
+                    "current_evidence":[r["evidence_id"] for r in current]}
+                path = Path(location) / (self._testMethodName + ".json")
+                path.parent.mkdir(exist_ok=True,parents=True)
+                path.write_text(json.dumps(snapshot,indent=2) + "\n")

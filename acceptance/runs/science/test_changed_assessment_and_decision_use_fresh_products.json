@@ -1,0 +1,241 @@
+{
+  "run_id": "gxr_01m80jxt3cdq2g6jn2",
+  "status": "COMPLETED",
+  "jobs": [
+    {
+      "job_id": "gxj_01m80jxt7gknbh8x7e",
+      "status": "SUCCEEDED"
+    },
+    {
+      "job_id": "gxj_01m80jxtd7fn93tnqk",
+      "status": "SUCCEEDED"
+    }
+  ],
+  "task_dependencies": [
+    {
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "object_type": "task",
+      "object_id": "gxt_01m80jxtw48wey12dd",
+      "item_id": "objective",
+      "item_version": 1,
+      "item_hash": "ef37036bc7e8de295d39ff12f7ef918dbe23947e20141c40b9d94117ab874120",
+      "role": "context"
+    },
+    {
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "object_type": "task",
+      "object_id": "gxt_01m80jxtw48wey12dd",
+      "item_id": "evaluation",
+      "item_version": 2,
+      "item_hash": "78223d46fdb183493f1317458f0099631d4bda40a2652720b7a6c28f516b6135",
+      "role": "evaluation"
+    },
+    {
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "object_type": "task",
+      "object_id": "gxt_01m80jxv0ve9q5df3x",
+      "item_id": "objective",
+      "item_version": 1,
+      "item_hash": "ef37036bc7e8de295d39ff12f7ef918dbe23947e20141c40b9d94117ab874120",
+      "role": "execution"
+    },
+    {
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "object_type": "task",
+      "object_id": "gxt_01m80jxv0ve9q5df3x",
+      "item_id": "evaluation",
+      "item_version": 3,
+      "item_hash": "a0d85f659ea901fb8c6e8c92b1735087fddf21b2a99e64fbefc088564ab76eec",
+      "role": "evaluation"
+    },
+    {
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "object_type": "task",
+      "object_id": "gxt_01m80jxv1rpcckzvqr",
+      "item_id": "objective",
+      "item_version": 1,
+      "item_hash": "ef37036bc7e8de295d39ff12f7ef918dbe23947e20141c40b9d94117ab874120",
+      "role": "context"
+    },
+    {
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "object_type": "task",
+      "object_id": "gxt_01m80jxv1rpcckzvqr",
+      "item_id": "evaluation",
+      "item_version": 3,
+      "item_hash": "a0d85f659ea901fb8c6e8c92b1735087fddf21b2a99e64fbefc088564ab76eec",
+      "role": "evaluation"
+    }
+  ],
+  "attempts": [
+    {
+      "thread_id": "review-v1",
+      "attempt": 1,
+      "lease_id": "gxl_01m80jxtzd9sfmf9k4",
+      "task_id": "gxt_01m80jxtw48wey12dd",
+      "input": {
+        "evidence_refs": [
+          "gxa_01m80jxtw195s57mnf"
+        ],
+        "instruction": "Evaluate the frozen prediction for every route using its original observations and threshold. Return science_assessment JSON with proposal_ref, evidence_refs and findings [{path_id,supported,reason}]. Cite evaluation_ref when present. Use null supported for a failed measurement. Read each frozen evaluation and its original grid observations. Compare the threshold crossing to the path's expected_reaches_threshold. Set supported=null when outcome_kind is not valid_scientific_outcome, including a failed evaluation of a successful Job.",
+        "max_rounds": 1,
+        "output_kind": "science_assessment",
+        "p0": true,
+        "proposal_ref": "gxa_01m80jxt45nd76rcjp",
+        "round": 0
+      }
+    },
+    {
+      "thread_id": "review-v2",
+      "attempt": 2,
+      "lease_id": "gxl_01m80jxv0536n37bdq",
+      "task_id": "gxt_01m80jxtw48wey12dd",
+      "input": {
+        "evidence_refs": [
+          "gxa_01m80jxv03qm4ydgds"
+        ],
+        "instruction": "Evaluate the frozen prediction for every route using its original observations and threshold. Return science_assessment JSON with proposal_ref, evidence_refs and findings [{path_id,supported,reason}]. Cite evaluation_ref when present. Use null supported for a failed measurement. Read each frozen evaluation and its original grid observations. Compare the threshold crossing to the path's expected_reaches_threshold. Set supported=null when outcome_kind is not valid_scientific_outcome, including a failed evaluation of a successful Job.",
+        "max_rounds": 1,
+        "output_kind": "science_assessment",
+        "p0": true,
+        "proposal_ref": "gxa_01m80jxtzwt8hz84bp",
+        "round": 0
+      }
+    },
+    {
+      "thread_id": "plan-v2",
+      "attempt": 1,
+      "lease_id": "gxl_01m80jxv19vfn99fdm",
+      "task_id": "gxt_01m80jxv0ve9q5df3x",
+      "input": {
+        "assessment_ref": "gxa_01m80jxv09htr3avkn",
+        "evidence_refs": [
+          "gxa_01m80jxv03qm4ydgds"
+        ],
+        "instruction": "Read the independent assessment and original evidence. Return science_decision JSON with proposal_ref, assessment_ref, continue_paths, next_grids, reason and stop_reason. To continue, give each selected route a fresh grid of candidates for fixture-grid@1. To stop, supply an empty selection and explain the reason. You may also pivot. Supply optional pivots:[{from_path,id,prediction,grid}] for a new testable prediction and fresh route identifier replacing its source. Omit a path to prune it. With no continuation or pivot, explain stop_reason. Respect the maximum round count.",
+        "max_rounds": 1,
+        "output_kind": "science_decision",
+        "p0": true,
+        "proposal_ref": "gxa_01m80jxtzwt8hz84bp",
+        "round": 0
+      }
+    },
+    {
+      "thread_id": "review-v3",
+      "attempt": 1,
+      "lease_id": "gxl_01m80jxv24qwm5qpdc",
+      "task_id": "gxt_01m80jxv1rpcckzvqr",
+      "input": {
+        "evidence_refs": [
+          "gxa_01m80jxv1qz3m27mnh"
+        ],
+        "instruction": "Evaluate the frozen prediction for every route using its original observations and threshold. Return science_assessment JSON with proposal_ref, evidence_refs and findings [{path_id,supported,reason}]. Cite evaluation_ref when present. Use null supported for a failed measurement. Read each frozen evaluation and its original grid observations. Compare the threshold crossing to the path's expected_reaches_threshold. Set supported=null when outcome_kind is not valid_scientific_outcome, including a failed evaluation of a successful Job. Review the retrospective criterion on the original measurements. Limit claims to this revised test.",
+        "max_rounds": 1,
+        "output_kind": "science_assessment",
+        "p0": true,
+        "proposal_ref": "gxa_01m80jxv1fe6ghnpyt",
+        "round": 0
+      }
+    },
+    {
+      "thread_id": "plan-v3",
+      "attempt": 2,
+      "lease_id": "gxl_01m80jxv2qnx3qez0n",
+      "task_id": "gxt_01m80jxv0ve9q5df3x",
+      "input": {
+        "assessment_ref": "gxa_01m80jxv2a37v6j6hc",
+        "evidence_refs": [
+          "gxa_01m80jxv1qz3m27mnh"
+        ],
+        "instruction": "Read the independent assessment and original evidence. Return science_decision JSON with proposal_ref, assessment_ref, continue_paths, next_grids, reason and stop_reason. To continue, give each selected route a fresh grid of candidates for fixture-grid@1. To stop, supply an empty selection and explain the reason. You may also pivot. Supply optional pivots:[{from_path,id,prediction,grid}] for a new testable prediction and fresh route identifier replacing its source. Omit a path to prune it. With no continuation or pivot, explain stop_reason. Respect the maximum round count.",
+        "max_rounds": 1,
+        "output_kind": "science_decision",
+        "p0": true,
+        "proposal_ref": "gxa_01m80jxv1fe6ghnpyt",
+        "round": 0
+      }
+    }
+  ],
+  "scientific_settlements": [
+    {
+      "settlement_id": "settlement_6b7134dbc70637059d68482c252f3d4e4665b7c40f21dedcf68471d264e5105e",
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "round_index": 0,
+      "path_id": "path-a",
+      "hypothesis_id": "gxh_ef84a5f0e44f86e7d9cefee95e83f47e63ecadc0029f8c12e8f80843e7a39226",
+      "task_id": "gxt_01m80jxtw48wey12dd",
+      "attempt": 2,
+      "submission_id": "gxsb_01m80jxv0adrp009nx",
+      "job_id": "gxj_01m80jxt7gknbh8x7e",
+      "kind": "valid_scientific_outcome",
+      "reason": "Best measured score -0 fell below the threshold 0.5.",
+      "eval_id": "gxe_c64bd9ecde97c6fe78faf84c32dfece66c491634219b5aeaffa9e1c57865caf4",
+      "artifact_ref": "gxa_01m80jxtpf6b68f1nx",
+      "manifest_hash": "b36d59fd3b74dc76d52b552beac004dea53418d18f5998774fbc1eb44390a2c2",
+      "evidence_id": "gxv_6cc6ab9eb0ec2ded027b9093c1c3b9099d6a102e91ed1c45a10ddca1b0248c88",
+      "direction": "refutes",
+      "created_at": "2026-11-22T02:56:22.038Z"
+    },
+    {
+      "settlement_id": "settlement_b722acc09026bbe17ff096e8b770c4a9977baecae5bcdc9ad4d6b05a6be70c70",
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "round_index": 0,
+      "path_id": "path-b",
+      "hypothesis_id": "gxh_7de32e2f98f7824424e287021635634c8c7377d5c55813ad3577908b995bd96b",
+      "task_id": "gxt_01m80jxtw48wey12dd",
+      "attempt": 2,
+      "submission_id": "gxsb_01m80jxv0adrp009nx",
+      "job_id": "gxj_01m80jxtd7fn93tnqk",
+      "kind": "valid_scientific_outcome",
+      "reason": "Best measured score -12.25 fell below the threshold 0.5.",
+      "eval_id": "gxe_18c127fcca5028b97f5b43ef9d7c7bb1ea5ef8a95b17340381a41bef460a0c70",
+      "artifact_ref": "gxa_01m80jxtt7bdt6znsw",
+      "manifest_hash": "00d795400487ec210c15a3d28ce7d01612e584c4a9622ac67c60b7a577b4e266",
+      "evidence_id": "gxv_cb1852b5e9f26c027b781fc764bf373d46af8e2d6607903a1451fab65ca5b79d",
+      "direction": "refutes",
+      "created_at": "2026-11-22T02:56:22.039Z"
+    },
+    {
+      "settlement_id": "settlement_b9089ab5ab0ee25dec7e2afe06751dd30d93b9c3de452b9059311345a110497b",
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "round_index": 0,
+      "path_id": "path-a",
+      "hypothesis_id": "gxh_ba81cb6691f805bd9b6f9d68e8e0c85246702a9c63719a4691ba9ffcbbc2ef1f",
+      "task_id": "gxt_01m80jxv1rpcckzvqr",
+      "attempt": 1,
+      "submission_id": "gxsb_01m80jxv2b60xd77wa",
+      "job_id": "gxj_01m80jxt7gknbh8x7e",
+      "kind": "valid_scientific_outcome",
+      "reason": "Best measured score -0 reached the threshold -0.25.",
+      "eval_id": "gxe_0717dd33bc3ee25a57b73c3953f4c8912bde5d8ccce688444cb27ed5652787c9",
+      "artifact_ref": "gxa_01m80jxtpf6b68f1nx",
+      "manifest_hash": "b36d59fd3b74dc76d52b552beac004dea53418d18f5998774fbc1eb44390a2c2",
+      "evidence_id": "gxv_19191b823254762f3fafe4c4cd118c3470f566631ed2a875294627d3f7124465",
+      "direction": "supports",
+      "created_at": "2026-11-22T02:56:22.101Z"
+    },
+    {
+      "settlement_id": "settlement_55d95661231207afc6d417aaf3c20240fbb35318b03e8f687a84fe442d45c45f",
+      "run_id": "gxr_01m80jxt3cdq2g6jn2",
+      "round_index": 0,
+      "path_id": "path-b",
+      "hypothesis_id": "gxh_90e3e1991c0c7ccbe94a68d14499ee17fc55e6de80f2a8d14acc875c6f9a96e3",
+      "task_id": "gxt_01m80jxv1rpcckzvqr",
+      "attempt": 1,
+      "submission_id": "gxsb_01m80jxv2b60xd77wa",
+      "job_id": "gxj_01m80jxtd7fn93tnqk",
+      "kind": "valid_scientific_outcome",
+      "reason": "Best measured score -12.25 fell below the threshold -0.25.",
+      "eval_id": "gxe_8696cf4a680e49e7e9fb9bccc9f0075d34a05942e151c653b59460d8a858dbb6",
+      "artifact_ref": "gxa_01m80jxtt7bdt6znsw",
+      "manifest_hash": "00d795400487ec210c15a3d28ce7d01612e584c4a9622ac67c60b7a577b4e266",
+      "evidence_id": "gxv_d578a6c14a01e5304054e95cc427a99536f072443db9f48827a268b1e4e5d016",
+      "direction": "refutes",
+      "created_at": "2026-11-22T02:56:22.101Z"
+    }
+  ],
+  "current_evidence": [
+    "gxv_19191b823254762f3fafe4c4cd118c3470f566631ed2a875294627d3f7124465",
+    "gxv_d578a6c14a01e5304054e95cc427a99536f072443db9f48827a268b1e4e5d016"
+  ]
+}

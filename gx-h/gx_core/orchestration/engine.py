@@ -62,6 +62,7 @@ from ..domain import clock, ids, machines
 from ..errors import (
     ApprovalRequired,
     ArtifactNotFound,
+    BudgetExceeded,
     ConcurrentRun,
     ContentHashMismatch,
     DependencyUnmet,
@@ -1446,6 +1447,10 @@ class Engine:
             except sqlite3.Error:
                 raise
             except Exception as exc:
+                if operation_budgets and isinstance(exc, BudgetExceeded):
+                    waiting = self._wait_for_admission(run_id, workflow, state, actor, name, exc, advance_id)
+                    if waiting is not None:
+                        return waiting
                 self._node_failed(run_id=run_id, workflow=workflow, state=state, actor=actor, node=name, exc=exc)
                 raise
             kind, payload = outcome
@@ -1467,6 +1472,31 @@ class Engine:
             completed = list(state["completed"])
 
         return self._finish(run_id=run_id, workflow=workflow, state=state, actor=actor)
+
+    def _wait_for_admission(self, run_id, workflow, state, actor, node, refusal, advance_id):
+        """A spending owner refused this operation. Let commissioned work settle before pausing."""
+        from ..scheduling import needs as vocabulary
+        needs = []
+        for line in refusal.details.get("shortfalls") or [refusal.details]:
+            key = line.get("key") or line.get("line")
+            amount = line.get("requested", line.get("needed"))
+            if not isinstance(key, str) or type(amount) not in (int, float) or amount <= 0:
+                return None
+            subject = {"kind":"budget_line", "id":key, "required":amount, "admission":True}
+            if ref := line.get("budget_ref") or refusal.details.get("budget_ref"):
+                subject["budget_ref"] = ref
+            needs.append(vocabulary.need("budget_line", f"{amount} {key} for the requested operation",
+                                         clear_by=vocabulary.PERSON, why=refusal.message, subject=subject))
+        with store.transaction(self.conn) as conn:
+            stopped = self._advance_stopped(conn, run_id, advance_id)
+            if stopped:
+                return self._response(run_id, node=node, warnings=[stopped], conn=conn)
+            outstanding = self._objective_work(conn, run_id, refusal.message, runnable_only=True)
+            if outstanding:
+                return self._park(conn, run_id=run_id, workflow=workflow, state=state, actor=actor,
+                                  node=node, interrupt=outstanding)
+            return self._pause(conn, run_id=run_id, workflow=workflow, state=state, actor=actor,
+                               node=node, reason=refusal.message, needs=needs)
 
     def _advance_stopped(self, conn: sqlite3.Connection, run_id: str, advance_id: str | None) -> str | None:
         """Why this advance may not run its next node, or None. Read under the write lock."""
@@ -1907,13 +1937,15 @@ class Engine:
         )
 
     @staticmethod
-    def _objective_work(conn: sqlite3.Connection, run_id: str, reason: str) -> InterruptRequest | None:
+    def _objective_work(conn: sqlite3.Connection, run_id: str, reason: str, *,
+                        runnable_only: bool = False) -> InterruptRequest | None:
         """Work already commissioned by the run; its existing owners settle it."""
         task_terminal = machines.terminal_states("task")
         job_terminal = machines.terminal_states("job")
         tasks = tuple(row["task_id"] for row in conn.execute(
             "SELECT task_id,status FROM tasks WHERE run_id=? ORDER BY rowid", (run_id,))
-            if row["status"] not in task_terminal)
+            if row["status"] not in task_terminal and
+            (not runnable_only or row["status"] in ("READY", "CLAIMED", "RUNNING")))
         jobs = tuple(row["job_id"] for row in conn.execute(
             "SELECT job_id,status FROM jobs WHERE run_id=? ORDER BY rowid", (run_id,))
             if row["status"] not in job_terminal)

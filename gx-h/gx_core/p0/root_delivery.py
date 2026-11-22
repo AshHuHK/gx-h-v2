@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
 import time
 import uuid
@@ -31,6 +32,20 @@ def _idle_refusal(error, method):
 
 def _token_count(value):
     return value if type(value) is int and value >= 0 else None
+
+
+@dataclass
+class _LiveReceipts:
+    responses: dict = field(default_factory=dict)
+    responses_at_snapshot: int = 0
+    unpaired_snapshot: bool = False
+
+    def snapshot(self):
+        # The pinned host can emit an unchanged count after receiving rate limits
+        # for an interrupted request whose final provider usage never arrived.
+        if self.responses_at_snapshot == len(self.responses):
+            self.unpaired_snapshot = True
+        self.responses_at_snapshot = len(self.responses)
 
 
 def _queued_message(item):
@@ -139,25 +154,29 @@ class RootDelivery:
     def _evidence(self, method, params, thread_id, turn_id):
         key = (thread_id, turn_id)
         if method == "turn/started":
-            self._live.setdefault(key, {})
+            self._live.setdefault(key, _LiveReceipts())
         elif method == "rawResponseItem/completed":
             if call_id := _queued_message(params.get("item") or {}):
                 owner = self.conn.execute("SELECT owner_turn FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
                                           key).fetchone()
                 self._queued(thread_id, turn_id, owner["owner_turn"] if owner else turn_id, call_id)
         elif method == "rawResponse/completed" and key in self._live:
-            receipts = self._live[key]
+            receipts = self._live[key].responses
             rid = params.get("responseId")
             tokens = _token_count((params.get("usage") or {}).get("totalTokens"))
             if not rid or (rid in receipts and receipts[rid] != tokens):
                 tokens = None
             receipts[rid] = tokens
 
-    def _live_end(self, thread_id, turn_id):
-        receipts = self._live.pop((thread_id, turn_id), None)
-        if receipts and all(value is not None for value in receipts.values()):
-            return sum(receipts.values()), 1
-        return None, int(receipts is not None)
+    def _live_end(self, thread_id, turn):
+        live = self._live.pop((thread_id, turn["id"]), None)
+        if live is None:
+            return None, 0
+        if turn.get("status") != "completed" and live.unpaired_snapshot:
+            return None, 1
+        if live.responses and all(value is not None for value in live.responses.values()):
+            return sum(live.responses.values()), 1
+        return None, 1
 
     def attached(self, thread_id, thread):
         """Use the verified official resume response before consuming its queued snapshot."""
@@ -237,6 +256,8 @@ class RootDelivery:
             raise
         if thread["id"] != thread_id:
             raise OutcomeUnknown("Codex returned a different thread")
+        if thread.get("path"):
+            self._paths[thread_id] = Path(thread["path"])
         status = thread["status"]["type"]
         if status == "idle":
             return None
@@ -523,6 +544,8 @@ class RootDelivery:
                 self._arrived(thread_id, turn_id, params.get("item") or {})
             elif method == "thread/tokenUsage/updated":
                 total = (params.get("tokenUsage") or {}).get("total", {}).get("totalTokens")
+                if _token_count(total) is not None and (live := self._live.get((thread_id, turn_id))):
+                    live.snapshot()
                 if _token_count(total) is not None and not self.conn.execute(
                         "SELECT 1 FROM p0_root_deliveries JOIN budget_reservations USING(reservation_ref) "
                         "WHERE thread_id=? AND turn_id=? AND status='SETTLED'", (thread_id, turn_id)).fetchone():
@@ -531,7 +554,7 @@ class RootDelivery:
                                       "max(coalesce(total_tokens,0),excluded.total_tokens)", (thread_id, turn_id, total))
                     self._settle(thread_id, turn_id)
             elif method == "turn/completed" and params["turn"].get("status") in TERMINAL:
-                measured, known = self._live_end(thread_id, turn_id)
+                measured, known = self._live_end(thread_id, params["turn"])
                 self._terminal(thread_id, params["turn"], measured=measured, children_known=known)
 
     def _child_start(self, child, turn):
@@ -619,10 +642,12 @@ class RootDelivery:
             if method == "thread/tokenUsage/updated":
                 total = _token_count((params.get("tokenUsage") or {}).get("total", {}).get("totalTokens"))
                 if total is not None:
+                    if live := self._live.get((sender, tid)):
+                        live.snapshot()
                     self.conn.execute("UPDATE p0_native_child_usage SET total_tokens=max(coalesce(total_tokens,0),?) "
                                       "WHERE child_id=? AND turn_id=?", (total, sender, tid))
             elif turn.get("status") in TERMINAL:
-                measured, known = self._live_end(sender, tid)
+                measured, known = self._live_end(sender, turn)
                 self.conn.execute("UPDATE p0_native_child_usage SET terminal=1,"
                                   "measured_tokens=coalesce(?,measured_tokens),children_known=max(children_known,?) "
                                   "WHERE child_id=? AND turn_id=?", (measured, known, sender, tid))

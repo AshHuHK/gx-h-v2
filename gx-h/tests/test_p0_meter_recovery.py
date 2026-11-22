@@ -86,6 +86,67 @@ class TurnMeterTests(unittest.TestCase):
         self.assert_pending(turn)
         self.assertEqual(budgets.state(self.db, self.budget)["spent"], {})
 
+    def abnormal_history(self, turn, amounts, *, extra_count=False, terminal_event="turn_aborted"):
+        events = [{"type":"session_meta", "payload":{"id":"root"}},
+                  {"type":"event_msg", "payload":{"type":"task_started", "turn_id":turn, "root_turn_id":turn}}]
+        total = 0
+        for n, amount in enumerate(amounts):
+            total += amount
+            events.append({"type":"token_usage_record", "payload":{"thread_id":"root", "turn_id":turn,
+                "session_id":"root", "root_turn_id":turn, "response_id":str(n), "usage":{"total_tokens":amount},
+                "turn_token_usage":{"total_tokens":total}}})
+            events.append({"type":"event_msg", "payload":{"type":"token_count",
+                "info":{"total_token_usage":{"total_tokens":total}}}})
+        if extra_count:
+            events.append(events[-1])
+        events.append({"type":"event_msg", "payload":{"type":terminal_event, "turn_id":turn}})
+        path = self.directory / "official-rollout.jsonl"
+        path.write_text("".join(json.dumps(e) + "\n" for e in events))
+        return {"id":"root", "path":str(path)}
+
+    def assert_unpaired_count_stays_held(self, status):
+        turn = self.start()
+        amounts = [10, 15, 22, 13, 19]
+        thread = self.abnormal_history(turn, amounts, extra_count=True,
+                                       terminal_event="turn_aborted" if status == "interrupted" else "task_complete")
+        self.delivery.attached("root", thread)
+        total = 0
+        for n, amount in enumerate(amounts):
+            self.raw(turn, str(n), amount)
+            total += amount
+            self.sample(turn, total)
+        self.sample(turn, total)  # Rate limits arrived for a request whose final cost is unknown.
+        terminal = self.peer.turns[-1]
+        terminal["status"] = status
+        self.delivery.observe("turn/completed", {"threadId":"root", "turn":terminal})
+        self.assert_pending(turn)
+        self.delivery = RootDelivery(self.peer)
+        self.delivery.attached("root", {**thread, "turns":[{**terminal, "itemsView":"full"}]})
+        self.sample(turn, total)
+        self.assert_pending(turn)
+        self.assertEqual(budgets.state(self.db, self.budget)["spent"], {})
+
+    def test_interrupted_unpaired_count_holds_live_and_cold(self):
+        self.assert_unpaired_count_stays_held("interrupted")
+
+    def test_failed_unpaired_count_holds_live_and_cold(self):
+        self.assert_unpaired_count_stays_held("failed")
+
+    def test_verified_zero_usage_and_duplicate_notifications_charge_once_on_interruption(self):
+        turn = self.start()
+        self.delivery.attached("root", self.abnormal_history(turn, [0, 0]))
+        for rid in ["0", "0", "1"]:
+            self.raw(turn, rid, 0)
+            self.sample(turn, 0)
+        terminal = self.peer.turns[-1]
+        terminal["status"] = "interrupted"
+        for _ in range(2):
+            self.delivery.observe("turn/completed", {"threadId":"root", "turn":terminal})
+        state = budgets.state(self.db, self.budget)
+        self.assertEqual((state["spent"]["api_calls"], state["spent"].get("tokens", 0)), (1, 0))
+        self.delivery.deliver("root", "continue", event_id="next")
+        self.assertEqual(self.delivery._get("next")["prior_tokens"], 0)
+
     def test_settled_later_row_does_not_hide_older_unknown_hold(self):
         turn = self.start()
         self.complete()

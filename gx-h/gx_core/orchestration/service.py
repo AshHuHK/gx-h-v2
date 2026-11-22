@@ -1637,11 +1637,18 @@ def _reaction_may_be_tried(conn: sqlite3.Connection, run: sqlite3.Row, need: Map
 
 
 def _budget_line_has_room(conn: sqlite3.Connection, run: sqlite3.Row, need: Mapping[str, Any]) -> bool:
-    line = (need.get("subject") or {}).get("id") or need.get("line")
-    budget = seams.budget_state(conn, run["budget_ref"]) or {}
+    subject = need.get("subject") or {}
+    line = subject.get("id") or need.get("line")
+    budget_ref = subject.get("budget_ref", run["budget_ref"]) if subject.get("admission") else run["budget_ref"]
+    budget = seams.budget_state(conn, budget_ref) or {}
     left = (budget.get("available") or {}).get(line)
-    required=need.get("required", (need.get("subject") or {}).get("required"))
-    return left is not None and (left>=float(required) if required is not None else left>0)
+    required = need.get("required", subject.get("required"))
+    if left is None or (left < float(required) if required is not None else left <= 0):
+        return False
+    if subject.get("admission") and required is not None:
+        from .. import budgets
+        return next(budgets._project_reservation_errors(conn, budget_ref, {line: required}), None) is None
+    return True
 
 
 def _independent_review_exists(conn: sqlite3.Connection,run: sqlite3.Row,need: Mapping[str,Any]) -> bool:
@@ -1733,7 +1740,9 @@ def _pause_needs(conn: sqlite3.Connection, run: sqlite3.Row,
             edge = conn.execute("SELECT payload_json FROM events WHERE run_id=? AND kind='run.transition'"
                                 " AND new_state='PAUSED' ORDER BY event_id DESC LIMIT 1", (run["run_id"],)).fetchone()
             before_node = store.loads(edge, "payload_json", {})
-            if (before_node.get("exhausted") == exhausted and isinstance(before_node.get("budget"), dict)
+            if (paused.get("reason") == "budget exhausted: " + ", ".join(exhausted)
+                    and isinstance(before_node.get("node"), str) and before_node.get("exhausted") == exhausted
+                    and isinstance(before_node.get("budget"), dict)
                     and before_node.get("node") == (paused.get("continue_from") or {}).get("node")):
                 exhausted = []
     for key in exhausted:

@@ -105,7 +105,7 @@ def capture(state):
                                         "WHERE subject_kind='native_turn' ORDER BY rowid"),
             'decisions': rows('SELECT round_index,submission_id,reviewer_submission_id,decision_ref,actions_json,'
                               'reason,stop_reason FROM science_decisions ORDER BY round_index'),
-            'settlements': rows('SELECT round_index,path_id,job_id,submission_id,kind,reason,eval_id,evidence_id,'
+            'settlements': rows('SELECT round_index,path_id,hypothesis_id,job_id,submission_id,kind,reason,eval_id,evidence_id,'
                                 'direction FROM science_settlements ORDER BY rowid'),
             'artifacts': rows('SELECT artifact_ref,kind,run_id,job_id,task_id,sha256,bytes FROM artifacts ORDER BY rowid'),
             'manifests': []
@@ -184,7 +184,7 @@ def verify_provenance(data, first, report_ref):
             'Missing prospective or terminal execution manifest')
 
 
-def export_science(state, out, receipts):
+def export_science(state, out, receipts, *, complete=True):
     from adapters.scientific.tl1a_geometry.review import independent_check, compare_protocols
     products = {}
     source = None
@@ -220,10 +220,12 @@ def export_science(state, out, receipts):
             require(comparison['status'] == evidence['comparison']['status'],
                     'Saved evidence disagrees with independent cross-protocol comparison')
             comparisons.append({'evidence_ref': ref, **comparison})
-    require(comparisons and receipts['decisions'], 'No assessed and decided comparison')
-    report, = [p['body'] for p in products.values() if p['kind'] == 'geometry_report']
+    require(comparisons, 'No evaluated comparison')
+    reports = [p['body'] for p in products.values() if p['kind'] == 'geometry_report']
+    if complete:
+        require(receipts['decisions'] and len(reports) == 1, 'No final assessed and decided comparison')
     previous = None
-    for entry in report['rounds']:
+    for entry in reports[0]['rounds'] if reports else []:
         plan = products[entry['proposal_ref']]['body']
         assessment = products[entry['assessment_ref']]['body']
         evidence = products[entry['evidence_ref']]['body']
@@ -240,7 +242,8 @@ def export_science(state, out, receipts):
                     and old['next_protocols'] and plan['evaluator'] == prior_plan['evaluator'],
                     'The follow-up measurements differ from the accepted decision or the frozen evaluation')
         previous = entry
-    require(previous and products[previous['artifact_ref']]['body']['stop_reason'], 'Missing scientific stopping reason')
+    if complete:
+        require(previous and products[previous['artifact_ref']]['body']['stop_reason'], 'Missing scientific stopping reason')
 
     save(out / 'products.json', products)
     save(out / 'recomputed.json', {'source_sha256': sha(source), 'results': checks, 'comparisons': comparisons})
@@ -251,10 +254,99 @@ def export_science(state, out, receipts):
 # Names of the shipped domain artifacts. These also bound the public evidence export.
 SCIENCE_KINDS = {
     'geometry_plan', 'geometry_proposal', 'geometry_criteria', 'geometry_checks', 'geometry_evidence',
-    'geometry_assessment', 'geometry_decision', 'geometry_report',
+    'geometry_assessment', 'geometry_decision', 'geometry_report','geometry_quality_summary',
 }
 SCIENCE_SCHEMAS = {'gx.tl1a.coordinate_quality/1', 'gx.tl1a.geometry/1', 'gx.tl1a.criteria/1'}
 CRITERIA_KIND = 'geometry_criteria'
+
+
+def audit_v2_control(state, out, data):
+    from acc1_research_usage import analyze
+    products = json.loads((out / 'products.json').read_text())
+    guide_refs = {v['body']['quality_summary_ref'] for v in products.values() if v['kind'] == 'geometry_proposal'}
+    guide_ref, = guide_refs
+    guide = products[guide_ref]['body']['source_guide']
+    db = state / 'gx.db'
+    with closing(sqlite3.connect(db.as_uri() + '?mode=ro', uri=True)) as conn:
+        namespace, rel = conn.execute('SELECT namespace,rel_path FROM artifacts WHERE artifact_ref=?',
+                                      (guide['structure_ref'],)).fetchone()
+    raw = (state / 'artifacts' / namespace / rel).read_bytes()
+    require(sha(raw) == guide['sha256'] and len(raw) == guide['bytes'], 'Source menu identifies different data')
+    for loc in guide['locators']:
+        excerpt = loc['excerpt'].encode()
+        require(raw[loc['offset']:loc['offset'] + len(excerpt)] == excerpt, 'Source menu byte offsets differ from raw CIF')
+    report, = [p['body'] for p in products.values() if p['kind'] == 'geometry_report']
+    forms = []
+    for entry in report['rounds']:
+        body = products[entry['assessment_ref']]['body']
+        plan = products[entry['proposal_ref']]['body']
+        fields = {h['id'] for h in plan['hypotheses']}, {h['hypothesis_id'] for h in plan['hypotheses']}
+        keys = set(body['findings'])
+        require(keys in fields, 'Hypothesis keys in submitted review were missing or mixed')
+        settled = {s['hypothesis_id']: s['direction'] for s in data['settlements']
+                   if s['round_index'] == entry['round'] and s['kind'] == 'valid_scientific_outcome'}
+        require(set(settled) == fields[1], 'A judgment was attached to the wrong canonical hypothesis ID')
+        for h in plan['hypotheses']:
+            key = h['id'] if keys == fields[0] else h['hypothesis_id']
+            require(settled[h['hypothesis_id']] == ('supports' if body['findings'][key]['supported'] else 'refutes'),
+                    'Canonical settlement disagrees with reviewer findings')
+        forms.append({'round': entry['round'], 'form': 'short IDs' if keys == fields[0] else 'canonical IDs',
+                      'limitations_type': type(body['limitations']).__name__, 'assessment_ref': entry['assessment_ref'],
+                      'canonical_settlements': settled})
+    require([(r['form'],r['limitations_type']) for r in forms] == [('short IDs','list'),('canonical IDs','str')],
+            'The second-version control needs both observed live hand-in forms')
+    usage = analyze(state, False)
+    require(0 < usage['mmcif_bytes_returned'] < guide['bytes'] and usage['repeated_mmcif_bytes'] == 0,
+            'The control should inspect one targeted source page without bulk rereading')
+    save(out / 'tool-context.json', usage)
+    save(out / 'source-and-review-shapes.json', {
+        'method': 'Official app-server and local scripted Responses, real GX Jobs and reviewer-triggered independent fits.',
+        'source_guide': guide, 'locator_bytes_verified': len(guide['locators']), 'reviews': forms,
+        'mmcif_bytes_returned': usage['mmcif_bytes_returned'], 'mmcif_bytes_available': guide['bytes'],
+        'post_fix_live_token_cost': None})
+
+
+def audit_saved(state, out):
+    """Reproduce saved experimental results offline, including incomplete paid projects."""
+    data = capture(state)
+    count = export_science(state, out, data, complete=False)
+    run, = [r for r in data['runs'] if r['workflow_id'] == 'tl1a_geometry']
+    products = json.loads((out / 'products.json').read_text())
+    reviews = []
+    for submission in data['submissions']:
+        for ref in json.loads(submission['artifact_refs_json']):
+            item = products.get(ref)
+            if item and item['kind'] == 'geometry_assessment':
+                body = item['body']
+                reviews.append({'submission_id': submission['submission_id'], 'product_ref': ref,
+                                'acceptance': submission['result'], 'attempt': submission['attempt'],
+                                'principal': submission['principal'], 'status': body.get('status'),
+                                'limitations': body.get('limitations'), 'findings': body.get('findings'),
+                                'checks': body.get('checks')})
+    with closing(sqlite3.connect((state / 'gx.db').as_uri() + '?mode=ro', uri=True)) as conn:
+        conn.row_factory = sqlite3.Row
+        budget = conn.execute('SELECT limits_json,spent_json,reserved_json FROM budgets '
+                              'WHERE run_id=? AND parent_ref IS NULL', (run['run_id'],)).fetchone()
+        native = conn.execute('SELECT paused_json FROM runs WHERE run_id=?', (run['run_id'],)).fetchone()
+        outstanding = [dict(r) for r in conn.execute("SELECT d.event_id,d.turn_id,d.thread_id,d.state,b.amounts_json "
+                "FROM p0_root_deliveries d JOIN budget_reservations b ON b.reservation_ref=d.reservation_ref "
+                "WHERE b.status='HELD' AND d.run_id=?", (run['run_id'],))]
+        dep = [dict(r) for r in conn.execute('SELECT task_id,stage,status,attempt FROM tasks WHERE run_id=?',
+                                             (run['run_id'],))]
+        refusal = []
+        for r in conn.execute("SELECT submission_id,validation_json FROM submissions WHERE result='REJECTED'"):
+            val = json.loads(r['validation_json'])
+            refusal.append({'submission_id': r['submission_id'],
+                            'messages': [v.get('message') for v in val.get('records', []) if not v.get('ok')]})
+    b = {key.removesuffix('_json'): json.loads(val) for key, val in dict(budget).items()}
+    save(out / 'scientific-status.json', {
+        'captured_at': utc(), 'mode': 'read-only audit of saved GX project and independent CPU reproduction',
+        'run': run, 'driver_pause': json.loads(native['paused_json']) if native['paused_json'] else None,
+        'tasks': dep, 'observations_reproduced': count, 'review_submissions': reviews,
+        'decisions': data['decisions'], 'has_final_report': any(v['kind'] == 'geometry_report' for v in products.values()),
+        'budget': b, 'spent_above_token_admission_limit': max(0, b['spent'].get('tokens',0) - b['limits']['tokens']),
+        'outstanding_native_reservations': outstanding, 'validation_refusals': refusal,
+        'provider_billing_usd': None, 'new_provider_calls': 0, 'new_jobs': 0})
 
 
 def execute(args):
@@ -327,10 +419,27 @@ def execute(args):
             spec = json.loads(args.spec.read_text())
             spec.setdefault('intent_items', []).append({
                 'item_id': 'acceptance-native-turns', 'item_type': 'resource_limit',
-                'value': {'resource': 'api_calls', 'max': 9, 'unit': 'gx_calls'}})
+                'value': {'resource': 'api_calls', 'max': 18 if args.extended_budget else 9, 'unit': 'gx_calls'}})
+            if args.extended_budget:
+                spec.update(budget_profile='p0_extended', turn_token_budget=12_000_000 // 18)
+                spec['intent_items'].append({'item_id': 'acceptance-tokens', 'item_type': 'resource_limit',
+                                             'value': {'resource': 'tokens', 'max': 12_000_000, 'unit': 'reserved_tokens'}})
             save(out / 'spec.json', spec)
             doc = cli('start', '--spec', out / 'spec.json')
             before = capture(state)
+            if args.extended_budget:
+                with closing(sqlite3.connect((state / 'gx.db').as_uri() + '?mode=ro', uri=True)) as conn:
+                    budget = json.loads(conn.execute('SELECT limits_json FROM budgets WHERE run_id=? AND parent_ref IS NULL',
+                                                     (doc['run_id'],)).fetchone()[0])
+                caps = {item['resource']: item['limit'] for item in doc['resource_limits']}
+                expected = {'tokens': 12_000_000, 'api_calls': 18, 'job_submissions': 4}
+                require(all(budget[key] == value == caps[key] for key, value in expected.items()) and
+                        budget['gpu_jobs'] == 0 and spec['max_rounds'] == 2,
+                        'Root allocation or committed project caps differ from the authorized extended budget')
+                save(out / 'initial-budget.json', {
+                    'run_id': doc['run_id'], 'actual_root_ledger_limits': budget, 'visible_after_start': doc['resource_limits'],
+                    'formal_intent': [item for item in doc['intent'].values() if item['item_type'] == 'resource_limit'],
+                    'max_rounds': spec['max_rounds'], 'per_turn_reservation': spec['turn_token_budget']})
             save(out / 'before-stop.json', before)
             require(doc['status'] != 'COMPLETED', 'No opportunity to interrupt the study')
             paused = cli('stop')
@@ -350,6 +459,9 @@ def execute(args):
                     and any(r['model'] == 'gpt-6.2-astra' and r['role'] != 'evidence_reviewer' for r in actual),
                     'Effective profiles of the submitting scientific workers differ from the validated selection')
         result['observations_recomputed'] = export_science(state, out, completed)
+        if args.loopback and not args.fixture_stop_if_stable and any(
+                r['workflow_id'] == 'tl1a_geometry' and r['workflow_version'] == '2' for r in completed['runs']):
+            audit_v2_control(state, out, completed)
         terminal = cli('run', '--timeout', '30')
         reopened = capture(state)
         require(terminal.get('report_ref') == doc.get('report_ref') and reopened == completed,
@@ -387,7 +499,15 @@ if __name__ == '__main__':
     parser.add_argument('--loopback', action='store_true', help='Use the scripted local reviewer and genuine GX CPU Jobs')
     parser.add_argument('--fixture-stop-if-stable', action='store_true',
                         help='Local control: stop when the common-atom comparison already answers the narrower question')
+    parser.add_argument('--extended-budget', action='store_true',
+                        help='Use the approved 12M-token, 18-native-turn, four-CPU-Job root budget and formal Intent')
+    parser.add_argument('--audit-only', action='store_true',
+                        help='Only export existing GX receipts and reproduce original observations without a model call')
     parser.add_argument('--review-model', default='gpt-6.2-sol')
     parser.add_argument('--timeout', type=int, default=600)
     parser.add_argument('--resume', action='store_true', help='Continue the existing state, preserving its history')
-    execute(parser.parse_args())
+    args = parser.parse_args()
+    if args.audit_only:
+        audit_saved(args.state.resolve(), args.output.resolve())
+    else:
+        execute(args)

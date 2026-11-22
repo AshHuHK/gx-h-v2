@@ -1,0 +1,3901 @@
+{
+  "scope": "Static source index for committed GX Python, in-tree examples and tests. Database DDL compiled in memory; no business execution. Runtime SQL sites include SQL construction as well as inline statements. Static caller edges list only resolved Python calls to literal SQL writers; omit dispatch registries, callbacks and other unresolved objects. The per-table state transition list includes resolved calls to store.transition, while state_fields shows schema columns and declared machine IDs. See GX_SOURCE.md for normal entry points, dynamic calls, and behavior and test interpretation. FTS shadow tables are SQLite internals.",
+  "sql_tables": {
+    "schema_meta": {
+      "definition": "contracts/db_schema.sql:19",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/persistence/store.py:65#_set_meta"
+      ],
+      "product_READ": [
+        "gx_core/native_release.py:124#_verify_database",
+        "gx_core/persistence/store.py:78#read_meta"
+      ],
+      "test_INSERT": [
+        "tests/test_v2_fencing.py:236#BaselineMigration.test_original_store_opens_with_epoch_and_keeps_existing_run_pins"
+      ],
+      "row_creation_in_product": true
+    },
+    "runs": {
+      "definition": "contracts/db_schema.sql:25",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        },
+        {
+          "field": "phase",
+          "default": null
+        }
+      ],
+      "declared_machine": "run",
+      "generic_transition_mapping": "gx_core/persistence/store.py:682",
+      "ddl_update_trigger": "contracts/db_schema.sql:58",
+      "example_READ": [
+        "examples/p01_fixture.py:24#project_run",
+        "examples/science_cycle.py:160#OfflinePeer.assign",
+        "examples/science_cycle.py:175#OfflinePeer.assign.manage",
+        "examples/science_cycle.py:298#execute",
+        "examples/science_cycle.py:57#find_run"
+      ],
+      "example_state_transition_calls": [
+        {
+          "at": "examples/p01_fixture.py:39#prepare",
+          "to": "{state}"
+        }
+      ],
+      "product_INSERT": [
+        "gx_core/persistence/records.py:50#create_run"
+      ],
+      "product_READ": [
+        "gx_core/api.py:151#doctor",
+        "gx_core/api.py:180#_current_run",
+        "gx_core/artifacts/service.py:570#ArtifactService.put",
+        "gx_core/authz.py:340#_authorize_arguments",
+        "gx_core/budgets/__init__.py:1074#budget_for",
+        "gx_core/budgets/__init__.py:167#_project_usage",
+        "gx_core/budgets/__init__.py:262#_check_project_reservation",
+        "gx_core/capabilities/ladder.py:291#probe_run",
+        "gx_core/capabilities/ladder.py:315#probe_run",
+        "gx_core/capabilities/ladder.py:539#_onboarding_smoke_inputs",
+        "gx_core/capabilities/ladder.py:565#_onboarding_smoke_inputs",
+        "gx_core/capabilities/ladder.py:875#advance",
+        "gx_core/governance/assets.py:359#submit_asset",
+        "gx_core/governance/native_operator.py:51#decide_in_terminal",
+        "gx_core/governance/native_operator.py:83#decide_in_terminal",
+        "gx_core/governance/reviews.py:226#resolve_review_subject",
+        "gx_core/governance/reviews.py:234#resolve_review_subject",
+        "gx_core/governance/subjects.py:111#resolve",
+        "gx_core/hostobs/codex_dispatch.py:406#_root_session",
+        "gx_core/hostobs/codex_dispatch.py:46#_contract",
+        "gx_core/hostobs/codex_dispatch.py:476#prepare_claim",
+        "gx_core/hostobs/codex_dispatch.py:60#_contract",
+        "gx_core/hostobs/codex_dispatch.py:671#record_verified_dispatch",
+        "gx_core/hostobs/codex_opaque_dispatch.py:199#_state",
+        "gx_core/hostobs/codex_opaque_dispatch.py:495#handle",
+        "gx_core/hostobs/codex_worker_observation.py:199#preflight",
+        "gx_core/hostobs/codex_worker_observation.py:25#scoped_run",
+        "gx_core/hostobs/codex_worker_observation.py:32#requirement",
+        "gx_core/hostobs/codex_worker_observation.py:90#snapshot",
+        "gx_core/hostobs/events.py:340#_coordinated_runs",
+        "gx_core/hostobs/native_context.py:274#qualification_onboarding",
+        "gx_core/hostobs/native_context.py:335#authorize_call",
+        "gx_core/hostobs/native_context.py:49#is_native_run",
+        "gx_core/hostobs/native_observation.py:205#previously_observed_fork",
+        "gx_core/hostobs/native_observation.py:27#snapshot",
+        "gx_core/hostobs/native_observation.py:344#record_adverse_epoch",
+        "gx_core/hostobs/native_spawn.py:82#recover_legacy_paths",
+        "gx_core/hostobs/observation.py:114#policy_of_run",
+        "gx_core/hostobs/observation.py:136#run_host_kind",
+        "gx_core/hostobs/pool.py:1924#HostPoolService.snapshot",
+        "gx_core/hostobs/pool.py:1929#HostPoolService.snapshot",
+        "gx_core/hostobs/pool.py:677#HostPoolService._scope_run",
+        "gx_core/hostobs/session_receipts.py:126#committed_facades",
+        "gx_core/jobs/service.py:279#JobService.open_retained_output",
+        "gx_core/jobs/service.py:439#JobService._admission_prerequisites",
+        "gx_core/knowledge/scopes.py:81#for_run",
+        "gx_core/knowledge/tools.py:127#questions_of",
+        "gx_core/native_cli.py:222#main",
+        "gx_core/orchestration/engine.py:1117#Engine._run_row",
+        "gx_core/orchestration/engine.py:1469#Engine._advance_stopped",
+        "gx_core/orchestration/engine.py:1926#Engine._open_child_work",
+        "gx_core/orchestration/engine.py:2024#Engine._response",
+        "gx_core/orchestration/engine.py:947#Engine.begin_resume",
+        "gx_core/orchestration/expansion.py:100#guard",
+        "gx_core/orchestration/reactions.py:14#_open_stage",
+        "gx_core/orchestration/reactor.py:48#_run",
+        "gx_core/orchestration/repin.py:140#ensure",
+        "gx_core/orchestration/repin.py:169#ensure",
+        "gx_core/orchestration/repin.py:89#compatible_transition",
+        "gx_core/orchestration/service.py:1461#proves_prior_resume_conflict.request_sha",
+        "gx_core/orchestration/service.py:256#_run",
+        "gx_core/orchestration/service.py:696#proves_reconciled_start",
+        "gx_core/orchestration/wait.py:268#wait",
+        "gx_core/orchestration/wait.py:298#wait",
+        "gx_core/persistence/store.py:639#current_revision",
+        "gx_core/planning/objective.py:220#for_run",
+        "gx_core/planning/objective.py:316#specification",
+        "gx_core/planning/objective.py:325#_record_specification_for_run",
+        "gx_core/planning/objective.py:365#bind_frozen_specification",
+        "gx_core/planning/objective.py:372#bind_frozen_specification",
+        "gx_core/planning/objective.py:377#bind_frozen_specification",
+        "gx_core/project_continuation.py:92#recoverable_workers",
+        "gx_core/project_followup.py:207#registered_successor",
+        "gx_core/project_followup.py:229#open_work",
+        "gx_core/project_followup.py:233#open_work",
+        "gx_core/project_work.py:267#_released_probe_budget",
+        "gx_core/project_work.py:332#_project_runs",
+        "gx_core/research/model_activity.py:39#_rows",
+        "gx_core/scheduling/snapshot.py:804#_read",
+        "gx_core/teams/board.py:306#_host_pool",
+        "gx_core/teams/board.py:324#_host_pool",
+        "gx_core/teams/board.py:546#SharedBoardService._read",
+        "gx_core/teams/brief_sections.py:43#_run",
+        "gx_core/teams/manager.py:636#TeamManager._publish_context_and_brief",
+        "gx_core/teams/manager.py:86#_run",
+        "gx_core/teams/recovery.py:117#_interrupted_product",
+        "gx_core/teams/service.py:264#TeamService._run_row",
+        "gx_core/teams/service.py:743#TeamService.lazy",
+        "gx_core/web/projects.py:105#milestones",
+        "workflows/module_collaboration/nodes.py:15#scope"
+      ],
+      "product_UPDATE": [
+        "gx_core/orchestration/engine.py:1416#Engine._advance_nodes",
+        "gx_core/orchestration/engine.py:1574#Engine._run_node",
+        "gx_core/orchestration/engine.py:997#Engine.begin_resume",
+        "gx_core/orchestration/repin.py:160#ensure",
+        "gx_core/orchestration/service.py:562#run_start.create",
+        "gx_core/orchestration/service.py:574#run_start.create",
+        "gx_core/persistence/store.py:659#bump_revision"
+      ],
+      "product_state_transition_calls": [
+        {
+          "at": "gx_core/orchestration/engine.py:1668#Engine._park",
+          "to": "{interrupt.waiting_state}"
+        },
+        {
+          "at": "gx_core/orchestration/engine.py:1807#Engine._pause",
+          "to": "PAUSED"
+        },
+        {
+          "at": "gx_core/orchestration/engine.py:1855#Engine._stop",
+          "to": "STOPPED"
+        },
+        {
+          "at": "gx_core/orchestration/engine.py:1894#Engine._pause_for_budget",
+          "to": "PAUSED"
+        },
+        {
+          "at": "gx_core/orchestration/engine.py:1986#Engine._finish",
+          "to": "{target}"
+        },
+        {
+          "at": "gx_core/orchestration/engine.py:877#Engine.start",
+          "to": "{target}"
+        },
+        {
+          "at": "gx_core/orchestration/engine.py:986#Engine.begin_resume",
+          "to": "ACTIVE"
+        },
+        {
+          "at": "gx_core/orchestration/reactor.py:475#derive_waiting",
+          "to": "{target}"
+        },
+        {
+          "at": "gx_core/orchestration/service.py:1913#run_control.work",
+          "to": "PAUSED"
+        },
+        {
+          "at": "gx_core/orchestration/service.py:1963#run_control.work",
+          "to": "{hop}"
+        },
+        {
+          "at": "gx_core/orchestration/service.py:1982#run_control.work",
+          "to": "CANCELLED"
+        },
+        {
+          "at": "gx_core/teams/service.py:2224#TeamService._hold",
+          "to": "WAITING_APPROVAL"
+        },
+        {
+          "at": "gx_core/teams/service.py:718#TeamService._hold_worker",
+          "to": "WAITING_APPROVAL"
+        },
+        {
+          "at": "gx_core/teams/service.py:867#TeamService._after_holds",
+          "to": "{target}"
+        }
+      ],
+      "test_INSERT": [
+        "tests/test_memory.py:21#ProjectMemory.test_index_scope_replay_and_withdrawal",
+        "tests/test_project_continuation.py:234#ProjectContinuation.native_claim",
+        "tests/test_web_bridge.py:79#WebBridgeTests.test_event_cursor_replays_only_later_project_transitions"
+      ],
+      "test_READ": [
+        "tests/science_runtime_comparison.py:151#run.factory.observe",
+        "tests/science_runtime_comparison.py:176#run",
+        "tests/test_launch_brief_paging.py:79#LaunchBriefPaging.test_root_reads_paged_originals_before_run_start",
+        "tests/test_module_collaboration.py:154#ModuleCollaboration.resume",
+        "tests/test_native_facades.py:117#NativeAcquire.test_pause_and_resume_require_a_new_handoff_before_first_acquire",
+        "tests/test_native_router.py:102#NativeRouterResume.test_same_root_reopens_through_thread_resume_and_reuses_run",
+        "tests/test_science_native_entry.py:36#ScientificProjectEntry.test_fresh_project_freezes_root_proposal_and_executes_its_grid",
+        "tests/test_v2_fencing.py:243#BaselineMigration.test_original_store_opens_with_epoch_and_keeps_existing_run_pins",
+        "tests/test_v2_fencing.py:247#BaselineMigration.test_original_store_opens_with_epoch_and_keeps_existing_run_pins",
+        "tests/test_v2_rollback.py:47#run_phase",
+        "tests/test_v2_rollback.py:69#run_phase",
+        "tests/test_v2_rollback.py:82#run_phase",
+        "tests/test_v2_rollback.py:86#run_phase"
+      ],
+      "test_UPDATE": [
+        "tests/test_dsh_activity.py:72#DSHActivityTest.test_reported_model_mismatch_keeps_response_and_refuses_delivery",
+        "tests/test_model_activity.py:173#ModelActivityTests.test_legacy_and_capability_boundaries",
+        "tests/test_native_facades.py:118#NativeAcquire.test_pause_and_resume_require_a_new_handoff_before_first_acquire",
+        "tests/test_native_facades.py:119#NativeAcquire.test_pause_and_resume_require_a_new_handoff_before_first_acquire",
+        "tests/test_native_facades.py:194#NativeFinish.test_assigned_secondary_profile_requires_its_observed_output",
+        "tests/test_native_facades.py:225#NativeFinish.test_recording_and_validation_recover_separately_after_ack_loss",
+        "tests/test_native_facades.py:288#NativeFinish.test_cancel_committed_after_manifest_read_fences_finish.cancel_after_prepare",
+        "tests/test_team_manager.py:209#TeamLifecycle.test_old_contract_pin_blocks_all_fresh_team_mutations",
+        "tests/test_team_manager.py:333#AssignmentAndHandoff.test_team_close_does_not_release_an_unknown_job_or_held_budget",
+        "tests/test_v2_fencing.py:246#BaselineMigration.test_original_store_opens_with_epoch_and_keeps_existing_run_pins"
+      ],
+      "test_state_transition_calls": [
+        {
+          "at": "tests/test_grid_job_recovery.py:50#GridJobRecovery.test_reconnect_to_project_jobs_under_lost_receipts",
+          "to": "{state}"
+        },
+        {
+          "at": "tests/test_local_job.py:69#LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once",
+          "to": "{state}"
+        },
+        {
+          "at": "tests/test_plugin_evaluator.py:79#ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt",
+          "to": "{state}"
+        }
+      ],
+      "row_creation_in_product": true
+    },
+    "objectives": {
+      "definition": "contracts/db_schema.sql:67",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": "objective",
+      "generic_transition_mapping": "gx_core/persistence/store.py:694",
+      "product_INSERT": [
+        "gx_core/orchestration/service.py:569#run_start.create"
+      ],
+      "product_READ": [
+        "gx_core/orchestration/service.py:646#run_start",
+        "gx_core/orchestration/service.py:696#proves_reconciled_start",
+        "gx_core/orchestration/service.py:913#_run_status",
+        "gx_core/planning/objective.py:220#for_run",
+        "gx_core/planning/objective.py:263#confirmation_condition",
+        "gx_core/planning/objective.py:316#specification",
+        "gx_core/planning/objective.py:325#_record_specification_for_run",
+        "gx_core/planning/objective.py:365#bind_frozen_specification"
+      ],
+      "product_UPDATE": [
+        "gx_core/planning/objective.py:338#_record_specification_for_run"
+      ],
+      "row_creation_in_product": true
+    },
+    "coordinator_leases": {
+      "definition": "contracts/db_schema.sql:85",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/persistence/store.py:1148#acquire_coordinator_lease"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/codex_dispatch.py:406#_root_session",
+        "gx_core/hostobs/events.py:340#_coordinated_runs",
+        "gx_core/hostobs/observation.py:1203#session_of_run",
+        "gx_core/persistence/store.py:1110#coordinator_lease",
+        "gx_core/teams/board.py:682#SharedBoardService._read",
+        "workflows/module_collaboration/nodes.py:139#_decision",
+        "workflows/module_collaboration/products.py:80#validate",
+        "workflows/science_grid/nodes.py:175#validate"
+      ],
+      "product_UPDATE": [
+        "gx_core/orchestration/service.py:1305#coordinator_claim.work",
+        "gx_core/orchestration/service.py:1319#coordinator_claim.work",
+        "gx_core/persistence/store.py:1206#require_coordinator_lease",
+        "gx_core/persistence/store.py:1218#release_coordinator_lease"
+      ],
+      "test_READ": [
+        "tests/test_v2_rollback.py:71#run_phase"
+      ],
+      "row_creation_in_product": true
+    },
+    "events": {
+      "definition": "contracts/db_schema.sql:99",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "prev_state",
+          "default": null
+        },
+        {
+          "field": "new_state",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/persistence/store.py:617#append_event"
+      ],
+      "product_READ": [
+        "gx_core/budgets/__init__.py:196#project_phase_event",
+        "gx_core/budgets/__init__.py:241#activate_project_budget",
+        "gx_core/budgets/__init__.py:258#_check_project_reservation",
+        "gx_core/budgets/__init__.py:619#draw_follower",
+        "gx_core/budgets/__init__.py:708#_settled_actual",
+        "gx_core/budgets/__init__.py:883#profile_of",
+        "gx_core/governance/pointers.py:68#history",
+        "gx_core/governance/tools.py:266#_projection_record",
+        "gx_core/hostobs/codex_dispatch.py:626#verified_lease_binding",
+        "gx_core/hostobs/codex_opaque_dispatch.py:262#_state",
+        "gx_core/hostobs/codex_opaque_dispatch.py:267#_event",
+        "gx_core/hostobs/codex_opaque_dispatch.py:278#_latest",
+        "gx_core/hostobs/codex_opaque_dispatch.py:459#fence_claim_receipt",
+        "gx_core/hostobs/codex_opaque_dispatch.py:461#fence_claim_receipt",
+        "gx_core/hostobs/codex_opaque_dispatch.py:553#handle",
+        "gx_core/hostobs/codex_opaque_dispatch.py:566#handle",
+        "gx_core/hostobs/codex_opaque_dispatch.py:585#_claim_after",
+        "gx_core/hostobs/codex_opaque_dispatch.py:590#_claim_after",
+        "gx_core/hostobs/codex_opaque_dispatch.py:645#_claim_after",
+        "gx_core/hostobs/codex_opaque_dispatch.py:666#read_authorized_binding",
+        "gx_core/hostobs/codex_worker_observation.py:130#_receipt",
+        "gx_core/hostobs/codex_worker_observation.py:291#prepare_run",
+        "gx_core/hostobs/codex_worker_observation.py:298#prepare_run",
+        "gx_core/hostobs/codex_worker_observation.py:310#fence_run",
+        "gx_core/hostobs/codex_worker_observation.py:95#snapshot",
+        "gx_core/hostobs/dispatch.py:107#_handouts",
+        "gx_core/hostobs/dispatch.py:118#_handouts",
+        "gx_core/hostobs/dispatch.py:189#nonce_used",
+        "gx_core/hostobs/dispatch.py:197#last_dispatch_failed",
+        "gx_core/hostobs/dispatch.py:203#last_dispatch_failed",
+        "gx_core/hostobs/native_context.py:303#_qualification_read",
+        "gx_core/hostobs/native_observation.py:190#claim_receipt",
+        "gx_core/hostobs/native_observation.py:205#previously_observed_fork",
+        "gx_core/hostobs/native_spawn.py:147#observe",
+        "gx_core/hostobs/native_spawn.py:174#dispatch_for_worker",
+        "gx_core/hostobs/native_spawn.py:183#_pending",
+        "gx_core/hostobs/native_spawn.py:44#remember_path",
+        "gx_core/hostobs/native_spawn.py:65#worker_directory",
+        "gx_core/hostobs/pool.py:1110#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1128#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1141#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1182#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1482#HostPoolService._claim_receipt_current",
+        "gx_core/hostobs/pool.py:1593#HostPoolService._require_fresh_admission",
+        "gx_core/hostobs/projection.py:421#recover_publications",
+        "gx_core/hostobs/projection.py:437#_publish",
+        "gx_core/hostobs/projection.py:526#written_for",
+        "gx_core/hostobs/session_receipts.py:126#committed_facades",
+        "gx_core/jobs/leases.py:159#job_lease",
+        "gx_core/jobs/leases.py:315#held_open",
+        "gx_core/orchestration/engine.py:1222#Engine._last_change",
+        "gx_core/orchestration/expansion.py:185#follower_reservation",
+        "gx_core/orchestration/expansion.py:29#current_round",
+        "gx_core/orchestration/expansion.py:37#round_start",
+        "gx_core/orchestration/expansion.py:44#task_round",
+        "gx_core/orchestration/expansion.py:48#task_round",
+        "gx_core/orchestration/reactor.py:145#_record_refusal",
+        "gx_core/orchestration/reactor.py:63#last_change",
+        "gx_core/orchestration/repin.py:19#_generation",
+        "gx_core/orchestration/service.py:1461#proves_prior_resume_conflict.request_sha",
+        "gx_core/orchestration/service.py:725#proves_reconciled_start",
+        "gx_core/orchestration/service.py:730#proves_reconciled_start",
+        "gx_core/orchestration/service.py:738#proves_reconciled_start",
+        "gx_core/orchestration/service.py:754#proves_reconciled_start",
+        "gx_core/orchestration/service.py:775#_waiting_for",
+        "gx_core/orchestration/service.py:843#_admission_of",
+        "gx_core/orchestration/wait.py:135#look",
+        "gx_core/orchestration/wait.py:272#wait",
+        "gx_core/persistence/store.py:631#events_for",
+        "gx_core/project_work.py:393#_progress_counts",
+        "gx_core/project_work.py:63#_only_stage_job_progress",
+        "gx_core/research/model_activity.py:165#_invoke.cancelled",
+        "gx_core/research/model_activity.py:185#_invoke",
+        "gx_core/research/model_activity.py:241#_remaining_requests",
+        "gx_core/research/model_activity.py:278#run_activity",
+        "gx_core/research/model_activity.py:344#_execute",
+        "gx_core/research/model_activity.py:356#_execute",
+        "gx_core/research/model_activity.py:62#_events",
+        "gx_core/scheduling/snapshot.py:809#_read",
+        "gx_core/scheduling/snapshot.py:866#_read",
+        "gx_core/teams/board.py:124#_feedback_sections",
+        "gx_core/teams/board.py:281#_organization",
+        "gx_core/teams/board.py:676#SharedBoardService._read",
+        "gx_core/teams/briefs.py:206#_approved_worker_decision",
+        "gx_core/teams/manager.py:384#TeamManager._mutate",
+        "gx_core/teams/manager.py:761#TeamManager._send",
+        "gx_core/teams/manager.py:857#TeamManager.snapshot",
+        "gx_core/teams/manager.py:862#TeamManager.snapshot",
+        "gx_core/teams/recovery.py:234#attempt_history",
+        "gx_core/teams/recovery.py:275#failed_dispatches",
+        "gx_core/teams/recovery.py:94#staged_task_product",
+        "gx_core/teams/service.py:1346#TeamService._require_current_plan",
+        "gx_core/teams/service.py:1645#TeamService.finish_task",
+        "gx_core/teams/service.py:181#task_mapping",
+        "gx_core/teams/service.py:1961#TeamService._ready_after",
+        "gx_core/teams/service.py:695#TeamService._run_before_task_hold",
+        "gx_core/web/projects.py:105#milestones"
+      ],
+      "test_INSERT": [
+        "tests/test_web_bridge.py:79#WebBridgeTests.test_event_cursor_replays_only_later_project_transitions"
+      ],
+      "test_READ": [
+        "tests/runtime_child_probe.py:256#run",
+        "tests/test_delivery_manifest.py:58#DeliveryManifest.test_freeze_rollback_register_reopen_and_cite",
+        "tests/test_dsh_activity.py:48#DSHActivityTest.test_gx_run_uses_sdk_model_then_returns_to_native_decision",
+        "tests/test_native_facades.py:69#NativeAcquire.test_one_callback_binds_and_new_call_recovers_the_live_lease",
+        "tests/test_native_spawn.py:95#NativeSpawnRecovery.test_duplicate_receipt_and_conflicting_identity",
+        "tests/test_team_manager.py:380#TeamMessagesAndReadModel.test_correlation_dedup_does_not_append_another_business_event",
+        "tests/test_team_manager.py:384#TeamMessagesAndReadModel.test_correlation_dedup_does_not_append_another_business_event",
+        "tests/test_team_manager.py:405#TeamMessagesAndReadModel.test_only_the_recipient_may_ack_and_repeat_ack_has_no_business_effect",
+        "tests/test_team_manager.py:408#TeamMessagesAndReadModel.test_only_the_recipient_may_ack_and_repeat_ack_has_no_business_effect",
+        "tests/test_v2_fencing.py:249#BaselineMigration.test_original_store_opens_with_epoch_and_keeps_existing_run_pins"
+      ],
+      "row_creation_in_product": true
+    },
+    "paths": {
+      "definition": "contracts/db_schema.sql:122",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": "path",
+      "generic_transition_mapping": "gx_core/persistence/store.py:683",
+      "example_READ": [
+        "examples/p01_fixture.py:63#tasks"
+      ],
+      "product_INSERT": [
+        "gx_core/persistence/records.py:103#create_path"
+      ],
+      "product_READ": [
+        "gx_core/budgets/__init__.py:1057#budget_for",
+        "gx_core/jobs/bundles.py:57#judge",
+        "gx_core/jobs/service.py:452#JobService._admission_prerequisites",
+        "gx_core/jobs/service.py:735#JobService._bind_to_plan",
+        "gx_core/orchestration/engine.py:803#NodeContext.paths",
+        "gx_core/orchestration/engine.py:806#NodeContext.paths",
+        "gx_core/persistence/records.py:92#create_path",
+        "gx_core/scheduling/snapshot.py:855#_read",
+        "gx_core/teams/service.py:386#TeamService.create_task",
+        "gx_core/teams/service.py:928#TeamService._end_chain"
+      ],
+      "product_state_transition_calls": [
+        {
+          "at": "gx_core/teams/service.py:935#TeamService._end_chain",
+          "to": "BLOCKED"
+        }
+      ],
+      "row_creation_in_product": true
+    },
+    "method_equivalences": {
+      "definition": "contracts/db_schema.sql:168",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/capabilities/registry.py:511#record_equivalence"
+      ],
+      "product_READ": [
+        "gx_core/capabilities/registry.py:531#equivalence",
+        "gx_core/capabilities/registry.py:546#equivalences"
+      ],
+      "row_creation_in_product": true
+    },
+    "tasks": {
+      "definition": "contracts/db_schema.sql:182",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": "task",
+      "generic_transition_mapping": "gx_core/persistence/store.py:684",
+      "example_READ": [
+        "examples/p01_fixture.py:63#tasks",
+        "examples/science_cycle.py:304#execute",
+        "examples/science_cycle.py:90#snapshot"
+      ],
+      "product_INSERT": [
+        "gx_core/persistence/records.py:157#create_task"
+      ],
+      "product_READ": [
+        "gx_core/artifacts/delivery.py:236#discard_orphan",
+        "gx_core/artifacts/delivery.py:95#prepare_manifest",
+        "gx_core/artifacts/service.py:575#ArtifactService.put",
+        "gx_core/authz.py:235#resolve_run_id",
+        "gx_core/authz.py:236#resolve_run_id",
+        "gx_core/capabilities/ladder.py:539#_onboarding_smoke_inputs",
+        "gx_core/governance/assets.py:353#submit_asset",
+        "gx_core/governance/gate.py:105#_reviewer_role",
+        "gx_core/governance/gate.py:113#_review_state",
+        "gx_core/governance/native_operator.py:24#_model_difference",
+        "gx_core/governance/reviews.py:226#resolve_review_subject",
+        "gx_core/governance/reviews.py:349#record_review",
+        "gx_core/governance/reviews.py:373#human_task_review",
+        "gx_core/governance/reviews.py:418#open_review_tasks",
+        "gx_core/governance/reviews.py:495#_request_review",
+        "gx_core/governance/reviews.py:514#_request_review",
+        "gx_core/governance/reviews.py:519#_request_review",
+        "gx_core/governance/reviews.py:54#_lease",
+        "gx_core/governance/subjects.py:89#resolve",
+        "gx_core/governance/tools.py:61#_task_mapping",
+        "gx_core/hostobs/codex_dispatch.py:457#prepare_claim",
+        "gx_core/hostobs/codex_dispatch.py:46#_contract",
+        "gx_core/hostobs/codex_dispatch.py:522#fence_claim",
+        "gx_core/hostobs/codex_dispatch.py:530#fence_claim",
+        "gx_core/hostobs/codex_dispatch.py:585#record_claim_binding",
+        "gx_core/hostobs/codex_dispatch.py:594#record_claim_binding",
+        "gx_core/hostobs/codex_dispatch.py:621#verified_lease_binding",
+        "gx_core/hostobs/codex_dispatch.py:64#_contract",
+        "gx_core/hostobs/codex_opaque_dispatch.py:193#_state",
+        "gx_core/hostobs/codex_opaque_dispatch.py:214#_state",
+        "gx_core/hostobs/codex_worker_observation.py:192#preflight",
+        "gx_core/hostobs/codex_worker_observation.py:229#prepare",
+        "gx_core/hostobs/codex_worker_observation.py:293#prepare_run",
+        "gx_core/hostobs/codex_worker_observation.py:376#binding_observation",
+        "gx_core/hostobs/codex_worker_observation.py:88#snapshot",
+        "gx_core/hostobs/dispatch.py:177#offered_rows",
+        "gx_core/hostobs/events.py:1040#_stop_gate",
+        "gx_core/hostobs/events.py:300#_tasks",
+        "gx_core/hostobs/events.py:400#_leases_of_agent",
+        "gx_core/hostobs/native_context.py:274#qualification_onboarding",
+        "gx_core/hostobs/native_observation.py:23#snapshot",
+        "gx_core/hostobs/native_observation.py:344#record_adverse_epoch",
+        "gx_core/hostobs/native_spawn.py:82#recover_legacy_paths",
+        "gx_core/hostobs/observation.py:1001#holder_stopped",
+        "gx_core/hostobs/observation.py:1048#stopped_holders",
+        "gx_core/hostobs/observation.py:1061#record_verdict_for_lease",
+        "gx_core/hostobs/observation.py:1166#observe_worker",
+        "gx_core/hostobs/observation.py:348#_task_and_lease",
+        "gx_core/hostobs/observation.py:548#identity_of",
+        "gx_core/hostobs/observation.py:575#identity_of",
+        "gx_core/hostobs/observation.py:793#bind_worker",
+        "gx_core/hostobs/observation.py:873#verdict_for",
+        "gx_core/hostobs/pool.py:1104#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1176#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1307#HostPoolService._handoff_checks",
+        "gx_core/hostobs/pool.py:1330#HostPoolService._fence_native_policy",
+        "gx_core/hostobs/pool.py:1390#HostPoolService._simple",
+        "gx_core/hostobs/pool.py:1515#HostPoolService._require_previous_binding_settled",
+        "gx_core/hostobs/pool.py:1795#HostPoolService.transition",
+        "gx_core/hostobs/pool.py:512#HostPoolService._adoption_task",
+        "gx_core/hostobs/pool.py:938#HostPoolService.reserve",
+        "gx_core/hostobs/pool.py:994#HostPoolService._reserve_commit",
+        "gx_core/jobs/leases.py:308#held_open",
+        "gx_core/jobs/leases.py:456#_held_path_lease",
+        "gx_core/jobs/leases.py:69#_task",
+        "gx_core/jobs/service.py:464#JobService._admission_prerequisites",
+        "gx_core/knowledge/index_run.py:27#index_run",
+        "gx_core/orchestration/engine.py:1139#Engine._outstanding",
+        "gx_core/orchestration/engine.py:1911#Engine._objective_work",
+        "gx_core/orchestration/engine.py:785#NodeContext.task_states",
+        "gx_core/orchestration/expansion.py:57#stage_tasks",
+        "gx_core/orchestration/expansion.py:67#stage_tasks",
+        "gx_core/orchestration/expansion.py:69#stage_tasks",
+        "gx_core/orchestration/reactor.py:178#on_submission_recorded",
+        "gx_core/orchestration/reactor.py:226#on_submission_accepted",
+        "gx_core/orchestration/reactor.py:249#on_job_terminal",
+        "gx_core/orchestration/reactor.py:277#on_worker_fact",
+        "gx_core/orchestration/repin.py:54#require_quiescent",
+        "gx_core/orchestration/repin.py:55#require_quiescent",
+        "gx_core/orchestration/seams.py:623#submission_review_state",
+        "gx_core/orchestration/service.py:1599#_task_no_longer_blocked",
+        "gx_core/orchestration/service.py:1631#_independent_review_exists",
+        "gx_core/orchestration/service.py:1774#_finish_cancel",
+        "gx_core/orchestration/service.py:1791#_finish_cancel",
+        "gx_core/orchestration/service.py:798#_waiting_for",
+        "gx_core/orchestration/service.py:812#_waiting_for",
+        "gx_core/orchestration/service.py:880#_run_status",
+        "gx_core/orchestration/service.py:883#_run_status",
+        "gx_core/persistence/records.py:189#dependencies_satisfied",
+        "gx_core/planning/objective.py:377#bind_frozen_specification",
+        "gx_core/planning/objective.py:399#record_specification",
+        "gx_core/project_continuation.py:201#observe",
+        "gx_core/project_continuation.py:92#recoverable_workers",
+        "gx_core/project_followup.py:233#open_work",
+        "gx_core/project_work.py:148#_run_work.saved_product_note",
+        "gx_core/project_work.py:317#_settled_probe_budget",
+        "gx_core/project_work.py:417#_progress_counts",
+        "gx_core/research/model_activity.py:36#_rows",
+        "gx_core/scheduling/snapshot.py:815#_read",
+        "gx_core/scheduling/snapshot.py:821#_read",
+        "gx_core/scheduling/snapshot.py:825#_read",
+        "gx_core/scheduling/snapshot.py:832#_read",
+        "gx_core/scheduling/snapshot.py:841#_read",
+        "gx_core/scheduling/snapshot.py:850#_read",
+        "gx_core/teams/board.py:555#SharedBoardService._read",
+        "gx_core/teams/board.py:557#SharedBoardService._read",
+        "gx_core/teams/board.py:569#SharedBoardService._read",
+        "gx_core/teams/board.py:575#SharedBoardService._read",
+        "gx_core/teams/briefs.py:220#_approved_worker_decision",
+        "gx_core/teams/manager.py:119#_task",
+        "gx_core/teams/manager.py:217#_observed_worker",
+        "gx_core/teams/manager.py:527#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:636#TeamManager._publish_context_and_brief",
+        "gx_core/teams/recovery.py:182#lapsed_leases",
+        "gx_core/teams/recovery.py:193#live_lease",
+        "gx_core/teams/recovery.py:259#pending_holds",
+        "gx_core/teams/recovery.py:275#failed_dispatches",
+        "gx_core/teams/recovery.py:295#needs_settling",
+        "gx_core/teams/recovery.py:302#needs_settling",
+        "gx_core/teams/recovery.py:308#needs_settling",
+        "gx_core/teams/recovery.py:342#_cancelled",
+        "gx_core/teams/recovery.py:488#settle",
+        "gx_core/teams/recovery.py:511#settle",
+        "gx_core/teams/recovery.py:538#promote_pending",
+        "gx_core/teams/recovery.py:88#_task",
+        "gx_core/teams/recovery.py:94#staged_task_product",
+        "gx_core/teams/service.py:1036#TeamService._blocked_row",
+        "gx_core/teams/service.py:1920#TeamService._refuse_within_lease",
+        "gx_core/teams/service.py:2424#TeamService.cancel_open",
+        "gx_core/teams/service.py:258#TeamService._task_row",
+        "gx_core/teams/service.py:379#TeamService.create_task",
+        "gx_core/teams/service.py:549#TeamService.settle",
+        "gx_core/teams/service.py:642#TeamService._inspect_workers",
+        "gx_core/teams/service.py:750#TeamService.lazy",
+        "gx_core/teams/service.py:802#TeamService._settle_worker_holds",
+        "gx_core/teams/service.py:901#TeamService._end_chain",
+        "workflows/module_collaboration/nodes.py:123#modules_rule",
+        "workflows/module_collaboration/products.py:110#accepted",
+        "workflows/science_grid/nodes.py:106#_accepted"
+      ],
+      "product_UPDATE": [
+        "gx_core/persistence/store.py:213#_resync_same_major",
+        "gx_core/persistence/store.py:216#_resync_same_major",
+        "gx_core/teams/recovery.py:389#requeue_or_exhaust",
+        "gx_core/teams/recovery.py:408#requeue_or_exhaust",
+        "gx_core/teams/service.py:405#TeamService.create_task",
+        "gx_core/teams/service.py:535#TeamService._compile_brief",
+        "gx_core/teams/service.py:831#TeamService._settle_worker_holds",
+        "gx_core/teams/service.py:836#TeamService._settle_worker_holds",
+        "gx_core/teams/service.py:893#TeamService._end_chain"
+      ],
+      "product_state_transition_calls": [
+        {
+          "at": "gx_core/teams/recovery.py:365#_move",
+          "to": "{to_state}"
+        },
+        {
+          "at": "gx_core/teams/service.py:1289#TeamService._claim",
+          "to": "CLAIMED"
+        },
+        {
+          "at": "gx_core/teams/service.py:1596#TeamService.bind",
+          "to": "RUNNING"
+        },
+        {
+          "at": "gx_core/teams/service.py:1695#TeamService.finish_task",
+          "to": "RUNNING"
+        },
+        {
+          "at": "gx_core/teams/service.py:1697#TeamService.finish_task",
+          "to": "SUBMITTED"
+        },
+        {
+          "at": "gx_core/teams/service.py:1700#TeamService.finish_task",
+          "to": "VALIDATING"
+        },
+        {
+          "at": "gx_core/teams/service.py:1829#TeamService.submit.work",
+          "to": "RUNNING"
+        },
+        {
+          "at": "gx_core/teams/service.py:1832#TeamService.submit.work",
+          "to": "SUBMITTED"
+        },
+        {
+          "at": "gx_core/teams/service.py:1835#TeamService.submit.work",
+          "to": "VALIDATING"
+        },
+        {
+          "at": "gx_core/teams/service.py:1928#TeamService._refuse_within_lease",
+          "to": "CANCELLED"
+        },
+        {
+          "at": "gx_core/teams/service.py:1935#TeamService._refuse_within_lease",
+          "to": "RETRYABLE"
+        },
+        {
+          "at": "gx_core/teams/service.py:2155#TeamService._conclude",
+          "to": "{result}"
+        },
+        {
+          "at": "gx_core/teams/service.py:2248#TeamService._hold",
+          "to": "BLOCKED"
+        },
+        {
+          "at": "gx_core/teams/service.py:2302#TeamService._release_held",
+          "to": "VALIDATING"
+        },
+        {
+          "at": "gx_core/teams/service.py:2431#TeamService.cancel_open",
+          "to": "CANCELLED"
+        },
+        {
+          "at": "gx_core/teams/service.py:505#TeamService._enter_ready",
+          "to": "READY"
+        },
+        {
+          "at": "gx_core/teams/service.py:681#TeamService._inspect_workers",
+          "to": "RETRYABLE"
+        },
+        {
+          "at": "gx_core/teams/service.py:725#TeamService._hold_worker",
+          "to": "BLOCKED"
+        },
+        {
+          "at": "gx_core/teams/service.py:790#TeamService._settle_failed_dispatches",
+          "to": "BLOCKED"
+        },
+        {
+          "at": "gx_core/teams/service.py:908#TeamService._end_chain",
+          "to": "CANCELLED"
+        }
+      ],
+      "test_INSERT": [
+        "tests/test_memory.py:32#ProjectMemory.test_index_scope_replay_and_withdrawal",
+        "tests/test_project_continuation.py:236#ProjectContinuation.native_claim"
+      ],
+      "test_READ": [
+        "tests/science_runtime_comparison.py:163#run",
+        "tests/test_model_activity.py:102#ModelActivityTests.test_receipt_reopens_original_and_budget",
+        "tests/test_module_collaboration.py:107#ModuleCollaboration.task",
+        "tests/test_module_collaboration.py:320#ModuleCollaboration.test_module_leads_repair_one_branch_and_close_the_project_from_current_results",
+        "tests/test_science_cycle.py:122#ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original",
+        "tests/test_science_cycle.py:39#ScienceCycle.test_project_driver_reconciles_without_a_model_turn.intercept",
+        "tests/test_science_cycle.py:78#ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original",
+        "tests/test_team_manager.py:255#AssignmentAndHandoff.test_claim_requires_assignee_membership_and_observed_identity",
+        "tests/test_team_manager.py:271#AssignmentAndHandoff.test_legacy_tasks_keep_their_old_admission_contract",
+        "tests/test_team_manager.py:293#AssignmentAndHandoff.test_pending_handoff_preserves_task_and_lease_and_blocks_both_closures",
+        "tests/test_team_manager.py:354#AssignmentAndHandoff.test_assignment_guard_refuses_to_run_outside_the_claim_transaction",
+        "tests/test_team_manager.py:364#AssignmentAndHandoff.test_paused_ancestor_withholds_new_assignment_claim",
+        "tests/test_v2_rollback.py:84#run_phase"
+      ],
+      "test_UPDATE": [
+        "tests/test_delivery_manifest.py:111#DeliveryManifest.test_discard_complete_orphan_only_after_attempt_end",
+        "tests/test_model_activity.py:117#ModelActivityTests.test_saved_answer_survives_reassignment",
+        "tests/test_model_activity.py:146#ModelActivityTests.test_lost_reply_blocks_duplicate_request_through_recovery",
+        "tests/test_model_activity.py:82#ModelActivityTests.assignment",
+        "tests/test_native_facades.py:192#NativeFinish.test_assigned_secondary_profile_requires_its_observed_output",
+        "tests/test_native_facades.py:32#FacadeFixture.assign"
+      ],
+      "test_state_transition_calls": [
+        {
+          "at": "tests/test_team_manager.py:340#AssignmentAndHandoff.test_team_close_does_not_release_an_unknown_job_or_held_budget",
+          "to": "CANCELLED"
+        },
+        {
+          "at": "tests/test_team_manager.py:92#ManagerFixture.known_task_lease",
+          "to": "READY"
+        },
+        {
+          "at": "tests/test_team_manager.py:95#ManagerFixture.known_task_lease",
+          "to": "CLAIMED"
+        }
+      ],
+      "row_creation_in_product": true
+    },
+    "task_deps": {
+      "definition": "contracts/db_schema.sql:227",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/persistence/records.py:173#create_task"
+      ],
+      "product_READ": [
+        "gx_core/orchestration/expansion.py:67#stage_tasks",
+        "gx_core/persistence/records.py:189#dependencies_satisfied",
+        "gx_core/scheduling/snapshot.py:821#_read",
+        "gx_core/teams/board.py:557#SharedBoardService._read",
+        "gx_core/teams/service.py:139#dependency_ids",
+        "gx_core/teams/service.py:901#TeamService._end_chain"
+      ],
+      "row_creation_in_product": true
+    },
+    "leases": {
+      "definition": "contracts/db_schema.sql:233",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/persistence/store.py:1050#issue_lease"
+      ],
+      "product_READ": [
+        "gx_core/authz.py:236#resolve_run_id",
+        "gx_core/governance/reviews.py:51#_lease",
+        "gx_core/governance/reviews.py:56#_lease",
+        "gx_core/governance/reviews.py:60#_lease",
+        "gx_core/governance/subjects.py:109#resolve",
+        "gx_core/hostobs/codex_dispatch.py:585#record_claim_binding",
+        "gx_core/hostobs/codex_dispatch.py:594#record_claim_binding",
+        "gx_core/hostobs/codex_dispatch.py:621#verified_lease_binding",
+        "gx_core/hostobs/codex_opaque_dispatch.py:212#_state",
+        "gx_core/hostobs/codex_worker_observation.py:189#preflight",
+        "gx_core/hostobs/codex_worker_observation.py:293#prepare_run",
+        "gx_core/hostobs/codex_worker_observation.py:373#binding_observation",
+        "gx_core/hostobs/codex_worker_observation.py:92#snapshot",
+        "gx_core/hostobs/events.py:400#_leases_of_agent",
+        "gx_core/hostobs/native_observation.py:164#record_claim",
+        "gx_core/hostobs/native_observation.py:31#snapshot",
+        "gx_core/hostobs/native_observation.py:344#record_adverse_epoch",
+        "gx_core/hostobs/native_observation.py:503#identity_of",
+        "gx_core/hostobs/native_observation.py:505#identity_of",
+        "gx_core/hostobs/observation.py:1048#stopped_holders",
+        "gx_core/hostobs/observation.py:351#_task_and_lease",
+        "gx_core/hostobs/observation.py:521#claim_independence",
+        "gx_core/hostobs/observation.py:554#identity_of",
+        "gx_core/hostobs/observation.py:557#identity_of",
+        "gx_core/hostobs/observation.py:998#holder_stopped",
+        "gx_core/hostobs/pool.py:1126#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1180#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1330#HostPoolService._fence_native_policy",
+        "gx_core/hostobs/pool.py:1390#HostPoolService._simple",
+        "gx_core/hostobs/pool.py:1515#HostPoolService._require_previous_binding_settled",
+        "gx_core/hostobs/pool.py:1795#HostPoolService.transition",
+        "gx_core/hostobs/pool.py:524#HostPoolService._adoption_task",
+        "gx_core/hostobs/pool.py:633#HostPoolService._adopt_existing_commit",
+        "gx_core/jobs/leases.py:308#held_open",
+        "gx_core/jobs/leases.py:479#unadopted",
+        "gx_core/jobs/leases.py:76#_lease",
+        "gx_core/orchestration/reactor.py:277#on_worker_fact",
+        "gx_core/orchestration/repin.py:54#require_quiescent",
+        "gx_core/persistence/store.py:1036#issue_lease",
+        "gx_core/persistence/store.py:1055#issue_lease",
+        "gx_core/persistence/store.py:1062#validate_lease",
+        "gx_core/persistence/store.py:1092#expire_stale_leases",
+        "gx_core/project_continuation.py:92#recoverable_workers",
+        "gx_core/project_followup.py:233#open_work",
+        "gx_core/project_work.py:140#_run_work.saved_product_note",
+        "gx_core/research/model_activity.py:257#run_activity",
+        "gx_core/scheduling/snapshot.py:850#_read",
+        "gx_core/teams/board.py:569#SharedBoardService._read",
+        "gx_core/teams/manager.py:217#_observed_worker",
+        "gx_core/teams/manager.py:533#TeamManager._close_blockers",
+        "gx_core/teams/recovery.py:182#lapsed_leases",
+        "gx_core/teams/recovery.py:193#live_lease",
+        "gx_core/teams/recovery.py:94#staged_task_product",
+        "gx_core/teams/service.py:1365#TeamService._require_independent_claimant",
+        "gx_core/teams/service.py:1437#TeamService._admit_lease_entry",
+        "gx_core/teams/service.py:1462#TeamService._admit_lease_entry",
+        "gx_core/teams/service.py:1509#TeamService._lease_for",
+        "gx_core/teams/service.py:1658#TeamService.finish_task",
+        "gx_core/teams/service.py:1661#TeamService.finish_task",
+        "gx_core/teams/service.py:2379#TeamService.bundle_check",
+        "gx_core/teams/service.py:642#TeamService._inspect_workers",
+        "workflows/module_collaboration/products.py:110#accepted",
+        "workflows/module_collaboration/products.py:71#validate",
+        "workflows/science_grid/nodes.py:174#validate",
+        "workflows/science_grid/nodes.py:179#validate"
+      ],
+      "product_UPDATE": [
+        "gx_core/jobs/leases.py:125#renew",
+        "gx_core/persistence/store.py:1045#issue_lease",
+        "gx_core/persistence/store.py:1085#release_lease",
+        "gx_core/persistence/store.py:1097#expire_stale_leases"
+      ],
+      "test_INSERT": [
+        "tests/test_project_continuation.py:239#ProjectContinuation.native_claim"
+      ],
+      "test_READ": [
+        "tests/runtime_child_probe.py:268#run",
+        "tests/test_native_crash_receipts.py:140#NativeCrashReceipts.exercise",
+        "tests/test_team_manager.py:281#AssignmentAndHandoff.test_membership_leave_and_leader_takeover_do_not_revoke_worker_lease",
+        "tests/test_team_manager.py:294#AssignmentAndHandoff.test_pending_handoff_preserves_task_and_lease_and_blocks_both_closures",
+        "tests/test_team_manager.py:301#AssignmentAndHandoff.test_pending_handoff_preserves_task_and_lease_and_blocks_both_closures",
+        "tests/test_v2_fencing.py:204#Fencing.test_two_processes_race_same_task_attempt"
+      ],
+      "test_UPDATE": [
+        "tests/test_native_facades.py:139#NativeAcquire.test_expired_lease_cannot_be_reactivated_by_another_acquire",
+        "tests/test_native_facades.py:302#NativeFinish.test_lapsed_owner_cannot_finish_prepared_originals"
+      ],
+      "row_creation_in_product": true
+    },
+    "worker_observations": {
+      "definition": "contracts/db_schema.sql:250",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "state",
+          "default": null
+        },
+        {
+          "field": "policy_verdict",
+          "default": null
+        }
+      ],
+      "declared_machine": "worker_observation",
+      "generic_transition_mapping": "gx_core/persistence/store.py:696",
+      "example_READ": [
+        "examples/p01_fixture.py:63#tasks"
+      ],
+      "product_INSERT": [
+        "gx_core/hostobs/observation.py:289#write_observation",
+        "gx_core/persistence/records.py:263#record_worker_observation"
+      ],
+      "product_READ": [
+        "gx_core/governance/native_operator.py:24#_model_difference",
+        "gx_core/governance/reviews.py:123#worker_facts",
+        "gx_core/hostobs/native_observation.py:290#_recorded",
+        "gx_core/hostobs/native_observation.py:377#record_adverse_epoch",
+        "gx_core/hostobs/native_observation.py:497#verdict_for",
+        "gx_core/hostobs/observation.py:1135#observe_worker",
+        "gx_core/hostobs/observation.py:1161#observe_worker",
+        "gx_core/hostobs/observation.py:211#latest_state",
+        "gx_core/hostobs/observation.py:216#latest_state",
+        "gx_core/hostobs/observation.py:361#binding_of",
+        "gx_core/hostobs/observation.py:527#claim_independence",
+        "gx_core/hostobs/observation.py:567#identity_of",
+        "gx_core/hostobs/observation.py:938#verdict_for",
+        "gx_core/hostobs/pool.py:1126#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1180#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1413#HostPoolService._simple",
+        "gx_core/orchestration/reactor.py:286#on_worker_fact",
+        "gx_core/orchestration/service.py:1574#_require_workers_on_policy",
+        "gx_core/teams/board.py:575#SharedBoardService._read",
+        "gx_core/teams/manager.py:217#_observed_worker",
+        "gx_core/teams/service.py:1137#TeamService._current_acquisition",
+        "gx_core/teams/service.py:1408#TeamService._replay_origin",
+        "gx_core/teams/service.py:2042#TeamService._require_independent_worker.workers",
+        "gx_core/teams/service.py:614#TeamService._native_passive_verdict",
+        "gx_core/teams/service.py:663#TeamService._inspect_workers"
+      ],
+      "test_INSERT": [
+        "tests/test_team_manager.py:105#ManagerFixture.known_verified_worker"
+      ],
+      "row_creation_in_product": true
+    },
+    "host_events": {
+      "definition": "contracts/db_schema.sql:280",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "decision",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/hostobs/observation.py:329#record_event"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/events.py:1074#_stop_gate",
+        "gx_core/hostobs/events.py:323#_earlier_task_ids",
+        "gx_core/hostobs/events.py:728#_session_started",
+        "gx_core/hostobs/events.py:777#session_capability",
+        "gx_core/hostobs/observation.py:380#_client_call_rows",
+        "gx_core/hostobs/observation.py:605#hook_saw_agent",
+        "gx_core/hostobs/observation.py:987#_stop_event"
+      ],
+      "row_creation_in_product": true
+    },
+    "submissions": {
+      "definition": "contracts/db_schema.sql:300",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "policy_verdict",
+          "default": null
+        },
+        {
+          "field": "result",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/teams/service.py:2194#TeamService._insert_submission"
+      ],
+      "product_READ": [
+        "gx_core/artifacts/delivery.py:242#discard_orphan",
+        "gx_core/governance/native_operator.py:24#_model_difference",
+        "gx_core/governance/reviews.py:226#resolve_review_subject",
+        "gx_core/governance/subjects.py:89#resolve",
+        "gx_core/hostobs/events.py:400#_leases_of_agent",
+        "gx_core/hostobs/pool.py:1126#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1180#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/knowledge/index_run.py:27#index_run",
+        "gx_core/orchestration/reactor.py:178#on_submission_recorded",
+        "gx_core/orchestration/reactor.py:224#on_submission_accepted",
+        "gx_core/orchestration/reactor.py:289#on_worker_fact",
+        "gx_core/orchestration/service.py:1568#_require_workers_on_policy",
+        "gx_core/orchestration/service.py:1631#_independent_review_exists",
+        "gx_core/project_work.py:156#_run_work.progress_note",
+        "gx_core/teams/recovery.py:212#attempt_history",
+        "gx_core/teams/service.py:1415#TeamService._replay_origin",
+        "gx_core/teams/service.py:1653#TeamService.finish_task",
+        "gx_core/teams/service.py:1736#TeamService.validate_delivery.submission",
+        "gx_core/teams/service.py:2172#TeamService._conclude",
+        "gx_core/teams/service.py:2283#TeamService._release_held",
+        "gx_core/teams/service.py:632#TeamService._native_passive_verdict",
+        "workflows/module_collaboration/products.py:110#accepted",
+        "workflows/science_grid/nodes.py:106#_accepted",
+        "workflows/science_grid/nodes.py:179#validate"
+      ],
+      "product_UPDATE": [
+        "gx_core/teams/service.py:1759#TeamService.validate_delivery",
+        "gx_core/teams/service.py:2147#TeamService._conclude",
+        "gx_core/teams/service.py:2336#TeamService._release_failed"
+      ],
+      "test_INSERT": [
+        "tests/test_memory.py:42#ProjectMemory.test_index_scope_replay_and_withdrawal"
+      ],
+      "test_READ": [
+        "tests/runtime_child_probe.py:270#run",
+        "tests/test_delivery_manifest.py:96#DeliveryManifest.test_crash_during_blob_staging_gc_preserves_finished_directory",
+        "tests/test_model_activity.py:130#ModelActivityTests.test_response_model_mismatch_keeps_raw_unsubmitted",
+        "tests/test_native_crash_receipts.py:141#NativeCrashReceipts.exercise",
+        "tests/test_science_cycle.py:106#ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original",
+        "tests/test_science_cycle.py:122#ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original",
+        "tests/test_science_cycle.py:84#ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original",
+        "tests/test_v2_fencing.py:169#Fencing.test_released_lease_cannot_submit"
+      ],
+      "row_creation_in_product": true
+    },
+    "environments": {
+      "definition": "contracts/db_schema.sql:323",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": "environment",
+      "generic_transition_mapping": "gx_core/persistence/store.py:691",
+      "product_INSERT": [
+        "gx_core/capabilities/environments.py:483#register"
+      ],
+      "product_READ": [
+        "gx_core/capabilities/environments.py:405#_row",
+        "gx_core/capabilities/environments.py:672#listing",
+        "gx_core/capabilities/shipped.py:42#ensure_grid"
+      ],
+      "product_UPDATE": [
+        "gx_core/capabilities/environments.py:508#register"
+      ],
+      "product_state_transition_calls": [
+        {
+          "at": "gx_core/capabilities/environments.py:444#_write_status",
+          "to": "{step}"
+        }
+      ],
+      "row_creation_in_product": true
+    },
+    "capabilities": {
+      "definition": "contracts/db_schema.sql:347",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        },
+        {
+          "field": "test_status",
+          "default": "'STATIC_REVIEW_ONLY'"
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/capabilities/registry.py:228#register_candidate"
+      ],
+      "product_READ": [
+        "gx_core/capabilities/matrix.py:147#rows",
+        "gx_core/capabilities/registry.py:279#_capability_row",
+        "gx_core/capabilities/registry.py:426#active_versions",
+        "gx_core/capabilities/registry.py:695#inspect",
+        "gx_core/capabilities/tools.py:256#enter_catalogue",
+        "gx_core/scheduling/snapshot.py:862#_read"
+      ],
+      "product_UPDATE": [
+        "gx_core/capabilities/registry.py:456#sync_status",
+        "gx_core/capabilities/registry.py:579#record_probe",
+        "gx_core/capabilities/tools.py:241#mirror_status"
+      ],
+      "row_creation_in_product": true
+    },
+    "probe_records": {
+      "definition": "contracts/db_schema.sql:376",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "result",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/capabilities/environments.py:555#_record_probe",
+        "gx_core/capabilities/registry.py:572#record_probe"
+      ],
+      "product_READ": [
+        "gx_core/capabilities/environments.py:569#_probe_rows",
+        "gx_core/capabilities/ladder.py:490#_smoke_attempt",
+        "gx_core/capabilities/registry.py:589#latest_probes",
+        "gx_core/project_work.py:275#_released_probe_budget"
+      ],
+      "row_creation_in_product": true
+    },
+    "jobs": {
+      "definition": "contracts/db_schema.sql:394",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        },
+        {
+          "field": "side_effect_status",
+          "default": "'NONE'"
+        }
+      ],
+      "declared_machine": "job",
+      "generic_transition_mapping": "gx_core/persistence/store.py:686",
+      "example_READ": [
+        "examples/p01_fixture.py:123#status",
+        "examples/p01_fixture.py:86#collect",
+        "examples/science_cycle.py:84#snapshot"
+      ],
+      "product_INSERT": [
+        "gx_core/jobs/service.py:680#JobService._admit"
+      ],
+      "product_READ": [
+        "gx_core/authz.py:237#resolve_run_id",
+        "gx_core/capabilities/checks.py:216#_job",
+        "gx_core/capabilities/ladder.py:434#_attempt_key",
+        "gx_core/capabilities/ladder.py:467#_smoke_attempt",
+        "gx_core/capabilities/ladder.py:875#advance",
+        "gx_core/capabilities/matrix.py:52#_job_succeeded",
+        "gx_core/capabilities/registry.py:332#measured",
+        "gx_core/hostobs/codex_opaque_dispatch.py:222#_state",
+        "gx_core/hostobs/native_context.py:303#_qualification_read",
+        "gx_core/hostobs/pool.py:1126#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1180#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1522#HostPoolService._require_previous_binding_settled",
+        "gx_core/jobs/bundles.py:131#judge",
+        "gx_core/jobs/bundles.py:86#judge",
+        "gx_core/jobs/capacity.py:151#jobs_state",
+        "gx_core/jobs/capacity.py:201#jobs_state",
+        "gx_core/jobs/grid_workflow.py:20#submit_grid",
+        "gx_core/jobs/leases.py:175#task_jobs",
+        "gx_core/jobs/leases.py:177#task_jobs",
+        "gx_core/jobs/leases.py:311#held_open",
+        "gx_core/jobs/leases.py:315#held_open",
+        "gx_core/jobs/outcomes.py:65#by_path",
+        "gx_core/jobs/service.py:1082#JobService._fail_unstarted",
+        "gx_core/jobs/service.py:1157#JobService._named",
+        "gx_core/jobs/service.py:1315#JobService._cancel_unreadable",
+        "gx_core/jobs/service.py:1359#JobService.cancel_for_run",
+        "gx_core/jobs/service.py:1393#JobService.cancel_unstarted_for_run",
+        "gx_core/jobs/service.py:1439#JobService.reconcile",
+        "gx_core/jobs/service.py:1590#JobService._reconcile_one",
+        "gx_core/jobs/service.py:1686#JobService._mark_unknown",
+        "gx_core/jobs/service.py:1749#JobService._settle",
+        "gx_core/jobs/service.py:2214#jobs_for_path",
+        "gx_core/jobs/service.py:265#JobService._row",
+        "gx_core/jobs/service.py:369#JobService.submit",
+        "gx_core/jobs/service.py:386#JobService.submit",
+        "gx_core/jobs/service.py:660#JobService._admit",
+        "gx_core/jobs/service.py:772#JobService._step_job",
+        "gx_core/jobs/service.py:882#JobService.active_gpu_jobs",
+        "gx_core/jobs/tools.py:120#job_cancel",
+        "gx_core/jobs/tools.py:241#gpu_job_within_limits",
+        "gx_core/jobs/tools.py:72#_adopt",
+        "gx_core/orchestration/engine.py:1161#Engine._outstanding",
+        "gx_core/orchestration/engine.py:1914#Engine._objective_work",
+        "gx_core/orchestration/expansion.py:73#stage_tasks",
+        "gx_core/orchestration/reactor.py:241#on_job_terminal",
+        "gx_core/orchestration/reactor.py:469#derive_waiting",
+        "gx_core/orchestration/repin.py:56#require_quiescent",
+        "gx_core/orchestration/service.py:1978#run_control.work",
+        "gx_core/orchestration/service.py:754#proves_reconciled_start",
+        "gx_core/orchestration/service.py:888#_run_status",
+        "gx_core/project_followup.py:229#open_work",
+        "gx_core/project_work.py:297#_settled_probe_budget",
+        "gx_core/project_work.py:416#_progress_counts",
+        "gx_core/project_work.py:420#_progress_counts",
+        "gx_core/project_work.py:89#_run_work",
+        "gx_core/scheduling/snapshot.py:832#_read",
+        "gx_core/scheduling/snapshot.py:877#_read",
+        "gx_core/teams/board.py:593#SharedBoardService._read",
+        "gx_core/teams/manager.py:531#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:658#TeamManager._busy_task",
+        "gx_core/teams/service.py:278#TeamService._compact_stage_outputs",
+        "gx_core/teams/service.py:750#TeamService.lazy",
+        "workflows/science_grid/nodes.py:74#experiment_rule"
+      ],
+      "product_UPDATE": [
+        "gx_core/jobs/service.py:1511#JobService._reconcile_one",
+        "gx_core/jobs/service.py:1600#JobService._reconcile_one",
+        "gx_core/jobs/service.py:1700#JobService._mark_unknown",
+        "gx_core/jobs/service.py:981#JobService._start"
+      ],
+      "product_state_transition_calls": [
+        {
+          "at": "gx_core/jobs/service.py:1019#JobService._start",
+          "to": "{SUBMITTING}"
+        },
+        {
+          "at": "gx_core/jobs/service.py:1040#JobService._start",
+          "to": "{SUBMITTED}"
+        },
+        {
+          "at": "gx_core/jobs/service.py:1068#JobService._end",
+          "to": "{to_state}"
+        },
+        {
+          "at": "gx_core/jobs/service.py:1243#JobService.cancel",
+          "to": "{CANCEL_REQUESTED}"
+        },
+        {
+          "at": "gx_core/jobs/service.py:1595#JobService._reconcile_one",
+          "to": "{target}"
+        },
+        {
+          "at": "gx_core/jobs/service.py:1692#JobService._mark_unknown",
+          "to": "{OUTCOME_UNKNOWN}"
+        },
+        {
+          "at": "gx_core/jobs/service.py:1762#JobService._settle",
+          "to": "{SUBMITTED}"
+        },
+        {
+          "at": "gx_core/jobs/service.py:1770#JobService._settle",
+          "to": "{CANCEL_REQUESTED}"
+        },
+        {
+          "at": "gx_core/jobs/service.py:1779#JobService._settle",
+          "to": "{RUNNING}"
+        }
+      ],
+      "test_INSERT": [
+        "tests/test_project_continuation.py:242#ProjectContinuation.native_claim",
+        "tests/test_team_manager.py:224#AssignmentAndHandoff.known_job"
+      ],
+      "test_READ": [
+        "tests/test_grid_job_recovery.py:81#GridJobRecovery.test_reconnect_to_project_jobs_under_lost_receipts",
+        "tests/test_local_job.py:103#LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once",
+        "tests/test_science_cycle.py:41#ScienceCycle.test_project_driver_reconciles_without_a_model_turn.intercept",
+        "tests/test_science_native_entry.py:45#ScientificProjectEntry.test_fresh_project_freezes_root_proposal_and_executes_its_grid",
+        "tests/test_shipped_grid.py:39#ShippedGrid.test_admission_retains_real_environment_and_recovers_without_reinstall",
+        "tests/test_team_manager.py:328#AssignmentAndHandoff.test_unknown_job_keeps_handoff_pending_after_lease_expires",
+        "tests/test_v2_rollback.py:85#run_phase"
+      ],
+      "test_UPDATE": [
+        "tests/test_project_continuation.py:264#ProjectContinuation.test_an_uncommitted_result_does_not_wake_the_driver_until_its_original_row_commits.settle_row"
+      ],
+      "row_creation_in_product": true
+    },
+    "artifacts": {
+      "definition": "contracts/db_schema.sql:431",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "example_READ": [
+        "examples/p01_fixture.py:117#status"
+      ],
+      "product_INSERT": [
+        "gx_core/artifacts/service.py:485#ArtifactService.register_materialized"
+      ],
+      "product_READ": [
+        "gx_core/artifacts/delivery.py:196#register_manifest",
+        "gx_core/artifacts/delivery.py:240#discard_orphan",
+        "gx_core/artifacts/service.py:1216#ArtifactService.list_artifacts",
+        "gx_core/artifacts/service.py:443#ArtifactService.publish",
+        "gx_core/artifacts/service.py:866#ArtifactService._row",
+        "gx_core/artifacts/tools.py:82#held_out_label",
+        "gx_core/authz.py:238#resolve_run_id",
+        "gx_core/authz.py:239#resolve_run_id",
+        "gx_core/authz.py:368#_authorize_arguments",
+        "gx_core/capabilities/ladder.py:380#materialise",
+        "gx_core/capabilities/ladder.py:509#_required_outputs_absent",
+        "gx_core/capabilities/ladder.py:565#_onboarding_smoke_inputs",
+        "gx_core/capabilities/registry.py:132#_check_script_ref",
+        "gx_core/governance/_artifacts.py:26#row",
+        "gx_core/governance/tools.py:453#_basis",
+        "gx_core/hostobs/native_context.py:309#_qualification_read",
+        "gx_core/jobs/bundles.py:244#_failure_problem",
+        "gx_core/knowledge/index_run.py:27#index_run",
+        "gx_core/mcp/envelope.py:257#job_response_owner",
+        "gx_core/orchestration/service.py:981#_run_status",
+        "gx_core/plugins/evaluator.py:56#evaluate_scores",
+        "gx_core/plugins/evaluator.py:65#evaluate_scores",
+        "gx_core/project_followup.py:304#_paged_brief",
+        "gx_core/project_work.py:148#_run_work.saved_product_note",
+        "gx_core/project_work.py:275#_released_probe_budget",
+        "gx_core/research/model_activity.py:133#_context",
+        "gx_core/teams/manager.py:129#_context",
+        "gx_core/teams/manager.py:284#assignment_artifacts",
+        "gx_core/teams/recovery.py:123#_interrupted_product",
+        "gx_core/teams/recovery.py:94#staged_task_product"
+      ],
+      "test_READ": [
+        "tests/runtime_child_probe.py:286#run",
+        "tests/test_delivery_manifest.py:164#DeliveryManifest.test_store_ancestor_flush_failure_precedes_registration",
+        "tests/test_delivery_manifest.py:191#DeliveryManifest.test_inbox_survives_outer_rollback_and_replacement_before_commit",
+        "tests/test_delivery_manifest.py:48#DeliveryManifest.test_freeze_rollback_register_reopen_and_cite",
+        "tests/test_delivery_manifest.py:97#DeliveryManifest.test_crash_during_blob_staging_gc_preserves_finished_directory",
+        "tests/test_launch_brief_paging.py:80#LaunchBriefPaging.test_root_reads_paged_originals_before_run_start",
+        "tests/test_plugin_evaluator.py:58#ScoreEvaluatorTest.test_pinned_input_version_relaunch_and_lost_reply",
+        "tests/test_science_native_entry.py:39#ScientificProjectEntry.test_fresh_project_freezes_root_proposal_and_executes_its_grid",
+        "tests/test_v2_rollback.py:77#run_phase"
+      ],
+      "row_creation_in_product": true
+    },
+    "eval_specs": {
+      "definition": "contracts/db_schema.sql:455",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": "eval_spec",
+      "generic_transition_mapping": "gx_core/persistence/store.py:690",
+      "product_READ": [
+        "gx_core/governance/subjects.py:74#_eval_spec_row",
+        "gx_core/governance/subjects.py:77#_eval_spec_row",
+        "gx_core/scheduling/snapshot.py:841#_read"
+      ],
+      "row_creation_in_product": false
+    },
+    "eval_cases": {
+      "definition": "contracts/db_schema.sql:478",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "evaluations": {
+      "definition": "contracts/db_schema.sql:491",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "verdict",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_READ": [
+        "gx_core/capabilities/registry.py:500#record_equivalence",
+        "gx_core/jobs/bundles.py:235#_failure_problem",
+        "gx_core/scheduling/snapshot.py:887#_read"
+      ],
+      "row_creation_in_product": false
+    },
+    "datasets": {
+      "definition": "contracts/db_schema.sql:515",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "dataset_records": {
+      "definition": "contracts/db_schema.sql:529",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_READ": [
+        "gx_core/artifacts/tools.py:80#held_out_label",
+        "gx_core/artifacts/tools.py:85#held_out_label"
+      ],
+      "row_creation_in_product": false
+    },
+    "heldout_reads": {
+      "definition": "contracts/db_schema.sql:544",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "state",
+          "default": "'READ'"
+        }
+      ],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "sources": {
+      "definition": "contracts/db_schema.sql:563",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": "'REGISTERED'"
+        },
+        {
+          "field": "retraction_status",
+          "default": null
+        }
+      ],
+      "declared_machine": "source",
+      "generic_transition_mapping": "gx_core/persistence/store.py:692",
+      "product_READ": [
+        "gx_core/governance/tools.py:456#_basis",
+        "gx_core/governance/tools.py:515#licence_standing",
+        "gx_core/knowledge/memory.py:162#MemoryService.write",
+        "gx_core/knowledge/memory.py:586#MemoryService.read"
+      ],
+      "row_creation_in_product": false
+    },
+    "source_identifiers": {
+      "definition": "contracts/db_schema.sql:598",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_READ": [
+        "gx_core/knowledge/memory.py:426#MemoryService._routed_sources",
+        "gx_core/knowledge/memory.py:433#MemoryService._routed_sources"
+      ],
+      "row_creation_in_product": false
+    },
+    "source_segments": {
+      "definition": "contracts/db_schema.sql:607",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "source_reads": {
+      "definition": "contracts/db_schema.sql:620",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "literature_searches": {
+      "definition": "contracts/db_schema.sql:635",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "evidence": {
+      "definition": "contracts/db_schema.sql:651",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": "'EXTRACTED'"
+        },
+        {
+          "field": "anchor_status",
+          "default": null
+        },
+        {
+          "field": "review_status",
+          "default": null
+        }
+      ],
+      "declared_machine": "evidence",
+      "generic_transition_mapping": "gx_core/persistence/store.py:689",
+      "product_READ": [
+        "gx_core/scheduling/snapshot.py:841#_read"
+      ],
+      "row_creation_in_product": false
+    },
+    "evidence_reviews": {
+      "definition": "contracts/db_schema.sql:686",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "verdict",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "gaps": {
+      "definition": "contracts/db_schema.sql:703",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": "gap",
+      "generic_transition_mapping": "gx_core/persistence/store.py:693",
+      "product_READ": [
+        "gx_core/orchestration/service.py:904#_run_status"
+      ],
+      "row_creation_in_product": false
+    },
+    "dependencies": {
+      "definition": "contracts/db_schema.sql:729",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/governance/reviews.py:433#record_waiter",
+        "gx_core/knowledge/memory.py:214#MemoryService.write",
+        "gx_core/orchestration/expansion.py:168#expand",
+        "gx_core/orchestration/expansion.py:171#expand"
+      ],
+      "product_READ": [
+        "gx_core/knowledge/memory.py:456#MemoryService._promote",
+        "gx_core/knowledge/memory.py:586#MemoryService.read",
+        "gx_core/knowledge/memory.py:620#MemoryService.read",
+        "gx_core/orchestration/expansion.py:69#stage_tasks",
+        "gx_core/scheduling/snapshot.py:825#_read",
+        "gx_core/scheduling/snapshot.py:832#_read"
+      ],
+      "row_creation_in_product": true
+    },
+    "episodes": {
+      "definition": "contracts/db_schema.sql:741",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "promotion_status",
+          "default": "'CANDIDATE'"
+        }
+      ],
+      "declared_machine": null,
+      "product_READ": [
+        "gx_core/scheduling/snapshot.py:883#_read"
+      ],
+      "row_creation_in_product": false
+    },
+    "memory_docs": {
+      "definition": "contracts/db_schema.sql:769",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/knowledge/memory.py:192#MemoryService.write"
+      ],
+      "product_READ": [
+        "gx_core/knowledge/index_run.py:42#index_run",
+        "gx_core/knowledge/memory.py:173#MemoryService.write",
+        "gx_core/knowledge/memory.py:183#MemoryService.write",
+        "gx_core/knowledge/memory.py:285#MemoryService.search",
+        "gx_core/knowledge/memory.py:402#MemoryService._channel",
+        "gx_core/knowledge/memory.py:456#MemoryService._promote",
+        "gx_core/knowledge/memory.py:486#MemoryService._results",
+        "gx_core/knowledge/memory.py:715#MemoryService.namespaces",
+        "gx_core/knowledge/memory.py:727#MemoryService._require_doc"
+      ],
+      "product_UPDATE": [
+        "gx_core/knowledge/memory.py:219#MemoryService.write",
+        "gx_core/knowledge/memory.py:683#MemoryService.retract",
+        "gx_core/knowledge/memory.py:704#MemoryService.supersede"
+      ],
+      "row_creation_in_product": true
+    },
+    "memory_fts": {
+      "definition": "contracts/db_schema.sql:791",
+      "database": "GX store",
+      "virtual_fts5": true,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_DELETE": [
+        "gx_core/knowledge/memory.py:722#MemoryService._unindex",
+        "gx_core/knowledge/memory.py:724#MemoryService._unindex"
+      ],
+      "product_INSERT": [
+        "gx_core/knowledge/memory.py:203#MemoryService.write"
+      ],
+      "product_READ": [
+        "gx_core/knowledge/memory.py:402#MemoryService._channel"
+      ],
+      "row_creation_in_product": true
+    },
+    "memory_fts_cjk": {
+      "definition": "contracts/db_schema.sql:797",
+      "database": "GX store",
+      "virtual_fts5": true,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_DELETE": [
+        "gx_core/knowledge/memory.py:722#MemoryService._unindex",
+        "gx_core/knowledge/memory.py:724#MemoryService._unindex"
+      ],
+      "product_INSERT": [
+        "gx_core/knowledge/memory.py:207#MemoryService.write"
+      ],
+      "product_READ": [
+        "gx_core/knowledge/memory.py:402#MemoryService._channel"
+      ],
+      "row_creation_in_product": true
+    },
+    "memory_vectors": {
+      "definition": "contracts/db_schema.sql:802",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "memory_queries": {
+      "definition": "contracts/db_schema.sql:814",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/knowledge/memory.py:541#MemoryService._record"
+      ],
+      "row_creation_in_product": true
+    },
+    "assets": {
+      "definition": "contracts/db_schema.sql:832",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        },
+        {
+          "field": "test_status",
+          "default": "'STATIC_REVIEW_ONLY'"
+        }
+      ],
+      "declared_machine": "asset",
+      "generic_transition_mapping": "gx_core/persistence/store.py:687",
+      "product_INSERT": [
+        "gx_core/governance/assets.py:371#submit_asset"
+      ],
+      "product_READ": [
+        "gx_core/capabilities/ladder.py:285#probe_run",
+        "gx_core/capabilities/ladder.py:786#latest",
+        "gx_core/capabilities/registry.py:426#active_versions",
+        "gx_core/capabilities/registry.py:96#asset_row",
+        "gx_core/capabilities/tools.py:183#capability_under_review",
+        "gx_core/governance/assets.py:146#_row",
+        "gx_core/governance/assets.py:150#_row",
+        "gx_core/governance/assets.py:168#versions",
+        "gx_core/governance/assets.py:210#active_assets",
+        "gx_core/governance/assets.py:329#submit_asset",
+        "gx_core/governance/assets.py:343#submit_asset",
+        "gx_core/governance/assets.py:651#_superseded",
+        "gx_core/governance/subjects.py:63#_asset_row",
+        "gx_core/governance/subjects.py:66#_asset_row",
+        "gx_core/hostobs/projection.py:114#_supersedes_problem",
+        "gx_core/orchestration/reactions.py:26#review_accepted",
+        "gx_core/orchestration/reactions.py:40#asset_accepted",
+        "gx_core/orchestration/reactor.py:269#on_approval_decided",
+        "gx_core/orchestration/service.py:135#default_registry",
+        "gx_core/scheduling/snapshot.py:841#_read",
+        "gx_core/teams/service.py:624#TeamService._native_passive_verdict"
+      ],
+      "product_state_transition_calls": [
+        {
+          "at": "gx_core/governance/assets.py:392#submit_asset",
+          "to": "{QUARANTINED}"
+        },
+        {
+          "at": "gx_core/governance/assets.py:522#commit_promotion",
+          "to": "{to_state}"
+        },
+        {
+          "at": "gx_core/governance/assets.py:665#_retire_superseded",
+          "to": "{DEPRECATED}"
+        }
+      ],
+      "row_creation_in_product": true
+    },
+    "check_runs": {
+      "definition": "contracts/db_schema.sql:863",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "result",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/governance/checks.py:144#_append"
+      ],
+      "product_READ": [
+        "gx_core/capabilities/checks.py:177#stale_checks",
+        "gx_core/capabilities/review.py:87#material",
+        "gx_core/governance/checks.py:172#_rows",
+        "gx_core/governance/checks.py:227#history",
+        "gx_core/governance/checks.py:239#get_run"
+      ],
+      "product_UPDATE": [
+        "gx_core/governance/checks.py:355#invalidate"
+      ],
+      "row_creation_in_product": true
+    },
+    "reviews": {
+      "definition": "contracts/db_schema.sql:884",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "verdict",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/governance/reviews.py:271#_insert"
+      ],
+      "product_READ": [
+        "gx_core/capabilities/ladder.py:539#_onboarding_smoke_inputs",
+        "gx_core/governance/checks.py:298#adjudicate",
+        "gx_core/governance/gate.py:113#_review_state",
+        "gx_core/governance/reviews.py:253#reviews_for",
+        "gx_core/governance/reviews.py:606#get",
+        "gx_core/governance/tools.py:402#byte_binding",
+        "gx_core/governance/tools.py:410#byte_binding",
+        "gx_core/hostobs/native_context.py:274#qualification_onboarding"
+      ],
+      "product_UPDATE": [
+        "gx_core/governance/reviews.py:598#invalidate"
+      ],
+      "row_creation_in_product": true
+    },
+    "adjudications": {
+      "definition": "contracts/db_schema.sql:904",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "decision",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/governance/checks.py:330#adjudicate"
+      ],
+      "product_READ": [
+        "gx_core/governance/checks.py:182#_adjudications"
+      ],
+      "row_creation_in_product": true
+    },
+    "approvals": {
+      "definition": "contracts/db_schema.sql:917",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": "approval",
+      "generic_transition_mapping": "gx_core/persistence/store.py:688",
+      "product_INSERT": [
+        "gx_core/governance/approvals.py:443#request",
+        "gx_core/persistence/store.py:1468#request_approval"
+      ],
+      "product_READ": [
+        "gx_core/authz.py:240#resolve_run_id",
+        "gx_core/budgets/__init__.py:968#raise_limit",
+        "gx_core/governance/approvals.py:270#get",
+        "gx_core/governance/approvals.py:278#_rows",
+        "gx_core/governance/approvals.py:316#_expire_if_due",
+        "gx_core/governance/approvals.py:455#request",
+        "gx_core/governance/approvals.py:461#request",
+        "gx_core/governance/approvals.py:547#decide",
+        "gx_core/governance/approvals.py:609#invalidate",
+        "gx_core/governance/assets.py:692#status",
+        "gx_core/governance/gate.py:160#_approval_state",
+        "gx_core/governance/tools.py:415#byte_binding",
+        "gx_core/hostobs/events.py:991#_model_approval_pending",
+        "gx_core/jobs/service.py:187#latest_admission_approval",
+        "gx_core/orchestration/engine.py:1764#Engine.waiting_needs",
+        "gx_core/orchestration/reactor.py:262#on_approval_decided",
+        "gx_core/orchestration/reactor.py:464#derive_waiting",
+        "gx_core/orchestration/repin.py:147#ensure",
+        "gx_core/orchestration/seams.py:295#approval_status",
+        "gx_core/orchestration/service.py:1539#_require_no_held_submission",
+        "gx_core/orchestration/service.py:1581#_require_workers_on_policy",
+        "gx_core/orchestration/service.py:1791#_finish_cancel",
+        "gx_core/orchestration/service.py:897#_run_status",
+        "gx_core/persistence/store.py:1482#approval_status",
+        "gx_core/project_work.py:178#_run_work",
+        "gx_core/project_work.py:313#_settled_probe_budget",
+        "gx_core/scheduling/snapshot.py:873#_read",
+        "gx_core/teams/board.py:615#SharedBoardService._read",
+        "gx_core/teams/briefs.py:212#_approved_worker_decision",
+        "gx_core/teams/recovery.py:265#pending_holds",
+        "gx_core/teams/recovery.py:316#needs_settling",
+        "gx_core/teams/service.py:2286#TeamService._release_held",
+        "gx_core/teams/service.py:750#TeamService.lazy",
+        "gx_core/teams/service.py:807#TeamService._settle_worker_holds",
+        "gx_core/teams/service.py:854#TeamService._after_holds"
+      ],
+      "product_UPDATE": [
+        "gx_core/governance/approvals.py:291#_set_status"
+      ],
+      "row_creation_in_product": true
+    },
+    "strategy_pointers": {
+      "definition": "contracts/db_schema.sql:942",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_DELETE": [
+        "gx_core/governance/pointers.py:194#clear"
+      ],
+      "product_INSERT": [
+        "gx_core/governance/pointers.py:84#_write"
+      ],
+      "product_READ": [
+        "gx_core/governance/pointers.py:61#active",
+        "gx_core/governance/pointers.py:78#_write"
+      ],
+      "row_creation_in_product": true
+    },
+    "rsi_cycles": {
+      "definition": "contracts/db_schema.sql:954",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        },
+        {
+          "field": "verdict",
+          "default": null
+        }
+      ],
+      "declared_machine": "rsi_cycle",
+      "generic_transition_mapping": "gx_core/persistence/store.py:695",
+      "product_READ": [
+        "gx_core/governance/pointers.py:120#_flip_on_active"
+      ],
+      "row_creation_in_product": false
+    },
+    "imports": {
+      "definition": "contracts/db_schema.sql:981",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_READ": [
+        "gx_core/governance/tools.py:459#_basis"
+      ],
+      "row_creation_in_product": false
+    },
+    "references_reviewed": {
+      "definition": "contracts/db_schema.sql:996",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "review_state",
+          "default": null
+        },
+        {
+          "field": "reuse_decision",
+          "default": null
+        }
+      ],
+      "declared_machine": "reference_review",
+      "generic_transition_mapping": "gx_core/persistence/store.py:697",
+      "row_creation_in_product": false
+    },
+    "checkpoints": {
+      "definition": "contracts/db_schema.sql:1013",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/persistence/store.py:1447#save_checkpoint"
+      ],
+      "product_READ": [
+        "gx_core/orchestration/engine.py:1800#Engine._pause",
+        "gx_core/orchestration/engine.py:1882#Engine._pause_for_budget",
+        "gx_core/orchestration/engine.py:2026#Engine._response",
+        "gx_core/orchestration/reactor.py:460#derive_waiting",
+        "gx_core/orchestration/repin.py:50#require_quiescent",
+        "gx_core/orchestration/service.py:1536#_require_no_held_submission",
+        "gx_core/persistence/store.py:1442#save_checkpoint",
+        "gx_core/persistence/store.py:1457#latest_checkpoint",
+        "gx_core/scheduling/snapshot.py:811#_read",
+        "gx_core/teams/service.py:743#TeamService.lazy"
+      ],
+      "row_creation_in_product": true
+    },
+    "outbox": {
+      "definition": "contracts/db_schema.sql:1028",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/persistence/store.py:1287#enqueue_outbox",
+        "gx_core/persistence/store.py:1292#enqueue_outbox"
+      ],
+      "product_READ": [
+        "gx_core/persistence/store.py:1280#enqueue_outbox",
+        "gx_core/persistence/store.py:1315#pending_triggers",
+        "gx_core/persistence/store.py:1326#claim_outbox",
+        "gx_core/persistence/store.py:1332#claim_outbox",
+        "gx_core/teams/board.py:64#_reaction_sections",
+        "gx_core/teams/service.py:750#TeamService.lazy"
+      ],
+      "product_UPDATE": [
+        "gx_core/orchestration/reactor.py:374#_react_to",
+        "gx_core/persistence/store.py:1336#claim_outbox",
+        "gx_core/persistence/store.py:1344#complete_outbox",
+        "gx_core/persistence/store.py:1352#fail_outbox"
+      ],
+      "test_READ": [
+        "tests/test_grid_job_recovery.py:95#GridJobRecovery.test_reconnect_to_project_jobs_under_lost_receipts",
+        "tests/test_local_job.py:108#LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once",
+        "tests/test_native_facades.py:186#NativeFinish.recorded_events",
+        "tests/test_plugin_evaluator.py:107#ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt",
+        "tests/test_science_cycle.py:108#ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original"
+      ],
+      "test_UPDATE": [
+        "tests/test_science_cycle.py:112#ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original"
+      ],
+      "row_creation_in_product": true
+    },
+    "idempotency": {
+      "definition": "contracts/db_schema.sql:1047",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "side_effect_status",
+          "default": "'NONE'"
+        }
+      ],
+      "declared_machine": null,
+      "product_DELETE": [
+        "gx_core/persistence/store.py:942#forget_idempotent"
+      ],
+      "product_INSERT": [
+        "gx_core/persistence/store.py:860#begin_idempotent"
+      ],
+      "product_READ": [
+        "gx_core/capabilities/tools.py:75#capability_register",
+        "gx_core/governance/tools.py:73#_replayed",
+        "gx_core/hostobs/codex_opaque_dispatch.py:501#handle",
+        "gx_core/hostobs/pool.py:905#HostPoolService._replay",
+        "gx_core/orchestration/expansion.py:91#replay",
+        "gx_core/orchestration/service.py:1429#_replayed_resume",
+        "gx_core/orchestration/service.py:1479#proves_prior_resume_conflict",
+        "gx_core/orchestration/service.py:696#proves_reconciled_start",
+        "gx_core/persistence/store.py:869#begin_idempotent",
+        "gx_core/persistence/store.py:948#stored_response",
+        "gx_core/project_followup.py:207#registered_successor",
+        "gx_core/project_work.py:357#_project_runs",
+        "gx_core/project_work.py:393#_progress_counts",
+        "gx_core/research/model_activity.py:278#run_activity",
+        "gx_core/research/model_activity.py:75#activity_status",
+        "gx_core/teams/service.py:1095#TeamService._acquire_replay",
+        "gx_core/teams/service.py:1444#TeamService._admit_lease_entry"
+      ],
+      "product_UPDATE": [
+        "gx_core/persistence/store.py:913#complete_idempotent",
+        "gx_core/persistence/store.py:928#mark_idempotent_unknown",
+        "gx_core/persistence/store.py:970#settle_answer"
+      ],
+      "test_READ": [
+        "tests/test_native_facades.py:84#NativeAcquire.test_model_activity_requires_the_observed_lease_owner",
+        "tests/test_science_activity_cycle.py:79#ScienceActivityCycle.test_assessment_crosses_http_and_decision_uses_saved_evidence"
+      ],
+      "row_creation_in_product": true
+    },
+    "budgets": {
+      "definition": "contracts/db_schema.sql:1057",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/budgets/__init__.py:367#create_root",
+        "gx_core/budgets/__init__.py:397#open_child",
+        "gx_core/persistence/store.py:1394#create_budget"
+      ],
+      "product_READ": [
+        "gx_core/budgets/__init__.py:100#_row",
+        "gx_core/budgets/__init__.py:167#_project_usage",
+        "gx_core/budgets/__init__.py:262#_check_project_reservation",
+        "gx_core/budgets/__init__.py:903#increase_condition",
+        "gx_core/capabilities/ladder.py:299#probe_run",
+        "gx_core/jobs/service.py:834#JobService._refuse_prohibited_lines",
+        "gx_core/orchestration/repin.py:58#require_quiescent",
+        "gx_core/orchestration/seams.py:443#release_run_holds",
+        "gx_core/orchestration/service.py:1766#_finish_cancel",
+        "gx_core/orchestration/service.py:1777#_finish_cancel",
+        "gx_core/orchestration/service.py:1832#_maintenance_control.work",
+        "gx_core/orchestration/service.py:696#proves_reconciled_start",
+        "gx_core/persistence/store.py:1366#create_budget",
+        "gx_core/persistence/store.py:1402#spend_budget",
+        "gx_core/persistence/store.py:1423#budget_state",
+        "gx_core/teams/board.py:668#SharedBoardService._read",
+        "gx_core/teams/service.py:411#TeamService.create_task"
+      ],
+      "product_UPDATE": [
+        "gx_core/budgets/__init__.py:126#_write",
+        "gx_core/orchestration/service.py:532#run_start.create",
+        "gx_core/persistence/store.py:1389#create_budget",
+        "gx_core/persistence/store.py:1416#spend_budget"
+      ],
+      "row_creation_in_product": true
+    },
+    "budget_reservations": {
+      "definition": "contracts/db_schema.sql:1070",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/budgets/__init__.py:481#_reserve"
+      ],
+      "product_READ": [
+        "gx_core/budgets/__init__.py:1019#state",
+        "gx_core/budgets/__init__.py:1042#confirmatory_allotment",
+        "gx_core/budgets/__init__.py:108#_reservation",
+        "gx_core/budgets/__init__.py:1092#verify",
+        "gx_core/budgets/__init__.py:167#_project_usage",
+        "gx_core/budgets/__init__.py:415#_funding_state",
+        "gx_core/budgets/__init__.py:433#_reserve",
+        "gx_core/budgets/__init__.py:559#reserve_chain",
+        "gx_core/budgets/__init__.py:563#reserve_chain",
+        "gx_core/budgets/__init__.py:613#draw_follower",
+        "gx_core/budgets/__init__.py:648#draw_reservation",
+        "gx_core/budgets/__init__.py:663#release_chain",
+        "gx_core/budgets/__init__.py:796#release",
+        "gx_core/capabilities/ladder.py:434#_attempt_key",
+        "gx_core/jobs/tools.py:299#gpu_job_within_limits",
+        "gx_core/orchestration/repin.py:58#require_quiescent",
+        "gx_core/orchestration/service.py:754#proves_reconciled_start",
+        "gx_core/project_work.py:310#_settled_probe_budget",
+        "gx_core/teams/manager.py:538#TeamManager._close_blockers",
+        "gx_core/teams/service.py:411#TeamService.create_task"
+      ],
+      "product_UPDATE": [
+        "gx_core/budgets/__init__.py:732#_settle",
+        "gx_core/budgets/__init__.py:817#release"
+      ],
+      "test_READ": [
+        "tests/test_local_job.py:105#LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once",
+        "tests/test_team_manager.py:348#AssignmentAndHandoff.test_team_close_does_not_release_an_unknown_job_or_held_budget"
+      ],
+      "row_creation_in_product": true
+    },
+    "teams": {
+      "definition": "contracts/db_schema.sql:1084",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": "team",
+      "generic_transition_mapping": "gx_core/persistence/store.py:685",
+      "example_READ": [
+        "examples/science_cycle.py:189#OfflinePeer.assign"
+      ],
+      "product_INSERT": [
+        "gx_core/teams/manager.py:457#TeamManager._create"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/native_observation.py:44#snapshot",
+        "gx_core/hostobs/pool.py:1137#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1189#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/orchestration/service.py:1184#dispatch_projection",
+        "gx_core/teams/board.py:272#_organization",
+        "gx_core/teams/board.py:273#_organization",
+        "gx_core/teams/board.py:276#_organization",
+        "gx_core/teams/manager.py:110#_team",
+        "gx_core/teams/manager.py:166#_tree_depth",
+        "gx_core/teams/manager.py:529#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:636#TeamManager._publish_context_and_brief",
+        "gx_core/teams/manager.py:846#TeamManager.snapshot",
+        "gx_core/teams/manager.py:847#TeamManager.snapshot",
+        "gx_core/teams/manager.py:848#TeamManager.snapshot",
+        "workflows/module_collaboration/products.py:87#validate"
+      ],
+      "product_UPDATE": [
+        "gx_core/teams/manager.py:396#TeamManager._mutate",
+        "gx_core/teams/manager.py:484#TeamManager._revise",
+        "gx_core/teams/manager.py:498#TeamManager._reparent",
+        "gx_core/teams/manager.py:517#TeamManager._transition",
+        "gx_core/teams/manager.py:552#TeamManager._leader"
+      ],
+      "test_READ": [
+        "tests/test_team_manager.py:239#AssignmentAndHandoff.test_leader_cannot_steal_an_unassigned_mainline_task",
+        "tests/test_v2_fencing.py:174#Fencing.test_team_cas_survives_unrelated_team_revision_and_fences_second_edit"
+      ],
+      "row_creation_in_product": true
+    },
+    "team_intents": {
+      "definition": "contracts/db_schema.sql:1102",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/teams/manager.py:461#TeamManager._create",
+        "gx_core/teams/manager.py:482#TeamManager._revise"
+      ],
+      "product_READ": [
+        "gx_core/teams/manager.py:271#assignment_intent",
+        "gx_core/teams/manager.py:330#TeamManager._view"
+      ],
+      "test_READ": [
+        "tests/test_team_manager.py:130#TeamLifecycle.test_intents_are_versioned_and_preserved"
+      ],
+      "row_creation_in_product": true
+    },
+    "team_grants": {
+      "definition": "contracts/db_schema.sql:1111",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/teams/manager.py:579#TeamManager._grant"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/native_observation.py:44#snapshot",
+        "gx_core/teams/manager.py:322#TeamManager._authorize",
+        "gx_core/teams/manager.py:664#TeamManager._require_task_grant"
+      ],
+      "product_UPDATE": [
+        "gx_core/teams/manager.py:554#TeamManager._leader"
+      ],
+      "row_creation_in_product": true
+    },
+    "team_members": {
+      "definition": "contracts/db_schema.sql:1122",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "example_READ": [
+        "examples/science_cycle.py:201#OfflinePeer.assign"
+      ],
+      "product_INSERT": [
+        "gx_core/teams/manager.py:604#TeamManager._member"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/codex_opaque_dispatch.py:232#_state",
+        "gx_core/hostobs/native_observation.py:38#snapshot",
+        "gx_core/hostobs/pool.py:1197#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/teams/board.py:273#_organization",
+        "gx_core/teams/manager.py:249#require_assignment",
+        "gx_core/teams/manager.py:311#TeamManager._authorize",
+        "gx_core/teams/manager.py:434#TeamManager.manage.apply",
+        "gx_core/teams/manager.py:608#TeamManager._member",
+        "gx_core/teams/manager.py:618#TeamManager._assignment_target",
+        "gx_core/teams/manager.py:847#TeamManager.snapshot"
+      ],
+      "product_UPDATE": [
+        "gx_core/teams/manager.py:611#TeamManager._member"
+      ],
+      "test_READ": [
+        "tests/test_native_team_subjects.py:54#NativeTeamSubjects.member"
+      ],
+      "test_UPDATE": [
+        "tests/test_native_team_subjects.py:136#NativeTeamSubjects.test_existing_unclaimed_path_assignment_can_be_handed_to_real_worker"
+      ],
+      "row_creation_in_product": true
+    },
+    "task_assignments": {
+      "definition": "contracts/db_schema.sql:1131",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "example_READ": [
+        "examples/science_cycle.py:156#OfflinePeer.assign"
+      ],
+      "product_INSERT": [
+        "gx_core/teams/manager.py:683#TeamManager._assign"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/codex_dispatch.py:52#_contract",
+        "gx_core/hostobs/codex_opaque_dispatch.py:194#_state",
+        "gx_core/hostobs/codex_opaque_dispatch.py:218#_state",
+        "gx_core/hostobs/codex_worker_observation.py:89#snapshot",
+        "gx_core/hostobs/native_observation.py:30#snapshot",
+        "gx_core/hostobs/native_spawn.py:82#recover_legacy_paths",
+        "gx_core/hostobs/pool.py:1132#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1186#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1310#HostPoolService._handoff_checks",
+        "gx_core/hostobs/pool.py:1500#HostPoolService._claim_receipt_current",
+        "gx_core/hostobs/pool.py:1529#HostPoolService._require_previous_binding_settled",
+        "gx_core/hostobs/pool.py:513#HostPoolService._adoption_task",
+        "gx_core/orchestration/service.py:1184#dispatch_projection",
+        "gx_core/teams/board.py:276#_organization",
+        "gx_core/teams/manager.py:236#require_assignment",
+        "gx_core/teams/manager.py:527#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:531#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:533#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:535#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:536#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:538#TeamManager._close_blockers",
+        "gx_core/teams/manager.py:575#TeamManager._grant",
+        "gx_core/teams/manager.py:642#TeamManager._publish_context_and_brief",
+        "gx_core/teams/manager.py:676#TeamManager._assign",
+        "gx_core/teams/manager.py:699#TeamManager._handoff",
+        "gx_core/teams/manager.py:848#TeamManager.snapshot",
+        "gx_core/teams/manager_tools.py:32#team_assignment_section",
+        "gx_core/teams/service.py:1078#TeamService.acquire_task",
+        "gx_core/teams/service.py:1211#TeamService._claim",
+        "workflows/module_collaboration/products.py:87#validate"
+      ],
+      "product_UPDATE": [
+        "gx_core/teams/manager.py:636#TeamManager._publish_context_and_brief",
+        "gx_core/teams/manager.py:710#TeamManager._handoff",
+        "gx_core/teams/manager.py:720#TeamManager._handoff",
+        "gx_core/teams/manager.py:723#TeamManager._handoff"
+      ],
+      "test_READ": [
+        "tests/test_native_team_subjects.py:50#NativeTeamSubjects.assignment",
+        "tests/test_team_manager.py:292#AssignmentAndHandoff.test_pending_handoff_preserves_task_and_lease_and_blocks_both_closures",
+        "tests/test_team_manager.py:313#AssignmentAndHandoff.test_handoff_applies_after_worker_settlement_without_changing_task_id"
+      ],
+      "test_UPDATE": [
+        "tests/test_native_team_subjects.py:113#NativeTeamSubjects.test_old_spawn_receipt_recovers_only_matching_thread_metadata",
+        "tests/test_native_team_subjects.py:138#NativeTeamSubjects.test_existing_unclaimed_path_assignment_can_be_handed_to_real_worker"
+      ],
+      "row_creation_in_product": true
+    },
+    "team_messages": {
+      "definition": "contracts/db_schema.sql:1151",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/teams/manager.py:790#TeamManager._send"
+      ],
+      "product_READ": [
+        "gx_core/teams/board.py:281#_organization",
+        "gx_core/teams/manager.py:783#TeamManager._send",
+        "gx_core/teams/manager.py:798#TeamManager._ack",
+        "gx_core/teams/manager.py:812#TeamManager._message_view",
+        "gx_core/teams/manager.py:857#TeamManager.snapshot",
+        "workflows/module_collaboration/nodes.py:139#_decision"
+      ],
+      "row_creation_in_product": true
+    },
+    "team_message_acks": {
+      "definition": "contracts/db_schema.sql:1170",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/teams/manager.py:807#TeamManager._ack"
+      ],
+      "product_READ": [
+        "gx_core/teams/board.py:268#_organization.message",
+        "gx_core/teams/manager.py:805#TeamManager._ack",
+        "gx_core/teams/manager.py:816#TeamManager._message_view",
+        "gx_core/teams/manager.py:823#TeamManager._message_view"
+      ],
+      "test_INSERT": [
+        "tests/test_team_manager.py:446#TeamMessagesAndReadModel.test_acknowledgement_summaries_are_bounded_and_report_omissions"
+      ],
+      "row_creation_in_product": true
+    },
+    "hypotheses": {
+      "definition": "contracts/db_schema.sql:1180",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "hypothesis_revisions": {
+      "definition": "contracts/db_schema.sql:1188",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "research_contexts": {
+      "definition": "contracts/db_schema.sql:1204",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "research_context_heads": {
+      "definition": "contracts/db_schema.sql:1220",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "research_rounds": {
+      "definition": "contracts/db_schema.sql:1225",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "hypothesis_update_proposals": {
+      "definition": "contracts/db_schema.sql:1251",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "hypothesis_update_reviews": {
+      "definition": "contracts/db_schema.sql:1275",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "verdict",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "plugin_versions": {
+      "definition": "contracts/db_schema.sql:1295",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "admission_state",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "plugin_heads": {
+      "definition": "contracts/db_schema.sql:1311",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "row_creation_in_product": false
+    },
+    "plugin_invocations": {
+      "definition": "contracts/db_schema.sql:1320",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "status",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_READ": [
+        "gx_core/orchestration/repin.py:57#require_quiescent",
+        "gx_core/teams/service.py:626#TeamService._native_passive_verdict"
+      ],
+      "row_creation_in_product": false
+    },
+    "host_pools": {
+      "definition": "contracts/db_schema.sql:1350",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/hostobs/pool.py:848#HostPoolService._register_commit"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/codex_opaque_dispatch.py:198#_state",
+        "gx_core/hostobs/pool.py:697#HostPoolService._pool",
+        "gx_core/hostobs/pool.py:767#HostPoolService.register",
+        "gx_core/hostobs/pool.py:841#HostPoolService._register_commit",
+        "gx_core/teams/board.py:322#_host_pool",
+        "gx_core/teams/board.py:353#_host_pool"
+      ],
+      "product_UPDATE": [
+        "gx_core/hostobs/pool.py:1030#HostPoolService._reserve_commit",
+        "gx_core/hostobs/pool.py:665#HostPoolService._adopt_existing_commit",
+        "gx_core/hostobs/pool.py:744#HostPoolService._write",
+        "gx_core/hostobs/pool.py:873#HostPoolService._register_commit"
+      ],
+      "row_creation_in_product": true
+    },
+    "host_pool_slots": {
+      "definition": "contracts/db_schema.sql:1368",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "state",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/hostobs/pool.py:1022#HostPoolService._reserve_commit",
+        "gx_core/hostobs/pool.py:661#HostPoolService._adopt_existing_commit"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/codex_opaque_dispatch.py:195#_state",
+        "gx_core/hostobs/pool.py:1205#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:1316#HostPoolService._handoff_checks",
+        "gx_core/hostobs/pool.py:1696#HostPoolService._settle",
+        "gx_core/hostobs/pool.py:1874#HostPoolService.reparent",
+        "gx_core/hostobs/pool.py:1911#HostPoolService.snapshot",
+        "gx_core/hostobs/pool.py:1924#HostPoolService.snapshot",
+        "gx_core/hostobs/pool.py:1929#HostPoolService.snapshot",
+        "gx_core/hostobs/pool.py:408#HostPoolService._inventory_external_count",
+        "gx_core/hostobs/pool.py:449#HostPoolService._register_inventory",
+        "gx_core/hostobs/pool.py:465#HostPoolService._require_inventory_covered",
+        "gx_core/hostobs/pool.py:624#HostPoolService._adopt_existing_commit",
+        "gx_core/hostobs/pool.py:703#HostPoolService._slot",
+        "gx_core/hostobs/pool.py:723#HostPoolService._occupied",
+        "gx_core/hostobs/pool.py:975#HostPoolService._reserve_commit",
+        "gx_core/teams/board.py:306#_host_pool",
+        "gx_core/teams/board.py:315#_host_pool.pool",
+        "gx_core/teams/board.py:324#_host_pool",
+        "gx_core/teams/board.py:351#_host_pool"
+      ],
+      "product_UPDATE": [
+        "gx_core/hostobs/pool.py:741#HostPoolService._write"
+      ],
+      "row_creation_in_product": true
+    },
+    "host_pool_inventory_receipts": {
+      "definition": "contracts/db_schema.sql:1406",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/hostobs/pool.py:430#HostPoolService._inventory_receipt"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/pool.py:1576#HostPoolService._require_fresh_admission",
+        "gx_core/hostobs/pool.py:421#HostPoolService._inventory_receipt",
+        "gx_core/hostobs/pool.py:472#HostPoolService._require_inventory_covered",
+        "gx_core/hostobs/pool.py:488#HostPoolService._pool_has_inventory"
+      ],
+      "row_creation_in_product": true
+    },
+    "host_pool_external_inventory": {
+      "definition": "contracts/db_schema.sql:1418",
+      "database": "GX store",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "runtime_status",
+          "default": null
+        }
+      ],
+      "declared_machine": null,
+      "product_INSERT": [
+        "gx_core/hostobs/pool.py:452#HostPoolService._register_inventory"
+      ],
+      "product_READ": [
+        "gx_core/hostobs/pool.py:1167#HostPoolService._unclaimed_transfer_checks",
+        "gx_core/hostobs/pool.py:411#HostPoolService._inventory_external_count",
+        "gx_core/hostobs/pool.py:441#HostPoolService._register_inventory",
+        "gx_core/hostobs/pool.py:468#HostPoolService._require_inventory_covered",
+        "gx_core/hostobs/pool.py:489#HostPoolService._pool_has_inventory",
+        "gx_core/hostobs/pool.py:620#HostPoolService._adopt_existing_commit"
+      ],
+      "product_UPDATE": [
+        "gx_core/hostobs/pool.py:444#HostPoolService._register_inventory",
+        "gx_core/hostobs/pool.py:662#HostPoolService._adopt_existing_commit"
+      ],
+      "row_creation_in_product": true
+    },
+    "messages": {
+      "definition": "gx_core/project_messages.py:14",
+      "database": "web-messages.sqlite3",
+      "virtual_fts5": false,
+      "state_fields": [
+        {
+          "field": "phase",
+          "default": "'queued'"
+        }
+      ],
+      "declared_machine": null,
+      "phase_writer_values": [
+        "queued",
+        "sending",
+        "steering",
+        "received",
+        "turn_completed"
+      ],
+      "product_INSERT": [
+        "gx_core/project_messages.py:17#enqueue"
+      ],
+      "product_READ": [
+        "gx_core/project_messages.py:163#reconcile",
+        "gx_core/project_messages.py:217#deliveries",
+        "gx_core/project_messages.py:36#last_entry",
+        "gx_core/project_messages.py:53#has_queued",
+        "gx_core/project_messages.py:61#delivery_status",
+        "gx_core/project_messages.py:74#take_for_turn",
+        "gx_core/web/projects.py:89#feedback"
+      ],
+      "product_UPDATE": [
+        "gx_core/project_messages.py:100#return_refused_steer",
+        "gx_core/project_messages.py:203#reconcile",
+        "gx_core/project_messages.py:78#take_for_turn",
+        "gx_core/project_messages.py:91#update_delivery"
+      ],
+      "row_creation_in_product": true
+    }
+  },
+  "direct_python_callers_of_literal_product_writers": {
+    "gx_core/artifacts/service.py:475#ArtifactService.register_materialized": [
+      "gx_core/artifacts/delivery.py:204#register_manifest",
+      "gx_core/artifacts/service.py:466#ArtifactService.publish"
+    ],
+    "gx_core/budgets/__init__.py:421#_reserve": [
+      "gx_core/budgets/__init__.py:391#open_child",
+      "gx_core/budgets/__init__.py:505#reserve",
+      "gx_core/budgets/__init__.py:518#spend",
+      "gx_core/budgets/__init__.py:592#reserve_chain",
+      "gx_core/budgets/__init__.py:597#reserve_chain"
+    ],
+    "gx_core/budgets/__init__.py:717#_settle": [
+      "gx_core/budgets/__init__.py:594#reserve_chain",
+      "gx_core/budgets/__init__.py:632#draw_follower",
+      "gx_core/budgets/__init__.py:703#settle"
+    ],
+    "gx_core/budgets/__init__.py:118#_write": [
+      "gx_core/budgets/__init__.py:478#_reserve",
+      "gx_core/budgets/__init__.py:729#_settle",
+      "gx_core/budgets/__init__.py:815#release",
+      "gx_core/budgets/__init__.py:859#tighten",
+      "gx_core/budgets/__init__.py:995#raise_limit"
+    ],
+    "gx_core/budgets/__init__.py:338#create_root": [
+      "examples/p01_fixture.py:34#prepare",
+      "gx_core/capabilities/ladder.py:320#probe_run",
+      "tests/test_grid_job_recovery.py:45#GridJobRecovery.test_reconnect_to_project_jobs_under_lost_receipts",
+      "tests/test_local_job.py:64#LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once",
+      "tests/test_plugin_evaluator.py:75#ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt",
+      "tests/test_team_manager.py:332#AssignmentAndHandoff.test_team_close_does_not_release_an_unknown_job_or_held_budget"
+    ],
+    "gx_core/budgets/__init__.py:379#open_child": [],
+    "gx_core/budgets/__init__.py:765#release": [
+      "gx_core/budgets/__init__.py:666#release_chain"
+    ],
+    "gx_core/capabilities/environments.py:535#_record_probe": [
+      "gx_core/capabilities/environments.py:523#register"
+    ],
+    "gx_core/capabilities/environments.py:449#register": [
+      "gx_core/capabilities/environments.py:581#reprobe",
+      "gx_core/capabilities/shipped.py:43#ensure_grid",
+      "gx_core/capabilities/tools.py:84#capability_register.work",
+      "tests/test_local_job.py:57#LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once",
+      "tests/test_plugin_evaluator.py:68#ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt",
+      "tests/test_shipped_grid.py:23#ShippedGrid.test_existing_draft_is_not_promoted_by_using_workflow"
+    ],
+    "gx_core/capabilities/registry.py:473#record_equivalence": [],
+    "gx_core/capabilities/registry.py:554#record_probe": [
+      "gx_core/capabilities/ladder.py:727#_record"
+    ],
+    "gx_core/capabilities/registry.py:156#register_candidate": [
+      "gx_core/capabilities/shipped.py:51#ensure_grid",
+      "gx_core/capabilities/tools.py:135#capability_manifest_bundle",
+      "gx_core/capabilities/tools.py:89#capability_register.work",
+      "tests/test_local_job.py:62#LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once",
+      "tests/test_plugin_evaluator.py:73#ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt",
+      "tests/test_shipped_grid.py:27#ShippedGrid.test_existing_draft_is_not_promoted_by_using_workflow"
+    ],
+    "gx_core/capabilities/registry.py:450#sync_status": [
+      "gx_core/capabilities/registry.py:257#register_candidate"
+    ],
+    "gx_core/capabilities/tools.py:238#mirror_status": [],
+    "gx_core/governance/approvals.py:284#_set_status": [
+      "gx_core/governance/approvals.py:314#_expire_if_due",
+      "gx_core/governance/approvals.py:398#_apply_policy",
+      "gx_core/governance/approvals.py:580#decide",
+      "gx_core/governance/approvals.py:620#invalidate"
+    ],
+    "gx_core/governance/approvals.py:411#request": [
+      "gx_core/budgets/__init__.py:951#request_increase",
+      "gx_core/governance/assets.py:492#prepare_promotion",
+      "gx_core/orchestration/repin.py:133#ensure"
+    ],
+    "gx_core/governance/assets.py:285#submit_asset": [
+      "gx_core/governance/tools.py:155#asset_submit.register",
+      "gx_core/hostobs/projection.py:172#judge_role_intent",
+      "gx_core/knowledge/strategy.py:293#submit"
+    ],
+    "gx_core/governance/checks.py:138#_append": [
+      "gx_core/governance/checks.py:134#run_checks"
+    ],
+    "gx_core/governance/checks.py:255#adjudicate": [
+      "gx_core/governance/tools.py:799#judge_asset_review",
+      "tests/test_local_job.py:30#LocalJobLifecycle.accept_local_utility"
+    ],
+    "gx_core/governance/checks.py:352#invalidate": [
+      "gx_core/governance/assets.py:542#commit_promotion"
+    ],
+    "gx_core/governance/pointers.py:76#_write": [
+      "gx_core/governance/pointers.py:124#_flip_on_active",
+      "gx_core/governance/pointers.py:163#install_baseline",
+      "gx_core/governance/pointers.py:233#rollback"
+    ],
+    "gx_core/governance/pointers.py:167#clear": [],
+    "gx_core/governance/reviews.py:260#_insert": [
+      "gx_core/governance/reviews.py:353#record_review",
+      "gx_core/governance/reviews.py:399#record_human_review"
+    ],
+    "gx_core/governance/reviews.py:595#invalidate": [
+      "gx_core/governance/assets.py:543#commit_promotion"
+    ],
+    "gx_core/governance/reviews.py:430#record_waiter": [
+      "gx_core/governance/reviews.py:531#_request_review"
+    ],
+    "gx_core/hostobs/observation.py:306#record_event": [
+      "gx_core/hostobs/events.py:1245#handle",
+      "gx_core/hostobs/events.py:489#_client_call",
+      "gx_core/hostobs/events.py:506#_client_call",
+      "gx_core/hostobs/observation.py:1273#observe_session",
+      "gx_core/hostobs/observation.py:1294#observe_session"
+    ],
+    "gx_core/hostobs/observation.py:232#write_observation": [
+      "gx_core/hostobs/events.py:874#_spawned",
+      "gx_core/hostobs/native_observation.py:392#record_adverse_epoch",
+      "gx_core/hostobs/native_observation.py:445#_write",
+      "gx_core/hostobs/native_observation.py:473#bind_worker",
+      "gx_core/hostobs/observation.py:1177#observe_worker",
+      "gx_core/hostobs/observation.py:764#_write_observed",
+      "gx_core/hostobs/observation.py:850#bind_worker",
+      "gx_core/hostobs/observation.py:908#verdict_for.report"
+    ],
+    "gx_core/hostobs/pool.py:609#HostPoolService._adopt_existing_commit": [
+      "gx_core/hostobs/pool.py:603#HostPoolService.adopt_existing.work"
+    ],
+    "gx_core/hostobs/pool.py:416#HostPoolService._inventory_receipt": [
+      "gx_core/hostobs/pool.py:437#HostPoolService._register_inventory",
+      "gx_core/hostobs/pool.py:639#HostPoolService._adopt_existing_commit",
+      "gx_core/hostobs/pool.py:988#HostPoolService._reserve_commit"
+    ],
+    "gx_core/hostobs/pool.py:799#HostPoolService._register_commit": [
+      "gx_core/hostobs/pool.py:788#HostPoolService.register"
+    ],
+    "gx_core/hostobs/pool.py:436#HostPoolService._register_inventory": [
+      "gx_core/hostobs/pool.py:881#HostPoolService._register_commit"
+    ],
+    "gx_core/hostobs/pool.py:957#HostPoolService._reserve_commit": [
+      "gx_core/hostobs/pool.py:947#HostPoolService.reserve"
+    ],
+    "gx_core/hostobs/pool.py:726#HostPoolService._write": [
+      "gx_core/hostobs/pool.py:1239#HostPoolService._unclaimed_transfer_commit",
+      "gx_core/hostobs/pool.py:1366#HostPoolService._simple",
+      "gx_core/hostobs/pool.py:1371#HostPoolService._simple",
+      "gx_core/hostobs/pool.py:1378#HostPoolService._simple",
+      "gx_core/hostobs/pool.py:1384#HostPoolService._simple",
+      "gx_core/hostobs/pool.py:1443#HostPoolService._simple",
+      "gx_core/hostobs/pool.py:1642#HostPoolService._begin_create",
+      "gx_core/hostobs/pool.py:1682#HostPoolService._settle",
+      "gx_core/hostobs/pool.py:1716#HostPoolService._settle",
+      "gx_core/hostobs/pool.py:1899#HostPoolService.reparent"
+    ],
+    "gx_core/jobs/leases.py:99#renew": [
+      "gx_core/jobs/leases.py:436#adopt",
+      "gx_core/teams/service.py:1594#TeamService.bind"
+    ],
+    "gx_core/jobs/service.py:508#JobService._admit": [
+      "gx_core/jobs/service.py:380#JobService.submit"
+    ],
+    "gx_core/jobs/service.py:1681#JobService._mark_unknown": [
+      "gx_core/jobs/service.py:1027#JobService._start",
+      "gx_core/jobs/service.py:1493#JobService._reconcile_one",
+      "gx_core/jobs/service.py:1538#JobService._reconcile_one",
+      "gx_core/jobs/service.py:1553#JobService._reconcile_one"
+    ],
+    "gx_core/jobs/service.py:1453#JobService._reconcile_one": [
+      "gx_core/jobs/service.py:1028#JobService._start",
+      "gx_core/jobs/service.py:1180#JobService.status",
+      "gx_core/jobs/service.py:1215#JobService.cancel",
+      "gx_core/jobs/service.py:1447#JobService.reconcile",
+      "gx_core/jobs/service.py:2217#jobs_for_path",
+      "gx_core/jobs/service.py:401#JobService._existing",
+      "gx_core/jobs/service.py:405#JobService._existing",
+      "gx_core/jobs/service.py:779#JobService._step_answer",
+      "gx_core/jobs/service.py:889#JobService.active_gpu_jobs"
+    ],
+    "gx_core/jobs/service.py:963#JobService._start": [
+      "gx_core/jobs/service.py:388#JobService.submit",
+      "gx_core/jobs/service.py:404#JobService._existing"
+    ],
+    "gx_core/knowledge/memory.py:531#MemoryService._record": [
+      "gx_core/knowledge/memory.py:379#MemoryService.search"
+    ],
+    "gx_core/knowledge/memory.py:718#MemoryService._unindex": [
+      "gx_core/knowledge/memory.py:220#MemoryService.write",
+      "gx_core/knowledge/memory.py:684#MemoryService.retract",
+      "gx_core/knowledge/memory.py:705#MemoryService.supersede"
+    ],
+    "gx_core/knowledge/memory.py:669#MemoryService.retract": [
+      "tests/test_memory.py:65#ProjectMemory.test_index_scope_replay_and_withdrawal"
+    ],
+    "gx_core/knowledge/memory.py:691#MemoryService.supersede": [],
+    "gx_core/knowledge/memory.py:92#MemoryService.write": [
+      "gx_core/knowledge/index_run.py:55#index_run"
+    ],
+    "gx_core/orchestration/engine.py:1353#Engine._advance_nodes": [
+      "gx_core/orchestration/engine.py:1344#Engine._advance"
+    ],
+    "gx_core/orchestration/engine.py:1500#Engine._run_node": [
+      "gx_core/orchestration/engine.py:1426#Engine._advance_nodes",
+      "gx_core/orchestration/engine.py:1440#Engine._advance_nodes"
+    ],
+    "gx_core/orchestration/engine.py:919#Engine.begin_resume": [
+      "gx_core/orchestration/engine.py:914#Engine.resume",
+      "gx_core/orchestration/reactor.py:214#drive_science",
+      "gx_core/orchestration/service.py:1392#run_resume.resume"
+    ],
+    "gx_core/orchestration/expansion.py:112#expand": [
+      "workflows/module_collaboration/nodes.py:53#_task",
+      "workflows/science_grid/nodes.py:137#_judgment"
+    ],
+    "gx_core/orchestration/reactor.py:346#_react_to": [
+      "gx_core/orchestration/reactor.py:409#react"
+    ],
+    "gx_core/orchestration/repin.py:121#ensure": [
+      "gx_core/orchestration/reactor.py:435#lazy",
+      "gx_core/orchestration/service.py:1864#_maintenance_control.work"
+    ],
+    "gx_core/orchestration/service.py:1280#coordinator_claim.work": [],
+    "gx_core/orchestration/service.py:522#run_start.create": [],
+    "gx_core/persistence/records.py:74#create_path": [
+      "examples/p01_fixture.py:53#prepare"
+    ],
+    "gx_core/persistence/records.py:22#create_run": [
+      "examples/p01_fixture.py:35#prepare",
+      "gx_core/capabilities/ladder.py:321#probe_run",
+      "gx_core/orchestration/service.py:525#run_start.create",
+      "tests/test_grid_job_recovery.py:47#GridJobRecovery.test_reconnect_to_project_jobs_under_lost_receipts",
+      "tests/test_local_job.py:66#LocalJobLifecycle.test_restart_reconciles_the_original_job_and_publishes_its_outputs_once",
+      "tests/test_model_activity.py:66#ModelActivityTests.setUp",
+      "tests/test_plugin_evaluator.py:28#ScoreEvaluatorTest.test_pinned_input_version_relaunch_and_lost_reply",
+      "tests/test_plugin_evaluator.py:76#ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt",
+      "tests/test_team_manager.py:247#AssignmentAndHandoff.test_cross_run_task_and_context_cannot_be_assigned",
+      "tests/test_team_manager.py:34#ManagerFixture.setUp",
+      "tests/test_v2_fencing.py:239#BaselineMigration.test_original_store_opens_with_epoch_and_keeps_existing_run_pins"
+    ],
+    "gx_core/persistence/records.py:123#create_task": [
+      "examples/p01_fixture.py:54#prepare",
+      "gx_core/teams/service.py:392#TeamService.create_task",
+      "tests/test_model_activity.py:78#ModelActivityTests.assignment",
+      "tests/test_team_manager.py:77#ManagerFixture.task"
+    ],
+    "gx_core/persistence/records.py:197#record_worker_observation": [
+      "examples/p01_fixture.py:56#prepare"
+    ],
+    "gx_core/persistence/store.py:158#_resync_same_major": [
+      "gx_core/persistence/store.py:282#ensure_schema"
+    ],
+    "gx_core/persistence/store.py:63#_set_meta": [
+      "gx_core/persistence/store.py:83#_stamp",
+      "gx_core/persistence/store.py:84#_stamp",
+      "gx_core/persistence/store.py:85#_stamp",
+      "gx_core/persistence/store.py:87#_stamp"
+    ],
+    "gx_core/persistence/store.py:1117#acquire_coordinator_lease": [
+      "gx_core/orchestration/service.py:1292#coordinator_claim.work",
+      "gx_core/orchestration/service.py:589#run_start.create",
+      "tests/test_team_manager.py:40#ManagerFixture.setUp"
+    ],
+    "gx_core/persistence/store.py:598#append_event": [
+      "gx_core/artifacts/service.py:494#ArtifactService.register_materialized",
+      "gx_core/budgets/__init__.py:252#activate_project_budget",
+      "gx_core/budgets/__init__.py:371#create_root",
+      "gx_core/budgets/__init__.py:401#open_child",
+      "gx_core/budgets/__init__.py:486#_reserve",
+      "gx_core/budgets/__init__.py:633#draw_follower",
+      "gx_core/budgets/__init__.py:735#_settle",
+      "gx_core/budgets/__init__.py:820#release",
+      "gx_core/budgets/__init__.py:860#tighten",
+      "gx_core/budgets/__init__.py:996#raise_limit",
+      "gx_core/capabilities/environments.py:492#register",
+      "gx_core/capabilities/registry.py:248#register_candidate",
+      "gx_core/capabilities/registry.py:518#record_equivalence",
+      "gx_core/governance/approvals.py:296#_set_status",
+      "gx_core/governance/approvals.py:449#request",
+      "gx_core/governance/assets.py:384#submit_asset",
+      "gx_core/governance/assets.py:549#commit_promotion",
+      "gx_core/governance/assets.py:561#commit_promotion",
+      "gx_core/governance/checks.py:154#_append",
+      "gx_core/governance/checks.py:340#adjudicate",
+      "gx_core/governance/pointers.py:195#clear",
+      "gx_core/governance/pointers.py:93#_write",
+      "gx_core/governance/reviews.py:277#_insert",
+      "gx_core/governance/reviews.py:532#_request_review",
+      "gx_core/hostobs/codex_dispatch.py:606#record_claim_binding",
+      "gx_core/hostobs/codex_dispatch.py:687#record_verified_dispatch",
+      "gx_core/hostobs/codex_opaque_dispatch.py:418#_append",
+      "gx_core/hostobs/codex_opaque_dispatch.py:478#fence_claim_receipt",
+      "gx_core/hostobs/dispatch.py:223#record_handout",
+      "gx_core/hostobs/dispatch.py:247#record_launched",
+      "gx_core/hostobs/dispatch.py:266#close",
+      "gx_core/hostobs/dispatch.py:307#record_dispatch_failed",
+      "gx_core/hostobs/native_observation.py:174#record_claim",
+      "gx_core/hostobs/native_spawn.py:166#observe",
+      "gx_core/hostobs/native_spawn.py:229#reconcile",
+      "gx_core/hostobs/native_spawn.py:46#remember_path",
+      "gx_core/hostobs/pool.py:1031#HostPoolService._reserve_commit",
+      "gx_core/hostobs/pool.py:1267#HostPoolService._unclaimed_transfer_commit",
+      "gx_core/hostobs/pool.py:1459#HostPoolService._simple",
+      "gx_core/hostobs/pool.py:1465#HostPoolService._simple",
+      "gx_core/hostobs/pool.py:670#HostPoolService._adopt_existing_commit",
+      "gx_core/hostobs/pool.py:746#HostPoolService._write",
+      "gx_core/hostobs/pool.py:882#HostPoolService._register_commit",
+      "gx_core/hostobs/projection.py:477#_publish",
+      "gx_core/hostobs/projection.py:568#_withdraw",
+      "gx_core/jobs/bundles.py:213#judge",
+      "gx_core/jobs/leases.py:126#renew",
+      "gx_core/jobs/leases.py:443#adopt",
+      "gx_core/jobs/service.py:1288#JobService._cancel_unsettled",
+      "gx_core/jobs/service.py:1342#JobService._cancel_unreadable",
+      "gx_core/jobs/service.py:1873#JobService._settle",
+      "gx_core/jobs/service.py:693#JobService._admit",
+      "gx_core/knowledge/memory.py:221#MemoryService.write",
+      "gx_core/knowledge/memory.py:685#MemoryService.retract",
+      "gx_core/knowledge/memory.py:706#MemoryService.supersede",
+      "gx_core/orchestration/engine.py:1417#Engine._advance_nodes",
+      "gx_core/orchestration/engine.py:1490#Engine._node_failed",
+      "gx_core/orchestration/engine.py:1579#Engine._run_node",
+      "gx_core/orchestration/engine.py:1627#Engine._rewind",
+      "gx_core/orchestration/engine.py:1646#Engine._rewind",
+      "gx_core/orchestration/engine.py:1775#Engine._checked",
+      "gx_core/orchestration/engine.py:812#NodeContext.log",
+      "gx_core/orchestration/engine.py:998#Engine.begin_resume",
+      "gx_core/orchestration/expansion.py:173#expand",
+      "gx_core/orchestration/reactor.py:153#_record_refusal",
+      "gx_core/orchestration/reactor.py:329#_record_failure",
+      "gx_core/orchestration/reactor.py:378#_react_to",
+      "gx_core/orchestration/repin.py:165#ensure",
+      "gx_core/orchestration/service.py:1322#coordinator_claim.work",
+      "gx_core/orchestration/service.py:1330#coordinator_claim.work",
+      "gx_core/orchestration/service.py:1802#_finish_cancel",
+      "gx_core/orchestration/service.py:1935#run_control.work",
+      "gx_core/orchestration/service.py:575#run_start.create",
+      "gx_core/orchestration/service.py:582#run_start.create",
+      "gx_core/persistence/records.py:113#create_path",
+      "gx_core/persistence/records.py:175#create_task",
+      "gx_core/persistence/records.py:64#create_run",
+      "gx_core/persistence/store.py:1157#acquire_coordinator_lease",
+      "gx_core/persistence/store.py:1221#release_coordinator_lease",
+      "gx_core/persistence/store.py:1472#request_approval",
+      "gx_core/persistence/store.py:223#_resync_same_major",
+      "gx_core/persistence/store.py:782#transition",
+      "gx_core/planning/objective.py:340#_record_specification_for_run",
+      "gx_core/research/model_activity.py:56#_event",
+      "gx_core/teams/briefs.py:437#_record_withheld",
+      "gx_core/teams/manager.py:398#TeamManager._mutate",
+      "gx_core/teams/recovery.py:411#requeue_or_exhaust",
+      "gx_core/teams/recovery.py:468#settle",
+      "gx_core/teams/service.py:1581#TeamService.bind",
+      "gx_core/teams/service.py:1718#TeamService.finish_task",
+      "gx_core/teams/service.py:1941#TeamService._refuse_within_lease",
+      "gx_core/teams/service.py:2339#TeamService._release_failed",
+      "gx_core/teams/service.py:526#TeamService._compile_brief",
+      "gx_core/teams/service.py:676#TeamService._inspect_workers",
+      "gx_core/teams/service.py:780#TeamService._dispatch_failed",
+      "gx_core/teams/service.py:827#TeamService._settle_worker_holds",
+      "gx_core/teams/service.py:949#TeamService._end_chain"
+    ],
+    "gx_core/persistence/store.py:835#begin_idempotent": [
+      "gx_core/hostobs/codex_opaque_dispatch.py:538#handle",
+      "gx_core/orchestration/engine.py:764#NodeContext.once",
+      "gx_core/orchestration/expansion.py:136#expand",
+      "gx_core/orchestration/service.py:1424#_replayed_resume",
+      "gx_core/persistence/store.py:1001#run_idempotent",
+      "gx_core/research/model_activity.py:269#run_activity",
+      "gx_core/teams/manager.py:365#TeamManager._mutate",
+      "gx_core/teams/service.py:1208#TeamService._claim",
+      "gx_core/teams/service.py:1560#TeamService.bind",
+      "gx_core/teams/service.py:1689#TeamService.finish_task"
+    ],
+    "gx_core/persistence/store.py:655#bump_revision": [
+      "gx_core/hostobs/codex_opaque_dispatch.py:417#_append",
+      "gx_core/hostobs/pool.py:1265#HostPoolService._unclaimed_transfer_commit",
+      "gx_core/hostobs/pool.py:1453#HostPoolService._simple",
+      "gx_core/orchestration/engine.py:1578#Engine._run_node",
+      "gx_core/orchestration/engine.py:1645#Engine._rewind",
+      "gx_core/orchestration/repin.py:164#ensure",
+      "gx_core/orchestration/service.py:1329#coordinator_claim.work",
+      "gx_core/orchestration/service.py:1859#_maintenance_control.work",
+      "gx_core/persistence/store.py:756#transition",
+      "gx_core/teams/manager.py:393#TeamManager._mutate"
+    ],
+    "gx_core/persistence/store.py:1320#claim_outbox": [],
+    "gx_core/persistence/store.py:903#complete_idempotent": [
+      "gx_core/hostobs/codex_opaque_dispatch.py:571#handle",
+      "gx_core/orchestration/engine.py:775#NodeContext.once",
+      "gx_core/orchestration/expansion.py:180#expand",
+      "gx_core/persistence/store.py:1012#run_idempotent",
+      "gx_core/research/model_activity.py:294#run_activity",
+      "gx_core/research/model_activity.py:365#_execute",
+      "gx_core/teams/manager.py:388#TeamManager._mutate",
+      "gx_core/teams/manager.py:409#TeamManager._mutate",
+      "gx_core/teams/service.py:1315#TeamService._claim",
+      "gx_core/teams/service.py:1614#TeamService.bind",
+      "gx_core/teams/service.py:1726#TeamService.finish_task"
+    ],
+    "gx_core/persistence/store.py:1341#complete_outbox": [
+      "gx_core/orchestration/reactor.py:377#_react_to"
+    ],
+    "gx_core/persistence/store.py:1358#create_budget": [],
+    "gx_core/persistence/store.py:1246#enqueue_outbox": [
+      "gx_core/governance/approvals.py:304#_set_status",
+      "gx_core/governance/assets.py:533#commit_promotion",
+      "gx_core/hostobs/events.py:1169#_write_dispatch_records",
+      "gx_core/jobs/service.py:1072#JobService._end",
+      "gx_core/teams/service.py:1723#TeamService.finish_task",
+      "gx_core/teams/service.py:2174#TeamService._conclude"
+    ],
+    "gx_core/persistence/store.py:1090#expire_stale_leases": [],
+    "gx_core/persistence/store.py:1350#fail_outbox": [
+      "gx_core/orchestration/reactor.py:337#_record_failure"
+    ],
+    "gx_core/persistence/store.py:933#forget_idempotent": [
+      "gx_core/teams/service.py:1580#TeamService.bind"
+    ],
+    "gx_core/persistence/store.py:1018#issue_lease": [
+      "gx_core/teams/service.py:1285#TeamService._claim",
+      "tests/test_model_activity.py:115#ModelActivityTests.test_saved_answer_survives_reassignment",
+      "tests/test_model_activity.py:144#ModelActivityTests.test_lost_reply_blocks_duplicate_request_through_recovery",
+      "tests/test_model_activity.py:80#ModelActivityTests.assignment",
+      "tests/test_team_manager.py:102#ManagerFixture.known_verified_worker",
+      "tests/test_team_manager.py:93#ManagerFixture.known_task_lease"
+    ],
+    "gx_core/persistence/store.py:919#mark_idempotent_unknown": [
+      "gx_core/research/model_activity.py:363#_execute"
+    ],
+    "gx_core/persistence/store.py:1213#release_coordinator_lease": [],
+    "gx_core/persistence/store.py:1083#release_lease": [
+      "gx_core/teams/recovery.py:459#settle",
+      "gx_core/teams/service.py:1762#TeamService.validate_delivery",
+      "gx_core/teams/service.py:1924#TeamService._refuse_within_lease",
+      "gx_core/teams/service.py:2167#TeamService._conclude",
+      "gx_core/teams/service.py:2255#TeamService._hold",
+      "gx_core/teams/service.py:2430#TeamService.cancel_open",
+      "gx_core/teams/service.py:674#TeamService._inspect_workers",
+      "gx_core/teams/service.py:724#TeamService._hold_worker",
+      "gx_core/teams/service.py:907#TeamService._end_chain",
+      "tests/test_model_activity.py:114#ModelActivityTests.test_saved_answer_survives_reassignment",
+      "tests/test_model_activity.py:143#ModelActivityTests.test_lost_reply_blocks_duplicate_request_through_recovery",
+      "tests/test_team_manager.py:109#ManagerFixture.known_verified_worker",
+      "tests/test_team_manager.py:311#AssignmentAndHandoff.test_handoff_applies_after_worker_settlement_without_changing_task_id",
+      "tests/test_team_manager.py:324#AssignmentAndHandoff.test_unknown_job_keeps_handoff_pending_after_lease_expires",
+      "tests/test_v2_fencing.py:165#Fencing.test_released_lease_cannot_submit"
+    ],
+    "gx_core/persistence/store.py:1463#request_approval": [],
+    "gx_core/persistence/store.py:1168#require_coordinator_lease": [
+      "gx_core/orchestration/service.py:1251#require_coordinator",
+      "gx_core/persistence/store.py:1216#release_coordinator_lease"
+    ],
+    "gx_core/persistence/store.py:1437#save_checkpoint": [
+      "gx_core/orchestration/engine.py:627#StoreCheckpointer.save"
+    ],
+    "gx_core/persistence/store.py:955#settle_answer": [
+      "gx_core/orchestration/service.py:1416#run_resume",
+      "gx_core/orchestration/service.py:661#run_start"
+    ],
+    "gx_core/persistence/store.py:1401#spend_budget": [],
+    "gx_core/planning/objective.py:323#_record_specification_for_run": [
+      "gx_core/planning/objective.py:385#bind_frozen_specification",
+      "gx_core/planning/objective.py:402#record_specification"
+    ],
+    "gx_core/project_messages.py:11#enqueue": [
+      "gx_core/web/projects.py:87#feedback",
+      "tests/test_project_continuation.py:108#ProjectContinuation.test_queued_input_resumes_unchanged_original_work_only_once"
+    ],
+    "gx_core/project_messages.py:154#reconcile": [
+      "gx_core/hostobs/native_app_server.py:1738#run_session.reconcile_additions"
+    ],
+    "gx_core/project_messages.py:95#return_refused_steer": [
+      "gx_core/hostobs/native_app_server.py:1790#run_session.wait_for_turn"
+    ],
+    "gx_core/project_messages.py:65#take_for_turn": [
+      "gx_core/hostobs/native_app_server.py:1750#run_session.take_additions",
+      "tests/test_project_continuation.py:113#ProjectContinuation.test_queued_input_resumes_unchanged_original_work_only_once.launch",
+      "tests/test_web_bridge.py:113#WebBridgeTests.test_feedback_wakes_the_existing_driver_and_stays_queued_on_launch_failure",
+      "tests/test_web_bridge.py:74#WebBridgeTests.test_feedback_is_deduplicated_and_conflicts_are_visible",
+      "tests/test_web_bridge.py:75#WebBridgeTests.test_feedback_is_deduplicated_and_conflicts_are_visible"
+    ],
+    "gx_core/project_messages.py:84#update_delivery": [
+      "gx_core/hostobs/native_app_server.py:1772#run_session.record_delivery",
+      "tests/test_project_continuation.py:115#ProjectContinuation.test_queued_input_resumes_unchanged_original_work_only_once.launch"
+    ],
+    "gx_core/teams/manager.py:796#TeamManager._ack": [],
+    "gx_core/teams/manager.py:670#TeamManager._assign": [],
+    "gx_core/teams/manager.py:444#TeamManager._create": [],
+    "gx_core/teams/manager.py:559#TeamManager._grant": [],
+    "gx_core/teams/manager.py:693#TeamManager._handoff": [],
+    "gx_core/teams/manager.py:542#TeamManager._leader": [],
+    "gx_core/teams/manager.py:588#TeamManager._member": [],
+    "gx_core/teams/manager.py:336#TeamManager._mutate": [
+      "gx_core/teams/manager.py:440#TeamManager.manage",
+      "gx_core/teams/manager.py:740#TeamManager.message"
+    ],
+    "gx_core/teams/manager.py:633#TeamManager._publish_context_and_brief": [
+      "gx_core/teams/manager.py:689#TeamManager._assign",
+      "gx_core/teams/manager.py:728#TeamManager._handoff"
+    ],
+    "gx_core/teams/manager.py:488#TeamManager._reparent": [],
+    "gx_core/teams/manager.py:471#TeamManager._revise": [],
+    "gx_core/teams/manager.py:744#TeamManager._send": [],
+    "gx_core/teams/manager.py:501#TeamManager._transition": [],
+    "gx_core/teams/recovery.py:372#requeue_or_exhaust": [
+      "gx_core/teams/recovery.py:481#settle",
+      "gx_core/teams/recovery.py:506#settle",
+      "gx_core/teams/recovery.py:515#settle",
+      "gx_core/teams/service.py:2345#TeamService._release_failed",
+      "gx_core/teams/service.py:683#TeamService._inspect_workers"
+    ],
+    "gx_core/teams/service.py:512#TeamService._compile_brief": [
+      "gx_core/teams/manager.py:648#TeamManager._publish_context_and_brief",
+      "gx_core/teams/service.py:1302#TeamService._claim",
+      "gx_core/teams/service.py:510#TeamService._enter_ready"
+    ],
+    "gx_core/teams/service.py:2125#TeamService._conclude": [
+      "gx_core/teams/service.py:1776#TeamService.validate_delivery",
+      "gx_core/teams/service.py:1866#TeamService.submit.work",
+      "gx_core/teams/service.py:2309#TeamService._release_held"
+    ],
+    "gx_core/teams/service.py:876#TeamService._end_chain": [
+      "gx_core/teams/service.py:795#TeamService._settle_failed_dispatches",
+      "gx_core/teams/service.py:833#TeamService._settle_worker_holds"
+    ],
+    "gx_core/teams/service.py:2190#TeamService._insert_submission": [
+      "gx_core/teams/service.py:1716#TeamService.finish_task",
+      "gx_core/teams/service.py:2153#TeamService._conclude",
+      "gx_core/teams/service.py:2246#TeamService._hold"
+    ],
+    "gx_core/teams/service.py:2322#TeamService._release_failed": [
+      "gx_core/teams/service.py:2289#TeamService._release_held",
+      "gx_core/teams/service.py:2292#TeamService._release_held",
+      "gx_core/teams/service.py:2316#TeamService._release_held",
+      "gx_core/teams/service.py:2318#TeamService._release_held"
+    ],
+    "gx_core/teams/service.py:799#TeamService._settle_worker_holds": [
+      "gx_core/teams/service.py:763#TeamService._settle"
+    ],
+    "gx_core/teams/service.py:290#TeamService.create_task": [
+      "gx_core/governance/reviews.py:522#_request_review",
+      "gx_core/teams/service.py:446#TeamService.create_tasks"
+    ],
+    "gx_core/teams/service.py:1729#TeamService.validate_delivery": [
+      "gx_core/orchestration/reactor.py:182#on_submission_recorded",
+      "tests/test_delivery_manifest.py:241#HistoricalDelivery.test_reopen_reference_only_delivery_after_finish_and_cleanup",
+      "tests/test_native_facades.py:222#NativeFinish.test_recording_and_validation_recover_separately_after_ack_loss"
+    ]
+  },
+  "state_machines": {
+    "run": {
+      "definition": "contracts/states.json:6",
+      "initial": "CREATED",
+      "terminal": [
+        "COMPLETED",
+        "STOPPED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "transitions": {
+        "CREATED": [
+          "AUDITING",
+          "PLANNING",
+          "WAITING_APPROVAL",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "AUDITING": [
+          "PLANNING",
+          "ACTIVE",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "PLANNING": [
+          "ACTIVE",
+          "WAITING_APPROVAL",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "ACTIVE": [
+          "WAITING_CLIENT",
+          "WAITING_EXTERNAL_JOB",
+          "WAITING_APPROVAL",
+          "EVALUATING",
+          "PLANNING",
+          "COMPLETED",
+          "STOPPED",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "WAITING_CLIENT": [
+          "ACTIVE",
+          "WAITING_EXTERNAL_JOB",
+          "WAITING_APPROVAL",
+          "PAUSED",
+          "STOPPED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "WAITING_EXTERNAL_JOB": [
+          "ACTIVE",
+          "WAITING_CLIENT",
+          "WAITING_APPROVAL",
+          "PAUSED",
+          "STOPPED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "WAITING_APPROVAL": [
+          "ACTIVE",
+          "WAITING_CLIENT",
+          "WAITING_EXTERNAL_JOB",
+          "PLANNING",
+          "PAUSED",
+          "STOPPED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "EVALUATING": [
+          "ACTIVE",
+          "COMPLETED",
+          "STOPPED",
+          "PAUSED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "PAUSED": [
+          "ACTIVE",
+          "PLANNING",
+          "WAITING_CLIENT",
+          "WAITING_EXTERNAL_JOB",
+          "WAITING_APPROVAL",
+          "STOPPED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "COMPLETED": [],
+        "STOPPED": [],
+        "FAILED": [],
+        "CANCELLED": []
+      }
+    },
+    "path": {
+      "definition": "contracts/states.json:153",
+      "initial": "DRAFT",
+      "terminal": [
+        "SUPERSEDED"
+      ],
+      "transitions": {
+        "DRAFT": [
+          "VALIDATED",
+          "REJECTED",
+          "BLOCKED",
+          "SUPERSEDED"
+        ],
+        "VALIDATED": [
+          "SELECTED",
+          "REJECTED",
+          "BLOCKED",
+          "SUPERSEDED"
+        ],
+        "SELECTED": [
+          "EXECUTING",
+          "BLOCKED",
+          "REJECTED",
+          "SUPERSEDED"
+        ],
+        "EXECUTING": [
+          "EVALUATED",
+          "BLOCKED",
+          "INCONCLUSIVE",
+          "REJECTED",
+          "SUPERSEDED"
+        ],
+        "EVALUATED": [
+          "RETAINED",
+          "REJECTED",
+          "INCONCLUSIVE",
+          "SUPERSEDED"
+        ],
+        "RETAINED": [
+          "SUPERSEDED"
+        ],
+        "REJECTED": [
+          "SUPERSEDED"
+        ],
+        "INCONCLUSIVE": [
+          "SUPERSEDED"
+        ],
+        "BLOCKED": [
+          "SELECTED",
+          "SUPERSEDED"
+        ],
+        "SUPERSEDED": []
+      }
+    },
+    "task": {
+      "definition": "contracts/states.json:238",
+      "initial": "PENDING",
+      "terminal": [
+        "ACCEPTED",
+        "CANCELLED"
+      ],
+      "transitions": {
+        "PENDING": [
+          "READY",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "READY": [
+          "CLAIMED",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "CLAIMED": [
+          "RUNNING",
+          "READY",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "RUNNING": [
+          "SUBMITTED",
+          "RETRYABLE",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "SUBMITTED": [
+          "VALIDATING",
+          "CANCELLED"
+        ],
+        "VALIDATING": [
+          "ACCEPTED",
+          "REJECTED",
+          "RETRYABLE",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "REJECTED": [
+          "READY",
+          "RETRYABLE",
+          "CANCELLED"
+        ],
+        "RETRYABLE": [
+          "READY",
+          "BLOCKED",
+          "CANCELLED"
+        ],
+        "BLOCKED": [
+          "READY",
+          "VALIDATING",
+          "CANCELLED"
+        ],
+        "ACCEPTED": [],
+        "CANCELLED": []
+      }
+    },
+    "job": {
+      "definition": "contracts/states.json:323",
+      "initial": "CREATED",
+      "terminal": [
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "transitions": {
+        "CREATED": [
+          "SUBMITTING",
+          "CANCELLED",
+          "FAILED"
+        ],
+        "SUBMITTING": [
+          "SUBMITTED",
+          "OUTCOME_UNKNOWN",
+          "FAILED"
+        ],
+        "SUBMITTED": [
+          "QUEUED",
+          "RUNNING",
+          "SUCCEEDED",
+          "FAILED",
+          "CANCEL_REQUESTED",
+          "OUTCOME_UNKNOWN"
+        ],
+        "QUEUED": [
+          "RUNNING",
+          "CANCEL_REQUESTED",
+          "FAILED",
+          "OUTCOME_UNKNOWN"
+        ],
+        "RUNNING": [
+          "SUCCEEDED",
+          "FAILED",
+          "CANCEL_REQUESTED",
+          "OUTCOME_UNKNOWN"
+        ],
+        "CANCEL_REQUESTED": [
+          "CANCELLED",
+          "SUCCEEDED",
+          "FAILED",
+          "OUTCOME_UNKNOWN"
+        ],
+        "OUTCOME_UNKNOWN": [
+          "SUBMITTED",
+          "QUEUED",
+          "RUNNING",
+          "SUCCEEDED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "SUCCEEDED": [],
+        "FAILED": [],
+        "CANCELLED": []
+      }
+    },
+    "asset": {
+      "definition": "contracts/states.json:401",
+      "initial": "DRAFT",
+      "terminal": [
+        "DEPRECATED"
+      ],
+      "transitions": {
+        "DRAFT": [
+          "REVIEWED",
+          "QUARANTINED",
+          "DEPRECATED"
+        ],
+        "QUARANTINED": [
+          "REVIEWED",
+          "DEPRECATED"
+        ],
+        "REVIEWED": [
+          "VALIDATED",
+          "QUARANTINED",
+          "DEPRECATED"
+        ],
+        "VALIDATED": [
+          "APPROVED",
+          "QUARANTINED",
+          "DEPRECATED"
+        ],
+        "APPROVED": [
+          "ACTIVE",
+          "QUARANTINED",
+          "DEPRECATED"
+        ],
+        "ACTIVE": [
+          "DEPRECATED"
+        ],
+        "DEPRECATED": []
+      }
+    },
+    "approval": {
+      "definition": "contracts/states.json:453",
+      "initial": "PENDING",
+      "terminal": [
+        "DENIED",
+        "EXPIRED",
+        "REVOKED"
+      ],
+      "transitions": {
+        "PENDING": [
+          "GRANTED",
+          "DENIED",
+          "EXPIRED"
+        ],
+        "GRANTED": [
+          "REVOKED",
+          "EXPIRED"
+        ],
+        "DENIED": [],
+        "EXPIRED": [],
+        "REVOKED": []
+      }
+    },
+    "evidence": {
+      "definition": "contracts/states.json:490",
+      "initial": "EXTRACTED",
+      "terminal": [
+        "REJECTED",
+        "WITHDRAWN"
+      ],
+      "transitions": {
+        "EXTRACTED": [
+          "LOCATOR_VERIFIED",
+          "LOCATOR_UNRESOLVED",
+          "VALUE_FROM_FIGURE",
+          "REJECTED"
+        ],
+        "IMPORTED_UNREVIEWED": [
+          "LOCATOR_VERIFIED",
+          "LOCATOR_UNRESOLVED",
+          "VALUE_FROM_FIGURE",
+          "REJECTED"
+        ],
+        "LOCATOR_UNRESOLVED": [
+          "LOCATOR_VERIFIED",
+          "VALUE_FROM_FIGURE",
+          "REJECTED"
+        ],
+        "LOCATOR_VERIFIED": [
+          "REVIEWED",
+          "DISPUTED",
+          "NEEDS_REVIEW",
+          "REJECTED"
+        ],
+        "VALUE_FROM_FIGURE": [
+          "REVIEWED",
+          "DISPUTED",
+          "NEEDS_REVIEW",
+          "REJECTED"
+        ],
+        "REVIEWED": [
+          "NEEDS_REVIEW",
+          "DISPUTED",
+          "WITHDRAWN"
+        ],
+        "DISPUTED": [
+          "REVIEWED",
+          "NEEDS_REVIEW",
+          "REJECTED",
+          "WITHDRAWN"
+        ],
+        "NEEDS_REVIEW": [
+          "REVIEWED",
+          "DISPUTED",
+          "REJECTED",
+          "WITHDRAWN"
+        ],
+        "REJECTED": [],
+        "WITHDRAWN": []
+      }
+    },
+    "eval_spec": {
+      "definition": "contracts/states.json:574",
+      "initial": "DRAFT",
+      "terminal": [
+        "INVALIDATED",
+        "SUPERSEDED",
+        "ABANDONED"
+      ],
+      "transitions": {
+        "DRAFT": [
+          "CASES_DECLARED",
+          "ABANDONED"
+        ],
+        "CASES_DECLARED": [
+          "CASES_PASSED",
+          "ABANDONED"
+        ],
+        "CASES_PASSED": [
+          "REVIEWED",
+          "ABANDONED"
+        ],
+        "REVIEWED": [
+          "FROZEN",
+          "ABANDONED"
+        ],
+        "FROZEN": [
+          "INVALIDATED",
+          "SUPERSEDED"
+        ],
+        "INVALIDATED": [],
+        "SUPERSEDED": [],
+        "ABANDONED": []
+      }
+    },
+    "environment": {
+      "definition": "contracts/states.json:631",
+      "initial": "UNPROBED",
+      "terminal": [
+        "RETIRED"
+      ],
+      "transitions": {
+        "UNPROBED": [
+          "HEALTHY",
+          "DEGRADED",
+          "BROKEN",
+          "RETIRED"
+        ],
+        "HEALTHY": [
+          "DEGRADED",
+          "BROKEN",
+          "UNPROBED",
+          "RETIRED"
+        ],
+        "DEGRADED": [
+          "HEALTHY",
+          "BROKEN",
+          "UNPROBED",
+          "RETIRED"
+        ],
+        "BROKEN": [
+          "UNPROBED",
+          "RETIRED"
+        ],
+        "RETIRED": []
+      }
+    },
+    "source": {
+      "definition": "contracts/states.json:677",
+      "initial": "REGISTERED",
+      "terminal": [
+        "RETRACTED",
+        "SUPERSEDED"
+      ],
+      "transitions": {
+        "REGISTERED": [
+          "ACQUIRED",
+          "UNAVAILABLE",
+          "RETRACTED",
+          "SUPERSEDED"
+        ],
+        "ACQUIRED": [
+          "PARSED",
+          "UNAVAILABLE",
+          "RETRACTED",
+          "SUPERSEDED"
+        ],
+        "PARSED": [
+          "RETRACTED",
+          "SUPERSEDED"
+        ],
+        "UNAVAILABLE": [
+          "ACQUIRED",
+          "RETRACTED",
+          "SUPERSEDED"
+        ],
+        "RETRACTED": [],
+        "SUPERSEDED": []
+      }
+    },
+    "gap": {
+      "definition": "contracts/states.json:725",
+      "initial": "OPEN",
+      "terminal": [
+        "SUPERSEDED"
+      ],
+      "transitions": {
+        "OPEN": [
+          "COVERED",
+          "UNRESOLVABLE",
+          "SUPERSEDED"
+        ],
+        "COVERED": [
+          "OPEN",
+          "SUPERSEDED"
+        ],
+        "UNRESOLVABLE": [
+          "OPEN",
+          "SUPERSEDED"
+        ],
+        "SUPERSEDED": []
+      }
+    },
+    "objective": {
+      "definition": "contracts/states.json:758",
+      "initial": "DRAFT",
+      "terminal": [
+        "BLOCKED"
+      ],
+      "transitions": {
+        "DRAFT": [
+          "SCREENED",
+          "BLOCKED"
+        ],
+        "SCREENED": [
+          "CONFIRMED",
+          "NEEDS_HUMAN_REVIEW",
+          "BLOCKED"
+        ],
+        "NEEDS_HUMAN_REVIEW": [
+          "CONFIRMED",
+          "BLOCKED"
+        ],
+        "CONFIRMED": [
+          "BLOCKED"
+        ],
+        "BLOCKED": []
+      }
+    },
+    "rsi_cycle": {
+      "definition": "contracts/states.json:796",
+      "initial": "PROPOSED",
+      "terminal": [
+        "RETAINED_FAILED",
+        "ROLLED_BACK",
+        "ABANDONED"
+      ],
+      "transitions": {
+        "PROPOSED": [
+          "CANDIDATE_REGISTERED",
+          "RETAINED_FAILED",
+          "ABANDONED"
+        ],
+        "CANDIDATE_REGISTERED": [
+          "CHECKS_PASSED",
+          "RETAINED_FAILED",
+          "ABANDONED"
+        ],
+        "CHECKS_PASSED": [
+          "DEV_COMPARED",
+          "RETAINED_FAILED",
+          "ABANDONED"
+        ],
+        "DEV_COMPARED": [
+          "FINAL_COMPARED",
+          "RETAINED_FAILED",
+          "ABANDONED"
+        ],
+        "FINAL_COMPARED": [
+          "PROMOTED",
+          "RETAINED_FAILED"
+        ],
+        "PROMOTED": [
+          "ROLLED_BACK"
+        ],
+        "RETAINED_FAILED": [],
+        "ROLLED_BACK": [],
+        "ABANDONED": []
+      }
+    },
+    "plugin_runtime": {
+      "definition": "contracts/states.json:856",
+      "initial": "DISABLED",
+      "terminal": [],
+      "transitions": {
+        "DISABLED": [
+          "STARTING"
+        ],
+        "STARTING": [
+          "HEALTHY",
+          "DEGRADED",
+          "FAILED",
+          "STOPPING"
+        ],
+        "HEALTHY": [
+          "DEGRADED",
+          "STOPPING",
+          "FAILED"
+        ],
+        "DEGRADED": [
+          "HEALTHY",
+          "STOPPING",
+          "FAILED"
+        ],
+        "STOPPING": [
+          "DISABLED",
+          "FAILED"
+        ],
+        "FAILED": [
+          "STARTING",
+          "DISABLED"
+        ]
+      }
+    },
+    "worker_observation": {
+      "definition": "contracts/states.json:900",
+      "initial": "requested",
+      "terminal": [
+        "observed_finished",
+        "failed",
+        "unavailable"
+      ],
+      "transitions": {
+        "requested": [
+          "observed_started",
+          "reported_running",
+          "failed",
+          "unavailable"
+        ],
+        "observed_started": [
+          "reported_running",
+          "reported_finished",
+          "observed_finished",
+          "failed",
+          "unavailable"
+        ],
+        "reported_running": [
+          "reported_finished",
+          "observed_finished",
+          "failed",
+          "unavailable"
+        ],
+        "reported_finished": [
+          "observed_finished"
+        ],
+        "observed_finished": [],
+        "failed": [],
+        "unavailable": []
+      }
+    },
+    "reference_review": {
+      "definition": "contracts/states.json:954",
+      "initial": "DISCOVERED",
+      "terminal": [
+        "ELIGIBLE_FOR_INTEGRATION",
+        "METHOD_ONLY",
+        "UNVERIFIED",
+        "REJECTED",
+        "DEFERRED"
+      ],
+      "transitions": {
+        "DISCOVERED": [
+          "PRIMARY_SOURCE_READ",
+          "OFFICIAL_DOC_SUBSTITUTE",
+          "UNVERIFIED",
+          "REJECTED",
+          "DEFERRED"
+        ],
+        "OFFICIAL_DOC_SUBSTITUTE": [
+          "REPO_IDENTITY_VERIFIED",
+          "METHOD_ONLY",
+          "UNVERIFIED",
+          "DEFERRED"
+        ],
+        "PRIMARY_SOURCE_READ": [
+          "REPO_IDENTITY_VERIFIED",
+          "METHOD_ONLY",
+          "UNVERIFIED",
+          "DEFERRED"
+        ],
+        "REPO_IDENTITY_VERIFIED": [
+          "SOURCE_PINNED",
+          "METHOD_ONLY",
+          "DEFERRED"
+        ],
+        "SOURCE_PINNED": [
+          "STATIC_REVIEWED",
+          "DEFERRED",
+          "REJECTED"
+        ],
+        "STATIC_REVIEWED": [
+          "ISOLATED_SMOKE_TESTED",
+          "ELIGIBLE_FOR_INTEGRATION",
+          "METHOD_ONLY",
+          "DEFERRED",
+          "REJECTED"
+        ],
+        "ISOLATED_SMOKE_TESTED": [
+          "ADAPTER_VALIDATED",
+          "ELIGIBLE_FOR_INTEGRATION",
+          "DEFERRED",
+          "REJECTED"
+        ],
+        "ADAPTER_VALIDATED": [
+          "ELIGIBLE_FOR_INTEGRATION",
+          "DEFERRED",
+          "REJECTED"
+        ],
+        "ELIGIBLE_FOR_INTEGRATION": [],
+        "METHOD_ONLY": [],
+        "UNVERIFIED": [],
+        "REJECTED": [],
+        "DEFERRED": []
+      }
+    },
+    "team": {
+      "definition": "contracts/states.json:1036",
+      "initial": "CREATED",
+      "terminal": [
+        "CLOSED"
+      ],
+      "transitions": {
+        "CREATED": [
+          "ACTIVE",
+          "DRAINING"
+        ],
+        "ACTIVE": [
+          "PAUSED",
+          "DRAINING"
+        ],
+        "PAUSED": [
+          "ACTIVE",
+          "DRAINING"
+        ],
+        "DRAINING": [
+          "CLOSED"
+        ],
+        "CLOSED": []
+      }
+    }
+  }
+}

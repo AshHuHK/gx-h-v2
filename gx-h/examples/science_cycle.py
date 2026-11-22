@@ -38,7 +38,7 @@ def read_inputs(args):
         )
     inputs = {
         "fixture_instance": args.instance,
-        "max_rounds": 2,
+        "max_rounds": getattr(args, "max_rounds", None) or 2,
         "proposal": {"paths": paths, "threshold": -0.25},
     }
     if args.evaluator:
@@ -275,11 +275,12 @@ def execute(args):
                     },
                 )
                 run = find_run(conn, args.instance)
-            elif args.fail_route or args.evaluator or args.execution_profiles:
+            elif args.fail_route or args.evaluator or args.execution_profiles or args.max_rounds is not None:
                 _, requested = read_inputs(args)
                 saved_inputs = store.loads(run, "inputs_json")["inputs"]
                 options = (
                     ("proposal", args.fail_route),
+                    ("max_rounds", args.max_rounds is not None),
                     ("evaluator", args.evaluator),
                     ("execution_profiles", args.execution_profiles),
                 )
@@ -325,6 +326,7 @@ def main():
         "--state", type=Path, required=True, help="Parent directory for the disposable offline_native store"
     )
     p.add_argument("--instance", default="main")
+    p.add_argument("--max-rounds", type=int)
     p.add_argument("--fail-route", choices=["path-a", "path-b"])
     p.add_argument("--evaluator", choices=["1", "2"])
     p.add_argument("--execution-profiles", type=Path)

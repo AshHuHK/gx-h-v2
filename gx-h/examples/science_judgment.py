@@ -10,6 +10,7 @@ def judge(artifacts, task_input):
     observations = {
         route["path_id"]: artifacts.read_json(route["observations_ref"])["observations"]
         for route in routes if route["status"] == "SUCCEEDED"
+        and route.get("outcome_kind", "valid_scientific_outcome") == "valid_scientific_outcome"
     }
     if task_input["output_kind"] == "science_assessment":
         findings = []
@@ -27,7 +28,8 @@ def judge(artifacts, task_input):
                     best = max(point["score"] for point in observations[path])
                     meets = best >= threshold
                 comparison = "reached" if meets else "fell below"
-                finding.update(supported=meets,
+                expectation = next(p for p in proposal["paths"] if p["id"] == path).get("expected_reaches_threshold", True)
+                finding.update(supported=meets == expectation,
                                reason=f"Best measured score {best:g} {comparison} the threshold {threshold:g}.")
             else:
                 finding.update(supported=None, reason=f"Job {route['job_id']} ended {route['status']} "

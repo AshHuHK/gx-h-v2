@@ -1,0 +1,100 @@
+{
+  "cli": "codex-cli 0.169.0",
+  "profile": "stable declarations plus experimental methods and fields",
+  "commands": [
+    {
+      "command": [
+        "codex",
+        "app-server",
+        "generate-ts",
+        "--out",
+        "/tmp/gx-public-schema-1l2_wb_k"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.205,
+      "stdout": "",
+      "stderr": "WARNING: failed to clean up stale arg0 temp dirs: Cross-device link (os error 18)\n"
+    },
+    {
+      "command": [
+        "codex",
+        "app-server",
+        "generate-json-schema",
+        "--out",
+        "/tmp/gx-public-schema-1l2_wb_k"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.139,
+      "stdout": "",
+      "stderr": "WARNING: failed to clean up stale arg0 temp dirs: Cross-device link (os error 18)\n"
+    },
+    {
+      "command": [
+        "codex",
+        "app-server",
+        "generate-ts",
+        "--out",
+        "generated/codex-schema",
+        "--experimental"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 1.284,
+      "stdout": "",
+      "stderr": "WARNING: failed to clean up stale arg0 temp dirs: Cross-device link (os error 18)\n"
+    },
+    {
+      "command": [
+        "codex",
+        "app-server",
+        "generate-json-schema",
+        "--out",
+        "generated/codex-schema",
+        "--experimental"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 0.759,
+      "stdout": "",
+      "stderr": "WARNING: failed to clean up stale arg0 temp dirs: Cross-device link (os error 18)\n"
+    }
+  ],
+  "stable": {
+    "ts": 784,
+    "json": 329,
+    "ts_dynamicTools": false,
+    "methods": {
+      "thread/start": true,
+      "thread/resume": true,
+      "turn/start": true,
+      "turn/steer": true,
+      "turn/interrupt": true,
+      "thread/goal/set": true,
+      "thread/goal/get": true,
+      "thread/goal/clear": true,
+      "thread/turns/list": true,
+      "thread/items/list": true,
+      "thread/compact/start": true
+    },
+    "origin": true,
+    "sha256_of_sorted_file_hashes": "c5e099dbea42fac3d457d2fcf7ff7a5cbb7b927ba03c7fd14dcf39edd67c2ced"
+  },
+  "experimental": {
+    "ts": 951,
+    "json": 479,
+    "ts_dynamicTools": true,
+    "methods": {
+      "thread/start": true,
+      "thread/resume": true,
+      "turn/start": true,
+      "turn/steer": true,
+      "turn/interrupt": true,
+      "thread/goal/set": true,
+      "thread/goal/get": true,
+      "thread/goal/clear": true,
+      "thread/turns/list": true,
+      "thread/items/list": true,
+      "thread/compact/start": true
+    },
+    "origin": true,
+    "sha256_of_sorted_file_hashes": "b68eaee2119b5186444cb13280ff04b011ab04b87015c8b993da74d53079468a"
+  }
+}

@@ -4,9 +4,11 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+import time
 import uuid
 from pathlib import Path
 
+from .. import metrics
 from ..artifacts.service import ArtifactService
 from ..domain import clock, ids, machines
 from ..errors import GxError, HoldActive, IllegalTransition, OutcomeUnknown, ScopeDenied, SchemaInvalid
@@ -16,8 +18,10 @@ from ..persistence import records, store
 from ..scheduling import dispatch as scheduler, snapshot
 from ..teams import recovery
 from ..teams.service import TeamService, default_lease_seconds
+from . import compute
 from . import profiles
-from . import science_inputs, waits
+from ..orchestration.service import hooks_for_run
+from . import activity, waits
 
 
 def _tool(name, description, key, schema):
@@ -36,6 +40,7 @@ WORKER_TOOLS = (
      "inputSchema": {"type": "object", "properties": {"ref": {"type": "string"},
                      "offset": {"type": "integer", "minimum": 0}}, "required": ["ref"],
                      "additionalProperties": False}},
+    *compute.TOOLS,
     _tool("gx_wait_job", "Wait for your current attempt's GX job. End this turn after parking.",
           "job_id", {"type": "string"}),
     _tool("gx_submit_product", "Submit the required scientific product as one JSON object for GX validation.",
@@ -53,6 +58,7 @@ WORKER_INSTRUCTIONS = (
     "Read gx_task_context for applicable supplemental evidence and the latest requirements after a change. "
     "Write the scientific product yourself and submit it through gx_submit_product. You may delegate "
     "short-lived analyses to native subagents. Give each child the exact artifact references it needs. "
+    "For compute use gx_capability_inspect, gx_job_submit, and gx_wait_job as available; end the turn after parking. "
     "A direct child may call gx_read_artifact for a reference available to this root. If GX is verifying "
     "the child, retry the read. Only this root may submit or wait for a job. Conclude after delivery."
 )
@@ -109,6 +115,8 @@ class Roots:
         self._ordinary_forks = set()
         self._goal_queue = set()
         self.delivery = RootDelivery(self)
+        self.heartbeats = activity.Heartbeats(self)
+        self.account_provider = "openai"
 
     def __enter__(self):
         from .profiles import CODEX_VERSION, clash_env
@@ -117,6 +125,8 @@ class Roots:
         document = json.loads(self.run["agent_policy_json"] or "{}")
         routes = document.get("p0_role_profiles", {})
         providers = {route["provider"] for route in routes.values()} or {provider}
+        if selection.get("test_mode") and len(providers) == 1:
+            self.account_provider = next(iter(providers))
         env = clash_env()
         if self.env is not None:
             proxy = {key:value for key,value in env.items() if key.lower() in
@@ -132,7 +142,8 @@ class Roots:
         try:
             self.client.start()
             initialized = self._request("initialize", {"clientInfo":{"name":"gx_p0","version":"1"},
-                                                        "capabilities":{"experimentalApi":True}})
+                                        "capabilities":{"experimentalApi":True,
+                                                        "optOutNotificationMethods":list(activity.OPT_OUT)}})
             # The official initialize user agent begins with originator/CARGO_PKG_VERSION.
             version = initialized.get("userAgent","").partition(" (")[0].rsplit("/",1)[-1]
             if version != CODEX_VERSION:
@@ -184,6 +195,9 @@ class Roots:
     def _observe(self, received):
         msg = received.message
         method, p = msg["method"], msg.get("params", {})
+        if method == "account/rateLimits/updated":
+            activity.account_update(self.conn, self.account_provider, p.get("rateLimits"))
+            return
         self.delivery.observe_descendant(method,p)
         thread = p.get("threadId")
         if method == "thread/started":
@@ -208,11 +222,15 @@ class Roots:
             if self.active_turns.get(thread) == p["turn"]["id"]:
                 self.active_turns.pop(thread, None)
         self.delivery.observe(method, p)
+        if method in activity.PROGRESS:
+            self.heartbeats.observed(thread, p.get("turnId") or (p.get("turn") or {}).get("id"))
         if method == "turn/completed" and thread not in self._meter_only:
             self._ended_turn(thread, p["turn"])
 
     def _ended_turn(self, thread_id, turn):
         row = self._binding(thread_id)
+        if activity.terminal_backoff(self.conn, row, turn):
+            return
         if not row["task_id"] or row["wait_job_id"]:
             return
         with store.transaction(self.conn):
@@ -236,14 +254,13 @@ class Roots:
             self.conn.execute("UPDATE p0_roots SET goal_desired='paused' WHERE thread_id=?", (thread_id,))
             self._goal_queue.add(thread_id)
             if clean:
-                store.release_lease(self.conn, row["lease_id"])
-                if task["status"] == "RUNNING":
-                    store.transition(self.conn,machine="task",subject_id=row["task_id"],to_state="RETRYABLE",
-                                     actor="backend",reason=reason,bump=False)
-                recovery.requeue_or_exhaust(self.conn,row["task_id"],reason=reason,
-                                            enter_ready=TeamService(self.conn)._enter_ready)
+                TeamService(self.conn).recover_failed_attempt(
+                    task_id=row["task_id"], lease_ref=row["lease_id"], reason=reason)
 
     def poll(self, seconds=0.1):
+        self.delivery.maintain()
+        self.delivery.flush_interrupts()
+        self.heartbeats.poll()
         if self._pending_child_reads:
             self._verify_child_reads()
         self._flush_goals()
@@ -333,10 +350,14 @@ class Roots:
             view = TeamService(self.conn).task(task_id)
             packet = {k: view[k] for k in ("task_id", "role", "kind", "input", "acceptance",
                                            "required_artifacts", "previous_attempts", "dependencies")}
-            current = science_inputs.task_context(self.conn, self.run_id, task_id)
-            packet.update(attempt=attempt, intent=current["intent"], supplement_sources=current["supplement_sources"],
+            current = hooks_for_run(self.conn, self.run_id).build_task_context(self.conn, self.run_id, task_id, attempt)
+            packet.update(attempt=attempt, run_objective=self.run["objective"],
+                          intent=current["intent"], supplement_sources=current["supplement_sources"],
                           provider=provider, model=profile["model"], effort=profile["effort"],
                           gx_tools=tool_names, token_budget=self.token_budget)
+            extra = {name: value for name, value in current.items() if name not in ("task_id", "intent", "supplement_sources")}
+            if extra:
+                packet["workflow_context"] = extra
             brief = "GX task brief\n" + json.dumps(packet, ensure_ascii=False)
         self.conn.execute("INSERT INTO p0_roots(root_key,run_id,task_id,attempt,lease_id,cwd,role,model,"
                           "effort,brief,provider,tool_names_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (key,self.run_id,
@@ -344,7 +365,7 @@ class Roots:
                           str(rootdir), role, profile["model"], profile["effort"], brief, provider,
                           ids.canonical_json(tool_names) if "provider" in profile else None))
         if task is not None:
-            self._allow_refs(key, [packet["input"], current["supplement_sources"]])
+            self._allow_refs(key, [packet["input"], current])
         return self._row(key)
 
     def _allow_refs(self, root_key, value):
@@ -355,6 +376,7 @@ class Roots:
 
     def _claim(self, task_id):
         with store.transaction(self.conn):
+            recovered = False
             task = self.conn.execute("SELECT * FROM tasks WHERE task_id=? AND run_id=?",
                                      (task_id, self.run_id)).fetchone()
             if not task:
@@ -367,26 +389,41 @@ class Roots:
                 lease = self.conn.execute("SELECT * FROM leases WHERE lease_id=?",(previous["lease_id"],)).fetchone()
                 if lease["released_at"] is not None or lease["attempt"] != task["attempt"]:
                     raise ScopeDenied("the original root attempt was fenced")
+                from .team_admission import resume_if_admitted
+                resume_if_admitted(self.conn, previous)
                 if waits.is_waiting(self.conn, previous["root_key"]) or recovery.live_lease(self.conn, task_id):
                     return dict(previous)
                 # No external wait protects this expired lease. Keep the previous root/brief and
                 # fence it before the scheduler admits a replacement.
-                store.release_lease(self.conn,lease["lease_id"])
-                if task["status"] == "RUNNING":
-                    store.transition(self.conn,machine="task",subject_id=task_id,to_state="RETRYABLE",
-                                     actor="backend",reason="expired P0 root lease",bump=False)
-                recovery.requeue_or_exhaust(self.conn,task_id,reason="expired P0 root lease",
-                                            enter_ready=TeamService(self.conn)._enter_ready)
+                recovered = TeamService(self.conn).recover_failed_attempt(
+                    task_id=task_id, lease_ref=lease["lease_id"], reason="expired P0 root lease")
+                if recovered == "BLOCKED":
+                    return None
                 task = self.conn.execute("SELECT * FROM tasks WHERE task_id=?",(task_id,)).fetchone()
+                recovered = True
             if task["status"] == "READY" and not records.dependencies_satisfied(self.conn,task_id)[0]:
                 return None
             if (task["status"] != "READY" or recovery.consumed(self.conn, task) >= task["max_attempts"]):
                 raise IllegalTransition("this task is not ready or has spent its attempts")
-            from .science_refresh_v2 import prepare_dispatch
-            if not prepare_dispatch(self.conn,self.run_id,task):
+            route = host_policy.p0_role_for_run(self.run, task["role"])
+            try:
+                activity.require_provider_capacity(self.conn, {**route, "run_id":self.run_id}, "claim:" + task_id)
+            except HoldActive:
+                if recovered:
+                    return None  # Commit the expired attempt before retrying capacity for its successor.
+                raise
+            if not hooks_for_run(self.conn, self.run_id).prepare_dispatch(self.conn, self.run_id, task):
                 return None
             task = self.conn.execute("SELECT * FROM tasks WHERE task_id=?",(task_id,)).fetchone()
-            allowed = scheduler.admit_claim(snapshot.load(self.conn, self.run_id, now=clock.now_iso()), task_id)
+            from .team_admission import claim_capacity
+            try:
+                capacity, unavailable = claim_capacity(self.conn, self.run_id, task_id)
+            except HoldActive:
+                if recovered:
+                    return None
+                raise
+            allowed = scheduler.admit_claim(snapshot.load(self.conn, self.run_id, now=clock.now_iso()),
+                                            task_id, root_capacity=capacity, unavailable=unavailable)
             if not allowed.admitted:
                 raise HoldActive(allowed.reason, details={"reason":"scheduler_wait","task_id":task_id})
             attempt = task["attempt"]+1
@@ -520,17 +557,7 @@ class Roots:
             tid = self._bind(row,matches[0])
             self._resume(tid)
             return tid
-        with store.transaction(self.conn):
-            moved = self.conn.execute("UPDATE p0_roots SET state='creating' WHERE root_key=? AND state='prepared'",
-                                      (row["root_key"],)).rowcount
-            if moved:
-                from ..jobs.resource_guard import child_start_ticks
-                pid = self.client.transport.process.pid
-                self.conn.execute("INSERT INTO p0_root_creations VALUES(?,?,?,?,?,NULL) "
-                                  "ON CONFLICT(cwd) DO UPDATE SET host_pid=excluded.host_pid,"
-                                  "host_start_ticks=excluded.host_start_ticks,outcome=excluded.outcome",
-                                  (row["cwd"],row["root_key"],pid,child_start_ticks(pid),"sending"))
-        if not moved:
+        if not self._admit_creation(row):
             return self._materialize(self._row(row["root_key"]))
         try:
             result = self._request("thread/start", self._settings(row, new=True))
@@ -543,6 +570,32 @@ class Roots:
         tid = self._bind(row,result["thread"])
         self.loaded.add(tid)
         return tid
+
+    def _admit_creation(self, row):
+        key = "create:" + row["root_key"]
+        with store.transaction(self.conn):
+            try:
+                activity.require_provider_capacity(self.conn, row, key)
+                if row["task_id"]:
+                    from .team_admission import require_capacity
+                    require_capacity(self.conn, row)
+            except HoldActive as exc:
+                waits.begin(self.conn, row["root_key"], exc.details["reason"], key)
+                denied = exc
+            else:
+                for reason in ("provider_backoff", "team_capacity", "team_paused"):
+                    waits.finish(self.conn, row["root_key"], reason, key)
+                moved = self.conn.execute("UPDATE p0_roots SET state='creating' WHERE root_key=? AND state='prepared'",
+                                          (row["root_key"],)).rowcount
+                if moved:
+                    from ..jobs.resource_guard import child_start_ticks
+                    pid = self.client.transport.process.pid
+                    self.conn.execute("INSERT INTO p0_root_creations VALUES(?,?,?,?,?,NULL) "
+                                      "ON CONFLICT(cwd) DO UPDATE SET host_pid=excluded.host_pid,"
+                                      "host_start_ticks=excluded.host_start_ticks,outcome=excluded.outcome",
+                                      (row["cwd"],row["root_key"],pid,child_start_ticks(pid),"sending"))
+                return moved
+        raise denied
 
     def _resume(self, thread_id, *, meter_only=False):
         if thread_id in self.loaded and (meter_only or thread_id not in self._meter_only):
@@ -563,6 +616,8 @@ class Roots:
             for turn in thread.get("turns",[]):
                 if turn["status"] == "inProgress":
                     self.active_turns[thread_id] = turn["id"]
+                    if not meter_only:
+                        self.heartbeats.observed(thread_id, turn["id"])
         self.delivery.reconcile(thread_id)
         if meter_only:
             return
@@ -624,6 +679,8 @@ class Roots:
         if row is None:
             return {"waiting_for_review":True,"task_id":task_id}
         tid = self._materialize(row)
+        if proposal := compute.pending_wait(self.conn,row["root_key"]):
+            return {"thread_id":tid,"task_id":task_id,"job_id":proposal["job_id"],"waiting":True}
         if row["wait_job_id"]:
             job = self.conn.execute("SELECT status FROM jobs WHERE job_id=?", (row["wait_job_id"],)).fetchone()
             if job and machines.is_terminal("job",job["status"]):
@@ -704,6 +761,7 @@ class Roots:
                 self._request("thread/goal/set",{"threadId":thread_id,"origin":"automatic","status":desired})
 
     def _callback(self, received):
+        started = time.monotonic_ns()
         p = received.message.get("params") or {}
         try:
             if received.message["method"] != "item/tool/call":
@@ -713,6 +771,10 @@ class Roots:
             return {"success":True,"contentItems":[{"type":"inputText","text":ids.canonical_json(out)}]}
         except (GxError, KeyError, ValueError, TypeError) as exc:
             return {"success":False,"contentItems":[{"type":"inputText","text":json.dumps({"error":str(exc)})}]}
+
+        finally:
+            metrics.record("p0_callback", started=started, run_id=self.run_id,
+                           thread_id=p.get("threadId"), turn_id=p.get("turnId"), tool=p.get("tool"))
 
     def _call(self,p):
         tid,turn,call_id,tool,args = (p[k] for k in ("threadId","turnId","callId","tool","arguments"))
@@ -779,12 +841,18 @@ class Roots:
                     if tool == "gx_read_artifact":
                         self._artifact_access(row, args["ref"])
                     return json.loads(receipt["result_json"])
+                self.heartbeats.observed(tid, turn)
                 if tool == "gx_task_context" and not args:
-                    answer = science_inputs.task_context(self.conn, self.run_id, row["task_id"])
+                    answer = hooks_for_run(self.conn, self.run_id).build_task_context(
+                        self.conn, self.run_id, row["task_id"], row["attempt"])
                     self._allow_refs(row["root_key"], answer)
                 elif tool == "gx_read_artifact":
                     answer = self._read_artifact(row, args)
                     self._allow_refs(row["root_key"],answer)
+                elif tool in compute.TOOL_MAP:
+                    answer = compute.call(self.conn,row,tool,args)
+                    if tool == "gx_job_status":
+                        self._allow_refs(row["root_key"], answer.get("outputs", []))
                 elif tool == "gx_wait_job" and set(args) == {"job_id"}:
                     answer = self._park_job(row, args["job_id"], turn_id=turn)
                 elif tool == "gx_submit_product" and set(args) == {"product"} and isinstance(args["product"],dict):
@@ -822,29 +890,14 @@ class Roots:
             return assets.read_json(ref)
         return assets.get(ref, offset=offset)
 
-    def _submit(self,binding,product,envelope):
-        task_id,lease_id = binding["task_id"],binding["lease_id"]
-        team = TeamService(self.conn)
-        task = team._task_row(self.conn,task_id)
-        inputs = json.loads(task["input_json"])
-        if not inputs.get("output_kind") or not json.loads(task["acceptance_json"]).get("validate_workflow_product"):
-            raise SchemaInvalid("this task has no pinned workflow product validator")
-        ref = team.artifacts.put(run_id=self.run_id,task_id=task_id,kind=inputs["output_kind"],
-                                 media_type="application/json",content=ids.canonical_json(product),
-                                 origin="HOST_PUT",put_by=binding["thread_id"]).artifact_ref
-        bundle_ref = team._bundle_ref(task,[team.artifacts.describe(ref)])
-        verdict = team._judge(self.conn,task,lease_id,bundle_ref,artifact_refs=[ref])
-        for status in ("RUNNING","SUBMITTED","VALIDATING") if task["status"]=="CLAIMED" else ("SUBMITTED","VALIDATING"):
-            store.transition(self.conn,machine="task",subject_id=task_id,to_state=status,actor="backend",
-                             reason="official Codex root submitted a workflow product",bump=False,payload=envelope)
-        base = {"submission_id":ids.new_id("submission"),"task_id":task_id,"lease_id":lease_id,
-                "attempt":binding["attempt"],"brief_sha256":ids.sha256_of_obj(binding["brief"]),
-                "content_sha256":ids.sha256_of_obj(product),"worker_observation_id":None,"policy_verdict":None,
-                "bundle_kind":task["bundle_kind"],"artifact_refs":[ref]}
-        answer = team._conclude(self.conn,task,lease_id,base,verdict, {})
-        self.conn.execute("UPDATE p0_roots SET goal_desired='complete' WHERE thread_id=?", (binding["thread_id"],))
-        self._goal_queue.add(binding["thread_id"])
-        return {**answer,"artifact_ref":ref}
+    def _submit(self, binding, product, envelope):
+        answer = TeamService(self.conn).submit_workflow_product(
+            run_id=self.run_id, task_id=binding["task_id"], lease_ref=binding["lease_id"],
+            brief_sha256=ids.sha256_of_obj(binding["brief"]), product=product, callback=envelope)
+        thread_id = binding["thread_id"]
+        self.conn.execute("UPDATE p0_roots SET goal_desired='complete' WHERE thread_id=?", (thread_id,))
+        store.on_transaction_end(self.conn, on_commit=lambda: self._goal_queue.add(thread_id))
+        return answer
 
     def _grant_job_outputs(self, root_key, job):
         outcome = store.loads(job, "outcome_json", {})
@@ -853,10 +906,15 @@ class Roots:
         return outputs
 
     def _park_job(self, binding, job_id, *, turn_id=None):
-        job = self.conn.execute("SELECT status,outcome_json FROM jobs WHERE job_id=? AND task_id=? AND lease_ref=? AND run_id=?",
-                                (job_id,binding["task_id"],binding["lease_id"], self.run_id)).fetchone()
+        job = compute.owned_job(self.conn,binding,job_id)
         if not job:
-            raise ScopeDenied("a root may only wait for a Job owned by this task's lease")
+            answer = compute.park_proposal(self.conn,binding,job_id,turn_id)
+            if answer["waiting"]:
+                self._goal_queue.add(binding["thread_id"])
+            return answer
+        pre_admission = compute.pending_wait(self.conn,binding["root_key"])
+        if pre_admission and pre_admission["job_id"] != job_id:
+            raise ScopeDenied("this attempt is already waiting for a different Job")
         if machines.is_terminal("job",job["status"]):
             return {"job_id":job_id,"status":job["status"],"waiting":False,
                     "result_refs":self._grant_job_outputs(binding["root_key"], job)}
@@ -882,6 +940,17 @@ class Roots:
 
     def wake_job(self, task_id, job_id):
         row = waits.job_waiter(self.conn, self.run_id, task_id, job_id)
+        if not row:
+            # After ownership ends only the original acknowledged receipt is readable.
+            # This path neither grants artifacts/leases nor contacts the old thread.
+            prior = self.conn.execute(
+                "SELECT d.*,j.status AS job_status FROM jobs j JOIN p0_roots r ON r.run_id=j.run_id"
+                " AND r.task_id=j.task_id AND r.lease_id=j.lease_ref JOIN p0_root_deliveries d"
+                " ON d.run_id=r.run_id AND d.thread_id=r.thread_id AND d.event_id=('wake:'||r.lease_id||':'||j.job_id)"
+                " WHERE j.run_id=? AND j.task_id=? AND j.job_id=? AND d.state='acknowledged'",
+                (self.run_id,task_id,job_id)).fetchone()
+            if prior and machines.is_terminal("job", prior["job_status"]):
+                return self.delivery._receipt(prior)
         if not row or not machines.is_terminal("job",row["job_status"]):
             raise IllegalTransition("only an observed terminal job wakes its current root")
         event_id = f"wake:{row['lease_id']}:{job_id}"

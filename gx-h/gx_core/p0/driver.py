@@ -8,6 +8,7 @@ import sqlite3
 import time
 import uuid
 
+from .. import metrics
 from ..context import Ctx, Principal
 from ..domain import clock, ids, machines
 from ..errors import ArtifactNotFound, BudgetExceeded, HoldActive, IdempotencyConflict, PermissionDenied, SchemaInvalid, StaleRevision
@@ -23,19 +24,17 @@ def context(conn):
                tool="gx_p0_operator")
 
 
-def project(conn):
-    rows = conn.execute("SELECT * FROM runs WHERE json_extract(inputs_json,'$.inputs.p0')=1"
-                        " ORDER BY rowid LIMIT 2").fetchall()
-    if len(rows) > 1:
-        raise ValueError("Use a separate --state directory for each P0 project")
-    return rows[0] if rows else None
+def project(conn, run_id=None):
+    from .workspace import find_run
+    return find_run(conn, run_id=run_id)
 
 
-def snapshot(conn):
-    run = project(conn)
+def snapshot(conn, run_id=None):
+    run = project(conn, run_id)
     if not run:
         return {"status": "not_started"}
     rid = run["run_id"]
+    from . import metering, operator_budget
     checkpoint = store.latest_checkpoint(conn, rid)
     state = store.loads(checkpoint, "state_json", {}) if checkpoint else {}
     def rows(sql):
@@ -55,10 +54,13 @@ def snapshot(conn):
                                         "awaiting terminal turn" if not entry["terminal_status"] else
                                         "awaiting attributable usage")
     return {
-        "project": run["project_ref"], "run_id": rid, "status": run["status"],
+        "project": run["project_ref"], "run_id": rid, "run_key": run["run_key"], "status": run["status"],
+        "run_objective": run["objective"],
+        "workflow": {"id": run["workflow_id"], "version": run["workflow_version"]},
         "pause": store.loads(run, "paused_json"),
         "attempt_waits": waits.pending(conn, rid),
         "resource_limits": intent_budget.current_caps(conn, rid),
+        "metering": metering.inspect(conn, rid),
         "supplements": science_inputs.source_status(conn, rid),
         "reviews": science_inputs.review_history(conn, rid),
         "node": checkpoint["node"] if checkpoint else None, "round": state.get("round"),
@@ -73,7 +75,7 @@ def snapshot(conn):
         "replies": rows("SELECT m.message_id,r.turn_id,r.status,r.response FROM p0_main_replies r "
                         "JOIN p0_operator_messages m USING(message_id) WHERE m.run_id=? ORDER BY m.rowid"),
         "messages": rows("SELECT message_id,result_json,rejected FROM p0_operator_messages WHERE run_id=? ORDER BY rowid"),
-        "pending_previews": intent.pending_previews(conn, rid),
+        "pending_previews": intent.pending_previews(conn, rid) + operator_budget.pending(conn, rid),
     }
 
 
@@ -107,7 +109,7 @@ class Driver:
         if tool != "gx_project_state" or args:
             raise SchemaInvalid("gx_project_state reads the bound project and takes no arguments")
         conn = self.conn
-        run = project(conn)
+        run = project(conn, self.rid)
         latest = conn.execute("SELECT round_index,actions_json,reason,stop_reason,decision_ref "
                               "FROM science_decisions WHERE run_id=? ORDER BY round_index DESC LIMIT 1",
                               (self.rid,)).fetchone()
@@ -130,7 +132,7 @@ class Driver:
         if self._native is None:
             thread_dir = self.directory / "threads"
             thread_dir.mkdir(parents=True, exist_ok=True)
-            run = project(self.conn)
+            run = project(self.conn, self.rid)
             spec = store.loads(run, "inputs_json")["inputs"]["p0_spec"]
             main_tool = {"type":"function", "name":"gx_project_state",
                          "description":"Read GX's saved Intent, this input's outcome and the most recent scientific decision.",
@@ -139,17 +141,10 @@ class Driver:
                              "description":"Suggest exact edits expressed by this human input. GX checks each edit against its source.",
                              "inputSchema":{"type":"object","properties":{"candidate":{"type":"object"}},
                                             "required":["candidate"],"additionalProperties":False}}
-            worker_tools, worker_call, worker_prepare = (), None, None
-            if run["workflow_id"] == "tl1a_geometry":
-                from workflows.tl1a_geometry import review_tools
-                worker_tools = review_tools.WORKER_TOOLS
-                def worker_prepare(row, tool, args, envelope):
-                    return review_tools.recalculate_now(self.conn, row, args)
-                def worker_call(row, tool, args, envelope, *, prepared):
-                    return review_tools.worker_call(self.conn, tool, args, row, envelope, prepared=prepared)
+            tools = service.hooks_for_run(self.conn, self.rid).build_worker_tools(self.conn, self.rid)
             self._native = self._stack.enter_context(Roots(self.conn, run_id=self.rid, cwd=thread_dir,
                     main_tools=(main_tool,proposal_tool), main_call=self.main_read,
-                    worker_tools=worker_tools, worker_call=worker_call, worker_prepare=worker_prepare,
+                    worker_tools=tools.specs, worker_call=tools.call, worker_prepare=tools.prepare,
                     token_budget=spec.get("turn_token_budget", 65536)))
         return self._native
 
@@ -157,11 +152,15 @@ class Driver:
         self._stack.close()
 
     def messages(self):
+        from . import operator
         rows = self.conn.execute("SELECT * FROM p0_operator_messages WHERE run_id=? AND result_json IS NULL"
                                  " AND rejected IS NULL ORDER BY rowid", (self.rid,)).fetchall()
+        native_blocked = False
         for row in rows:
             mid = row["message_id"]
             action = json.loads(row["action_json"])
+            if operator.consume_queued(self.ctx, self.rid, row) or native_blocked:
+                continue
             thread = self.native.ensure_main()
             intent.bind_main(self.conn, self.rid, thread)
             def stage(thread_id, message_id):
@@ -180,10 +179,10 @@ class Driver:
                                        message_id=mid)
             except HoldActive:
                 # In particular, a confirmation must receive its own later main turn.
-                break
+                native_blocked = True
             except BudgetExceeded as exc:
                 self._exhausted["message:"+mid] = exc
-                break
+                native_blocked = True
             except (ArtifactNotFound, IdempotencyConflict, PermissionDenied, SchemaInvalid, StaleRevision) as exc:
                 # Transport and uncertain native outcomes remain durable and can be reconciled.
                 with store.transaction(self.conn) as tx:
@@ -224,7 +223,7 @@ class Driver:
     def deliveries(self):
         rows = self.conn.execute("SELECT * FROM outbox WHERE run_id=? AND consumed_at IS NULL "
                                  "AND topic IN ('p0.intent.notification','p0.intent.reevaluate','p0.intent.cancel_job',"
-                                 "'p0.supplement.review') ORDER BY outbox_id",
+                                 "'p0.supplement.review','p0.compute.notice') ORDER BY outbox_id",
                                  (self.rid,)).fetchall()
         for row in rows:
             oid = row["outbox_id"]
@@ -232,14 +231,13 @@ class Driver:
                 continue
             payload = json.loads(row["payload_json"])
             try:
-                if row["topic"] == "p0.intent.reevaluate":
-                    if project(self.conn)["workflow_id"] == "tl1a_geometry":
-                        from workflows.tl1a_geometry.domain import reevaluate_intent
-                    else:
-                        from .science import reevaluate_intent
-                    reevaluate_intent(self.conn, payload)
+                if row["topic"] == "p0.compute.notice":
+                    from . import compute
+                    compute.deliver_notice(self.native, payload)
+                elif row["topic"] == "p0.intent.reevaluate":
+                    service.hooks_for_run(self.conn, self.rid).reevaluate(self.conn, payload)
                 elif row["topic"] == "p0.supplement.review":
-                    if not science_inputs.reconcile_supplement(self.conn, self.rid, payload["source_id"]):
+                    if not service.hooks_for_run(self.conn, self.rid).reconcile_supplement(self.conn, self.rid, payload["source_id"]):
                         self._retry_at[oid] = time.monotonic() + 0.5
                         continue
                 elif row["topic"] == "p0.intent.cancel_job":
@@ -282,14 +280,26 @@ class Driver:
             self.native.reconcile_meter(row["thread_id"])
 
     def drive(self, timeout):
-        deadline = time.monotonic() + timeout
+        passes = self.passes(time.monotonic() + timeout)
+        while True:
+            try:
+                next(passes)
+            except StopIteration as end:
+                return end.value
+
+    def passes(self, deadline, *, shared=False):
+        """Yield between passes so other runs can progress on the same SQLite connection."""
+        from . import compute, metering
         idle_delay = 0.15
         self.reconcile_costs()
         sent = {}
         retry_delay = {}
         last_terminal_event = None
         while time.monotonic() < deadline:
+            yield
             self._exhausted.clear()
+            metering.maintain(self.conn, self.rid)
+            compute.drain(self.conn, self.rid)
             self.messages()
             # A terminal human message may still need its GX effect after billing has settled.
             # This also applies when the project is paused and there is no live native client.
@@ -298,24 +308,31 @@ class Driver:
                     "AND r.message_id IS NULL ORDER BY m.rowid", (self.rid,)).fetchall():
                 self.finish_main(row[0], wait=0)
             self.deliveries()
-            run = project(self.conn)
+            run = project(self.conn, self.rid)
             if run["status"] == "PAUSED" or run["status"] in machines.terminal_states("run"):
                 # A pause or final scientific decision can commit while an admitted
                 # native turn is still streaming. Drain its receipt before closing.
                 if self._native and self.native.active_turns:
-                    self.native.poll(0.2)
+                    self.native.poll(0.01 if shared else 0.2)
                     continue
-                self.reconcile_costs()
-                result = snapshot(self.conn)
-                if self._native and result["unsettled_turns"]:
+                if last_terminal_event is None:
+                    self.reconcile_costs()
+                    last_terminal_event = time.monotonic()
+                held = self.conn.execute("SELECT terminal_status,state FROM p0_meter_native_turns WHERE run_id=? "
+                                         "AND budget_status='HELD'", (self.rid,)).fetchall()
+                if held:
                     # Parents may finish before the last child reports usage. Drain the live
                     # connection while it has traffic, then expose genuinely missing receipts.
-                    if last_terminal_event is None:
-                        last_terminal_event = time.monotonic()
-                    if time.monotonic() - last_terminal_event < 3:
-                        if self.native.poll(0.2):
+                    estimable = any(row["terminal_status"] and row["state"] == "acknowledged" for row in held)
+                    if estimable or time.monotonic() - last_terminal_event < 3:
+                        delay = min(0.01 if shared else 0.2, max(0, deadline - time.monotonic()))
+                        if self._native and self.native.poll(delay):
                             last_terminal_event = time.monotonic()
+                        elif not self._native and not shared:
+                            time.sleep(delay)
                         continue
+                result = snapshot(self.conn, self.rid)
+                if held:
                     result["driver"] = "usage_pending"
                 return result
             for job in self.conn.execute("SELECT job_id FROM jobs WHERE run_id=? AND status IN "
@@ -343,7 +360,12 @@ class Driver:
                             retry_delay[key] = (min(30, delay * 2), time.monotonic() + min(30, delay * 2))
                 if key not in sent or retry or t["waiting_job"] in machines.terminal_states("job"):
                     try:
-                        receipt = self.native.dispatch(t["task_id"])
+                        started = time.monotonic_ns()
+                        with metrics.identity(run_id=self.rid, task_id=t["task_id"]):
+                            try:
+                                receipt = self.native.dispatch(t["task_id"])
+                            finally:
+                                metrics.record("p0_dispatch", started=started)
                     except HoldActive:
                         continue
                     except BudgetExceeded as exc:
@@ -353,9 +375,9 @@ class Driver:
                         continue
                     sent[key] = receipt.get("turn_id")
                     progressed = True
-            if self._native and self.native.poll(min(0.2, max(0.01, deadline - time.monotonic()))):
+            if self._native and self.native.poll(min(0.01 if shared else 0.2, max(0.001, deadline - time.monotonic()))):
                 # Drain a burst of native items before sleeping or re-reading every GX checkpoint.
-                until = min(deadline, time.monotonic() + 0.15)
+                until = min(deadline, time.monotonic() + (0.025 if shared else 0.15))
                 while time.monotonic() < until and self.native.poll(0.005):
                     pass
                 idle_delay = 0.1
@@ -370,9 +392,10 @@ class Driver:
                     service.run_control(self.ctx, {"run_id":self.rid, "action":"pause",
                                         "reason":"budget_exhausted: "+cause.message,
                                         "idempotency_key":str(uuid.uuid4())})
-                    return snapshot(self.conn)
+                    return snapshot(self.conn, self.rid)
             idle_delay = 0.1 if progressed else min(1, idle_delay * 1.3)
-            time.sleep(min(idle_delay, max(0, deadline - time.monotonic())))
-        result = snapshot(self.conn)
+            if not shared:
+                time.sleep(min(idle_delay, max(0, deadline - time.monotonic())))
+        result = snapshot(self.conn, self.rid)
         result["driver"] = "time_limit"
         return result

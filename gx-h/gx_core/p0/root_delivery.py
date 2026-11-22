@@ -9,12 +9,12 @@ import time
 import uuid
 
 from .. import budgets
-from ..domain import machines
+from ..domain import clock, machines
 from ..errors import (BudgetExceeded, HoldActive, IdempotencyConflict, LeaseExpired,
                       OutcomeUnknown, SchemaInvalid, ScopeDenied)
 from ..hostobs.app_server_client import AppServerResponseError
 from ..persistence import store
-from . import waits
+from . import activity, meter_limits, metering, team_admission, waits
 from .profiles import CODEX_VERSION
 
 ACTOR = "p0-root"
@@ -39,13 +39,18 @@ class _LiveReceipts:
     responses: dict = field(default_factory=dict)
     responses_at_snapshot: int = 0
     unpaired_snapshot: bool = False
+    latest_total: int | None = None
+    repeated_total: bool = False
 
-    def snapshot(self):
+    def snapshot(self, total):
         # The pinned host can emit an unchanged count after receiving rate limits
         # for an interrupted request whose final provider usage never arrived.
         if self.responses_at_snapshot == len(self.responses):
             self.unpaired_snapshot = True
         self.responses_at_snapshot = len(self.responses)
+        if self.latest_total is not None and total <= self.latest_total:
+            self.repeated_total = True
+        self.latest_total = total
 
 
 def _queued_message(item):
@@ -160,10 +165,18 @@ class RootDelivery:
                 owner = self.conn.execute("SELECT owner_turn FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
                                           key).fetchone()
                 self._queued(thread_id, turn_id, owner["owner_turn"] if owner else turn_id, call_id)
-        elif method == "rawResponse/completed" and key in self._live:
-            receipts = self._live[key].responses
+        elif method == "rawResponse/completed":
             rid = params.get("responseId")
             tokens = _token_count((params.get("usage") or {}).get("totalTokens"))
+            with store.transaction(self.conn):
+                metering.response(self.conn,thread_id,turn_id,rid,tokens)
+                owner = self.conn.execute("SELECT root_id,metadata_verified FROM p0_native_child_meters WHERE child_id=?",
+                                          (thread_id,)).fetchone()
+                if not owner or owner["metadata_verified"]:
+                    meter_limits.check(self.conn,self.run_id,owner["root_id"] if owner else thread_id)
+            if key not in self._live:
+                return
+            receipts = self._live[key].responses
             if not rid or (rid in receipts and receipts[rid] != tokens):
                 tokens = None
             receipts[rid] = tokens
@@ -196,7 +209,7 @@ class RootDelivery:
 
     def _recorded(self, thread_id, turn_id, session_id, owner_turn, prior):
         path = self._paths.get(thread_id)
-        if not path:
+        if not path or not metering.rollout_diagnostics(self.conn,self.run_id):
             return None
         key = thread_id, turn_id
         try:
@@ -261,10 +274,14 @@ class RootDelivery:
         status = thread["status"]["type"]
         if status == "idle":
             return None
-        if status != "active":
+        if status not in ("active", "systemError"):
             raise HoldActive(f"Codex thread is {status}, resume before delivery")
         page = self.roots._request("thread/turns/list", {"threadId": thread_id,
                                    "sortDirection": "desc", "itemsView": "notLoaded", "limit": 2})
+        if status == "systemError":
+            if activity.retryable_failed_thread(self.conn, self.roots._binding(thread_id), page["data"]):
+                return None
+            raise HoldActive("Codex thread is systemError, resume before delivery")
         turn = next((t for t in page["data"] if t["status"] == "inProgress"), None)
         if turn:
             return turn["id"]
@@ -316,18 +333,24 @@ class RootDelivery:
         if pending:
             raise HoldActive("waiting for the preceding Codex turn's usage and descendants",
                              details={**dict(pending), "reason": "native_usage_pending"})
-        previous = self.conn.execute(
-            "SELECT d.event_id,d.turn_id,u.total_tokens,u.terminal_status FROM p0_root_deliveries d "
-            "JOIN budget_reservations r USING(reservation_ref) LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) "
-            "WHERE d.thread_id=? AND d.method='turn/start' AND r.status='SETTLED' ORDER BY r.rowid DESC LIMIT 1",
-            (thread_id,)).fetchone()
-        if previous and (previous["terminal_status"] is None or previous["total_tokens"] is None):
+        previous = self.conn.execute("SELECT * FROM p0_meter_native_turns WHERE thread_id=? "
+            "AND budget_status='SETTLED' ORDER BY sequence DESC LIMIT 1",(thread_id,)).fetchone()
+        if previous and previous["estimated_at"] is None and (
+                previous["terminal_status"] is None or previous["total_tokens"] is None):
             raise HoldActive("the preceding charged turn lacks its cumulative baseline", details={
                 "reason": "native_usage_pending", "thread_id": thread_id, "event_id": previous["event_id"],
                 "turn_id": previous["turn_id"]})
         prior = previous["total_tokens"] if previous else 0
-        ref = budgets.budget_for(self.conn, run_id=self.run_id)
+        if prior is None and previous["estimated_at"]:
+            observed = self.conn.execute("SELECT observed_total FROM p0_meter_threads WHERE thread_id=?",
+                                         (thread_id,)).fetchone()
+            prior = (observed[0] if observed else None) or 0  # A provisional baseline; never an actual charge.
+        run_ref = budgets.budget_for(self.conn, run_id=self.run_id)
+        ref = team_admission.team_funding(self.conn,self.run_id,binding.get("task_id"),run_ref)
+        risk_available = meter_limits.allowance(self.conn,self.run_id,ref,binding)
         available = int(budgets.state(self.conn, ref)["available"].get("tokens", 0))
+        if risk_available is not None:
+            available = min(available,risk_available)
         ceiling = self.roots.token_budget
         if ceiling is not None and (type(ceiling) is not int or ceiling <= 0):
             raise SchemaInvalid("the per-turn token allocation must be a positive integer")
@@ -338,6 +361,12 @@ class RootDelivery:
             try:
                 hold = budgets.reserve(self.conn, budget_ref=ref, subject_kind="native_turn", subject_id=event_id,
                                        amounts={"tokens": tokens, "api_calls": 1}, actor=ACTOR)
+                if risk_available is not None and risk_available < 1:
+                    # A funded leaf can have local units while sibling work ties up
+                    # all of the workspace's real headroom. The admission savepoint rolls back this hold.
+                    raise HoldActive("the shared native allowance is reserved by in-flight work",
+                                     details={"reason":"budget_reserved","available":risk_available,"key":"tokens"})
+                self.conn.execute("INSERT INTO p0_meter_turns(reservation_ref) VALUES(?)",(hold["reservation_ref"],))
                 return hold["reservation_ref"], tokens, prior
             except BudgetExceeded as exc:
                 # Use only an explicit positive smaller token allowance returned by the
@@ -355,6 +384,11 @@ class RootDelivery:
                 # One token and one GX call must be possible on every limiting line.
                 exhausted = next((line for line in limits if line.get("reserved", 0) <= 0
                                   or line.get("limit") is None or line["limit"] - line.get("spent", 0) < 1), None)
+                local_team = self.conn.execute("SELECT team_id FROM p0_teams WHERE run_id=? AND budget_ref=?",
+                                               (self.run_id,ref)).fetchone()
+                if local_team and all("project_ref" not in line for line in limits):
+                    raise HoldActive("the team's native budget has no available grant",details={
+                        **details,"reason":"budget_reserved","team_id":local_team[0]}) from exc
                 if exhausted is None:
                     raise HoldActive("native turn capacity is reserved by work in progress",
                                      details={**details, "reason": "budget_reserved"}) from exc
@@ -369,10 +403,12 @@ class RootDelivery:
                 return self._try_prepare(thread_id, text, event_id, human, interrupt, client_id, active)
             except (BudgetExceeded, HoldActive) as exc:
                 reason = exc.details.get("reason")
-                if reason not in ("budget_reserved", "budget_exhausted", "native_usage_pending"):
+                reasons = {"budget_reserved":"budget","budget_exhausted":"budget","soft_budget":"budget",
+                           "native_usage_pending":"metering","provider_backoff":"provider_backoff",
+                           "team_capacity":"team_capacity","team_paused":"team_paused"}
+                if reason not in reasons:
                     raise
-                waits.begin_delivery(self.conn, thread_id, event_id,
-                                     "metering" if reason == "native_usage_pending" else "budget")
+                waits.begin_delivery(self.conn, thread_id, event_id,reasons[reason])
                 denied = exc
         raise denied
 
@@ -388,6 +424,9 @@ class RootDelivery:
             if not interrupt:
                 waits.prepare_delivery(self.conn, thread_id, event_id)
             binding = self._binding(thread_id, interrupt=interrupt, human=human)
+            if not interrupt and binding.get("wait_job_id") and event_id != (
+                    f"wake:{binding['lease_id']}:{binding['wait_job_id']}"):
+                raise HoldActive("the worker is waiting for its original Job",details={"reason":"job_wait"})
             if self.conn.execute("SELECT 1 FROM p0_root_deliveries WHERE thread_id=? AND state='sending' "
                                  "AND event_id<>?", (thread_id, event_id)).fetchone() and not interrupt:
                 raise HoldActive("another input to this thread still needs a delivery receipt")
@@ -400,7 +439,11 @@ class RootDelivery:
             method = "turn/interrupt" if interrupt else "turn/steer" if active else "turn/start"
             if not interrupt:
                 budgets.require_native_metering(self.conn, self.run_id)
+            if method == "turn/start" or (method=="turn/steer" and event_id.startswith("wake:")):
+                team_admission.require_capacity(self.conn,binding)
             ref, tokens, prior = self._reserve(thread_id, event_id, binding) if method == "turn/start" else (None, None, None)
+            if method == "turn/start":
+                activity.require_provider_capacity(self.conn,binding,event_id)
             state = "acknowledged" if interrupt and not active else "sending"
             self.conn.execute("UPDATE p0_root_deliveries SET method=?,target_turn=?,reservation_ref=?,token_budget=?,"
                               "prior_tokens=?,state=? WHERE run_id=? AND event_id=?",
@@ -428,6 +471,7 @@ class RootDelivery:
         self._settle(row["thread_id"], turn_id)
 
     def _settle(self, thread_id, turn_id):
+        metering.terminal(self.conn,thread_id,turn_id)
         row = self.conn.execute(
             "SELECT d.reservation_ref,d.prior_tokens,u.total_tokens,u.measured_tokens,u.children_known "
             "FROM p0_root_deliveries d "
@@ -455,7 +499,10 @@ class RootDelivery:
             reason = "missing cumulative usage for this turn"
         elif prior is None:
             reason = "historical turn was admitted without an attributable baseline"
-        elif row["measured_tokens"] is None or row["total_tokens"] - prior != row["measured_tokens"]:
+        elif row["measured_tokens"] is None or (row["total_tokens"] - prior != row["measured_tokens"] and
+            not self.conn.execute("SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND estimated_at IS NOT NULL "
+                                  "AND sequence<(SELECT rowid FROM budget_reservations WHERE reservation_ref=?)",
+                                  (thread_id,row["reservation_ref"])).fetchone()):
             reason = "cumulative usage is awaiting complete matching provider receipts"
         elif not row["children_known"]:
             reason = "native child activity has not been reconciled"
@@ -480,10 +527,10 @@ class RootDelivery:
         if reason:
             waits.meter_pending(self.conn, thread_id, turn_id)
             return
-        budgets.settle(self.conn, row["reservation_ref"], actual={"tokens": actual, "api_calls": 1}, actor=ACTOR)
-        waits.meter_settled(self.conn, thread_id, turn_id)
+        metering.confirm(self.conn,row["reservation_ref"],actual)
 
     def _terminal(self, thread_id, turn, *, measured=None, children_known=0):
+        meter_limits.ended(self.conn,thread_id,turn["id"],turn["status"])
         if measured is None:
             held = self.conn.execute(
                 "SELECT prior_tokens FROM p0_root_deliveries JOIN budget_reservations USING(reservation_ref) "
@@ -502,6 +549,37 @@ class RootDelivery:
                           "WHERE run_id=? AND thread_id=? AND method='turn/interrupt' AND target_turn=? "
                           "AND state='sending'", (self.run_id, thread_id, turn["id"]))
         self._settle(thread_id, turn["id"])
+        meter_limits.check(self.conn,self.run_id,thread_id)
+
+    def maintain(self):
+        metering.maintain(self.conn,self.run_id)
+
+    def flush_interrupts(self):
+        """Deliver a committed hard-budget decision outside callbacks and SQLite writes."""
+        for row in self.conn.execute("SELECT * FROM p0_meter_interrupts WHERE run_id=? "
+                "AND sent_at IS NULL AND ended_at IS NULL ORDER BY requested_at", (self.run_id,)).fetchall():
+            thread,tid = row["thread_id"],row["turn_id"]
+            try:
+                if self.roots.active_turns.get(thread) != tid and self.roots._child_turns.get(thread) != tid:
+                    turns = self._pages("thread/turns/list", {"threadId":thread,"sortDirection":"desc",
+                                                             "itemsView":"notLoaded","limit":16})
+                    original = next((turn for turn in turns if turn["id"]==tid), None)
+                    if not original:
+                        continue
+                    if original["status"] in TERMINAL:
+                        with store.transaction(self.conn):
+                            meter_limits.ended(self.conn,thread,tid,original["status"])
+                        continue
+                    if original["status"] != "inProgress":
+                        continue
+                self.roots._request("turn/interrupt",{"threadId":thread,"turnId":tid})
+            except AppServerResponseError as exc:
+                if exc.code not in (-32600,-32602):
+                    raise
+                continue  # A racing completion is reconciled by its actual turn ID.
+            with store.transaction(self.conn):
+                self.conn.execute("UPDATE p0_meter_interrupts SET sent_at=coalesce(sent_at,?) "
+                                  "WHERE thread_id=? AND turn_id=?", (clock.now_iso(),thread,tid))
 
     @staticmethod
     def _receipt(row):
@@ -544,18 +622,31 @@ class RootDelivery:
                 self._arrived(thread_id, turn_id, params.get("item") or {})
             elif method == "thread/tokenUsage/updated":
                 total = (params.get("tokenUsage") or {}).get("total", {}).get("totalTokens")
+                earlier = self.conn.execute("SELECT total_tokens,terminal_status FROM p0_root_turn_usage "
+                                            "WHERE thread_id=? AND turn_id=?",(thread_id,turn_id)).fetchone()
+                metering.observe(self.conn,self.run_id,thread_id,thread_id,turn_id,total)
                 if _token_count(total) is not None and (live := self._live.get((thread_id, turn_id))):
-                    live.snapshot()
+                    live.snapshot(total)
                 if _token_count(total) is not None and not self.conn.execute(
-                        "SELECT 1 FROM p0_root_deliveries JOIN budget_reservations USING(reservation_ref) "
-                        "WHERE thread_id=? AND turn_id=? AND status='SETTLED'", (thread_id, turn_id)).fetchone():
+                        "SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=? "
+                        "AND budget_status='SETTLED' AND estimated_at IS NULL",(thread_id,turn_id)).fetchone():
                     self.conn.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,total_tokens) VALUES(?,?,?) "
                                       "ON CONFLICT(thread_id,turn_id) DO UPDATE SET total_tokens="
                                       "max(coalesce(total_tokens,0),excluded.total_tokens)", (thread_id, turn_id, total))
                     self._settle(thread_id, turn_id)
+                    if (earlier and earlier["terminal_status"]=="completed" and earlier["total_tokens"] is not None
+                            and total>earlier["total_tokens"]):
+                        metering.settle_cumulative(self.conn,thread_id,turn_id)
+                    metering.late_cumulative(self.conn,thread_id,turn_id)
+                    meter_limits.check(self.conn,self.run_id,thread_id)
             elif method == "turn/completed" and params["turn"].get("status") in TERMINAL:
+                live = self._live.get((thread_id,turn_id))
+                aggregate = (params["turn"]["status"]=="completed" and live and not live.responses
+                             and live.latest_total is not None and not live.repeated_total)
                 measured, known = self._live_end(thread_id, params["turn"])
                 self._terminal(thread_id, params["turn"], measured=measured, children_known=known)
+                if aggregate:
+                    metering.settle_cumulative(self.conn,thread_id,turn_id)
 
     def _child_start(self, child, turn):
         owner_turn = turn.get("rootTurnId")
@@ -643,22 +734,28 @@ class RootDelivery:
                 total = _token_count((params.get("tokenUsage") or {}).get("total", {}).get("totalTokens"))
                 if total is not None:
                     if live := self._live.get((sender, tid)):
-                        live.snapshot()
+                        live.snapshot(total)
+                    if child["metadata_verified"]:
+                        metering.observe(self.conn,self.run_id,child["root_id"],sender,tid,total)
                     self.conn.execute("UPDATE p0_native_child_usage SET total_tokens=max(coalesce(total_tokens,0),?) "
                                       "WHERE child_id=? AND turn_id=?", (total, sender, tid))
             elif turn.get("status") in TERMINAL:
                 measured, known = self._live_end(sender, turn)
+                meter_limits.ended(self.conn,sender,tid,turn["status"])
                 self.conn.execute("UPDATE p0_native_child_usage SET terminal=1,"
                                   "measured_tokens=coalesce(?,measured_tokens),children_known=max(children_known,?) "
                                   "WHERE child_id=? AND turn_id=?", (measured, known, sender, tid))
             self._settle(child["root_id"], meter["owner_turn"])
+            metering.late_cumulative(self.conn,child["root_id"],meter["owner_turn"])
+            meter_limits.check(self.conn,self.run_id,child["root_id"])
 
     def verify_descendants(self, requested=()):
         """Verify accounting-only ancestry and recover terminal children without starting them."""
         meters = self.conn.execute(
             "SELECT m.* FROM p0_native_child_meters m WHERE run_id=? AND "
             "(metadata_verified=0 OR EXISTS (SELECT 1 FROM p0_root_deliveries d "
-            "JOIN budget_reservations r USING(reservation_ref) WHERE d.thread_id=m.root_id AND r.status='HELD' "
+            "JOIN budget_reservations r USING(reservation_ref) LEFT JOIN p0_meter_turns mt USING(reservation_ref) "
+            "WHERE d.thread_id=m.root_id AND (r.status='HELD' OR mt.confidence='ESTIMATED') "
             "AND (d.turn_id=m.owner_turn OR EXISTS (SELECT 1 FROM p0_native_child_usage u WHERE "
             "u.child_id=m.child_id AND u.owner_turn=d.turn_id)))) ORDER BY m.rowid", (self.run_id,)).fetchall()
         for meter in meters:
@@ -682,7 +779,12 @@ class RootDelivery:
                     or not isinstance(facts, dict) or facts.get("parent_thread_id") != expected):
                 continue
             if thread.get("sessionId") != meter["root_id"]:
-                if not _stored_child_session(thread, meter) or not self.conn.execute(
+                cached = (meter["metadata_verified"] and thread.get("sessionId")==child_id
+                          and (thread.get("status") or {}).get("type")=="notLoaded"
+                          and thread.get("cliVersion")==CODEX_VERSION)
+                diagnostic = (not cached and metering.rollout_diagnostics(self.conn,self.run_id)
+                              and _stored_child_session(thread,meter))
+                if not (cached or diagnostic) or not self.conn.execute(
                         "SELECT 1 FROM p0_root_deliveries WHERE run_id=? AND thread_id=? AND turn_id=? "
                         "AND method='turn/start' AND state='acknowledged'",
                         (self.run_id, meter["root_id"], meter["owner_turn"])).fetchone():
@@ -704,6 +806,10 @@ class RootDelivery:
                                             (child_id, turn["id"])).fetchone()
                     proof = self._recorded(child_id, turn["id"], meter["root_id"], owner, row["prior_tokens"])
                     measured, cumulative = proof or (None, None)
+                    total = cumulative if cumulative is not None else row["total_tokens"]
+                    metering.observe(self.conn,self.run_id,meter["root_id"],child_id,turn["id"],total,
+                                     source="official child history")
+                    meter_limits.ended(self.conn,child_id,turn["id"],turn["status"])
                     self.conn.execute("UPDATE p0_native_child_usage SET terminal=1,"
                                       "measured_tokens=coalesce(?,measured_tokens),total_tokens=CASE WHEN ? IS NULL "
                                       "THEN total_tokens ELSE max(coalesce(total_tokens,0),?) END,"
@@ -712,6 +818,7 @@ class RootDelivery:
                 for owner in self.conn.execute("SELECT DISTINCT owner_turn FROM p0_native_child_usage WHERE child_id=?",
                                                (child_id,)):
                     self._settle(meter["root_id"], owner["owner_turn"])
+                    metering.late_cumulative(self.conn,meter["root_id"],owner["owner_turn"])
 
     def _pages(self, method, params):
         seen = set()
@@ -784,6 +891,8 @@ class RootDelivery:
             raise RuntimeError("commit the GX change before Codex delivery")
         if not isinstance(text, str) or not isinstance(event_id, str) or not event_id:
             raise SchemaInvalid("a Codex delivery requires a text body and stable event ID")
+        if not interrupt:
+            self.maintain()  # Commit due settlements independently of the next attempted grant.
         client_id = message_id or str(uuid.uuid5(uuid.NAMESPACE_URL, self.run_id + "/" + event_id))
         while True:
             row = self._get(event_id)
@@ -808,6 +917,14 @@ class RootDelivery:
             try:
                 response = self.roots._request(method, params)
             except AppServerResponseError as exc:
+                if method == "turn/start" and activity.rate_refusal(exc.data):
+                    with store.transaction(self.conn):
+                        latest = self._get(event_id)
+                        if latest["state"] == "acknowledged":
+                            return self._receipt(latest)
+                        self._refused(event_id)
+                        denied = activity.rejected_start(self.conn, self.roots._binding(thread_id), event_id)
+                    raise denied from exc
                 if method == "turn/steer" and _idle_refusal(exc, "steer"):
                     # The protocol explicitly refused this input. The next iteration samples the live turn again.
                     self._refused(event_id)

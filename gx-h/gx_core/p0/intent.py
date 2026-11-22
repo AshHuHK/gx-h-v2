@@ -169,7 +169,8 @@ def bind_main(conn, run_id, thread_id):
     with store.transaction(conn):
         if not conn.execute("SELECT 1 FROM runs WHERE run_id=?", (run_id,)).fetchone():
             raise ArtifactNotFound("Unknown run")
-        conn.execute("INSERT INTO p0_intent_main VALUES(?,?) ON CONFLICT(run_id) DO NOTHING",
+        conn.execute("INSERT INTO p0_intent_main VALUES(?,?) ON CONFLICT(run_id) DO UPDATE "
+                     "SET thread_id=excluded.thread_id WHERE p0_intent_main.thread_id=''",
                      (run_id, thread_id))
         saved = conn.execute("SELECT thread_id FROM p0_intent_main WHERE run_id=?", (run_id,)).fetchone()
         if saved[0] != thread_id:
@@ -182,7 +183,13 @@ def unbind_empty_main(conn, run_id, thread_id):
     with store.transaction(conn):
         changed = conn.execute("DELETE FROM p0_intent_main WHERE run_id=? AND thread_id=? AND NOT EXISTS"
                                " (SELECT 1 FROM p0_human_inputs WHERE run_id=?)", (run_id, thread_id, run_id))
-        return changed.rowcount == 1
+        if changed.rowcount:
+            return True
+        # A local bootstrap can precede the first real thread. Local receipts survive replacement.
+        return bool(conn.execute("UPDATE p0_intent_main SET thread_id='' WHERE run_id=? AND thread_id=? "
+                                 "AND NOT EXISTS(SELECT 1 FROM p0_human_inputs WHERE run_id=? "
+                                 "AND (received_at IS NULL OR receipt_turn_id IS NOT NULL))",
+                                 (run_id, thread_id, run_id)).rowcount)
 
 
 def _validate_value(item_type, value):
@@ -204,14 +211,13 @@ def _validate_value(item_type, value):
                 and _number(value["max"]) and value["max"] >= 0):
             raise SchemaInvalid("A resource limit requires a supported resource and nonnegative finite max")
     elif item_type == "evaluation_spec":
-        pinned = _keys(value, {"eval_spec_id", "version"}) and all(_text(v) for v in value.values())
-        threshold = _keys(value, {"threshold"}, {"evaluator"}) and _number(value["threshold"])
-        geometry = _keys(value, {"method", "coverage", "comparison", "reproduction"}) and value["method"] == "tl1a-geometry@1"
-        if geometry:
-            from workflows.tl1a_geometry.domain import SECTIONS, controls
-            controls({key: value[key] for key in SECTIONS})
-        elif not (pinned or threshold):
-            raise SchemaInvalid("Supply a frozen evaluator, a numeric threshold, or the declared geometric criteria")
+        if not isinstance(value, dict) or not value:
+            raise SchemaInvalid("An evaluation specification requires an object")
+        if "eval_spec_id" in value and not (_keys(value, {"eval_spec_id", "version"}) and
+                                             all(_text(v) for v in value.values())):
+            raise SchemaInvalid("A frozen evaluator requires its exact reference and version")
+        if "threshold" in value and not (_keys(value, {"threshold"}, {"evaluator"}) and _number(value["threshold"])):
+            raise SchemaInvalid("A numeric evaluation requires a finite threshold")
         evaluator = value.get("evaluator")
         if evaluator is not None:
             from ..plugins.evaluator import installed_plugin_ref
@@ -293,7 +299,7 @@ def stage_input(conn, run_id, message_id, action):
         raise SchemaInvalid("The client input requires a stable message ID")
     encoded = _check_action(action)
     with store.transaction(conn):
-        if not conn.execute("SELECT 1 FROM p0_intent_main WHERE run_id=?", (run_id,)).fetchone():
+        if not conn.execute("SELECT 1 FROM p0_intent_main WHERE run_id=? AND thread_id<>''", (run_id,)).fetchone():
             raise PermissionDenied("The run has no registered main thread")
         if action["kind"] == "text":
             queued = conn.execute("SELECT message_text FROM p0_operator_messages WHERE run_id=? AND message_id=?",
@@ -351,15 +357,6 @@ def _changes(conn, run_id, edits):
                                 (new["eval_spec_id"], new["version"], run_id)).fetchone()
             if not spec or spec["status"] != "FROZEN":
                 raise SchemaInvalid("The selected evaluation specification has no frozen version")
-        if kind == "evaluation_spec" and new is not None:
-            workflow = conn.execute("SELECT workflow_id FROM runs WHERE run_id=?", (run_id,)).fetchone()[0]
-            if workflow == "tl1a_geometry":
-                from workflows.tl1a_geometry.domain import intent_criteria
-                if key != "evaluation":
-                    raise SchemaInvalid("Use the evaluation item for this comparison's shared geometric criteria")
-                intent_criteria(conn, run_id, new)
-            elif new.get("method") == "tl1a-geometry@1":
-                raise SchemaInvalid("Geometric criteria apply to the tl1a_geometry workflow")
         old = previous["value"] if previous else None
         if new is not None and kind in BAN_TYPES:
             prohibited = set(new["forbidden_capabilities"])
@@ -403,7 +400,14 @@ def _cap_balances(conn, run_id, diffs):
 def _impact(conn, run_id, change_id, diffs, *, commit, cancel_jobs):
     from .impact import apply_impact
     from .intent_budget import cancellation_preview, enqueue_cancellations
-    report = apply_impact(conn, run_id, change_id, diffs, commit=commit)
+    from .workspace import intent_targets
+    report = []
+    for target, edits in intent_targets(conn, run_id, diffs):
+        effects = apply_impact(conn, target, change_id, edits, commit=commit)
+        if target != run_id:
+            for effect in effects:
+                effect["run_id"] = target
+        report.extend(effects)
     for row in report:
         if row["action"] == "interrupt":
             row["consequence"] = "The current attempt will be interrupted."
@@ -432,18 +436,19 @@ def _dispositions(impact):
 
 
 def _commit(conn, run_id, change, message_id, diffs, cancel_jobs):
+    from .workspace import intent_targets
     now = clock.now_iso()
-    for diff in diffs:
-        # BEGIN IMMEDIATE serializes this re-read and the version insert with job completion.
-        current = conn.execute("SELECT COALESCE(MAX(version),0) FROM p0_intent_versions"
-                               " WHERE run_id=? AND item_id=?", (run_id, diff["item_id"])).fetchone()[0]
-        if current != diff["old_version"]:
-            raise StaleRevision(f"Preview for {diff['item_id']} expected {diff['old_version']}, now {current}")
-        new = diff["new_value"]
-        conn.execute("INSERT INTO p0_intent_versions VALUES(?,?,?,?,?,?,?,?,?,?)",
-                     (run_id, diff["item_id"], diff["new_version"], diff["item_type"], ids.canonical_json(new),
-                      ids.sha256_of_obj(new), "removed" if new is None else "active", change["change_id"],
-                      message_id, now))
+    for target, edits in intent_targets(conn, run_id, diffs):
+        for diff in edits:
+            current = conn.execute("SELECT COALESCE(MAX(version),0) FROM p0_intent_versions "
+                                   "WHERE run_id=? AND item_id=?", (target, diff["item_id"])).fetchone()[0]
+            if current != diff["old_version"]:
+                raise StaleRevision(f"Preview for {diff['item_id']} expected {diff['old_version']}, now {current}")
+            new = diff["new_value"]
+            conn.execute("INSERT INTO p0_intent_versions VALUES(?,?,?,?,?,?,?,?,?,?)",
+                         (target, diff["item_id"], diff["new_version"], diff["item_type"], ids.canonical_json(new),
+                          ids.sha256_of_obj(new), "removed" if new is None else "active", change["change_id"],
+                          message_id, now))
     impact = _impact(conn, run_id, change["change_id"], diffs, commit=True, cancel_jobs=cancel_jobs)
     conn.execute("UPDATE p0_intent_changes SET status='committed',confirmation_message_id=?,"
                  "impact_json=?,committed_at=? WHERE change_id=?",
@@ -456,10 +461,10 @@ def _commit(conn, run_id, change, message_id, diffs, cancel_jobs):
             "preview": diffs, "impact": impact, "resource_limits": _cap_balances(conn, run_id, diffs)}
 
 
-def _change(conn, run_id, message_id, action):
-    from .science_inputs import unsupported_edit
+def _change(conn, run_id, message_id, action, *, force_preview=False):
+    from ..orchestration.service import hooks_for_run
     edits = action.get("items", [])
-    if rejected := _unsupported_resource(edits) or unsupported_edit(conn, run_id, edits):
+    if rejected := _unsupported_resource(edits) or hooks_for_run(conn, run_id).validate_intent(conn, run_id, edits):
         return rejected
     diffs = _changes(conn, run_id, edits)
     cancel_jobs = action.get("cancel_job_ids", action.get("job_ids", []))
@@ -467,7 +472,7 @@ def _change(conn, run_id, message_id, action):
         return {"status": "unchanged", "preview": [], "impact": []}
     change_id = ids.new_id("request")
     existing_objective = bool(active_items(conn, run_id, "objective"))
-    confirm = bool(cancel_jobs) or any(_requires_confirmation(d) or
+    confirm = force_preview or bool(cancel_jobs) or any(_requires_confirmation(d) or
               (existing_objective and d["item_type"] == "objective") for d in diffs)
     # An ordinary cap edit permits existing work to finish. In a composite edit another
     # item may invalidate an attempt or its result, which must appear in the preview.
@@ -501,8 +506,10 @@ def _confirm(conn, run_id, turn_id, message_id, action):
     change = _preview_for_confirmation(conn, run_id, action)
     origin = conn.execute("SELECT receipt_turn_id FROM p0_human_inputs WHERE message_id=?",
                           (change["source_message_id"],)).fetchone()
-    if origin["receipt_turn_id"] == turn_id:
+    if change["source_message_id"] == message_id or (turn_id and origin["receipt_turn_id"] == turn_id):
         raise PermissionDenied("This change needs confirmation in a later human main-thread turn")
+    if turn_id is None and not was_displayed(conn, change["change_id"], message_id):
+        raise PermissionDenied("Display this exact preview before confirming it in a later local action.")
     if change["status"] == "committed":
         raise PermissionDenied("This change has already been committed")
     diffs = json.loads(change["preview_json"])
@@ -518,7 +525,7 @@ def _confirm(conn, run_id, turn_id, message_id, action):
         # An exact structured confirmation of an ordinary intent replacement names
         # its bound digest. Budget side effects, explicit cancellations and deictic
         # natural-language confirmations require the additional displayed acknowledgment.
-        designated = human_kind == "text" or ack == CANCEL_ACK or any(d["item_type"] == "resource_limit" for d in diffs)
+        designated = turn_id is None or human_kind == "text" or ack == CANCEL_ACK or any(d["item_type"] == "resource_limit" for d in diffs)
         if designated and (action.get("acknowledge_consequences") != ack or not was_displayed(conn, change["change_id"], message_id)):
             raise PermissionDenied("Display the exact preview, then explicitly confirm its listed consequences "
                                    "in a later human message.")
@@ -540,17 +547,18 @@ def _note(conn, run_id, message_id, action):
     conn.execute("INSERT INTO source_segments(source_id,segment_id,ordinal,kind,text,text_sha256,char_count)"
                  " VALUES(?, 'note', 0, 'note', ?, ?, ?)",
                  (source, note, hashlib.sha256(note.encode("utf-8")).hexdigest(), len(note)))
-    from .science_inputs import register_supplement
-    return {"status": "supplement_registered", "source_id": source, **register_supplement(conn, run_id, source)}
+    from ..orchestration.service import hooks_for_run
+    receipt = hooks_for_run(conn, run_id).register_supplement(conn, run_id, source)
+    return {"status": "supplement_registered", "source_id": source, **receipt}
 
 
 def _receipt(conn, run_id, thread_id, turn_id, message_id):
-    if not _text(turn_id):
+    if not _text(thread_id) or not _text(turn_id):
         raise PermissionDenied("No official human turn receipt")
     row = conn.execute("""
         SELECT i.* FROM p0_human_inputs i JOIN p0_intent_main m ON i.run_id=m.run_id
         WHERE i.run_id=? AND m.thread_id=? AND i.message_id=?""", (run_id, thread_id, message_id)).fetchone()
-    if row is None or (row["receipt_turn_id"] and row["receipt_turn_id"] != turn_id):
+    if row is None or (row["received_at"] and row["receipt_turn_id"] != turn_id):
         raise PermissionDenied("No matching main-thread operator input for this receipt")
     return row
 
@@ -561,6 +569,34 @@ def _apply_action(conn, run_id, turn_id, message_id, action):
     if action["kind"] == "confirm":
         return _confirm(conn, run_id, turn_id, message_id, action)
     return _note(conn, run_id, message_id, action)
+
+
+def _apply_local(conn, run_id, message_id, action, *, force_preview=False):
+    """Write a trusted local operator input to the same versioned Intent journal."""
+    from .intent_text import prepare
+    encoded = _check_action(action)
+    with store.transaction(conn):
+        now = clock.now_iso()
+        # The legacy FK uses this run anchor. An empty thread means no native thread has been bound.
+        conn.execute("INSERT OR IGNORE INTO p0_intent_main(run_id,thread_id) VALUES(?,'')", (run_id,))
+        conn.execute("INSERT OR IGNORE INTO p0_human_inputs(message_id,run_id,action_json,staged_at) "
+                     "VALUES(?,?,?,?)", (message_id, run_id, encoded, now))
+        row = conn.execute("SELECT * FROM p0_human_inputs WHERE message_id=?", (message_id,)).fetchone()
+        if row["run_id"] != run_id or row["action_json"] != encoded or row["receipt_turn_id"]:
+            raise IdempotencyConflict("A different input or native receipt owns this message")
+        if row["consumed_at"]:
+            return json.loads(row["result_json"])
+        if action["kind"] == "text":
+            action = prepare(conn, run_id, message_id, action["text"])
+        if action.get("status") == "needs_clarification":
+            result = action
+        elif force_preview:
+            result = _change(conn, run_id, message_id, action, force_preview=True)
+        else:
+            result = _apply_action(conn, run_id, None, message_id, action)
+        conn.execute("UPDATE p0_human_inputs SET received_at=?,consumed_at=?,result_json=? WHERE message_id=?",
+                     (now, now, ids.canonical_json(result), message_id))
+        return result
 
 
 def accept_input(conn, run_id, thread_id, turn_id, message_id):

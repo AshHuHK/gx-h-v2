@@ -15,49 +15,37 @@ from ..domain import ids, machines
 from ..hostobs.app_server_client import AppServerDisconnected, AppServerTimeout
 from ..errors import OutcomeUnknown
 from ..native_release import native_state, ReleaseStateError
-from ..orchestration import service
+from ..orchestration import packages, service
 from ..persistence import store
 from . import deployment, intent
 from .driver import Driver, context, enqueue, project, snapshot
 
 
 def demo_spec():
-    folder = config.HARNESS_ROOT / "examples" / "p01_data"
-    source = json.loads((folder / "project.json").read_text())
-    predictions = {h["id"]: h["prediction"] for h in source["hypotheses"]}
-    paths = [{"id": route["id"], "prediction": predictions[route["hypothesis_id"]],
-              "grid": json.loads((folder / Path(route["input"]).name).read_text())}
-             for route in source["paths"]]
-    return {"project": "p0-grid", "objective": source["objective"]["description"], "max_rounds": 3,
-            "proposal": {"threshold": -0.25, "paths": paths}}
+    """Historical Python entry; public operator examples come from the installation."""
+    return packages.python_example("demo_spec")
 
 
 def geometry_spec():
-    path = config.HARNESS_ROOT.parent / "examples" / "tl1a_geometry" / "project.json"
-    return json.loads(path.read_text())
+    """Reproduce the existing Python example on its originally released workflow."""
+    return packages.python_example("geometry_spec")
 
 
-def initial_action(spec):
+def initial_action(spec, start_spec=None):
+    if start_spec is None:
+        workflow_id, version = packages.research_ref(spec)
+        start_spec = service.default_registry().get(workflow_id, version).hooks.research_start(spec)
     objective = {"item_id": "objective", "item_type": "objective", "expected_version": 0, "value": spec["objective"]}
-    if spec.get("workflow") == "tl1a_geometry":
-        from workflows.tl1a_geometry.domain import user_items
-        items = [objective, *user_items(spec)]
-    else:
-        items = [
-            objective, {"item_id": "evaluation", "item_type": "evaluation_spec", "expected_version": 0,
-                        "value": {"threshold": spec["proposal"]["threshold"]}},
-            {"item_id": "methods", "item_type": "method_ban", "expected_version": 0,
-             "value": {"forbidden_capabilities": []}},
-        ]
+    items = [objective, *start_spec.items]
     keyed = {item["item_id"]: item for item in items}
     for item in spec.get("intent_items", []):
         if item["item_id"] == "objective" and item["value"] != spec["objective"]:
             raise ValueError("Initial objective must match the project objective")
         if item["item_id"] in keyed and item["item_type"] != keyed[item["item_id"]]["item_type"]:
             raise ValueError("A predefined item must keep its item_type")
-        if (spec.get("workflow") == "tl1a_geometry" and item["item_id"] in keyed and item["item_id"] in ("coordinates", "job-limit", "evaluation")
+        if (item["item_id"] in keyed and item["item_id"] in start_spec.fixed_items
                 and item["value"] != keyed[item["item_id"]]["value"]):
-            raise ValueError("The initial source, criteria, and Job limit must agree with the project specification")
+            raise ValueError(f"Initial item {item['item_id']!r} must agree with the project specification")
         keyed[item["item_id"]] = {**item, "expected_version": 0}
     return {"kind": "change", "items": list(keyed.values())}
 
@@ -68,17 +56,28 @@ def show(data):
 
 def record_displayed_previews(args, output):
     from .intent_text import mark_displayed_together
-    if args.command == "message":
-        results = [(output.get("message_id"), output.get("result"))]
+    from .operator_budget import mark_displayed
+    groups = []
+    if args.command in ("message", "operator"):
+        result = output.get("result")
+        results = [(output.get("message_id"), result)]
+        if isinstance(result, dict):
+            results.extend((row["message_id"], row["result"]) for row in result.get("pending_previews", []))
+    elif "runs" in output:
+        groups = [[(p["message_id"], p["result"]) for p in run["pending_previews"]] for run in output["runs"]]
+        results = []
     elif "pending_previews" in output:
         results = [(row["message_id"], row["result"]) for row in output["pending_previews"]]
     else:
         return
-    shown = [(mid, result) for mid, result in results if isinstance(result, dict)
-             and result.get("status") == "awaiting_confirmation"]
-    if shown:
+    groups.append(results)
+    shown_groups = [[(mid, result) for mid, result in group if isinstance(result, dict)
+                    and result.get("status") == "awaiting_confirmation"] for group in groups]
+    if any(shown_groups):
         with closing(existing_db(args.state.expanduser().resolve(), readonly=False)) as conn:
-            mark_displayed_together(conn, shown)
+            for shown in shown_groups:
+                mark_displayed_together(conn, shown)
+                mark_displayed(conn, shown)
 
 
 def existing_db(directory, *, readonly):
@@ -102,7 +101,8 @@ def existing_db(directory, *, readonly):
     return conn
 
 
-def start(conn, directory, spec):
+def start(conn, directory, spec, *, run_key=None):
+    from . import workspace
     if type(spec.get("max_rounds")) is not int or spec["max_rounds"] < 1:
         raise ValueError("Supply a positive max_rounds")
     if not isinstance(spec.get("objective"), str) or not spec["objective"].strip():
@@ -113,55 +113,52 @@ def start(conn, directory, spec):
     budget_profile = spec.get("budget_profile", "p0")
     if not isinstance(budget_profile, str) or not budget_profile.strip():
         raise ValueError("budget_profile must name a configured budget profile")
-    action = initial_action(spec)
-    current = project(conn)
+    current = workspace.find_run(conn, run_key=run_key)
     if current and store.loads(current, "inputs_json")["inputs"]["p0_spec"] != spec:
         raise ValueError("This state already belongs to a different project specification")
-    workflow = spec.get("workflow", "science_grid")
-    inputs = {"p0": True, "p0_spec": spec, "max_rounds": spec["max_rounds"]}
-    files = []
-    if workflow == "tl1a_geometry":
-        from workflows.tl1a_geometry import domain
-        files = [domain.coordinate_input()]
-        roles = {"objective": "context", "coordinates": "execution", "job-limit": "context"}
-        version = current["workflow_version"] if current else str(spec.get("workflow_version", "2"))
-        if version not in ("1", "2"):
-            raise ValueError("Select tl1a_geometry workflow_version 1 or 2")
-    elif workflow == "science_grid":
-        inputs["proposal"] = spec["proposal"]
-        roles = {"objective": "context", "evaluation": "evaluation"}
-        version = current["workflow_version"] if current else "2"
-    else:
-        raise ValueError(f"Unknown public research workflow {workflow!r}")
+    if current and run_key is None:
+        run_key = current["run_key"]
+    workflow, version = packages.research_ref(spec, current)
+    flow = service.default_registry(conn, workflow_id=workflow, version=version).get(workflow, version)
+    service.seams.workflow_admission(conn, workflow_id=workflow, version=version,
+                                    sha256=flow.digest(), sources_complete=flow.sources_complete())
+    start_spec = flow.hooks.research_start(spec)
+    action = initial_action(spec, start_spec)
+    inputs = {**start_spec.inputs, "p0": True, "p0_spec": spec, "max_rounds": spec["max_rounds"]}
+    files, roles = list(start_spec.files), dict(start_spec.roles)
 
     def bootstrap(rid):
-        if workflow == "tl1a_geometry":
-            source = next(item for item in action["items"] if item["item_id"] == "coordinates")
-            source["value"] = {**domain.source_value(), "artifact_ref": domain.source_artifact(conn, rid)}
-            for item in action["items"]:
-                if item["item_type"] == "evaluation_spec":
-                    roles[item["item_id"]] = "evaluation"
+        flow.hooks.bootstrap_intent(conn, rid, action["items"], roles)
+        initial = workspace.bootstrap_action(conn, rid, action)
         mid = str(uuid.uuid5(uuid.NAMESPACE_URL, "gx-p0-bootstrap/" + rid))
-        enqueue(conn, rid, action, "Start this scientific project with the supplied initial Intent. "
-                "GX owns durable execution. " + ids.canonical_json(action), mid)
-        row = conn.execute("SELECT result_json,rejected FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
-        if not row["result_json"]:
-            driver = Driver(conn, directory, rid)
-            try:
-                driver.messages()
-                driver.finish_main(mid)
-            finally:
-                driver.close()
+        if run_key is not None:
+            from . import operator
+            if initial["items"]:
+                result = operator.apply_bootstrap(conn, rid, initial, mid)
+                if result.get("status") != "committed":
+                    raise ValueError("Initial Intent is pending: " + mid)
+        else:
+            enqueue(conn, rid, initial, "Start this scientific project with the supplied initial Intent. "
+                    "GX owns durable execution. " + ids.canonical_json(initial), mid)
             row = conn.execute("SELECT result_json,rejected FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
-        if not row["result_json"] or json.loads(row["result_json"]).get("status") != "committed":
-            raise ValueError("Initial Intent is pending: " + str(row["rejected"] or mid))
+            if not row["result_json"]:
+                driver = Driver(conn, directory, rid)
+                try:
+                    driver.messages()
+                    driver.finish_main(mid)
+                finally:
+                    driver.close()
+                row = conn.execute("SELECT result_json,rejected FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
+            if not row["result_json"] or json.loads(row["result_json"]).get("status") != "committed":
+                raise ValueError("Initial Intent is pending: " + str(row["rejected"] or mid))
         # The workflow reads the objective and prospective criterion. Individual tasks and Jobs
         # bind their own narrower inputs where they are created.
         intent.bind_dependencies(conn, rid, "workflow", rid, roles)
-    service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
+    outcome = service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
                       "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
-                      "inputs": inputs, "input_files": files, "idempotency_key": "p0-start:" + spec["project"]}, prepare_p0=bootstrap)
-    return snapshot(conn)
+                      "inputs": inputs, "input_files": files, "idempotency_key": workspace.start_key(spec["project"], run_key)},
+                      prepare_p0=bootstrap, workspace_key=run_key)
+    return snapshot(conn, outcome["run_id"])
 
 
 def change_state(conn, run, action):
@@ -181,7 +178,12 @@ def run_until_stopped(conn, directory, rid, timeout):
     while time.monotonic() < deadline:
         driver = Driver(conn, directory, rid)
         try:
-            return driver.drive(deadline - time.monotonic())
+            result = driver.drive(deadline - time.monotonic())
+            if result["status"] in machines.terminal_states("run"):
+                from .workspace import release_finished
+                release_finished(conn)
+                result.update(snapshot(conn, rid))
+            return result
         except (AppServerDisconnected, AppServerTimeout, OutcomeUnknown) as exc:
             failures += 1
             # GX effects are already durable. The new client inspects history and
@@ -193,33 +195,75 @@ def run_until_stopped(conn, directory, rid, timeout):
         finally:
             driver.close()
         time.sleep(min(5, 0.2 * 2 ** min(failures, 5), max(0, deadline - time.monotonic())))
-    result = snapshot(conn)
+    result = snapshot(conn, rid)
     result["driver"] = "time_limit"
     return result
 
 
 def execute(args):
+    from . import coordinator, operator, workspace
     directory = args.state.expanduser().resolve()
+    selected = getattr(args, "run_id", None)
+
+    def selected_run(conn):
+        row = project(conn, selected)
+        if row is None:
+            raise ValueError("Start a project before using this command")
+        operator.authorize_project(operator.local_context(conn), row["project_ref"])
+        return row
+
+    def authorize_workspace(conn):
+        ctx = operator.local_context(conn)
+        operator.authorize_project(ctx, None)
+        for run in workspace.list_runs(conn):
+            operator.authorize_project(ctx, run["project_ref"])
+
+    if args.command == "operator":
+        with closing(existing_db(directory, readonly=False)) as conn:
+            rid = selected_run(conn)["run_id"]
+            output = operator.submit(operator.local_context(conn), rid, operator.cli_action(args), args.message_id)
+        if args.output:
+            from ..native_release import STATE_MARKER, write_native_bytes
+            target = args.output.expanduser().resolve()
+            if target.parent == directory and target.name in {"gx.db", "gx.db-wal", "gx.db-shm", ".native.lock", STATE_MARKER}:
+                raise ValueError("Choose an audit output file distinct from the workspace database and its state files")
+            write_native_bytes(target, (json.dumps(output["result"], indent=2, ensure_ascii=False) + "\n").encode())
+            return {"message_id": output["message_id"], "run_id": rid, "audit_file": str(args.output)}
+        return output
+    if args.command == "team":
+        from .team_admission import team_control, team_status
+        with closing(existing_db(directory, readonly=args.operation == "status")) as conn:
+            rid = selected_run(conn)["run_id"]
+            if args.team_id:
+                return team_control(conn, rid, args.team_id, args.operation)
+            if args.operation != "status":
+                raise ValueError("Specify --team-id for a team change")
+            return {"run_id":rid, "teams":team_status(conn, rid)}
     if args.command == "status":
         if not (directory / "gx.db").exists():
             return {"status": "not_started"}
         with closing(existing_db(directory, readonly=True)) as conn:
-            return snapshot(conn)
+            if selected:
+                return snapshot(conn, selected_run(conn)["run_id"])
+            authorize_workspace(conn)
+            return coordinator.overview(conn)
     if args.command == "stop":
         with closing(existing_db(directory, readonly=False)) as conn:
-            change_state(conn, project(conn), "pause")
-            return snapshot(conn)
+            target = selected_run(conn)
+            change_state(conn, target, "pause")
+            return snapshot(conn, target["run_id"])
     if args.command == "message":
         if args.action:
             action = json.loads(args.action.read_text())
-            text = (action["text"] if isinstance(action, dict) and action.get("kind") == "text"
-                    else "My requested action is " + ids.canonical_json(action))
-        elif args.supplement:
+            with closing(existing_db(directory, readonly=False)) as conn:
+                rid = selected_run(conn)["run_id"]
+                return operator.submit(operator.local_context(conn), rid, action, args.message_id, queue_only=args.queue_only)
+        if args.supplement:
             action, text = {"kind": "supplement", "text": args.supplement}, args.supplement
         else:
             action, text = {"kind": "text", "text": args.text}, args.text
         with closing(existing_db(directory, readonly=False)) as conn:
-            rid = project(conn)["run_id"]
+            rid = selected_run(conn)["run_id"]
             if args.text and args.message_id:
                 saved = conn.execute("SELECT action_json FROM p0_operator_messages WHERE run_id=? AND message_id=?",
                                      (rid, args.message_id)).fetchone()
@@ -233,20 +277,18 @@ def execute(args):
     try:
         with native_state(directory), closing(store.open_store(directory / "gx.db")) as conn:
             if args.command == "start":
-                if args.demo_grid:
-                    spec = demo_spec()
-                elif args.tl1a_geometry:
-                    spec = geometry_spec()
-                else:
-                    spec = json.loads(args.spec.read_text())
-                return start(conn, directory, spec)
-            run = project(conn)
-            if not run:
-                raise ValueError("Start a project before using this command")
+                spec = packages.example(args.example) if args.example else json.loads(args.spec.read_text())
+                operator.authorize_project(operator.local_context(conn), spec["project"])
+                return start(conn, directory, spec, run_key=args.run_key)
+            if args.command == "run" and selected is None:
+                authorize_workspace(conn)
+                return coordinator.drive_workspace(conn, directory, args.timeout)
+            run = selected_run(conn)
             if args.command == "resume" and run["status"] == "PAUSED":
                 change_state(conn, run, "continue")
             if args.command != "message" and not store.latest_checkpoint(conn, run["run_id"]):
-                start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"])
+                start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"],
+                      run_key=workspace.key_for_run(conn, run["run_id"]))
             if args.command != "message":
                 return run_until_stopped(conn, directory, run["run_id"], args.timeout)
             driver = Driver(conn, directory, run["run_id"])
@@ -261,6 +303,11 @@ def execute(args):
             finally:
                 driver.close()
     except ReleaseStateError as exc:
+        if args.command == "start" and args.run_key and "another native client" in str(exc):
+            spec = packages.example(args.example) if args.example else json.loads(args.spec.read_text())
+            with closing(existing_db(directory, readonly=False)) as conn:
+                operator.authorize_project(operator.local_context(conn), spec["project"])
+                return coordinator.queue_start(conn, args.run_key, spec)
         if args.command == "message" and "another native client" in str(exc):
             return {"message_id": mid, "status": "queued_for_active_driver"}
         raise
@@ -270,14 +317,24 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     deployment.add_commands(commands)
-    for name in ("start", "status", "run", "resume", "stop", "message"):
+    from .operator import add_commands
+    add_commands(commands)
+    for name in ("start", "status", "run", "resume", "stop", "message", "team"):
         sub = commands.add_parser(name)
         sub.add_argument("--state", required=True, type=Path)
+        if name != "start":
+            sub.add_argument("--run-id", help="Select a run within this workspace")
+        if name == "team":
+            sub.add_argument("--team-id")
+            sub.add_argument("--operation", choices=("status", "pause", "resume"), default="status")
         if name == "start":
+            sub.add_argument("--run-key", help="Idempotent name for a workflow run sharing this workspace")
             selector = sub.add_mutually_exclusive_group(required=True)
             selector.add_argument("--spec", type=Path)
-            selector.add_argument("--demo-grid", action="store_true")
-            selector.add_argument("--tl1a-geometry", action="store_true", help="Start the bounded 2RE9 coordinate study")
+            for alias, example in packages.installation()["examples"].items():
+                if not example.get("private"):
+                    selector.add_argument("--" + alias, dest="example", action="store_const", const=alias,
+                                          help=example["help"])
         if name in ("run", "resume"):
             sub.add_argument("--timeout", type=float, default=math.inf, help="Optional wall time in seconds")
         if name == "message":

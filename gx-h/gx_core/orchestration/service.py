@@ -578,12 +578,13 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
             inputs={"inputs": inputs, "files": files}, host=host,
         )
         if p0:
-            from ..p0 import workspace
+            from ..p0 import team_admission, workspace
             budget_ref = workspace.attach_run(
                 tx, run_id, project_ref=project_ref, run_key=workspace_key, profile_name=args["budget_profile"],
                 spec=inputs.get("p0_spec", {}), actor=ctx.actor)
             tx.execute("UPDATE runs SET budget_ref=?, budget_json=(SELECT limits_json FROM budgets "
                        "WHERE budget_ref=?) WHERE run_id=?", (budget_ref, budget_ref, run_id))
+            team_admission.configure(tx, run_id, inputs.get("p0_spec", {}))
         else:
             tx.execute("UPDATE budgets SET run_id=? WHERE budget_ref=?", (run_id, budget_ref))
 

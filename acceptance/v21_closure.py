@@ -3,6 +3,7 @@ import argparse
 import ast
 from collections import Counter, defaultdict
 from importlib.util import resolve_name
+import gzip
 import json
 import re
 from pathlib import Path
@@ -180,6 +181,10 @@ def reachable(edges, start):
 
 
 def classify(name, primary, compatibility, executed):
+    pinned_grid = {"gx-h/gx_core/p0/" + file for file in (
+        "science.py", "science_inputs.py", "science_refresh.py", "science_refresh_v2.py", "science_v2.py")}
+    if name in pinned_grid:
+        return "compatibility"
     if (name.startswith(("gx-h/gx_core/cli/","gx-h/gx_core/web/","gx-h/gx_core/mcp/","gx-h/workflows/compat_v20/"))
             or "/manager" in name or name.startswith("gx-h/bin/")):
         return "compatibility"
@@ -204,10 +209,12 @@ def observe(root, trace, out):
     primary = reachable(edges, ["bin/gx-p0"])
     compatibility = reachable(edges, [name for name in paths if name.startswith("gx-h/bin/")])
     by_stage = {}
-    for raw in trace.read_text().splitlines():
-        stage, pid, ppid, kind, value = json.loads(raw)
-        group = by_stage.setdefault(stage, defaultdict(lambda: defaultdict(set)))
-        group[kind][value].add(pid)
+    stream = gzip.open(trace, "rt") if trace.suffix == ".gz" else trace.open()
+    with stream:
+        for raw in stream:
+            stage, pid, ppid, kind, value = json.loads(raw)
+            group = by_stage.setdefault(stage, defaultdict(lambda: defaultdict(set)))
+            group[kind][value].add(pid)
     stages = {stage: {kind: {value:len(pids) for value,pids in sorted(records.items())}
                        for kind,records in sorted(group.items())} for stage,group in sorted(by_stage.items())}
     candidate = {name: data for name,data in stages.items() if name.startswith("candidate") and "compat" not in name}

@@ -1,0 +1,164 @@
+"""Run the GX Python and Node suites and the host generator in an isolated checkout of a named commit."""
+import argparse
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+import tarfile
+import tempfile
+import time
+
+REPO = Path(__file__).resolve().parents[2]
+PRODUCT = ('gx-h/', 'bin/', 'codex_adapter/', 'examples/', 'scripts/')
+PROTOCOL = ('native_activity.py','native_budget.py','native_cumulative.py','native_events.py','native_refusal.py','native_child.py')
+
+
+def utc():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def digest(path):
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream,'sha256').hexdigest()
+
+
+def save(path, data):
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True)+'\n')
+
+
+def unit_counts(log):
+    text=log.read_text()
+    count=re.findall(r'^Ran (\d+) tests?',text,re.M)
+    total=int(count[-1]) if count else 0
+    skips=[line.strip() for line in text.splitlines() if '... skipped ' in line]
+    failures=re.findall(r'^(FAIL|ERROR): (.*)$',text,re.M)
+    return {'total':total,'passed':total-len(skips)-len(failures),'skipped':len(skips),
+            'failures':len([f for f in failures if f[0]=='FAIL']),'errors':len([f for f in failures if f[0]=='ERROR']),
+            'skip_details':skips,'failure_details':failures}
+
+
+def run_suite(commit, out, *, native):
+    checkout=Path(tempfile.mkdtemp(prefix='gx-v21-regression-'))
+    package=checkout/'package'
+    package.mkdir()
+    paths=['gx-h','bin','codex_adapter','examples','scripts','release-assets/lock.json','release-assets/npm',
+           'release-assets/python','release-assets/codex-schema-v0.169.0-experimental.tar.gz']
+    if native:
+        # Retain only acceptance sources and fixtures in the reproducible checkout.
+        paths += subprocess.check_output(['git','ls-tree','--name-only','-r',commit,'acceptance'],cwd=REPO,
+                  text=True).splitlines()
+        paths=[p for p in paths if not p.startswith('acceptance/') or
+               (p.endswith('.py') and (len(Path(p).parts)==2 or Path(p).name in PROTOCOL))]
+    with subprocess.Popen(['git','archive',commit,*paths],cwd=REPO,stdout=subprocess.PIPE) as process:
+        with tarfile.open(mode='r|',fileobj=process.stdout) as archive:
+            archive.extractall(package,filter='data')
+        if process.wait():
+            raise RuntimeError('failed to extract requested checkout')
+    manifest={p.relative_to(package).as_posix():digest(p) for p in sorted(package.rglob('*')) if p.is_file()}
+    save(out/'files.json',manifest)
+    product={name:sha for name,sha in manifest.items() if name.startswith(PRODUCT)}
+    content_hash=hashlib.sha256(json.dumps(product,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+    env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'}
+    summary={'commit':commit,'started_utc':utc(),'source_file_manifest':'files.json','product_files':len(product),
+             'product_sha256':content_hash,'product_prefixes':PRODUCT,'node_version':subprocess.check_output(
+                 ['node','--version'],text=True).strip(),'python_version':sys.version.split()[0],'operations':{},
+             'class':'Local Python, SQLite and CPU Job fixtures. Official-protocol scenarios use pinned Codex with a scripted loopback provider.'}
+    sys.path.insert(0,str(package/'gx-h'))
+    from gx_core.hostobs.native_app_server import _proxy_preflight
+    _proxy_preflight()
+
+    def execute(label, command, cwd):
+        start=utc()
+        elapsed=time.monotonic()
+        with (out/(label+'.log')).open('w') as log:
+            code=subprocess.run(command,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT).returncode
+        return {'command':[str(a).replace(str(package),'$CHECKOUT').replace(str(checkout),'$SCRATCH').replace(
+                    str(out),'$EVIDENCE') for a in command], 'returncode':code,'started_utc':start,'ended_utc':utc(),
+                'cwd':str(cwd).replace(str(package),'$CHECKOUT'),'seconds':round(time.monotonic()-elapsed,3)}
+
+    def record(name,command,cwd):
+        operation=execute(name,command,cwd)
+        summary['operations'][name]=operation
+        save(out/'summary.json',summary)
+        return operation['returncode']
+
+    try:
+        venv=checkout/'venv'
+        python=venv/'bin/python'
+        wheels=package/'release-assets/python'
+        installs=[('venv',[sys.executable,'-m','venv',venv]),
+                  ('offline-wheels',[python,'-m','pip','--isolated','--disable-pip-version-check','install',
+                     '--no-index','--no-cache-dir','--require-hashes','--find-links',wheels,'-r',wheels/'requirements.lock']),
+                  ('offline-cordis',[python,'-B','scripts/release_assets.py','cordis'])]
+        for name,command in installs:
+            if record(name,command,package):
+                return 2
+        env['PATH']=str(venv/'bin')+os.pathsep+env['PATH']
+        if native:
+            binary=REPO/'vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex'
+            lock=json.loads((package/'release-assets/lock.json').read_text())
+            summary['native_binary']={'version':subprocess.check_output([binary,'--version'],text=True).strip(),
+                                      'sha256':digest(binary)}
+            if summary['native_binary']['version']!='codex-cli 0.169.0' or summary['native_binary']['sha256']!=lock['linux_x64']['binary_sha256']:
+                raise ValueError('binary does not match release lock')
+            env['PATH']=str(binary.parent)+os.pathsep+env['PATH']
+            env['GX_P0_CODEX']=str(binary)
+        gx=package/'gx-h'
+        commands={'python-full':[python,'-B','-m','unittest','discover','-s','tests','-v'],
+                  'generator':[python,'-B','adapters/hosts/generate.py','--check'],
+                  'node':['node','--experimental-strip-types','--test','runtime/plugin-host/host.test.ts']}
+        with ThreadPoolExecutor(max_workers=len(commands)) as pool:
+            pending={k:pool.submit(execute,k,v,gx) for k,v in commands.items()}
+            summary['operations'].update({k:v.result() for k,v in pending.items()})
+        summary['python_counts']=unit_counts(out/'python-full.log')
+        summary['node_counts']={key:int(value) for key,value in re.findall(
+            r'^# (tests|pass|fail|skipped|cancelled) (\d+)',(out/'node.log').read_text(),re.M)}
+        record('p0-focused',[python,'-B','-m','unittest','discover','-s','tests','-p','test_p0*.py','-v'],gx)
+        summary['p0_counts']=unit_counts(out/'p0-focused.log')
+        if native:
+            native_dir=out/'native'
+            native_dir.mkdir(exist_ok=True)
+            native_commands={
+                'native-reference':['v21/native_events.py'],
+                'native-routing':['v21/native_activity.py','--case','routing'],
+                'native-http429':['v21/native_refusal.py'],
+                'native-lease':['v21/native_activity.py','--case','lease'],
+                'native-multi-budget':['v21/native_budget.py'],
+                'native-meter-warm':['v21/native_cumulative.py','--connection','warm'],
+                'native-meter-cold':['v21/native_cumulative.py','--connection','cold'],
+                'native-meter-repeated':['v21/native_cumulative.py','--connection','cold-repeated'],
+                'native-late-child':['v21/native_child.py','--case','complete'],
+                'native-incomplete-child':['v21/native_child.py','--case','missing'],'native-interrupted':['acc1_interrupted_meter.py'],
+                'native-wake-ack':['acc1_wake.py','--expire-wait']}
+            with ThreadPoolExecutor(max_workers=3) as pool:
+                jobs={k:pool.submit(execute,k,[python,'-B',package/'acceptance'/v[0],*v[1:],
+                                   '--out',native_dir/(k+'.json')],package) for k,v in native_commands.items()}
+                summary['operations'].update({k:v.result() for k,v in jobs.items()})
+            record('official-suite',[python,'-B','acceptance/native_probe.py','--binary',binary,
+                                     '--out',native_dir/'official-suite'],package)
+            summary['official_cases']={p.stem:json.loads(p.read_text())['status']
+                                       for p in sorted((native_dir/'official-suite').glob('*.json'))}
+        summary['ended_utc']=utc()
+        summary['passed']=all(op['returncode']==0 for op in summary['operations'].values())
+        save(out/'summary.json',summary)
+        print('PASS' if summary['passed'] else 'FAIL',summary['python_counts']['total'],'Python cases;',summary['node_counts'])
+        return 0 if summary['passed'] else 1
+    finally:
+        shutil.rmtree(checkout)
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--commit',required=True)
+    parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--native',action='store_true',help='also run the committed 2.1 protocol probes against the local locked ELF')
+    args=parser.parse_args()
+    args.out.mkdir(parents=True,exist_ok=True)
+    commit=subprocess.check_output(['git','rev-parse','--verify',args.commit+'^{commit}'],cwd=REPO,text=True).strip()
+    raise SystemExit(run_suite(commit,args.out.resolve(),native=args.native))

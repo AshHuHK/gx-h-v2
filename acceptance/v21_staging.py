@@ -351,7 +351,13 @@ def run(work, revision, evidence):
         # Final staging resumes the restored v2 state once. It consumes the existing third Job outcome.
         install.rename(work / "original-install")
         candidate.rename(install)
-        resumed = invoke("candidate-final", "resume", "--timeout", "145")
+        optional = install / "gx-h/runtime/plugin-host/node_modules"
+        parked = work / "optional-cordis-offline"
+        with ExitStack() as restore_optional:
+            optional.rename(parked)
+            restore_optional.callback(parked.rename, optional)
+            resumed = invoke("candidate-final", "resume", "--timeout", "145")
+        evidence["optional_cordis"]["grid_resumed_with_plugin_node_modules_absent"] = True
         check(resumed["status"] == "COMPLETED" and resumed["run_id"] == begun["run_id"], str(resumed)[-500:])
         final = original_facts(state)
         check(migrations(state) == upgraded_migrations, "Final candidate did not apply the same migration set")

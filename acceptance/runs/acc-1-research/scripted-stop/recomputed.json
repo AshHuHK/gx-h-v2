@@ -1,0 +1,337 @@
+{
+  "comparisons": [
+    {
+      "comparisons": [
+        {
+          "angle_delta_deg": 0.022118439898349607,
+          "fixed_chain": "A",
+          "moving_chain": "B",
+          "protocols": [
+            "common_backbone",
+            "common_ca"
+          ],
+          "rmsd_delta_angstrom": 0.020158884699569835,
+          "status": "stable"
+        },
+        {
+          "angle_delta_deg": 0.04000838765017534,
+          "fixed_chain": "A",
+          "moving_chain": "C",
+          "protocols": [
+            "common_backbone",
+            "common_ca"
+          ],
+          "rmsd_delta_angstrom": 0.01145013900977876,
+          "status": "stable"
+        },
+        {
+          "angle_delta_deg": 0.06438756014208025,
+          "fixed_chain": "B",
+          "moving_chain": "C",
+          "protocols": [
+            "common_backbone",
+            "common_ca"
+          ],
+          "rmsd_delta_angstrom": 0.039880912936875346,
+          "status": "stable"
+        }
+      ],
+      "coverage": {
+        "denominator": "observed_union_residues",
+        "min_fraction": 0.25,
+        "min_residues": 40
+      },
+      "criteria": {
+        "max_angle_delta_deg": 0.5,
+        "max_rmsd_delta_angstrom": 0.15
+      },
+      "criteria_spec_sha256": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a",
+      "evidence_ref": "gxa_01m81564j08ncc8bk0",
+      "ineligible_protocols": [],
+      "protocols": [
+        "common_backbone",
+        "common_ca"
+      ],
+      "reason": "All measured pairs fall within both inter-protocol geometry bounds.",
+      "scope": "One deposited experimental model. Compare unsigned pair rotations and fitted Cartesian atom RMSDs after proper rigid superposition.",
+      "status": "stable"
+    }
+  ],
+  "results": [
+    {
+      "observation_ref": "gxa_01m81564bkjwny0r9h",
+      "reference": {
+        "checks": {
+          "criteria_spec_sha256": true,
+          "mapping": true,
+          "method": true,
+          "numerical_tolerances": true,
+          "pair_identities": true,
+          "schema": true,
+          "source_metadata": true,
+          "source_sha256": true,
+          "status": true,
+          "units": true
+        },
+        "differences": [
+          {
+            "absolute_difference": {
+              "absolute_departure_from_120_deg": 1.4210854715202004e-14,
+              "fitted_rmsd_angstrom": 1.3322676295501878e-15,
+              "rotation_angle_deg": 1.4210854715202004e-14
+            },
+            "fixed_chain": "A",
+            "moving_chain": "B",
+            "within_reproduction_tolerance": true
+          },
+          {
+            "absolute_difference": {
+              "absolute_departure_from_120_deg": 0.0,
+              "fitted_rmsd_angstrom": 6.661338147750939e-16,
+              "rotation_angle_deg": 0.0
+            },
+            "fixed_chain": "A",
+            "moving_chain": "C",
+            "within_reproduction_tolerance": true
+          },
+          {
+            "absolute_difference": {
+              "absolute_departure_from_120_deg": 2.842170943040401e-14,
+              "fitted_rmsd_angstrom": 1.1102230246251565e-15,
+              "rotation_angle_deg": 2.842170943040401e-14
+            },
+            "fixed_chain": "B",
+            "moving_chain": "C",
+            "within_reproduction_tolerance": true
+          }
+        ],
+        "implementation": {
+          "biopython": "1.88",
+          "fit": "Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)",
+          "numpy": "1.26.4",
+          "parser": "Bio.PDB.MMCIF2Dict",
+          "python": "3.11.9",
+          "script_sha256": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705"
+        },
+        "protocol": "common_backbone",
+        "reference": {
+          "implementation": {
+            "biopython": "1.88",
+            "fit": "Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)",
+            "numpy": "1.26.4",
+            "parser": "Bio.PDB.MMCIF2Dict",
+            "python": "3.11.9",
+            "script_sha256": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705"
+          },
+          "mapping": {
+            "common_backbone_atoms": 656,
+            "common_backbone_residues": 164,
+            "observed_union_atoms": 656,
+            "observed_union_residues": 164,
+            "selected_atoms": 656,
+            "selected_fraction_of_observed_union_residues": 1.0,
+            "selected_keys_sha256": "30ef64f33d5e97c7ba1233b7d84454e617615b0a9e9be57bba52f2d3b266b403",
+            "selected_residues": 164
+          },
+          "pairs": [
+            {
+              "absolute_departure_from_120_deg": 0.556536987799916,
+              "fitted_rmsd_angstrom": 0.7384782934226825,
+              "fixed_chain": "A",
+              "moving_chain": "B",
+              "rotation_angle_deg": 119.44346301220008
+            },
+            {
+              "absolute_departure_from_120_deg": 0.22946416927074154,
+              "fitted_rmsd_angstrom": 1.3269554228168223,
+              "fixed_chain": "A",
+              "moving_chain": "C",
+              "rotation_angle_deg": 120.22946416927074
+            },
+            {
+              "absolute_departure_from_120_deg": 0.279170568887011,
+              "fitted_rmsd_angstrom": 1.0301966849760704,
+              "fixed_chain": "B",
+              "moving_chain": "C",
+              "rotation_angle_deg": 120.27917056888701
+            }
+          ],
+          "protocol": "common_backbone",
+          "source": {
+            "chains": [
+              "A",
+              "B",
+              "C"
+            ],
+            "declared_polymer_residues": 181,
+            "experimental_method": "X-RAY DIFFRACTION",
+            "label_entity_id": "1",
+            "model_id": "1",
+            "pdb_id": "2RE9",
+            "resolution_angstrom": 2.1,
+            "unobserved_polymer_positions": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ]
+          },
+          "status": "measured"
+        },
+        "source_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "status": "matches"
+      }
+    },
+    {
+      "observation_ref": "gxa_01m81564ebgwqvy8e2",
+      "reference": {
+        "checks": {
+          "criteria_spec_sha256": true,
+          "mapping": true,
+          "method": true,
+          "numerical_tolerances": true,
+          "pair_identities": true,
+          "schema": true,
+          "source_metadata": true,
+          "source_sha256": true,
+          "status": true,
+          "units": true
+        },
+        "differences": [
+          {
+            "absolute_difference": {
+              "absolute_departure_from_120_deg": 1.4210854715202004e-14,
+              "fitted_rmsd_angstrom": 1.1102230246251565e-16,
+              "rotation_angle_deg": 1.4210854715202004e-14
+            },
+            "fixed_chain": "A",
+            "moving_chain": "B",
+            "within_reproduction_tolerance": true
+          },
+          {
+            "absolute_difference": {
+              "absolute_departure_from_120_deg": 0.0,
+              "fitted_rmsd_angstrom": 8.881784197001252e-16,
+              "rotation_angle_deg": 0.0
+            },
+            "fixed_chain": "A",
+            "moving_chain": "C",
+            "within_reproduction_tolerance": true
+          },
+          {
+            "absolute_difference": {
+              "absolute_departure_from_120_deg": 2.842170943040401e-14,
+              "fitted_rmsd_angstrom": 2.220446049250313e-16,
+              "rotation_angle_deg": 2.842170943040401e-14
+            },
+            "fixed_chain": "B",
+            "moving_chain": "C",
+            "within_reproduction_tolerance": true
+          }
+        ],
+        "implementation": {
+          "biopython": "1.88",
+          "fit": "Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)",
+          "numpy": "1.26.4",
+          "parser": "Bio.PDB.MMCIF2Dict",
+          "python": "3.11.9",
+          "script_sha256": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705"
+        },
+        "protocol": "common_ca",
+        "reference": {
+          "implementation": {
+            "biopython": "1.88",
+            "fit": "Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)",
+            "numpy": "1.26.4",
+            "parser": "Bio.PDB.MMCIF2Dict",
+            "python": "3.11.9",
+            "script_sha256": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705"
+          },
+          "mapping": {
+            "common_backbone_atoms": 656,
+            "common_backbone_residues": 164,
+            "observed_union_atoms": 656,
+            "observed_union_residues": 164,
+            "selected_atoms": 164,
+            "selected_fraction_of_observed_union_residues": 1.0,
+            "selected_keys_sha256": "8174cdb61041dd0788f387dee724c59a6ce818089f84ca2aef827331e5f89789",
+            "selected_residues": 164
+          },
+          "pairs": [
+            {
+              "absolute_departure_from_120_deg": 0.5786554276982656,
+              "fitted_rmsd_angstrom": 0.7183194087231138,
+              "fixed_chain": "A",
+              "moving_chain": "B",
+              "rotation_angle_deg": 119.42134457230173
+            },
+            {
+              "absolute_departure_from_120_deg": 0.1894557816205662,
+              "fitted_rmsd_angstrom": 1.3384055618266013,
+              "fixed_chain": "A",
+              "moving_chain": "C",
+              "rotation_angle_deg": 120.18945578162057
+            },
+            {
+              "absolute_departure_from_120_deg": 0.34355812902914806,
+              "fitted_rmsd_angstrom": 1.0700775979129449,
+              "fixed_chain": "B",
+              "moving_chain": "C",
+              "rotation_angle_deg": 120.34355812902915
+            }
+          ],
+          "protocol": "common_ca",
+          "source": {
+            "chains": [
+              "A",
+              "B",
+              "C"
+            ],
+            "declared_polymer_residues": 181,
+            "experimental_method": "X-RAY DIFFRACTION",
+            "label_entity_id": "1",
+            "model_id": "1",
+            "pdb_id": "2RE9",
+            "resolution_angstrom": 2.1,
+            "unobserved_polymer_positions": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ]
+          },
+          "status": "measured"
+        },
+        "source_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "status": "matches"
+      }
+    }
+  ],
+  "source_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+}

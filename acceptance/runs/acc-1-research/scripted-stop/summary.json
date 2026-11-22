@@ -1,0 +1,106 @@
+{
+  "code_at_end": {
+    "files_hashed": 238,
+    "git_commit": "47165af6befa919a5fc444a7c823ea9160cfb22f",
+    "scientific_and_runtime_tree_sha256": "52668eff8b04b0f83096eda888d494f3fddc991f43f59a1c1a3e733fdef8dca5"
+  },
+  "code_at_start": {
+    "files_hashed": 238,
+    "git_commit": "47165af6befa919a5fc444a7c823ea9160cfb22f",
+    "scientific_and_runtime_tree_sha256": "52668eff8b04b0f83096eda888d494f3fddc991f43f59a1c1a3e733fdef8dca5"
+  },
+  "commands": [
+    {
+      "command": [
+        "start",
+        "--state",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/var/acc1-research-final-stopped",
+        "--spec",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-research/scripted-stop/spec.json"
+      ],
+      "exit": 0,
+      "node": "quality",
+      "report_ref": null,
+      "round": 0,
+      "run_id": "gxr_01m8155zksjvft8vvb",
+      "seconds": 1.926,
+      "status": "WAITING_EXTERNAL_JOB"
+    },
+    {
+      "command": [
+        "stop",
+        "--state",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/var/acc1-research-final-stopped"
+      ],
+      "exit": 0,
+      "node": "quality",
+      "report_ref": null,
+      "round": 0,
+      "run_id": "gxr_01m8155zksjvft8vvb",
+      "seconds": 0.34,
+      "status": "PAUSED"
+    },
+    {
+      "command": [
+        "resume",
+        "--state",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/var/acc1-research-final-stopped",
+        "--timeout",
+        "200"
+      ],
+      "exit": 0,
+      "node": "__end__",
+      "report_ref": "gxa_01m81566zaehskd64e",
+      "round": 0,
+      "run_id": "gxr_01m8155zksjvft8vvb",
+      "seconds": 5.663,
+      "status": "COMPLETED"
+    },
+    {
+      "command": [
+        "run",
+        "--state",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/var/acc1-research-final-stopped",
+        "--timeout",
+        "30"
+      ],
+      "exit": 0,
+      "node": "__end__",
+      "report_ref": "gxa_01m81566zaehskd64e",
+      "round": 0,
+      "run_id": "gxr_01m8155zksjvft8vvb",
+      "seconds": 0.205,
+      "status": "COMPLETED"
+    }
+  ],
+  "decisions": [
+    {
+      "actions": [
+        {
+          "action": "stop"
+        }
+      ],
+      "reason": "The independent assessment found stable for ['common_backbone', 'common_ca']. The measured masks and pairwise deltas delimit the supported scope.",
+      "round": 0,
+      "stop_reason": "The two common-atom selections answer the defined question for atoms recovered in all chains. The narrower ordered subset remains untested."
+    }
+  ],
+  "finished": "2026-11-22T08:15:31.856972+00:00",
+  "job_count": 3,
+  "mode": "official Codex app-server, scripted loopback Responses, real local CPU Jobs",
+  "native_accounting": {
+    "charged_gx_turns": 4,
+    "charged_tokens": 595,
+    "provider_billing_usd": null,
+    "remaining_native_holds": [],
+    "status": "NO_HELD_NATIVE_TURNS"
+  },
+  "observations_recomputed": 2,
+  "replay_new_jobs": 0,
+  "replay_new_turns": 0,
+  "report_ref": "gxa_01m81566zaehskd64e",
+  "scripted_policy": "finish when the measured common-atom comparison is stable",
+  "started": "2026-11-22T08:15:22.858000+00:00",
+  "status": "PASS",
+  "task_count": 3
+}

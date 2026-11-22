@@ -1,0 +1,172 @@
+{
+  "source": "Read-only snapshot of the original GX budget, delivery, task and attempt rows, verified against numeric receipts at the exact official local Codex paths for the five paid threads. This export contains UTC timestamps on 2026-11-22, usage counters and hashed GX task references.",
+  "cap": {
+    "GX_run_tokens": 1000000,
+    "GX_reservation_per_paid_turn": 65536,
+    "GX_calls_per_paid_turn": 1
+  },
+  "turns": [
+    {
+      "number": 1,
+      "role": "main",
+      "attempt": null,
+      "task_hash_prefix": null,
+      "admitted_at_utc": "2026-11-22T08:16:12.729Z",
+      "ledger_spent_before_admission": 0,
+      "ledger_held_before_admission": 0,
+      "ledger_available_before_admission": 1000000,
+      "grant": {
+        "api_calls": 1,
+        "tokens": 65536
+      },
+      "settled_at_utc": "2026-11-22T08:16:33.355Z",
+      "actual_inclusive_tokens": 53972,
+      "cached_input_tokens": 34432,
+      "uncached_input_plus_output_tokens": 19540,
+      "provider_responses": 3,
+      "prior_thread_tokens": 0,
+      "provider_tokens_reported_by_admission": 0
+    },
+    {
+      "number": 2,
+      "role": "planner",
+      "attempt": 1,
+      "task_hash_prefix": "138fffa66ab064a9",
+      "admitted_at_utc": "2026-11-22T08:16:36.835Z",
+      "ledger_spent_before_admission": 53972,
+      "ledger_held_before_admission": 0,
+      "ledger_available_before_admission": 946028,
+      "grant": {
+        "api_calls": 1,
+        "tokens": 65536
+      },
+      "settled_at_utc": "2026-11-22T08:18:40.701Z",
+      "actual_inclusive_tokens": 266705,
+      "cached_input_tokens": 230144,
+      "uncached_input_plus_output_tokens": 36561,
+      "provider_responses": 9,
+      "prior_thread_tokens": 0,
+      "provider_tokens_reported_by_admission": 53972
+    },
+    {
+      "number": 3,
+      "role": "planner",
+      "attempt": 2,
+      "task_hash_prefix": "138fffa66ab064a9",
+      "admitted_at_utc": "2026-11-22T08:18:14.043Z",
+      "ledger_spent_before_admission": 53972,
+      "ledger_held_before_admission": 65536,
+      "ledger_available_before_admission": 880492,
+      "grant": {
+        "api_calls": 1,
+        "tokens": 65536
+      },
+      "settled_at_utc": "2026-11-22T08:20:02.300Z",
+      "actual_inclusive_tokens": 191002,
+      "cached_input_tokens": 150144,
+      "uncached_input_plus_output_tokens": 40858,
+      "provider_responses": 6,
+      "prior_thread_tokens": 0,
+      "provider_tokens_reported_by_admission": 223687
+    },
+    {
+      "number": 4,
+      "role": "evidence_reviewer",
+      "attempt": 1,
+      "task_hash_prefix": "8b9018776196b5e6",
+      "admitted_at_utc": "2026-11-22T08:19:58.564Z",
+      "ledger_spent_before_admission": 320677,
+      "ledger_held_before_admission": 65536,
+      "ledger_available_before_admission": 613787,
+      "grant": {
+        "api_calls": 1,
+        "tokens": 65536
+      },
+      "settled_at_utc": "2026-11-22T08:22:46.039Z",
+      "actual_inclusive_tokens": 533421,
+      "cached_input_tokens": 473472,
+      "uncached_input_plus_output_tokens": 59949,
+      "provider_responses": 12,
+      "prior_thread_tokens": 0,
+      "provider_tokens_reported_by_admission": 474947
+    },
+    {
+      "number": 5,
+      "role": "evidence_reviewer",
+      "attempt": 2,
+      "task_hash_prefix": "8b9018776196b5e6",
+      "admitted_at_utc": "2026-11-22T08:22:08.359Z",
+      "ledger_spent_before_admission": 511679,
+      "ledger_held_before_admission": 65536,
+      "ledger_available_before_admission": 422785,
+      "grant": {
+        "api_calls": 1,
+        "tokens": 65536
+      },
+      "settled_at_utc": "2026-11-22T08:25:28.253Z",
+      "actual_inclusive_tokens": 573196,
+      "cached_input_tokens": 510848,
+      "uncached_input_plus_output_tokens": 62348,
+      "provider_responses": 12,
+      "prior_thread_tokens": 0,
+      "provider_tokens_reported_by_admission": 839736
+    }
+  ],
+  "first_provider_receipt_over_cap": {
+    "at_utc": "2026-11-22T08:22:21.506Z",
+    "turn_number": 4,
+    "prior_tokens": 966941,
+    "increment_tokens": 51168,
+    "cumulative_tokens": 1018109,
+    "later_gx_paid_turn_admissions": 0,
+    "provider_receipts_completed_later_by_turn": [
+      {
+        "turn_number": 4,
+        "count": 1,
+        "tokens": 52352
+      },
+      {
+        "turn_number": 5,
+        "count": 11,
+        "tokens": 547835
+      }
+    ]
+  },
+  "first_gx_settlement_over_cap": {
+    "at_utc": "2026-11-22T08:22:46.039Z",
+    "turn_number": 4,
+    "prior_tokens": 511679,
+    "increment_tokens": 533421,
+    "cumulative_tokens": 1045100,
+    "later_gx_paid_turn_admissions": 0,
+    "provider_receipts_completed_later_by_turn": [
+      {
+        "turn_number": 5,
+        "count": 10,
+        "tokens": 515779
+      }
+    ]
+  },
+  "final": {
+    "GX_status": "PAUSED",
+    "settled_GX_turns": 5,
+    "settled_GX_calls": 5,
+    "still_held_tokens": 0,
+    "official_unique_provider_responses": 42,
+    "inclusive_tokens": 1618296,
+    "over_cap_tokens": 618296,
+    "cached_input_tokens": 1399040
+  },
+  "third_reviewer_attempt": {
+    "claimed_at_utc": "2026-11-22T08:24:20.617Z",
+    "budget_wait_started_at_utc": "2026-11-22T08:24:20.837Z",
+    "GX_paid_turns": 0
+  },
+  "interpretation": [
+    "GX charged each already-admitted turn in full. All five original baselines are attributable. The final new GX turn fit both the ledger and known actual usage at its admission. The turn continued emitting provider responses after the aggregate crossed the cap. Receipt times identify when each provider response completed.",
+    "Distinct threads for a rejected worker and its next attempt belonged to the same logical task. The old same-thread check allowed the successor to spend before the prior attempt settled. The fix applies the existing metering wait across earlier attempts of that same task. Independent tasks retain ordinary budget admission.",
+    "The GX reserve is an estimate. Codex 0.169.0 Goal accounting uses uncached input plus output. The per-turn equivalents shown here are calculated from the provider receipts. GX charges the inclusive total. A reservation cap cannot bound every provider request of an in-flight turn."
+  ],
+  "offline_replay": "budget-admission-replay.json",
+  "official_multi_task_comparison": "../../acc-1-attempt-meter/comparison.json"
+}

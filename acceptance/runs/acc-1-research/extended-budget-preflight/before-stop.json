@@ -1,0 +1,212 @@
+{
+  "artifacts": [
+    {
+      "artifact_ref": "gxa_01m81671p5w7gx6cr4",
+      "bytes": 507971,
+      "job_id": null,
+      "kind": "run_input",
+      "run_id": "gxr_01m81671nez72npyqw",
+      "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "task_id": null
+    },
+    {
+      "artifact_ref": "gxa_01m81673cfpv1kb27t",
+      "bytes": 14612,
+      "job_id": null,
+      "kind": "capability_script",
+      "run_id": null,
+      "sha256": "f6a589ae44c53725d8066988cda86b1212aad19d26f89660a2e49a3e96f13003",
+      "task_id": null
+    },
+    {
+      "artifact_ref": "gxa_01m81673d80t26h0jx",
+      "bytes": 1724,
+      "job_id": null,
+      "kind": "asset_content",
+      "run_id": null,
+      "sha256": "f4c232a3820cae363939ae441e6bed200f482b94f922439adaf15cc770789203",
+      "task_id": null
+    },
+    {
+      "artifact_ref": "gxa_01m81673e873sqptqc",
+      "bytes": 571,
+      "job_id": null,
+      "kind": "input_manifest",
+      "run_id": "gxr_01m81671nez72npyqw",
+      "sha256": "442865f5b3f6e1ec853791e8d3963a6e579c445969b793cbe93ff975a734465d",
+      "task_id": null
+    }
+  ],
+  "budget": [
+    {
+      "limits_json": "{\"api_calls\":18,\"cpu_seconds\":14400,\"gpu_jobs\":0,\"gpu_minutes\":0,\"job_submissions\":4,\"tokens\":12000000,\"wall_hours\":24,\"worker_tasks\":120}",
+      "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":30,\"job_submissions\":1,\"tokens\":0}",
+      "spent_json": "{\"api_calls\":1,\"tokens\":35}"
+    }
+  ],
+  "decisions": [],
+  "deliveries": [
+    {
+      "event_id": "human:09772cc2-1458-5bbb-82f9-4f7bc0888ed6",
+      "method": "turn/start",
+      "state": "acknowledged",
+      "thread_id": "01a20263-899c-7772-8603-85416f835709",
+      "turn_id": "01a20263-8a46-7df1-a645-a12f1054f7a4"
+    }
+  ],
+  "effective_roots": [
+    {
+      "attempt": null,
+      "effective_profile_json": "{\"effort\":\"xhigh\",\"model\":\"gpt-6.2-astra\",\"provider\":\"gx_loopback\"}",
+      "effort": "xhigh",
+      "model": "gpt-6.2-astra",
+      "provider": "gx_loopback",
+      "role": "main",
+      "task_id": null,
+      "thread_id": "01a20263-899c-7772-8603-85416f835709"
+    }
+  ],
+  "jobs": [
+    {
+      "capability_id": "tl1a-coordinate-quality",
+      "capability_version": "1",
+      "exit_code": null,
+      "finished_at": null,
+      "idempotency_key": "job:gxr_01m81671nez72npyqw:tl1a-coordinate-quality:structure-inventory",
+      "input_manifest_ref": "gxa_01m81673e873sqptqc",
+      "job_id": "gxj_01m81673et1rb02830",
+      "measured_json": "{}",
+      "scheduler_ref": "runner:1711295:2965587139",
+      "status": "SUBMITTED",
+      "submitted_at": "2026-11-22T08:33:28.672Z"
+    }
+  ],
+  "manifests": [
+    {
+      "admission": {
+        "capability": {
+          "id": "tl1a-coordinate-quality",
+          "sha256": "f4c232a3820cae363939ae441e6bed200f482b94f922439adaf15cc770789203",
+          "version": "1"
+        },
+        "evaluator": null,
+        "input_manifest": {
+          "artifact_ref": "gxa_01m81673e873sqptqc",
+          "sha256": "442865f5b3f6e1ec853791e8d3963a6e579c445969b793cbe93ff975a734465d"
+        },
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m81671p5w7gx6cr4",
+            "bytes": 507971,
+            "role": "structure",
+            "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+          }
+        ],
+        "intent_dependencies": {
+          "coordinates": {
+            "item_type": "data_source",
+            "role": "execution",
+            "sha256": "80a4c31a6ed5c641929f5bbb2149aaf98a2eac294ffcf92359d5993c17544b45",
+            "version": 1
+          }
+        },
+        "limits": {
+          "cpu_threads": 1,
+          "gpu": null,
+          "memory_mib": null,
+          "tightened": {},
+          "wall_seconds": 30
+        },
+        "owner": {
+          "attempt_id": null,
+          "kind": "workflow_node",
+          "node_id": "quality",
+          "path_id": null,
+          "task_id": null,
+          "workflow_id": "tl1a_geometry",
+          "workflow_version": "2"
+        },
+        "parameters": {},
+        "runtime": {
+          "container_digest": null,
+          "dependency_lock_scope": "interpreter and declared distributions",
+          "env_id": "control-plane-python",
+          "execution_host": "ash-gpu--e7ed9c93ca7b-kfaa4ldexx",
+          "gpu": null,
+          "kind": "SYSTEM_BINARY",
+          "lockfile_ref": null,
+          "machine": "x86_64",
+          "observed_dependencies": {
+            "distributions": {},
+            "interpreter_sha256": "f3e3f561b473976be55d937616915d6c507dedcb3950c3ca72df786b28e8efdc",
+            "python": "3.11.9",
+            "requirements": {}
+          },
+          "observed_dependencies_sha256": "53e716d0f6700c6e2f062d3eb2201392c9fa145d364730d9bec17b6aa5ca6415",
+          "os": "Linux"
+        },
+        "source": {
+          "files": {
+            "entry_script": "f6a589ae44c53725d8066988cda86b1212aad19d26f89660a2e49a3e96f13003",
+            "gx_core/jobs/adapter_host.py": "d40145b94a68c688276dd0c372bc0b30ba378ad10259bcec59b40b200f760e63",
+            "gx_core/jobs/executor.py": "e66d815807fa8b416652454fd18198d258bd4554f704d5e0ac355e38ed8a8087",
+            "gx_core/jobs/resource_guard.py": "25ba017aabd111ec226b2bffeae20bfed91c542d1380c02c4df1e616a0369df6",
+            "gx_core/jobs/service.py": "9d234e1a4c1c1327f44b6d7b9291d5ddd036d2dce13c87acde472c1be6118732",
+            "gx_core/p0/manifest.py": "dbf88a9990112b9e70f5c62bfa6f0e462fba72aa60e888f614eac88b08761c44",
+            "method_source": "f6a589ae44c53725d8066988cda86b1212aad19d26f89660a2e49a3e96f13003",
+            "runner": "a752445abbc817330b9b0e7136ab16f6ab9a65d844e775fa235c3e4d6ea3d179"
+          },
+          "method_source": {
+            "path": "{harness}/adapters/scientific/tl1a_geometry/worker.py",
+            "sha256": "f6a589ae44c53725d8066988cda86b1212aad19d26f89660a2e49a3e96f13003"
+          },
+          "scope": "method, GX Job runner, publication and adapter sources",
+          "tree_sha256": "9cafafef0fe780dd229d1a35143485691bbcaf6c346b80df61702c813ef47a38"
+        }
+      },
+      "admission_sha256": "404c9f0c530279d134383eba9339f5b155c56e081aac2e34cb58c460ca7115c8",
+      "completion_sha256": null,
+      "job_id": "gxj_01m81673et1rb02830"
+    }
+  ],
+  "native_reservations": [
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":666666}",
+      "status": "SETTLED",
+      "subject_id": "human:09772cc2-1458-5bbb-82f9-4f7bc0888ed6"
+    }
+  ],
+  "reviewer_recalculations": [],
+  "roots": [
+    {
+      "attempt": null,
+      "effort": "xhigh",
+      "model": "gpt-6.2-astra",
+      "role": "main",
+      "task_id": null,
+      "thread_id": "01a20263-899c-7772-8603-85416f835709"
+    }
+  ],
+  "runs": [
+    {
+      "objective": "Using the deposited 2RE9 coordinates, determine how sensitive the pairwise rigid-body geometry of the observed TL1A chains is to atom selection and incomplete observations. Quantify uncertainty and limit the conclusion to the crystal coordinates.",
+      "project_ref": "tl1a-coordinate-sensitivity",
+      "run_id": "gxr_01m81671nez72npyqw",
+      "status": "WAITING_EXTERNAL_JOB",
+      "workflow_id": "tl1a_geometry",
+      "workflow_sha256": "33d7414ce6489dbee3b0dfa2c8136f31653ec1c81fdcfb15b69d533201dcd755",
+      "workflow_version": "2"
+    }
+  ],
+  "settlements": [],
+  "submissions": [],
+  "tasks": [],
+  "usage": [
+    {
+      "terminal_status": "completed",
+      "thread_id": "01a20263-899c-7772-8603-85416f835709",
+      "total_tokens": 35,
+      "turn_id": "01a20263-8a46-7df1-a645-a12f1054f7a4"
+    }
+  ]
+}

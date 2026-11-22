@@ -1,0 +1,146 @@
+{
+  "budget": {
+    "limits": {
+      "api_calls": 128,
+      "cpu_seconds": 14400,
+      "gpu_jobs": 2,
+      "gpu_minutes": 40,
+      "job_submissions": 200,
+      "tokens": 1000000,
+      "wall_hours": 24,
+      "worker_tasks": 120
+    },
+    "reserved": {
+      "api_calls": 0,
+      "cpu_seconds": 0,
+      "job_submissions": 0,
+      "tokens": 0,
+      "worker_tasks": 0
+    },
+    "spent": {
+      "api_calls": 5,
+      "cpu_seconds": 4,
+      "job_submissions": 4,
+      "tokens": 1618296,
+      "worker_tasks": 2
+    }
+  },
+  "captured_at": "2026-11-22T08:25:37.708177+00:00",
+  "decisions": [],
+  "driver_pause": {
+    "at": "2026-11-22T08:25:28.527Z",
+    "continue_from": {
+      "checkpoint_seq": 11,
+      "interrupt_ref": "gxi_01m815ebjnrpdbvam3",
+      "node": "assessment",
+      "status": "WAITING_CLIENT"
+    },
+    "paused_by": "cli:operator:gx-p0-operator",
+    "reason": "budget_exhausted: budget gxb_01m8157egcf6cy2se8: tokens=1 requested, -618296 left of 1000000"
+  },
+  "has_final_report": false,
+  "mode": "read-only audit of saved GX project and independent CPU reproduction",
+  "new_jobs": 0,
+  "new_provider_calls": 0,
+  "observations_reproduced": 3,
+  "outstanding_native_reservations": [],
+  "provider_billing_usd": null,
+  "review_submissions": [
+    {
+      "acceptance": "REJECTED",
+      "attempt": 1,
+      "checks": {
+        "common_backbone": "gxa_01m815fc0mc5114e09",
+        "common_ca": "gxa_01m815fbtpmysn01a7",
+        "ordered_backbone": "gxa_01m815fc5td8kwfqeg"
+      },
+      "findings": {
+        "H_sensitive": {
+          "reason": "Changing coverage while keeping N, Cα, C and O gave absolute angle and RMSD changes of B→A (0.725°, 0.615 Å), C→A (0.117°, 1.205 Å), C→B (0.558°, 0.900 Å). Comparing Cα-only with ordered backbone gave B→A (0.747°, 0.595 Å), C→A (0.077°, 1.217 Å), C→B (0.622°, 0.940 Å). Each ordered backbone contrast crossed the RMSD bound in all three pairs and the angle bound for B→A and C→B. C→A crossed only the RMSD bound in both contrasts. Across all three selections the angle and RMSD ranges were B→A 119.421–120.168° and 0.124–0.738 Å, C→A 120.113–120.229° and 0.122–1.338 Å, C→B 119.721–120.344° and 0.130–1.070 Å. The independent fits reproduced all nine classifications in the frozen evaluation.",
+          "supported": true
+        },
+        "H_stable": {
+          "reason": "The full backbone and Cα-only selections cover the same 164 residues. Their absolute changes in principal angle and fitted RMSD were B→A (0.022°, 0.020 Å), C→A (0.040°, 0.011 Å), C→B (0.064°, 0.040 Å). All three pairs satisfy the frozen bounds of 0.5° and 0.15 Å for this contrast. Universal stability fails because the admissible ordered backbone contrasts cross the bounds. All nine fits reproduced and all selections met the coverage floors. The largest independent reproduction differences were 1.85 × 10⁻¹³° and 1.40 × 10⁻¹⁵ Å, within the frozen tolerances of 0.01° and 0.001 Å.",
+          "supported": false
+        }
+      },
+      "limitations": [
+        "The two broad selections used all 164 residues in the observed union, label positions 18–181 in every chain. This is 90.6% of the 181 declared positions. The full backbone used 656 atoms per chain and the Cα selection used 164. The ordered backbone used 196 atoms at 49 of 164 observed residues (29.88%, or 27.07% of the declared sequence), exactly meeting both frozen floors and omitting 115 observed residues. Its eight retained stretches were 26–30, 75–85, 107–109, 111, 124–129, 139–148, 157–160 and 172–180. Every selection had noncollinear coordinates in all three chains. Positions 1–17 were unobserved in all three chains, so their influence is undetermined.",
+        "The values in parentheses give the principal rotation angle and fitted atom RMSD. common_backbone gave B→A (119.443°, 0.738 Å), C→A (120.229°, 1.327 Å), C→B (120.279°, 1.030 Å). common_ca gave B→A (119.421°, 0.718 Å), C→A (120.189°, 1.338 Å), C→B (120.344°, 1.070 Å). ordered_backbone gave B→A (120.168°, 0.124 Å), C→A (120.113°, 0.122 Å), C→B (119.721°, 0.130 Å). A fitted RMSD describes the residual on the atoms used for that fit. The lower ordered backbone RMSDs therefore characterize the retained subset. The occupancy and B-factor filter is selective, and B factors reflect both disorder and refinement.",
+        "The ranges describe the effect of the tested selections on these deposited coordinates. Experimental confidence intervals and the effect of the missing segment are undetermined. The chain pairs share chains and provide dependent comparisons from one asymmetric unit. The unsigned angles alone leave the rotation axes unresolved, and the conclusions are confined to the 2RE9 crystal model."
+      ],
+      "principal": "01a20257-2fcd-73c0-b0bb-9d062ab38b03",
+      "product_ref": "gxa_01m815jappw41rdnz3",
+      "status": "sensitive",
+      "submission_id": "gxsb_01m815jaqab1ner9rx"
+    },
+    {
+      "acceptance": "REJECTED",
+      "attempt": 2,
+      "checks": {
+        "common_backbone": "gxa_01m815k2kya7mzzwjd",
+        "common_ca": "gxa_01m815k2827f0kmkdp",
+        "ordered_backbone": "gxa_01m815k2d0kea02s36"
+      },
+      "findings": {
+        "geometry_h_1bfd1cc427ea21480ddfcc2bdf0865b5c2223af6c03b7a5d9cb503020f7de3e7": {
+          "reason": "H_stable predicts all nine contrasts stay within 0.5° and 0.15 Å. Six contrasts exceeded at least one bound using unrounded values. All three distinct protocols met the frozen coverage and reproduced, so the evidence rejects the stability prediction for these selections.",
+          "supported": false
+        },
+        "geometry_h_4520fd7758ec59bcd6196e93e7f55e31ba8d8919fbe24c2a26ab84d20ffdacf4": {
+          "reason": "H_sensitive is supported. At fixed residue coverage, switching from the full N/CA/C/O backbone to Cα changed the fitted angle by at most 0.0644° and RMSD by at most 0.0399 Å. Applying the occupancy 1 and B ≤40 Å² filter to complete N/CA/C/O residues in all three chains retained 49 of 164 observed residues. Relative to the full backbone, the filter exceeded the RMSD bound in all three pairs and the angle bound for B onto A and C onto B. The same pattern held against Cα. C onto A had the largest RMSD shift (1.2166 Å against Cα) with angle shifts within the bound against both full-coverage protocols.\n\nEach fit cell gives the unsigned rotation angle and fitted atom RMSD.\n\n| Fit | B onto A | C onto A | C onto B |\n| --- | --- | --- | --- |\n| Full backbone | 119.4435° / 0.7385 Å | 120.2295° / 1.3270 Å | 120.2792° / 1.0302 Å |\n| Cα | 119.4213° / 0.7183 Å | 120.1895° / 1.3384 Å | 120.3436° / 1.0701 Å |\n| Ordered backbone | 120.1683° / 0.1237 Å | 120.1128° / 0.1218 Å | 119.7211° / 0.1305 Å |\n\nEach contrast cell gives the absolute angle and RMSD deltas. All nine reproduced comparisons agreed with the frozen evaluation.\n\n| Protocol contrast | B onto A | C onto A | C onto B |\n| --- | --- | --- | --- |\n| Full backbone vs Cα | 0.0221° / 0.0202 Å | 0.0400° / 0.0115 Å | 0.0644° / 0.0399 Å |\n| Full backbone vs Ordered backbone | 0.7248° / 0.6148 Å | 0.1166° / 1.2051 Å | 0.5580° / 0.8997 Å |\n| Cα vs Ordered backbone | 0.7469° / 0.5946 Å | 0.0766° / 1.2166 Å | 0.6224° / 0.9396 Å |\n\nThe observed protocol ranges were B onto A 119.4213–120.1683° and 0.1237–0.7385 Å, C onto A 120.1128–120.2295° and 0.1218–1.3384 Å, C onto B 119.7211–120.3436° and 0.1305–1.0701 Å. Independent Biopython SVD fits matched the job atom-key hashes, counts, pair identities and all numerical tolerances. The maximum reproduction differences were 1.85 × 10⁻¹³° and 1.41 × 10⁻¹⁵ Å, within the 0.01° and 0.001 Å tolerance limits.",
+          "supported": true
+        }
+      },
+      "limitations": "The deposited entity declares 181 residue positions per chain. Label positions 1–17 are unobserved in A, B and C, so their influence on the fits is unidentifiable from these coordinates. The full-backbone and Cα fits each use positions 18–181, or 164/164 (100%) of the observed union and 164/181 (90.61%) of the declared positions, with 656 and 164 atom correspondences per pair, respectively. The ordered fit uses 196 atom correspondences and 49/164 (29.878%) of the observed union, exactly the frozen count and fraction floors, or 49/181 (27.07%) of the declared positions. It excludes 115 observed residues. Its lower fitted RMSDs describe only its retained sites under its own refit. B factors mix disorder and refinement effects, and these selected sites may differ systematically from discarded sites. Protocol ranges quantify selection sensitivity under the tested choices. Experimental coordinate uncertainty remains unquantified, and the pairs share chains and are dependent. The conclusions apply to model 1 of this 2.10 Å 2RE9 asymmetric unit. A common symmetry axis, solution assembly, binding and activity require additional evidence.",
+      "principal": "01a20259-2c9d-7b81-8208-6ae07ed913c2",
+      "product_ref": "gxa_01m815pc40vjv2zyej",
+      "status": "sensitive",
+      "submission_id": "gxsb_01m815pc4p8eqtx7ym"
+    }
+  ],
+  "run": {
+    "objective": "Using the deposited 2RE9 coordinates, determine how sensitive the pairwise rigid-body geometry of the observed TL1A chains is to atom selection and incomplete observations. Quantify uncertainty and limit the conclusion to the crystal coordinates.",
+    "project_ref": "tl1a-coordinate-sensitivity",
+    "run_id": "gxr_01m8157egct7y5p1c0",
+    "status": "PAUSED",
+    "workflow_id": "tl1a_geometry",
+    "workflow_sha256": "bd01ffd53b2f9148c868e7e699fda32149acd0734b60841534fa404e5c47d455",
+    "workflow_version": "1"
+  },
+  "spent_above_token_admission_limit": 618296,
+  "tasks": [
+    {
+      "attempt": 2,
+      "stage": "proposal",
+      "status": "ACCEPTED",
+      "task_id": "gxt_01m81585tpqn21v98j"
+    },
+    {
+      "attempt": 3,
+      "stage": "assessment",
+      "status": "CLAIMED",
+      "task_id": "gxt_01m815ebgf7rk0k42c"
+    }
+  ],
+  "validation_refusals": [
+    {
+      "messages": [
+        "apply the current task's Intent versions; read gx_task_context"
+      ],
+      "submission_id": "gxsb_01m815b60cap6ra9gx"
+    },
+    {
+      "messages": [
+        "interpret the frozen comparison; explain any evidentiary qualification and limits"
+      ],
+      "submission_id": "gxsb_01m815jaqab1ner9rx"
+    },
+    {
+      "messages": [
+        "assess each declared hypothesis"
+      ],
+      "submission_id": "gxsb_01m815pc4p8eqtx7ym"
+    }
+  ]
+}

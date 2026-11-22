@@ -53,6 +53,12 @@ def peer_action(body, ident, *, finish_if_stable=False):
         stage = task['output_kind']
         if stage == 'geometry_plan':
             quality = read(task['quality_summary_ref'])
+            guide = quality.get('source_guide')
+            if guide:
+                locator = next(loc for loc in guide['locators'] if 'ATOM ' in loc['excerpt'])
+                page = get('gx_read_artifact', ref=guide['structure_ref'], offset=locator['offset'])
+                if not page['content'].startswith(locator['excerpt']) or page['sha256'] != guide['sha256']:
+                    raise ValueError('The source locator does not lead to the original coordinate excerpt')
             # Prospectively accept exploratory subsets with >=40 positions and 25% observed-union coverage.
             # Both constraints are written into the plan before any geometry observations.
             criteria = dict(task['criteria_template'])
@@ -87,11 +93,17 @@ def peer_action(body, ident, *, finish_if_stable=False):
                 if comparisons:
                     reason += (f' Maximum angle difference {max(c["angle_delta_deg"] for c in comparisons):.5f} degrees, '
                                f'maximum fitted RMSD difference {max(c["rmsd_delta_angstrom"] for c in comparisons):.5f} Å.')
+                guide = read(task['quality_summary_ref']).get('source_guide')
+                id_field = 'hypothesis_id' if guide and plan.get('previous_decision_ref') else 'id'
+                limitations = ('The pairs share atoms and use one deposited model. Disorder and missing density limit inference.'
+                               if not guide or id_field == 'hypothesis_id' else [
+                                   'The three pair fits share atom coordinates.',
+                                   'A single experimental crystal cannot determine the solution-state geometry.'])
                 product = {'proposal_ref': task['proposal_ref'], 'evidence_ref': task['evidence_ref'],
                            'checks': checks, 'status': status,
-                           'findings': {h['id']: {'supported': None if status == 'insufficient'
+                           'findings': {h[id_field]: {'supported': None if status == 'insufficient'
                                                  else h['expected'] == status, 'reason': reason} for h in plan['hypotheses']},
-                           'limitations': 'The pairs share atoms and use one deposited model. Disorder and missing density limit inference.'}
+                           'limitations': limitations}
             elif stage == 'geometry_decision':
                 assessed = read(task['assessment_ref'])
                 observed = {r['protocol'] for r in evidence['routes']}

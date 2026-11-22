@@ -1,0 +1,944 @@
+{
+  "case": "exhaustion",
+  "entry": "gx_core.p0.cli.run_until_stopped",
+  "codex": "official App Server 0.169.0",
+  "inference": "deterministic loopback Responses",
+  "started": "2026-11-22T08:34:17.604203+00:00",
+  "result": "FAIL",
+  "run_id": "gxr_01m8168ke9mr9chd6e",
+  "tasks": {
+    "rejected": "gxt_01m8168kee812dm88z",
+    "independent": "gxt_01m8168kef6e4qze75",
+    "depends_only_on_independent": "gxt_01m8168kefm8940vd1",
+    "depends_on_both_paths": "gxt_01m8168kefytf8awwk"
+  },
+  "before_final_usage": {
+    "balance": {
+      "spent": {
+        "api_calls": 3,
+        "tokens": 45
+      },
+      "reserved": {
+        "api_calls": 2,
+        "tokens": 60
+      },
+      "available": {
+        "api_calls": 5,
+        "cpu_seconds": 14400,
+        "gpu_jobs": 2,
+        "gpu_minutes": 40,
+        "job_submissions": 200,
+        "tokens": -5,
+        "wall_hours": 24,
+        "worker_tasks": 120
+      },
+      "reservations": [
+        {
+          "reservation_ref": "rsv_01m8168m8b6t57jtc9",
+          "subject_kind": "native_turn",
+          "subject_id": "start:4623b17e-4b94-4848-b94a-3c40f323bb59",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 30
+          },
+          "status": "HELD",
+          "created_at": "2026-11-22T08:34:18.507Z",
+          "settled_at": null
+        },
+        {
+          "reservation_ref": "rsv_01m8168mcgtxtcrrqt",
+          "subject_kind": "native_turn",
+          "subject_id": "start:5be33f07-3588-4a8d-8be4-e7975441b0ab",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 30
+          },
+          "status": "SETTLED",
+          "created_at": "2026-11-22T08:34:18.640Z",
+          "settled_at": "2026-11-22T08:34:19.224Z"
+        },
+        {
+          "reservation_ref": "rsv_01m8168mp4zgh9qn2f",
+          "subject_kind": "native_turn",
+          "subject_id": "start:08909cff-aadc-4fbd-8b24-0985110449e8",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 30
+          },
+          "status": "SETTLED",
+          "created_at": "2026-11-22T08:34:18.948Z",
+          "settled_at": "2026-11-22T08:34:19.354Z"
+        },
+        {
+          "reservation_ref": "rsv_01m8168mye1eg9r0cy",
+          "subject_kind": "native_turn",
+          "subject_id": "start:f15af56a-9c4a-412d-a753-d2d7a83efffb",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 10
+          },
+          "status": "SETTLED",
+          "created_at": "2026-11-22T08:34:19.214Z",
+          "settled_at": "2026-11-22T08:34:19.682Z"
+        },
+        {
+          "reservation_ref": "rsv_01m8168nce3wqmxtf4",
+          "subject_kind": "native_turn",
+          "subject_id": "start:9c7cf65f-50b9-495e-94c9-42891c1ff7bb",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 30
+          },
+          "status": "HELD",
+          "created_at": "2026-11-22T08:34:19.662Z",
+          "settled_at": null
+        }
+      ]
+    },
+    "tasks": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "status": "ACCEPTED",
+        "attempt": 2,
+        "attempts_consumed": 1
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "attempts_consumed": 0
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "attempts_consumed": 0
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "status": "CLAIMED",
+        "attempt": 1,
+        "attempts_consumed": 0
+      }
+    ],
+    "jobs": [],
+    "roots": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 1,
+        "lease_id": "gxl_01m8168m29zvnb18a0",
+        "thread_id": "01a20264-5059-7f22-9164-de0cd8b94745"
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "attempt": 1,
+        "lease_id": "gxl_01m8168mbv5cgj8mvt",
+        "thread_id": "01a20264-5185-7553-b51d-d2e99f78e2af"
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 2,
+        "lease_id": "gxl_01m8168mnbs4jk4bxa",
+        "thread_id": "01a20264-52b3-7f03-b074-4aff36b0d4e0"
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "attempt": 1,
+        "lease_id": "gxl_01m8168mxmb2cy4sxc",
+        "thread_id": "01a20264-53bd-77c0-becd-7d50fecce697"
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "attempt": 1,
+        "lease_id": "gxl_01m8168nbwg4zer8qp",
+        "thread_id": "01a20264-5584-7bc3-987a-4f7ecfc28559"
+      }
+    ],
+    "leases": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "lease_id": "gxl_01m8168m29zvnb18a0",
+        "attempt": 1,
+        "released_at": "2026-11-22T08:34:18.787Z"
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "lease_id": "gxl_01m8168mbv5cgj8mvt",
+        "attempt": 1,
+        "released_at": "2026-11-22T08:34:19.138Z"
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "lease_id": "gxl_01m8168mnbs4jk4bxa",
+        "attempt": 2,
+        "released_at": "2026-11-22T08:34:19.292Z"
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "lease_id": "gxl_01m8168mxmb2cy4sxc",
+        "attempt": 1,
+        "released_at": "2026-11-22T08:34:19.587Z"
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "lease_id": "gxl_01m8168nbwg4zer8qp",
+        "attempt": 1,
+        "released_at": null
+      }
+    ],
+    "paid": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 1,
+        "thread_id": "01a20264-5059-7f22-9164-de0cd8b94745",
+        "turn_id": "01a20264-510f-7c41-8c2b-15d557517e98",
+        "token_budget": 30,
+        "status": "HELD",
+        "created_at": "2026-11-22T08:34:18.507Z",
+        "settled_at": null,
+        "total_tokens": 2,
+        "terminal_status": null
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "attempt": 1,
+        "thread_id": "01a20264-5185-7553-b51d-d2e99f78e2af",
+        "turn_id": "01a20264-5192-7601-986f-f6d76c2d8ccd",
+        "token_budget": 30,
+        "status": "SETTLED",
+        "created_at": "2026-11-22T08:34:18.640Z",
+        "settled_at": "2026-11-22T08:34:19.224Z",
+        "total_tokens": 15,
+        "terminal_status": "completed"
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 2,
+        "thread_id": "01a20264-52b3-7f03-b074-4aff36b0d4e0",
+        "turn_id": "01a20264-52c7-7bb1-82dc-254eb0f83508",
+        "token_budget": 30,
+        "status": "SETTLED",
+        "created_at": "2026-11-22T08:34:18.948Z",
+        "settled_at": "2026-11-22T08:34:19.354Z",
+        "total_tokens": 15,
+        "terminal_status": "completed"
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "attempt": 1,
+        "thread_id": "01a20264-53bd-77c0-becd-7d50fecce697",
+        "turn_id": "01a20264-53d0-7af1-95bb-d42d0b991138",
+        "token_budget": 10,
+        "status": "SETTLED",
+        "created_at": "2026-11-22T08:34:19.214Z",
+        "settled_at": "2026-11-22T08:34:19.682Z",
+        "total_tokens": 15,
+        "terminal_status": "completed"
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "attempt": 1,
+        "thread_id": "01a20264-5584-7bc3-987a-4f7ecfc28559",
+        "turn_id": "01a20264-5590-7061-9955-f2adc8725447",
+        "token_budget": 30,
+        "status": "HELD",
+        "created_at": "2026-11-22T08:34:19.662Z",
+        "settled_at": null,
+        "total_tokens": null,
+        "terminal_status": null
+      }
+    ],
+    "submissions": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 1,
+        "result": "REJECTED"
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "attempt": 1,
+        "result": "ACCEPTED"
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 2,
+        "result": "ACCEPTED"
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "attempt": 1,
+        "result": "ACCEPTED"
+      }
+    ],
+    "failures": [
+      {
+        "kind": "agent_execution_failure",
+        "task_id": "gxt_01m8168kee812dm88z"
+      }
+    ],
+    "attempt_waits": []
+  },
+  "replacement_requests_before_final_usage": 6,
+  "status": {
+    "project": "competing-reviews",
+    "run_id": "gxr_01m8168ke9mr9chd6e",
+    "status": "ACTIVE",
+    "pause": null,
+    "attempt_waits": [],
+    "resource_limits": [],
+    "supplements": [],
+    "reviews": [
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "submission_id": "gxsb_01m8168nps61yvcm3n",
+        "artifact_ref": "gxa_01m8168npm0zbs8xx5",
+        "round": 0,
+        "proposal_ref": "gxa_01m8168keby87e76q3",
+        "evidence_refs": [
+          "gxa_01m8168keeccprkra9"
+        ],
+        "source_ids": [],
+        "source_reviews": [],
+        "covers_current_sources": true
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "submission_id": "gxsb_01m8168n9xfbf2k6z3",
+        "artifact_ref": "gxa_01m8168n9rqx6f0fyh",
+        "round": 0,
+        "proposal_ref": "gxa_01m8168keby87e76q3",
+        "evidence_refs": [
+          "gxa_01m8168keeccprkra9"
+        ],
+        "source_ids": [],
+        "source_reviews": [],
+        "covers_current_sources": true
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "submission_id": "gxsb_01m8168n0t9dasywt7",
+        "artifact_ref": "gxa_01m8168n0rz9wtah7h",
+        "round": 0,
+        "proposal_ref": "gxa_01m8168keby87e76q3",
+        "evidence_refs": [
+          "gxa_01m8168keeccprkra9"
+        ],
+        "source_ids": [],
+        "source_reviews": [],
+        "covers_current_sources": true
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "submission_id": "gxsb_01m8168mvy3dmsb1nz",
+        "artifact_ref": "gxa_01m8168mvtbgnngqwy",
+        "round": 0,
+        "proposal_ref": "gxa_01m8168keby87e76q3",
+        "evidence_refs": [
+          "gxa_01m8168keeccprkra9"
+        ],
+        "source_ids": [],
+        "source_reviews": [],
+        "covers_current_sources": true
+      }
+    ],
+    "node": null,
+    "round": null,
+    "report_ref": null,
+    "rounds": [],
+    "intent": {},
+    "jobs": [],
+    "tasks": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "role": "evidence_reviewer",
+        "stage": null,
+        "status": "ACCEPTED",
+        "attempt": 2
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "role": "evidence_reviewer",
+        "stage": null,
+        "status": "ACCEPTED",
+        "attempt": 1
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "role": "evidence_reviewer",
+        "stage": null,
+        "status": "ACCEPTED",
+        "attempt": 1
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "role": "evidence_reviewer",
+        "stage": null,
+        "status": "ACCEPTED",
+        "attempt": 1
+      }
+    ],
+    "unsettled_turns": [],
+    "pending_deliveries": [],
+    "replies": [],
+    "messages": [],
+    "pending_previews": [],
+    "driver": "time_limit"
+  },
+  "after": {
+    "balance": {
+      "spent": {
+        "api_calls": 5,
+        "tokens": 130
+      },
+      "reserved": {},
+      "available": {
+        "api_calls": 5,
+        "cpu_seconds": 14400,
+        "gpu_jobs": 2,
+        "gpu_minutes": 40,
+        "job_submissions": 200,
+        "tokens": -30,
+        "wall_hours": 24,
+        "worker_tasks": 120
+      },
+      "reservations": [
+        {
+          "reservation_ref": "rsv_01m8168m8b6t57jtc9",
+          "subject_kind": "native_turn",
+          "subject_id": "start:4623b17e-4b94-4848-b94a-3c40f323bb59",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 30
+          },
+          "status": "SETTLED",
+          "created_at": "2026-11-22T08:34:18.507Z",
+          "settled_at": "2026-11-22T08:34:19.716Z"
+        },
+        {
+          "reservation_ref": "rsv_01m8168mcgtxtcrrqt",
+          "subject_kind": "native_turn",
+          "subject_id": "start:5be33f07-3588-4a8d-8be4-e7975441b0ab",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 30
+          },
+          "status": "SETTLED",
+          "created_at": "2026-11-22T08:34:18.640Z",
+          "settled_at": "2026-11-22T08:34:19.224Z"
+        },
+        {
+          "reservation_ref": "rsv_01m8168mp4zgh9qn2f",
+          "subject_kind": "native_turn",
+          "subject_id": "start:08909cff-aadc-4fbd-8b24-0985110449e8",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 30
+          },
+          "status": "SETTLED",
+          "created_at": "2026-11-22T08:34:18.948Z",
+          "settled_at": "2026-11-22T08:34:19.354Z"
+        },
+        {
+          "reservation_ref": "rsv_01m8168mye1eg9r0cy",
+          "subject_kind": "native_turn",
+          "subject_id": "start:f15af56a-9c4a-412d-a753-d2d7a83efffb",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 10
+          },
+          "status": "SETTLED",
+          "created_at": "2026-11-22T08:34:19.214Z",
+          "settled_at": "2026-11-22T08:34:19.682Z"
+        },
+        {
+          "reservation_ref": "rsv_01m8168nce3wqmxtf4",
+          "subject_kind": "native_turn",
+          "subject_id": "start:9c7cf65f-50b9-495e-94c9-42891c1ff7bb",
+          "amounts": {
+            "api_calls": 1,
+            "tokens": 30
+          },
+          "status": "SETTLED",
+          "created_at": "2026-11-22T08:34:19.662Z",
+          "settled_at": "2026-11-22T08:34:20.080Z"
+        }
+      ]
+    },
+    "tasks": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "status": "ACCEPTED",
+        "attempt": 2,
+        "attempts_consumed": 1
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "attempts_consumed": 0
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "attempts_consumed": 0
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "attempts_consumed": 0
+      }
+    ],
+    "jobs": [],
+    "roots": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 1,
+        "lease_id": "gxl_01m8168m29zvnb18a0",
+        "thread_id": "01a20264-5059-7f22-9164-de0cd8b94745"
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "attempt": 1,
+        "lease_id": "gxl_01m8168mbv5cgj8mvt",
+        "thread_id": "01a20264-5185-7553-b51d-d2e99f78e2af"
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 2,
+        "lease_id": "gxl_01m8168mnbs4jk4bxa",
+        "thread_id": "01a20264-52b3-7f03-b074-4aff36b0d4e0"
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "attempt": 1,
+        "lease_id": "gxl_01m8168mxmb2cy4sxc",
+        "thread_id": "01a20264-53bd-77c0-becd-7d50fecce697"
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "attempt": 1,
+        "lease_id": "gxl_01m8168nbwg4zer8qp",
+        "thread_id": "01a20264-5584-7bc3-987a-4f7ecfc28559"
+      }
+    ],
+    "leases": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "lease_id": "gxl_01m8168m29zvnb18a0",
+        "attempt": 1,
+        "released_at": "2026-11-22T08:34:18.787Z"
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "lease_id": "gxl_01m8168mbv5cgj8mvt",
+        "attempt": 1,
+        "released_at": "2026-11-22T08:34:19.138Z"
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "lease_id": "gxl_01m8168mnbs4jk4bxa",
+        "attempt": 2,
+        "released_at": "2026-11-22T08:34:19.292Z"
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "lease_id": "gxl_01m8168mxmb2cy4sxc",
+        "attempt": 1,
+        "released_at": "2026-11-22T08:34:19.587Z"
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "lease_id": "gxl_01m8168nbwg4zer8qp",
+        "attempt": 1,
+        "released_at": "2026-11-22T08:34:19.997Z"
+      }
+    ],
+    "paid": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 1,
+        "thread_id": "01a20264-5059-7f22-9164-de0cd8b94745",
+        "turn_id": "01a20264-510f-7c41-8c2b-15d557517e98",
+        "token_budget": 30,
+        "status": "SETTLED",
+        "created_at": "2026-11-22T08:34:18.507Z",
+        "settled_at": "2026-11-22T08:34:19.716Z",
+        "total_tokens": 70,
+        "terminal_status": "completed"
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "attempt": 1,
+        "thread_id": "01a20264-5185-7553-b51d-d2e99f78e2af",
+        "turn_id": "01a20264-5192-7601-986f-f6d76c2d8ccd",
+        "token_budget": 30,
+        "status": "SETTLED",
+        "created_at": "2026-11-22T08:34:18.640Z",
+        "settled_at": "2026-11-22T08:34:19.224Z",
+        "total_tokens": 15,
+        "terminal_status": "completed"
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 2,
+        "thread_id": "01a20264-52b3-7f03-b074-4aff36b0d4e0",
+        "turn_id": "01a20264-52c7-7bb1-82dc-254eb0f83508",
+        "token_budget": 30,
+        "status": "SETTLED",
+        "created_at": "2026-11-22T08:34:18.948Z",
+        "settled_at": "2026-11-22T08:34:19.354Z",
+        "total_tokens": 15,
+        "terminal_status": "completed"
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "attempt": 1,
+        "thread_id": "01a20264-53bd-77c0-becd-7d50fecce697",
+        "turn_id": "01a20264-53d0-7af1-95bb-d42d0b991138",
+        "token_budget": 10,
+        "status": "SETTLED",
+        "created_at": "2026-11-22T08:34:19.214Z",
+        "settled_at": "2026-11-22T08:34:19.682Z",
+        "total_tokens": 15,
+        "terminal_status": "completed"
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "attempt": 1,
+        "thread_id": "01a20264-5584-7bc3-987a-4f7ecfc28559",
+        "turn_id": "01a20264-5590-7061-9955-f2adc8725447",
+        "token_budget": 30,
+        "status": "SETTLED",
+        "created_at": "2026-11-22T08:34:19.662Z",
+        "settled_at": "2026-11-22T08:34:20.080Z",
+        "total_tokens": 15,
+        "terminal_status": "completed"
+      }
+    ],
+    "submissions": [
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 1,
+        "result": "REJECTED"
+      },
+      {
+        "task_id": "gxt_01m8168kef6e4qze75",
+        "attempt": 1,
+        "result": "ACCEPTED"
+      },
+      {
+        "task_id": "gxt_01m8168kee812dm88z",
+        "attempt": 2,
+        "result": "ACCEPTED"
+      },
+      {
+        "task_id": "gxt_01m8168kefm8940vd1",
+        "attempt": 1,
+        "result": "ACCEPTED"
+      },
+      {
+        "task_id": "gxt_01m8168kefytf8awwk",
+        "attempt": 1,
+        "result": "ACCEPTED"
+      }
+    ],
+    "failures": [
+      {
+        "kind": "agent_execution_failure",
+        "task_id": "gxt_01m8168kee812dm88z"
+      }
+    ]
+  },
+  "provider_requests": [
+    {
+      "id": "response-1",
+      "task_id": "gxt_01m8168kee812dm88z",
+      "attempt": 1,
+      "action": "gx_submit_product",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-2",
+      "task_id": "gxt_01m8168kef6e4qze75",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-3",
+      "task_id": "gxt_01m8168kef6e4qze75",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-4",
+      "task_id": "gxt_01m8168kee812dm88z",
+      "attempt": 1,
+      "action": "reply",
+      "usage": {
+        "input_tokens": 67,
+        "output_tokens": 1,
+        "total_tokens": 68
+      }
+    },
+    {
+      "id": "response-5",
+      "task_id": "gxt_01m8168kef6e4qze75",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-6",
+      "task_id": "gxt_01m8168kee812dm88z",
+      "attempt": 2,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-7",
+      "task_id": "gxt_01m8168kef6e4qze75",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-8",
+      "task_id": "gxt_01m8168kee812dm88z",
+      "attempt": 2,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-9",
+      "task_id": "gxt_01m8168kef6e4qze75",
+      "attempt": 1,
+      "action": "gx_submit_product",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-10",
+      "task_id": "gxt_01m8168kee812dm88z",
+      "attempt": 2,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-11",
+      "task_id": "gxt_01m8168kef6e4qze75",
+      "attempt": 1,
+      "action": "reply",
+      "usage": {
+        "input_tokens": 4,
+        "output_tokens": 1,
+        "total_tokens": 5
+      }
+    },
+    {
+      "id": "response-12",
+      "task_id": "gxt_01m8168kee812dm88z",
+      "attempt": 2,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-13",
+      "task_id": "gxt_01m8168kee812dm88z",
+      "attempt": 2,
+      "action": "gx_submit_product",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-14",
+      "task_id": "gxt_01m8168kefm8940vd1",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-15",
+      "task_id": "gxt_01m8168kee812dm88z",
+      "attempt": 2,
+      "action": "reply",
+      "usage": {
+        "input_tokens": 4,
+        "output_tokens": 1,
+        "total_tokens": 5
+      }
+    },
+    {
+      "id": "response-16",
+      "task_id": "gxt_01m8168kefm8940vd1",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-17",
+      "task_id": "gxt_01m8168kefm8940vd1",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-18",
+      "task_id": "gxt_01m8168kefm8940vd1",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-19",
+      "task_id": "gxt_01m8168kefm8940vd1",
+      "attempt": 1,
+      "action": "gx_submit_product",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-20",
+      "task_id": "gxt_01m8168kefm8940vd1",
+      "attempt": 1,
+      "action": "reply",
+      "usage": {
+        "input_tokens": 4,
+        "output_tokens": 1,
+        "total_tokens": 5
+      }
+    },
+    {
+      "id": "response-21",
+      "task_id": "gxt_01m8168kefytf8awwk",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-22",
+      "task_id": "gxt_01m8168kefytf8awwk",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-23",
+      "task_id": "gxt_01m8168kefytf8awwk",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-24",
+      "task_id": "gxt_01m8168kefytf8awwk",
+      "attempt": 1,
+      "action": "gx_read_artifact",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-25",
+      "task_id": "gxt_01m8168kefytf8awwk",
+      "attempt": 1,
+      "action": "gx_submit_product",
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "total_tokens": 2
+      }
+    },
+    {
+      "id": "response-26",
+      "task_id": "gxt_01m8168kefytf8awwk",
+      "attempt": 1,
+      "action": "reply",
+      "usage": {
+        "input_tokens": 4,
+        "output_tokens": 1,
+        "total_tokens": 5
+      }
+    }
+  ],
+  "error": "AssertionError: replacement already received a paid turn",
+  "ended": "2026-11-22T08:34:36.576190+00:00"
+}

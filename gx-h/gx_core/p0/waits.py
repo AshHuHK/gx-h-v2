@@ -49,6 +49,9 @@ def _waiting(conn, by, value):
     # metering and operator waits can overlap it or each other and end independently.
     saved = (" OR EXISTS (SELECT 1 FROM p0_attempt_waits w WHERE w.root_key=r.root_key"
              " AND w.ended_at IS NULL AND w.reason<>'job')") if installed else ""
+    if _installed(conn, "p0_job_proposals"):
+        saved += (" OR EXISTS (SELECT 1 FROM p0_job_proposals p WHERE p.root_key=r.root_key AND p.wait_turn IS NOT NULL "
+                  "AND p.wait_ended IS NULL)")
     return [row for row in conn.execute(
         "SELECT r.task_id,r.lease_id,j.job_id,rn.status AS run_status" + _CURRENT +
         " LEFT JOIN jobs j ON j.job_id=r.wait_job_id AND " + _JOB_OWNER +
@@ -120,6 +123,25 @@ def begin(conn, root_key, reason, key, *, started_at=None, turn_id=None):
     _insert(conn, root, reason, key, started_at=started_at, turn_id=turn_id)
 
 
+def proposal_wait(conn, root_key, job_id, *, stage, turn_id=None):
+    """A durable park can precede admission, which is when the Job foreign key becomes available."""
+    root = _current(conn,root_key)
+    proposal = conn.execute("SELECT wait_turn,wait_started,wait_ended FROM p0_job_proposals WHERE root_key=? AND job_id=?",
+                            (root_key,job_id)).fetchone()
+    if not root or not proposal or not proposal["wait_turn"] or proposal["wait_ended"]:
+        return
+    wait = _open_wait(conn,root_key,"job",job_id)
+    if stage == "park":
+        if turn_id != proposal["wait_turn"] or clock.is_past(root["expires_at"]):
+            return
+        _insert(conn,root,"job",job_id,started_at=proposal["wait_started"],turn_id=turn_id)
+    elif wait and clock.parse(root["issued_at"]) <= clock.parse(wait["started_at"]) <= clock.parse(root["expires_at"]):
+        if clock.is_past(root["expires_at"]):
+            _handoff(conn,root,wait,"proposal_" + stage)
+        if stage == "notice_delivered":
+            conn.execute("UPDATE p0_attempt_waits SET ended_at=? WHERE wait_id=?", (clock.now_iso(),wait["wait_id"]))
+
+
 def _handoff(conn, root, wait, phase):
     """Grant one normal work interval at a committed wait transition. Reads never call this."""
     from ..teams.service import default_lease_seconds
@@ -176,19 +198,24 @@ def _worker(conn, thread_id):
     return _current(conn, thread_id, by="r.thread_id")
 
 
+_ADMISSION_REASONS = ("budget", "metering", "provider_backoff", "team_capacity", "team_paused")
+_ADMISSION_PARAMETERS = ",".join("?" for _ in _ADMISSION_REASONS)
+
+
 def begin_delivery(conn, thread_id, event_id, reason):
-    if reason not in ("budget", "metering"):
-        raise ValueError("delivery waits require a budget or metering decision")
+    if reason not in _ADMISSION_REASONS:
+        raise ValueError("unrecognized turn admission wait")
     root = _worker(conn, thread_id)
     if root:
         begin(conn, root["root_key"], reason, event_id)
         # A new admission decision supersedes the older reason for this same
         # undelivered event. The task is still waiting, so no lease handoff is due.
-        previous = "metering" if reason == "budget" else "budget"
         conn.execute("UPDATE p0_attempt_waits SET ended_at=? WHERE root_key=? AND wait_key=?"
-                     " AND reason=? AND ended_at IS NULL AND EXISTS (SELECT 1 FROM p0_attempt_waits w"
+                     f" AND reason IN ({_ADMISSION_PARAMETERS}) AND reason<>? AND ended_at IS NULL"
+                     " AND EXISTS (SELECT 1 FROM p0_attempt_waits w"
                      " WHERE w.root_key=? AND w.wait_key=? AND w.reason=? AND w.ended_at IS NULL)",
-                     (clock.now_iso(), root["root_key"], event_id, previous, root["root_key"], event_id, reason))
+                     (clock.now_iso(), root["root_key"], event_id, *_ADMISSION_REASONS, reason,
+                      root["root_key"], event_id, reason))
 
 
 def prepare_delivery(conn, thread_id, event_id):
@@ -196,9 +223,12 @@ def prepare_delivery(conn, thread_id, event_id):
     root = _worker(conn, thread_id)
     if not root or root["run_status"] == "PAUSED":
         return
+    from . import team_admission
+    team_admission.resume_if_admitted(conn, root)
     key = root["root_key"]
     blocked = conn.execute("SELECT reason FROM p0_attempt_waits WHERE root_key=? AND wait_key=?"
-                           " AND reason IN ('budget','metering') AND ended_at IS NULL", (key, event_id)).fetchall()
+                           f" AND reason IN ({_ADMISSION_PARAMETERS}) AND ended_at IS NULL",
+                           (key, event_id, *_ADMISSION_REASONS)).fetchall()
     for row in blocked:
         finish(conn, key, row["reason"], event_id)
     if not blocked and clock.is_past(root["expires_at"]):
@@ -300,12 +330,18 @@ def on_run_transition(conn, run, to_state, event_id):
 
 def deferred_turn(conn, root_key, turn_id):
     """An observed park/stop for this very turn explains its ending without a worker product."""
+    if _installed(conn, "p0_job_proposals") and conn.execute(
+            "SELECT 1 FROM p0_job_proposals WHERE root_key=? AND wait_turn=?", (root_key,turn_id)).fetchone():
+        return True
     return conn.execute(
         "SELECT 1 FROM p0_attempt_waits w JOIN p0_roots r USING(root_key)"
         " LEFT JOIN p0_root_deliveries stopped ON w.reason='operator_pause' AND stopped.run_id=r.run_id"
         " AND stopped.thread_id=r.thread_id AND stopped.event_id=w.wait_key"
-        " WHERE w.root_key=? AND ((w.reason='operator_pause' AND (w.turn_id=? OR stopped.turn_id=?))"
+        " WHERE w.root_key=? AND ((w.reason IN ('budget','provider_backoff') AND w.wait_key=('resume:'||?)"
+        " AND (w.turn_id IS NULL OR w.turn_id=?))"
+        " OR (w.reason='operator_pause' AND (w.turn_id=? OR stopped.turn_id=?))"
         " OR (w.reason='job' AND w.turn_id=?"
         " AND NOT EXISTS(SELECT 1 FROM p0_root_deliveries d WHERE d.run_id=r.run_id AND d.thread_id=r.thread_id"
         " AND d.turn_id=w.turn_id AND d.event_id=('wake:'||r.lease_id||':'||w.wait_key)"
-        " AND d.state='acknowledged'))) LIMIT 1", (root_key, turn_id, turn_id, turn_id)).fetchone() is not None
+        " AND d.state='acknowledged'))) LIMIT 1",
+        (root_key, turn_id, turn_id, turn_id, turn_id, turn_id)).fetchone() is not None

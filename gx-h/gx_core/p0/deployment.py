@@ -62,11 +62,11 @@ def _local_profiles():
             "inference": "not_run", "mode": "local_configuration"}
 
 
-def _saved_profiles(directory):
+def _saved_profiles(directory, run_id=None):
     from .cli import existing_db
     from .driver import project
     with closing(existing_db(directory.expanduser().resolve(), readonly=True)) as conn:
-        run = project(conn)
+        run = project(conn, run_id)
         if run is None:
             raise ValueError("There is no GX project in this state directory")
         document, _ = host_policy.current_for_run(run)
@@ -146,7 +146,7 @@ def _doctor(args):
     env = clash_env()
     version = _version(env)
     report = {"codex_version": version, "expected_version": CODEX_VERSION, "provider": provider, "model": model,
-              "http_proxy": env["HTTP_PROXY"], "socks_proxy": env["ALL_PROXY"], "no_proxy": env["NO_PROXY"]}
+              "http_proxy": env.get("HTTP_PROXY"), "socks_proxy": env.get("ALL_PROXY"), "no_proxy": env["NO_PROXY"]}
     if version != CODEX_VERSION:
         _print({**report, "ready": False, "error": "Select the pinned official Codex CLI with GX_P0_CODEX."})
         return 1
@@ -187,7 +187,7 @@ def _run(args):
     try:
         if args.command == "profiles":
             if getattr(args, "state", None) is not None:
-                _print(_saved_profiles(args.state))
+                _print(_saved_profiles(args.state, getattr(args, "run_id", None)))
                 return 0
             report = _local_profiles()
             _print(report)
@@ -215,6 +215,7 @@ def add_commands(subparsers):
         parser = subparsers.add_parser(name, help=help_text)
         parser.set_defaults(command=name, deployment_handler=_run)
         if name == "profiles":
+            parser.add_argument("--run-id", help="Select a saved workflow run")
             parser.add_argument("--state", type=Path, help="Read pinned and observed profiles from a saved project")
         if name == "doctor":
             parser.add_argument("--role", help="Check one GX role's selected provider, model and effort")

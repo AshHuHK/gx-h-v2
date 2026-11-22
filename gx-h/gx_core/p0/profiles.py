@@ -8,6 +8,8 @@ import socket
 import tomllib
 from urllib.parse import urlsplit
 
+from .. import config
+
 
 DEFAULT_MODEL = "gpt-6.2-astra"
 CODEX_VERSION = "0.169.0"
@@ -67,8 +69,9 @@ def _route_fields(value):
     if "model" in value and (not isinstance(value["model"], str) or
                              not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_./:@+-]*", value["model"])):
         raise ValueError("Supply a provider model ID")
-    if "effort" in value and value["effort"] not in ("xhigh", "max", "ultra"):
-        raise ValueError("The GX effort must be xhigh, max or ultra")
+    if "effort" in value and (not isinstance(value["effort"], str) or not value["effort"].strip()
+                              or value["effort"] != value["effort"].strip()):
+        raise ValueError("Supply a nonempty reasoning effort from the provider's official model catalog")
     names = value.get("tools", [])
     if (not isinstance(names, list) or
             not all(isinstance(name, str) and name and name.strip() == name for name in names)
@@ -98,10 +101,6 @@ def project_routes(document, overrides):
         level = effort_for("lead" if role in {"main", "coordinator", "planner"} else task_class)
         route = {**default, **classes.get(task_class, {}), **roles.get(role, {})}
         selected = route.get("effort", level)
-        if _testing(None):
-            selected = "xhigh"
-        elif selected != level and (level, selected) != ("max", "ultra"):
-            raise ValueError(f"GX {role} requires {level} effort")
         if role != "main" and "tools" in route and "gx_submit_product" not in route["tools"]:
             raise ValueError(f"The {role} task requires gx_submit_product to deliver its result")
         result[role] = {**route, "effort": selected}
@@ -188,25 +187,39 @@ def proxy_settings() -> dict[str, str]:
         if key in os.environ:
             allowed.intersection_update(value.strip() for value in os.environ[key].split(","))
     bypass = ",".join(address for address in _LOOPBACK if address in allowed)
-    values = {
-        "HTTP_PROXY": "http://127.0.0.1:7890",
-        "HTTPS_PROXY": "http://127.0.0.1:7890",
-        "ALL_PROXY": "socks5h://127.0.0.1:7891",
-        "NO_PROXY": bypass,
-    }
+    network = json.loads((config.CONFIG_DIR / "p0_network.json").read_text())
+    values = {"NO_PROXY": bypass}
+    if network["mode"] == "proxy":
+        for key in ("http", "https", "all"):
+            url = network.get(key, "")
+            endpoint = urlsplit(url)
+            if endpoint.scheme not in ("http", "https", "socks5h") or not endpoint.hostname or not endpoint.port:
+                raise ValueError(f"Set a complete {key} proxy endpoint in p0_network.json")
+            values[key.upper() + "_PROXY"] = url
+    elif network["mode"] == "environment":
+        for key in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"):
+            inherited = os.environ.get(key.lower()) or os.environ.get(key)
+            if inherited:
+                values[key] = inherited
+    else:
+        raise ValueError("p0_network.json mode must be proxy or environment")
     return {**values, **{key.lower(): value for key, value in values.items()}}
 
 
 def clash_env(*, check: bool = True) -> dict[str, str]:
     """Return the child environment and fail before network use if Clash is unavailable."""
+    selected = proxy_settings()
     if check:
-        for port in (7890, 7891):
+        endpoints = dict.fromkeys(selected[k] for k in ("HTTP_PROXY","HTTPS_PROXY","ALL_PROXY") if k in selected)
+        for endpoint in endpoints:
+            parsed = urlsplit(endpoint)
+            port = parsed.port or (443 if parsed.scheme == "https" else 80)
             try:
-                with socket.create_connection(("127.0.0.1", port), timeout=2):
+                with socket.create_connection((parsed.hostname, port), timeout=2):
                     pass
             except OSError as exc:
-                raise ConnectionError(f"Clash is unavailable at 127.0.0.1:{port}") from exc
-    return {**os.environ, **proxy_settings()}
+                raise ConnectionError(f"Configured proxy is unavailable at {parsed.hostname}:{port}") from exc
+    return {**os.environ, **selected}
 
 
 def codex_argv(*, test_mode: bool | None = None, provider: str | None = None) -> list[str]:

@@ -70,8 +70,8 @@ class ModelProfiles(unittest.TestCase):
                 client.assert_not_called()
 
     def test_unsupported_effort_or_tool_fails_before_dispatch(self):
-        self.profile.write_text(json.dumps({"roles":{"main":{"effort":"max"}}}))
-        with self.assertRaisesRegex(ValueError, "main requires ultra"):
+        self.profile.write_text(json.dumps({"roles":{"main":{"effort":" "}}}))
+        with self.assertRaisesRegex(ValueError, "reasoning effort"):
             host_policy.p0_policy()
         with self.assertRaisesRegex(ValueError, "gx_unavailable"):
             profiles.selected_tools([{"name":"gx_submit_product"}], ["gx_unavailable"])
@@ -81,6 +81,22 @@ class ModelProfiles(unittest.TestCase):
         with patch.dict(os.environ, {"GX_P0_TEST":"1"}):
             with self.assertRaisesRegex(ValueError, "loopback base_url"):
                 profiles.provider_endpoint("analysis_service", profiles.codex_config(), test_mode=True)
+
+    def test_selected_efforts_come_from_the_model_catalog_and_survive_reopen(self):
+        self.profile.write_text(json.dumps({"roles":{"main":{"effort":"low"}},
+             "task_classes":{"VERIFICATION":{"provider":"analysis_service","model":"analysis-model","effort":"balanced"}}}))
+        doc, digest, host = host_policy.p0_host()
+        saved = {"agent_policy_json":json.dumps(doc),"agent_policy_sha256":digest,"host_json":json.dumps(host)}
+        self.assertTrue(doc["p0_check_catalog"])
+        self.assertEqual(doc["p0_role_profiles"]["main"]["effort"], "low")
+        self.profile.unlink()
+        route = host_policy.p0_role_for_run(saved, "evidence_reviewer")
+        self.assertEqual(route["effort"], "balanced")
+        self.assertEqual(policy.requirement_of_task({"role":"evidence_reviewer"}, doc)["allowed_efforts"], ["balanced"])
+        self.assertEqual(policy.requirement_of_task({"task_class":"VERIFICATION"}, doc)["allowed_efforts"], ["balanced"])
+        profiles.require_catalog_entry({"analysis-model":["balanced","low"]}, "analysis_service", "analysis-model", "balanced")
+        with self.assertRaisesRegex(ValueError, "analysis-model with balanced"):
+            profiles.require_catalog_entry({"analysis-model":["low"]}, "analysis_service", "analysis-model", "balanced")
 
     def test_offline_profiles_and_catalog_pagination_use_only_selected_providers(self):
         with patch.object(deployment, "AppServerClient") as host, redirect_stdout(StringIO()) as out:

@@ -1334,6 +1334,7 @@ def _project_instruction(work: Mapping[str, Any]) -> str:
 def _collaboration_instruction(mode: str, max_workers: int) -> str:
     if mode == "auto":
         return "The user selected automatic collaboration. Choose staffing and delegation for the current work."
+    from ..orchestration.packages import native_guidance
     return (
         "The user selected module-leads collaboration. As Root, choose the natural modules, their scope, "
         "inputs and expected deliverables. Reuse the existing work and GX teams. Designate a native lead for "
@@ -1346,15 +1347,7 @@ def _collaboration_instruction(mode: str, max_workers: int) -> str:
         f"{max_workers}-worker launch limit. Leave room for workers and use waves when needed.\n\n"
         "Root decides what to follow up with the original leads, when independent review is needed, and "
         "when the objective is settled. "
-        "For module deliverables, start module_collaboration@1 with "
-        'inputs such as {"modules":[{"key":"coverage","question":"Which observations are missing?"}]}. '
-        "Keep the selected scientific workflow and its original run on continuation. For module_collaboration@1, each module may also name its lead_role. "
-        "The same lead submits its module_plan and module_synthesis tasks, and its workers submit module_work "
-        "tasks using the respective briefs. At the Root checkpoint inspect pending_interrupt.payload.handoff_ref "
-        "with gx_artifact_get. Use gx_team_message action=send with the coordinator lease, existing sender "
-        "and recipient teams, kind=response, a correlation_key, and that handoff_ref in artifact_refs. "
-        "Put action (accept, return or stop) and reason in the body. "
-        "For return include the affected module keys in modules. Resume the original run."
+        + native_guidance(mode)
     )
 
 

@@ -209,13 +209,16 @@ def p0_policy():
     model = main["model"]
     models = {r["model"] for r in routes.values()}
     document["pinned_model"] = {"id": model, "aliases": []}
+    document["p0_class_efforts"] = {}
     for name, settings in document["task_classes"].items():
         defaults = {**overrides.get("default", {}), **overrides.get("task_classes", {}).get(name, {})}
-        level = ("xhigh" if os.environ.get("GX_P0_TEST") == "1" else
-                 defaults.get("effort", profiles.effort_for(name)))
+        level = defaults.get("effort", profiles.effort_for(name))
         class_model = defaults.get("model", profiles.role_profile(name)["model"])
         models.add(class_model)
-        settings.update(model=class_model, min_effort=level, default_effort=level)
+        document["p0_class_efforts"][name] = level
+        settings["model"] = class_model
+        if level in document["effort_order"]:
+            settings.update(min_effort=level, default_effort=level)
     document["models"] = {name: {"aliases": []} for name in sorted(models)}
     if models - {model}:
         document["pinned_model"]["history"] = [{
@@ -226,11 +229,12 @@ def p0_policy():
     document["native_coordinator_observation"].update(default_effort=main["effort"],
                                                        accepted_efforts=[main["effort"]])
     document["p0_role_profiles"] = routes
-    # Legacy/fixture runs keep their prior no-catalog launch behavior. An explicit
-    # operator route must be advertised by its provider's official model/list.
+    document["p0_unknown_provider_parallel_turns"] = config.limits().get("native_provider", {}).get(
+        "unknown_parallel_turns", 1)
+    # The pinned host must advertise the selected effort for each real route.
+    # Older saved runs retain the catalog setting under which their threads were created.
     local_fixture = os.environ.get("GX_P0_TEST") == "1" and main["provider"] != "openai"
-    document["p0_check_catalog"] = bool(overrides or os.environ.get("GX_P0_PROVIDER") or
-                                        (os.environ.get("GX_P0_MODEL") and not local_fixture))
+    document["p0_check_catalog"] = bool(not local_fixture or overrides or os.environ.get("GX_P0_PROVIDER"))
     problems = policy.problems_in(document)
     if problems:
         raise SchemaInvalid("invalid P0 project model policy", details={"problems": problems})

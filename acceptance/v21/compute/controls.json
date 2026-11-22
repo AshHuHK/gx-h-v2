@@ -2,7 +2,7 @@
   "controls": [
     {
       "observed": {
-        "cancelled": "gxj_01m81shkan7r98qycd",
+        "cancelled": "gxj_01m81ssxpkxtkxmzvw",
         "refusals": [
           {
             "error": "SCOPE_DENIED: only the assigned GX root may call this tool",
@@ -11,9 +11,9 @@
         ],
         "revocation_reason": {
           "code": "LEASE_EXPIRED",
-          "message": "lease gxl_01m81shk9ztm399bc0 was released at 2026-11-22T14:11:15.417Z"
+          "message": "lease gxl_01m81ssxpaf4etb39z was released at 2026-11-22T14:15:48.182Z"
         },
-        "revoked_job": "gxj_01m81shkar5hdghv02"
+        "revoked_job": "gxj_01m81ssxpnt8bq5gjt"
       },
       "test": "tests.test_v21_compute.ComputeTest.test_cancel_and_fence_before_scheduling"
     },
@@ -25,16 +25,16 @@
             "observed": "runner_error",
             "summary": "runner_error: host_process_peak_rss_limit"
           },
-          "job_id": "gxj_01m81shn1rmmsqxp93",
+          "job_id": "gxj_01m81sszb5e7pmkyca",
           "measured": {
-            "cpu_seconds": 0.012,
+            "cpu_seconds": 0.01,
             "limit_memory_mib": 1,
             "limit_wall_seconds": 10,
-            "max_rss_mib": 11.9,
+            "max_rss_mib": 12.0,
             "memory_within_limit": false,
             "result": "runner_error",
             "started": true,
-            "wall_seconds": 0.017
+            "wall_seconds": 0.014
           }
         },
         "wall_limit": {
@@ -44,16 +44,16 @@
             "summary": "timed out: the runner ended the tool at its 1.0 s limit",
             "timed_out": true
           },
-          "job_id": "gxj_01m81shkdagsjkq88y",
+          "job_id": "gxj_01m81ssxry9eafzser",
           "measured": {
-            "cpu_seconds": 0.049,
+            "cpu_seconds": 0.06,
             "limit_memory_mib": 128,
             "limit_wall_seconds": 1,
             "max_rss_mib": 14.4,
             "memory_within_limit": true,
             "result": "timed_out",
             "started": true,
-            "wall_seconds": 1.048
+            "wall_seconds": 1.039
           }
         }
       },
@@ -61,12 +61,31 @@
     },
     {
       "observed": {
-        "job_id": "gxj_01m81shnd7p9ztpft2",
-        "manifest_sha256": "c7a810586b77239044ea43ef4ec4d505544b83f8f31f92bc33d77da958805a24",
+        "job_id": "gxj_01m81sszqct3hxzjh4",
+        "new_attempt": "3b33d504-b50c-4838-9fc3-fbdaa4b6eda3",
+        "original_attempt": "93d5cf98-f20e-4b2e-ab84-8cf7796e18a6",
+        "original_manifest": "bf798152d3d7cb683b5a3fece229fdbdf43033499bb77a59ba799a5863e01b0b",
+        "refusals": [
+          {
+            "error": "IDEMPOTENCY_CONFLICT: this operation already binds different inputs or parameters",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCOPE_DENIED: this root no longer owns the current task attempt",
+            "tool": "gx_job_status"
+          }
+        ]
+      },
+      "test": "tests.test_v21_compute.ComputeTest.test_new_attempt_adopts_exact_operation_and_keeps_original_manifest"
+    },
+    {
+      "observed": {
+        "job_id": "gxj_01m81st0b2v9c46wsd",
+        "manifest_sha256": "2d11378b37416ea5dbae000a6ebac71c82aad7192583441d01311ae32864cf76",
         "result": {
           "gap": 14.5
         },
-        "result_ref": "gxa_01m81shnxr5wqag6b4",
+        "result_ref": "gxa_01m81st0w9xgwd4wry",
         "result_sha256": "fa674ac096b47799f34cf887b57bf4f076fcbe73a827d59c2ff04ce9058669f9",
         "runtime": {
           "cpu_seconds": 8,
@@ -89,13 +108,13 @@
         "failed_jobs": [
           {
             "diagnostic": "analysis refused: encoded result exceeds 32768 bytes",
-            "job_id": "gxj_01m81shp0jhgkr3k6e",
+            "job_id": "gxj_01m81st0ypttgr2gd0",
             "result_count": 0,
             "status": "FAILED"
           },
           {
             "diagnostic": "analysis refused: result type disagrees with output_schema",
-            "job_id": "gxj_01m81shpka9b9abdjt",
+            "job_id": "gxj_01m81st1kfvzr49jw2",
             "result_count": 0,
             "status": "FAILED"
           }
@@ -106,7 +125,7 @@
             "code": "SCHEMA_INVALID",
             "message": "tighten.wall_seconds=11 is above the manifest's 10; a request may only lower a limit"
           },
-          "job_id": "gxj_01m81shq6mfwm9qyrk",
+          "job_id": "gxj_01m81st27gtjne4rn3",
           "outputs": [],
           "status": "REJECTED",
           "terminal": true
@@ -150,6 +169,10 @@
             "tool": "gx_job_submit"
           },
           {
+            "error": "SCHEMA_INVALID: inputs must be Artifact refs; paths and URLs are unavailable",
+            "tool": "gx_job_submit"
+          },
+          {
             "error": "SCOPE_DENIED: only the assigned GX root may call this tool",
             "tool": "gx_job_submit"
           }
@@ -158,5 +181,5 @@
       "test": "tests.test_v21_compute.ComputeTest.test_unavailable_programs_paths_inputs_are_rejected_before_execution"
     }
   ],
-  "passed": 5
+  "passed": 6
 }

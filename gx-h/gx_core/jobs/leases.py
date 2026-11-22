@@ -406,7 +406,7 @@ def earlier_jobs(conn: sqlite3.Connection, task_id: str) -> list[dict[str, Any]]
 # ----------------------------------------------------------------------------- adoption
 
 def adopt(conn: sqlite3.Connection, job: Mapping[str, Any], *, principal: str | None, actor: str,
-          via: str) -> dict[str, Any] | None:
+          via: str, include_in_transaction: bool = False) -> dict[str, Any] | None:
     """§7.2.4. A look at a job by the worker that holds its task's live lease takes the job
     over, when the job belongs to another lease or to none: the event ``job.adopted``
     ``{task_id, lease_ref, from_lease_ref, attempt, principal, via, job_status}`` is written,
@@ -415,11 +415,11 @@ def adopt(conn: sqlite3.Connection, job: Mapping[str, Any], *, principal: str | 
 
     Returns an adoption, or None when no adoption was needed: the caller holds no live lease of
     the job's task, the job is already that lease's, or the call is inside a transaction
-    (where, like a settlement, nothing is decided). The job may have ended: its outputs are
+    without an explicit transactional adoption by the native proposal owner. The job may have ended: its outputs are
     then what the new attempt takes over, and no step is run again for them. An accepted
     look by a live holder also renews its lease, including when it already owns the job.
     """
-    if conn.in_transaction or not principal:
+    if (conn.in_transaction and not include_in_transaction) or not principal:
         return None
     task_id = job["task_id"]
     lease = held_lease(conn, task_id, principal) if task_id else _held_path_lease(conn, job, principal)

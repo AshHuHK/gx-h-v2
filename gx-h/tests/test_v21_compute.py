@@ -10,12 +10,12 @@ from gx_core.hostobs.app_server_client import ReceivedMessage
 from gx_core.jobs.service import JobService
 from gx_core.p0 import compute, manifest, waits
 from gx_core.persistence import store
-from tests.test_p0_roots import DurableRoots as RootFixture
+from tests import test_p0_roots
 
 
 class ComputeTest(unittest.TestCase):
     def setUp(self):
-        f = self.fixture = RootFixture()
+        f = self.fixture = test_p0_roots.DurableRoots()
         f.setUp()
         self.addCleanup(f.doCleanups)
         self.db, self.run, self.task, self.roots = f.conn, f.run, f.task, f.roots
@@ -92,11 +92,34 @@ class ComputeTest(unittest.TestCase):
         for expr in ("{'v': open('/dev/null')}", "{'v': socket()}", "{'v': data.keys()}",
                      "{'v': [x for x in data]}", "import os"):
             self.assertIn("refused",self.invoke("gx_job_submit",self.proposal(expr,script=expr),False)["error"])
-        for data in ({"left":self.unassigned},{"../outside":self.refs["left"]},{"data":"/dev/null"}):
+        for data in ({"left":self.unassigned},{"../outside":self.refs["left"]},{"data":"/dev/null"},{"data":"https://example.invalid/measurements"}):
             self.invoke("gx_job_submit",self.proposal("scope",inputs=data),False)
         self.invoke("gx_job_submit",self.proposal("child"),False,thread="unbound-child")
         self.assertEqual(self.db.execute("SELECT count(*) FROM p0_job_proposals").fetchone()[0],0)
         self.assertEqual(self.db.execute("SELECT count(*) FROM jobs").fetchone()[0],0)
+
+    def test_new_attempt_adopts_exact_operation_and_keeps_original_manifest(self):
+        req = self.proposal("durable-comparison")
+        jid = self.invoke("gx_job_submit",req)["job_id"]
+        self.assertEqual(self.finish(jid)["status"],"SUCCEEDED")
+        original = manifest.read_manifest(self.db,jid)
+        old = self.row
+        with store.transaction(self.db):
+            store.release_lease(self.db,old["lease_id"])
+            store.transition(self.db,machine="task",subject_id=self.task,to_state="READY",actor="test",
+                             extra_updates={"owner":None,"lease_id":None})
+        self.row = self.fixture.bind()
+        completed = self.invoke("gx_job_submit",req)
+        self.assertEqual(completed,{"job_id":jid,"status":"SUCCEEDED"})
+        self.invoke("gx_job_submit",{**req,"parameters":{"offset":7}},False)
+        self.assertFalse(self.invoke("gx_wait_job",{"job_id":jid})["waiting"])
+        view = self.invoke("gx_job_status",{"job_id":jid})
+        self.assertTrue(any(output["kind"] == "artifact_analysis_result" for output in view["outputs"]))
+        self.invoke("gx_job_status",{"job_id":jid},False,thread=old["thread_id"])
+        self.assertEqual(self.db.execute("SELECT count(*) FROM jobs").fetchone()[0],1)
+        self.assertEqual(manifest.read_manifest(self.db,jid),original)
+        self.observations.update(job_id=jid,original_attempt=old["root_key"],new_attempt=self.row["root_key"],
+                                 original_manifest=original["manifest_hash"])
 
     def test_schema_encoded_output_and_resource_refusal(self):
         too_large=self.proposal("too_large",inputs={"text":self.refs["long"]},script="{'gap': data['text']}")

@@ -10,7 +10,7 @@ from ..capabilities.tools import capability_inspect
 from ..context import Ctx, Principal
 from ..domain import clock, ids
 from ..errors import GxError, IdempotencyConflict, SchemaInvalid, ScopeDenied
-from ..jobs import tools as job_tools
+from ..jobs import leases, tools as job_tools
 from ..persistence import store
 
 IDENT = re.compile(r"[A-Za-z][A-Za-z0-9_]{0,30}\Z")
@@ -98,11 +98,26 @@ def queue_job(conn, row, *, capability_version, inputs, parameters, idempotency_
     if len(request_text.encode()) > 24576 or analysis and len(ids.canonical_json(analysis).encode()) > 16384:
         raise SchemaInvalid("job proposal exceeds its declared size limit")
     with store.transaction(conn):
-        old = conn.execute("SELECT * FROM p0_job_proposals WHERE root_key=? AND operation_key=?",
-                           (row["root_key"], idempotency_key)).fetchone()
+        old = conn.execute("SELECT p.* FROM p0_job_proposals p JOIN p0_roots r USING(root_key)"
+                           " WHERE p.run_id=? AND r.task_id=? AND p.operation_key=? ORDER BY p.rowid LIMIT 1",
+                           (row["run_id"],row["task_id"],idempotency_key)).fetchone()
         if old:
             if old["request_json"] != request_text:
                 raise IdempotencyConflict("this operation already binds different inputs or parameters")
+            if old["root_key"] != row["root_key"]:
+                _scope(conn,row,inputs.values(),internal=internal)
+                job = conn.execute("SELECT * FROM jobs WHERE job_id=?", (old["job_id"],)).fetchone()
+                if job:
+                    leases.adopt(conn,job,principal=row["thread_id"],actor="backend",
+                                 via="gx_job_submit",include_in_transaction=True)
+                else:
+                    conn.execute("UPDATE p0_attempt_waits SET ended_at=? WHERE root_key=? AND reason='job'"
+                                 " AND wait_key=? AND ended_at IS NULL",(clock.now_iso(),old["root_key"],old["job_id"]))
+                    store.append_event(conn,kind="job.proposal_transferred",actor="backend",run_id=row["run_id"],
+                        subject_kind="task",subject_id=row["task_id"],evidence_level="EXECUTION_OBSERVED",
+                        payload={"job_id":old["job_id"],"from_root":old["root_key"],"to_root":row["root_key"]})
+                    conn.execute("UPDATE p0_job_proposals SET root_key=?,wait_started=NULL,wait_turn=NULL,wait_ended=NULL"
+                                 " WHERE job_id=?", (row["root_key"],old["job_id"]))
             return {"job_id": old["job_id"], "status": job_status(conn, row, old["job_id"])["status"]}
         _registered(conn, capability_version)
         _scope(conn, row, inputs.values(), internal=internal)
@@ -124,9 +139,16 @@ def validate_proposal(conn, job_id, request):
         raise ScopeDenied("the original attempt has no open proposal for this Job ID")
 
 
+def owned_job(conn, row, job_id):
+    job = conn.execute("SELECT * FROM jobs WHERE job_id=? AND run_id=? AND task_id=?",
+                       (job_id,row["run_id"],row["task_id"])).fetchone()
+    if job and leases.job_lease(conn,job)["lease_ref"] != row["lease_id"]:
+        raise ScopeDenied("this attempt does not currently own this Job")
+    return job
+
+
 def job_status(conn, row, job_id):
-    job = conn.execute("SELECT * FROM jobs WHERE job_id=? AND run_id=? AND task_id=? AND lease_ref=?",
-                       (job_id, row["run_id"], row["task_id"], row["lease_id"])).fetchone()
+    job = owned_job(conn,row,job_id)
     if job:
         return job_tools.job_status(_ctx(conn, row, "gx_job_status"), {"job_id": job_id}, observed_row=job).data
     req = conn.execute("SELECT state,error_json FROM p0_job_proposals WHERE job_id=? AND root_key=?",
@@ -288,7 +310,7 @@ def _submit(conn, row, proposal):
              "tighten":args["tighten"],"idempotency_key":"p0-proposal:"+job_id}, binding=binding,reserved_job_id=job_id)
     with store.transaction(conn):
         req = conn.execute("SELECT * FROM p0_job_proposals WHERE job_id=?", (job_id,)).fetchone()
-        conn.execute("UPDATE p0_job_proposals SET state='ADMITTED' WHERE job_id=?", (job_id,))
+        conn.execute("UPDATE p0_job_proposals SET state='ADMITTED',error_json=NULL WHERE job_id=?", (job_id,))
         if req["wait_turn"] and not req["wait_ended"]:
             conn.execute("UPDATE p0_roots SET wait_job_id=?,goal_desired='paused' WHERE root_key=?", (job_id,row["root_key"]))
             waits.begin(conn,row["root_key"],"job",job_id,started_at=req["wait_started"],turn_id=req["wait_turn"])
@@ -326,8 +348,15 @@ def drain(conn, run_id):
                     job_tools.job_cancel(_ctx(conn,root,"gx_job_cancel"), {"job_id":p["job_id"], "reason":p["reason"],
                                          "idempotency_key":outbox["idempotency_key"]})
             except GxError as exc:
-                if outbox["topic"] == SUBMIT and exc.details.get("reason") in ("team_paused", "soft_budget"):
-                    continue
+                if outbox["topic"] == SUBMIT:
+                    current = conn.execute("SELECT root_key FROM p0_job_proposals WHERE job_id=?", (p["job_id"],)).fetchone()
+                    if current["root_key"] != root_key:
+                        continue
+                    if exc.details.get("reason") in ("team_paused", "soft_budget"):
+                        detail = {"code":exc.code, "reason":exc.details["reason"], "message":exc.message}
+                        conn.execute("UPDATE p0_job_proposals SET error_json=? WHERE job_id=? AND state='PROPOSED'",
+                                     (ids.canonical_json(detail),p["job_id"]))
+                        continue
                 # If admission committed before transport/process failure the Job remains authoritative.
                 if outbox["topic"] == SUBMIT and conn.execute("SELECT 1 FROM jobs WHERE job_id=?", (p["job_id"],)).fetchone():
                     _submit(conn,root,req)

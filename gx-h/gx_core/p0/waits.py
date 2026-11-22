@@ -15,7 +15,7 @@ _CURRENT = (
 )
 _FIELDS = "r.*,l.issued_at,l.expires_at,rn.status AS run_status"
 _JOB_OWNER = (
-    "j.run_id=r.run_id AND j.task_id=r.task_id AND j.lease_ref=r.lease_id"
+    "j.run_id=r.run_id AND j.task_id=r.task_id"
     " AND COALESCE((SELECT json_extract(e.payload_json,'$.lease_ref') FROM events e"
     " WHERE e.subject_kind='job' AND e.subject_id=j.job_id AND e.kind='job.adopted'"
     " ORDER BY e.event_id DESC LIMIT 1),j.lease_ref)=r.lease_id"
@@ -175,6 +175,9 @@ def finish(conn, root_key, reason, key):
     root = _current(conn, root_key)
     if not root or (reason == "job" and root["wait_job_id"] != key):
         return
+    if reason in ("operator_pause", "metering"):
+        from .team_admission import defer_unavailable_slot
+        defer_unavailable_slot(conn, root, ending_reason=reason, ending_key=key)
     conn.execute("UPDATE p0_attempt_waits SET ended_at=? WHERE wait_id=?", (clock.now_iso(), wait["wait_id"]))
     if reason != "job" or clock.is_past(root["expires_at"]):
         _handoff(conn, root, wait, "wait_finished")

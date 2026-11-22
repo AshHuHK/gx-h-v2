@@ -173,6 +173,23 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(self.conn.execute("SELECT count(*) FROM budgets").fetchone()[0], 2)
         self.assertEqual(intent.read_item(self.conn, a, "compute")["value"], cap)
 
+    def test_a_project_intent_limit_applies_to_other_members_actual_holds(self):
+        a, ref_a = self.member("A", workspace_budget={"cpu_seconds": 12}, run_budget={"cpu_seconds": 6})
+        b, ref_b = self.member("B", run_budget={"cpu_seconds": 6})
+        updated = self.local(b, "shared-limit", ("compute", "resource_limit", 0, {"resource": "cpu_seconds", "max": 5}))
+        self.assertEqual(intent.read_item(self.conn, a, "compute")["change_id"], updated["change_id"])
+        hold = budgets.reserve(self.conn, budget_ref=ref_a, subject_kind="job", subject_id="sample",
+                               amounts={"cpu_seconds": 3}, actor="test")
+        with self.assertRaises(BudgetExceeded) as refused:
+            budgets.reserve(self.conn, budget_ref=ref_b, subject_kind="job", subject_id="independent",
+                            amounts={"cpu_seconds": 3}, actor="test")
+        self.assertEqual((refused.exception.details["reason"], refused.exception.details["reserved"],
+                          refused.exception.details["available"]), ("current_intent", 3, 2))
+        budgets.settle(self.conn, hold["reservation_ref"], actual={"cpu_seconds": 2}, actor="test")
+        budgets.spend(self.conn, budget_ref=ref_b, subject_kind="job", subject_id="independent",
+                      amounts={"cpu_seconds": 3}, actor="test")
+        self.assertEqual(budgets._project_usage(self.conn, self.project)[0]["cpu_seconds"], 5)
+
     def test_competing_allocations_commit_only_one_run(self):
         self.member("anchor", workspace_budget={"job_submissions": 5}, run_budget={"job_submissions": 0})
         gate = threading.Barrier(2)

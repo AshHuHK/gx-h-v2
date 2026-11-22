@@ -16,7 +16,7 @@ from gx_core.errors import BudgetExceeded, HoldActive, IdempotencyConflict
 from gx_core.jobs.service import JobService
 from gx_core.hostobs.app_server_client import ReceivedMessage
 from gx_core.orchestration import expansion
-from gx_core.p0 import compute, team_admission as teams, workspace
+from gx_core.p0 import cli, compute, metering, team_admission as teams, workspace
 from gx_core.p0.roots import Roots
 from gx_core.persistence import records, store
 from gx_core.teams.service import TeamService
@@ -32,6 +32,7 @@ class WorkspaceTeams(unittest.TestCase):
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
+        self.addCleanup(clock.reset)
         self.home = Path(tmp.name)
         self.db = store.open_store(self.home / "gx.db")
         self.addCleanup(self.db.close)
@@ -76,6 +77,32 @@ class WorkspaceTeams(unittest.TestCase):
             store.release_lease(db, row[0])
             store.transition(db, machine="task", subject_id=task, to_state="READY", actor="test", reason="return",
                              extra_updates={"owner":None,"lease_id":None})
+
+    def test_invalid_team_allocation_rolls_back_public_run_start(self):
+        small = group("analysis", ["evidence_reviewer"])
+        base = {**cli.demo_spec(), "project": "allocation-rollback"}
+        invalid = {**base, "teams":[small, group("oversized", tokens=10**12)]}
+        with self.assertRaises(BudgetExceeded):
+            cli.start(self.db,self.home,invalid,run_key="A")
+        empty = {name:self.db.execute("SELECT count(*) FROM " + name).fetchone()[0]
+                 for name in ("runs","budgets","budget_reservations","p0_workspace","p0_workspace_runs",
+                              "p0_teams","p0_task_teams","tasks","jobs","p0_operator_messages")}
+        self.assertFalse(any(empty.values()),empty)
+        valid = {**base, "teams":[small]}
+        started = cli.start(self.db,self.home,valid,run_key="A")
+        rid = started["run_id"]
+        received = teams.team_status(self.db,rid)
+        self.assertEqual([team["team_id"] for team in received], ["analysis"])
+        with self.assertRaises(BudgetExceeded):
+            cli.start(self.db,self.home,invalid,run_key="B")
+        self.assertEqual([r["run_id"] for r in workspace.list_runs(self.db)], [rid])
+        self.assertEqual(self.db.execute("SELECT count(*) FROM p0_teams").fetchone()[0],1)
+        self.assertEqual(cli.start(self.db,self.home,valid,run_key="A")["run_id"],rid)
+        for row in self.db.execute("SELECT job_id FROM jobs").fetchall():
+            self.assertTrue(JobService(self.db).wait(row["job_id"],20)["terminal"])
+        self.observed = {"checks":["F03","F04","F06"],"entry":"gx_core.p0.cli.start",
+                         "rows_after_rejected_first_start":empty,"corrected_same_run_key":rid,
+                         "prior_run_after_rejected_sibling":rid,"duplicate_team_rows":0}
 
     def test_atomic_allotments_expansion_and_task_attribution(self):
         alpha, beta = group("alpha", ["evidence_reviewer"]), group("beta", ["planner"])
@@ -173,6 +200,75 @@ class WorkspaceTeams(unittest.TestCase):
         self.observed = {"checks":["F05","F07"],"first_run":first,"original_lease":owner["lease_id"],
                          "other_task":b,"paused_denial":paused.exception.details,"cold_resume_denial":reacquire.exception.details,
                          "restored_lease":roots._claim(a)["lease_id"],"active_roots":1}
+
+    def test_terminal_meter_handoff_cannot_occupy_another_runs_last_slot(self):
+        a,_ = self.run_case("analysis",maximum=1)
+        b,_ = self.run_case("other",maximum=1)
+        first, second = self.create(a)["task_id"], self.create(b)["task_id"]
+        roots = self.roots(a)
+        binding = self.occupy(roots,first,"root")
+        peer = Peer(self.db,a)
+        roots._request = peer._request
+        roots._goal_for_budget = lambda *args:None
+        roots.loaded.add("root")
+        turn = roots.dispatch(first)["turn_id"]
+        roots.delivery.observe("turn/started",{"threadId":"root","turn":{"id":turn}})
+        peer.turns[0]["status"] = "completed"
+        roots.delivery.observe("turn/completed",{"threadId":"root","turn":peer.turns[0]})
+        self.assertEqual(len(teams._occupancy(self.db,None)),0)
+        self.roots(b)._claim(second)
+        clock.advance(31)
+        metering.maintain(self.db,a)
+        self.assertEqual(len(teams._occupancy(self.db,None)),1)
+        with self.assertRaises(HoldActive) as denied:
+            roots._claim(first)
+        self.assertEqual(denied.exception.details["scope"],"workspace")
+        self.yield_task(second)
+        self.assertEqual(roots._claim(first)["lease_id"],binding["lease_id"])
+        self.observed = {"checks":["F05","F06"],"runs":[a,b],"workspace_cap":1,"terminal_turn":turn,
+                         "meter_after_grace":metering.inspect(self.db,a)["turns"][0]["confidence"],
+                         "resumed_denial":denied.exception.details,"restored_lease":binding["lease_id"]}
+
+    def test_resumed_run_preserves_its_lease_while_another_run_owns_the_slot(self):
+        a,_ = self.run_case("a", maximum=1)
+        b,_ = self.run_case("b", maximum=1)
+        roots = self.roots(a)
+        first, second = self.create(a)["task_id"], self.create(b)["task_id"]
+        owner = roots._claim(first)
+        with store.transaction(self.db):
+            store.transition(self.db, machine="run", subject_id=a, to_state="PAUSED", actor="test", reason="operator pause")
+        self.roots(b)._claim(second)
+        with store.transaction(self.db):
+            store.transition(self.db, machine="run", subject_id=a, to_state="ACTIVE", actor="test", reason="operator continue")
+        self.assertEqual(len(teams._occupancy(self.db,None)),1)
+        with self.assertRaises(HoldActive) as denied:
+            roots._claim(first)
+        self.assertEqual(denied.exception.details["scope"],"workspace")
+        self.yield_task(second)
+        self.assertEqual(roots._claim(first)["lease_id"],owner["lease_id"])
+        self.observed = {"checks":["F05","F06"],"runs":[a,b],"workspace_cap":1,"first_lease":owner["lease_id"],
+                         "resumed_denial":denied.exception.details,"restored_lease":roots._claim(first)["lease_id"]}
+
+    def test_an_overdue_paused_task_does_not_reserve_the_other_teams_slot(self):
+        limits = config.limits()
+        limits["run_budget"]["max_overtakes"] = 1
+        rid,_ = self.run_case("a", [group("analysis",["evidence_reviewer"]),group("other",["planner"])], parallel=1)
+        roots = self.roots(rid)
+        paused = self.create(rid)["task_id"]
+        teams.team_control(self.db,rid,"analysis","pause")
+        with patch.object(config,"limits",return_value=limits):
+            completed = []
+            for _ in range(3):
+                task = self.create(rid,role="planner")["task_id"]
+                lease = roots._claim(task)["lease_id"]
+                with store.transaction(self.db):
+                    store.release_lease(self.db,lease)
+                    store.transition(self.db,machine="task",subject_id=task,to_state="CANCELLED",actor="test",reason="done")
+                completed.append(task)
+        self.assertEqual(len(completed), 3)
+        self.assertEqual(self.db.execute("SELECT attempt FROM tasks WHERE task_id=?", (paused,)).fetchone()[0],0)
+        self.observed = {"checks":["F05","F07"],"run":rid,"paused_ready_task":paused,"max_overtakes":1,
+                         "other_team_claimed_tasks":completed}
 
     def test_park_releases_a_slot_and_wake_reacquires_it_before_steering_the_original_turn(self):
         rid,_ = self.run_case("a",[group("analysis",["evidence_reviewer"])],parallel=1,maximum=1)

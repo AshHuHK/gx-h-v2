@@ -1,5 +1,7 @@
 """Task team attribution, carved-out budgets and admission on the workspace's SQLite writer."""
-from .. import budgets
+from collections import Counter
+
+from .. import budgets, config, contracts
 from ..domain import clock, ids, machines
 from ..errors import ArtifactNotFound, HoldActive, IdempotencyConflict, SchemaInvalid
 from ..persistence import store
@@ -29,7 +31,7 @@ def configure(conn, run_id, spec):
             maximum = _positive(entry.get("max_parallel_roots"), "team max_parallel_roots")
             if (not isinstance(key, str) or not key.strip() or key in seen or not isinstance(name,str)
                     or not name.strip() or not isinstance(alloc, dict) or not alloc or not isinstance(roles,list)
-                    or not all(isinstance(r,str) and r.strip() for r in roles)
+                    or not all(isinstance(r,str) and contracts.is_label("worker_role", r) for r in roles)
                     or len(set(roles)) != len(roles) or assigned.intersection(roles)):
                 raise SchemaInvalid("teams need distinct identifiers, unique role mappings and a resource allocation")
             seen.add(key)
@@ -97,6 +99,8 @@ def attach(conn, task_id, team, explicit):
 
 
 def team_status(conn, run_id):
+    if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_teams'").fetchone():
+        return []
     result = []
     occupied = _occupancy(conn, None)
     for r in conn.execute("SELECT * FROM p0_teams WHERE run_id=? ORDER BY team_id",(run_id,)):
@@ -111,33 +115,63 @@ def team_status(conn, run_id):
     return result
 
 
-def resume_if_admitted(conn, root):
-    """A parked control wait keeps the original lease until this worker can reclaim its slot."""
-    wait = conn.execute(
-        "SELECT t.team_id,t.status FROM p0_attempt_waits w JOIN p0_task_teams a ON a.task_id=? "
-        "JOIN p0_teams t USING(run_id,team_id) WHERE w.root_key=? AND w.reason='team_paused' "
-        "AND w.wait_key=t.team_id AND w.ended_at IS NULL",
-        (root["task_id"], root["root_key"])).fetchone()
-    if not wait:
+def defer_unavailable_slot(conn, root, *, ending_reason, ending_key):
+    """When an external control or meter completes, queue an idle attempt behind current occupants."""
+    if root["wait_job_id"] or root["run_status"] == "PAUSED":
         return
-    if wait["status"] == "paused":
-        raise HoldActive("this task's team is paused", details={"reason":"team_paused", "team_id":wait["team_id"]})
+    if ending_reason == "metering":
+        measured = conn.execute("SELECT 1 FROM budget_reservations WHERE reservation_ref=? AND status=?",
+                                (ending_key, budgets.SETTLED)).fetchone()
+        if not measured:
+            return  # Per-delivery metering waits are already inside their turn admission.
+    elif ending_reason != "operator_pause":
+        return
+    if conn.execute("SELECT 1 FROM p0_attempt_waits WHERE root_key=? AND ended_at IS NULL "
+                    "AND (reason<>? OR wait_key<>?) LIMIT 1",
+                    (root["root_key"], ending_reason, ending_key)).fetchone():
+        return
+    try:
+        require_capacity(conn, dict(root))
+    except HoldActive:
+        from . import waits
+        waits.begin(conn, root["root_key"], "team_capacity", "slot:" + root["root_key"])
+
+
+def resume_if_admitted(conn, root):
+    """Keep the original attempt through a control or meter handoff until it can reclaim capacity."""
+    waits_to_finish = conn.execute(
+        "SELECT w.reason,w.wait_key,t.status,t.team_id FROM p0_attempt_waits w "
+        "LEFT JOIN p0_task_teams a ON a.task_id=? LEFT JOIN p0_teams t USING(run_id,team_id) "
+        "WHERE w.root_key=? AND w.ended_at IS NULL AND ((w.reason='team_paused' AND w.wait_key=t.team_id) "
+        "OR (w.reason='team_capacity' AND w.wait_key=?)) ORDER BY w.wait_id",
+        (root["task_id"], root["root_key"], "slot:" + root["root_key"])).fetchall()
+    if not waits_to_finish:
+        return
+    if waits_to_finish[0]["status"] == "paused":
+        raise HoldActive("this task's team is paused",
+                         details={"reason": "team_paused", "team_id": waits_to_finish[0]["team_id"]})
     if not root["wait_job_id"]:
         require_capacity(conn, dict(root))
     from . import waits
-    waits.finish(conn, root["root_key"], "team_paused", wait["team_id"])
+    for wait in waits_to_finish:
+        waits.finish(conn, root["root_key"], wait["reason"], wait["wait_key"])
 
 
 def team_control(conn, run_id, team_id, action):
     if action not in ("status","pause","resume"):
         raise SchemaInvalid("team action must be status, pause or resume")
+    if action == "status":
+        current = next((t for t in team_status(conn, run_id) if t["team_id"] == team_id), None)
+        if current is None:
+            raise ArtifactNotFound("this run has no such team")
+        return current
     from . import waits
     with store.transaction(conn):
         team = conn.execute("SELECT status FROM p0_teams WHERE run_id=? AND team_id=?", (run_id,team_id)).fetchone()
         if not team:
             raise ArtifactNotFound("this run has no such team")
         target = "paused" if action=="pause" else "active"
-        if action != "status" and team[0] != target:
+        if team[0] != target:
             conn.execute("UPDATE p0_teams SET status=?,updated_at=? WHERE run_id=? AND team_id=?",
                          (target,clock.now_iso(),run_id,team_id))
             for root in conn.execute("SELECT r.* FROM p0_roots r JOIN tasks t ON r.lease_id=t.lease_id "
@@ -179,13 +213,12 @@ def _occupancy(conn, excluded):
         )""",(excluded or "",clock.now_iso())).fetchall()
 
 
-def require_capacity(conn, binding):
+def _capacity(conn, binding):
     if not conn.in_transaction:
         raise RuntimeError("Root admission belongs in the lease or turn writer transaction")
     run_id = binding["run_id"]
     run = conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)).fetchone()
     inputs = store.loads(run,"inputs_json",{}).get("inputs",{})
-    from .. import config
     from . import workspace
     limit = inputs.get("p0_spec", {}).get("max_parallel_roots", config.limits()["run_budget"]["max_parallel_workers"])
     workspace_limit = workspace.max_parallel_roots(conn)
@@ -203,4 +236,23 @@ def require_capacity(conn, binding):
         if used >= bound:
             raise HoldActive(f"{scope} has {used} active roots at its limit of {bound}",details={
                 "reason":"team_capacity","scope":scope,"limit":bound,"occupied":used,"team_id":team["team_id"] if team else None})
-    return limit,run_count
+    return (limit, run_count), occupied
+
+
+def require_capacity(conn, binding):
+    """Gate one Root's admission in the writer that takes its slot."""
+    bounds, _ = _capacity(conn, binding)
+    return bounds
+
+
+def claim_capacity(conn, run_id, task_id):
+    """An overdue task can keep a slot only if its team could actually claim it."""
+    bounds, occupied = _capacity(conn, {"run_id":run_id, "task_id":task_id})
+    used = Counter(row["team_id"] for row in occupied if row["run_id"] == run_id)
+    blocked = [team["team_id"] for team in conn.execute(
+        "SELECT team_id,status,max_parallel_roots FROM p0_teams WHERE run_id=?", (run_id,))
+        if team["status"] == "paused" or used[team["team_id"]] >= team["max_parallel_roots"]]
+    unavailable = frozenset(row[0] for row in conn.execute(
+        "SELECT a.task_id FROM p0_task_teams a JOIN tasks t USING(task_id) WHERE a.run_id=? AND t.status='READY' "
+        "AND a.team_id IN (SELECT value FROM json_each(?))", (run_id, ids.canonical_json(blocked)))) if blocked else frozenset()
+    return bounds, unavailable

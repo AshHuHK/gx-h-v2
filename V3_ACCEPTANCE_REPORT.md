@@ -12,3 +12,5 @@
 ## 部署与恢复
 
 可单独部署的 Linux x86_64 快照来自产品提交 `2476f2b`。归档重建得到相同的 SHA-256。从空目录安装后，24 条检查命令均成功，覆盖官方 Codex 0.169.0、插件公开核验、选择插件后启动并暂停新项目，以及从副本读取旧 v2.1 项目。该部署检查使用了零次模型调用。另一次完整冷恢复实测核对了原 Job 回执，项目抵达终态后再打开时新增模型请求为零。[部署与启动](V3_DEPLOYMENT_REPORT.md) · [部署回执](acceptance/v3/p1/standalone-deployment.json) · [恢复与回退](V3_ROLLBACK_REPORT.md) · [已知限制](V3_KNOWN_LIMITATIONS.md)
+
+真实模型实测中，提交回调 p95 从 65.7 ms 升至 97.5 ms。使用 7 份真实提交和原始状态重新交错执行，在源代码和数据位于同一共享文件系统时，每版各 168 次无探针计时的 p95 分别为 44.9 ms 和 42.8 ms。复验限定了在这些条件下可重现的开销，付费阶段的历史差值仍待解释。实施包要求上一阶段通过后再开始下一阶段，v2.1 继续作为稳定回退版本。[实测比较](acceptance/v3/performance/COMPARISON.md) · [真实慢样本回放](acceptance/v3/p1/callback-owner-audit/paid-replay/REPORT.md) · [实施包阶段规则](GX_H_V3_Lean_Implementation_Package/GX_H_V3_BLUEPRINT.md)

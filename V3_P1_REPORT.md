@@ -62,3 +62,5 @@
 修正 P1 的完成 Run 吞吐比 v2.1 低 0.34%。真实 Root 调用了 118 次网格测量工具，其中 68 次在有效提交前成功，50 次发生在任务已释放后，得到了所有权拒绝。停止的初版加上修正后的候选共结算 9,968,775 tokens，剩余预留为零。[逐波比较](acceptance/v3/performance/COMPARISON.md) · [对账与哈希](acceptance/v3/performance/p1/closeout-check.json)
 
 原始 p95 触发既定复核条件。派发样本组成发生变化，同时首次启动的官方进程出现较慢的元数据响应，部分热态领取增加了重新核对科学输入的事务。提交回调的增量主要处于原有 SQLite 写事务内。相同请求交错执行、相同文件系统的同步写入和复演真实网格工具调用顺序均未稳定复现整个付费时段的增量。原始性能比较保留 REVIEW。[原生冷启动分解](acceptance/v3/performance/cold-metadata-control/REPORT.md) · [提交事务审计](acceptance/v3/p1/callback-owner-audit/REPORT.md) · [三组工具调用复验](acceptance/v3/performance/callback-tool-history-2476f2b/REPORT.md)
+
+随后逐项匹配了付费阶段的 156 份正式提交。两个最慢的获接受规划提交出现在不同环节，一个在产品落盘前花了 128.5 ms，另一个在最后一个租约或事件时间戳之后花了 114.1 ms。用 7 份原始提交及对应的租约、产物和评审状态，在同一共享文件系统上交错回放，两版各有 168 次无探针计时。提交 p95 为 44.898 和 42.763 ms。原来耗时 273.54 和 216.72 ms 的两个 P1 规划提交，回放 p95 分别为 37.39 和 38.62 ms。两版都出现过别的单次慢写。现有记录能定位这些等待的时间段，仍不足以解释原付费对照中的差值，P1 性能门槛继续开放。[原始提交与历史时间戳](acceptance/v3/performance/paid-submit-timing/REPORT.md) · [原始请求与状态的交错回放](acceptance/v3/p1/callback-owner-audit/paid-replay/REPORT.md)

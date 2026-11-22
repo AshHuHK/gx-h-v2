@@ -35,3 +35,5 @@ Run from `gx-h-v-3`. The scripts use Git archives of v2.1 `61ed0067448658e02d181
   --v21 ../gx-h-2-1 --p1 . --storage ../scratchpad/v3-real-performance \
   --out /tmp/gx-shared-callback-repeat.json --blocks 4 --per-block 2
 ```
+
+The subsequent seven-case replay used the original paid reviewer and planner products and their historical evidence under both releases. Fully shared source and data produced callback p95 of 44.90 ms on v2.1 and 42.76 ms on P1. [Paid-body replay, custody and remaining uncertainty](paid-replay/REPORT.md)

@@ -13,7 +13,7 @@
 | 唯一一条真实模型请求 | `xhigh` 线程 `01a20121-a7cf-7431-bd82-450f1f61422e`，turn `01a20121-a7fa-78d3-a29e-5019155c68cf`。收到 `turn/completed`，状态 `completed`，最终消息精确匹配 `GX_P0_OAUTH_OK`。从 turn/start 应答到终态 3.17 秒，Codex 报告输入 8,545 tokens、缓存输入 0、输出 10、其中推理输出 0。 |
 | 传输观测 | 对 App Server 进程及子进程的 TCP socket 采样，只观察到对端 `127.0.0.1:7890`。同时核对下面的固定版本路由实现。 |
 
-`max` 的临时线程为 `01a20121-a6f2-7aa2-9bb2-32606882d6d7`，`ultra` 为 `01a20121-a79e-7f41-8f01-fcdd802d5253`。启动传入 `modelProvider="openai"`、`config.model_reasoning_effort`、`ephemeral=true`，实际请求另传 `turn/start.effort="xhigh"`。所有协议记录只保留档位、状态和用量。[线程参数及响应](../vendor/codex/codex-rs/app-server-protocol/src/protocol/v2/thread.rs#L64) · [turn 参数](../vendor/codex/codex-rs/app-server-protocol/src/protocol/v2/turn.rs#L181)
+`max` 的临时线程为 `01a20121-a6f2-7aa2-9bb2-32606882d6d7`，`ultra` 为 `01a20121-a79e-7f41-8f01-fcdd802d5253`。启动传入 `modelProvider="openai"`、`config.model_reasoning_effort`、`ephemeral=true`，实际请求另传 `turn/start.effort="xhigh"`。部署后可用 `bin/gx-p0 doctor` 重读账号目录，`--smoke` 会显式新增一次模型调用。[真实调用记录](../acceptance/runs/oauth/live-xhigh.json) · [产品入口目录检查](../acceptance/runs/oauth/doctor.json) · [线程参数及响应](../vendor/codex/codex-rs/app-server-protocol/src/protocol/v2/thread.rs#L64) · [turn 参数](../vendor/codex/codex-rs/app-server-protocol/src/protocol/v2/turn.rs#L181)
 
 | 模型目录报告的可选档位 | 本机可见模型 |
 | --- | --- |
@@ -24,7 +24,7 @@ Codex 的普通推理请求直接传递 `max` 和 `xhigh`。`ultra` 是客户端
 
 ## OAuth 及 Clash
 
-DSH 指南第 17–25、80–109 行记载 DSH 自身可重用已获准的授权，设备码由人在 OpenAI 页面完成，指南的短文本探针使用 `gpt-6.1-sol`。本包使用官方 `codex login --device-auth` 和 App Server 的 `account/read`。现有 ChatGPT 登录可直接复用。GX 只消费账户类型、模型列表与公开协议状态，凭据的存储和更新由官方 CLI 持有。[项目提供的 OAuth 指南](../../output/DSH-OpenAI-OAuth-接入指南.md) · [OpenAI 设备登录说明](https://learn.chatgpt.com/docs/auth)
+DSH 指南第 17–25、80–109 行记载 DSH 自身可重用已获准的授权，设备码由人在 OpenAI 页面完成，指南的短文本探针使用 `gpt-6.1-sol`。本包使用官方 `codex login --device-auth` 和 App Server 的 `account/read`。现有 ChatGPT 登录可直接复用。GX 只消费账户类型、模型列表与公开协议状态，凭据的存储和更新由官方 CLI 持有。[项目提供的 OAuth 指南](../../../output/DSH-OpenAI-OAuth-接入指南.md) · [OpenAI 设备登录说明](https://learn.chatgpt.com/docs/auth)
 
 CLI 的 `features list` 显示，默认 `respect_system_proxy=false`、`system_proxy_fallback=true`。本次显式运行 `codex --enable respect_system_proxy --disable system_proxy_fallback …`，再次读取功能列表得到 `true/false`。在 Linux 上，显式模式为 HTTPS/WSS 选取 `HTTPS_PROXY`，HTTP 选取 `HTTP_PROXY`，将 `NO_PROXY` 应用于相应传输。大小写代理变量均指向 HTTP `http://127.0.0.1:7890`、SOCKS5H `socks5h://127.0.0.1:7891`。本机的绕过表为 `localhost,127.0.0.1,::1`，本次请求前两个监听套接字均可连接。[配置和启动期路由](../vendor/codex/codex-rs/core/src/config/mod.rs#L1863) · [Linux 解析](../vendor/codex/codex-rs/http-client/src/outbound_proxy.rs#L381) · [WebSocket 连接](../vendor/codex/codex-rs/websocket-client/src/dialer.rs#L51)
 

@@ -1,54 +1,26 @@
-# GX + Codex Autonomous Science Harness — P0 Implementation Package
+# GX + Codex Autonomous Science Harness
 
-本包是交给 Coding Agent 的**实施规格 + Codex App Server 接入参考代码 + 验收合同**。
-它不是声称已经完成的 GX 实现，也不是 Codex 上游源码的复制品。
+本目录是一套独立可运行的科研执行系统。官方 Codex App Server 负责模型、原生子代理和会话，GX 负责长期任务、租约、科研 Job、不可变产物、证据和决策。发布入口是 `bin/gx-p0`。在线执行使用官方 ChatGPT OAuth。
 
-## 目标架构
+## 启动一个项目
 
-- **Codex**：未修改的官方 Agent Runtime。保留原生 Agent Loop、原生 Subagent、Thread、Session、Tool Orchestrator、Compaction、Sandbox。
-- **GX**：精简的 Scientific Execution Kernel。只负责正式 Intent、持久任务执行、Job、资源准入、执行清单、证据和事件推进。
-- **Codex 原生 Subagent**：用于单个执行上下文内的临时协作；GX 不追踪、不接管其任务生命周期。
-- **GX Durable Task**：当工作需要跨 Thread、等待外部 Job、被人类需求变更影响、需要租约/预算/恢复时，GX 创建独立 Codex Root Thread。
-- **Skills**：科研方法、角色说明、操作规程。不得用 Skill 替代确定性状态、预算强制、Job 对账或证据来源。
-
-## 包含内容
-
-| 路径 | 内容 |
-|---|---|
-| `DESIGN_SPEC.md` | 完整 P0 架构与多轮消息机制 |
-| `IMPLEMENTATION_PROMPT.md` | 可直接交给 Coding Agent 的总 Prompt |
-| `CODEX_SOURCE_AND_API.md` | Codex 源码版本、源码地图、接口核验要求 |
-| `codex_adapter/app_server.py` | Codex App Server JSON-RPC Python 参考客户端 |
-| `gx_reference/schema.sql` | Intent、授权、变更、Outbox、Task/Attempt、Job、Evidence、Execution Manifest 的最小参考 Schema |
-| `gx_reference/intent_policy.py` | 变更分类与提交政策参考实现 |
-| `scripts/fetch_codex_source.sh` | 获取并核验指定 Codex 源码基线 |
-| `acceptance/ACCEPTANCE_MATRIX.md` | P0 功能、故障注入与验收矩阵 |
-
-## 重要边界
-
-1. 不 Fork、不修改 Codex 核心；优先通过官方 App Server 接入。
-2. 本包的 `codex_adapter` 是 GX 到 Codex 的**客户端参考代码**，不是 Codex 源码。
-3. `rust-v0.169.0` 与 commit 前缀 `d32063f9` 来自本项目已提供蓝图的静态审计基线。实施 Agent 必须实际检出并核对；不匹配时停止版本相关实现并报告，不可静默换版本。
-4. 当前公开 App Server 文档可作为协议导航，但最终以锁定版本生成的 schema 和源码为准：
-   - https://learn.chatgpt.com/docs/app-server
-   - https://github.com/openai/codex
-5. 不把未经运行验证的接口、状态枚举、恢复语义写成已实现事实。
-
-## 快速使用
+从本目录运行以下命令。示例生成两条合成数值路线；分别派发审查和决策 Root，并由 GX 推进下一轮。项目可随时用同一个状态目录继续。
 
 ```bash
-# 1. 解压到 GX 仓库工作区外层或独立实施目录
-# 2. 获取 Codex 源码基线（如环境可访问 GitHub）
-bash scripts/fetch_codex_source.sh ./vendor/codex
-
-# 3. 把 IMPLEMENTATION_PROMPT.md 完整交给 Coding Agent
-# 4. 要求 Agent 先审计当前 GX 仓库和 Codex 源码，再提交实施计划
+./bin/gx-p0 login-status
+./bin/gx-p0 doctor
+./bin/gx-p0 start --state ./var/my-first-project --demo-grid
+./bin/gx-p0 run --state ./var/my-first-project
+./bin/gx-p0 status --state ./var/my-first-project
 ```
 
-## 不在本包范围内
+使用自己准备的 `--spec project.json` 可设定研究问题、假设路线、判别阈值与轮数。在另一终端可用 `stop --state DIR` 暂停调度，再用 `resume --state DIR` 恢复。主对话可接收 `message --text`、`--supplement` 或精确的 `--action` 文件。不同项目分别使用自己的状态目录。[部署与授权](DEPLOYMENT.md)
 
-- 不重写 Codex Agent Loop / Subagent / Thread Manager。
-- 不重建 DSH / Cordis。
-- 不预先建设完整通用科研知识图谱、Agent Pool、Research Portfolio、Council、自动配方市场。
-- 不承诺所有外部模型 API、GPU 任务都能 bitwise reproducible。
-- 不允许 Agent 自行放宽人类硬约束或资源上限。
+默认模型为 `gpt-6.2-astra`。协调者使用 `ultra`，复杂推理、规划、代码和科学审查使用 `max`。简单任务和测试使用 `xhigh`。用 `GX_P0_TEST=1` 启动验收项目可把实际模型 turn 统一设为 `xhigh`。[模型目录与实测](audit/OAUTH_EFFORT.md)
+
+## 交付与证据
+
+- [验收报告](ACCEPTANCE_REPORT.md) 与 [故障注入报告](FAILURE_INJECTION_REPORT.md)
+- [已知限制](KNOWN_LIMITATIONS.md) 与 [部署、状态与回退](DEPLOYMENT.md)
+- [源码审计](AUDIT_REPORT.md)、[基线](BASELINE_REPORT.md)、[复用与改造](REUSE_DELETE_REWRITE.md)、[架构决定](ARCHITECTURE_DECISIONS.md) 和 [实施计划](P0_IMPLEMENTATION_PLAN.md)
+- [原始实施提示](GX_Codex_Implementation_Agent_Prompt.md)、[设计约束](DESIGN_SPEC.md) 与 [验收合同](acceptance/ACCEPTANCE_MATRIX.md)

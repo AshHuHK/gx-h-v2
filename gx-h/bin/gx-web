@@ -5,6 +5,6 @@ import sys
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from gx_core.web.http import main
+from gx_core.cli.compat import web
 
-raise SystemExit(main())
+raise SystemExit(web())

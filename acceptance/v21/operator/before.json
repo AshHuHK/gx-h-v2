@@ -1,0 +1,331 @@
+{
+  "head": "2314eed72822387e03378e8e676ad5fa9228a8d0",
+  "provider": "scripted Responses on 127.0.0.1",
+  "commands": [
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "$WORK/workspace",
+        "--demo-grid"
+      ],
+      "action": null,
+      "exit": 0,
+      "outcome": "WAITING_EXTERNAL_JOB",
+      "stderr": "",
+      "loopback_requests_added": 1,
+      "before": {},
+      "after": {
+        "spent": {
+          "api_calls": 1,
+          "tokens": 35
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 1,
+        "intent_versions": 3,
+        "unprocessed_operator_messages": 0
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/workspace",
+        "--message-id",
+        "edit-CPU",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "operator-cpu",
+            "item_type": "resource_limit",
+            "expected_version": 0,
+            "value": {
+              "resource": "cpu_seconds",
+              "max": 120
+            }
+          }
+        ]
+      },
+      "exit": 0,
+      "outcome": {
+        "change_id": "gxq_01m81r857wdbbah2df",
+        "impact": [],
+        "preview": [
+          {
+            "item_id": "operator-cpu",
+            "item_type": "resource_limit",
+            "new_value": {
+              "max": 120,
+              "resource": "cpu_seconds"
+            },
+            "new_version": 1,
+            "old_value": null,
+            "old_version": 0
+          }
+        ],
+        "preview_sha256": "6eeb76bd58343753a9d72ef397ce036b660a1c58a6bbf595bc2891bbf32037d9",
+        "resource_limits": [
+          {
+            "availability_scope": "this project intent limit",
+            "available_for_new": 60,
+            "held": 60,
+            "item_id": "operator-cpu",
+            "limit": 120,
+            "message": "新上限用于后续准入，已有工作继续结算。",
+            "resource": "cpu_seconds",
+            "spent": 0,
+            "spent_over_limit": 0,
+            "state": "within_new_limit",
+            "unit": "cpu_seconds"
+          }
+        ],
+        "status": "committed"
+      },
+      "stderr": "",
+      "loopback_requests_added": 1,
+      "before": {
+        "spent": {
+          "api_calls": 1,
+          "tokens": 35
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 1,
+        "intent_versions": 3,
+        "unprocessed_operator_messages": 0
+      },
+      "after": {
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 2,
+        "intent_versions": 4,
+        "unprocessed_operator_messages": 0
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/workspace",
+        "--message-id",
+        "exhaust-tokens",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "operator-token",
+            "item_type": "resource_limit",
+            "expected_version": 0,
+            "value": {
+              "resource": "tokens",
+              "unit": "reserved_tokens",
+              "max": 0
+            }
+          }
+        ]
+      },
+      "exit": 0,
+      "outcome": {
+        "change_id": "gxq_01m81r85ywf6wfy4rf",
+        "impact": [],
+        "preview": [
+          {
+            "item_id": "operator-token",
+            "item_type": "resource_limit",
+            "new_value": {
+              "max": 0,
+              "resource": "tokens",
+              "unit": "reserved_tokens"
+            },
+            "new_version": 1,
+            "old_value": null,
+            "old_version": 0
+          }
+        ],
+        "preview_sha256": "d75dd9491b3acf24b7cc25719f9e8cf6f3b356157b4bd5963aba751495161337",
+        "resource_limits": [
+          {
+            "availability_scope": "this project intent limit",
+            "available_for_new": 0,
+            "held": 65536,
+            "item_id": "operator-token",
+            "limit": 0,
+            "message": "已超新上限。此资源停止新增支出，原支出如实保留，在途工作继续结算。",
+            "metering": "GX limits new token reservations. Reported actual usage can exceed a reservation.",
+            "resource": "tokens",
+            "spent": 70,
+            "spent_over_limit": 70,
+            "state": "already_over_new_limit",
+            "unit": "reserved_tokens"
+          }
+        ],
+        "status": "committed"
+      },
+      "stderr": "",
+      "loopback_requests_added": 1,
+      "before": {
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 2,
+        "intent_versions": 4,
+        "unprocessed_operator_messages": 0
+      },
+      "after": {
+        "spent": {
+          "api_calls": 3,
+          "tokens": 105
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 3,
+        "intent_versions": 5,
+        "unprocessed_operator_messages": 0
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/workspace",
+        "--message-id",
+        "try-budget-relief",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "operator-token",
+            "item_type": "resource_limit",
+            "expected_version": 1,
+            "value": {
+              "resource": "tokens",
+              "unit": "reserved_tokens",
+              "max": 500
+            }
+          }
+        ]
+      },
+      "exit": 0,
+      "outcome": "pending",
+      "stderr": "",
+      "loopback_requests_added": 0,
+      "before": {
+        "spent": {
+          "api_calls": 3,
+          "tokens": 105
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 3,
+        "intent_versions": 5,
+        "unprocessed_operator_messages": 0
+      },
+      "after": {
+        "spent": {
+          "api_calls": 3,
+          "tokens": 105
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 3,
+        "intent_versions": 5,
+        "unprocessed_operator_messages": 1
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "stop",
+        "--state",
+        "$WORK/workspace"
+      ],
+      "action": null,
+      "exit": 0,
+      "outcome": "PAUSED",
+      "stderr": "",
+      "loopback_requests_added": 0,
+      "before": {
+        "spent": {
+          "api_calls": 3,
+          "tokens": 105
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 3,
+        "intent_versions": 5,
+        "unprocessed_operator_messages": 1
+      },
+      "after": {
+        "spent": {
+          "api_calls": 3,
+          "tokens": 105
+        },
+        "reserved": {
+          "api_calls": 0,
+          "cpu_seconds": 60,
+          "job_submissions": 2,
+          "tokens": 0
+        },
+        "native_deliveries": 3,
+        "intent_versions": 5,
+        "unprocessed_operator_messages": 1
+      }
+    }
+  ],
+  "codex": "codex-cli 0.169.0",
+  "external_provider_requests": 0
+}

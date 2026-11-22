@@ -1,0 +1,343 @@
+{
+  "version": "codex-cli 0.169.0",
+  "sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "run": "gxr_01m81tcrjcpx5jb90n",
+  "checks": {
+    "parallel_grants": true,
+    "reported_103_while_two_active": false,
+    "both_native_interrupt_terminals": true,
+    "interrupt_receipts_match_exact_turns": true,
+    "both_charges_final_or_marked": true,
+    "hard_limit_blocks_further_paid_work": true,
+    "honest_unbounded_provider_inflight_exposure": true
+  },
+  "risk_trace": [
+    {
+      "scope": "gxb_01m81tcrjcp5cq8x0q",
+      "hard_tokens": 100,
+      "settled_tokens": 0,
+      "reserved_tokens": 80,
+      "observed_in_flight_tokens": 30,
+      "observed_plus_settled": 30,
+      "committed_tokens": 80,
+      "available_tokens": 20,
+      "active_root_count": 2,
+      "largest_active_turn_grant": 40,
+      "unobserved_reserved_tokens": 50,
+      "provider_maximum_overshoot_tokens": null,
+      "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound."
+    },
+    {
+      "scope": "gxb_01m81tcrjcp5cq8x0q",
+      "hard_tokens": 100,
+      "settled_tokens": 30,
+      "reserved_tokens": 40,
+      "observed_in_flight_tokens": 73,
+      "observed_plus_settled": 103,
+      "committed_tokens": 103,
+      "available_tokens": -3,
+      "active_root_count": 1,
+      "largest_active_turn_grant": 40,
+      "unobserved_reserved_tokens": 0,
+      "provider_maximum_overshoot_tokens": null,
+      "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound."
+    }
+  ],
+  "denied_after_limit": {
+    "code": "BUDGET_EXCEEDED",
+    "details": {
+      "budget_ref": "gxb_01m81tcrjcp5cq8x0q",
+      "shortfalls": [
+        {
+          "key": "tokens",
+          "requested": 1,
+          "limit": 100,
+          "spent": 103,
+          "reserved": 0,
+          "available": -3,
+          "why": "not enough left"
+        }
+      ],
+      "subject": [
+        "native_turn",
+        "human:over-cap"
+      ],
+      "reason": "budget_exhausted",
+      "key": "tokens"
+    }
+  },
+  "task_ids": [
+    "gxt_01m81tcrjf89s9jrhk",
+    "gxt_01m81tcrjh26zjmxtj"
+  ],
+  "native_turns": {
+    "01a203a6-630b-7253-90a1-47c5e4183854": "01a203a6-632e-79d3-9822-00d4ec4c1245",
+    "01a203a6-6368-7022-847a-7fe1c8490de7": "01a203a6-637a-7fa0-9493-0cfe8c36d13d"
+  },
+  "provider_inflight_counts": {
+    "gxt_01m81tcrjf89s9jrhk": 1,
+    "gxt_01m81tcrjh26zjmxtj": 1
+  },
+  "initial_ledger": {
+    "budget_ref": "gxb_01m81tcrjcp5cq8x0q",
+    "parent_ref": null,
+    "run_id": null,
+    "limits": {
+      "api_calls": 5,
+      "tokens": 100
+    },
+    "spent": {},
+    "reserved": {
+      "api_calls": 2,
+      "tokens": 80
+    },
+    "available": {
+      "api_calls": 3,
+      "tokens": 20
+    },
+    "reservations": [
+      {
+        "reservation_ref": "rsv_01m81tcrsaag4tfwbb",
+        "subject_kind": "native_turn",
+        "subject_id": "start:54385e38-718b-43cb-b946-5771fa1790c8",
+        "amounts": {
+          "api_calls": 1,
+          "tokens": 40
+        },
+        "status": "HELD",
+        "created_at": "2026-11-22T14:26:05.738Z",
+        "settled_at": null
+      },
+      {
+        "reservation_ref": "rsv_01m81tcrvpkssd1x8k",
+        "subject_kind": "native_turn",
+        "subject_id": "start:0b04e7cc-5f85-4442-9316-4e5d3b68b616",
+        "amounts": {
+          "api_calls": 1,
+          "tokens": 40
+        },
+        "status": "HELD",
+        "created_at": "2026-11-22T14:26:05.814Z",
+        "settled_at": null
+      }
+    ],
+    "open": true,
+    "funding": null
+  },
+  "after_update": {
+    "budget_ref": "gxb_01m81tcrjcp5cq8x0q",
+    "parent_ref": null,
+    "run_id": null,
+    "limits": {
+      "api_calls": 5,
+      "tokens": 100
+    },
+    "spent": {
+      "api_calls": 2,
+      "tokens": 103
+    },
+    "reserved": {},
+    "available": {
+      "api_calls": 3,
+      "tokens": -3
+    },
+    "reservations": [
+      {
+        "reservation_ref": "rsv_01m81tcrsaag4tfwbb",
+        "subject_kind": "native_turn",
+        "subject_id": "start:54385e38-718b-43cb-b946-5771fa1790c8",
+        "amounts": {
+          "api_calls": 1,
+          "tokens": 40
+        },
+        "status": "SETTLED",
+        "created_at": "2026-11-22T14:26:05.738Z",
+        "settled_at": "2026-11-22T14:26:05.984Z"
+      },
+      {
+        "reservation_ref": "rsv_01m81tcrvpkssd1x8k",
+        "subject_kind": "native_turn",
+        "subject_id": "start:0b04e7cc-5f85-4442-9316-4e5d3b68b616",
+        "amounts": {
+          "api_calls": 1,
+          "tokens": 40
+        },
+        "status": "SETTLED",
+        "created_at": "2026-11-22T14:26:05.814Z",
+        "settled_at": "2026-11-22T14:26:06.000Z"
+      }
+    ],
+    "open": true,
+    "funding": null
+  },
+  "official_usage": [
+    {
+      "thread": "01a203a6-630b-7253-90a1-47c5e4183854",
+      "turn": "01a203a6-632e-79d3-9822-00d4ec4c1245",
+      "count": 30
+    },
+    {
+      "thread": "01a203a6-6368-7022-847a-7fe1c8490de7",
+      "turn": "01a203a6-637a-7fa0-9493-0cfe8c36d13d",
+      "count": 73
+    }
+  ],
+  "official_terminals": [
+    {
+      "thread": "01a203a6-630b-7253-90a1-47c5e4183854",
+      "turn": "01a203a6-632e-79d3-9822-00d4ec4c1245",
+      "status": "interrupted"
+    },
+    {
+      "thread": "01a203a6-6368-7022-847a-7fe1c8490de7",
+      "turn": "01a203a6-637a-7fa0-9493-0cfe8c36d13d",
+      "status": "interrupted"
+    }
+  ],
+  "tool_callbacks": [
+    {
+      "thread_id": "01a203a6-630b-7253-90a1-47c5e4183854",
+      "turn_id": "01a203a6-632e-79d3-9822-00d4ec4c1245",
+      "call_id": "gxt_01m81tcrjf89s9jrhk-1",
+      "task": "gxt_01m81tcrjf89s9jrhk"
+    },
+    {
+      "thread_id": "01a203a6-6368-7022-847a-7fe1c8490de7",
+      "turn_id": "01a203a6-637a-7fa0-9493-0cfe8c36d13d",
+      "call_id": "gxt_01m81tcrjh26zjmxtj-1",
+      "task": "gxt_01m81tcrjh26zjmxtj"
+    }
+  ],
+  "metering": {
+    "threads": [
+      {
+        "thread_id": "01a203a6-630b-7253-90a1-47c5e4183854",
+        "run_id": "gxr_01m81tcrjcpx5jb90n",
+        "root_id": "01a203a6-630b-7253-90a1-47c5e4183854",
+        "observed_total": 30,
+        "observed_at": "2026-11-22T14:26:05.949Z",
+        "observation_source": "thread/tokenUsage/updated",
+        "reconciled_total": 30,
+        "confidence": "PROVIDER_RECONCILED",
+        "anomaly_total": null,
+        "anomaly_at": null,
+        "unresolved_delta": 0
+      },
+      {
+        "thread_id": "01a203a6-6368-7022-847a-7fe1c8490de7",
+        "run_id": "gxr_01m81tcrjcpx5jb90n",
+        "root_id": "01a203a6-6368-7022-847a-7fe1c8490de7",
+        "observed_total": 73,
+        "observed_at": "2026-11-22T14:26:05.988Z",
+        "observation_source": "thread/tokenUsage/updated",
+        "reconciled_total": 73,
+        "confidence": "PROVIDER_RECONCILED",
+        "anomaly_total": null,
+        "anomaly_at": null,
+        "unresolved_delta": 0
+      }
+    ],
+    "turns": [
+      {
+        "run_id": "gxr_01m81tcrjcpx5jb90n",
+        "thread_id": "01a203a6-630b-7253-90a1-47c5e4183854",
+        "turn_id": "01a203a6-632e-79d3-9822-00d4ec4c1245",
+        "event_id": "start:54385e38-718b-43cb-b946-5771fa1790c8",
+        "state": "acknowledged",
+        "prior_tokens": 0,
+        "token_budget": 40,
+        "reservation_ref": "rsv_01m81tcrsaag4tfwbb",
+        "budget_ref": "gxb_01m81tcrjcp5cq8x0q",
+        "sequence": 2,
+        "budget_status": "SETTLED",
+        "terminal_status": "interrupted",
+        "total_tokens": 30,
+        "measured_tokens": 30,
+        "children_known": 1,
+        "metering_reason": null,
+        "terminal_at": "2026-11-22T14:26:05.983Z",
+        "confidence": "PROVIDER_CONFIRMED",
+        "settled_tokens": 30,
+        "observed_lower_bound": 30,
+        "estimate_snapshot": null,
+        "attribution": "TURN",
+        "estimated_at": null
+      },
+      {
+        "run_id": "gxr_01m81tcrjcpx5jb90n",
+        "thread_id": "01a203a6-6368-7022-847a-7fe1c8490de7",
+        "turn_id": "01a203a6-637a-7fa0-9493-0cfe8c36d13d",
+        "event_id": "start:0b04e7cc-5f85-4442-9316-4e5d3b68b616",
+        "state": "acknowledged",
+        "prior_tokens": 0,
+        "token_budget": 40,
+        "reservation_ref": "rsv_01m81tcrvpkssd1x8k",
+        "budget_ref": "gxb_01m81tcrjcp5cq8x0q",
+        "sequence": 3,
+        "budget_status": "SETTLED",
+        "terminal_status": "interrupted",
+        "total_tokens": 73,
+        "measured_tokens": 73,
+        "children_known": 1,
+        "metering_reason": null,
+        "terminal_at": "2026-11-22T14:26:06.000Z",
+        "confidence": "PROVIDER_CONFIRMED",
+        "settled_tokens": 73,
+        "observed_lower_bound": 73,
+        "estimate_snapshot": null,
+        "attribution": "TURN",
+        "estimated_at": null
+      }
+    ],
+    "adjustments": [],
+    "interrupts": [
+      {
+        "thread_id": "01a203a6-630b-7253-90a1-47c5e4183854",
+        "turn_id": "01a203a6-632e-79d3-9822-00d4ec4c1245",
+        "run_id": "gxr_01m81tcrjcpx5jb90n",
+        "reason": "gxb_01m81tcrjcp5cq8x0q",
+        "requested_at": "2026-11-22T14:26:05.962Z",
+        "sent_at": "2026-11-22T14:26:05.982Z",
+        "terminal_status": "interrupted",
+        "ended_at": "2026-11-22T14:26:05.983Z"
+      },
+      {
+        "thread_id": "01a203a6-6368-7022-847a-7fe1c8490de7",
+        "turn_id": "01a203a6-637a-7fa0-9493-0cfe8c36d13d",
+        "run_id": "gxr_01m81tcrjcpx5jb90n",
+        "reason": "gxb_01m81tcrjcp5cq8x0q",
+        "requested_at": "2026-11-22T14:26:05.963Z",
+        "sent_at": "2026-11-22T14:26:05.997Z",
+        "terminal_status": "interrupted",
+        "ended_at": "2026-11-22T14:26:06.000Z"
+      }
+    ],
+    "risk": {
+      "scope": "gxb_01m81tcrjcp5cq8x0q",
+      "hard_tokens": 100,
+      "settled_tokens": 103,
+      "reserved_tokens": 0,
+      "observed_in_flight_tokens": 0,
+      "observed_plus_settled": 103,
+      "committed_tokens": 103,
+      "available_tokens": -3,
+      "active_root_count": 0,
+      "largest_active_turn_grant": 0,
+      "unobserved_reserved_tokens": 0,
+      "provider_maximum_overshoot_tokens": null,
+      "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound."
+    },
+    "token_unit": "provider totalTokens, including cached input once",
+    "provider_money_cost": null
+  },
+  "reached_terminal_condition": true,
+  "checked_hard_cap": 100,
+  "root_grants": [
+    40,
+    40
+  ],
+  "guard_observed": true,
+  "mode": "official native stdio, 2 concurrent real GX Roots, scripted model usage; temporary SQLite",
+  "expected": "bounded interrupt on hard limit",
+  "passed": false
+}

@@ -1,0 +1,50 @@
+{
+  "scope": "Working tree during parallel implementation; separate repeat at the frozen commit is required.",
+  "cwd": "$PACKAGE/gx-h",
+  "argv": [
+    "$PACKAGE/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-v"
+  ],
+  "product_sha_at_start": "3a18d92e27bdfc1d6d9120a2d94d0fa377d1a85694f9cbe3d6c1ddcee2dab58f",
+  "product_sha_at_end": "a37afee2d95011c58de1810a425d5655d2f682799ece51c86e58a172a97b275a",
+  "changed_files": [
+    "gx-h/gx_core/jobs/service.py",
+    "gx-h/gx_core/p0/cli.py",
+    "gx-h/gx_core/p0/compute.py",
+    "gx-h/gx_core/p0/coordinator.py",
+    "gx-h/gx_core/p0/driver.py",
+    "gx-h/gx_core/p0/operator.py",
+    "gx-h/gx_core/p0/roots.py",
+    "gx-h/gx_core/p0/team_admission.py",
+    "gx-h/gx_core/p0/waits.py",
+    "gx-h/gx_core/p0/workspace.py",
+    "gx-h/gx_core/p0/zz_v21_historical_meter.sql",
+    "gx-h/gx_core/teams/service.py",
+    "gx-h/tests/test_p0_local_operator.py",
+    "gx-h/tests/test_p0_service.py",
+    "gx-h/tests/test_p0_workspace.py",
+    "gx-h/tests/test_tl1a_review_job.py",
+    "gx-h/tests/test_v21_compute.py",
+    "gx-h/tests/test_v21_metering.py",
+    "gx-h/tests/test_v21_teams.py"
+  ],
+  "returncode": 1,
+  "total": 325,
+  "passed": 320,
+  "skipped": 4,
+  "skip_details": [
+    "test_gx_run_uses_sdk_model_then_returns_to_native_decision (test_dsh_activity.DSHActivityTest.test_gx_run_uses_sdk_model_then_returns_to_native_decision) ... skipped 'install runtime/dsh-sdk/.venv first'",
+    "test_reported_model_mismatch_keeps_response_and_refuses_delivery (test_dsh_activity.DSHActivityTest.test_reported_model_mismatch_keeps_response_and_refuses_delivery) ... skipped 'install runtime/dsh-sdk/.venv first'",
+    "test_close_cold_resume_and_observe_prior_evidence (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_cold_resume_and_observe_prior_evidence) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'",
+    "test_close_while_recorded_response_is_pending (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_while_recorded_response_is_pending) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'"
+  ],
+  "failures": 1,
+  "errors": 0,
+  "failure": "test_p0_local_operator.LocalOperator.test_bootstrap_without_native_identity_then_native_binding_and_queued_replay expected committed but saw unsupported. Its tokens fixture omitted required reserved_tokens unit during this run; changed test passed on isolated rerun (operator-repro.log)."
+}

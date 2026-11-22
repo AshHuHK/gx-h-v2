@@ -1,0 +1,842 @@
+{
+  "test": "child_default_tools",
+  "started_utc": "2026-11-22T14:26:44.766694+00:00",
+  "provider": "local_probe",
+  "binary_version": "codex-cli 0.169.0",
+  "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "model_service": "loopback scripted Responses",
+  "gpu_seconds": 0,
+  "external_api_cost": 0,
+  "human_intervention": false,
+  "parent": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+  "child": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+  "permissions": {
+    "approvalPolicy": {
+      "root": "never",
+      "child": "never"
+    },
+    "sandbox": {
+      "root": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "child": {
+        "type": "readOnly",
+        "networkAccess": false
+      }
+    }
+  },
+  "wake_turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+  "parent_model_tokens": 105,
+  "child_model_tokens": 366,
+  "goal": {
+    "threadId": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+    "objective": "Measure descendant accounting",
+    "status": "complete",
+    "tokenBudget": 8000,
+    "tokensUsed": 436,
+    "timeUsedSeconds": 0,
+    "createdAt": 1795357605,
+    "updatedAt": 1795357605
+  },
+  "child_source": {
+    "subAgent": {
+      "thread_spawn": {
+        "parent_thread_id": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+        "depth": 1,
+        "agent_path": "/root/native_probe_child",
+        "agent_nickname": "Parfit",
+        "agent_role": null
+      }
+    }
+  },
+  "child_callback": [],
+  "parent_cwd": "/tmp/gx-native-p0-kx5kbmbe/child_default_tools/work",
+  "child_cwd": "/tmp/gx-native-p0-kx5kbmbe/child_default_tools/work",
+  "status": "PASS",
+  "log": [
+    {
+      "t": 29677067.52113872,
+      "generation": 1,
+      "direction": "request",
+      "method": "initialize",
+      "thread": null,
+      "turn": null,
+      "keys": [
+        "clientInfo",
+        "capabilities"
+      ]
+    },
+    {
+      "t": 29677067.7521382,
+      "generation": 1,
+      "direction": "result",
+      "method": "initialize",
+      "seq": 1,
+      "thread": null,
+      "turn": null
+    },
+    {
+      "t": 29677067.752316304,
+      "generation": 1,
+      "direction": "send",
+      "method": "initialized"
+    },
+    {
+      "t": 29677067.75233602,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/start",
+      "thread": null,
+      "turn": null,
+      "keys": [
+        "cwd",
+        "developerInstructions",
+        "environments",
+        "approvalPolicy",
+        "sandbox",
+        "dynamicTools"
+      ]
+    },
+    {
+      "t": 29677067.752572365,
+      "generation": 1,
+      "direction": "notification",
+      "method": "remoteControl/status/changed",
+      "seq": 2
+    },
+    {
+      "t": 29677067.798917416,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/start",
+      "seq": 3,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": null
+    },
+    {
+      "t": 29677067.798956644,
+      "generation": 1,
+      "direction": "request",
+      "method": "turn/start",
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": null,
+      "keys": [
+        "threadId",
+        "input"
+      ]
+    },
+    {
+      "t": 29677067.79923393,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/started",
+      "seq": 4,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8"
+    },
+    {
+      "t": 29677067.80652282,
+      "generation": 1,
+      "direction": "notification",
+      "method": "warning",
+      "seq": 5,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8"
+    },
+    {
+      "t": 29677067.809381112,
+      "generation": 1,
+      "direction": "result",
+      "method": "turn/start",
+      "seq": 6,
+      "thread": null,
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7"
+    },
+    {
+      "t": 29677067.9097752,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/goal/set",
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": null,
+      "keys": [
+        "threadId",
+        "objective",
+        "status",
+        "tokenBudget"
+      ]
+    },
+    {
+      "t": 29677067.910126917,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 7,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8"
+    },
+    {
+      "t": 29677067.9102152,
+      "generation": 1,
+      "direction": "notification",
+      "method": "turn/started",
+      "seq": 8,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "status": "inProgress"
+    },
+    {
+      "t": 29677067.91029626,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 9,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "item_type": "userMessage",
+      "item_id": "01a203a6-fd0b-7b81-82c3-df4ffb3b9c8e"
+    },
+    {
+      "t": 29677067.91036348,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 10,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "item_type": "userMessage",
+      "item_id": "01a203a6-fd0b-7b81-82c3-df4ffb3b9c8e"
+    },
+    {
+      "t": 29677067.918977752,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/goal/set",
+      "seq": 11,
+      "thread": null,
+      "turn": null
+    },
+    {
+      "t": 29677067.919177443,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 12,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8"
+    },
+    {
+      "t": 29677067.939816296,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 13,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "item_type": "subAgentActivity",
+      "item_id": "response-1",
+      "kind": "started",
+      "agent_thread_id": "01a203a6-fd54-7a11-b844-95535ed9f79c"
+    },
+    {
+      "t": 29677067.940918256,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 14,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c"
+    },
+    {
+      "t": 29677067.942156844,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 15,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "item_type": "subAgentActivity",
+      "item_id": "response-1",
+      "kind": "started",
+      "agent_thread_id": "01a203a6-fd54-7a11-b844-95535ed9f79c"
+    },
+    {
+      "t": 29677067.945988912,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 16,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7"
+    },
+    {
+      "t": 29677067.95097593,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 17,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c"
+    },
+    {
+      "t": 29677067.95106298,
+      "generation": 1,
+      "direction": "notification",
+      "method": "turn/started",
+      "seq": 18,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": "01a203a6-fd5b-7dd1-930c-da65e9117381",
+      "status": "inProgress"
+    },
+    {
+      "t": 29677067.95316204,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 19,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7"
+    },
+    {
+      "t": 29677067.95324142,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 20
+    },
+    {
+      "t": 29677068.019679047,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 21,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": "01a203a6-fd5b-7dd1-930c-da65e9117381"
+    },
+    {
+      "t": 29677068.019773744,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 22
+    },
+    {
+      "t": 29677068.061724994,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 23,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": "01a203a6-fd5b-7dd1-930c-da65e9117381",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-4"
+    },
+    {
+      "t": 29677068.065108705,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 24,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": "01a203a6-fd5b-7dd1-930c-da65e9117381",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-4"
+    },
+    {
+      "t": 29677068.069674816,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 25,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7"
+    },
+    {
+      "t": 29677068.071257785,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 26,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": "01a203a6-fd5b-7dd1-930c-da65e9117381"
+    },
+    {
+      "t": 29677068.07133413,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 27
+    },
+    {
+      "t": 29677068.071388543,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 28,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7"
+    },
+    {
+      "t": 29677068.07766721,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 29,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7"
+    },
+    {
+      "t": 29677068.0777336,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 30
+    },
+    {
+      "t": 29677068.079747707,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 31,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "item_type": "subAgentActivity",
+      "item_id": "subagent-completed-01a203a6-fd5b-7dd1-930c-da65e9117381",
+      "kind": "completed",
+      "agent_thread_id": "01a203a6-fd54-7a11-b844-95535ed9f79c"
+    },
+    {
+      "t": 29677068.07989786,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 32,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c"
+    },
+    {
+      "t": 29677068.079983603,
+      "generation": 1,
+      "direction": "notification",
+      "method": "turn/completed",
+      "seq": 33,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": "01a203a6-fd5b-7dd1-930c-da65e9117381",
+      "status": "completed"
+    },
+    {
+      "t": 29677068.081655465,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 34,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "item_type": "subAgentActivity",
+      "item_id": "subagent-completed-01a203a6-fd5b-7dd1-930c-da65e9117381",
+      "kind": "completed",
+      "agent_thread_id": "01a203a6-fd54-7a11-b844-95535ed9f79c"
+    },
+    {
+      "t": 29677068.104069836,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 35,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-5"
+    },
+    {
+      "t": 29677068.10570418,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 36,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-5"
+    },
+    {
+      "t": 29677068.110871553,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 37,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7"
+    },
+    {
+      "t": 29677068.110944923,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 38
+    },
+    {
+      "t": 29677068.119100902,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/readState/changed",
+      "seq": 39,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8"
+    },
+    {
+      "t": 29677068.119169082,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 40,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8"
+    },
+    {
+      "t": 29677068.119261257,
+      "generation": 1,
+      "direction": "notification",
+      "method": "turn/completed",
+      "seq": 41,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": "01a203a6-fcd2-7b41-ad9e-5f546330bfb7",
+      "status": "completed"
+    },
+    {
+      "t": 29677068.11928461,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/goal/get",
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29677068.120447017,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/goal/get",
+      "seq": 42,
+      "thread": null,
+      "turn": null
+    },
+    {
+      "t": 29677068.120497223,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/read",
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29677068.12337239,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/read",
+      "seq": 43,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": null
+    },
+    {
+      "t": 29677068.12338205,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/read",
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29677068.12586509,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/read",
+      "seq": 44,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": null
+    },
+    {
+      "t": 29677068.125871096,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/resume",
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29677068.127960496,
+      "generation": 1,
+      "direction": "notification",
+      "method": "deprecationNotice",
+      "seq": 45
+    },
+    {
+      "t": 29677068.136384506,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/resume",
+      "seq": 46,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": null
+    },
+    {
+      "t": 29677068.13639171,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/resume",
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29677068.13655516,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 47,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c",
+      "turn": "01a203a6-fd5b-7dd1-930c-da65e9117381"
+    },
+    {
+      "t": 29677068.136605825,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/cleared",
+      "seq": 48,
+      "thread": "01a203a6-fd54-7a11-b844-95535ed9f79c"
+    },
+    {
+      "t": 29677068.138400946,
+      "generation": 1,
+      "direction": "notification",
+      "method": "deprecationNotice",
+      "seq": 49
+    },
+    {
+      "t": 29677068.145851128,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/resume",
+      "seq": 50,
+      "thread": "01a203a6-fca9-7272-92e2-cdf00ea4f1f8",
+      "turn": null
+    }
+  ],
+  "model_requests": [
+    {
+      "id": "response-1",
+      "t": 29677067.906837024,
+      "scenario": "spawn",
+      "wire_model": "gpt-5.4",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "steer_samples": [],
+      "dynamic_in_catalog": true,
+      "goal_tools": [
+        "create_goal",
+        "get_goal",
+        "update_goal"
+      ],
+      "goal_mutator_declared": true,
+      "spawn_in_catalog": true,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "request_user_input",
+        "view_image",
+        "collaboration",
+        "followup_task",
+        "interrupt_agent",
+        "list_agents",
+        "send_message",
+        "spawn_agent",
+        "wait_agent",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "gx_probe_identity"
+      ],
+      "tool_outputs": [],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    },
+    {
+      "id": "response-2",
+      "t": 29677067.99157268,
+      "scenario": "spawn",
+      "wire_model": "gpt-5.4",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "steer_samples": [],
+      "dynamic_in_catalog": true,
+      "goal_tools": [
+        "create_goal",
+        "get_goal",
+        "update_goal"
+      ],
+      "goal_mutator_declared": true,
+      "spawn_in_catalog": true,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "request_user_input",
+        "view_image",
+        "collaboration",
+        "followup_task",
+        "interrupt_agent",
+        "list_agents",
+        "send_message",
+        "spawn_agent",
+        "wait_agent",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "gx_probe_identity"
+      ],
+      "tool_outputs": [
+        "{\"task_name\":\"/root/native_probe_child\"}"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    },
+    {
+      "id": "response-3",
+      "t": 29677068.00709928,
+      "scenario": "spawn",
+      "wire_model": "gpt-6.1-sol",
+      "wire_effort": "xhigh",
+      "child": true,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "steer_samples": [],
+      "dynamic_in_catalog": false,
+      "goal_tools": [],
+      "goal_mutator_declared": false,
+      "spawn_in_catalog": false,
+      "tool_names": [],
+      "tool_outputs": [],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 170,
+        "output_tokens": 13,
+        "total_tokens": 183
+      }
+    },
+    {
+      "id": "response-4",
+      "t": 29677068.056482505,
+      "scenario": "spawn",
+      "wire_model": "gpt-6.1-sol",
+      "wire_effort": "xhigh",
+      "child": true,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "steer_samples": [],
+      "dynamic_in_catalog": false,
+      "goal_tools": [],
+      "goal_mutator_declared": false,
+      "spawn_in_catalog": false,
+      "tool_names": [],
+      "tool_outputs": [
+        "unsupported call: gx_probe_identity"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 170,
+        "output_tokens": 13,
+        "total_tokens": 183
+      }
+    },
+    {
+      "id": "response-5",
+      "t": 29677068.100399274,
+      "scenario": "spawn",
+      "wire_model": "gpt-5.4",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "steer_samples": [],
+      "dynamic_in_catalog": true,
+      "goal_tools": [
+        "create_goal",
+        "get_goal",
+        "update_goal"
+      ],
+      "goal_mutator_declared": true,
+      "spawn_in_catalog": true,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "request_user_input",
+        "view_image",
+        "collaboration",
+        "followup_task",
+        "interrupt_agent",
+        "list_agents",
+        "send_message",
+        "spawn_agent",
+        "wait_agent",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "gx_probe_identity"
+      ],
+      "tool_outputs": [
+        "{\"task_name\":\"/root/native_probe_child\"}",
+        "{\"goal\":{\"threadId\":\"01a203a6-fca9-7272-92e2-cdf00ea4f1f8\",\"objective\":\"Measure descendant accounting\",\"status\":\"complete\",\"tokenBudget\":8000,\"tokensUsed\":436,\"timeUsedSeconds\":0,\"createdAt\":1795357605,\"updatedAt\":1795357605},\"remainingTokens\":7564,\"completionBudgetReport\":\"Goal achieved. Report final usage from this tool result's structu"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    }
+  ],
+  "callbacks": [],
+  "finished_utc": "2026-11-22T14:26:45.872329+00:00",
+  "fixture_tokens": 471
+}

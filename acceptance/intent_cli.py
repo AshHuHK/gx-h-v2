@@ -99,8 +99,11 @@ def run(out, binary):
                 prior = command("before-" + confirm_id, "status")
                 item = edit_action["items"][0]
                 assert prior["intent"][item["item_id"]]["value"] != item["value"]
-                confirmed = message(confirm_id, {"kind": "confirm", "change_id": decision["change_id"],
-                                                "preview_sha256": decision["preview_sha256"]})
+                confirmation = {"kind": "confirm", "change_id": decision["change_id"],
+                                "preview_sha256": decision["preview_sha256"]}
+                if "required_confirmation" in decision:
+                    confirmation["acknowledge_consequences"] = decision["required_confirmation"]["acknowledge_consequences"]
+                confirmed = message(confirm_id, confirmation)
                 assert confirmed["status"] == "committed"
                 confirmation_pairs.append((preview_id, confirm_id))
             final = command("final", "status")
@@ -115,11 +118,15 @@ def run(out, binary):
             receipts = {r["client_id"]: r for r in records["p0_root_deliveries"] if r["human"]}
             main = records["p0_intent_main"][0]["thread_id"]
             for mid, row in trusted.items():
-                receipt = receipts[mid]
-                assert (receipt["thread_id"], receipt["state"], receipt["turn_id"]) == (
-                    main, "acknowledged", row["receipt_turn_id"])
+                if mid in receipts:
+                    receipt = receipts[mid]
+                    assert (receipt["thread_id"], receipt["state"], receipt["turn_id"]) == (
+                        main, "acknowledged", row["receipt_turn_id"])
+                else:
+                    assert row["receipt_turn_id"] is None and row["received_at"] and row["consumed_at"]
             for input_id, confirmation in confirmation_pairs:
-                assert trusted[input_id]["receipt_turn_id"] != trusted[confirmation]["receipt_turn_id"]
+                assert input_id != confirmation and input_id not in receipts and confirmation not in receipts
+            assert {"ambiguous", "note"}.issubset(receipts) and len(receipts) == 3  # plus the legacy bootstrap
             assert len([i for i in records["p0_intent_changes"] if i["change_id"] == preview["change_id"]]) == 1
             assert not {"altered-preview", "forged-authorization"}.intersection(trusted)
             assert final["intent"]["objective"]["version"] == 2 and final["intent"]["evaluation"]["version"] == 1
@@ -127,7 +134,7 @@ def run(out, binary):
             report.update(result="PASS", main_thread_id=main, accepted_operator_inputs=len(trusted),
                           real_turn_ids=[r["turn_id"] for r in receipts.values()], model_requests=peer.request_count,
                           external_requests=0, GPU_seconds=0, change_preview=preview["preview_sha256"],
-                          confirmation_turn=trusted["confirm"]["receipt_turn_id"])
+                          confirmation_message_id="confirm", local_inputs=len(trusted) - len(receipts))
     except Exception as exc:
         report["error"] = str(exc)
         raise

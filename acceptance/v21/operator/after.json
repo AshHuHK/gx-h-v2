@@ -1,0 +1,1296 @@
+{
+  "result": "PASS",
+  "codex": "codex-cli 0.169.0",
+  "app_server": "official; scripted Responses on localhost",
+  "run_id": "gxr_01m81sq5w9541xhmb8",
+  "actual_native_turns": [
+    "01a2039b-98cb-7251-8fb4-cf4aacd9726e",
+    "01a2039b-9d87-78a1-8006-310eff705eb9"
+  ],
+  "local_intent_inputs": 6,
+  "commands": [
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "$WORK/state",
+        "--demo-grid"
+      ],
+      "exit": 0,
+      "result": "WAITING_EXTERNAL_JOB",
+      "before": {},
+      "after": {
+        "native_deliveries": 1,
+        "spent": {
+          "api_calls": 1,
+          "tokens": 35
+        },
+        "loopback_requests": 1
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--text",
+        "The previous report discussed changing the budget."
+      ],
+      "exit": 0,
+      "result": "needs_clarification",
+      "before": {
+        "native_deliveries": 1,
+        "spent": {
+          "api_calls": 1,
+          "tokens": 35
+        },
+        "loopback_requests": 1
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--message-id",
+        "zero-tokens",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "exit": 0,
+      "result": "committed",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "tokens",
+            "item_type": "resource_limit",
+            "expected_version": 0,
+            "value": {
+              "resource": "tokens",
+              "unit": "reserved_tokens",
+              "max": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--message-id",
+        "queued-cpu",
+        "--action",
+        "$WORK/action.json",
+        "--queue-only"
+      ],
+      "exit": 0,
+      "result": "queued",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "cpu",
+            "item_type": "resource_limit",
+            "expected_version": 0,
+            "value": {
+              "resource": "cpu_seconds",
+              "max": 100
+            }
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "pending"
+      ],
+      "exit": 0,
+      "result": "WAITING_EXTERNAL_JOB",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "recover"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--message-id",
+        "raise-tokens",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "exit": 0,
+      "result": "awaiting_confirmation",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "tokens",
+            "item_type": "resource_limit",
+            "expected_version": 1,
+            "value": {
+              "resource": "tokens",
+              "unit": "reserved_tokens",
+              "max": 500
+            }
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--message-id",
+        "confirm-relief",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "exit": 0,
+      "result": "committed",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "action": {
+        "kind": "confirm",
+        "change_id": "gxq_01m81sq8hgc7msw2bb",
+        "preview_sha256": "57d6f580a091f7e1007f2811ed4b0eae22db988c1bcf7662c074f3ee3109ff50"
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--message-id",
+        "confirm-relief",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "exit": 0,
+      "result": "committed",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "action": {
+        "kind": "confirm",
+        "change_id": "gxq_01m81sq8hgc7msw2bb",
+        "preview_sha256": "57d6f580a091f7e1007f2811ed4b0eae22db988c1bcf7662c074f3ee3109ff50"
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--message-id",
+        "deny-model",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "exit": 1,
+      "result": "local GX operator",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "tokens",
+            "item_type": "resource_limit",
+            "expected_version": 2,
+            "value": {
+              "resource": "tokens",
+              "unit": "reserved_tokens",
+              "max": 400
+            }
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--message-id",
+        "deny-project",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "exit": 1,
+      "result": "no access",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "tokens",
+            "item_type": "resource_limit",
+            "expected_version": 2,
+            "value": {
+              "resource": "tokens",
+              "unit": "reserved_tokens",
+              "max": 400
+            }
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "message",
+        "--state",
+        "$WORK/state",
+        "--message-id",
+        "forged",
+        "--action",
+        "$WORK/action.json"
+      ],
+      "exit": 1,
+      "result": "requires nonempty item edits",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "action": {
+        "kind": "change",
+        "items": [
+          {
+            "item_id": "tokens",
+            "item_type": "resource_limit",
+            "expected_version": 2,
+            "value": {
+              "resource": "tokens",
+              "unit": "reserved_tokens",
+              "max": 400
+            }
+          }
+        ],
+        "turn_id": "forged"
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "inspect"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "usage"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "pending"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "recover"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "retry"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "budget-preview",
+        "--resource",
+        "tokens",
+        "--limit",
+        "0",
+        "--budget-scope",
+        "project"
+      ],
+      "exit": 0,
+      "result": "awaiting_confirmation",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "budget-apply",
+        "--preview-id",
+        "gxq_01m81sqan073q135fb",
+        "--preview-sha256",
+        "2718c1ba9494fa9fb47bae9e2e0b2358e169f45d2e00f119ab2e14883ee0b874"
+      ],
+      "exit": 0,
+      "result": "committed",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "usage"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "budget-preview",
+        "--resource",
+        "api_calls",
+        "--limit",
+        "2",
+        "--budget-scope",
+        "run"
+      ],
+      "exit": 0,
+      "result": "awaiting_confirmation",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "budget-apply",
+        "--preview-id",
+        "5de7466b-b61c-496a-b185-af579d868d2a",
+        "--preview-sha256",
+        "e3082cb7bebbf3c3f9b6274ab8a4c1499b08db1ef424c0580e342d2b1c1df839"
+      ],
+      "exit": 0,
+      "result": "committed",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "pause"
+      ],
+      "exit": 0,
+      "result": "PAUSED",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "resume"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "budget-preview",
+        "--resource",
+        "api_calls",
+        "--limit",
+        "133",
+        "--budget-scope",
+        "run"
+      ],
+      "exit": 0,
+      "result": "awaiting_confirmation",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "budget-apply",
+        "--preview-id",
+        "34bc487d-a949-4e21-99fc-8b9ade49d3b9",
+        "--preview-sha256",
+        "a6989b500c3c71bcdd6ce904f421b65797078e630454efb4ee16786275b98668"
+      ],
+      "exit": 0,
+      "result": "committed",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "usage"
+      ],
+      "exit": 0,
+      "result": "WAITING_APPROVAL",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "budget-apply",
+        "--preview-id",
+        "34bc487d-a949-4e21-99fc-8b9ade49d3b9",
+        "--preview-sha256",
+        "a6989b500c3c71bcdd6ce904f421b65797078e630454efb4ee16786275b98668"
+      ],
+      "exit": 1,
+      "result": "displayed pending budget preview",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "cancel"
+      ],
+      "exit": 0,
+      "result": "CANCELLED",
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/state",
+        "audit",
+        "--output",
+        "$WORK/audit.json"
+      ],
+      "exit": 0,
+      "result": null,
+      "before": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 2,
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        },
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "$WORK/keyed-workspace",
+        "--run-key",
+        "first",
+        "--demo-grid"
+      ],
+      "exit": 0,
+      "result": "WAITING_EXTERNAL_JOB",
+      "before": {},
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "$WORK/keyed-workspace",
+        "--run-key",
+        "second",
+        "--demo-grid"
+      ],
+      "exit": 0,
+      "result": "WAITING_EXTERNAL_JOB",
+      "before": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/keyed-workspace",
+        "usage",
+        "--run-id",
+        "gxr_01m81sqdsn4gsbvymg"
+      ],
+      "exit": 0,
+      "result": "WAITING_EXTERNAL_JOB",
+      "before": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/keyed-workspace",
+        "usage",
+        "--run-id",
+        "gxr_01m81sqej5gey09bdz"
+      ],
+      "exit": 0,
+      "result": "WAITING_EXTERNAL_JOB",
+      "before": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/keyed-workspace",
+        "budget-preview",
+        "--run-id",
+        "gxr_01m81sqdsn4gsbvymg",
+        "--resource",
+        "tokens",
+        "--limit",
+        "500001"
+      ],
+      "exit": 0,
+      "result": "awaiting_confirmation",
+      "before": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/keyed-workspace",
+        "budget-apply",
+        "--run-id",
+        "gxr_01m81sqej5gey09bdz",
+        "--preview-id",
+        "1e6ce6af-b483-4ae2-ad12-a4c47052d4c5",
+        "--preview-sha256",
+        "ce92554ca0316402079fff8ae80e1795319dc8900e909898dff2269ecbf53d2e"
+      ],
+      "exit": 1,
+      "result": "displayed pending",
+      "before": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/keyed-workspace",
+        "budget-apply",
+        "--run-id",
+        "gxr_01m81sqdsn4gsbvymg",
+        "--preview-id",
+        "1e6ce6af-b483-4ae2-ad12-a4c47052d4c5",
+        "--preview-sha256",
+        "ce92554ca0316402079fff8ae80e1795319dc8900e909898dff2269ecbf53d2e"
+      ],
+      "exit": 0,
+      "result": "committed",
+      "before": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/keyed-workspace",
+        "usage",
+        "--run-id",
+        "gxr_01m81sqdsn4gsbvymg"
+      ],
+      "exit": 0,
+      "result": "WAITING_EXTERNAL_JOB",
+      "before": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "operator",
+        "--state",
+        "$WORK/keyed-workspace",
+        "usage",
+        "--run-id",
+        "gxr_01m81sqej5gey09bdz"
+      ],
+      "exit": 0,
+      "result": "WAITING_EXTERNAL_JOB",
+      "before": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      },
+      "after": {
+        "native_deliveries": 0,
+        "spent": {},
+        "loopback_requests": 2
+      }
+    }
+  ],
+  "keyed_runs": [
+    "gxr_01m81sqdsn4gsbvymg",
+    "gxr_01m81sqej5gey09bdz"
+  ],
+  "keyed_workspace_native_turns": 0
+}

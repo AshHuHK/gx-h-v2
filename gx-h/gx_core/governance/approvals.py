@@ -505,6 +505,7 @@ def decide(
     expected_subject_sha256: str | None = None,
     policy_ref: str | None = None,
     decision_detail: Mapping[str, Any] | None = None,
+    operator_budget_message: str | None = None,
 ) -> dict[str, Any]:
     """The operator surface: grant, deny or revoke one approval.
 
@@ -529,7 +530,11 @@ def decide(
         raise SchemaInvalid("a decision states its reason in the note")
     # contract r5: the caller's scope, the shape of the arguments, that a person is there to decide
     # or policy_ref names the standing policy -- and only then the approval itself
-    if policy_ref is None and not person_shown(ctx):
+    shown = person_shown(ctx)
+    if operator_budget_message and decision == GRANTED and policy_ref is None:
+        from ..p0.operator_budget import allows_grant
+        shown = allows_grant(ctx, approval_id, operator_budget_message)
+    if policy_ref is None and not shown:
         raise PermissionDenied(
             "this decision belongs to a person and the call was not shown to one; decide it where a "
             "person is, or name the standing policy with policy_ref",

@@ -166,6 +166,9 @@ class WaitLeases(unittest.TestCase):
         self.assertEqual(ledger["reserved"], {"tokens":65, "api_calls":1})
 
     def test_operator_pause_with_meter_gap_and_terminal_job_survives_cold_resume(self):
+        # Exercise the lease handoff while the original receipt is still within its grace period.
+        self.db.execute("UPDATE runs SET inputs_json=json_set(inputs_json,'$.inputs.p0_spec.metering.grace_seconds',604800) "
+                        "WHERE run_id=?", (self.run,))
         turn = self.roots.dispatch(self.task)["turn_id"]
         self.roots.delivery.observe("turn/started", {"threadId": self.thread, "turn":{"id":turn}})
         self.roots.delivery.observe("rawResponse/completed", {"threadId":self.thread, "turnId": turn,
@@ -202,6 +205,8 @@ class WaitLeases(unittest.TestCase):
         self.assertEqual(waits.pending(self.db, self.run), [])
 
     def test_meter_wait_precedes_first_retry_and_authorizes_only_after_exact_charge(self):
+        self.db.execute("UPDATE runs SET inputs_json=json_set(inputs_json,'$.inputs.p0_spec.metering.grace_seconds',604800) "
+                        "WHERE run_id=?", (self.run,))
         turn = self.roots.dispatch(self.task)["turn_id"]
         self.roots.delivery.observe("turn/started", {"threadId": self.thread, "turn":{"id":turn}})
         self.roots.delivery.observe("rawResponse/completed", {"threadId":self.thread, "turnId":turn,

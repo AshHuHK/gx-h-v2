@@ -87,6 +87,8 @@ class TurnMeterTests(unittest.TestCase):
         self.assertEqual(budgets.state(self.db, self.budget)["spent"], {})
 
     def abnormal_history(self, turn, amounts, *, extra_count=False, terminal_event="turn_aborted"):
+        self.db.execute("UPDATE runs SET inputs_json=? WHERE run_id=?",(json.dumps({"inputs":{
+            "p0_spec":{"metering":{"rollout_diagnostics":True}}}}),self.run))
         events = [{"type":"session_meta", "payload":{"id":"root"}},
                   {"type":"event_msg", "payload":{"type":"task_started", "turn_id":turn, "root_turn_id":turn}}]
         total = 0
@@ -246,6 +248,8 @@ class TurnMeterTests(unittest.TestCase):
         self.assertEqual(self.db.execute("SELECT awaiting_turn FROM p0_native_child_meters").fetchone()[0], 0)
 
     def test_unloaded_child_requires_its_original_session_and_complete_response_records(self):
+        self.db.execute("UPDATE runs SET inputs_json=? WHERE run_id=?",(json.dumps({"inputs":{
+            "p0_spec":{"metering":{"rollout_diagnostics":True}}}}),self.run))
         parent_turn = self.start()
         self.delivery.observe_descendant("item/completed", {"threadId":"root","turnId":parent_turn,
             "item":{"type":"subAgentActivity","kind":"started","agentThreadId":"child"}})
@@ -380,6 +384,9 @@ class TaskRetryMeterTests(unittest.TestCase):
         self.assertFalse(self.db.execute("SELECT 1 FROM events WHERE kind='task.wait_handoff'").fetchone())
 
     def test_other_task_runs_and_expired_successor_resumes_once_after_cold_metering(self):
+        # Keep the receipt unresolved for this lease-expiry scenario; v2.1 estimates after grace.
+        self.db.execute("UPDATE runs SET inputs_json=json_set(inputs_json,'$.inputs.p0_spec.metering.grace_seconds',604800) "
+                        "WHERE run_id=?", (self.run,))
         first, successor = self.start_retry()
         other_task = records.create_task(self.db, run_id=self.run, actor="test", kind="research_round",
                                          role="evidence_reviewer", required_artifacts=["science_assessment"])

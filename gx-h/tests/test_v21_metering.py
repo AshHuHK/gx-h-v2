@@ -144,6 +144,21 @@ class ThreadAccounts(unittest.TestCase):
         self.assertEqual((ticket["state"],ticket["confidence"],ticket["settled_tokens"]),("sending","RESERVED",None))
         self.assertEqual(budgets.state(self.db,f.budget)["reserved"],{"api_calls":1,"tokens":100})
 
+    def test_durable_positive_raw_receipts_set_an_estimate_floor_when_all_snapshots_are_missing(self):
+        f = self.fx
+        t = f.start()
+        f.raw(t,"expensive",145)
+        f.raw(t,"expensive",145)
+        f.raw(t,"unknown",None)
+        f.complete()
+        f.delivery = RootDelivery(f.peer)
+        clock.advance(31)
+        f.delivery.maintain()
+        ticket, = self.status()["turns"]
+        self.assertEqual((ticket["confidence"],ticket["observed_lower_bound"],ticket["settled_tokens"]),
+                         ("ESTIMATED",145,145))
+        self.assertIsNone(ticket["total_tokens"])
+
     def test_existing_v2_charges_seed_the_cumulative_checkpoint_without_rebilling(self):
         f = self.fx
         t = f.start()
@@ -151,13 +166,15 @@ class ThreadAccounts(unittest.TestCase):
         f.sample(t,22)
         f.complete()
         self.db.execute("DROP VIEW p0_meter_native_turns")
-        for table in ("p0_meter_adjustments","p0_meter_turns","p0_meter_threads","p0_meter_interrupts","p0_meter_responses"):
+        for table in ("p0_meter_adjustments","p0_meter_turns","p0_meter_threads","p0_meter_interrupts","p0_meter_responses",
+                      "p0_meter_legacy_runs"):
             self.db.execute("DROP TABLE "+table)
         self.db.executemany("DELETE FROM schema_meta WHERE key=?", (("p0.migration."+k,) for k in (
-            "z_v21_metering.sql","z_v21_response_receipts.sql","zz_v21_historical_meter.sql")))
+            "z_v21_metering.sql","z_v21_response_receipts.sql","zz_v21_historical_meter.sql","y_v21_legacy_meter.sql")))
         schema.install(self.db)
         schema.install(self.db)
         self.assertEqual(self.status()["threads"][0]["reconciled_total"],22)
+        self.assertTrue(metering.rollout_diagnostics(self.db,self.run))
         self.assertEqual(budgets.state(self.db,f.budget)["spent"],{"api_calls":1,"tokens":22})
 
 

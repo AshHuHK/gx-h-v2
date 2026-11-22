@@ -47,6 +47,7 @@ def _risk(conn, limit, spent, reserved, active, *, scope):
             "committed_tokens":spent+reserved+over_holds,
             "available_tokens":None if limit is None else limit-spent-reserved-over_holds,
             "active_root_count":len({r["thread_id"] for r in active}),
+            "largest_active_turn_grant":max((r["token_budget"] or 0 for r in active),default=0),
             "unobserved_reserved_tokens":unobserved,
             "provider_maximum_overshoot_tokens":None,
             "maximum_exposure_note":"A GX grant bounds reserved units. Without an enforced provider response "
@@ -101,7 +102,7 @@ def allowance(conn, run_id, ref, binding):
     constrained = [line for line in lines if line["hard_tokens"] is not None]
     if not constrained:
         return None
-    crossed = [line for line in constrained if line["observed_in_flight_tokens"]
+    crossed = [line for line in constrained if (line["observed_in_flight_tokens"] or line["scope"]!=ref)
                and line["observed_plus_settled"]>=line["hard_tokens"]]
     if crossed:
         team = conn.execute("SELECT team_id FROM p0_teams WHERE run_id=? AND budget_ref=?",(run_id,ref)).fetchone()

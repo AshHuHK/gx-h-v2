@@ -549,6 +549,7 @@ class RootDelivery:
                           "WHERE run_id=? AND thread_id=? AND method='turn/interrupt' AND target_turn=? "
                           "AND state='sending'", (self.run_id, thread_id, turn["id"]))
         self._settle(thread_id, turn["id"])
+        metering.late_cumulative(self.conn,thread_id,turn["id"])
         meter_limits.check(self.conn,self.run_id,thread_id)
 
     def maintain(self):

@@ -15,12 +15,23 @@ def policy(conn, run_id):
 
 
 def validate_policy(value):
-    if not isinstance(value, dict) or value.keys() - {"grace_seconds", "soft_tokens"}:
-        raise SchemaInvalid("metering accepts grace_seconds and soft_tokens")
+    if not isinstance(value, dict) or value.keys() - {"grace_seconds", "soft_tokens", "rollout_diagnostics"}:
+        raise SchemaInvalid("metering accepts grace_seconds, soft_tokens and rollout_diagnostics")
     for name, amount in value.items():
+        if name=="rollout_diagnostics" and type(amount) is bool:
+            continue
+        if name=="rollout_diagnostics":
+            raise SchemaInvalid("metering.rollout_diagnostics requires a boolean")
         if type(amount) is not int or amount < 0:
             raise SchemaInvalid(f"metering.{name} requires a nonnegative integer")
     return {"grace_seconds":30, **value}
+
+
+def rollout_diagnostics(conn, run_id):
+    explicit = policy(conn,run_id).get("rollout_diagnostics")
+    if explicit is not None:
+        return explicit
+    return bool(conn.execute("SELECT 1 FROM p0_meter_legacy_runs WHERE run_id=?",(run_id,)).fetchone())
 
 
 def observe(conn, run_id, root, thread, turn, total, *, source="thread/tokenUsage/updated"):
@@ -223,13 +234,16 @@ def maintain(conn, run_id):
     """DB-only grace processing, also usable with an offline or paused native connection."""
     if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_meter_turns'").fetchone():
         return
+    outstanding = ("FROM p0_meter_native_turns WHERE run_id=? AND budget_status='HELD' "
+                   "AND state='acknowledged' AND terminal_status IS NOT NULL")
+    oldest = conn.execute("SELECT terminal_at "+outstanding+" ORDER BY terminal_at LIMIT 1",(run_id,)).fetchone()
+    if not oldest:
+        return
+    grace = policy(conn,run_id)["grace_seconds"]
+    if oldest["terminal_at"] and clock.age_seconds(oldest["terminal_at"])<grace:
+        return
     with store.transaction(conn):
-        rows = conn.execute("SELECT * FROM p0_meter_native_turns WHERE run_id=? AND budget_status='HELD' "
-                            "AND state='acknowledged' AND terminal_status IS NOT NULL ORDER BY sequence",
-                            (run_id,)).fetchall()
-        if not rows:
-            return
-        grace = policy(conn,run_id)["grace_seconds"]
+        rows = conn.execute("SELECT * "+outstanding+" ORDER BY sequence",(run_id,)).fetchall()
         for row in rows:
             if not row["terminal_at"]:
                 terminal(conn,row["thread_id"],row["turn_id"])

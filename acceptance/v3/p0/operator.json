@@ -1,0 +1,608 @@
+{
+  "approved_sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603",
+  "base_revision": "177037621d935bbac9e31618ebbc095f21e613b8",
+  "command": [
+    "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+    "acceptance/v3/p0/operator_probe.py",
+    "--revision",
+    "177037621d935bbac9e31618ebbc095f21e613b8",
+    "--out",
+    "acceptance/v3/p0/operator.json"
+  ],
+  "ended_utc": "2026-11-22T17:53:06.721593+00:00",
+  "fault": {
+    "cut": "package published, immediately before catalog atomic rename",
+    "env": {
+      "PYTHONPATH": "/tmp/gx-p0-operator-zqffau_q/observer",
+      "QA_CATALOG": "/tmp/gx-p0-operator-zqffau_q/snapshot/gx-h/config/workflow_packages.json",
+      "QA_REACHED": "/tmp/gx-p0-operator-zqffau_q/catalog-before-rename"
+    },
+    "observer_sha256": "c702d650ecc85e7c42c925bd06da5b3c1d972c690ce487d53e9526b76ea33ca8",
+    "owned_pid": 3406124,
+    "signal": "SIGKILL"
+  },
+  "final_records": [
+    {
+      "path": "org.example.gx.hello-research/0.2.0",
+      "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+    },
+    {
+      "path": "org.example.gx.hello-research/0.2.0-qa.one",
+      "sha256": "b081a5db677530c93d1453dd12eff7fccfb9af03e83ea654ce22cde9796fc3df"
+    },
+    {
+      "path": "org.example.gx.hello-research/0.2.0-qa.two",
+      "sha256": "cc29ec9529616f7611fa51de45238bc9462e1514f5a0d0c881c074804650b7a1"
+    }
+  ],
+  "legacy_catalog_fields_unchanged": true,
+  "operations": [
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "list"
+      ],
+      "case": "fresh catalog",
+      "exit": 0,
+      "pid": 3406106,
+      "stderr": "",
+      "stdout": {
+        "plugins": []
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "digest",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/examples/plugins/hello_research"
+      ],
+      "case": "independent package hash",
+      "exit": 0,
+      "pid": 3406107,
+      "stderr": "",
+      "stdout": {
+        "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "verify",
+        "org.example.gx.hello-research@0.2.0"
+      ],
+      "case": "unapproved cold verify",
+      "exit": 1,
+      "pid": 3406108,
+      "stderr": "",
+      "stdout": {
+        "failures": {
+          "org.example.gx.hello-research@0.2.0": "org.example.gx.hello-research@0.2.0: no operator-approved installation"
+        },
+        "plugins": []
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/examples/plugins/hello_research",
+        "--sha256",
+        "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+      ],
+      "case": "changed reviewed source refused",
+      "exit": 1,
+      "pid": 3406123,
+      "stderr": "ValueError: reviewed digest mismatch: package digest is ce6a3fb73090c8011131d95a3dc737d856f1450c1daebe9d0e29168be37885ce",
+      "stdout": null
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/examples/plugins/hello_research",
+        "--sha256",
+        "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+      ],
+      "case": "first install interrupted before catalog publication",
+      "exit": -9,
+      "pid": 3406124,
+      "stderr": "",
+      "stdout": null
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "list"
+      ],
+      "case": "cold list after process death",
+      "exit": 0,
+      "pid": 3406126,
+      "stderr": "",
+      "stdout": {
+        "plugins": []
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "verify",
+        "org.example.gx.hello-research@0.2.0"
+      ],
+      "case": "cold verify after process death",
+      "exit": 1,
+      "pid": 3406127,
+      "stderr": "",
+      "stdout": {
+        "failures": {
+          "org.example.gx.hello-research@0.2.0": "org.example.gx.hello-research@0.2.0: no operator-approved installation"
+        },
+        "plugins": []
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/examples/plugins/hello_research",
+        "--sha256",
+        "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+      ],
+      "case": "retry interrupted install",
+      "exit": 0,
+      "pid": 3406128,
+      "stderr": "",
+      "stdout": {
+        "id": "org.example.gx.hello-research",
+        "path": "org.example.gx.hello-research/0.2.0",
+        "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603",
+        "version": "0.2.0"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "verify",
+        "org.example.gx.hello-research@0.2.0"
+      ],
+      "case": "cold load after install retry",
+      "exit": 0,
+      "pid": 3406133,
+      "stderr": "",
+      "stdout": {
+        "failures": {},
+        "plugins": [
+          {
+            "contributions": {
+              "capabilities": [],
+              "tools": [
+                "hello_research"
+              ],
+              "workflows": []
+            },
+            "id": "org.example.gx.hello-research",
+            "namespace": "gx_ext_org_example_gx_hello_research_0_2_0_a219d6259a0df7f50630999aaa1fbb91eeb10f984b6bf441d003de659a37a68b",
+            "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603",
+            "version": "0.2.0"
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "verify",
+        "org.example.gx.hello-research@0.2.0"
+      ],
+      "case": "cold load refuses changed installed bytes",
+      "exit": 1,
+      "pid": 3406134,
+      "stderr": "",
+      "stdout": {
+        "failures": {
+          "org.example.gx.hello-research@0.2.0": "org.example.gx.hello-research@0.2.0: package digest mismatch for org.example.gx.hello-research/0.2.0: expected d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603, got fff08e808eaab2a240a5cd2380872db84973fce9cebd5ea4db4844cf22d21339"
+        },
+        "plugins": []
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/examples/plugins/hello_research",
+        "--sha256",
+        "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+      ],
+      "case": "installer refuses to overwrite changed installed version",
+      "exit": 1,
+      "pid": 3406137,
+      "stderr": "ValueError: installed files differ from the reviewed package: org.example.gx.hello-research/0.2.0",
+      "stdout": null
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "verify",
+        "org.example.gx.hello-research@0.2.0"
+      ],
+      "case": "cold verify missing installed path",
+      "exit": 1,
+      "pid": 3406140,
+      "stderr": "",
+      "stdout": {
+        "failures": {
+          "org.example.gx.hello-research@0.2.0": "org.example.gx.hello-research@0.2.0: [Errno 2] No such file or directory: '0.2.0'"
+        },
+        "plugins": []
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "list"
+      ],
+      "case": "installed pin remains visible",
+      "exit": 0,
+      "pid": 3406148,
+      "stderr": "",
+      "stdout": {
+        "plugins": [
+          {
+            "path": "org.example.gx.hello-research/0.2.0",
+            "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/examples/plugins/hello_research",
+        "--sha256",
+        "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+      ],
+      "case": "reinstall original bytes at missing path",
+      "exit": 0,
+      "pid": 3406149,
+      "stderr": "",
+      "stdout": {
+        "id": "org.example.gx.hello-research",
+        "path": "org.example.gx.hello-research/0.2.0",
+        "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603",
+        "version": "0.2.0"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "verify",
+        "org.example.gx.hello-research@0.2.0"
+      ],
+      "case": "restored exact pin after cold reopen",
+      "exit": 0,
+      "pid": 3406151,
+      "stderr": "",
+      "stdout": {
+        "failures": {},
+        "plugins": [
+          {
+            "contributions": {
+              "capabilities": [],
+              "tools": [
+                "hello_research"
+              ],
+              "workflows": []
+            },
+            "id": "org.example.gx.hello-research",
+            "namespace": "gx_ext_org_example_gx_hello_research_0_2_0_a219d6259a0df7f50630999aaa1fbb91eeb10f984b6bf441d003de659a37a68b",
+            "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603",
+            "version": "0.2.0"
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/examples/plugins/hello_research",
+        "--sha256",
+        "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+      ],
+      "case": "concurrent duplicate install",
+      "exit": 0,
+      "pid": 3406156,
+      "stderr": "",
+      "stdout": {
+        "id": "org.example.gx.hello-research",
+        "path": "org.example.gx.hello-research/0.2.0",
+        "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603",
+        "version": "0.2.0"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/examples/plugins/hello_research",
+        "--sha256",
+        "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+      ],
+      "case": "concurrent duplicate install",
+      "exit": 0,
+      "pid": 3406157,
+      "stderr": "",
+      "stdout": {
+        "id": "org.example.gx.hello-research",
+        "path": "org.example.gx.hello-research/0.2.0",
+        "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603",
+        "version": "0.2.0"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/reviewed-0.2.0-qa.one",
+        "--sha256",
+        "b081a5db677530c93d1453dd12eff7fccfb9af03e83ea654ce22cde9796fc3df"
+      ],
+      "case": "concurrent duplicate install",
+      "exit": 0,
+      "pid": 3406158,
+      "stderr": "",
+      "stdout": {
+        "id": "org.example.gx.hello-research",
+        "path": "org.example.gx.hello-research/0.2.0-qa.one",
+        "sha256": "b081a5db677530c93d1453dd12eff7fccfb9af03e83ea654ce22cde9796fc3df",
+        "version": "0.2.0-qa.one"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/reviewed-0.2.0-qa.one",
+        "--sha256",
+        "b081a5db677530c93d1453dd12eff7fccfb9af03e83ea654ce22cde9796fc3df"
+      ],
+      "case": "concurrent duplicate install",
+      "exit": 0,
+      "pid": 3406159,
+      "stderr": "",
+      "stdout": {
+        "id": "org.example.gx.hello-research",
+        "path": "org.example.gx.hello-research/0.2.0-qa.one",
+        "sha256": "b081a5db677530c93d1453dd12eff7fccfb9af03e83ea654ce22cde9796fc3df",
+        "version": "0.2.0-qa.one"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/reviewed-0.2.0-qa.two",
+        "--sha256",
+        "cc29ec9529616f7611fa51de45238bc9462e1514f5a0d0c881c074804650b7a1"
+      ],
+      "case": "concurrent duplicate install",
+      "exit": 0,
+      "pid": 3406160,
+      "stderr": "",
+      "stdout": {
+        "id": "org.example.gx.hello-research",
+        "path": "org.example.gx.hello-research/0.2.0-qa.two",
+        "sha256": "cc29ec9529616f7611fa51de45238bc9462e1514f5a0d0c881c074804650b7a1",
+        "version": "0.2.0-qa.two"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "install",
+        "/tmp/gx-p0-operator-zqffau_q/reviewed-0.2.0-qa.two",
+        "--sha256",
+        "cc29ec9529616f7611fa51de45238bc9462e1514f5a0d0c881c074804650b7a1"
+      ],
+      "case": "concurrent duplicate install",
+      "exit": 0,
+      "pid": 3406161,
+      "stderr": "",
+      "stdout": {
+        "id": "org.example.gx.hello-research",
+        "path": "org.example.gx.hello-research/0.2.0-qa.two",
+        "sha256": "cc29ec9529616f7611fa51de45238bc9462e1514f5a0d0c881c074804650b7a1",
+        "version": "0.2.0-qa.two"
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "list"
+      ],
+      "case": "list after concurrent writers",
+      "exit": 0,
+      "pid": 3406164,
+      "stderr": "",
+      "stdout": {
+        "plugins": [
+          {
+            "path": "org.example.gx.hello-research/0.2.0",
+            "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603"
+          },
+          {
+            "path": "org.example.gx.hello-research/0.2.0-qa.one",
+            "sha256": "b081a5db677530c93d1453dd12eff7fccfb9af03e83ea654ce22cde9796fc3df"
+          },
+          {
+            "path": "org.example.gx.hello-research/0.2.0-qa.two",
+            "sha256": "cc29ec9529616f7611fa51de45238bc9462e1514f5a0d0c881c074804650b7a1"
+          }
+        ]
+      }
+    },
+    {
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/.venv/bin/python",
+        "-B",
+        "/tmp/gx-p0-operator-zqffau_q/snapshot/bin/gx-p0",
+        "plugin",
+        "verify",
+        "org.example.gx.hello-research@0.2.0",
+        "org.example.gx.hello-research@0.2.0-qa.one",
+        "org.example.gx.hello-research@0.2.0-qa.two"
+      ],
+      "case": "cold load all exact versions",
+      "exit": 0,
+      "pid": 3406165,
+      "stderr": "",
+      "stdout": {
+        "failures": {},
+        "plugins": [
+          {
+            "contributions": {
+              "capabilities": [],
+              "tools": [
+                "hello_research"
+              ],
+              "workflows": []
+            },
+            "id": "org.example.gx.hello-research",
+            "namespace": "gx_ext_org_example_gx_hello_research_0_2_0_a219d6259a0df7f50630999aaa1fbb91eeb10f984b6bf441d003de659a37a68b",
+            "sha256": "d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603",
+            "version": "0.2.0"
+          },
+          {
+            "contributions": {
+              "capabilities": [],
+              "tools": [
+                "hello_research"
+              ],
+              "workflows": []
+            },
+            "id": "org.example.gx.hello-research",
+            "namespace": "gx_ext_org_example_gx_hello_research_0_2_0_qa_one_78a4b8c2f8447ba19be3fef24fb48e7f053a597d45f81ac4457142c44cb3db35",
+            "sha256": "b081a5db677530c93d1453dd12eff7fccfb9af03e83ea654ce22cde9796fc3df",
+            "version": "0.2.0-qa.one"
+          },
+          {
+            "contributions": {
+              "capabilities": [],
+              "tools": [
+                "hello_research"
+              ],
+              "workflows": []
+            },
+            "id": "org.example.gx.hello-research",
+            "namespace": "gx_ext_org_example_gx_hello_research_0_2_0_qa_two_efeb6e8891715e7813febac9a580fbbb800ae87626e7ed5b9b672eeedf0c1eca",
+            "sha256": "cc29ec9529616f7611fa51de45238bc9462e1514f5a0d0c881c074804650b7a1",
+            "version": "0.2.0-qa.two"
+          }
+        ]
+      }
+    }
+  ],
+  "overlapping_writer_pids_before_wait": [
+    3406156,
+    3406157,
+    3406158,
+    3406159,
+    3406160,
+    3406161
+  ],
+  "passed": true,
+  "probe_sha256": "00075a4cae708e2c4bb1336bc2d6acc281fd94c2c55878f3650285d1d4698031",
+  "restored_namespace": "gx_ext_org_example_gx_hello_research_0_2_0_a219d6259a0df7f50630999aaa1fbb91eeb10f984b6bf441d003de659a37a68b",
+  "scope": "Public CLI in isolated staging; local files only; observed process death during catalog publication",
+  "scratch": "/tmp/gx-p0-operator-zqffau_q",
+  "snapshot_digest_method": "SHA-256 compact sorted JSON array of [relative path, file SHA-256]",
+  "snapshot_files": 427,
+  "snapshot_sha256": "bdc410251ef2162d4b974035830a1e4047da7f7c20eb11b003f777ea65e4bea4",
+  "source_origin": "immutable git archive",
+  "source_sha256": {
+    "bin/gx-p0": "82d5cd8a888c7c5c25cb559ea59a4450c842ed5213a5c826dc6852619d776b04",
+    "examples/plugins/hello_research/gx_plugin.json": "9297b79c64b0e823f8b6619221ca7c0e21b3b4238d3a1053f029fcde72750068",
+    "examples/plugins/hello_research/package/__init__.py": "3a084ce7b476d6b4d1e4239b7a901b33137d37db27eca075b40da0214493f217",
+    "examples/plugins/hello_research/package/text/__init__.py": "0e7221b57b1df2e50700a549214d3747dea332c4c08542c0e1048ed18f182d39",
+    "examples/plugins/hello_research/package/text/messages.py": "70127f7dd36d23bbd9ed12d226d26fdc258c976030cf1cf5282adc13d35acbc7",
+    "examples/plugins/hello_research/package/tools.py": "17de79cb32eb093d4b29543ef20c0c38efb78290c2b786efa0b7c47055c3b7bf",
+    "examples/plugins/hello_research/plugin.py": "72d528199be1b9e2d51f3ee7a62db3d6c0b7e24b1cfd4a7e7c6bf63a1666fe84",
+    "gx-h/gx_core/p0/cli.py": "f6bc874ed7feec15678830b30a98ef5c995860915d0786cba9208b88ca80cfd3",
+    "gx-h/gx_core/plugins/__init__.py": "9105facff8b8fd268653af8e9d6071a17f0d982ef7db3ab6ff379fb2fd2b9945",
+    "gx-h/gx_core/plugins/author_api.py": "65711bfee122e30ce7065025ef4855ce36b06286ac867470b55ea1d34f473d97",
+    "gx-h/gx_core/plugins/catalog.py": "29c78a137dc5cdfc0c6e8f08d015cc54f2907bc712c359b100ab20ca78f20bfe",
+    "gx-h/gx_core/plugins/cli.py": "73036cb53e5e585fe939363556cb1957a977a8acb97032404d16fa40fbfbe68e",
+    "gx-h/gx_core/plugins/evaluator.py": "cb21f4a870f5371808c998918f5db58623b342d4882eca66b4310bef15cb240b",
+    "gx-h/gx_core/plugins/imports.py": "8d1e7e041de6b0b2a068e1c58041afa718c9240fbd05d4616ca38ded24359399",
+    "gx-h/gx_core/plugins/loader.py": "14f8ef984b034d8255d5bc933d66bcdb281158be82fd8839cc9db4d9de93eeca",
+    "gx-h/gx_core/plugins/manifest.py": "27ce6574a4e8105d04591234609e6fa59f3dca1e3d54da3f25a1f119fb29ea89",
+    "gx-h/gx_core/plugins/manifest.schema.json": "0035d73d02bad51631924291168d3894cc4dbb1d990514afeb91f6e798895547"
+  },
+  "started_utc": "2026-11-22T17:52:57.917048+00:00"
+}

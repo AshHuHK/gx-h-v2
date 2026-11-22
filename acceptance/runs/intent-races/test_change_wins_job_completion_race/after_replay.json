@@ -1,0 +1,78 @@
+{
+  "admission_sha256": "d5976abba274e516df33956d7f493665c0572dd40a6b364c38f084392e56094c",
+  "change_records": [
+    {
+      "change_id": "gxq_01m80jcrwdxzc196f5",
+      "impact_json": "[]",
+      "status": "committed"
+    },
+    {
+      "change_id": "gxq_01m80jcsqg88qwwh5v",
+      "impact_json": "[{\"action\":\"historical\",\"items\":[{\"item_id\":\"allowed-methods\",\"new_version\":2,\"role\":\"execution\"}],\"object_id\":\"gxj_01m80jcrwpsqq31b23\",\"object_type\":\"job\",\"status\":\"SUBMITTED\"},{\"action\":\"interrupt\",\"attempt\":1,\"items\":[{\"item_id\":\"allowed-methods\",\"new_version\":2,\"role\":\"execution\"}],\"lease_id\":\"gxl_01m80jcrwe90t3cdx2\",\"object_id\":\"gxt_01m80jcrwenskf8w77\",\"object_type\":\"task\",\"outbox_id\":1,\"status\":\"CLAIMED\"},{\"action\":\"refresh\",\"items\":[{\"item_id\":\"allowed-methods\",\"new_version\":2,\"role\":\"execution\"}],\"object_id\":\"gxr_01m80jcrw7sc10vfeg\",\"object_type\":\"workflow\",\"status\":\"ACTIVE\"}]",
+      "status": "committed"
+    }
+  ],
+  "completion_sha256": "6856fcb851975ab207c85b530375a830ad293db0309bae743f2a4f935cadb59b",
+  "item": {
+    "change_id": "gxq_01m80jcsqg88qwwh5v",
+    "created_at": "2026-11-22T02:47:03.664Z",
+    "item_id": "allowed-methods",
+    "item_type": "method_ban",
+    "run_id": "gxr_01m80jcrw7sc10vfeg",
+    "sha256": "89ca963ecadd0a88ba6b1e4c48239d58ac2eb25a95518a91f08d916a46e39858",
+    "source_message_id": "block-grid-method",
+    "status": "active",
+    "value": {
+      "forbidden_capabilities": [
+        "fixture-grid"
+      ]
+    },
+    "version": 2
+  },
+  "job_artifacts": [
+    {
+      "artifact_ref": "gxa_01m80jcsx9t23gxekb",
+      "kind": "synthetic_grid",
+      "sha256": "1c2ffca34cf563fabd52005eaf8b7fa562191ec2c20147f462fb6c6cb1f6f819"
+    },
+    {
+      "artifact_ref": "gxa_01m80jcsxdrzc5qcgw",
+      "kind": "job_stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifact_ref": "gxa_01m80jcsxgm1ehy4n0",
+      "kind": "job_stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "job_current": false,
+  "job_id": "gxj_01m80jcrwpsqq31b23",
+  "job_status": "SUCCEEDED",
+  "lease_released_at": "2026-11-22T02:47:03.665Z",
+  "outbox": [
+    {
+      "attempts": 0,
+      "consumed_at": null,
+      "idempotency_key": "p0.intent.notification:gxq_01m80jcsqg88qwwh5v:gxl_01m80jcrwe90t3cdx2",
+      "outbox_id": 1,
+      "topic": "p0.intent.notification"
+    },
+    {
+      "attempts": 0,
+      "consumed_at": null,
+      "idempotency_key": "job.terminal:gxj_01m80jcrwpsqq31b23",
+      "outbox_id": 2,
+      "topic": "job.terminal"
+    }
+  ],
+  "run_id": "gxr_01m80jcrw7sc10vfeg",
+  "runner_pid": 653066,
+  "scheduler_ref": "runner:653066:2963508565",
+  "task": {
+    "attempt": 1,
+    "lease_id": null,
+    "status": "READY",
+    "task_id": "gxt_01m80jcrwenskf8w77"
+  }
+}

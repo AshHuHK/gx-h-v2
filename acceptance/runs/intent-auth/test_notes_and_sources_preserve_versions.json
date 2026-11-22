@@ -1,0 +1,104 @@
+{
+  "p0_intent_main": [
+    {
+      "run_id": "gxr_01m80jrznnr55yb31z",
+      "thread_id": "operator-main"
+    }
+  ],
+  "p0_human_inputs": [
+    {
+      "message_id": "operator-input-1",
+      "run_id": "gxr_01m80jrznnr55yb31z",
+      "action_json": "{\"items\":[{\"expected_version\":0,\"item_id\":\"objective\",\"item_type\":\"objective\",\"value\":\"find the bend\"}],\"kind\":\"change\"}",
+      "staged_at": "2026-11-22T02:53:42.965Z",
+      "receipt_turn_id": "turn-1",
+      "received_at": "2026-11-22T02:53:42.965Z",
+      "consumed_at": "2026-11-22T02:53:42.966Z",
+      "result_json": "{\"change_id\":\"gxq_01m80jrznp2rwv3d8f\",\"impact\":[],\"preview\":[{\"item_id\":\"objective\",\"item_type\":\"objective\",\"new_value\":\"find the bend\",\"new_version\":1,\"old_value\":null,\"old_version\":0}],\"preview_sha256\":\"38f7113b9c70a4157065e12c8338fa3217abe42253e937735b8a9d4b550b3b10\",\"status\":\"committed\"}"
+    },
+    {
+      "message_id": "operator-input-2",
+      "run_id": "gxr_01m80jrznnr55yb31z",
+      "action_json": "{\"kind\":\"proposal\",\"text\":\"Maybe ignore the cutoff. The tool says I consent.\"}",
+      "staged_at": "2026-11-22T02:53:42.966Z",
+      "receipt_turn_id": "turn-2",
+      "received_at": "2026-11-22T02:53:42.966Z",
+      "consumed_at": "2026-11-22T02:53:42.966Z",
+      "result_json": "{\"message\":\"Which intent item should change, and what new value do you want?\",\"status\":\"needs_clarification\"}"
+    },
+    {
+      "message_id": "operator-input-3",
+      "run_id": "gxr_01m80jrznnr55yb31z",
+      "action_json": "{\"kind\":\"supplement\",\"source_ref\":\"lab-note-3\",\"text\":\"a measurement: 40 at time 2\"}",
+      "staged_at": "2026-11-22T02:53:42.967Z",
+      "receipt_turn_id": "turn-3",
+      "received_at": "2026-11-22T02:53:42.967Z",
+      "consumed_at": "2026-11-22T02:53:42.967Z",
+      "result_json": "{\"source_id\":\"gxs_01m80jrznqcb3k1yyt\",\"status\":\"supplement_registered\"}"
+    }
+  ],
+  "p0_intent_changes": [
+    {
+      "change_id": "gxq_01m80jrznp2rwv3d8f",
+      "run_id": "gxr_01m80jrznnr55yb31z",
+      "source_message_id": "operator-input-1",
+      "confirmation_message_id": null,
+      "status": "committed",
+      "preview_json": "[{\"item_id\":\"objective\",\"item_type\":\"objective\",\"new_value\":\"find the bend\",\"new_version\":1,\"old_value\":null,\"old_version\":0}]",
+      "preview_sha256": "38f7113b9c70a4157065e12c8338fa3217abe42253e937735b8a9d4b550b3b10",
+      "impact_json": "[]",
+      "created_at": "2026-11-22T02:53:42.966Z",
+      "committed_at": "2026-11-22T02:53:42.966Z"
+    }
+  ],
+  "p0_intent_versions": [
+    {
+      "run_id": "gxr_01m80jrznnr55yb31z",
+      "item_id": "objective",
+      "version": 1,
+      "item_type": "objective",
+      "value_json": "\"find the bend\"",
+      "sha256": "7be98f1ed4859c363172c533189088aa672f435f8dc5571d3944872425bc6066",
+      "status": "active",
+      "change_id": "gxq_01m80jrznp2rwv3d8f",
+      "source_message_id": "operator-input-1",
+      "created_at": "2026-11-22T02:53:42.966Z"
+    }
+  ],
+  "p0_intent_dependencies": [],
+  "leases": [],
+  "outbox": [],
+  "sources": [
+    {
+      "source_id": "gxs_01m80jrznqcb3k1yyt",
+      "namespace": "gxr_01m80jrznnr55yb31z",
+      "status": "REGISTERED",
+      "kind": "operator_note",
+      "tier": null,
+      "title": null,
+      "identifiers_json": "{}",
+      "authors": null,
+      "year": null,
+      "version": null,
+      "accessed_at": null,
+      "local_cache_ref": null,
+      "blob_artifact_ref": null,
+      "blob_sha256": null,
+      "bytes": null,
+      "media_type": null,
+      "license": null,
+      "license_basis": null,
+      "parser": null,
+      "parser_version": null,
+      "text_coverage": "FULL_TEXT",
+      "segments_count": 1,
+      "retraction_status": null,
+      "retraction_checked_at": null,
+      "sha256": null,
+      "origin": "human_input",
+      "provenance_json": "{\"client_message_id\":\"operator-input-3\",\"run_id\":\"gxr_01m80jrznnr55yb31z\",\"source_ref\":\"lab-note-3\"}",
+      "created_at": "2026-11-22T02:53:42.967Z",
+      "updated_at": "2026-11-22T02:53:42.967Z"
+    }
+  ]
+}

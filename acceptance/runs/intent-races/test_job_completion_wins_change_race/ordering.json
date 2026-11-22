@@ -1,0 +1,73 @@
+{
+  "change": {
+    "change_id": "gxq_01m80jcvacd0mcnjv0",
+    "impact": [
+      {
+        "action": "historical",
+        "items": [
+          {
+            "item_id": "allowed-methods",
+            "new_version": 2,
+            "role": "execution"
+          }
+        ],
+        "object_id": "gxj_01m80jct3rc5qvq86c",
+        "object_type": "job",
+        "status": "SUCCEEDED"
+      },
+      {
+        "action": "interrupt",
+        "attempt": 1,
+        "items": [
+          {
+            "item_id": "allowed-methods",
+            "new_version": 2,
+            "role": "execution"
+          }
+        ],
+        "lease_id": "gxl_01m80jct3c2xdrfx9h",
+        "object_id": "gxt_01m80jct3ccc2pdcg0",
+        "object_type": "task",
+        "outbox_id": 2,
+        "status": "CLAIMED"
+      },
+      {
+        "action": "refresh",
+        "items": [
+          {
+            "item_id": "allowed-methods",
+            "new_version": 2,
+            "role": "execution"
+          }
+        ],
+        "object_id": "gxr_01m80jct3712mr20wk",
+        "object_type": "workflow",
+        "status": "ACTIVE"
+      }
+    ],
+    "preview": [
+      {
+        "item_id": "allowed-methods",
+        "item_type": "method_ban",
+        "new_value": {
+          "forbidden_capabilities": [
+            "fixture-grid"
+          ]
+        },
+        "new_version": 2,
+        "old_value": {
+          "forbidden_capabilities": []
+        },
+        "old_version": 1
+      }
+    ],
+    "preview_sha256": "25a3ce68fb12ec34abb3f3e29003e458c1975a78a8bf6d79ae4ff64d43909554",
+    "status": "committed"
+  },
+  "elapsed_seconds": 0.8872611373662949,
+  "first_pid": 653117,
+  "first_writer": "completion",
+  "original_output": "gxa_01m80jcv4e2j9jx3yn",
+  "second_pid": 653091,
+  "second_writer": "change"
+}

@@ -193,12 +193,12 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
     conn = ctx.conn
     backend = backend_ctx(conn)
     run = _run(conn, run_id)
-    if (run["workflow_id"] not in ("science_grid", "tl1a_geometry", "tl1a_coordinate_quality")
-            or run["status"] not in {"ACTIVE", *machines.waiting_states("run")}):
+    if run["status"] not in {"ACTIVE", *machines.waiting_states("run")} or not run["workflow_id"]:
         return None
-    if run["workflow_id"] == "tl1a_geometry":
-        from workflows.tl1a_geometry.replan import prepare
-        prepare(conn, run_id)
+    hooks = service.hooks_for_run(conn, run_id)
+    if not hooks.auto_advance:
+        return None
+    hooks.replan(conn, run_id)
     engine = service._engine(backend, run_id)
     with store.transaction(conn) as tx:
         run = _run(tx, run_id)

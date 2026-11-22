@@ -344,7 +344,7 @@ def workflow_admission(conn: sqlite3.Connection, *, workflow_id: str, version: s
     reason = None
     if owner is not None:
         try:
-            done, asset = _call("workflow_admission", owner, conn, conn, workflow_id, version)
+            done, asset = _call("workflow_admission", owner, conn, conn, workflow_id, version, sha256)
         except ArtifactNotFound:
             done, asset = True, None
             reason = f"{workflow_id}@{version} is not registered as an asset"

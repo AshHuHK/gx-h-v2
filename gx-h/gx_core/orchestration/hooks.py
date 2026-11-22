@@ -13,6 +13,12 @@ class WorkerTools:
     prepare: Callable | None = None
     call: Callable | None = None
 
+    def __post_init__(self):
+        names = [spec.get("name") for spec in self.specs]
+        if (not all(isinstance(n, str) and n for n in names) or len(set(names)) != len(names)
+                or self.specs and not callable(self.call) or self.prepare is not None and not callable(self.prepare)):
+            raise SchemaInvalid("Workflow worker tools require distinct names and a callable handler")
+
 
 @dataclass(frozen=True)
 class ResearchStart:
@@ -119,11 +125,11 @@ class WorkflowHooks:
         implementation, functions = {}, []
         for field in fields(self):
             value = getattr(self, field.name)
-            if callable(value):
+            if field.name in {"auto_advance", "mechanical_continuation"} and type(value) is bool:
+                implementation[field.name] = value
+            elif callable(value) and getattr(value, "__qualname__", None):
                 implementation[field.name] = f"{value.__module__}.{value.__qualname__}"
                 functions.append(value)
-            elif type(value) is bool:
-                implementation[field.name] = value
             else:
                 raise SchemaInvalid(f"Invalid workflow hook {field.name}")
         return {"bindings": implementation, "sources": module_sources(functions)}

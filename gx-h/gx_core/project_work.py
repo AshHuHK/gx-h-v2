@@ -70,7 +70,8 @@ def _only_stage_job_progress(conn, run_id, state, standing, snapshot_jobs, waiti
 def _run_work(conn, run, view, child_refs):
     run_id = run["run_id"]
     actions = view["actions"]
-    science = run["workflow_id"] == "science_grid"
+    from .orchestration.service import hooks_for_run
+    science = hooks_for_run(conn, run_id).mechanical_continuation
     def offer(action, *, mechanical=False):
         if mechanical and science:
             view.setdefault("reactor_runs", set()).add(run_id)

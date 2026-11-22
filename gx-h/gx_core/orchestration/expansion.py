@@ -145,14 +145,21 @@ def expand(ctx: Ctx, run_id: str, *, rule: str, key: str, trigger: Mapping[str, 
         run = guard(tx, run_id, stage=stage, round_index=round_index)
         if predicate is not None and not predicate(tx):
             raise StaleRevision("the expansion predicate no longer holds", details={"key": key})
-        wanted = {f"task{i}": {"worker_tasks": 1} for i, spec in enumerate(tasks)
-                  if not spec.get("reservation_ref")}
-        wanted.update(dict(followers or {}))
+        from ..p0.team_admission import selected_team
+        groups = {}
+        for i, spec in enumerate(tasks):
+            if spec.get("reservation_ref"):
+                continue
+            team = selected_team(tx, run_id, spec["role"], spec.get("team_id"))
+            funding = team["budget_ref"] if team else run["budget_ref"]
+            groups.setdefault(funding, {})[f"task{i}"] = {"worker_tasks": 1}
+        if followers:
+            groups.setdefault(run["budget_ref"], {}).update(followers)
         reservations: dict[str, Any] = {}
-        if run["budget_ref"] and wanted:
-            chain = seams.reserve_task_chain(tx, budget_ref=run["budget_ref"], head_id=key,
-                                             followers=wanted, actor=ctx.actor)
-            reservations = dict(chain.get("followers") or {})
+        for funding, wanted in groups.items():
+            if funding:
+                chain = seams.reserve_task_chain(tx, budget_ref=funding, head_id=key, followers=wanted, actor=ctx.actor)
+                reservations.update(chain.get("followers") or {})
         created = []
         for index, spec in enumerate(tasks):
             arguments = dict(spec)

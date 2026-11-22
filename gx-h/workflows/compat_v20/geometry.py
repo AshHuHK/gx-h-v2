@@ -10,7 +10,8 @@ from .grid import task_context
 
 
 def example_spec():
-    return json.loads((config.HARNESS_ROOT.parent / "examples/tl1a_geometry/project.json").read_text())
+    data = json.loads((config.HARNESS_ROOT.parent / "examples/tl1a_geometry/project.json").read_text())
+    return {**data, "workflow_version": "2"}
 
 
 def research_start(spec):
@@ -30,7 +31,10 @@ def validate_intent(conn, run_id, edits):
         if edit["item_type"] == "evaluation_spec" and edit["value"] is not None:
             if edit["item_id"] != "evaluation":
                 raise SchemaInvalid("Use the evaluation item for this comparison's shared geometric criteria")
-            domain.intent_criteria(conn, run_id, edit["value"])
+            value = edit["value"]
+            if set(value) not in ({"eval_spec_id", "version"}, {"method", *domain.SECTIONS}):
+                raise SchemaInvalid("Supply the complete coordinate evaluation method, coverage, comparison and reproduction rules")
+            domain.intent_criteria(conn, run_id, value)
     return science_inputs.unsupported_edit(conn, run_id, edits)
 
 

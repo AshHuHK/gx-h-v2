@@ -18,7 +18,7 @@ from typing import Any, Iterable
 
 from ..errors import ArtifactNotFound, SchemaInvalid
 from .engine import Workflow
-from .hooks import WorkflowHooks
+from .hooks import DEFAULT_HOOKS, WorkflowHooks
 
 
 class WorkflowRegistry:
@@ -57,6 +57,14 @@ class WorkflowRegistry:
         staged = WorkflowRegistry()
         staged._by_key.update(self._by_key)
         return staged
+
+    def pin_new_defaults(self, existing, compatibility_refs):
+        """Even a newly installed package with no explicit hooks pins the defaults it will use."""
+        for key, flow in tuple(self._by_key.items()):
+            if key in existing._by_key or flow.hook_bindings is not None or "@".join(key) in compatibility_refs:
+                continue
+            del self._by_key[key]
+            self.register(flow, hooks=DEFAULT_HOOKS)
 
     def bind_compat(self, workflow_id, version, hooks, *, workflow_pin, hook_pin):
         """A release adapter for a graph whose original digest predates hooks."""

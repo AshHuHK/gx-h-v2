@@ -63,7 +63,8 @@ from ..errors import (
 from ..persistence import records, store
 from ..teams import recovery
 from ..teams.service import TeamService
-from . import seams
+from . import packages, seams
+from .hooks import DEFAULT_HOOKS
 from .engine import Engine, InterruptRequest, Workflow
 from .registry import WorkflowRegistry
 
@@ -81,10 +82,6 @@ CONTROL_ACTIONS = ("pause", "continue", "cancel", "budget_apply", "workflow_repi
 LEASE_ACTIONS = ("claim", "renew", "release")
 
 _registry: WorkflowRegistry | None = None
-#: The workflow packages this tree ships (``workflows/<name>``), registered by
-#: :func:`default_registry` in this order. Each exposes ``register_all(registry)``.
-SHIPPED_PACKAGES = ("module_collaboration", "science_grid", "science_grid_v2",
-                    "tl1a_coordinate_quality", "tl1a_geometry", "tl1a_geometry_v2")
 #: Package -> why it could not be registered, for the last registry built.
 _load_errors: dict[str, str] = {}
 _registry_injected = False
@@ -97,7 +94,7 @@ _installed_shipped_refs: frozenset[tuple[str, str]] = frozenset()
 
 def default_workflow_ref() -> tuple[str, str]:
     """The workflow a run starts on when it names none: the plugin's own default."""
-    return "module_collaboration", "1"
+    return tuple(packages.installation()["default"].rsplit("@", 1))
 
 
 def default_registry(conn: sqlite3.Connection | None = None, *, workflow_id: str | None = None,
@@ -117,10 +114,19 @@ def default_registry(conn: sqlite3.Connection | None = None, *, workflow_id: str
     if _registry is None:
         registry = WorkflowRegistry()
         errors: dict[str, str] = {}
-        for name in SHIPPED_PACKAGES:
-            try:  # local: workflows/ depends on gx_core, never the other way round at import
-                importlib.import_module(f"workflows.{name}").register_all(registry)
-            except Exception as exc:  # noqa: BLE001 - reported, and the rest still load
+        for entry in packages.installation()["packages"]:
+            name = entry["module"]
+            try:
+                staged = registry.staged_copy()
+                importlib.import_module(name).register_all(staged)
+                for reference, provider in entry.get("compat_hooks", {}).items():
+                    wid, ver = reference.rsplit("@", 1)
+                    staged.bind_compat(wid, ver, packages.component(provider),
+                        workflow_pin=seams.shipped_pins("workflows").get(reference),
+                        hook_pin=seams.shipped_pins("workflow_compat_hooks").get(reference))
+                staged.pin_new_defaults(registry, entry.get("compat_hooks", {}))
+                registry = staged
+            except Exception as exc:  # an unavailable package cannot hide the remaining installations
                 errors[name] = f"{type(exc).__name__}: {exc}"[:600]
         _registry, _load_errors = registry, errors
         _installed_shipped_refs = frozenset(
@@ -133,18 +139,18 @@ def default_registry(conn: sqlite3.Connection | None = None, *, workflow_id: str
         # Preserve the pre-existing trusted wiring/test injection seam. Requests
         # cannot select it; normal process caches always take the store path below.
         return _registry
-    row = conn.execute("SELECT kind,status FROM assets WHERE asset_id=? AND version=?",
+    row = conn.execute("SELECT kind,status,content_sha256 FROM assets WHERE asset_id=? AND version=?",
                        (workflow_id, version)).fetchone()
-    if row is None:
-        # Only the initial package inventory proves installation. A missing pin
-        # is refused by workflow_admission, not mistaken for missing code here.
-        # Later activation/cache entries from another store are not installed.
-        if _registry.has(workflow_id, version) and (workflow_id, version) in _installed_shipped_refs:
-            return _registry
-        raise ArtifactNotFound("no exact ACTIVE native workflow asset or shipped definition is available",
+    if (workflow_id, version) not in _installed_shipped_refs:
+        raise ArtifactNotFound("The exact workflow package is not installed",
                                details={"workflow_id": workflow_id, "version": version})
-    raise ArtifactNotFound("Only installed, pinned workflow packages can be executed.",
-                           details={"workflow_id": workflow_id, "version": version})
+    if row is not None:
+        flow = _registry.get(workflow_id, version)
+        if (row["kind"], row["status"], row["content_sha256"]) != ("EXECUTABLE_WORKFLOW", "ACTIVE", flow.digest()):
+            raise CapabilityNotApproved("The installed package differs from the exact ACTIVE workflow asset",
+                details={"workflow_id": workflow_id, "version": version, "asset_status": row["status"],
+                         "asset_sha256": row["content_sha256"], "installed_sha256": flow.digest()})
+    return _registry
 
 
 def load_errors() -> dict[str, str]:
@@ -190,6 +196,28 @@ def _pinned_workflow(conn: sqlite3.Connection, run: sqlite3.Row) -> Workflow:
             details={"workflow_id": run["workflow_id"], "version": run["workflow_version"],
                      "cause": {"code": exc.code, "message": exc.message}},
         ) from exc
+
+
+def hooks_for_run(conn, run_id):
+    """Resolve the exact saved binding before invoking any workflow behavior."""
+    run = _run(conn, run_id)
+    if not run["workflow_id"]:
+        return DEFAULT_HOOKS
+    flow = _pinned_workflow(conn, run)
+    if run["workflow_sha256"] and flow.digest() != run["workflow_sha256"]:
+        raise VersionImmutable("The installed workflow behavior differs from this run's original workflow pin")
+    return flow.hooks
+
+
+def prepare_workflow_job(conn, run_id, proposal):
+    """Validate an exact fresh Job request. Existing idempotent Jobs retain their original receipt."""
+    prepare = hooks_for_run(conn, run_id).prepare_job
+    if prepare is DEFAULT_HOOKS.prepare_job:
+        return
+    from copy import deepcopy
+    original = deepcopy(proposal)
+    if prepare(conn, run_id, original) is not None or original != proposal:
+        raise SchemaInvalid("prepare_job validates the exact request; a new proposal needs its own Job request")
 
 
 def shipped_report() -> dict[str, Any]:
@@ -465,7 +493,7 @@ def _require_capable_session(conn: sqlite3.Connection, host: Mapping[str, Any]) 
     )
 
 
-def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None) -> dict[str, Any]:
+def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_key=None) -> dict[str, Any]:
     """Create a run with its pins, objective, budget and coordinator lease, then run the
     workflow to its first interrupt. Returns as soon as outside work is needed."""
     config.check_holds("orchestration")
@@ -509,12 +537,12 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None) -> dict[str
     _require_capable_session(conn, host)
     files = _check_input_files(args.get("input_files") or [])
     inputs = dict(args.get("inputs") or {})
-    if workflow_id == "science_grid" and "execution_profiles" in inputs:
-        from ..research.model_activity import validated_profiles
-        inputs["execution_profiles"] = validated_profiles(inputs["execution_profiles"])
+    inputs = workflow.hooks.run_inputs(inputs)
     constraints = dict(args.get("constraints") or {})
     if inputs.get("p0") is True and prepare_p0 is None:
         raise PermissionDenied("Use the P0 operator entry to authorize a new research project")
+    if workspace_key is not None and (prepare_p0 is None or inputs.get("p0") is not True):
+        raise SchemaInvalid("A workspace run key requires the P0 operator entry")
     pins = installed_pins(workflow, policy_sha256=policy_sha)
     screen = seams.screen_objective(objective)
     if screen.get("result") == "BLOCKED":
@@ -528,6 +556,8 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None) -> dict[str
                "budget_profile": args["budget_profile"], "workflow": [workflow_id, version],
                "inputs": inputs, "input_files": [[f["path"], f["sha256"]] for f in files],
                "host": args.get("host"), "constraints": constraints}
+    if workspace_key is not None:
+        request["workspace_key"] = workspace_key
     if ctx.native_call is not None:
         # A model may omit host/session from its arguments. Bind start replay to
         # the backend-settled native root, while allowing new calls/connections
@@ -537,8 +567,9 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None) -> dict[str
                                   ("source", "session_ref", "native_agent_ref")}
 
     def create(tx: sqlite3.Connection) -> dict[str, Any]:
-        budget_ref = seams.create_root_budget(tx, run_id=None, profile_name=args["budget_profile"],
-                                              actor=ctx.actor)
+        p0 = inputs.get("p0") is True
+        budget_ref = None if p0 else seams.create_root_budget(
+            tx, run_id=None, profile_name=args["budget_profile"], actor=ctx.actor)
         run_id = records.create_run(
             tx, objective=text, project_ref=project_ref, actor=ctx.actor,
             budget_json=profile.get("limits") or {}, constraints=constraints, budget_ref=budget_ref,
@@ -546,7 +577,15 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None) -> dict[str
             agent_policy_ref=f"{('config/role_policy.codex.json' if policy.get('policy_host') == 'codex' else 'config/role_policy.json')}@{policy_sha}", agent_policy=policy,
             inputs={"inputs": inputs, "files": files}, host=host,
         )
-        tx.execute("UPDATE budgets SET run_id=? WHERE budget_ref=?", (run_id, budget_ref))
+        if p0:
+            from ..p0 import workspace
+            budget_ref = workspace.attach_run(
+                tx, run_id, project_ref=project_ref, run_key=workspace_key, profile_name=args["budget_profile"],
+                spec=inputs.get("p0_spec", {}), actor=ctx.actor)
+            tx.execute("UPDATE runs SET budget_ref=?, budget_json=(SELECT limits_json FROM budgets "
+                       "WHERE budget_ref=?) WHERE run_id=?", (budget_ref, budget_ref, run_id))
+        else:
+            tx.execute("UPDATE budgets SET run_id=? WHERE budget_ref=?", (run_id, budget_ref))
 
         arts = ArtifactService(tx)
         stored_files = []
@@ -1912,7 +1951,7 @@ def _maintenance_control(ctx: Ctx, args: Mapping[str, Any], reason: str) -> dict
     return {**response, "replayed": replayed}
 
 
-def run_control(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
+def run_control(ctx: Ctx, args: Mapping[str, Any], *, defer_advance: bool = False) -> dict[str, Any]:
     """Control a run, or deliberately adjust its budget or compatible workflow pins."""
     from ..p0 import waits
     conn, run_id = ctx.conn, args["run_id"]
@@ -2093,7 +2132,7 @@ def run_control(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
                 f"cancellation cleanup: {finished['cancelled_tasks']} remaining task(s) cancelled, "
                 f"{finished['released_holds']} unused hold(s) released, "
                 f"{finished['expired_worker_refusals']} obsolete worker refusal(s) withdrawn"]
-    if action == "continue":
+    if action == "continue" and not defer_advance:
         # A run that came back to ACTIVE with nothing pending has no interrupt for anyone to
         # resume: it is driven on here, after the state change has committed, so a node never
         # runs inside the control call's transaction. A replay finds the run already moved on,

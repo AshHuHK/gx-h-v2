@@ -971,7 +971,8 @@ ADMISSION: tuple[str, ...] = (RULE_CAPACITY, RULE_OVERDUE_FIRST, RULE_APPROVAL)
 
 
 def admit_claim(snapshot: Snapshot, task_id: str, *, order: Sequence[Component] = ORDER,
-                rules: Sequence[str] = ADMISSION, refusal: Any = None) -> Admission:
+                rules: Sequence[str] = ADMISSION, refusal: Any = None,
+                root_capacity: tuple[int, int] | None = None, unavailable: frozenset[str] = frozenset()) -> Admission:
     """Whether ``task_id`` may be claimed now. The caller's own checks still apply.
 
     Both facts are returned whatever the answer: whether a slot is free, and which
@@ -988,10 +989,11 @@ def admit_claim(snapshot: Snapshot, task_id: str, *, order: Sequence[Component] 
     if unknown:
         raise ValueError(f"unknown admission rule(s) {unknown}")
     applied = tuple(rule for rule in ADMISSION if rule in rules)
-    parallel = snapshot.limits.max_parallel_workers
-    in_flight = len(snapshot.in_flight)
+    parallel, in_flight = root_capacity or (snapshot.limits.max_parallel_workers, len(snapshot.in_flight))
     stopped = _run_refusal(snapshot, refusal)
     ranked, _refused = _candidates(snapshot, order, approvals=RULE_APPROVAL in applied)
+    if unavailable:
+        ranked = [(item, key) for item, key in ranked if item.task_id not in unavailable or item.task_id == task_id]
     # a task handed to a dispatch holds a slot only while it could be claimed; its own claim takes it
     handed_out = set(snapshot.offered) & {item.task_id for item, _key in ranked}
     others_offered = len(handed_out - {task_id})

@@ -441,6 +441,9 @@ class Workflow:
             raise SchemaInvalid("a workflow needs an id and a version")
         self.workflow_id = workflow_id
         self.version = str(version)
+        from .hooks import DEFAULT_HOOKS
+        self.hooks = DEFAULT_HOOKS
+        self.hook_bindings = None
         self.description = description
         #: The definition as it was written (the shipped JSON), when there is one.
         self.document: dict[str, Any] | None = dict(document) if document is not None else None
@@ -549,6 +552,8 @@ class Workflow:
         if self.stage_rules:
             definition["stage_rules"]={name:f"{fn.__module__}.{fn.__qualname__}"
                                        for name,fn in sorted(self.stage_rules.items())}
+        if self.hook_bindings is not None:
+            definition["workflow_hooks"] = self.hook_bindings
         if self.task_product_validator is not None:
             fn = self.task_product_validator
             definition["task_product_validator"] = f"{fn.__module__}.{fn.__qualname__}"

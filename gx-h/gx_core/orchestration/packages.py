@@ -33,3 +33,12 @@ def example(name):
     if "file" in entry:
         return json.loads((config.HARNESS_ROOT.parent / entry["file"]).read_text(encoding="utf-8"))
     return component(entry["factory"])()
+
+
+def python_example(name):
+    return example(installation()["python_examples"][name])
+
+
+def native_guidance(mode):
+    path = installation().get("native_guidance", {}).get(mode)
+    return (config.HARNESS_ROOT / path).read_text(encoding="utf-8").strip() if path else ""

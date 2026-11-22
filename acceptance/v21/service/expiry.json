@@ -1,0 +1,160 @@
+{
+  "scope": "Read-only SQLite backup and temporary artifact copy of both preserved public CLI failures. The historical installation and candidate were each run on their own copy.",
+  "regression": "tests.test_p0_service.WorkflowProductService.test_hard_failed_p0_turns_lapse_under_their_original_root_and_exhaust_exactly_once",
+  "fixtures": [
+    {
+      "fixture": "var/v21-long-run/cohort-m2mxdx4z",
+      "staging_cli_error": "",
+      "before": {
+        "leases": [
+          {
+            "run_id": "gxr_01m81rv9stwan0sv0p",
+            "task_id": "gxt_01m81rwc9t9k8nmqk1",
+            "status": "CLAIMED",
+            "attempt": 1,
+            "attempts_consumed": 0,
+            "lease_id": "gxl_01m81rwcpf2az542s5",
+            "expires_at": "2026-11-22T14:00:31.177Z",
+            "principal": "01a2038e-32e4-7281-bc2c-b1bf03b045fd",
+            "thread_id": "01a2038e-32e4-7281-bc2c-b1bf03b045fd"
+          }
+        ],
+        "accepted_before": 13,
+        "error": "ContentHashMismatch: CONTENT_HASH_MISMATCH: the task's run has no pinned Codex role intent",
+        "stack": [
+          "<listcomp>",
+          "settle",
+          "_settle",
+          "_inspect_workers",
+          "record_verdict_for_lease",
+          "_call",
+          "record_verdict_for_lease",
+          "record_verdict_for_lease",
+          "_observe",
+          "consume",
+          "requirement"
+        ]
+      },
+      "after": {
+        "leases": [
+          {
+            "run_id": "gxr_01m81rv9stwan0sv0p",
+            "task_id": "gxt_01m81rwc9t9k8nmqk1",
+            "status": "CLAIMED",
+            "attempt": 1,
+            "attempts_consumed": 0,
+            "lease_id": "gxl_01m81rwcpf2az542s5",
+            "expires_at": "2026-11-22T14:00:31.177Z",
+            "principal": "01a2038e-32e4-7281-bc2c-b1bf03b045fd",
+            "thread_id": "01a2038e-32e4-7281-bc2c-b1bf03b045fd"
+          }
+        ],
+        "accepted_before": 13,
+        "settlement": [
+          {
+            "lapsed": [
+              "gxt_01m81rwc9t9k8nmqk1"
+            ],
+            "requeued": [
+              "gxt_01m81rwc9t9k8nmqk1"
+            ]
+          }
+        ],
+        "task_after": [
+          {
+            "status": "READY",
+            "attempt": 1,
+            "attempts_consumed": 1,
+            "lease_id": null
+          }
+        ],
+        "new_lapse_events": [
+          {
+            "subject_id": "gxt_01m81rwc9t9k8nmqk1",
+            "event_id": 566,
+            "kind": "task.attempt_lapsed",
+            "reason": "lease gxl_01m81rwcpf2az542s5 of gx:p0-dispatch expired at 2026-11-22T14:00:31.177Z"
+          }
+        ],
+        "historical_submissions_and_verdict_refs_unchanged": true
+      }
+    },
+    {
+      "fixture": "var/v21-long-run/pause-read-tds7boas",
+      "staging_cli_error": "ContentHashMismatch: CONTENT_HASH_MISMATCH: the task's run has no pinned Codex role intent",
+      "before": {
+        "leases": [
+          {
+            "run_id": "gxr_01m81s31z3gr3fjpwy",
+            "task_id": "gxt_01m81s398zj7jgcpsy",
+            "status": "CLAIMED",
+            "attempt": 1,
+            "attempts_consumed": 0,
+            "lease_id": "gxl_01m81s39ay9rnwrjyg",
+            "expires_at": "2026-11-22T14:04:16.690Z",
+            "principal": "01a20391-a572-7793-8972-fd9c31448172",
+            "thread_id": "01a20391-a572-7793-8972-fd9c31448172"
+          }
+        ],
+        "accepted_before": 2,
+        "error": "ContentHashMismatch: CONTENT_HASH_MISMATCH: the task's run has no pinned Codex role intent",
+        "stack": [
+          "<listcomp>",
+          "settle",
+          "_settle",
+          "_inspect_workers",
+          "record_verdict_for_lease",
+          "_call",
+          "record_verdict_for_lease",
+          "record_verdict_for_lease",
+          "_observe",
+          "consume",
+          "requirement"
+        ]
+      },
+      "after": {
+        "leases": [
+          {
+            "run_id": "gxr_01m81s31z3gr3fjpwy",
+            "task_id": "gxt_01m81s398zj7jgcpsy",
+            "status": "CLAIMED",
+            "attempt": 1,
+            "attempts_consumed": 0,
+            "lease_id": "gxl_01m81s39ay9rnwrjyg",
+            "expires_at": "2026-11-22T14:04:16.690Z",
+            "principal": "01a20391-a572-7793-8972-fd9c31448172",
+            "thread_id": "01a20391-a572-7793-8972-fd9c31448172"
+          }
+        ],
+        "accepted_before": 2,
+        "settlement": [
+          {
+            "lapsed": [
+              "gxt_01m81s398zj7jgcpsy"
+            ],
+            "requeued": [
+              "gxt_01m81s398zj7jgcpsy"
+            ]
+          }
+        ],
+        "task_after": [
+          {
+            "status": "READY",
+            "attempt": 1,
+            "attempts_consumed": 1,
+            "lease_id": null
+          }
+        ],
+        "new_lapse_events": [
+          {
+            "subject_id": "gxt_01m81s398zj7jgcpsy",
+            "event_id": 153,
+            "kind": "task.attempt_lapsed",
+            "reason": "lease gxl_01m81s39ay9rnwrjyg of gx:p0-dispatch expired at 2026-11-22T14:04:16.690Z"
+          }
+        ],
+        "historical_submissions_and_verdict_refs_unchanged": true
+      }
+    }
+  ]
+}

@@ -175,6 +175,9 @@ def task_mapping(conn: sqlite3.Connection, row: sqlite3.Row) -> dict[str, Any]:
     data["required_effort"] = store.loads(row, "required_effort_json", []) or []
     data["required_artifacts"] = store.loads(row, "required_artifacts_json", []) or []
     data["hold"] = store.loads(row, "hold_json", None)
+    assignment = conn.execute("SELECT team_id FROM p0_task_teams WHERE task_id=?", (row["task_id"],)).fetchone()
+    if assignment:
+        data["team_id"] = assignment["team_id"]
     data["dependencies"] = dependency_ids(conn, row["task_id"])
     data["previous_attempts"] = recovery.attempt_history(conn, row["task_id"])
     decision = conn.execute(
@@ -205,6 +208,7 @@ def task_view(task: Mapping[str, Any]) -> dict[str, Any]:
         })
     return {
         "task_id": task["task_id"], "run_id": task["run_id"], "path_id": task.get("path_id"),
+        **({"team_id":task["team_id"]} if task.get("team_id") else {}),
         "kind": task["kind"], "role": task["role"], "task_class": task.get("task_class"),
         "status": task["status"], "attempt": int(task["attempt"]),
         "max_attempts": int(task["max_attempts"]),
@@ -293,7 +297,7 @@ class TeamService:
         subject: Subject | Mapping[str, Any] | None = None,
         independent_of_task_id: str | None = None, parallel_group: str | None = None,
         path_id: str | None = None, depends_on: Sequence[str] = (), stage: str | None = None,
-        reservation_ref: str | None = None,
+        reservation_ref: str | None = None, team_id: str | None = None,
         max_attempts: int | None = None, required_artifacts: Sequence[str] = (),
         actor: str | None = None,
     ) -> dict[str, Any]:
@@ -388,31 +392,35 @@ class TeamService:
                     raise SchemaInvalid(f"{path_id!r} is not a path of run {run_id}",
                                         details={"path_id": path_id, "run_id": run_id})
 
+            from ..p0 import team_admission
+            team = team_admission.selected_team(conn, run_id, role, team_id)
+            funding = team["budget_ref"] if team else run["budget_ref"]
             requirement = seams.task_requirement(store.loads(run, "agent_policy_json", {}), role=role)
             task_id = records.create_task(
                 conn, run_id=run_id, kind=kind, role=role, actor=actor, path_id=path_id,
                 depends_on=list(depends_on), required_artifacts=list(required_artifacts),
-                task_input=task_input, budget_ref=run["budget_ref"],
+                task_input=task_input, budget_ref=funding,
                 task_class=requirement.get("task_class"), bundle_kind=bundle_kind,
                 acceptance=acceptance, max_attempts=attempts, parallel_group=parallel_group,
                 subject=subject, independent_of_task_id=independent_of_task_id,
                 required_model=requirement.get("model"),
                 required_effort=list(requirement.get("allowed_efforts") or []),
             )
+            team_admission.attach(conn,task_id,team,team_id is not None)
             if stage is not None:
                 # The workflow supplies this below the request boundary. The public task
                 # creation tools deliberately do not accept a caller-selected stage.
                 conn.execute("UPDATE tasks SET stage=? WHERE task_id=?", (stage, task_id))
             if reservation_ref is None:
-                seams.charge_worker_task(conn, budget_ref=run["budget_ref"], task_id=task_id, actor=actor)
+                seams.charge_worker_task(conn, budget_ref=funding, task_id=task_id, actor=actor)
             else:
                 from .. import budgets
                 held = conn.execute(
-                    "SELECT b.run_id, r.amounts_json, r.status FROM budget_reservations r"
+                    "SELECT b.run_id,r.budget_ref,r.amounts_json,r.status FROM budget_reservations r"
                     " JOIN budgets b ON b.budget_ref=r.budget_ref WHERE r.reservation_ref=?",
                     (reservation_ref,),
                 ).fetchone()
-                if held is None or held["run_id"] != run_id:
+                if held is None or held["run_id"] != run_id or (team and held["budget_ref"] != funding):
                     raise ScopeDenied("a task draws only a reservation of its own run",
                                       details={"run_id": run_id, "reservation_ref": reservation_ref})
                 amounts = store.loads(held, "amounts_json", {}) or {}
@@ -448,7 +456,7 @@ class TeamService:
                     bundle_kind=spec.get("bundle_kind"), acceptance=spec.get("acceptance"),
                     input=spec.get("input"), subject=spec.get("subject"),
                     independent_of_task_id=created.get(spec.get("independent_of"), spec.get("independent_of")),
-                    parallel_group=spec.get("parallel_group"), path_id=spec.get("path_id"),
+                    parallel_group=spec.get("parallel_group"), path_id=spec.get("path_id"), team_id=spec.get("team_id"),
                     depends_on=[created.get(dep, dep) for dep in spec.get("depends_on", ())],
                     max_attempts=spec.get("max_attempts"),
                     required_artifacts=spec.get("required_artifacts", ()), actor=actor,
@@ -508,6 +516,21 @@ class TeamService:
             extra_updates={"owner": None, "lease_id": None, "hold_json": None, "blocked_reason": None}, bump=False,
         )
         self._compile_brief(conn, task_id, raise_errors=False)
+
+    def recover_failed_attempt(self, *, task_id: str, lease_ref: str, reason: str) -> str:
+        """End the backend-observed failure of this exact attempt and settle its retry."""
+        if self.ctx.principal.source != BACKEND:
+            raise ScopeDenied("attempt recovery requires the task backend")
+        with store.transaction(self.conn) as conn:
+            task = self._task_row(conn, task_id)
+            if task["status"] not in ("CLAIMED", "RUNNING") or task["lease_id"] != lease_ref:
+                raise ScopeDenied("this failure no longer belongs to the current task attempt")
+            store.release_lease(conn, lease_ref)
+            if task["status"] == "RUNNING":
+                store.transition(conn, machine=TASK, subject_id=task_id, to_state="RETRYABLE",
+                                 actor=self._writer, reason=reason, bump=False)
+            return recovery.requeue_or_exhaust(conn, task_id, reason=reason,
+                                               enter_ready=self._enter_ready, actor=self._writer)
 
     def _compile_brief(self, conn: sqlite3.Connection, task_id: str, *, raise_errors: bool) -> tuple[str | None, str | None]:
         """Ask the host stream for the brief of the coming attempt and record it on the task.
@@ -635,6 +658,9 @@ class TeamService:
         return None
 
     def _inspect_workers(self, conn: sqlite3.Connection, run_id: str, *, include_live: bool = False) -> dict[str, Any]:
+        from ..hostobs import host_policy, native_context
+        run = self._run_row(conn, run_id)
+        p0 = native_context.source_of_run(run) == host_policy.P0_SOURCE
         stopped = {item["lease_id"]: item for item in (seams.stopped_holders(conn, run_id=run_id) or [])}
         due = {row["lease_id"] for row in recovery.lapsed_leases(conn, run_id)}
         out: dict[str, Any] = {"worker_holds": [], "host_stopped": []}
@@ -647,16 +673,25 @@ class TeamService:
             if not include_live and lease["lease_id"] not in due and lease["lease_id"] not in stopped:
                 continue
             task = self._task_row(conn, lease["task_id"])
+            if p0:
+                # A P0 thread's official settings and turn receipts are maintained by Roots.
+                # An unmaterialized creation can expire with both thread and principal null.
+                # The ordinary lapse settlement below retains waits and the attempt history.
+                root = conn.execute("SELECT 1 FROM p0_roots WHERE run_id=? AND task_id=? AND lease_id=? "
+                                    "AND attempt=? AND thread_id IS ?", (run_id, task["task_id"], lease["lease_id"],
+                                    task["attempt"], lease["principal"])).fetchone()
+                if (not root or task["attempt"] != lease["attempt"] or task["owner"] != lease["owner"]
+                        or host_policy.scope_of_run(run) != "codex"):
+                    raise ScopeDenied("the P0 root binding and pinned run do not cover this task lease")
+                continue
             prepared = getattr(self, "_codex_observations", {}).get(lease["lease_id"])
-            from ..hostobs.native_context import is_native_run
-            if prepared is None and is_native_run(conn, run_id):
+            if prepared is None and native_context.is_native_run(conn, run_id):
                 verdict = self._native_passive_verdict(conn, task, lease, due=lease["lease_id"] in due)
                 if verdict is None:
                     continue
             else:
                 verdict = seams.record_verdict_for_lease(conn, task_id=task["task_id"], lease_id=lease["lease_id"],
                     **({"_codex_prepared": prepared} if prepared is not None else {}))
-            run = self._run_row(conn, run_id)
             policy_doc = store.loads(run, "agent_policy_json", {}) or seams.agent_policy()[0]
             hosts = {(store.loads(run, "host_json", {}) or {}).get("kind")}
             hosts.update(row["host"] for row in conn.execute(
@@ -1775,6 +1810,56 @@ class TeamService:
             verdict = self._apply_judgment(tx, task, inputs)
             return self._conclude(tx, task, sub["lease_id"], {**dict(sub), "artifact_refs": refs}, verdict,
                                   {"policy_verdict": sub["policy_verdict"]}, existing=True)
+
+    def submit_workflow_product(
+        self, *, run_id: str, task_id: str, lease_ref: str, brief_sha256: str,
+        product: dict[str, Any], callback: Mapping[str, str],
+    ) -> dict[str, Any]:
+        """Judge a product received on the backend's authenticated native callback.
+
+        The transport owns the official thread, turn and call receipt. The task owner
+        checks the live lease and workflow, publishes the product, and commits its
+        verdict and acceptance outbox in the caller's transaction.
+        """
+        if self.ctx.principal.source != BACKEND:
+            raise ScopeDenied("native workflow submission requires the callback backend")
+        if not isinstance(product, dict) or not all(
+            isinstance(callback.get(key), str) and callback[key] for key in ("thread_id", "turn_id", "call_id")
+        ):
+            raise SchemaInvalid("native submission requires a JSON product and the official callback identifiers")
+        with store.transaction(self.conn) as conn:
+            task = self._task_row(conn, task_id)
+            run = self._run_row(conn, run_id)
+            lease = store.validate_lease(conn, lease_ref, task_id=task_id)
+            if (task["run_id"] != run_id or task["status"] not in ("CLAIMED", "RUNNING")
+                    or run["status"] in (*_NO_DISPATCH, *machines.terminal_states(RUN))
+                    or task["lease_id"] != lease_ref or task["attempt"] != lease["attempt"]
+                    or lease["principal"] != callback["thread_id"]):
+                raise ScopeDenied("the callback does not own the current workflow task attempt")
+            kind = store.loads(task, "input_json", {}).get("output_kind")
+            if not kind or store.loads(task, "acceptance_json", {}).get("validate_workflow_product") is not True:
+                raise SchemaInvalid("this task has no pinned workflow product validator")
+            ref = self.artifacts.put(
+                run_id=run_id, task_id=task_id, kind=kind, media_type="application/json",
+                content=ids.canonical_json(product), origin="HOST_PUT", put_by=callback["thread_id"],
+            ).artifact_ref
+            bundle_ref = self._bundle_ref(task, [self.artifacts.describe(ref)])
+            verdict = self._judge(conn, task, lease_ref, bundle_ref, artifact_refs=[ref])
+            states = ["SUBMITTED", "VALIDATING"]
+            if task["status"] == "CLAIMED":
+                states.insert(0, "RUNNING")
+            for status in states:
+                store.transition(conn, machine=TASK, subject_id=task_id, to_state=status, actor=self._writer,
+                                 reason="official Codex root submitted a workflow product", bump=False,
+                                 payload=callback)
+            submission = {
+                "submission_id": ids.new_id("submission"), "task_id": task_id, "lease_id": lease_ref,
+                "attempt": task["attempt"], "brief_sha256": brief_sha256,
+                "content_sha256": ids.sha256_of_obj(product), "worker_observation_id": None,
+                "policy_verdict": None, "bundle_kind": task["bundle_kind"], "artifact_refs": [ref],
+            }
+            result = self._conclude(conn, task, lease_ref, submission, verdict, {})
+            return {**result, "artifact_ref": ref}
 
     def submit(self, *, task_id: str, lease_ref: str, artifact_refs: Sequence[str],
                idempotency_key: str, summary: str | None = None) -> dict[str, Any]:

@@ -5,10 +5,11 @@ GX's single-user trust domain. A PTY does not authenticate a person against
 other processes sharing the same OS account. This entry is absent from all
 native worker catalogs and the state owner excludes concurrent Host sessions.
 """
+import json
 import os
 import pwd
+from typing import Any
 
-from ..cli.main import _confirm_as_person
 from ..context import Ctx, Principal, SCOPE_OPERATOR
 from ..domain import machines
 from ..errors import PermissionDenied, ScopeDenied
@@ -16,6 +17,43 @@ from ..hostobs import native_context, policy
 from ..persistence import store
 from ..teams.service import TeamService
 from . import approvals
+
+
+def _confirm_as_person(tool: str, arguments: dict[str, Any]) -> bool:
+    """Ask the person at the controlling terminal. False when there is none.
+
+    The terminal is opened by name rather than taken from stdin, so arguments piped in
+    do not stand in for an answer and an answer cannot be piped in with them.
+
+    It is opened as a bare descriptor. A buffered read-write text stream cannot be built
+    on a device that does not seek, so ``open("/dev/tty", "r+")`` raised whenever there
+    *was* a terminal, and the handler written for "there is none" turned that into
+    "no": nobody could ever confirm. This is a procedural boundary like a scope: a
+    process can give its child a terminal, and what is recorded is that a confirmation
+    was read from one.
+    """
+    try:
+        fd = os.open("/dev/tty", os.O_RDWR | os.O_NOCTTY)
+    except OSError:
+        return False
+    try:
+        if not os.isatty(fd):
+            return False
+        prompt = (
+            f"\n{tool} records a decision as yours.\n"
+            + json.dumps(arguments, ensure_ascii=False, indent=2)[:4000]
+            + "\nType yes to make it: "
+        )
+        os.write(fd, prompt.encode("utf-8"))
+        answer = b""
+        while not answer.endswith(b"\n") and len(answer) < 256:
+            chunk = os.read(fd, 64)
+            if not chunk:
+                break
+            answer += chunk
+        return answer.decode("utf-8", "replace").strip().lower() == "yes"
+    finally:
+        os.close(fd)
 
 
 def _model_difference(conn, approval):

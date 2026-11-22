@@ -559,7 +559,8 @@ def _onboarding_smoke_inputs(ctx, view, review):
             or call.root_thread_id != host["policy_selection"].get("native_agent_ref")):
         raise ScopeDenied("explicit qualification inputs belong to their native onboarding project and session")
     refs = selected[version]
-    if not isinstance(refs, dict) or set(refs) != set(manifest_mod.input_roles(view["manifest"])):
+    if not isinstance(refs, dict) or set(refs) != set(manifest_mod.staged_roles(view["manifest"],
+            [{"role": key, "bytes": 0} for key in refs])):
         raise SchemaInvalid("qualification inputs must name all input roles of the reviewed capability")
     for role, ref in refs.items():
         row = ctx.conn.execute("SELECT 1 FROM artifacts a JOIN runs r ON r.run_id=a.run_id "

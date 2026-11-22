@@ -336,6 +336,7 @@ class JobService:
         lease_ref: str | None = None,
         step_index: int | None = None,
         binding: Mapping[str, Any] | None = None,
+        reserved_job_id: str | None = None,
     ) -> dict[str, Any]:
         """Start a job and return at once. See the module docstring for the order of checks.
 
@@ -380,8 +381,10 @@ class JobService:
                                      manifest_sha256=self._manifest_sha(input_manifest_ref))
             if current is not None and current["status"] not in (FAILED, CANCELLED):
                 return self._step_answer(current)
+        from ..orchestration.service import prepare_workflow_job
+        prepare_workflow_job(self.conn, run_id, request)
         try:
-            admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key)
+            admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
         except _StepTaken as taken:
             return self._step_answer(self._row(taken.job_id))
         except _KeyTaken:
@@ -506,11 +509,13 @@ class JobService:
         budgets = _budgets()
         budget_ref = budgets.budget_for(self.conn, run_id=request["run_id"],
                                        path_id=request["path_id"] if request["purpose"] == PURPOSE_PATH else None)
+        from ..p0.team_admission import team_funding
+        budget_ref = team_funding(self.conn, request["run_id"], request.get("task_id"), budget_ref, admit=True)
         self._refuse_prohibited_lines(self.conn, budget_ref=budget_ref, amounts=amounts)
         self._budget_would_hold(budgets, budget_ref=budget_ref, job_id=ids.new_id("job"), amounts=amounts)
         self._threads_or_refuse(self.conn, resources)
 
-    def _admit(self, request: Mapping[str, Any], request_sha: str, key: str) -> sqlite3.Row:
+    def _admit(self, request: Mapping[str, Any], request_sha: str, key: str, *, reserved_job_id=None) -> sqlite3.Row:
         conn = self.conn
         run_id, path_id, task_id = request["run_id"], request["path_id"], request["task_id"]
         purpose = request["purpose"]
@@ -526,7 +531,7 @@ class JobService:
             )
         listed = input_doc.get("entries", [])
         listed_roles = [entry["role"] for entry in listed]
-        needed = manifest_mod.input_roles(manifest)
+        needed = manifest_mod.staged_roles(manifest, listed)
         if sorted(listed_roles) != needed:
             raise SchemaInvalid(
                 f"{capability['capability_version']} takes input role(s) {needed}; the input "
@@ -539,7 +544,10 @@ class JobService:
         self._check_limits(resources)
 
         # From here on the job has a directory; a refusal removes it again.
-        job_id = ids.new_id("job")
+        if reserved_job_id is not None:
+            from ..p0.compute import validate_proposal
+            validate_proposal(conn, reserved_job_id, request)
+        job_id = reserved_job_id or ids.new_id("job")
         job = self._paths(job_id)
         job.create()
         out_dir = self.artifacts.staging_dir(f"jobs/{job_id}")
@@ -591,6 +599,8 @@ class JobService:
             budgets = _budgets()
             budget_ref = budgets.budget_for(conn, run_id=run_id,
                                             path_id=path_id if purpose == PURPOSE_PATH else None)
+            from ..p0.team_admission import team_funding
+            budget_ref = team_funding(conn, run_id, task_id, budget_ref, admit=True)
             # The budget is asked here, before the preflight, because its refusal is the cheaper
             # one. It is held only in the transaction that writes the row: a submitter that dies
             # between the two leaves neither a hold nor a row (audit J9).
@@ -662,6 +672,8 @@ class JobService:
             staging_ref = str(Path(out_dir).relative_to(storage.store_dir(conn)))
 
             with store.transaction(conn) as txn:
+                if reserved_job_id is not None:
+                    validate_proposal(txn, reserved_job_id, request)
                 if txn.execute("SELECT 1 FROM jobs WHERE idempotency_key=?", (key,)).fetchone() is not None:
                     raise _KeyTaken(key)                  # writers are serialised: this is the race's loser
                 attempt = 1
@@ -678,6 +690,9 @@ class JobService:
                 # have expired or changed hands meanwhile; a new row and its reservation
                 # must still be admitted under the caller's live lease, atomically.
                 self._lease_and_step(txn, request, purpose)
+                budget_ref = team_funding(txn, run_id, task_id, budget_ref, admit=True)
+                from ..p0.meter_limits import check_soft
+                check_soft(txn,run_id,task_id)
                 self._threads_or_refuse(txn, resources)
                 reservation = budgets.reserve(txn, budget_ref=budget_ref, subject_kind="job",
                                               subject_id=job_id, amounts=amounts, actor=self.actor)

@@ -43,12 +43,14 @@ def _job_data(view: Mapping[str, Any]) -> dict[str, Any]:
 
 
 @tool("gx_job_submit")
-def job_submit(ctx: Ctx, args: dict[str, Any]) -> ToolResult:
+def job_submit(ctx: Ctx, args: dict[str, Any], *, binding=None, reserved_job_id=None) -> ToolResult:
     answer = JobService(ctx.conn, ctx=ctx).submit(
-        run_id=args["run_id"], path_id=args["path_id"], task_id=args.get("task_id"),
+        run_id=args["run_id"], path_id=args.get("path_id"), task_id=args.get("task_id"),
         capability_version=args["capability_version"],
         input_manifest_ref=args["input_manifest_ref"], parameters=args.get("parameters"),
-        tighten=args.get("tighten"), idempotency_key=args["idempotency_key"], purpose=PURPOSE_PATH,
+        tighten=args.get("tighten"), idempotency_key=args["idempotency_key"],
+        purpose=job_service.PURPOSE_WORKFLOW if binding and not args.get("path_id") else PURPOSE_PATH,
+        binding=binding, reserved_job_id=reserved_job_id,
         lease_ref=args.get("lease_ref"), step_index=args.get("step_index"),
     )
     if answer["replayed"]:
@@ -95,8 +97,9 @@ def _warn_about(ctx: Ctx, view: Mapping[str, Any]) -> None:
 
 
 @tool("gx_job_status")
-def job_status(ctx: Ctx, args: dict[str, Any]) -> ToolResult:
-    view = JobService(ctx.conn, ctx=ctx).status(args["job_id"])
+def job_status(ctx: Ctx, args: dict[str, Any], *, observed_row=None) -> ToolResult:
+    service = JobService(ctx.conn, ctx=ctx)
+    view = service.view(observed_row) if observed_row is not None else service.status(args["job_id"])
     _warn_about(ctx, view)
     _adopt(ctx, view["job_id"], "gx_job_status")
     return ToolResult(data=_job_data(view), artifact_refs=view["artifact_refs"], run_id=view["run_id"])

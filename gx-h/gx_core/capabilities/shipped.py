@@ -1,5 +1,6 @@
 """Install a release-pinned local method the first time a workflow uses it."""
 import json
+import os
 import sys
 
 from .. import config
@@ -10,12 +11,16 @@ from ..persistence import store
 from . import environments, registry
 
 
+ARTIFACT_ANALYSIS = "artifact-analysis@1"
 GRID = "fixture-grid@1"
 GRID_MANIFEST = "adapters/local/p01_grid/manifest.json"
+REVIEW = "tl1a-review@1"
 QUALITY = "tl1a-coordinate-quality@1"
 GEOMETRY = "tl1a-geometry@1"
 MANIFESTS = {
+    ARTIFACT_ANALYSIS: "adapters/local/artifact_analysis/manifest.json",
     GRID: GRID_MANIFEST,
+    REVIEW: "adapters/scientific/tl1a_geometry/review_batch.json",
     QUALITY: "adapters/scientific/tl1a_geometry/quality.json",
     GEOMETRY: "adapters/scientific/tl1a_geometry/geometry.json",
 }
@@ -50,7 +55,7 @@ def ensure(ctx: Ctx, capability):
     env_id = bundle["manifest"]["env_id"]
     if not conn.execute("SELECT 1 FROM environments WHERE env_id=?", (env_id,)).fetchone():
         environments.register(conn, {"env_id": env_id, "kind": "SYSTEM_BINARY",
-                                     "python_executable": sys.executable}, actor=ctx.actor)
+                                     "python_executable": os.path.abspath(sys.executable)}, actor=ctx.actor)
     with store.transaction(conn):
         for key in ("entry_script", "parser"):
             if bundle.get(key):

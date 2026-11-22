@@ -1,0 +1,162 @@
+{
+  "controls": [
+    {
+      "observed": {
+        "cancelled": "gxj_01m81shkan7r98qycd",
+        "refusals": [
+          {
+            "error": "SCOPE_DENIED: only the assigned GX root may call this tool",
+            "tool": "gx_job_status"
+          }
+        ],
+        "revocation_reason": {
+          "code": "LEASE_EXPIRED",
+          "message": "lease gxl_01m81shk9ztm399bc0 was released at 2026-11-22T14:11:15.417Z"
+        },
+        "revoked_job": "gxj_01m81shkar5hdghv02"
+      },
+      "test": "tests.test_v21_compute.ComputeTest.test_cancel_and_fence_before_scheduling"
+    },
+    {
+      "observed": {
+        "memory_limit": {
+          "failure": {
+            "failure_class": "job_timeout_or_lost",
+            "observed": "runner_error",
+            "summary": "runner_error: host_process_peak_rss_limit"
+          },
+          "job_id": "gxj_01m81shn1rmmsqxp93",
+          "measured": {
+            "cpu_seconds": 0.012,
+            "limit_memory_mib": 1,
+            "limit_wall_seconds": 10,
+            "max_rss_mib": 11.9,
+            "memory_within_limit": false,
+            "result": "runner_error",
+            "started": true,
+            "wall_seconds": 0.017
+          }
+        },
+        "wall_limit": {
+          "failure": {
+            "failure_class": "job_timeout_or_lost",
+            "observed": "timed_out",
+            "summary": "timed out: the runner ended the tool at its 1.0 s limit",
+            "timed_out": true
+          },
+          "job_id": "gxj_01m81shkdagsjkq88y",
+          "measured": {
+            "cpu_seconds": 0.049,
+            "limit_memory_mib": 128,
+            "limit_wall_seconds": 1,
+            "max_rss_mib": 14.4,
+            "memory_within_limit": true,
+            "result": "timed_out",
+            "started": true,
+            "wall_seconds": 1.048
+          }
+        }
+      },
+      "test": "tests.test_v21_compute.ComputeTest.test_existing_job_limits_stop_bounded_compute_load"
+    },
+    {
+      "observed": {
+        "job_id": "gxj_01m81shnd7p9ztpft2",
+        "manifest_sha256": "c7a810586b77239044ea43ef4ec4d505544b83f8f31f92bc33d77da958805a24",
+        "result": {
+          "gap": 14.5
+        },
+        "result_ref": "gxa_01m81shnxr5wqag6b4",
+        "result_sha256": "fa674ac096b47799f34cf887b57bf4f076fcbe73a827d59c2ff04ce9058669f9",
+        "runtime": {
+          "cpu_seconds": 8,
+          "hard_address_space_bytes": 100663296,
+          "hard_fsize_bytes": 0,
+          "kernel_filter": "libseccomp-default-EPERM",
+          "open_probe": "EPERM",
+          "output_bytes": 12,
+          "socket_probe": "EPERM",
+          "visible_input_aliases": [
+            "left",
+            "right"
+          ]
+        }
+      },
+      "test": "tests.test_v21_compute.ComputeTest.test_original_inputs_result_and_wait_survive_cold_admission"
+    },
+    {
+      "observed": {
+        "failed_jobs": [
+          {
+            "diagnostic": "analysis refused: encoded result exceeds 32768 bytes",
+            "job_id": "gxj_01m81shp0jhgkr3k6e",
+            "result_count": 0,
+            "status": "FAILED"
+          },
+          {
+            "diagnostic": "analysis refused: result type disagrees with output_schema",
+            "job_id": "gxj_01m81shpka9b9abdjt",
+            "result_count": 0,
+            "status": "FAILED"
+          }
+        ],
+        "notice_count": 1,
+        "refused": {
+          "failure": {
+            "code": "SCHEMA_INVALID",
+            "message": "tighten.wall_seconds=11 is above the manifest's 10; a request may only lower a limit"
+          },
+          "job_id": "gxj_01m81shq6mfwm9qyrk",
+          "outputs": [],
+          "status": "REJECTED",
+          "terminal": true
+        }
+      },
+      "test": "tests.test_v21_compute.ComputeTest.test_schema_encoded_output_and_resource_refusal"
+    },
+    {
+      "observed": {
+        "refusals": [
+          {
+            "error": "SCHEMA_INVALID: analysis program refused: only listed numeric operations are callable",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCHEMA_INVALID: analysis program refused: only listed numeric operations are callable",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCHEMA_INVALID: analysis program refused: only listed numeric operations are callable",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCHEMA_INVALID: analysis program refused: unsupported expression: ListComp",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCHEMA_INVALID: analysis program refused: invalid syntax (<unknown>, line 1)",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCOPE_DENIED: the current task has no access to the specified artifact",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCHEMA_INVALID: invalid version, named input refs, operation key or job parameters",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCHEMA_INVALID: inputs must be Artifact refs; paths and URLs are unavailable",
+            "tool": "gx_job_submit"
+          },
+          {
+            "error": "SCOPE_DENIED: only the assigned GX root may call this tool",
+            "tool": "gx_job_submit"
+          }
+        ]
+      },
+      "test": "tests.test_v21_compute.ComputeTest.test_unavailable_programs_paths_inputs_are_rejected_before_execution"
+    }
+  ],
+  "passed": 5
+}

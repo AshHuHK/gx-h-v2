@@ -88,7 +88,7 @@ def _content(capability: Mapping[str, Any], artifacts: Any, input_manifest_ref: 
         document = artifacts.read_input_manifest(input_manifest_ref)
         listed = list(document.get("entries", []))
         entries = {entry["role"]: entry for entry in listed}
-        needed = manifest_mod.input_roles(manifest)
+        needed = manifest_mod.staged_roles(manifest, listed)
         if sorted(entries) != needed or len(entries) != len(listed):
             found["input"].append(f"the capability takes input role(s) {needed}; the manifest supplies "
                                   f"{sorted(entry['role'] for entry in listed)}")

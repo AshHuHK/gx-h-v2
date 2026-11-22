@@ -101,7 +101,7 @@ LAUNCH_ENV_ALLOWED = frozenset({
 BACKEND_OWNED_ENV = frozenset({
     "PATH", "PYTHONPATH", "PYTHONHOME", "PYTHONSTARTUP", "PYTHONDONTWRITEBYTECODE", "HOME",
     "XDG_CACHE_HOME", "XDG_CONFIG_HOME", "XDG_DATA_HOME", "PYTHONPYCACHEPREFIX",
-    "TMPDIR", "LANG", "LC_ALL", "LD_PRELOAD", "CUDA_VISIBLE_DEVICES", "OMP_NUM_THREADS",
+    "TMPDIR", "LANG", "LC_ALL", "LD_PRELOAD", "CUDA_VISIBLE_DEVICES", "OMP_NUM_THREADS", "GX_JOB_MEMORY_MIB",
     "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS",
 })
 
@@ -109,14 +109,14 @@ _SYSTEM_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 _ARGV_NAMESPACES = frozenset({
     "env.python", "env.bin", "env.prefix", "workspace", "harness", "entry_script",
-    "weights", "data", "in", "out.dir", "param",
+    "weights", "data", "in", "inputs.json", "out.dir", "param",
 })
 _PATH_NAMESPACES = frozenset({"workspace", "harness", "env.prefix"})
 _CWD_NAMESPACES = _PATH_NAMESPACES | {"out.dir"}
 _ENV_VALUE_NAMESPACES = _PATH_NAMESPACES | {"out.dir"}
 
 #: What a request may lower. Keys of ``gx_job_submit``'s ``tighten``.
-TIGHTENABLE = ("wall_seconds", "cpu_threads", "gpu_memory_mib")
+TIGHTENABLE = ("wall_seconds", "cpu_threads", "gpu_memory_mib", "memory_mib")
 
 
 # --------------------------------------------------------------------------- locations
@@ -143,7 +143,7 @@ _PREFIXED = (("env.bin.", "env.bin"), ("in.", "in"), ("param.", "param"),
 
 def _split(name: str) -> tuple[str | None, str]:
     """``"in.sequences"`` -> ``("in", "sequences")``; an unknown name -> ``(None, name)``."""
-    if name in ("env.python", "env.prefix", "workspace", "harness", "entry_script", "out.dir"):
+    if name in ("env.python", "env.prefix", "workspace", "harness", "entry_script", "out.dir", "inputs.json"):
         return name, ""
     for prefix, kind in _PREFIXED:
         if name.startswith(prefix) and name[len(prefix):]:
@@ -395,7 +395,7 @@ def probe_argv_problems(manifest: Mapping[str, Any], argv: Any) -> list[str]:
     if not isinstance(argv, list) or not argv:
         return ["ENTRYPOINT_PROBE.argv must be a non-empty list of strings"]
     found: list[str] = []
-    allowed = _ARGV_NAMESPACES - {"in", "out.dir", "param"}
+    allowed = _ARGV_NAMESPACES - {"in", "inputs.json", "out.dir", "param"}
     for index, token in enumerate(argv):
         found.extend(_token_problems(token, where=f"ENTRYPOINT_PROBE.argv[{index}]", allowed=allowed))
     if not found and argv[0] != manifest["entry"]["argv_template"][0]:
@@ -478,6 +478,18 @@ def input_roles(manifest: Mapping[str, Any]) -> list[str]:
     """The input roles a job must supply: every ``{in.ROLE}`` the argv template names."""
     return sorted({_split(name)[1] for token in manifest["entry"]["argv_template"]
                    for name in placeholders(token) if _namespace(name) == "in"})
+
+
+def staged_roles(manifest, entries):
+    """A signed {inputs.json} entry may receive 1–8 extra named, bounded JSON artifacts."""
+    fixed = input_roles(manifest)
+    if "{inputs.json}" not in manifest["entry"]["argv_template"]:
+        return fixed
+    extra = [e for e in entries if e["role"] not in fixed]
+    if (not 1 <= len(extra) <= 8 or any(not re.fullmatch(r"input_[A-Za-z][A-Za-z0-9_]{0,30}", e["role"]) for e in extra)
+            or sum(e["bytes"] for e in extra) > 1048576 or any(e["bytes"] > 16384 for e in entries if e["role"] in fixed)):
+        raise SchemaInvalid("Grouped inputs require 1–8 named artifacts (1 MiB total) and bounded specification files")
+    return sorted({*fixed, *(e["role"] for e in extra)})
 
 
 def parameter_names(manifest: Mapping[str, Any]) -> list[str]:
@@ -617,6 +629,8 @@ def effective_resources(manifest: Mapping[str, Any], tighten: Mapping[str, Any] 
             ceiling = out["gpu"]["memory_mib"]
         else:
             ceiling = out[key]
+        if ceiling is None:
+            raise SchemaInvalid(f"capability declares no {key} limit to tighten", details={"key":key})
         if value > ceiling:
             raise SchemaInvalid(
                 f"tighten.{key}={value} is above the manifest's {ceiling}; a request may only "
@@ -694,6 +708,8 @@ def launch_plan(
         values[f"weights.{index}"] = str(resolve_path(weight["path"], env=env))
     for index, item in enumerate(manifest["required_data"]):
         values[f"data.{index}"] = str(resolve_path(item, env=env))
+    if inputs is not None:
+        values["inputs.json"] = ids.canonical_json(dict(inputs))
     for role, path in dict(inputs or {}).items():
         values[f"in.{role}"] = str(path)
 
@@ -758,6 +774,8 @@ def launch_plan(
         process_env["TMPDIR"] = tmp_dir
     if out_dir is not None:
         process_env["GX_OUT_DIR"] = out_dir
+    if resource_limits and resource_limits.get("memory_mib"):
+        process_env["GX_JOB_MEMORY_MIB"] = str(resource_limits["memory_mib"])
     if gpu_device is not None and gpu_memory_mib is not None:
         process_env["GX_GPU_MEMORY_MIB"] = str(int(gpu_memory_mib))
     search = [_substitute(item, values, where="entry.pythonpath") for item in entry.get("pythonpath") or []]

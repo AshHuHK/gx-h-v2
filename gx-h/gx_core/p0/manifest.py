@@ -133,6 +133,9 @@ def admit(conn, job_id, *, launch, bundle, env, inputs, resources, preflight):
     if pinned_method and cap == shipped.GRID:
         levels = {"level": "deterministic_synthetic_cpu", "replay": "numeric observations on frozen inputs",
                   "known_variation": ["process identifiers, wall time and resource measurements"]}
+    elif pinned_method and cap == shipped.ARTIFACT_ANALYSIS:
+        levels = {"level": "deterministic_restricted_json_analysis", "replay": "frozen program, inputs, parameters and seed",
+                  "known_variation": ["interpreter float roundoff, wall time and resource measurements"]}
     elif pinned_method:
         levels = {"level": "deterministic_coordinate_analysis", "replay": "deposited coordinates and frozen inputs",
                   "known_variation": ["floating-point roundoff, wall time and resource measurements"]}

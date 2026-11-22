@@ -316,6 +316,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     deployment.add_commands(commands)
+    from ..plugins.cli import add_commands as add_plugin_commands
+    add_plugin_commands(commands)
     from .operator import add_commands
     add_commands(commands)
     for name in ("start", "status", "run", "resume", "stop", "message", "team"):

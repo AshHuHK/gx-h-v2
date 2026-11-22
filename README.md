@@ -1,4 +1,17 @@
-# GX-H v2.1 科研执行平台
+# GX-H v3 科研插件平台
+
+在 v3 安装目录中，操作员可以按版本安装本地科研插件。GX 校验审核过的包内容，在独立 Python 命名空间中执行 `register(ctx)`，并列出插件贡献的工作流、工具和计算能力。现有项目继续使用各自保存的工作流和科研记录。
+
+```bash
+source .venv/bin/activate
+bin/gx-p0 plugin digest examples/plugins/hello_research
+bin/gx-p0 plugin install examples/plugins/hello_research --sha256 d425088e9bd646bb34256bd2aee4f2c9029587d7534187400093993bd6b46603
+bin/gx-p0 plugin verify org.example.gx.hello-research@0.2.0
+```
+
+示例命令的摘要对应本版本随附的 hello_research。发布自有插件时，使用已审核目录的摘要。插件的嵌套模块、工具参数和注册函数可直接参考这个例子。[插件源码](examples/plugins/hello_research/plugin.py) · [插件安装与核验](examples/plugins/README.md)
+
+## v2.1 科研执行基础
 
 官方 Codex App Server 管理模型、原生子代理和会话。GX 保存研究目标、多个工作流的长期任务、Job、科研产物、审查、决策及预算。操作入口为 `bin/gx-p0`。
 

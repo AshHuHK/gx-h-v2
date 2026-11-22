@@ -1,6 +1,34 @@
-# GX + Codex Autonomous Science Harness
+# GX-H v2.1 科研执行平台
 
-本目录是一套独立可运行的科研执行系统。官方 Codex App Server 负责模型、原生子代理和会话，GX 负责长期任务、租约、科研 Job、不可变产物、证据和决策。发布入口是 `bin/gx-p0`。在线执行使用官方 ChatGPT OAuth。
+官方 Codex App Server 管理模型、原生子代理和会话。GX 保存研究目标、多个工作流的长期任务、Job、科研产物、审查、决策及预算。操作入口为 `bin/gx-p0`。
+
+## 在 v2.1 启动和恢复
+
+在本目录使用已经部署的 Python 环境。以下示例在同一项目中创建两个独立 Run，分别保存工作流版本、任务、Job 和预算。缺少推理凭据时仍可查看状态和使用本地操作命令。
+
+```bash
+source .venv/bin/activate
+bin/gx-p0 login-status
+bin/gx-p0 start --state ./var/study --run-key sampling-a --demo-grid
+bin/gx-p0 start --state ./var/study --run-key sampling-b --demo-grid
+bin/gx-p0 run --state ./var/study --timeout 3600
+bin/gx-p0 status --state ./var/study
+```
+
+`status` 列出每个 Run 的 `run_id`。把以下 `RUN_ID` 换为要操作的那一个。在另一终端暂停时，其他 Run 可以继续。重启后再次执行 workspace 的 `run` 可接管仍在运行的工作。显式暂停的 Run 需先恢复。到达命令的墙钟上限时返回码为 75。
+
+```bash
+bin/gx-p0 operator pause --state ./var/study --run-id RUN_ID
+bin/gx-p0 operator usage --state ./var/study --run-id RUN_ID
+bin/gx-p0 operator resume --state ./var/study --run-id RUN_ID
+bin/gx-p0 run --state ./var/study --timeout 3600
+```
+
+已耗尽模型预算时，`operator budget-preview` 和 `operator budget-apply` 也可本地运行。先用 `--resource tokens --limit 数值 --budget-scope run` 查看变更，再按回执提交对应的预览 ID 和摘要。团队状态由 `team --state DIR --run-id RUN_ID` 查看。普通自然语言交流走模型会话。
+
+为自定义 spec 设置项目总预算用 `workspace_budget`，给单次研究分配额度用 `run_budget`。均可分别指定 `tokens`、`api_calls`、`job_submissions`、`cpu_seconds` 等预算行。未显式指定时，带 key 的新 Run 按可下拨余额分配默认份额。项目实耗、实际在途预留与可下拨余额可在 `status` 的 `workspace_budget` 中分别查看。[带两个团队的可运行规格](acceptance/v21_long_run.py)
+
+安装材料、已部署 staging 的位置、验收命令与适用范围见 [v2.1 部署](V21_DEPLOYMENT_REPORT.md)、[验收矩阵](V21_ACCEPTANCE_REPORT.md)、[限时连续运行](V21_LONG_RUN_REPORT.md)、[故障注入](V21_FAILURE_INJECTION_REPORT.md)、[回退](V21_ROLLBACK_REPORT.md) 和 [已知限制](V21_KNOWN_LIMITATIONS.md)。
 
 ## 启动一个项目
 
@@ -38,3 +66,20 @@
 - [已知限制](KNOWN_LIMITATIONS.md) 与 [部署、状态与回退](DEPLOYMENT.md)
 - [源码审计](AUDIT_REPORT.md)、[基线](BASELINE_REPORT.md)、[复用与改造](REUSE_DELETE_REWRITE.md)、[架构决定](ARCHITECTURE_DECISIONS.md) 和 [实施计划](P0_IMPLEMENTATION_PLAN.md)
 - [原始实施提示](GX_Codex_Implementation_Agent_Prompt.md)、[设计约束](DESIGN_SPEC.md) 与 [验收合同](acceptance/ACCEPTANCE_MATRIX.md)
+
+## v2.1 离线安装包
+
+本次 Linux x86_64 部署包位于 `dist/gx-h-v2.1-linux-x86_64.tar`，旁边附 SHA-256 校验文件。源码与锁定版本的官方二进制、Schema、Python wheels、科研坐标、独立复算代码均随包交付。在具备 CPython 3.11 和 Node 22 的主机上，可解包到新目录。通用分析能力另需系统 libseccomp。
+
+```bash
+cd dist
+sha256sum -c gx-h-v2.1-linux-x86_64.tar.sha256
+mkdir gx-v21-install
+tar -xf gx-h-v2.1-linux-x86_64.tar -C gx-v21-install
+cd gx-v21-install
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install --no-index --require-hashes --find-links release-assets/python -r release-assets/python/requirements.lock
+python scripts/release_assets.py all
+bin/gx-p0 login-status
+```

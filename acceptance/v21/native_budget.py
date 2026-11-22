@@ -143,8 +143,11 @@ def measure(probe,baseline):
             def capture(frame):
                 probe.notification(frame)
                 listener(frame)
-                if not baseline and frame.message['method']=='thread/tokenUsage/updated':
-                    traces.append(metering.inspect(conn,run)['risk'])
+                if not baseline and frame.message['method'] in ('rawResponse/completed','thread/tokenUsage/updated'):
+                    params=frame.message['params']
+                    traces.append({**metering.inspect(conn,run)['risk'],'native_method':frame.message['method'],
+                                   'thread_id':params.get('threadId'),'turn_id':params.get('turnId'),
+                                   'response_id':params.get('responseId')})
             roots.client.on_notification=capture
             work=[roots.dispatch(task) for task in tasks]
             ids={w['thread_id']:w['turn_id'] for w in work}
@@ -186,6 +189,8 @@ def measure(probe,baseline):
             if not baseline:
                 checks={'parallel_grants':before['reserved'].get('tokens')==80,
                         'reported_103_while_two_active':any(r['observed_in_flight_tokens']==103 and r['active_root_count']==2 for r in traces),
+                        'threshold_observed_on_raw_before_interrupt':any(r['native_method']=='rawResponse/completed'
+                             and r['observed_plus_settled']==103 and r['active_root_count']==2 for r in traces),
                         'both_native_interrupt_terminals':len(terminals)==2 and all(t['status']=='interrupted' for t in terminals),
                         'interrupt_receipts_match_exact_turns':{(i['thread_id'],i['turn_id']) for i in inspect['interrupts']
                                   if i['sent_at'] and i['ended_at'] and i['terminal_status']=='interrupted'}==set(ids.items()),

@@ -16,7 +16,7 @@ import time
 
 REPO = Path(__file__).resolve().parents[2]
 PRODUCT = ('gx-h/', 'bin/', 'codex_adapter/', 'examples/', 'scripts/')
-PROTOCOL = ('native_activity.py','native_budget.py','native_cumulative.py','native_events.py','native_refusal.py','native_child.py')
+PROTOCOL = ('native_activity.py','native_budget.py','native_cumulative.py','native_events.py','native_refusal.py','native_child.py','native_wake.py')
 
 
 def utc():
@@ -43,7 +43,10 @@ def unit_counts(log):
             'skip_details':skips,'failure_details':failures}
 
 
-def run_suite(commit, out, *, native):
+def run_suite(commit, out, *, native, selected, product_commit):
+    if product_commit:
+        subprocess.run(['git','diff','--exit-code','--quiet',product_commit,commit,'--',
+                        *[p.rstrip('/') for p in PRODUCT],'release-assets'],cwd=REPO,check=True)
     checkout=Path(tempfile.mkdtemp(prefix='gx-v21-regression-'))
     package=checkout/'package'
     package.mkdir()
@@ -65,7 +68,7 @@ def run_suite(commit, out, *, native):
     product={name:sha for name,sha in manifest.items() if name.startswith(PRODUCT)}
     content_hash=hashlib.sha256(json.dumps(product,sort_keys=True,separators=(',',':')).encode()).hexdigest()
     env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'}
-    summary={'commit':commit,'started_utc':utc(),'source_file_manifest':'files.json','product_files':len(product),
+    summary={'commit':commit,'verified_product_commit':product_commit or commit,'started_utc':utc(),'source_file_manifest':'files.json','product_files':len(product),
              'product_sha256':content_hash,'product_prefixes':PRODUCT,'node_version':subprocess.check_output(
                  ['node','--version'],text=True).strip(),'python_version':sys.version.split()[0],'operations':{},
              'class':'Local Python, SQLite and CPU Job fixtures. Official-protocol scenarios use pinned Codex with a scripted loopback provider.'}
@@ -110,17 +113,18 @@ def run_suite(commit, out, *, native):
             env['PATH']=str(binary.parent)+os.pathsep+env['PATH']
             env['GX_P0_CODEX']=str(binary)
         gx=package/'gx-h'
-        commands={'python-full':[python,'-B','-m','unittest','discover','-s','tests','-v'],
-                  'generator':[python,'-B','adapters/hosts/generate.py','--check'],
-                  'node':['node','--experimental-strip-types','--test','runtime/plugin-host/host.test.ts']}
-        with ThreadPoolExecutor(max_workers=len(commands)) as pool:
-            pending={k:pool.submit(execute,k,v,gx) for k,v in commands.items()}
-            summary['operations'].update({k:v.result() for k,v in pending.items()})
-        summary['python_counts']=unit_counts(out/'python-full.log')
-        summary['node_counts']={key:int(value) for key,value in re.findall(
-            r'^# (tests|pass|fail|skipped|cancelled) (\d+)',(out/'node.log').read_text(),re.M)}
-        record('p0-focused',[python,'-B','-m','unittest','discover','-s','tests','-p','test_p0*.py','-v'],gx)
-        summary['p0_counts']=unit_counts(out/'p0-focused.log')
+        if not selected:
+            commands={'python-full':[python,'-B','-m','unittest','discover','-s','tests','-v'],
+                      'generator':[python,'-B','adapters/hosts/generate.py','--check'],
+                      'node':['node','--experimental-strip-types','--test','runtime/plugin-host/host.test.ts']}
+            with ThreadPoolExecutor(max_workers=len(commands)) as pool:
+                pending={k:pool.submit(execute,k,v,gx) for k,v in commands.items()}
+                summary['operations'].update({k:v.result() for k,v in pending.items()})
+            summary['python_counts']=unit_counts(out/'python-full.log')
+            summary['node_counts']={key:int(value) for key,value in re.findall(
+                r'^# (tests|pass|fail|skipped|cancelled) (\d+)',(out/'node.log').read_text(),re.M)}
+            record('p0-focused',[python,'-B','-m','unittest','discover','-s','tests','-p','test_p0*.py','-v'],gx)
+            summary['p0_counts']=unit_counts(out/'p0-focused.log')
         if native:
             native_dir=out/'native'
             native_dir.mkdir(exist_ok=True)
@@ -134,20 +138,28 @@ def run_suite(commit, out, *, native):
                 'native-meter-cold':['v21/native_cumulative.py','--connection','cold'],
                 'native-meter-repeated':['v21/native_cumulative.py','--connection','cold-repeated'],
                 'native-late-child':['v21/native_child.py','--case','complete'],
-                'native-incomplete-child':['v21/native_child.py','--case','missing'],'native-interrupted':['acc1_interrupted_meter.py'],
-                'native-wake-ack':['acc1_wake.py','--expire-wait']}
+                'native-incomplete-child':['v21/native_child.py','--case','missing'],
+                'native-unloaded-child':['v21/native_child.py','--case','rapid'],
+                'native-interrupted':['acc1_interrupted_meter.py'],
+                'native-wake-ack':['v21/native_wake.py']}
+            if selected:
+                unknown=set(selected)-native_commands.keys()
+                if unknown:
+                    raise ValueError('Unknown native cases '+str(sorted(unknown)))
+                native_commands={key:native_commands[key] for key in selected}
             with ThreadPoolExecutor(max_workers=3) as pool:
                 jobs={k:pool.submit(execute,k,[python,'-B',package/'acceptance'/v[0],*v[1:],
                                    '--out',native_dir/(k+'.json')],package) for k,v in native_commands.items()}
                 summary['operations'].update({k:v.result() for k,v in jobs.items()})
-            record('official-suite',[python,'-B','acceptance/native_probe.py','--binary',binary,
-                                     '--out',native_dir/'official-suite'],package)
-            summary['official_cases']={p.stem:json.loads(p.read_text())['status']
-                                       for p in sorted((native_dir/'official-suite').glob('*.json'))}
+            if not selected:
+                record('official-suite',[python,'-B','acceptance/native_probe.py','--binary',binary,
+                                         '--out',native_dir/'official-suite'],package)
+                summary['official_cases']={p.stem:json.loads(p.read_text())['status']
+                                           for p in sorted((native_dir/'official-suite').glob('*.json'))}
         summary['ended_utc']=utc()
         summary['passed']=all(op['returncode']==0 for op in summary['operations'].values())
         save(out/'summary.json',summary)
-        print('PASS' if summary['passed'] else 'FAIL',summary['python_counts']['total'],'Python cases;',summary['node_counts'])
+        print('PASS' if summary['passed'] else 'FAIL', {k:v['returncode'] for k,v in summary['operations'].items()})
         return 0 if summary['passed'] else 1
     finally:
         shutil.rmtree(checkout)
@@ -158,7 +170,13 @@ if __name__=='__main__':
     parser.add_argument('--commit',required=True)
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--native',action='store_true',help='also run the committed 2.1 protocol probes against the local locked ELF')
+    parser.add_argument('--native-case',action='append',default=[],help='run only this named official scenario (repeatable)')
+    parser.add_argument('--product-commit',help='verify the selected commit has identical production, test and dependency trees')
     args=parser.parse_args()
     args.out.mkdir(parents=True,exist_ok=True)
     commit=subprocess.check_output(['git','rev-parse','--verify',args.commit+'^{commit}'],cwd=REPO,text=True).strip()
-    raise SystemExit(run_suite(commit,args.out.resolve(),native=args.native))
+    product=None
+    if args.product_commit:
+        product=subprocess.check_output(['git','rev-parse','--verify',args.product_commit+'^{commit}'],cwd=REPO,text=True).strip()
+    raise SystemExit(run_suite(commit,args.out.resolve(),native=args.native or bool(args.native_case),
+                               selected=args.native_case,product_commit=product))

@@ -6,14 +6,17 @@ import json
 from pathlib import Path
 import sqlite3
 import sys
+import time
 import uuid
 
 from .. import config
 from ..domain import ids, machines
+from ..hostobs.app_server_client import AppServerDisconnected, AppServerTimeout
+from ..errors import OutcomeUnknown
 from ..native_release import native_state, ReleaseStateError
 from ..orchestration import service
 from ..persistence import store
-from . import deployment
+from . import deployment, intent
 from .driver import Driver, context, enqueue, project, snapshot
 
 
@@ -92,6 +95,9 @@ def start(conn, directory, spec):
             row = conn.execute("SELECT result_json,rejected FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
         if not row["result_json"] or json.loads(row["result_json"]).get("status") != "committed":
             raise ValueError("Initial Intent is pending: " + str(row["rejected"] or mid))
+        # The workflow reads the objective and prospective criterion. Individual tasks and Jobs
+        # bind their own narrower inputs where they are created.
+        intent.bind_dependencies(conn, rid, "workflow", rid, {"objective": "context", "evaluation": "evaluation"})
     service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
                       "budget_profile": "p0", "workflow": {"id": "science_grid", "version": "1"},
                       "inputs": inputs, "idempotency_key": "p0-start:" + spec["project"]}, prepare_p0=bootstrap)
@@ -105,6 +111,29 @@ def change_state(conn, run, action):
     service.run_control(context(conn), {"run_id": run["run_id"], "action": action,
                         "reason": "operator requested " + action, "coordinator_lease_ref": lease["lease_id"],
                         "idempotency_key": str(uuid.uuid4())})
+
+
+def run_until_stopped(conn, directory, rid, timeout):
+    deadline = time.monotonic() + timeout
+    failures = 0
+    while time.monotonic() < deadline:
+        driver = Driver(conn, directory, rid)
+        try:
+            return driver.drive(deadline - time.monotonic())
+        except (AppServerDisconnected, AppServerTimeout, OutcomeUnknown) as exc:
+            failures += 1
+            # GX effects are already durable. The new client inspects history and
+            # existing task leases before sending anything with the same event key.
+            with store.transaction(conn) as tx:
+                store.append_event(tx, kind="p0.transport_recovery", run_id=rid, actor="gx-p0",
+                                   subject_kind="run", subject_id=rid, reason=type(exc).__name__,
+                                   evidence_level="EXECUTION_OBSERVED", payload={"attempt": failures})
+        finally:
+            driver.close()
+        time.sleep(min(5, 0.2 * 2 ** min(failures, 5), max(0, deadline - time.monotonic())))
+    result = snapshot(conn)
+    result["driver"] = "time_limit"
+    return result
 
 
 def execute(args):
@@ -143,17 +172,17 @@ def execute(args):
                 change_state(conn, run, "continue")
             if args.command != "message" and not store.latest_checkpoint(conn, run["run_id"]):
                 start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"])
+            if args.command != "message":
+                return run_until_stopped(conn, directory, run["run_id"], args.timeout)
             driver = Driver(conn, directory, run["run_id"])
             try:
-                if args.command == "message":
-                    driver.messages()
-                    driver.finish_main(mid)
-                    driver.deliveries()
-                    row = conn.execute("SELECT result_json,rejected FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
-                    if row["rejected"]:
-                        raise ValueError(row["rejected"])
-                    return {"message_id": mid, "result": json.loads(row["result_json"]) if row["result_json"] else "pending"}
-                return driver.drive(args.timeout)
+                driver.messages()
+                driver.finish_main(mid)
+                driver.deliveries()
+                row = conn.execute("SELECT result_json,rejected FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
+                if row["rejected"]:
+                    raise ValueError(row["rejected"])
+                return {"message_id": mid, "result": json.loads(row["result_json"]) if row["result_json"] else "pending"}
             finally:
                 driver.close()
     except ReleaseStateError as exc:

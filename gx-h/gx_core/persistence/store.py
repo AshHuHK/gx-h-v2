@@ -403,6 +403,9 @@ def _open_once(target: Path) -> sqlite3.Connection:
             details={"reason": "locked" if _is_lock(exc) else "unreadable",
                      "path": str(target), "error": type(exc).__name__},
         ) from exc
+    except BaseException:
+        conn.close()
+        raise
     try:
         for handler in tuple(_RECOVERY_HANDLERS.values()):
             handler(conn)

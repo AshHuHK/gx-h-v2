@@ -47,6 +47,9 @@ def snapshot(conn):
         "intent": intent.active_items(conn, rid),
         "jobs": rows("SELECT job_id,status,scheduler_ref FROM jobs WHERE run_id=? ORDER BY rowid"),
         "tasks": rows("SELECT task_id,role,stage,status,attempt FROM tasks WHERE run_id=? ORDER BY rowid"),
+        "unsettled_turns": rows("SELECT d.thread_id,d.turn_id,d.state,b.amounts_json FROM p0_root_deliveries d "
+                               "JOIN budget_reservations b ON b.reservation_ref=d.reservation_ref "
+                               "WHERE d.run_id=? AND b.status='HELD'"),
         "pending_deliveries": rows("SELECT outbox_id,topic,attempts,last_error FROM outbox "
                                    "WHERE run_id=? AND topic LIKE 'p0.%' AND consumed_at IS NULL"),
         "replies": rows("SELECT m.message_id,r.turn_id,r.status,r.response FROM p0_main_replies r "
@@ -177,9 +180,18 @@ class Driver:
                     store.fail_outbox(tx, oid, type(exc).__name__ + ": " + str(exc)[:240])
                 self._retry_at[oid] = time.monotonic() + min(30, 2 ** min(row["attempts"], 5))
 
+    def reconcile_costs(self):
+        pending = self.conn.execute(
+            "SELECT DISTINCT d.thread_id FROM p0_root_deliveries d JOIN budget_reservations b "
+            "ON b.reservation_ref=d.reservation_ref WHERE d.run_id=? AND b.status='HELD'",
+            (self.rid,)).fetchall()
+        for row in pending:
+            self.native.delivery.reconcile(row["thread_id"])
+
     def drive(self, timeout):
         deadline = time.monotonic() + timeout
         idle_delay = 0.15
+        self.reconcile_costs()
         sent = set()
         while time.monotonic() < deadline:
             self.messages()
@@ -190,7 +202,15 @@ class Driver:
                     self.finish_main(row[0], wait=0)
             self.deliveries()
             run = project(self.conn)
-            if run["status"] in machines.terminal_states("run") or run["status"] == "PAUSED":
+            if run["status"] in machines.terminal_states("run"):
+                # A scientific decision can commit while its author's turn is still streaming.
+                # Keep its reservation until the official final usage has been observed.
+                if self._native and self.native.active_turns:
+                    self.native.poll(0.2)
+                    continue
+                self.reconcile_costs()
+                return snapshot(self.conn)
+            if run["status"] == "PAUSED":
                 return snapshot(self.conn)
             for job in self.conn.execute("SELECT job_id FROM jobs WHERE run_id=? AND status IN "
                                          "('CREATED','SUBMITTING','SUBMITTED','QUEUED','RUNNING','CANCEL_REQUESTED')",
@@ -207,11 +227,18 @@ class Driver:
             for t in tasks:
                 key = (t["task_id"], t["attempt"] + (t["status"] == "READY"))
                 if key not in sent or t["waiting_job"] in machines.terminal_states("job"):
-                    self.native.dispatch(t["task_id"])
+                    receipt = self.native.dispatch(t["task_id"])
+                    if receipt.get("waiting_for_review"):
+                        continue
                     sent.add(key)
                     progressed = True
-            if self._native:
-                self.native.poll(min(0.2, max(0.01, deadline - time.monotonic())))
+            if self._native and self.native.poll(min(0.2, max(0.01, deadline - time.monotonic()))):
+                # Drain a burst of native items before sleeping or re-reading every GX checkpoint.
+                until = min(deadline, time.monotonic() + 0.15)
+                while time.monotonic() < until and self.native.poll(0.005):
+                    pass
+                idle_delay = 0.1
+                continue
             idle_delay = 0.1 if progressed else min(1, idle_delay * 1.3)
             time.sleep(min(idle_delay, max(0, deadline - time.monotonic())))
         result = snapshot(self.conn)

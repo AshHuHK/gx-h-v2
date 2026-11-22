@@ -13,3 +13,5 @@
 | 上游锁定 | GitHub annotated tag `a41fe5b443652cbdbee57717fbb9fd78d8d8b32a` 指向 `d32063f96c2dff1dc96af839b3952abb6acfeda4`。本机 CLI 实报 0.169.0。 |
 
 完整表、读写点、源码/测试清单见 [表索引](audit/gx_source_tables.json) 与 [源文件和测试索引](audit/gx_source_files_tests.json)。上述代码行为来自静态检查。实测包括 [官方 tag](acceptance/runs/schema/upstream-tag.txt)、[发布包和 CLI](acceptance/runs/schema/cli-provenance.json)、[170 项干净树基线](acceptance/runs/baseline-clean/unittest.log)。账户访问、模型等级、故障恢复和端到端结果由各自验收报告记录。
+
+GX 生产代码审计共匹配 74 张主库业务表，45 张检出行创建者，29 张仅在读侧或 DDL 出现。另有独立项目消息库。全部 286 个 GX 文件与原发布树一致。Codex 的默认导出和 experimental 导出分别逐文件比对了 1113 与 1430 项。锁定版修改已有 Goal 的 objective 会保留 token 计数；创建新 Goal 开始新计数。[GX 逐表审计](audit/GX_SOURCE.md) · [Codex 协议与实测边界](audit/CODEX_SOURCE.md) · [基线与历史依赖复测](BASELINE_REPORT.md)

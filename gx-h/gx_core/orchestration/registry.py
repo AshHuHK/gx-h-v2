@@ -13,10 +13,12 @@ twice in one process must not be an error.
 
 from __future__ import annotations
 
+from copy import copy
 from typing import Any, Iterable
 
 from ..errors import ArtifactNotFound, SchemaInvalid
 from .engine import Workflow
+from .hooks import WorkflowHooks
 
 
 class WorkflowRegistry:
@@ -26,7 +28,13 @@ class WorkflowRegistry:
             self.register(workflow)
 
     # ------------------------------------------------------------------ mutation
-    def register(self, workflow: Workflow) -> Workflow:
+    def register(self, workflow: Workflow, *, hooks: WorkflowHooks | None = None) -> Workflow:
+        if hooks is not None:
+            content = hooks.content()
+            workflow = copy(workflow)
+            workflow.hooks = hooks
+            workflow.hook_bindings = content["bindings"]
+            workflow.sources = {**workflow.sources, **content["sources"]}
         key = (workflow.workflow_id, workflow.version)
         existing = self._by_key.get(key)
         if existing is not None:
@@ -44,6 +52,20 @@ class WorkflowRegistry:
             )
         self._by_key[key] = workflow
         return workflow
+
+    def staged_copy(self):
+        staged = WorkflowRegistry()
+        staged._by_key.update(self._by_key)
+        return staged
+
+    def bind_compat(self, workflow_id, version, hooks, *, workflow_pin, hook_pin):
+        """A release adapter for a graph whose original digest predates hooks."""
+        workflow = self.get(workflow_id, version)
+        if not workflow_pin or workflow.digest() != workflow_pin or hooks.digest() != hook_pin:
+            raise SchemaInvalid(f"Compatibility binding does not match both installed pins for {workflow_id}@{version}")
+        bound = copy(workflow)
+        bound.hooks = hooks
+        self._by_key[(workflow_id, version)] = bound
 
     # --------------------------------------------------------------------- query
     def get(self, workflow_id: str, version: str) -> Workflow:

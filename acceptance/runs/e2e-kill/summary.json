@@ -1,0 +1,356 @@
+{
+  "artifacts_rehashed": 58,
+  "codex": "codex-cli 0.169.0",
+  "commands": [
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "$STATE",
+        "--demo-grid"
+      ],
+      "exit_code": 0,
+      "name": "01-start",
+      "response_count_after": 1,
+      "response_count_before": 0,
+      "wall_seconds": 1.38
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "status",
+        "--state",
+        "$STATE"
+      ],
+      "exit_code": 0,
+      "name": "02-status",
+      "response_count_after": 1,
+      "response_count_before": 1,
+      "wall_seconds": 0.395
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "run",
+        "--state",
+        "$STATE",
+        "--timeout",
+        "90"
+      ],
+      "exit_code": 0,
+      "name": "03-run",
+      "response_count_after": 41,
+      "response_count_before": 41,
+      "wall_seconds": 0.392
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "run",
+        "--state",
+        "$STATE",
+        "--timeout",
+        "90"
+      ],
+      "exit_code": 0,
+      "name": "05-resume-stopped",
+      "response_count_after": 41,
+      "response_count_before": 41,
+      "wall_seconds": 0.37
+    }
+  ],
+  "cost": {
+    "external_model_cost_usd": 0,
+    "external_model_requests": 0,
+    "gpu_seconds": 0,
+    "gx_budget_balances": [
+      {
+        "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":0,\"job_submissions\":0,\"tokens\":0,\"worker_tasks\":0}",
+        "spent_json": "{\"api_calls\":8,\"cpu_seconds\":4,\"job_submissions\":4,\"tokens\":1400,\"worker_tasks\":6}"
+      }
+    ],
+    "job_cpu_measurements": [
+      {
+        "cpu_seconds": 0.048,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.1,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.219
+      },
+      {
+        "cpu_seconds": 0.043,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.2,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.215
+      },
+      {
+        "cpu_seconds": 0.051,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.1,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.218
+      },
+      {
+        "cpu_seconds": 0.036,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.3,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.22
+      }
+    ],
+    "synthetic_reported_tokens": 1400,
+    "synthetic_usage_per_response": {
+      "input_tokens": 30,
+      "output_tokens": 5
+    }
+  },
+  "ended": "2026-11-22T02:59:15.845344+00:00",
+  "fault": {
+    "after_cli_exit": {
+      "bindings": [
+        {
+          "attempt": null,
+          "task_id": null,
+          "task_status": null,
+          "thread_id": "01a20131-74f5-7593-99a0-d35684693ffb"
+        },
+        {
+          "attempt": 1,
+          "task_id": "gxt_01m80k2ysn2xn8vttb",
+          "task_status": "ACCEPTED",
+          "thread_id": "01a20131-7c7c-76a3-a10a-da7e4f925c64"
+        },
+        {
+          "attempt": 1,
+          "task_id": "gxt_01m80k30frjsxzhv52",
+          "task_status": "ACCEPTED",
+          "thread_id": "01a20131-8217-78f1-a1f5-a627f5342589"
+        },
+        {
+          "attempt": 1,
+          "task_id": "gxt_01m80k31gyjevbemkw",
+          "task_status": "ACCEPTED",
+          "thread_id": "01a20131-8636-7f83-a4a7-78d4b6e61646"
+        },
+        {
+          "attempt": 1,
+          "task_id": "gxt_01m80k31xcrbt25921",
+          "task_status": "ACCEPTED",
+          "thread_id": "01a20131-87c4-7270-9af3-2450716c5243"
+        },
+        {
+          "attempt": 1,
+          "task_id": "gxt_01m80k32whyaft55y5",
+          "task_status": "ACCEPTED",
+          "thread_id": "01a20131-8ba9-7d53-ae09-3601b3539323"
+        },
+        {
+          "attempt": 1,
+          "task_id": "gxt_01m80k339ymbmp1mkm",
+          "task_status": "ACCEPTED",
+          "thread_id": "01a20131-8d5a-72d3-a69a-da444140a38d"
+        }
+      ],
+      "deliveries": [
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-74f5-7593-99a0-d35684693ffb",
+          "turn_id": "01a20131-750d-7b50-992f-cc5d00b2abbf"
+        },
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-7c7c-76a3-a10a-da7e4f925c64",
+          "turn_id": "01a20131-7c9c-7ec3-8f20-8957b3744174"
+        },
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-7c7c-76a3-a10a-da7e4f925c64",
+          "turn_id": "01a20131-8158-76a2-ade4-c347e15079d0"
+        },
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-8217-78f1-a1f5-a627f5342589",
+          "turn_id": "01a20131-8225-7151-8987-007fc8d03656"
+        },
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-8636-7f83-a4a7-78d4b6e61646",
+          "turn_id": "01a20131-8648-74c1-a09d-1ffb2f30526f"
+        },
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-87c4-7270-9af3-2450716c5243",
+          "turn_id": "01a20131-87d0-7643-adf8-52ed94c838bc"
+        },
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-8ba9-7d53-ae09-3601b3539323",
+          "turn_id": "01a20131-8bb6-72f2-b99f-ff9302724996"
+        },
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-8d5a-72d3-a69a-da444140a38d",
+          "turn_id": "01a20131-8d6a-72b0-996c-c7d25009d470"
+        }
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m80k2xhw98xwgwxp",
+          "scheduler_ref": "runner:719442:2963581135",
+          "status": "SUCCEEDED"
+        },
+        {
+          "job_id": "gxj_01m80k2xq2fmpp2ryb",
+          "scheduler_ref": "runner:719456:2963581150",
+          "status": "SUCCEEDED"
+        },
+        {
+          "job_id": "gxj_01m80k30yfk5tw4wke",
+          "scheduler_ref": "runner:720113:2963581485",
+          "status": "SUCCEEDED"
+        },
+        {
+          "job_id": "gxj_01m80k32b03mwfeqby",
+          "scheduler_ref": "runner:720272:2963581625",
+          "status": "SUCCEEDED"
+        }
+      ],
+      "runs": [
+        {
+          "run_id": "gxr_01m80k2wy5bekpn6n4",
+          "status": "COMPLETED"
+        }
+      ],
+      "submissions": [
+        {
+          "result": "ACCEPTED",
+          "submission_id": "gxsb_01m80k30dvmmd88tgc",
+          "task_id": "gxt_01m80k2ysn2xn8vttb"
+        },
+        {
+          "result": "ACCEPTED",
+          "submission_id": "gxsb_01m80k30wsvhd8gbqj",
+          "task_id": "gxt_01m80k30frjsxzhv52"
+        },
+        {
+          "result": "ACCEPTED",
+          "submission_id": "gxsb_01m80k31vzhn0c05mj",
+          "task_id": "gxt_01m80k31gyjevbemkw"
+        },
+        {
+          "result": "ACCEPTED",
+          "submission_id": "gxsb_01m80k328vzx3qnc61",
+          "task_id": "gxt_01m80k31xcrbt25921"
+        },
+        {
+          "result": "ACCEPTED",
+          "submission_id": "gxsb_01m80k338gm8jfk40f",
+          "task_id": "gxt_01m80k32whyaft55y5"
+        },
+        {
+          "result": "ACCEPTED",
+          "submission_id": "gxsb_01m80k33q8nc6exf9c",
+          "task_id": "gxt_01m80k339ymbmp1mkm"
+        }
+      ]
+    },
+    "app_server_pid": 719631,
+    "before": {
+      "bindings": [
+        {
+          "attempt": null,
+          "task_id": null,
+          "task_status": null,
+          "thread_id": "01a20131-74f5-7593-99a0-d35684693ffb"
+        },
+        {
+          "attempt": 1,
+          "task_id": "gxt_01m80k2ysn2xn8vttb",
+          "task_status": "CLAIMED",
+          "thread_id": "01a20131-7c7c-76a3-a10a-da7e4f925c64"
+        }
+      ],
+      "deliveries": [
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-74f5-7593-99a0-d35684693ffb",
+          "turn_id": "01a20131-750d-7b50-992f-cc5d00b2abbf"
+        },
+        {
+          "method": "turn/start",
+          "state": "acknowledged",
+          "thread_id": "01a20131-7c7c-76a3-a10a-da7e4f925c64",
+          "turn_id": "01a20131-7c9c-7ec3-8f20-8957b3744174"
+        }
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m80k2xhw98xwgwxp",
+          "scheduler_ref": "runner:719442:2963581135",
+          "status": "SUCCEEDED"
+        },
+        {
+          "job_id": "gxj_01m80k2xq2fmpp2ryb",
+          "scheduler_ref": "runner:719456:2963581150",
+          "status": "SUCCEEDED"
+        }
+      ],
+      "runs": [
+        {
+          "run_id": "gxr_01m80k2wy5bekpn6n4",
+          "status": "WAITING_CLIENT"
+        }
+      ],
+      "submissions": []
+    },
+    "cli_returncode": 0,
+    "injection": "SIGKILL while first reviewer submit tool call was pending at the Responses endpoint",
+    "recovery_to_scientific_stop_seconds": 4.372,
+    "seconds_from_injection_to_cli_exit": 4.372
+  },
+  "job_polling_calls": [],
+  "jobs": 4,
+  "manual_advancement": false,
+  "mode": "official Codex app-server, scripted loopback Responses, real local synthetic grid Jobs",
+  "reconciled_usage": {
+    "native_turns": 8,
+    "reported_tokens": 1400,
+    "tokens": 1400
+  },
+  "replay_new_jobs": 0,
+  "replay_new_model_calls": 0,
+  "replay_new_submissions": 0,
+  "responses_during_grid_jobs": [],
+  "responses_requests": 41,
+  "result": "PASS",
+  "rounds": 3,
+  "started": "2026-11-22T02:59:07.396059+00:00",
+  "unique_worker_principals": 6
+}

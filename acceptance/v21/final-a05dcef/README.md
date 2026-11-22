@@ -23,9 +23,13 @@ The first run's [summary](summary.json) records two failed expectations. It samp
 
 ### Reproduction
 
+Use the runner stored in each specified checkout, with the locally provisioned locked Codex binary and standard Clash environment.
+
 ```sh
+# In the a05dcef product checkout
 python -B acceptance/v21/regression.py --commit a05dcef64522fbbbc12120b1d78da518e6886b10 --native --out /tmp/gx-v21-original
+# In the 3b34594 probes checkout
 python -B acceptance/v21/regression.py --commit 3b3459421a32dcddbe5765152534d987de94917d --product-commit a05dcef64522fbbbc12120b1d78da518e6886b10 --native-case native-multi-budget --native-case native-incomplete-child --native-case native-late-child --native-case native-unloaded-child --native-case native-wake-ack --out /tmp/gx-v21-supplement
 ```
 
-The second invocation runs with the runner from the probes-only commit or later. Each output directory contains exact commands, exit codes, UTC timestamps, file hashes and results.
+Each output directory contains exact commands, exit codes, UTC timestamps, file hashes and results.

@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from gx_core.errors import OutcomeUnknown, ScopeDenied
 from gx_core.hostobs.app_server_client import ReceivedMessage
@@ -146,6 +146,27 @@ class DurableRoots(unittest.TestCase):
         self.assertEqual(calls[0],calls[1])
         self.assertEqual(wake["attempt"],1)
         self.assertEqual(goal_budget,[(row["thread_id"],50)])
+
+    def test_provider_admission_requires_pinned_version_and_oauth(self):
+        for version,account in (("0.170.0","chatgpt"),("0.169.0","apiKey"),("0.169.0","chatgpt")):
+            with self.subTest(version=version,account=account):
+                client = MagicMock()
+                replies = {"initialize":{"userAgent":f"gx_p0/{version} (Linux)"},
+                           "account/read":{"account":{"type":account}}, "config/read":{"config":{}}}
+                client.request.side_effect = lambda method,params:replies[method]
+                with patch("gx_core.p0.roots.AppServerClient",return_value=client), \
+                     patch("gx_core.p0.profiles.clash_env",return_value={}), \
+                     patch("gx_core.hostobs.host_policy.p0_provider_for_run",return_value="openai"):
+                    roots = Roots(self.conn,run_id=self.run,cwd=self.tmp.name,argv=["codex","app-server"])
+                    if version=="0.169.0" and account=="chatgpt":
+                        with roots:
+                            pass
+                    else:
+                        with self.assertRaises(ScopeDenied):
+                            with roots:
+                                self.fail("unexpected provider admission")
+                    self.assertTrue(client.close.called)
+                    self.assertFalse(any(call.args[0]=="turn/start" for call in client.request.call_args_list))
 
     def test_main_has_no_worker_tools_or_goal(self):
         self.roots._request = self.fake

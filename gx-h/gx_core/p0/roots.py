@@ -92,7 +92,7 @@ class Roots:
         self.delivery = RootDelivery(self)
 
     def __enter__(self):
-        from .profiles import clash_env
+        from .profiles import CODEX_VERSION, clash_env
         provider = host_policy.p0_provider_for_run(self.run)
         env = clash_env()
         if self.env is not None:
@@ -109,9 +109,18 @@ class Roots:
                                       on_server_request=self._callback, default_timeout=60)
         try:
             self.client.start()
-            self._request("initialize", {"clientInfo": {"name": "gx_p0", "version": "1"},
-                                         "capabilities": {"experimentalApi": True}})
+            initialized = self._request("initialize", {"clientInfo":{"name":"gx_p0","version":"1"},
+                                                        "capabilities":{"experimentalApi":True}})
+            # The official initialize user agent begins with originator/CARGO_PKG_VERSION.
+            version = initialized.get("userAgent","").partition(" (")[0].rsplit("/",1)[-1]
+            if version != CODEX_VERSION:
+                raise ScopeDenied(f"GX requires official Codex App Server {CODEX_VERSION}")
             self.client.notify("initialized", {})
+            if provider == "openai":
+                account = self._request("account/read",{"refreshToken":False}).get("account") or {}
+                if account.get("type") != "chatgpt":
+                    raise ScopeDenied("Use the selected deployment's ChatGPT OAuth login for the OpenAI provider")
+                del account
             # Retain only the literal server names needed to close inherited MCP write paths.
             # Raw effective configuration can contain credentials and never enters GX or a prompt.
             effective = self._request("config/read",{"cwd":str(self.cwd),"includeLayers":False})["config"]

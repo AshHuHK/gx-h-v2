@@ -85,6 +85,32 @@ def specification(base, wave, lane):
     return spec
 
 
+def candidate_headroom(work, prior, ceiling, next_budget):
+    """Conservatively budget separate benchmark acquisitions using the existing GX root ledgers."""
+    previous_used=prior['counts']['ledger_spent_tokens']
+    settled=at_risk=0
+    workspaces=[]
+    for file in sorted(work.glob('state-*/gx.db')):
+        conn=sqlite3.connect(file.resolve().as_uri()+'?mode=ro',uri=True)
+        try:
+            limits,spent,reserved=map(json.loads,conn.execute('SELECT b.limits_json,b.spent_json,b.reserved_json '
+                'FROM p0_workspace w JOIN budgets b ON b.budget_ref=w.budget_ref').fetchone())
+            statuses=[r[0] for r in conn.execute('SELECT status FROM runs')]
+            held=conn.execute("SELECT count(*) FROM p0_meter_native_turns WHERE budget_status='HELD'").fetchone()[0]
+        finally:
+            conn.close()
+        used=spent.get('tokens',0)
+        closed=len(statuses)==len(LANES) and all(s=='COMPLETED' for s in statuses) and not held and not reserved.get('tokens',0)
+        committed=0 if closed else limits['tokens']-used
+        settled+=used
+        at_risk+=committed
+        workspaces.append({'state':file.parent.name,'closed':closed,'used_tokens':used,'additional_exposure_tokens':committed})
+    headroom=ceiling-previous_used-settled-at_risk
+    return {'checked_utc':utc(),'combined_token_ceiling':ceiling,'prior_candidate_tokens':previous_used,
+        'current_arm_spent_tokens':settled,'open_arm_exposure_tokens':at_risk,'headroom_before_wave_tokens':headroom,
+        'next_original_workspace_ceiling':next_budget,'admit':headroom>=next_budget,'previous_workspaces':workspaces}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--source", type=Path, required=True)
@@ -94,7 +120,17 @@ def main():
     p.add_argument("--evidence", type=Path, required=True)
     p.add_argument("--composed-grid", action="store_true",
                    help="P1 arm: select the reviewed science-grid plugin in every public Run specification")
+    p.add_argument('--prior-candidate-summary',type=Path,
+                   help='Charge earlier immutable candidates against the aggregate benchmark token allowance')
+    p.add_argument('--combined-token-ceiling',type=int)
     args = p.parse_args()
+    if bool(args.prior_candidate_summary)!=bool(args.combined_token_ceiling):
+        p.error('the prior candidate summary and combined token ceiling are paired')
+    prior=None
+    if args.prior_candidate_summary:
+        prior=json.loads(args.prior_candidate_summary.read_bytes())
+        if not args.composed_grid or not prior.get('captured_receipts_ok') or not prior['checks']['all_native_reservations_settled'] or not prior['checks']['native_vs_ledger_tokens_equal']:
+            raise ValueError('cumulative spending requires the reconciled prior candidate and explicit composed workload')
     os.umask(0o077)
     source, runtime, work = args.source.resolve(), args.runtime.resolve(), args.private.resolve()
     out = args.evidence.resolve()
@@ -170,6 +206,12 @@ def main():
     if args.composed_grid:
         start_env["public_plugin_selection"]={"plugins":[GRID_PLUGIN]}
         start_env["predeclared_comparison"]["latency_review"]="investigate p95 increase over both 20% and 5 ms for GX dispatch, callbacks and SQLite transactions"
+    if prior is not None:
+        start_env['cumulative_token_plan']={'prior_candidate':prior['source_commit'],
+            'prior_summary_sha256':sha(args.prior_candidate_summary),'prior_spent_tokens':prior['counts']['ledger_spent_tokens'],
+            'prior_completed_runs':prior['distributions']['run'].get('COMPLETED',0),
+            'prior_billed_turns':prior['counts']['billed_turns'],'prior_jobs':prior['counts']['jobs'],
+            'combined_token_ceiling':args.combined_token_ceiling,'accounted_at':'before each paired workspace admission'}
     save(out/"environment.json", start_env)
     if args.composed_grid:
         verify, verification=launch("operator-plugin-verify", ["plugin","verify",GRID_PLUGIN])
@@ -207,6 +249,12 @@ def main():
             time.sleep(min(5,remain))
         collect_drivers()
         state = work / f"state-{wave:02d}"
+        if prior is not None:
+            next_budget=specification(stage,wave,LANES[0])['workspace_budget']['tokens']
+            decision=candidate_headroom(work,prior,args.combined_token_ceiling,next_budget)
+            append(out/'cumulative-candidate-tokens.jsonl',{'wave':wave,**decision})
+            if not decision['admit']:
+                raise RuntimeError(f'aggregate token headroom cannot cover original paired workspace ceiling at wave {wave}')
         for lane in LANES:
             key=f"{wave:02d}-{lane}"
             spec_file = specdir/(key+".json")

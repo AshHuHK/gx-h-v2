@@ -33,3 +33,38 @@ The second command reads the completed project journals and produces the measure
 ## Matched P1 invocation
 
 The prepared runner adds `--composed-grid` to the same command, using the immutable candidate revision and new private state and evidence directories. It asks the operator CLI to verify `org.gx.science-grid@2.0.0`, then includes `"plugins":["org.gx.science-grid@2.0.0"]` on each public Run specification. Before any candidate acquisition, the generator reproduced all 26 baseline scientific and budget documents exactly. The original baseline runner is preserved in Git commit `41f3b9da407123daf70be746857e320a09fdff91`. [Input comparison and runner digests](post-input-check.json)
+
+The first P1 candidate was `336225603dec3a1bc5efd6eccb401ccd25e63287`. It stopped after two complete pairs when the timing study isolated a delay after a Team slot was released. All 1,330,448 paid tokens, 12 Turns and eight CPU Jobs remain attributable to that revision. The corrected candidate uses the same per-workspace budgets and includes that spend in its 11,700,000-token aggregate envelope. [Prior candidate report](p1-prior-3362256/REPORT.md)
+
+ After the acquisition exits, `verify_treatment.py` checks every live Run’s stored package, adapter, tool scope and scientific Job manifest, then the same read-only audit used for Gate 0 reconciles the complete workload. Run reproductions in fresh output directories. The original commands used these paths.
+
+```sh
+perf=gx-h-v-3/acceptance/v3/performance
+stage=scratchpad/v3-real-performance
+py=gx-h-2-1/.venv/bin/python
+"$py" -B "$perf/run_workload.py" --source gx-h-v-3 \
+  --revision 336225603dec3a1bc5efd6eccb401ccd25e63287 --runtime gx-h-2-1 \
+  --private "$stage/p1-3362256-xhigh" --evidence "$perf/p1" --composed-grid
+"$py" -B "$perf/verify_treatment.py" --private "$stage/p1-3362256-xhigh" \
+  --evidence "$perf/p1" --runtime gx-h-2-1
+"$py" -B "$perf/audit_workload.py" --private "$stage/p1-3362256-xhigh" --evidence "$perf/p1"
+"$py" -B "$perf/compare_workloads.py" --baseline "$perf/gate0" --candidate "$perf/p1" \
+  --output "$perf/comparison.json"
+"$py" -B "$perf/dispatch_phases.py" --baseline "$stage/v21-gate0-xhigh" \
+  --candidate "$stage/p1-3362256-xhigh" --output "$perf/dispatch-comparison.json" \
+  --samples "$perf/dispatch-samples.jsonl.gz"
+```
+
+## Same-request dispatch control
+
+For the diagnostic control, fixed loopback Responses exercise the release CLI, the matching official binary and real local numerical Jobs. Eight interleaved paired trials hold model-visible reads, submissions, active worker count and reply delays fixed. Under the same scripted requests, the operation trace reports successful claim, capacity denial, native thread creation, turn start, queue time and elapsed time after an occupied Team slot releases. The first trial in each arm used the ordinary CLI. Later trials wrapped the same GX and native owners in each subprocess to measure nested intervals. [Control methods and measured outcomes](dispatch-control/REPORT.md)
+
+```sh
+"$py" -B "$perf/control_workload.py" --baseline "$stage/v21-gate0-xhigh/install" \
+  --candidate "$stage/p1-3362256-xhigh/install" --runtime gx-h-2-1 \
+  --private "$stage/control-dispatch-01" --evidence "$perf/dispatch-control"
+"$py" -B "$perf/control_summary.py" --private "$stage/control-dispatch-01" --evidence "$perf/dispatch-control"
+"$py" -B "$perf/dispatch_phases.py" --baseline "$stage/control-dispatch-01" \
+  --candidate "$stage/control-dispatch-01" --control --output "$perf/dispatch-control/operations.json" \
+  --samples "$perf/dispatch-control/dispatch-samples.jsonl.gz"
+```

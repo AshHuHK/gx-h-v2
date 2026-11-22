@@ -1,5 +1,7 @@
 """Task team attribution, carved-out budgets and admission on the workspace's SQLite writer."""
 from collections import Counter
+from dataclasses import dataclass
+from typing import Callable
 
 from .. import budgets, config, contracts
 from ..domain import clock, ids, machines
@@ -190,16 +192,38 @@ def team_control(conn, run_id, team_id, action):
         return next(t for t in team_status(conn,run_id) if t["team_id"]==team_id)
 
 
-def _occupancy(conn, excluded):
+@dataclass(frozen=True)
+class SlotWatch:
+    """Recheck just the occupants observed by the denying owner."""
+    count_held: Callable
+    occupants: tuple
+    limit: int
+
+    def opened(self, conn):
+        return self.count_held(conn, self.occupants) < self.limit
+
+    def hold(self, message, details):
+        error = HoldActive(message, details=details)
+        # Keep other Runs' internal identities out of public error details.
+        error.slot_watch = self
+        return error
+
+
+def _occupancy(conn, excluded, *, root_keys=None):
     # A claimed worker owns a slot before its thread exists. A paid turn may
     # still run after submission releases its lease. Count their union once.
-    return conn.execute("""
-        SELECT r.run_id, a.team_id FROM p0_roots r JOIN runs p ON p.run_id=r.run_id
+    selection = "r.root_key!=?"
+    argument = excluded or ""
+    if root_keys is not None:
+        selection = "r.root_key IN (SELECT value FROM json_each(?))"
+        argument = ids.canonical_json(root_keys)
+    return conn.execute(f"""
+        SELECT r.root_key, r.run_id, a.team_id FROM p0_roots r JOIN runs p ON p.run_id=r.run_id
         LEFT JOIN tasks t ON t.task_id=r.task_id AND r.lease_id=t.lease_id
         LEFT JOIN leases l ON l.lease_id=t.lease_id
         LEFT JOIN p0_task_teams a ON a.task_id=r.task_id
         LEFT JOIN p0_teams g ON g.run_id=a.run_id AND g.team_id=a.team_id
-        WHERE r.root_key!=? AND (
+        WHERE {selection} AND (
             (r.wait_job_id IS NULL AND t.status IN ('CLAIMED','RUNNING','SUBMITTED','VALIDATING')
              AND l.released_at IS NULL AND l.expires_at>? AND p.status!='PAUSED'
              AND COALESCE(g.status,'active')='active'
@@ -210,7 +234,11 @@ def _occupancy(conn, excluded):
                        AND ((r.wait_job_id IS NULL AND d.method='turn/start' AND u.terminal_status IS NULL)
                            OR (r.wait_job_id IS NOT NULL AND d.method IN ('turn/start','turn/steer')
                                AND d.event_id=('wake:'||r.lease_id||':'||r.wait_job_id))))
-        )""",(excluded or "",clock.now_iso())).fetchall()
+        )""",(argument,clock.now_iso())).fetchall()
+
+
+def _count_held_roots(conn, root_keys):
+    return len(_occupancy(conn, None, root_keys=root_keys))
 
 
 def _capacity(conn, binding):
@@ -227,16 +255,17 @@ def _capacity(conn, binding):
     if team and team["status"]=="paused":
         raise HoldActive("this task's team is paused",details={"reason":"team_paused","team_id":team["team_id"]})
     occupied = _occupancy(conn,binding.get("root_key"))
-    run_count = sum(r["run_id"]==run_id for r in occupied)
-    gates = [("workspace",len(occupied),workspace_limit),("run",run_count,limit)]
+    run_roots = [r for r in occupied if r["run_id"] == run_id]
+    gates = [("workspace", occupied, workspace_limit), ("run", run_roots, limit)]
     if team:
-        n = sum(r["run_id"]==run_id and r["team_id"]==team["team_id"] for r in occupied)
-        gates.append(("team",n,team["max_parallel_roots"]))
-    for scope,used,bound in gates:
-        if used >= bound:
-            raise HoldActive(f"{scope} has {used} active roots at its limit of {bound}",details={
-                "reason":"team_capacity","scope":scope,"limit":bound,"occupied":used,"team_id":team["team_id"] if team else None})
-    return (limit, run_count), occupied
+        gates.append(("team", [r for r in run_roots if r["team_id"] == team["team_id"]], team["max_parallel_roots"]))
+    for scope, occupants, bound in gates:
+        if len(occupants) >= bound:
+            keys = tuple(sorted(r["root_key"] for r in occupants))
+            raise SlotWatch(_count_held_roots, keys, bound).hold(
+                f"{scope} has {len(occupants)} active roots at its limit of {bound}",
+                {"reason":"team_capacity","scope":scope,"limit":bound,"occupied":len(occupants),"team_id":team["team_id"] if team else None})
+    return (limit, len(run_roots)), occupied
 
 
 def require_capacity(conn, binding):

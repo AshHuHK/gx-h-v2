@@ -305,9 +305,10 @@ class Driver:
         sent = {}
         retry_delay = {}
         admission_retries = {}
-        def defer_admission(key):
-            delay = min(2.0, 2 * admission_retries.get(key, (0.25, 0))[0])
-            admission_retries[key] = (delay, time.monotonic() + delay)
+        def defer_admission(key, watch=None):
+            previous = admission_retries.get(key)
+            delay = min(2.0, 2 * previous[0]) if previous else 0.5
+            admission_retries[key] = (delay, time.monotonic() + delay, watch)
         last_terminal_event = None
         while time.monotonic() < deadline:
             yield
@@ -361,14 +362,22 @@ class Driver:
                                       "AND t.status IN ('READY','CLAIMED','RUNNING') ORDER BY t.rowid",
                                       (self.rid,)).fetchall()
             progressed = False
+            opened = {}
             if admission_retries:
                 ready_attempts = {(t["task_id"], t["attempt"] + 1) for t in tasks if t["status"] == "READY"}
                 for ended in admission_retries.keys() - ready_attempts:
                     del admission_retries[ended]
             for t in tasks:
                 key = (t["task_id"], t["attempt"] + (t["status"] == "READY"))
-                if key in admission_retries and time.monotonic() < admission_retries[key][1]:
-                    continue
+                if key in admission_retries:
+                    _, retry_at, watch = admission_retries[key]
+                    if time.monotonic() < retry_at:
+                        if watch is None:
+                            continue
+                        if watch not in opened:
+                            opened[watch] = watch.opened(self.conn)
+                        if not opened[watch]:
+                            continue
                 retry = False
                 if turn_id := sent.get(key):
                     outcome = self.conn.execute("SELECT terminal_status FROM p0_root_turn_usage WHERE turn_id=?",
@@ -386,9 +395,9 @@ class Driver:
                                 receipt = self.native.dispatch(t["task_id"])
                             finally:
                                 metrics.record("p0_dispatch", started=started)
-                    except HoldActive:
+                    except HoldActive as exc:
                         if t["status"] == "READY":
-                            defer_admission(key)
+                            defer_admission(key, getattr(exc, "slot_watch", None))
                         continue
                     except BudgetExceeded as exc:
                         self._exhausted[t["task_id"]] = exc

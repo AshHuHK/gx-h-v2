@@ -32,8 +32,20 @@ def native_tools(work):
                 if (thread and r.get("type")=="event_msg" and payload.get("type")=="item_completed"
                         and item.get("type")=="DynamicToolCall" and item.get("tool")==TOOL):
                     call_id=item["id"]
-                    calls.setdefault(thread,{})[call_id]={"call_id":call_id,"turn_id":payload.get("turn_id"),
-                        "at":r["timestamp"],"official_status":item.get("status"),"official_success":item.get("success")}
+                    invocation={"call_id":call_id,"turn_id":payload.get("turn_id"),"at":r["timestamp"],
+                                "official_status":item.get("status"),"official_success":item.get("success")}
+                    if item.get("success") is False:
+                        for content in item.get("content_items") or []:
+                            try:
+                                message=json.loads(content.get("text","")).get("error")
+                            except (ValueError,AttributeError):
+                                continue
+                            if isinstance(message,str):
+                                code,_,detail=message.partition(":")
+                                invocation["error_code"]=code if code.replace("_","").isupper() else "TOOL_ERROR"
+                                if detail.strip()=="this root no longer owns the current task attempt":
+                                    invocation["error_reason"]="original Root no longer owns the current Task attempt"
+                    calls.setdefault(thread,{})[call_id]=invocation
     return by_thread,calls
 
 
@@ -42,7 +54,10 @@ def main():
     p.add_argument("--private",type=Path,required=True)
     p.add_argument("--evidence",type=Path,required=True)
     p.add_argument("--runtime",type=Path,required=True)
-    p.add_argument("--first-wave",action="store_true",help="Only verify the closed first pair")
+    scope=p.add_mutually_exclusive_group()
+    scope.add_argument("--first-wave",action="store_true",help="Only verify the closed first pair")
+    scope.add_argument("--captured-waves",type=int,choices=range(1,len(WAVE_OFFSETS)+1),
+                       help="Number of arrivals actually admitted before a recorded early stop")
     args=p.parse_args()
     work,out,runtime=args.private.resolve(),args.evidence.resolve(),args.runtime.resolve()
     output=out/("first-wave-treatment.json" if args.first_wave else "treatment.json")
@@ -71,7 +86,9 @@ def main():
     starts=[]
     receipts=[]
     commands=[]
-    states=[work/"state-00"] if args.first_wave else sorted(work.glob("state-*"))
+    states=[work/"state-00"] if args.first_wave else sorted(db.parent for db in work.glob('state-*/gx.db'))
+    if args.captured_waves and (not (out/'partial-stop.json').is_file() or len(states)!=args.captured_waves):
+        raise ValueError('partial treatment audit requires a matching stopped acquisition')
     root_profile=json.loads((out/"environment.json").read_bytes())
     for state in states:
         with closing(db_file(state/"gx.db")) as c:
@@ -149,7 +166,7 @@ def main():
                 if not receipt["verified"]:
                     issues.extend(f'{key} {k}' for k,v in chk.items() if not v)
                 starts.append(key)
-    expected=len(LANES) if args.first_wave else len(WAVE_OFFSETS)*len(LANES)
+    expected=(1 if args.first_wave else args.captured_waves or len(WAVE_OFFSETS))*len(LANES)
     if len(set(starts))!=expected:
         issues.append(f"expected {expected} distinct Run bindings, obtained {len(set(starts))}")
     report={"captured":utc(),"source_commit":root_profile["source_commit"],"public_selection":"public GX Run specification",

@@ -10,10 +10,10 @@ from gx_core.errors import HoldActive
 from gx_core.orchestration import service
 from gx_core.orchestration.dispatch_preparation import DispatchPreparation
 from gx_core.orchestration.hooks import DEFAULT_HOOKS
-from gx_core.p0 import driver, intent, roots
+from gx_core.p0 import activity, driver, intent, roots
 from gx_core.persistence import records, store
 from gx_core.plugins.evaluator import plugin_ref
-from tests import test_p0_review_sources, test_p0_roots
+from tests import test_p0_review_sources, test_p0_roots, test_v21_teams
 from workflows.compat_v20 import grid_dispatch
 
 
@@ -122,6 +122,115 @@ class ClaimAdmission(unittest.TestCase):
         self.assertEqual(attempted.count(f.task), 2)
         self.assertEqual(attempted.count(other), 1)
         passes.close()
+
+
+class CapacityWake(unittest.TestCase):
+    def setUp(self):
+        self.f = test_v21_teams.WorkspaceTeams()
+        self.addCleanup(self.f.doCleanups)
+        self.f.setUp()
+        self.now = 50.0
+        self.attempts = []
+
+    def drive(self, rid, waiting):
+        f = self.f
+        owner = f.roots(rid)
+        def dispatch(tid):
+            if tid not in waiting:
+                return {"turn_id": "existing-" + tid}
+            try:
+                row = owner._claim(tid)
+            except HoldActive as exc:
+                self.attempts.append((tid, self.now, exc.details.get("scope", exc.details["reason"])))
+                raise
+            self.attempts.append((tid, self.now, "claimed"))
+            return {"turn_id": row["lease_id"]}
+        run_driver = driver.Driver(f.db, f.home, rid)
+        run_driver._native = SimpleNamespace(dispatch=dispatch, poll=lambda delay: False, active_turns={})
+        for path in ("gx_core.p0.metering.maintain", "gx_core.p0.compute.drain", "gx_core.orchestration.reactor.lazy",
+                     "gx_core.orchestration.reactor.drive_science"):
+            self.enterContext(patch(path))
+        for name in ("messages", "reconcile_costs", "deliveries"):
+            self.enterContext(patch.object(run_driver, name))
+        self.enterContext(patch.object(driver.time, "monotonic", side_effect=lambda: self.now))
+        self.passes = run_driver.passes(self.now + 5, shared=True)
+        self.addCleanup(self.passes.close)
+        next(self.passes)
+        self.tick(50.0)
+
+    def tick(self, at):
+        self.now = at
+        next(self.passes)
+
+    def paid_turn(self, rid, tid):
+        f = self.f
+        root = f.roots(rid)
+        row = f.occupy(root, tid, "root")
+        peer = test_v21_teams.Peer(f.db, rid)
+        root._request = peer._request
+        root._goal_for_budget = lambda *args: None
+        root.loaded.add("root")
+        turn = root.dispatch(tid)["turn_id"]
+        root.delivery.observe("turn/started", {"threadId":"root", "turn":{"id":turn}})
+        def finish():
+            peer.turns[0]["status"] = "completed"
+            root.delivery.observe("turn/completed", {"threadId":"root", "turn":peer.turns[0]})
+        return row, finish
+
+    def test_only_the_freed_team_wakes_and_an_unfinished_turn_still_holds_its_slot(self):
+        f = self.f
+        rid, _ = f.run_case("teams", (test_v21_teams.group("reading", ["evidence_reviewer"]),
+                                      test_v21_teams.group("analysis", ["planner"])), maximum=4)
+        holder_a, waiting_a = [f.create(rid)["task_id"] for _ in range(2)]
+        holder_b, waiting_b = [f.create(rid, role="planner")["task_id"] for _ in range(2)]
+        _, finish = self.paid_turn(rid, holder_a)
+        f.roots(rid)._claim(holder_b)
+        self.drive(rid, {waiting_a, waiting_b})
+        self.assertCountEqual(self.attempts, [(waiting_a,50.0,"team"), (waiting_b,50.0,"team")])
+        f.yield_task(holder_a)
+        self.tick(50.035)
+        self.assertEqual(len(self.attempts), 2)
+        f.yield_task(holder_b)
+        self.tick(50.070)
+        self.assertEqual(self.attempts[2:], [(waiting_b,50.070,"claimed")])
+        self.tick(50.105)
+        self.assertEqual(len(self.attempts), 3)
+        finish()
+        self.tick(50.140)
+        self.assertEqual(self.attempts[3:], [(waiting_a,50.140,"claimed")])
+
+    def test_other_run_releases_workspace_slot_before_retry_deadline(self):
+        f = self.f
+        first, _ = f.run_case("first", maximum=1)
+        second, _ = f.run_case("next", maximum=1)
+        holder = f.roots(first)._claim(f.create(first)["task_id"])
+        waiting = f.create(second)["task_id"]
+        self.drive(second, {waiting})
+        self.tick(50.035)
+        self.assertEqual(self.attempts, [(waiting,50.0,"workspace")])
+        peer = store.open_store(f.home / "gx.db")
+        self.addCleanup(peer.close)
+        with store.transaction(peer):
+            store.release_lease(peer, holder["lease_id"])
+        self.tick(50.070)
+        self.assertEqual(self.attempts[-1], (waiting,50.070,"claimed"))
+
+    def test_other_run_finishes_provider_turn_before_retry_deadline(self):
+        f = self.f
+        self.enterContext(patch.object(activity, "_policy", return_value={"parallel_turns":{"openai":1}}))
+        first, _ = f.run_case("first", maximum=3)
+        second, _ = f.run_case("next", maximum=3)
+        holder, finish = self.paid_turn(first, f.create(first)["task_id"])
+        waiting = f.create(second)["task_id"]
+        self.drive(second, {waiting})
+        f.db.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,terminal_status) VALUES('other','other','completed')")
+        self.tick(50.035)
+        self.assertEqual(self.attempts, [(waiting,50.0,"provider_backoff")])
+        finish()
+        self.tick(50.070)
+        self.assertEqual(self.attempts[-1], (waiting,50.070,"claimed"))
+        self.assertIsNone(f.db.execute("SELECT released_at FROM leases WHERE lease_id=?",
+                                       (holder["lease_id"],)).fetchone()[0])
 
 
 class GridDispatchPreparation(unittest.TestCase):

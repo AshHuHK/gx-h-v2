@@ -106,6 +106,22 @@ def main():
             "paired_run_status_counts":[{"baseline":k[0],"candidate":k[1],"count":v} for k,v in dispositions.items()],
             "thresholds_to_explain":affected,"unmatched_or_failed_inputs":[k for k,v in invariants.items() if not v],
             "comparison_status":"REVIEW" if affected or not all(invariants.values()) else "WITHIN_MEASURED_BOUNDS"}
+    if plan:=ce.get('cumulative_token_plan'):
+        released=[json.loads(line) for line in (cand/'cumulative-candidate-tokens.jsonl').read_text().splitlines()]
+        used=plan['prior_spent_tokens']+cs['counts']['ledger_spent_tokens']
+        balances_ok=(len(released)==len(cs['wave_activity']) and all(r['admit'] and
+            r['headroom_before_wave_tokens']>=r['next_original_workspace_ceiling'] for r in released))
+        report['candidate_cumulative_spend']={'prior_revision':plan['prior_candidate'],'prior_summary_sha256':plan['prior_summary_sha256'],
+            'current_revision':cs['source_commit'],'prior':{'tokens':plan['prior_spent_tokens'],'turns':plan['prior_billed_turns'],
+                'jobs':plan['prior_jobs'],'completed_runs':plan['prior_completed_runs']},
+            'current':{'tokens':cs['counts']['ledger_spent_tokens'],'turns':cs['counts']['billed_turns'],
+                'jobs':cs['counts']['jobs'],'completed_runs':cs['distributions']['run'].get('COMPLETED',0)},
+            'combined':{'tokens':used,'turns':plan['prior_billed_turns']+cs['counts']['billed_turns'],
+                'jobs':plan['prior_jobs']+cs['counts']['jobs'],'completed_runs':plan['prior_completed_runs']+cs['distributions']['run'].get('COMPLETED',0)},
+            'combined_token_ceiling':plan['combined_token_ceiling'],'tokens_remaining':plan['combined_token_ceiling']-used,
+            'headroom_checked_before_all_arrivals':balances_ok}
+        if not balances_ok or used>plan['combined_token_ceiling']:
+            report['comparison_status']='REVIEW';report['unmatched_or_failed_inputs'].append('combined candidate token accounting')
     save(args.output,report)
     print(json.dumps({k:report[k] for k in ("comparison_status","thresholds_to_explain","unmatched_or_failed_inputs")},indent=2))
 

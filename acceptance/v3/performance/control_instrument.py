@@ -29,6 +29,7 @@ def instrument(cls, name):
         begin = time.time_ns()
         label = args[0] if name == '_request' else name
         outcome = 'returned'
+        reason = None
         try:
             value = original(self, *args, **kwargs)
             if name == '_claim':
@@ -36,13 +37,16 @@ def instrument(cls, name):
             return value
         except BaseException as exc:
             outcome = type(exc).__name__
+            details = getattr(exc, 'details', None)
+            if isinstance(details, dict):
+                reason = details.get('reason')
             raise
         finally:
             end = time.time_ns()
             root = self.roots if isinstance(self, RootDelivery) else self
             stream.write(json.dumps({'owner': cls.__name__, 'operation':label, 'run_id':root.run_id,
                 'task_id':task, 'started_ns':begin,'ended_ns':end,'duration_ms':(end-begin)/1e6,
-                'outcome':outcome},separators=(',',':'))+'\n')
+                'outcome':outcome,'owner_reason':reason},separators=(',',':'))+'\n')
             if binding is not None:
                 current_task.reset(binding)
     setattr(cls, name, measured)

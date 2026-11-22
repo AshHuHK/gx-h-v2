@@ -17,6 +17,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for option in ('baseline','candidate','runtime','private','evidence'):
         parser.add_argument('--'+option,type=Path,required=True)
+    parser.add_argument('--baseline-composed',action='store_true',
+                        help='Select the reviewed grid in both arms when comparing a scheduling-only correction')
     args = parser.parse_args()
     os.umask(0o077)
     check_proxy()
@@ -50,7 +52,9 @@ def main():
     result={'mode':'credential-free loopback Responses through actual Codex 0.169.0, two real local grid Runs per workspace',
         'codex_sha256':sha(binary),'started':utc(),'order':order,'model':MODEL,'peer_request_delay_s':0.2,
         'peer_final_message_delay_s':2.0,'fixed_script':'reject first assessment by removing one finding; record accepted retry; same scientific judge in both arms',
-        'controlled_difference':'only candidate selects org.gx.science-grid@2.0.0; peer never calls the contributed measurement tool',
+        'controlled_difference':('both arms select org.gx.science-grid@2.0.0 for a scheduling-only comparison' if args.baseline_composed else 'only candidate selects org.gx.science-grid@2.0.0')+'; peer never calls the contributed measurement tool',
+        'stage_metadata':{k:{'path':str(stage),'driver_sha256':sha(stage/'gx-h/gx_core/p0/driver.py'),
+            'roots_sha256':sha(stage/'gx-h/gx_core/p0/roots.py')} for k,stage in stages.items()},
         'trials':[], 'result':'IN_PROGRESS'}
     save(out/'control.json',result)
     for sequence,arm in enumerate(order):
@@ -78,7 +82,7 @@ def main():
                     raise RuntimeError(f'control {trial.name} {label} exited {proc.returncode}')
             for lane in LANES:
                 spec=specification(stage,0,lane)
-                if arm=='candidate':
+                if arm=='candidate' or args.baseline_composed:
                     spec['plugins']=[GRID_PLUGIN]
                 specfile=trial/(lane+'.json'); save(specfile,spec)
                 command('start-'+lane,['start','--state',str(state),'--run-key','00-'+lane,'--spec',str(specfile)])

@@ -239,7 +239,13 @@ def pulse(work):
 
 
 def acquire(work,out):
-    finish=json.loads((out/"finished.json").read_bytes())
+    partial_stop=out/'partial-stop.json'
+    if partial_stop.is_file():
+        ended=json.loads(partial_stop.read_bytes())['stopped_utc']
+        started=json.loads((out/'start.json').read_bytes())['released']
+        finish={'start':started,'ended':ended,'elapsed_utc_s':stamp(ended)-stamp(started)}
+    else:
+        finish=json.loads((out/"finished.json").read_bytes())
     setup=json.loads((out/"environment.json").read_bytes())
     errors=[]
     warnings=[]
@@ -500,7 +506,7 @@ def acquire(work,out):
                    if k.startswith("drive-") and k in exits]
     arrivals=list(records_in(out/"arrivals.jsonl"))
     completed=distributions["turn_terminal"]["completed"]
-    elapsed=finish["elapsed_monotonic_s"]
+    elapsed=finish.get('elapsed_utc_s') if partial_stop.is_file() else finish['elapsed_monotonic_s']
     throughput={k:round(n*3600/elapsed,4) for k,n in {"completed_native_turns_per_hour":completed,
                         "completed_runs_per_hour":distributions["run"]["COMPLETED"],
                         "accepted_products_per_hour":distributions["submission"]["ACCEPTED"],
@@ -560,14 +566,15 @@ def acquire(work,out):
               and all(ep["native_root_busy_s"]>0 for ep in arr_epochs) and not errors
               and totals["evaluated_jobs"]==sum(len(w["runs"])*2 for w in workspaces))
     make_hashes=["commands.jsonl","arrivals.jsonl","environment.json","oauth-readiness.json","start.json",
-                 "finished.json","gx-metrics.jsonl.gz","receipts.jsonl.gz","native-session-hashes.json",
+                 "partial-stop.json" if partial_stop.is_file() else "finished.json","gx-metrics.jsonl.gz","receipts.jsonl.gz","native-session-hashes.json",
                  "input-hashes.json","workspace-receipts.json","project-specifications.jsonl.gz"]
-    for optional in ("first-wave.json","proxy-observation.json","runtime-details.json","progress-load.jsonl","treatment.json"):
+    for optional in ("first-wave.json","proxy-observation.json","runtime-details.json","progress-load.jsonl","treatment.json",'cumulative-candidate-tokens.jsonl'):
         if (out/optional).is_file():
             make_hashes.append(optional)
     result={"gate_measurement":"PASS" if complete and not errors else "INCOMPLETE","source_commit":setup["source_commit"],
         "software_under_test":"GX release archive and Codex 0.169.0","real_mode":True,"model":MODEL,"effort":EFFORT,
-        "run_utc":{"first_release":finish["start"],"ended":finish["ended"],"elapsed_monotonic_s":round(elapsed,3)},
+        "run_utc":{"first_release":finish["start"],"ended":finish["ended"],
+                   ('elapsed_utc_s' if partial_stop.is_file() else 'elapsed_monotonic_s'):round(elapsed,3)},
         "native_root_work":actual,"budget_reservations":admissions,"coordinator_command_intervals":occupancy(app_intervals),
         "cpu_job_execution":occupancy(all_job_intervals),"root_busy_fraction_of_elapsed":round(actual["busy_s"]/elapsed,5),
         "elapsed_without_active_native_root_s":round(elapsed-actual["busy_s"],3),"wave_activity":arr_epochs,
@@ -588,6 +595,9 @@ def acquire(work,out):
         "errors":errors,"warnings":warnings,
         "raw_private_metrics_sha256":sha(work/"metrics.jsonl"),
         "evidence_sha256":{name:sha(out/name) for name in make_hashes}}
+    if partial_stop.is_file():
+        result['disposition']='STOPPED_PRIOR_CANDIDATE_AFTER_COMPLETED_WAVES'
+        result['captured_receipts_ok']=not errors and not warnings and all(s=='COMPLETED' for s in end_states) and len(roots)==len(meters) and totals['evaluated_jobs']==2*len(end_states)
     save(out/"summary.json",result)
     return result
 

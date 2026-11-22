@@ -12,6 +12,7 @@ from ..hostobs.app_server_client import AppServerResponseError
 from ..jobs import leases
 from ..persistence import store
 from . import waits
+from .team_admission import SlotWatch
 
 
 # Exact v0.169.0 ServerNotification names. Completed items, dynamic tool requests,
@@ -140,6 +141,20 @@ def retryable_failed_thread(conn, binding, recent_turns):
         (_provider(conn, binding), binding["run_id"], binding["thread_id"], turn_id)).fetchone())
 
 
+def _active_starts(conn, provider=None, *, receipts=None):
+    selection, argument = ("r.provider=?", provider) if receipts is None else (
+        "d.rowid IN (SELECT value FROM json_each(?))", json.dumps(receipts))
+    return conn.execute(
+        "SELECT d.rowid FROM p0_root_deliveries d JOIN p0_roots r USING(thread_id)"
+        " LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) WHERE d.method='turn/start'"
+        f" AND d.state IN ('sending','acknowledged') AND u.terminal_status IS NULL AND {selection}",
+        (argument,)).fetchall()
+
+
+def _count_held_starts(conn, receipts):
+    return len(_active_starts(conn, receipts=receipts))
+
+
 def require_provider_capacity(conn, binding, event_id):
     """Within the claim or paid-start transaction; replays, steers and interrupts bypass admission."""
     provider = _provider(conn, binding)
@@ -171,14 +186,11 @@ def require_provider_capacity(conn, binding, event_id):
     if cap is not None:
         # Sending without a receipt is still exposure. A terminal turn can free
         # provider capacity while its GX token adjustment is being reconciled.
-        active = conn.execute(
-            "SELECT count(*) FROM p0_root_deliveries d JOIN p0_roots r USING(thread_id)"
-            " LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) WHERE d.method='turn/start'"
-            " AND d.state IN ('sending','acknowledged') AND u.terminal_status IS NULL AND r.provider=?",
-            (provider,)).fetchone()[0]
-        if active >= cap:
-            raise HoldActive("The provider's concurrent turn capacity is in use", details={
-                "reason":"provider_backoff", "provider":provider, "event_id":event_id, "active":active})
+        active = _active_starts(conn, provider)
+        if len(active) >= cap:
+            receipts = tuple(sorted(row[0] for row in active))
+            raise SlotWatch(_count_held_starts, receipts, cap).hold("The provider's concurrent turn capacity is in use",
+                {"reason":"provider_backoff", "provider":provider, "event_id":event_id, "active":len(active)})
 
 
 def _due(conn, run_id, thread_id, turn_id, horizon):

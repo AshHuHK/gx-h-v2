@@ -13,6 +13,10 @@
 
 基线 Python 回归为 273 通过、4 跳过。最终提交的独立环境中，Python 全量 344 项，340 通过、4 项可选 DSH 跳过；Node 插件测试 2/2 通过，生成配置一致性检查通过。[基线清单](acceptance/v21/baseline/summary.json) · [冻结版本 Python 日志](acceptance/v21/final-a05dcef/python-full.log) · [Node](acceptance/v21/final-a05dcef/node.log) · [生成检查](acceptance/v21/final-a05dcef/generator.log)
 
+**协议探针的首轮读数。** 最终冻结产品的 17 个原版官方协议场景均通过。第一遍专项测试另有两条原断言未满足，原始日志已保留。双 Root 用量有时先到达 `rawResponse/completed`，先前探针只在 token 通知时记录触限现场。Job 唤醒测试在官方 ACK 之后、GX 保存 ACK 之前杀进程，原断言在三秒时要求准确加 35，新建项目的默认对账宽限为 30 秒。三秒时已核对同一官方 turn 且没有第二次模型请求，2000 token 的预留尚在。超过真实宽限后，在暂停状态连续两次冷恢复，只结算一个 wake 估值 2000，已知下界 35。科学执行与费用置信度可分别核对。[首次结果](acceptance/v21/final-a05dcef/summary.json) · [30 秒后两次冷恢复](acceptance/v21/protocol/supplement/wake-paused.json)
+
+**最终协议结果。** 在同一份产品代码上补跑五条官方协议探针，五条全部退出 0。连同已通过的用例共 17 个固定协议场景、13 个 v2.1 专项场景。两次归档中 423 个产品、脚本及测试文件的聚合 SHA-256 均为 `2101a99e9fc48e2c4c3c680c211413aeb2d91ef033b85001a6b9c8020bed63c4`。该唤醒只产生一次有效继续和一次结算。旧 Attempt 已释放，后续请求被拒，本例没有取得可归属的最终精确费用。另一个仍合法持有原线程的用例取得了后继累计 70，触发一次 −65 更正，冷重放未增加调用。[统一结果与重跑命令](acceptance/v21/final-a05dcef/README.md) · [机器可读汇总](acceptance/v21/final-a05dcef/aggregate.json) · [可归属与不可归属的对照](acceptance/v21/meter/README.md)
+
 ## 业务验收矩阵
 
 | 蓝图编号 | 行为与验收观察 | 主要实现 | 测试及原始记录 |

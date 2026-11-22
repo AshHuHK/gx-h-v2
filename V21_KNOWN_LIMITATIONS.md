@@ -8,3 +8,4 @@
 - 新研究示例默认使用 `tl1a_geometry@3` 的异步复算。旧 `@1` 和 `@2` 保持各自原方法与同步行为，以重现历史研究；已完成的研究沿用其原判据和结果。[版本与复算](acceptance/v21/review-job/README.md)
 - 固定依赖含可选的 Cordis 插件测试。DSH 完整独立 Runtime 的 Python SDK/Runtime wheel 对不在此发行依赖中；其四个可选测试在基线与候选均有明确跳过原因。GPU/Slurm 和外部商业 Provider 未参加本轮验收。[部署环境](V21_DEPLOYMENT_REPORT.md)
 - 旧库迁移和回退都在 v2 一致快照的 staging 副本实测。旧库与新库在切换后产生不同写入时，应保存两份状态并按迁移报告选择恢复点。回退普通数据库副本不可能撤销上游已发生的计算或消费。[回退演练](V21_ROLLBACK_REPORT.md)
+- 共享盘上的官方客户端在部分测试退出时记录了清理旧临时目录的跨文件系统警告。相关进程正常退出，原生收据与重复恢复检查均通过。[原始退出日志](acceptance/v21/final-a05dcef/supplement/runner.log)

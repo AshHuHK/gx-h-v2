@@ -1,0 +1,95 @@
+{
+  "run": "gxr_01m81tp3zah8xzsvjd",
+  "thread": "01a203ab-10ef-72e0-b365-ce9b46cbf31d",
+  "turn": "01a203ab-111a-7631-9ec9-49d03b420634",
+  "stored_child": {
+    "child_id": "01a203ab-118f-74c1-aea6-b354d42cebd9",
+    "run_id": "gxr_01m81tp3zah8xzsvjd",
+    "root_id": "01a203ab-10ef-72e0-b365-ce9b46cbf31d",
+    "parent_id": "01a203ab-10ef-72e0-b365-ce9b46cbf31d",
+    "owner_turn": "01a203ab-111a-7631-9ec9-49d03b420634",
+    "metadata_verified": 0,
+    "awaiting_turn": 0,
+    "awaiting_call_id": null
+  },
+  "stored_child_usage": {
+    "child_id": "01a203ab-118f-74c1-aea6-b354d42cebd9",
+    "turn_id": "01a203ab-1196-7030-a7f5-208cae9f931e",
+    "owner_turn": "01a203ab-111a-7631-9ec9-49d03b420634",
+    "prior_tokens": 0,
+    "total_tokens": null,
+    "terminal": 1,
+    "measured_tokens": null,
+    "children_known": 1
+  },
+  "official_child_fields": {
+    "id": "01a203ab-118f-74c1-aea6-b354d42cebd9",
+    "parentThreadId": "01a203ab-10ef-72e0-b365-ce9b46cbf31d",
+    "sessionId": "01a203ab-118f-74c1-aea6-b354d42cebd9",
+    "status": {
+      "type": "notLoaded"
+    }
+  },
+  "snapshot": {
+    "turns": [
+      {
+        "run_id": "gxr_01m81tp3zah8xzsvjd",
+        "thread_id": "01a203ab-10ef-72e0-b365-ce9b46cbf31d",
+        "turn_id": "01a203ab-111a-7631-9ec9-49d03b420634",
+        "event_id": "human:rapid",
+        "state": "acknowledged",
+        "prior_tokens": 0,
+        "token_budget": 100,
+        "reservation_ref": "rsv_01m81tp48pm0w4d7xj",
+        "budget_ref": "gxb_01m81tp3z97kj7gksy",
+        "sequence": 1,
+        "budget_status": "SETTLED",
+        "terminal_status": "completed",
+        "total_tokens": 70,
+        "measured_tokens": 70,
+        "children_known": 1,
+        "metering_reason": "awaiting attributable final usage from native child 01a203ab-118f-74c1-aea6-b354d42cebd9",
+        "terminal_at": "2026-11-22T14:31:12.611Z",
+        "confidence": "ESTIMATED",
+        "settled_tokens": 100,
+        "observed_lower_bound": 70,
+        "estimate_snapshot": 70,
+        "attribution": "PROVISIONAL_TURN",
+        "estimated_at": "2026-11-22T14:31:14.909Z"
+      }
+    ],
+    "adjustments": [],
+    "threads": [
+      {
+        "thread_id": "01a203ab-10ef-72e0-b365-ce9b46cbf31d",
+        "run_id": "gxr_01m81tp3zah8xzsvjd",
+        "root_id": "01a203ab-10ef-72e0-b365-ce9b46cbf31d",
+        "observed_total": 70,
+        "observed_at": "2026-11-22T14:31:12.600Z",
+        "observation_source": "thread/tokenUsage/updated",
+        "reconciled_total": null,
+        "confidence": "ESTIMATED",
+        "anomaly_total": null,
+        "anomaly_at": null,
+        "unresolved_delta": 70
+      }
+    ],
+    "spent": {
+      "api_calls": 1,
+      "tokens": 100
+    },
+    "reserved": {},
+    "reservation_count": 1
+  },
+  "checks": {
+    "official_candidate_has_same_root_and_turn": true,
+    "cold_unloaded_child_identity_is_incomplete": true,
+    "missing_child_remains_unknown": true,
+    "one_provisional_charge_and_no_new_calls": true,
+    "new_gx_store_attempted_zero_rollout_opens": true
+  },
+  "version": "codex-cli 0.169.0",
+  "sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "denied_rollout_access": [],
+  "scope": "real native child and parent, official pinned binary, loopback provider, fresh database, GX rollout opens denied"
+}

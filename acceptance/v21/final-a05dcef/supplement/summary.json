@@ -1,0 +1,150 @@
+{
+  "class": "Local Python, SQLite and CPU Job fixtures. Official-protocol scenarios use pinned Codex with a scripted loopback provider.",
+  "commit": "3b3459421a32dcddbe5765152534d987de94917d",
+  "ended_utc": "2026-11-22T14:31:49.402377+00:00",
+  "native_binary": {
+    "sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+    "version": "codex-cli 0.169.0"
+  },
+  "node_version": "v22.17.0",
+  "operations": {
+    "native-incomplete-child": {
+      "command": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "$CHECKOUT/acceptance/v21/native_child.py",
+        "--case",
+        "missing",
+        "--out",
+        "$EVIDENCE/native/native-incomplete-child.json"
+      ],
+      "cwd": "$CHECKOUT",
+      "ended_utc": "2026-11-22T14:31:12.582843+00:00",
+      "returncode": 0,
+      "seconds": 2.977,
+      "started_utc": "2026-11-22T14:31:09.606193+00:00"
+    },
+    "native-late-child": {
+      "command": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "$CHECKOUT/acceptance/v21/native_child.py",
+        "--case",
+        "complete",
+        "--out",
+        "$EVIDENCE/native/native-late-child.json"
+      ],
+      "cwd": "$CHECKOUT",
+      "ended_utc": "2026-11-22T14:31:11.631201+00:00",
+      "returncode": 0,
+      "seconds": 2.025,
+      "started_utc": "2026-11-22T14:31:09.606600+00:00"
+    },
+    "native-multi-budget": {
+      "command": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "$CHECKOUT/acceptance/v21/native_budget.py",
+        "--out",
+        "$EVIDENCE/native/native-multi-budget.json"
+      ],
+      "cwd": "$CHECKOUT",
+      "ended_utc": "2026-11-22T14:31:11.782948+00:00",
+      "returncode": 0,
+      "seconds": 2.177,
+      "started_utc": "2026-11-22T14:31:09.605750+00:00"
+    },
+    "native-unloaded-child": {
+      "command": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "$CHECKOUT/acceptance/v21/native_child.py",
+        "--case",
+        "rapid",
+        "--out",
+        "$EVIDENCE/native/native-unloaded-child.json"
+      ],
+      "cwd": "$CHECKOUT",
+      "ended_utc": "2026-11-22T14:31:13.481845+00:00",
+      "returncode": 0,
+      "seconds": 1.85,
+      "started_utc": "2026-11-22T14:31:11.631387+00:00"
+    },
+    "native-wake-ack": {
+      "command": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "$CHECKOUT/acceptance/v21/native_wake.py",
+        "--out",
+        "$EVIDENCE/native/native-wake-ack.json"
+      ],
+      "cwd": "$CHECKOUT",
+      "ended_utc": "2026-11-22T14:31:49.401688+00:00",
+      "returncode": 0,
+      "seconds": 37.619,
+      "started_utc": "2026-11-22T14:31:11.783158+00:00"
+    },
+    "offline-cordis": {
+      "command": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "scripts/release_assets.py",
+        "cordis"
+      ],
+      "cwd": "$CHECKOUT",
+      "ended_utc": "2026-11-22T14:31:08.737930+00:00",
+      "returncode": 0,
+      "seconds": 2.127,
+      "started_utc": "2026-11-22T14:31:06.611138+00:00"
+    },
+    "offline-wheels": {
+      "command": [
+        "$SCRATCH/venv/bin/python",
+        "-m",
+        "pip",
+        "--isolated",
+        "--disable-pip-version-check",
+        "install",
+        "--no-index",
+        "--no-cache-dir",
+        "--require-hashes",
+        "--find-links",
+        "$CHECKOUT/release-assets/python",
+        "-r",
+        "$CHECKOUT/release-assets/python/requirements.lock"
+      ],
+      "cwd": "$CHECKOUT",
+      "ended_utc": "2026-11-22T14:31:06.609906+00:00",
+      "returncode": 0,
+      "seconds": 2.954,
+      "started_utc": "2026-11-22T14:31:03.655434+00:00"
+    },
+    "venv": {
+      "command": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+        "-m",
+        "venv",
+        "$SCRATCH/venv"
+      ],
+      "cwd": "$CHECKOUT",
+      "ended_utc": "2026-11-22T14:31:03.653489+00:00",
+      "returncode": 0,
+      "seconds": 2.93,
+      "started_utc": "2026-11-22T14:31:00.723619+00:00"
+    }
+  },
+  "passed": true,
+  "product_files": 423,
+  "product_prefixes": [
+    "gx-h/",
+    "bin/",
+    "codex_adapter/",
+    "examples/",
+    "scripts/"
+  ],
+  "product_sha256": "2101a99e9fc48e2c4c3c680c211413aeb2d91ef033b85001a6b9c8020bed63c4",
+  "python_version": "3.11.9",
+  "source_file_manifest": "files.json",
+  "started_utc": "2026-11-22T14:31:00.494946+00:00",
+  "verified_product_commit": "a05dcef64522fbbbc12120b1d78da518e6886b10"
+}

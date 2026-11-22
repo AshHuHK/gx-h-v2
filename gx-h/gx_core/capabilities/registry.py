@@ -389,8 +389,8 @@ def active_view(conn: sqlite3.Connection, view: dict[str, Any]) -> dict[str, Any
     environment's readiness, or ``CAPABILITY_NOT_APPROVED`` when the version is not ACTIVE."""
     capability_version = view["capability_version"]
     shipped = False
-    if view["status"] == "DRAFT" and view["capability_version"] == "fixture-grid@1":
-        from .shipped import admitted
+    from .shipped import MANIFESTS, admitted
+    if view["status"] == "DRAFT" and capability_version in MANIFESTS:
         source = _governance_assets().get(conn, view["capability_id"], view["version"], kind=ASSET_KIND)["source"]
         shipped = admitted(view, source)
     if shipped:

@@ -1,4 +1,5 @@
 """Durable binding, crash recovery, and trusted callbacks on a real GX database."""
+import json
 import os
 import tempfile
 import unittest
@@ -6,6 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+from gx_core.artifacts.service import ArtifactService
 from gx_core.errors import OutcomeUnknown, ScopeDenied
 from gx_core.hostobs.app_server_client import ReceivedMessage
 from gx_core.p0 import schema
@@ -89,7 +91,125 @@ class DurableRoots(unittest.TestCase):
         for _ in range(2):
             self.assertTrue(call(row["thread_id"],"turn")["success"])
         self.assertFalse(call(row["thread_id"],"turn",{"replay":"conflict"})["success"])
+        store.release_lease(self.conn, row["lease_id"])
+        self.assertTrue(call(row["thread_id"], "turn")["success"])
         self.assertEqual(written,[row["lease_id"]])
+
+    def child_research(self):
+        assets = ArtifactService(self.conn)
+        def publish(run, body, media):
+            return assets.put(run_id=run, kind="source", media_type=media, content=body,
+                              origin="HOST_PUT", put_by="fixture").artifact_ref
+        self.original = "μ = 0.25\n" * 3200
+        self.source = publish(self.run, self.original, "text/plain; charset=utf-8")
+        self.index = publish(self.run, json.dumps({"source": self.source}), "application/json")
+        foreign = records.create_run(self.conn, objective="other project", project_ref="other", actor="fixture")
+        self.foreign = publish(foreign, "A different project's evidence.", "text/plain")
+        self.conn.execute("UPDATE tasks SET input_json=? WHERE task_id=?",
+                          (json.dumps({"ref": self.index, "other": self.foreign}), self.task))
+        self.roots._request = self.fake
+        self.parent = self.bind()
+        self.pid = self.parent["thread_id"]
+        self.roots.client.run_until = lambda *args, **kwargs: None
+
+    def child_event(self, method, params):
+        self.roots._observe(ReceivedMessage(1, {"method": method, "params": params}))
+
+    def child_call(self, thread="child", turn="ct", tool="gx_read_artifact", args=None):
+        p = {"threadId": thread, "turnId": turn, "callId": "call-" + tool,
+             "tool": tool, "arguments": {"ref": self.index} if args is None else args}
+        with patch.object(self.roots, "_request", side_effect=AssertionError("RPC inside callback")):
+            response = self.roots._callback(ReceivedMessage(1, {"method": "item/tool/call", "params": p}))
+        return response["success"], json.loads(response["contentItems"][0]["text"])
+
+    def child_facts(self, name="child", parent=None):
+        parent = parent or self.pid
+        return {"id": name, "sessionId": self.pid, "parentThreadId": parent,
+                "source": {"subAgent": {"thread_spawn": {"parent_thread_id": parent}}}}
+
+    def child_spawn(self, child="child", parent=None, turn="turn"):
+        self.child_event("item/started", {"threadId": parent or self.pid, "turnId": turn,
+                         "item": {"type": "subAgentActivity", "kind": "started", "agentThreadId": child}})
+        self.child_event("turn/started", {"threadId": child, "turn": {"id": "ct", "rootTurnId": "turn"}})
+
+    def test_child_read_retries_after_verification_and_rechecks_scope_on_every_call(self):
+        self.child_research()
+        self.child_spawn()
+        counts = lambda: tuple(self.conn.execute("SELECT count(*) FROM " + t).fetchone()[0] for t in ("tasks", "leases"))
+        before = counts()
+        success, result = self.child_call()
+        self.assertFalse(success)
+        self.assertIn("Retry", result["error"])
+        def verify(method, params):
+            self.assertFalse(self.conn.in_transaction)
+            self.assertEqual((method, params["threadId"]), ("thread/read", "child"))
+            return {"thread": {**self.child_facts(), "forkedFromId": self.pid}}
+        self.roots._request = verify
+        self.roots.poll()
+        self.assertEqual(self.child_call(), (True, {"source": self.source}))
+        # Reading the index as a child leaves the parent's list untouched.
+        self.assertFalse(self.child_call(args={"ref": self.source})[0])
+        self.assertTrue(self.child_call(thread=self.pid, turn="turn")[0])
+        self.assertTrue(self.child_call(thread=self.pid, turn="turn", tool="gx_task_context", args={})[0])
+        ok, page = self.child_call(args={"ref": self.source})
+        self.assertTrue(ok)
+        self.assertTrue(page["truncated"])
+        ok, tail = self.child_call(args={"ref": self.source, "offset": page["metadata"]["next_offset"]})
+        self.assertTrue(ok)
+        self.assertEqual(page["content"] + tail["content"], self.original)
+        self.conn.execute("INSERT INTO p0_root_artifact_reads VALUES(?,?)", (self.parent["root_key"], self.foreign))
+        self.assertFalse(self.child_call(args={"ref": self.foreign})[0])
+        self.assertFalse(self.child_call(args={"ref": self.source, "root_id": self.pid})[0])
+        self.assertFalse(self.child_call(args={"ref": self.source, "offset": True})[0])
+        for tool in ("gx_submit_product", "gx_wait_job", "gx_task_context", "custom_worker_write"):
+            self.assertFalse(self.child_call(tool=tool, args={})[0])
+        with patch.object(self.roots, "_tools_for", return_value=[]):
+            self.assertFalse(self.child_call()[0])
+        self.conn.execute("DELETE FROM p0_root_artifact_reads WHERE artifact_ref=?", (self.index,))
+        self.assertFalse(self.child_call()[0])
+        self.assertFalse(self.child_call(thread=self.pid, turn="turn")[0])
+        self.conn.execute("UPDATE leases SET expires_at='2000-01-01T00:00:00Z' WHERE lease_id=?", (self.parent["lease_id"],))
+        self.assertFalse(self.child_call(args={"ref": self.source})[0])
+        self.assertFalse(self.child_call(thread=self.pid, turn="turn", tool="gx_task_context", args={})[0])
+        self.conn.execute("UPDATE leases SET expires_at='2100-01-01T00:00:00Z' WHERE lease_id=?", (self.parent["lease_id"],))
+        self.conn.execute("UPDATE tasks SET attempt=attempt+1 WHERE task_id=?", (self.task,))
+        self.assertFalse(self.child_call(args={"ref": self.source})[0])
+        self.assertEqual(counts(), before)
+        self.assertIsNone(self.conn.execute("SELECT 1 FROM p0_root_calls WHERE thread_id='child'").fetchone())
+
+    def test_cold_child_requires_parent_activity_metadata_and_current_turn(self):
+        self.child_research()
+        self.roots = Roots(self.conn, run_id=self.run, cwd=self.tmp.name)
+        self.roots.client = SimpleNamespace(run_until=lambda *a, **kw: None)
+        requested = []
+        metadata = {"child": self.child_facts(), "fork": {**self.child_facts("fork"), "source": "appServer",
+                    "forkedFromId": self.pid}, "unknown": self.child_facts("unknown", "different-root"),
+                    "unannounced": self.child_facts("unannounced")}
+        def official(method, params):
+            requested.append((method, params["threadId"]))
+            self.assertFalse(self.conn.in_transaction)
+            if method == "thread/read":
+                return {"thread": metadata[params["threadId"]]}
+            if method == "thread/items/list":
+                self.assertEqual(params["threadId"], self.pid)
+                return {"data": [{"turnId": "turn", "item": {"type": "subAgentActivity", "kind": "started",
+                                 "agentThreadId": "child"}}]}
+            self.assertEqual((method, params["threadId"]), ("thread/turns/list", "child"))
+            return {"data": [{"id": "ct", "rootTurnId": "turn", "status": "inProgress"}]}
+        self.roots._request = official
+        for name in ("child", "fork", "unknown", "unannounced"):
+            self.assertFalse(self.child_call(thread=name)[0])
+        self.roots.poll()
+        self.assertEqual(self.child_call(), (True, {"source": self.source}))
+        for name in ("fork", "unknown", "unannounced"):
+            self.assertFalse(self.child_call(thread=name)[0])
+        self.assertEqual(requested.count(("thread/read", "child")), 1)
+        self.assertFalse(self.child_call(turn="old")[0])
+        self.child_event("turn/completed", {"threadId": "child", "turn": {"id": "ct", "status": "completed"}})
+        self.child_event("turn/started", {"threadId": "child", "turn": {"id": "ct", "rootTurnId": "turn"}})
+        self.assertFalse(self.child_call()[0])
+        self.child_spawn("grandchild", parent="child", turn="ct")
+        self.assertFalse(self.child_call(thread="grandchild")[0])
 
     def test_lost_creation_checks_official_index_and_preserves_original_attempt(self):
         row = self.roots._claim(self.task)

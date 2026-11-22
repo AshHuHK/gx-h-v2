@@ -193,8 +193,12 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
     conn = ctx.conn
     backend = backend_ctx(conn)
     run = _run(conn, run_id)
-    if run["workflow_id"] != "science_grid" or run["status"] not in {"ACTIVE", *machines.waiting_states("run")}:
+    if (run["workflow_id"] not in ("science_grid", "tl1a_geometry", "tl1a_coordinate_quality")
+            or run["status"] not in {"ACTIVE", *machines.waiting_states("run")}):
         return None
+    if run["workflow_id"] == "tl1a_geometry":
+        from workflows.tl1a_geometry.replan import prepare
+        prepare(conn, run_id)
     engine = service._engine(backend, run_id)
     with store.transaction(conn) as tx:
         run = _run(tx, run_id)
@@ -246,6 +250,10 @@ def on_job_terminal(ctx: Ctx, run_id: str, row: sqlite3.Row, payload: Mapping[st
     if intent.get("purpose") == "probe":
         return {"reaction": None, "why": "the probe consumes this job's result"}
     if job["task_id"]:
+        from ..p0 import waits
+        waiter = waits.job_waiter(conn, run_id, job["task_id"], job["job_id"])
+        if waiter and waiter["wait_job_id"] == job["job_id"]:
+            return {"reaction": None, "job_status": job["status"], "why": "the parked attempt owns the terminal result"}
         task = conn.execute("SELECT status FROM tasks WHERE task_id=?", (job["task_id"],)).fetchone()
         if task is not None and task["status"] in ("CLAIMED", "RUNNING") \
                 and recovery.live_lease(conn, job["task_id"]) is not None:

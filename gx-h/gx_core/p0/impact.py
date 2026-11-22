@@ -5,9 +5,9 @@ from ..domain import ids, machines
 from ..errors import ArtifactNotFound
 from ..jobs import leases as job_leases
 from ..persistence import store
-from . import intent
+from . import intent, science_inputs
 
-_ADVISORY = {"soft_preference", "priority", "resource_limit"}
+_ADVISORY = {"soft_preference", "optimization_target", "priority", "resource_limit"}
 _ACTIVE_ATTEMPT = {"CLAIMED", "RUNNING", "SUBMITTED", "VALIDATING"}
 
 
@@ -45,6 +45,14 @@ def _dependencies(conn, run_id, changes):
             "WHERE run_id=? AND item_id=?", (run_id, item_id),
         ):
             targets[row["object_type"], row["object_id"]][item_id] = row["role"]
+        if change["item_type"] in science_inputs.ADVISORY and change["new_value"] is not None:
+            # A newly added item cannot have a stored link. Apply the same role rule
+            # as task creation for already commissioned, still-open assignments.
+            for task in conn.execute("SELECT task_id,input_json FROM tasks WHERE run_id=? "
+                                     "AND status NOT IN ('ACCEPTED','CANCELLED','EXHAUSTED')", (run_id,)):
+                role = science_inputs.role_of(store.loads(task, "input_json", {}))
+                if science_inputs.consumes(role, change["item_type"], change["new_value"]):
+                    targets["task", task["task_id"]].setdefault(item_id, "context")
         if change["item_type"] not in intent.BAN_TYPES:
             continue
         # A newly introduced prohibition has no pre-existing item link. A task
@@ -117,7 +125,7 @@ def _projected_items(conn, run_id, diffs):
     return current
 
 
-def _release_attempt(conn, task, change_id, items):
+def _release_attempt(conn, task, change_id, items, *, reason="the attempt's Intent dependency changed"):
     status = task["status"]
     if task["lease_id"]:
         store.release_lease(conn, task["lease_id"])
@@ -132,7 +140,7 @@ def _release_attempt(conn, task, change_id, items):
     for state in [*steps, "READY"]:
         store.transition(
             conn, machine="task", subject_id=task["task_id"], to_state=state,
-            actor="backend", bump=False, reason="the attempt's Intent dependency changed",
+            actor="backend", bump=False, reason=reason,
             evidence_level="EXECUTION_OBSERVED", payload={"change_id": change_id, "item_ids": items,
                                                          "attempt": task["attempt"]},
             extra_updates=fields if state == "READY" else None,
@@ -156,9 +164,27 @@ def _task_action(conn, task, changes, roles, commit, change_id, result):
             result["outbox_id"] = store.enqueue_outbox(
                 conn, topic=topic, idempotency_key=f"{topic}:{change_id}:{lease_id}",
                 payload={"run_id": task["run_id"], "task_id": task["task_id"], "lease_id": lease_id,
-                         "action": action, "change_id": change_id, "item_ids": sorted(roles)},
+                         "attempt": task["attempt"], "action": action, "change_id": change_id,
+                         "item_ids": sorted(roles), "items": [_notice_item(changes[k]) for k in sorted(roles)],
+                         "instruction": science_inputs.INSTRUCTION},
             )
     return action
+
+
+def _notice_item(change):
+    return {"item_id": change["item_id"], "item_type": change["item_type"], "version": change["new_version"],
+            "value": change["new_value"], "status": "removed" if change["new_value"] is None else "active"}
+
+
+def notification_content(conn, payload):
+    """Reconstruct legacy notices from their immutable change, independent of delivery time."""
+    if "items" in payload or "source" in payload or not payload.get("change_id"):
+        return payload
+    change = conn.execute("SELECT preview_json FROM p0_intent_changes WHERE run_id=? AND change_id=?",
+                          (payload["run_id"], payload["change_id"])).fetchone()
+    items = [_notice_item(item) for item in store.loads(change, "preview_json", [])
+             if item["item_id"] in payload.get("item_ids", ())]
+    return {**payload, "items": items, "instruction": science_inputs.INSTRUCTION} if items else payload
 
 
 def enqueue_reevaluation(conn, run_id, eval_id, item_id, version, value, change_id):

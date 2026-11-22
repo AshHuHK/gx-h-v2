@@ -686,13 +686,18 @@ def _requirement(policy: Mapping[str, Any], sha256: str | None, task_class: str,
     """The requirement of a class of work; for the coordinating role, on the pin whatever its class names."""
     spec = _class_spec(policy, task_class)
     model = str(policy["pinned_model"]["id"]) if role == COORDINATOR_ROLE else class_model(task_class, policy)
+    route = (policy.get("p0_role_profiles", {}).get(role)
+             if policy["roles"].get(role, {}).get("task_class") == task_class else None)
+    if route:
+        model = route["model"]
+        spec = {**spec, "min_effort": route["effort"], "default_effort": route["effort"]}
     return {
         "task_class": task_class,
         "model": model,
         "model_aliases": aliases_of(model, policy),
         "min_effort": spec["min_effort"],
         "default_effort": spec["default_effort"],
-        "allowed_efforts": allowed_efforts(task_class, policy),
+        "allowed_efforts": ([spec["default_effort"]] if route else allowed_efforts(task_class, policy)),
         "policy_sha256": sha256,
     }
 

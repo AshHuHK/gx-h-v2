@@ -799,6 +799,9 @@ def transition(
         evidence_level=evidence_level,
         payload=payload,
     )
+    if machine == "run" and "PAUSED" in (prev_state, to_state):
+        from ..p0 import waits
+        waits.on_run_transition(conn, row, to_state, event_id)
     return TransitionResult(
         subject_id=subject_id,
         machine=machine,

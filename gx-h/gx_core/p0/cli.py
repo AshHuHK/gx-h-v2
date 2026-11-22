@@ -32,26 +32,53 @@ def demo_spec():
             "proposal": {"threshold": -0.25, "paths": paths}}
 
 
+def geometry_spec():
+    path = config.HARNESS_ROOT.parent / "examples" / "tl1a_geometry" / "project.json"
+    return json.loads(path.read_text())
+
+
 def initial_action(spec):
-    items = [
-        {"item_id": "objective", "item_type": "objective", "expected_version": 0, "value": spec["objective"]},
-        {"item_id": "evaluation", "item_type": "evaluation_spec", "expected_version": 0,
-         "value": {"threshold": spec["proposal"]["threshold"]}},
-        {"item_id": "methods", "item_type": "method_ban", "expected_version": 0,
-         "value": {"forbidden_capabilities": []}},
-    ]
+    objective = {"item_id": "objective", "item_type": "objective", "expected_version": 0, "value": spec["objective"]}
+    if spec.get("workflow") == "tl1a_geometry":
+        from workflows.tl1a_geometry.domain import user_items
+        items = [objective, *user_items(spec)]
+    else:
+        items = [
+            objective, {"item_id": "evaluation", "item_type": "evaluation_spec", "expected_version": 0,
+                        "value": {"threshold": spec["proposal"]["threshold"]}},
+            {"item_id": "methods", "item_type": "method_ban", "expected_version": 0,
+             "value": {"forbidden_capabilities": []}},
+        ]
     keyed = {item["item_id"]: item for item in items}
     for item in spec.get("intent_items", []):
         if item["item_id"] == "objective" and item["value"] != spec["objective"]:
             raise ValueError("Initial objective must match the project objective")
         if item["item_id"] in keyed and item["item_type"] != keyed[item["item_id"]]["item_type"]:
             raise ValueError("A predefined item must keep its item_type")
+        if (spec.get("workflow") == "tl1a_geometry" and item["item_id"] in keyed and item["item_id"] in ("coordinates", "job-limit", "evaluation")
+                and item["value"] != keyed[item["item_id"]]["value"]):
+            raise ValueError("The initial source, criteria, and Job limit must agree with the project specification")
         keyed[item["item_id"]] = {**item, "expected_version": 0}
     return {"kind": "change", "items": list(keyed.values())}
 
 
 def show(data):
-    print(json.dumps(data, ensure_ascii=False, indent=2))
+    print(json.dumps(data, ensure_ascii=False, indent=2), flush=True)
+
+
+def record_displayed_previews(args, output):
+    from .intent_text import mark_displayed_together
+    if args.command == "message":
+        results = [(output.get("message_id"), output.get("result"))]
+    elif "pending_previews" in output:
+        results = [(row["message_id"], row["result"]) for row in output["pending_previews"]]
+    else:
+        return
+    shown = [(mid, result) for mid, result in results if isinstance(result, dict)
+             and result.get("status") == "awaiting_confirmation"]
+    if shown:
+        with closing(existing_db(args.state.expanduser().resolve(), readonly=False)) as conn:
+            mark_displayed_together(conn, shown)
 
 
 def existing_db(directory, *, readonly):
@@ -65,6 +92,13 @@ def existing_db(directory, *, readonly):
     if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_operator_messages'").fetchone():
         conn.close()
         raise ValueError("State belongs to a different deployment")
+    if not readonly:
+        from .schema import install
+        try:
+            install(conn)
+        except BaseException:
+            conn.close()
+            raise
     return conn
 
 
@@ -80,8 +114,28 @@ def start(conn, directory, spec):
     current = project(conn)
     if current and store.loads(current, "inputs_json")["inputs"]["p0_spec"] != spec:
         raise ValueError("This state already belongs to a different project specification")
-    inputs = {"p0": True, "p0_spec": spec, "proposal": spec["proposal"], "max_rounds": spec["max_rounds"]}
+    workflow = spec.get("workflow", "science_grid")
+    inputs = {"p0": True, "p0_spec": spec, "max_rounds": spec["max_rounds"]}
+    files = []
+    if workflow == "tl1a_geometry":
+        from workflows.tl1a_geometry import domain
+        files = [domain.coordinate_input()]
+        roles = {"objective": "context", "coordinates": "execution", "job-limit": "context"}
+        version = "1"
+    elif workflow == "science_grid":
+        inputs["proposal"] = spec["proposal"]
+        roles = {"objective": "context", "evaluation": "evaluation"}
+        version = current["workflow_version"] if current else "2"
+    else:
+        raise ValueError(f"Unknown public research workflow {workflow!r}")
+
     def bootstrap(rid):
+        if workflow == "tl1a_geometry":
+            source = next(item for item in action["items"] if item["item_id"] == "coordinates")
+            source["value"] = {**domain.source_value(), "artifact_ref": domain.source_artifact(conn, rid)}
+            for item in action["items"]:
+                if item["item_type"] == "evaluation_spec":
+                    roles[item["item_id"]] = "evaluation"
         mid = str(uuid.uuid5(uuid.NAMESPACE_URL, "gx-p0-bootstrap/" + rid))
         enqueue(conn, rid, action, "Start this scientific project with the supplied initial Intent. "
                 "GX owns durable execution. " + ids.canonical_json(action), mid)
@@ -98,10 +152,10 @@ def start(conn, directory, spec):
             raise ValueError("Initial Intent is pending: " + str(row["rejected"] or mid))
         # The workflow reads the objective and prospective criterion. Individual tasks and Jobs
         # bind their own narrower inputs where they are created.
-        intent.bind_dependencies(conn, rid, "workflow", rid, {"objective": "context", "evaluation": "evaluation"})
+        intent.bind_dependencies(conn, rid, "workflow", rid, roles)
     service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
-                      "budget_profile": "p0", "workflow": {"id": "science_grid", "version": "1"},
-                      "inputs": inputs, "idempotency_key": "p0-start:" + spec["project"]}, prepare_p0=bootstrap)
+                      "budget_profile": "p0", "workflow": {"id": workflow, "version": version},
+                      "inputs": inputs, "input_files": files, "idempotency_key": "p0-start:" + spec["project"]}, prepare_p0=bootstrap)
     return snapshot(conn)
 
 
@@ -111,9 +165,8 @@ def change_state(conn, run, action):
     if action == "continue":
         from .replan import prepare_replan
         prepare_replan(conn, run["run_id"])
-    lease = store.coordinator_lease(conn, run["run_id"])
     service.run_control(context(conn), {"run_id": run["run_id"], "action": action,
-                        "reason": "operator requested " + action, "coordinator_lease_ref": lease["lease_id"],
+                        "reason": "operator requested " + action,
                         "idempotency_key": str(uuid.uuid4())})
 
 
@@ -154,20 +207,33 @@ def execute(args):
     if args.command == "message":
         if args.action:
             action = json.loads(args.action.read_text())
-            text = "My requested action is " + ids.canonical_json(action)
+            text = (action["text"] if isinstance(action, dict) and action.get("kind") == "text"
+                    else "My requested action is " + ids.canonical_json(action))
         elif args.supplement:
             action, text = {"kind": "supplement", "text": args.supplement}, args.supplement
         else:
-            action, text = {"kind": "proposal", "text": args.text}, args.text
+            action, text = {"kind": "text", "text": args.text}, args.text
         with closing(existing_db(directory, readonly=False)) as conn:
             rid = project(conn)["run_id"]
+            if args.text and args.message_id:
+                saved = conn.execute("SELECT action_json FROM p0_operator_messages WHERE run_id=? AND message_id=?",
+                                     (rid, args.message_id)).fetchone()
+                legacy = {"kind": "proposal", "text": text}
+                if saved and json.loads(saved[0]) == legacy:
+                    # Repeating a pre-upgrade --text message keeps the original outcome.
+                    action = legacy
             mid = enqueue(conn, rid, action, text, args.message_id)
         if args.queue_only:
             return {"message_id": mid, "status": "queued"}
     try:
         with native_state(directory), closing(store.open_store(directory / "gx.db")) as conn:
             if args.command == "start":
-                spec = demo_spec() if args.demo_grid else json.loads(args.spec.read_text())
+                if args.demo_grid:
+                    spec = demo_spec()
+                elif args.tl1a_geometry:
+                    spec = geometry_spec()
+                else:
+                    spec = json.loads(args.spec.read_text())
                 return start(conn, directory, spec)
             run = project(conn)
             if not run:
@@ -206,6 +272,7 @@ def main(argv=None):
             selector = sub.add_mutually_exclusive_group(required=True)
             selector.add_argument("--spec", type=Path)
             selector.add_argument("--demo-grid", action="store_true")
+            selector.add_argument("--tl1a-geometry", action="store_true", help="Start the bounded 2RE9 coordinate study")
         if name in ("run", "resume"):
             sub.add_argument("--timeout", type=float, default=math.inf, help="Optional wall time in seconds")
         if name == "message":
@@ -223,6 +290,7 @@ def main(argv=None):
             parser.error("--timeout must be positive")
         result = execute(args)
         show(result)
+        record_displayed_previews(args, result)
         return 75 if result.get("driver") == "time_limit" else 0
     except KeyboardInterrupt:
         return 130

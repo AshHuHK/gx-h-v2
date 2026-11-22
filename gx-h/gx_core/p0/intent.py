@@ -25,6 +25,8 @@ ITEM_TYPES = BAN_TYPES | {"resource_limit", "objective", "soft_preference", "opt
 OBJECTS = {"job": ("jobs", "job_id"), "evaluation": ("evaluations", "eval_id"),
            "task": ("tasks", "task_id"), "workflow": ("runs", "run_id")}
 ROLES = {"execution", "evaluation", "context"}
+CANCEL_ACK = "cancel_listed_jobs"
+IMPACT_ACK = "apply_listed_impacts"
 
 
 def _text(value):
@@ -204,8 +206,12 @@ def _validate_value(item_type, value):
     elif item_type == "evaluation_spec":
         pinned = _keys(value, {"eval_spec_id", "version"}) and all(_text(v) for v in value.values())
         threshold = _keys(value, {"threshold"}, {"evaluator"}) and _number(value["threshold"])
-        if not (pinned or threshold):
-            raise SchemaInvalid("A scoring specification requires a frozen spec reference or a numeric threshold")
+        geometry = _keys(value, {"method", "coverage", "comparison", "reproduction"}) and value["method"] == "tl1a-geometry@1"
+        if geometry:
+            from workflows.tl1a_geometry.domain import SECTIONS, controls
+            controls({key: value[key] for key in SECTIONS})
+        elif not (pinned or threshold):
+            raise SchemaInvalid("Supply a frozen evaluator, a numeric threshold, or the declared geometric criteria")
         evaluator = value.get("evaluator")
         if evaluator is not None:
             from ..plugins.evaluator import installed_plugin_ref
@@ -221,21 +227,33 @@ def _validate_value(item_type, value):
         raise SchemaInvalid("A research objective requires nonempty text")
 
 
+def _check_job_ids(values):
+    if not isinstance(values, list) or not values or not all(_text(v) for v in values) or len(values) != len(set(values)):
+        raise SchemaInvalid("Provide a nonempty list of distinct Job IDs")
+
+
 def _check_action(action):
     if not isinstance(action, dict):
         raise SchemaInvalid("Expected an operator input object")
     kind = action.get("kind")
-    if kind in ("proposal", "supplement"):
+    if kind in ("text", "proposal", "supplement"):
         options = ("source_ref",) if kind == "supplement" else ()
         if not (_keys(action, {"kind", "text"}, options) and _text(action["text"])
                 and ("source_ref" not in action or _text(action["source_ref"]))):
             raise SchemaInvalid("Expected a user note with text and an optional supplement source")
     elif kind == "confirm":
-        if not (_keys(action, {"kind", "change_id", "preview_sha256"}) and
-                _text(action["change_id"]) and _text(action["preview_sha256"])):
+        if not (_keys(action, {"kind", "change_id", "preview_sha256"}, {"acknowledge_consequences"}) and
+                _text(action["change_id"]) and _text(action["preview_sha256"]) and
+                ("acknowledge_consequences" not in action or action["acknowledge_consequences"] in (CANCEL_ACK, IMPACT_ACK))):
             raise SchemaInvalid("Confirmation must identify the exact preview")
+    elif kind == "cancel_jobs":
+        if not _keys(action, {"kind", "job_ids"}):
+            raise SchemaInvalid("Cancellation must identify the Jobs to preview")
+        _check_job_ids(action["job_ids"])
     elif kind == "change":
-        if not (_keys(action, {"kind", "items"}) and isinstance(action["items"], list) and action["items"]):
+        if "cancel_job_ids" in action:
+            _check_job_ids(action["cancel_job_ids"])
+        if not (_keys(action, {"kind", "items"}, {"cancel_job_ids"}) and isinstance(action["items"], list) and action["items"]):
             raise SchemaInvalid("An explicit change requires nonempty item edits")
         seen = set()
         for edit in action["items"]:
@@ -247,7 +265,7 @@ def _check_action(action):
             seen.add(edit["item_id"])
             _validate_value(edit["item_type"], edit["value"])
     else:
-        raise SchemaInvalid("Input kind must be proposal, supplement, change or confirm")
+        raise SchemaInvalid("Unknown operator input kind")
     try:
         return json.dumps(action, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
     except (TypeError, ValueError) as exc:
@@ -262,6 +280,13 @@ def _preview_for_confirmation(conn, run_id, action):
     return change
 
 
+def pending_previews(conn, run_id):
+    rows = conn.execute("SELECT h.message_id,h.result_json FROM p0_intent_changes c JOIN p0_human_inputs h "
+                        "ON h.message_id=c.source_message_id WHERE c.run_id=? AND c.status='awaiting_confirmation' "
+                        "AND h.consumed_at IS NOT NULL ORDER BY c.rowid", (run_id,))
+    return [{"message_id": row["message_id"], "result": json.loads(row["result_json"])} for row in rows]
+
+
 def stage_input(conn, run_id, message_id, action):
     """Journal an action received from the trusted operator before sending it to Codex."""
     if not _text(message_id):
@@ -270,6 +295,11 @@ def stage_input(conn, run_id, message_id, action):
     with store.transaction(conn):
         if not conn.execute("SELECT 1 FROM p0_intent_main WHERE run_id=?", (run_id,)).fetchone():
             raise PermissionDenied("The run has no registered main thread")
+        if action["kind"] == "text":
+            queued = conn.execute("SELECT message_text FROM p0_operator_messages WHERE run_id=? AND message_id=?",
+                                  (run_id, message_id)).fetchone()
+            if queued and queued["message_text"] != action["text"]:
+                raise PermissionDenied("The text interpretation must use the exact submitted human message")
         if action["kind"] == "confirm":
             _preview_for_confirmation(conn, run_id, action)
         conn.execute("INSERT INTO p0_human_inputs(message_id,run_id,action_json,staged_at)"
@@ -321,6 +351,15 @@ def _changes(conn, run_id, edits):
                                 (new["eval_spec_id"], new["version"], run_id)).fetchone()
             if not spec or spec["status"] != "FROZEN":
                 raise SchemaInvalid("The selected evaluation specification has no frozen version")
+        if kind == "evaluation_spec" and new is not None:
+            workflow = conn.execute("SELECT workflow_id FROM runs WHERE run_id=?", (run_id,)).fetchone()[0]
+            if workflow == "tl1a_geometry":
+                from workflows.tl1a_geometry.domain import intent_criteria
+                if key != "evaluation":
+                    raise SchemaInvalid("Use the evaluation item for this comparison's shared geometric criteria")
+                intent_criteria(conn, run_id, new)
+            elif new.get("method") == "tl1a-geometry@1":
+                raise SchemaInvalid("Geometric criteria apply to the tl1a_geometry workflow")
         old = previous["value"] if previous else None
         if new is not None and kind in BAN_TYPES:
             prohibited = set(new["forbidden_capabilities"])
@@ -355,8 +394,44 @@ def _requires_confirmation(diff):
     return False
 
 
-def _commit(conn, run_id, change, message_id, diffs):
+def _cap_balances(conn, run_id, diffs):
+    from .intent_budget import limits_report
+    return limits_report(conn, run_id, [(d["item_id"], d["new_value"]) for d in diffs
+                                        if d["item_type"] == "resource_limit"])
+
+
+def _impact(conn, run_id, change_id, diffs, *, commit, cancel_jobs):
     from .impact import apply_impact
+    from .intent_budget import cancellation_preview, enqueue_cancellations
+    report = apply_impact(conn, run_id, change_id, diffs, commit=commit)
+    for row in report:
+        if row["action"] == "interrupt":
+            row["consequence"] = "The current attempt will be interrupted."
+        elif row["object_type"] == "job" and row["action"] == "historical":
+            row["consequence"] = "This Job's result will be retained as historical evidence."
+    cancelled = cancellation_preview(conn, run_id, cancel_jobs)
+    if commit:
+        enqueue_cancellations(conn, run_id, change_id, cancelled)
+    return report + cancelled
+
+
+def _required_ack(impact):
+    if any(row["action"] == "request_cancel" for row in impact):
+        return CANCEL_ACK
+    if any("consequence" in row for row in impact):
+        return IMPACT_ACK
+    return None
+
+
+def _dispositions(impact):
+    # Earlier previews already recorded the disposition, subject, status and exact
+    # lease. The added user-facing description does not change that consequence.
+    return [{k: v for k, v in row.items() if k != "consequence"} for row in impact
+            if row["action"] in ("interrupt", "request_cancel") or
+            (row["object_type"] == "job" and row["action"] == "historical")]
+
+
+def _commit(conn, run_id, change, message_id, diffs, cancel_jobs):
     now = clock.now_iso()
     for diff in diffs:
         # BEGIN IMMEDIATE serializes this re-read and the version insert with job completion.
@@ -369,7 +444,7 @@ def _commit(conn, run_id, change, message_id, diffs):
                      (run_id, diff["item_id"], diff["new_version"], diff["item_type"], ids.canonical_json(new),
                       ids.sha256_of_obj(new), "removed" if new is None else "active", change["change_id"],
                       message_id, now))
-    impact = apply_impact(conn, run_id, change["change_id"], diffs, commit=True)
+    impact = _impact(conn, run_id, change["change_id"], diffs, commit=True, cancel_jobs=cancel_jobs)
     conn.execute("UPDATE p0_intent_changes SET status='committed',confirmation_message_id=?,"
                  "impact_json=?,committed_at=? WHERE change_id=?",
                  (message_id if message_id != change["source_message_id"] else None,
@@ -378,35 +453,51 @@ def _commit(conn, run_id, change, message_id, diffs):
                        subject_id=change["change_id"], evidence_level="EXECUTION_OBSERVED",
                        payload={"message_id": message_id, "preview_sha256": change["preview_sha256"]})
     return {"status": "committed", "change_id": change["change_id"], "preview_sha256": change["preview_sha256"],
-            "preview": diffs, "impact": impact}
+            "preview": diffs, "impact": impact, "resource_limits": _cap_balances(conn, run_id, diffs)}
 
 
 def _change(conn, run_id, message_id, action):
-    from .impact import apply_impact
-    if rejected := _unsupported_resource(action["items"]):
+    from .science_inputs import unsupported_edit
+    edits = action.get("items", [])
+    if rejected := _unsupported_resource(edits) or unsupported_edit(conn, run_id, edits):
         return rejected
-    diffs = _changes(conn, run_id, action["items"])
-    if not diffs:
+    diffs = _changes(conn, run_id, edits)
+    cancel_jobs = action.get("cancel_job_ids", action.get("job_ids", []))
+    if not diffs and not cancel_jobs:
         return {"status": "unchanged", "preview": [], "impact": []}
     change_id = ids.new_id("request")
-    # The digest commits the run, source message and old/new values/versions, independent of impact count.
-    digest = ids.sha256_of_obj({"run_id": run_id, "message_id": message_id, "changes": diffs})
-    existing_objective = any(i["item_type"] == "objective" for i in active_items(conn, run_id).values())
-    confirm = any(_requires_confirmation(d) or (existing_objective and d["item_type"] == "objective")
-                  for d in diffs)
-    impact = apply_impact(conn, run_id, change_id, diffs, commit=False) if confirm else []
+    existing_objective = bool(active_items(conn, run_id, "objective"))
+    confirm = bool(cancel_jobs) or any(_requires_confirmation(d) or
+              (existing_objective and d["item_type"] == "objective") for d in diffs)
+    # An ordinary cap edit permits existing work to finish. In a composite edit another
+    # item may invalidate an attempt or its result, which must appear in the preview.
+    check_composite = len(diffs) > 1 and any(d["item_type"] == "resource_limit" for d in diffs)
+    impact = (_impact(conn, run_id, change_id, diffs, commit=False, cancel_jobs=cancel_jobs)
+              if confirm or check_composite else [])
+    consequences = [row for row in impact if "consequence" in row]
+    exact = {"run_id": run_id, "message_id": message_id, "changes": diffs}
+    if consequences:
+        exact["consequences"] = consequences
+    digest = ids.sha256_of_obj(exact)
     conn.execute("INSERT INTO p0_intent_changes(change_id,run_id,source_message_id,status,"
                  "preview_json,preview_sha256,impact_json,created_at) VALUES(?,?,?,'awaiting_confirmation',?,?,?,?)",
                  (change_id, run_id, message_id, ids.canonical_json(diffs), digest, ids.canonical_json(impact),
                   clock.now_iso()))
-    if confirm:
-        return {"status": "awaiting_confirmation", "change_id": change_id, "preview_sha256": digest,
-                "preview": diffs, "impact": impact}
-    return _commit(conn, run_id, {"change_id": change_id, "source_message_id": message_id, "preview_sha256": digest},
-                   message_id, diffs)
+    change = {"change_id": change_id, "source_message_id": message_id, "preview_sha256": digest}
+    if confirm or consequences:
+        result = {"status": "awaiting_confirmation", "change_id": change_id, "preview_sha256": digest,
+                  "preview": diffs, "impact": impact, "resource_limits": _cap_balances(conn, run_id, diffs)}
+        if ack := _required_ack(impact):
+            result["required_confirmation"] = {"acknowledge_consequences": ack,
+                "text": ("确认取消预览中列出的作业" if ack == CANCEL_ACK else "确认执行并接受预览中列出的后果"),
+                "english": ("I confirm cancellation of the jobs listed in the preview" if ack == CANCEL_ACK
+                            else "I accept the listed consequences and confirm this change")}
+        return result
+    return _commit(conn, run_id, change, message_id, diffs, cancel_jobs)
 
 
 def _confirm(conn, run_id, turn_id, message_id, action):
+    from .intent_text import was_displayed
     change = _preview_for_confirmation(conn, run_id, action)
     origin = conn.execute("SELECT receipt_turn_id FROM p0_human_inputs WHERE message_id=?",
                           (change["source_message_id"],)).fetchone()
@@ -414,7 +505,24 @@ def _confirm(conn, run_id, turn_id, message_id, action):
         raise PermissionDenied("This change needs confirmation in a later human main-thread turn")
     if change["status"] == "committed":
         raise PermissionDenied("This change has already been committed")
-    return _commit(conn, run_id, change, message_id, json.loads(change["preview_json"]))
+    diffs = json.loads(change["preview_json"])
+    original = json.loads(change["impact_json"])
+    cancelled = [r["object_id"] for r in original if r["action"] == "request_cancel"]
+    current = _impact(conn, run_id, change["change_id"], diffs, commit=False, cancel_jobs=cancelled)
+    if _dispositions(original) != _dispositions(current):
+        raise StaleRevision("The consequences changed. Request and inspect a fresh preview.")
+    ack = _required_ack(current)
+    if ack:
+        human_kind = conn.execute("SELECT json_extract(action_json,'$.kind') FROM p0_human_inputs WHERE message_id=?",
+                                  (message_id,)).fetchone()[0]
+        # An exact structured confirmation of an ordinary intent replacement names
+        # its bound digest. Budget side effects, explicit cancellations and deictic
+        # natural-language confirmations require the additional displayed acknowledgment.
+        designated = human_kind == "text" or ack == CANCEL_ACK or any(d["item_type"] == "resource_limit" for d in diffs)
+        if designated and (action.get("acknowledge_consequences") != ack or not was_displayed(conn, change["change_id"], message_id)):
+            raise PermissionDenied("Display the exact preview, then explicitly confirm its listed consequences "
+                                   "in a later human message.")
+    return _commit(conn, run_id, change, message_id, diffs, cancelled)
 
 
 def _note(conn, run_id, message_id, action):
@@ -432,7 +540,8 @@ def _note(conn, run_id, message_id, action):
     conn.execute("INSERT INTO source_segments(source_id,segment_id,ordinal,kind,text,text_sha256,char_count)"
                  " VALUES(?, 'note', 0, 'note', ?, ?, ?)",
                  (source, note, hashlib.sha256(note.encode("utf-8")).hexdigest(), len(note)))
-    return {"status": "supplement_registered", "source_id": source}
+    from .science_inputs import register_supplement
+    return {"status": "supplement_registered", "source_id": source, **register_supplement(conn, run_id, source)}
 
 
 def _receipt(conn, run_id, thread_id, turn_id, message_id):
@@ -446,23 +555,118 @@ def _receipt(conn, run_id, thread_id, turn_id, message_id):
     return row
 
 
+def _apply_action(conn, run_id, turn_id, message_id, action):
+    if action["kind"] in ("change", "cancel_jobs"):
+        return _change(conn, run_id, message_id, action)
+    if action["kind"] == "confirm":
+        return _confirm(conn, run_id, turn_id, message_id, action)
+    return _note(conn, run_id, message_id, action)
+
+
 def accept_input(conn, run_id, thread_id, turn_id, message_id):
-    """Apply a trusted transport acknowledgement; never accepts action data from the caller."""
+    """Journal the official receipt. Text waits for its main-thread proposal or terminal fallback."""
+    from .intent_text import prepare
     with store.transaction(conn):
-        _receipt(conn, run_id, thread_id, turn_id, message_id)
+        row = _receipt(conn, run_id, thread_id, turn_id, message_id)
+        if row["result_json"]:
+            return json.loads(row["result_json"])
         conn.execute("UPDATE p0_human_inputs SET receipt_turn_id=?,received_at=?"
                      " WHERE message_id=? AND receipt_turn_id IS NULL", (turn_id, clock.now_iso(), message_id))
+        action = json.loads(row["action_json"])
+        if action["kind"] == "text":
+            plan = prepare(conn, run_id, message_id, action["text"])
+            result = {"status": "input_received", "interpretation": plan}
+            if plan.get("kind") == "supplement":
+                # A later decision writer must see evidence the operator already supplied,
+                # including while the main model is still discussing this same input.
+                result["registered_supplement"] = _note(conn, run_id, message_id, plan)
+            conn.execute("UPDATE p0_human_inputs SET result_json=? WHERE message_id=?",
+                         (ids.canonical_json(result), message_id))
+            return result
     with store.transaction(conn):
         row = _receipt(conn, run_id, thread_id, turn_id, message_id)
         if row["consumed_at"]:
             return json.loads(row["result_json"])
-        action = json.loads(row["action_json"])
-        if action["kind"] == "change":
-            result = _change(conn, run_id, message_id, action)
-        elif action["kind"] == "confirm":
-            result = _confirm(conn, run_id, turn_id, message_id, action)
-        else:
-            result = _note(conn, run_id, message_id, action)
+        result = _apply_action(conn, run_id, turn_id, message_id, action)
         conn.execute("UPDATE p0_human_inputs SET consumed_at=?,result_json=? WHERE message_id=?",
                      (clock.now_iso(), ids.canonical_json(result), message_id))
         return result
+
+
+def _check_candidate(candidate):
+    # Unimplemented edit types are permitted in a proposal. Only edits which match
+    # the complete, independently validated human action can reach the writer.
+    if isinstance(candidate, dict) and candidate.get("kind") == "change":
+        if not (_keys(candidate, {"kind", "items"}, {"cancel_job_ids"}) and
+                isinstance(candidate["items"], list) and candidate["items"]):
+            raise SchemaInvalid("Supply a candidate edit list. The call envelope identifies the human turn.")
+        try:
+            json.dumps(candidate, allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise SchemaInvalid("A proposal must contain finite JSON values") from exc
+        return
+    _check_action(candidate)
+    if candidate["kind"] == "text":
+        raise SchemaInvalid("A model proposal cannot create an operator input")
+
+
+def process_text(conn, run_id, thread_id, turn_id, *, candidate=None):
+    """The bound official call envelope identifies one human input. Tool arguments carry proposals only."""
+    from .intent_text import clarify
+    with store.transaction(conn):
+        rows = conn.execute("SELECT i.* FROM p0_human_inputs i JOIN p0_intent_main m ON m.run_id=i.run_id "
+                            "WHERE i.run_id=? AND m.thread_id=? AND i.receipt_turn_id=? LIMIT 2",
+                            (run_id, thread_id, turn_id)).fetchall()
+        if len(rows) != 1 or json.loads(rows[0]["action_json"])["kind"] != "text" or not rows[0]["received_at"]:
+            raise PermissionDenied("This main-thread turn has no unique acknowledged raw operator message")
+        row = rows[0]
+        receipt = json.loads(row["result_json"])
+        if row["consumed_at"]:
+            return receipt
+        authorized = receipt["interpretation"]
+        remainder = None
+        if candidate is not None:
+            _check_candidate(candidate)
+            if candidate != authorized and candidate.get("kind") != "proposal":
+                if candidate["kind"] == authorized.get("kind") == "change":
+                    grounded = {ids.canonical_json(edit) for edit in authorized["items"]}
+                    extra = [edit for edit in candidate["items"] if ids.canonical_json(edit) not in grounded]
+                    extra_jobs = candidate.get("cancel_job_ids")
+                    if extra or (extra_jobs and extra_jobs != authorized.get("cancel_job_ids")):
+                        remainder = {"kind": "change", "items": extra}
+                        if extra_jobs and extra_jobs != authorized.get("cancel_job_ids"):
+                            remainder["cancel_job_ids"] = extra_jobs
+                else:
+                    remainder = candidate
+            elif candidate != authorized:
+                remainder = candidate
+        if "registered_supplement" in receipt:
+            result = receipt["registered_supplement"]
+        elif "status" in authorized:
+            result = authorized
+        else:
+            try:
+                # A stale multi-item preview must roll back every write before returning clarification.
+                with store.transaction(conn):
+                    _check_action(authorized)
+                    result = _apply_action(conn, run_id, turn_id, row["message_id"], authorized)
+            except (ArtifactNotFound, PermissionDenied, SchemaInvalid, StaleRevision) as exc:
+                result = clarify(exc.message)
+        if remainder:
+            result = {**result, "unapplied_proposal": remainder}
+        encoded = ids.canonical_json(result)
+        conn.execute("UPDATE p0_human_inputs SET consumed_at=?,result_json=? WHERE message_id=?",
+                     (clock.now_iso(), encoded, row["message_id"]))
+        conn.execute("UPDATE p0_operator_messages SET result_json=? WHERE run_id=? AND message_id=?",
+                     (encoded, run_id, row["message_id"]))
+        return result
+
+
+def finish_text(conn, run_id, message_id):
+    """Process a terminal human turn that ended without using the optional candidate tool."""
+    row = conn.execute("SELECT m.thread_id,i.receipt_turn_id FROM p0_human_inputs i JOIN p0_intent_main m "
+                       "ON m.run_id=i.run_id WHERE i.run_id=? AND i.message_id=? AND i.consumed_at IS NULL "
+                       "AND i.receipt_turn_id IS NOT NULL AND json_extract(i.action_json,'$.kind')='text'",
+                       (run_id, message_id)).fetchone()
+    if row:
+        return process_text(conn, run_id, row["thread_id"], row["receipt_turn_id"])

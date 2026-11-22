@@ -1,5 +1,6 @@
-"""Deploy an upgrade and restore it at the same paths in a disposable checkout."""
+"""Deploy the installed candidate over an authentic older release and restore its WAL snapshot."""
 from contextlib import closing
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -9,9 +10,6 @@ import subprocess
 import sys
 import tempfile
 import unittest
-
-
-BASELINE = "23d581c27f46e65324246dff269b6ce77c9b3e9a"
 
 
 def snapshot(state_dir, destination):
@@ -94,30 +92,33 @@ def run_phase(phase, root):
 
 class Rollback(unittest.TestCase):
     def test_wal_snapshot_restores_threads_tasks_and_artifacts_after_upgrade(self):
+        from tests.migration_fixture import BASELINE, BUNDLE_SHA256, checkout_baseline
+
         checkout = Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory(prefix="gx-migrate-restore-") as tmp:
             root = Path(tmp)
-            source = root / "source"
-            subprocess.run(["git", "clone", "--quiet", "--local", "--no-hardlinks", "--no-checkout", str(checkout), str(source)], check=True)
-            subprocess.run(["git", "checkout", "--quiet", BASELINE], cwd=source, check=True)
+            source = checkout_baseline(root / "source")
 
             def run(phase):
-                # -c keeps the scratch deployment first on sys.path in every interpreter.
-                command = "import runpy,sys; runpy.run_path(sys.argv[1])['run_phase'](sys.argv[2], __import__('pathlib').Path(sys.argv[3]))"
-                output = subprocess.check_output([sys.executable, "-B", "-c", command, __file__, phase, str(root)],
+                command = ("from pathlib import Path; import runpy,sys; sys.path.insert(0, str(Path.cwd())); "
+                           "runpy.run_path(sys.argv[1])['run_phase'](sys.argv[2], Path(sys.argv[3]))")
+                output = subprocess.check_output([sys.executable, "-I", "-B", "-c", command, __file__, phase, str(root)],
                                                  cwd=source, text=True)
                 return json.loads(output)
 
             old = run("baseline")
-            candidate = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=checkout, text=True).strip()
-            subprocess.run(["git", "checkout", "--quiet", candidate], cwd=source, check=True)
+            # The release marker binds the absolute install path. Keep the bytes of the old install for rollback.
+            source.rename(root / "original-install")
+            shutil.copytree(checkout, source, symlinks=True, ignore=shutil.ignore_patterns(
+                ".git", "node_modules", "var", "__pycache__", "*.pyc", ".pytest_cache"))
             upgraded = run("candidate")
             self.assertNotEqual(old["actual_store_pin"], upgraded["actual_store_pin"])
             self.assertEqual(upgraded["actual_store_pin"], upgraded["installed_pin"])
             self.assertEqual(upgraded["candidate_resume_error"], "CONTENT_HASH_MISMATCH")
             (root / "state").rename(root / "upgraded-state")
             shutil.copytree(root / "backup", root / "state")
-            subprocess.run(["git", "checkout", "--quiet", BASELINE], cwd=source, check=True)
+            source.rename(root / "upgraded-install")
+            (root / "original-install").rename(source)
             restored = run("restored")
             self.assertEqual(old["actual_store_pin"], restored["actual_store_pin"])
             self.assertEqual(restored["native_protocol_method"], "thread/resume")
@@ -126,9 +127,16 @@ class Rollback(unittest.TestCase):
                 self.assertEqual(upgraded[key], old[key], key)
                 self.assertEqual(restored[key], old[key], key)
             if output := os.environ.get("GX_MIGRATION_TEST_REPORT"):
+                installed = root / "upgraded-install"
+                # Fingerprint the actual candidate code, including source-only distributions without .git.
+                digest = hashlib.sha256()
+                for item in sorted(path for path in installed.rglob("*") if path.is_file()):
+                    digest.update(item.relative_to(installed).as_posix().encode() + b"\0")
+                    digest.update(hashlib.sha256(item.read_bytes()).digest())
                 Path(output).write_text(json.dumps({
                     "scope_task_id": "P02", "scenario_id": "SC24", "mode": "offline_fake",
-                    "boundaries": "real SQLite WAL backup, files and two checkouts, scripted App Server peer",
-                    "baseline_commit": BASELINE, "candidate_commit": candidate,
+                    "boundaries": "real SQLite WAL backup, bundled historical checkout, installed candidate files, scripted App Server peer",
+                    "baseline_commit": BASELINE, "baseline_bundle_sha256": BUNDLE_SHA256,
+                    "installed_candidate_tree_sha256": digest.hexdigest(),
                     "phases": [old, upgraded, restored]
                 }, indent=2) + "\n")

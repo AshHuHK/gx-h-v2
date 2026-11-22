@@ -1087,6 +1087,8 @@ class JobService:
         execution_manifest.complete(txn, row["job_id"])
         store.enqueue_outbox(txn, topic=TERMINAL_TOPIC, idempotency_key=terminal_trigger_key(row["job_id"]),
                              payload=terminal_trigger(row, to_state, moved.event_id))
+        from ..p0 import waits
+        waits.terminal_job(txn, row)
         return moved.event_id
 
     def _fail_unstarted(self, row: sqlite3.Row, reason: str, *, failure_class: str = "environment",

@@ -15,7 +15,7 @@ from e2e_audit import require
 from native_probe import Probe, find_binary
 from native_probe_peer import Peer
 from gx_core import budgets
-from gx_core.errors import BudgetExceeded
+from gx_core.errors import HoldActive
 from gx_core.p0 import schema
 from gx_core.p0.profiles import clash_env
 from gx_core.p0.roots import Roots
@@ -78,7 +78,8 @@ def run(folder, result):
         require(len(peer.rows) == 1, "first official inference did not reach the barrier")
         try:
             root.dispatch(tasks[1])
-        except BudgetExceeded as exc:
+        except HoldActive as exc:
+            require(exc.details.get("reason") == "budget_reserved", "wrong reason for waiting")
             result["rejection"] = str(exc)
         else:
             raise AssertionError("second Root entered a turn while the first reserved the total")

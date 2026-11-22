@@ -2,7 +2,11 @@
 
 import json
 import os
+from pathlib import Path
+import re
 import socket
+import tomllib
+from urllib.parse import urlsplit
 
 
 DEFAULT_MODEL = "gpt-6.2-astra"
@@ -30,10 +34,151 @@ def role_profile(kind: str, *, model: str | None = None, test_mode: bool | None 
 
 
 def provider_name(*, test_mode: bool | None = None, provider: str | None = None) -> str:
-    provider = provider if provider is not None else os.environ.get("GX_P0_TEST_PROVIDER")
-    if provider and provider != "openai" and not _testing(test_mode):
-        raise ValueError("GX_P0_TEST_PROVIDER requires GX_P0_TEST=1")
-    return provider or "openai"
+    if provider is None:
+        fixture = os.environ.get("GX_P0_TEST_PROVIDER")
+        if fixture and fixture != "openai" and not _testing(test_mode):
+            raise ValueError("GX_P0_TEST_PROVIDER requires GX_P0_TEST=1")
+        provider = fixture or os.environ.get("GX_P0_PROVIDER") or "openai"
+    if not isinstance(provider, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+", provider):
+        raise ValueError("Use an official Codex provider ID in the model profile")
+    return provider
+
+
+def read_overrides():
+    filename = os.environ.get("GX_P0_PROFILE")
+    if not filename:
+        return {}
+    try:
+        raw = json.loads(Path(filename).expanduser().read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ValueError("GX_P0_PROFILE must name a readable JSON file") from exc
+    if not isinstance(raw, dict) or set(raw) - {"default", "roles", "task_classes"}:
+        raise ValueError("The model profile accepts default, roles and task_classes")
+    return raw
+
+
+def _route_fields(value):
+    if not isinstance(value, dict) or set(value) - {"provider", "model", "effort", "tools"}:
+        raise ValueError("Profile entries accept provider, model, effort and tools")
+    if "provider" in value:
+        if value["provider"] is None:
+            raise ValueError("Supply a Codex provider ID")
+        provider_name(provider=value["provider"])
+    if "model" in value and (not isinstance(value["model"], str) or
+                             not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_./:@+-]*", value["model"])):
+        raise ValueError("Supply a provider model ID")
+    if "effort" in value and value["effort"] not in ("xhigh", "max", "ultra"):
+        raise ValueError("The GX effort must be xhigh, max or ultra")
+    names = value.get("tools", [])
+    if (not isinstance(names, list) or
+            not all(isinstance(name, str) and name and name.strip() == name for name in names)
+            or len(names) != len(set(names))):
+        raise ValueError("tools must list distinct GX dynamic tool names")
+    return value
+
+
+def project_routes(document, overrides):
+    """Resolve the operator selection once; store the result with the run's policy."""
+    default = {**_route_fields({"model": role_profile("main")["model"], "provider": provider_name()}),
+               **_route_fields(overrides.get("default", {}))}
+    classes = overrides.get("task_classes", {})
+    roles = overrides.get("roles", {})
+    known = {"main": document["roles"]["coordinator"], **document["roles"]}
+    if not isinstance(classes, dict) or set(classes) - set(document["task_classes"]):
+        raise ValueError("Model profile contains an unknown GX task class")
+    if not isinstance(roles, dict) or set(roles) - set(known):
+        raise ValueError("Model profile contains an unknown GX role")
+    for value in (*roles.values(), *classes.values()):
+        _route_fields(value)
+    result = {}
+    # The main and planner coordinate decisions. Task classes supply the complexity
+    # baseline for each other role, including simple execution and code authoring.
+    for role, role_spec in known.items():
+        task_class = role_spec["task_class"]
+        level = effort_for("lead" if role in {"main", "coordinator", "planner"} else task_class)
+        route = {**default, **classes.get(task_class, {}), **roles.get(role, {})}
+        selected = route.get("effort", level)
+        if _testing(None):
+            selected = "xhigh"
+        elif selected != level and (level, selected) != ("max", "ultra"):
+            raise ValueError(f"GX {role} requires {level} effort")
+        if role != "main" and "tools" in route and "gx_submit_product" not in route["tools"]:
+            raise ValueError(f"The {role} task requires gx_submit_product to deliver its result")
+        result[role] = {**route, "effort": selected}
+    return result
+
+
+def codex_config():
+    home = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex")
+    try:
+        with (home / "config.toml").open("rb") as stream:
+            config = tomllib.load(stream)
+    except FileNotFoundError:
+        return {}
+    except (OSError, ValueError) as exc:
+        raise ValueError("Codex config.toml is unreadable") from exc
+    if not isinstance(config.get("model_providers", {}), dict):
+        raise ValueError("Codex model_providers must be a TOML table")
+    return config
+
+
+def provider_endpoint(provider, config, *, test_mode, environ=None):
+    """Validate the Codex-owned transport; never copy credentials into project state."""
+    if provider == "openai":
+        return None
+    info = (config.get("model_providers") or {}).get(provider)
+    if not isinstance(info, dict):
+        raise ValueError(f"Configure model_providers.{provider} in the official Codex config.toml")
+    if info.get("wire_api", "responses") != "responses":
+        raise ValueError(f"{provider} requires wire_api=responses for Codex {CODEX_VERSION}")
+    url = info.get("base_url")
+    target = urlsplit(url) if isinstance(url, str) else None
+    if (not target or not target.hostname or target.scheme not in {"http", "https"} or
+            target.username is not None or target.password is not None or target.query or target.fragment):
+        raise ValueError(f"Configure a service base_url without credentials for {provider}")
+    if test_mode and target.hostname not in _LOOPBACK:
+        raise ValueError(f"Configure a loopback base_url for the selected P0 test provider {provider}")
+    if not test_mode and info.get("requires_openai_auth"):
+        raise ValueError(f"Configure {provider}'s own credentials in Codex")
+    key = info.get("env_key")
+    if key is not None and (not isinstance(key, str) or not key.strip()):
+        raise ValueError(f"Set env_key to the credential environment variable name for {provider}")
+    if key and not (os.environ if environ is None else environ).get(key):
+        raise ValueError(f"The credential environment variable configured for {provider} is missing")
+    return url.rstrip("/")
+
+
+def selected_tools(available, names):
+    if names is None:
+        return available
+    by_name = {tool["name"]: tool for tool in available}
+    missing = set(names) - set(by_name)
+    if missing:
+        raise ValueError("GX tools unavailable for this root: " + ", ".join(sorted(missing)))
+    return [by_name[name] for name in names]
+
+
+def model_catalog(client, provider):
+    from ..hostobs.app_server_client import AppServerError
+    params = {"modelProvider": provider, "includeHidden": False, "limit": 100}
+    result, seen = {}, set()
+    while True:
+        page = client.request("model/list", params)
+        for row in page["data"]:
+            if not row.get("hidden"):
+                result[row["model"]] = [v["reasoningEffort"] for v in row["supportedReasoningEfforts"]]
+        cursor = page.get("nextCursor")
+        if not cursor:
+            return result
+        if cursor in seen:
+            raise AppServerError("Codex model/list repeated a pagination cursor")
+        seen.add(cursor)
+        params = {**params, "cursor": cursor}
+
+
+def require_catalog_entry(catalog, provider, model, effort):
+    if effort not in catalog.get(model, ()):
+        raise ValueError(f"Codex model/list for {provider} does not advertise {model} with {effort} effort")
 
 
 def proxy_settings() -> dict[str, str]:
@@ -66,8 +211,9 @@ def clash_env(*, check: bool = True) -> dict[str, str]:
 
 def codex_argv(*, test_mode: bool | None = None, provider: str | None = None) -> list[str]:
     chosen_provider = provider_name(test_mode=test_mode, provider=provider)
+    packaged = Path(__file__).resolve().parents[3] / "vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex"
     return [
-        os.environ.get("GX_P0_CODEX") or "codex",
+        os.environ.get("GX_P0_CODEX") or (str(packaged) if packaged.is_file() else "codex"),
         "--enable", "respect_system_proxy",
         "--disable", "system_proxy_fallback",
         "-c", f"model_provider={json.dumps(chosen_provider)}",

@@ -79,6 +79,10 @@ def prepare_replan(conn, run_id):
     Return False for an ordinary pause and for a replay of a previously committed replan.
     History, prior expenses and original observations remain addressable through the old checkpoint.
     """
+    run = conn.execute("SELECT workflow_id FROM runs WHERE run_id=?", (run_id,)).fetchone()
+    if run and run["workflow_id"] == "tl1a_geometry":
+        from workflows.tl1a_geometry.replan import prepare
+        return prepare(conn, run_id)
     if not _previous(conn, run_id):
         return False
     JobService(conn).reconcile(run_id)

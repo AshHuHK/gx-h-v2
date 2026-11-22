@@ -174,7 +174,7 @@ def consumed(conn: sqlite3.Connection, row: sqlite3.Row | dict[str, Any]) -> int
 
 
 def lapsed_leases(conn: sqlite3.Connection, run_id: str) -> list[sqlite3.Row]:
-    """Unreleased leases past their expiry and not held open by a job of that lease."""
+    """Past-due leases with neither an active Job nor an outstanding GX-owned wait."""
     from ..jobs import leases as job_leases
     at = clock.now_iso()
     held = job_leases.held_open(conn, run_id, at=at)
@@ -188,6 +188,7 @@ def lapsed_leases(conn: sqlite3.Connection, run_id: str) -> list[sqlite3.Row]:
 
 
 def live_lease(conn: sqlite3.Connection, task_id: str) -> sqlite3.Row | None:
+    """Write authority. A retained system wait only reopens this at a bounded handoff."""
     from ..jobs import leases as job_leases
     row = conn.execute(
         "SELECT l.* FROM leases l JOIN tasks t ON t.lease_id=l.lease_id"

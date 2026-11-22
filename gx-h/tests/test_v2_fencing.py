@@ -214,20 +214,17 @@ class Fencing(unittest.TestCase):
 
 class BaselineMigration(unittest.TestCase):
     def test_original_store_opens_with_epoch_and_keeps_existing_run_pins(self):
-        import subprocess
         import tempfile
         from pathlib import Path
         from gx_core import contracts
         from gx_core.native_release import native_state
         from gx_core.persistence import records
+        from tests.migration_fixture import checkout_baseline
 
-        baseline = "23d581c27f46e65324246dff269b6ce77c9b3e9a"
-        def historical(name):
-            return subprocess.check_output(["git", "show", f"{baseline}:contracts/{name}"],
-                                           cwd=contracts.HARNESS_ROOT, text=True)
-        old = json.loads(historical("CONTRACT_SHA"))
-        old_sql = historical("db_schema.sql")
         with tempfile.TemporaryDirectory(prefix="gx-p02-migration-") as tmp:
+            historical = checkout_baseline(Path(tmp) / "old") / "contracts"
+            old = json.loads((historical / "CONTRACT_SHA").read_text())
+            old_sql = (historical / "db_schema.sql").read_text()
             root = Path(tmp) / "state"
             with native_state(root, env={}) as state:
                 with closing(store.connect(state.db_path)) as conn:

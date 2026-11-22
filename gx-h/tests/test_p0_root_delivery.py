@@ -81,7 +81,16 @@ class RootDeliveryTests(unittest.TestCase):
         return budgets.state(self.conn, self.ref)
 
     def finish(self, turn_id, *totals):
+        # The pinned server emits exact raw receipts for each provider response
+        # when the root requests them. The ordinary meter is cumulative.
+        self.delivery.observe("turn/started", {"threadId": "root", "turn": {"id": turn_id}})
+        before = self.conn.execute("SELECT prior_tokens FROM p0_root_deliveries WHERE turn_id=? "
+                                   "AND method='turn/start'", (turn_id,)).fetchone()[0]
         for n in totals:
+            if n != before:
+                self.delivery.observe("rawResponse/completed", {"threadId": "root", "turnId": turn_id,
+                                      "responseId": f"{turn_id}-{n}", "usage": {"totalTokens": n-before}})
+            before = n
             self.delivery.observe("thread/tokenUsage/updated", {"threadId": "root", "turnId": turn_id,
                                   "tokenUsage": {"total": {"totalTokens": n}, "last": {"totalTokens": 7}}})
         turn = next(t for t in self.peer.turns if t["id"] == turn_id)
@@ -121,9 +130,14 @@ class RootDeliveryTests(unittest.TestCase):
         recovered = self.delivery.deliver("root", "human operator input", event_id="1", human=True, message_id="real")
         self.assertEqual(recovered["turn_id"], "turn-1")
         self.assertEqual(len(self.peer.sent), 1)
-        self.finish("turn-1")
+        self.delivery.observe("turn/started", {"threadId":"root", "turn":{"id":"turn-1"}})
+        self.delivery.observe("rawResponse/completed", {"threadId":"root", "turnId":"turn-1",
+                              "responseId":"response-1", "usage":{"totalTokens":16}})
+        self.peer.turns[0]["status"] = "completed"
+        self.delivery.observe("turn/completed", {"threadId":"root", "turn":self.peer.turns[0]})
         self.assertEqual(self.budget()["reserved"], {"api_calls": 1, "tokens": 100})
-        self.finish("turn-1", 16)
+        self.delivery.observe("thread/tokenUsage/updated", {"threadId":"root", "turnId":"turn-1",
+                              "tokenUsage":{"total":{"totalTokens":16}}})
         self.assertEqual(self.budget()["spent"], {"api_calls": 1, "tokens": 16})
 
     def test_steer_uses_observed_turn_then_falls_back_after_definite_idle_race(self):
@@ -146,8 +160,10 @@ class RootDeliveryTests(unittest.TestCase):
         self.peer.active_turns = {"root": turn}
         self.delivery.observe_descendant("item/started", {"threadId": "root","turnId": turn,
             "item": {"type": "subAgentActivity","kind": "started","agentThreadId": "child"}})
-        self.delivery.observe_descendant("turn/started", {"threadId": "child","turn":{"id":"c"}})
+        self.delivery.observe_descendant("turn/started", {"threadId": "child","turn":{"id":"c","rootTurnId":turn}})
         for amount in (183, 366, 366):
+            self.delivery.observe_descendant("rawResponse/completed", {"threadId":"child","turnId":"c",
+                "responseId":f"child-{amount}","usage":{"totalTokens":183}})
             self.delivery.observe_descendant("thread/tokenUsage/updated", {"threadId": "child","turnId":"c",
                 "tokenUsage":{"total":{"totalTokens":amount}}})
         self.delivery.observe_descendant("turn/completed", {"threadId":"child","turn":{"id":"c","status":"completed"}})

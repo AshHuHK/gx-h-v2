@@ -83,7 +83,8 @@ LEASE_ACTIONS = ("claim", "renew", "release")
 _registry: WorkflowRegistry | None = None
 #: The workflow packages this tree ships (``workflows/<name>``), registered by
 #: :func:`default_registry` in this order. Each exposes ``register_all(registry)``.
-SHIPPED_PACKAGES = ("module_collaboration", "science_grid")
+SHIPPED_PACKAGES = ("module_collaboration", "science_grid", "science_grid_v2",
+                    "tl1a_coordinate_quality", "tl1a_geometry")
 #: Package -> why it could not be registered, for the last registry built.
 _load_errors: dict[str, str] = {}
 _registry_injected = False
@@ -491,7 +492,18 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None) -> dict[str
     host = _host_record(ctx, args.get("host"))
     from ..hostobs import host_policy
     if prepare_p0 is not None:
-        policy, policy_sha, host = host_policy.p0_host()
+        # A partial start may have committed its run before writing its first
+        # checkpoint. Resume that deployment even when its profile file is gone.
+        prior = conn.execute(
+            "SELECT r.* FROM idempotency i JOIN runs r ON r.run_id=json_extract(i.response_json,'$.run_id') "
+            "WHERE i.scope='gx_run_start' AND i.idempotency_key=? AND i.side_effect_status='APPLIED' "
+            "AND json_extract(r.inputs_json,'$.inputs.p0')=1",
+            (store.tool_key("gx_run_start", args["idempotency_key"]),)).fetchone()
+        if prior:
+            policy, policy_sha = host_policy.current_for_run(prior)
+            host = store.loads(prior, "host_json")
+        else:
+            policy, policy_sha, host = host_policy.p0_host()
     else:
         policy, policy_sha, host = host_policy.for_new_run(ctx, host)
     _require_capable_session(conn, host)
@@ -542,7 +554,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None) -> dict[str
             ref = None
             if item["bytes"] <= MAX_COPIED_INPUT_BYTES:
                 raw = Path(item["path"]).read_bytes()
-                media_type = None
+                media_type = "chemical/x-mmcif" if Path(item["path"]).suffix.lower() in (".cif", ".mmcif") else None
                 if Path(item["path"]).suffix.lower() == ".py" and b"\x00" not in raw:
                     try:
                         raw.decode("utf-8")
@@ -1881,6 +1893,7 @@ def _maintenance_control(ctx: Ctx, args: Mapping[str, Any], reason: str) -> dict
 
 def run_control(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
     """Control a run, or deliberately adjust its budget or compatible workflow pins."""
+    from ..p0 import waits
     conn, run_id = ctx.conn, args["run_id"]
     action = args["action"]
     if action not in CONTROL_ACTIONS:
@@ -2005,7 +2018,7 @@ def run_control(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
         request, work,
     )
     response = {**response, "replayed": replayed}
-    if action == "pause":
+    if action == "pause" and not waits.is_p0_run(_run(conn, run_id)):
         # Jobs of the run whose tool has not started would start while it is paused: they are
         # ended, after the pause has committed and outside any transaction. A job that is
         # running is left to finish. A replay asks again for whatever is still unstarted.

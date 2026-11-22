@@ -284,7 +284,7 @@ def require_native_metering(conn: sqlite3.Connection, run_id: str) -> None:
                          "unit": cap["unit"]})
 
 
-def _check_project_reservation(conn: sqlite3.Connection, budget_ref: str, amounts: Mapping[str, Any]) -> None:
+def _project_reservation_errors(conn: sqlite3.Connection, budget_ref: str, amounts: Mapping[str, Any]):
     configured = conn.execute(
         "SELECT 1 FROM events WHERE subject_kind='project_budget' UNION ALL"
         " SELECT 1 FROM p0_intent_versions WHERE item_type='resource_limit' LIMIT 1").fetchone()
@@ -312,7 +312,7 @@ def _check_project_reservation(conn: sqlite3.Connection, budget_ref: str, amount
         for key, cap in limits.items():
             available = round(cap - used[key] - held[key], DIGITS)
             if amounts[key] > available:
-                raise BudgetExceeded(
+                yield BudgetExceeded(
                     f"project {project_ref} resource limit allows {available} more {key}",
                     details={"reason": "current_intent", "project_ref": project_ref, "key": key,
                              "limit": cap, "spent": used[key], "reserved": held[key],
@@ -326,7 +326,7 @@ def _check_project_reservation(conn: sqlite3.Connection, budget_ref: str, amount
                  if key in state["limits"] and amount > 0 and amount > state["available"][key]]
         if short:
             item = short[0]
-            raise BudgetExceeded(
+            yield BudgetExceeded(
                 f"project {state['project_ref']} phase {state['phase_id']}: {item['key']} needs {item['needed']}, "
                 f"{item['available']} left", details={"project_ref": state["project_ref"],
                 "phase_id": state["phase_id"], "budget_ref": budget_ref, "shortfalls": short})
@@ -512,6 +512,17 @@ def _reserve(conn: sqlite3.Connection, budget: sqlite3.Row, *, reservation_ref: 
             shortfalls.append({"key": key, "requested": requested, "limit": limits[key],
                                "spent": spent.get(key, 0), "reserved": reserved.get(key, 0),
                                "available": _clean(left), "why": "not enough left"})
+    native = subject_kind == "native_turn" and reservation_ref is None
+    if native:
+        # A run's token hold can coincide with an exhausted project call cap.
+        # The driver needs both facts to choose between waiting and pausing.
+        project_errors = list(_project_reservation_errors(conn, budget_ref, amounts))
+        if len(project_errors) == 1 and not shortfalls:
+            raise project_errors[0]
+        for error in project_errors:
+            scope = {k: error.details[k] for k in ("project_ref", "phase_id", "reason") if k in error.details}
+            for line in error.details.get("shortfalls", [error.details]):
+                shortfalls.append({**scope, **line})
     if shortfalls:
         first = shortfalls[0]
         if first["limit"] is None:
@@ -523,8 +534,10 @@ def _reserve(conn: sqlite3.Connection, budget: sqlite3.Row, *, reservation_ref: 
         raise BudgetExceeded(message, details={"budget_ref": budget_ref, "shortfalls": shortfalls,
                                                "subject": [subject_kind, subject_id]})
 
-    if reservation_ref is None:
-        _check_project_reservation(conn, budget_ref, amounts)
+    if reservation_ref is None and not native:
+        refusal = next(_project_reservation_errors(conn, budget_ref, amounts), None)
+        if refusal:
+            raise refusal
     for key, requested in amounts.items():
         reserved[key] = _clean(reserved.get(key, 0) + requested)
     _write(conn, budget_ref, reserved=reserved)

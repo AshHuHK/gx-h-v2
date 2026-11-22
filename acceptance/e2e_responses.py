@@ -133,6 +133,9 @@ class Peer(BaseHTTPRequestHandler):
             ident = f"fixture-{self.server.request_count}"
         metadata = {"id": ident, "at_utc": datetime.now(timezone.utc).isoformat(), "model": body.get("model"),
                     "reasoning_effort": (body.get("reasoning") or {}).get("effort"),
+                    "gx_tools": sorted(tool["name"] for group in body.get("tools", [])
+                                       for tool in (group.get("tools") or [group])
+                                       if (tool.get("name") or "").startswith("gx_")),
                     "peer": self.client_address[0]}
         try:
             item, detail = fixture_action(body, ident)

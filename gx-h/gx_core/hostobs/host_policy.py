@@ -201,11 +201,39 @@ P0_SOURCE = "gx_p0_app_server"
 
 def p0_policy():
     from ..p0 import profiles
-    document, _ = _native_policy_for_model(profiles.role_profile("coordinator")["model"], None)
+    from ..domain import clock
+    document, _ = for_host("codex")
+    overrides = profiles.read_overrides()
+    routes = profiles.project_routes(document, overrides)
+    main = routes["main"]
+    model = main["model"]
+    models = {r["model"] for r in routes.values()}
+    document["pinned_model"] = {"id": model, "aliases": []}
     for name, settings in document["task_classes"].items():
-        level = profiles.effort_for(name)
-        settings.update(min_effort=level, default_effort=level)
-    document["native_coordinator_observation"]["default_effort"] = profiles.effort_for("coordinator")
+        defaults = {**overrides.get("default", {}), **overrides.get("task_classes", {}).get(name, {})}
+        level = ("xhigh" if os.environ.get("GX_P0_TEST") == "1" else
+                 defaults.get("effort", profiles.effort_for(name)))
+        class_model = defaults.get("model", profiles.role_profile(name)["model"])
+        models.add(class_model)
+        settings.update(model=class_model, min_effort=level, default_effort=level)
+    document["models"] = {name: {"aliases": []} for name in sorted(models)}
+    if models - {model}:
+        document["pinned_model"]["history"] = [{
+            "from": clock.now_iso(), "model": model, "aliases": [],
+            "also_allowed": [{"model": name, "aliases": [], "for": "Operator-selected GX worker profile"}
+                             for name in sorted(models - {model})],
+        }]
+    document["native_coordinator_observation"].update(default_effort=main["effort"],
+                                                       accepted_efforts=[main["effort"]])
+    document["p0_role_profiles"] = routes
+    # Legacy/fixture runs keep their prior no-catalog launch behavior. An explicit
+    # operator route must be advertised by its provider's official model/list.
+    local_fixture = os.environ.get("GX_P0_TEST") == "1" and main["provider"] != "openai"
+    document["p0_check_catalog"] = bool(overrides or os.environ.get("GX_P0_PROVIDER") or
+                                        (os.environ.get("GX_P0_MODEL") and not local_fixture))
+    problems = policy.problems_in(document)
+    if problems:
+        raise SchemaInvalid("invalid P0 project model policy", details={"problems": problems})
     return document, ids.sha256_of_obj(document)
 
 
@@ -215,48 +243,38 @@ def p0_role_for_run(run, role):
     if selection.get("source") != P0_SOURCE:
         return profiles.role_profile(role)
     document, _ = current_for_run(run)
+    routes = document.get("p0_role_profiles", {})
+    key = {"decision": "planner", "lead": "coordinator"}.get(role, role)
+    if key in routes:
+        return routes[key]
     role_class = document["roles"].get(role, {}).get("task_class", "AUTHORING")
     effort = (document["native_coordinator_observation"]["default_effort"] if role in
-              {"main", "coordinator", "lead", "decision"} else document["task_classes"][role_class]["default_effort"])
+              {"main", "coordinator", "lead", "decision", "planner"} else document["task_classes"][role_class]["default_effort"])
     return {"model": document["pinned_model"]["id"], "effort": effort}
-
-
-def p0_test_endpoint(provider):
-    if provider == "openai":
-        return None
-    import tomllib
-    from urllib.parse import urlsplit
-    home = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex")
-    with (home / "config.toml").open("rb") as f:
-        config = tomllib.load(f)
-    url = config.get("model_providers", {}).get(provider, {}).get("base_url", "")
-    parsed = urlsplit(url)
-    if (parsed.scheme not in {"http", "https"} or parsed.hostname not in {"localhost", "127.0.0.1", "::1"}
-            or parsed.username or parsed.password or parsed.query or parsed.fragment):
-        raise SchemaInvalid("Configure a loopback base_url for the selected P0 test provider")
-    return url.rstrip("/")
 
 
 def p0_provider_for_run(run):
     from ..p0 import profiles
     selection = json.loads(run["host_json"] or "{}").get("policy_selection", {})
     expected = selection.get("model_provider")
-    actual = profiles.provider_name()
-    if expected and expected != actual:
-        raise SchemaInvalid("Restore the project's saved Codex model provider: " + expected)
-    endpoint = selection.get("test_base_url")
-    if endpoint and p0_test_endpoint(actual) != endpoint:
-        raise SchemaInvalid("Restore the project's saved loopback test endpoint")
-    return expected or actual
+    return expected or profiles.provider_name()
 
 
 def p0_host():
     from ..p0 import profiles
     document, digest = p0_policy()
+    main = document["p0_role_profiles"]["main"]["provider"]
+    test = os.environ.get("GX_P0_TEST") == "1"
+    config = profiles.codex_config()
+    endpoints = {}
+    for provider in sorted({r["provider"] for r in document["p0_role_profiles"].values()}):
+        url = profiles.provider_endpoint(provider, config, test_mode=test)
+        if test and url:
+            endpoints[provider] = url
     return document, digest, {"kind": "codex", "policy_selection": {
         "source": P0_SOURCE, "policy_sha256": digest,
-        "test_mode":os.environ.get("GX_P0_TEST") == "1", "model_provider":profiles.provider_name(),
-        "test_base_url":p0_test_endpoint(profiles.provider_name()),
+        "test_mode": test, "model_provider": main, "test_base_url": endpoints.get(main),
+        "test_endpoints": endpoints,
         "policy_snapshot_sha256": digest, "identity_sha256": ids.sha256_of_obj(
             {"client": P0_SOURCE, "protocol": "rust-v0.169.0"})}}
 

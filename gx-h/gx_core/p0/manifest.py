@@ -129,10 +129,13 @@ def admit(conn, job_id, *, launch, bundle, env, inputs, resources, preflight):
     params = launch["parameters"]
     levels = {"level": "provenance", "replay": "requires original runtime and data",
               "known_variation": ["host runtime and external inputs may vary"]}
-    shipped_grid = cap == shipped.GRID and shipped.portable_digest(bundle) == shipped._grid_pin()
-    if shipped_grid:
+    pinned_method = cap in shipped.MANIFESTS and shipped.portable_digest(bundle) == shipped.pin(cap)
+    if pinned_method and cap == shipped.GRID:
         levels = {"level": "deterministic_synthetic_cpu", "replay": "numeric observations on frozen inputs",
                   "known_variation": ["process identifiers, wall time and resource measurements"]}
+    elif pinned_method:
+        levels = {"level": "deterministic_coordinate_analysis", "replay": "deposited coordinates and frozen inputs",
+                  "known_variation": ["floating-point roundoff, wall time and resource measurements"]}
     doc = {
         "schema": "gx.execution-manifest.admission/1", "job_id": job_id, "run_id": run_id, "owner": owner,
         "task_id": owner["task_id"], "attempt_id": owner["attempt_id"], "job_attempt": row["job_attempt"],
@@ -149,7 +152,7 @@ def admit(conn, job_id, *, launch, bundle, env, inputs, resources, preflight):
         "source": _source(launch, bundle), "capability": {"id": row["capability_id"],
                     "version": row["capability_version"], "sha256": launch["manifest_sha256"]},
         "model": {"id": None, "provider": None, "weights": launch["weights"],
-                  "applicability": "no learned model" if shipped_grid else "as declared by capability"},
+                  "applicability": "no learned model" if pinned_method else "as declared by capability"},
         "parameters": params, "seeds": {k: v for k, v in params.items() if "seed" in k.lower()},
         "argv": launch["argv"], "limits": resources, "budget_reservation_ref": row["reservation_ref"],
         "runtime": _runtime(env, resources, preflight), "evaluator": _evaluation(conn, binding),

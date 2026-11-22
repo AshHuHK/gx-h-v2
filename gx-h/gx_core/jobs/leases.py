@@ -283,24 +283,17 @@ def live_deadline(conn: sqlite3.Connection, task_id: str, *, limits: Mapping[str
 
 def held_open(conn: sqlite3.Connection, run_id: str, *, limits: Mapping[str, Any] | None = None,
               at: str | None = None) -> dict[str, dict[str, Any]]:
-    """§7.2.1 for a run: the tasks whose current lease is held open at ``at`` by a job of it
-    that has not ended and is inside its own deadline.
+    """§7.2.1 for a run: task attempts kept on the board by an open Job or a recorded GX wait.
 
         {task_id: {"lease_ref", "deadline_at", "jobs": [job_id]}}
 
-    ``deadline_at`` is the latest deadline among those jobs and ``jobs`` names them, oldest
-    first. A task is absent when it has no lease, when its lease has been released, when it
-    has no open job of that lease, or when every such job is past its own deadline. For each
-    task in the answer it is :func:`live_deadline` of that task, at the same ``limits`` and
-    ``at``: one rule (``_hold``), read here for the whole run.
+    Ordinary Jobs use :func:`live_deadline`'s rule. The latest applicable Job deadline
+    is ``deadline_at`` and ``jobs`` lists the Jobs sharing it or ending sooner. A recorded
+    GX wait independently retains the current attempt across a service outage. Its
+    deadline can be absent until the budget, metering, pause or Job handoff resolves.
 
-    Three queries whatever the size of the run (its tasks with their unreleased leases; its
-    open jobs; the adoptions of those jobs), no runner, no file. With ``limits`` and ``at``
-    given it reads no clock and no configuration either, so it can be part of a snapshot that
-    is read in one transaction, and of a plan that is a function of that snapshot. The
-    scheduler's snapshot and core's settle both read it (SCHEDULING_DESIGN r2.2a §4.2): a
-    task CLAIMED or RUNNING is in flight when its lease is unexpired at ``at`` or it is in
-    this answer, and the later of the two instants is when it lapses.
+    The scheduler's snapshot and lease recovery read these facts together. Worker
+    write authority still requires a live lease. All queries are batched per run.
     """
     limits = config.limits() if limits is None else limits
     at = clock.now_iso() if at is None else at
@@ -334,6 +327,11 @@ def held_open(conn: sqlite3.Connection, run_id: str, *, limits: Mapping[str, Any
             held[task["task_id"]] = {
                 "lease_ref": found["lease_ref"], "deadline_at": found["deadline_at"],
                 "jobs": [job["job_id"] for job in found["jobs"] if not job["overdue"]]}
+    if tasks:
+        from ..p0 import waits
+        for waiter in waits.held_for_run(conn, run_id):
+            held.setdefault(waiter["task_id"], {"lease_ref": waiter["lease_id"], "deadline_at": None,
+                                               "jobs": [waiter["job_id"]] if waiter["job_id"] else []})
     return held
 
 

@@ -182,6 +182,13 @@ def begin_delivery(conn, thread_id, event_id, reason):
     root = _worker(conn, thread_id)
     if root:
         begin(conn, root["root_key"], reason, event_id)
+        # A new admission decision supersedes the older reason for this same
+        # undelivered event. The task is still waiting, so no lease handoff is due.
+        previous = "metering" if reason == "budget" else "budget"
+        conn.execute("UPDATE p0_attempt_waits SET ended_at=? WHERE root_key=? AND wait_key=?"
+                     " AND reason=? AND ended_at IS NULL AND EXISTS (SELECT 1 FROM p0_attempt_waits w"
+                     " WHERE w.root_key=? AND w.wait_key=? AND w.reason=? AND w.ended_at IS NULL)",
+                     (clock.now_iso(), root["root_key"], event_id, previous, root["root_key"], event_id, reason))
 
 
 def prepare_delivery(conn, thread_id, event_id):

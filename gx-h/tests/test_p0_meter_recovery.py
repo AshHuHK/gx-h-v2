@@ -314,6 +314,9 @@ class TaskRetryMeterTests(unittest.TestCase):
         self.assertEqual(budgets.state(self.db, self.budget)["spent"], {"tokens":1_045_100, "api_calls":4})
         self.assertFalse(self.peers[successor["thread_id"]].sent)
         self.assertIsNone(self.roots.delivery._get("start:" + successor["root_key"]))
+        wait, = waits.pending(self.db, self.run)
+        self.assertEqual((wait["reason"], wait["wait_key"]), ("budget", "start:" + successor["root_key"]))
+        self.assertFalse(self.db.execute("SELECT 1 FROM events WHERE kind='task.wait_handoff'").fetchone())
 
     def test_other_task_runs_and_expired_successor_resumes_once_after_cold_metering(self):
         first, successor = self.start_retry()

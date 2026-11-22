@@ -1358,6 +1358,8 @@ class Engine:
         must still be the run's, so a pause, a cancel or another advancer that took over a
         lapsed lease stops this one."""
         completed: list[str] = list(state.get("completed", []))
+        from ..p0.waits import is_p0_run
+        operation_budgets = is_p0_run(self._run_row(run_id))
         carry_submissions = tuple(submissions)
         # Stated by the caller, not inferred from submission_refs: an approval resume
         # legitimately carries none, and a node branching on ctx.resumed would be lied to.
@@ -1387,7 +1389,9 @@ class Engine:
             config.check_holds(self.hold_scope)
             revision = store.current_revision(self.conn, run_id)
             budget = self._budget_snapshot(run_id)
-            exhausted = self._budget_exhausted(budget)
+            # P0's native-turn and Job owners reserve exactly what each operation
+            # spends. A full Job line still permits observing its result and review.
+            exhausted = [] if operation_budgets else self._budget_exhausted(budget)
             if exhausted:
                 return self._pause_for_budget(
                     run_id=run_id, workflow=workflow, state=state, actor=actor,
@@ -1449,7 +1453,7 @@ class Engine:
                 # The run was stopped by the node, or by the engine for it: its jobs are asked
                 # to end after that has committed and outside any transaction, as a cancel does.
                 self._end_jobs(run_id, actor, reason=str((payload.get("warnings") or ["the run was stopped"])[0]))
-            if kind == "paused":
+            if kind == "paused" and not operation_budgets:
                 # Jobs whose tool has not started would start while the run is paused: they are
                 # ended, after the pause has committed and outside any transaction.
                 self._hold_jobs(run_id, actor, reason=str((payload.get("warnings") or ["the run is paused"])[0]))

@@ -1724,7 +1724,19 @@ def _pause_needs(conn: sqlite3.Connection, run: sqlite3.Row,
     """
     needs: list[dict[str, Any]] = []
     paused = store.loads(run, "paused_json", {}) or {}
-    for key in paused.get("exhausted") or []:
+    exhausted = paused.get("exhausted") or []
+    if exhausted:
+        from ..p0.waits import is_p0_run
+        if is_p0_run(run) and paused.get("paused_by") == "backend":
+            # Only the previous engine's unconditional pre-node snapshot had all
+            # three fields. A specific operation refusal or human pause stays intact.
+            edge = conn.execute("SELECT payload_json FROM events WHERE run_id=? AND kind='run.transition'"
+                                " AND new_state='PAUSED' ORDER BY event_id DESC LIMIT 1", (run["run_id"],)).fetchone()
+            before_node = store.loads(edge, "payload_json", {})
+            if (before_node.get("exhausted") == exhausted and isinstance(before_node.get("budget"), dict)
+                    and before_node.get("node") == (paused.get("continue_from") or {}).get("node")):
+                exhausted = []
+    for key in exhausted:
         budget = seams.budget_state(conn, run["budget_ref"]) or {}
         left = (budget.get("available") or {}).get(key)
         if left is None or left <= 0:

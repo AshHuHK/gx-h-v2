@@ -299,9 +299,9 @@ class Driver:
                 self.finish_main(row[0], wait=0)
             self.deliveries()
             run = project(self.conn)
-            if run["status"] in machines.terminal_states("run"):
-                # A scientific decision can commit while its author's turn is still streaming.
-                # Keep its reservation until the official final usage has been observed.
+            if run["status"] == "PAUSED" or run["status"] in machines.terminal_states("run"):
+                # A pause or final scientific decision can commit while an admitted
+                # native turn is still streaming. Drain its receipt before closing.
                 if self._native and self.native.active_turns:
                     self.native.poll(0.2)
                     continue
@@ -318,8 +318,6 @@ class Driver:
                         continue
                     result["driver"] = "usage_pending"
                 return result
-            if run["status"] == "PAUSED":
-                return snapshot(self.conn)
             for job in self.conn.execute("SELECT job_id FROM jobs WHERE run_id=? AND status IN "
                                          "('CREATED','SUBMITTING','SUBMITTED','QUEUED','RUNNING','CANCEL_REQUESTED','OUTCOME_UNKNOWN')",
                                          (self.rid,)).fetchall():

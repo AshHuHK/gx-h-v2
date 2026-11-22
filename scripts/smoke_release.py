@@ -117,9 +117,17 @@ def smoke(out, archive):
             summary["dsh_skipped"] = len(re.findall(r"\.\.\. skipped ", dsh))
             run("geometry", [python, "-B", "acceptance/acc1_coordinate_method.py",
                              "--output", out / "geometry.json"])
-            run("coordinate-project", [python, "-B", "acceptance/acc1_research.py", "--loopback",
+            run("coordinate-project", [python, "-B", "acceptance/acc1_research.py", "--loopback", "--extended-budget",
                                        "--state", scratch / "coordinate-state", "--output", out / "coordinate-project",
                                        "--timeout", "180"])
+            coordinate = json.loads((out / "coordinate-project/summary.json").read_text())
+            limits = json.loads((out / "coordinate-project/initial-budget.json").read_text())["actual_root_ledger_limits"]
+            decisions = coordinate["decisions"]
+            if (coordinate["status"] != "PASS" or coordinate["job_count"] != limits["job_submissions"]
+                    or limits["job_submissions"] != 4 or len(decisions) != 2 or not decisions[-1]["stop_reason"]):
+                raise ValueError("The project must publish its final scientific decision after spending the fourth Job")
+            summary["coordinate_project"] = {"root_job_limit": limits["job_submissions"], "jobs": coordinate["job_count"],
+                                             "decisions": len(decisions), "report_ref": coordinate["report_ref"]}
             run("loopback-doctor", [python, "-B", "acceptance/oauth_loopback.py"])
             run("loopback-protocol", [python, "-B", "acceptance/native_probe.py", "--binary", binary, "--out",
                                       out / "protocol", "session"])

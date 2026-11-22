@@ -73,8 +73,16 @@ def install_observer(venv, root, work):
     trace, stage = work / "audit-events.jsonl", work / "audit-stage"
     stage.write_text("setup")
     header = f"STAGED_ROOT={str(root)!r}\nTRACE_FILE={str(trace)!r}\nSTAGE_FILE={str(stage)!r}\n"
-    (target / "sitecustomize.py").write_text(header + SITE)
-    return trace, stage
+    observer = target / "sitecustomize.py"
+    observer.write_text(header + SITE)
+    return trace, stage, observer
+
+
+def remove_observer(path):
+    """Leave the staged interpreter ready for ordinary operator use after the measurement."""
+    path.unlink()
+    for cache in (path.parent / "__pycache__").glob("sitecustomize.*.pyc"):
+        cache.unlink()
 
 
 def documents(root):

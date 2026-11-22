@@ -101,7 +101,7 @@ def existing_db(directory, *, readonly):
     return conn
 
 
-def start(conn, directory, spec, *, run_key=None):
+def start(conn, directory, spec, *, run_key=None, run_id=None):
     from . import workspace
     if type(spec.get("max_rounds")) is not int or spec["max_rounds"] < 1:
         raise ValueError("Supply a positive max_rounds")
@@ -113,10 +113,10 @@ def start(conn, directory, spec, *, run_key=None):
     budget_profile = spec.get("budget_profile", "p0")
     if not isinstance(budget_profile, str) or not budget_profile.strip():
         raise ValueError("budget_profile must name a configured budget profile")
-    current = workspace.find_run(conn, run_key=run_key)
-    if current and store.loads(current, "inputs_json")["inputs"]["p0_spec"] != spec:
-        raise ValueError("This state already belongs to a different project specification")
-    if current and run_key is None:
+    current = workspace.find_run(conn, run_key=run_key, run_id=run_id)
+    if current:
+        if store.loads(current, "inputs_json")["inputs"]["p0_spec"] != spec:
+            raise ValueError("This state already belongs to a different project specification")
         run_key = current["run_key"]
     workflow, version = packages.research_ref(spec, current)
     flow = service.default_registry(conn, workflow_id=workflow, version=version).get(workflow, version)
@@ -287,8 +287,7 @@ def execute(args):
             if args.command == "resume" and run["status"] == "PAUSED":
                 change_state(conn, run, "continue")
             if args.command != "message" and not store.latest_checkpoint(conn, run["run_id"]):
-                start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"],
-                      run_key=workspace.key_for_run(conn, run["run_id"]))
+                start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"], run_id=run["run_id"])
             if args.command != "message":
                 return run_until_stopped(conn, directory, run["run_id"], args.timeout)
             driver = Driver(conn, directory, run["run_id"])

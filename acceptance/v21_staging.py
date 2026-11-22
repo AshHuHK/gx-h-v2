@@ -216,8 +216,8 @@ def run(work, revision, evidence):
                     "-r", str(candidate / "release-assets/python/requirements.lock")], stdout=subprocess.DEVNULL, check=True)
     evidence["python"] = json.loads(subprocess.check_output([python, "-I", "-B", "-c",
         "import sys,Bio,numpy,sqlite3,json; print(json.dumps(dict(python=sys.version.split()[0],biopython=Bio.__version__,numpy=numpy.__version__,sqlite=sqlite3.sqlite_version)))"], text=True))
-    from v21_closure import install_observer
-    trace, stage_marker = install_observer(venv, install, work)
+    from v21_closure import install_observer, remove_observer
+    trace, stage_marker, observer = install_observer(venv, install, work)
     native_action = e2e_responses.fixture_action
 
     def pace(body, ident):
@@ -231,6 +231,7 @@ def run(work, revision, evidence):
 
     with (e2e_responses.local_responses(work / "requests.jsonl") as peer,
           patch.object(e2e_responses, "fixture_action", pace), ExitStack() as resources):
+        resources.callback(remove_observer, observer)
         env = fixture_env(work, peer, str(binary))
         env["PATH"] = str(venv / "bin") + os.pathsep + env["PATH"]
         evidence["codex_version"] = subprocess.check_output([str(binary), "--version"], env=env, text=True).strip()

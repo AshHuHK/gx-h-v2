@@ -7,10 +7,14 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from gx_core.errors import OutcomeUnknown
+from gx_core.hostobs.app_server_client import AppServerDisconnected, AppServerTimeout
 from gx_core.jobs.service import JobService
 from gx_core.native_release import native_state
-from gx_core.p0 import cli, coordinator, profiles
+from gx_core.orchestration.engine import Engine
+from gx_core.p0 import cli, coordinator, operator, profiles, workspace
 from gx_core.persistence import store
+from tests.test_tl1a_geometry import OfflineIngress
 
 
 class WorkspaceQueueTests(unittest.TestCase):
@@ -50,6 +54,124 @@ class WorkspaceQueueTests(unittest.TestCase):
                     start("invalid")
                 for row in conn.execute("SELECT job_id FROM jobs").fetchall():
                     self.assertTrue(JobService(conn).wait(row[0], 30)["terminal"])
+
+    def test_uncreated_start_stays_pending_at_timeout_and_replays_after_restart(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp)
+            spec = cli.demo_spec()
+            with closing(store.open_store(state / "gx.db")) as conn:
+                initial = coordinator.queue_start(conn, "delayed", spec)
+                with patch.object(cli, "start", side_effect=AppServerTimeout("start reply delayed")) as start:
+                    result = coordinator.drive_workspace(conn, state, 0.15)
+                self.assertEqual(start.call_count, 1)
+                self.assertEqual(result["driver"], "time_limit")
+                self.assertEqual(result["runs"], [])
+                pending, = result["workspace_requests"]
+                self.assertEqual(pending["status"], "queued")
+                self.assertIn("start reply delayed", pending["last_error"])
+                replay = coordinator.queue_start(conn, "delayed", spec)
+                self.assertEqual(replay["outbox_id"], initial["outbox_id"])
+                self.assertEqual(replay["attempts"], 1)
+                self.assertEqual(replay["last_error"], pending["last_error"])
+
+            # A fresh process replays the same durable request. Pause after real
+            # bootstrap so the test exercises the workspace driver without a model.
+            actual_start = cli.start
+            def start_and_pause(conn, directory, spec, *, run_key):
+                actual_start(conn, directory, spec, run_key=run_key)
+                cli.change_state(conn, workspace.find_run(conn, run_key=run_key), "pause")
+            with closing(store.open_store(state / "gx.db")) as conn:
+                with patch.object(cli, "start", side_effect=start_and_pause) as start:
+                    result = coordinator.drive_workspace(conn, state, 4)
+                self.assertEqual(start.call_count, 1)
+                self.assertEqual(result["status"], "PAUSED")
+                self.assertNotIn("workspace_requests", result)
+                row, = conn.execute("SELECT attempts,last_error,consumed_at FROM outbox WHERE outbox_id=?",
+                                    (initial["outbox_id"],)).fetchall()
+                self.assertEqual(row["attempts"], 1)
+                self.assertIsNone(row["last_error"])
+                self.assertIsNotNone(row["consumed_at"])
+                self.assertEqual(len(workspace.list_runs(conn)), 1)
+                for job in conn.execute("SELECT job_id FROM jobs").fetchall():
+                    self.assertTrue(JobService(conn).wait(job[0], 30)["terminal"])
+
+    def test_partial_start_retry_preserves_run_and_allows_other_run_to_progress(self):
+        with tempfile.TemporaryDirectory() as tmp, closing(store.open_store(Path(tmp) / "gx.db")) as conn:
+            state, spec = Path(tmp), cli.demo_spec()
+            run_a = cli.start(conn, state, spec, run_key="A")["run_id"]
+            operator.submit(operator.local_context(conn), run_a, {"kind": "pause"}, "pause-A", queue_only=True)
+            with patch.object(workspace, "bootstrap_action", side_effect=OutcomeUnknown("bootstrap reply lost")):
+                with self.assertRaisesRegex(OutcomeUnknown, "bootstrap reply lost"):
+                    cli.start(conn, state, spec, run_key="B")
+            original = workspace.find_run(conn, run_key="B")
+            self.assertIsNone(store.latest_checkpoint(conn, original["run_id"]))
+            actual_start = cli.start
+            attempts = []
+
+            def retry_start(db, directory, spec, *, run_id):
+                self.assertEqual(run_id, original["run_id"])
+                attempts.append(run_id)
+                if len(attempts) == 1:
+                    raise AppServerDisconnected("lost bootstrap connection")
+                pending, = coordinator.overview(db)["workspace_requests"]
+                self.assertEqual(pending["status"], "queued")
+                self.assertIn("lost bootstrap connection", pending["last_error"])
+                self.assertEqual(coordinator.queue_start(db, "B", spec)["outbox_id"], pending["outbox_id"])
+                self.assertEqual(workspace.find_run(db, run_id=run_a)["status"], "PAUSED")
+                message, = db.execute("SELECT result_json,rejected FROM p0_operator_messages WHERE message_id='pause-A'")
+                self.assertIsNotNone(message["result_json"])
+                self.assertIsNone(message["rejected"])
+                actual_start(db, directory, spec, run_id=run_id)
+                cli.change_state(db, workspace.find_run(db, run_id=run_id), "pause")
+
+            with patch.object(cli, "start", side_effect=retry_start):
+                result = coordinator.drive_workspace(conn, state, 5)
+            self.assertEqual(attempts, [original["run_id"], original["run_id"]])
+            self.assertEqual(result["status"], "PAUSED")
+            self.assertNotIn("driver", result)
+            self.assertNotIn("workspace_requests", result)
+            self.assertEqual({r["run_key"]: r["run_id"] for r in result["runs"]},
+                             {"A": run_a, "B": original["run_id"]})
+            self.assertIsNotNone(store.latest_checkpoint(conn, original["run_id"]))
+            self.assertEqual(workspace.find_run(conn, run_key="B")["budget_ref"], original["budget_ref"])
+            row, = conn.execute("SELECT attempts,last_error,consumed_at FROM outbox WHERE topic='p0.workspace.start'")
+            self.assertEqual(row["attempts"], 1)
+            self.assertIsNone(row["last_error"])
+            self.assertIsNotNone(row["consumed_at"])
+            for job in conn.execute("SELECT job_id FROM jobs").fetchall():
+                self.assertTrue(JobService(conn).wait(job[0], 30)["terminal"])
+
+    def test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace(self):
+        for command in ("run", "resume"):
+            with self.subTest(command=command), tempfile.TemporaryDirectory() as tmp:
+                state, spec = Path(tmp) / "state", cli.demo_spec()
+                with native_state(state) as site, closing(store.open_store(site.db_path)) as conn:
+                    # After the original operator Intent commits but before its first checkpoint,
+                    # another process can admit a keyed sibling from that shared project Intent.
+                    with patch.object(cli, "Driver", OfflineIngress), patch.object(
+                            Engine, "start", side_effect=AppServerDisconnected("first checkpoint pending")):
+                        with self.assertRaisesRegex(AppServerDisconnected, "first checkpoint pending"):
+                            cli.start(conn, state, spec)
+                    original = workspace.find_run(conn)
+                    rid = original["run_id"]
+                    self.assertIsNone(original["run_key"])
+                    self.assertIsNone(store.latest_checkpoint(conn, rid))
+                    sibling = cli.start(conn, state, spec, run_key="B")["run_id"]
+                    cli.change_state(conn, workspace.find_run(conn, run_id=sibling), "pause")
+                    operator.submit(operator.local_context(conn), rid, {"kind": "pause"}, "pause-original", queue_only=True)
+                result = cli.execute(Namespace(command=command, state=state, run_id=rid if command == "resume" else None,
+                                               timeout=4))
+                self.assertEqual(result["status"], "PAUSED")
+                self.assertNotIn("driver", result)
+                with closing(store.open_store(state / "gx.db")) as conn:
+                    current = workspace.find_run(conn, run_id=rid)
+                    self.assertIsNone(current["run_key"])
+                    self.assertEqual(current["budget_ref"], original["budget_ref"])
+                    self.assertEqual([r["run_id"] for r in workspace.list_runs(conn)], [rid, sibling])
+                    self.assertIsNotNone(store.latest_checkpoint(conn, rid))
+                    self.assertEqual(conn.execute("SELECT count(*) FROM p0_human_inputs WHERE run_id=?", (rid,)).fetchone()[0], 1)
+                    for job in conn.execute("SELECT job_id FROM jobs").fetchall():
+                        self.assertTrue(JobService(conn).wait(job[0], 30)["terminal"])
 
     def test_portable_installation_inherits_proxy_and_restricts_bypass(self):
         # Only the configuration reader is exercised. No sockets are used.

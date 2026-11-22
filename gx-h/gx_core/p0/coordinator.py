@@ -52,6 +52,7 @@ def queue_start(conn, run_key, spec):
 
 def drain_starts(conn, directory, retry_at=None):
     from .cli import start
+    from .workspace import find_run
     if retry_at is None:
         retry_at = {}
     for row in conn.execute("SELECT * FROM outbox WHERE topic='p0.workspace.start' "
@@ -61,7 +62,14 @@ def drain_starts(conn, directory, retry_at=None):
             continue
         data = store.loads(row, "payload_json")
         try:
-            start(conn, directory, data["spec"], run_key=data["run_key"])
+            rid = data.get("run_id")
+            if rid is None:
+                existing = find_run(conn, run_key=data["run_key"])
+                rid = existing["run_id"] if existing else None
+            if rid is None:
+                start(conn, directory, data["spec"], run_key=data["run_key"])
+            else:
+                start(conn, directory, data["spec"], run_id=rid)
         except TRANSIENT as exc:
             with store.transaction(conn):
                 store.fail_outbox(conn, oid, f"{type(exc).__name__}: {exc}"[:500])

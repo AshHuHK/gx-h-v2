@@ -3,6 +3,7 @@
 import argparse
 from contextlib import closing
 import json
+import math
 from pathlib import Path
 import sqlite3
 import sys
@@ -107,6 +108,9 @@ def start(conn, directory, spec):
 def change_state(conn, run, action):
     if run["status"] in machines.terminal_states("run") or (action == "pause") == (run["status"] == "PAUSED"):
         return
+    if action == "continue":
+        from .replan import prepare_replan
+        prepare_replan(conn, run["run_id"])
     lease = store.coordinator_lease(conn, run["run_id"])
     service.run_control(context(conn), {"run_id": run["run_id"], "action": action,
                         "reason": "operator requested " + action, "coordinator_lease_ref": lease["lease_id"],
@@ -203,7 +207,7 @@ def main(argv=None):
             selector.add_argument("--spec", type=Path)
             selector.add_argument("--demo-grid", action="store_true")
         if name in ("run", "resume"):
-            sub.add_argument("--timeout", type=float, default=1800)
+            sub.add_argument("--timeout", type=float, default=math.inf, help="Optional wall time in seconds")
         if name == "message":
             selector = sub.add_mutually_exclusive_group(required=True)
             selector.add_argument("--text")
@@ -215,7 +219,7 @@ def main(argv=None):
     try:
         if getattr(args, "deployment_handler", None):
             return args.deployment_handler(args)
-        if getattr(args, "timeout", 1) <= 0:
+        if not getattr(args, "timeout", 1) > 0:
             parser.error("--timeout must be positive")
         result = execute(args)
         show(result)

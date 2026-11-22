@@ -80,6 +80,22 @@ class Driver:
         self._native = None
         self._retry_at = {}
 
+    def main_read(self, tool, args, envelope):
+        if tool != "gx_project_state" or args:
+            raise SchemaInvalid("gx_project_state reads the bound project and takes no arguments")
+        conn = self.conn
+        run = project(conn)
+        latest = conn.execute("SELECT round_index,actions_json,reason,stop_reason,decision_ref "
+                              "FROM science_decisions WHERE run_id=? ORDER BY round_index DESC LIMIT 1",
+                              (self.rid,)).fetchone()
+        action = conn.execute("SELECT result_json FROM p0_human_inputs WHERE run_id=? AND receipt_turn_id=? "
+                              "AND result_json IS NOT NULL ORDER BY rowid DESC LIMIT 1",
+                              (self.rid, envelope["turn_id"])).fetchone()
+        return {"run_id":self.rid, "status":run["status"],
+                "current_items":intent.active_items(conn, self.rid),
+                "input_result":json.loads(action[0]) if action else None,
+                "latest_decision":dict(latest) if latest else None}
+
     @property
     def native(self):
         if self._native is None:
@@ -87,8 +103,11 @@ class Driver:
             thread_dir.mkdir(parents=True, exist_ok=True)
             run = project(self.conn)
             spec = store.loads(run, "inputs_json")["inputs"]["p0_spec"]
+            main_tool = {"type":"function", "name":"gx_project_state",
+                         "description":"Read GX's saved Intent, this input's outcome and the most recent scientific decision.",
+                         "inputSchema":{"type":"object", "properties":{}, "additionalProperties":False}}
             self._native = self._stack.enter_context(Roots(self.conn, run_id=self.rid, cwd=thread_dir,
-                    token_budget=spec.get("turn_token_budget", 65536)))
+                    main_tools=(main_tool,), main_call=self.main_read, token_budget=spec.get("turn_token_budget", 65536)))
         return self._native
 
     def close(self):
@@ -192,7 +211,8 @@ class Driver:
         deadline = time.monotonic() + timeout
         idle_delay = 0.15
         self.reconcile_costs()
-        sent = set()
+        sent = {}
+        retry_delay = {}
         while time.monotonic() < deadline:
             self.messages()
             if self._native:
@@ -226,11 +246,20 @@ class Driver:
             progressed = False
             for t in tasks:
                 key = (t["task_id"], t["attempt"] + (t["status"] == "READY"))
-                if key not in sent or t["waiting_job"] in machines.terminal_states("job"):
+                retry = False
+                if turn_id := sent.get(key):
+                    outcome = self.conn.execute("SELECT terminal_status FROM p0_root_turn_usage WHERE turn_id=?",
+                                                (turn_id,)).fetchone()
+                    if outcome and outcome[0] in ("interrupted", "failed"):
+                        delay, at = retry_delay.setdefault(key, (0.5, time.monotonic() + 0.5))
+                        if time.monotonic() >= at:
+                            retry = True
+                            retry_delay[key] = (min(30, delay * 2), time.monotonic() + min(30, delay * 2))
+                if key not in sent or retry or t["waiting_job"] in machines.terminal_states("job"):
                     receipt = self.native.dispatch(t["task_id"])
                     if receipt.get("waiting_for_review"):
                         continue
-                    sent.add(key)
+                    sent[key] = receipt.get("turn_id")
                     progressed = True
             if self._native and self.native.poll(min(0.2, max(0.01, deadline - time.monotonic()))):
                 # Drain a burst of native items before sleeping or re-reading every GX checkpoint.

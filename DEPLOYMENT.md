@@ -70,3 +70,17 @@ state_dir="$HOME/.local/state/gx-p0/grid-trial"
 ```
 
 业务入口还支持 `start --state DIR --spec FILE`，接受包内当前工作流的结构化项目规格。通过 `./bin/gx-p0 COMMAND --help` 查看现有命令参数。[CLI 实现](gx-h/gx_core/p0/cli.py) · [验收矩阵](acceptance/ACCEPTANCE_MATRIX.md)
+
+## 变更目标后继续原项目
+
+先在主对话以正式 change 和后续独立 confirm 修改目标。若旧研究方案依赖原目标，项目会暂停。通过另一条主对话输入登记类型为 `data_source` 的替代方案，指定生效的 objective 和 evaluation 的 item ID、版本以及新的数值 proposal。继续使用原目录运行 `bin/gx-p0 resume --state DIR`；GX 会保留旧计算与评审，使用剩余预算开展下一轮。停留在 PAUSED 时，`status` 可查看条目版本与历史。本机验收用的完整命令序列和 JSON 动作可以复用。[实际操作实例](acceptance/replan_grid.py) · [执行前后对照](acceptance/runs/replan-grid/summary.json)
+
+## 状态迁移与回退
+
+本次部署使用新包内 GX 源码和独立的 `--state`。新基线的 SQLite 增量迁移与版本摘要同一事务提交，不会将历史项目自动移入新版本。普通恢复应当使用原状态目录、原发布以及同一 Codex 本地线程存储。模型凭据由官方 CLI 管理。
+
+保留可回退的科研状态时，先暂停驱动，等待或对账现有 Job，再使用一致的文件系统快照保存整个项目状态（含数据库、其 WAL、原始产物与 Job 收据），并保留该项目依赖的 Codex 线程与原释放版本。回退到旧 GX-H-2 时，从原发布的启动器打开旧发布自己的状态。回退 P0 的某次部署时，恢复相匹配的源码和快照到相同的绝对路径；既有 release marker 和 workflow pin 会核对来源。当前未验证任意变更绝对路径或跨平台的线程存储迁移。独立入口的同目录停止/重开、回执重放和旧库兼容已实测。[正常恢复](acceptance/runs/e2e-grid/summary.json) · [迁移回归](acceptance/runs/final-regression/summary.json)
+
+可编辑的项目规格见 [paired-grid.json](examples/paired-grid.json)。以该文件启动的命令为 `./bin/gx-p0 start --state ./var/paired-grid --spec examples/paired-grid.json`。命令 `run` 默认持续处理至终态或暂停。设置 `--timeout SECONDS` 可以限制本次驱动的墙钟时间，到时返回 75，随后可用同目录继续。
+
+主对话可调用只读的 `gx_project_state` 查询已提交的条目、当前输入结果和最近科研决定。查询不授予向 GX 写入变更或接受结果的权限。

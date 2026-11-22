@@ -1,0 +1,35 @@
+{
+  "completed_utc": "2026-11-22T03:00:00.309465+00:00",
+  "discovery": {
+    "total": 210,
+    "passed": 210,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_s": 71.172,
+    "inherited_tests": 170,
+    "p0_tests": 40,
+    "dsh_tests_executed": 4
+  },
+  "check_generated_hosts": "Codex role projections and model policies match.",
+  "node_plugin_host": {
+    "total": 2,
+    "passed": 2
+  },
+  "gx_files_changed_since_snapshot_at_check": [
+    "gx_core/p0/cli.py",
+    "gx_core/p0/driver.py",
+    "gx_core/p0/replan.py",
+    "tests/test_p0_replan.py"
+  ],
+  "test_type": "local regression; optional DSH SDK used loopback fixtures from copied locked baseline dependencies",
+  "commands": [
+    "runtime/dsh-sdk/.venv/bin/python -B -m unittest discover -s tests -v",
+    "python3 -B adapters/hosts/generate.py --check",
+    "node --experimental-strip-types --test runtime/plugin-host/host.test.ts"
+  ],
+  "notes": [
+    "Only the temporary checkout had local copied DSH/Node dependencies and a disposable candidate commit for the migration test's Git checkout.",
+    "Two inherited driver SIGKILL scenarios passed. The optional DSH cold-resume test logged ResourceWarning for unclosed streams."
+  ]
+}

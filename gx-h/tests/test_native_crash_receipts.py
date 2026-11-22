@@ -17,6 +17,13 @@ from gx_core.persistence import store
 from tests import test_module_collaboration as collaboration
 
 
+class RouterFixtureAuthority(collaboration.native_context.NativeAuthority):
+    """Use the router's default Root identity when creating the fixture project."""
+
+    def __init__(self, *, project_ref, root_subject):
+        super().__init__(project_ref=project_ref)
+
+
 def wire_frames(policy, operations, resumed=False):
     root, turn = collaboration.ROOT, "root-resumed" if resumed else "root-first"
     model, effort = policy["pinned_model"]["id"], policy["native_coordinator_observation"]["default_effort"]
@@ -84,12 +91,13 @@ class NativeCrashReceipts(unittest.TestCase):
     def exercise(self, finish):
         project = collaboration.ModuleCollaboration()
         self.addCleanup(project.doCleanups)
-        project.setUp()
+        with patch.object(collaboration.native_context, "NativeAuthority", RouterFixtureAuthority):
+            project.setUp()
         task = project.ready("module_plan", "keys")[0]["task_id"]
         team = project.module_teams["keys"]
         # Assign the registered root thread so this test isolates post-commit loss
         # from child discovery, which has separate adapter tests.
-        subject = "native-coordinator"
+        subject = project.subject(collaboration.ROOT)
         project.manage("member", {"team_id": team, "subject": subject, "action": "add"})
         project.manage("assign", {"team_id": team, "task_id": task, "subject": subject})
         operations = [("gx_task_acquire", {"task_id": task})]

@@ -62,3 +62,5 @@ GX 的调用边界是 App Server 与 GX 控制的工具。原生 turn loop、Thr
 ## 运行证据的范围
 
 本审计实际运行了 Git、发行包核验、schema 生成和逐文件比较。运行时验收应另看逐场景结果，特别是长 shell 期间 steer 的确认及生效时间、暂停等待期间的模型调用数、子 Agent 实际 token 增量、杀进程后的 tool/Job 状态，以及指定 provider 压缩后的任务书内容。上游测试文件仅作为定位器，本文未运行上游全量 Rust 测试。[P0 验收矩阵](../acceptance/ACCEPTANCE_MATRIX.md)
+
+部署时提供的 fetch 脚本在完成基线审计后改为单 tag 浅克隆，显式复用发布的 Clash 路由，并校验完整 commit。原官方 HTTPS 记录和改过脚本在已核上游镜像上的实际检出均保留。[原始实测](../acceptance/runs/schema/fetch.txt) · [脚本复验](../acceptance/runs/schema/fetch-portability.txt)

@@ -1,0 +1,157 @@
+{
+  "artifacts_rehashed": 58,
+  "codex": "codex-cli 0.169.0",
+  "commands": [
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "$STATE",
+        "--demo-grid"
+      ],
+      "exit_code": 0,
+      "name": "01-start",
+      "response_count_after": 1,
+      "response_count_before": 0,
+      "wall_seconds": 1.521
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "stop",
+        "--state",
+        "$STATE"
+      ],
+      "exit_code": 0,
+      "name": "02-pause",
+      "response_count_after": 1,
+      "response_count_before": 1,
+      "wall_seconds": 0.573
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "status",
+        "--state",
+        "$STATE"
+      ],
+      "exit_code": 0,
+      "name": "02-status",
+      "response_count_after": 1,
+      "response_count_before": 1,
+      "wall_seconds": 0.332
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "resume",
+        "--state",
+        "$STATE",
+        "--timeout",
+        "90"
+      ],
+      "exit_code": 0,
+      "name": "03-run",
+      "response_count_after": 40,
+      "response_count_before": 1,
+      "wall_seconds": 5.217
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "run",
+        "--state",
+        "$STATE",
+        "--timeout",
+        "90"
+      ],
+      "exit_code": 0,
+      "name": "05-resume-stopped",
+      "response_count_after": 40,
+      "response_count_before": 40,
+      "wall_seconds": 0.309
+    }
+  ],
+  "cost": {
+    "external_model_cost_usd": 0,
+    "external_model_requests": 0,
+    "gpu_seconds": 0,
+    "gx_budget_balances": [
+      {
+        "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":0,\"job_submissions\":0,\"tokens\":0,\"worker_tasks\":0}",
+        "spent_json": "{\"api_calls\":7,\"cpu_seconds\":4,\"job_submissions\":4,\"tokens\":1400,\"worker_tasks\":6}"
+      }
+    ],
+    "job_cpu_measurements": [
+      {
+        "cpu_seconds": 0.057,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.3,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.217
+      },
+      {
+        "cpu_seconds": 0.038,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.2,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.232
+      },
+      {
+        "cpu_seconds": 0.047,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.2,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.211
+      },
+      {
+        "cpu_seconds": 0.053,
+        "limit_memory_mib": null,
+        "limit_wall_seconds": 30,
+        "max_rss_mib": 15.1,
+        "memory_check": "no memory_mib is declared for this job: nothing to check against",
+        "memory_within_limit": null,
+        "result": "exited",
+        "started": true,
+        "wall_seconds": 0.216
+      }
+    ],
+    "synthetic_reported_tokens": 1400,
+    "synthetic_usage_per_response": {
+      "input_tokens": 30,
+      "output_tokens": 5
+    }
+  },
+  "ended": "2026-11-22T03:01:50.832214+00:00",
+  "job_polling_calls": [],
+  "jobs": 4,
+  "manual_advancement": false,
+  "mode": "official Codex app-server, scripted loopback Responses, real local synthetic grid Jobs",
+  "reconciled_usage": {
+    "native_turns": 7,
+    "reported_tokens": 1400,
+    "tokens": 1400
+  },
+  "replay_new_jobs": 0,
+  "replay_new_model_calls": 0,
+  "replay_new_submissions": 0,
+  "responses_during_grid_jobs": [],
+  "responses_requests": 40,
+  "result": "PASS",
+  "rounds": 3,
+  "started": "2026-11-22T03:01:42.479265+00:00",
+  "unique_worker_principals": 6
+}

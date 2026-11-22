@@ -1,0 +1,1459 @@
+{
+  "test": "child",
+  "started_utc": "2026-11-22T03:00:13.577669+00:00",
+  "provider": "local_probe",
+  "binary_version": "codex-cli 0.169.0",
+  "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "model_service": "loopback scripted Responses",
+  "gpu_seconds": 0,
+  "external_api_cost": 0,
+  "human_intervention": false,
+  "parent": "01a20132-7587-7561-a1e8-e2642bc895ee",
+  "child": "01a20132-7640-7d02-9abb-c1b6e650815a",
+  "permissions": {
+    "approvalPolicy": {
+      "root": "never",
+      "child": "never"
+    },
+    "sandbox": {
+      "root": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "child": {
+        "type": "readOnly",
+        "networkAccess": false
+      }
+    }
+  },
+  "wake_turn": "01a20132-75a5-71c2-9051-937485562490",
+  "parent_model_tokens": 105,
+  "child_model_tokens": 366,
+  "goal": {
+    "threadId": "01a20132-7587-7561-a1e8-e2642bc895ee",
+    "objective": "Measure descendant accounting",
+    "status": "complete",
+    "tokenBudget": 8000,
+    "tokensUsed": 436,
+    "timeUsedSeconds": 0,
+    "createdAt": 1795316413,
+    "updatedAt": 1795316414
+  },
+  "child_source": {
+    "subAgent": {
+      "thread_spawn": {
+        "parent_thread_id": "01a20132-7587-7561-a1e8-e2642bc895ee",
+        "depth": 1,
+        "agent_path": "/root/native_probe_child",
+        "agent_nickname": "Goodall",
+        "agent_role": null
+      }
+    }
+  },
+  "child_callback": [
+    {
+      "method": "item/tool/call",
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "tool": "gx_probe_identity"
+    }
+  ],
+  "parent_cwd": "/tmp/gx-native-p0-6uem38mu/child/work",
+  "child_cwd": "/tmp/gx-native-p0-6uem38mu/child/work",
+  "followup_turn": "01a20132-7905-7bb1-a062-508884a235fd",
+  "restored_child_callbacks": [
+    {
+      "method": "item/tool/call",
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "tool": "gx_probe_identity"
+    }
+  ],
+  "status": "PASS",
+  "log": [
+    {
+      "t": 29635876.331850704,
+      "generation": 1,
+      "direction": "request",
+      "method": "initialize",
+      "thread": null,
+      "turn": null,
+      "keys": [
+        "clientInfo",
+        "capabilities"
+      ]
+    },
+    {
+      "t": 29635876.550654624,
+      "generation": 1,
+      "direction": "result",
+      "method": "initialize",
+      "seq": 1,
+      "thread": null,
+      "turn": null
+    },
+    {
+      "t": 29635876.550812382,
+      "generation": 1,
+      "direction": "send",
+      "method": "initialized"
+    },
+    {
+      "t": 29635876.550831765,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/start",
+      "thread": null,
+      "turn": null,
+      "keys": [
+        "cwd",
+        "developerInstructions",
+        "environments",
+        "approvalPolicy",
+        "sandbox",
+        "dynamicTools"
+      ]
+    },
+    {
+      "t": 29635876.551074818,
+      "generation": 1,
+      "direction": "notification",
+      "method": "remoteControl/status/changed",
+      "seq": 2
+    },
+    {
+      "t": 29635876.585506536,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/start",
+      "seq": 3,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null
+    },
+    {
+      "t": 29635876.585553233,
+      "generation": 1,
+      "direction": "request",
+      "method": "turn/start",
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null,
+      "keys": [
+        "threadId",
+        "input"
+      ]
+    },
+    {
+      "t": 29635876.585838336,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/started",
+      "seq": 4,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635876.593340766,
+      "generation": 1,
+      "direction": "notification",
+      "method": "warning",
+      "seq": 5,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635876.596962165,
+      "generation": 1,
+      "direction": "result",
+      "method": "turn/start",
+      "seq": 6,
+      "thread": null,
+      "turn": "01a20132-75a5-71c2-9051-937485562490"
+    },
+    {
+      "t": 29635876.717468776,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/goal/set",
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null,
+      "keys": [
+        "threadId",
+        "objective",
+        "status",
+        "tokenBudget"
+      ]
+    },
+    {
+      "t": 29635876.71783611,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 7,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635876.717919584,
+      "generation": 1,
+      "direction": "notification",
+      "method": "turn/started",
+      "seq": 8,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "status": "inProgress"
+    },
+    {
+      "t": 29635876.717996236,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 9,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "item_type": "userMessage",
+      "item_id": "01a20132-75e7-71b1-9b50-4baedac9bbc8"
+    },
+    {
+      "t": 29635876.71806352,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 10,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "item_type": "userMessage",
+      "item_id": "01a20132-75e7-71b1-9b50-4baedac9bbc8"
+    },
+    {
+      "t": 29635876.73261235,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/goal/set",
+      "seq": 11,
+      "thread": null,
+      "turn": null
+    },
+    {
+      "t": 29635876.732840035,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 12,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635876.746890776,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 13,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "item_type": "subAgentActivity",
+      "item_id": "response-1",
+      "kind": "started",
+      "agent_thread_id": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635876.748881858,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 14,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635876.74905095,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 15,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "item_type": "subAgentActivity",
+      "item_id": "response-1",
+      "kind": "started",
+      "agent_thread_id": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635876.753205735,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 16,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490"
+    },
+    {
+      "t": 29635876.75944795,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 17,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635876.75953667,
+      "generation": 1,
+      "direction": "notification",
+      "method": "turn/started",
+      "seq": 18,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "status": "inProgress"
+    },
+    {
+      "t": 29635876.765436076,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 19,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490"
+    },
+    {
+      "t": 29635876.765511096,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 20
+    },
+    {
+      "t": 29635876.841721795,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 21,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "item_type": "dynamicToolCall",
+      "item_id": "response-3",
+      "tool": "gx_probe_identity"
+    },
+    {
+      "t": 29635876.84184096,
+      "generation": 1,
+      "direction": "callback",
+      "method": "item/tool/call",
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "tool": "gx_probe_identity"
+    },
+    {
+      "t": 29635876.845773097,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 23,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "item_type": "dynamicToolCall",
+      "item_id": "response-3",
+      "tool": "gx_probe_identity"
+    },
+    {
+      "t": 29635876.85471017,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 24,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be"
+    },
+    {
+      "t": 29635876.854791086,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 25
+    },
+    {
+      "t": 29635876.89756561,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 26,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-4"
+    },
+    {
+      "t": 29635876.90006928,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 27,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-4"
+    },
+    {
+      "t": 29635876.907022066,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 28,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be"
+    },
+    {
+      "t": 29635876.907127004,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 29
+    },
+    {
+      "t": 29635876.907592837,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 30,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490"
+    },
+    {
+      "t": 29635876.90874452,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 31,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490"
+    },
+    {
+      "t": 29635876.913583092,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 32,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635876.913695466,
+      "generation": 1,
+      "direction": "notification",
+      "method": "turn/completed",
+      "seq": 33,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "status": "completed"
+    },
+    {
+      "t": 29635876.91379155,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 34,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "item_type": "subAgentActivity",
+      "item_id": "subagent-completed-01a20132-7643-7431-962d-8e19c2c7a3be",
+      "kind": "completed",
+      "agent_thread_id": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635876.9155826,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 35,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490"
+    },
+    {
+      "t": 29635876.91565325,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 36
+    },
+    {
+      "t": 29635876.916756153,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 37,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "item_type": "subAgentActivity",
+      "item_id": "subagent-completed-01a20132-7643-7431-962d-8e19c2c7a3be",
+      "kind": "completed",
+      "agent_thread_id": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635876.953759823,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 38,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-5"
+    },
+    {
+      "t": 29635876.95584947,
+      "generation": 1,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 39,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-5"
+    },
+    {
+      "t": 29635876.961985875,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 40,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490"
+    },
+    {
+      "t": 29635876.962071665,
+      "generation": 1,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 41
+    },
+    {
+      "t": 29635876.971187968,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/readState/changed",
+      "seq": 42,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635876.97126428,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 43,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635876.97133849,
+      "generation": 1,
+      "direction": "notification",
+      "method": "turn/completed",
+      "seq": 44,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490",
+      "status": "completed"
+    },
+    {
+      "t": 29635876.97136297,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/goal/get",
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29635876.972497664,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/goal/get",
+      "seq": 45,
+      "thread": null,
+      "turn": null
+    },
+    {
+      "t": 29635876.9725142,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/read",
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29635876.97533379,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/read",
+      "seq": 46,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null
+    },
+    {
+      "t": 29635876.97534275,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/read",
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29635876.978190914,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/read",
+      "seq": 47,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": null
+    },
+    {
+      "t": 29635876.978206616,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/resume",
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29635876.980832845,
+      "generation": 1,
+      "direction": "notification",
+      "method": "deprecationNotice",
+      "seq": 48
+    },
+    {
+      "t": 29635876.99036281,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/resume",
+      "seq": 49,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": null
+    },
+    {
+      "t": 29635876.99037676,
+      "generation": 1,
+      "direction": "request",
+      "method": "thread/resume",
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29635876.99064097,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 50,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be"
+    },
+    {
+      "t": 29635876.99069576,
+      "generation": 1,
+      "direction": "notification",
+      "method": "thread/goal/cleared",
+      "seq": 51,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635876.992831424,
+      "generation": 1,
+      "direction": "notification",
+      "method": "deprecationNotice",
+      "seq": 52
+    },
+    {
+      "t": 29635877.001390144,
+      "generation": 1,
+      "direction": "result",
+      "method": "thread/resume",
+      "seq": 53,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null
+    },
+    {
+      "t": 29635877.017307527,
+      "generation": 1,
+      "direction": "fault",
+      "method": "SIGKILL",
+      "pid": 729722,
+      "exit": -9
+    },
+    {
+      "t": 29635877.01883286,
+      "generation": 2,
+      "direction": "request",
+      "method": "initialize",
+      "thread": null,
+      "turn": null,
+      "keys": [
+        "clientInfo",
+        "capabilities"
+      ]
+    },
+    {
+      "t": 29635877.151753888,
+      "generation": 2,
+      "direction": "result",
+      "method": "initialize",
+      "seq": 1,
+      "thread": null,
+      "turn": null
+    },
+    {
+      "t": 29635877.15190582,
+      "generation": 2,
+      "direction": "send",
+      "method": "initialized"
+    },
+    {
+      "t": 29635877.151916735,
+      "generation": 2,
+      "direction": "request",
+      "method": "thread/resume",
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null,
+      "keys": [
+        "threadId"
+      ]
+    },
+    {
+      "t": 29635877.152120635,
+      "generation": 2,
+      "direction": "notification",
+      "method": "remoteControl/status/changed",
+      "seq": 2
+    },
+    {
+      "t": 29635877.163123775,
+      "generation": 2,
+      "direction": "notification",
+      "method": "deprecationNotice",
+      "seq": 3
+    },
+    {
+      "t": 29635877.443287823,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 4,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635877.44668672,
+      "generation": 2,
+      "direction": "result",
+      "method": "thread/resume",
+      "seq": 5,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null
+    },
+    {
+      "t": 29635877.446725354,
+      "generation": 2,
+      "direction": "request",
+      "method": "turn/start",
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": null,
+      "keys": [
+        "threadId",
+        "input"
+      ]
+    },
+    {
+      "t": 29635877.447010417,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 6,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-75a5-71c2-9051-937485562490"
+    },
+    {
+      "t": 29635877.447079457,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/goal/updated",
+      "seq": 7,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635877.4566567,
+      "generation": 2,
+      "direction": "notification",
+      "method": "warning",
+      "seq": 8,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635877.457452696,
+      "generation": 2,
+      "direction": "result",
+      "method": "turn/start",
+      "seq": 9,
+      "thread": null,
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd"
+    },
+    {
+      "t": 29635877.467744485,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 10,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635877.467838082,
+      "generation": 2,
+      "direction": "notification",
+      "method": "turn/started",
+      "seq": 11,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd",
+      "status": "inProgress"
+    },
+    {
+      "t": 29635877.483681872,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 12,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd",
+      "item_type": "userMessage",
+      "item_id": "01a20132-7922-7873-8b68-279b82bef67a"
+    },
+    {
+      "t": 29635877.48772825,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 13,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd",
+      "item_type": "userMessage",
+      "item_id": "01a20132-7922-7873-8b68-279b82bef67a"
+    },
+    {
+      "t": 29635877.56998025,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 14,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd",
+      "item_type": "subAgentActivity",
+      "item_id": "response-6",
+      "kind": "interacted",
+      "agent_thread_id": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635877.57097559,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 15,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635877.57209989,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 16,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd",
+      "item_type": "subAgentActivity",
+      "item_id": "response-6",
+      "kind": "interacted",
+      "agent_thread_id": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635877.58097277,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 17,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635877.58117543,
+      "generation": 2,
+      "direction": "notification",
+      "method": "turn/started",
+      "seq": 18,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "status": "inProgress"
+    },
+    {
+      "t": 29635877.58700401,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 19,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd"
+    },
+    {
+      "t": 29635877.587087344,
+      "generation": 2,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 20
+    },
+    {
+      "t": 29635877.64843723,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 21,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "item_type": "dynamicToolCall",
+      "item_id": "response-8",
+      "tool": "gx_probe_identity"
+    },
+    {
+      "t": 29635877.648479793,
+      "generation": 2,
+      "direction": "callback",
+      "method": "item/tool/call",
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "tool": "gx_probe_identity"
+    },
+    {
+      "t": 29635877.650623158,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 23,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "item_type": "dynamicToolCall",
+      "item_id": "response-8",
+      "tool": "gx_probe_identity"
+    },
+    {
+      "t": 29635877.658206526,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 24,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e"
+    },
+    {
+      "t": 29635877.658264693,
+      "generation": 2,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 25
+    },
+    {
+      "t": 29635877.69870273,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 26,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-9"
+    },
+    {
+      "t": 29635877.699834116,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/started",
+      "seq": 27,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-7"
+    },
+    {
+      "t": 29635877.700785648,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 28,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-9"
+    },
+    {
+      "t": 29635877.701957025,
+      "generation": 2,
+      "direction": "notification",
+      "method": "item/completed",
+      "seq": 29,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd",
+      "item_type": "agentMessage",
+      "item_id": "msg-response-7"
+    },
+    {
+      "t": 29635877.70741737,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 30,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e"
+    },
+    {
+      "t": 29635877.707466744,
+      "generation": 2,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 31
+    },
+    {
+      "t": 29635877.70795209,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/tokenUsage/updated",
+      "seq": 32,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd"
+    },
+    {
+      "t": 29635877.707988016,
+      "generation": 2,
+      "direction": "notification",
+      "method": "account/rateLimits/updated",
+      "seq": 33
+    },
+    {
+      "t": 29635877.714632627,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 34,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a"
+    },
+    {
+      "t": 29635877.71471035,
+      "generation": 2,
+      "direction": "notification",
+      "method": "turn/completed",
+      "seq": 35,
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "status": "completed"
+    },
+    {
+      "t": 29635877.717472456,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/readState/changed",
+      "seq": 36,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635877.717518684,
+      "generation": 2,
+      "direction": "notification",
+      "method": "thread/status/changed",
+      "seq": 37,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee"
+    },
+    {
+      "t": 29635877.71760244,
+      "generation": 2,
+      "direction": "notification",
+      "method": "turn/completed",
+      "seq": 38,
+      "thread": "01a20132-7587-7561-a1e8-e2642bc895ee",
+      "turn": "01a20132-7905-7bb1-a062-508884a235fd",
+      "status": "completed"
+    }
+  ],
+  "model_requests": [
+    {
+      "id": "response-1",
+      "t": 29635876.70500452,
+      "scenario": "spawn",
+      "wire_model": "gpt-5.4",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": true,
+      "goal_tools": [
+        "create_goal",
+        "get_goal",
+        "update_goal"
+      ],
+      "goal_mutator_declared": true,
+      "spawn_in_catalog": true,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "request_user_input",
+        "view_image",
+        "collaboration",
+        "followup_task",
+        "interrupt_agent",
+        "list_agents",
+        "send_message",
+        "spawn_agent",
+        "wait_agent",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "gx_probe_identity"
+      ],
+      "tool_outputs": [],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    },
+    {
+      "id": "response-2",
+      "t": 29635876.80552639,
+      "scenario": "spawn",
+      "wire_model": "gpt-5.4",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": true,
+      "goal_tools": [
+        "create_goal",
+        "get_goal",
+        "update_goal"
+      ],
+      "goal_mutator_declared": true,
+      "spawn_in_catalog": true,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "request_user_input",
+        "view_image",
+        "collaboration",
+        "followup_task",
+        "interrupt_agent",
+        "list_agents",
+        "send_message",
+        "spawn_agent",
+        "wait_agent",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "gx_probe_identity"
+      ],
+      "tool_outputs": [
+        "{\"task_name\":\"/root/native_probe_child\"}"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    },
+    {
+      "id": "response-3",
+      "t": 29635876.825991698,
+      "scenario": "spawn",
+      "wire_model": "gpt-6.1-sol",
+      "wire_effort": "xhigh",
+      "child": true,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": false,
+      "goal_tools": [],
+      "goal_mutator_declared": false,
+      "spawn_in_catalog": false,
+      "tool_names": [],
+      "tool_outputs": [],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 170,
+        "output_tokens": 13,
+        "total_tokens": 183
+      }
+    },
+    {
+      "id": "response-4",
+      "t": 29635876.89195953,
+      "scenario": "spawn",
+      "wire_model": "gpt-6.1-sol",
+      "wire_effort": "xhigh",
+      "child": true,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": false,
+      "goal_tools": [],
+      "goal_mutator_declared": false,
+      "spawn_in_catalog": false,
+      "tool_names": [],
+      "tool_outputs": [
+        "GX_NATIVE_OK"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 170,
+        "output_tokens": 13,
+        "total_tokens": 183
+      }
+    },
+    {
+      "id": "response-5",
+      "t": 29635876.949250203,
+      "scenario": "spawn",
+      "wire_model": "gpt-5.4",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": true,
+      "goal_tools": [
+        "create_goal",
+        "get_goal",
+        "update_goal"
+      ],
+      "goal_mutator_declared": true,
+      "spawn_in_catalog": true,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "request_user_input",
+        "view_image",
+        "collaboration",
+        "followup_task",
+        "interrupt_agent",
+        "list_agents",
+        "send_message",
+        "spawn_agent",
+        "wait_agent",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "gx_probe_identity"
+      ],
+      "tool_outputs": [
+        "{\"task_name\":\"/root/native_probe_child\"}",
+        "{\"goal\":{\"threadId\":\"01a20132-7587-7561-a1e8-e2642bc895ee\",\"objective\":\"Measure descendant accounting\",\"status\":\"complete\",\"tokenBudget\":8000,\"tokensUsed\":436,\"timeUsedSeconds\":0,\"createdAt\":1795316413,\"updatedAt\":1795316414},\"remainingTokens\":7564,\"completionBudgetReport\":\"Goal achieved. Report final usage from this tool result's structu"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    },
+    {
+      "id": "response-6",
+      "t": 29635877.531889543,
+      "scenario": "follow",
+      "wire_model": "gpt-5.4",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": true,
+      "goal_tools": [
+        "create_goal",
+        "get_goal",
+        "update_goal"
+      ],
+      "goal_mutator_declared": true,
+      "spawn_in_catalog": true,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "request_user_input",
+        "view_image",
+        "collaboration",
+        "followup_task",
+        "interrupt_agent",
+        "list_agents",
+        "send_message",
+        "spawn_agent",
+        "wait_agent",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "gx_probe_identity"
+      ],
+      "tool_outputs": [
+        "{\"task_name\":\"/root/native_probe_child\"}",
+        "{\"goal\":{\"threadId\":\"01a20132-7587-7561-a1e8-e2642bc895ee\",\"objective\":\"Measure descendant accounting\",\"status\":\"complete\",\"tokenBudget\":8000,\"tokensUsed\":436,\"timeUsedSeconds\":0,\"createdAt\":1795316413,\"updatedAt\":1795316414},\"remainingTokens\":7564,\"completionBudgetReport\":\"Goal achieved. Report final usage from this tool result's structu"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    },
+    {
+      "id": "response-7",
+      "t": 29635877.627589606,
+      "scenario": "follow",
+      "wire_model": "gpt-5.4",
+      "wire_effort": "xhigh",
+      "child": false,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": true,
+      "goal_tools": [
+        "create_goal",
+        "get_goal",
+        "update_goal"
+      ],
+      "goal_mutator_declared": true,
+      "spawn_in_catalog": true,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "request_user_input",
+        "view_image",
+        "collaboration",
+        "followup_task",
+        "interrupt_agent",
+        "list_agents",
+        "send_message",
+        "spawn_agent",
+        "wait_agent",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "gx_probe_identity"
+      ],
+      "tool_outputs": [
+        "{\"task_name\":\"/root/native_probe_child\"}",
+        "{\"goal\":{\"threadId\":\"01a20132-7587-7561-a1e8-e2642bc895ee\",\"objective\":\"Measure descendant accounting\",\"status\":\"complete\",\"tokenBudget\":8000,\"tokensUsed\":436,\"timeUsedSeconds\":0,\"createdAt\":1795316413,\"updatedAt\":1795316414},\"remainingTokens\":7564,\"completionBudgetReport\":\"Goal achieved. Report final usage from this tool result's structu",
+        ""
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 30,
+        "output_tokens": 5,
+        "total_tokens": 35
+      }
+    },
+    {
+      "id": "response-8",
+      "t": 29635877.638882805,
+      "scenario": "follow",
+      "wire_model": "gpt-6.1-sol",
+      "wire_effort": "xhigh",
+      "child": true,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": false,
+      "goal_tools": [],
+      "goal_mutator_declared": false,
+      "spawn_in_catalog": false,
+      "tool_names": [],
+      "tool_outputs": [
+        "GX_NATIVE_OK"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 170,
+        "output_tokens": 13,
+        "total_tokens": 183
+      }
+    },
+    {
+      "id": "response-9",
+      "t": 29635877.69429174,
+      "scenario": "follow",
+      "wire_model": "gpt-6.1-sol",
+      "wire_effort": "xhigh",
+      "child": true,
+      "brief_in_input": true,
+      "brief_in_instructions": false,
+      "steer_in_input": false,
+      "dynamic_in_catalog": false,
+      "goal_tools": [],
+      "goal_mutator_declared": false,
+      "spawn_in_catalog": false,
+      "tool_names": [],
+      "tool_outputs": [
+        "GX_NATIVE_OK",
+        "GX_NATIVE_OK"
+      ],
+      "compact_trigger": false,
+      "encrypted_summary_in_context": false,
+      "local_summary_in_context": false,
+      "objective_change_in_input": false,
+      "sandbox_instructions": "read-only",
+      "usage": {
+        "input_tokens": 170,
+        "output_tokens": 13,
+        "total_tokens": 183
+      }
+    }
+  ],
+  "callbacks": [
+    {
+      "method": "item/tool/call",
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-7643-7431-962d-8e19c2c7a3be",
+      "tool": "gx_probe_identity"
+    },
+    {
+      "method": "item/tool/call",
+      "thread": "01a20132-7640-7d02-9abb-c1b6e650815a",
+      "turn": "01a20132-797a-7713-a499-f26a1411797e",
+      "tool": "gx_probe_identity"
+    }
+  ],
+  "finished_utc": "2026-11-22T03:00:15.465158+00:00",
+  "fixture_tokens": 907
+}

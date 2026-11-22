@@ -98,6 +98,18 @@ class ComputeTest(unittest.TestCase):
         self.assertEqual(self.db.execute("SELECT count(*) FROM p0_job_proposals").fetchone()[0],0)
         self.assertEqual(self.db.execute("SELECT count(*) FROM jobs").fetchone()[0],0)
 
+    def test_string_measurements_grant_no_artifact_access(self):
+        req = self.proposal("opaque-label",script="{'label': params['label']}",parameters={"label":self.unassigned},
+                            output_schema={"type":"object","properties":{"label":{"type":"string"}},
+                                           "required":["label"],"additionalProperties":False})
+        jid = self.invoke("gx_job_submit",req)["job_id"]
+        self.assertEqual(self.finish(jid)["status"],"SUCCEEDED")
+        outputs = self.invoke("gx_job_status",{"job_id":jid})["outputs"]
+        result = next(o["artifact_ref"] for o in outputs if o["kind"] == "artifact_analysis_result")
+        self.assertEqual(self.invoke("gx_read_artifact",{"ref":result}),{"label":self.unassigned})
+        self.invoke("gx_read_artifact",{"ref":self.unassigned},False)
+        self.observations.update(job_id=jid,opaque_identifier=True)
+
     def test_new_attempt_adopts_exact_operation_and_keeps_original_manifest(self):
         req = self.proposal("durable-comparison")
         jid = self.invoke("gx_job_submit",req)["job_id"]

@@ -117,14 +117,13 @@ def default_registry(conn: sqlite3.Connection | None = None, *, workflow_id: str
         for entry in packages.installation()["packages"]:
             name = entry["module"]
             try:
-                staged = registry.staged_copy()
+                staged = registry.staged_copy(entry.get("compat_hooks", {}))
                 importlib.import_module(name).register_all(staged)
                 for reference, provider in entry.get("compat_hooks", {}).items():
                     wid, ver = reference.rsplit("@", 1)
                     staged.bind_compat(wid, ver, packages.component(provider),
                         workflow_pin=seams.shipped_pins("workflows").get(reference),
                         hook_pin=seams.shipped_pins("workflow_compat_hooks").get(reference))
-                staged.pin_new_defaults(registry, entry.get("compat_hooks", {}))
                 registry = staged
             except Exception as exc:  # an unavailable package cannot hide the remaining installations
                 errors[name] = f"{type(exc).__name__}: {exc}"[:600]

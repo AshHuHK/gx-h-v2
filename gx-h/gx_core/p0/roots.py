@@ -848,7 +848,9 @@ class Roots:
                     self._allow_refs(row["root_key"], answer)
                 elif tool == "gx_read_artifact":
                     answer = self._read_artifact(row, args)
-                    self._allow_refs(row["root_key"],answer)
+                    # User-defined analytical output can contain identifier-shaped measurements.
+                    if not compute.is_analysis_data(self.conn,args["ref"]):
+                        self._allow_refs(row["root_key"],answer)
                 elif tool in compute.TOOL_MAP:
                     answer = compute.call(self.conn,row,tool,args)
                     if tool == "gx_job_status":

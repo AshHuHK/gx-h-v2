@@ -19,7 +19,9 @@
 }
 ```
 
-字段按 `default`、`task_classes`、`roles` 的顺序覆盖。`profiles` 会列出可用角色。复杂度分类为 `PLANNING`、`AUTHORING`、`VERIFICATION`、`EXECUTION` 和 `TESTING`。协调者、组长和承担最终决策的 planner 使用 `ultra`，复杂科研、验证与代码工作使用 `max` 或显式提高到 `ultra`，简单执行和测试使用 `xhigh`。`GX_P0_TEST=1` 统一为 `xhigh`。工具名必须来自该 Root 的实际 GX 工具，持久 Worker 需要 `gx_submit_product` 交付成果。
+字段按 `default`、`task_classes`、`roles` 的顺序覆盖。`profiles` 会列出可用角色。任务类别包括 `PLANNING`、`AUTHORING`、`VERIFICATION`、`EXECUTION` 和 `TESTING`。省略 `effort` 时，协调和决策角色默认 `ultra`，复杂科研、验证和代码工作默认 `max`，简单执行和测试默认 `xhigh`。本地测试模式的默认值也是 `xhigh`。显式填写时可使用所选模型目录中的档位名。新生产项目由官方 `model/list` 核对目标模型与档位；冷恢复沿用该项目冻结的角色设置。工具名必须来自该 Root 的实际 GX 工具，持久 Worker 需要 `gx_submit_product` 交付成果。
+
+同一工作区的 Run 共享供应商正式发布的限流窗口。GX 保留原任务和等待中的租约，窗口重置后继续准入。部署可以在 `gx-h/config/limits.json` 的 `native_provider.parallel_turns` 中为指定供应商设置并发上限。新项目接入缺少限额反馈的供应商时默认并发为 1，可通过项目的 `max_parallel_roots` 显式设置。窗口缺少重置时间时，GX 按 `native_provider.retry_seconds` 安排下一次尝试，默认 60 秒。
 
 ```bash
 export GX_P0_PROFILE=/path/to/roles.json

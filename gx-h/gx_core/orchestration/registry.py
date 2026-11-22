@@ -24,18 +24,21 @@ from .hooks import DEFAULT_HOOKS, WorkflowHooks
 class WorkflowRegistry:
     def __init__(self, workflows: Iterable[Workflow] = ()) -> None:
         self._by_key: dict[tuple[str, str], Workflow] = {}
+        self._compatibility_refs: frozenset[str] | None = None
         for workflow in workflows:
             self.register(workflow)
 
     # ------------------------------------------------------------------ mutation
     def register(self, workflow: Workflow, *, hooks: WorkflowHooks | None = None) -> Workflow:
+        key = (workflow.workflow_id, workflow.version)
+        if hooks is None and self._compatibility_refs is not None and "@".join(key) not in self._compatibility_refs:
+            hooks = DEFAULT_HOOKS
         if hooks is not None:
             content = hooks.content()
             workflow = copy(workflow)
             workflow.hooks = hooks
             workflow.hook_bindings = content["bindings"]
             workflow.sources = {**workflow.sources, **content["sources"]}
-        key = (workflow.workflow_id, workflow.version)
         existing = self._by_key.get(key)
         if existing is not None:
             if existing.digest() == workflow.digest():
@@ -53,18 +56,12 @@ class WorkflowRegistry:
         self._by_key[key] = workflow
         return workflow
 
-    def staged_copy(self):
+    def staged_copy(self, compatibility_refs):
+        """Install a package atomically and expose each final child pin to its dependent graphs."""
         staged = WorkflowRegistry()
         staged._by_key.update(self._by_key)
+        staged._compatibility_refs = frozenset(compatibility_refs)
         return staged
-
-    def pin_new_defaults(self, existing, compatibility_refs):
-        """Even a newly installed package with no explicit hooks pins the defaults it will use."""
-        for key, flow in tuple(self._by_key.items()):
-            if key in existing._by_key or flow.hook_bindings is not None or "@".join(key) in compatibility_refs:
-                continue
-            del self._by_key[key]
-            self.register(flow, hooks=DEFAULT_HOOKS)
 
     def bind_compat(self, workflow_id, version, hooks, *, workflow_pin, hook_pin):
         """A release adapter for a graph whose original digest predates hooks."""

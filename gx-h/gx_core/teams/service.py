@@ -660,7 +660,6 @@ class TeamService:
     def _inspect_workers(self, conn: sqlite3.Connection, run_id: str, *, include_live: bool = False) -> dict[str, Any]:
         from ..hostobs import host_policy, native_context
         run = self._run_row(conn, run_id)
-        p0 = native_context.source_of_run(run) == host_policy.P0_SOURCE
         stopped = {item["lease_id"]: item for item in (seams.stopped_holders(conn, run_id=run_id) or [])}
         due = {row["lease_id"] for row in recovery.lapsed_leases(conn, run_id)}
         out: dict[str, Any] = {"worker_holds": [], "host_stopped": []}
@@ -673,7 +672,8 @@ class TeamService:
             if not include_live and lease["lease_id"] not in due and lease["lease_id"] not in stopped:
                 continue
             task = self._task_row(conn, lease["task_id"])
-            if p0:
+            source = native_context.source_of_run(run)
+            if source == host_policy.P0_SOURCE:
                 # A P0 thread's official settings and turn receipts are maintained by Roots.
                 # An unmaterialized creation can expire with both thread and principal null.
                 # The ordinary lapse settlement below retains waits and the attempt history.
@@ -685,7 +685,7 @@ class TeamService:
                     raise ScopeDenied("the P0 root binding and pinned run do not cover this task lease")
                 continue
             prepared = getattr(self, "_codex_observations", {}).get(lease["lease_id"])
-            if prepared is None and native_context.is_native_run(conn, run_id):
+            if prepared is None and source == native_context.SOURCE:
                 verdict = self._native_passive_verdict(conn, task, lease, due=lease["lease_id"] in due)
                 if verdict is None:
                     continue

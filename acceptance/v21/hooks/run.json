@@ -1,0 +1,90 @@
+{
+  "commands": [
+    {
+      "command": "start",
+      "exit": 0
+    },
+    {
+      "command": "stop",
+      "exit": 0
+    },
+    {
+      "command": "message",
+      "exit": 1
+    },
+    {
+      "command": "message",
+      "exit": 0
+    },
+    {
+      "command": "resume",
+      "exit": 0
+    }
+  ],
+  "core_after_install": "e5b7076cf68379a984404e5d8e955a8faa72fcc88d71033397efd87663695d6d",
+  "core_before_install": "e5b7076cf68379a984404e5d8e955a8faa72fcc88d71033397efd87663695d6d",
+  "evaluations": [
+    {
+      "eval_id": "gxe_337a6c4b113d0ebfb212fde34a39ea1c010310a0874156854f44c36ed622f09f",
+      "metrics_json": "{\"count_at_or_above\":1,\"max_score\":0,\"observations\":3,\"threshold\":-0.25}",
+      "provenance_json": "{\"input_ref\":\"gxa_01m81sv5gc6ymjwg0c\",\"intent_item\":{\"item_id\":\"evaluation\",\"version\":1},\"job_id\":\"gxj_01m81sv539v84cjr1j\",\"manifest_hash\":\"6d1dcda2fd95b3b811942b9e87b5e60f5276ffcd67c9708cb07fe497c4494a15\",\"original_evaluation_id\":null}",
+      "verdict": "PASS"
+    },
+    {
+      "eval_id": "gxe_28d570102075b428f136643c2a07be796814a602ae1bb5c5f76d565b749e49b2",
+      "metrics_json": "{\"count_at_or_above\":0,\"max_score\":0,\"observations\":3,\"threshold\":1.0}",
+      "provenance_json": "{\"input_ref\":\"gxa_01m81sv5gc6ymjwg0c\",\"intent_item\":{\"item_id\":\"evaluation\",\"version\":2},\"job_id\":\"gxj_01m81sv539v84cjr1j\",\"manifest_hash\":\"6d1dcda2fd95b3b811942b9e87b5e60f5276ffcd67c9708cb07fe497c4494a15\",\"original_evaluation_id\":\"gxe_337a6c4b113d0ebfb212fde34a39ea1c010310a0874156854f44c36ed622f09f\"}",
+      "verdict": "FAIL"
+    }
+  ],
+  "final": "COMPLETED",
+  "invalid_intent": {
+    "error": "SchemaInvalid: SCHEMA_INVALID: Sampling requires a positive minimum number of readings"
+  },
+  "jobs": [
+    {
+      "capability_version": "1",
+      "job_id": "gxj_01m81sv539v84cjr1j",
+      "status": "SUCCEEDED"
+    }
+  ],
+  "replan": [
+    {
+      "event_id": 59,
+      "payload_json": "{\"sampling\":{\"minimum\":3}}"
+    }
+  ],
+  "root_calls": [
+    {
+      "call_id": "call-fixture-1",
+      "result_json": "{\"attempt\":1,\"instrument_units\":\"readings\",\"intent\":{},\"supplement_sources\":[],\"task_id\":\"gxt_01m81sv5h3nj7sgjx2\"}",
+      "thread_id": "01a2039d-a215-7c83-9870-2b336a5fa406",
+      "tool": "gx_task_context",
+      "turn_id": "01a2039d-a2de-77e0-827a-458a96a189d9"
+    },
+    {
+      "call_id": "call-fixture-2",
+      "result_json": "{\"count\":3,\"observations_ref\":\"gxa_01m81sv5gc6ymjwg0c\"}",
+      "thread_id": "01a2039d-a215-7c83-9870-2b336a5fa406",
+      "tool": "gx_sample_count",
+      "turn_id": "01a2039d-a2de-77e0-827a-458a96a189d9"
+    },
+    {
+      "call_id": "call-fixture-3",
+      "result_json": "{\"artifact_ref\":\"gxa_01m81sv9s1rvxwgpwe\",\"records_ref\":\"gxa_01m81sv9sbgx33t0da\",\"revision\":7,\"run_id\":\"gxr_01m81sv4z8k79v4aqa\",\"submission_id\":\"gxsb_01m81sv9s60c7y8588\",\"task_status\":\"ACCEPTED\",\"validation\":{\"accepted_count\":0,\"bundle_kind\":\"\",\"complete\":true,\"created\":{},\"created_counts\":{},\"policy_verdict\":null,\"records\":[],\"records_ref\":\"gxa_01m81sv9sbgx33t0da\",\"records_shown\":0,\"records_total\":0,\"rejected_count\":0,\"summary\":\"the workflow accepted the required artifacts\",\"would_accept\":true}}",
+      "thread_id": "01a2039d-a215-7c83-9870-2b336a5fa406",
+      "tool": "gx_submit_product",
+      "turn_id": "01a2039d-a2de-77e0-827a-458a96a189d9"
+    }
+  ],
+  "run_id": "gxr_01m81sv4z8k79v4aqa",
+  "tasks": [
+    {
+      "input_json": "{\"evaluation_ref\":\"gxa_01m81sv5gxerg8mr6v\",\"instruction\":\"Inspect gx_task_context, count observations with gx_sample_count and submit the observed count.\",\"job_id\":\"gxj_01m81sv539v84cjr1j\",\"observations_ref\":\"gxa_01m81sv5gc6ymjwg0c\",\"output_kind\":\"calibration_review\",\"minimum\":3}",
+      "status": "ACCEPTED",
+      "task_id": "gxt_01m81sv5h3nj7sgjx2"
+    }
+  ],
+  "workflow": "calibration@1",
+  "workflow_digest": "7e5e9d86336322b533a02061c33f20852ca3cf387fbff952f6e2563d137004d9"
+}

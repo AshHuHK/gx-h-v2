@@ -49,6 +49,12 @@ def _ctx(conn, row, tool):
                principal=Principal(row["thread_id"], "worker", source="official_root_binding"))
 
 
+def is_analysis_data(conn, artifact_ref):
+    row = conn.execute("SELECT a.kind,j.capability_id FROM artifacts a LEFT JOIN jobs j USING(job_id) WHERE a.artifact_ref=?",
+                       (artifact_ref,)).fetchone()
+    return row is not None and (row["kind"] == "analysis_program" or row["capability_id"] == "artifact-analysis")
+
+
 def _scope(conn, row, refs, *, internal):
     for ref in refs:
         if not isinstance(ref, str) or ids.kind_of(ref) != "artifact":
@@ -81,7 +87,7 @@ def queue_job(conn, row, *, capability_version, inputs, parameters, idempotency_
     if (not isinstance(capability_version, str) or not CAP.fullmatch(capability_version) or
             not isinstance(idempotency_key, str) or not 0 < len(idempotency_key) <= 200 or
             not isinstance(inputs, dict) or not 1 <= len(inputs) <= 32 or
-            any(not IDENT.fullmatch(key) for key in inputs) or not isinstance(parameters, dict) or
+            any(not isinstance(key,str) or not IDENT.fullmatch(key) for key in inputs) or not isinstance(parameters, dict) or
             not isinstance(tighten or {}, dict) or set(binding or {}) - {"evaluator"}):
         raise SchemaInvalid("invalid version, named input refs, operation key or job parameters")
     if analysis is not None:
@@ -216,9 +222,16 @@ def call(conn, row, name, args):
     spec = TOOL_MAP[name]["inputSchema"]
     if set(args) - set(spec["properties"]) or set(spec["required"]) - set(args):
         raise SchemaInvalid("invalid arguments to " + name)
+    for key, value in args.items():
+        field = spec["properties"][key]
+        expected = {"string":str,"integer":int,"object":dict,"array":list}[field["type"]]
+        if type(value) is not expected or (expected is str and not value):
+            raise SchemaInvalid(f"{name}.{key} must be a {field['type']}")
+        if expected is int and (value < field.get("minimum",value) or value > field.get("maximum",value)):
+            raise SchemaInvalid(f"{name}.{key} is outside the allowed range")
+        if expected is list and not all(isinstance(k,str) for k in value):
+            raise SchemaInvalid(f"{name}.{key} requires string names")
     if name == "gx_capability_inspect":
-        if args.get("capability_id") is not None and not isinstance(args["capability_id"], str):
-            raise SchemaInvalid("capability_id must be a string")
         from .. import config
         from ..capabilities import manifest as capability_manifest
         requested = args.get("capability_id")

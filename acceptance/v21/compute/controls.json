@@ -2,7 +2,7 @@
   "controls": [
     {
       "observed": {
-        "cancelled": "gxj_01m81ssxpkxtkxmzvw",
+        "cancelled": "gxj_01m81sxh718t2ddx7p",
         "refusals": [
           {
             "error": "SCOPE_DENIED: only the assigned GX root may call this tool",
@@ -11,9 +11,9 @@
         ],
         "revocation_reason": {
           "code": "LEASE_EXPIRED",
-          "message": "lease gxl_01m81ssxpaf4etb39z was released at 2026-11-22T14:15:48.182Z"
+          "message": "lease gxl_01m81sxh6jhf5ftzwt was released at 2026-11-22T14:17:46.468Z"
         },
-        "revoked_job": "gxj_01m81ssxpnt8bq5gjt"
+        "revoked_job": "gxj_01m81sxh743k6agmhd"
       },
       "test": "tests.test_v21_compute.ComputeTest.test_cancel_and_fence_before_scheduling"
     },
@@ -25,12 +25,12 @@
             "observed": "runner_error",
             "summary": "runner_error: host_process_peak_rss_limit"
           },
-          "job_id": "gxj_01m81sszb5e7pmkyca",
+          "job_id": "gxj_01m81sxjys50ce314p",
           "measured": {
             "cpu_seconds": 0.01,
             "limit_memory_mib": 1,
             "limit_wall_seconds": 10,
-            "max_rss_mib": 12.0,
+            "max_rss_mib": 11.9,
             "memory_within_limit": false,
             "result": "runner_error",
             "started": true,
@@ -44,16 +44,16 @@
             "summary": "timed out: the runner ended the tool at its 1.0 s limit",
             "timed_out": true
           },
-          "job_id": "gxj_01m81ssxry9eafzser",
+          "job_id": "gxj_01m81sxha818g0a8vb",
           "measured": {
-            "cpu_seconds": 0.06,
+            "cpu_seconds": 0.053,
             "limit_memory_mib": 128,
             "limit_wall_seconds": 1,
-            "max_rss_mib": 14.4,
+            "max_rss_mib": 14.2,
             "memory_within_limit": true,
             "result": "timed_out",
             "started": true,
-            "wall_seconds": 1.039
+            "wall_seconds": 1.04
           }
         }
       },
@@ -61,10 +61,10 @@
     },
     {
       "observed": {
-        "job_id": "gxj_01m81sszqct3hxzjh4",
-        "new_attempt": "3b33d504-b50c-4838-9fc3-fbdaa4b6eda3",
-        "original_attempt": "93d5cf98-f20e-4b2e-ab84-8cf7796e18a6",
-        "original_manifest": "bf798152d3d7cb683b5a3fece229fdbdf43033499bb77a59ba799a5863e01b0b",
+        "job_id": "gxj_01m81sxkakgdr98vhv",
+        "new_attempt": "c01d1843-d787-44c6-bef1-1345a13d3c96",
+        "original_attempt": "4d57e1c0-26d4-46aa-be2f-a0351cccd97c",
+        "original_manifest": "6c3c10fd24a9b298621ff2de24c9f51f4e33582a66b5ca331a513d2edbeb0efd",
         "refusals": [
           {
             "error": "IDEMPOTENCY_CONFLICT: this operation already binds different inputs or parameters",
@@ -80,12 +80,12 @@
     },
     {
       "observed": {
-        "job_id": "gxj_01m81st0b2v9c46wsd",
-        "manifest_sha256": "2d11378b37416ea5dbae000a6ebac71c82aad7192583441d01311ae32864cf76",
+        "job_id": "gxj_01m81sxkzfyrm3evb8",
+        "manifest_sha256": "18ebdb02e01a19e7fc0c9d04ba9ea3919524e6103958de876a9d3c75ee862e07",
         "result": {
           "gap": 14.5
         },
-        "result_ref": "gxa_01m81st0w9xgwd4wry",
+        "result_ref": "gxa_01m81sxmhvdwg1mwvs",
         "result_sha256": "fa674ac096b47799f34cf887b57bf4f076fcbe73a827d59c2ff04ce9058669f9",
         "runtime": {
           "cpu_seconds": 8,
@@ -108,13 +108,13 @@
         "failed_jobs": [
           {
             "diagnostic": "analysis refused: encoded result exceeds 32768 bytes",
-            "job_id": "gxj_01m81st0ypttgr2gd0",
+            "job_id": "gxj_01m81sxmnp8t8he87z",
             "result_count": 0,
             "status": "FAILED"
           },
           {
             "diagnostic": "analysis refused: result type disagrees with output_schema",
-            "job_id": "gxj_01m81st1kfvzr49jw2",
+            "job_id": "gxj_01m81sxn89xqqgbdn7",
             "result_count": 0,
             "status": "FAILED"
           }
@@ -125,13 +125,26 @@
             "code": "SCHEMA_INVALID",
             "message": "tighten.wall_seconds=11 is above the manifest's 10; a request may only lower a limit"
           },
-          "job_id": "gxj_01m81st27gtjne4rn3",
+          "job_id": "gxj_01m81sxnqznaegq71w",
           "outputs": [],
           "status": "REJECTED",
           "terminal": true
         }
       },
       "test": "tests.test_v21_compute.ComputeTest.test_schema_encoded_output_and_resource_refusal"
+    },
+    {
+      "observed": {
+        "job_id": "gxj_01m81sxntpg0dq8cm7",
+        "opaque_identifier": true,
+        "refusals": [
+          {
+            "error": "SCOPE_DENIED: this artifact has not been cited in the task inputs",
+            "tool": "gx_read_artifact"
+          }
+        ]
+      },
+      "test": "tests.test_v21_compute.ComputeTest.test_string_measurements_grant_no_artifact_access"
     },
     {
       "observed": {
@@ -181,5 +194,5 @@
       "test": "tests.test_v21_compute.ComputeTest.test_unavailable_programs_paths_inputs_are_rejected_before_execution"
     }
   ],
-  "passed": 6
+  "passed": 7
 }

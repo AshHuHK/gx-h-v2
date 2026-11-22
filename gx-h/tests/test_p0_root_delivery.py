@@ -30,6 +30,9 @@ class Peer:
             return {"thread": {"id": "root", "status": {"type": "active" if active else "idle"}}}
         if method == "thread/turns/list":
             return {"data": self.turns[::-1], "nextCursor": None}
+        if method == "thread/items/list":
+            turn = next(t for t in self.turns if t["id"] == params["turnId"])
+            return {"data": [{"turnId": turn["id"], "item": item} for item in turn["items"]], "nextCursor": None}
         self.sent.append((method, params))
         if method == "turn/interrupt":
             self.assert_active(active, params["turnId"])
@@ -138,11 +141,26 @@ class RootDeliveryTests(unittest.TestCase):
         self.assertEqual(len(self.budget()["reservations"]), 2)
         self.assertEqual(len(self.peer.sent), 4)
 
+    def test_definitive_protocol_refusal_releases_unsent_turn_hold(self):
+        original = self.peer._request
+        def refused(method, params):
+            if method == "turn/start":
+                raise AppServerResponseError(ReceivedMessage(1, {"id": 1, "error": {
+                    "code": -32602, "message": "invalid params"}}))
+            return original(method, params)
+        self.peer._request = refused
+        with self.assertRaises(AppServerResponseError):
+            self.delivery.deliver("root", "measure", event_id="1")
+        self.assertFalse(self.budget()["reserved"])
+        self.peer._request = original
+        self.assertEqual(self.delivery.deliver("root", "measure", event_id="1")["turn_id"], "turn-1")
+        self.assertEqual(len(self.peer.sent), 1)
+
     def test_interrupt_requires_frozen_attempt_and_never_targets_a_new_turn(self):
         t = records.create_task(self.conn, run_id=self.run, kind="research_round",
                                 role="evidence_reviewer", actor="test")
         lease = store.issue_lease(self.conn, task_id=t, owner="root", worker_role="evidence_reviewer",
-                                  seconds=600, attempt=1)
+                                  seconds=600, attempt=1, principal="root")
         self.conn.execute("UPDATE tasks SET attempt=1, lease_id=?,status='CLAIMED' WHERE task_id=?",
                           (lease["lease_id"], t))
         self.peer.task = {"task_id": t, "attempt": 1, "lease_id": lease["lease_id"]}

@@ -5,6 +5,7 @@ import hashlib
 import uuid
 
 from .. import budgets
+from ..domain import machines
 from ..errors import (BudgetExceeded, HoldActive, IdempotencyConflict, LeaseExpired,
                       OutcomeUnknown, SchemaInvalid, ScopeDenied)
 from ..hostobs.app_server_client import AppServerResponseError
@@ -63,7 +64,8 @@ class RootDelivery:
             return binding
         if human:
             raise ScopeDenied("human input must be delivered to the registered main thread")
-        task = self.conn.execute("SELECT lease_id, attempt, status FROM tasks WHERE task_id=? AND run_id=?",
+        task = self.conn.execute("SELECT t.lease_id,t.attempt,t.status,r.status AS run_status FROM tasks t "
+                                 "JOIN runs r ON r.run_id=t.run_id WHERE t.task_id=? AND t.run_id=?",
                                  (task_id, self.run_id)).fetchone()
         lease = self.conn.execute("SELECT released_at FROM leases WHERE lease_id=? AND task_id=?",
                                   (binding["lease_id"], task_id)).fetchone()
@@ -73,7 +75,10 @@ class RootDelivery:
             if current:
                 raise ScopeDenied("commit the GX attempt fence before interrupting Codex")
         elif current:
-            store.validate_lease(self.conn, binding["lease_id"], task_id=task_id)
+            lease = store.validate_lease(self.conn, binding["lease_id"], task_id=task_id)
+            if (lease["principal"] != thread_id or lease["attempt"] != binding["attempt"] or
+                    task["run_status"] in ("PAUSED", *machines.terminal_states("run"))):
+                raise ScopeDenied("GX no longer permits this root to execute its task")
         else:
             raise LeaseExpired("the root no longer holds the task attempt")
         return binding
@@ -218,40 +223,64 @@ class RootDelivery:
                                   "AND state='sending'", (self.run_id, thread_id, turn_id))
                 self._settle(thread_id, turn_id)
 
-    def reconcile(self, thread_id):
-        """Search the official durable history, including older pages, for uncertain inputs."""
-        rows = self.conn.execute(
-            "SELECT d.* FROM p0_root_deliveries d LEFT JOIN budget_reservations r ON r.reservation_ref=d.reservation_ref "
-            "WHERE d.run_id=? AND d.thread_id=? AND (d.state='sending' OR r.status='HELD')",
-            (self.run_id, thread_id)).fetchall()
-        if not rows:
-            return
-        pending_input = any(row["state"] == "sending" and not row["interrupt"] for row in rows)
-        cursor = None
+    def _pages(self, method, params):
         seen = set()
         while True:
-            params = {"threadId": thread_id, "sortDirection": "desc", "itemsView": "full" if pending_input else
-                      "notLoaded", "limit": 8}
-            if cursor:
-                params["cursor"] = cursor
-            try:
-                page = self.roots._request("thread/turns/list", params)
-            except AppServerResponseError as exc:
-                if "not materialized yet" in exc.message and "before first user message" in exc.message:
-                    return
-                raise
-            for turn in page["data"]:
-                for item in turn.get("items") or []:
-                    with store.transaction(self.conn):
-                        self._arrived(thread_id, turn["id"], item)
-                if turn["status"] in TERMINAL:
-                    self.observe("turn/completed", {"threadId": thread_id, "turn": turn})
+            page = self.roots._request(method, params)
+            yield from page["data"]
             cursor = page.get("nextCursor")
             if not cursor:
                 return
             if cursor in seen:
                 raise OutcomeUnknown("Codex returned an inconsistent history cursor")
             seen.add(cursor)
+            params = {**params, "cursor": cursor}
+
+    def reconcile(self, thread_id):
+        """Recover exact input receipts and terminal turns from the official history."""
+        rows = self.conn.execute(
+            "SELECT d.* FROM p0_root_deliveries d LEFT JOIN budget_reservations r ON r.reservation_ref=d.reservation_ref "
+            "WHERE d.run_id=? AND d.thread_id=? AND (d.state='sending' OR r.status='HELD')",
+            (self.run_id, thread_id)).fetchall()
+        if not rows:
+            return
+        pending = {row["event_id"]: row["target_turn"] for row in rows if row["state"] == "sending"
+                   and not row["interrupt"]}
+        targets = {row["turn_id"] or row["target_turn"] for row in rows} - {None}
+        turns = self._pages("thread/turns/list", {"threadId": thread_id, "sortDirection": "desc",
+                                                 "itemsView": "notLoaded", "limit": 64})
+        try:
+            for turn in turns:
+                tid = turn["id"]
+                if tid in pending.values() or None in pending.values():
+                    items = self._pages("thread/items/list", {"threadId": thread_id, "turnId": tid,
+                                        "sortDirection": "desc", "limit": 16,
+                                        "deferOutput": {"commandExecution": True, "mcpToolCall": True}})
+                    for entry in items:
+                        if entry.get("turnId") == tid and entry["item"].get("type") == "userMessage":
+                            with store.transaction(self.conn):
+                                self._arrived(thread_id, tid, entry["item"])
+                            pending = {eid: target for eid, target in pending.items()
+                                       if self._get(eid)["state"] == "sending"}
+                            if not pending:
+                                break
+                if turn["status"] in TERMINAL:
+                    self.observe("turn/completed", {"threadId": thread_id, "turn": turn})
+                targets.discard(tid)
+                if not pending and not targets:
+                    break
+        except AppServerResponseError as exc:
+            if "not materialized yet" not in exc.message or "before first user message" not in exc.message:
+                raise
+
+    def _refused(self, event_id):
+        with store.transaction(self.conn):
+            row = self._get(event_id)
+            if row["state"] == "sending":
+                if row["reservation_ref"]:
+                    budgets.release(self.conn, row["reservation_ref"], actor=ACTOR, reason="Codex refused the input")
+                self.conn.execute("UPDATE p0_root_deliveries SET state='ready',reservation_ref=NULL,prior_tokens=NULL,"
+                                  "token_budget=NULL WHERE run_id=? AND event_id=?", (self.run_id, event_id))
 
     def deliver(self, thread_id, text, *, event_id, interrupt=False, human=False, message_id=None):
         if self.conn.in_transaction:
@@ -284,14 +313,15 @@ class RootDelivery:
             except AppServerResponseError as exc:
                 if method == "turn/steer" and _idle_refusal(exc, "steer"):
                     # The protocol explicitly refused this input. The next iteration samples the live turn again.
-                    self.conn.execute("UPDATE p0_root_deliveries SET state='ready' WHERE run_id=? "
-                                      "AND event_id=? AND state='sending'", (self.run_id, event_id))
+                    self._refused(event_id)
                     if self.active(thread_id) == active:
                         raise HoldActive("Codex has not yet published the new active-turn state") from exc
                     continue
                 if method == "turn/interrupt" and _idle_refusal(exc, "interrupt") and self.active(thread_id) != active:
                     response = {}
                 else:
+                    if exc.code in (-32600, -32601, -32602):
+                        self._refused(event_id)
                     raise
             turn_id = (response.get("turn") or {}).get("id") if method == "turn/start" else response.get("turnId", active)
             if not turn_id or (active and turn_id != active):

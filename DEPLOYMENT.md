@@ -1,6 +1,10 @@
 # 本机部署与运行
 
+在新 Linux x86_64 主机上部署 ACC-1 时，独立 tar 附件提供上游源码与许可证、官方 Codex、实验协议、历史迁移夹具和离线测试依赖。解压后运行 `python3 -B scripts/release_assets.py all`。[附件校验、安装与公开 CLI 复验](RELEASE.md)
+
 在本包根目录运行 `bin/gx-p0`。本机已验证 Python 3.11.9、官方 `@openai/codex@0.169.0` 和已有的 ChatGPT OAuth 登录。启动器从本包的 `gx-h` 导入 GX，在本机通过 stdio 启动官方 App Server。模型请求和设备授权使用 Clash。一次真实 `xhigh` 请求已收到预期回复。[OAuth 运行记录及模型目录](audit/OAUTH_EFFORT.md) · [本机 doctor 结果](acceptance/runs/oauth/doctor.json)
+
+在新项目的 `--spec` 文件中，`budget_profile` 可选择已配置的项目预算。缺省的 `p0` 档有 1,000,000 token 准入额度。经用户授权的 2RE9 扩大验收选用 `p0_extended`，根预算上限为 12,000,000 token、18 个付费 GX turn 和 4 个 Job，限 CPU 计算。正式需求还可给出更小的上限。一次原生 turn 可以包含多份模型响应，实际用量可超过事先预留，最终按回执结算。[可选项目预算](gx-h/config/limits.json)
 
 ## 本机首次运行
 
@@ -41,7 +45,7 @@ export GX_P0_CODEX="$HOME/.local/gx-codex-p0/node_modules/.bin/codex"
 ./bin/gx-p0 doctor
 ```
 
-已有官方二进制时，`GX_P0_CODEX` 也可直接指向它；默认从 `PATH` 解析 `codex`。npm 包同时声明了对应平台的原生可选依赖，执行安装需允许 optional dependencies。正式运行的 provider 为 `openai`。本机部署启用官方 `respect_system_proxy` 并关闭 `system_proxy_fallback`。任一配置的 Clash 入口连接失败时，启动器给出地址并停止发起网络请求。[官方 CLI 发行文件核验](acceptance/runs/schema/cli-provenance.json) · [代理和角色配置](gx-h/gx_core/p0/profiles.py)
+已有官方二进制时，`GX_P0_CODEX` 也可直接指向它；随后优先使用便携发布包中的固定二进制，再从 `PATH` 解析 `codex`。npm 包同时声明了对应平台的原生可选依赖，执行安装需允许 optional dependencies。正式运行默认使用 `openai` 和 ChatGPT OAuth，科研角色也可以选用在同一官方客户端中注册的 Responses 服务。本机部署启用官方 `respect_system_proxy` 并关闭 `system_proxy_fallback`。任一配置的 Clash 入口连接失败时，启动器给出地址并停止发起网络请求。[官方 CLI 发行文件核验](acceptance/runs/schema/cli-provenance.json) · [模型、Provider 与角色工具配置](MODEL_PROFILES.md)
 
 ## 角色档位
 

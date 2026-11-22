@@ -1,0 +1,397 @@
+{
+  "base_commit": "adceab86e6400e0868ec034d0ff4365de22d5c4f",
+  "domain_geometry_counts": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 4,
+    "skipped": 0,
+    "total": 4
+  },
+  "ended_utc": "2026-11-22T08:37:13.628623+00:00",
+  "environment": "clean isolated local package copy; release wheelhouse, bundled historical Git fixture, bundled Cordis npm archives; optional DSH not in released dependencies",
+  "geometry_review_version_counts": {
+    "errors": 0,
+    "failed": 0,
+    "skipped": 0,
+    "total": 2
+  },
+  "initial_ledger_invocation": {
+    "argv": [
+      "$SCRATCH/venv/bin/python",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_p0_root_delivery",
+      "tests.test_p0_meter_recovery",
+      "tests.test_p0_wait_leases",
+      "tests.test_p0_roots"
+    ],
+    "cwd": "$PACKAGE/gx-h",
+    "elapsed_seconds": 2.039,
+    "ended_utc": "2026-11-22T08:36:29.089261+00:00",
+    "log": "ledger-focused-import-error.log",
+    "note": "Metering tests import a sibling module by its short name. unittest discover already adds tests/ to sys.path. This direct module invocation did not.",
+    "returncode": 1,
+    "started_utc": "2026-11-22T08:36:27.050787+00:00"
+  },
+  "installed_assets": {
+    "release-assets/lock.json": "ef1b0bd377ccb552ee321abdccda7db189fa6a9d0dfbf356322033db80ad2fd2",
+    "release-assets/npm/cordis-4.1.0.tgz": "3b0099a6aa9b0b52c3e199042acf6f1ae195c5690f7de11aa61171bca7752eca",
+    "release-assets/npm/cosmokit-1.9.0.tgz": "6225043dbc7f6ff6c7cb104bc381b74c972577967ad827af26180719e17ff71d",
+    "release-assets/npm/dsh-scope-0.2.2-rc.5.tgz": "daa7eb76bf5642404e149a44a1091cd97648dc537bf360ad22842286a7754b3a",
+    "release-assets/npm/spec-1.1.0.tgz": "a7cb7268be280ab518d450f8c3b07c86f23417225c0ab53691ed59b3067cceaf",
+    "release-assets/python/biopython-1.88-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl": "99e1f7022ab8eee2ae9e9a05b66ad183b9fe4eeb4e561a65ed0fd85eef5f8267",
+    "release-assets/python/numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "ec58f02bdf7b9ff35c17a8b2d76cdfc45ba97a55d2d921bbd7ec79c7d591c9e5",
+    "release-assets/python/requirements.lock": "bd2ca6f9fd8fcded8af09b11e62740584c03e8ea1d102b3a8b3262faab2664b0"
+  },
+  "ledger_focused_counts": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 40,
+    "skipped": 0,
+    "total": 40
+  },
+  "node_counts": {
+    "cancelled": 0,
+    "fail": 0,
+    "pass": 2,
+    "skipped": 0,
+    "tests": 2
+  },
+  "node_version": "v22.17.0",
+  "operations": {
+    "domain-geometry": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_tl1a_geometry",
+        "tests.test_p0_context_acknowledgments"
+      ],
+      "cwd": "$PACKAGE/gx-h",
+      "elapsed_seconds": 9.036,
+      "ended_utc": "2026-11-22T08:36:27.050668+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:18.014418+00:00"
+    },
+    "generator": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "adapters/hosts/generate.py",
+        "--check"
+      ],
+      "cwd": "$PACKAGE/gx-h",
+      "elapsed_seconds": 0.1,
+      "ended_utc": "2026-11-22T08:34:11.660100+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:34:11.560281+00:00"
+    },
+    "geometry-review-compatibility": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_tl1a_review_versions"
+      ],
+      "cwd": "$PACKAGE/gx-h",
+      "elapsed_seconds": 2.529,
+      "ended_utc": "2026-11-22T08:34:25.801512+00:00",
+      "returncode": 0
+    },
+    "ledger-focused": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_p0_root_delivery",
+        "tests.test_p0_meter_recovery",
+        "tests.test_p0_wait_leases",
+        "tests.test_p0_roots"
+      ],
+      "cwd": "$PACKAGE/gx-h",
+      "elapsed_seconds": 2.334,
+      "ended_utc": "2026-11-22T08:37:13.624036+00:00",
+      "env": {
+        "PYTHONPATH": "$PACKAGE/gx-h/tests"
+      },
+      "returncode": 0
+    },
+    "node": {
+      "argv": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "runtime/plugin-host/host.test.ts"
+      ],
+      "cwd": "$PACKAGE/gx-h",
+      "elapsed_seconds": 0.342,
+      "ended_utc": "2026-11-22T08:34:11.902576+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:34:11.560948+00:00"
+    },
+    "offline-cordis": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "scripts/release_assets.py",
+        "cordis"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 3.044,
+      "ended_utc": "2026-11-22T08:34:11.558898+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:34:08.515211+00:00"
+    },
+    "offline-wheels": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-m",
+        "pip",
+        "--isolated",
+        "--disable-pip-version-check",
+        "install",
+        "--no-index",
+        "--no-cache-dir",
+        "--require-hashes",
+        "--find-links",
+        "$PACKAGE/release-assets/python",
+        "-r",
+        "$PACKAGE/release-assets/python/requirements.lock"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 3.005,
+      "ended_utc": "2026-11-22T08:34:08.515107+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:34:05.510444+00:00"
+    },
+    "p0-focused": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_p0*.py",
+        "-v"
+      ],
+      "cwd": "$PACKAGE/gx-h",
+      "elapsed_seconds": 30.301,
+      "ended_utc": "2026-11-22T08:36:06.374434+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:35:36.073267+00:00"
+    },
+    "python-full": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "cwd": "$PACKAGE/gx-h",
+      "elapsed_seconds": 84.513,
+      "ended_utc": "2026-11-22T08:35:36.072685+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:34:11.559710+00:00"
+    },
+    "venv": {
+      "argv": [
+        "/opt/conda/bin/python",
+        "-m",
+        "venv",
+        "$SCRATCH/venv"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 3.028,
+      "ended_utc": "2026-11-22T08:34:05.510354+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:34:02.481980+00:00"
+    }
+  },
+  "p0_focused_counts": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 100,
+    "skipped": 0,
+    "total": 100
+  },
+  "passed": true,
+  "product_commit_equivalence": "commit-equivalence.json",
+  "product_source_prefixes": [
+    "gx-h/",
+    "bin/",
+    "codex_adapter/",
+    "examples/",
+    "scripts/"
+  ],
+  "product_source_test_sha256": "c68624158b2fe15a6cd927a1cefe1ed37aa6aaf8816b06349944f7611834f5a4",
+  "protocol_counts": {
+    "passed": 8,
+    "total": 8
+  },
+  "protocol_operations": {
+    "expired-wake": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "acceptance/acc1_wake.py",
+        "--expire-wait",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-regression/protocol/expired-wake.json"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 9.132,
+      "ended_utc": "2026-11-22T08:36:18.013769+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:08.881662+00:00"
+    },
+    "gx-late": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "acceptance/acc1_child_late.py",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-regression/protocol/gx-late.json"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 2.117,
+      "ended_utc": "2026-11-22T08:36:10.768545+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:08.651496+00:00"
+    },
+    "gx-missing": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "acceptance/acc1_cold_meter.py",
+        "--case",
+        "missing_last_usage",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-regression/protocol/gx-missing.json"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 2.054,
+      "ended_utc": "2026-11-22T08:36:10.687142+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:08.633096+00:00"
+    },
+    "gx-two": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "acceptance/acc1_cold_meter.py",
+        "--case",
+        "two_samples",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-regression/protocol/gx-two.json"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 2.498,
+      "ended_utc": "2026-11-22T08:36:08.881464+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:06.383108+00:00"
+    },
+    "native-late": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "acceptance/acc1_protocol.py",
+        "--case",
+        "delayed_child",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-regression/protocol/native-late.json"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 2.292,
+      "ended_utc": "2026-11-22T08:36:08.674967+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:06.382596+00:00"
+    },
+    "native-missing": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "acceptance/acc1_protocol.py",
+        "--case",
+        "missing_last_usage",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-regression/protocol/native-missing.json"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 2.251,
+      "ended_utc": "2026-11-22T08:36:08.632896+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:06.382006+00:00"
+    },
+    "native-two": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "acceptance/acc1_protocol.py",
+        "--case",
+        "two_samples",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-regression/protocol/native-two.json"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 2.27,
+      "ended_utc": "2026-11-22T08:36:08.651334+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:06.381683+00:00"
+    },
+    "wake": {
+      "argv": [
+        "$SCRATCH/venv/bin/python",
+        "-B",
+        "acceptance/acc1_wake.py",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_codex_science_harness_package/acceptance/runs/acc-1-regression/protocol/wake.json"
+      ],
+      "cwd": "$PACKAGE",
+      "elapsed_seconds": 9.318,
+      "ended_utc": "2026-11-22T08:36:17.993376+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-22T08:36:08.675128+00:00"
+    }
+  },
+  "python_counts": {
+    "errors": 0,
+    "failures": 0,
+    "passed": 267,
+    "skipped": 4,
+    "total": 271
+  },
+  "python_failures": [],
+  "python_focused": {
+    "p0_discovered_in_full_suite": 96,
+    "p0_errors_or_failures": []
+  },
+  "python_version": "3.11.9",
+  "role_generator_result": "Codex role projections and model policies match.",
+  "skips": [
+    "test_gx_run_uses_sdk_model_then_returns_to_native_decision (test_dsh_activity.DSHActivityTest.test_gx_run_uses_sdk_model_then_returns_to_native_decision) ... skipped 'install runtime/dsh-sdk/.venv first'",
+    "test_reported_model_mismatch_keeps_response_and_refuses_delivery (test_dsh_activity.DSHActivityTest.test_reported_model_mismatch_keeps_response_and_refuses_delivery) ... skipped 'install runtime/dsh-sdk/.venv first'",
+    "test_close_cold_resume_and_observe_prior_evidence (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_cold_resume_and_observe_prior_evidence) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'",
+    "test_close_while_recorded_response_is_pending (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_while_recorded_response_is_pending) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'"
+  ],
+  "source_content_sha256": "ab92b74ee586675fbafecced9b04aab8230260d41a6e6e55125ed27ff7cd485b",
+  "source_file_manifest": "files.json",
+  "source_files": 428,
+  "source_scope": "Every runtime, test and selected release asset was exported directly from the Git commit for this run. Optional DSH wheels are absent from the released dependency set.",
+  "started_utc": "2026-11-22T08:34:02.285763+00:00",
+  "verified_product_commit": "adceab86e6400e0868ec034d0ff4365de22d5c4f"
+}

@@ -1,0 +1,250 @@
+{
+  "mode": "live ChatGPT OAuth through official Codex 0.169.0 and local GX CPU Jobs",
+  "run": {
+    "objective": "Using the deposited 2RE9 coordinates, determine how sensitive the pairwise rigid-body geometry of the observed TL1A chains is to atom selection and incomplete observations. Quantify uncertainty and limit the conclusion to the crystal coordinates.",
+    "project_ref": "tl1a-coordinate-sensitivity",
+    "run_id": "gxr_01m816989yd1bcmpyp",
+    "status": "COMPLETED",
+    "workflow_id": "tl1a_geometry",
+    "workflow_sha256": "33d7414ce6489dbee3b0dfa2c8136f31653ec1c81fdcfb15b69d533201dcd755",
+    "workflow_version": "2"
+  },
+  "report_ref": "gxa_01m816vzpv0r8veg2f",
+  "initial_code": "adceab86e6400e0868ec034d0ff4365de22d5c4f",
+  "recovery_patch": "316a8a3bf7ac9889cb5d16f7f37f4126e722a53d",
+  "recovery_detached_commit": "cd836cfe04ea1fe5556e5c9205fff3ce78d4e170",
+  "recovery_code_sha256": "0d99f8f2d57f8ca2119c81c6712571cfb3e9e58ca5addba1c8774e31cd391cf6",
+  "version_stable_during_resumed_run": true,
+  "source_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+  "formal_intent_versions": [
+    {
+      "item_id": "acceptance-native-turns",
+      "item_type": "resource_limit",
+      "version": 1,
+      "status": "active",
+      "sha256": "a8c62d32a661ac777b02eaa4e2f340f868b9f6fd8057b3766a9bd670dffc374d"
+    },
+    {
+      "item_id": "acceptance-tokens",
+      "item_type": "resource_limit",
+      "version": 1,
+      "status": "active",
+      "sha256": "24bd65522473e1ae03118c7d14279ab7bfe83f82c1ca568a2fd5e6f1d174e655"
+    },
+    {
+      "item_id": "coordinates",
+      "item_type": "data_source",
+      "version": 1,
+      "status": "active",
+      "sha256": "1d52efd9d312be5fdb2faf384308aa7440871685d5401c074c20d9676c54d411"
+    },
+    {
+      "item_id": "job-limit",
+      "item_type": "resource_limit",
+      "version": 1,
+      "status": "active",
+      "sha256": "568d2220b9d7b7862c80de5a6e40ee7840cfe2d3da527c80fdd87ea09f9998ea"
+    },
+    {
+      "item_id": "objective",
+      "item_type": "objective",
+      "version": 1,
+      "status": "active",
+      "sha256": "4af5dd036dc8f4d60aa58ad1f6e38ed1a4fb72cf089d7b033d4171d6e3f32d56"
+    }
+  ],
+  "scientific_actors": [
+    {
+      "stage": "proposal",
+      "task_id": "gxt_01m816a5j3pxfnh3n1",
+      "attempt": 1,
+      "submission_id": "gxsb_01m816ce5549c6k6e9",
+      "thread_id": "01a20265-201e-72b1-9feb-7e66217799be",
+      "provider": "openai",
+      "model": "gpt-6.2-astra",
+      "effort": "xhigh",
+      "effective_permissions": {
+        "approval_policy": "never",
+        "file_system_type": "restricted",
+        "model": "gpt-6.2-astra",
+        "network": "restricted",
+        "reasoning_effort": "xhigh",
+        "sandbox": "read-only"
+      }
+    },
+    {
+      "stage": "assessment",
+      "task_id": "gxt_01m816ngbskn7dgh3r",
+      "attempt": 1,
+      "submission_id": "gxsb_01m816stchz5j31n6a",
+      "thread_id": "01a2026a-cda0-7ca0-a824-09971de3c091",
+      "provider": "openai",
+      "model": "gpt-6.2-sol",
+      "effort": "xhigh",
+      "effective_permissions": {
+        "approval_policy": "never",
+        "file_system_type": "restricted",
+        "model": "gpt-6.2-sol",
+        "network": "restricted",
+        "reasoning_effort": "xhigh",
+        "sandbox": "read-only"
+      }
+    },
+    {
+      "stage": "decision",
+      "task_id": "gxt_01m816stkmm7hc2aqe",
+      "attempt": 1,
+      "submission_id": "gxsb_01m816vzgqbayjs7xy",
+      "thread_id": "01a2026c-eae4-7823-ad88-67af4df69473",
+      "provider": "openai",
+      "model": "gpt-6.2-astra",
+      "effort": "xhigh",
+      "effective_permissions": {
+        "approval_policy": "never",
+        "file_system_type": "restricted",
+        "model": "gpt-6.2-astra",
+        "network": "restricted",
+        "reasoning_effort": "xhigh",
+        "sandbox": "read-only"
+      }
+    }
+  ],
+  "evidence_directions": [
+    {
+      "direction": "refutes",
+      "eval_id": "geometry_e_32b5b23a60d92899bc943045cd802ed545703e4af245f5d48cf589bf92e28a9e",
+      "evidence_id": "geometry_v_0f549832b6498727821de284ddaa8d94567696bf04984d2f8402bcaeac16b763",
+      "hypothesis_id": "geometry_h_6e9c52c8cdf16b2626102054bc940fc5f62abb0aaf91cec9ddcac668dff8e570",
+      "job_id": "gxj_01m816cefq74hqen21",
+      "kind": "valid_scientific_outcome",
+      "path_id": "H_stable",
+      "reason": "Six of the nine prespecified contrasts exceeded at least one frozen bound (0.50° or 0.15 Å), refuting the prediction that every contrast stays within both. Common backbone (656 atom correspondences) and common Cα (164) both cover 164 of 164 observed residues. Their absolute rotation-angle and RMSD differences for A–B, A–C and B–C, respectively, were (0.022°, 0.020 Å), (0.040°, 0.011 Å) and (0.064°, 0.040 Å), all within both bounds. All three protocols were admissible and reproduced their job measurements. The largest absolute differences between the job fits and the independent fits were 1.85 × 10⁻¹³° and 1.41 × 10⁻¹⁵ Å, within the frozen reproduction tolerances of 0.01° and 0.001 Å.",
+      "round_index": 0,
+      "submission_id": "gxsb_01m816stchz5j31n6a"
+    },
+    {
+      "direction": "supports",
+      "eval_id": "geometry_e_32b5b23a60d92899bc943045cd802ed545703e4af245f5d48cf589bf92e28a9e",
+      "evidence_id": "geometry_v_fd1981a8bef010c13abd565d78f69a3585b4a6e20c0cec5e691e8ee2942afd6e",
+      "hypothesis_id": "geometry_h_5a13192ca7ed3b3b4bd794e92df531d8d96002f7085b5ac32967b418ddb13127",
+      "job_id": "gxj_01m816cefq74hqen21",
+      "kind": "valid_scientific_outcome",
+      "path_id": "H_sensitive",
+      "reason": "Ordered backbone requires all four N, Cα, C and O atoms on each of A, B and C to have occupancy 1 and B ≤ 40 Å². Its 196 matched atoms span 49 of 164 observed residues (29.878%), meeting both frozen coverage floors exactly and omitting 115 observed residues. For A–B, A–C and B–C, respectively, the absolute angle and RMSD differences for common versus ordered backbone were (0.725°, 0.615 Å), (0.117°, 1.205 Å) and (0.558°, 0.900 Å). For common Cα versus ordered backbone the differences were (0.747°, 0.595 Å), (0.077°, 1.217 Å) and (0.622°, 0.940 Å). All six ordered-backbone contrasts exceeded the RMSD bound, and both ordered-backbone contrasts for A–B and B–C also exceeded the angle bound. Across the three protocols, A–B spanned 119.421–120.168° and 0.124–0.738 Å, A–C spanned 120.113–120.229° and 0.122–1.338 Å, and B–C spanned 119.721–120.344° and 0.130–1.070 Å. Comparisons used unrounded values.",
+      "round_index": 0,
+      "submission_id": "gxsb_01m816stchz5j31n6a"
+    }
+  ],
+  "rounds": 1,
+  "decision": {
+    "actions_json": "[{\"action\":\"stop\"}]",
+    "decision_ref": "gxa_01m816vzggej8pwwvd",
+    "reason": "Stop with the assessment of selection sensitivity. In model 1 of the 2.10 Å 2RE9 crystal structure, all nine fitted principal rotation angles are near 120°. Six of the nine prespecified comparisons exceed at least one bound (0.50° for the absolute difference in principal angle, 0.15 Å for the absolute difference in fitted RMSD). All six involve the ordered backbone. Keeping the same four backbone atom types and requiring occupancy 1 and B ≤ 40 Å² for each atom in all three chains reduces coverage from 164 to 49 residues. It lowers RMSD by 0.615 Å for B onto A, 1.205 Å for C onto A and 0.900 Å for C onto B. The corresponding absolute angle changes are 0.725°, 0.117° and 0.558°. Comparing common Cα with ordered backbone gives absolute angle and RMSD changes of (0.747°, 0.595 Å), (0.077°, 1.217 Å) and (0.622°, 0.940 Å) in the same pair order. Both contrasts exceed the RMSD bound for every pair and the angle bound for A–B and B–C. Classifications use unrounded measurements.",
+    "reviewer_submission_id": "gxsb_01m816stchz5j31n6a",
+    "round_index": 0,
+    "stop_reason": "All three proposed atom selections have been tested and independently reproduced. The comparison at fixed residue coverage and the comparison at fixed atom types resolve the prespecified sensitivity question for the observed chains. One inventory job and three fit jobs used the four submissions, with no remaining protocol. A common-site evaluation of the different transforms would address how much of the RMSD decrease comes from changing the scoring sites. Recovering the effect of the 17 unobserved positions would require additional coordinate evidence.",
+    "submission_id": "gxsb_01m816vzgqbayjs7xy"
+  },
+  "frozen_coverage": {
+    "denominator": "observed_union_residues",
+    "min_fraction": 0.29878048780487804,
+    "min_residues": 49
+  },
+  "frozen_comparison_bounds": {
+    "max_angle_delta_deg": 0.5,
+    "max_rmsd_delta_angstrom": 0.15
+  },
+  "frozen_reproduction_bounds": {
+    "angle_abs_tol_deg": 0.01,
+    "rmsd_abs_tol_angstrom": 0.001
+  },
+  "protocol_measurements": [
+    {
+      "observed_union_residues": 164,
+      "selected_atoms": 656,
+      "selected_residues": 164,
+      "protocol": "common_backbone",
+      "check": "matches"
+    },
+    {
+      "observed_union_residues": 164,
+      "selected_atoms": 164,
+      "selected_residues": 164,
+      "protocol": "common_ca",
+      "check": "matches"
+    },
+    {
+      "observed_union_residues": 164,
+      "selected_atoms": 196,
+      "selected_residues": 49,
+      "protocol": "ordered_backbone",
+      "check": "matches"
+    }
+  ],
+  "max_independent_reproduction_difference": {
+    "rotation_angle_deg": 1.8474111129762605e-13,
+    "fitted_rmsd_angstrom": 1.4016565685892601e-15
+  },
+  "comparison_count": 9,
+  "above_bounds": 6,
+  "common_backbone_vs_ca_max_delta": {
+    "rotation_angle_deg": 0.06438756014208025,
+    "fitted_rmsd_angstrom": 0.039880912936875346
+  },
+  "raw_cif_tool_bytes": 768000,
+  "distinct_raw_cif_bytes_read": 430170,
+  "reads_per_root": [
+    {
+      "role": "main",
+      "thread_id": "01a20264-aadb-7ea2-a511-ddf21ea6cafc",
+      "source_pages": 0,
+      "source_payload_bytes": 0
+    },
+    {
+      "role": "planner",
+      "thread_id": "01a20265-201e-72b1-9feb-7e66217799be",
+      "source_pages": 6,
+      "source_payload_bytes": 144000
+    },
+    {
+      "role": "evidence_reviewer",
+      "thread_id": "01a2026a-cda0-7ca0-a824-09971de3c091",
+      "source_pages": 20,
+      "source_payload_bytes": 480000
+    },
+    {
+      "role": "planner",
+      "thread_id": "01a2026c-eae4-7823-ad88-67af4df69473",
+      "source_pages": 6,
+      "source_payload_bytes": 144000
+    }
+  ],
+  "recovery_added_jobs": 0,
+  "reused_backend_jobs": [
+    "gxj_01m816a3g4gftv9zvs",
+    "gxj_01m816cefq74hqen21",
+    "gxj_01m816cepg2d37t7z3",
+    "gxj_01m816cew7j2fe0y55"
+  ],
+  "cold_reopen": {
+    "new_jobs": 0,
+    "new_model_turns": 0,
+    "same_submissions_artifacts_and_ledger": true
+  },
+  "accounting": {
+    "charged_gx_turns": 3,
+    "settled_tokens": 599701,
+    "observed_receipted_tokens_across_all_turns_lower_bound": 761931,
+    "unsettled_planner_known_provider_tokens": 162230,
+    "unsettled_planner_final_tokens": null,
+    "remaining_holds": [
+      {
+        "amounts_json": "{\"api_calls\":1,\"tokens\":666666}",
+        "status": "HELD",
+        "subject_id": "start:c7c86a92-74bc-455a-8633-299414453fb9"
+      }
+    ],
+    "last_decision_turn_settled_tokens": 185017,
+    "billing_usd": null
+  }
+}

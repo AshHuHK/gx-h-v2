@@ -1,6 +1,10 @@
-# P0 部署验收
+# P0 部署与科研闭环验收
 
-本机新目录中的 `bin/gx-p0` 已完成独立部署。上游执行器为官方 Codex `rust-v0.169.0`。GX 持有唯一科研数据库，方式为真实 SQLite、异步 CPU Job、按角色独立创建的 Codex Root 和正式科学结算。[启动和登录](DEPLOYMENT.md) · [上游来源和完整性](audit/CODEX_SOURCE.md)
+本次修复按等待与恢复、多轮科研输入、受限真实领域闭环、后续扩展分批记录。[本次实施与验收](ACC_1_IMPLEMENTATION.md) · [采纳的修复计划](FIX_PLAN_ACC_1.md)
+
+## 修复前的部署记录
+
+下表保留原提交的部署记录。其中预算争用由脚本手工推进，三轮项目使用合成数据；该版本在生产 Driver 上复现了六项缺陷。后续签收请使用上方的分批报告。[修前诊断](acceptance/runs/acc-1-before-fix/observations.json) · [启动和登录](DEPLOYMENT.md) · [上游来源和完整性](audit/CODEX_SOURCE.md)
 
 | 验收 | 实际结果与适用范围 |
 |---|---|

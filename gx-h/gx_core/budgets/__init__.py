@@ -143,18 +143,21 @@ def _available(limits: Mapping[str, Any], spent: Mapping[str, Any], reserved: Ma
 
 # ----------------------------------------------------------------------- project phases
 
-PROJECT_LINES = ("job_submissions", "gpu_jobs", "gpu_minutes", "cpu_seconds", "worker_tasks")
+_BASE_PROJECT_LINES = ("job_submissions", "gpu_jobs", "gpu_minutes", "cpu_seconds", "worker_tasks")
+PROJECT_LINES = (*_BASE_PROJECT_LINES, "api_calls", "tokens")
 _PHASE_EVENT = "budget.project_phase"
 
 
 def check_project_limits(raw: Any) -> dict[str, int]:
-    """Validate the optional gx-project budget file's five resource allowances."""
-    if not isinstance(raw, Mapping) or set(raw) != set(PROJECT_LINES):
-        raise SchemaInvalid("project budget must contain exactly " + ", ".join(PROJECT_LINES))
-    for key in PROJECT_LINES:
+    """Existing project budgets may omit the native API call and token allowances."""
+    if (not isinstance(raw, Mapping) or not set(_BASE_PROJECT_LINES) <= set(raw)
+            or not set(raw) <= set(PROJECT_LINES)):
+        raise SchemaInvalid("project budget requires " + ", ".join(_BASE_PROJECT_LINES)
+                            + "; optional resources are api_calls and tokens")
+    for key in raw:
         if type(raw[key]) is not int or raw[key] < 0:
             raise SchemaInvalid(f"project budget {key} must be a nonnegative integer")
-    return {key: raw[key] for key in PROJECT_LINES}
+    return {key: raw[key] for key in PROJECT_LINES if key in raw}
 
 
 def _project_usage(conn: sqlite3.Connection, project_ref: str) -> tuple[dict, dict]:
@@ -203,10 +206,11 @@ def _current_phase(conn: sqlite3.Connection, project_ref: str) -> dict | None:
 
 
 def _phase_state(project_ref: str, phase: dict, cumulative: dict, reserved: dict) -> dict:
-    spent = {key: round(cumulative[key] - phase["baseline_spent"][key], DIGITS) for key in PROJECT_LINES}
-    available = {key: round(phase["limits"][key] - spent[key] - reserved[key], DIGITS) for key in PROJECT_LINES}
-    return {"project_ref": project_ref, **phase, "cumulative_spent": cumulative,
-            "spent": spent, "reserved": reserved, "available": available}
+    lines = phase["limits"]
+    spent = {key: round(cumulative[key] - phase["baseline_spent"].get(key, 0), DIGITS) for key in lines}
+    available = {key: round(lines[key] - spent[key] - reserved[key], DIGITS) for key in lines}
+    return {"project_ref": project_ref, **phase, "cumulative_spent": {k: cumulative[k] for k in lines},
+            "spent": spent, "reserved": {k: reserved[k] for k in lines}, "available": available}
 
 
 def project_budget_state(conn: sqlite3.Connection, project_ref: str) -> dict | None:
@@ -254,8 +258,37 @@ def activate_project_budget(conn: sqlite3.Connection, project_ref: str, limits: 
         return _phase_state(project_ref, phase, cumulative, held)
 
 
+def _formal_project_limits(conn, project_ref):
+    from ..p0.intent import active_items
+
+    for run in conn.execute("SELECT run_id FROM runs WHERE project_ref=?", (project_ref,)):
+        yield from active_items(conn, run["run_id"], {"resource_limit"}).values()
+
+
+def require_native_metering(conn: sqlite3.Connection, run_id: str) -> None:
+    """A native turn can span multiple provider requests; its token total arrives afterwards."""
+    project = conn.execute("SELECT project_ref FROM runs WHERE run_id=?", (run_id,)).fetchone()
+    if project is None:
+        raise ArtifactNotFound("no run owns this native request", details={"run_id": run_id})
+    units = {"api_calls": "gx_calls", "tokens": "reserved_tokens"}
+    for item in _formal_project_limits(conn, project["project_ref"]):
+        cap = item["value"]
+        resource = cap["resource"]
+        # Older rows without units were implemented as GX reservations.
+        if resource in units and cap.get("unit", units[resource]) != units[resource]:
+            raise BudgetExceeded(
+                "Codex reports token usage after execution and can make multiple provider HTTP requests "
+                "during one turn. This native turn cannot enforce the active provider limit before use.",
+                details={"reason": "native_provider_limit_unenforceable", "item_id": item["item_id"],
+                         "project_ref": project["project_ref"], "resource": resource, "max": cap["max"],
+                         "unit": cap["unit"]})
+
+
 def _check_project_reservation(conn: sqlite3.Connection, budget_ref: str, amounts: Mapping[str, Any]) -> None:
-    if conn.execute("SELECT 1 FROM events WHERE subject_kind='project_budget' LIMIT 1").fetchone() is None:
+    configured = conn.execute(
+        "SELECT 1 FROM events WHERE subject_kind='project_budget' UNION ALL"
+        " SELECT 1 FROM p0_intent_versions WHERE item_type='resource_limit' LIMIT 1").fetchone()
+    if not configured:
         return
     # A run carries its budget reference even when the qualification budget has no run_id.
     projects = conn.execute(
@@ -265,9 +298,28 @@ def _check_project_reservation(conn: sqlite3.Connection, budget_ref: str, amount
         ") SELECT DISTINCT project_ref FROM runs JOIN lineage ON runs.budget_ref=lineage.ref"
         " WHERE lineage.parent IS NULL", (budget_ref,))
     for project in projects:
-        state = project_budget_state(conn, project["project_ref"])
-        if state is None:
+        project_ref = project["project_ref"]
+        phase = _current_phase(conn, project_ref)
+        limits = {}
+        for item in _formal_project_limits(conn, project_ref):
+            cap = item["value"]
+            key = cap["resource"]
+            if key in amounts and amounts[key] > 0:
+                limits[key] = min(limits.get(key, cap["max"]), cap["max"])
+        if not limits and phase is None:
             continue
+        used, held = _project_usage(conn, project_ref)
+        for key, cap in limits.items():
+            available = round(cap - used[key] - held[key], DIGITS)
+            if amounts[key] > available:
+                raise BudgetExceeded(
+                    f"project {project_ref} resource limit allows {available} more {key}",
+                    details={"reason": "current_intent", "project_ref": project_ref, "key": key,
+                             "limit": cap, "spent": used[key], "reserved": held[key],
+                             "requested": amounts[key], "available": available})
+        if phase is None:
+            continue
+        state = _phase_state(project_ref, phase, used, held)
         short = [{"key": key, "needed": amount, "requested": amount, "available": state["available"][key],
                   "limit": state["limits"][key], "spent": state["spent"][key], "reserved": state["reserved"][key]}
                  for key, amount in amounts.items()
@@ -1106,6 +1158,7 @@ __all__ = [
     "confirmatory_allotment", "create_root", "draw_follower", "draw_reservation", "line",
     "increase_condition", "increase_subject", "open_child", "profile", "profile_of", "project_budget_state",
     "project_phase_event", "raise_limit", "release",
-    "release_chain", "request_increase", "reserve", "reserve_chain", "settle", "spend", "state", "tighten",
+    "release_chain", "request_increase", "require_native_metering", "reserve", "reserve_chain", "settle",
+    "spend", "state", "tighten",
     "verify",
 ]

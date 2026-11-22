@@ -1,4 +1,5 @@
 """The synthetic grid workflow uses project-owned Jobs and their original outputs."""
+import json
 import sqlite3
 
 from ..capabilities.shipped import ensure_grid
@@ -7,7 +8,8 @@ from ..errors import IdempotencyConflict, SchemaInvalid
 from .service import JobService, PURPOSE_WORKFLOW, SUCCEEDED
 
 
-def submit_grid(conn: sqlite3.Connection, *, run_id: str, operation_id: str, input_ref: str) -> dict:
+def submit_grid(conn: sqlite3.Connection, *, run_id: str, operation_id: str, input_ref: str,
+                binding: dict | None = None) -> dict:
     """Start or recover this route's frozen grid request, even if the last ACK was lost."""
     if not isinstance(operation_id, str) or not operation_id.strip():
         raise SchemaInvalid("A grid operation needs a stable non-empty operation_id")
@@ -17,7 +19,7 @@ def submit_grid(conn: sqlite3.Connection, *, run_id: str, operation_id: str, inp
     jobs = JobService(conn)
     artifacts = artifact_service(conn)
     key = f"grid:{operation_id}"
-    existing = conn.execute("SELECT input_manifest_ref FROM jobs WHERE idempotency_key=?",
+    existing = conn.execute("SELECT input_manifest_ref,submit_intent_json FROM jobs WHERE idempotency_key=?",
                             (f"job:{run_id}:{key}",)).fetchone()
     if existing:
         # Keep the original manifest (including its contract pin) across a software upgrade.
@@ -26,6 +28,12 @@ def submit_grid(conn: sqlite3.Connection, *, run_id: str, operation_id: str, inp
         if [item["artifact_ref"] for item in entries if item["role"] == "grid"] != [input_ref]:
             raise IdempotencyConflict("This grid operation already names a different input",
                                       details={"operation_id": operation_id, "manifest_ref": manifest_ref})
+        original = json.loads(existing["submit_intent_json"])["request"].get("binding")
+        if binding and original and any(binding.get(key) != original.get(key)
+                                        for key in set(binding) | set(original) if key != "evaluator"):
+            raise IdempotencyConflict("The grid operation already belongs to another execution assignment")
+        # A later evaluator can reuse the same raw observation. Preserve the first execution's pin.
+        binding = original
     else:
         ensure_grid(jobs.ctx)
         manifest_ref = artifacts.make_input_manifest(
@@ -35,7 +43,7 @@ def submit_grid(conn: sqlite3.Connection, *, run_id: str, operation_id: str, inp
     return jobs.submit(
         run_id=run_id, capability_version="fixture-grid@1", purpose=PURPOSE_WORKFLOW,
         input_manifest_ref=manifest_ref, parameters={"operation": operation_id},
-        idempotency_key=key,
+        idempotency_key=key, binding=binding,
     )
 
 

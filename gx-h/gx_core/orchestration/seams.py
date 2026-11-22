@@ -434,8 +434,7 @@ def release_chain(conn: sqlite3.Connection, *, budget_ref: str | None, head_id: 
 
 
 def release_run_holds(conn: sqlite3.Connection, *, run_id: str, actor: str, reason: str) -> list[str]:
-    """Give back everything a run still holds in its budgets: a run that has ended holds
-    nothing (design r2.2 §2.5.7; owner of the release: eval). The references released."""
+    """Release unused allocations; submitted native turns and Jobs settle from their own receipts."""
     released: list[str] = []
     # The newest budget first: a path's own allotment is emptied before the hold that funds
     # it is given back, which the owner refuses while anything inside is still held.
@@ -445,6 +444,12 @@ def release_run_holds(conn: sqlite3.Connection, *, run_id: str, actor: str, reas
         state = budget_state(conn, budget_ref) or {}
         for item in reversed(state.get("reservations") or []):
             if item.get("status") != "HELD" or not item.get("reservation_ref"):
+                continue
+            if item.get("subject_kind") == "native_turn":
+                continue
+            if item.get("subject_kind") == "job" and conn.execute(
+                    "SELECT 1 FROM jobs WHERE job_id=? AND reservation_ref=?",
+                    (item["subject_id"], item["reservation_ref"])).fetchone():
                 continue
             try:
                 _must("release_reservation", conn, conn, item["reservation_ref"], actor=actor, reason=reason)

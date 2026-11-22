@@ -154,7 +154,7 @@ def commission_budget(prompt, prompt_data, budget_file):
             if key in amounts and amounts[key] != value:
                 raise ValueError(f"--budget-file conflicts with the embedded GX 预算 for {key}")
             amounts[key] = value
-    limits = {k: amounts[k] for k in budgets.PROJECT_LINES} if amounts else None
+    limits = {k: amounts[k] for k in budgets.PROJECT_LINES if k in amounts} if amounts else None
     return limits, {k: amounts[k] for k in HOST_LINES if k in amounts}, model
 
 
@@ -261,12 +261,13 @@ def save_model_budget(state, record, phase, current_budget):
     limits = subject.get("budget_limits")
     if limits is not None:
         lines += ["## GX 预算", "", "| 资源 | 上限 |", "| --- | ---: |"]
-        lines += [f"| `{key}` | {limits[key]} |" for key in budgets.PROJECT_LINES]
+        lines += [f"| `{key}` | {limits[key]} |" for key in budgets.PROJECT_LINES if key in limits]
     else:
         if current_budget:
             lines += ["## 沿用的项目额度", "", f"预算阶段 `{current_budget['phase_id']}`", "",
                       "| 资源 | 原上限 |", "| --- | ---: |"]
-            lines += [f"| `{key}` | {current_budget['limits'][key]} |" for key in budgets.PROJECT_LINES]
+            lines += [f"| `{key}` | {current_budget['limits'][key]} |" for key in budgets.PROJECT_LINES
+                      if key in current_budget["limits"]]
             lines.append("")
         lines += ["## 宿主额度", "", "| 宿主资源 | 上限 |", "| --- | ---: |"]
     lines += [f"| `{key}` | {subject[key]} |" for key in HOST_LINES]

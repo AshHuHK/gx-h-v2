@@ -81,6 +81,7 @@ from ..errors import (
     ScopeDenied,
 )
 from ..persistence import store
+from ..p0 import manifest as execution_manifest
 from ..registry import Subject
 from . import adapter as adapter_mod
 from . import documents, executor, leases, resource_guard, retained
@@ -334,6 +335,7 @@ class JobService:
         purpose: str = PURPOSE_PATH,
         lease_ref: str | None = None,
         step_index: int | None = None,
+        binding: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Start a job and return at once. See the module docstring for the order of checks.
 
@@ -363,6 +365,8 @@ class JobService:
         }
         if step_index is not None:
             request["step_index"] = step_index
+        if binding:
+            request["binding"] = dict(binding)
         request_sha = ids.sha256_of_obj(request)
         key = f"job:{run_id}:{idempotency_key}"
 
@@ -439,6 +443,7 @@ class JobService:
         run = conn.execute("SELECT run_id, status FROM runs WHERE run_id=?", (run_id,)).fetchone()
         if run is None:
             raise ArtifactNotFound(f"no run {run_id!r}", details={"run_id": run_id})
+        execution_manifest.check_capability(conn, run_id, request["capability_version"])
         executable = contracts.states()["machines"]["run"]["executable"]
         if purpose != PURPOSE_PROBE and run["status"] not in executable:
             raise PhaseDenied(
@@ -690,6 +695,8 @@ class JobService:
                      int(resources["wall_seconds"]), staging_ref, reservation["reservation_ref"],
                      clock.now_iso(), lease_ref, step_index, attempt),
                 )
+                execution_manifest.admit(txn, job_id, launch=intent, bundle=capability["bundle"], env=env,
+                                         inputs=listed, resources=resources, preflight=preflight)
                 store.append_event(
                     txn, kind="job.created", actor=self.actor, run_id=run_id, subject_kind="job",
                     subject_id=job_id, new_state=CREATED, evidence_level="EXECUTION_OBSERVED",
@@ -1011,16 +1018,24 @@ class JobService:
             self._fail_unstarted(row, "the job directory was removed before the job could start")
             raise self._named(ArtifactNotFound(f"job {job_id} has no launch specification any more"),
                               job_id)
-        with store.transaction(conn) as txn:
-            current = self._row(job_id)
-            if current["status"] != CREATED:
-                # A concurrent replay acquired the same launch intent.
-                return self._submit_answer(current, replayed=True)
-            store.transition(txn, machine=MACHINE, subject_id=job_id, to_state=SUBMITTING,
-                             actor=self.actor, bump=False, evidence_level="EXECUTION_OBSERVED",
-                             reason="intent persisted; starting the runner",
-                             extra_updates={"side_effect_status": "UNKNOWN",
-                                            "observed_at": clock.now_iso()})
+        try:
+            with store.transaction(conn) as txn:
+                current = self._row(job_id)
+                if current["status"] != CREATED:
+                    # A concurrent replay acquired the same launch intent.
+                    return self._submit_answer(current, replayed=True)
+                execution_manifest.check_launch(txn, job_id)
+                store.transition(txn, machine=MACHINE, subject_id=job_id, to_state=SUBMITTING,
+                                 actor=self.actor, bump=False, evidence_level="EXECUTION_OBSERVED",
+                                 reason="intent persisted; starting the runner",
+                                 extra_updates={"side_effect_status": "UNKNOWN",
+                                                "observed_at": clock.now_iso()})
+        except SchemaInvalid as exc:
+            reason = exc.details.get("reason")
+            if reason not in ("current_intent", "superseded_attempt"):
+                raise
+            self._fail_unstarted(row, exc.message, failure_class="input_or_format", because=reason)
+            raise self._named(exc, job_id) from None
         try:
             identity = executor.launch(job.job_dir)
         except executor.LaunchReceiptUnknown as exc:
@@ -1069,6 +1084,7 @@ class JobService:
             txn, machine=MACHINE, subject_id=row["job_id"], to_state=to_state, actor=self.actor,
             bump=False, reason=reason, evidence_level="EXECUTION_OBSERVED",
             extra_updates=dict(extra_updates), payload=dict(payload) if payload is not None else None)
+        execution_manifest.complete(txn, row["job_id"])
         store.enqueue_outbox(txn, topic=TERMINAL_TOPIC, idempotency_key=terminal_trigger_key(row["job_id"]),
                              payload=terminal_trigger(row, to_state, moved.event_id))
         return moved.event_id
@@ -1783,12 +1799,14 @@ class JobService:
             common = {"run_id": row["run_id"], "path_id": row["path_id"], "task_id": row["task_id"],
                       "job_id": job_id, "actor": self.actor, "origin": "JOB_OUTPUT"}
             if to_state == SUCCEEDED:
+                runner_hashes = {f["path"]: f.get("sha256") for f in outcome.get("files", ()) if "path" in f}
                 for item in raw_outputs:
                     artifact = self._publish_copy(namespace, item["rel_path"], item["artifact_kind"],
                                                   Path(item["path"]), common, item["name"])
                     published.append({"output_name": item["name"], "artifact_ref": artifact.artifact_ref,
                                       "kind": item["artifact_kind"], "sha256": artifact.sha256,
-                                      "bytes": artifact.bytes, "validated": False})
+                                      "bytes": artifact.bytes, "validated": False,
+                                      "runner_sha256": runner_hashes.get(item["name"])})
                 for name, (kind, document) in documents_out.items():
                     artifact = self.artifacts.publish_bytes(
                         namespace=namespace, rel_path=f"{name}.json", kind=kind,

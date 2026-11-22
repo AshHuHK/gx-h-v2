@@ -28,3 +28,9 @@ P1 产品提交 `336225603dec3a1bc5efd6eccb401ccd25e63287`。测试使用该 Git
 | 原平台完整回归 | 281.968 秒，退出码 0。Python 发现 382 项，通过 378 项，4 项沿用原有 DSH 跳过条件。124 项 P0 子集、2 项 Node、生成器及 30 个官方 Codex 环回场景都通过。先前签收的 16 项 v3 P0 测试逐一通过。[环境与命令](acceptance/v3/p1/regression/invocation.json) · [结果](acceptance/v3/p1/regression/summary.json) · [原用例核对](acceptance/v3/p1/regression/frozen-comparison.json) · [P0 身份核对](acceptance/v3/p1/regression/p0-case-comparison.json) |
 
 同负载真实模型对照于 2026-11-22 19:57:24 UTC 开始，双方均使用 OpenAI OAuth、`gpt-6.2-astra`、`xhigh` 和原生 Codex 0.169.0。[对照口径](acceptance/v3/performance/PROTOCOL.md)
+
+### 对照中发现并重测的等待延迟
+
+早期候选 `3362256` 的两波实测显示，上一名 worker 已完成计量并释放团队名额后，后继任务的领取中位等待从 119 ms 增至 899 ms，p95 从 128 ms 增至 2,019 ms。队列的退避定时器在名额已经可用时仍然有效。采集在第 2 波全部结算后的空闲边界停止，账本保留 4 个 Run、8 个成功 Job、12 个已对账的 turn 和 1,330,448 tokens。两波的付费数据单独列入累计开销。[停止回执](acceptance/v3/performance/p1-prior-3362256/partial-stop.json) · [同负载环回对照](acceptance/v3/performance/dispatch-control/REPORT.md)
+
+对照还发现，原平台的大量容量拒绝在几毫秒内返回，会拉低所有派发调用合在一起的 p95。用相同 Git 版本、数值输入和领取状态再分别测量，P1 的合格领取 p95 从 7.250 ms 变为 8.330 ms；容量拒绝从 1.873 ms 降至 0.811 ms。每组每类 128 次，无外部模型调用。报告同时保留总分布和按状态分组的结果。[本地领取分组测量](acceptance/v3/p1/dispatch-comparison/REPORT.md)

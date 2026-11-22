@@ -390,6 +390,8 @@ def _open_once(target: Path) -> sqlite3.Connection:
         ) from exc
     try:
         ensure_schema(conn)
+        from ..p0.schema import install
+        install(conn)
     except StoreUnavailable as exc:
         conn.close()
         exc.details.setdefault("path", str(target))

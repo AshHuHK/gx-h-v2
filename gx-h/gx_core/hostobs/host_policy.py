@@ -140,7 +140,7 @@ def scope_of_run(run: Mapping[str, Any]) -> str | None:
     selected = host_record.get("policy_selection", {})
     from .native_context import SOURCE as NATIVE_SOURCE, MODEL_AUTHORITY
     if (host_record.get("kind") != "codex" or not isinstance(selected, Mapping)
-            or selected.get("source") not in ("codex_native_invocation", NATIVE_SOURCE)
+            or selected.get("source") not in ("codex_native_invocation", NATIVE_SOURCE, P0_SOURCE)
             or selected.get("session_ref") != host_record.get("session_ref")
             or not selected.get("identity_sha256")):
         raise ContentHashMismatch("the Codex policy has no backend-verified run Host binding")
@@ -168,6 +168,8 @@ def current_for_run(run: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
         return for_host(host)
     from .native_context import SOURCE
     selection = json.loads(run["host_json"])["policy_selection"]
+    if selection["source"] == P0_SOURCE:
+        return p0_policy()
     if selection["source"] == SOURCE:
         raw = run["agent_policy_json"]
         snapshot = json.loads(raw) if isinstance(raw, str) else raw
@@ -189,6 +191,27 @@ def current_for_run(run: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
         if successor == ids.sha256_of_obj(installed_pins):
             return current
     raise ContentHashMismatch("the Codex role intent pins changed after this run started")
+
+
+P0_SOURCE = "gx_p0_app_server"
+
+
+def p0_policy():
+    from ..p0 import profiles
+    document, _ = _native_policy_for_model(profiles.DEFAULT_MODEL, None)
+    for name, settings in document["task_classes"].items():
+        level = profiles.effort_for(name)
+        settings.update(min_effort=level, default_effort=level)
+    document["native_coordinator_observation"]["default_effort"] = profiles.effort_for("coordinator")
+    return document, ids.sha256_of_obj(document)
+
+
+def p0_host():
+    document, digest = p0_policy()
+    return document, digest, {"kind": "codex", "policy_selection": {
+        "source": P0_SOURCE, "policy_sha256": digest,
+        "policy_snapshot_sha256": digest, "identity_sha256": ids.sha256_of_obj(
+            {"client": P0_SOURCE, "protocol": "rust-v0.169.0"})}}
 
 
 def for_new_run(ctx: Any, record: Mapping[str, Any]) -> tuple[dict[str, Any], str, dict[str, Any]]:

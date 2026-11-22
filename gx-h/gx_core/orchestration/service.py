@@ -464,7 +464,7 @@ def _require_capable_session(conn: sqlite3.Connection, host: Mapping[str, Any]) 
     )
 
 
-def run_start(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
+def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None) -> dict[str, Any]:
     """Create a run with its pins, objective, budget and coordinator lease, then run the
     workflow to its first interrupt. Returns as soon as outside work is needed."""
     config.check_holds("orchestration")
@@ -490,7 +490,10 @@ def run_start(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
                                          sources_complete=workflow.sources_complete())
     host = _host_record(ctx, args.get("host"))
     from ..hostobs import host_policy
-    policy, policy_sha, host = host_policy.for_new_run(ctx, host)
+    if prepare_p0 is not None:
+        policy, policy_sha, host = host_policy.p0_host()
+    else:
+        policy, policy_sha, host = host_policy.for_new_run(ctx, host)
     _require_capable_session(conn, host)
     files = _check_input_files(args.get("input_files") or [])
     inputs = dict(args.get("inputs") or {})
@@ -498,6 +501,8 @@ def run_start(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
         from ..research.model_activity import validated_profiles
         inputs["execution_profiles"] = validated_profiles(inputs["execution_profiles"])
     constraints = dict(args.get("constraints") or {})
+    if inputs.get("p0") is True and prepare_p0 is None:
+        raise PermissionDenied("Use the P0 operator entry to authorize a new research project")
     pins = installed_pins(workflow, policy_sha256=policy_sha)
     screen = seams.screen_objective(objective)
     if screen.get("result") == "BLOCKED":
@@ -615,6 +620,9 @@ def run_start(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
     engine = _engine(ctx, run_id)
     warnings: list[str] = []
     wait = False
+    if inputs.get("p0") is True:
+        # The first native human turn authorizes the initial Intent before any node can submit a Job.
+        prepare_p0(run_id)
     if engine.state(run_id)["checkpoint_seq"] == 0:
         try:
             started = engine.start(

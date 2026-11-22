@@ -53,6 +53,15 @@ def _audit(event, args):
                 selected = "app-server"
             _emit("subprocess", executable + (":" + selected if selected else ""))
 _s.addaudithook(_audit)
+if _stage == "candidate-final":
+    _legacy_files = {_root+"gx-h/gx_core/teams/manager.py", _root+"gx-h/gx_core/teams/manager_tools.py"}
+    def _observe_legacy(frame, event, arg):
+        if event == "call" and frame.f_code.co_filename in _legacy_files:
+            name = frame.f_code.co_qualname
+            if "<" not in name:
+                kind = "legacy_team_class_definition" if name == "TeamManager" else "legacy_team_call"
+                _emit(kind, _local(frame.f_code.co_filename) + ":" + name)
+    _s.setprofile(_observe_legacy)
 _emit("process", _local(_s.argv[0]) or _o.path.basename(_s.executable))
 '''
 
@@ -230,6 +239,7 @@ def observe(root, trace, out):
                "compat_static_reachable":len(compatibility),"candidate_executed_sources":len(executed),
                "runtime_only_sources":sorted(executed-primary),"module_classification_counts":dict(sorted(counts.items())),
                "candidate_final_subprocess":final.get("subprocess",{}),
+               "candidate_final_legacy_team_calls":final.get("legacy_team_call",{}),
                "candidate_final_directly_observed_cpu_workers":{k:n for k,n in final["executed_source"].items()
                                                                 if k.endswith(("/p01_grid/worker.py", "/jobs/runner.py"))}}
     # These references are delivered separately and have explicit non-runtime purposes.

@@ -366,6 +366,21 @@ def run(work, revision, evidence):
         replay = invoke("candidate-final", "run", "--timeout", "15")
         check(replay["status"] == "COMPLETED" and original_facts(state) == final and count == peer.request_count,
               "Terminal cold replay changed state or spent model calls")
+        original_root = before["original_budget_lines"][0]["budget_ref"]
+        run_budget, = [entry for entry in final["original_budget_lines"] if entry["budget_ref"] == original_root]
+        spent = json.loads(run_budget["spent_json"])
+        reservations = json.loads(run_budget["reserved_json"])
+        usage = {}
+        for turn in final["usage"]:
+            usage[turn["thread_id"]] = max(usage.get(turn["thread_id"], 0), turn["total_tokens"])
+        check(sum(usage.values()) == spent["tokens"] == count * 35, "Provider receipts and original root ledger differ")
+        check(spent["api_calls"] == len(final["usage"]) and spent["job_submissions"] == len(receipts),
+              "Original root ledger includes missing or duplicate calls/Jobs")
+        check(not any(reservations.values()), "Original root ledger still holds reservations")
+        evidence["final_accounting"] = {"original_budget_ref":original_root, "settled_tokens":spent["tokens"],
+                                        "official_thread_cumulative_total":sum(usage.values()), "scripted_provider_reported":count * 35,
+                                        "settled_native_turns":spent["api_calls"], "settled_job_submissions":spent["job_submissions"],
+                                        "reserved":reservations}
         evidence["continuation"] = {"final_project": receipt(final), "final_report_ref": resumed["report_ref"],
                                     "original_job_receipts_preserved": len(original_sidecars),
                                     "total_cpu_jobs": len(receipts), "total_turns": len(final["usage"]),

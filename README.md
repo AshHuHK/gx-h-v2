@@ -2,6 +2,8 @@
 
 在 v3 安装目录中，操作员可以按版本安装本地科研插件。GX 校验审核过的包内容，在独立 Python 命名空间中执行 `register(ctx)`，并列出插件贡献的工作流、工具和计算能力。现有项目继续使用各自保存的工作流和科研记录。
 
+首次部署可使用 [Linux x86_64 离线包](dist/gx-h-v3-p1-linux-x86_64.tar)，按[安装与启动步骤](V3_DEPLOYMENT_REPORT.md)在独立目录运行。该包对应产品提交 `2476f2b`。P0 已签收，P1 的科研结果和冷恢复已验证，真实模型的尾延迟仍待签收。稳定版本保留在 v2.1。[阶段验收](V3_ACCEPTANCE_REPORT.md) · [回退操作](V3_ROLLBACK_REPORT.md)
+
 ```bash
 source .venv/bin/activate
 bin/gx-p0 plugin digest examples/plugins/hello_research

@@ -6,5 +6,9 @@
 | Gate 0 | 通过。首个原生 turn 到末次完成相隔 7,321.716 秒，其中 1,583.510 秒有模型执行，两 Root 重叠 1,438.667 秒。26 个 Run、52 个 CPU Job 全部完成，78 个 turn 对账为 8,647,052 tokens。 | [协议](acceptance/v3/performance/PROTOCOL.md) · [完整基线](acceptance/v3/performance/gate0/REPORT.md) |
 | P0 加载与安装 | 通过，产品提交 `1770376`。加载器、操作员安装、同 ID 两个版本共存、原平台回归均有执行回执。 | [P0 报告](V3_P0_REPORT.md) |
 | P1 科研工作流接入与派发 | 代码、四组科学回放及两小时实测已完成。两个版本各完成 26 个科研决策和 52 个 Job。原始回调及派发 p95 超过复核门槛，性能签收状态为 REVIEW。 | [P1 报告](V3_P1_REPORT.md) · [两小时比较](acceptance/v3/performance/COMPARISON.md) |
-| P2 独立插件 | 待 P1 签收后验证工具调用、真实计算 Job 与产物。 | [验收条件](V3_ACCEPTANCE_PLAN.md) |
-| P3 Run 级固定组合 | 待 P2 签收后验证多版本、冷恢复和回退。 | [验收条件](V3_ACCEPTANCE_PLAN.md) |
+| P2 独立插件 | 尚未实施。待 P1 签收后，用第二个独立插件验证工具调用、真实计算 Job 与产物。 | [P2 状态和用例](V3_P2_REPORT.md) |
+| P3 Run 级固定组合 | 尚未实施。待 P2 签收后，在同一工作区验证双版本科研执行、组合校验及缺失版本恢复。 | [P3 状态和用例](V3_P3_REPORT.md) |
+
+## 部署与恢复
+
+可单独部署的 Linux x86_64 快照来自产品提交 `2476f2b`。归档重建得到相同的 SHA-256。从空目录安装后，24 条检查命令均成功，覆盖官方 Codex 0.169.0、插件公开核验、选择插件后启动并暂停新项目，以及从副本读取旧 v2.1 项目。该部署检查使用了零次模型调用。另一次完整冷恢复实测核对了原 Job 回执，项目抵达终态后再打开时新增模型请求为零。[部署与启动](V3_DEPLOYMENT_REPORT.md) · [部署回执](acceptance/v3/p1/standalone-deployment.json) · [恢复与回退](V3_ROLLBACK_REPORT.md) · [已知限制](V3_KNOWN_LIMITATIONS.md)

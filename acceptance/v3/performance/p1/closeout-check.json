@@ -1,0 +1,79 @@
+{
+  "captured": "2026-11-22T22:25:08.100387+00:00",
+  "result": "PASS",
+  "issues": [],
+  "revalidated_raw_manifests": {
+    "gate0": {
+      "summary_sha256": "6a09e8bf994a0b9de37eba2c5c54470aa0f135dc5f173a5649fa090db0ff95d2",
+      "rechecked_source_digests": 16,
+      "gate_measurement": "PASS"
+    },
+    "p1-prior-3362256": {
+      "summary_sha256": "0ca775ad513b24b5ee765319eaa309d196bdbec3cb5841d4ee278680c577b954",
+      "rechecked_source_digests": 16,
+      "gate_measurement": "INCOMPLETE"
+    },
+    "p1": {
+      "summary_sha256": "5183324b9409ef9e875ad6060bea4b69d6f9490ab552de2d0b74958e6f23a167",
+      "rechecked_source_digests": 17,
+      "gate_measurement": "PASS"
+    }
+  },
+  "diagnostic_hashes": {
+    "comparison.json": "35c1bf7d830e0e504dd9fed1e834dabe5f785922bab3b297f48b4f131e066c75",
+    "dispatch-comparison.json": "0ee26abd55c7996509729c87ed6036070443c37a911810e4049740958c6c7ced",
+    "dispatch-samples.jsonl.gz": "743a807bb7bd9db8a6afdca4785ec6f3bb7469fa009e8dd412ff4951ab90f1a8",
+    "callback-comparison.json": "30d211e36c94952d6dc6dccd847f6cde25488fea8d90f5375506fa1d97489802",
+    "callback-samples.jsonl.gz": "202e7ab7bd56d0cb0c9fd2579acd4eebd87aa46b70de34a7b385ada26efa347f",
+    "grid-equivalence.json": "2b0243654fd62abf058a56de8250edb9284e3fc1b0e1f97862cd43cc78d229aa",
+    "p1/native-startup.json": "798006dd38103df2f9688da5332ddc94727271f47cde82c00a2dfc3a100ee777",
+    "p1/treatment.json": "d9d38aa5a94ea97fe7a86ab108ab2d556a88ad431ac611d3485e5bc94e53cf0d",
+    "p1/summary.json": "5183324b9409ef9e875ad6060bea4b69d6f9490ab552de2d0b74958e6f23a167"
+  },
+  "native_grid_refusals": [
+    {
+      "code": "SCOPE_DENIED",
+      "reason": "original Root no longer owns the current Task attempt",
+      "n": 50
+    }
+  ],
+  "paid_grid_history": [
+    {
+      "role": "evidence_reviewer",
+      "attempt": 1,
+      "phase": "after_formal_submission",
+      "success": false,
+      "calls": 50
+    },
+    {
+      "role": "evidence_reviewer",
+      "attempt": 1,
+      "phase": "before_formal_submission",
+      "success": true,
+      "calls": 2
+    },
+    {
+      "role": "evidence_reviewer",
+      "attempt": 2,
+      "phase": "before_formal_submission",
+      "success": true,
+      "calls": 52
+    },
+    {
+      "role": "planner",
+      "attempt": 1,
+      "phase": "before_formal_submission",
+      "success": true,
+      "calls": 14
+    }
+  ],
+  "threshold_flags": [
+    "p0_callback",
+    "p0_dispatch"
+  ],
+  "native_spans_s": {
+    "gate0": 7321.716,
+    "p1": 7344.444
+  },
+  "unmatched_input_checks": []
+}

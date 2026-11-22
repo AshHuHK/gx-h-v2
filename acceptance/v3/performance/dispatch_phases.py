@@ -5,7 +5,6 @@ from collections import Counter, defaultdict
 from contextlib import closing
 from datetime import datetime
 import json
-import math
 from pathlib import Path
 
 from audit_workload import db_file, quantile, records_in, write_compressed
@@ -62,7 +61,12 @@ def collect(work,waves,control=False):
                 starts[r['task_id'],r['attempt']]={**dict(r),'reservation_ns':ns(r['created_at']),
                     'official_start_ns':sessions.get((r['thread_id'],r['turn_id']))}
     windows=defaultdict(list)
+    transactions=defaultdict(list)
     for r in records_in(work/'metrics.jsonl'):
+        if r['kind']=='db_transaction' and r.get('run_id') in run_wave and r.get('task_id'):
+            end=r['observed_ns']
+            transactions[r['task_id']].append({'started_ns':end-round(r['duration_ms']*1e6),'ended_ns':end,
+                'duration_ms':r['duration_ms'],'lock_acquire_ms':r['lock_acquire_ms']})
         if r['kind']=='p0_dispatch' and r.get('run_id') in run_wave:
             end=r['observed_ns']; begin=end-round(r['duration_ms']*1e6)
             windows[r['task_id']].append({'task_id':r['task_id'],'run_id':r['run_id'],'wave':run_wave[r['run_id']][0],
@@ -131,11 +135,19 @@ def collect(work,waves,control=False):
     # The only Team in each Run has one worker slot. Its previous native Turn can
     # keep that slot after the scientific submission released the Task lease.
     by_run=defaultdict(list)
+    by_workspace=defaultdict(list)
     for w in samples:
+        by_workspace[w['wave']].append(w)
         if w['operation']=='new_claim':
             by_run[w['run_id']].append(w)
     for lane in by_run.values():
         ordered=sorted(lane,key=lambda w:w['claim_ns'])
+        first=ordered[0]
+        relevant=[t for t in transactions[first['task_id']] if first['started_ns']<t['ended_ns']<=first['ended_ns'] and t['started_ns']<=first['claim_ns']]
+        if relevant:
+            writer=min(relevant,key=lambda t:t['started_ns'])
+            first['first_same_task_writer']=writer
+            first['subphases_ms']['cold_dispatch_start_to_first_writer_ms']=ms(max(0,writer['started_ns']-first['started_ns']))
         for earlier,later in zip(ordered,ordered[1:]):
             prev=starts.get((earlier['task_id'],earlier['attempt']),{})
             if prev.get('settled_at') and prev.get('terminal_at'):
@@ -145,6 +157,47 @@ def collect(work,waves,control=False):
                 later['previous_slot_release_ns']=release
                 later['subphases_ms']['ready_elapsed_with_previous_team_slot_occupied_ms']=ms(max(0,release-later['ready_ns']))
                 later['subphases_ms']['ready_and_previous_team_slot_released_to_claim_ms']=ms(later['claim_ns']-eligible)
+                # Each paired workspace has one public synchronous coordinator.
+                # Count only observed sibling dispatch intervals overlapping this wait.
+                overlaps=[]
+                for sibling in by_workspace[later['wave']]:
+                    if sibling['run_id']==later['run_id']:
+                        continue
+                    begin=max(eligible,sibling['started_ns']);end=min(later['claim_ns'],sibling['ended_ns'])
+                    if end>begin:
+                        overlaps.append({'task_id':sibling['task_id'],'operation':sibling['operation'],
+                            'dispatch_end_ns':sibling['ended_ns'],'from_ns':begin,'to_ns':end})
+                covered=covered_before_own=0
+                edge=eligible
+                own_start=max(eligible,later['started_ns'])
+                for interval in sorted(overlaps,key=lambda o:o['from_ns']):
+                    begin=max(edge,interval['from_ns'])
+                    covered+=max(0,interval['to_ns']-begin)
+                    covered_before_own+=max(0,min(own_start,interval['to_ns'])-begin)
+                    edge=max(edge,interval['to_ns'])
+                later['sibling_dispatch_overlap']=overlaps
+                later['subphases_ms']['eligible_wait_overlapping_sibling_dispatch_ms']=ms(covered)
+                later['subphases_ms']['eligible_wait_outside_sibling_dispatch_ms']=ms(later['claim_ns']-eligible-covered)
+                later['subphases_ms']['eligible_before_own_dispatch_outside_sibling_ms']=ms(own_start-eligible-covered_before_own)
+                later['subphases_ms']['follow_on_own_dispatch_start_to_claim_ms']=ms(later['claim_ns']-own_start)
+                # Only outer BEGIN IMMEDIATE transactions are emitted, using the same Task
+                # metric identity. The crossing writer continues after the claim edge.
+                a,c,b=later['started_ns'],later['claim_ns'],later['ended_ns']
+                before=[]
+                for transaction in transactions[later['task_id']]:
+                    s,e=transaction['started_ns'],transaction['ended_ns']
+                    if a<e<=b and s<=c:
+                        before.append({**transaction,'relation':'finished_before_claim' if e<=c else 'crosses_claim',
+                            'clip_start_ns':max(a,s),'clip_end_ns':min(e,c)})
+                later['preclaim_writer_intervals']=before
+                writer=0;edge=a
+                for tx in sorted(before,key=lambda v:v['clip_start_ns']):
+                    writer+=max(0,tx['clip_end_ns']-max(edge,tx['clip_start_ns']))
+                    edge=max(edge,tx['clip_end_ns'])
+                later['subphases_ms']['follow_on_preclaim_writer_ms']=ms(writer)
+                later['subphases_ms']['follow_on_preclaim_outside_writer_ms']=ms(c-a-writer)
+                later['subphases_ms']['follow_on_preclaim_finished_writer_ms']=round(sum(t['duration_ms'] for t in before if t['relation']=='finished_before_claim'),4)
+                later['subphases_ms']['follow_on_preclaim_lock_acquire_ms']=round(sum(t['lock_acquire_ms'] for t in before),4)
     if windows:
         errors.append('GX dispatch metrics without task transitions '+str(list(windows)))
     return samples,errors,[{'event':k[0],'method':k[1],'delivery_state':k[2],'n':n} for k,n in deliveries.items()]
@@ -198,14 +251,24 @@ def main():
                     row['trial']=trial.name; row['wave']=int(trial.name.split('-')[0]); row['instrumented']=row['wave']>=2
             found.extend(raw);events.extend(deliveries);issues.extend(errors)
         full[arm]=found; lease_counts[arm]=events
+        patterns=Counter((r['role'],sum(t['relation']=='finished_before_claim' for t in r['preclaim_writer_intervals']),
+            sum(t['relation']=='crosses_claim' for t in r['preclaim_writer_intervals'])) for r in found if 'preclaim_writer_intervals' in r)
         groups[arm]={'all':summary(found),'per_wave':{str(w):summary([r for r in found if r['wave']==w]) for w in sorted({r['wave'] for r in found})},
-            'operations':dict(Counter(r['operation'] for r in found))}
+            'operations':dict(Counter(r['operation'] for r in found)),'follow_on_writer_counts_by_role':[
+                {'role':role,'completed_before_claim':done,'crossing_claim':cross,'claims':count} for (role,done,cross),count in sorted(patterns.items())]}
     output={'captured':utc(),'scope':'fixed loopback Responses control' if a.control else 'matched completed official OAuth arrivals',
         'units':'milliseconds, empirical nearest rank', 'groups':groups,'receipt_join_issues':issues,'native_delivery_receipts':lease_counts,
         'standardization':compare(full), 'definitions':{'new_claim':'dispatch interval containing the durable READY to CLAIMED edge plus matching original lease; telemetry end minus elapsed reconstructs start',
         'ready_unadmitted':'task remained READY at midpoint before its actual claim; return reason unavailable from real GX metrics; control timers record HoldActive explicitly',
         'existing_lease_dispatch':'identity-matched dispatch on an already live original lease; count separately from official resume-prefixed turn deliveries',
         'ready_and_previous_team_slot_released_to_claim_ms':'noninitial same-Team claim minus the later of this READY timestamp and the prior Task lease release/native terminal/budget settlement; each Team has one slot and only one other single-slot Team shares its two-slot workspace',
+        'eligible_wait_overlapping_sibling_dispatch_ms':'union of actually timed dispatch intervals on the other Run of the same single-coordinator workspace while the measured claim was eligible',
+        'eligible_wait_outside_sibling_dispatch_ms':'eligible interval with observed synchronous other-Run dispatch overlap subtracted; other work or waits inside this residual are not classified',
+        'eligible_before_own_dispatch_outside_sibling_ms':'eligible to start of own follow-on dispatch, excluding any overlapping synchronous sibling Run dispatches',
+        'follow_on_own_dispatch_start_to_claim_ms':'admitted follow-on dispatch start (or eligibility if later) to the durable claim, including actual GX claim preparation',
+        'follow_on_preclaim_writer_ms':'union of same-Task outer GX writer time clipped to follow-on dispatch start through claim, including lock acquisition. Metrics identify no individual SQL/Python call. The metric end timestamp is emitted after transaction-end callbacks, which can offset reconstruction; claim event is persisted to milliseconds.',
+        'follow_on_preclaim_outside_writer_ms':'remaining observed own preclaim interval after excluding that clipped writer union; includes Python, other IO, metric emissions and timing uncertainty',
+        'cold_dispatch_start_to_first_writer_ms':'first admitted Root dispatch per Run through the first outer GX writer under the same Task identity. Includes lazy public-driver native/worker tool initialization; no production timer separates these inside this interval.',
         'claim_to_native_reservation_ms':'durable claim until GX funding reservation for same native Turn, includes native thread materialization',
         'native_reservation_to_official_start_ms':'GX budget reservation to Codex official task_started message; accurate to persisted millisecond precision',
         'official_start_to_dispatch_return_ms':'official task_started to GX dispatch timer end; native start and receipt processing run asynchronously',

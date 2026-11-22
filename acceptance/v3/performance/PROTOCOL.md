@@ -36,22 +36,23 @@ The prepared runner adds `--composed-grid` to the same command, using the immuta
 
 The first P1 candidate was `336225603dec3a1bc5efd6eccb401ccd25e63287`. It stopped after two complete pairs when the timing study isolated a delay after a Team slot was released. All 1,330,448 paid tokens, 12 Turns and eight CPU Jobs remain attributable to that revision. The corrected candidate uses the same per-workspace budgets and includes that spend in its 11,700,000-token aggregate envelope. [Prior candidate report](p1-prior-3362256/REPORT.md)
 
- After the acquisition exits, `verify_treatment.py` checks every live Run’s stored package, adapter, tool scope and scientific Job manifest, then the same read-only audit used for Gate 0 reconciles the complete workload. Run reproductions in fresh output directories. The original commands used these paths.
+The real 13-wave correction uses frozen commit `2476f2bdd74b53e3833ce35d08287120e4fdf0c8`. All 448 staged Git blobs matched that commit. After acquisition, `verify_treatment.py` checks every Run’s stored package, adapter, tool scope and scientific Job manifest. The read-only audit reconciles the complete workload. Reproductions require fresh output directories. The measured command lines used these paths. [Corrected control before launch](dispatch-control-2476f2b/REPORT.md) · [Verified installation](p1/runtime-details.json)
 
 ```sh
 perf=gx-h-v-3/acceptance/v3/performance
 stage=scratchpad/v3-real-performance
 py=gx-h-2-1/.venv/bin/python
 "$py" -B "$perf/run_workload.py" --source gx-h-v-3 \
-  --revision 336225603dec3a1bc5efd6eccb401ccd25e63287 --runtime gx-h-2-1 \
-  --private "$stage/p1-3362256-xhigh" --evidence "$perf/p1" --composed-grid
-"$py" -B "$perf/verify_treatment.py" --private "$stage/p1-3362256-xhigh" \
+  --revision 2476f2bdd74b53e3833ce35d08287120e4fdf0c8 --runtime gx-h-2-1 \
+  --private "$stage/p1-2476f2b-xhigh" --evidence "$perf/p1" --composed-grid \
+  --prior-candidate-summary "$perf/p1-prior-3362256/summary.json" --combined-token-ceiling 11700000
+"$py" -B "$perf/verify_treatment.py" --private "$stage/p1-2476f2b-xhigh" \
   --evidence "$perf/p1" --runtime gx-h-2-1
-"$py" -B "$perf/audit_workload.py" --private "$stage/p1-3362256-xhigh" --evidence "$perf/p1"
+"$py" -B "$perf/audit_workload.py" --private "$stage/p1-2476f2b-xhigh" --evidence "$perf/p1"
 "$py" -B "$perf/compare_workloads.py" --baseline "$perf/gate0" --candidate "$perf/p1" \
   --output "$perf/comparison.json"
 "$py" -B "$perf/dispatch_phases.py" --baseline "$stage/v21-gate0-xhigh" \
-  --candidate "$stage/p1-3362256-xhigh" --output "$perf/dispatch-comparison.json" \
+  --candidate "$stage/p1-2476f2b-xhigh" --output "$perf/dispatch-comparison.json" \
   --samples "$perf/dispatch-samples.jsonl.gz"
 ```
 
@@ -67,4 +68,68 @@ For the diagnostic control, fixed loopback Responses exercise the release CLI, t
 "$py" -B "$perf/dispatch_phases.py" --baseline "$stage/control-dispatch-01" \
   --candidate "$stage/control-dispatch-01" --control --output "$perf/dispatch-control/operations.json" \
   --samples "$perf/dispatch-control/dispatch-samples.jsonl.gz"
+```
+
+The scheduling-correction control selected the same reviewed plugin on both arms. Its candidate archive was verified against all 448 recorded Git blobs before the interleaved trials. [Matched corrected control](dispatch-control-2476f2b/REPORT.md)
+
+```sh
+mkdir "$stage/control-stage-2476f2b"
+git -C gx-h-v-3 archive 2476f2bdd74b53e3833ce35d08287120e4fdf0c8 bin codex_adapter examples gx-h |
+  tar -xf - -C "$stage/control-stage-2476f2b"
+"$py" -B "$perf/control_workload.py" --baseline "$stage/p1-3362256-xhigh/install" \
+  --candidate "$stage/control-stage-2476f2b" --baseline-composed --runtime gx-h-2-1 \
+  --private "$stage/control-dispatch-2476f2b" --evidence "$perf/dispatch-control-2476f2b"
+"$py" -B "$perf/control_summary.py" --private "$stage/control-dispatch-2476f2b" \
+  --evidence "$perf/dispatch-control-2476f2b"
+```
+
+The corrected arm recorded optional process startup timings beginning at wave index four. A passive local observer sampled the Linux start ticks for both official Codex children of the public GX driver. Each birth was joined to the unique first dispatch of its Run and the first same-Task GX outer transaction. The baseline arm has no matching process-birth samples. The two real arms retain their original aggregate and per-operation GX timings. [Process observer](observe_native_births.py) · [Time and identity join](native_birth_diagnostics.py)
+
+## Direct callback timing control
+
+The callback study compares v2.1 and the corrected candidate directly in 24 interleaved paired trials. Each revision runs 12 fresh workspaces with the original public CLI and official native binary. The local peer supplies identical scientific actions and reply delays. Existing GX timers measure the callbacks. Official completed calls provide canonical UTF-8 argument sizes, the underlying GX submission identity and the accepted or rejected scientific outcome. The local control waits for confirmed idle windows in the separate paid study, with time reserved before the next scheduled release. [Control workload](control_workload.py) · [Callback and writer joins](callback_diagnostics.py) · [Independent warm-read and fresh-fsync probe](callback_disk_probe.py)
+
+```sh
+"$py" -B "$perf/control_workload.py" --baseline "$stage/v21-gate0-xhigh/install" \
+  --candidate "$stage/control-stage-2476f2b" --runtime gx-h-2-1 --callback-study \
+  --avoid-live-arrivals "$perf/p1" --private "$stage/callback-control-2476f2b" \
+  --evidence "$perf/callback-control-2476f2b"
+"$py" -B "$perf/callback_diagnostics.py" --baseline "$stage/callback-control-2476f2b" \
+  --candidate "$stage/callback-control-2476f2b" --control \
+  --output "$perf/callback-control-2476f2b/callbacks.json" \
+  --samples "$perf/callback-control-2476f2b/callback-samples.jsonl.gz"
+```
+
+## Paid grid-tool history supplement
+
+Before starting the supplementary control, the six official Turns of the first corrected paid arrival supplied its tool order. Both first-attempt reviewers requested their two paths after submission and received scope refusals. Both second-attempt reviewers requested their two paths before submission and succeeded. The west planner used the two paths before submission and the east planner had no measurement call. The supplement uses this exact per-lane/per-role order. [Original official Turn and tool call IDs](p1/first-wave-grid-tool-order.json)
+
+The three-way control uses six uninstrumented workspaces per condition in all permutations of the three conditions. The first runs v2.1 with the common local response script. The second uses corrected P1 with its reviewed measurement tool available. The third uses that same corrected installation and selects measurement calls according to the original paid sequence. The fixture preserves every remaining scientific action and submission. Each product is hashed after replacing workspace-generated artifact, Job and evaluation references with their explicit scientific roles. Numerical values and complete scientific reasons are preserved. Each common outcome is compared by worker role and verdict. This study starts after the separate cold-start probe’s reserved idle window and suspends its own new arrivals around the continuing paid campaign. [Replay implementation](measurement_sequence.py) · [Scientific identity and sequencing checks](validate_callback_study.py)
+
+```sh
+"$py" -B "$perf/control_workload.py" --baseline "$stage/v21-gate0-xhigh/install" \
+  --candidate "$stage/control-stage-2476f2b" --runtime gx-h-2-1 --callback-study \
+  --replay-grid-sequence "$perf/p1/first-wave-grid-tool-order.json" \
+  --avoid-live-arrivals "$perf/p1" --private "$stage/callback-tool-history-2476f2b" \
+  --evidence "$perf/callback-tool-history-2476f2b"
+```
+
+During each uninstrumented control acquisition, the independent disk observer samples one existing file and a fresh durable write per timing iteration. Start it once the control has written its planned trial order. The final commands join official tool completions, verify the paid sequence and compare the 36 matched submissions across all three conditions.
+
+```sh
+study="$perf/callback-tool-history-2476f2b"
+private_study="$stage/callback-tool-history-2476f2b"
+"$py" -B "$perf/callback_disk_probe.py" --private "$private_study" --evidence "$study" \
+  --reference "gx-h-2-1/examples/paired-grid.json"
+"$py" -B "$perf/callback_diagnostics.py" --control --baseline "$private_study" --candidate "$private_study" \
+  --output "$study/callbacks.json" --samples "$study/callback-samples.jsonl.gz"
+"$py" -B "$perf/validate_callback_study.py" --control "$study" --paid "$perf/p1"
+"$py" -B "$perf/measurement_effect.py" --evidence "$study"
+```
+
+The earlier direct callback study's 24 workspaces also support a matched dispatch comparison from the original leases, Turns and GX timers.
+
+```sh
+"$py" -B "$perf/dispatch_phases.py" --control --baseline "$stage/callback-control-2476f2b" \
+  --candidate "$stage/callback-control-2476f2b" --output "$perf/callback-control-2476f2b/dispatch-components.json"
 ```

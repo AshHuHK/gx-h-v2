@@ -1,0 +1,31 @@
+[
+  {
+    "command": [
+      "gx-h-2-1/.venv/bin/python",
+      "-B",
+      "gx-h-v-3/acceptance/v3/performance/callback_diagnostics.py",
+      "--baseline",
+      "scratchpad/v3-real-performance/callback-tool-history-2476f2b",
+      "--candidate",
+      "scratchpad/v3-real-performance/callback-tool-history-2476f2b",
+      "--control",
+      "--output",
+      "gx-h-v-3/acceptance/v3/performance/callback-tool-history-2476f2b/callbacks.json",
+      "--samples",
+      "gx-h-v-3/acceptance/v3/performance/callback-tool-history-2476f2b/callback-samples.jsonl.gz"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "gx-h-2-1/.venv/bin/python",
+      "-B",
+      "gx-h-v-3/acceptance/v3/performance/validate_callback_study.py",
+      "--control",
+      "gx-h-v-3/acceptance/v3/performance/callback-tool-history-2476f2b",
+      "--paid",
+      "gx-h-v-3/acceptance/v3/performance/p1"
+    ],
+    "exit": 0
+  }
+]

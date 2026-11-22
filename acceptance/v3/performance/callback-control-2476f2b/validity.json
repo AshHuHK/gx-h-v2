@@ -1,0 +1,167 @@
+{
+  "ambient_method": "four timed same-file warm reads and four fresh 4096-byte create/write/fsync/close operations per local trial, from a separate observer on the shared filesystem",
+  "captured": "2026-11-22T21:58:34.068404+00:00",
+  "checks": {
+    "all_direct_public_cli": true,
+    "all_scheduled_trials": true,
+    "ambient_samples_all_trials": true,
+    "identical_observed_groups": true,
+    "zero_overlap_with_paid_cli": true
+  },
+  "groups": {
+    "baseline": {
+      "all_loopback": true,
+      "all_ordinary_cli": true,
+      "all_valid": true,
+      "ambient_ms": {
+        "fresh_create_write_fsync_close_ms": {
+          "max": 34.5714,
+          "n": 48,
+          "p50": 3.8391,
+          "p95": 6.8207,
+          "p99": 34.5714
+        },
+        "warm_read_ms": {
+          "max": 2.1957,
+          "n": 48,
+          "p50": 0.1357,
+          "p95": 1.4616,
+          "p99": 2.1957
+        }
+      },
+      "completed_runs": 24,
+      "completed_turns": 72,
+      "payload_sizes": [
+        {
+          "attempt": 1,
+          "bytes": 256,
+          "fixture_removed_last_finding": true,
+          "n": 12,
+          "role": "evidence_reviewer"
+        },
+        {
+          "attempt": 1,
+          "bytes": 262,
+          "fixture_removed_last_finding": true,
+          "n": 12,
+          "role": "evidence_reviewer"
+        },
+        {
+          "attempt": 2,
+          "bytes": 413,
+          "fixture_removed_last_finding": false,
+          "n": 12,
+          "role": "evidence_reviewer"
+        },
+        {
+          "attempt": 2,
+          "bytes": 420,
+          "fixture_removed_last_finding": false,
+          "n": 12,
+          "role": "evidence_reviewer"
+        },
+        {
+          "attempt": 1,
+          "bytes": 218,
+          "fixture_removed_last_finding": false,
+          "n": 24,
+          "role": "planner"
+        }
+      ],
+      "peer_actions": {
+        "finish": 72,
+        "gx_read_artifact": 408,
+        "gx_submit_product": 72
+      },
+      "responses": 552,
+      "scientific_outcomes": {
+        "ACCEPTED": 48,
+        "REJECTED": 24
+      },
+      "succeeded_cpu_jobs": 48,
+      "trials": 12
+    },
+    "candidate": {
+      "all_loopback": true,
+      "all_ordinary_cli": true,
+      "all_valid": true,
+      "ambient_ms": {
+        "fresh_create_write_fsync_close_ms": {
+          "max": 24.7582,
+          "n": 48,
+          "p50": 4.1325,
+          "p95": 8.5656,
+          "p99": 24.7582
+        },
+        "warm_read_ms": {
+          "max": 1.718,
+          "n": 48,
+          "p50": 0.1378,
+          "p95": 1.5187,
+          "p99": 1.718
+        }
+      },
+      "completed_runs": 24,
+      "completed_turns": 72,
+      "payload_sizes": [
+        {
+          "attempt": 1,
+          "bytes": 256,
+          "fixture_removed_last_finding": true,
+          "n": 12,
+          "role": "evidence_reviewer"
+        },
+        {
+          "attempt": 1,
+          "bytes": 262,
+          "fixture_removed_last_finding": true,
+          "n": 12,
+          "role": "evidence_reviewer"
+        },
+        {
+          "attempt": 2,
+          "bytes": 413,
+          "fixture_removed_last_finding": false,
+          "n": 12,
+          "role": "evidence_reviewer"
+        },
+        {
+          "attempt": 2,
+          "bytes": 420,
+          "fixture_removed_last_finding": false,
+          "n": 12,
+          "role": "evidence_reviewer"
+        },
+        {
+          "attempt": 1,
+          "bytes": 218,
+          "fixture_removed_last_finding": false,
+          "n": 24,
+          "role": "planner"
+        }
+      ],
+      "peer_actions": {
+        "finish": 72,
+        "gx_read_artifact": 408,
+        "gx_submit_product": 72
+      },
+      "responses": 552,
+      "scientific_outcomes": {
+        "ACCEPTED": 48,
+        "REJECTED": 24
+      },
+      "succeeded_cpu_jobs": 48,
+      "trials": 12
+    }
+  },
+  "overlap_definition": "local trial from before both GX starts through driver completion vs paid first public Run start through observed driver exit in each arrival",
+  "overlap_with_paid_windows": [],
+  "payload_match": "canonical argument byte distributions, role, attempt, scripted rejection and response actions match. Store-generated absolute object IDs vary by fresh workspace.",
+  "result": "PASS",
+  "sources_sha256": {
+    "ambient-disk.jsonl": "0fe1d40315142f37ed3d275e3dbc9086bb1106d6b2e9537c1a85e30a16039e9d",
+    "callback-samples.jsonl.gz": "c3bb07b5475e7f0e330bfca063647bf0632455624c1d1be0d251f2d2302030cb",
+    "callbacks.json": "ec01aa12dbe1547d73bcd630ad995b90c44c7e132916b1eeac16e3aabe51098d",
+    "control.json": "f116a65ae56d959ad00007f0ec82bdd90bfdb69f890f7700034a3b6862e5cd70"
+  }
+}

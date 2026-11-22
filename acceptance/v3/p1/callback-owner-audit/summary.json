@@ -1,0 +1,388 @@
+{
+  "evidence_reviewer.gx_read_artifact": {
+    "p1": {
+      "call_counts": {
+        "gx-h/gx_core/artifacts/service.py::read_json": 1,
+        "gx-h/gx_core/domain/ids.py::sha256_of_obj": 1,
+        "gx-h/gx_core/p0/compute.py::is_analysis_data": 1,
+        "gx-h/gx_core/p0/roots.py::_allow_refs": 1,
+        "gx-h/gx_core/p0/roots.py::_call": 1,
+        "gx-h/gx_core/p0/roots.py::_callback": 1,
+        "gx-h/gx_core/p0/roots.py::_read_artifact": 1,
+        "gx-h/gx_core/p0/roots.py::_read_task_artifact": 1,
+        "~::<method 'execute' of 'sqlite3.Connection' objects>": 19
+      },
+      "cpu": {
+        "max_ms": 1.589993,
+        "n": 48,
+        "p50_ms": 1.109007,
+        "p95_ms": 1.485353
+      },
+      "db_changes": 7,
+      "python_fsync_count": [
+        0
+      ],
+      "python_open_counts": {
+        "artifact/file": 1,
+        "gx-h/config/limits.json": 1
+      },
+      "request_sha256": "9f6f2da8aa97974ec0b96c132f4eaa7d18917c0ba73b9263dfb3f6bc152aa0e7",
+      "sql_shape_orders": [
+        "37d1ad77d797a270686e3b27fe3320e60faafea73dd525698f1eaaa9efb1acaf"
+      ],
+      "sql_total": [
+        19
+      ],
+      "traces": 3,
+      "wall": {
+        "max_ms": 4.272736,
+        "n": 48,
+        "p50_ms": 3.137479,
+        "p95_ms": 3.776997
+      }
+    },
+    "v21": {
+      "call_counts": {
+        "gx-h/gx_core/artifacts/service.py::read_json": 1,
+        "gx-h/gx_core/domain/ids.py::sha256_of_obj": 1,
+        "gx-h/gx_core/p0/compute.py::is_analysis_data": 1,
+        "gx-h/gx_core/p0/roots.py::_allow_refs": 1,
+        "gx-h/gx_core/p0/roots.py::_call": 1,
+        "gx-h/gx_core/p0/roots.py::_callback": 1,
+        "gx-h/gx_core/p0/roots.py::_read_artifact": 1,
+        "~::<method 'execute' of 'sqlite3.Connection' objects>": 19
+      },
+      "cpu": {
+        "max_ms": 2.620835,
+        "n": 48,
+        "p50_ms": 1.102115,
+        "p95_ms": 1.372681
+      },
+      "db_changes": 7,
+      "python_fsync_count": [
+        0
+      ],
+      "python_open_counts": {
+        "artifact/file": 1,
+        "gx-h/config/limits.json": 1
+      },
+      "request_sha256": "9f6f2da8aa97974ec0b96c132f4eaa7d18917c0ba73b9263dfb3f6bc152aa0e7",
+      "sql_shape_orders": [
+        "37d1ad77d797a270686e3b27fe3320e60faafea73dd525698f1eaaa9efb1acaf"
+      ],
+      "sql_total": [
+        19
+      ],
+      "traces": 3,
+      "wall": {
+        "max_ms": 4.402102,
+        "n": 48,
+        "p50_ms": 3.0602384999999996,
+        "p95_ms": 4.100998
+      }
+    }
+  },
+  "evidence_reviewer.gx_submit_product": {
+    "p1": {
+      "call_counts": {
+        "gx-h/gx_core/artifacts/service.py::publish": 2,
+        "gx-h/gx_core/artifacts/service.py::publish_bytes": 1,
+        "gx-h/gx_core/artifacts/service.py::put": 1,
+        "gx-h/gx_core/artifacts/service.py::read_json": 7,
+        "gx-h/gx_core/artifacts/service.py::sync_directory_chain": 4,
+        "gx-h/gx_core/domain/ids.py::sha256_of_file": 3,
+        "gx-h/gx_core/domain/ids.py::sha256_of_obj": 5,
+        "gx-h/gx_core/orchestration/engine.py::digest": 1,
+        "gx-h/gx_core/p0/roots.py::_call": 1,
+        "gx-h/gx_core/p0/roots.py::_callback": 1,
+        "gx-h/gx_core/p0/roots.py::_submit": 1,
+        "gx-h/gx_core/teams/service.py::_conclude": 1,
+        "gx-h/gx_core/teams/service.py::_prepare_judgment": 1,
+        "gx-h/gx_core/teams/service.py::_product_workflow": 1,
+        "gx-h/gx_core/teams/service.py::_publish_verdict": 1,
+        "gx-h/gx_core/teams/service.py::submit_workflow_product": 1,
+        "gx-h/workflows/science_grid_v2/nodes.py::validate": 1,
+        "~::<built-in method posix.fsync>": 13,
+        "~::<method 'execute' of 'sqlite3.Connection' objects>": 74
+      },
+      "cpu": {
+        "max_ms": 17.536771,
+        "n": 48,
+        "p50_ms": 5.866441,
+        "p95_ms": 11.382441
+      },
+      "db_changes": 17,
+      "python_fsync_count": [
+        13
+      ],
+      "python_open_counts": {
+        "artifact directory": 7,
+        "artifact/file": 7,
+        "artifact/staging": 10,
+        "fixture directory": 4,
+        "gx-h/config/limits.json": 2
+      },
+      "request_sha256": "a98b1692fa039955bdbbbc64ee0c0c90bb2110f35a83e25accfdad6625c07357",
+      "sql_shape_orders": [
+        "ce52cba6836cf0189762da4e1ee6d3d560e820b65e17ba24f0ea4078d80b7828"
+      ],
+      "sql_total": [
+        75
+      ],
+      "traces": 3,
+      "wall": {
+        "max_ms": 197.458732,
+        "n": 48,
+        "p50_ms": 9.071529,
+        "p95_ms": 14.53148
+      }
+    },
+    "v21": {
+      "call_counts": {
+        "gx-h/gx_core/artifacts/service.py::publish": 2,
+        "gx-h/gx_core/artifacts/service.py::publish_bytes": 1,
+        "gx-h/gx_core/artifacts/service.py::put": 1,
+        "gx-h/gx_core/artifacts/service.py::read_json": 7,
+        "gx-h/gx_core/artifacts/service.py::sync_directory_chain": 4,
+        "gx-h/gx_core/domain/ids.py::sha256_of_file": 3,
+        "gx-h/gx_core/domain/ids.py::sha256_of_obj": 5,
+        "gx-h/gx_core/orchestration/engine.py::digest": 1,
+        "gx-h/gx_core/p0/roots.py::_call": 1,
+        "gx-h/gx_core/p0/roots.py::_callback": 1,
+        "gx-h/gx_core/p0/roots.py::_submit": 1,
+        "gx-h/gx_core/teams/service.py::_conclude": 1,
+        "gx-h/gx_core/teams/service.py::_prepare_judgment": 1,
+        "gx-h/gx_core/teams/service.py::_product_workflow": 1,
+        "gx-h/gx_core/teams/service.py::_publish_verdict": 1,
+        "gx-h/gx_core/teams/service.py::submit_workflow_product": 1,
+        "gx-h/workflows/science_grid_v2/nodes.py::validate": 1,
+        "~::<built-in method posix.fsync>": 13,
+        "~::<method 'execute' of 'sqlite3.Connection' objects>": 74
+      },
+      "cpu": {
+        "max_ms": 12.511896,
+        "n": 48,
+        "p50_ms": 5.7288879999999995,
+        "p95_ms": 7.437211
+      },
+      "db_changes": 17,
+      "python_fsync_count": [
+        13
+      ],
+      "python_open_counts": {
+        "artifact directory": 7,
+        "artifact/file": 7,
+        "artifact/staging": 10,
+        "fixture directory": 4,
+        "gx-h/config/limits.json": 2
+      },
+      "request_sha256": "a98b1692fa039955bdbbbc64ee0c0c90bb2110f35a83e25accfdad6625c07357",
+      "sql_shape_orders": [
+        "ce52cba6836cf0189762da4e1ee6d3d560e820b65e17ba24f0ea4078d80b7828"
+      ],
+      "sql_total": [
+        75
+      ],
+      "traces": 3,
+      "wall": {
+        "max_ms": 18.8906,
+        "n": 48,
+        "p50_ms": 8.6753445,
+        "p95_ms": 10.440235
+      }
+    }
+  },
+  "planner.gx_read_artifact": {
+    "p1": {
+      "call_counts": {
+        "gx-h/gx_core/artifacts/service.py::read_json": 1,
+        "gx-h/gx_core/domain/ids.py::sha256_of_obj": 1,
+        "gx-h/gx_core/p0/compute.py::is_analysis_data": 1,
+        "gx-h/gx_core/p0/roots.py::_allow_refs": 1,
+        "gx-h/gx_core/p0/roots.py::_call": 1,
+        "gx-h/gx_core/p0/roots.py::_callback": 1,
+        "gx-h/gx_core/p0/roots.py::_read_artifact": 1,
+        "gx-h/gx_core/p0/roots.py::_read_task_artifact": 1,
+        "~::<method 'execute' of 'sqlite3.Connection' objects>": 19
+      },
+      "cpu": {
+        "max_ms": 1.966304,
+        "n": 48,
+        "p50_ms": 1.1114785,
+        "p95_ms": 1.540677
+      },
+      "db_changes": 7,
+      "python_fsync_count": [
+        0
+      ],
+      "python_open_counts": {
+        "artifact/file": 1,
+        "gx-h/config/limits.json": 1
+      },
+      "request_sha256": "f273b713081494dd4f9ef35618d821fa2805a1a382692ae692677237bcc45339",
+      "sql_shape_orders": [
+        "37d1ad77d797a270686e3b27fe3320e60faafea73dd525698f1eaaa9efb1acaf"
+      ],
+      "sql_total": [
+        19
+      ],
+      "traces": 3,
+      "wall": {
+        "max_ms": 13.338998,
+        "n": 48,
+        "p50_ms": 3.251685,
+        "p95_ms": 4.641719
+      }
+    },
+    "v21": {
+      "call_counts": {
+        "gx-h/gx_core/artifacts/service.py::read_json": 1,
+        "gx-h/gx_core/domain/ids.py::sha256_of_obj": 1,
+        "gx-h/gx_core/p0/compute.py::is_analysis_data": 1,
+        "gx-h/gx_core/p0/roots.py::_allow_refs": 1,
+        "gx-h/gx_core/p0/roots.py::_call": 1,
+        "gx-h/gx_core/p0/roots.py::_callback": 1,
+        "gx-h/gx_core/p0/roots.py::_read_artifact": 1,
+        "~::<method 'execute' of 'sqlite3.Connection' objects>": 19
+      },
+      "cpu": {
+        "max_ms": 1.497906,
+        "n": 48,
+        "p50_ms": 1.098458,
+        "p95_ms": 1.264156
+      },
+      "db_changes": 7,
+      "python_fsync_count": [
+        0
+      ],
+      "python_open_counts": {
+        "artifact/file": 1,
+        "gx-h/config/limits.json": 1
+      },
+      "request_sha256": "f273b713081494dd4f9ef35618d821fa2805a1a382692ae692677237bcc45339",
+      "sql_shape_orders": [
+        "37d1ad77d797a270686e3b27fe3320e60faafea73dd525698f1eaaa9efb1acaf"
+      ],
+      "sql_total": [
+        19
+      ],
+      "traces": 3,
+      "wall": {
+        "max_ms": 4.749722,
+        "n": 48,
+        "p50_ms": 3.1985349999999997,
+        "p95_ms": 3.861059
+      }
+    }
+  },
+  "planner.gx_submit_product": {
+    "p1": {
+      "call_counts": {
+        "gx-h/gx_core/artifacts/service.py::publish": 2,
+        "gx-h/gx_core/artifacts/service.py::publish_bytes": 1,
+        "gx-h/gx_core/artifacts/service.py::put": 1,
+        "gx-h/gx_core/artifacts/service.py::read_json": 4,
+        "gx-h/gx_core/artifacts/service.py::sync_directory_chain": 4,
+        "gx-h/gx_core/domain/ids.py::sha256_of_file": 3,
+        "gx-h/gx_core/domain/ids.py::sha256_of_obj": 5,
+        "gx-h/gx_core/orchestration/engine.py::digest": 1,
+        "gx-h/gx_core/p0/roots.py::_call": 1,
+        "gx-h/gx_core/p0/roots.py::_callback": 1,
+        "gx-h/gx_core/p0/roots.py::_submit": 1,
+        "gx-h/gx_core/teams/service.py::_conclude": 1,
+        "gx-h/gx_core/teams/service.py::_prepare_judgment": 1,
+        "gx-h/gx_core/teams/service.py::_product_workflow": 1,
+        "gx-h/gx_core/teams/service.py::_publish_verdict": 1,
+        "gx-h/gx_core/teams/service.py::submit_workflow_product": 1,
+        "gx-h/workflows/science_grid_v2/nodes.py::validate": 1,
+        "~::<built-in method posix.fsync>": 13,
+        "~::<method 'execute' of 'sqlite3.Connection' objects>": 73
+      },
+      "cpu": {
+        "max_ms": 8.73358,
+        "n": 48,
+        "p50_ms": 5.483928499999999,
+        "p95_ms": 7.330404
+      },
+      "db_changes": 17,
+      "python_fsync_count": [
+        13
+      ],
+      "python_open_counts": {
+        "artifact directory": 7,
+        "artifact/file": 4,
+        "artifact/staging": 10,
+        "fixture directory": 4,
+        "gx-h/config/limits.json": 2
+      },
+      "request_sha256": "348b672fe56312df8bed53d1a8f6921ff947754c403a47a031ff17628ff8c943",
+      "sql_shape_orders": [
+        "134b2fd4e429fe49f687d0b578637f5bbbdbf5dc6aedd92fd6ea4918ec2c9948"
+      ],
+      "sql_total": [
+        74
+      ],
+      "traces": 3,
+      "wall": {
+        "max_ms": 19.726874,
+        "n": 48,
+        "p50_ms": 8.7375985,
+        "p95_ms": 12.069577
+      }
+    },
+    "v21": {
+      "call_counts": {
+        "gx-h/gx_core/artifacts/service.py::publish": 2,
+        "gx-h/gx_core/artifacts/service.py::publish_bytes": 1,
+        "gx-h/gx_core/artifacts/service.py::put": 1,
+        "gx-h/gx_core/artifacts/service.py::read_json": 4,
+        "gx-h/gx_core/artifacts/service.py::sync_directory_chain": 4,
+        "gx-h/gx_core/domain/ids.py::sha256_of_file": 3,
+        "gx-h/gx_core/domain/ids.py::sha256_of_obj": 5,
+        "gx-h/gx_core/orchestration/engine.py::digest": 1,
+        "gx-h/gx_core/p0/roots.py::_call": 1,
+        "gx-h/gx_core/p0/roots.py::_callback": 1,
+        "gx-h/gx_core/p0/roots.py::_submit": 1,
+        "gx-h/gx_core/teams/service.py::_conclude": 1,
+        "gx-h/gx_core/teams/service.py::_prepare_judgment": 1,
+        "gx-h/gx_core/teams/service.py::_product_workflow": 1,
+        "gx-h/gx_core/teams/service.py::_publish_verdict": 1,
+        "gx-h/gx_core/teams/service.py::submit_workflow_product": 1,
+        "gx-h/workflows/science_grid_v2/nodes.py::validate": 1,
+        "~::<built-in method posix.fsync>": 13,
+        "~::<method 'execute' of 'sqlite3.Connection' objects>": 73
+      },
+      "cpu": {
+        "max_ms": 29.216089,
+        "n": 48,
+        "p50_ms": 5.422501499999999,
+        "p95_ms": 6.862933
+      },
+      "db_changes": 17,
+      "python_fsync_count": [
+        13
+      ],
+      "python_open_counts": {
+        "artifact directory": 7,
+        "artifact/file": 4,
+        "artifact/staging": 10,
+        "fixture directory": 4,
+        "gx-h/config/limits.json": 2
+      },
+      "request_sha256": "348b672fe56312df8bed53d1a8f6921ff947754c403a47a031ff17628ff8c943",
+      "sql_shape_orders": [
+        "134b2fd4e429fe49f687d0b578637f5bbbdbf5dc6aedd92fd6ea4918ec2c9948"
+      ],
+      "sql_total": [
+        74
+      ],
+      "traces": 3,
+      "wall": {
+        "max_ms": 235.918996,
+        "n": 48,
+        "p50_ms": 8.571371,
+        "p95_ms": 10.512764
+      }
+    }
+  }
+}

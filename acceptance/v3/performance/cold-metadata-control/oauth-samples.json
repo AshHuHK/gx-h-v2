@@ -1,0 +1,1558 @@
+{
+  "started": "2026-11-22T22:07:27.566904+00:00",
+  "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate"
+  ],
+  "results": [
+    {
+      "sequence": 0,
+      "arm": "baseline",
+      "started": "2026-11-22T22:07:27.851207+00:00",
+      "ended": "2026-11-22T22:07:33.360185+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/00-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/00-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/00-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/00-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/oauth_metadata.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/00-baseline/state"
+        ]
+      ],
+      "observed_native_established_peers": [
+        {
+          "address": "127.0.0.1",
+          "port": 7890
+        }
+      ],
+      "rows": [
+        {
+          "run_id": "gxr_01m82msjnfnpjf2atw",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 1670.336536,
+          "before_enter_ms": 88.84259,
+          "hook_and_tool_prep_ms": 72.829559,
+          "worker_tool_build_envelope_ms": 0.016226,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.828669,
+              "end_ms": 75.642002,
+              "duration_ms": 72.813333
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 75.658228,
+              "end_ms": 88.837772,
+              "duration_ms": 13.179544
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 90.669823,
+              "end_ms": 92.272817,
+              "duration_ms": 1.602994
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 92.278025,
+              "end_ms": 550.366588,
+              "duration_ms": 458.088563
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 550.384903,
+              "end_ms": 550.541593,
+              "duration_ms": 0.15669
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 550.554385,
+              "end_ms": 1059.946078,
+              "duration_ms": 509.391693
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1059.972964,
+              "end_ms": 1082.066655,
+              "duration_ms": 22.093691
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1082.124238,
+              "end_ms": 1670.14855,
+              "duration_ms": 588.024312
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 88.84259,
+              "end_ms": 1670.269101,
+              "duration_ms": 1581.426511
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 2.67726
+        },
+        {
+          "run_id": "gxr_01m82msm0x4905h3qk",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 614.833978,
+          "before_enter_ms": 2.665533,
+          "hook_and_tool_prep_ms": 0.836128,
+          "worker_tool_build_envelope_ms": 0.041376,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.990594,
+              "end_ms": 1.785346,
+              "duration_ms": 0.794752
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.826722,
+              "end_ms": 2.655451,
+              "duration_ms": 0.828729
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.771475,
+              "end_ms": 6.796695,
+              "duration_ms": 2.02522
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.8115,
+              "end_ms": 198.068708,
+              "duration_ms": 191.257208
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 198.087592,
+              "end_ms": 198.24061,
+              "duration_ms": 0.153018
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 198.252675,
+              "end_ms": 590.406435,
+              "duration_ms": 392.15376
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 590.437856,
+              "end_ms": 606.738815,
+              "duration_ms": 16.300959
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 606.807222,
+              "end_ms": 614.696291,
+              "duration_ms": 7.889069
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.665533,
+              "end_ms": 614.782877,
+              "duration_ms": 612.117344
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 0.485994
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 1,
+      "arm": "candidate",
+      "started": "2026-11-22T22:07:33.417660+00:00",
+      "ended": "2026-11-22T22:07:39.577900+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/01-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/01-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/01-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/01-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/oauth_metadata.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/01-candidate/state"
+        ]
+      ],
+      "observed_native_established_peers": [
+        {
+          "address": "127.0.0.1",
+          "port": 7890
+        }
+      ],
+      "rows": [
+        {
+          "run_id": "gxr_01m82msr9fs55mexb1",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1719.356936,
+          "before_enter_ms": 10.992976,
+          "hook_and_tool_prep_ms": 0.543888,
+          "worker_tool_build_envelope_ms": 0.02543,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.775781,
+              "end_ms": 1.294239,
+              "duration_ms": 0.518458
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.319669,
+              "end_ms": 10.988993,
+              "duration_ms": 9.669324
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 12.883447,
+              "end_ms": 14.473279,
+              "duration_ms": 1.589832
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 14.478975,
+              "end_ms": 871.106626,
+              "duration_ms": 856.627651
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 871.200791,
+              "end_ms": 872.214195,
+              "duration_ms": 1.013404
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 872.286224,
+              "end_ms": 1195.23176,
+              "duration_ms": 322.945536
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1195.255594,
+              "end_ms": 1211.814911,
+              "duration_ms": 16.559317
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1211.879782,
+              "end_ms": 1719.195949,
+              "duration_ms": 507.316167
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 10.992976,
+              "end_ms": 1719.31358,
+              "duration_ms": 1708.320604
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 112.656864
+        },
+        {
+          "run_id": "gxr_01m82mssnyvjnyhhxg",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 643.649659,
+          "before_enter_ms": 1.750634,
+          "hook_and_tool_prep_ms": 0.595223,
+          "worker_tool_build_envelope_ms": 0.039648,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.62759,
+              "end_ms": 1.183165,
+              "duration_ms": 0.555575
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.222813,
+              "end_ms": 1.746715,
+              "duration_ms": 0.523902
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 2.785111,
+              "end_ms": 4.584384,
+              "duration_ms": 1.799273
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 4.591206,
+              "end_ms": 192.607041,
+              "duration_ms": 188.015835
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 192.626907,
+              "end_ms": 192.779623,
+              "duration_ms": 0.152716
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 192.791247,
+              "end_ms": 618.265787,
+              "duration_ms": 425.47454
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 618.289666,
+              "end_ms": 635.615799,
+              "duration_ms": 17.326133
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 635.67744,
+              "end_ms": 643.543414,
+              "duration_ms": 7.865974
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 1.750634,
+              "end_ms": 643.609919,
+              "duration_ms": 641.859285
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 2.356179
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "arm": "candidate",
+      "started": "2026-11-22T22:07:39.636734+00:00",
+      "ended": "2026-11-22T22:07:45.657548+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/02-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/02-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/02-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/02-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/oauth_metadata.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/02-candidate/state"
+        ]
+      ],
+      "observed_native_established_peers": [
+        {
+          "address": "127.0.0.1",
+          "port": 7890
+        }
+      ],
+      "rows": [
+        {
+          "run_id": "gxr_01m82msyken9a1mx5c",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1671.115684,
+          "before_enter_ms": 13.318533,
+          "hook_and_tool_prep_ms": 0.498955,
+          "worker_tool_build_envelope_ms": 0.027497,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 3.108351,
+              "end_ms": 3.579809,
+              "duration_ms": 0.471458
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 3.607306,
+              "end_ms": 13.314613,
+              "duration_ms": 9.707307
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 15.163097,
+              "end_ms": 16.875119,
+              "duration_ms": 1.712022
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 16.880975,
+              "end_ms": 449.109801,
+              "duration_ms": 432.228826
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 449.127147,
+              "end_ms": 449.284922,
+              "duration_ms": 0.157775
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 449.303653,
+              "end_ms": 1102.441161,
+              "duration_ms": 653.137508
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1102.463876,
+              "end_ms": 1120.624219,
+              "duration_ms": 18.160343
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1120.67656,
+              "end_ms": 1670.953003,
+              "duration_ms": 550.276443
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 13.318533,
+              "end_ms": 1671.072933,
+              "duration_ms": 1657.7544
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 121.324307
+        },
+        {
+          "run_id": "gxr_01m82msztv0dsrp0hq",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 590.872303,
+          "before_enter_ms": 2.680235,
+          "hook_and_tool_prep_ms": 1.000015,
+          "worker_tool_build_envelope_ms": 0.072675,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.893778,
+              "end_ms": 1.821118,
+              "duration_ms": 0.92734
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.893793,
+              "end_ms": 2.672235,
+              "duration_ms": 0.778442
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.662194,
+              "end_ms": 6.274294,
+              "duration_ms": 1.6121
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.287338,
+              "end_ms": 200.140764,
+              "duration_ms": 193.853426
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 200.152851,
+              "end_ms": 200.247004,
+              "duration_ms": 0.094153
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 200.253911,
+              "end_ms": 567.394776,
+              "duration_ms": 367.140865
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 567.418675,
+              "end_ms": 582.512561,
+              "duration_ms": 15.093886
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 582.572891,
+              "end_ms": 590.770661,
+              "duration_ms": 8.19777
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.680235,
+              "end_ms": 590.835717,
+              "duration_ms": 588.155482
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 2.518869
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "arm": "baseline",
+      "started": "2026-11-22T22:07:45.705712+00:00",
+      "ended": "2026-11-22T22:07:51.007750+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/03-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/03-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/03-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/03-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/oauth_metadata.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/03-baseline/state"
+        ]
+      ],
+      "observed_native_established_peers": [
+        {
+          "address": "127.0.0.1",
+          "port": 7890
+        }
+      ],
+      "rows": [
+        {
+          "run_id": "gxr_01m82mt43hea7fycgx",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 1401.394236,
+          "before_enter_ms": 88.993224,
+          "hook_and_tool_prep_ms": 74.498602,
+          "worker_tool_build_envelope_ms": 0.014875,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 3.008333,
+              "end_ms": 77.49206,
+              "duration_ms": 74.483727
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 77.506935,
+              "end_ms": 88.989165,
+              "duration_ms": 11.48223
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 90.800662,
+              "end_ms": 92.449914,
+              "duration_ms": 1.649252
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 92.454975,
+              "end_ms": 549.244647,
+              "duration_ms": 456.789672
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 549.259151,
+              "end_ms": 549.382505,
+              "duration_ms": 0.123354
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 549.391248,
+              "end_ms": 875.291034,
+              "duration_ms": 325.899786
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 875.316865,
+              "end_ms": 893.234898,
+              "duration_ms": 17.918033
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 893.291314,
+              "end_ms": 1401.207929,
+              "duration_ms": 507.916615
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 88.993224,
+              "end_ms": 1401.32871,
+              "duration_ms": 1312.335486
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 2.861286
+        },
+        {
+          "run_id": "gxr_01m82mt5fmywg2hv71",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 644.599919,
+          "before_enter_ms": 2.615504,
+          "hook_and_tool_prep_ms": 0.785553,
+          "worker_tool_build_envelope_ms": 0.037815,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.025479,
+              "end_ms": 1.773217,
+              "duration_ms": 0.747738
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.811032,
+              "end_ms": 2.606284,
+              "duration_ms": 0.795252
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.607328,
+              "end_ms": 6.591491,
+              "duration_ms": 1.984163
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.60502,
+              "end_ms": 200.848982,
+              "duration_ms": 194.243962
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 200.868872,
+              "end_ms": 201.021788,
+              "duration_ms": 0.152916
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 201.033563,
+              "end_ms": 619.512425,
+              "duration_ms": 418.478862
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 619.537785,
+              "end_ms": 636.376364,
+              "duration_ms": 16.838579
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 636.43341,
+              "end_ms": 644.436048,
+              "duration_ms": 8.002638
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.615504,
+              "end_ms": 644.544389,
+              "duration_ms": 641.928885
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 0.48152
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "arm": "candidate",
+      "started": "2026-11-22T22:07:51.063967+00:00",
+      "ended": "2026-11-22T22:07:56.936084+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/04-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/04-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/04-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/04-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/oauth_metadata.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/04-candidate/state"
+        ]
+      ],
+      "observed_native_established_peers": [
+        {
+          "address": "127.0.0.1",
+          "port": 7890
+        }
+      ],
+      "rows": [
+        {
+          "run_id": "gxr_01m82mt9g2t25rhbyv",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1836.747641,
+          "before_enter_ms": 10.81618,
+          "hook_and_tool_prep_ms": 0.485924,
+          "worker_tool_build_envelope_ms": 0.028113,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.665906,
+              "end_ms": 1.123717,
+              "duration_ms": 0.457811
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.15183,
+              "end_ms": 10.81229,
+              "duration_ms": 9.66046
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 12.664921,
+              "end_ms": 13.791212,
+              "duration_ms": 1.126291
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 13.796237,
+              "end_ms": 703.587873,
+              "duration_ms": 689.791636
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 703.606112,
+              "end_ms": 703.747809,
+              "duration_ms": 0.141697
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 703.764584,
+              "end_ms": 1114.507122,
+              "duration_ms": 410.742538
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1114.529302,
+              "end_ms": 1132.484804,
+              "duration_ms": 17.955502
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1132.541943,
+              "end_ms": 1836.584209,
+              "duration_ms": 704.042266
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 10.81618,
+              "end_ms": 1836.704482,
+              "duration_ms": 1825.888302
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 113.471706
+        },
+        {
+          "run_id": "gxr_01m82mtarybbmfgmg8",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 588.303982,
+          "before_enter_ms": 3.429735,
+          "hook_and_tool_prep_ms": 1.237111,
+          "worker_tool_build_envelope_ms": 0.080216,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.273202,
+              "end_ms": 2.430097,
+              "duration_ms": 1.156895
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 2.510313,
+              "end_ms": 3.420691,
+              "duration_ms": 0.910378
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 5.437339,
+              "end_ms": 7.450697,
+              "duration_ms": 2.013358
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 7.462956,
+              "end_ms": 181.946039,
+              "duration_ms": 174.483083
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 181.970003,
+              "end_ms": 182.168791,
+              "duration_ms": 0.198788
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 182.182136,
+              "end_ms": 567.574102,
+              "duration_ms": 385.391966
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 567.598503,
+              "end_ms": 581.491231,
+              "duration_ms": 13.892728
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 581.579962,
+              "end_ms": 588.197781,
+              "duration_ms": 6.617819
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 3.429735,
+              "end_ms": 588.266146,
+              "duration_ms": 584.836411
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 2.535768
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "arm": "baseline",
+      "started": "2026-11-22T22:07:56.982487+00:00",
+      "ended": "2026-11-22T22:08:02.469822+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/05-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/05-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/05-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/05-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/oauth_metadata.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/05-baseline/state"
+        ]
+      ],
+      "observed_native_established_peers": [
+        {
+          "address": "127.0.0.1",
+          "port": 7890
+        }
+      ],
+      "rows": [
+        {
+          "run_id": "gxr_01m82mtf6m0ptf37sd",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 1455.540023,
+          "before_enter_ms": 92.066873,
+          "hook_and_tool_prep_ms": 77.01883,
+          "worker_tool_build_envelope_ms": 0.016752,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.795073,
+              "end_ms": 79.797151,
+              "duration_ms": 77.002078
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 79.813903,
+              "end_ms": 92.061732,
+              "duration_ms": 12.247829
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 94.035762,
+              "end_ms": 95.791438,
+              "duration_ms": 1.755676
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 95.797516,
+              "end_ms": 556.971401,
+              "duration_ms": 461.173885
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 556.992331,
+              "end_ms": 557.149019,
+              "duration_ms": 0.156688
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 557.161984,
+              "end_ms": 913.388944,
+              "duration_ms": 356.22696
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 913.418705,
+              "end_ms": 931.159897,
+              "duration_ms": 17.741192
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 931.215652,
+              "end_ms": 1455.353947,
+              "duration_ms": 524.138295
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 92.066873,
+              "end_ms": 1455.471674,
+              "duration_ms": 1363.404801
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 2.709671
+        },
+        {
+          "run_id": "gxr_01m82mtgnpzxvxtq9d",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 604.112946,
+          "before_enter_ms": 2.77908,
+          "hook_and_tool_prep_ms": 0.832439,
+          "worker_tool_build_envelope_ms": 0.041461,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.019478,
+              "end_ms": 1.810456,
+              "duration_ms": 0.790978
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.851917,
+              "end_ms": 2.769189,
+              "duration_ms": 0.917272
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.819593,
+              "end_ms": 6.78268,
+              "duration_ms": 1.963087
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.795184,
+              "end_ms": 190.862527,
+              "duration_ms": 184.067343
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 190.88226,
+              "end_ms": 191.034622,
+              "duration_ms": 0.152362
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 191.045273,
+              "end_ms": 579.015688,
+              "duration_ms": 387.970415
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 579.0413,
+              "end_ms": 596.05856,
+              "duration_ms": 17.01726
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 596.11635,
+              "end_ms": 604.001879,
+              "duration_ms": 7.885529
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.77908,
+              "end_ms": 604.072115,
+              "duration_ms": 601.293035
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 0.51255
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "arm": "baseline",
+      "started": "2026-11-22T22:08:02.541808+00:00",
+      "ended": "2026-11-22T22:08:08.051301+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/06-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/06-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/06-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/06-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/oauth_metadata.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/06-baseline/state"
+        ]
+      ],
+      "observed_native_established_peers": [
+        {
+          "address": "127.0.0.1",
+          "port": 7890
+        }
+      ],
+      "rows": [
+        {
+          "run_id": "gxr_01m82mtmhbmhzvsjaf",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 1592.713702,
+          "before_enter_ms": 86.56691,
+          "hook_and_tool_prep_ms": 72.216233,
+          "worker_tool_build_envelope_ms": 0.015681,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.77892,
+              "end_ms": 74.979472,
+              "duration_ms": 72.200552
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 74.995153,
+              "end_ms": 86.56278,
+              "duration_ms": 11.567627
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 88.367017,
+              "end_ms": 89.97207,
+              "duration_ms": 1.605053
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 89.976814,
+              "end_ms": 543.41923,
+              "duration_ms": 453.442416
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 543.438214,
+              "end_ms": 543.581695,
+              "duration_ms": 0.143481
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 543.593171,
+              "end_ms": 1014.682403,
+              "duration_ms": 471.089232
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1014.709008,
+              "end_ms": 1030.905154,
+              "duration_ms": 16.196146
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1030.963029,
+              "end_ms": 1592.609072,
+              "duration_ms": 561.646043
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 86.56691,
+              "end_ms": 1592.671555,
+              "duration_ms": 1506.104645
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 2.595447
+        },
+        {
+          "run_id": "gxr_01m82mtp1czr679gnb",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 535.457781,
+          "before_enter_ms": 1.670745,
+          "hook_and_tool_prep_ms": 0.519283,
+          "worker_tool_build_envelope_ms": 0.023183,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.64625,
+              "end_ms": 1.14235,
+              "duration_ms": 0.4961
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.165533,
+              "end_ms": 1.66614,
+              "duration_ms": 0.500607
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 2.788424,
+              "end_ms": 4.545289,
+              "duration_ms": 1.756865
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 4.552274,
+              "end_ms": 201.395486,
+              "duration_ms": 196.843212
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 201.414301,
+              "end_ms": 201.567038,
+              "duration_ms": 0.152737
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 201.577868,
+              "end_ms": 510.886415,
+              "duration_ms": 309.308547
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 510.911717,
+              "end_ms": 527.513692,
+              "duration_ms": 16.601975
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 527.578212,
+              "end_ms": 535.349189,
+              "duration_ms": 7.770977
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 1.670745,
+              "end_ms": 535.417256,
+              "duration_ms": 533.746511
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 0.31461
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 7,
+      "arm": "candidate",
+      "started": "2026-11-22T22:08:08.114239+00:00",
+      "ended": "2026-11-22T22:08:13.685485+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/07-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/07-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/07-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/07-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/oauth_metadata.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-oauth-metadata-01/07-candidate/state"
+        ]
+      ],
+      "observed_native_established_peers": [
+        {
+          "address": "127.0.0.1",
+          "port": 7890
+        }
+      ],
+      "rows": [
+        {
+          "run_id": "gxr_01m82mtt6mt9hks32x",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1495.927381,
+          "before_enter_ms": 10.88021,
+          "hook_and_tool_prep_ms": 0.477699,
+          "worker_tool_build_envelope_ms": 0.02663,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.671763,
+              "end_ms": 1.122832,
+              "duration_ms": 0.451069
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.149462,
+              "end_ms": 10.876037,
+              "duration_ms": 9.726575
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 12.737943,
+              "end_ms": 14.38849,
+              "duration_ms": 1.650547
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 14.393772,
+              "end_ms": 485.414747,
+              "duration_ms": 471.020975
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 485.427303,
+              "end_ms": 485.507091,
+              "duration_ms": 0.079788
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 485.516769,
+              "end_ms": 874.478379,
+              "duration_ms": 388.96161
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 874.5026,
+              "end_ms": 892.168246,
+              "duration_ms": 17.665646
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 892.226978,
+              "end_ms": 1495.765673,
+              "duration_ms": 603.538695
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 10.88021,
+              "end_ms": 1495.884179,
+              "duration_ms": 1485.003969
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 121.771372
+        },
+        {
+          "run_id": "gxr_01m82mtvf6esqwcjmr",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 554.356258,
+          "before_enter_ms": 2.75073,
+          "hook_and_tool_prep_ms": 1.024289,
+          "worker_tool_build_envelope_ms": 0.073407,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.925214,
+              "end_ms": 1.876096,
+              "duration_ms": 0.950882
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.949503,
+              "end_ms": 2.742174,
+              "duration_ms": 0.792671
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.696907,
+              "end_ms": 6.645693,
+              "duration_ms": 1.948786
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.659348,
+              "end_ms": 192.389703,
+              "duration_ms": 185.730355
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 192.409408,
+              "end_ms": 192.553869,
+              "duration_ms": 0.144461
+            },
+            {
+              "phase": "account/read",
+              "start_ms": 192.565614,
+              "end_ms": 528.685866,
+              "duration_ms": 336.120252
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 528.711097,
+              "end_ms": 546.159426,
+              "duration_ms": 17.448329
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 546.221018,
+              "end_ms": 554.246932,
+              "duration_ms": 8.025914
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.75073,
+              "end_ms": 554.316922,
+              "duration_ms": 551.566192
+            }
+          ],
+          "supplement": [],
+          "initial_coordinator_pass_to_first_yield_ms": 2.449386
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    }
+  ],
+  "scope": "metadata-only OAuth startup through verified Clash, no turn or thread RPC allowed",
+  "files": {
+    "oauth_metadata.py": "94ce82a708a2cfaa397395269862d4b6b2d2b1568bbe21eb93703090ee16acbc",
+    "probe.py": "df20f7557da28a30debde7cd4a2f315dcb48c079ef3f76a7a6f9b626a024ee9b"
+  },
+  "ended": "2026-11-22T22:08:13.737127+00:00"
+}

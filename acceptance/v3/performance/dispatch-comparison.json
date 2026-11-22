@@ -1,0 +1,4663 @@
+{
+  "captured": "2026-11-22T22:25:06.166250+00:00",
+  "definitions": {
+    "claim_to_native_reservation_ms": "durable claim until GX funding reservation for same native Turn, includes native thread materialization",
+    "cold_dispatch_start_to_first_writer_ms": "first admitted Root dispatch per Run through the first outer GX writer under the same Task identity. Includes lazy public-driver native/worker tool initialization; no production timer separates these inside this interval.",
+    "eligible_before_own_dispatch_outside_sibling_ms": "eligible to start of own follow-on dispatch, excluding any overlapping synchronous sibling Run dispatches",
+    "eligible_wait_outside_sibling_dispatch_ms": "eligible interval with observed synchronous other-Run dispatch overlap subtracted; other work or waits inside this residual are not classified",
+    "eligible_wait_overlapping_sibling_dispatch_ms": "union of actually timed dispatch intervals on the other Run of the same single-coordinator workspace while the measured claim was eligible",
+    "existing_lease_dispatch": "identity-matched dispatch on an already live original lease; count separately from official resume-prefixed turn deliveries",
+    "follow_on_own_dispatch_start_to_claim_ms": "admitted follow-on dispatch start (or eligibility if later) to the durable claim, including actual GX claim preparation",
+    "follow_on_preclaim_outside_writer_ms": "remaining observed own preclaim interval after excluding that clipped writer union; includes Python, other IO, metric emissions and timing uncertainty",
+    "follow_on_preclaim_writer_ms": "union of same-Task outer GX writer time clipped to follow-on dispatch start through claim, including lock acquisition. Metrics identify no individual SQL/Python call. The metric end timestamp is emitted after transaction-end callbacks, which can offset reconstruction; claim event is persisted to milliseconds.",
+    "native_reservation_to_official_start_ms": "GX budget reservation to Codex official task_started message; accurate to persisted millisecond precision",
+    "new_claim": "dispatch interval containing the durable READY to CLAIMED edge plus matching original lease; telemetry end minus elapsed reconstructs start",
+    "official_start_to_dispatch_return_ms": "official task_started to GX dispatch timer end; native start and receipt processing run asynchronously",
+    "ready_and_previous_team_slot_released_to_claim_ms": "noninitial same-Team claim minus the later of this READY timestamp and the prior Task lease release/native terminal/budget settlement; each Team has one slot and only one other single-slot Team shares its two-slot workspace",
+    "ready_unadmitted": "task remained READY at midpoint before its actual claim; return reason unavailable from real GX metrics; control timers record HoldActive explicitly",
+    "standardization": "nearest weighted empirical p95 retaining same operation-specific duration samples, replacing only operation frequencies; missing stratum yields null"
+  },
+  "groups": {
+    "baseline": {
+      "all": {
+        "all_raw_ms": {
+          "max": 2884.7008,
+          "n": 7577,
+          "p50": 4.2208,
+          "p95": 6.961,
+          "p99": 95.5628
+        },
+        "claim_evidence_reviewer_attempt_1_ms": {
+          "max": 2884.7008,
+          "n": 26,
+          "p50": 1572.4307,
+          "p95": 2341.9265,
+          "p99": 2884.7008
+        },
+        "claim_evidence_reviewer_attempt_2_ms": {
+          "max": 623.6434,
+          "n": 26,
+          "p50": 108.2676,
+          "p95": 522.0616,
+          "p99": 623.6434
+        },
+        "claim_planner_attempt_1_ms": {
+          "max": 449.6523,
+          "n": 26,
+          "p50": 106.1389,
+          "p95": 430.5643,
+          "p99": 449.6523
+        },
+        "claim_to_dispatch_return_ms": {
+          "max": 616.4245,
+          "n": 78,
+          "p50": 177.9557,
+          "p95": 471.6684,
+          "p99": 616.4245
+        },
+        "claim_to_native_reservation_ms": {
+          "max": 470.0,
+          "n": 78,
+          "p50": 70.0,
+          "p95": 378.0,
+          "p99": 470.0
+        },
+        "cold_dispatch_start_to_first_writer_ms": {
+          "max": 2435.0825,
+          "n": 26,
+          "p50": 1303.9173,
+          "p95": 2086.2717,
+          "p99": 2435.0825
+        },
+        "dispatch_start_to_claim_ms": {
+          "max": 2449.6874,
+          "n": 78,
+          "p50": 8.6059,
+          "p95": 1917.3966,
+          "p99": 2449.6874
+        },
+        "eligible_before_own_dispatch_outside_sibling_ms": {
+          "max": 227.9719,
+          "n": 52,
+          "p50": 108.1553,
+          "p95": 133.6393,
+          "p99": 227.9719
+        },
+        "eligible_wait_outside_sibling_dispatch_ms": {
+          "max": 235.0,
+          "n": 52,
+          "p50": 114.4169,
+          "p95": 145.0,
+          "p99": 235.0
+        },
+        "eligible_wait_overlapping_sibling_dispatch_ms": {
+          "max": 7.9935,
+          "n": 52,
+          "p50": 0.0,
+          "p95": 6.9294,
+          "p99": 7.9935
+        },
+        "follow_on_own_dispatch_start_to_claim_ms": {
+          "max": 16.167,
+          "n": 52,
+          "p50": 7.5176,
+          "p95": 12.047,
+          "p99": 16.167
+        },
+        "follow_on_preclaim_finished_writer_ms": {
+          "max": 0,
+          "n": 52,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "follow_on_preclaim_lock_acquire_ms": {
+          "max": 0.2466,
+          "n": 52,
+          "p50": 0.1676,
+          "p95": 0.1985,
+          "p99": 0.2466
+        },
+        "follow_on_preclaim_outside_writer_ms": {
+          "max": 0.0788,
+          "n": 52,
+          "p50": 0.0457,
+          "p95": 0.0676,
+          "p99": 0.0788
+        },
+        "follow_on_preclaim_writer_ms": {
+          "max": 16.0896,
+          "n": 52,
+          "p50": 7.4593,
+          "p95": 11.9888,
+          "p99": 16.0896
+        },
+        "native_reservation_to_official_start_ms": {
+          "max": 318.0,
+          "n": 78,
+          "p50": 15.0,
+          "p95": 265.0,
+          "p99": 318.0
+        },
+        "new_claim_ms": {
+          "max": 2884.7008,
+          "n": 78,
+          "p50": 184.8025,
+          "p95": 2310.1106,
+          "p99": 2884.7008
+        },
+        "official_start_to_dispatch_return_ms": {
+          "max": 276.4854,
+          "n": 78,
+          "p50": 33.9332,
+          "p95": 115.0134,
+          "p99": 276.4854
+        },
+        "ready_and_previous_team_slot_released_to_claim_ms": {
+          "max": 235.0,
+          "n": 52,
+          "p50": 118.0,
+          "p95": 145.0,
+          "p99": 235.0
+        },
+        "ready_elapsed_with_previous_team_slot_occupied_ms": {
+          "max": 31310.0,
+          "n": 52,
+          "p50": 15800.0,
+          "p95": 28555.0,
+          "p99": 31310.0
+        },
+        "ready_to_claim_ms": {
+          "max": 31428.0,
+          "n": 78,
+          "p50": 10529.0,
+          "p95": 27111.0,
+          "p99": 31428.0
+        },
+        "ready_unadmitted_ms": {
+          "max": 38.0115,
+          "n": 7499,
+          "p50": 4.2114,
+          "p95": 6.7295,
+          "p99": 9.1395
+        }
+      },
+      "follow_on_writer_counts_by_role": [
+        {
+          "claims": 26,
+          "completed_before_claim": 0,
+          "crossing_claim": 1,
+          "role": "evidence_reviewer"
+        },
+        {
+          "claims": 26,
+          "completed_before_claim": 0,
+          "crossing_claim": 1,
+          "role": "planner"
+        }
+      ],
+      "operations": {
+        "new_claim": 78,
+        "ready_unadmitted": 7499
+      },
+      "per_wave": {
+        "0": {
+          "all_raw_ms": {
+            "max": 957.9203,
+            "n": 550,
+            "p50": 4.2455,
+            "p95": 6.7338,
+            "p99": 101.4457
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 957.9203,
+            "n": 2,
+            "p50": 807.981,
+            "p95": 957.9203,
+            "p99": 957.9203
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 194.0161,
+            "n": 2,
+            "p50": 184.8025,
+            "p95": 194.0161,
+            "p99": 194.0161
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 103.18,
+            "n": 2,
+            "p50": 101.4457,
+            "p95": 103.18,
+            "p99": 103.18
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 258.6299,
+            "n": 6,
+            "p50": 177.9557,
+            "p95": 258.6299,
+            "p99": 258.6299
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 150.0,
+            "n": 6,
+            "p50": 133.0,
+            "p95": 150.0,
+            "p99": 150.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 713.9887,
+            "n": 2,
+            "p50": 538.6856,
+            "p95": 713.9887,
+            "p99": 713.9887
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 726.2518,
+            "n": 6,
+            "p50": 8.3973,
+            "p95": 726.2518,
+            "p99": 726.2518
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 111.4006,
+            "n": 4,
+            "p50": 106.4824,
+            "p95": 111.4006,
+            "p99": 111.4006
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 120.0065,
+            "n": 4,
+            "p50": 114.0,
+            "p95": 120.0065,
+            "p99": 120.0065
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 7.9935,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 7.9935,
+            "p99": 7.9935
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 8.6059,
+            "n": 4,
+            "p50": 7.5176,
+            "p95": 8.6059,
+            "p99": 8.6059
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1824,
+            "n": 4,
+            "p50": 0.1734,
+            "p95": 0.1824,
+            "p99": 0.1824
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0613,
+            "n": 4,
+            "p50": 0.0484,
+            "p95": 0.0613,
+            "p99": 0.0613
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 8.5619,
+            "n": 4,
+            "p50": 7.4593,
+            "p95": 8.5619,
+            "p99": 8.5619
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 19.0,
+            "n": 6,
+            "p50": 14.0,
+            "p95": 19.0,
+            "p99": 19.0
+          },
+          "new_claim_ms": {
+            "max": 957.9203,
+            "n": 6,
+            "p50": 184.8025,
+            "p95": 957.9203,
+            "p99": 957.9203
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 92.6299,
+            "n": 6,
+            "p50": 30.4985,
+            "p95": 92.6299,
+            "p99": 92.6299
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 128.0,
+            "n": 4,
+            "p50": 114.0,
+            "p95": 128.0,
+            "p99": 128.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 26993.0,
+            "n": 4,
+            "p50": 9197.0,
+            "p95": 26993.0,
+            "p99": 26993.0
+          },
+          "ready_to_claim_ms": {
+            "max": 27107.0,
+            "n": 6,
+            "p50": 8572.0,
+            "p95": 27107.0,
+            "p99": 27107.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 32.3825,
+            "n": 544,
+            "p50": 4.2415,
+            "p95": 6.5386,
+            "p99": 9.5225
+          }
+        },
+        "1": {
+          "all_raw_ms": {
+            "max": 2310.1106,
+            "n": 580,
+            "p50": 4.436,
+            "p95": 6.9963,
+            "p99": 98.418
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2310.1106,
+            "n": 2,
+            "p50": 770.2093,
+            "p95": 2310.1106,
+            "p99": 2310.1106
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 623.6434,
+            "n": 2,
+            "p50": 478.151,
+            "p95": 623.6434,
+            "p99": 623.6434
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 104.6999,
+            "n": 2,
+            "p50": 98.418,
+            "p95": 104.6999,
+            "p99": 104.6999
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 616.4245,
+            "n": 6,
+            "p50": 193.0998,
+            "p95": 616.4245,
+            "p99": 616.4245
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 413.0,
+            "n": 6,
+            "p50": 129.0,
+            "p95": 413.0,
+            "p99": 413.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1734.1299,
+            "n": 2,
+            "p50": 565.7312,
+            "p95": 1734.1299,
+            "p99": 1734.1299
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1744.9238,
+            "n": 6,
+            "p50": 7.566,
+            "p95": 1744.9238,
+            "p99": 1744.9238
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 117.5173,
+            "n": 4,
+            "p50": 109.4281,
+            "p95": 117.5173,
+            "p99": 117.5173
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 124.0,
+            "n": 4,
+            "p50": 117.7228,
+            "p95": 124.0,
+            "p99": 124.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 7.2008,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 7.2008,
+            "p99": 7.2008
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 9.5719,
+            "n": 4,
+            "p50": 7.2189,
+            "p95": 9.5719,
+            "p99": 9.5719
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1962,
+            "n": 4,
+            "p50": 0.1857,
+            "p95": 0.1962,
+            "p99": 0.1962
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0518,
+            "n": 4,
+            "p50": 0.0429,
+            "p95": 0.0518,
+            "p99": 0.0518
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 9.5288,
+            "n": 4,
+            "p50": 7.1671,
+            "p95": 9.5288,
+            "p99": 9.5288
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 265.0,
+            "n": 6,
+            "p50": 15.0,
+            "p95": 265.0,
+            "p99": 265.0
+          },
+          "new_claim_ms": {
+            "max": 2310.1106,
+            "n": 6,
+            "p50": 478.151,
+            "p95": 2310.1106,
+            "p99": 2310.1106
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 114.1868,
+            "n": 6,
+            "p50": 43.6684,
+            "p95": 114.1868,
+            "p99": 114.1868
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 124.0,
+            "n": 4,
+            "p50": 120.0,
+            "p95": 124.0,
+            "p99": 124.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 21749.0,
+            "n": 4,
+            "p50": 15274.0,
+            "p95": 21749.0,
+            "p99": 21749.0
+          },
+          "ready_to_claim_ms": {
+            "max": 21873.0,
+            "n": 6,
+            "p50": 11721.0,
+            "p95": 21873.0,
+            "p99": 21873.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 18.2233,
+            "n": 574,
+            "p50": 4.4122,
+            "p95": 6.8685,
+            "p99": 8.5323
+          }
+        },
+        "10": {
+          "all_raw_ms": {
+            "max": 2172.3202,
+            "n": 540,
+            "p50": 4.4774,
+            "p95": 7.1405,
+            "p99": 99.3104
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2172.3202,
+            "n": 2,
+            "p50": 1415.0338,
+            "p95": 2172.3202,
+            "p99": 2172.3202
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 112.2242,
+            "n": 2,
+            "p50": 111.2514,
+            "p95": 112.2242,
+            "p99": 112.2242
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 109.2882,
+            "n": 2,
+            "p50": 99.3104,
+            "p95": 109.2882,
+            "p99": 109.2882
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 300.6673,
+            "n": 6,
+            "p50": 104.1163,
+            "p95": 300.6673,
+            "p99": 300.6673
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 153.0,
+            "n": 6,
+            "p50": 56.0,
+            "p95": 153.0,
+            "p99": 153.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1859.5451,
+            "n": 2,
+            "p50": 1178.6518,
+            "p95": 1859.5451,
+            "p99": 1859.5451
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1871.653,
+            "n": 6,
+            "p50": 7.1351,
+            "p95": 1871.653,
+            "p99": 1871.653
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 115.2382,
+            "n": 4,
+            "p50": 107.2456,
+            "p95": 115.2382,
+            "p99": 115.2382
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 124.0,
+            "n": 4,
+            "p50": 114.0706,
+            "p95": 124.0,
+            "p99": 124.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 6.9294,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 6.9294,
+            "p99": 6.9294
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 8.7618,
+            "n": 4,
+            "p50": 6.825,
+            "p95": 8.7618,
+            "p99": 8.7618
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.2466,
+            "n": 4,
+            "p50": 0.1721,
+            "p95": 0.2466,
+            "p99": 0.2466
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0461,
+            "n": 4,
+            "p50": 0.0368,
+            "p95": 0.0461,
+            "p99": 0.0461
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 8.7182,
+            "n": 4,
+            "p50": 6.7886,
+            "p95": 8.7182,
+            "p99": 8.7182
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 20.0,
+            "n": 6,
+            "p50": 14.0,
+            "p95": 20.0,
+            "p99": 20.0
+          },
+          "new_claim_ms": {
+            "max": 2172.3202,
+            "n": 6,
+            "p50": 111.2514,
+            "p95": 2172.3202,
+            "p99": 2172.3202
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 134.6673,
+            "n": 6,
+            "p50": 32.4854,
+            "p95": 134.6673,
+            "p99": 134.6673
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 124.0,
+            "n": 4,
+            "p50": 120.0,
+            "p95": 124.0,
+            "p99": 124.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 24595.0,
+            "n": 4,
+            "p50": 10174.0,
+            "p95": 24595.0,
+            "p99": 24595.0
+          },
+          "ready_to_claim_ms": {
+            "max": 24707.0,
+            "n": 6,
+            "p50": 8772.0,
+            "p95": 24707.0,
+            "p99": 24707.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 30.8922,
+            "n": 534,
+            "p50": 4.4613,
+            "p95": 7.0184,
+            "p99": 9.8301
+          }
+        },
+        "11": {
+          "all_raw_ms": {
+            "max": 1833.7553,
+            "n": 548,
+            "p50": 4.2235,
+            "p95": 6.4686,
+            "p99": 96.9072
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 1833.7553,
+            "n": 2,
+            "p50": 1611.3144,
+            "p95": 1833.7553,
+            "p99": 1833.7553
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 97.328,
+            "n": 2,
+            "p50": 96.9072,
+            "p95": 97.328,
+            "p99": 97.328
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 348.1203,
+            "n": 2,
+            "p50": 97.0033,
+            "p95": 348.1203,
+            "p99": 348.1203
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 339.289,
+            "n": 6,
+            "p50": 90.8101,
+            "p95": 339.289,
+            "p99": 339.289
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 148.0,
+            "n": 6,
+            "p50": 48.0,
+            "p95": 148.0,
+            "p99": 148.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1568.8258,
+            "n": 2,
+            "p50": 1334.6226,
+            "p95": 1568.8258,
+            "p99": 1568.8258
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1580.8566,
+            "n": 6,
+            "p50": 8.8312,
+            "p95": 1580.8566,
+            "p99": 1580.8566
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 114.99,
+            "n": 4,
+            "p50": 102.0272,
+            "p95": 114.99,
+            "p99": 114.99
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 125.0,
+            "n": 4,
+            "p50": 110.8584,
+            "p95": 125.0,
+            "p99": 125.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 5.1416,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 5.1416,
+            "p99": 5.1416
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 10.01,
+            "n": 4,
+            "p50": 7.3084,
+            "p95": 10.01,
+            "p99": 10.01
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.2195,
+            "n": 4,
+            "p50": 0.1644,
+            "p95": 0.2195,
+            "p99": 0.2195
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0503,
+            "n": 4,
+            "p50": 0.0411,
+            "p95": 0.0503,
+            "p99": 0.0503
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 9.9689,
+            "n": 4,
+            "p50": 7.2642,
+            "p95": 9.9689,
+            "p99": 9.9689
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 269.0,
+            "n": 6,
+            "p50": 14.0,
+            "p95": 269.0,
+            "p99": 269.0
+          },
+          "new_claim_ms": {
+            "max": 1833.7553,
+            "n": 6,
+            "p50": 97.328,
+            "p95": 1833.7553,
+            "p99": 1833.7553
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 86.8987,
+            "n": 6,
+            "p50": 28.8102,
+            "p95": 86.8987,
+            "p99": 86.8987
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 125.0,
+            "n": 4,
+            "p50": 116.0,
+            "p95": 125.0,
+            "p99": 125.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 21572.0,
+            "n": 4,
+            "p50": 10587.0,
+            "p95": 21572.0,
+            "p99": 21572.0
+          },
+          "ready_to_claim_ms": {
+            "max": 21680.0,
+            "n": 6,
+            "p50": 9904.0,
+            "p95": 21680.0,
+            "p99": 21680.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 15.757,
+            "n": 542,
+            "p50": 4.2208,
+            "p95": 6.3421,
+            "p99": 8.4165
+          }
+        },
+        "12": {
+          "all_raw_ms": {
+            "max": 1972.4415,
+            "n": 664,
+            "p50": 4.1952,
+            "p95": 6.7339,
+            "p99": 16.1953
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 1972.4415,
+            "n": 2,
+            "p50": 1033.1652,
+            "p95": 1972.4415,
+            "p99": 1972.4415
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 108.2676,
+            "n": 2,
+            "p50": 107.277,
+            "p95": 108.2676,
+            "p99": 108.2676
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 165.1531,
+            "n": 2,
+            "p50": 139.205,
+            "p95": 165.1531,
+            "p99": 165.1531
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 269.3572,
+            "n": 6,
+            "p50": 131.0997,
+            "p95": 269.3572,
+            "p99": 269.3572
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 156.0,
+            "n": 6,
+            "p50": 56.0,
+            "p95": 156.0,
+            "p99": 156.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1691.3946,
+            "n": 2,
+            "p50": 814.1555,
+            "p95": 1691.3946,
+            "p99": 1691.3946
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1703.0843,
+            "n": 6,
+            "p50": 8.1053,
+            "p95": 1703.0843,
+            "p99": 1703.0843
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 133.6393,
+            "n": 4,
+            "p50": 108.8947,
+            "p95": 133.6393,
+            "p99": 133.6393
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 145.0,
+            "n": 4,
+            "p50": 117.0,
+            "p95": 145.0,
+            "p99": 145.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 4.2015,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 4.2015,
+            "p99": 4.2015
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 11.3607,
+            "n": 4,
+            "p50": 7.3159,
+            "p95": 11.3607,
+            "p99": 11.3607
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.174,
+            "n": 4,
+            "p50": 0.164,
+            "p95": 0.174,
+            "p99": 0.174
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0615,
+            "n": 4,
+            "p50": 0.0457,
+            "p95": 0.0615,
+            "p99": 0.0615
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 11.2992,
+            "n": 4,
+            "p50": 7.2702,
+            "p95": 11.2992,
+            "p99": 11.2992
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 18.0,
+            "n": 6,
+            "p50": 14.0,
+            "p95": 18.0,
+            "p99": 18.0
+          },
+          "new_claim_ms": {
+            "max": 1972.4415,
+            "n": 6,
+            "p50": 139.205,
+            "p95": 1972.4415,
+            "p99": 1972.4415
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 97.3572,
+            "n": 6,
+            "p50": 53.445,
+            "p95": 97.3572,
+            "p99": 97.3572
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 145.0,
+            "n": 4,
+            "p50": 118.0,
+            "p95": 145.0,
+            "p99": 145.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 31310.0,
+            "n": 4,
+            "p50": 9694.0,
+            "p95": 31310.0,
+            "p99": 31310.0
+          },
+          "ready_to_claim_ms": {
+            "max": 31428.0,
+            "n": 6,
+            "p50": 9731.0,
+            "p95": 31428.0,
+            "p99": 31428.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 16.1953,
+            "n": 658,
+            "p50": 4.1893,
+            "p95": 6.4196,
+            "p99": 8.9584
+          }
+        },
+        "2": {
+          "all_raw_ms": {
+            "max": 2341.4142,
+            "n": 614,
+            "p50": 4.3284,
+            "p95": 6.7823,
+            "p99": 34.926
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2341.4142,
+            "n": 2,
+            "p50": 884.7492,
+            "p95": 2341.4142,
+            "p99": 2341.4142
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 468.8876,
+            "n": 2,
+            "p50": 105.9674,
+            "p95": 468.8876,
+            "p99": 468.8876
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 407.3334,
+            "n": 2,
+            "p50": 102.4895,
+            "p95": 407.3334,
+            "p99": 407.3334
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 461.9332,
+            "n": 6,
+            "p50": 246.5327,
+            "p95": 461.9332,
+            "p99": 461.9332
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 415.0,
+            "n": 6,
+            "p50": 55.0,
+            "p95": 415.0,
+            "p99": 415.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1906.1393,
+            "n": 2,
+            "p50": 627.7962,
+            "p95": 1906.1393,
+            "p99": 1906.1393
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1917.3966,
+            "n": 6,
+            "p50": 8.4408,
+            "p95": 1917.3966,
+            "p99": 1917.3966
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 105.2958,
+            "n": 4,
+            "p50": 104.449,
+            "p95": 105.2958,
+            "p99": 105.2958
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 114.4169,
+            "n": 4,
+            "p50": 112.0,
+            "p95": 114.4169,
+            "p99": 114.4169
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 5.5831,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 5.5831,
+            "p99": 5.5831
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 9.3525,
+            "n": 4,
+            "p50": 7.551,
+            "p95": 9.3525,
+            "p99": 9.3525
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1708,
+            "n": 4,
+            "p50": 0.163,
+            "p95": 0.1708,
+            "p99": 0.1708
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0564,
+            "n": 4,
+            "p50": 0.046,
+            "p95": 0.0564,
+            "p99": 0.0564
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 9.3065,
+            "n": 4,
+            "p50": 7.4946,
+            "p95": 9.3065,
+            "p99": 9.3065
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 318.0,
+            "n": 6,
+            "p50": 14.0,
+            "p95": 318.0,
+            "p99": 318.0
+          },
+          "new_claim_ms": {
+            "max": 2341.4142,
+            "n": 6,
+            "p50": 407.3334,
+            "p95": 2341.4142,
+            "p99": 2341.4142
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 110.0176,
+            "n": 6,
+            "p50": 30.4164,
+            "p95": 110.0176,
+            "p99": 110.0176
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 120.0,
+            "n": 4,
+            "p50": 112.0,
+            "p95": 120.0,
+            "p99": 120.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 28555.0,
+            "n": 4,
+            "p50": 15800.0,
+            "p95": 28555.0,
+            "p99": 28555.0
+          },
+          "ready_to_claim_ms": {
+            "max": 28667.0,
+            "n": 6,
+            "p50": 9743.0,
+            "p95": 28667.0,
+            "p99": 28667.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 34.926,
+            "n": 608,
+            "p50": 4.303,
+            "p95": 6.5189,
+            "p99": 10.8468
+          }
+        },
+        "3": {
+          "all_raw_ms": {
+            "max": 1572.4307,
+            "n": 632,
+            "p50": 4.1295,
+            "p95": 6.6373,
+            "p99": 27.34
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 1572.4307,
+            "n": 2,
+            "p50": 840.3676,
+            "p95": 1572.4307,
+            "p99": 1572.4307
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 101.6612,
+            "n": 2,
+            "p50": 95.5628,
+            "p95": 101.6612,
+            "p99": 101.6612
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 397.5366,
+            "n": 2,
+            "p50": 96.279,
+            "p95": 397.5366,
+            "p99": 397.5366
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 385.2359,
+            "n": 6,
+            "p50": 95.1271,
+            "p95": 385.2359,
+            "p99": 385.2359
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 161.0,
+            "n": 6,
+            "p50": 50.0,
+            "p95": 161.0,
+            "p99": 161.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1303.9173,
+            "n": 2,
+            "p50": 610.9049,
+            "p95": 1303.9173,
+            "p99": 1303.9173
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1315.5212,
+            "n": 6,
+            "p50": 8.3252,
+            "p95": 1315.5212,
+            "p99": 1315.5212
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 115.6993,
+            "n": 4,
+            "p50": 108.321,
+            "p95": 115.6993,
+            "p99": 115.6993
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 128.0,
+            "n": 4,
+            "p50": 114.0,
+            "p95": 128.0,
+            "p99": 128.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 4.6127,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 4.6127,
+            "p99": 4.6127
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 12.3007,
+            "n": 4,
+            "p50": 6.5341,
+            "p95": 12.3007,
+            "p99": 12.3007
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1846,
+            "n": 4,
+            "p50": 0.159,
+            "p95": 0.1846,
+            "p99": 0.1846
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0611,
+            "n": 4,
+            "p50": 0.0426,
+            "p95": 0.0611,
+            "p99": 0.0611
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 12.2396,
+            "n": 4,
+            "p50": 6.4848,
+            "p95": 12.2396,
+            "p99": 12.2396
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 302.0,
+            "n": 6,
+            "p50": 14.0,
+            "p95": 302.0,
+            "p99": 302.0
+          },
+          "new_claim_ms": {
+            "max": 1572.4307,
+            "n": 6,
+            "p50": 101.6612,
+            "p95": 1572.4307,
+            "p99": 1572.4307
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 76.9095,
+            "n": 6,
+            "p50": 31.1271,
+            "p95": 76.9095,
+            "p99": 76.9095
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 128.0,
+            "n": 4,
+            "p50": 118.0,
+            "p95": 128.0,
+            "p99": 128.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 26997.0,
+            "n": 4,
+            "p50": 13297.0,
+            "p95": 26997.0,
+            "p99": 26997.0
+          },
+          "ready_to_claim_ms": {
+            "max": 27111.0,
+            "n": 6,
+            "p50": 11042.0,
+            "p95": 27111.0,
+            "p99": 27111.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 27.34,
+            "n": 626,
+            "p50": 4.1152,
+            "p95": 6.3843,
+            "p99": 8.6506
+          }
+        },
+        "4": {
+          "all_raw_ms": {
+            "max": 2884.7008,
+            "n": 578,
+            "p50": 4.1541,
+            "p95": 6.9938,
+            "p99": 103.1056
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2884.7008,
+            "n": 2,
+            "p50": 1470.2075,
+            "p95": 2884.7008,
+            "p99": 2884.7008
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 522.0616,
+            "n": 2,
+            "p50": 110.2324,
+            "p95": 522.0616,
+            "p99": 522.0616
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 106.1389,
+            "n": 2,
+            "p50": 103.1056,
+            "p95": 106.1389,
+            "p99": 106.1389
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 515.0327,
+            "n": 6,
+            "p50": 102.9372,
+            "p95": 515.0327,
+            "p99": 515.0327
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 470.0,
+            "n": 6,
+            "p50": 54.0,
+            "p95": 470.0,
+            "p99": 470.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 2435.0825,
+            "n": 2,
+            "p50": 1160.7543,
+            "p95": 2435.0825,
+            "p99": 2435.0825
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 2449.6874,
+            "n": 6,
+            "p50": 7.2953,
+            "p95": 2449.6874,
+            "p99": 2449.6874
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 110.6195,
+            "n": 4,
+            "p50": 105.2177,
+            "p95": 110.6195,
+            "p99": 110.6195
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 116.6982,
+            "n": 4,
+            "p50": 113.1492,
+            "p95": 116.6982,
+            "p99": 116.6982
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 5.3018,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 5.3018,
+            "p99": 5.3018
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 8.7823,
+            "n": 4,
+            "p50": 7.029,
+            "p95": 8.7823,
+            "p99": 8.7823
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1747,
+            "n": 4,
+            "p50": 0.1612,
+            "p95": 0.1747,
+            "p99": 0.1747
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0454,
+            "n": 4,
+            "p50": 0.0414,
+            "p95": 0.0454,
+            "p99": 0.0454
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 8.7385,
+            "n": 4,
+            "p50": 6.9836,
+            "p95": 8.7385,
+            "p99": 8.7385
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 81.0,
+            "n": 6,
+            "p50": 14.0,
+            "p95": 81.0,
+            "p99": 81.0
+          },
+          "new_claim_ms": {
+            "max": 2884.7008,
+            "n": 6,
+            "p50": 110.2324,
+            "p95": 2884.7008,
+            "p99": 2884.7008
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 115.0134,
+            "n": 6,
+            "p50": 35.9372,
+            "p95": 115.0134,
+            "p99": 115.0134
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 122.0,
+            "n": 4,
+            "p50": 114.0,
+            "p95": 122.0,
+            "p99": 122.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 24874.0,
+            "n": 4,
+            "p50": 10695.0,
+            "p95": 24874.0,
+            "p99": 24874.0
+          },
+          "ready_to_claim_ms": {
+            "max": 24984.0,
+            "n": 6,
+            "p50": 10529.0,
+            "p95": 24984.0,
+            "p99": 24984.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 38.0115,
+            "n": 572,
+            "p50": 4.1503,
+            "p95": 6.536,
+            "p99": 8.7699
+          }
+        },
+        "5": {
+          "all_raw_ms": {
+            "max": 2289.0213,
+            "n": 630,
+            "p50": 4.1266,
+            "p95": 6.5228,
+            "p99": 22.707
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2289.0213,
+            "n": 2,
+            "p50": 1494.2057,
+            "p95": 2289.0213,
+            "p99": 2289.0213
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 105.958,
+            "n": 2,
+            "p50": 101.6837,
+            "p95": 105.958,
+            "p99": 105.958
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 140.4556,
+            "n": 2,
+            "p50": 139.1462,
+            "p95": 140.4556,
+            "p99": 140.4556
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 265.6077,
+            "n": 6,
+            "p50": 127.0992,
+            "p95": 265.6077,
+            "p99": 265.6077
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 161.0,
+            "n": 6,
+            "p50": 73.0,
+            "p95": 161.0,
+            "p99": 161.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 2011.7033,
+            "n": 2,
+            "p50": 1275.1897,
+            "p95": 2011.7033,
+            "p99": 2011.7033
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 2023.4136,
+            "n": 6,
+            "p50": 8.5969,
+            "p95": 2023.4136,
+            "p99": 2023.4136
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 116.7106,
+            "n": 4,
+            "p50": 113.5001,
+            "p95": 116.7106,
+            "p99": 116.7106
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 125.5471,
+            "n": 4,
+            "p50": 124.0,
+            "p95": 125.5471,
+            "p99": 125.5471
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 5.4529,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 5.4529,
+            "p99": 5.4529
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 12.047,
+            "n": 4,
+            "p50": 7.2894,
+            "p95": 12.047,
+            "p99": 12.047
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1801,
+            "n": 4,
+            "p50": 0.1753,
+            "p95": 0.1801,
+            "p99": 0.1801
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0661,
+            "n": 4,
+            "p50": 0.0493,
+            "p95": 0.0661,
+            "p99": 0.0661
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 11.9888,
+            "n": 4,
+            "p50": 7.248,
+            "p95": 11.9888,
+            "p99": 11.9888
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 25.0,
+            "n": 6,
+            "p50": 17.0,
+            "p95": 25.0,
+            "p99": 25.0
+          },
+          "new_claim_ms": {
+            "max": 2289.0213,
+            "n": 6,
+            "p50": 139.1462,
+            "p95": 2289.0213,
+            "p99": 2289.0213
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 86.6077,
+            "n": 6,
+            "p50": 31.3684,
+            "p95": 86.6077,
+            "p99": 86.6077
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 131.0,
+            "n": 4,
+            "p50": 124.0,
+            "p95": 131.0,
+            "p99": 131.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 29240.0,
+            "n": 4,
+            "p50": 11845.0,
+            "p95": 29240.0,
+            "p99": 29240.0
+          },
+          "ready_to_claim_ms": {
+            "max": 29364.0,
+            "n": 6,
+            "p50": 11934.0,
+            "p95": 29364.0,
+            "p99": 29364.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 22.707,
+            "n": 624,
+            "p50": 4.1239,
+            "p95": 6.3973,
+            "p99": 8.906
+          }
+        },
+        "6": {
+          "all_raw_ms": {
+            "max": 1832.7783,
+            "n": 540,
+            "p50": 4.1525,
+            "p95": 7.5153,
+            "p99": 100.0613
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 1832.7783,
+            "n": 2,
+            "p50": 1719.6787,
+            "p95": 1832.7783,
+            "p99": 1832.7783
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 111.6791,
+            "n": 2,
+            "p50": 103.0768,
+            "p95": 111.6791,
+            "p99": 111.6791
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 430.5643,
+            "n": 2,
+            "p50": 100.0613,
+            "p95": 430.5643,
+            "p99": 430.5643
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 422.0041,
+            "n": 6,
+            "p50": 105.4582,
+            "p95": 422.0041,
+            "p99": 422.0041
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 377.0,
+            "n": 6,
+            "p50": 57.0,
+            "p95": 377.0,
+            "p99": 377.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1586.9791,
+            "n": 2,
+            "p50": 1452.1465,
+            "p95": 1586.9791,
+            "p99": 1586.9791
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1599.2559,
+            "n": 6,
+            "p50": 7.7525,
+            "p95": 1599.2559,
+            "p99": 1599.2559
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 115.4398,
+            "n": 4,
+            "p50": 102.9695,
+            "p95": 115.4398,
+            "p99": 115.4398
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 124.0,
+            "n": 4,
+            "p50": 109.0,
+            "p95": 124.0,
+            "p99": 124.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 3.6468,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 3.6468,
+            "p99": 3.6468
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 8.5602,
+            "n": 4,
+            "p50": 6.2209,
+            "p95": 8.5602,
+            "p99": 8.5602
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1802,
+            "n": 4,
+            "p50": 0.1627,
+            "p95": 0.1802,
+            "p99": 0.1802
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0676,
+            "n": 4,
+            "p50": 0.0404,
+            "p95": 0.0676,
+            "p99": 0.0676
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 8.4926,
+            "n": 4,
+            "p50": 6.1737,
+            "p95": 8.4926,
+            "p99": 8.4926
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 19.0,
+            "n": 6,
+            "p50": 15.0,
+            "p95": 19.0,
+            "p99": 19.0
+          },
+          "new_claim_ms": {
+            "max": 1832.7783,
+            "n": 6,
+            "p50": 111.6791,
+            "p95": 1832.7783,
+            "p99": 1832.7783
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 98.9978,
+            "n": 6,
+            "p50": 32.4582,
+            "p95": 98.9978,
+            "p99": 98.9978
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 124.0,
+            "n": 4,
+            "p50": 111.0,
+            "p95": 124.0,
+            "p99": 124.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 25485.0,
+            "n": 4,
+            "p50": 9773.0,
+            "p95": 25485.0,
+            "p99": 25485.0
+          },
+          "ready_to_claim_ms": {
+            "max": 25594.0,
+            "n": 6,
+            "p50": 7833.0,
+            "p95": 25594.0,
+            "p99": 25594.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 15.4551,
+            "n": 534,
+            "p50": 4.1393,
+            "p95": 7.1627,
+            "p99": 11.1935
+          }
+        },
+        "7": {
+          "all_raw_ms": {
+            "max": 2341.9265,
+            "n": 567,
+            "p50": 4.1409,
+            "p95": 7.1695,
+            "p99": 93.9027
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2341.9265,
+            "n": 2,
+            "p50": 1405.4696,
+            "p95": 2341.9265,
+            "p99": 2341.9265
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 433.6704,
+            "n": 2,
+            "p50": 105.396,
+            "p95": 433.6704,
+            "p99": 433.6704
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 159.9704,
+            "n": 2,
+            "p50": 93.9027,
+            "p95": 159.9704,
+            "p99": 159.9704
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 426.5602,
+            "n": 6,
+            "p50": 151.8841,
+            "p95": 426.5602,
+            "p99": 426.5602
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 378.0,
+            "n": 6,
+            "p50": 108.0,
+            "p95": 378.0,
+            "p99": 378.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 2086.2717,
+            "n": 2,
+            "p50": 1191.4519,
+            "p95": 2086.2717,
+            "p99": 2086.2717
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 2095.878,
+            "n": 6,
+            "p50": 8.0863,
+            "p95": 2095.878,
+            "p99": 2095.878
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 109.6486,
+            "n": 4,
+            "p50": 103.4659,
+            "p95": 109.6486,
+            "p99": 109.6486
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 118.0,
+            "n": 4,
+            "p50": 110.5088,
+            "p95": 118.0,
+            "p99": 118.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 4.4912,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 4.4912,
+            "p99": 4.4912
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 8.3514,
+            "n": 4,
+            "p50": 7.1102,
+            "p95": 8.3514,
+            "p99": 8.3514
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1824,
+            "n": 4,
+            "p50": 0.1627,
+            "p95": 0.1824,
+            "p99": 0.1824
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0675,
+            "n": 4,
+            "p50": 0.053,
+            "p95": 0.0675,
+            "p99": 0.0675
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 8.284,
+            "n": 4,
+            "p50": 7.0562,
+            "p95": 8.284,
+            "p99": 8.284
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 18.0,
+            "n": 6,
+            "p50": 13.0,
+            "p95": 18.0,
+            "p99": 18.0
+          },
+          "new_claim_ms": {
+            "max": 2341.9265,
+            "n": 6,
+            "p50": 159.9704,
+            "p95": 2341.9265,
+            "p99": 2341.9265
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 83.0485,
+            "n": 6,
+            "p50": 32.5216,
+            "p95": 83.0485,
+            "p99": 83.0485
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 118.0,
+            "n": 4,
+            "p50": 115.0,
+            "p95": 118.0,
+            "p99": 118.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 22812.0,
+            "n": 4,
+            "p50": 11665.0,
+            "p95": 22812.0,
+            "p99": 22812.0
+          },
+          "ready_to_claim_ms": {
+            "max": 22928.0,
+            "n": 6,
+            "p50": 10498.0,
+            "p95": 22928.0,
+            "p99": 22928.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 19.996,
+            "n": 561,
+            "p50": 4.1311,
+            "p95": 6.8879,
+            "p99": 9.6855
+          }
+        },
+        "8": {
+          "all_raw_ms": {
+            "max": 2118.5251,
+            "n": 557,
+            "p50": 4.2652,
+            "p95": 7.0057,
+            "p99": 113.4465
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2118.5251,
+            "n": 2,
+            "p50": 1530.4916,
+            "p95": 2118.5251,
+            "p99": 2118.5251
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 117.1506,
+            "n": 2,
+            "p50": 113.4465,
+            "p95": 117.1506,
+            "p99": 117.1506
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 449.6523,
+            "n": 2,
+            "p50": 364.5961,
+            "p95": 449.6523,
+            "p99": 449.6523
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 433.4854,
+            "n": 6,
+            "p50": 229.8173,
+            "p95": 433.4854,
+            "p99": 433.4854
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 290.0,
+            "n": 6,
+            "p50": 125.0,
+            "p95": 290.0,
+            "p99": 290.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1834.141,
+            "n": 2,
+            "p50": 1289.5537,
+            "p95": 1834.141,
+            "p99": 1834.141
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1846.4332,
+            "n": 6,
+            "p50": 10.2858,
+            "p95": 1846.4332,
+            "p99": 1846.4332
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 154.7948,
+            "n": 4,
+            "p50": 113.4465,
+            "p95": 154.7948,
+            "p99": 154.7948
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 170.9618,
+            "n": 4,
+            "p50": 123.0,
+            "p95": 170.9618,
+            "p99": 170.9618
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 3.9973,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 3.9973,
+            "p99": 3.9973
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 16.167,
+            "n": 4,
+            "p50": 9.5535,
+            "p95": 16.167,
+            "p99": 16.167
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1985,
+            "n": 4,
+            "p50": 0.1584,
+            "p95": 0.1985,
+            "p99": 0.1985
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0788,
+            "n": 4,
+            "p50": 0.0643,
+            "p95": 0.0788,
+            "p99": 0.0788
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 16.0896,
+            "n": 4,
+            "p50": 9.4892,
+            "p95": 16.0896,
+            "p99": 16.0896
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 43.0,
+            "n": 6,
+            "p50": 18.0,
+            "p95": 43.0,
+            "p99": 43.0
+          },
+          "new_claim_ms": {
+            "max": 2118.5251,
+            "n": 6,
+            "p50": 364.5961,
+            "p95": 2118.5251,
+            "p99": 2118.5251
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 276.4854,
+            "n": 6,
+            "p50": 37.893,
+            "p95": 276.4854,
+            "p99": 276.4854
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 174.0,
+            "n": 4,
+            "p50": 123.0,
+            "p95": 174.0,
+            "p99": 174.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 22656.0,
+            "n": 4,
+            "p50": 10832.0,
+            "p95": 22656.0,
+            "p99": 22656.0
+          },
+          "ready_to_claim_ms": {
+            "max": 22779.0,
+            "n": 6,
+            "p50": 10229.0,
+            "p95": 22779.0,
+            "p99": 22779.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 18.6446,
+            "n": 551,
+            "p50": 4.2609,
+            "p95": 6.7594,
+            "p99": 9.0728
+          }
+        },
+        "9": {
+          "all_raw_ms": {
+            "max": 2178.7633,
+            "n": 577,
+            "p50": 4.1556,
+            "p95": 6.742,
+            "p99": 92.6145
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2178.7633,
+            "n": 2,
+            "p50": 1318.4945,
+            "p95": 2178.7633,
+            "p99": 2178.7633
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 103.1227,
+            "n": 2,
+            "p50": 92.6145,
+            "p95": 103.1227,
+            "p99": 103.1227
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 318.2699,
+            "n": 2,
+            "p50": 99.5467,
+            "p95": 318.2699,
+            "p99": 318.2699
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 314.5243,
+            "n": 6,
+            "p50": 96.0946,
+            "p95": 314.5243,
+            "p99": 314.5243
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 167.0,
+            "n": 6,
+            "p50": 48.0,
+            "p95": 167.0,
+            "p99": 167.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1899.5586,
+            "n": 2,
+            "p50": 1103.7345,
+            "p95": 1899.5586,
+            "p99": 1899.5586
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1911.2412,
+            "n": 6,
+            "p50": 7.0281,
+            "p95": 1911.2412,
+            "p99": 1911.2412
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 227.9719,
+            "n": 4,
+            "p50": 102.5237,
+            "p95": 227.9719,
+            "p99": 227.9719
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 235.0,
+            "n": 4,
+            "p50": 110.4388,
+            "p95": 235.0,
+            "p99": 235.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 5.0094,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 5.0094,
+            "p99": 5.0094
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 8.4669,
+            "n": 4,
+            "p50": 6.6402,
+            "p95": 8.4669,
+            "p99": 8.4669
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 0,
+            "n": 4,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.1666,
+            "n": 4,
+            "p50": 0.1563,
+            "p95": 0.1666,
+            "p99": 0.1666
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 0.0484,
+            "n": 4,
+            "p50": 0.0447,
+            "p95": 0.0484,
+            "p99": 0.0484
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 8.422,
+            "n": 4,
+            "p50": 6.5918,
+            "p95": 8.422,
+            "p99": 8.422
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 19.0,
+            "n": 6,
+            "p50": 15.0,
+            "p95": 19.0,
+            "p99": 19.0
+          },
+          "new_claim_ms": {
+            "max": 2178.7633,
+            "n": 6,
+            "p50": 103.1227,
+            "p95": 2178.7633,
+            "p99": 2178.7633
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 253.5243,
+            "n": 6,
+            "p50": 31.9744,
+            "p95": 253.5243,
+            "p99": 253.5243
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 235.0,
+            "n": 4,
+            "p50": 114.0,
+            "p95": 235.0,
+            "p99": 235.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 20887.0,
+            "n": 4,
+            "p50": 12599.0,
+            "p95": 20887.0,
+            "p99": 20887.0
+          },
+          "ready_to_claim_ms": {
+            "max": 21122.0,
+            "n": 6,
+            "p50": 11699.0,
+            "p95": 21122.0,
+            "p99": 21122.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 10.7777,
+            "n": 571,
+            "p50": 4.1346,
+            "p95": 6.3812,
+            "p99": 8.8299
+          }
+        }
+      }
+    },
+    "candidate": {
+      "all": {
+        "all_raw_ms": {
+          "max": 6746.8038,
+          "n": 609,
+          "p50": 2.9376,
+          "p95": 1213.6525,
+          "p99": 3511.7279
+        },
+        "claim_evidence_reviewer_attempt_1_ms": {
+          "max": 6746.8038,
+          "n": 26,
+          "p50": 2778.1121,
+          "p95": 6006.4378,
+          "p99": 6746.8038
+        },
+        "claim_evidence_reviewer_attempt_2_ms": {
+          "max": 1668.9791,
+          "n": 26,
+          "p50": 410.1135,
+          "p95": 1576.9274,
+          "p99": 1668.9791
+        },
+        "claim_planner_attempt_1_ms": {
+          "max": 2177.9555,
+          "n": 26,
+          "p50": 425.7321,
+          "p95": 1489.6784,
+          "p99": 2177.9555
+        },
+        "claim_to_dispatch_return_ms": {
+          "max": 2150.0583,
+          "n": 78,
+          "p50": 433.759,
+          "p95": 1560.8559,
+          "p99": 2150.0583
+        },
+        "claim_to_native_reservation_ms": {
+          "max": 1645.0,
+          "n": 78,
+          "p50": 303.0,
+          "p95": 1184.0,
+          "p99": 1645.0
+        },
+        "cold_dispatch_start_to_first_writer_ms": {
+          "max": 5089.7572,
+          "n": 26,
+          "p50": 2213.3085,
+          "p95": 4525.0743,
+          "p99": 5089.7572
+        },
+        "dispatch_start_to_claim_ms": {
+          "max": 5185.9479,
+          "n": 78,
+          "p50": 27.0165,
+          "p95": 3631.9992,
+          "p99": 5185.9479
+        },
+        "eligible_before_own_dispatch_outside_sibling_ms": {
+          "max": 290.9233,
+          "n": 52,
+          "p50": 115.7614,
+          "p95": 149.1947,
+          "p99": 290.9233
+        },
+        "eligible_wait_outside_sibling_dispatch_ms": {
+          "max": 326.5602,
+          "n": 52,
+          "p50": 138.0,
+          "p95": 181.0,
+          "p99": 326.5602
+        },
+        "eligible_wait_overlapping_sibling_dispatch_ms": {
+          "max": 1288.5401,
+          "n": 52,
+          "p50": 0.0,
+          "p95": 5.66,
+          "p99": 1288.5401
+        },
+        "follow_on_own_dispatch_start_to_claim_ms": {
+          "max": 35.6369,
+          "n": 52,
+          "p50": 22.8998,
+          "p95": 31.8053,
+          "p99": 35.6369
+        },
+        "follow_on_preclaim_finished_writer_ms": {
+          "max": 17.0417,
+          "n": 52,
+          "p50": 10.011,
+          "p95": 14.2448,
+          "p99": 17.0417
+        },
+        "follow_on_preclaim_lock_acquire_ms": {
+          "max": 0.5943,
+          "n": 52,
+          "p50": 0.3664,
+          "p95": 0.5509,
+          "p99": 0.5943
+        },
+        "follow_on_preclaim_outside_writer_ms": {
+          "max": 11.1002,
+          "n": 52,
+          "p50": 5.4413,
+          "p95": 9.3893,
+          "p99": 11.1002
+        },
+        "follow_on_preclaim_writer_ms": {
+          "max": 27.77,
+          "n": 52,
+          "p50": 16.6695,
+          "p95": 22.7092,
+          "p99": 27.77
+        },
+        "native_reservation_to_official_start_ms": {
+          "max": 543.0,
+          "n": 78,
+          "p50": 27.0,
+          "p95": 186.0,
+          "p99": 543.0
+        },
+        "new_claim_ms": {
+          "max": 6746.8038,
+          "n": 78,
+          "p50": 689.4767,
+          "p95": 4341.6567,
+          "p99": 6746.8038
+        },
+        "official_start_to_dispatch_return_ms": {
+          "max": 690.5013,
+          "n": 78,
+          "p50": 68.5833,
+          "p95": 642.1881,
+          "p99": 690.5013
+        },
+        "ready_and_previous_team_slot_released_to_claim_ms": {
+          "max": 1411.0,
+          "n": 52,
+          "p50": 141.0,
+          "p95": 331.0,
+          "p99": 1411.0
+        },
+        "ready_elapsed_with_previous_team_slot_occupied_ms": {
+          "max": 33526.0,
+          "n": 52,
+          "p50": 11750.0,
+          "p95": 29950.0,
+          "p99": 33526.0
+        },
+        "ready_to_claim_ms": {
+          "max": 33830.0,
+          "n": 78,
+          "p50": 10193.0,
+          "p95": 28954.0,
+          "p99": 33830.0
+        },
+        "ready_unadmitted_ms": {
+          "max": 145.4257,
+          "n": 531,
+          "p50": 2.5034,
+          "p95": 6.3863,
+          "p99": 16.5413
+        }
+      },
+      "follow_on_writer_counts_by_role": [
+        {
+          "claims": 26,
+          "completed_before_claim": 1,
+          "crossing_claim": 1,
+          "role": "evidence_reviewer"
+        },
+        {
+          "claims": 1,
+          "completed_before_claim": 2,
+          "crossing_claim": 0,
+          "role": "planner"
+        },
+        {
+          "claims": 25,
+          "completed_before_claim": 2,
+          "crossing_claim": 1,
+          "role": "planner"
+        }
+      ],
+      "operations": {
+        "new_claim": 78,
+        "ready_unadmitted": 531
+      },
+      "per_wave": {
+        "0": {
+          "all_raw_ms": {
+            "max": 1213.6525,
+            "n": 42,
+            "p50": 2.5141,
+            "p95": 452.0593,
+            "p99": 1213.6525
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 1213.6525,
+            "n": 2,
+            "p50": 929.6532,
+            "p95": 1213.6525,
+            "p99": 1213.6525
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 452.0593,
+            "n": 2,
+            "p50": 216.0608,
+            "p95": 452.0593,
+            "p99": 452.0593
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 383.6974,
+            "n": 2,
+            "p50": 157.0819,
+            "p95": 383.6974,
+            "p99": 383.6974
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 438.6796,
+            "n": 6,
+            "p50": 203.3708,
+            "p95": 438.6796,
+            "p99": 438.6796
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 378.0,
+            "n": 6,
+            "p50": 145.0,
+            "p95": 378.0,
+            "p99": 378.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1003.481,
+            "n": 2,
+            "p50": 667.4601,
+            "p95": 1003.481,
+            "p99": 1003.481
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1022.7808,
+            "n": 6,
+            "p50": 17.4607,
+            "p95": 1022.7808,
+            "p99": 1022.7808
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 124.342,
+            "n": 4,
+            "p50": 109.31,
+            "p95": 124.342,
+            "p99": 124.342
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 150.0,
+            "n": 4,
+            "p50": 122.6354,
+            "p95": 150.0,
+            "p99": 150.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 2.3646,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 2.3646,
+            "p99": 2.3646
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 25.658,
+            "n": 4,
+            "p50": 13.3796,
+            "p95": 25.658,
+            "p99": 25.658
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 13.7208,
+            "n": 4,
+            "p50": 5.8851,
+            "p95": 13.7208,
+            "p99": 13.7208
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.5943,
+            "n": 4,
+            "p50": 0.3296,
+            "p95": 0.5943,
+            "p99": 0.5943
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 5.3853,
+            "n": 4,
+            "p50": 4.1679,
+            "p95": 5.3853,
+            "p99": 5.3853
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 20.2727,
+            "n": 4,
+            "p50": 9.2117,
+            "p95": 20.2727,
+            "p99": 20.2727
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 25.0,
+            "n": 6,
+            "p50": 20.0,
+            "p95": 25.0,
+            "p99": 25.0
+          },
+          "new_claim_ms": {
+            "max": 1213.6525,
+            "n": 6,
+            "p50": 383.6974,
+            "p95": 1213.6525,
+            "p99": 1213.6525
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 80.7593,
+            "n": 6,
+            "p50": 40.6796,
+            "p95": 80.7593,
+            "p99": 80.7593
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 150.0,
+            "n": 4,
+            "p50": 125.0,
+            "p95": 150.0,
+            "p99": 150.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 19718.0,
+            "n": 4,
+            "p50": 11085.0,
+            "p95": 19718.0,
+            "p99": 19718.0
+          },
+          "ready_to_claim_ms": {
+            "max": 19840.0,
+            "n": 6,
+            "p50": 10951.0,
+            "p95": 19840.0,
+            "p99": 19840.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 4.6268,
+            "n": 36,
+            "p50": 2.4372,
+            "p95": 4.4687,
+            "p99": 4.6268
+          }
+        },
+        "1": {
+          "all_raw_ms": {
+            "max": 2379.5979,
+            "n": 46,
+            "p50": 2.5194,
+            "p95": 1288.5401,
+            "p99": 2379.5979
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2379.5979,
+            "n": 2,
+            "p50": 1606.3424,
+            "p95": 2379.5979,
+            "p99": 2379.5979
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 1288.5401,
+            "n": 2,
+            "p50": 431.9103,
+            "p95": 1288.5401,
+            "p99": 1288.5401
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 424.6091,
+            "n": 2,
+            "p50": 413.3793,
+            "p95": 424.6091,
+            "p99": 424.6091
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 1268.1963,
+            "n": 6,
+            "p50": 408.4429,
+            "p95": 1268.1963,
+            "p99": 1268.1963
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 1057.0,
+            "n": 6,
+            "p50": 236.0,
+            "p95": 1057.0,
+            "p99": 1057.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1928.6984,
+            "n": 2,
+            "p50": 1202.2168,
+            "p95": 1928.6984,
+            "p99": 1928.6984
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1946.592,
+            "n": 6,
+            "p50": 20.3438,
+            "p95": 1946.592,
+            "p99": 1946.592
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 123.8338,
+            "n": 4,
+            "p50": 106.1177,
+            "p95": 123.8338,
+            "p99": 123.8338
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 140.0,
+            "n": 4,
+            "p50": 126.4615,
+            "p95": 140.0,
+            "p99": 140.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 1288.5401,
+            "n": 4,
+            "p50": 1.5385,
+            "p95": 1288.5401,
+            "p99": 1288.5401
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 24.37,
+            "n": 4,
+            "p50": 17.9978,
+            "p95": 24.37,
+            "p99": 24.37
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 10.7093,
+            "n": 4,
+            "p50": 9.1605,
+            "p95": 10.7093,
+            "p99": 10.7093
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.4988,
+            "n": 4,
+            "p50": 0.3259,
+            "p95": 0.4988,
+            "p99": 0.4988
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 6.867,
+            "n": 4,
+            "p50": 5.517,
+            "p95": 6.867,
+            "p99": 6.867
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 18.0856,
+            "n": 4,
+            "p50": 11.9577,
+            "p95": 18.0856,
+            "p99": 18.0856
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 95.0,
+            "n": 6,
+            "p50": 25.0,
+            "p95": 95.0,
+            "p99": 95.0
+          },
+          "new_claim_ms": {
+            "max": 2379.5979,
+            "n": 6,
+            "p50": 431.9103,
+            "p95": 2379.5979,
+            "p99": 2379.5979
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 301.4429,
+            "n": 6,
+            "p50": 116.1963,
+            "p95": 301.4429,
+            "p99": 301.4429
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 1411.0,
+            "n": 4,
+            "p50": 140.0,
+            "p95": 1411.0,
+            "p99": 1411.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 22913.0,
+            "n": 4,
+            "p50": 9882.0,
+            "p95": 22913.0,
+            "p99": 22913.0
+          },
+          "ready_to_claim_ms": {
+            "max": 23873.0,
+            "n": 6,
+            "p50": 9453.0,
+            "p95": 23873.0,
+            "p99": 23873.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 5.3156,
+            "n": 40,
+            "p50": 2.4455,
+            "p95": 4.5501,
+            "p99": 5.3156
+          }
+        },
+        "10": {
+          "all_raw_ms": {
+            "max": 4341.6567,
+            "n": 52,
+            "p50": 3.9877,
+            "p95": 1576.9274,
+            "p99": 4341.6567
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 4341.6567,
+            "n": 2,
+            "p50": 4078.0043,
+            "p95": 4341.6567,
+            "p99": 4341.6567
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 1576.9274,
+            "n": 2,
+            "p50": 1176.2099,
+            "p95": 1576.9274,
+            "p99": 1576.9274
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 449.7219,
+            "n": 2,
+            "p50": 225.1585,
+            "p95": 449.7219,
+            "p99": 449.7219
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 1554.5013,
+            "n": 6,
+            "p50": 709.6576,
+            "p95": 1554.5013,
+            "p99": 1554.5013
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 1015.0,
+            "n": 6,
+            "p50": 347.0,
+            "p95": 1015.0,
+            "p99": 1015.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 3554.2385,
+            "n": 2,
+            "p50": 3012.0789,
+            "p95": 3554.2385,
+            "p99": 3554.2385
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 3631.9992,
+            "n": 6,
+            "p50": 24.216,
+            "p95": 3631.9992,
+            "p99": 3631.9992
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 279.784,
+            "n": 4,
+            "p50": 120.8841,
+            "p95": 279.784,
+            "p99": 279.784
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 304.0,
+            "n": 4,
+            "p50": 139.5972,
+            "p95": 304.0,
+            "p99": 304.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 4.6722,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 4.6722,
+            "p99": 4.6722
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 26.6897,
+            "n": 4,
+            "p50": 22.4261,
+            "p95": 26.6897,
+            "p99": 26.6897
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 12.5242,
+            "n": 4,
+            "p50": 10.3167,
+            "p95": 12.5242,
+            "p99": 12.5242
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.4797,
+            "n": 4,
+            "p50": 0.3664,
+            "p95": 0.4797,
+            "p99": 0.4797
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 7.5465,
+            "n": 4,
+            "p50": 6.3554,
+            "p95": 7.5465,
+            "p99": 7.5465
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 19.989,
+            "n": 4,
+            "p50": 16.0707,
+            "p95": 19.989,
+            "p99": 19.989
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 543.0,
+            "n": 6,
+            "p50": 30.0,
+            "p95": 543.0,
+            "p99": 543.0
+          },
+          "new_claim_ms": {
+            "max": 4341.6567,
+            "n": 6,
+            "p50": 1176.2099,
+            "p95": 4341.6567,
+            "p99": 4341.6567
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 690.5013,
+            "n": 6,
+            "p50": 106.9939,
+            "p95": 690.5013,
+            "p99": 690.5013
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 304.0,
+            "n": 4,
+            "p50": 142.0,
+            "p95": 304.0,
+            "p99": 304.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 33526.0,
+            "n": 4,
+            "p50": 9890.0,
+            "p95": 33526.0,
+            "p99": 33526.0
+          },
+          "ready_to_claim_ms": {
+            "max": 33830.0,
+            "n": 6,
+            "p50": 9481.0,
+            "p95": 33830.0,
+            "p99": 33830.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 18.4086,
+            "n": 46,
+            "p50": 3.7409,
+            "p95": 12.3711,
+            "p99": 18.4086
+          }
+        },
+        "11": {
+          "all_raw_ms": {
+            "max": 6746.8038,
+            "n": 48,
+            "p50": 2.55,
+            "p95": 460.819,
+            "p99": 6746.8038
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 6746.8038,
+            "n": 2,
+            "p50": 1882.4123,
+            "p95": 6746.8038,
+            "p99": 6746.8038
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 410.1135,
+            "n": 2,
+            "p50": 117.0,
+            "p95": 410.1135,
+            "p99": 410.1135
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 460.819,
+            "n": 2,
+            "p50": 159.3856,
+            "p95": 460.819,
+            "p99": 460.819
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 1560.8559,
+            "n": 6,
+            "p50": 246.8431,
+            "p95": 1560.8559,
+            "p99": 1560.8559
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 1364.0,
+            "n": 6,
+            "p50": 170.0,
+            "p95": 1364.0,
+            "p99": 1364.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 5089.7572,
+            "n": 2,
+            "p50": 1615.9592,
+            "p95": 5089.7572,
+            "p99": 5089.7572
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 5185.9479,
+            "n": 6,
+            "p50": 24.1985,
+            "p95": 5185.9479,
+            "p99": 5185.9479
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 130.1414,
+            "n": 4,
+            "p50": 114.7359,
+            "p95": 130.1414,
+            "p99": 130.1414
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 154.34,
+            "n": 4,
+            "p50": 141.7959,
+            "p95": 154.34,
+            "p99": 154.34
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 410.1135,
+            "n": 4,
+            "p50": 2.2041,
+            "p95": 410.1135,
+            "p99": 410.1135
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 27.06,
+            "n": 4,
+            "p50": 16.1126,
+            "p95": 27.06,
+            "p99": 27.06
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 12.2762,
+            "n": 4,
+            "p50": 9.2582,
+            "p95": 12.2762,
+            "p99": 12.2762
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.4884,
+            "n": 4,
+            "p50": 0.3333,
+            "p95": 0.4884,
+            "p99": 0.4884
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 6.6582,
+            "n": 4,
+            "p50": 4.0279,
+            "p95": 6.6582,
+            "p99": 6.6582
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 20.4018,
+            "n": 4,
+            "p50": 12.0847,
+            "p95": 20.4018,
+            "p99": 20.4018
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 58.0,
+            "n": 6,
+            "p50": 25.0,
+            "p95": 58.0,
+            "p99": 58.0
+          },
+          "new_claim_ms": {
+            "max": 6746.8038,
+            "n": 6,
+            "p50": 410.1135,
+            "p95": 6746.8038,
+            "p99": 6746.8038
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 138.8559,
+            "n": 6,
+            "p50": 51.759,
+            "p95": 138.8559,
+            "p99": 138.8559
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 514.0,
+            "n": 4,
+            "p50": 144.0,
+            "p95": 514.0,
+            "p99": 514.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 24863.0,
+            "n": 4,
+            "p50": 11156.0,
+            "p95": 24863.0,
+            "p99": 24863.0
+          },
+          "ready_to_claim_ms": {
+            "max": 25023.0,
+            "n": 6,
+            "p50": 10627.0,
+            "p95": 25023.0,
+            "p99": 25023.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 6.709,
+            "n": 42,
+            "p50": 2.4753,
+            "p95": 5.8128,
+            "p99": 6.709
+          }
+        },
+        "12": {
+          "all_raw_ms": {
+            "max": 5703.4092,
+            "n": 47,
+            "p50": 3.7935,
+            "p95": 1489.6784,
+            "p99": 5703.4092
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 5703.4092,
+            "n": 2,
+            "p50": 2778.1121,
+            "p95": 5703.4092,
+            "p99": 5703.4092
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 610.7097,
+            "n": 2,
+            "p50": 390.502,
+            "p95": 610.7097,
+            "p99": 610.7097
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 1489.6784,
+            "n": 2,
+            "p50": 976.7706,
+            "p95": 1489.6784,
+            "p99": 1489.6784
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 1842.0136,
+            "n": 6,
+            "p50": 590.4515,
+            "p95": 1842.0136,
+            "p99": 1842.0136
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 1645.0,
+            "n": 6,
+            "p50": 333.0,
+            "p95": 1645.0,
+            "p99": 1645.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 3778.4375,
+            "n": 2,
+            "p50": 2213.3085,
+            "p95": 3778.4375,
+            "p99": 3778.4375
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 3861.3957,
+            "n": 6,
+            "p50": 24.3651,
+            "p95": 3861.3957,
+            "p99": 3861.3957
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 145.6349,
+            "n": 4,
+            "p50": 114.9313,
+            "p95": 145.6349,
+            "p99": 145.6349
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 170.0,
+            "n": 4,
+            "p50": 138.0,
+            "p95": 170.0,
+            "p99": 170.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 4.007,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 4.007,
+            "p99": 4.007
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 24.8443,
+            "n": 4,
+            "p50": 23.0687,
+            "p95": 24.8443,
+            "p99": 24.8443
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 12.9283,
+            "n": 4,
+            "p50": 11.3202,
+            "p95": 12.9283,
+            "p99": 12.9283
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.4846,
+            "n": 4,
+            "p50": 0.3082,
+            "p95": 0.4846,
+            "p99": 0.4846
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 10.1404,
+            "n": 4,
+            "p50": 4.5705,
+            "p95": 10.1404,
+            "p99": 10.1404
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 19.8694,
+            "n": 4,
+            "p50": 15.6877,
+            "p95": 19.8694,
+            "p99": 19.8694
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 47.0,
+            "n": 6,
+            "p50": 31.0,
+            "p95": 47.0,
+            "p99": 47.0
+          },
+          "new_claim_ms": {
+            "max": 5703.4092,
+            "n": 6,
+            "p50": 976.7706,
+            "p95": 5703.4092,
+            "p99": 5703.4092
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 690.3133,
+            "n": 6,
+            "p50": 142.13,
+            "p95": 690.3133,
+            "p99": 690.3133
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 170.0,
+            "n": 4,
+            "p50": 138.0,
+            "p95": 170.0,
+            "p99": 170.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 27725.0,
+            "n": 4,
+            "p50": 10983.0,
+            "p95": 27725.0,
+            "p99": 27725.0
+          },
+          "ready_to_claim_ms": {
+            "max": 27861.0,
+            "n": 6,
+            "p50": 9873.0,
+            "p95": 27861.0,
+            "p99": 27861.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 7.0898,
+            "n": 41,
+            "p50": 3.6088,
+            "p95": 6.2127,
+            "p99": 7.0898
+          }
+        },
+        "2": {
+          "all_raw_ms": {
+            "max": 2322.8323,
+            "n": 43,
+            "p50": 2.8918,
+            "p95": 974.9934,
+            "p99": 2322.8323
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 2322.8323,
+            "n": 2,
+            "p50": 2229.1097,
+            "p95": 2322.8323,
+            "p99": 2322.8323
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 659.2581,
+            "n": 2,
+            "p50": 228.4956,
+            "p95": 659.2581,
+            "p99": 659.2581
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 974.9934,
+            "n": 2,
+            "p50": 368.0226,
+            "p95": 974.9934,
+            "p99": 974.9934
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 1127.8853,
+            "n": 6,
+            "p50": 439.4949,
+            "p95": 1127.8853,
+            "p99": 1127.8853
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 955.0,
+            "n": 6,
+            "p50": 293.0,
+            "p95": 955.0,
+            "p99": 955.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 1866.0008,
+            "n": 2,
+            "p50": 1084.3794,
+            "p95": 1866.0008,
+            "p99": 1866.0008
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 1883.3374,
+            "n": 6,
+            "p50": 27.8193,
+            "p95": 1883.3374,
+            "p99": 1883.3374
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 119.1807,
+            "n": 4,
+            "p50": 115.7614,
+            "p95": 119.1807,
+            "p99": 119.1807
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 147.0,
+            "n": 4,
+            "p50": 142.0,
+            "p95": 147.0,
+            "p99": 147.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 3.3003,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 3.3003,
+            "p99": 3.3003
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 29.9383,
+            "n": 4,
+            "p50": 26.1407,
+            "p95": 29.9383,
+            "p99": 29.9383
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 12.4589,
+            "n": 4,
+            "p50": 8.9522,
+            "p95": 12.4589,
+            "p99": 12.4589
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.4989,
+            "n": 4,
+            "p50": 0.3365,
+            "p95": 0.4989,
+            "p99": 0.4989
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 9.3893,
+            "n": 4,
+            "p50": 7.1904,
+            "p95": 9.3893,
+            "p99": 9.3893
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 20.5489,
+            "n": 4,
+            "p50": 18.9503,
+            "p95": 20.5489,
+            "p99": 20.5489
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 41.0,
+            "n": 6,
+            "p50": 22.0,
+            "p95": 41.0,
+            "p99": 41.0
+          },
+          "new_claim_ms": {
+            "max": 2322.8323,
+            "n": 6,
+            "p50": 659.2581,
+            "p95": 2322.8323,
+            "p99": 2322.8323
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 320.1174,
+            "n": 6,
+            "p50": 100.0552,
+            "p95": 320.1174,
+            "p99": 320.1174
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 149.0,
+            "n": 4,
+            "p50": 142.0,
+            "p95": 149.0,
+            "p99": 149.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 22643.0,
+            "n": 4,
+            "p50": 10648.0,
+            "p95": 22643.0,
+            "p99": 22643.0
+          },
+          "ready_to_claim_ms": {
+            "max": 22785.0,
+            "n": 6,
+            "p50": 9984.0,
+            "p95": 22785.0,
+            "p99": 22785.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 5.0682,
+            "n": 37,
+            "p50": 2.4244,
+            "p95": 5.0121,
+            "p99": 5.0682
+          }
+        },
+        "3": {
+          "all_raw_ms": {
+            "max": 3420.2838,
+            "n": 51,
+            "p50": 4.1213,
+            "p95": 1668.9791,
+            "p99": 3420.2838
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 3420.2838,
+            "n": 2,
+            "p50": 3389.3563,
+            "p95": 3420.2838,
+            "p99": 3420.2838
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 1668.9791,
+            "n": 2,
+            "p50": 211.9651,
+            "p95": 1668.9791,
+            "p99": 1668.9791
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 432.0765,
+            "n": 2,
+            "p50": 409.7726,
+            "p95": 432.0765,
+            "p99": 432.0765
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 1633.3421,
+            "n": 6,
+            "p50": 404.8139,
+            "p95": 1633.3421,
+            "p99": 1633.3421
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 704.0,
+            "n": 6,
+            "p50": 327.0,
+            "p95": 704.0,
+            "p99": 704.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 2622.3771,
+            "n": 2,
+            "p50": 2512.8549,
+            "p95": 2622.3771,
+            "p99": 2622.3771
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 2708.5852,
+            "n": 6,
+            "p50": 28.3458,
+            "p95": 2708.5852,
+            "p99": 2708.5852
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 290.9233,
+            "n": 4,
+            "p50": 116.6542,
+            "p95": 290.9233,
+            "p99": 290.9233
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 326.5602,
+            "n": 4,
+            "p50": 145.0,
+            "p95": 326.5602,
+            "p99": 326.5602
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 4.4398,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 4.4398,
+            "p99": 4.4398
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 35.6369,
+            "n": 4,
+            "p50": 27.2626,
+            "p95": 35.6369,
+            "p99": 35.6369
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 17.0417,
+            "n": 4,
+            "p50": 12.3692,
+            "p95": 17.0417,
+            "p99": 17.0417
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.5102,
+            "n": 4,
+            "p50": 0.3702,
+            "p95": 0.5102,
+            "p99": 0.5102
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 8.1751,
+            "n": 4,
+            "p50": 7.4011,
+            "p95": 8.1751,
+            "p99": 8.1751
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 27.77,
+            "n": 4,
+            "p50": 19.8615,
+            "p95": 27.77,
+            "p99": 27.77
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 375.0,
+            "n": 6,
+            "p50": 34.0,
+            "p95": 375.0,
+            "p99": 375.0
+          },
+          "new_claim_ms": {
+            "max": 3420.2838,
+            "n": 6,
+            "p50": 432.0765,
+            "p95": 3420.2838,
+            "p99": 3420.2838
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 554.3421,
+            "n": 6,
+            "p50": 58.4268,
+            "p95": 554.3421,
+            "p99": 554.3421
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 331.0,
+            "n": 4,
+            "p50": 145.0,
+            "p95": 331.0,
+            "p99": 331.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 33145.0,
+            "n": 4,
+            "p50": 10987.0,
+            "p95": 33145.0,
+            "p99": 33145.0
+          },
+          "ready_to_claim_ms": {
+            "max": 33277.0,
+            "n": 6,
+            "p50": 10480.0,
+            "p95": 33277.0,
+            "p99": 33277.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 25.9511,
+            "n": 45,
+            "p50": 3.9911,
+            "p95": 9.0897,
+            "p99": 25.9511
+          }
+        },
+        "4": {
+          "all_raw_ms": {
+            "max": 3756.781,
+            "n": 48,
+            "p50": 2.57,
+            "p95": 412.2299,
+            "p99": 3756.781
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 3756.781,
+            "n": 2,
+            "p50": 1797.8337,
+            "p95": 3756.781,
+            "p99": 3756.781
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 369.2415,
+            "n": 2,
+            "p50": 111.9158,
+            "p95": 369.2415,
+            "p99": 369.2415
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 412.2299,
+            "n": 2,
+            "p50": 403.4319,
+            "p95": 412.2299,
+            "p99": 412.2299
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 598.3366,
+            "n": 6,
+            "p50": 352.256,
+            "p95": 598.3366,
+            "p99": 598.3366
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 370.0,
+            "n": 6,
+            "p50": 285.0,
+            "p95": 370.0,
+            "p99": 370.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 3102.4713,
+            "n": 2,
+            "p50": 1577.8995,
+            "p95": 3102.4713,
+            "p99": 3102.4713
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 3158.4444,
+            "n": 6,
+            "p50": 26.0422,
+            "p95": 3158.4444,
+            "p99": 3158.4444
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 124.8652,
+            "n": 4,
+            "p50": 109.1668,
+            "p95": 124.8652,
+            "p99": 124.8652
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 154.0,
+            "n": 4,
+            "p50": 121.0063,
+            "p95": 154.0,
+            "p99": 154.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 3.9662,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 3.9662,
+            "p99": 3.9662
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 29.1348,
+            "n": 4,
+            "p50": 16.9855,
+            "p95": 29.1348,
+            "p99": 29.1348
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 13.2201,
+            "n": 4,
+            "p50": 7.2771,
+            "p95": 13.2201,
+            "p99": 13.2201
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.5172,
+            "n": 4,
+            "p50": 0.294,
+            "p95": 0.5172,
+            "p99": 0.5172
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 8.3232,
+            "n": 4,
+            "p50": 4.6635,
+            "p95": 8.3232,
+            "p99": 8.3232
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 20.8116,
+            "n": 4,
+            "p50": 12.3221,
+            "p95": 20.8116,
+            "p99": 20.8116
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 102.0,
+            "n": 6,
+            "p50": 19.0,
+            "p95": 102.0,
+            "p99": 102.0
+          },
+          "new_claim_ms": {
+            "max": 3756.781,
+            "n": 6,
+            "p50": 403.4319,
+            "p95": 3756.781,
+            "p99": 3756.781
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 126.3366,
+            "n": 6,
+            "p50": 47.0951,
+            "p95": 126.3366,
+            "p99": 126.3366
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 154.0,
+            "n": 4,
+            "p50": 124.0,
+            "p95": 154.0,
+            "p99": 154.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 25305.0,
+            "n": 4,
+            "p50": 11240.0,
+            "p95": 25305.0,
+            "p99": 25305.0
+          },
+          "ready_to_claim_ms": {
+            "max": 25429.0,
+            "n": 6,
+            "p50": 11065.0,
+            "p95": 25429.0,
+            "p99": 25429.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 145.4257,
+            "n": 42,
+            "p50": 2.4227,
+            "p95": 6.1036,
+            "p99": 145.4257
+          }
+        },
+        "5": {
+          "all_raw_ms": {
+            "max": 3263.9167,
+            "n": 49,
+            "p50": 2.2094,
+            "p95": 646.6019,
+            "p99": 3263.9167
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 3263.9167,
+            "n": 2,
+            "p50": 2278.7772,
+            "p95": 3263.9167,
+            "p99": 3263.9167
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 350.717,
+            "n": 2,
+            "p50": 115.2718,
+            "p95": 350.717,
+            "p99": 350.717
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 646.6019,
+            "n": 2,
+            "p50": 573.0313,
+            "p95": 646.6019,
+            "p99": 646.6019
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 631.2607,
+            "n": 6,
+            "p50": 458.4601,
+            "p95": 631.2607,
+            "p99": 631.2607
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 358.0,
+            "n": 6,
+            "p50": 280.0,
+            "p95": 358.0,
+            "p99": 358.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 2787.3047,
+            "n": 2,
+            "p50": 1775.2106,
+            "p95": 2787.3047,
+            "p99": 2787.3047
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 2805.4566,
+            "n": 6,
+            "p50": 14.8125,
+            "p95": 2805.4566,
+            "p99": 2805.4566
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 121.1875,
+            "n": 4,
+            "p50": 102.4919,
+            "p95": 121.1875,
+            "p99": 121.1875
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 136.0,
+            "n": 4,
+            "p50": 117.8331,
+            "p95": 136.0,
+            "p99": 136.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 2.2485,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 2.2485,
+            "p99": 2.2485
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 15.3412,
+            "n": 4,
+            "p50": 13.9505,
+            "p95": 15.3412,
+            "p99": 15.3412
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 8.217,
+            "n": 4,
+            "p50": 5.9732,
+            "p95": 8.217,
+            "p99": 8.217
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.5509,
+            "n": 4,
+            "p50": 0.3456,
+            "p95": 0.5509,
+            "p99": 0.5509
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 4.6132,
+            "n": 4,
+            "p50": 3.6854,
+            "p95": 4.6132,
+            "p99": 4.6132
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 11.1271,
+            "n": 4,
+            "p50": 9.7095,
+            "p95": 11.1271,
+            "p99": 11.1271
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 201.0,
+            "n": 6,
+            "p50": 21.0,
+            "p95": 201.0,
+            "p99": 201.0
+          },
+          "new_claim_ms": {
+            "max": 3263.9167,
+            "n": 6,
+            "p50": 573.0313,
+            "p95": 3263.9167,
+            "p99": 3263.9167
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 330.2607,
+            "n": 6,
+            "p50": 44.7665,
+            "p95": 330.2607,
+            "p99": 330.2607
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 136.0,
+            "n": 4,
+            "p50": 119.0,
+            "p95": 136.0,
+            "p99": 136.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 28256.0,
+            "n": 4,
+            "p50": 9482.0,
+            "p95": 28256.0,
+            "p99": 28256.0
+          },
+          "ready_to_claim_ms": {
+            "max": 28366.0,
+            "n": 6,
+            "p50": 8943.0,
+            "p95": 28366.0,
+            "p99": 28366.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 3.2168,
+            "n": 43,
+            "p50": 2.1815,
+            "p95": 2.5139,
+            "p99": 3.2168
+          }
+        },
+        "6": {
+          "all_raw_ms": {
+            "max": 3054.1563,
+            "n": 45,
+            "p50": 2.2144,
+            "p95": 563.814,
+            "p99": 3054.1563
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 3054.1563,
+            "n": 2,
+            "p50": 2470.1845,
+            "p95": 3054.1563,
+            "p99": 3054.1563
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 163.4219,
+            "n": 2,
+            "p50": 105.4402,
+            "p95": 163.4219,
+            "p99": 163.4219
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 563.814,
+            "n": 2,
+            "p50": 374.4293,
+            "p95": 563.814,
+            "p99": 563.814
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 549.1501,
+            "n": 6,
+            "p50": 317.8148,
+            "p95": 549.1501,
+            "p99": 549.1501
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 468.0,
+            "n": 6,
+            "p50": 220.0,
+            "p95": 468.0,
+            "p99": 468.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 2565.2654,
+            "n": 2,
+            "p50": 2132.3927,
+            "p95": 2565.2654,
+            "p99": 2565.2654
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 2583.1377,
+            "n": 6,
+            "p50": 14.6639,
+            "p95": 2583.1377,
+            "p99": 2583.1377
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 130.3361,
+            "n": 4,
+            "p50": 106.1769,
+            "p95": 130.3361,
+            "p99": 130.3361
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 145.0,
+            "n": 4,
+            "p50": 119.0,
+            "p95": 145.0,
+            "p99": 145.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 2.2932,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 2.2932,
+            "p99": 2.2932
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 15.8683,
+            "n": 4,
+            "p50": 12.8231,
+            "p95": 15.8683,
+            "p99": 15.8683
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 8.4592,
+            "n": 4,
+            "p50": 5.7332,
+            "p95": 8.4592,
+            "p99": 8.4592
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.5337,
+            "n": 4,
+            "p50": 0.3247,
+            "p95": 0.5337,
+            "p99": 0.5337
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 4.3767,
+            "n": 4,
+            "p50": 3.3863,
+            "p95": 4.3767,
+            "p99": 4.3767
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 11.4916,
+            "n": 4,
+            "p50": 9.3333,
+            "p95": 11.4916,
+            "p99": 11.4916
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 30.0,
+            "n": 6,
+            "p50": 21.0,
+            "p95": 30.0,
+            "p99": 30.0
+          },
+          "new_claim_ms": {
+            "max": 3054.1563,
+            "n": 6,
+            "p50": 374.4293,
+            "p95": 3054.1563,
+            "p99": 3054.1563
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 134.0186,
+            "n": 6,
+            "p50": 40.561,
+            "p95": 134.0186,
+            "p99": 134.0186
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 145.0,
+            "n": 4,
+            "p50": 119.0,
+            "p95": 145.0,
+            "p99": 145.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 22277.0,
+            "n": 4,
+            "p50": 11224.0,
+            "p95": 22277.0,
+            "p99": 22277.0
+          },
+          "ready_to_claim_ms": {
+            "max": 22396.0,
+            "n": 6,
+            "p50": 10987.0,
+            "p95": 22396.0,
+            "p99": 22396.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 8.6311,
+            "n": 39,
+            "p50": 2.1633,
+            "p95": 7.8523,
+            "p99": 8.6311
+          }
+        },
+        "7": {
+          "all_raw_ms": {
+            "max": 3293.1792,
+            "n": 45,
+            "p50": 3.6219,
+            "p95": 1395.8215,
+            "p99": 3293.1792
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 3293.1792,
+            "n": 2,
+            "p50": 1395.8215,
+            "p95": 3293.1792,
+            "p99": 3293.1792
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 835.5463,
+            "n": 2,
+            "p50": 355.482,
+            "p95": 835.5463,
+            "p99": 835.5463
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 2177.9555,
+            "n": 2,
+            "p50": 566.5295,
+            "p95": 2177.9555,
+            "p99": 2177.9555
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 2150.0583,
+            "n": 6,
+            "p50": 446.3771,
+            "p95": 2150.0583,
+            "p99": 2150.0583
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 1312.0,
+            "n": 6,
+            "p50": 294.0,
+            "p95": 1312.0,
+            "p99": 1312.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 2827.194,
+            "n": 2,
+            "p50": 1168.1759,
+            "p95": 2827.194,
+            "p99": 2827.194
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 2846.8021,
+            "n": 6,
+            "p50": 31.8053,
+            "p95": 2846.8021,
+            "p99": 2846.8021
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 149.1947,
+            "n": 4,
+            "p50": 119.8953,
+            "p95": 149.1947,
+            "p99": 149.1947
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 181.0,
+            "n": 4,
+            "p50": 152.3843,
+            "p95": 181.0,
+            "p99": 181.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 1.6157,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 1.6157,
+            "p99": 1.6157
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 32.489,
+            "n": 4,
+            "p50": 27.8972,
+            "p95": 32.489,
+            "p99": 32.489
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 14.2448,
+            "n": 4,
+            "p50": 12.1734,
+            "p95": 14.2448,
+            "p99": 14.2448
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.5849,
+            "n": 4,
+            "p50": 0.352,
+            "p95": 0.5849,
+            "p99": 0.5849
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 11.1002,
+            "n": 4,
+            "p50": 8.7969,
+            "p95": 11.1002,
+            "p99": 11.1002
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 22.5427,
+            "n": 4,
+            "p50": 19.1003,
+            "p95": 22.5427,
+            "p99": 22.5427
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 150.0,
+            "n": 6,
+            "p50": 23.0,
+            "p95": 150.0,
+            "p99": 150.0
+          },
+          "new_claim_ms": {
+            "max": 3293.1792,
+            "n": 6,
+            "p50": 835.5463,
+            "p95": 3293.1792,
+            "p99": 3293.1792
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 688.0583,
+            "n": 6,
+            "p50": 61.993,
+            "p95": 688.0583,
+            "p99": 688.0583
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 181.0,
+            "n": 4,
+            "p50": 154.0,
+            "p95": 181.0,
+            "p99": 181.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 23280.0,
+            "n": 4,
+            "p50": 11750.0,
+            "p95": 23280.0,
+            "p99": 23280.0
+          },
+          "ready_to_claim_ms": {
+            "max": 23415.0,
+            "n": 6,
+            "p50": 9616.0,
+            "p95": 23415.0,
+            "p99": 23415.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 6.4889,
+            "n": 39,
+            "p50": 3.5166,
+            "p95": 5.4344,
+            "p99": 6.4889
+          }
+        },
+        "8": {
+          "all_raw_ms": {
+            "max": 3511.7279,
+            "n": 46,
+            "p50": 3.4991,
+            "p95": 1031.891,
+            "p99": 3511.7279
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 3511.7279,
+            "n": 2,
+            "p50": 1427.0184,
+            "p95": 3511.7279,
+            "p99": 3511.7279
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 1031.891,
+            "n": 2,
+            "p50": 482.3994,
+            "p95": 1031.891,
+            "p99": 1031.891
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 918.3517,
+            "n": 2,
+            "p50": 425.7321,
+            "p95": 918.3517,
+            "p99": 918.3517
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 1008.1881,
+            "n": 6,
+            "p50": 453.5833,
+            "p95": 1008.1881,
+            "p99": 1008.1881
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 747.0,
+            "n": 6,
+            "p50": 327.0,
+            "p95": 747.0,
+            "p99": 747.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 2907.1296,
+            "n": 2,
+            "p50": 1183.1182,
+            "p95": 2907.1296,
+            "p99": 2907.1296
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 2980.0347,
+            "n": 6,
+            "p50": 27.1904,
+            "p95": 2980.0347,
+            "p99": 2980.0347
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 118.7954,
+            "n": 4,
+            "p50": 116.1531,
+            "p95": 118.7954,
+            "p99": 118.7954
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 145.9857,
+            "n": 4,
+            "p50": 135.028,
+            "p95": 145.9857,
+            "p99": 145.9857
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 2.0143,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 2.0143,
+            "p99": 2.0143
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 28.8162,
+            "n": 4,
+            "p50": 23.7029,
+            "p95": 28.8162,
+            "p99": 28.8162
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 14.1619,
+            "n": 4,
+            "p50": 8.7284,
+            "p95": 14.1619,
+            "p99": 14.1619
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.5021,
+            "n": 4,
+            "p50": 0.338,
+            "p95": 0.5021,
+            "p99": 0.5021
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 8.3264,
+            "n": 4,
+            "p50": 6.107,
+            "p95": 8.3264,
+            "p99": 8.3264
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 22.7092,
+            "n": 4,
+            "p50": 15.3765,
+            "p95": 22.7092,
+            "p99": 22.7092
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 91.0,
+            "n": 6,
+            "p50": 27.0,
+            "p95": 91.0,
+            "p99": 91.0
+          },
+          "new_claim_ms": {
+            "max": 3511.7279,
+            "n": 6,
+            "p50": 918.3517,
+            "p95": 3511.7279,
+            "p99": 3511.7279
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 642.1881,
+            "n": 6,
+            "p50": 68.5833,
+            "p95": 642.1881,
+            "p99": 642.1881
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 148.0,
+            "n": 4,
+            "p50": 137.0,
+            "p95": 148.0,
+            "p99": 148.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 22648.0,
+            "n": 4,
+            "p50": 10045.0,
+            "p95": 22648.0,
+            "p99": 22648.0
+          },
+          "ready_to_claim_ms": {
+            "max": 22785.0,
+            "n": 6,
+            "p50": 9974.0,
+            "p95": 22785.0,
+            "p99": 22785.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 33.3334,
+            "n": 40,
+            "p50": 3.2273,
+            "p95": 6.6948,
+            "p99": 33.3334
+          }
+        },
+        "9": {
+          "all_raw_ms": {
+            "max": 6006.4378,
+            "n": 47,
+            "p50": 4.0631,
+            "p95": 1296.3987,
+            "p99": 6006.4378
+          },
+          "claim_evidence_reviewer_attempt_1_ms": {
+            "max": 6006.4378,
+            "n": 2,
+            "p50": 3066.5604,
+            "p95": 6006.4378,
+            "p99": 6006.4378
+          },
+          "claim_evidence_reviewer_attempt_2_ms": {
+            "max": 1296.3987,
+            "n": 2,
+            "p50": 1042.7448,
+            "p95": 1296.3987,
+            "p99": 1296.3987
+          },
+          "claim_planner_attempt_1_ms": {
+            "max": 689.4767,
+            "n": 2,
+            "p50": 211.5736,
+            "p95": 689.4767,
+            "p99": 689.4767
+          },
+          "claim_to_dispatch_return_ms": {
+            "max": 1381.4765,
+            "n": 6,
+            "p50": 669.0668,
+            "p95": 1381.4765,
+            "p99": 1381.4765
+          },
+          "claim_to_native_reservation_ms": {
+            "max": 1184.0,
+            "n": 6,
+            "p50": 300.0,
+            "p95": 1184.0,
+            "p99": 1184.0
+          },
+          "cold_dispatch_start_to_first_writer_ms": {
+            "max": 4525.0743,
+            "n": 2,
+            "p50": 2529.8904,
+            "p95": 4525.0743,
+            "p99": 4525.0743
+          },
+          "dispatch_start_to_claim_ms": {
+            "max": 4624.9613,
+            "n": 6,
+            "p50": 27.0165,
+            "p95": 4624.9613,
+            "p99": 4624.9613
+          },
+          "eligible_before_own_dispatch_outside_sibling_ms": {
+            "max": 124.0143,
+            "n": 4,
+            "p50": 97.732,
+            "p95": 124.0143,
+            "p99": 124.0143
+          },
+          "eligible_wait_outside_sibling_dispatch_ms": {
+            "max": 152.0,
+            "n": 4,
+            "p50": 121.0,
+            "p95": 152.0,
+            "p99": 152.0
+          },
+          "eligible_wait_overlapping_sibling_dispatch_ms": {
+            "max": 2.2842,
+            "n": 4,
+            "p50": 0.0,
+            "p95": 2.2842,
+            "p99": 2.2842
+          },
+          "follow_on_own_dispatch_start_to_claim_ms": {
+            "max": 27.9857,
+            "n": 4,
+            "p50": 23.268,
+            "p95": 27.9857,
+            "p99": 27.9857
+          },
+          "follow_on_preclaim_finished_writer_ms": {
+            "max": 15.0045,
+            "n": 4,
+            "p50": 10.3626,
+            "p95": 15.0045,
+            "p99": 15.0045
+          },
+          "follow_on_preclaim_lock_acquire_ms": {
+            "max": 0.489,
+            "n": 4,
+            "p50": 0.3497,
+            "p95": 0.489,
+            "p99": 0.489
+          },
+          "follow_on_preclaim_outside_writer_ms": {
+            "max": 7.3123,
+            "n": 4,
+            "p50": 5.0084,
+            "p95": 7.3123,
+            "p99": 7.3123
+          },
+          "follow_on_preclaim_writer_ms": {
+            "max": 22.9773,
+            "n": 4,
+            "p50": 16.8281,
+            "p95": 22.9773,
+            "p99": 22.9773
+          },
+          "native_reservation_to_official_start_ms": {
+            "max": 169.0,
+            "n": 6,
+            "p50": 46.0,
+            "p95": 169.0,
+            "p99": 169.0
+          },
+          "new_claim_ms": {
+            "max": 6006.4378,
+            "n": 6,
+            "p50": 1042.7448,
+            "p95": 6006.4378,
+            "p99": 6006.4378
+          },
+          "official_start_to_dispatch_return_ms": {
+            "max": 286.0668,
+            "n": 6,
+            "p50": 143.513,
+            "p95": 286.0668,
+            "p99": 286.0668
+          },
+          "ready_and_previous_team_slot_released_to_claim_ms": {
+            "max": 152.0,
+            "n": 4,
+            "p50": 121.0,
+            "p95": 152.0,
+            "p99": 152.0
+          },
+          "ready_elapsed_with_previous_team_slot_occupied_ms": {
+            "max": 29950.0,
+            "n": 4,
+            "p50": 9633.0,
+            "p95": 29950.0,
+            "p99": 29950.0
+          },
+          "ready_to_claim_ms": {
+            "max": 30071.0,
+            "n": 6,
+            "p50": 9336.0,
+            "p95": 30071.0,
+            "p99": 30071.0
+          },
+          "ready_unadmitted_ms": {
+            "max": 7.411,
+            "n": 41,
+            "p50": 3.9502,
+            "p95": 5.9387,
+            "p99": 7.411
+          }
+        }
+      }
+    }
+  },
+  "native_delivery_receipts": {
+    "baseline": [
+      {
+        "delivery_state": "acknowledged",
+        "event": "start",
+        "method": "turn/start",
+        "n": 78
+      }
+    ],
+    "candidate": [
+      {
+        "delivery_state": "acknowledged",
+        "event": "start",
+        "method": "turn/start",
+        "n": 78
+      }
+    ]
+  },
+  "receipt_join_issues": [],
+  "scope": "matched completed official OAuth arrivals",
+  "standardization": {
+    "baseline_timings_with_baseline_operation_mix_p95_ms": 6.961,
+    "baseline_timings_with_candidate_operation_mix_p95_ms": 449.6523,
+    "candidate_timings_with_baseline_operation_mix_p95_ms": 6.7175,
+    "candidate_timings_with_candidate_operation_mix_p95_ms": 1213.6525
+  },
+  "units": "milliseconds, empirical nearest rank"
+}

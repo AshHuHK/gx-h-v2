@@ -1,0 +1,4527 @@
+{
+  "started": "2026-11-22T22:04:38.858846+00:00",
+  "scope": "credential-free loopback for native startup, followed by supplemental account/read and model/list; zero model turns",
+  "source_sha256": "df20f7557da28a30debde7cd4a2f315dcb48c079ef3f76a7a6f9b626a024ee9b",
+  "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "stages": {
+    "baseline": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+    "candidate": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b"
+  },
+  "order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate"
+  ],
+  "results": [
+    {
+      "sequence": 0,
+      "arm": "baseline",
+      "started": "2026-11-22T22:04:39.154941+00:00",
+      "ended": "2026-11-22T22:04:43.519413+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/00-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/00-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/00-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/00-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/00-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mme4dp37y6xfh",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 580.975684,
+          "before_enter_ms": 95.056195,
+          "hook_and_tool_prep_ms": 77.052084,
+          "worker_tool_build_envelope_ms": 0.016738,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.923524,
+              "end_ms": 79.95887,
+              "duration_ms": 77.035346
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 79.975608,
+              "end_ms": 95.051782,
+              "duration_ms": 15.076174
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 96.997055,
+              "end_ms": 98.63794,
+              "duration_ms": 1.640885
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 98.644008,
+              "end_ms": 559.606625,
+              "duration_ms": 460.962617
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 559.626459,
+              "end_ms": 559.803062,
+              "duration_ms": 0.176603
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 559.821397,
+              "end_ms": 580.770862,
+              "duration_ms": 20.949465
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 95.056195,
+              "end_ms": 580.917223,
+              "duration_ms": 485.861028
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 580.998475,
+              "end_ms": 585.482848,
+              "duration_ms": 4.484373
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 585.523085,
+              "end_ms": 589.792702,
+              "duration_ms": 4.269617
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mmfhxsbwcwrxj",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 271.371541,
+          "before_enter_ms": 2.754,
+          "hook_and_tool_prep_ms": 0.793912,
+          "worker_tool_build_envelope_ms": 0.040362,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.110031,
+              "end_ms": 1.863581,
+              "duration_ms": 0.75355
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.903943,
+              "end_ms": 2.744584,
+              "duration_ms": 0.840641
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.705237,
+              "end_ms": 6.642525,
+              "duration_ms": 1.937288
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.655081,
+              "end_ms": 248.177934,
+              "duration_ms": 241.522853
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 248.192175,
+              "end_ms": 248.295941,
+              "duration_ms": 0.103766
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 248.310602,
+              "end_ms": 271.253349,
+              "duration_ms": 22.942747
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.754,
+              "end_ms": 271.335889,
+              "duration_ms": 268.581889
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 271.389921,
+              "end_ms": 276.052893,
+              "duration_ms": 4.662972
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 276.091654,
+              "end_ms": 280.585254,
+              "duration_ms": 4.4936
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 1,
+      "arm": "candidate",
+      "started": "2026-11-22T22:04:43.663937+00:00",
+      "ended": "2026-11-22T22:04:49.393008+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/01-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/01-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/01-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/01-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/01-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mmk49kctc42qb",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1264.018775,
+          "before_enter_ms": 136.452187,
+          "hook_and_tool_prep_ms": 120.29938,
+          "worker_tool_build_envelope_ms": 0.023378,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.831362,
+              "end_ms": 123.107364,
+              "duration_ms": 120.276002
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 123.130742,
+              "end_ms": 136.447785,
+              "duration_ms": 13.317043
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 138.367239,
+              "end_ms": 140.994567,
+              "duration_ms": 2.627328
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 141.013207,
+              "end_ms": 1217.397701,
+              "duration_ms": 1076.384494
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1217.417837,
+              "end_ms": 1217.582579,
+              "duration_ms": 0.164742
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1217.601649,
+              "end_ms": 1263.820383,
+              "duration_ms": 46.218734
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 136.452187,
+              "end_ms": 1263.97744,
+              "duration_ms": 1127.525253
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1264.042866,
+              "end_ms": 1271.579528,
+              "duration_ms": 7.536662
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1271.619523,
+              "end_ms": 1276.794622,
+              "duration_ms": 5.175099
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mmmnyg94xk69d",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 200.578669,
+          "before_enter_ms": 3.396218,
+          "hook_and_tool_prep_ms": 1.274122,
+          "worker_tool_build_envelope_ms": 0.06723,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.207402,
+              "end_ms": 2.414294,
+              "duration_ms": 1.206892
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 2.481524,
+              "end_ms": 3.387622,
+              "duration_ms": 0.906098
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 5.412652,
+              "end_ms": 7.294068,
+              "duration_ms": 1.881416
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 7.305903,
+              "end_ms": 180.042598,
+              "duration_ms": 172.736695
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 180.060203,
+              "end_ms": 180.209675,
+              "duration_ms": 0.149472
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 180.226725,
+              "end_ms": 200.446998,
+              "duration_ms": 20.220273
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 3.396218,
+              "end_ms": 200.541325,
+              "duration_ms": 197.145107
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 200.598973,
+              "end_ms": 204.998483,
+              "duration_ms": 4.39951
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 205.038349,
+              "end_ms": 208.110993,
+              "duration_ms": 3.072644
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "arm": "candidate",
+      "started": "2026-11-22T22:04:49.678806+00:00",
+      "ended": "2026-11-22T22:04:54.550141+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/02-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/02-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/02-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/02-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/02-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mmrcskrhrpb9g",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 838.81182,
+          "before_enter_ms": 127.153317,
+          "hook_and_tool_prep_ms": 111.920743,
+          "worker_tool_build_envelope_ms": 0.022118,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.929134,
+              "end_ms": 114.827759,
+              "duration_ms": 111.898625
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 114.849877,
+              "end_ms": 127.149157,
+              "duration_ms": 12.29928
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 129.026369,
+              "end_ms": 342.495027,
+              "duration_ms": 213.468658
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 342.517877,
+              "end_ms": 816.056215,
+              "duration_ms": 473.538338
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 816.070539,
+              "end_ms": 816.159478,
+              "duration_ms": 0.088939
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 816.169877,
+              "end_ms": 838.708113,
+              "duration_ms": 22.538236
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 127.153317,
+              "end_ms": 838.78892,
+              "duration_ms": 711.635603
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 838.821044,
+              "end_ms": 843.496451,
+              "duration_ms": 4.675407
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 843.518612,
+              "end_ms": 846.247016,
+              "duration_ms": 2.728404
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mmspfzc6mvq8y",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 214.296986,
+          "before_enter_ms": 1.861092,
+          "hook_and_tool_prep_ms": 0.6819,
+          "worker_tool_build_envelope_ms": 0.033209,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 0.682229,
+              "end_ms": 1.33092,
+              "duration_ms": 0.648691
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.364129,
+              "end_ms": 1.85751,
+              "duration_ms": 0.493381
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 2.760132,
+              "end_ms": 4.342182,
+              "duration_ms": 1.58205
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 4.346706,
+              "end_ms": 191.771786,
+              "duration_ms": 187.42508
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 191.779076,
+              "end_ms": 191.823918,
+              "duration_ms": 0.044842
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 191.828827,
+              "end_ms": 214.240401,
+              "duration_ms": 22.411574
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 1.861092,
+              "end_ms": 214.278657,
+              "duration_ms": 212.417565
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 214.304579,
+              "end_ms": 218.560103,
+              "duration_ms": 4.255524
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 218.575095,
+              "end_ms": 222.419434,
+              "duration_ms": 3.844339
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "arm": "baseline",
+      "started": "2026-11-22T22:04:54.687574+00:00",
+      "ended": "2026-11-22T22:04:59.162045+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/03-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/03-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/03-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/03-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/03-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mmxaazn4brdvd",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 572.697575,
+          "before_enter_ms": 89.618251,
+          "hook_and_tool_prep_ms": 71.337415,
+          "worker_tool_build_envelope_ms": 0.016282,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.722012,
+              "end_ms": 74.043145,
+              "duration_ms": 71.321133
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 74.059427,
+              "end_ms": 89.614127,
+              "duration_ms": 15.5547
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 91.452476,
+              "end_ms": 93.008087,
+              "duration_ms": 1.555611
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 93.012874,
+              "end_ms": 551.223825,
+              "duration_ms": 458.210951
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 551.242345,
+              "end_ms": 551.391748,
+              "duration_ms": 0.149403
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 551.407273,
+              "end_ms": 572.499068,
+              "duration_ms": 21.091795
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 89.618251,
+              "end_ms": 572.640025,
+              "duration_ms": 483.021774
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 572.719146,
+              "end_ms": 577.26731,
+              "duration_ms": 4.548164
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 577.306259,
+              "end_ms": 581.381461,
+              "duration_ms": 4.075202
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mmyn9r712wb6w",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 230.518352,
+          "before_enter_ms": 2.766256,
+          "hook_and_tool_prep_ms": 0.783186,
+          "worker_tool_build_envelope_ms": 0.041041,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.127991,
+              "end_ms": 1.870136,
+              "duration_ms": 0.742145
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.911177,
+              "end_ms": 2.757094,
+              "duration_ms": 0.845917
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.778531,
+              "end_ms": 6.690227,
+              "duration_ms": 1.911696
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.701889,
+              "end_ms": 207.68242,
+              "duration_ms": 200.980531
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 207.70059,
+              "end_ms": 207.847341,
+              "duration_ms": 0.146751
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 207.861491,
+              "end_ms": 230.385781,
+              "duration_ms": 22.52429
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.766256,
+              "end_ms": 230.480482,
+              "duration_ms": 227.714226
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 230.536548,
+              "end_ms": 241.395203,
+              "duration_ms": 10.858655
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 241.450885,
+              "end_ms": 247.203025,
+              "duration_ms": 5.75214
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 4,
+      "arm": "candidate",
+      "started": "2026-11-22T22:04:59.195736+00:00",
+      "ended": "2026-11-22T22:05:07.258391+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/04-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/04-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/04-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/04-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/04-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mn1pxy7amrxsz",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1636.080053,
+          "before_enter_ms": 338.037716,
+          "hook_and_tool_prep_ms": 302.685734,
+          "worker_tool_build_envelope_ms": 0.641205,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 12.387893,
+              "end_ms": 314.432422,
+              "duration_ms": 302.044529
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 315.073627,
+              "end_ms": 338.032985,
+              "duration_ms": 22.959358
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 345.591147,
+              "end_ms": 350.620301,
+              "duration_ms": 5.029154
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 350.633925,
+              "end_ms": 1575.427205,
+              "duration_ms": 1224.79328
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1577.443568,
+              "end_ms": 1583.488451,
+              "duration_ms": 6.044883
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1583.511631,
+              "end_ms": 1630.614267,
+              "duration_ms": 47.102636
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 338.037716,
+              "end_ms": 1635.646313,
+              "duration_ms": 1297.608597
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1637.283841,
+              "end_ms": 1644.910759,
+              "duration_ms": 7.626918
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1646.942908,
+              "end_ms": 1653.346501,
+              "duration_ms": 6.403593
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mn3eyvz24a7j3",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 1417.15187,
+          "before_enter_ms": 13.789087,
+          "hook_and_tool_prep_ms": 6.909295,
+          "worker_tool_build_envelope_ms": 1.152986,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 4.226816,
+              "end_ms": 9.983125,
+              "duration_ms": 5.756309
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 11.136111,
+              "end_ms": 13.779493,
+              "duration_ms": 2.643382
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 34.845258,
+              "end_ms": 42.394376,
+              "duration_ms": 7.549118
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 42.403626,
+              "end_ms": 1194.190242,
+              "duration_ms": 1151.786616
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1197.858337,
+              "end_ms": 1207.590206,
+              "duration_ms": 9.731869
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1207.60815,
+              "end_ms": 1413.01934,
+              "duration_ms": 205.41119
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 13.789087,
+              "end_ms": 1416.446302,
+              "duration_ms": 1402.657215
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1418.14181,
+              "end_ms": 1426.883294,
+              "duration_ms": 8.741484
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1430.798992,
+              "end_ms": 1439.870581,
+              "duration_ms": 9.071589
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "arm": "baseline",
+      "started": "2026-11-22T22:05:08.001032+00:00",
+      "ended": "2026-11-22T22:05:16.287969+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/05-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/05-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/05-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/05-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/05-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mnaas4kzzagc3",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 2180.513781,
+          "before_enter_ms": 211.049493,
+          "hook_and_tool_prep_ms": 187.867829,
+          "worker_tool_build_envelope_ms": 0.020846,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 5.67112,
+              "end_ms": 193.518103,
+              "duration_ms": 187.846983
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 193.538949,
+              "end_ms": 211.04445,
+              "duration_ms": 17.505501
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 213.694444,
+              "end_ms": 216.239841,
+              "duration_ms": 2.545397
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 216.246392,
+              "end_ms": 2035.116353,
+              "duration_ms": 1818.869961
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 2035.174629,
+              "end_ms": 2035.454898,
+              "duration_ms": 0.280269
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 2035.479588,
+              "end_ms": 2180.254304,
+              "duration_ms": 144.774716
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 211.049493,
+              "end_ms": 2180.465546,
+              "duration_ms": 1969.416053
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 2180.550768,
+              "end_ms": 2187.474935,
+              "duration_ms": 6.924167
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 2187.548865,
+              "end_ms": 2193.00828,
+              "duration_ms": 5.459415
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mncdsqwrzderh",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 1180.952461,
+          "before_enter_ms": 4.693543,
+          "hook_and_tool_prep_ms": 0.898508,
+          "worker_tool_build_envelope_ms": 0.049376,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.890347,
+              "end_ms": 3.739479,
+              "duration_ms": 0.849132
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 3.788855,
+              "end_ms": 4.684306,
+              "duration_ms": 0.895451
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 7.977411,
+              "end_ms": 10.819775,
+              "duration_ms": 2.842364
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 10.832065,
+              "end_ms": 907.834464,
+              "duration_ms": 897.002399
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 911.348123,
+              "end_ms": 919.191255,
+              "duration_ms": 7.843132
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 919.209006,
+              "end_ms": 1176.717077,
+              "duration_ms": 257.508071
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 4.693543,
+              "end_ms": 1180.438441,
+              "duration_ms": 1175.744898
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1183.309815,
+              "end_ms": 1200.378821,
+              "duration_ms": 17.069006
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1204.232706,
+              "end_ms": 1216.944455,
+              "duration_ms": 12.711749
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "arm": "baseline",
+      "started": "2026-11-22T22:05:16.634907+00:00",
+      "ended": "2026-11-22T22:05:24.002667+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/06-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/06-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/06-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/06-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/06-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mnkxgbfay43ae",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 1309.508565,
+          "before_enter_ms": 153.838957,
+          "hook_and_tool_prep_ms": 131.275749,
+          "worker_tool_build_envelope_ms": 0.016358,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 5.677279,
+              "end_ms": 136.93667,
+              "duration_ms": 131.259391
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 136.953028,
+              "end_ms": 153.834369,
+              "duration_ms": 16.881341
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 156.525311,
+              "end_ms": 158.634757,
+              "duration_ms": 2.109446
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 158.640309,
+              "end_ms": 1268.943881,
+              "duration_ms": 1110.303572
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1268.985703,
+              "end_ms": 1269.202456,
+              "duration_ms": 0.216753
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1269.222655,
+              "end_ms": 1309.258708,
+              "duration_ms": 40.036053
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 153.838957,
+              "end_ms": 1309.46015,
+              "duration_ms": 1155.621193
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1309.543825,
+              "end_ms": 1314.73416,
+              "duration_ms": 5.190335
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1314.807021,
+              "end_ms": 1319.653008,
+              "duration_ms": 4.845987
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mnnwmrz7vm59k",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 210.643632,
+          "before_enter_ms": 4.788394,
+          "hook_and_tool_prep_ms": 0.837641,
+          "worker_tool_build_envelope_ms": 0.04402,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 3.066336,
+              "end_ms": 3.859957,
+              "duration_ms": 0.793621
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 3.903977,
+              "end_ms": 4.779833,
+              "duration_ms": 0.875856
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 8.196068,
+              "end_ms": 10.20449,
+              "duration_ms": 2.008422
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 10.215499,
+              "end_ms": 188.344988,
+              "duration_ms": 178.129489
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 188.360712,
+              "end_ms": 188.490564,
+              "duration_ms": 0.129852
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 188.503139,
+              "end_ms": 210.488488,
+              "duration_ms": 21.985349
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 4.788394,
+              "end_ms": 210.594764,
+              "duration_ms": 205.80637
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 210.665871,
+              "end_ms": 215.506995,
+              "duration_ms": 4.841124
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 215.556591,
+              "end_ms": 218.834879,
+              "duration_ms": 3.278288
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 7,
+      "arm": "candidate",
+      "started": "2026-11-22T22:05:24.174509+00:00",
+      "ended": "2026-11-22T22:05:29.632711+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/07-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/07-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/07-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/07-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/07-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mnt9pkrfmpdn6",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1292.478883,
+          "before_enter_ms": 132.1035,
+          "hook_and_tool_prep_ms": 115.127454,
+          "worker_tool_build_envelope_ms": 0.021014,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 3.698773,
+              "end_ms": 118.805213,
+              "duration_ms": 115.10644
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 118.826227,
+              "end_ms": 132.099629,
+              "duration_ms": 13.273402
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 134.118095,
+              "end_ms": 136.398995,
+              "duration_ms": 2.2809
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 136.404962,
+              "end_ms": 1241.140116,
+              "duration_ms": 1104.735154
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1241.152917,
+              "end_ms": 1241.253418,
+              "duration_ms": 0.100501
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1241.264494,
+              "end_ms": 1292.295096,
+              "duration_ms": 51.030602
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 132.1035,
+              "end_ms": 1292.438597,
+              "duration_ms": 1160.335097
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1292.500732,
+              "end_ms": 1298.641158,
+              "duration_ms": 6.140426
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1298.686797,
+              "end_ms": 1304.084414,
+              "duration_ms": 5.397617
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mnvx84n76nkcr",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 213.78206,
+          "before_enter_ms": 3.374154,
+          "hook_and_tool_prep_ms": 1.275667,
+          "worker_tool_build_envelope_ms": 0.069286,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.16004,
+              "end_ms": 2.366421,
+              "duration_ms": 1.206381
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 2.435707,
+              "end_ms": 3.365252,
+              "duration_ms": 0.929545
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 5.299818,
+              "end_ms": 7.224552,
+              "duration_ms": 1.924734
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 7.236583,
+              "end_ms": 191.662751,
+              "duration_ms": 184.426168
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 191.672815,
+              "end_ms": 191.750958,
+              "duration_ms": 0.078143
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 191.758666,
+              "end_ms": 213.715883,
+              "duration_ms": 21.957217
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 3.374154,
+              "end_ms": 213.762085,
+              "duration_ms": 210.387931
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 213.791122,
+              "end_ms": 218.412339,
+              "duration_ms": 4.621217
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 218.4375,
+              "end_ms": 222.168308,
+              "duration_ms": 3.730808
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 8,
+      "arm": "baseline",
+      "started": "2026-11-22T22:05:29.686494+00:00",
+      "ended": "2026-11-22T22:05:34.390696+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/08-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/08-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/08-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/08-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/08-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mnzfwtz06pscp",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 846.059079,
+          "before_enter_ms": 87.737715,
+          "hook_and_tool_prep_ms": 70.787897,
+          "worker_tool_build_envelope_ms": 0.014066,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.792417,
+              "end_ms": 73.566248,
+              "duration_ms": 70.773831
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 73.580314,
+              "end_ms": 87.733516,
+              "duration_ms": 14.153202
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 89.572545,
+              "end_ms": 91.125127,
+              "duration_ms": 1.552582
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 91.129483,
+              "end_ms": 823.816469,
+              "duration_ms": 732.686986
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 823.835239,
+              "end_ms": 823.993972,
+              "duration_ms": 0.158733
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 824.009887,
+              "end_ms": 845.860142,
+              "duration_ms": 21.850255
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 87.737715,
+              "end_ms": 846.000103,
+              "duration_ms": 758.262388
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 846.081321,
+              "end_ms": 851.16902,
+              "duration_ms": 5.087699
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 851.213021,
+              "end_ms": 854.065205,
+              "duration_ms": 2.852184
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mp0v1cjy2z4sp",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 216.042258,
+          "before_enter_ms": 2.853822,
+          "hook_and_tool_prep_ms": 0.809325,
+          "worker_tool_build_envelope_ms": 0.038745,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.16599,
+              "end_ms": 1.93657,
+              "duration_ms": 0.77058
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.975315,
+              "end_ms": 2.845412,
+              "duration_ms": 0.870097
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.931869,
+              "end_ms": 6.800022,
+              "duration_ms": 1.868153
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.811938,
+              "end_ms": 195.539425,
+              "duration_ms": 188.727487
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 195.558245,
+              "end_ms": 195.705791,
+              "duration_ms": 0.147546
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 195.720321,
+              "end_ms": 215.925826,
+              "duration_ms": 20.205505
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.853822,
+              "end_ms": 216.008042,
+              "duration_ms": 213.15422
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 216.059802,
+              "end_ms": 220.773663,
+              "duration_ms": 4.713861
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 220.811943,
+              "end_ms": 224.9129,
+              "duration_ms": 4.100957
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 9,
+      "arm": "candidate",
+      "started": "2026-11-22T22:05:34.695331+00:00",
+      "ended": "2026-11-22T22:05:41.773238+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/09-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/09-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/09-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/09-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/09-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mp4bmbnydxjk7",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1605.053439,
+          "before_enter_ms": 121.886047,
+          "hook_and_tool_prep_ms": 106.958206,
+          "worker_tool_build_envelope_ms": 0.021545,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.901881,
+              "end_ms": 109.838542,
+              "duration_ms": 106.936661
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 109.860087,
+              "end_ms": 121.88173,
+              "duration_ms": 12.021643
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 123.712054,
+              "end_ms": 125.299081,
+              "duration_ms": 1.587027
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 125.30459,
+              "end_ms": 938.646584,
+              "duration_ms": 813.341994
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 938.675666,
+              "end_ms": 938.849604,
+              "duration_ms": 0.173938
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 938.864994,
+              "end_ms": 1592.587051,
+              "duration_ms": 653.722057
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 121.886047,
+              "end_ms": 1603.915813,
+              "duration_ms": 1482.029766
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1606.692984,
+              "end_ms": 1658.991284,
+              "duration_ms": 52.2983
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1664.439513,
+              "end_ms": 1683.354211,
+              "duration_ms": 18.914698
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mp5w5pdkdeydd",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 1134.623264,
+          "before_enter_ms": 24.877671,
+          "hook_and_tool_prep_ms": 10.697715,
+          "worker_tool_build_envelope_ms": 1.391632,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 11.200123,
+              "end_ms": 20.506206,
+              "duration_ms": 9.306083
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 21.897838,
+              "end_ms": 24.866986,
+              "duration_ms": 2.969148
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 47.315288,
+              "end_ms": 54.869744,
+              "duration_ms": 7.554456
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 54.884084,
+              "end_ms": 1074.608572,
+              "duration_ms": 1019.724488
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1076.326495,
+              "end_ms": 1083.188281,
+              "duration_ms": 6.861786
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1083.20747,
+              "end_ms": 1131.241746,
+              "duration_ms": 48.034276
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 24.877671,
+              "end_ms": 1134.108451,
+              "duration_ms": 1109.23078
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1136.047156,
+              "end_ms": 1142.080798,
+              "duration_ms": 6.033642
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1144.086572,
+              "end_ms": 1150.811852,
+              "duration_ms": 6.72528
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 10,
+      "arm": "candidate",
+      "started": "2026-11-22T22:05:42.247803+00:00",
+      "ended": "2026-11-22T22:05:50.947969+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/10-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/10-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/10-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/10-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/10-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mpbz2nnw97akm",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1555.658635,
+          "before_enter_ms": 319.138771,
+          "hook_and_tool_prep_ms": 286.692968,
+          "worker_tool_build_envelope_ms": 0.837025,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 9.485853,
+              "end_ms": 295.341796,
+              "duration_ms": 285.855943
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 296.178821,
+              "end_ms": 319.133906,
+              "duration_ms": 22.955085
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 326.077273,
+              "end_ms": 329.865413,
+              "duration_ms": 3.78814
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 329.872902,
+              "end_ms": 1506.749065,
+              "duration_ms": 1176.876163
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1508.112467,
+              "end_ms": 1510.800595,
+              "duration_ms": 2.688128
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1510.822436,
+              "end_ms": 1551.218679,
+              "duration_ms": 40.396243
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 319.138771,
+              "end_ms": 1555.243435,
+              "duration_ms": 1236.104664
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1556.16512,
+              "end_ms": 1562.659542,
+              "duration_ms": 6.494422
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1564.714296,
+              "end_ms": 1570.102562,
+              "duration_ms": 5.388266
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mpe2q860pjcqd",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 1501.974352,
+          "before_enter_ms": 10.422099,
+          "hook_and_tool_prep_ms": 6.242557,
+          "worker_tool_build_envelope_ms": 1.103411,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 3.019057,
+              "end_ms": 8.158203,
+              "duration_ms": 5.139146
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 9.261614,
+              "end_ms": 10.411424,
+              "duration_ms": 1.14981
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 24.056547,
+              "end_ms": 30.691859,
+              "duration_ms": 6.635312
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 30.703155,
+              "end_ms": 914.830367,
+              "duration_ms": 884.127212
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 916.681439,
+              "end_ms": 923.593044,
+              "duration_ms": 6.911605
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 923.60803,
+              "end_ms": 1491.950224,
+              "duration_ms": 568.342194
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 10.422099,
+              "end_ms": 1500.40947,
+              "duration_ms": 1489.987371
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1504.153108,
+              "end_ms": 1568.341772,
+              "duration_ms": 64.188664
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1573.706038,
+              "end_ms": 1596.442349,
+              "duration_ms": 22.736311
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 11,
+      "arm": "baseline",
+      "started": "2026-11-22T22:05:51.321818+00:00",
+      "ended": "2026-11-22T22:05:59.522936+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/11-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/11-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/11-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/11-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/11-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mpmzr2f9jg81c",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 2277.866136,
+          "before_enter_ms": 91.649298,
+          "hook_and_tool_prep_ms": 74.144981,
+          "worker_tool_build_envelope_ms": 0.01588,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.942137,
+              "end_ms": 77.071238,
+              "duration_ms": 74.129101
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 77.087118,
+              "end_ms": 91.644427,
+              "duration_ms": 14.557309
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 94.214405,
+              "end_ms": 96.660865,
+              "duration_ms": 2.44646
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 96.666435,
+              "end_ms": 1743.845485,
+              "duration_ms": 1647.17905
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1743.883905,
+              "end_ms": 1744.079444,
+              "duration_ms": 0.195539
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1744.100397,
+              "end_ms": 2268.012932,
+              "duration_ms": 523.912535
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 91.649298,
+              "end_ms": 2276.692271,
+              "duration_ms": 2185.042973
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 2280.2259,
+              "end_ms": 2334.698302,
+              "duration_ms": 54.472402
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 2336.815547,
+              "end_ms": 2360.041078,
+              "duration_ms": 23.225531
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mpqckmqeavt2w",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 474.888159,
+          "before_enter_ms": 9.671608,
+          "hook_and_tool_prep_ms": 2.620017,
+          "worker_tool_build_envelope_ms": 0.580978,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 4.187676,
+              "end_ms": 6.226715,
+              "duration_ms": 2.039039
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 6.807693,
+              "end_ms": 9.661518,
+              "duration_ms": 2.853825
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 34.048617,
+              "end_ms": 43.780049,
+              "duration_ms": 9.731432
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 43.79301,
+              "end_ms": 449.644101,
+              "duration_ms": 405.851091
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 450.553619,
+              "end_ms": 450.676286,
+              "duration_ms": 0.122667
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 450.691118,
+              "end_ms": 474.355747,
+              "duration_ms": 23.664629
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 9.671608,
+              "end_ms": 474.747045,
+              "duration_ms": 465.075437
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 474.996941,
+              "end_ms": 480.499351,
+              "duration_ms": 5.50241
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 480.819813,
+              "end_ms": 564.797409,
+              "duration_ms": 83.977596
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "arm": "candidate",
+      "started": "2026-11-22T22:05:59.894535+00:00",
+      "ended": "2026-11-22T22:06:05.940617+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/12-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/12-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/12-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/12-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/12-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mpxtfzjzq2khj",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1531.626014,
+          "before_enter_ms": 126.228245,
+          "hook_and_tool_prep_ms": 110.454949,
+          "worker_tool_build_envelope_ms": 0.022749,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 3.04422,
+              "end_ms": 113.47642,
+              "duration_ms": 110.4322
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 113.499169,
+              "end_ms": 126.224103,
+              "duration_ms": 12.724934
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 128.054151,
+              "end_ms": 130.56503,
+              "duration_ms": 2.510879
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 130.569805,
+              "end_ms": 1483.432551,
+              "duration_ms": 1352.862746
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1483.452185,
+              "end_ms": 1483.607517,
+              "duration_ms": 0.155332
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1483.624898,
+              "end_ms": 1531.437231,
+              "duration_ms": 47.812333
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 126.228245,
+              "end_ms": 1531.585874,
+              "duration_ms": 1405.357629
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1531.647958,
+              "end_ms": 1537.207825,
+              "duration_ms": 5.559867
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1537.254091,
+              "end_ms": 1543.332332,
+              "duration_ms": 6.078241
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mpz4gh6z7yv8v",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 222.613896,
+          "before_enter_ms": 3.401161,
+          "hook_and_tool_prep_ms": 1.305546,
+          "worker_tool_build_envelope_ms": 0.069226,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.153669,
+              "end_ms": 2.389989,
+              "duration_ms": 1.23632
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 2.459215,
+              "end_ms": 3.39211,
+              "duration_ms": 0.932895
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 5.46728,
+              "end_ms": 8.113867,
+              "duration_ms": 2.646587
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 8.126242,
+              "end_ms": 199.241573,
+              "duration_ms": 191.115331
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 199.259363,
+              "end_ms": 199.4074,
+              "duration_ms": 0.148037
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 199.42245,
+              "end_ms": 222.484364,
+              "duration_ms": 23.061914
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 3.401161,
+              "end_ms": 222.57503,
+              "duration_ms": 219.173869
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 222.632978,
+              "end_ms": 227.288626,
+              "duration_ms": 4.655648
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 227.327427,
+              "end_ms": 230.975994,
+              "duration_ms": 3.648567
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 13,
+      "arm": "baseline",
+      "started": "2026-11-22T22:06:06.412353+00:00",
+      "ended": "2026-11-22T22:06:13.550276+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/13-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/13-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/13-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/13-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/13-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mq3c2y74nb26t",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 1913.324757,
+          "before_enter_ms": 88.668131,
+          "hook_and_tool_prep_ms": 71.396974,
+          "worker_tool_build_envelope_ms": 0.015855,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.832975,
+              "end_ms": 74.214094,
+              "duration_ms": 71.381119
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 74.229949,
+              "end_ms": 88.663228,
+              "duration_ms": 14.433279
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 90.529081,
+              "end_ms": 92.972481,
+              "duration_ms": 2.4434
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 92.977927,
+              "end_ms": 1696.616506,
+              "duration_ms": 1603.638579
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1699.845684,
+              "end_ms": 1708.623273,
+              "duration_ms": 8.777589
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1708.963465,
+              "end_ms": 1907.397077,
+              "duration_ms": 198.433612
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 88.668131,
+              "end_ms": 1912.748441,
+              "duration_ms": 1824.08031
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1914.449076,
+              "end_ms": 1923.698419,
+              "duration_ms": 9.249343
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1926.776375,
+              "end_ms": 1938.431566,
+              "duration_ms": 11.655191
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mq5bm56dnvzhq",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 900.409813,
+          "before_enter_ms": 10.796962,
+          "hook_and_tool_prep_ms": 3.094377,
+          "worker_tool_build_envelope_ms": 0.493051,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 4.019762,
+              "end_ms": 6.621088,
+              "duration_ms": 2.601326
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 7.114139,
+              "end_ms": 10.786925,
+              "duration_ms": 3.672786
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 35.813199,
+              "end_ms": 44.369374,
+              "duration_ms": 8.556175
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 44.384214,
+              "end_ms": 716.707091,
+              "duration_ms": 672.322877
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 719.864947,
+              "end_ms": 727.138667,
+              "duration_ms": 7.27372
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 727.153406,
+              "end_ms": 896.104314,
+              "duration_ms": 168.950908
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 10.796962,
+              "end_ms": 899.944725,
+              "duration_ms": 889.147763
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 902.387651,
+              "end_ms": 909.603807,
+              "duration_ms": 7.216156
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 913.9882,
+              "end_ms": 919.84113,
+              "duration_ms": 5.85293
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 14,
+      "arm": "baseline",
+      "started": "2026-11-22T22:06:14.016412+00:00",
+      "ended": "2026-11-22T22:06:23.864489+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/14-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/14-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/14-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/14-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/14-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mqaym9zybh808",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 2510.195688,
+          "before_enter_ms": 171.081279,
+          "hook_and_tool_prep_ms": 138.366702,
+          "worker_tool_build_envelope_ms": 0.017889,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 8.236631,
+              "end_ms": 146.585444,
+              "duration_ms": 138.348813
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 146.603333,
+              "end_ms": 171.07687,
+              "duration_ms": 24.473537
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 173.910675,
+              "end_ms": 176.763902,
+              "duration_ms": 2.853227
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 176.770365,
+              "end_ms": 1750.143112,
+              "duration_ms": 1573.372747
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1753.243871,
+              "end_ms": 1760.13245,
+              "duration_ms": 6.888579
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1760.155045,
+              "end_ms": 2500.035691,
+              "duration_ms": 739.880646
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 171.081279,
+              "end_ms": 2509.345441,
+              "duration_ms": 2338.264162
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 2511.007409,
+              "end_ms": 2574.891086,
+              "duration_ms": 63.883677
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 2577.29617,
+              "end_ms": 2595.77276,
+              "duration_ms": 18.47659
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mqe81x5r6n5fn",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 1016.444278,
+          "before_enter_ms": 9.659863,
+          "hook_and_tool_prep_ms": 3.33526,
+          "worker_tool_build_envelope_ms": 0.457067,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 3.81584,
+              "end_ms": 6.694033,
+              "duration_ms": 2.878193
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 7.1511,
+              "end_ms": 9.653627,
+              "duration_ms": 2.502527
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 31.760558,
+              "end_ms": 41.115905,
+              "duration_ms": 9.355347
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 41.124585,
+              "end_ms": 953.489634,
+              "duration_ms": 912.365049
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 956.425161,
+              "end_ms": 963.609194,
+              "duration_ms": 7.184033
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 963.620048,
+              "end_ms": 1011.58724,
+              "duration_ms": 47.967192
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 9.659863,
+              "end_ms": 1015.75908,
+              "duration_ms": 1006.099217
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1018.588229,
+              "end_ms": 1024.61455,
+              "duration_ms": 6.026321
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1028.83277,
+              "end_ms": 1033.369671,
+              "duration_ms": 4.536901
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 15,
+      "arm": "candidate",
+      "started": "2026-11-22T22:06:24.360919+00:00",
+      "ended": "2026-11-22T22:06:32.981454+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/15-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/15-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/15-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/15-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/15-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mqnjm4nbbt1x0",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1774.741959,
+          "before_enter_ms": 132.26325,
+          "hook_and_tool_prep_ms": 112.752455,
+          "worker_tool_build_envelope_ms": 0.021266,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 5.827983,
+              "end_ms": 118.559172,
+              "duration_ms": 112.731189
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 118.580438,
+              "end_ms": 132.259109,
+              "duration_ms": 13.678671
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 134.817367,
+              "end_ms": 137.035903,
+              "duration_ms": 2.218536
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 137.040872,
+              "end_ms": 1267.480286,
+              "duration_ms": 1130.439414
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1267.500312,
+              "end_ms": 1267.653669,
+              "duration_ms": 0.153357
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1267.671134,
+              "end_ms": 1774.438581,
+              "duration_ms": 506.767447
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 132.26325,
+              "end_ms": 1774.690214,
+              "duration_ms": 1642.426964
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1774.784781,
+              "end_ms": 1854.386382,
+              "duration_ms": 79.601601
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1854.470619,
+              "end_ms": 1876.281921,
+              "duration_ms": 21.811302
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mqr1cjbcqd3yp",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 1193.243915,
+          "before_enter_ms": 8.661967,
+          "hook_and_tool_prep_ms": 2.821592,
+          "worker_tool_build_envelope_ms": 0.228602,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 4.759703,
+              "end_ms": 7.352693,
+              "duration_ms": 2.59299
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 7.581295,
+              "end_ms": 8.651927,
+              "duration_ms": 1.070632
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 11.601515,
+              "end_ms": 14.337705,
+              "duration_ms": 2.73619
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 14.349735,
+              "end_ms": 1134.24036,
+              "duration_ms": 1119.890625
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1136.48523,
+              "end_ms": 1142.206479,
+              "duration_ms": 5.721249
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1142.236423,
+              "end_ms": 1189.198975,
+              "duration_ms": 46.962552
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 8.661967,
+              "end_ms": 1192.290783,
+              "duration_ms": 1183.628816
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1193.732331,
+              "end_ms": 1201.685129,
+              "duration_ms": 7.952798
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1204.42577,
+              "end_ms": 1210.770041,
+              "duration_ms": 6.344271
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 16,
+      "arm": "baseline",
+      "started": "2026-11-22T22:06:33.570961+00:00",
+      "ended": "2026-11-22T22:06:42.611528+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/16-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/16-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/16-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/16-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/16-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mqymnzjas14js",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 2570.759411,
+          "before_enter_ms": 486.950668,
+          "hook_and_tool_prep_ms": 449.549607,
+          "worker_tool_build_envelope_ms": 0.030474,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 10.912017,
+              "end_ms": 460.43115,
+              "duration_ms": 449.519133
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 460.461624,
+              "end_ms": 486.944377,
+              "duration_ms": 26.482753
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 497.482098,
+              "end_ms": 503.996602,
+              "duration_ms": 6.514504
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 504.005108,
+              "end_ms": 2510.030687,
+              "duration_ms": 2006.025579
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 2512.237486,
+              "end_ms": 2517.277831,
+              "duration_ms": 5.040345
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 2517.305311,
+              "end_ms": 2566.682931,
+              "duration_ms": 49.37762
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 486.950668,
+              "end_ms": 2570.082518,
+              "duration_ms": 2083.13185
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 2571.515913,
+              "end_ms": 2578.685012,
+              "duration_ms": 7.169099
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 2581.084302,
+              "end_ms": 2587.667719,
+              "duration_ms": 6.583417
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mr0va3pgcewvf",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 317.585349,
+          "before_enter_ms": 12.818813,
+          "hook_and_tool_prep_ms": 3.643359,
+          "worker_tool_build_envelope_ms": 1.144731,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 4.60936,
+              "end_ms": 7.107988,
+              "duration_ms": 2.498628
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 8.252719,
+              "end_ms": 12.804204,
+              "duration_ms": 4.551485
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 36.90477,
+              "end_ms": 47.681742,
+              "duration_ms": 10.776972
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 47.697627,
+              "end_ms": 294.669601,
+              "duration_ms": 246.971974
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 294.689276,
+              "end_ms": 294.853527,
+              "duration_ms": 0.164251
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 294.873092,
+              "end_ms": 317.437644,
+              "duration_ms": 22.564552
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 12.818813,
+              "end_ms": 317.543599,
+              "duration_ms": 304.724786
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 317.606178,
+              "end_ms": 322.213928,
+              "duration_ms": 4.60775
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 322.254969,
+              "end_ms": 325.475279,
+              "duration_ms": 3.22031
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 17,
+      "arm": "candidate",
+      "started": "2026-11-22T22:06:42.645751+00:00",
+      "ended": "2026-11-22T22:06:50.066060+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/17-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/17-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/17-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/17-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/17-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mr7mwtxmda3jg",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1538.733668,
+          "before_enter_ms": 203.325101,
+          "hook_and_tool_prep_ms": 181.063477,
+          "worker_tool_build_envelope_ms": 0.026436,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 9.443847,
+              "end_ms": 190.480888,
+              "duration_ms": 181.037041
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 190.507324,
+              "end_ms": 203.320644,
+              "duration_ms": 12.81332
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 206.009968,
+              "end_ms": 208.375785,
+              "duration_ms": 2.365817
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 208.381227,
+              "end_ms": 1485.200438,
+              "duration_ms": 1276.819211
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1485.244518,
+              "end_ms": 1485.471561,
+              "duration_ms": 0.227043
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1485.492366,
+              "end_ms": 1538.495081,
+              "duration_ms": 53.002715
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 203.325101,
+              "end_ms": 1538.689808,
+              "duration_ms": 1335.364707
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1538.769113,
+              "end_ms": 1544.746827,
+              "duration_ms": 5.977714
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1544.819668,
+              "end_ms": 1551.510985,
+              "duration_ms": 6.691317
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mr9qa5wtqqdgt",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 277.696639,
+          "before_enter_ms": 5.609515,
+          "hook_and_tool_prep_ms": 1.353705,
+          "worker_tool_build_envelope_ms": 0.080641,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 3.344375,
+              "end_ms": 4.617439,
+              "duration_ms": 1.273064
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 4.69808,
+              "end_ms": 5.600459,
+              "duration_ms": 0.902379
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 8.575656,
+              "end_ms": 11.560433,
+              "duration_ms": 2.984777
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 11.572368,
+              "end_ms": 256.346881,
+              "duration_ms": 244.774513
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 256.365322,
+              "end_ms": 256.513749,
+              "duration_ms": 0.148427
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 256.530938,
+              "end_ms": 277.567388,
+              "duration_ms": 21.03645
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 5.609515,
+              "end_ms": 277.658009,
+              "duration_ms": 272.048494
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 277.715833,
+              "end_ms": 282.191102,
+              "duration_ms": 4.475269
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 282.228957,
+              "end_ms": 285.458461,
+              "duration_ms": 3.229504
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 18,
+      "arm": "candidate",
+      "started": "2026-11-22T22:06:50.179750+00:00",
+      "ended": "2026-11-22T22:06:56.236552+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/18-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/18-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/18-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/18-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/18-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mreb48nepxzt1",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 1497.043369,
+          "before_enter_ms": 209.988687,
+          "hook_and_tool_prep_ms": 190.785427,
+          "worker_tool_build_envelope_ms": 0.023085,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 6.377266,
+              "end_ms": 197.139608,
+              "duration_ms": 190.762342
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 197.162693,
+              "end_ms": 209.984796,
+              "duration_ms": 12.822103
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 212.462802,
+              "end_ms": 291.374916,
+              "duration_ms": 78.912114
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 291.400271,
+              "end_ms": 1446.153749,
+              "duration_ms": 1154.753478
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 1446.17337,
+              "end_ms": 1446.326607,
+              "duration_ms": 0.153237
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 1446.343522,
+              "end_ms": 1496.849158,
+              "duration_ms": 50.505636
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 209.988687,
+              "end_ms": 1497.000275,
+              "duration_ms": 1287.011588
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 1497.066955,
+              "end_ms": 1503.876611,
+              "duration_ms": 6.809656
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 1503.933236,
+              "end_ms": 1509.490364,
+              "duration_ms": 5.557128
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mrfp3avj8p7g9",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 219.934484,
+          "before_enter_ms": 3.362196,
+          "hook_and_tool_prep_ms": 1.308393,
+          "worker_tool_build_envelope_ms": 0.07529,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.164078,
+              "end_ms": 2.397181,
+              "duration_ms": 1.233103
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 2.472471,
+              "end_ms": 3.35307,
+              "duration_ms": 0.880599
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 5.236631,
+              "end_ms": 7.285892,
+              "duration_ms": 2.049261
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 7.297616,
+              "end_ms": 193.916892,
+              "duration_ms": 186.619276
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 193.934097,
+              "end_ms": 194.149305,
+              "duration_ms": 0.215208
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 194.164176,
+              "end_ms": 219.805079,
+              "duration_ms": 25.640903
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 3.362196,
+              "end_ms": 219.895795,
+              "duration_ms": 216.533599
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 219.95393,
+              "end_ms": 224.22808,
+              "duration_ms": 4.27415
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 224.265386,
+              "end_ms": 227.634256,
+              "duration_ms": 3.36887
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 19,
+      "arm": "baseline",
+      "started": "2026-11-22T22:06:56.711019+00:00",
+      "ended": "2026-11-22T22:07:01.338022+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/19-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/19-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/19-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/19-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/19-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mrmf5xte68dkm",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 591.477005,
+          "before_enter_ms": 101.332756,
+          "hook_and_tool_prep_ms": 80.558929,
+          "worker_tool_build_envelope_ms": 0.015448,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 6.23134,
+              "end_ms": 86.774821,
+              "duration_ms": 80.543481
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 86.790269,
+              "end_ms": 101.328661,
+              "duration_ms": 14.538392
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 103.190618,
+              "end_ms": 104.835344,
+              "duration_ms": 1.644726
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 104.840077,
+              "end_ms": 569.665728,
+              "duration_ms": 464.825651
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 569.686733,
+              "end_ms": 569.84651,
+              "duration_ms": 0.159777
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 569.863115,
+              "end_ms": 591.253328,
+              "duration_ms": 21.390213
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 101.332756,
+              "end_ms": 591.417003,
+              "duration_ms": 490.084247
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 591.498515,
+              "end_ms": 596.103521,
+              "duration_ms": 4.605006
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 596.143287,
+              "end_ms": 600.063192,
+              "duration_ms": 3.919905
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mrp3ae7p3nc2e",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 213.814747,
+          "before_enter_ms": 2.816015,
+          "hook_and_tool_prep_ms": 0.815333,
+          "worker_tool_build_envelope_ms": 0.042905,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.135298,
+              "end_ms": 1.907726,
+              "duration_ms": 0.772428
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.950631,
+              "end_ms": 2.807126,
+              "duration_ms": 0.856495
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.774091,
+              "end_ms": 6.667305,
+              "duration_ms": 1.893214
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.677516,
+              "end_ms": 193.370506,
+              "duration_ms": 186.69299
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 193.390066,
+              "end_ms": 193.545641,
+              "duration_ms": 0.155575
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 193.560978,
+              "end_ms": 213.685353,
+              "duration_ms": 20.124375
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.816015,
+              "end_ms": 213.776716,
+              "duration_ms": 210.960701
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 213.835242,
+              "end_ms": 218.421924,
+              "duration_ms": 4.586682
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 218.46133,
+              "end_ms": 222.662673,
+              "duration_ms": 4.201343
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 20,
+      "arm": "candidate",
+      "started": "2026-11-22T22:07:01.719942+00:00",
+      "ended": "2026-11-22T22:07:06.155962+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/20-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/20-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/20-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/20-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/20-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mrsc8rygb4rpg",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 610.733341,
+          "before_enter_ms": 122.832311,
+          "hook_and_tool_prep_ms": 107.824532,
+          "worker_tool_build_envelope_ms": 0.02304,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.862897,
+              "end_ms": 110.664389,
+              "duration_ms": 107.801492
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 110.687429,
+              "end_ms": 122.828355,
+              "duration_ms": 12.140926
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 124.798638,
+              "end_ms": 126.402129,
+              "duration_ms": 1.603491
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 126.407118,
+              "end_ms": 589.501653,
+              "duration_ms": 463.094535
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 589.521923,
+              "end_ms": 589.67527,
+              "duration_ms": 0.153347
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 589.691524,
+              "end_ms": 610.542364,
+              "duration_ms": 20.85084
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 122.832311,
+              "end_ms": 610.688026,
+              "duration_ms": 487.855715
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 610.760191,
+              "end_ms": 615.378809,
+              "duration_ms": 4.618618
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 615.419054,
+              "end_ms": 617.754682,
+              "duration_ms": 2.335628
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mrtnt0stdqxs5",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 225.970552,
+          "before_enter_ms": 3.40348,
+          "hook_and_tool_prep_ms": 1.297893,
+          "worker_tool_build_envelope_ms": 0.068741,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.217168,
+              "end_ms": 2.44632,
+              "duration_ms": 1.229152
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 2.515061,
+              "end_ms": 3.39465,
+              "duration_ms": 0.879589
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 5.450971,
+              "end_ms": 7.492701,
+              "duration_ms": 2.04173
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 7.507801,
+              "end_ms": 203.972858,
+              "duration_ms": 196.465057
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 203.989977,
+              "end_ms": 204.129444,
+              "duration_ms": 0.139467
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 204.142125,
+              "end_ms": 225.83547,
+              "duration_ms": 21.693345
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 3.40348,
+              "end_ms": 225.926691,
+              "duration_ms": 222.523211
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 225.995052,
+              "end_ms": 230.503868,
+              "duration_ms": 4.508816
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 230.545464,
+              "end_ms": 233.978604,
+              "duration_ms": 3.43314
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 21,
+      "arm": "baseline",
+      "started": "2026-11-22T22:07:06.227634+00:00",
+      "ended": "2026-11-22T22:07:10.397513+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/21-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/21-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/21-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/21-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/21-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82mrxhd0601g3ay",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 579.306481,
+          "before_enter_ms": 91.398536,
+          "hook_and_tool_prep_ms": 74.86826,
+          "worker_tool_build_envelope_ms": 0.017076,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.800054,
+              "end_ms": 77.651238,
+              "duration_ms": 74.851184
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 77.668314,
+              "end_ms": 91.394382,
+              "duration_ms": 13.726068
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 93.323634,
+              "end_ms": 94.921114,
+              "duration_ms": 1.59748
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 94.927014,
+              "end_ms": 559.693469,
+              "duration_ms": 464.766455
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 559.711556,
+              "end_ms": 559.865211,
+              "duration_ms": 0.153655
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 559.880246,
+              "end_ms": 579.10315,
+              "duration_ms": 19.222904
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 91.398536,
+              "end_ms": 579.24649,
+              "duration_ms": 487.847954
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 579.327967,
+              "end_ms": 583.737617,
+              "duration_ms": 4.40965
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 583.782322,
+              "end_ms": 587.913909,
+              "duration_ms": 4.131587
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82mryw16f9m5yd0",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 226.638699,
+          "before_enter_ms": 2.841444,
+          "hook_and_tool_prep_ms": 0.840667,
+          "worker_tool_build_envelope_ms": 0.041975,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.119082,
+              "end_ms": 1.917774,
+              "duration_ms": 0.798692
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.959749,
+              "end_ms": 2.832124,
+              "duration_ms": 0.872375
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.832279,
+              "end_ms": 6.826688,
+              "duration_ms": 1.994409
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 6.836925,
+              "end_ms": 205.484492,
+              "duration_ms": 198.647567
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 205.501573,
+              "end_ms": 205.648854,
+              "duration_ms": 0.147281
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 205.686574,
+              "end_ms": 226.515753,
+              "duration_ms": 20.829179
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.841444,
+              "end_ms": 226.601994,
+              "duration_ms": 223.76055
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 226.656711,
+              "end_ms": 231.169536,
+              "duration_ms": 4.512825
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 231.208306,
+              "end_ms": 235.381308,
+              "duration_ms": 4.173002
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 22,
+      "arm": "baseline",
+      "started": "2026-11-22T22:07:10.735692+00:00",
+      "ended": "2026-11-22T22:07:15.167524+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/22-baseline/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/22-baseline/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/22-baseline/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/22-baseline/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/22-baseline/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82ms1yz9dm0p1qq",
+          "position": 0,
+          "selected_plugin": false,
+          "total_ms": 560.784468,
+          "before_enter_ms": 88.13482,
+          "hook_and_tool_prep_ms": 71.826287,
+          "worker_tool_build_envelope_ms": 0.015593,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.80368,
+              "end_ms": 74.614374,
+              "duration_ms": 71.810694
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 74.629967,
+              "end_ms": 88.130712,
+              "duration_ms": 13.500745
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 90.005951,
+              "end_ms": 91.490292,
+              "duration_ms": 1.484341
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 91.495189,
+              "end_ms": 541.017375,
+              "duration_ms": 449.522186
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 541.041005,
+              "end_ms": 541.200982,
+              "duration_ms": 0.159977
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 541.217576,
+              "end_ms": 560.581281,
+              "duration_ms": 19.363705
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 88.13482,
+              "end_ms": 560.726936,
+              "duration_ms": 472.592116
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 560.807223,
+              "end_ms": 565.692951,
+              "duration_ms": 4.885728
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 565.733222,
+              "end_ms": 570.14053,
+              "duration_ms": 4.407308
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82ms3a7fj8d8x05",
+          "position": 1,
+          "selected_plugin": false,
+          "total_ms": 466.439472,
+          "before_enter_ms": 2.797024,
+          "hook_and_tool_prep_ms": 0.802318,
+          "worker_tool_build_envelope_ms": 0.041191,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.140558,
+              "end_ms": 1.901685,
+              "duration_ms": 0.761127
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 1.942876,
+              "end_ms": 2.788628,
+              "duration_ms": 0.845752
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 4.786489,
+              "end_ms": 245.367869,
+              "duration_ms": 240.58138
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 245.388755,
+              "end_ms": 444.264359,
+              "duration_ms": 198.875604
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 444.283559,
+              "end_ms": 444.439092,
+              "duration_ms": 0.155533
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 444.454761,
+              "end_ms": 466.316731,
+              "duration_ms": 21.86197
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 2.797024,
+              "end_ms": 466.401576,
+              "duration_ms": 463.604552
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 466.458752,
+              "end_ms": 470.772945,
+              "duration_ms": 4.314193
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 470.810885,
+              "end_ms": 475.512297,
+              "duration_ms": 4.701412
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    },
+    {
+      "sequence": 23,
+      "arm": "candidate",
+      "started": "2026-11-22T22:07:15.243774+00:00",
+      "ended": "2026-11-22T22:07:19.948783+00:00",
+      "commands": [
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/23-candidate/state",
+          "--run-key",
+          "west",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/23-candidate/west.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+          "start",
+          "--state",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/23-candidate/state",
+          "--run-key",
+          "east",
+          "--spec",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/23-candidate/east.json"
+        ],
+        [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/acceptance/v3/performance/cold-metadata-control/probe.py",
+          "--observe",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/cold-metadata-control-02/23-candidate/state"
+        ]
+      ],
+      "responses": 0,
+      "rows": [
+        {
+          "run_id": "gxr_01m82ms6ppj6ngyn8e",
+          "position": 0,
+          "selected_plugin": true,
+          "total_ms": 744.933213,
+          "before_enter_ms": 121.551458,
+          "hook_and_tool_prep_ms": 106.915753,
+          "worker_tool_build_envelope_ms": 0.022913,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 2.879165,
+              "end_ms": 109.772005,
+              "duration_ms": 106.89284
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 109.794918,
+              "end_ms": 121.547683,
+              "duration_ms": 11.752765
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 123.360107,
+              "end_ms": 276.730308,
+              "duration_ms": 153.370201
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 276.744973,
+              "end_ms": 725.754553,
+              "duration_ms": 449.00958
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 725.777053,
+              "end_ms": 725.93546,
+              "duration_ms": 0.158407
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 725.951085,
+              "end_ms": 744.756071,
+              "duration_ms": 18.804986
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 121.551458,
+              "end_ms": 744.893537,
+              "duration_ms": 623.342079
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 744.954257,
+              "end_ms": 749.7289,
+              "duration_ms": 4.774643
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 749.770965,
+              "end_ms": 752.993278,
+              "duration_ms": 3.222313
+            }
+          ]
+        },
+        {
+          "run_id": "gxr_01m82ms87h40se00y8",
+          "position": 1,
+          "selected_plugin": true,
+          "total_ms": 207.340362,
+          "before_enter_ms": 3.399738,
+          "hook_and_tool_prep_ms": 1.353364,
+          "worker_tool_build_envelope_ms": 0.070001,
+          "main": [
+            {
+              "phase": "gx_core.orchestration.service.hooks_for_run",
+              "start_ms": 1.176225,
+              "end_ms": 2.459588,
+              "duration_ms": 1.283363
+            },
+            {
+              "phase": "Roots.__init__",
+              "start_ms": 2.529589,
+              "end_ms": 3.390882,
+              "duration_ms": 0.861293
+            },
+            {
+              "phase": "AppServerClient.start",
+              "start_ms": 5.273337,
+              "end_ms": 7.213756,
+              "duration_ms": 1.940419
+            },
+            {
+              "phase": "initialize",
+              "start_ms": 7.224905,
+              "end_ms": 186.645042,
+              "duration_ms": 179.420137
+            },
+            {
+              "phase": "initialized",
+              "start_ms": 186.662222,
+              "end_ms": 186.809859,
+              "duration_ms": 0.147637
+            },
+            {
+              "phase": "config/read",
+              "start_ms": 186.82398,
+              "end_ms": 207.21274,
+              "duration_ms": 20.38876
+            },
+            {
+              "phase": "Roots.__enter__",
+              "start_ms": 3.399738,
+              "end_ms": 207.303441,
+              "duration_ms": 203.903703
+            }
+          ],
+          "supplement": [
+            {
+              "phase": "account/read",
+              "start_ms": 207.359857,
+              "end_ms": 211.866637,
+              "duration_ms": 4.50678
+            },
+            {
+              "phase": "model/list",
+              "start_ms": 211.917682,
+              "end_ms": 214.023192,
+              "duration_ms": 2.10551
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "p0_meter_native_turns": 0,
+        "budget_reservations": 8,
+        "p0_roots": 0,
+        "reservations_by_subject": {
+          "job": 4,
+          "run": 2,
+          "team": 2
+        }
+      }
+    }
+  ],
+  "ended": "2026-11-22T22:07:19.948823+00:00"
+}

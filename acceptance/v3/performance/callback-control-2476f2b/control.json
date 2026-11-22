@@ -1,0 +1,3557 @@
+{
+  "callback_study": true,
+  "codex_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "controlled_difference": "only candidate selects org.gx.science-grid@2.0.0; peer never calls the contributed measurement tool",
+  "ended": "2026-11-22T21:58:25.934269+00:00",
+  "fixed_script": "reject first assessment by removing one finding; record accepted retry; same scientific judge in both arms",
+  "mode": "credential-free loopback Responses through actual Codex 0.169.0, two real local grid Runs per workspace",
+  "model": "gpt-6.2-astra",
+  "order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate"
+  ],
+  "peer_final_message_delay_s": 2.0,
+  "peer_request_delay_s": 0.2,
+  "result": "PASS",
+  "stage_metadata": {
+    "baseline": {
+      "driver_sha256": "503405a5c4699e169a28b9c18d91bc6d1f6cb5d722250642dff138574b6994a7",
+      "path": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install",
+      "roots_sha256": "2835ec12e2c71a146a6cbb7e448b287e63910fc0703baa2c7cd8a70ca607479a"
+    },
+    "candidate": {
+      "driver_sha256": "b7233675c687d59d9a508d2fb259022ffe1617a0dfeac9f32a116305a8011620",
+      "path": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b",
+      "roots_sha256": "5eb175eba3944d01eb5ebbb670165a3578a153a38d38bd76944e0e1368e34897"
+    }
+  },
+  "started": "2026-11-22T21:40:58.350104+00:00",
+  "trials": [
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/00-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/00-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "e208f2089a27a1197a22850f3b4c34a6f9d085b98b885e19baa204285886f40a",
+          "wall_s": 2.2505
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/00-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/00-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "b281c7074fda9e9aa5330ab6f70b2a25651d32e460768a36122c49e4714a65fa",
+          "wall_s": 1.987
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/00-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "f4cd51165284de107caca05245d86c222c4715310dbe9f59594a420db16c943f",
+          "wall_s": 26.268
+        }
+      ],
+      "ended": "2026-11-22T21:44:12.675379+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "8822e623333e5a7f5b5528e6620e3bc523cbc6b9302b8df0c0276fe0099f3682",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "bf56ffc334f102d2553c2b93fd29f9020a5c78e00e8fff68f22cd53d70bdec55",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/00-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 0,
+      "started": "2026-11-22T21:43:41.827096+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82ke6ssam5btftw",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82ke9pzwkap0qe4",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82ke6ssam5btftw",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82ke9pzwkap0qe4",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kend7dhccy5kr",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kepy5zc3xfdyc",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/01-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/01-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "bfa9d84d2b16effa34e0b3cc4685d395a447cb8817fb9a7a386a05631f9073b7",
+          "wall_s": 2.7225
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/01-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/01-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "bc4246f43c598d8cbff332e9b74a8cd6963d562da31245f994dbc0cba975e20e",
+          "wall_s": 2.0356
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/01-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "dc5669c2808add5b1e4f2ddedd6fbaae5245e6acf09c64512abe4d93d0f187a1",
+          "wall_s": 25.1382
+        }
+      ],
+      "ended": "2026-11-22T21:44:43.014389+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "d61c8f51d3f4a1641d85a2a1d5504bd0773c2684f386d2a96cc5a4cc49536116",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "2295e71dffb64b116c62ca5118e8439f6b9fa4b6ca96d25ff68f784741f1ceaa",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/01-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 1,
+      "started": "2026-11-22T21:44:12.740996+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kf7w2phfys9dd",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kf5cnrzfhf68q",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kf7w2phfys9dd",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kf5cnrzfhf68q",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kfhcg683pnhr1",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kfj8hs6g6bgm4",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/02-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/02-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "a5a6ce72e147544558deb48c8d163d29777e38ea90ec444b3061b1840f071d43",
+          "wall_s": 2.1517
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/02-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/02-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "aff78efb3b2cf838c6796414c2cde89a459d157cef5f5a3af9bebcf1a5bc8a7b",
+          "wall_s": 2.6281
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/02-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "4a01e5f9cafef49febfa7c8410510d4961d94e21bb54b5812a41228c3e64be5c",
+          "wall_s": 22.4126
+        }
+      ],
+      "ended": "2026-11-22T21:45:10.665988+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "c40ddf58bd29388a6994e49b824b00121044b7b7d1b582607d10b06a985b9824",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "7d491d5623417fb2fd8ffd1fc8a27378ccff2d6d6595c3606579b59439a331e6",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/02-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 2,
+      "started": "2026-11-22T21:44:43.032709+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kg3jg2ss36dqt",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kg6kfjajw5tzh",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kg3jg2ss36dqt",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kg6kfjajw5tzh",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kgffk4b5m5qqq",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kgfkds6erqvzh",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/03-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/03-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "e00f782a312eef77e7d80ddf0a0bfe958019d90bf0f6f68cde55b8600bff9113",
+          "wall_s": 2.3255
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/03-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/03-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "fedbb81c32351a379037e5e8923e6e90e42641d87eb1c9a5ed278795217dc09b",
+          "wall_s": 1.8265
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/03-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "a2611463241a1f333649cb38b4353367118b0999c12fff884257a8901f8c46e5",
+          "wall_s": 19.5889
+        }
+      ],
+      "ended": "2026-11-22T21:45:35.016124+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "a71f749f6e5f7c84d4aa03c3e11ddcdf73e4f2ba5ce068b9664650ed8bb742ea",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "63412bdca288c23b3dc62f9cc4de4b7aeac3dce3a2e2584c722877e303107d07",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/03-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 3,
+      "started": "2026-11-22T21:45:10.809102+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kgxjjzth1efkb",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kgzhsmv9wsxs2",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kgxjjzth1efkb",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kgzhsmv9wsxs2",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kh7j9cnb6vzpp",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kh7q72mp0crxd",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/04-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/04-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "7b0ec8c2cb7e0500fb2a4286c693fdcdb4bf499823546d58e34678f0b41793a9",
+          "wall_s": 1.8893
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/04-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/04-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "cebb7646a9d95ddb03874049d6de0be79af55188d07b8c73a8cb1ec14c2b4c3a",
+          "wall_s": 1.7444
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/04-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "87288d9292243172284a180d37dd89e043aa665aa9fca4d1c7796f3e544525d2",
+          "wall_s": 22.1636
+        }
+      ],
+      "ended": "2026-11-22T21:46:00.998644+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "3cf9d00e59a2f347899d9e4baf03cfc18ed61a960e0853e41d62d36abe7e6efe",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "03bc0e296d9f19dd07c5e8bb4fd40b3b02e47886b427d887c6c7c79f278987cf",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/04-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 4,
+      "started": "2026-11-22T21:45:35.089995+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82khms8ttv11tmh",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82khqmpgn1xnnn2",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82khms8ttv11tmh",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82khqmpgn1xnnn2",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kj13t0aatm9xp",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kj17rrpc2r5g2",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/05-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/05-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "b5dfd20b009e92d722f751fefcf3b857f4fe1b194eb02bc63ef70eee374cb90c",
+          "wall_s": 1.8715
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/05-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/05-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "bd4cb73c2bde934f8f853018512c612868169c0e9f4724dee52f4fff1b19ed2a",
+          "wall_s": 1.4202
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/05-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "90f8bc59bff6fb40c49db777e4a53e19939a2036de06f5ad5e7422773c793bc1",
+          "wall_s": 22.0128
+        }
+      ],
+      "ended": "2026-11-22T21:46:26.433977+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "12ce48b64e202f0063f945575f6b8f067813f46659c24797b38f71692aa9482e",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "01e375be6f5a60128d3690bc29cf165a9270b31f1c8e64e13399e31f28e290a6",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/05-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 5,
+      "started": "2026-11-22T21:46:01.011824+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kjesndb0zkked",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kjdgbe5chzkze",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kjdgbe5chzkze",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kjesndb0zkked",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kjtkdpcc5qnge",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kjtypb88bseng",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/06-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/06-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "cb719d7d4a6b8e25f3573672b5e324801f76d10b30428f786f4af306137d1fee",
+          "wall_s": 1.8218
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/06-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/06-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "4324cc1c6fefe41da8add6488deeab7929ab368d8070ec0f3ebe0caeb7cfc0d2",
+          "wall_s": 1.3707
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/06-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "2967ef1a1e3362406c13fb9795c9307abb98ab305d938e886aceede82250c49b",
+          "wall_s": 22.3431
+        }
+      ],
+      "ended": "2026-11-22T21:46:52.534760+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "6405bfe7b7106ca8653d65254daf04c0518ee01829f19d32ddb5543f16b06d71",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "edb848b61e60f1f55ea17f0ea0560ed07b36401b15e7c6587608c15e3e8f88f8",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/06-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 6,
+      "started": "2026-11-22T21:46:26.449167+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kk69avb606hs2",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kk7w2rz90gva9",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kk7w2rz90gva9",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kk69avb606hs2",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kkj3sr1v1aft5",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kkjgzzwem8436",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/07-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/07-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "c8f95ad8f2fc1d1e850acc472924ea193b790913a292b7b32c6789fdd63ef55c",
+          "wall_s": 2.6732
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/07-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/07-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "9b6f9e931cf44e5fbe4f1bb4e5bef6a1a2ea7c5cf96f211daffee378a7ba1b65",
+          "wall_s": 2.9499
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/07-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "2747104bdd04237a9de622a160aee945f8878a4fdd04d89c1809e5cb7ea0e544",
+          "wall_s": 22.5739
+        }
+      ],
+      "ended": "2026-11-22T21:47:21.401983+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "b5fc61f022237dc78d4e98a9b3189ee93e0d6a38d8b0314e1e255d0d4cd5d672",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "f049f882043454d03d64a54fe0241fc1d02c80c8fecaaeb8ad9ca69746893964",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/07-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 7,
+      "started": "2026-11-22T21:46:52.607901+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82km2eymhqxn9ef",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82km4khbxfm04wz",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82km4khbxfm04wz",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82km2eymhqxn9ef",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kmf00thes8af4",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kmev9rswen81b",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/08-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/08-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "3fd31ad42a8bd40807a0b852295a1f2c56ac29b8aad72125fbcfc1eca45da160",
+          "wall_s": 1.731
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/08-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/08-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "bed12e6d5b6d73025e959c275310b76c5d96548617c61aaa168bf468a3790357",
+          "wall_s": 1.4203
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/08-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "6c8460cfeedad537479c96773f0a847b2eaf4de6c4c45f0772e5a0fdbf5c6eb3",
+          "wall_s": 18.7869
+        }
+      ],
+      "ended": "2026-11-22T21:47:43.938976+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "24b29aaea2ca31446d1c0e05f75f29beccfaa8d40cef828920af7634297e38cf",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "08830148a04cff157bdd9f59487ff3ae16105aa5e458e7e43c097c884dc9127f",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/08-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 8,
+      "started": "2026-11-22T21:47:21.525506+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kmw13q77018qq",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kmy45ckqztfzk",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kmw13q77018qq",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kmy45ckqztfzk",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kn5v27vr370hy",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kn5zdvb4dha1d",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/09-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/09-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "265a9b50e02fad2b42709c7207996a74a3cca257042362cb928a2e4d9148ccae",
+          "wall_s": 2.2068
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/09-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/09-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "a4968f1a164e2ab6be3950581798e72048ebc6ed1ebbb86f454e17b6772c593f",
+          "wall_s": 1.5709
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/09-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "a6e62f91c92541eccf7732651b4013c17eb8d78358c379548a876c1ebe56982d",
+          "wall_s": 19.9883
+        }
+      ],
+      "ended": "2026-11-22T21:48:07.868598+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "017a809e0d2698a88004be8514903f65babdac2b4b5c8c66e601b6f70da3da75",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "928cbffa2a00fcf39d0c053f69ad0e840d254e65ba0adcf6eba65b802cf4d7b7",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/09-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 9,
+      "started": "2026-11-22T21:47:43.969296+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82knjwjeaa48mrk",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82knmxwx84dyc29",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82knjwjeaa48mrk",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82knmxwx84dyc29",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82knxxe0zc0b5vp",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kny73xs1nn5w8",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/10-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/10-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "376f87a2f8fe7d0a56d1845fdf2102bd7ca37ea62a34078207e80f4f03d4d751",
+          "wall_s": 1.8231
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/10-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/10-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "e0d92baa40d8791f33ccd6c047e79017b720e19cfc2feb27f0c8ca9de4eb11bb",
+          "wall_s": 1.3706
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/10-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "e2a0304c972108df7b3fcdf3d8da8e2bd29164b30a1327a2babccbe04140924f",
+          "wall_s": 19.2077
+        }
+      ],
+      "ended": "2026-11-22T21:48:30.460123+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "5c40a347665739784dabe3d3529276edf30dc1ef5548e3226480fb5334e6bbb4",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "530702d550494e1c3a1d1e365e1ee052767bb905ef7c85d841d691176e6c929d",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/10-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 10,
+      "started": "2026-11-22T21:48:07.883927+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kp9ajnkvxkk1c",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kpak1gtwcm2z1",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kp9ajnkvxkk1c",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kpak1gtwcm2z1",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kpk4rhmx57nh5",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kpk05pd3kpsgz",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/11-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/11-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "0bb8d0f77806f94844ca94252ea4536e17bb33d251e45b0e62513c478eb134ae",
+          "wall_s": 1.8726
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/11-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/11-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "060009067a8c2450b7cadfe98fd28baee5736521e363d5bb53c383b5dc8f9473",
+          "wall_s": 1.5061
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/11-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "650c272e7ce385a9265451ff5b6a49266d11bd8ebf47b03bb25c0da823b8e5c5",
+          "wall_s": 18.2851
+        }
+      ],
+      "ended": "2026-11-22T21:48:52.457990+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "c1b4df9b414fb8457a62d013bc3784df7ac0c2e02d2fa41dc8fbd5b2cf2010e0",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "b299995f36049debdce96cddf81c4c14bd86122446454685f831b9e46ee497aa",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/11-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 11,
+      "started": "2026-11-22T21:48:30.477404+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kpzvsqedf7c3b",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kq1e389jnsx86",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kpzvsqedf7c3b",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kq1e389jnsx86",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kq9gd77asyx5x",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kq9cg4pgnjnk8",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/12-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/12-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "33c779ca292b5950910ef753d4229e694d72834206fb9991a803f0bfb7b47be7",
+          "wall_s": 2.0746
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/12-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/12-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "375e6b0c8938562caae83d4954e54eee8facfef50dc5abac1141663f2d6e06b0",
+          "wall_s": 1.5708
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/12-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "acbc2667a98c09df3545152a0a71ac0d13fe4efc42777292d3a847a4ec433440",
+          "wall_s": 17.4029
+        }
+      ],
+      "ended": "2026-11-22T21:49:13.802227+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "21ffa591dc5d8fbb664f98492b0dd540d9d28780955cd57579f3d2534f90dc5f",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "adbe3976a0b014327032f21d487d3de6d9407976e531bddfef2d6ca1d5ead113",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/12-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 12,
+      "started": "2026-11-22T21:48:52.471693+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kqn8mez04rw68",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kqpbfnmaf87k4",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kqn8mez04rw68",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82kqpbfnmaf87k4",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kqyage7rf1m0j",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82kqyf533se2yw5",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/13-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/13-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "de1768b4453a0061fe946b8136e156779ede4e93d2950c05224055f8b4d90ed2",
+          "wall_s": 2.0245
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/13-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/13-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "13b2cb2d0bf8ab49288ffec8cb54dfb7426d20939ff81e55e10f635d0b440ae9",
+          "wall_s": 1.423
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/13-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "acbcf4d7daad9002510396368d030a96c9fa8ca7980ae772c0fb9056730d3628",
+          "wall_s": 21.7503
+        }
+      ],
+      "ended": "2026-11-22T21:54:28.285338+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "ee0271e457921e3109aad361213f66be1b627db9e0f4bb6fa2ed1b927dcd6300",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "e59eba68aa20fa1c64a7ce3f70ef9bee5d96680fd9d1477f16b5c551f46feda3",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/13-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 13,
+      "started": "2026-11-22T21:54:02.649003+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m1413tcmwb6tv",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m15h4vht4s4qh",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m1413tcmwb6tv",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m15h4vht4s4qh",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m1dp3qjpvf2nk",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m1dtbnvj0vw1j",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/14-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/14-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "e124352a9cfd64dcb8b25d48578f97eb7233f80a98253bb733211fc8ef8b6597",
+          "wall_s": 2.2762
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/14-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/14-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "be361c3f4c41652acc339767b88623f861a82613a9226ef9341028c69e7a7875",
+          "wall_s": 1.4716
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/14-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "d57481a5e3a2587394c71df7baf00dafc422fde5b9e0129e020761b00f75591e",
+          "wall_s": 21.0537
+        }
+      ],
+      "ended": "2026-11-22T21:54:53.248518+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "7ccfacc38e8030b5bd0ee7f21a3d990d0d8a0d8e1182259a2f6aff7ddff86c6e",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "13da3f0d5813a837bcf489a7bc0b9bb3d7cdc6cef9fa6c9a280518ea06d85c44",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/14-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 14,
+      "started": "2026-11-22T21:54:28.310181+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m1xqc4y0c9pc4",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m20fxpy1f3vmz",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m1xqc4y0c9pc4",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m20fxpy1f3vmz",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m29e5vrbdqfde",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m29qq29rg3eks",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/15-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/15-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "2c8a56a4fe190e6ff0f46a0159a9965bb59860ae065846ca2c61ae985379bcef",
+          "wall_s": 2.3985
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/15-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/15-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "f4428acbab0e57440da7752eb9373852056e0501285417f6b3582a6386c8734f",
+          "wall_s": 1.5222
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/15-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "cf8bb6ee5e7f75f08b7758a9fc57ef73d2610020baf9a38dc0dedb4dccee7d48",
+          "wall_s": 22.4204
+        }
+      ],
+      "ended": "2026-11-22T21:55:19.896277+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "3173af37d2b37dccdbb6273a48644137d6fbdbc611b7e8c1c77eb2b162d537a4",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "e1f4d8d9ef212336ca7d357c0870530a37137588a596c450244478e3429ba53e",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/15-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 15,
+      "started": "2026-11-22T21:54:53.267554+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m2pejzymcavfb",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m2r5gex6rxz0f",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m2pejzymcavfb",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m2r5gex6rxz0f",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m31qnw68r3qez",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m31x4a11prk5j",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/16-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/16-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "a64ce31dd46ad22b794d55d0a31cae509438a0b0c6dd6eef8bff6d7dff67efe5",
+          "wall_s": 1.9735
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/16-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/16-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "bdd50f4b1915c15ada433737b589a25397a1286edb33ca9d4e23004329eb68dd",
+          "wall_s": 1.3216
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/16-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "44b9b309510bb7e097871f11bb92f1fbf2512f8b50112493cb13f3064a03f7ee",
+          "wall_s": 23.5397
+        }
+      ],
+      "ended": "2026-11-22T21:55:47.162505+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "d2cae93ab1a410ebe2f3a7a36ac643d29537a0b31c11d2f6c7780602993bcdf1",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "ac7366f23c5b30b4d2fbbad17b20ed0cb9c8b6f7b9139c1653c18bb4f8f0860a",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/16-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 16,
+      "started": "2026-11-22T21:55:19.911684+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m3fagsw75wqe5",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m3gwc640jr76a",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m3fagsw75wqe5",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m3gwc640jr76a",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m3v489b79jtzs",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m3x8dmrc96c01",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/17-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/17-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "e53879841c4c9cc0afb771aef56b7d6271b8bab9138e8f7dd711e949d3fd6428",
+          "wall_s": 2.3532
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/17-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/17-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "93f4d8d1815131de7c3cb93c3c2485b641792f0a0f3520714b1db6f886ac9daf",
+          "wall_s": 1.5726
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/17-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "bf412e6ac5a3f5fe563fc46272e5a8641ab0d4f93e25c0b1ed243d0cc07cbeda",
+          "wall_s": 19.0755
+        }
+      ],
+      "ended": "2026-11-22T21:56:10.495853+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "8b7ffe6f9189c24801aec9bf538813bb858934a11d188218312fdb837c6a67b1",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "88c3b0cc931c1f3c19a79aaa9d4c4d73acb5295abeb96ae9985c3b3b45397fe1",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/17-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 17,
+      "started": "2026-11-22T21:55:47.183062+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m4amdnyq2drsv",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m4crwwm6g12jb",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m4amdnyq2drsv",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m4crwwm6g12jb",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m4mp51p02w3t3",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m4n62qnxrthkv",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/18-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/18-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "e92fee4e683412cdb014dff2be9a2afdff7fb6939c8ba10bdd3d81eb91a037fa",
+          "wall_s": 2.5369
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/18-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/18-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "43606cb4fd89e04d49b6f8a29e42aa6f9595be0b294d3525f41d03e28a2f1994",
+          "wall_s": 1.6728
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/18-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "513186872ba745abf073d1374c936b87fd25f247d768d0ae372abd8232050c80",
+          "wall_s": 20.3299
+        }
+      ],
+      "ended": "2026-11-22T21:56:35.572865+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "f6d0d17a5627066e29844e9f00ba87244fb61aa5849eacaf2e07d194f4a7a1c1",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "7699229582aa7405e8236d8aea61dd1464f7564500fc630a7ddb50e6f050f1fd",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/18-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 18,
+      "started": "2026-11-22T21:56:10.514020+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m526878cc9gfx",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m53fkz9perj38",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m526878cc9gfx",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m53fkz9perj38",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m5cetffd53hq5",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m5c9pqkmn6mp3",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/19-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/19-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "4ecd432fedfbf3b6d12cb33b5883a2cc4fda37c004459ee3b8deab7299d85e3d",
+          "wall_s": 1.8214
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/19-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/19-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "eb5ae835aae47553868702720ac80058142aa6f32ff26ca92af08e0ff8c54ba7",
+          "wall_s": 1.2193
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/19-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "ec3250fa200b5e3a6956dfb7be439e8cf87b404ad4689361e8222f3573ff8f7c",
+          "wall_s": 17.5673
+        }
+      ],
+      "ended": "2026-11-22T21:56:56.487096+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "223f20a13f111b8c41cee8199e7938ee596c4a89670f92dd0257a1f809d4fd80",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "ff84ceb607cb982a27c74939fb46824e509e9d38aea898a0df1739c05c81b192",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/19-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 19,
+      "started": "2026-11-22T21:56:35.584033+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m5rzeeqc863pj",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m5tc2sp3tbkx8",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m5rzeeqc863pj",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m5tc2sp3tbkx8",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m627kmzxa9whz",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m62h4ybm467hg",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/20-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/20-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "1032bca18511975a574c3f1b803617ae312216db4a54311f5477026bc7e976b7",
+          "wall_s": 1.9708
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/20-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/20-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "f6da3f184ba25a02b1e6003cfef12939f966abae9c1ff310c16f55a76493244f",
+          "wall_s": 1.4221
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/20-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "2abc6935a7c11b3617604cc8706e724fe7430aa71cfed9c03012aa0fc2c67c36",
+          "wall_s": 18.7521
+        }
+      ],
+      "ended": "2026-11-22T21:57:18.824322+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "b861a0401219b5177ae474cbaba8f0e8f054b76f1c3b6e75e8ae95482166492c",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "516b5fbe6c8a3268dd9d35357d27210c82f2fd20115b43c175258442f251b645",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/20-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 20,
+      "started": "2026-11-22T21:56:56.501034+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m6dveec8fn76f",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m6f7cmab90jsh",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m6dveec8fn76f",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m6f7cmab90jsh",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m6qpgwzd58hfw",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m6qjna0643z6b",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/21-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/21-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "b05b9766d8b9d9b4d23a6b0fddede65590aca6a8dff012ff0d0a7e4d9d55f9a3",
+          "wall_s": 1.7703
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/21-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/21-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "0519a941d4dd2e5347c77ea3d5b6d43dc9dfc7e934d20f46bc5e61976b760e04",
+          "wall_s": 1.4702
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/21-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "7645433f56f5731ba493c8d486a497902bc9517e8c9a1ada0dcc2d4b89407d21",
+          "wall_s": 19.8083
+        }
+      ],
+      "ended": "2026-11-22T21:57:42.268395+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "395a9e7e7469294726de8fcdbe0b0e401d86b181f01ae2127830eda72e6c0a18",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "21b36503882d76e04c1b9950999e7201d4b22a4b953bae6a5e3b02ce6569fb04",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/21-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 21,
+      "started": "2026-11-22T21:57:18.835171+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m73qhe2dt2st9",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m75k2w7r24mqe",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m73qhe2dt2st9",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m75k2w7r24mqe",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m7e0g0v4zyc17",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m7epn0p730rmv",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "baseline",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/22-baseline/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/22-baseline/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "a15ac3b98c8cef39b856a363ff7472bbfb07f48d7583d2dae25a2f02e00fe7bb",
+          "wall_s": 1.7718
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/22-baseline/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/22-baseline/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "d09276a93f064e536f6479a2a7a1d92a8504c751f4ed407dae84ac8729baef18",
+          "wall_s": 1.5715
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/v21-gate0-xhigh/install/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/22-baseline/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "599e2bbd501767d4da8ef1954990646cabb2f2284123c4685ff4778891d2816e",
+          "wall_s": 17.7987
+        }
+      ],
+      "ended": "2026-11-22T21:58:03.810687+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "d04a34eb0850f2846b22639db314d73181bc56e7f4e723f7305c1adcfd24f5e2",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "a10ae2fd365a15f919aba5eb2b114ad76290fb41ac78bb1b43c0a98b4e33b46e",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/22-baseline",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 22,
+      "started": "2026-11-22T21:57:42.286129+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m7tbcmbdqfrz1",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m7w8h4yt87g98",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m7w8h4yt87g98",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m7tbcmbdqfrz1",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m83x6z7vdx13a",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m8421ezqx62zr",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    },
+    {
+      "all_connections_loopback": true,
+      "arm": "candidate",
+      "attempts_made_incomplete_by_control": 2,
+      "commands": [
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/23-candidate/state-00",
+            "--run-key",
+            "00-west",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/23-candidate/west.json"
+          ],
+          "exit": 0,
+          "label": "start-west",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "40e2108798943e4768efe648011635ad04980c5b391bb66c4c8b3d6fe5303ec9",
+          "wall_s": 1.921
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "start",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/23-candidate/state-00",
+            "--run-key",
+            "00-east",
+            "--spec",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/23-candidate/east.json"
+          ],
+          "exit": 0,
+          "label": "start-east",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "195fd353354c29ca44a92442a12de1e96c0bf481bf6a135779a9c4a8ca3581ce",
+          "wall_s": 1.5709
+        },
+        {
+          "command": [
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python",
+            "-B",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/control-stage-2476f2b/bin/gx-p0",
+            "run",
+            "--state",
+            "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/23-candidate/state-00",
+            "--timeout",
+            "120"
+          ],
+          "exit": 0,
+          "label": "drive",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_sha256": "1f576d8cd4b99ecf69962124c9c92229958a44261032312cddc072d42878c988",
+          "wall_s": 18.1984
+        }
+      ],
+      "ended": "2026-11-22T21:58:25.916654+00:00",
+      "instrumented": false,
+      "jobs": {
+        "SUCCEEDED": 4
+      },
+      "metrics_sha256": "da20d203b484bfdb1f0d3a953b132e78bdfa1adb43852844208f388e8f5cf9cf",
+      "model_effort": [
+        [
+          "gpt-6.2-astra",
+          "xhigh"
+        ]
+      ],
+      "peer_errors": 0,
+      "peer_responses": 46,
+      "peer_tool_actions": {
+        "finish": 6,
+        "gx_read_artifact": 34,
+        "gx_submit_product": 6
+      },
+      "peer_trace_sha256": "b39d235c7e72163033b85991ede818959eadcc6b6c1330b625778430c2bf4b0d",
+      "private_trial": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/callback-control-2476f2b/23-candidate",
+      "reviews": {
+        "ACCEPTED": 4,
+        "REJECTED": 2
+      },
+      "runs": {
+        "COMPLETED": 2
+      },
+      "sequence": 23,
+      "started": "2026-11-22T21:58:03.825704+00:00",
+      "submit_payloads": [
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 262,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m8fq0r4eetcgx",
+          "wire_argument_bytes": 275
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 256,
+          "fixture_dropped_last_finding": true,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m8h3bxfn3bzgs",
+          "wire_argument_bytes": 269
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 420,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m8fq0r4eetcgx",
+          "wire_argument_bytes": 441
+        },
+        {
+          "attempt": 2,
+          "canonical_argument_bytes": 413,
+          "fixture_dropped_last_finding": null,
+          "role": "evidence_reviewer",
+          "task_id": "gxt_01m82m8h3bxfn3bzgs",
+          "wire_argument_bytes": 434
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m8rqnkmnx4fqz",
+          "wire_argument_bytes": 230
+        },
+        {
+          "attempt": 1,
+          "canonical_argument_bytes": 218,
+          "fixture_dropped_last_finding": null,
+          "role": "planner",
+          "task_id": "gxt_01m82m8s1jznnz91rv",
+          "wire_argument_bytes": 230
+        }
+      ],
+      "turns": {
+        "completed": 6
+      },
+      "valid": true
+    }
+  ]
+}

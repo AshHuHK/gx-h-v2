@@ -42,6 +42,6 @@
 
 在冻结修正版本上，70 项派发、团队、计量等待和补充证据测试通过。每类 512 次稳定等待观测均无写入。团队和 Provider 两个分组的查询 p95 分别为 17.82 µs、7.32 µs。每次仅按索引读取此前记录的实际占用者。[查询计划、原始样本和命令](acceptance/v3/p1/dispatch-release-watch/REPORT.md)
 
-使用相同插件、相同输入和相同本地 Responses 进行交错的八次对照，名额实际开放至领取的中位数/p95 从 1,826/2,965 ms 降至 127/531 ms。每组均完成 8 个 Run、16 个 CPU Job 和 24 个 turn。[交错对照](acceptance/v3/performance/dispatch-control-2476f2b/REPORT.md)
+使用相同插件、相同输入和相同本地 Responses 进行交错的八次对照，名额实际开放至领取的中位数/p95 从 1,826/2,965 ms 降至 127/531 ms。每组均完成 8 个 Run、16 个 CPU Job 和 24 个 turn。[交错对照](acceptance/v3/performance/dispatch-control-2476f2b/operations.json)
 
 修正版本的独立全量回归耗时 287.070 秒，退出码 0。385 项 Python 测试中 381 项通过、4 项沿用基线跳过，124 项 P0 子集、2 项 Node 测试、生成器和全部 30 个固定 Codex 环回场景通过。另从该提交复跑四条科研路径，89.410 秒完成，科学结论、原始测量和冻结评分与前一提交一致，每组终态重放均无新增请求。[回归核对](acceptance/v3/p1/regression-2476f2b/frozen-comparison.json) · [四组科研数据](acceptance/v3/p1/paired-grid-2476f2b.json) · [独立数值对照](acceptance/v3/p1/paired-grid-2476f2b-traces/index.json)

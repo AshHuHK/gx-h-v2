@@ -160,7 +160,7 @@ def check_project_limits(raw: Any) -> dict[str, int]:
     return {key: raw[key] for key in PROJECT_LINES if key in raw}
 
 
-def _project_usage(conn: sqlite3.Connection, project_ref: str) -> tuple[dict, dict]:
+def _project_usage(conn: sqlite3.Connection, project_ref: str, *, lines=PROJECT_LINES) -> tuple[dict, dict]:
     """Read each root once, including qualification roots whose budgets.run_id is NULL.
 
     A funded child's actual charges reach its parent's spent balance only on closure.
@@ -168,9 +168,13 @@ def _project_usage(conn: sqlite3.Connection, project_ref: str) -> tuple[dict, di
     The remaining reservations cover actual work, including outstanding chain followers.
     """
     balances = conn.execute("""
-        WITH RECURSIVE live(ref, funding) AS (
-            SELECT budget_ref, NULL FROM budgets WHERE parent_ref IS NULL
-            AND budget_ref IN (SELECT budget_ref FROM runs WHERE project_ref=?)
+        WITH RECURSIVE ancestors(ref,parent) AS (
+            SELECT b.budget_ref,b.parent_ref FROM budgets b JOIN runs r ON r.budget_ref=b.budget_ref
+            WHERE r.project_ref=?
+            UNION
+            SELECT b.budget_ref,b.parent_ref FROM budgets b JOIN ancestors a ON b.budget_ref=a.parent
+        ), live(ref, funding) AS (
+            SELECT ref,NULL FROM ancestors WHERE parent IS NULL
             UNION ALL
             SELECT child.budget_ref, f.amounts_json FROM live
             JOIN budgets child ON child.parent_ref=live.ref
@@ -180,13 +184,13 @@ def _project_usage(conn: sqlite3.Connection, project_ref: str) -> tuple[dict, di
         SELECT b.spent_json, b.reserved_json, live.funding FROM live
         JOIN budgets b ON b.budget_ref=live.ref
         """, (project_ref, FUND_PREFIX, HELD))
-    spent = dict.fromkeys(PROJECT_LINES, 0)
-    reserved = dict.fromkeys(PROJECT_LINES, 0)
+    spent = dict.fromkeys(lines, 0)
+    reserved = dict.fromkeys(lines, 0)
     for budget in balances:
         used = store.loads(budget, "spent_json", {})
         held = store.loads(budget, "reserved_json", {})
         funding = store.loads(budget, "funding", {})
-        for key in PROJECT_LINES:
+        for key in lines:
             spent[key] += used.get(key, 0)
             reserved[key] += held.get(key, 0) - funding.get(key, 0)
     return ({key: round(amount, DIGITS) for key, amount in spent.items()},
@@ -261,8 +265,13 @@ def activate_project_budget(conn: sqlite3.Connection, project_ref: str, limits: 
 def _formal_project_limits(conn, project_ref):
     from ..p0.intent import active_items
 
+    seen = set()
     for run in conn.execute("SELECT run_id FROM runs WHERE project_ref=?", (project_ref,)):
-        yield from active_items(conn, run["run_id"], {"resource_limit"}).values()
+        for item in active_items(conn, run["run_id"], {"resource_limit"}).values():
+            key = (item["change_id"], item["item_id"])
+            if key not in seen:
+                seen.add(key)
+                yield item
 
 
 def require_native_metering(conn: sqlite3.Connection, run_id: str) -> None:
@@ -285,36 +294,46 @@ def require_native_metering(conn: sqlite3.Connection, run_id: str) -> None:
 
 
 def _project_reservation_errors(conn: sqlite3.Connection, budget_ref: str, amounts: Mapping[str, Any]):
+    workspace = None
+    if conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_workspace'").fetchone():
+        workspace = conn.execute("SELECT w.project_ref,w.budget_ref,b.limits_json FROM p0_workspace w "
+                                 "JOIN budgets b ON b.budget_ref=w.budget_ref").fetchone()
     configured = conn.execute(
         "SELECT 1 FROM events WHERE subject_kind='project_budget' UNION ALL"
         " SELECT 1 FROM p0_intent_versions WHERE item_type='resource_limit' LIMIT 1").fetchone()
-    if not configured:
+    if not configured and workspace is None:
         return
     # A run carries its budget reference even when the qualification budget has no run_id.
-    projects = conn.execute(
+    projects = {row[0] for row in conn.execute(
         "WITH RECURSIVE lineage(ref,parent) AS ("
         " SELECT budget_ref,parent_ref FROM budgets WHERE budget_ref=? UNION ALL"
         " SELECT b.budget_ref,b.parent_ref FROM budgets b JOIN lineage ON b.budget_ref=lineage.parent"
-        ") SELECT DISTINCT project_ref FROM runs JOIN lineage ON runs.budget_ref=lineage.ref"
-        " WHERE lineage.parent IS NULL", (budget_ref,))
-    for project in projects:
-        project_ref = project["project_ref"]
+        ") SELECT DISTINCT project_ref FROM runs JOIN lineage ON runs.budget_ref=lineage.ref", (budget_ref,))}
+    if workspace is not None and workspace["budget_ref"] == budget_ref:
+        projects.add(workspace["project_ref"])
+    for project_ref in projects:
         phase = _current_phase(conn, project_ref)
-        limits = {}
+        limits, reasons = {}, {}
+        if workspace is not None and workspace["project_ref"] == project_ref:
+            # Actual usage can exceed an individual reservation. Further work in any member
+            # must see that charge even before the finished member's balance rolls up.
+            for key, cap in store.loads(workspace, "limits_json").items():
+                if amounts.get(key, 0) > 0:
+                    limits[key], reasons[key] = cap, "workspace_budget"
         for item in _formal_project_limits(conn, project_ref):
             cap = item["value"]
             key = cap["resource"]
-            if key in amounts and amounts[key] > 0:
-                limits[key] = min(limits.get(key, cap["max"]), cap["max"])
+            if key in amounts and amounts[key] > 0 and cap["max"] <= limits.get(key, cap["max"]):
+                limits[key], reasons[key] = cap["max"], "current_intent"
         if not limits and phase is None:
             continue
-        used, held = _project_usage(conn, project_ref)
+        used, held = _project_usage(conn, project_ref, lines=set(PROJECT_LINES) | set(limits))
         for key, cap in limits.items():
             available = round(cap - used[key] - held[key], DIGITS)
             if amounts[key] > available:
                 yield BudgetExceeded(
                     f"project {project_ref} resource limit allows {available} more {key}",
-                    details={"reason": "current_intent", "project_ref": project_ref, "key": key,
+                    details={"reason": reasons[key], "project_ref": project_ref, "key": key,
                              "limit": cap, "spent": used[key], "reserved": held[key],
                              "requested": amounts[key], "available": available})
         if phase is None:
@@ -734,7 +753,7 @@ def release_chain(conn: sqlite3.Connection, *, budget_ref: str, head_id: str, ac
 # ------------------------------------------------------------------------------ settle
 
 def settle(conn: sqlite3.Connection, reservation_ref: str, *, actual: Mapping[str, Any],
-           actor: str) -> dict[str, Any]:
+           actor: str, confidence: str | None = None) -> dict[str, Any]:
     """Replace a hold with what was really used.
 
     ``actual`` is what the backend measured. It is charged as it is: less than was held
@@ -765,7 +784,7 @@ def settle(conn: sqlite3.Connection, reservation_ref: str, *, actual: Mapping[st
                 f"reservation {reservation_ref} is {row['status']}, not {HELD}",
                 details={"reservation_ref": reservation_ref, "status": row["status"]},
             )
-        return _settle(txn, row, used, actor=actor)
+        return _settle(txn, row, used, actor=actor, confidence=confidence)
 
 
 def _settled_actual(conn: sqlite3.Connection, reservation_ref: str) -> dict[str, Any] | None:
@@ -779,7 +798,8 @@ def _settled_actual(conn: sqlite3.Connection, reservation_ref: str) -> dict[str,
     return store.loads(row, "payload_json", {}).get("actual")
 
 
-def _settle(conn: sqlite3.Connection, row: sqlite3.Row, used: Mapping[str, Any], *, actor: str) -> dict[str, Any]:
+def _settle(conn: sqlite3.Connection, row: sqlite3.Row, used: Mapping[str, Any], *, actor: str,
+            confidence: str | None = None) -> dict[str, Any]:
     budget = _row(conn, row["budget_ref"])
     held = store.loads(row, "amounts_json", {})
     limits = store.loads(budget, "limits_json", {})
@@ -800,11 +820,42 @@ def _settle(conn: sqlite3.Connection, row: sqlite3.Row, used: Mapping[str, Any],
     store.append_event(
         conn, kind="budget.settled", actor=actor, run_id=budget["run_id"], subject_kind="budget",
         subject_id=budget["budget_ref"], prev_state=HELD, new_state=SETTLED,
-        evidence_level="EXECUTION_OBSERVED",
+        evidence_level=None if confidence == "ESTIMATED" else "EXECUTION_OBSERVED",
         payload={"reservation_ref": row["reservation_ref"], "held": held, "actual": dict(used),
-                 "for": [row["subject_kind"], row["subject_id"]], "unbudgeted": unbudgeted},
+                 "for": [row["subject_kind"], row["subject_id"]], "unbudgeted": unbudgeted,
+                 **({"confidence":confidence} if confidence else {})},
     )
     return _settle_result(conn, row, used, held, reused=False)
+
+
+def adjust_settled_tokens(conn, reservation_ref, *, delta, adjustment_id, actor):
+    """Apply one signed reconciliation to the original funding chain and keep its receipt."""
+    if type(delta) is not int or not isinstance(adjustment_id, str) or not adjustment_id:
+        raise SchemaInvalid("a token adjustment needs an integer delta and a stable adjustment ID")
+    with store.transaction(conn) as tx:
+        row = _reservation(tx, reservation_ref)
+        if row["status"] != SETTLED:
+            raise IllegalTransition("only settled reservations accept a token adjustment")
+        prefix = "budget.token_adjusted"
+        seen = tx.execute("SELECT payload_json FROM events WHERE kind=? AND subject_id=? AND "
+                          "json_extract(payload_json,'$.adjustment_id')=?", (prefix,row["budget_ref"],adjustment_id)).fetchone()
+        facts = {"reservation_ref":reservation_ref, "adjustment_id":adjustment_id, "delta_tokens":delta}
+        if seen:
+            if store.loads(seen, "payload_json") != facts:
+                raise IdempotencyConflict("the token adjustment ID already has another value")
+            return
+        budget = _row(tx, row["budget_ref"])
+        while True:
+            spent = store.loads(budget, "spent_json", {})
+            if spent.get("tokens", 0) + delta < 0:
+                raise IllegalTransition("a token adjustment would erase unrelated spending")
+            spent["tokens"] = spent.get("tokens", 0) + delta
+            _write(tx, budget["budget_ref"], spent=spent)
+            if not budget["parent_ref"] or _funding_state(tx, budget["budget_ref"]) == HELD:
+                break
+            budget = _row(tx, budget["parent_ref"])  # Its closed child's balance was already rolled up.
+        store.append_event(tx, kind=prefix, actor=actor, run_id=budget["run_id"], subject_kind="budget",
+                           subject_id=row["budget_ref"], evidence_level="EXECUTION_OBSERVED", payload=facts)
 
 
 def _settle_result(conn: sqlite3.Connection, row: sqlite3.Row, used: Mapping[str, Any],

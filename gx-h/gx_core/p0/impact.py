@@ -5,7 +5,8 @@ from ..domain import ids, machines
 from ..errors import ArtifactNotFound
 from ..jobs import leases as job_leases
 from ..persistence import store
-from . import intent, science_inputs
+from ..research import records
+from . import intent
 
 _ADVISORY = {"soft_preference", "optimization_target", "priority", "resource_limit"}
 _ACTIVE_ATTEMPT = {"CLAIMED", "RUNNING", "SUBMITTED", "VALIDATING"}
@@ -45,13 +46,13 @@ def _dependencies(conn, run_id, changes):
             "WHERE run_id=? AND item_id=?", (run_id, item_id),
         ):
             targets[row["object_type"], row["object_id"]][item_id] = row["role"]
-        if change["item_type"] in science_inputs.ADVISORY and change["new_value"] is not None:
+        if change["item_type"] in records.ADVISORY_ITEMS and change["new_value"] is not None:
             # A newly added item cannot have a stored link. Apply the same role rule
             # as task creation for already commissioned, still-open assignments.
             for task in conn.execute("SELECT task_id,input_json FROM tasks WHERE run_id=? "
                                      "AND status NOT IN ('ACCEPTED','CANCELLED','EXHAUSTED')", (run_id,)):
-                role = science_inputs.role_of(store.loads(task, "input_json", {}))
-                if science_inputs.consumes(role, change["item_type"], change["new_value"]):
+                role = records.assignment_role(store.loads(task, "input_json", {}))
+                if records.consumes_item(role, change["item_type"], change["new_value"]):
                     targets["task", task["task_id"]].setdefault(item_id, "context")
         if change["item_type"] not in intent.BAN_TYPES:
             continue
@@ -166,7 +167,7 @@ def _task_action(conn, task, changes, roles, commit, change_id, result):
                 payload={"run_id": task["run_id"], "task_id": task["task_id"], "lease_id": lease_id,
                          "attempt": task["attempt"], "action": action, "change_id": change_id,
                          "item_ids": sorted(roles), "items": [_notice_item(changes[k]) for k in sorted(roles)],
-                         "instruction": science_inputs.INSTRUCTION},
+                         "instruction": records.REVIEW_INSTRUCTION},
             )
     return action
 
@@ -184,7 +185,7 @@ def notification_content(conn, payload):
                           (payload["run_id"], payload["change_id"])).fetchone()
     items = [_notice_item(item) for item in store.loads(change, "preview_json", [])
              if item["item_id"] in payload.get("item_ids", ())]
-    return {**payload, "items": items, "instruction": science_inputs.INSTRUCTION} if items else payload
+    return {**payload, "items": items, "instruction": records.REVIEW_INSTRUCTION} if items else payload
 
 
 def enqueue_reevaluation(conn, run_id, eval_id, item_id, version, value, change_id):

@@ -7,7 +7,7 @@ import time
 import unittest
 
 from gx_core import budgets
-from gx_core.capabilities import environments, ladder, registry, storage
+from gx_core.capabilities import environments, ladder, registry, shipped, storage
 from gx_core.context import Ctx, Principal
 from gx_core.errors import IdempotencyConflict
 from gx_core.governance import assets, checks, reviews
@@ -61,6 +61,8 @@ class LocalJobLifecycle(unittest.TestCase):
                     bundle[name] = registry.publish_script(ctx, bundle[name])
                 candidate = registry.register_candidate(ctx, bundle)
                 self.accept_local_utility(ctx, candidate)
+                attached = shipped.attach(ctx, candidate["capability_version"])
+                self.assertEqual(attached["manifest_sha256"], candidate["manifest_sha256"])
                 budget = budgets.create_root(conn, run_id=None, actor=actor)
                 with store.transaction(conn) as tx:
                     run = records.create_run(tx, objective="Exercise a local job", project_ref="example",

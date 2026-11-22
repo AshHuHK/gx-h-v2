@@ -67,7 +67,7 @@ SHA256 = re.compile(r"[0-9a-f]{64}")
 _PLACEHOLDER = re.compile(r"\{([^{}]*)\}")
 
 #: Repository-local code accepted by the local Job runner.
-SCRIPT_ROOTS = ("adapters/local/", "adapters/scientific/")
+SCRIPT_ROOTS = ("adapters/local/", "adapters/scientific/", "plugins/installed/")
 SCRIPT_ROOT = SCRIPT_ROOTS[0]
 
 #: LOCAL vocabulary, not from contracts/: the two controls a manifest may declare.

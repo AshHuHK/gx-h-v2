@@ -15,7 +15,8 @@ from ..errors import ArtifactNotFound, BudgetExceeded, HoldActive, IdempotencyCo
 from ..jobs.service import JobService
 from ..orchestration import reactor, service
 from ..persistence import store
-from . import intent, intent_budget, science_inputs, waits
+from ..research import records
+from . import intent, intent_budget, waits
 from .roots import Roots
 
 
@@ -53,16 +54,18 @@ def snapshot(conn, run_id=None):
             entry["metering_reason"] = ("awaiting delivery receipt" if not entry["turn_id"] else
                                         "awaiting terminal turn" if not entry["terminal_status"] else
                                         "awaiting attributable usage")
+    binding = store.loads(run, "inputs_json").get("plugin_binding") if '"plugin_binding"' in (run["inputs_json"] or "") else None
     return {
         "project": run["project_ref"], "run_id": rid, "run_key": run["run_key"], "status": run["status"],
         "run_objective": run["objective"],
         "workflow": {"id": run["workflow_id"], "version": run["workflow_version"]},
+        **({"plugin_binding": binding} if binding is not None else {}),
         "pause": store.loads(run, "paused_json"),
         "attempt_waits": waits.pending(conn, rid),
         "resource_limits": intent_budget.current_caps(conn, rid),
         "metering": metering.inspect(conn, rid),
-        "supplements": science_inputs.source_status(conn, rid),
-        "reviews": science_inputs.review_history(conn, rid),
+        "supplements": records.source_status(conn, rid),
+        "reviews": records.review_history(conn, rid),
         "node": checkpoint["node"] if checkpoint else None, "round": state.get("round"),
         "report_ref": state.get("outputs", {}).get("report", {}).get("artifact_ref"),
         "rounds": state.get("scratch", {}).get("history", []),
@@ -116,7 +119,7 @@ class Driver:
         action = conn.execute("SELECT result_json FROM p0_human_inputs WHERE run_id=? AND receipt_turn_id=? "
                               "AND result_json IS NOT NULL ORDER BY rowid DESC LIMIT 1",
                               (self.rid, envelope["turn_id"])).fetchone()
-        supplements = science_inputs.source_status(conn, self.rid)
+        supplements = records.source_status(conn, self.rid)
         decision = dict(latest) if latest else None
         if decision is not None:
             decision["pending_source_ids"] = [source["source_id"] for source in supplements
@@ -290,10 +293,21 @@ class Driver:
     def passes(self, deadline, *, shared=False):
         """Yield between passes so other runs can progress on the same SQLite connection."""
         from . import compute, metering
+        run = project(self.conn, self.rid)
+        if run and '"plugin_binding"' in (run["inputs_json"] or ""):
+            from ..errors import VersionImmutable
+            try:
+                service.hooks_for_run(self.conn, self.rid)
+            except VersionImmutable as exc:
+                return {**snapshot(self.conn, self.rid), "driver": "plugin_unavailable", "reason": exc.message}
         idle_delay = 0.15
         self.reconcile_costs()
         sent = {}
         retry_delay = {}
+        admission_retries = {}
+        def defer_admission(key):
+            delay = min(2.0, 2 * admission_retries.get(key, (0.25, 0))[0])
+            admission_retries[key] = (delay, time.monotonic() + delay)
         last_terminal_event = None
         while time.monotonic() < deadline:
             yield
@@ -347,8 +361,14 @@ class Driver:
                                       "AND t.status IN ('READY','CLAIMED','RUNNING') ORDER BY t.rowid",
                                       (self.rid,)).fetchall()
             progressed = False
+            if admission_retries:
+                ready_attempts = {(t["task_id"], t["attempt"] + 1) for t in tasks if t["status"] == "READY"}
+                for ended in admission_retries.keys() - ready_attempts:
+                    del admission_retries[ended]
             for t in tasks:
                 key = (t["task_id"], t["attempt"] + (t["status"] == "READY"))
+                if key in admission_retries and time.monotonic() < admission_retries[key][1]:
+                    continue
                 retry = False
                 if turn_id := sent.get(key):
                     outcome = self.conn.execute("SELECT terminal_status FROM p0_root_turn_usage WHERE turn_id=?",
@@ -367,12 +387,17 @@ class Driver:
                             finally:
                                 metrics.record("p0_dispatch", started=started)
                     except HoldActive:
+                        if t["status"] == "READY":
+                            defer_admission(key)
                         continue
                     except BudgetExceeded as exc:
                         self._exhausted[t["task_id"]] = exc
                         continue
                     if receipt.get("waiting_for_review"):
+                        if t["status"] == "READY":
+                            defer_admission(key)
                         continue
+                    admission_retries.pop(key, None)
                     sent[key] = receipt.get("turn_id")
                     progressed = True
             if self._native and self.native.poll(min(0.01 if shared else 0.2, max(0.001, deadline - time.monotonic()))):

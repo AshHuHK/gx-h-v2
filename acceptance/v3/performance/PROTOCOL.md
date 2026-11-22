@@ -12,7 +12,7 @@ The treatment for the v3 arm is the publicly selected, reviewed `science_grid@2`
 
 The implementation plan adopted a 20% relative and 5 ms absolute threshold for a p95 increase in GX dispatch, callback or SQLite transaction latency. The initial acquisition receipt recorded 25% and 5 ms. The stricter 20% and 5 ms rule applies to both arms and was recorded here before collecting any post-change samples. A decrease of more than 10% in completed Turns/hour or completed Runs/hour also requires investigation. Report queue READY-to-CLAIM, SQLite write-lock latency, observed response tokens, job successes and failures, rejected products, retries, transport recoveries and CPU time. Attribute every explained change to evidence. A threshold exceedance stays open until there is an explanation. [Implementation plan](../../../V3_IMPLEMENTATION_PLAN.md) · [Original acquisition receipt](gate0/environment.json)
 
-The workload denominator includes scheduled interarrival time. Also compare active model durations and matched waves. Count the actual official terminal status, each failed or rejected attempt and the reconciled ledger. Recompute numerical scores and frozen threshold evaluations against artifacts, verify every artifact's size and SHA-256, and verify database integrity. Each arm retains private raw logs and official session files in its own staging directory. Public evidence contains the GX telemetry, numerical and timing receipts, artifact hashes and official-session file digests. Private OAuth material stays outside the repository.
+The workload denominator includes scheduled interarrival time. Also compare active model durations and matched waves. Count the actual official terminal status, each failed or rejected attempt and the reconciled ledger. Recompute numerical scores and frozen threshold evaluations against artifacts, verify every artifact's size and SHA-256, and verify database integrity. Each arm retains private raw logs and official session files in its own staging directory. Public evidence contains the GX telemetry, numerical and timing receipts, artifact hashes and official-session file digests. Private OAuth material stays outside the repository. The baseline's minute-level shared-host load samples begin at 17:50:32 UTC, about eight minutes after release. Native receipts, GX telemetry and CLI logs cover the first arrival.
 
 ## Reproduce Gate 0
 
@@ -29,3 +29,7 @@ gx-h-2-1/.venv/bin/python -B gx-h-v-3/acceptance/v3/performance/audit_workload.p
 ```
 
 The second command reads the completed project journals and produces the measurement summary. Omitting its evidence argument prints a read-only progress snapshot.
+
+## Matched P1 invocation
+
+The prepared runner adds `--composed-grid` to the same command, using the immutable candidate revision and new private state and evidence directories. It asks the operator CLI to verify `org.gx.science-grid@2.0.0`, then includes `"plugins":["org.gx.science-grid@2.0.0"]` on each public Run specification. Before any candidate acquisition, the generator reproduced all 26 baseline scientific and budget documents exactly. The original baseline runner is preserved in Git commit `41f3b9da407123daf70be746857e320a09fdff91`. [Input comparison and runner digests](post-input-check.json)

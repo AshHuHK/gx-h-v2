@@ -264,15 +264,18 @@ def acquire(work,out):
     spec_hashes={}
     science_spec_hashes={}
     spec_extensions={}
+    portable_specs=[]
     expected_fields={"project","objective","max_rounds","proposal","turn_token_budget","workflow","workflow_version",
                      "max_parallel_roots","workspace","workspace_budget","run_budget","teams"}
     for f in sorted((work/"specifications").glob("*.json")):
         spec_hashes[f.name]=sha(f)
         documents=json.loads(f.read_bytes())
+        portable_specs.append({"name":f.name,"specification":documents,"original_file_sha256":spec_hashes[f.name]})
         scientific_input={key:documents[key] for key in sorted(expected_fields)}
         scientific_bytes=json.dumps(scientific_input,sort_keys=True,separators=(",",":")).encode()
         science_spec_hashes[f.name]=hashlib.sha256(scientific_bytes).hexdigest()
         spec_extensions[f.name]={k:v for k,v in documents.items() if k not in expected_fields}
+    write_compressed(out/"project-specifications.jsonl.gz",portable_specs)
     for f in sorted((work/"install").rglob("*")):
         if f.is_file():
             source_hashes[str(f.relative_to(work/"install"))]=sha(f)
@@ -310,6 +313,17 @@ def acquire(work,out):
                 s["refusal_codes"]=[v.get("code") for v in validation.get("records",[]) if v.get("code")]
                 distributions["submission"][s["result"]]+=1
                 distributions["refusal_codes"].update(s["refusal_codes"])
+                s["refusal_reasons"]=[]
+                for v in validation.get("records",[]):
+                    message=v.get("message")
+                    if not message:
+                        continue
+                    if message=="cover every route and cite its evidence":
+                        reason=message
+                    else:
+                        reason=(v.get("code") or "other")+":"+hashlib.sha256(message.encode()).hexdigest()[:12]
+                    s["refusal_reasons"].append(reason)
+                    distributions["refusal_reason"][reason]+=1
             taskrows=rows(c,"SELECT task_id,run_id,role,status,attempt,attempts_consumed FROM tasks")
             waits=rows(c,"SELECT reason,started_at,ended_at,root_key FROM p0_attempt_waits")
             for t in taskrows:
@@ -355,8 +369,23 @@ def acquire(work,out):
                     all_job_intervals.append((stamp(start),stamp(end)))
                 j["sidecar_sha256"]={f.name:sha(f) for f in sorted((state/"jobs"/j["job_id"]).glob("*"))
                                       if f.is_file() and f.name in {"launch.claim","outcome.json","spec.json","runner.json","status.json"}}
-                if j["status"]=="SUCCEEDED" and (j["exit_code"]!=0 or not j["scheduler_ref"] or "outcome.json" not in j["sidecar_sha256"]):
-                    errors.append("missing Job receipt: "+j["job_id"])
+                if j["status"]=="SUCCEEDED":
+                    if j["exit_code"]!=0 or not j["scheduler_ref"] or not {"outcome.json","runner.json","launch.claim"}<=j["sidecar_sha256"].keys():
+                        errors.append("missing Job receipt: "+j["job_id"])
+                    else:
+                        sidecar=state/"jobs"/j["job_id"]
+                        finished_job=json.loads((sidecar/"outcome.json").read_bytes())
+                        runner=json.loads((sidecar/"runner.json").read_bytes())
+                        if finished_job["job_id"]!=j["job_id"] or runner["job_id"]!=j["job_id"] or (
+                            finished_job["runner_pid"],finished_job["runner_started"],finished_job["exit_code"])!=(
+                            runner["runner_pid"],runner["runner_started"],j["exit_code"]):
+                            errors.append("runner and outcome sidecars disagree with admitted Job: "+j["job_id"])
+                        for item in outcome.get("outputs",()):
+                            stored=c.execute("SELECT sha256,bytes FROM artifacts WHERE artifact_ref=? AND job_id=?",
+                                             (item["artifact_ref"],j["job_id"])).fetchone()
+                            if not stored or (item["sha256"],item["bytes"])!=(stored["sha256"],stored["bytes"]) or (
+                                item.get("runner_sha256") and item["runner_sha256"]!=stored["sha256"]):
+                                errors.append("Job output receipt and published artifact differ: "+j["job_id"])
                 distributions["job"][j["status"]]+=1
                 totals["job_retries"]+=max(j["job_attempt"]-1,0)
                 totals["job_cpu_seconds"]+=j["cpu_seconds"] or 0
@@ -364,6 +393,10 @@ def acquire(work,out):
             if duplicate_ops:
                 errors.append("duplicated Job key: "+state.name)
             totals["duplicate_job_keys"]+=duplicate_ops
+            dup_scheduler=c.execute("SELECT count(*)-count(distinct scheduler_ref) FROM jobs WHERE scheduler_ref IS NOT NULL").fetchone()[0]
+            totals["duplicate_scheduler_receipts"]+=dup_scheduler
+            if dup_scheduler:
+                errors.append("different Jobs share a scheduler receipt: "+state.name)
             for run in runs:
                 distributions["run"][run["status"]]+=1
             for bill in bills:
@@ -393,6 +426,12 @@ def acquire(work,out):
             totals["official_turn_failures"]+=sum(b["terminal_status"]=="failed" for b in bills)
             totals["scientific_decisions"]+=c.execute("SELECT count(*) FROM science_decisions").fetchone()[0]
             totals["scientific_settlements"]+=c.execute("SELECT count(*) FROM science_settlements").fetchone()[0]
+            for name,n in c.execute("SELECT kind,count(*) FROM science_settlements GROUP BY kind"):
+                distributions["settlement_kind"][name]+=n
+            for name,n in c.execute("SELECT direction,count(*) FROM science_settlements GROUP BY direction"):
+                distributions["scientific_direction"][name or "(unset)"]+=n
+            for name,n in c.execute("SELECT verdict,count(*) FROM evaluations WHERE purpose='CANDIDATE' GROUP BY verdict"):
+                distributions["frozen_evaluation"][name]+=n
             totals["reviewed_reports"]+=c.execute("SELECT count(*) FROM artifacts WHERE kind='research_report'").fetchone()[0]
             totals["unsettled_native_turns"]+=sum(b["budget_status"]=="HELD" for b in bills)
             totals["cost_adjustments"]+=len(adjustments)
@@ -476,11 +515,20 @@ def acquire(work,out):
         callback_tools[cb.get("tool") or "(unspecified)"].append(cb.get("duration_ms"))
     arr_epochs=[]
     for i,entry in enumerate(arrivals):
-        start=stamp(entry["utc"])
-        end=stamp(arrivals[i+1]["utc"]) if i+1<len(arrivals) else stamp(finish["ended"])
+        start=stamp(finish["start"])+entry["scheduled_offset_seconds"]
+        end=(stamp(finish["start"])+arrivals[i+1]["scheduled_offset_seconds"]) if i+1<len(arrivals) else stamp(finish["ended"])
         active=occupancy([(max(a,start),min(b,end)) for a,b in intervals if max(a,start)<min(b,end)])
-        arr_epochs.append({"wave":entry["wave"],"utc":entry["utc"],"interval_s":round(end-start,3),
-                           "native_root_busy_s":active["busy_s"],"peak_native_roots":active["peak_concurrent"]})
+        window={}
+        for name in ("db_transaction","p0_dispatch","p0_callback"):
+            ms=(r["duration_ms"] for r in metrics.get(name,()) if start<=r["observed_ns"]/1e9<end)
+            window[name]=quantile(ms)
+        arr_epochs.append({"wave":entry["wave"],"scheduled_utc":utc(start),"driver_launched_utc":entry["utc"],
+                           "interval_s":round(end-start,3),"native_root_busy_s":active["busy_s"],
+                           "peak_native_roots":active["peak_concurrent"],"gx_elapsed_window_latency_ms":window})
+    actual_jobs={r["data"]["job_id"] for r in receipts if r["kind"]=="job"}
+    calculated_ids=[r["data"]["job_id"] for r in receipts if r["kind"]=="recomputed_numerical_result"]
+    if len(set(calculated_ids))!=len(calculated_ids) or actual_jobs!=set(calculated_ids):
+        errors.append("numerical recomputation does not cover each distinct admitted Job exactly once")
     totals["queue_right_censored"]=sum(r["kind"]=="queue_right_censored" for r in receipts)
     totals["queue_ended_without_claim"]=sum(r["kind"]=="queue_ended_without_claim" for r in receipts)
     dispatch_endpoints=defaultdict(list)
@@ -511,7 +559,13 @@ def acquire(work,out):
               and actual["peak_concurrent"]>=2 and completed>0 and len(roots)==len(meters)
               and all(ep["native_root_busy_s"]>0 for ep in arr_epochs) and not errors
               and totals["evaluated_jobs"]==sum(len(w["runs"])*2 for w in workspaces))
-    result={"gate_measurement":"PASS" if complete else "INCOMPLETE","source_commit":setup["source_commit"],
+    make_hashes=["commands.jsonl","arrivals.jsonl","environment.json","oauth-readiness.json","start.json",
+                 "finished.json","gx-metrics.jsonl.gz","receipts.jsonl.gz","native-session-hashes.json",
+                 "input-hashes.json","workspace-receipts.json","project-specifications.jsonl.gz"]
+    for optional in ("first-wave.json","proxy-observation.json","runtime-details.json","progress-load.jsonl","treatment.json"):
+        if (out/optional).is_file():
+            make_hashes.append(optional)
+    result={"gate_measurement":"PASS" if complete and not errors else "INCOMPLETE","source_commit":setup["source_commit"],
         "software_under_test":"GX release archive and Codex 0.169.0","real_mode":True,"model":MODEL,"effort":EFFORT,
         "run_utc":{"first_release":finish["start"],"ended":finish["ended"],"elapsed_monotonic_s":round(elapsed,3)},
         "native_root_work":actual,"budget_reservations":admissions,"coordinator_command_intervals":occupancy(app_intervals),
@@ -533,8 +587,7 @@ def acquire(work,out):
                   "native_vs_ledger_tokens_equal":totals["ledger_spent_tokens"]==token_counts["total_tokens"]},
         "errors":errors,"warnings":warnings,
         "raw_private_metrics_sha256":sha(work/"metrics.jsonl"),
-        "evidence_sha256":{name:sha(out/name) for name in ("commands.jsonl","arrivals.jsonl","environment.json","oauth-readiness.json",
-                "start.json","finished.json","gx-metrics.jsonl.gz","receipts.jsonl.gz","native-session-hashes.json","input-hashes.json","workspace-receipts.json")}}
+        "evidence_sha256":{name:sha(out/name) for name in make_hashes}}
     save(out/"summary.json",result)
     return result
 

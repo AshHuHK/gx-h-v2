@@ -446,7 +446,7 @@ class JobService:
         run = conn.execute("SELECT run_id, status FROM runs WHERE run_id=?", (run_id,)).fetchone()
         if run is None:
             raise ArtifactNotFound(f"no run {run_id!r}", details={"run_id": run_id})
-        execution_manifest.check_capability(conn, run_id, request["capability_version"])
+        execution_manifest.check_capability(conn, run_id, request["capability_version"], review_probe=purpose == PURPOSE_PROBE)
         executable = contracts.states()["machines"]["run"]["executable"]
         if purpose != PURPOSE_PROBE and run["status"] not in executable:
             raise PhaseDenied(

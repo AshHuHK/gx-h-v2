@@ -41,6 +41,7 @@ place that knows where to look.
 from __future__ import annotations
 
 import sqlite3
+from contextlib import nullcontext
 from datetime import timedelta
 from typing import Any, Iterable, Mapping
 
@@ -425,7 +426,7 @@ def adopt(conn: sqlite3.Connection, job: Mapping[str, Any], *, principal: str | 
     lease = held_lease(conn, task_id, principal) if task_id else _held_path_lease(conn, job, principal)
     if lease is None:
         return None
-    with store.transaction(conn) as txn:
+    with (nullcontext(conn) if include_in_transaction and conn.in_transaction else store.transaction(conn)) as txn:
         # Recheck under the write lock; the holder or deadline may have moved since the
         # preliminary read. A status query never renews somebody else's lease.
         lease = held_lease(txn, lease["task_id"], principal)

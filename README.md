@@ -96,3 +96,23 @@ python -m pip install --no-index --require-hashes --find-links release-assets/py
 python scripts/release_assets.py all
 bin/gx-p0 login-status
 ```
+
+## 在数值网格项目使用插件
+
+下面的命令沿用随包的数值研究问题，并为新 Run 选择网格插件。工作节点能通过 `gx_grid_measurement` 读取自己负责的路线、冻结阈值和实测结果。
+
+```bash
+mkdir -p var
+python - <<'PY'
+import json
+from pathlib import Path
+spec = json.loads(Path("examples/paired-grid.json").read_text())
+spec["plugins"] = ["org.gx.science-grid@2.0.0"]
+Path("var/paired-grid-plugin.json").write_text(json.dumps(spec))
+PY
+bin/gx-p0 start --state var/research-v3 --run-key paired --spec var/paired-grid-plugin.json
+bin/gx-p0 run --state var/research-v3 --timeout 3600
+bin/gx-p0 status --state var/research-v3
+```
+
+[网格插件](gx-h/plugins/installed/org.gx.science-grid/2.0.0/plugin.py) · [分阶段验收](V3_ACCEPTANCE_REPORT.md)

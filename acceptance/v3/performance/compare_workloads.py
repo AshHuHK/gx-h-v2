@@ -33,10 +33,19 @@ def main():
                "lanes","workspace_root_cap","team_root_cap"]
     invariants={k:be[k]==ce[k] for k in identical}
     invariants["scientific_budget_input_sha_by_run_key"]=bh["science_and_budget_fields"]==ch["science_and_budget_fields"]
+    invariants["baseline_spec_extensions_empty"]=all(not ext for ext in bh["additional_spec_fields"].values())
+    treatment=read(cand,"treatment.json") if (cand/"treatment.json").is_file() else {}
+    cases=treatment.get("runs",[])
+    expected_keys={name.removesuffix(".json") for name in ch["specifications"]}
+    invariants["plugin_treatment_observed_for_every_candidate_run"]=bool(treatment.get("public_selection")) and (
+        {v.get("run_key") for v in cases}==expected_keys and all(v.get("verified") is True for v in cases))
+    invariants["candidate_extra_fields_match_declared_plugin_selection"]=bool(treatment) and all(
+        extras==treatment.get("expected_extra_spec_fields") for extras in ch["additional_spec_fields"].values())
+    invariants["distinct_product_commits"]=be["source_commit"]!=ce["source_commit"]
     invariants["native_multi_root_span_both"]=all(s["native_root_work"]["span_s"]>=7200 and
             s["native_root_work"]["peak_concurrent"]>=2 for s in (bs,cs))
     invariants["all_measurement_checks"]=all(s["gate_measurement"]=="PASS" for s in (bs,cs))
-    for k in ("all_expected_jobs_evaluated","native_vs_ledger_tokens_equal"):
+    for k in ("all_expected_jobs_evaluated","all_native_reservations_settled","native_vs_ledger_tokens_equal"):
         invariants[k]=bs["checks"][k] and cs["checks"][k]
     affected=[]
     latency={}
@@ -69,6 +78,21 @@ def main():
             "accepted_products":diff(b.get("submissions",{}).get("ACCEPTED",0),c.get("submissions",{}).get("ACCEPTED",0)),
             "rejected_products":diff(b.get("submissions",{}).get("REJECTED",0),c.get("submissions",{}).get("REJECTED",0)),
             "jobs":[b.get("jobs"),c.get("jobs")]})
+    callback_deltas={}
+    for tool in sorted(set(bs["callback_per_tool_ms"])|set(cs["callback_per_tool_ms"])):
+        b=bs["callback_per_tool_ms"].get(tool,{})
+        c=cs["callback_per_tool_ms"].get(tool,{})
+        callback_deltas[tool]={k:diff(b.get(k),c.get(k)) for k in ("n","p50","p95","p99")}
+    baseline_waves={wave["wave"]:wave for wave in bs["wave_activity"]}
+    wave_deltas=[]
+    for c in cs["wave_activity"]:
+        b=baseline_waves.get(c["wave"],{})
+        match={"wave":c["wave"],"root_busy_seconds":diff(b.get("native_root_busy_s"),c.get("native_root_busy_s"))}
+        for k in ("db_transaction","p0_dispatch","p0_callback"):
+            previous=b.get("gx_elapsed_window_latency_ms",{}).get(k,{})
+            following=c.get("gx_elapsed_window_latency_ms",{}).get(k,{})
+            match[k+"_p95_ms"]=diff(previous.get("p95"),following.get("p95"))
+        wave_deltas.append(match)
     dispositions=Counter()
     for entry in case:
         dispositions[tuple(entry["status"])]+=1
@@ -78,6 +102,7 @@ def main():
             "native_active_seconds":diff(bs["native_root_work"]["busy_s"],cs["native_root_work"]["busy_s"]),
             "native_peak_root_concurrency":diff(bs["native_root_work"]["peak_concurrent"],cs["native_root_work"]["peak_concurrent"]),
             "throughput":throughput,"latency_ms":latency,"counts":counts,"per_run":case,
+            "matched_arrival_windows":wave_deltas,"callbacks_by_tool_ms":callback_deltas,
             "paired_run_status_counts":[{"baseline":k[0],"candidate":k[1],"count":v} for k,v in dispositions.items()],
             "thresholds_to_explain":affected,"unmatched_or_failed_inputs":[k for k,v in invariants.items() if not v],
             "comparison_status":"REVIEW" if affected or not all(invariants.values()) else "WITHIN_MEASURED_BOUNDS"}

@@ -15,8 +15,10 @@ def _refuse(reason, message, **facts):
     raise SchemaInvalid(message, details={"reason": reason, **facts})
 
 
-def check_capability(conn, run_id, capability):
+def check_capability(conn, run_id, capability, *, review_probe=False):
     """GX checks the concrete capability, including hard constraints added after planning."""
+    if not review_probe and not shipped.participates(conn, run_id, capability):
+        _refuse("run_composition", f"{capability} is outside this Run composition", capability=capability)
     cap_id, version = capability.rsplit("@", 1)
     if intent.forbidden_capability(cap_id, version, intent.active_items(conn, run_id, intent.BAN_TYPES)):
         _refuse("current_intent", f"the active Intent forbids {capability}", capability=capability)
@@ -103,7 +105,7 @@ def admit(conn, job_id, *, launch, bundle, env, inputs, resources, preflight):
     row = conn.execute("SELECT * FROM jobs WHERE job_id=?", (job_id,)).fetchone()
     cap = launch["capability_version"]
     run_id = row["run_id"]
-    check_capability(conn, run_id, cap)
+    check_capability(conn, run_id, cap, review_probe=launch.get("purpose") == "probe")
     binding = launch["request"].get("binding") or {}
     owner = _owner(conn, row, binding)
     if owner["kind"] == "durable_task":

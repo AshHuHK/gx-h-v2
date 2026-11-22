@@ -16,7 +16,52 @@ from typing import Any, Generic, TypeVar
 from ..capabilities.manifest import parse_capability_version as _parse_capability_version
 from ..orchestration.hooks import WorkflowHooks as _WorkflowHooks
 
-__all__ = ["RegistrationContext", "Contributions", "ToolContribution", "WorkflowContribution"]
+__all__ = ["RegistrationContext", "RunContext", "Contributions", "ToolContribution", "WorkflowContribution"]
+
+
+@dataclass(frozen=True, slots=True)
+class TaskOperations:
+    read_context: Callable
+    inputs: Callable
+    propose: Callable
+
+
+@dataclass(frozen=True, slots=True)
+class ArtifactOperations:
+    read: Callable
+    publish: Callable
+
+
+@dataclass(frozen=True, slots=True)
+class JobOperations:
+    inspect_capability: Callable
+    propose: Callable
+    status: Callable
+    wait: Callable
+    cancel: Callable
+
+
+@dataclass(frozen=True, slots=True)
+class EvaluationOperations:
+    propose: Callable
+
+
+@dataclass(frozen=True, slots=True)
+class IntentOperations:
+    items: Callable
+
+
+@dataclass(frozen=True, slots=True)
+class RunContext:
+    """Named operations valid for the duration of this Run's hook or Root callback."""
+    run_id: str
+    task_id: str | None
+    attempt: int | None
+    tasks: TaskOperations
+    intent: IntentOperations
+    artifacts: ArtifactOperations
+    jobs: JobOperations
+    evaluations: EvaluationOperations
 
 
 @dataclass(frozen=True, slots=True)

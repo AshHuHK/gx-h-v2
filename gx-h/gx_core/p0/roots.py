@@ -14,6 +14,7 @@ from ..domain import clock, ids, machines
 from ..errors import GxError, HoldActive, IllegalTransition, OutcomeUnknown, ScopeDenied, SchemaInvalid
 from ..hostobs import host_policy
 from ..hostobs.app_server_client import AppServerClient, AppServerResponseError
+from ..orchestration.dispatch_preparation import DispatchPreparation
 from ..persistence import records, store
 from ..scheduling import dispatch as scheduler, snapshot
 from ..teams import recovery
@@ -85,7 +86,7 @@ def _artifact_refs(value):
     elif isinstance(value, dict):
         for field in value.values():
             yield from _artifact_refs(field)
-    elif isinstance(value, list):
+    elif isinstance(value, (list, tuple)):
         for item in value:
             yield from _artifact_refs(item)
 
@@ -105,6 +106,7 @@ class Roots:
         self.worker_call, self.main_call = worker_call, main_call
         self.worker_prepare = worker_prepare
         self._extension_tools = {spec["name"] for spec in worker_tools}
+        self._plugin_tools = getattr(worker_call, "plugin_names", frozenset())
         self.client = None
         self.disabled_mcp = {}
         self.loaded = set()
@@ -244,13 +246,13 @@ class Roots:
                                           "AND turn_id=? AND method='turn/start'", (thread_id,turn["id"])).fetchone()
             if not delivered:
                 return
-            from .science import record_failure
+            from ..research.records import record_attempt_failure
             clean = turn.get("status") == "completed"
             failure = "agent_execution_failure" if clean else "infrastructure_failure"
             reason = ("Worker completed a turn without submitting a product or waiting for a job" if clean
                       else "Official Codex turn " + str(turn.get("status")))
-            record_failure(self.conn, run_id=self.run_id, task_id=row["task_id"], attempt=row["attempt"],
-                           kind=failure, reason=reason, operation_id=turn["id"])
+            record_attempt_failure(self.conn, run_id=self.run_id, task_id=row["task_id"], attempt=row["attempt"],
+                                   kind=failure, reason=reason, operation_id=turn["id"])
             self.conn.execute("UPDATE p0_roots SET goal_desired='paused' WHERE thread_id=?", (thread_id,))
             self._goal_queue.add(thread_id)
             if clean:
@@ -365,7 +367,7 @@ class Roots:
                           str(rootdir), role, profile["model"], profile["effort"], brief, provider,
                           ids.canonical_json(tool_names) if "provider" in profile else None))
         if task is not None:
-            self._allow_refs(key, [packet["input"], current])
+            self._allow_refs(key, [packet["input"], getattr(current, "citations", current)])
         return self._row(key)
 
     def _allow_refs(self, root_key, value):
@@ -375,12 +377,23 @@ class Roots:
                               (root_key, ref, self.run_id))
 
     def _claim(self, task_id):
+        decision = self._claim_once(task_id)
+        if not isinstance(decision, DispatchPreparation):
+            return decision
+        if self.conn.in_transaction:
+            raise RuntimeError("finish the GX writer before preparing a scientific assignment")
+        prepared = decision.prepare()
+        return self._claim_once(task_id, preparation=(decision.basis, prepared))
+
+    def _claim_once(self, task_id, *, preparation=None):
         with store.transaction(self.conn):
             recovered = False
             task = self.conn.execute("SELECT * FROM tasks WHERE task_id=? AND run_id=?",
                                      (task_id, self.run_id)).fetchone()
             if not task:
                 raise ScopeDenied("task does not belong to this project")
+            if preparation is not None and task["status"] != "READY":
+                return None  # A competing claim or control took ownership during preparation.
             if task["status"] in ("CLAIMED", "RUNNING"):
                 previous = self.conn.execute("SELECT * FROM p0_roots WHERE lease_id=? "
                                              "AND task_id=?", (task["lease_id"], task_id)).fetchone()
@@ -406,26 +419,31 @@ class Roots:
             if (task["status"] != "READY" or recovery.consumed(self.conn, task) >= task["max_attempts"]):
                 raise IllegalTransition("this task is not ready or has spent its attempts")
             route = host_policy.p0_role_for_run(self.run, task["role"])
+            from .team_admission import claim_capacity
             try:
                 activity.require_provider_capacity(self.conn, {**route, "run_id":self.run_id}, "claim:" + task_id)
+                capacity, unavailable = claim_capacity(self.conn, self.run_id, task_id)
+                allowed = scheduler.admit_claim(snapshot.load(self.conn, self.run_id, now=clock.now_iso()),
+                                                task_id, root_capacity=capacity, unavailable=unavailable)
+                if not allowed.admitted:
+                    raise HoldActive(allowed.reason, details={"reason":"scheduler_wait","task_id":task_id})
             except HoldActive:
                 if recovered:
                     return None  # Commit the expired attempt before retrying capacity for its successor.
                 raise
-            if not hooks_for_run(self.conn, self.run_id).prepare_dispatch(self.conn, self.run_id, task):
-                return None
-            task = self.conn.execute("SELECT * FROM tasks WHERE task_id=?",(task_id,)).fetchone()
-            from .team_admission import claim_capacity
-            try:
-                capacity, unavailable = claim_capacity(self.conn, self.run_id, task_id)
-            except HoldActive:
-                if recovered:
+            ready = hooks_for_run(self.conn, self.run_id).prepare_dispatch(self.conn, self.run_id, task)
+            if isinstance(ready, DispatchPreparation):
+                if preparation is None:
+                    return ready
+                basis, prepared = preparation
+                if ready.basis != basis:
                     return None
-                raise
-            allowed = scheduler.admit_claim(snapshot.load(self.conn, self.run_id, now=clock.now_iso()),
-                                            task_id, root_capacity=capacity, unavailable=unavailable)
-            if not allowed.admitted:
-                raise HoldActive(allowed.reason, details={"reason":"scheduler_wait","task_id":task_id})
+                ready = ready.apply(prepared)
+            if not ready:
+                return None
+            task = self.conn.execute("SELECT * FROM tasks WHERE task_id=?", (task_id,)).fetchone()
+            if task["status"] != "READY" or not records.dependencies_satisfied(self.conn, task_id)[0]:
+                return None
             attempt = task["attempt"]+1
             lease = store.issue_lease(self.conn, task_id=task_id, owner="gx:p0-dispatch", worker_role=task["role"],
                                       seconds=default_lease_seconds(), attempt=attempt)
@@ -784,7 +802,7 @@ class Roots:
         envelope = {"thread_id":tid,"turn_id":turn,"call_id":call_id}
         digest = ids.sha256_of_obj([tool,args])
         prepared = None
-        if self.worker_prepare and tool in self._extension_tools:
+        if self.worker_prepare and tool in self._extension_tools and tool not in self._plugin_tools:
             binding = require_binding(self.conn, self.run_id, tid)
             if self.active_turns.get(tid) != turn or tool not in {t["name"] for t in self._tools_for(binding)}:
                 raise ScopeDenied("only the bound worker turn can request this calculation")
@@ -825,7 +843,8 @@ class Roots:
             if receipt:
                 if receipt["turn_id"]!=turn or receipt["request_sha"]!=digest:
                     raise ScopeDenied("conflicting root callback identifier")
-                if row["task_id"] is None or tool not in ("gx_read_artifact", "gx_task_context"):
+                requires_live_task = tool in self._plugin_tools or tool in ("gx_read_artifact", "gx_task_context")
+                if row["task_id"] is None or not requires_live_task:
                     return json.loads(receipt["result_json"])
             main = row["task_id"] is None
             tools = self._tools_for(row)
@@ -845,12 +864,9 @@ class Roots:
                 if tool == "gx_task_context" and not args:
                     answer = hooks_for_run(self.conn, self.run_id).build_task_context(
                         self.conn, self.run_id, row["task_id"], row["attempt"])
-                    self._allow_refs(row["root_key"], answer)
+                    self._allow_refs(row["root_key"], getattr(answer, "citations", answer))
                 elif tool == "gx_read_artifact":
-                    answer = self._read_artifact(row, args)
-                    # User-defined analytical output can contain identifier-shaped measurements.
-                    if not compute.is_analysis_data(self.conn,args["ref"]):
-                        self._allow_refs(row["root_key"],answer)
+                    answer = self._read_task_artifact(row, args)
                 elif tool in compute.TOOL_MAP:
                     answer = compute.call(self.conn,row,tool,args)
                     if tool == "gx_job_status":
@@ -859,6 +875,8 @@ class Roots:
                     answer = self._park_job(row, args["job_id"], turn_id=turn)
                 elif tool == "gx_submit_product" and set(args) == {"product"} and isinstance(args["product"],dict):
                     answer = self._submit(row,args["product"],envelope)
+                elif tool in self._plugin_tools:
+                    answer = self.worker_call.invoke(self, row, tool, args, envelope)
                 elif self.worker_call and tool not in {spec["name"] for spec in WORKER_TOOLS}:
                     if self.worker_prepare:
                         answer = self.worker_call(row,tool,args,envelope,prepared=prepared)
@@ -869,6 +887,13 @@ class Roots:
             self.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                               (tid,call_id,turn,digest,ids.canonical_json(answer)))
             return answer
+
+    def _read_task_artifact(self, binding, args):
+        answer = self._read_artifact(binding, args)
+        # An analytical output may contain arbitrary identifier-shaped measurements.
+        if not compute.is_analysis_data(self.conn, args["ref"]):
+            self._allow_refs(binding["root_key"], answer)
+        return answer
 
     def _artifact_access(self, binding, ref):
         allowed = self.conn.execute("SELECT media_type,rel_path FROM p0_root_artifact_reads JOIN artifacts USING(artifact_ref) "

@@ -40,7 +40,7 @@ from . import manifest as manifest_mod
 def capability_inspect(ctx: Ctx, args: dict[str, Any]) -> ToolResult:
     data = registry.inspect(
         ctx.conn, capability_id=args.get("capability_id"), filters=args.get("filters"),
-        include=args.get("include"), limit=args.get("limit"),
+        include=args.get("include"), limit=args.get("limit"), run_id=ctx.authz.get("run_id"),
     )
     if data["truncated"]:
         ctx.warn(f"more capabilities are registered than the {data['limit']} listed; narrow the "

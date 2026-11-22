@@ -3,13 +3,14 @@ import fcntl
 import json
 import os
 import re
+from contextlib import nullcontext
 
 from ..artifacts import ArtifactService
-from ..capabilities import shipped, storage
+from ..capabilities import registry, shipped, storage
 from ..capabilities.tools import capability_inspect
 from ..context import Ctx, Principal
 from ..domain import clock, ids
-from ..errors import GxError, IdempotencyConflict, SchemaInvalid, ScopeDenied
+from ..errors import CapabilityNotApproved, GxError, IdempotencyConflict, SchemaInvalid, ScopeDenied
 from ..jobs import leases, tools as job_tools
 from ..persistence import store
 
@@ -70,16 +71,19 @@ def _scope(conn, row, refs, *, internal):
             raise ScopeDenied("the current task has no access to the specified artifact")
 
 
-def _registered(conn, cap):
-    key, version = cap.rsplit("@", 1)
-    if cap not in shipped.MANIFESTS and not conn.execute(
-            "SELECT 1 FROM capabilities WHERE capability_id=? AND version=? AND status='ACTIVE'",
-            (key, version)).fetchone():
-        raise ScopeDenied("this capability version is outside the registered catalog")
+def _registered(conn, run_id, cap):
+    if cap in shipped.MANIFESTS:
+        return  # Built-ins may be initialized when the proposal is drained.
+    if not shipped.participates(conn, run_id, cap):
+        raise ScopeDenied(f"{cap} is outside the Run composition")
+    try:
+        registry.resolve(conn, cap)
+    except CapabilityNotApproved as exc:
+        raise ScopeDenied("this capability version is outside the registered catalog") from exc
 
 
 def queue_job(conn, row, *, capability_version, inputs, parameters, idempotency_key, tighten=None,
-              binding=None, internal=False, analysis=None):
+              binding=None, internal=False, analysis=None, join_callback=False):
     from .roots import require_binding
     owner = require_binding(conn, row["run_id"], row["thread_id"])
     if row["root_key"] != owner["root_key"]:
@@ -103,7 +107,9 @@ def queue_job(conn, row, *, capability_version, inputs, parameters, idempotency_
     request_text = ids.canonical_json(request)
     if len(request_text.encode()) > 24576 or analysis and len(ids.canonical_json(analysis).encode()) > 16384:
         raise SchemaInvalid("job proposal exceeds its declared size limit")
-    with store.transaction(conn):
+    if join_callback and not conn.in_transaction:
+        raise RuntimeError("an atomic callback proposal requires its active writer")
+    with (nullcontext(conn) if join_callback else store.transaction(conn)):
         old = conn.execute("SELECT p.* FROM p0_job_proposals p JOIN p0_roots r USING(root_key)"
                            " WHERE p.run_id=? AND r.task_id=? AND p.operation_key=? ORDER BY p.rowid LIMIT 1",
                            (row["run_id"],row["task_id"],idempotency_key)).fetchone()
@@ -125,7 +131,7 @@ def queue_job(conn, row, *, capability_version, inputs, parameters, idempotency_
                     conn.execute("UPDATE p0_job_proposals SET root_key=?,wait_started=NULL,wait_turn=NULL,wait_ended=NULL"
                                  " WHERE job_id=?", (row["root_key"],old["job_id"]))
             return {"job_id": old["job_id"], "status": job_status(conn, row, old["job_id"])["status"]}
-        _registered(conn, capability_version)
+        _registered(conn, row["run_id"], capability_version)
         _scope(conn, row, inputs.values(), internal=internal)
         job_id = ids.new_id("job")
         conn.execute("INSERT INTO p0_job_proposals(job_id,run_id,root_key,operation_key,request_json,state)"
@@ -218,7 +224,7 @@ def pending_wait(conn, root_key, turn=None):
     return conn.execute(sql+(" AND wait_turn=?" if turn else ""), (root_key,turn) if turn else (root_key,)).fetchone()
 
 
-def call(conn, row, name, args):
+def call(conn, row, name, args, *, join_callback=False):
     spec = TOOL_MAP[name]["inputSchema"]
     if set(args) - set(spec["properties"]) or set(spec["required"]) - set(args):
         raise SchemaInvalid("invalid arguments to " + name)
@@ -236,7 +242,9 @@ def call(conn, row, name, args):
         from ..capabilities import manifest as capability_manifest
         requested = args.get("capability_id")
         key, sep, version = (requested or "").partition("@")
-        result = capability_inspect(_ctx(conn,row,name),{**args,"capability_id":key or None}).data
+        ctx = _ctx(conn, row, name)
+        ctx.authz["run_id"] = row["run_id"]
+        result = capability_inspect(ctx, {**args, "capability_id": key or None}).data
         if sep:
             result["capabilities"] = [item for item in result["capabilities"] if item["version"] == version]
         # Release methods are discoverable before their first execution. Their local governance state is explicit.
@@ -267,10 +275,10 @@ def call(conn, row, name, args):
             if not special:
                 raise SchemaInvalid("artifact-analysis@1 requires script and output_schema")
             special["parameters"] = params
-            return queue_job(conn, row, **args, parameters={}, analysis=special)
+            return queue_job(conn, row, **args, parameters={}, analysis=special, join_callback=join_callback)
         if special:
             raise SchemaInvalid("analysis script fields apply only to artifact-analysis@1")
-        return queue_job(conn,row,**args,parameters=params)
+        return queue_job(conn,row,**args,parameters=params,join_callback=join_callback)
     status = job_status(conn,row,args["job_id"])
     if name == "gx_job_status" or status["terminal"]:
         return status

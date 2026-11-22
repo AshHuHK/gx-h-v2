@@ -138,6 +138,7 @@ def drive_workspace(conn, directory, timeout):
     from .workspace import list_runs
     deadline = time.monotonic() + timeout
     drivers, finished, retry_at, failures = {}, {}, {}, {}
+    plugin_waits = {}
     start_retry_at = {}
     try:
         while time.monotonic() < deadline:
@@ -172,6 +173,10 @@ def drive_workspace(conn, directory, timeout):
                     del drivers[rid]
                     if end.value and end.value.get("driver") != "time_limit":
                         finished[rid] = (end.value["status"], inbox)
+                        if end.value.get("driver") == "plugin_unavailable":
+                            plugin_waits[rid] = end.value["reason"]
+                        else:
+                            plugin_waits.pop(rid, None)
                         if end.value["status"] in machines.terminal_states("run"):
                             from .workspace import release_finished
                             release_finished(conn)
@@ -188,9 +193,11 @@ def drive_workspace(conn, directory, timeout):
                                     for r in list_runs(conn)) and not _pending_start(conn)):
                 from .workspace import release_finished
                 release_finished(conn)
-                return overview(conn)
+                return {**overview(conn), **({"plugin_waits": plugin_waits} if plugin_waits else {})}
             time.sleep(min(0.035, max(0, deadline - time.monotonic())))
         result = overview(conn)
+        if plugin_waits:
+            result["plugin_waits"] = plugin_waits
         result["driver"] = "time_limit"
         return result
     finally:

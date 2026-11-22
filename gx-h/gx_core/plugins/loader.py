@@ -108,9 +108,10 @@ def _label(key: Key) -> str:
 class _Resolver:
     """Select and preflight a complete dependency closure before running its entrypoints."""
 
-    def __init__(self, catalog: Catalog, expected: dict[Key, set[str]]):
+    def __init__(self, catalog: Catalog, expected: dict[Key, set[str]], frozen: bool):
         self.catalog = catalog
         self.expected = expected
+        self.frozen = frozen
         self.verified: dict[Key, tuple[Package, dict[str, Source]]] = {}
 
     def closure(self, root: Key) -> list[Key]:
@@ -142,6 +143,11 @@ class _Resolver:
             package, _ = self.verified[key]
             for dep in sorted(package.manifest.dependencies, key=lambda item: (item.id, item.version)):
                 dependency = (dep.id, dep.version)
+                if self.frozen and dependency not in self.expected:
+                    if dep.optional:
+                        continue
+                    chain = " -> ".join(map(_label, [*path, dependency]))
+                    raise ValueError(f"{chain}: required dependency is missing from the frozen closure")
                 if not dep.optional or self.catalog.has(dependency) or self.expected.get(dependency):
                     visit(dependency)
             path.pop()
@@ -153,8 +159,8 @@ class _Resolver:
 
 
 def bootstrap(install_root: Path | None = None, catalog_path: Path | None = None,
-              selected: Iterable[Key | Pin] = ()) -> Registry:
-    """Select exact (id, version) pairs or digest-pinned Pin values. Collect local failures."""
+              selected: Iterable[Key | Pin] = (), *, frozen_closure: Iterable[Pin] | None = None) -> Registry:
+    """Load exact roots. On restoration only the stored closure can supply dependencies."""
     expected: dict[Key, set[str]] = {}
     for item in selected:
         if isinstance(item, Pin):
@@ -162,18 +168,28 @@ def bootstrap(install_root: Path | None = None, catalog_path: Path | None = None
         else:
             plugin_id, version = item
             expected.setdefault((plugin_id, version), set())
+    roots = sorted(expected)
+    frozen = frozen_closure is not None
+    if frozen:
+        restored: dict[Key, set[str]] = {}
+        for pin in frozen_closure:
+            restored.setdefault((pin.id, pin.version), set()).add(pin.digest)
+        for key, requested in expected.items():
+            if key not in restored or not requested.issubset(restored[key]):
+                raise ValueError(f"{_label(key)} is outside the frozen plugin closure")
+        expected = restored
     loaded = {}
     failures = {}
-    if expected:
+    if roots:
         try:
             catalog = Catalog(install_root if install_root is not None else config.HARNESS_ROOT / "plugins" / "installed",
                               catalog_path if catalog_path is not None else config.CONFIG_DIR / "workflow_packages.json")
         except (ValueError, OSError) as exc:
-            failures = {key: f"installation catalog: {exc}" for key in expected}
+            failures = {key: f"installation catalog: {exc}" for key in roots}
         else:
-            resolver = _Resolver(catalog, expected)
+            resolver = _Resolver(catalog, expected, frozen)
             registration_errors = {}
-            for key in sorted(expected):
+            for key in roots:
                 try:
                     for member in resolver.closure(key):
                         package, sources = resolver.verified[member]

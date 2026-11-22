@@ -122,13 +122,23 @@ def start(conn, directory, spec, *, run_key=None, run_id=None):
     flow = service.default_registry(conn, workflow_id=workflow, version=version).get(workflow, version)
     service.seams.workflow_admission(conn, workflow_id=workflow, version=version,
                                     sha256=flow.digest(), sources_complete=flow.sources_complete())
-    start_spec = flow.hooks.research_start(spec)
+    bound = None
+    if "plugins" in spec and spec["plugins"] != []:
+        from ..plugins import runtime
+        from . import operator
+        operator.authorize_project(operator.local_context(conn), spec["project"])
+        if current is None:
+            bound = runtime.for_start(context(conn), flow, spec["plugins"])
+        elif (saved := runtime.recorded(current)) is not None:
+            bound = runtime.for_saved(flow, saved)
+    hooks = bound.hooks if bound else flow.hooks
+    start_spec = hooks.research_start(spec)
     action = initial_action(spec, start_spec)
     inputs = {**start_spec.inputs, "p0": True, "p0_spec": spec, "max_rounds": spec["max_rounds"]}
     files, roles = list(start_spec.files), dict(start_spec.roles)
 
     def bootstrap(rid):
-        flow.hooks.bootstrap_intent(conn, rid, action["items"], roles)
+        hooks.bootstrap_intent(conn, rid, action["items"], roles)
         initial = workspace.bootstrap_action(conn, rid, action)
         mid = str(uuid.uuid5(uuid.NAMESPACE_URL, "gx-p0-bootstrap/" + rid))
         if run_key is not None:
@@ -157,7 +167,7 @@ def start(conn, directory, spec, *, run_key=None, run_id=None):
     outcome = service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
                       "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
                       "inputs": inputs, "input_files": files, "idempotency_key": workspace.start_key(spec["project"], run_key)},
-                      prepare_p0=bootstrap, workspace_key=run_key)
+                      prepare_p0=bootstrap, workspace_key=run_key, plugin_binding=bound)
     return snapshot(conn, outcome["run_id"])
 
 

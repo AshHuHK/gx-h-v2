@@ -1,4 +1,10 @@
 {
+  "plugins": [
+    {
+      "path": "org.gx.science-grid/2.0.0",
+      "sha256": "171e6f12272b3d6cd3a8ff2055c9e092c2512113bfdc0684da48a834a6c8d0ef"
+    }
+  ],
   "packages": [
     {
       "module": "workflows.module_collaboration",
@@ -14,6 +20,12 @@
     },
     {
       "module": "workflows.science_grid_v2",
+      "dispatch_preparation": {
+        "science_grid@2": {
+          "function": "workflows.compat_v20.grid_dispatch:prepare_dispatch",
+          "sha256": "279d09347a9c88d8fd3ee753b94c24c5417a3b23f8d8c3652b6df5fa13bc481e"
+        }
+      },
       "compat_hooks": {
         "science_grid@2": "workflows.compat_v20.grid:v2_hooks"
       }

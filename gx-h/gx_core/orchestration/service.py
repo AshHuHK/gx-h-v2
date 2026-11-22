@@ -205,6 +205,10 @@ def hooks_for_run(conn, run_id):
     flow = _pinned_workflow(conn, run)
     if run["workflow_sha256"] and flow.digest() != run["workflow_sha256"]:
         raise VersionImmutable("The installed workflow behavior differs from this run's original workflow pin")
+    if '"plugin_binding"' in (run["inputs_json"] or ""):
+        from ..plugins import runtime
+        if (saved := runtime.recorded(run)) is not None:
+            return runtime.for_saved(flow, saved).hooks
     return flow.hooks
 
 
@@ -492,7 +496,7 @@ def _require_capable_session(conn: sqlite3.Connection, host: Mapping[str, Any]) 
     )
 
 
-def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_key=None) -> dict[str, Any]:
+def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_key=None, plugin_binding=None) -> dict[str, Any]:
     """Create a run with its pins, objective, budget and coordinator lease, then run the
     workflow to its first interrupt. Returns as soon as outside work is needed."""
     config.check_holds("orchestration")
@@ -536,7 +540,8 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     _require_capable_session(conn, host)
     files = _check_input_files(args.get("input_files") or [])
     inputs = dict(args.get("inputs") or {})
-    inputs = workflow.hooks.run_inputs(inputs)
+    hooks = plugin_binding.hooks if plugin_binding else workflow.hooks
+    inputs = hooks.run_inputs(inputs)
     constraints = dict(args.get("constraints") or {})
     if inputs.get("p0") is True and prepare_p0 is None:
         raise PermissionDenied("Use the P0 operator entry to authorize a new research project")
@@ -557,6 +562,8 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
                "host": args.get("host"), "constraints": constraints}
     if workspace_key is not None:
         request["workspace_key"] = workspace_key
+    if plugin_binding:
+        request["plugin_binding"] = plugin_binding.receipt
     if ctx.native_call is not None:
         # A model may omit host/session from its arguments. Bind start replay to
         # the backend-settled native root, while allowing new calls/connections
@@ -615,8 +622,10 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
                     )
                 ref = published.artifact_ref
             stored_files.append({**item, "artifact_ref": ref})
-        tx.execute("UPDATE runs SET inputs_json=? WHERE run_id=?",
-                   (store._j({"inputs": inputs, "files": stored_files}), run_id))
+        run_inputs = {"inputs": inputs, "files": stored_files}
+        if plugin_binding:
+            run_inputs["plugin_binding"] = plugin_binding.receipt
+        tx.execute("UPDATE runs SET inputs_json=? WHERE run_id=?", (store._j(run_inputs), run_id))
 
         objective_id = ids.new_id("objective")
         spec = {"objective": objective, "text": text}

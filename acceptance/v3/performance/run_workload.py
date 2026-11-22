@@ -18,6 +18,7 @@ WAVE_OFFSETS = tuple(range(0, 7201, 600))
 LANES = ("west", "east")
 MODEL = "gpt-6.2-astra"
 EFFORT = "xhigh"
+GRID_PLUGIN = "org.gx.science-grid@2.0.0"
 OFFICIAL_BINARY_SHA256 = "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b"
 
 
@@ -91,6 +92,8 @@ def main():
     p.add_argument("--runtime", type=Path, required=True)
     p.add_argument("--private", type=Path, required=True)
     p.add_argument("--evidence", type=Path, required=True)
+    p.add_argument("--composed-grid", action="store_true",
+                   help="P1 arm: select the reviewed science-grid plugin in every public Run specification")
     args = p.parse_args()
     os.umask(0o077)
     source, runtime, work = args.source.resolve(), args.runtime.resolve(), args.private.resolve()
@@ -164,7 +167,22 @@ def main():
         "capacity":"at least 2 simultaneous real workers; first admitted to last completed real turn spans at least 7200s; report actual occupied time separately",
         "latency_review":"investigate p95 increase over both 25% and 5 ms for GX dispatch, callbacks and SQLite transactions",
         "quality_review":"investigate greater than 10% decrease in completed turns/hour or accepted runs/hour, added job failures or discrepancies in accounting"}}
+    if args.composed_grid:
+        start_env["public_plugin_selection"]={"plugins":[GRID_PLUGIN]}
+        start_env["predeclared_comparison"]["latency_review"]="investigate p95 increase over both 20% and 5 ms for GX dispatch, callbacks and SQLite transactions"
     save(out/"environment.json", start_env)
+    if args.composed_grid:
+        verify, verification=launch("operator-plugin-verify", ["plugin","verify",GRID_PLUGIN])
+        verify.wait(timeout=90)
+        receipt(verify,verification)
+        installed=json.loads((work/"operator-plugin-verify.out").read_bytes())
+        save(out/"operator-plugin-verify.json",installed)
+        selected=next((v for v in installed.get("plugins",[]) if v["id"]+"@"+v["version"]==GRID_PLUGIN),None)
+        if verify.returncode or not selected or installed.get("failures"):
+            raise RuntimeError("Public operator verification did not resolve the reviewed grid plugin")
+        required={"workflows":"science_grid@2","tools":"gx_grid_measurement","capabilities":"fixture-grid@1"}
+        if any(value not in selected["contributions"][kind] for kind,value in required.items()):
+            raise RuntimeError("Reviewed grid plugin lacks its workflow, worker tool or canonical capability")
     pre, pre_row=launch("oauth-readiness", ["doctor"])
     pre.wait(timeout=125)
     receipt(pre,pre_row)
@@ -192,12 +210,22 @@ def main():
         for lane in LANES:
             key=f"{wave:02d}-{lane}"
             spec_file = specdir/(key+".json")
-            save(spec_file, specification(stage,wave,lane))
+            project=specification(stage,wave,lane)
+            if args.composed_grid:
+                project["plugins"]=[GRID_PLUGIN]
+            save(spec_file, project)
             r, info=launch("start-"+key,["start","--state",str(state),"--run-key",key,"--spec",str(spec_file)])
             r.wait(timeout=180)
             receipt(r,info)
             if r.returncode:
                 raise RuntimeError("Staging Start failed: "+key)
+            if args.composed_grid:
+                opened=json.loads((work/("start-"+key+".out")).read_bytes())["plugin_binding"]
+                selected_digests={pin["id"]+"@"+pin["version"]:pin["sha256"] for pin in opened["packages"]}
+                if selected_digests.get(GRID_PLUGIN)!=selected["sha256"] or (
+                    opened["workflow"]["id"],opened["workflow"]["version"])!=("science_grid","2") or not any(
+                    method["capability_version"]=="fixture-grid@1" for method in opened["capabilities"]):
+                    raise RuntimeError("Public Run did not preserve the requested plugin, graph and capability: "+key)
         driver=launch(f"drive-{wave:02d}",["run","--state",str(state),"--timeout","870"])
         drivers.append(driver)
         append(out/"arrivals.jsonl",{"wave":wave,"utc":utc(),"seconds_from_first_release":round(time.monotonic()-base_time,3),

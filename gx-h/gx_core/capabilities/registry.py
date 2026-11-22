@@ -101,7 +101,7 @@ def asset_row(conn: sqlite3.Connection, capability_id: str, version: str) -> sql
 
 # ------------------------------------------------------------------------------ scripts
 
-def publish_script(ctx: Ctx, rel_path: str) -> dict[str, str]:
+def publish_script(ctx: Ctx, rel_path: str, *, expected_sha256: str | None = None) -> dict[str, str]:
     """Publish one script of this tree by content and return the ScriptRef that binds it.
 
     ``rel_path`` is relative to this tree. The reference names the path the bytes were
@@ -118,6 +118,8 @@ def publish_script(ctx: Ctx, rel_path: str) -> dict[str, str]:
         )
     data = path.read_bytes()
     digest = hashlib.sha256(data).hexdigest()
+    if expected_sha256 is not None and digest != expected_sha256:
+        raise ContentHashMismatch(f"{rel_path} differs from its verified installation")
     published = storage.artifact_service(ctx.conn).publish_bytes(
         namespace=f"{SCRIPT_NAMESPACE}/{digest[:16]}", rel_path=Path(rel_path).name,
         kind=SCRIPT_KIND, data=data, media_type="text/x-python", actor=ctx.actor,
@@ -162,6 +164,7 @@ def register_candidate(
     task_id: str | None = None,
     commit: bool = True,
     shipped_digest: str | None = None,
+    installed_package: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     """Take a manifest bundle in as a candidate capability version.
 
@@ -208,10 +211,13 @@ def register_candidate(
     assets = _governance_assets()
     with store.transaction(conn) as txn:
         content_ref = assets.publish_content(ctx, canonical)
+        source = {"admission": "SHIPPED", "shipped_sha256": shipped_digest} if shipped_digest else {}
+        if installed_package is not None:
+            source["installed_package"] = dict(installed_package)
         answer = assets.submit_asset(
             ctx, kind=ASSET_KIND, manifest=manifest, content_ref=content_ref, origin=origin,
             run_id=run_id, task_id=task_id,
-            source={"admission": "SHIPPED", "shipped_sha256": shipped_digest} if shipped_digest else None,
+            source=source,
         )
         recorded = answer["asset_ref"]["sha256"]
         if recorded != digest:
@@ -389,8 +395,8 @@ def active_view(conn: sqlite3.Connection, view: dict[str, Any]) -> dict[str, Any
     environment's readiness, or ``CAPABILITY_NOT_APPROVED`` when the version is not ACTIVE."""
     capability_version = view["capability_version"]
     shipped = False
-    from .shipped import MANIFESTS, admitted
-    if view["status"] == "DRAFT" and capability_version in MANIFESTS:
+    from .shipped import admitted
+    if view["status"] == "DRAFT":
         source = _governance_assets().get(conn, view["capability_id"], view["version"], kind=ASSET_KIND)["source"]
         shipped = admitted(view, source)
     if shipped:
@@ -666,6 +672,7 @@ def inspect(
     filters: Mapping[str, Any] | None = None,
     include: Sequence[str] | None = None,
     limit: int | None = None,
+    run_id: str | None = None,
 ) -> dict[str, Any]:
     """The ``gx_capability_inspect`` payload.
 
@@ -697,7 +704,10 @@ def inspect(
 
     out: list[dict[str, Any]] = []
     truncated = False
+    from .shipped import participates
     for row in rows:
+        if run_id is not None and not participates(conn, run_id, f"{row['capability_id']}@{row['version']}"):
+            continue
         asset = asset_row(conn, row["capability_id"], row["version"])
         status = asset["status"] if asset is not None else row["status"]
         card = store.loads(row, "method_card_json", {}) or {}

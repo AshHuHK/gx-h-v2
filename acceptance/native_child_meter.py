@@ -1,9 +1,11 @@
 """Measure root/child accounting through production Roots with an official binary and loopback Responses."""
 import argparse
+import hashlib
 from contextlib import closing
 import json
 import os
 from pathlib import Path
+import subprocess
 from tempfile import TemporaryDirectory
 import threading
 import time
@@ -17,6 +19,11 @@ from gx_core.persistence import records, store
 
 
 def measure(directory, binary):
+    version = subprocess.check_output([str(binary), "--version"], text=True).strip()
+    if version != "codex-cli 0.169.0":
+        raise RuntimeError(f"Expected the pinned official binary, got {version}")
+    with binary.open("rb") as stream:
+        digest = hashlib.file_digest(stream, "sha256").hexdigest()
     peer = Peer()
     threading.Thread(target=peer.serve_forever, daemon=True).start()
     probe = Probe(directory / "official", binary, peer)
@@ -46,7 +53,8 @@ def measure(directory, binary):
                 ledger = budgets.state(conn, budget)
                 parent_tokens = sum(r["usage"]["total_tokens"] for r in peer.rows if not r["child"])
                 child_tokens = sum(r["usage"]["total_tokens"] for r in peer.rows if r["child"])
-                result = {"provider":"official Codex with loopback scripted Responses","run_id":run,
+                result = {"provider":"official Codex with loopback scripted Responses","binary_version":version,
+                          "binary_sha256":digest,"run_id":run,
                           "root_thread_id":tid,"root_turn":turn,"root_usage":dict(raw) if raw else None,
                           "official_child_metadata":{k:original.get(k) for k in ("id","parentThreadId","sessionId","source")},
                           "child_meter":dict(child) if child else None,"child_usage":observations,

@@ -1,0 +1,54 @@
+{
+  "manifest": {
+    "capability_id": "tl1a-review",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--method",
+        "{harness}/adapters/scientific/tl1a_geometry/review.py",
+        "--structure",
+        "{in.structure}",
+        "--criteria",
+        "{in.criteria}",
+        "--observations",
+        "{in.observations}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "rigid_protein_backbone_superposition",
+      "mechanism": "Independently parse the raw deposited mmCIF with Biopython and reproduce each assigned atom mapping and chain-pair fit in one reviewer-owned Job.",
+      "objective": "Compare the frozen original measurements with independent proper least-squares SVD fits.",
+      "estimator": "Bio.SVDSuperimposer and NumPy LAPACK SVD; compare all fitted RMSDs and unsigned rotations under the frozen reproduction tolerances.",
+      "training_data_lineage": "Deterministic coordinate analysis; no learned weights or training data."
+    },
+    "source": {
+      "path": "{harness}/adapters/scientific/tl1a_geometry/review.py",
+      "sha256": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705"
+    },
+    "licence": "The deposited data carry CC0-1.0. The Chaperone metric precedent carries MIT.",
+    "licence_basis": "adapters/scientific/tl1a_geometry/data/LICENSE.cc0 and adapters/scientific/tl1a_geometry/LICENSE.chaperone",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "checks.json",
+        "kind": "file:geometry_review_batch",
+        "required": true
+      }
+    ],
+    "limitations": "Single deposited TL1A crystal model 2RE9, label entity 1, chains A/B/C. Monomer mapping and relative rotations describe observed coordinates. No solution assembly, binding or functional estimates."
+  },
+  "entry_script": "adapters/scientific/tl1a_geometry/review_batch.py"
+}

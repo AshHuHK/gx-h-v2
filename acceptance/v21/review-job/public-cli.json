@@ -1,0 +1,139 @@
+{
+  "budget": {
+    "root_job_limit": 200,
+    "formal_job_limit": 6,
+    "jobs_charged": 6
+  },
+  "mode": "official Codex 0.169.0 with local scripted Responses, real detached CPU Jobs",
+  "external_model_calls": 0,
+  "workflow": {
+    "workflow_id": "tl1a_geometry",
+    "workflow_version": "3",
+    "workflow_sha256": "80f8b0b513b1a14eb37b6cb662a89bd8f4ebc94e91b51189f37ee28b59b00568",
+    "status": "COMPLETED"
+  },
+  "run": "gxr_01m81sb84hffvy5ym8",
+  "jobs": [
+    {
+      "job_id": "gxj_01m81sbaq0340xj834",
+      "capability_id": "tl1a-coordinate-quality",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:2713762:2967593300"
+    },
+    {
+      "job_id": "gxj_01m81sbcy0hwwqbv1a",
+      "capability_id": "tl1a-geometry",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:2715101:2967593510"
+    },
+    {
+      "job_id": "gxj_01m81sbd2fdqbcv5t2",
+      "capability_id": "tl1a-geometry",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:2715106:2967593522"
+    },
+    {
+      "job_id": "gxj_01m81sbdxh86ps0frz",
+      "capability_id": "tl1a-review",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:2715173:2967593615"
+    },
+    {
+      "job_id": "gxj_01m81sbg9bb4faq5mp",
+      "capability_id": "tl1a-geometry",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:2715259:2967593853"
+    },
+    {
+      "job_id": "gxj_01m81sbh3c48n1st6r",
+      "capability_id": "tl1a-review",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:2715300:2967593942"
+    }
+  ],
+  "reviews": [
+    {
+      "job_id": "gxj_01m81sbdxh86ps0frz",
+      "owner": {
+        "attempt": 1,
+        "attempt_id": "41e3f7bb-ddf8-4af8-951c-64a4586d602b",
+        "kind": "durable_task",
+        "lease_id": "gxl_01m81sbdhpybet4hqe",
+        "task_id": "gxt_01m81sbdgd6vck7zeh",
+        "thread_id": "01a20395-b642-7d23-8822-3d07c6c8a44c",
+        "workflow_id": "tl1a_geometry"
+      },
+      "assigned_root": {
+        "role": "evidence_reviewer",
+        "attempt": 1,
+        "model": "gpt-6.2-astra"
+      },
+      "protocols": [
+        "common_backbone",
+        "common_ca"
+      ],
+      "manifest_hash": "1fa7836ed0f804e72614c7b4657ed9ab190f7c88b3f518d5a88ab54c694b2e8c",
+      "raw_output": {
+        "artifact_ref": "gxa_01m81sbf5a6s0x2dpk",
+        "bytes": 6749,
+        "kind": "geometry_review_batch",
+        "output_name": "checks.json",
+        "runner_sha256": "74fee25311b4919f3b0f6ac56475468a89b72c938fd223d1d54a5d3762c1bb01",
+        "sha256": "74fee25311b4919f3b0f6ac56475468a89b72c938fd223d1d54a5d3762c1bb01",
+        "validated": false
+      },
+      "check_refs": {
+        "common_backbone": "gxa_01m81sbf9cvxkyj6h1",
+        "common_ca": "gxa_01m81sbfejjz855qb9"
+      },
+      "request_turn": "01a20395-b651-72d2-a342-3656fc87c9c1",
+      "collection_turns": [
+        "01a20395-bcc8-7da1-81f4-856babb486a2"
+      ]
+    },
+    {
+      "job_id": "gxj_01m81sbh3c48n1st6r",
+      "owner": {
+        "attempt": 1,
+        "attempt_id": "f0e358d2-0ec4-463f-93cb-2e6e681973d2",
+        "kind": "durable_task",
+        "lease_id": "gxl_01m81sbgr6j8xcnmee",
+        "task_id": "gxt_01m81sbgqfp2ry8ymg",
+        "thread_id": "01a20395-c30d-7330-bcd3-d5bada74e69a",
+        "workflow_id": "tl1a_geometry"
+      },
+      "assigned_root": {
+        "role": "evidence_reviewer",
+        "attempt": 1,
+        "model": "gpt-6.2-astra"
+      },
+      "protocols": [
+        "common_backbone",
+        "common_ca",
+        "ordered_backbone"
+      ],
+      "manifest_hash": "d71345dbd889a07fce140dd5d57021433e5d8b0c3e4a608fc2ed776cf3608258",
+      "raw_output": {
+        "artifact_ref": "gxa_01m81sbjc9rp073b3r",
+        "bytes": 10049,
+        "kind": "geometry_review_batch",
+        "output_name": "checks.json",
+        "runner_sha256": "db6eb3801a24d606945ff9e598ee92f3fbc839a20d552636c75fd7e46b789180",
+        "sha256": "db6eb3801a24d606945ff9e598ee92f3fbc839a20d552636c75fd7e46b789180",
+        "validated": false
+      },
+      "check_refs": {
+        "common_backbone": "gxa_01m81sbjgqb2eds297",
+        "common_ca": "gxa_01m81sbjp19x9r50aq",
+        "ordered_backbone": "gxa_01m81sbjv2pkr8jaf3"
+      },
+      "request_turn": "01a20395-c31f-7031-9a2a-2185d1a4376d",
+      "collection_turns": [
+        "01a20395-c9af-7bb1-9f42-703bc1b7645c"
+      ]
+    }
+  ],
+  "report_ref": "gxa_01m81sbm155nrja8fj",
+  "rounds": 2,
+  "cold_terminal_reopen_same_jobs_and_report": true
+}

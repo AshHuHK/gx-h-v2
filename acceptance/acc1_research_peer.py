@@ -5,7 +5,7 @@ tool calls. All coordinate processing and validation run in the public GX CLI.
 """
 import json
 
-from e2e_responses import brief_from, output_json
+from e2e_responses import brief_from, message_texts, output_json
 
 
 class NeedTool(Exception):
@@ -85,6 +85,14 @@ def peer_action(body, ident, *, finish_if_stable=False):
                     if route.get('observations_ref'):
                         read(route['observations_ref'])
                         reproduced = get('gx_recalculate_geometry', protocol=route['protocol'])
+                        if reproduced.get('waiting'):
+                            job_id = reproduced['job_id']
+                            parked = get('gx_wait_job', job_id=job_id)
+                            awakened = any(f'GX job {job_id} is now ' in text for item in body['input']
+                                           if item.get('role') == 'user' for text in message_texts(item))
+                            if parked.get('waiting') and not awakened:
+                                return message('Parked on the assigned independent fit Job.', info)
+                            raise NeedTool('gx_recalculate_geometry', {'protocol': route['protocol']})
                         if reproduced['status'] != 'matches':
                             raise ValueError('independent and primary fits disagree')
                         checks[route['protocol']] = reproduced['check_ref']

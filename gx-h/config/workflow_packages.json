@@ -1,0 +1,71 @@
+{
+  "packages": [
+    {
+      "module": "workflows.module_collaboration",
+      "compat_hooks": {
+        "module_collaboration@1": "gx_core.orchestration.hooks:DEFAULT_HOOKS"
+      }
+    },
+    {
+      "module": "workflows.science_grid",
+      "compat_hooks": {
+        "science_grid@1": "workflows.compat_v20.grid:hooks"
+      }
+    },
+    {
+      "module": "workflows.science_grid_v2",
+      "compat_hooks": {
+        "science_grid@2": "workflows.compat_v20.grid:v2_hooks"
+      }
+    },
+    {
+      "module": "workflows.tl1a_coordinate_quality",
+      "compat_hooks": {
+        "tl1a_coordinate_quality@1": "workflows.compat_v20.geometry:quality_hooks"
+      }
+    },
+    {
+      "module": "workflows.tl1a_geometry",
+      "compat_hooks": {
+        "tl1a_geometry@1": "workflows.compat_v20.geometry:hooks"
+      }
+    },
+    {
+      "module": "workflows.tl1a_geometry_v2",
+      "compat_hooks": {
+        "tl1a_geometry@2": "workflows.compat_v20.geometry:hooks"
+      }
+    },
+    {
+      "module": "workflows.tl1a_geometry_v3"
+    }
+  ],
+  "default": "module_collaboration@1",
+  "research_default": "science_grid@2",
+  "research_versions": {
+    "science_grid": "2",
+    "tl1a_geometry": "3"
+  },
+  "examples": {
+    "demo-grid": {
+      "factory": "workflows.compat_v20.grid:demo_spec",
+      "help": "Start the numerical grid example"
+    },
+    "tl1a-geometry": {
+      "file": "examples/tl1a_geometry_v3/project.json",
+      "help": "Start a coordinate study with independent review Jobs"
+    },
+    "tl1a-geometry-v2": {
+      "factory": "workflows.compat_v20.geometry:example_spec",
+      "help": "Start the bounded 2RE9 coordinate study",
+      "private": true
+    }
+  },
+  "python_examples": {
+    "demo_spec": "demo-grid",
+    "geometry_spec": "tl1a-geometry-v2"
+  },
+  "native_guidance": {
+    "module-leads": "workflows/compat_v20/module_leads.txt"
+  }
+}

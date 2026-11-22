@@ -1,0 +1,703 @@
+{
+  "manifests": {
+    "gxj_01m81sbdxh86ps0frz": {
+      "job_id": "gxj_01m81sbdxh86ps0frz",
+      "admission": {
+        "admitted_at": "2026-11-22T14:07:53.356Z",
+        "argv": [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python3",
+          "-I",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/gx-h/adapters/scientific/tl1a_geometry/review_batch.py",
+          "--method",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/gx-h/adapters/scientific/tl1a_geometry/review.py",
+          "--structure",
+          "/tmp/tmppjfkjpw0/state/jobs/gxj_01m81sbdxh86ps0frz/in/structure.cif",
+          "--criteria",
+          "/tmp/tmppjfkjpw0/state/jobs/gxj_01m81sbdxh86ps0frz/in/criteria.json",
+          "--observations",
+          "/tmp/tmppjfkjpw0/state/jobs/gxj_01m81sbdxh86ps0frz/in/observations.json",
+          "--out",
+          "/tmp/tmppjfkjpw0/state/artifacts/.staging/jobs/gxj_01m81sbdxh86ps0frz/stg_d0i2v1bz"
+        ],
+        "attempt_id": "41e3f7bb-ddf8-4af8-951c-64a4586d602b",
+        "backend": "detached_runner",
+        "budget_reservation_ref": "rsv_01m81sbe0c7c7b1aqs",
+        "capability": {
+          "id": "tl1a-review",
+          "sha256": "69bc8a65e904d91b3bb965a89a0be74455c00160135206b817458365377be520",
+          "version": "1"
+        },
+        "datasets": [
+          {
+            "id": "gxa_01m81sbcx95tne9w7x",
+            "sha256": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a",
+            "version": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a"
+          },
+          {
+            "id": "gxa_01m81sbdhjx1ht0yv2",
+            "sha256": "908f4093b5f90660ba76532d1aa6d0cc3f0ef5d3077990f93d594c8f5d5cfdcf",
+            "version": "908f4093b5f90660ba76532d1aa6d0cc3f0ef5d3077990f93d594c8f5d5cfdcf"
+          },
+          {
+            "id": "gxa_01m81sb850q433khca",
+            "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+            "version": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+          }
+        ],
+        "evaluator": {
+          "id": "geometry_spec_f6ae44c1ffc3fa2f166c2fd7473f035ad41179878481e09bbd08feedcdf2788b",
+          "spec_hash": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a",
+          "version": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a"
+        },
+        "external_data_paths": [],
+        "hard_constraints_at_admission": {
+          "job-limit": {
+            "sha256": "2e8afa500eee8d97b740560f74c45e704b5b5535547a75ea0d20bef6f8505914",
+            "version": 1
+          }
+        },
+        "input_manifest": {
+          "artifact_ref": "gxa_01m81sbe03qhbdmndp",
+          "sha256": "dfe97563edb58f27066fd80107673c59c1dcb3e0174587359ec4dc9357558f4e"
+        },
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m81sbcx95tne9w7x",
+            "bytes": 1857,
+            "role": "criteria",
+            "sha256": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a"
+          },
+          {
+            "artifact_ref": "gxa_01m81sbdhjx1ht0yv2",
+            "bytes": 4703,
+            "role": "observations",
+            "sha256": "908f4093b5f90660ba76532d1aa6d0cc3f0ef5d3077990f93d594c8f5d5cfdcf"
+          },
+          {
+            "artifact_ref": "gxa_01m81sb850q433khca",
+            "bytes": 507971,
+            "role": "structure",
+            "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+          }
+        ],
+        "intent_dependencies": {
+          "coordinates": {
+            "item_type": "data_source",
+            "role": "execution",
+            "sha256": "519709c9ead5f4a1da97914247a33fa35ff1c963a5028c2c6833b64eff45e1e4",
+            "version": 1
+          }
+        },
+        "job_attempt": 1,
+        "job_id": "gxj_01m81sbdxh86ps0frz",
+        "limits": {
+          "cpu_threads": 1,
+          "gpu": null,
+          "memory_mib": null,
+          "tightened": {},
+          "wall_seconds": 30
+        },
+        "model": {
+          "applicability": "no learned model",
+          "id": null,
+          "provider": null,
+          "weights": []
+        },
+        "operation_key": "job:gxr_01m81sb84hffvy5ym8:p0-proposal:gxj_01m81sbdxh86ps0frz",
+        "owner": {
+          "attempt": 1,
+          "attempt_id": "41e3f7bb-ddf8-4af8-951c-64a4586d602b",
+          "kind": "durable_task",
+          "lease_id": "gxl_01m81sbdhpybet4hqe",
+          "task_id": "gxt_01m81sbdgd6vck7zeh",
+          "thread_id": "01a20395-b642-7d23-8822-3d07c6c8a44c",
+          "workflow_id": "tl1a_geometry"
+        },
+        "parameters": {},
+        "reproducibility": {
+          "known_variation": [
+            "floating-point roundoff, wall time and resource measurements"
+          ],
+          "level": "deterministic_coordinate_analysis",
+          "replay": "deposited coordinates and frozen inputs"
+        },
+        "request_sha256": "41c8a86bd1b383a743279eb34df745dee335cbe7d49a3b60cea08da061487b85",
+        "run_id": "gxr_01m81sb84hffvy5ym8",
+        "runtime": {
+          "container_digest": null,
+          "dependency_lock_scope": "interpreter and declared distributions",
+          "env_id": "control-plane-python",
+          "execution_host": "ash-gpu--e7ed9c93ca7b-kfaa4ldexx",
+          "gpu": null,
+          "kind": "SYSTEM_BINARY",
+          "lockfile_ref": null,
+          "machine": "x86_64",
+          "observed_dependencies": {
+            "distributions": {},
+            "interpreter_sha256": "f3e3f561b473976be55d937616915d6c507dedcb3950c3ca72df786b28e8efdc",
+            "python": "3.11.9",
+            "requirements": {}
+          },
+          "observed_dependencies_sha256": "53e716d0f6700c6e2f062d3eb2201392c9fa145d364730d9bec17b6aa5ca6415",
+          "os": "Linux"
+        },
+        "schema": "gx.execution-manifest.admission/1",
+        "seeds": {},
+        "source": {
+          "files": {
+            "entry_script": "b8538bb85d61ce9dacbe975e8efd324b2666c4dd0c3c4ac3fa8cdc001643c8c1",
+            "gx_core/jobs/adapter_host.py": "d40145b94a68c688276dd0c372bc0b30ba378ad10259bcec59b40b200f760e63",
+            "gx_core/jobs/executor.py": "e66d815807fa8b416652454fd18198d258bd4554f704d5e0ac355e38ed8a8087",
+            "gx_core/jobs/resource_guard.py": "25ba017aabd111ec226b2bffeae20bfed91c542d1380c02c4df1e616a0369df6",
+            "gx_core/jobs/service.py": "a7457874bd30e3840647e0484e45601563836c9182a7201dc72c23da4ec34575",
+            "gx_core/p0/manifest.py": "2a7fcbfa0cb54afeba1b40807b674c00f409e5b304c8912deb611af58bc3c641",
+            "method_source": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705",
+            "runner": "a752445abbc817330b9b0e7136ab16f6ab9a65d844e775fa235c3e4d6ea3d179"
+          },
+          "method_source": {
+            "path": "{harness}/adapters/scientific/tl1a_geometry/review.py",
+            "sha256": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705"
+          },
+          "scope": "method, GX Job runner, publication and adapter sources",
+          "tree_sha256": "ac69cfe765e3c533e88157433b69f252811849baecef87fc46f5181653cf9fb7"
+        },
+        "task_id": "gxt_01m81sbdgd6vck7zeh"
+      },
+      "completion": {
+        "admission_sha256": "223e71f2eab727156baa2e06b355b9a0207518e6e86b1a685c8d61030de0ecd3",
+        "backend": "detached_runner",
+        "backend_job_id": "runner:2715173:2967593615",
+        "current_at_completion": true,
+        "exit_code": 0,
+        "failure": null,
+        "finished_at": "2026-11-22T14:07:54.530Z",
+        "gpu": null,
+        "job_id": "gxj_01m81sbdxh86ps0frz",
+        "logs": [
+          {
+            "artifact_ref": "gxa_01m81sbf5dvgzhx4sm",
+            "bytes": 0,
+            "kind": "job_stdout",
+            "output_name": "stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validated": false
+          },
+          {
+            "artifact_ref": "gxa_01m81sbf5fycehvbhh",
+            "bytes": 0,
+            "kind": "job_stderr",
+            "output_name": "stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validated": false
+          }
+        ],
+        "measured": {
+          "cpu_seconds": 0.406,
+          "limit_memory_mib": null,
+          "limit_wall_seconds": 30,
+          "max_rss_mib": 47.6,
+          "memory_check": "no memory_mib is declared for this job: nothing to check against",
+          "memory_within_limit": null,
+          "result": "exited",
+          "started": true,
+          "wall_seconds": 1.072
+        },
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m81sbf5a6s0x2dpk",
+            "bytes": 6749,
+            "kind": "geometry_review_batch",
+            "output_name": "checks.json",
+            "runner_sha256": "74fee25311b4919f3b0f6ac56475468a89b72c938fd223d1d54a5d3762c1bb01",
+            "sha256": "74fee25311b4919f3b0f6ac56475468a89b72c938fd223d1d54a5d3762c1bb01",
+            "validated": false
+          }
+        ],
+        "recovery_artifact": null,
+        "runner": {
+          "files_truncated": false,
+          "finished_at": "2026-11-22T14:07:54.530Z",
+          "group_leftover_ended": false,
+          "runner_pid": 2715173,
+          "runner_started": "2967593615",
+          "started_at": "2026-11-22T14:07:53.458Z",
+          "timeout_seconds": 30.0,
+          "tool_pid": 2715174,
+          "tool_started": "2967593618",
+          "wall_seconds": 1.072
+        },
+        "schema": "gx.execution-manifest.completion/1",
+        "settled_at": "2026-11-22T14:07:54.543Z",
+        "started_at": "2026-11-22T14:07:53.458Z",
+        "status": "SUCCEEDED",
+        "submitted_at": "2026-11-22T14:07:53.433Z"
+      },
+      "admission_hash": "223e71f2eab727156baa2e06b355b9a0207518e6e86b1a685c8d61030de0ecd3",
+      "manifest_hash": "1fa7836ed0f804e72614c7b4657ed9ab190f7c88b3f518d5a88ab54c694b2e8c"
+    },
+    "gxj_01m81sbh3c48n1st6r": {
+      "job_id": "gxj_01m81sbh3c48n1st6r",
+      "admission": {
+        "admitted_at": "2026-11-22T14:07:56.610Z",
+        "argv": [
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/.venv/bin/python3",
+          "-I",
+          "-B",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/gx-h/adapters/scientific/tl1a_geometry/review_batch.py",
+          "--method",
+          "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-2-1/gx-h/adapters/scientific/tl1a_geometry/review.py",
+          "--structure",
+          "/tmp/tmppjfkjpw0/state/jobs/gxj_01m81sbh3c48n1st6r/in/structure.cif",
+          "--criteria",
+          "/tmp/tmppjfkjpw0/state/jobs/gxj_01m81sbh3c48n1st6r/in/criteria.json",
+          "--observations",
+          "/tmp/tmppjfkjpw0/state/jobs/gxj_01m81sbh3c48n1st6r/in/observations.json",
+          "--out",
+          "/tmp/tmppjfkjpw0/state/artifacts/.staging/jobs/gxj_01m81sbh3c48n1st6r/stg_i3afwqy5"
+        ],
+        "attempt_id": "f0e358d2-0ec4-463f-93cb-2e6e681973d2",
+        "backend": "detached_runner",
+        "budget_reservation_ref": "rsv_01m81sbh61122jbvqq",
+        "capability": {
+          "id": "tl1a-review",
+          "sha256": "69bc8a65e904d91b3bb965a89a0be74455c00160135206b817458365377be520",
+          "version": "1"
+        },
+        "datasets": [
+          {
+            "id": "gxa_01m81sbcx95tne9w7x",
+            "sha256": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a",
+            "version": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a"
+          },
+          {
+            "id": "gxa_01m81sbgr4q3ya9355",
+            "sha256": "ee93368403b5b575bcc0784e7b78fd5f0814840cf2be72b28591021d97a07051",
+            "version": "ee93368403b5b575bcc0784e7b78fd5f0814840cf2be72b28591021d97a07051"
+          },
+          {
+            "id": "gxa_01m81sb850q433khca",
+            "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+            "version": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+          }
+        ],
+        "evaluator": {
+          "id": "geometry_spec_f6ae44c1ffc3fa2f166c2fd7473f035ad41179878481e09bbd08feedcdf2788b",
+          "spec_hash": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a",
+          "version": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a"
+        },
+        "external_data_paths": [],
+        "hard_constraints_at_admission": {
+          "job-limit": {
+            "sha256": "2e8afa500eee8d97b740560f74c45e704b5b5535547a75ea0d20bef6f8505914",
+            "version": 1
+          }
+        },
+        "input_manifest": {
+          "artifact_ref": "gxa_01m81sbh5g3brbp12y",
+          "sha256": "55376619406c8aeca609d346a83e9bf1b2611890fbfd486e3220dc7bda56412f"
+        },
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m81sbcx95tne9w7x",
+            "bytes": 1857,
+            "role": "criteria",
+            "sha256": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a"
+          },
+          {
+            "artifact_ref": "gxa_01m81sbgr4q3ya9355",
+            "bytes": 7037,
+            "role": "observations",
+            "sha256": "ee93368403b5b575bcc0784e7b78fd5f0814840cf2be72b28591021d97a07051"
+          },
+          {
+            "artifact_ref": "gxa_01m81sb850q433khca",
+            "bytes": 507971,
+            "role": "structure",
+            "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+          }
+        ],
+        "intent_dependencies": {
+          "coordinates": {
+            "item_type": "data_source",
+            "role": "execution",
+            "sha256": "519709c9ead5f4a1da97914247a33fa35ff1c963a5028c2c6833b64eff45e1e4",
+            "version": 1
+          }
+        },
+        "job_attempt": 1,
+        "job_id": "gxj_01m81sbh3c48n1st6r",
+        "limits": {
+          "cpu_threads": 1,
+          "gpu": null,
+          "memory_mib": null,
+          "tightened": {},
+          "wall_seconds": 30
+        },
+        "model": {
+          "applicability": "no learned model",
+          "id": null,
+          "provider": null,
+          "weights": []
+        },
+        "operation_key": "job:gxr_01m81sb84hffvy5ym8:p0-proposal:gxj_01m81sbh3c48n1st6r",
+        "owner": {
+          "attempt": 1,
+          "attempt_id": "f0e358d2-0ec4-463f-93cb-2e6e681973d2",
+          "kind": "durable_task",
+          "lease_id": "gxl_01m81sbgr6j8xcnmee",
+          "task_id": "gxt_01m81sbgqfp2ry8ymg",
+          "thread_id": "01a20395-c30d-7330-bcd3-d5bada74e69a",
+          "workflow_id": "tl1a_geometry"
+        },
+        "parameters": {},
+        "reproducibility": {
+          "known_variation": [
+            "floating-point roundoff, wall time and resource measurements"
+          ],
+          "level": "deterministic_coordinate_analysis",
+          "replay": "deposited coordinates and frozen inputs"
+        },
+        "request_sha256": "10204763ce49aff4b8ffba6c999fe370a82e743f1b6f67057a7bc95aa4e9c641",
+        "run_id": "gxr_01m81sb84hffvy5ym8",
+        "runtime": {
+          "container_digest": null,
+          "dependency_lock_scope": "interpreter and declared distributions",
+          "env_id": "control-plane-python",
+          "execution_host": "ash-gpu--e7ed9c93ca7b-kfaa4ldexx",
+          "gpu": null,
+          "kind": "SYSTEM_BINARY",
+          "lockfile_ref": null,
+          "machine": "x86_64",
+          "observed_dependencies": {
+            "distributions": {},
+            "interpreter_sha256": "f3e3f561b473976be55d937616915d6c507dedcb3950c3ca72df786b28e8efdc",
+            "python": "3.11.9",
+            "requirements": {}
+          },
+          "observed_dependencies_sha256": "53e716d0f6700c6e2f062d3eb2201392c9fa145d364730d9bec17b6aa5ca6415",
+          "os": "Linux"
+        },
+        "schema": "gx.execution-manifest.admission/1",
+        "seeds": {},
+        "source": {
+          "files": {
+            "entry_script": "b8538bb85d61ce9dacbe975e8efd324b2666c4dd0c3c4ac3fa8cdc001643c8c1",
+            "gx_core/jobs/adapter_host.py": "d40145b94a68c688276dd0c372bc0b30ba378ad10259bcec59b40b200f760e63",
+            "gx_core/jobs/executor.py": "e66d815807fa8b416652454fd18198d258bd4554f704d5e0ac355e38ed8a8087",
+            "gx_core/jobs/resource_guard.py": "25ba017aabd111ec226b2bffeae20bfed91c542d1380c02c4df1e616a0369df6",
+            "gx_core/jobs/service.py": "a7457874bd30e3840647e0484e45601563836c9182a7201dc72c23da4ec34575",
+            "gx_core/p0/manifest.py": "2a7fcbfa0cb54afeba1b40807b674c00f409e5b304c8912deb611af58bc3c641",
+            "method_source": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705",
+            "runner": "a752445abbc817330b9b0e7136ab16f6ab9a65d844e775fa235c3e4d6ea3d179"
+          },
+          "method_source": {
+            "path": "{harness}/adapters/scientific/tl1a_geometry/review.py",
+            "sha256": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705"
+          },
+          "scope": "method, GX Job runner, publication and adapter sources",
+          "tree_sha256": "ac69cfe765e3c533e88157433b69f252811849baecef87fc46f5181653cf9fb7"
+        },
+        "task_id": "gxt_01m81sbgqfp2ry8ymg"
+      },
+      "completion": {
+        "admission_sha256": "c5dd9507214977033870ed7181e0a34d0fb8d6d6f7b4a5c8c96e901031e13384",
+        "backend": "detached_runner",
+        "backend_job_id": "runner:2715300:2967593942",
+        "current_at_completion": true,
+        "exit_code": 0,
+        "failure": null,
+        "finished_at": "2026-11-22T14:07:57.787Z",
+        "gpu": null,
+        "job_id": "gxj_01m81sbh3c48n1st6r",
+        "logs": [
+          {
+            "artifact_ref": "gxa_01m81sbjcc1r3dtf2e",
+            "bytes": 0,
+            "kind": "job_stdout",
+            "output_name": "stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validated": false
+          },
+          {
+            "artifact_ref": "gxa_01m81sbjcfqkqqmbcx",
+            "bytes": 0,
+            "kind": "job_stderr",
+            "output_name": "stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validated": false
+          }
+        ],
+        "measured": {
+          "cpu_seconds": 0.551,
+          "limit_memory_mib": null,
+          "limit_wall_seconds": 30,
+          "max_rss_mib": 45.2,
+          "memory_check": "no memory_mib is declared for this job: nothing to check against",
+          "memory_within_limit": null,
+          "result": "exited",
+          "started": true,
+          "wall_seconds": 1.061
+        },
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m81sbjc9rp073b3r",
+            "bytes": 10049,
+            "kind": "geometry_review_batch",
+            "output_name": "checks.json",
+            "runner_sha256": "db6eb3801a24d606945ff9e598ee92f3fbc839a20d552636c75fd7e46b789180",
+            "sha256": "db6eb3801a24d606945ff9e598ee92f3fbc839a20d552636c75fd7e46b789180",
+            "validated": false
+          }
+        ],
+        "recovery_artifact": null,
+        "runner": {
+          "files_truncated": false,
+          "finished_at": "2026-11-22T14:07:57.787Z",
+          "group_leftover_ended": false,
+          "runner_pid": 2715300,
+          "runner_started": "2967593942",
+          "started_at": "2026-11-22T14:07:56.725Z",
+          "timeout_seconds": 30.0,
+          "tool_pid": 2715301,
+          "tool_started": "2967593945",
+          "wall_seconds": 1.061
+        },
+        "schema": "gx.execution-manifest.completion/1",
+        "settled_at": "2026-11-22T14:07:57.840Z",
+        "started_at": "2026-11-22T14:07:56.725Z",
+        "status": "SUCCEEDED",
+        "submitted_at": "2026-11-22T14:07:56.700Z"
+      },
+      "admission_hash": "c5dd9507214977033870ed7181e0a34d0fb8d6d6f7b4a5c8c96e901031e13384",
+      "manifest_hash": "d71345dbd889a07fce140dd5d57021433e5d8b0c3e4a608fc2ed776cf3608258"
+    }
+  },
+  "artifacts": {
+    "gxa_01m81sbf5a6s0x2dpk": {
+      "kind": "geometry_review_batch",
+      "origin": "JOB_OUTPUT",
+      "job_id": "gxj_01m81sbdxh86ps0frz",
+      "task_id": "gxt_01m81sbdgd6vck7zeh",
+      "sha256": "74fee25311b4919f3b0f6ac56475468a89b72c938fd223d1d54a5d3762c1bb01",
+      "bytes": 6749,
+      "utf8": "{\"evidence_ref\": \"gxa_01m81sbdg71hmkzqw9\", \"method_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\", \"results\": {\"common_backbone\": {\"checks\": {\"criteria_spec_sha256\": true, \"mapping\": true, \"method\": true, \"numerical_tolerances\": true, \"pair_identities\": true, \"schema\": true, \"source_metadata\": true, \"source_sha256\": true, \"status\": true, \"units\": true}, \"differences\": [{\"absolute_difference\": {\"absolute_departure_from_120_deg\": 7.105427357601002e-14, \"fitted_rmsd_angstrom\": 3.3306690738754696e-16, \"rotation_angle_deg\": 7.105427357601002e-14}, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 0.0, \"fitted_rmsd_angstrom\": 6.661338147750939e-16, \"rotation_angle_deg\": 0.0}, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 4.263256414560601e-14, \"fitted_rmsd_angstrom\": 2.220446049250313e-16, \"rotation_angle_deg\": 4.263256414560601e-14}, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}], \"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"measurement_ref\": \"gxa_01m81sbdabmgf1yqbc\", \"measurement_sha256\": \"d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31\", \"observation_job_id\": \"gxj_01m81sbcy0hwwqbv1a\", \"observations_ref\": \"gxa_01m81sbdabmgf1yqbc\", \"observations_sha256\": \"d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31\", \"protocol\": \"common_backbone\", \"reference\": {\"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"mapping\": {\"common_backbone_atoms\": 656, \"common_backbone_residues\": 164, \"observed_union_atoms\": 656, \"observed_union_residues\": 164, \"selected_atoms\": 656, \"selected_fraction_of_observed_union_residues\": 1.0, \"selected_keys_sha256\": \"30ef64f33d5e97c7ba1233b7d84454e617615b0a9e9be57bba52f2d3b266b403\", \"selected_residues\": 164}, \"pairs\": [{\"absolute_departure_from_120_deg\": 0.5565369877999728, \"fitted_rmsd_angstrom\": 0.7384782934226841, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"rotation_angle_deg\": 119.44346301220003}, {\"absolute_departure_from_120_deg\": 0.22946416927074154, \"fitted_rmsd_angstrom\": 1.3269554228168223, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.22946416927074}, {\"absolute_departure_from_120_deg\": 0.279170568887082, \"fitted_rmsd_angstrom\": 1.0301966849760695, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.27917056888708}], \"protocol\": \"common_backbone\", \"source\": {\"chains\": [\"A\", \"B\", \"C\"], \"declared_polymer_residues\": 181, \"experimental_method\": \"X-RAY DIFFRACTION\", \"label_entity_id\": \"1\", \"model_id\": \"1\", \"pdb_id\": \"2RE9\", \"resolution_angstrom\": 2.1, \"unobserved_polymer_positions\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}, \"status\": \"measured\"}, \"source_sha256\": \"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\", \"status\": \"matches\"}, \"common_ca\": {\"checks\": {\"criteria_spec_sha256\": true, \"mapping\": true, \"method\": true, \"numerical_tolerances\": true, \"pair_identities\": true, \"schema\": true, \"source_metadata\": true, \"source_sha256\": true, \"status\": true, \"units\": true}, \"differences\": [{\"absolute_difference\": {\"absolute_departure_from_120_deg\": 1.4210854715202004e-14, \"fitted_rmsd_angstrom\": 3.3306690738754696e-16, \"rotation_angle_deg\": 1.4210854715202004e-14}, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 2.842170943040401e-14, \"fitted_rmsd_angstrom\": 2.220446049250313e-16, \"rotation_angle_deg\": 2.842170943040401e-14}, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 2.842170943040401e-14, \"fitted_rmsd_angstrom\": 4.440892098500626e-16, \"rotation_angle_deg\": 2.842170943040401e-14}, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}], \"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"measurement_ref\": \"gxa_01m81sbdf1ndjssdsg\", \"measurement_sha256\": \"7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266\", \"observation_job_id\": \"gxj_01m81sbd2fdqbcv5t2\", \"observations_ref\": \"gxa_01m81sbdf1ndjssdsg\", \"observations_sha256\": \"7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266\", \"protocol\": \"common_ca\", \"reference\": {\"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"mapping\": {\"common_backbone_atoms\": 656, \"common_backbone_residues\": 164, \"observed_union_atoms\": 656, \"observed_union_residues\": 164, \"selected_atoms\": 164, \"selected_fraction_of_observed_union_residues\": 1.0, \"selected_keys_sha256\": \"8174cdb61041dd0788f387dee724c59a6ce818089f84ca2aef827331e5f89789\", \"selected_residues\": 164}, \"pairs\": [{\"absolute_departure_from_120_deg\": 0.5786554276982656, \"fitted_rmsd_angstrom\": 0.7183194087231136, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"rotation_angle_deg\": 119.42134457230173}, {\"absolute_departure_from_120_deg\": 0.18945578162059462, \"fitted_rmsd_angstrom\": 1.3384055618266006, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.1894557816206}, {\"absolute_departure_from_120_deg\": 0.34355812902914806, \"fitted_rmsd_angstrom\": 1.0700775979129442, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.34355812902915}], \"protocol\": \"common_ca\", \"source\": {\"chains\": [\"A\", \"B\", \"C\"], \"declared_polymer_residues\": 181, \"experimental_method\": \"X-RAY DIFFRACTION\", \"label_entity_id\": \"1\", \"model_id\": \"1\", \"pdb_id\": \"2RE9\", \"resolution_angstrom\": 2.1, \"unobserved_polymer_positions\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}, \"status\": \"measured\"}, \"source_sha256\": \"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\", \"status\": \"matches\"}}, \"schema\": \"gx.tl1a.independent_batch/1\"}\n"
+    },
+    "gxa_01m81sbe03qhbdmndp": {
+      "kind": "input_manifest",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": "gxt_01m81sbdgd6vck7zeh",
+      "sha256": "dfe97563edb58f27066fd80107673c59c1dcb3e0174587359ec4dc9357558f4e",
+      "bytes": 1307,
+      "utf8": "{\"contract_sha256\":\"afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd\",\"entries\":[{\"artifact_ref\":\"gxa_01m81sbcx95tne9w7x\",\"bytes\":1857,\"kind\":\"geometry_criteria\",\"media_type\":\"application/json\",\"namespace\":\"gxr_01m81sb84hffvy5ym8/science/tl1a/geometry_criteria\",\"rel_path\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a.json\",\"role\":\"criteria\",\"sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\"},{\"artifact_ref\":\"gxa_01m81sbdhjx1ht0yv2\",\"bytes\":4703,\"kind\":\"geometry_review_inputs\",\"media_type\":\"application/json\",\"namespace\":\"gxr_01m81sb84hffvy5ym8/science/tl1a/geometry_review_inputs\",\"rel_path\":\"908f4093b5f90660ba76532d1aa6d0cc3f0ef5d3077990f93d594c8f5d5cfdcf.json\",\"role\":\"observations\",\"sha256\":\"908f4093b5f90660ba76532d1aa6d0cc3f0ef5d3077990f93d594c8f5d5cfdcf\"},{\"artifact_ref\":\"gxa_01m81sb850q433khca\",\"bytes\":507971,\"kind\":\"run_input\",\"media_type\":\"chemical/x-mmcif\",\"namespace\":\"gxr_01m81sb84hffvy5ym8/inputs\",\"rel_path\":\"8c8b9a48cf32d0350327a8c7/2RE9.cif\",\"role\":\"structure\",\"sha256\":\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\"}],\"entry_count\":3,\"namespace\":\"gxr_01m81sb84hffvy5ym8/compute/inputs\",\"path_id\":null,\"run_id\":\"gxr_01m81sb84hffvy5ym8\",\"schema\":\"gx.input_manifest/1\",\"task_id\":\"gxt_01m81sbdgd6vck7zeh\"}"
+    },
+    "gxa_01m81sbcx95tne9w7x": {
+      "kind": "geometry_criteria",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a",
+      "bytes": 1857,
+      "utf8": "{\"comparison\":{\"max_angle_delta_deg\":0.5,\"max_rmsd_delta_angstrom\":0.15},\"coverage\":{\"denominator\":\"observed_union_residues\",\"min_fraction\":0.25,\"min_residues\":40},\"domain\":\"TL1A 2RE9 deposited coordinate geometry\",\"interpretation\":{\"insufficient\":\"A requested protocol lacks the frozen residue coverage, its fit is underdetermined, or fewer than two distinct comparable protocols were measured. Preserve the observable measurements and each individual comparison.\",\"limits\":\"Thresholds define this coordinate sensitivity screen. Chain pairs share atoms and are dependent, and B factors mix disorder and refinement effects. A single asymmetric unit cannot establish a common symmetry axis, solution assembly, binding, or activity.\",\"sensitive\":\"At least one measured chain pair exceeds either comparison bound. Report all pairwise differences.\",\"stable\":\"Every prespecified chain pair across every admissible measured protocol differs by at most both comparison bounds.\"},\"mapping\":{\"chains\":[\"A\",\"B\",\"C\"],\"keys\":[\"label_seq_id\",\"label_comp_id\",\"label_atom_id\"],\"label_entity_id\":\"1\",\"model_id\":\"1\",\"pairs_fixed_moving\":[[\"A\",\"B\"],[\"A\",\"C\"],[\"B\",\"C\"]]},\"method\":\"tl1a-geometry@1\",\"protocols\":{\"common_backbone\":\"Positive-occupancy N/CA/C/O atom identities observed in all three chains.\",\"common_ca\":\"Positive-occupancy alpha-carbon identities observed in all three chains.\",\"ordered_backbone\":\"Retain a complete N/CA/C/O residue only when all four atoms on all three chains have occupancy 1 and B_iso_or_equiv <= 40 angstrom^2.\"},\"reproduction\":{\"angle_abs_tol_deg\":0.01,\"rmsd_abs_tol_angstrom\":0.001},\"schema\":\"gx.tl1a.criteria/1\",\"scope\":\"One deposited experimental model. Compare unsigned pair rotations and fitted Cartesian atom RMSDs after proper rigid superposition.\",\"source_sha256\":\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\"}"
+    },
+    "gxa_01m81sbdhjx1ht0yv2": {
+      "kind": "geometry_review_inputs",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "908f4093b5f90660ba76532d1aa6d0cc3f0ef5d3077990f93d594c8f5d5cfdcf",
+      "bytes": 4703,
+      "utf8": "{\"evidence_ref\":\"gxa_01m81sbdg71hmkzqw9\",\"routes\":{\"common_backbone\":{\"measurement_json\":\"{\\\"criteria_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"criteria_spec_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"input_sha256\\\":\\\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\\\",\\\"issues\\\":[],\\\"mapping\\\":{\\\"common_backbone_atoms\\\":656,\\\"common_backbone_residues\\\":164,\\\"observed_union_atoms\\\":656,\\\"observed_union_residues\\\":164,\\\"selected_atoms\\\":656,\\\"selected_fraction_of_observed_union_residues\\\":1.0,\\\"selected_keys_sha256\\\":\\\"30ef64f33d5e97c7ba1233b7d84454e617615b0a9e9be57bba52f2d3b266b403\\\",\\\"selected_residues\\\":164},\\\"method\\\":\\\"tl1a-geometry@1\\\",\\\"pairs\\\":[{\\\"absolute_departure_from_120_deg\\\":0.5565369877999018,\\\"fitted_rmsd_angstrom\\\":0.7384782934226838,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"B\\\",\\\"rotation_angle_deg\\\":119.4434630122001},{\\\"absolute_departure_from_120_deg\\\":0.22946416927074154,\\\"fitted_rmsd_angstrom\\\":1.3269554228168217,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.22946416927074},{\\\"absolute_departure_from_120_deg\\\":0.2791705688870394,\\\"fitted_rmsd_angstrom\\\":1.0301966849760693,\\\"fixed_chain\\\":\\\"B\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.27917056888704}],\\\"protocol\\\":\\\"common_backbone\\\",\\\"quality_sha256\\\":\\\"3861a33360a732fdc9d2c60c045f0076b54ae1b4e6ded5947696cada8230f688\\\",\\\"runtime\\\":{\\\"fit\\\":\\\"Horn proper quaternion, Jacobi eigensolver\\\",\\\"python\\\":\\\"3.11.9\\\"},\\\"schema\\\":\\\"gx.tl1a.geometry/1\\\",\\\"source\\\":{\\\"atom_site_locator\\\":\\\"_atom_site, model 1, label_entity_id 1, label_asym_id A/B/C\\\",\\\"chains\\\":[\\\"A\\\",\\\"B\\\",\\\"C\\\"],\\\"declared_polymer_residues\\\":181,\\\"experimental_method\\\":\\\"X-RAY DIFFRACTION\\\",\\\"label_entity_id\\\":\\\"1\\\",\\\"model_id\\\":\\\"1\\\",\\\"pdb_id\\\":\\\"2RE9\\\",\\\"resolution_angstrom\\\":2.1,\\\"unobserved_polymer_positions\\\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]},\\\"status\\\":\\\"measured\\\",\\\"units\\\":{\\\"fitted_rmsd_angstrom\\\":\\\"angstrom\\\",\\\"rotation_angle_deg\\\":\\\"degrees\\\"}}\\n\",\"measurement_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"measurement_sha256\":\"d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31\",\"observation_job_id\":\"gxj_01m81sbcy0hwwqbv1a\",\"observations_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"observations_sha256\":\"d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31\"},\"common_ca\":{\"measurement_json\":\"{\\\"criteria_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"criteria_spec_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"input_sha256\\\":\\\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\\\",\\\"issues\\\":[],\\\"mapping\\\":{\\\"common_backbone_atoms\\\":656,\\\"common_backbone_residues\\\":164,\\\"observed_union_atoms\\\":656,\\\"observed_union_residues\\\":164,\\\"selected_atoms\\\":164,\\\"selected_fraction_of_observed_union_residues\\\":1.0,\\\"selected_keys_sha256\\\":\\\"8174cdb61041dd0788f387dee724c59a6ce818089f84ca2aef827331e5f89789\\\",\\\"selected_residues\\\":164},\\\"method\\\":\\\"tl1a-geometry@1\\\",\\\"pairs\\\":[{\\\"absolute_departure_from_120_deg\\\":0.5786554276982514,\\\"fitted_rmsd_angstrom\\\":0.718319408723114,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"B\\\",\\\"rotation_angle_deg\\\":119.42134457230175},{\\\"absolute_departure_from_120_deg\\\":0.1894557816205662,\\\"fitted_rmsd_angstrom\\\":1.3384055618266004,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.18945578162057},{\\\"absolute_departure_from_120_deg\\\":0.34355812902911964,\\\"fitted_rmsd_angstrom\\\":1.0700775979129447,\\\"fixed_chain\\\":\\\"B\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.34355812902912}],\\\"protocol\\\":\\\"common_ca\\\",\\\"quality_sha256\\\":\\\"3861a33360a732fdc9d2c60c045f0076b54ae1b4e6ded5947696cada8230f688\\\",\\\"runtime\\\":{\\\"fit\\\":\\\"Horn proper quaternion, Jacobi eigensolver\\\",\\\"python\\\":\\\"3.11.9\\\"},\\\"schema\\\":\\\"gx.tl1a.geometry/1\\\",\\\"source\\\":{\\\"atom_site_locator\\\":\\\"_atom_site, model 1, label_entity_id 1, label_asym_id A/B/C\\\",\\\"chains\\\":[\\\"A\\\",\\\"B\\\",\\\"C\\\"],\\\"declared_polymer_residues\\\":181,\\\"experimental_method\\\":\\\"X-RAY DIFFRACTION\\\",\\\"label_entity_id\\\":\\\"1\\\",\\\"model_id\\\":\\\"1\\\",\\\"pdb_id\\\":\\\"2RE9\\\",\\\"resolution_angstrom\\\":2.1,\\\"unobserved_polymer_positions\\\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]},\\\"status\\\":\\\"measured\\\",\\\"units\\\":{\\\"fitted_rmsd_angstrom\\\":\\\"angstrom\\\",\\\"rotation_angle_deg\\\":\\\"degrees\\\"}}\\n\",\"measurement_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"measurement_sha256\":\"7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266\",\"observation_job_id\":\"gxj_01m81sbd2fdqbcv5t2\",\"observations_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"observations_sha256\":\"7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266\"}},\"schema\":\"gx.tl1a.review_inputs/1\"}"
+    },
+    "gxa_01m81sb850q433khca": {
+      "kind": "run_input",
+      "origin": "INGEST",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "bytes": 507971,
+      "package_file": "gx-h/adapters/scientific/tl1a_geometry/data/2RE9.cif"
+    },
+    "gxa_01m81sbdabmgf1yqbc": {
+      "kind": "tl1a_geometry",
+      "origin": "JOB_OUTPUT",
+      "job_id": "gxj_01m81sbcy0hwwqbv1a",
+      "task_id": null,
+      "sha256": "d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31",
+      "bytes": 1807,
+      "utf8": "{\"criteria_sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"criteria_spec_sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"input_sha256\":\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\",\"issues\":[],\"mapping\":{\"common_backbone_atoms\":656,\"common_backbone_residues\":164,\"observed_union_atoms\":656,\"observed_union_residues\":164,\"selected_atoms\":656,\"selected_fraction_of_observed_union_residues\":1.0,\"selected_keys_sha256\":\"30ef64f33d5e97c7ba1233b7d84454e617615b0a9e9be57bba52f2d3b266b403\",\"selected_residues\":164},\"method\":\"tl1a-geometry@1\",\"pairs\":[{\"absolute_departure_from_120_deg\":0.5565369877999018,\"fitted_rmsd_angstrom\":0.7384782934226838,\"fixed_chain\":\"A\",\"moving_chain\":\"B\",\"rotation_angle_deg\":119.4434630122001},{\"absolute_departure_from_120_deg\":0.22946416927074154,\"fitted_rmsd_angstrom\":1.3269554228168217,\"fixed_chain\":\"A\",\"moving_chain\":\"C\",\"rotation_angle_deg\":120.22946416927074},{\"absolute_departure_from_120_deg\":0.2791705688870394,\"fitted_rmsd_angstrom\":1.0301966849760693,\"fixed_chain\":\"B\",\"moving_chain\":\"C\",\"rotation_angle_deg\":120.27917056888704}],\"protocol\":\"common_backbone\",\"quality_sha256\":\"3861a33360a732fdc9d2c60c045f0076b54ae1b4e6ded5947696cada8230f688\",\"runtime\":{\"fit\":\"Horn proper quaternion, Jacobi eigensolver\",\"python\":\"3.11.9\"},\"schema\":\"gx.tl1a.geometry/1\",\"source\":{\"atom_site_locator\":\"_atom_site, model 1, label_entity_id 1, label_asym_id A/B/C\",\"chains\":[\"A\",\"B\",\"C\"],\"declared_polymer_residues\":181,\"experimental_method\":\"X-RAY DIFFRACTION\",\"label_entity_id\":\"1\",\"model_id\":\"1\",\"pdb_id\":\"2RE9\",\"resolution_angstrom\":2.1,\"unobserved_polymer_positions\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]},\"status\":\"measured\",\"units\":{\"fitted_rmsd_angstrom\":\"angstrom\",\"rotation_angle_deg\":\"degrees\"}}\n"
+    },
+    "gxa_01m81sbdg71hmkzqw9": {
+      "kind": "geometry_evidence",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "7d6a629010b1d0b5f50f740cce2f7421acf2b408f529441d25ba799e0abccbfb",
+      "bytes": 2265,
+      "utf8": "{\"comparison\":{\"comparisons\":[{\"angle_delta_deg\":0.022118439898349607,\"fixed_chain\":\"A\",\"moving_chain\":\"B\",\"protocols\":[\"common_backbone\",\"common_ca\"],\"rmsd_delta_angstrom\":0.020158884699569835,\"status\":\"stable\"},{\"angle_delta_deg\":0.04000838765017534,\"fixed_chain\":\"A\",\"moving_chain\":\"C\",\"protocols\":[\"common_backbone\",\"common_ca\"],\"rmsd_delta_angstrom\":0.01145013900977876,\"status\":\"stable\"},{\"angle_delta_deg\":0.06438756014208025,\"fixed_chain\":\"B\",\"moving_chain\":\"C\",\"protocols\":[\"common_backbone\",\"common_ca\"],\"rmsd_delta_angstrom\":0.039880912936875346,\"status\":\"stable\"}],\"coverage\":{\"denominator\":\"observed_union_residues\",\"min_fraction\":0.25,\"min_residues\":40},\"criteria\":{\"max_angle_delta_deg\":0.5,\"max_rmsd_delta_angstrom\":0.15},\"criteria_spec_sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"ineligible_protocols\":[],\"protocols\":[\"common_backbone\",\"common_ca\"],\"reason\":\"All measured pairs fall within both inter-protocol geometry bounds.\",\"scope\":\"One deposited experimental model. Compare unsigned pair rotations and fitted Cartesian atom RMSDs after proper rigid superposition.\",\"status\":\"stable\"},\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"eval_id\":\"geometry_e_416af70dcc762085b3d5740caf668be46a65ea47bc7bd59a998bee7b638eaf20\",\"original_evaluation_id\":null,\"proposal_ref\":\"gxa_01m81sbcxfxbe65pab\",\"review_status\":\"awaiting_independent_review\",\"round\":0,\"routes\":[{\"executed_criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"failure\":null,\"job_id\":\"gxj_01m81sbcy0hwwqbv1a\",\"job_status\":\"SUCCEEDED\",\"manifest_hash\":\"612d1433c9a1127dedd4c9de19429bb833283c1ef601126799e7f1d774b547e9\",\"observations_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"protocol\":\"common_backbone\"},{\"executed_criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"failure\":null,\"job_id\":\"gxj_01m81sbd2fdqbcv5t2\",\"job_status\":\"SUCCEEDED\",\"manifest_hash\":\"1dbe64b3d3fb9f70e0360f3603b2dd851a78edcf3a65025cdf8539671a1cda85\",\"observations_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"protocol\":\"common_ca\"}],\"scope\":\"Thresholds define this coordinate sensitivity screen. Chain pairs share atoms and are dependent, and B factors mix disorder and refinement effects. A single asymmetric unit cannot establish a common symmetry axis, solution assembly, binding, or activity.\",\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbf9cvxkyj6h1": {
+      "kind": "geometry_checks",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": "gxt_01m81sbdgd6vck7zeh",
+      "sha256": "e91cb46ca4af6cc7f62f1177a7c39eee6d7a858272abe9f72febcc2742a21d27",
+      "bytes": 1042,
+      "utf8": "{\"admission_hash\":\"223e71f2eab727156baa2e06b355b9a0207518e6e86b1a685c8d61030de0ecd3\",\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"evidence_ref\":\"gxa_01m81sbdg71hmkzqw9\",\"job_id\":\"gxj_01m81sbdxh86ps0frz\",\"job_output_ref\":\"gxa_01m81sbf5a6s0x2dpk\",\"lease_id\":\"gxl_01m81sbdhpybet4hqe\",\"manifest_hash\":\"1fa7836ed0f804e72614c7b4657ed9ab190f7c88b3f518d5a88ab54c694b2e8c\",\"measurement_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"observation_job_id\":\"gxj_01m81sbcy0hwwqbv1a\",\"observations_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"output_sha256\":\"74fee25311b4919f3b0f6ac56475468a89b72c938fd223d1d54a5d3762c1bb01\",\"protocol\":\"common_backbone\",\"request_call_id\":\"call-fixture-9\",\"request_turn_id\":\"01a20395-b651-72d2-a342-3656fc87c9c1\",\"review_inputs_ref\":\"gxa_01m81sbdhjx1ht0yv2\",\"review_job_id\":\"gxj_01m81sbdxh86ps0frz\",\"reviewer_call_id\":\"call-fixture-12\",\"reviewer_task_id\":\"gxt_01m81sbdgd6vck7zeh\",\"reviewer_thread_id\":\"01a20395-b642-7d23-8822-3d07c6c8a44c\",\"reviewer_turn_id\":\"01a20395-bcc8-7da1-81f4-856babb486a2\",\"status\":\"matches\",\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbdf1ndjssdsg": {
+      "kind": "tl1a_geometry",
+      "origin": "JOB_OUTPUT",
+      "job_id": "gxj_01m81sbd2fdqbcv5t2",
+      "task_id": null,
+      "sha256": "7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266",
+      "bytes": 1801,
+      "utf8": "{\"criteria_sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"criteria_spec_sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"input_sha256\":\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\",\"issues\":[],\"mapping\":{\"common_backbone_atoms\":656,\"common_backbone_residues\":164,\"observed_union_atoms\":656,\"observed_union_residues\":164,\"selected_atoms\":164,\"selected_fraction_of_observed_union_residues\":1.0,\"selected_keys_sha256\":\"8174cdb61041dd0788f387dee724c59a6ce818089f84ca2aef827331e5f89789\",\"selected_residues\":164},\"method\":\"tl1a-geometry@1\",\"pairs\":[{\"absolute_departure_from_120_deg\":0.5786554276982514,\"fitted_rmsd_angstrom\":0.718319408723114,\"fixed_chain\":\"A\",\"moving_chain\":\"B\",\"rotation_angle_deg\":119.42134457230175},{\"absolute_departure_from_120_deg\":0.1894557816205662,\"fitted_rmsd_angstrom\":1.3384055618266004,\"fixed_chain\":\"A\",\"moving_chain\":\"C\",\"rotation_angle_deg\":120.18945578162057},{\"absolute_departure_from_120_deg\":0.34355812902911964,\"fitted_rmsd_angstrom\":1.0700775979129447,\"fixed_chain\":\"B\",\"moving_chain\":\"C\",\"rotation_angle_deg\":120.34355812902912}],\"protocol\":\"common_ca\",\"quality_sha256\":\"3861a33360a732fdc9d2c60c045f0076b54ae1b4e6ded5947696cada8230f688\",\"runtime\":{\"fit\":\"Horn proper quaternion, Jacobi eigensolver\",\"python\":\"3.11.9\"},\"schema\":\"gx.tl1a.geometry/1\",\"source\":{\"atom_site_locator\":\"_atom_site, model 1, label_entity_id 1, label_asym_id A/B/C\",\"chains\":[\"A\",\"B\",\"C\"],\"declared_polymer_residues\":181,\"experimental_method\":\"X-RAY DIFFRACTION\",\"label_entity_id\":\"1\",\"model_id\":\"1\",\"pdb_id\":\"2RE9\",\"resolution_angstrom\":2.1,\"unobserved_polymer_positions\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]},\"status\":\"measured\",\"units\":{\"fitted_rmsd_angstrom\":\"angstrom\",\"rotation_angle_deg\":\"degrees\"}}\n"
+    },
+    "gxa_01m81sbfejjz855qb9": {
+      "kind": "geometry_checks",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": "gxt_01m81sbdgd6vck7zeh",
+      "sha256": "ba95bbae8ddefb41ec64c3a589fdf59bd800396ff62b1c0e3a51dc9032dd1182",
+      "bytes": 1036,
+      "utf8": "{\"admission_hash\":\"223e71f2eab727156baa2e06b355b9a0207518e6e86b1a685c8d61030de0ecd3\",\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"evidence_ref\":\"gxa_01m81sbdg71hmkzqw9\",\"job_id\":\"gxj_01m81sbdxh86ps0frz\",\"job_output_ref\":\"gxa_01m81sbf5a6s0x2dpk\",\"lease_id\":\"gxl_01m81sbdhpybet4hqe\",\"manifest_hash\":\"1fa7836ed0f804e72614c7b4657ed9ab190f7c88b3f518d5a88ab54c694b2e8c\",\"measurement_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"observation_job_id\":\"gxj_01m81sbd2fdqbcv5t2\",\"observations_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"output_sha256\":\"74fee25311b4919f3b0f6ac56475468a89b72c938fd223d1d54a5d3762c1bb01\",\"protocol\":\"common_ca\",\"request_call_id\":\"call-fixture-9\",\"request_turn_id\":\"01a20395-b651-72d2-a342-3656fc87c9c1\",\"review_inputs_ref\":\"gxa_01m81sbdhjx1ht0yv2\",\"review_job_id\":\"gxj_01m81sbdxh86ps0frz\",\"reviewer_call_id\":\"call-fixture-14\",\"reviewer_task_id\":\"gxt_01m81sbdgd6vck7zeh\",\"reviewer_thread_id\":\"01a20395-b642-7d23-8822-3d07c6c8a44c\",\"reviewer_turn_id\":\"01a20395-bcc8-7da1-81f4-856babb486a2\",\"status\":\"matches\",\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbjc9rp073b3r": {
+      "kind": "geometry_review_batch",
+      "origin": "JOB_OUTPUT",
+      "job_id": "gxj_01m81sbh3c48n1st6r",
+      "task_id": "gxt_01m81sbgqfp2ry8ymg",
+      "sha256": "db6eb3801a24d606945ff9e598ee92f3fbc839a20d552636c75fd7e46b789180",
+      "bytes": 10049,
+      "utf8": "{\"evidence_ref\": \"gxa_01m81sbgqad6q73t9g\", \"method_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\", \"results\": {\"common_backbone\": {\"checks\": {\"criteria_spec_sha256\": true, \"mapping\": true, \"method\": true, \"numerical_tolerances\": true, \"pair_identities\": true, \"schema\": true, \"source_metadata\": true, \"source_sha256\": true, \"status\": true, \"units\": true}, \"differences\": [{\"absolute_difference\": {\"absolute_departure_from_120_deg\": 7.105427357601002e-14, \"fitted_rmsd_angstrom\": 3.3306690738754696e-16, \"rotation_angle_deg\": 7.105427357601002e-14}, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 0.0, \"fitted_rmsd_angstrom\": 6.661338147750939e-16, \"rotation_angle_deg\": 0.0}, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 4.263256414560601e-14, \"fitted_rmsd_angstrom\": 2.220446049250313e-16, \"rotation_angle_deg\": 4.263256414560601e-14}, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}], \"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"measurement_ref\": \"gxa_01m81sbdabmgf1yqbc\", \"measurement_sha256\": \"d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31\", \"observation_job_id\": \"gxj_01m81sbcy0hwwqbv1a\", \"observations_ref\": \"gxa_01m81sbdabmgf1yqbc\", \"observations_sha256\": \"d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31\", \"protocol\": \"common_backbone\", \"reference\": {\"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"mapping\": {\"common_backbone_atoms\": 656, \"common_backbone_residues\": 164, \"observed_union_atoms\": 656, \"observed_union_residues\": 164, \"selected_atoms\": 656, \"selected_fraction_of_observed_union_residues\": 1.0, \"selected_keys_sha256\": \"30ef64f33d5e97c7ba1233b7d84454e617615b0a9e9be57bba52f2d3b266b403\", \"selected_residues\": 164}, \"pairs\": [{\"absolute_departure_from_120_deg\": 0.5565369877999728, \"fitted_rmsd_angstrom\": 0.7384782934226841, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"rotation_angle_deg\": 119.44346301220003}, {\"absolute_departure_from_120_deg\": 0.22946416927074154, \"fitted_rmsd_angstrom\": 1.3269554228168223, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.22946416927074}, {\"absolute_departure_from_120_deg\": 0.279170568887082, \"fitted_rmsd_angstrom\": 1.0301966849760695, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.27917056888708}], \"protocol\": \"common_backbone\", \"source\": {\"chains\": [\"A\", \"B\", \"C\"], \"declared_polymer_residues\": 181, \"experimental_method\": \"X-RAY DIFFRACTION\", \"label_entity_id\": \"1\", \"model_id\": \"1\", \"pdb_id\": \"2RE9\", \"resolution_angstrom\": 2.1, \"unobserved_polymer_positions\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}, \"status\": \"measured\"}, \"source_sha256\": \"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\", \"status\": \"matches\"}, \"common_ca\": {\"checks\": {\"criteria_spec_sha256\": true, \"mapping\": true, \"method\": true, \"numerical_tolerances\": true, \"pair_identities\": true, \"schema\": true, \"source_metadata\": true, \"source_sha256\": true, \"status\": true, \"units\": true}, \"differences\": [{\"absolute_difference\": {\"absolute_departure_from_120_deg\": 1.4210854715202004e-14, \"fitted_rmsd_angstrom\": 3.3306690738754696e-16, \"rotation_angle_deg\": 1.4210854715202004e-14}, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 2.842170943040401e-14, \"fitted_rmsd_angstrom\": 2.220446049250313e-16, \"rotation_angle_deg\": 2.842170943040401e-14}, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 2.842170943040401e-14, \"fitted_rmsd_angstrom\": 4.440892098500626e-16, \"rotation_angle_deg\": 2.842170943040401e-14}, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}], \"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"measurement_ref\": \"gxa_01m81sbdf1ndjssdsg\", \"measurement_sha256\": \"7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266\", \"observation_job_id\": \"gxj_01m81sbd2fdqbcv5t2\", \"observations_ref\": \"gxa_01m81sbdf1ndjssdsg\", \"observations_sha256\": \"7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266\", \"protocol\": \"common_ca\", \"reference\": {\"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"mapping\": {\"common_backbone_atoms\": 656, \"common_backbone_residues\": 164, \"observed_union_atoms\": 656, \"observed_union_residues\": 164, \"selected_atoms\": 164, \"selected_fraction_of_observed_union_residues\": 1.0, \"selected_keys_sha256\": \"8174cdb61041dd0788f387dee724c59a6ce818089f84ca2aef827331e5f89789\", \"selected_residues\": 164}, \"pairs\": [{\"absolute_departure_from_120_deg\": 0.5786554276982656, \"fitted_rmsd_angstrom\": 0.7183194087231136, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"rotation_angle_deg\": 119.42134457230173}, {\"absolute_departure_from_120_deg\": 0.18945578162059462, \"fitted_rmsd_angstrom\": 1.3384055618266006, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.1894557816206}, {\"absolute_departure_from_120_deg\": 0.34355812902914806, \"fitted_rmsd_angstrom\": 1.0700775979129442, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.34355812902915}], \"protocol\": \"common_ca\", \"source\": {\"chains\": [\"A\", \"B\", \"C\"], \"declared_polymer_residues\": 181, \"experimental_method\": \"X-RAY DIFFRACTION\", \"label_entity_id\": \"1\", \"model_id\": \"1\", \"pdb_id\": \"2RE9\", \"resolution_angstrom\": 2.1, \"unobserved_polymer_positions\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}, \"status\": \"measured\"}, \"source_sha256\": \"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\", \"status\": \"matches\"}, \"ordered_backbone\": {\"checks\": {\"criteria_spec_sha256\": true, \"mapping\": true, \"method\": true, \"numerical_tolerances\": true, \"pair_identities\": true, \"schema\": true, \"source_metadata\": true, \"source_sha256\": true, \"status\": true, \"units\": true}, \"differences\": [{\"absolute_difference\": {\"absolute_departure_from_120_deg\": 8.526512829121202e-14, \"fitted_rmsd_angstrom\": 1.5126788710517758e-15, \"rotation_angle_deg\": 8.526512829121202e-14}, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 0.0, \"fitted_rmsd_angstrom\": 1.0547118733938987e-15, \"rotation_angle_deg\": 0.0}, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}, {\"absolute_difference\": {\"absolute_departure_from_120_deg\": 1.8474111129762605e-13, \"fitted_rmsd_angstrom\": 1.6653345369377348e-16, \"rotation_angle_deg\": 1.8474111129762605e-13}, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"within_reproduction_tolerance\": true}], \"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"measurement_ref\": \"gxa_01m81sbgp2kb61ztd1\", \"measurement_sha256\": \"57b5ee93da1769257a428a965a39058dc1b3c9bf004809c6a70ab7edeafddbea\", \"observation_job_id\": \"gxj_01m81sbg9bb4faq5mp\", \"observations_ref\": \"gxa_01m81sbgp2kb61ztd1\", \"observations_sha256\": \"57b5ee93da1769257a428a965a39058dc1b3c9bf004809c6a70ab7edeafddbea\", \"protocol\": \"ordered_backbone\", \"reference\": {\"implementation\": {\"biopython\": \"1.88\", \"fit\": \"Bio.SVDSuperimposer.SVDSuperimposer (NumPy LAPACK SVD, proper rotation)\", \"numpy\": \"1.26.4\", \"parser\": \"Bio.PDB.MMCIF2Dict\", \"python\": \"3.11.9\", \"script_sha256\": \"7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705\"}, \"mapping\": {\"common_backbone_atoms\": 656, \"common_backbone_residues\": 164, \"observed_union_atoms\": 656, \"observed_union_residues\": 164, \"selected_atoms\": 196, \"selected_fraction_of_observed_union_residues\": 0.29878048780487804, \"selected_keys_sha256\": \"e0dea83487c919cb38e486539cd8c1e616e77d21701e770c450ffdf673651512\", \"selected_residues\": 49}, \"pairs\": [{\"absolute_departure_from_120_deg\": 0.16825736986062623, \"fitted_rmsd_angstrom\": 0.12367469417296388, \"fixed_chain\": \"A\", \"moving_chain\": \"B\", \"rotation_angle_deg\": 120.16825736986063}, {\"absolute_departure_from_120_deg\": 0.11283383478522069, \"fitted_rmsd_angstrom\": 0.1218469832790419, \"fixed_chain\": \"A\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 120.11283383478522}, {\"absolute_departure_from_120_deg\": 0.27887404378707004, \"fitted_rmsd_angstrom\": 0.13048718621497035, \"fixed_chain\": \"B\", \"moving_chain\": \"C\", \"rotation_angle_deg\": 119.72112595621293}], \"protocol\": \"ordered_backbone\", \"source\": {\"chains\": [\"A\", \"B\", \"C\"], \"declared_polymer_residues\": 181, \"experimental_method\": \"X-RAY DIFFRACTION\", \"label_entity_id\": \"1\", \"model_id\": \"1\", \"pdb_id\": \"2RE9\", \"resolution_angstrom\": 2.1, \"unobserved_polymer_positions\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}, \"status\": \"measured\"}, \"source_sha256\": \"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\", \"status\": \"matches\"}}, \"schema\": \"gx.tl1a.independent_batch/1\"}\n"
+    },
+    "gxa_01m81sbh5g3brbp12y": {
+      "kind": "input_manifest",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": "gxt_01m81sbgqfp2ry8ymg",
+      "sha256": "55376619406c8aeca609d346a83e9bf1b2611890fbfd486e3220dc7bda56412f",
+      "bytes": 1307,
+      "utf8": "{\"contract_sha256\":\"afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd\",\"entries\":[{\"artifact_ref\":\"gxa_01m81sbcx95tne9w7x\",\"bytes\":1857,\"kind\":\"geometry_criteria\",\"media_type\":\"application/json\",\"namespace\":\"gxr_01m81sb84hffvy5ym8/science/tl1a/geometry_criteria\",\"rel_path\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a.json\",\"role\":\"criteria\",\"sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\"},{\"artifact_ref\":\"gxa_01m81sbgr4q3ya9355\",\"bytes\":7037,\"kind\":\"geometry_review_inputs\",\"media_type\":\"application/json\",\"namespace\":\"gxr_01m81sb84hffvy5ym8/science/tl1a/geometry_review_inputs\",\"rel_path\":\"ee93368403b5b575bcc0784e7b78fd5f0814840cf2be72b28591021d97a07051.json\",\"role\":\"observations\",\"sha256\":\"ee93368403b5b575bcc0784e7b78fd5f0814840cf2be72b28591021d97a07051\"},{\"artifact_ref\":\"gxa_01m81sb850q433khca\",\"bytes\":507971,\"kind\":\"run_input\",\"media_type\":\"chemical/x-mmcif\",\"namespace\":\"gxr_01m81sb84hffvy5ym8/inputs\",\"rel_path\":\"8c8b9a48cf32d0350327a8c7/2RE9.cif\",\"role\":\"structure\",\"sha256\":\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\"}],\"entry_count\":3,\"namespace\":\"gxr_01m81sb84hffvy5ym8/compute/inputs\",\"path_id\":null,\"run_id\":\"gxr_01m81sb84hffvy5ym8\",\"schema\":\"gx.input_manifest/1\",\"task_id\":\"gxt_01m81sbgqfp2ry8ymg\"}"
+    },
+    "gxa_01m81sbgr4q3ya9355": {
+      "kind": "geometry_review_inputs",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "ee93368403b5b575bcc0784e7b78fd5f0814840cf2be72b28591021d97a07051",
+      "bytes": 7037,
+      "utf8": "{\"evidence_ref\":\"gxa_01m81sbgqad6q73t9g\",\"routes\":{\"common_backbone\":{\"measurement_json\":\"{\\\"criteria_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"criteria_spec_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"input_sha256\\\":\\\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\\\",\\\"issues\\\":[],\\\"mapping\\\":{\\\"common_backbone_atoms\\\":656,\\\"common_backbone_residues\\\":164,\\\"observed_union_atoms\\\":656,\\\"observed_union_residues\\\":164,\\\"selected_atoms\\\":656,\\\"selected_fraction_of_observed_union_residues\\\":1.0,\\\"selected_keys_sha256\\\":\\\"30ef64f33d5e97c7ba1233b7d84454e617615b0a9e9be57bba52f2d3b266b403\\\",\\\"selected_residues\\\":164},\\\"method\\\":\\\"tl1a-geometry@1\\\",\\\"pairs\\\":[{\\\"absolute_departure_from_120_deg\\\":0.5565369877999018,\\\"fitted_rmsd_angstrom\\\":0.7384782934226838,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"B\\\",\\\"rotation_angle_deg\\\":119.4434630122001},{\\\"absolute_departure_from_120_deg\\\":0.22946416927074154,\\\"fitted_rmsd_angstrom\\\":1.3269554228168217,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.22946416927074},{\\\"absolute_departure_from_120_deg\\\":0.2791705688870394,\\\"fitted_rmsd_angstrom\\\":1.0301966849760693,\\\"fixed_chain\\\":\\\"B\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.27917056888704}],\\\"protocol\\\":\\\"common_backbone\\\",\\\"quality_sha256\\\":\\\"3861a33360a732fdc9d2c60c045f0076b54ae1b4e6ded5947696cada8230f688\\\",\\\"runtime\\\":{\\\"fit\\\":\\\"Horn proper quaternion, Jacobi eigensolver\\\",\\\"python\\\":\\\"3.11.9\\\"},\\\"schema\\\":\\\"gx.tl1a.geometry/1\\\",\\\"source\\\":{\\\"atom_site_locator\\\":\\\"_atom_site, model 1, label_entity_id 1, label_asym_id A/B/C\\\",\\\"chains\\\":[\\\"A\\\",\\\"B\\\",\\\"C\\\"],\\\"declared_polymer_residues\\\":181,\\\"experimental_method\\\":\\\"X-RAY DIFFRACTION\\\",\\\"label_entity_id\\\":\\\"1\\\",\\\"model_id\\\":\\\"1\\\",\\\"pdb_id\\\":\\\"2RE9\\\",\\\"resolution_angstrom\\\":2.1,\\\"unobserved_polymer_positions\\\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]},\\\"status\\\":\\\"measured\\\",\\\"units\\\":{\\\"fitted_rmsd_angstrom\\\":\\\"angstrom\\\",\\\"rotation_angle_deg\\\":\\\"degrees\\\"}}\\n\",\"measurement_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"measurement_sha256\":\"d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31\",\"observation_job_id\":\"gxj_01m81sbcy0hwwqbv1a\",\"observations_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"observations_sha256\":\"d4d58c467353d5082b17c721b70db32496220c8d3a4225ccaa0e26d16d644c31\"},\"common_ca\":{\"measurement_json\":\"{\\\"criteria_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"criteria_spec_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"input_sha256\\\":\\\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\\\",\\\"issues\\\":[],\\\"mapping\\\":{\\\"common_backbone_atoms\\\":656,\\\"common_backbone_residues\\\":164,\\\"observed_union_atoms\\\":656,\\\"observed_union_residues\\\":164,\\\"selected_atoms\\\":164,\\\"selected_fraction_of_observed_union_residues\\\":1.0,\\\"selected_keys_sha256\\\":\\\"8174cdb61041dd0788f387dee724c59a6ce818089f84ca2aef827331e5f89789\\\",\\\"selected_residues\\\":164},\\\"method\\\":\\\"tl1a-geometry@1\\\",\\\"pairs\\\":[{\\\"absolute_departure_from_120_deg\\\":0.5786554276982514,\\\"fitted_rmsd_angstrom\\\":0.718319408723114,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"B\\\",\\\"rotation_angle_deg\\\":119.42134457230175},{\\\"absolute_departure_from_120_deg\\\":0.1894557816205662,\\\"fitted_rmsd_angstrom\\\":1.3384055618266004,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.18945578162057},{\\\"absolute_departure_from_120_deg\\\":0.34355812902911964,\\\"fitted_rmsd_angstrom\\\":1.0700775979129447,\\\"fixed_chain\\\":\\\"B\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.34355812902912}],\\\"protocol\\\":\\\"common_ca\\\",\\\"quality_sha256\\\":\\\"3861a33360a732fdc9d2c60c045f0076b54ae1b4e6ded5947696cada8230f688\\\",\\\"runtime\\\":{\\\"fit\\\":\\\"Horn proper quaternion, Jacobi eigensolver\\\",\\\"python\\\":\\\"3.11.9\\\"},\\\"schema\\\":\\\"gx.tl1a.geometry/1\\\",\\\"source\\\":{\\\"atom_site_locator\\\":\\\"_atom_site, model 1, label_entity_id 1, label_asym_id A/B/C\\\",\\\"chains\\\":[\\\"A\\\",\\\"B\\\",\\\"C\\\"],\\\"declared_polymer_residues\\\":181,\\\"experimental_method\\\":\\\"X-RAY DIFFRACTION\\\",\\\"label_entity_id\\\":\\\"1\\\",\\\"model_id\\\":\\\"1\\\",\\\"pdb_id\\\":\\\"2RE9\\\",\\\"resolution_angstrom\\\":2.1,\\\"unobserved_polymer_positions\\\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]},\\\"status\\\":\\\"measured\\\",\\\"units\\\":{\\\"fitted_rmsd_angstrom\\\":\\\"angstrom\\\",\\\"rotation_angle_deg\\\":\\\"degrees\\\"}}\\n\",\"measurement_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"measurement_sha256\":\"7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266\",\"observation_job_id\":\"gxj_01m81sbd2fdqbcv5t2\",\"observations_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"observations_sha256\":\"7c73b935a5769c779e1757be9ced8f7eebcfb83d6a0334fe0053dcd893b5e266\"},\"ordered_backbone\":{\"measurement_json\":\"{\\\"criteria_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"criteria_spec_sha256\\\":\\\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\\\",\\\"input_sha256\\\":\\\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\\\",\\\"issues\\\":[],\\\"mapping\\\":{\\\"common_backbone_atoms\\\":656,\\\"common_backbone_residues\\\":164,\\\"observed_union_atoms\\\":656,\\\"observed_union_residues\\\":164,\\\"selected_atoms\\\":196,\\\"selected_fraction_of_observed_union_residues\\\":0.29878048780487804,\\\"selected_keys_sha256\\\":\\\"e0dea83487c919cb38e486539cd8c1e616e77d21701e770c450ffdf673651512\\\",\\\"selected_residues\\\":49},\\\"method\\\":\\\"tl1a-geometry@1\\\",\\\"pairs\\\":[{\\\"absolute_departure_from_120_deg\\\":0.1682573698607115,\\\"fitted_rmsd_angstrom\\\":0.1236746941729654,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"B\\\",\\\"rotation_angle_deg\\\":120.16825736986071},{\\\"absolute_departure_from_120_deg\\\":0.11283383478522069,\\\"fitted_rmsd_angstrom\\\":0.12184698327904085,\\\"fixed_chain\\\":\\\"A\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":120.11283383478522},{\\\"absolute_departure_from_120_deg\\\":0.2788740437868853,\\\"fitted_rmsd_angstrom\\\":0.13048718621497052,\\\"fixed_chain\\\":\\\"B\\\",\\\"moving_chain\\\":\\\"C\\\",\\\"rotation_angle_deg\\\":119.72112595621311}],\\\"protocol\\\":\\\"ordered_backbone\\\",\\\"quality_sha256\\\":\\\"3861a33360a732fdc9d2c60c045f0076b54ae1b4e6ded5947696cada8230f688\\\",\\\"runtime\\\":{\\\"fit\\\":\\\"Horn proper quaternion, Jacobi eigensolver\\\",\\\"python\\\":\\\"3.11.9\\\"},\\\"schema\\\":\\\"gx.tl1a.geometry/1\\\",\\\"source\\\":{\\\"atom_site_locator\\\":\\\"_atom_site, model 1, label_entity_id 1, label_asym_id A/B/C\\\",\\\"chains\\\":[\\\"A\\\",\\\"B\\\",\\\"C\\\"],\\\"declared_polymer_residues\\\":181,\\\"experimental_method\\\":\\\"X-RAY DIFFRACTION\\\",\\\"label_entity_id\\\":\\\"1\\\",\\\"model_id\\\":\\\"1\\\",\\\"pdb_id\\\":\\\"2RE9\\\",\\\"resolution_angstrom\\\":2.1,\\\"unobserved_polymer_positions\\\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]},\\\"status\\\":\\\"measured\\\",\\\"units\\\":{\\\"fitted_rmsd_angstrom\\\":\\\"angstrom\\\",\\\"rotation_angle_deg\\\":\\\"degrees\\\"}}\\n\",\"measurement_ref\":\"gxa_01m81sbgp2kb61ztd1\",\"measurement_sha256\":\"57b5ee93da1769257a428a965a39058dc1b3c9bf004809c6a70ab7edeafddbea\",\"observation_job_id\":\"gxj_01m81sbg9bb4faq5mp\",\"observations_ref\":\"gxa_01m81sbgp2kb61ztd1\",\"observations_sha256\":\"57b5ee93da1769257a428a965a39058dc1b3c9bf004809c6a70ab7edeafddbea\"}},\"schema\":\"gx.tl1a.review_inputs/1\"}"
+    },
+    "gxa_01m81sbgqad6q73t9g": {
+      "kind": "geometry_evidence",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "cacbc4d6127349caf2432bd8dd49e5f86ecddbbeb682cfba7d2f9a0a17bdca54",
+      "bytes": 3678,
+      "utf8": "{\"comparison\":{\"comparisons\":[{\"angle_delta_deg\":0.022118439898349607,\"fixed_chain\":\"A\",\"moving_chain\":\"B\",\"protocols\":[\"common_backbone\",\"common_ca\"],\"rmsd_delta_angstrom\":0.020158884699569835,\"status\":\"stable\"},{\"angle_delta_deg\":0.04000838765017534,\"fixed_chain\":\"A\",\"moving_chain\":\"C\",\"protocols\":[\"common_backbone\",\"common_ca\"],\"rmsd_delta_angstrom\":0.01145013900977876,\"status\":\"stable\"},{\"angle_delta_deg\":0.06438756014208025,\"fixed_chain\":\"B\",\"moving_chain\":\"C\",\"protocols\":[\"common_backbone\",\"common_ca\"],\"rmsd_delta_angstrom\":0.039880912936875346,\"status\":\"stable\"},{\"angle_delta_deg\":0.7247943576606133,\"fixed_chain\":\"A\",\"moving_chain\":\"B\",\"protocols\":[\"common_backbone\",\"ordered_backbone\"],\"rmsd_delta_angstrom\":0.6148035992497184,\"status\":\"sensitive\"},{\"angle_delta_deg\":0.11663033448552085,\"fixed_chain\":\"A\",\"moving_chain\":\"C\",\"protocols\":[\"common_backbone\",\"ordered_backbone\"],\"rmsd_delta_angstrom\":1.205108439537781,\"status\":\"sensitive\"},{\"angle_delta_deg\":0.5580446126739247,\"fixed_chain\":\"B\",\"moving_chain\":\"C\",\"protocols\":[\"common_backbone\",\"ordered_backbone\"],\"rmsd_delta_angstrom\":0.8997094987610987,\"status\":\"sensitive\"},{\"angle_delta_deg\":0.7469127975589629,\"fixed_chain\":\"A\",\"moving_chain\":\"B\",\"protocols\":[\"common_ca\",\"ordered_backbone\"],\"rmsd_delta_angstrom\":0.5946447145501486,\"status\":\"sensitive\"},{\"angle_delta_deg\":0.07662194683534551,\"fixed_chain\":\"A\",\"moving_chain\":\"C\",\"protocols\":[\"common_ca\",\"ordered_backbone\"],\"rmsd_delta_angstrom\":1.2165585785475597,\"status\":\"sensitive\"},{\"angle_delta_deg\":0.6224321728160049,\"fixed_chain\":\"B\",\"moving_chain\":\"C\",\"protocols\":[\"common_ca\",\"ordered_backbone\"],\"rmsd_delta_angstrom\":0.9395904116979741,\"status\":\"sensitive\"}],\"coverage\":{\"denominator\":\"observed_union_residues\",\"min_fraction\":0.25,\"min_residues\":40},\"criteria\":{\"max_angle_delta_deg\":0.5,\"max_rmsd_delta_angstrom\":0.15},\"criteria_spec_sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"ineligible_protocols\":[],\"protocols\":[\"common_backbone\",\"common_ca\",\"ordered_backbone\"],\"reason\":\"At least one pair exceeds an inter-protocol geometry bound.\",\"scope\":\"One deposited experimental model. Compare unsigned pair rotations and fitted Cartesian atom RMSDs after proper rigid superposition.\",\"status\":\"sensitive\"},\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"eval_id\":\"geometry_e_bc71fbe0bc29150925987ca3375355e5f5836ef564d6292e663fbd044eb6bd74\",\"original_evaluation_id\":null,\"proposal_ref\":\"gxa_01m81sbg91vhvbmk29\",\"review_status\":\"awaiting_independent_review\",\"round\":1,\"routes\":[{\"executed_criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"failure\":null,\"job_id\":\"gxj_01m81sbcy0hwwqbv1a\",\"job_status\":\"SUCCEEDED\",\"manifest_hash\":\"612d1433c9a1127dedd4c9de19429bb833283c1ef601126799e7f1d774b547e9\",\"observations_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"protocol\":\"common_backbone\"},{\"executed_criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"failure\":null,\"job_id\":\"gxj_01m81sbd2fdqbcv5t2\",\"job_status\":\"SUCCEEDED\",\"manifest_hash\":\"1dbe64b3d3fb9f70e0360f3603b2dd851a78edcf3a65025cdf8539671a1cda85\",\"observations_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"protocol\":\"common_ca\"},{\"executed_criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"failure\":null,\"job_id\":\"gxj_01m81sbg9bb4faq5mp\",\"job_status\":\"SUCCEEDED\",\"manifest_hash\":\"04f687ec7f7e00a1c8c0b26fb9af2bda28c37015cb72225edce8991132f7a5f5\",\"observations_ref\":\"gxa_01m81sbgp2kb61ztd1\",\"protocol\":\"ordered_backbone\"}],\"scope\":\"Thresholds define this coordinate sensitivity screen. Chain pairs share atoms and are dependent, and B factors mix disorder and refinement effects. A single asymmetric unit cannot establish a common symmetry axis, solution assembly, binding, or activity.\",\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbjgqb2eds297": {
+      "kind": "geometry_checks",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": "gxt_01m81sbgqfp2ry8ymg",
+      "sha256": "45646f8dbf46f5af81f2a3246637def18559c86b8288d336da90a1918724aeea",
+      "bytes": 1043,
+      "utf8": "{\"admission_hash\":\"c5dd9507214977033870ed7181e0a34d0fb8d6d6f7b4a5c8c96e901031e13384\",\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"evidence_ref\":\"gxa_01m81sbgqad6q73t9g\",\"job_id\":\"gxj_01m81sbh3c48n1st6r\",\"job_output_ref\":\"gxa_01m81sbjc9rp073b3r\",\"lease_id\":\"gxl_01m81sbgr6j8xcnmee\",\"manifest_hash\":\"d71345dbd889a07fce140dd5d57021433e5d8b0c3e4a608fc2ed776cf3608258\",\"measurement_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"observation_job_id\":\"gxj_01m81sbcy0hwwqbv1a\",\"observations_ref\":\"gxa_01m81sbdabmgf1yqbc\",\"output_sha256\":\"db6eb3801a24d606945ff9e598ee92f3fbc839a20d552636c75fd7e46b789180\",\"protocol\":\"common_backbone\",\"request_call_id\":\"call-fixture-26\",\"request_turn_id\":\"01a20395-c31f-7031-9a2a-2185d1a4376d\",\"review_inputs_ref\":\"gxa_01m81sbgr4q3ya9355\",\"review_job_id\":\"gxj_01m81sbh3c48n1st6r\",\"reviewer_call_id\":\"call-fixture-29\",\"reviewer_task_id\":\"gxt_01m81sbgqfp2ry8ymg\",\"reviewer_thread_id\":\"01a20395-c30d-7330-bcd3-d5bada74e69a\",\"reviewer_turn_id\":\"01a20395-c9af-7bb1-9f42-703bc1b7645c\",\"status\":\"matches\",\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbjp19x9r50aq": {
+      "kind": "geometry_checks",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": "gxt_01m81sbgqfp2ry8ymg",
+      "sha256": "157dc4be5c0c8bccd09918e136a20664ec7fc2efa8b6f1b365e0b09da0da0ad8",
+      "bytes": 1037,
+      "utf8": "{\"admission_hash\":\"c5dd9507214977033870ed7181e0a34d0fb8d6d6f7b4a5c8c96e901031e13384\",\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"evidence_ref\":\"gxa_01m81sbgqad6q73t9g\",\"job_id\":\"gxj_01m81sbh3c48n1st6r\",\"job_output_ref\":\"gxa_01m81sbjc9rp073b3r\",\"lease_id\":\"gxl_01m81sbgr6j8xcnmee\",\"manifest_hash\":\"d71345dbd889a07fce140dd5d57021433e5d8b0c3e4a608fc2ed776cf3608258\",\"measurement_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"observation_job_id\":\"gxj_01m81sbd2fdqbcv5t2\",\"observations_ref\":\"gxa_01m81sbdf1ndjssdsg\",\"output_sha256\":\"db6eb3801a24d606945ff9e598ee92f3fbc839a20d552636c75fd7e46b789180\",\"protocol\":\"common_ca\",\"request_call_id\":\"call-fixture-26\",\"request_turn_id\":\"01a20395-c31f-7031-9a2a-2185d1a4376d\",\"review_inputs_ref\":\"gxa_01m81sbgr4q3ya9355\",\"review_job_id\":\"gxj_01m81sbh3c48n1st6r\",\"reviewer_call_id\":\"call-fixture-31\",\"reviewer_task_id\":\"gxt_01m81sbgqfp2ry8ymg\",\"reviewer_thread_id\":\"01a20395-c30d-7330-bcd3-d5bada74e69a\",\"reviewer_turn_id\":\"01a20395-c9af-7bb1-9f42-703bc1b7645c\",\"status\":\"matches\",\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbgp2kb61ztd1": {
+      "kind": "tl1a_geometry",
+      "origin": "JOB_OUTPUT",
+      "job_id": "gxj_01m81sbg9bb4faq5mp",
+      "task_id": null,
+      "sha256": "57b5ee93da1769257a428a965a39058dc1b3c9bf004809c6a70ab7edeafddbea",
+      "bytes": 1826,
+      "utf8": "{\"criteria_sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"criteria_spec_sha256\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"input_sha256\":\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\",\"issues\":[],\"mapping\":{\"common_backbone_atoms\":656,\"common_backbone_residues\":164,\"observed_union_atoms\":656,\"observed_union_residues\":164,\"selected_atoms\":196,\"selected_fraction_of_observed_union_residues\":0.29878048780487804,\"selected_keys_sha256\":\"e0dea83487c919cb38e486539cd8c1e616e77d21701e770c450ffdf673651512\",\"selected_residues\":49},\"method\":\"tl1a-geometry@1\",\"pairs\":[{\"absolute_departure_from_120_deg\":0.1682573698607115,\"fitted_rmsd_angstrom\":0.1236746941729654,\"fixed_chain\":\"A\",\"moving_chain\":\"B\",\"rotation_angle_deg\":120.16825736986071},{\"absolute_departure_from_120_deg\":0.11283383478522069,\"fitted_rmsd_angstrom\":0.12184698327904085,\"fixed_chain\":\"A\",\"moving_chain\":\"C\",\"rotation_angle_deg\":120.11283383478522},{\"absolute_departure_from_120_deg\":0.2788740437868853,\"fitted_rmsd_angstrom\":0.13048718621497052,\"fixed_chain\":\"B\",\"moving_chain\":\"C\",\"rotation_angle_deg\":119.72112595621311}],\"protocol\":\"ordered_backbone\",\"quality_sha256\":\"3861a33360a732fdc9d2c60c045f0076b54ae1b4e6ded5947696cada8230f688\",\"runtime\":{\"fit\":\"Horn proper quaternion, Jacobi eigensolver\",\"python\":\"3.11.9\"},\"schema\":\"gx.tl1a.geometry/1\",\"source\":{\"atom_site_locator\":\"_atom_site, model 1, label_entity_id 1, label_asym_id A/B/C\",\"chains\":[\"A\",\"B\",\"C\"],\"declared_polymer_residues\":181,\"experimental_method\":\"X-RAY DIFFRACTION\",\"label_entity_id\":\"1\",\"model_id\":\"1\",\"pdb_id\":\"2RE9\",\"resolution_angstrom\":2.1,\"unobserved_polymer_positions\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]},\"status\":\"measured\",\"units\":{\"fitted_rmsd_angstrom\":\"angstrom\",\"rotation_angle_deg\":\"degrees\"}}\n"
+    },
+    "gxa_01m81sbjv2pkr8jaf3": {
+      "kind": "geometry_checks",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": "gxt_01m81sbgqfp2ry8ymg",
+      "sha256": "9ac543d5d80af794607979354bbd4336c934cec6ee61164ba755db5fcbb40b75",
+      "bytes": 1044,
+      "utf8": "{\"admission_hash\":\"c5dd9507214977033870ed7181e0a34d0fb8d6d6f7b4a5c8c96e901031e13384\",\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"evidence_ref\":\"gxa_01m81sbgqad6q73t9g\",\"job_id\":\"gxj_01m81sbh3c48n1st6r\",\"job_output_ref\":\"gxa_01m81sbjc9rp073b3r\",\"lease_id\":\"gxl_01m81sbgr6j8xcnmee\",\"manifest_hash\":\"d71345dbd889a07fce140dd5d57021433e5d8b0c3e4a608fc2ed776cf3608258\",\"measurement_ref\":\"gxa_01m81sbgp2kb61ztd1\",\"observation_job_id\":\"gxj_01m81sbg9bb4faq5mp\",\"observations_ref\":\"gxa_01m81sbgp2kb61ztd1\",\"output_sha256\":\"db6eb3801a24d606945ff9e598ee92f3fbc839a20d552636c75fd7e46b789180\",\"protocol\":\"ordered_backbone\",\"request_call_id\":\"call-fixture-26\",\"request_turn_id\":\"01a20395-c31f-7031-9a2a-2185d1a4376d\",\"review_inputs_ref\":\"gxa_01m81sbgr4q3ya9355\",\"review_job_id\":\"gxj_01m81sbh3c48n1st6r\",\"reviewer_call_id\":\"call-fixture-33\",\"reviewer_task_id\":\"gxt_01m81sbgqfp2ry8ymg\",\"reviewer_thread_id\":\"01a20395-c30d-7330-bcd3-d5bada74e69a\",\"reviewer_turn_id\":\"01a20395-c9af-7bb1-9f42-703bc1b7645c\",\"status\":\"matches\",\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbm155nrja8fj": {
+      "kind": "geometry_report",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "e750d29a9b1c61db2f7e4c3d8059dcdb829554339604910c90bd7faf046031a1",
+      "bytes": 2876,
+      "utf8": "{\"conclusion\":\"The independent assessment found sensitive for ['common_backbone', 'common_ca', 'ordered_backbone']. The measured masks and pairwise deltas delimit the supported scope.\",\"coordinate_quality\":{\"mask_ref\":\"gxa_01m81sbbqavmhmang2\",\"quality_job_id\":\"gxj_01m81sbaq0340xj834\",\"quality_run_id\":\"gxr_01m81sbbprrtmmzv8s\",\"quality_summary_ref\":\"gxa_01m81sbbqz28dc2vs6\",\"structure_ref\":\"gxa_01m81sb850q433khca\"},\"counterevidence\":\"At least one pair exceeds an inter-protocol geometry bound.\",\"objective\":\"Using the deposited 2RE9 coordinates, determine how sensitive the pairwise rigid-body geometry of the observed TL1A chains is to atom selection and incomplete observations. Quantify uncertainty and limit the conclusion to the crystal coordinates.\",\"rounds\":[{\"artifact_ref\":\"gxa_01m81sbg5khej2jvrj\",\"assessment_ref\":\"gxa_01m81sbfm2b2rv57n0\",\"evidence_ref\":\"gxa_01m81sbdg71hmkzqw9\",\"proposal_ref\":\"gxa_01m81sbcxfxbe65pab\",\"quality_run_id\":\"gxr_01m81sbbprrtmmzv8s\",\"round\":0},{\"artifact_ref\":\"gxa_01m81sbkye971pz3w8\",\"assessment_ref\":\"gxa_01m81sbk069w7j38rp\",\"evidence_ref\":\"gxa_01m81sbgqad6q73t9g\",\"proposal_ref\":\"gxa_01m81sbg91vhvbmk29\",\"quality_run_id\":\"gxr_01m81sbbprrtmmzv8s\",\"round\":1}],\"run_id\":\"gxr_01m81sb84hffvy5ym8\",\"scope\":\"Thresholds define this coordinate sensitivity screen. Chain pairs share atoms and are dependent, and B factors mix disorder and refinement effects. A single asymmetric unit cannot establish a common symmetry axis, solution assembly, binding, or activity.\",\"source\":{\"archived_acquisition\":{\"artifact_ref\":\"gxa_01m7j81xwxb9t5pcdb\",\"run_id\":\"gxr_01m7j6a56m4g2xgp9b\",\"source_id\":\"gxs_01m7j81xweecfxwa2k\"},\"archived_input\":\"gxdesign-harness/releases/science-native-v2/scratchpad/native-orchestration-4stage-20261120/tl1a/evidence/2RE9.cif\",\"bytes\":507971,\"coordinate_data_license\":\"CC0-1.0\",\"coordinate_download\":\"https://files.rcsb.org/download/2RE9.cif\",\"deposition\":\"https://doi.org/10.2210/pdb2re9/pdb\",\"filename\":\"2RE9.cif\",\"license_file\":\"LICENSE.cc0\",\"locators\":[\"_entry.id\",\"_exptl.method\",\"_refine.ls_d_res_high\",\"_entity_poly_seq\",\"_atom_site\"],\"pdb_id\":\"2RE9\",\"pdb_usage_policy\":\"https://www.wwpdb.org/about/usage-policies\",\"primary_publication\":\"Jin T, Guo F, Kim S, Howard A, Zhang YZ. X-ray crystal structure of TNF ligand family member TL1A at 2.1 A. Biochem Biophys Res Commun 364 (2007), 1–6.\",\"publication_doi\":\"https://doi.org/10.1016/j.bbrc.2007.09.097\",\"reuse\":\"Byte-for-byte copy of the previously acquired experimental deposition, including all coordinate and metadata tables.\",\"sha256\":\"8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b\",\"source_revision\":\"1.4 (2024-11-20), _pdbx_audit_revision_history\"},\"stop_reason\":\"No further funded, informative atom selection remains for this comparison.\",\"uncertainty\":\"Correlated pairs and unobserved atoms preclude extrapolation to solution geometry.\"}"
+    },
+    "gxa_01m81sbcxfxbe65pab": {
+      "kind": "geometry_proposal",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "23c01169b02e9201bce676e266111f576ecb05118b0eeb7b3cd6cae96ff0a2b0",
+      "bytes": 2090,
+      "utf8": "{\"author_principal\":\"01a20395-b121-70c3-8af5-f99d709262c2\",\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"evaluation_item\":null,\"evaluator\":{\"id\":\"geometry_spec_f6ae44c1ffc3fa2f166c2fd7473f035ad41179878481e09bbd08feedcdf2788b\",\"spec_hash\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"version\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\"},\"formal_criteria\":null,\"hypotheses\":[{\"expected\":\"stable\",\"hypothesis_id\":\"geometry_h_72f04e23f7a57ce8698d2e02dd55c3e4c2a99d1745e3cf7181047ad309da29ac\",\"id\":\"stable\",\"prediction\":\"All three pairs stay within both prospective tolerances across measured masks.\"},{\"expected\":\"sensitive\",\"hypothesis_id\":\"geometry_h_89bde24bb001818177d0f7e138c34acc7c10d1c112992b1e06810d50c772ef25\",\"id\":\"sensitive\",\"prediction\":\"At least one fitted pair exceeds an angle or RMSD tolerance across measured masks.\"}],\"mask_ref\":\"gxa_01m81sbbqavmhmang2\",\"objective\":\"Using the deposited 2RE9 coordinates, determine how sensitive the pairwise rigid-body geometry of the observed TL1A chains is to atom selection and incomplete observations. Quantify uncertainty and limit the conclusion to the crystal coordinates.\",\"objective_item\":{\"item_id\":\"objective\",\"sha256\":\"4af5dd036dc8f4d60aa58ad1f6e38ed1a4fb72cf089d7b033d4171d6e3f32d56\",\"status\":\"active\",\"version\":1},\"plan_ref\":\"gxa_01m81sbctfyc56bs2h\",\"planner_submission_id\":\"gxsb_01m81sbctjk0h14jqy\",\"protocols\":[\"common_backbone\",\"common_ca\"],\"quality_summary_ref\":\"gxa_01m81sbbqz28dc2vs6\",\"rationale\":\"The coordinate inventory covers 164 observed-union positions. First compare two common-atom definitions. Retain at least 40 distinct positions and 25% overlap for each exploratory fit. This prevents a tiny local patch dominating the comparison. Keep the stated angle and RMSD bounds for all selections and require numerical reproduction at the stricter frozen tolerances.\",\"reused_protocols\":[],\"source_item\":{\"item_id\":\"coordinates\",\"sha256\":\"519709c9ead5f4a1da97914247a33fa35ff1c963a5028c2c6833b64eff45e1e4\",\"status\":\"active\",\"version\":1},\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbfm2b2rv57n0": {
+      "kind": "geometry_assessment",
+      "origin": "HOST_PUT",
+      "job_id": null,
+      "task_id": "gxt_01m81sbdgd6vck7zeh",
+      "sha256": "fab48f64e5cde4994e267edffe18c9eeef2961b7a4749975cf69eeeada00d297",
+      "bytes": 933,
+      "utf8": "{\"checks\":{\"common_backbone\":\"gxa_01m81sbf9cvxkyj6h1\",\"common_ca\":\"gxa_01m81sbfejjz855qb9\"},\"evidence_ref\":\"gxa_01m81sbdg71hmkzqw9\",\"findings\":{\"sensitive\":{\"reason\":\"3 comparisons were retained. All measured pairs fall within both inter-protocol geometry bounds. Maximum angle difference 0.06439 degrees, maximum fitted RMSD difference 0.03988 Å.\",\"supported\":false},\"stable\":{\"reason\":\"3 comparisons were retained. All measured pairs fall within both inter-protocol geometry bounds. Maximum angle difference 0.06439 degrees, maximum fitted RMSD difference 0.03988 Å.\",\"supported\":true}},\"intent_responses\":[{\"item_id\":\"coordinates\",\"reason\":\"The project-provided coordinate source is used within the assigned scope.\",\"version\":1}],\"limitations\":[\"The three pair fits share atom coordinates.\",\"A single experimental crystal cannot determine the solution-state geometry.\"],\"proposal_ref\":\"gxa_01m81sbcxfxbe65pab\",\"status\":\"stable\"}"
+    },
+    "gxa_01m81sbg5khej2jvrj": {
+      "kind": "geometry_decision",
+      "origin": "HOST_PUT",
+      "job_id": null,
+      "task_id": "gxt_01m81sbfq7djfgc2kd",
+      "sha256": "19b6431fb785346c61e2bed54fa6cf9c13404259570cba22352b61ec9cd5a350",
+      "bytes": 690,
+      "utf8": "{\"assessment_ref\":\"gxa_01m81sbfm2b2rv57n0\",\"counterevidence\":\"All measured pairs fall within both inter-protocol geometry bounds.\",\"evidence_ref\":\"gxa_01m81sbdg71hmkzqw9\",\"intent_responses\":[{\"item_id\":\"coordinates\",\"reason\":\"The project-provided coordinate source is used within the assigned scope.\",\"version\":1}],\"next_protocols\":[\"ordered_backbone\"],\"proposal_ref\":\"gxa_01m81sbcxfxbe65pab\",\"reason\":\"The independent assessment found stable for ['common_backbone', 'common_ca']. Test whether high-order residues concentrated in a smaller subset change that comparison.\",\"stop_reason\":null,\"uncertainty\":\"Correlated pairs and unobserved atoms preclude extrapolation to solution geometry.\"}"
+    },
+    "gxa_01m81sbg91vhvbmk29": {
+      "kind": "geometry_proposal",
+      "origin": "BACKEND",
+      "job_id": null,
+      "task_id": null,
+      "sha256": "73430b675226858cf19308d0f958368c8af0a91fa9193a88daf78b4d8f6cd8ab",
+      "bytes": 2054,
+      "utf8": "{\"author_principal\":\"01a20395-bf4f-74f0-bfb9-d97abe44a884\",\"criteria_ref\":\"gxa_01m81sbcx95tne9w7x\",\"evaluation_item\":null,\"evaluator\":{\"id\":\"geometry_spec_f6ae44c1ffc3fa2f166c2fd7473f035ad41179878481e09bbd08feedcdf2788b\",\"spec_hash\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\",\"version\":\"94143c7ad8c65af378c56e33d5ca029610aa38e1f8a9c1eea4635cd9adefdc0a\"},\"formal_criteria\":null,\"hypotheses\":[{\"expected\":\"stable\",\"hypothesis_id\":\"geometry_h_5ac862a4aaad49672191d7a0dec61ed4a6a03622875dd9983e2a6c3848947605\",\"id\":\"stable\",\"prediction\":\"All three pairs stay within both prospective tolerances across measured masks.\"},{\"expected\":\"sensitive\",\"hypothesis_id\":\"geometry_h_2b1198399f86b425bc3ea649e14bf2a4b0c34e6ef2b5bea097ef2157acebb97b\",\"id\":\"sensitive\",\"prediction\":\"At least one fitted pair exceeds an angle or RMSD tolerance across measured masks.\"}],\"mask_ref\":\"gxa_01m81sbbqavmhmang2\",\"objective\":\"Using the deposited 2RE9 coordinates, determine how sensitive the pairwise rigid-body geometry of the observed TL1A chains is to atom selection and incomplete observations. Quantify uncertainty and limit the conclusion to the crystal coordinates.\",\"objective_item\":{\"item_id\":\"objective\",\"sha256\":\"4af5dd036dc8f4d60aa58ad1f6e38ed1a4fb72cf089d7b033d4171d6e3f32d56\",\"status\":\"active\",\"version\":1},\"plan_ref\":\"gxa_01m81sbctfyc56bs2h\",\"planner_submission_id\":\"gxsb_01m81sbctjk0h14jqy\",\"previous_assessment_ref\":\"gxa_01m81sbfm2b2rv57n0\",\"previous_decision_ref\":\"gxa_01m81sbg5khej2jvrj\",\"previous_proposal_ref\":\"gxa_01m81sbcxfxbe65pab\",\"protocols\":[\"common_backbone\",\"common_ca\",\"ordered_backbone\"],\"quality_summary_ref\":\"gxa_01m81sbbqz28dc2vs6\",\"rationale\":\"The independent assessment found stable for ['common_backbone', 'common_ca']. Test whether high-order residues concentrated in a smaller subset change that comparison.\",\"reused_protocols\":[],\"source_item\":{\"item_id\":\"coordinates\",\"sha256\":\"519709c9ead5f4a1da97914247a33fa35ff1c963a5028c2c6833b64eff45e1e4\",\"status\":\"active\",\"version\":1},\"structure_ref\":\"gxa_01m81sb850q433khca\"}"
+    },
+    "gxa_01m81sbk069w7j38rp": {
+      "kind": "geometry_assessment",
+      "origin": "HOST_PUT",
+      "job_id": null,
+      "task_id": "gxt_01m81sbgqfp2ry8ymg",
+      "sha256": "e4f7294bebce22e0247364d7a36bcf2e6ea8c5f6fa926dacf64aeb7f194b4903",
+      "bytes": 1072,
+      "utf8": "{\"checks\":{\"common_backbone\":\"gxa_01m81sbjgqb2eds297\",\"common_ca\":\"gxa_01m81sbjp19x9r50aq\",\"ordered_backbone\":\"gxa_01m81sbjv2pkr8jaf3\"},\"evidence_ref\":\"gxa_01m81sbgqad6q73t9g\",\"findings\":{\"geometry_h_2b1198399f86b425bc3ea649e14bf2a4b0c34e6ef2b5bea097ef2157acebb97b\":{\"reason\":\"9 comparisons were retained. At least one pair exceeds an inter-protocol geometry bound. Maximum angle difference 0.74691 degrees, maximum fitted RMSD difference 1.21656 Å.\",\"supported\":true},\"geometry_h_5ac862a4aaad49672191d7a0dec61ed4a6a03622875dd9983e2a6c3848947605\":{\"reason\":\"9 comparisons were retained. At least one pair exceeds an inter-protocol geometry bound. Maximum angle difference 0.74691 degrees, maximum fitted RMSD difference 1.21656 Å.\",\"supported\":false}},\"intent_responses\":[{\"item_id\":\"coordinates\",\"reason\":\"The project-provided coordinate source is used within the assigned scope.\",\"version\":1}],\"limitations\":\"The pairs share atoms and use one deposited model. Disorder and missing density limit inference.\",\"proposal_ref\":\"gxa_01m81sbg91vhvbmk29\",\"status\":\"sensitive\"}"
+    },
+    "gxa_01m81sbkye971pz3w8": {
+      "kind": "geometry_decision",
+      "origin": "HOST_PUT",
+      "job_id": null,
+      "task_id": "gxt_01m81sbk3dq4005fgx",
+      "sha256": "a2657e0e91bc903b9ba520899e9bc18a39987616020fbf290120ad6db4afc926",
+      "bytes": 737,
+      "utf8": "{\"assessment_ref\":\"gxa_01m81sbk069w7j38rp\",\"counterevidence\":\"At least one pair exceeds an inter-protocol geometry bound.\",\"evidence_ref\":\"gxa_01m81sbgqad6q73t9g\",\"intent_responses\":[{\"item_id\":\"coordinates\",\"reason\":\"The project-provided coordinate source is used within the assigned scope.\",\"version\":1}],\"next_protocols\":[],\"proposal_ref\":\"gxa_01m81sbg91vhvbmk29\",\"reason\":\"The independent assessment found sensitive for ['common_backbone', 'common_ca', 'ordered_backbone']. The measured masks and pairwise deltas delimit the supported scope.\",\"stop_reason\":\"No further funded, informative atom selection remains for this comparison.\",\"uncertainty\":\"Correlated pairs and unobserved atoms preclude extrapolation to solution geometry.\"}"
+    }
+  }
+}

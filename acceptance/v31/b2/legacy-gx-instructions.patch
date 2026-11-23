@@ -1,7 +1,7 @@
 --- a/gx-h/gx_core/p0/roots.py
 +++ b/gx-h/gx_core/p0/roots.py
-@@ -473,8 +473,4 @@
-             config.update({"features.multi_agent_v2.enabled": True, "features.multi_agent_v2_dynamic_tools": True})
+@@ -509,8 +509,4 @@
+             config.update(self._product_tool_config)
          instructions = WORKER_INSTRUCTIONS
 -        if self._role_tools and not main:
 -            names = (json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None

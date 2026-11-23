@@ -1,0 +1,164 @@
+{
+  "discrepancy": "Official model emitted a third direct submission function_call, then cancellation and Turn abort. No completion or reported usage for that final call appears in the official rollout or live GX telemetry. Historical ESTIMATED charge retained.",
+  "external_request_start_count": "not observable without provider-side request-start telemetry",
+  "meter": {
+    "attribution": "PROVISIONAL_TURN",
+    "budget_status": "SETTLED",
+    "children_known": 1,
+    "confidence": "ESTIMATED",
+    "estimated_at": "2026-11-23T15:40:15.831Z",
+    "measured_tokens": null,
+    "metering_reason": "cumulative usage is awaiting complete matching provider receipts",
+    "observed_lower_bound": 44731,
+    "settled_tokens": 180000,
+    "state": "acknowledged",
+    "terminal_status": "interrupted",
+    "token_budget": 180000,
+    "total_tokens": 44731
+  },
+  "observed_model_response_completions": [
+    {
+      "input_tokens": 21214,
+      "observed_at": "2026-11-23T15:39:30.731Z",
+      "output_tokens": 182,
+      "request_ordinal": 1,
+      "response_id": "resp_0f85d30fd93bab48016b045e2b6e2487d08251f1325bade3bf",
+      "total_tokens": 21396
+    },
+    {
+      "input_tokens": 23184,
+      "observed_at": "2026-11-23T15:39:36.835Z",
+      "output_tokens": 151,
+      "request_ordinal": 2,
+      "response_id": "resp_0f85d30fd93bab48016b045e33334887d09453abb4651e409d",
+      "total_tokens": 23335
+    }
+  ],
+  "official_events_in_recorded_order": [
+    {
+      "at": "2026-11-23T15:39:22.063Z",
+      "kind": "task_started",
+      "record": "event_msg",
+      "token_count_total": null,
+      "turn_id": "01a2090f-d443-7c93-af70-45bd4137a6d5"
+    },
+    {
+      "at": "2026-11-23T15:39:30.611Z",
+      "call_id": "call_5a8e40526aad43958288a534d5f7f05a",
+      "item_id": "ctc_0f85d30fd93bab48016b045e2fb02087d0af4bbebbb7d0aefa",
+      "kind": "custom_tool_call",
+      "name": "exec",
+      "namespace": null,
+      "record": "response_item"
+    },
+    {
+      "at": "2026-11-23T15:39:30.626Z",
+      "kind": null,
+      "record": "token_usage_record",
+      "response_id": "resp_0f85d30fd93bab48016b045e2b6e2487d08251f1325bade3bf",
+      "total_tokens": 21396
+    },
+    {
+      "at": "2026-11-23T15:39:30.920Z",
+      "kind": "token_count",
+      "record": "event_msg",
+      "token_count_total": 21396,
+      "turn_id": null
+    },
+    {
+      "at": "2026-11-23T15:39:36.820Z",
+      "call_id": "call_f18503a14f7546d9ae308da10adda883",
+      "item_id": "ctc_0f85d30fd93bab48016b045e36012487d0a0608ff93b625236",
+      "kind": "custom_tool_call",
+      "name": "exec",
+      "namespace": null,
+      "record": "response_item"
+    },
+    {
+      "at": "2026-11-23T15:39:36.834Z",
+      "kind": null,
+      "record": "token_usage_record",
+      "response_id": "resp_0f85d30fd93bab48016b045e33334887d09453abb4651e409d",
+      "total_tokens": 23335
+    },
+    {
+      "at": "2026-11-23T15:39:37.137Z",
+      "kind": "token_count",
+      "record": "event_msg",
+      "token_count_total": 44731,
+      "turn_id": null
+    },
+    {
+      "at": "2026-11-23T15:39:45.372Z",
+      "call_id": "call_48a15b2427de447f8a245f31837e05c1",
+      "item_id": "fc_0f85d30fd93bab48016b045e3d3eac87d0b21bcd42f38c7f8b",
+      "kind": "function_call",
+      "name": "gx_submit_product",
+      "namespace": "gx",
+      "record": "response_item"
+    },
+    {
+      "at": "2026-11-23T15:39:45.537Z",
+      "call_id": "call_48a15b2427de447f8a245f31837e05c1",
+      "kind": "item_completed",
+      "record": "event_msg",
+      "status": "failed",
+      "success": false
+    },
+    {
+      "at": "2026-11-23T15:39:45.542Z",
+      "call_id": "call_48a15b2427de447f8a245f31837e05c1",
+      "canceled_before_response": true,
+      "kind": "function_call_output",
+      "record": "response_item"
+    },
+    {
+      "at": "2026-11-23T15:39:45.545Z",
+      "kind": "token_count",
+      "record": "event_msg",
+      "token_count_total": 44731,
+      "turn_id": null
+    },
+    {
+      "at": "2026-11-23T15:39:45.562Z",
+      "kind": "turn_aborted",
+      "record": "event_msg",
+      "token_count_total": null,
+      "turn_id": "01a2090f-d443-7c93-af70-45bd4137a6d5"
+    }
+  ],
+  "raw_rollout_sha256": "42ba7ee39e2d6bf6c151362baefc92a1557778f2554820f86a06a585baceaaa8",
+  "root": {
+    "attempt": 1,
+    "role": "evidence_reviewer",
+    "root_key": "e5df98c0-fa64-4852-b2dc-e2180e7b7169",
+    "run_key": "07-east",
+    "task_id": "gxt_01m84gzm8j2h5zf3vx"
+  },
+  "terminal": {
+    "call_id": "call_48a15b2427de447f8a245f31837e05c1",
+    "goal_checked_at": "2026-11-23T15:39:45.532Z",
+    "goal_last_error": null,
+    "interrupt_ack_at": "2026-11-23T15:39:45.566Z",
+    "interrupt_attempts": 1,
+    "interrupt_last_error": null,
+    "reason": "GX_ACCEPTED",
+    "recorded_at": "2026-11-23T15:39:45.509Z",
+    "thread_id": "01a2090f-d3be-7c82-aab7-0b8b7adffa2a",
+    "turn_id": "01a2090f-d443-7c93-af70-45bd4137a6d5"
+  },
+  "terminal_callback_response_links": [
+    {
+      "call_id": "call_48a15b2427de447f8a245f31837e05c1",
+      "model_call_id": "call_48a15b2427de447f8a245f31837e05c1",
+      "namespace": "gx",
+      "outcome": "ACCEPTED",
+      "response_id": null,
+      "source": "GX",
+      "tool": "gx_submit_product"
+    }
+  ],
+  "thread": "01a2090f-d3be-7c82-aab7-0b8b7adffa2a",
+  "turn": "01a2090f-d443-7c93-af70-45bd4137a6d5",
+  "workspace": "state-07"
+}

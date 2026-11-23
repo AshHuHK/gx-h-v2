@@ -1,0 +1,104 @@
+{
+  "max_parallel_roots": 2,
+  "max_rounds": 1,
+  "objective": "Use measured CPU grid outputs to compare two finite sets of coordinates for score(x)=-(x-2)^2. Review both sets against each run's frozen cutoff and close the single-round comparison.",
+  "plugins": [
+    "org.gx.science-grid@3.0.0"
+  ],
+  "project": "v3-multiroot-finite-grid",
+  "proposal": {
+    "paths": [
+      {
+        "grid": {
+          "candidates": [
+            {
+              "candidate_id": "06-east-path_a-1",
+              "x": 1.546875
+            },
+            {
+              "candidate_id": "06-east-path_a-2",
+              "x": 2.046875
+            },
+            {
+              "candidate_id": "06-east-path_a-3",
+              "x": 2.546875
+            }
+          ],
+          "fixture_version": "1",
+          "method_id": "fixture-grid",
+          "method_version": "1",
+          "synthetic": true
+        },
+        "id": "east-near",
+        "prediction": "A coordinate in this east grid has measured score at or above -0.125."
+      },
+      {
+        "grid": {
+          "candidates": [
+            {
+              "candidate_id": "06-east-path_b-1",
+              "x": -2.453125
+            },
+            {
+              "candidate_id": "06-east-path_b-2",
+              "x": -1.953125
+            },
+            {
+              "candidate_id": "06-east-path_b-3",
+              "x": -1.453125
+            }
+          ],
+          "fixture_version": "1",
+          "method_id": "fixture-grid",
+          "method_version": "1",
+          "synthetic": true
+        },
+        "id": "east-offset",
+        "prediction": "A coordinate in this east grid has measured score at or above -0.125."
+      }
+    ],
+    "threshold": -0.125
+  },
+  "run_budget": {
+    "api_calls": 3,
+    "cpu_seconds": 120,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "job_submissions": 2,
+    "tokens": 440000,
+    "wall_hours": 2,
+    "worker_tasks": 6
+  },
+  "teams": [
+    {
+      "limits": {
+        "api_calls": 3,
+        "tokens": 435000,
+        "worker_tasks": 5
+      },
+      "max_parallel_roots": 1,
+      "name": "East grid",
+      "roles": [
+        "planner",
+        "evidence_reviewer"
+      ],
+      "team_id": "east"
+    }
+  ],
+  "turn_token_budget": 180000,
+  "workflow": "science_grid",
+  "workflow_version": "3",
+  "workspace": {
+    "max_parallel_roots": 2
+  },
+  "workspace_budget": {
+    "api_calls": 6,
+    "cpu_seconds": 300,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "job_submissions": 4,
+    "tokens": 900000,
+    "wall_hours": 6,
+    "worker_tasks": 12
+  }
+}

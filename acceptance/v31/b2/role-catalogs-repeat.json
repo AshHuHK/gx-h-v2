@@ -1,0 +1,476 @@
+{
+  "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "explicit_review_assignment": {
+    "multi_agent": true,
+    "tools": [
+      "gx_read_artifact",
+      "gx_wait_job",
+      "gx_submit_product"
+    ]
+  },
+  "fixture": "official stdio App Server with loopback scripted Responses",
+  "historical_callbacks": {
+    "calls": {
+      "baseline": {
+        "evidence_reviewer": {
+          "gx_read_artifact": 479,
+          "gx_submit_product": 77,
+          "gx_task_context": 74
+        },
+        "planner": {
+          "gx_read_artifact": 234,
+          "gx_submit_product": 26,
+          "gx_task_context": 26
+        }
+      },
+      "candidate": {
+        "evidence_reviewer": {
+          "gx_grid_measurement": 104,
+          "gx_read_artifact": 466,
+          "gx_submit_product": 76,
+          "gx_task_context": 73
+        },
+        "planner": {
+          "gx_grid_measurement": 14,
+          "gx_read_artifact": 234,
+          "gx_submit_product": 26,
+          "gx_task_context": 26
+        }
+      }
+    },
+    "path": "acceptance/v3/performance/callback-samples.jsonl.gz",
+    "sha256": "202e7ab7bd56d0cb0c9fd2579acd4eebd87aa46b70de34a7b385ada26efa347f",
+    "waves": {
+      "baseline": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "candidate": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  },
+  "native_child": {
+    "artifact_ref": "gxa_01m84gejrknjx17vny",
+    "attempt": 1,
+    "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+    "callbacks": [
+      {
+        "call": "warm-source-1",
+        "error": "SCOPE_DENIED: GX is verifying the native child and its active turn. Retry gx_read_artifact.",
+        "phase": "warm",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-4cc5-7e61-be5d-ec7b84491dac"
+      },
+      {
+        "call": "warm-source-2",
+        "error": null,
+        "phase": "warm",
+        "returned_text": "Observation 7: μ = 0.25 ± 0.01.\nOriginal notebook entry.",
+        "success": true,
+        "thread": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-4cc5-7e61-be5d-ec7b84491dac"
+      },
+      {
+        "call": "warm-other-3",
+        "error": "SCOPE_DENIED: this artifact has not been cited in the task inputs",
+        "phase": "warm",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-4cc5-7e61-be5d-ec7b84491dac"
+      },
+      {
+        "call": "warm-write-4",
+        "error": "SCOPE_DENIED: only the assigned GX root may call this tool",
+        "phase": "warm",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+        "tool": "gx_submit_product",
+        "turn": "01a20907-4cc5-7e61-be5d-ec7b84491dac"
+      },
+      {
+        "call": "warm-park-2",
+        "error": null,
+        "phase": "warm",
+        "returned_text": null,
+        "success": true,
+        "thread": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e",
+        "tool": "gx_wait_job",
+        "turn": "01a20907-4c32-7e71-ab24-b4eab825b2a0"
+      },
+      {
+        "call": "fork-ordinary-1",
+        "error": "SCOPE_DENIED: GX is verifying the native child and its active turn. Retry gx_read_artifact.",
+        "phase": "fork",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4e4d-7550-b32c-b4b6803823d2",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-4e71-7f63-aa33-21f90bb0d1bd"
+      },
+      {
+        "call": "fork-ordinary-2",
+        "error": "SCOPE_DENIED: an ordinary Codex fork has no delegated GX artifact access",
+        "phase": "fork",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4e4d-7550-b32c-b4b6803823d2",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-4e71-7f63-aa33-21f90bb0d1bd"
+      },
+      {
+        "call": "other_root-ordinary-1",
+        "error": "SCOPE_DENIED: this native thread belongs to another GX run",
+        "phase": "other_root",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4f40-72e2-aff8-568303cef77f",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-4f49-7fa2-bb2e-964f7147dea7"
+      },
+      {
+        "call": "other_root-ordinary-2",
+        "error": "SCOPE_DENIED: this native thread belongs to another GX run",
+        "phase": "other_root",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4f40-72e2-aff8-568303cef77f",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-4f49-7fa2-bb2e-964f7147dea7"
+      },
+      {
+        "call": "cold-source-1",
+        "error": "SCOPE_DENIED: GX is verifying the native child and its active turn. Retry gx_read_artifact.",
+        "phase": "cold",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-5192-7592-bd23-a4fe9bf72d63"
+      },
+      {
+        "call": "cold-source-2",
+        "error": null,
+        "phase": "cold",
+        "returned_text": "Observation 7: μ = 0.25 ± 0.01.\nOriginal notebook entry.",
+        "success": true,
+        "thread": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-5192-7592-bd23-a4fe9bf72d63"
+      },
+      {
+        "call": "cold-expired-3",
+        "error": "LEASE_EXPIRED: lease gxl_01m84gek02871t05y0 expired at 2000-01-01T00:00:00Z",
+        "phase": "cold",
+        "returned_text": null,
+        "success": false,
+        "thread": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+        "tool": "gx_read_artifact",
+        "turn": "01a20907-5192-7592-bd23-a4fe9bf72d63"
+      }
+    ],
+    "checks": {
+      "child_inherited_assigned_catalog": true,
+      "child_wire_catalog_matches_assignment": true,
+      "child_write_denied": true,
+      "cold_retry": true,
+      "cold_success": true,
+      "expired_parent_denied": true,
+      "native_child_inherited_read": true,
+      "ordinary_fork_denied": true,
+      "original_in_child_input": true,
+      "other_run_root_denied": true,
+      "root_wire_catalog_matches_assignment": true,
+      "same_task_lease": true,
+      "unrelated_artifact_denied": true,
+      "warm_retry": true,
+      "warm_success": true
+    },
+    "child_metadata": {
+      "forkedFromId": null,
+      "id": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+      "parentThreadId": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e",
+      "sessionId": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e",
+      "source": {
+        "subAgent": {
+          "thread_spawn": {
+            "agent_nickname": "Wegener",
+            "agent_path": "/root/native_probe_child",
+            "agent_role": null,
+            "depth": 1,
+            "parent_thread_id": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e"
+          }
+        }
+      }
+    },
+    "child_observations": [
+      [
+        "warm",
+        true,
+        "warm-source-2"
+      ],
+      [
+        "warm",
+        true,
+        "warm-source-2"
+      ],
+      [
+        "warm",
+        true,
+        "warm-source-2"
+      ],
+      [
+        "cold",
+        true,
+        "cold-source-2"
+      ],
+      [
+        "cold",
+        true,
+        "cold-source-2"
+      ]
+    ],
+    "child_session_meta": {
+      "dynamic_tools": [
+        "gx_read_artifact",
+        "gx_wait_job",
+        "gx_submit_product"
+      ],
+      "id": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+      "multi_agent_version": "v2",
+      "parent_thread_id": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e",
+      "session_id": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e"
+    },
+    "codex_version": "codex-cli 0.169.0",
+    "cold_child_metadata": {
+      "forkedFromId": null,
+      "id": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+      "parentThreadId": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e",
+      "sessionId": "01a20907-4cba-7301-b972-1cb1c2eb3dbb",
+      "source": {
+        "subAgent": {
+          "thread_spawn": {
+            "agent_nickname": "Wegener",
+            "agent_path": "/root/native_probe_child",
+            "agent_role": null,
+            "depth": 1,
+            "parent_thread_id": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e"
+          }
+        }
+      }
+    },
+    "cold_turn_started_notification_dropped": [
+      "01a20907-5192-7592-bd23-a4fe9bf72d63"
+    ],
+    "counts": {
+      "after": {
+        "leases": 1,
+        "tasks": 1
+      },
+      "before": {
+        "leases": 1,
+        "tasks": 1
+      }
+    },
+    "fork_metadata": {
+      "forkedFromId": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e",
+      "id": "01a20907-4e4d-7550-b32c-b4b6803823d2",
+      "parentThreadId": null,
+      "sessionId": "01a20907-4e4d-7550-b32c-b4b6803823d2",
+      "source": "vscode"
+    },
+    "input_config": {
+      "multi_agent_v2": false,
+      "multi_agent_v2_dynamic_tools": false
+    },
+    "lease_id": "gxl_01m84gek02871t05y0",
+    "other_artifact_ref": "gxa_01m84gejrnxk1rxqzw",
+    "other_root_id": "01a20907-4f40-72e2-aff8-568303cef77f",
+    "other_run_id": "gxr_01m84gejre04sjmsdv",
+    "pass": true,
+    "provider": "scripted loopback Responses",
+    "root_id": "01a20907-4c0f-7c53-a1b4-07a9c5093f0e",
+    "run_id": "gxr_01m84gejrdmc3z6xc5",
+    "spawn_notifications_dropped": [],
+    "task_id": "gxt_01m84gejrnn1y3mrpy"
+  },
+  "wire_catalogs": [
+    {
+      "base_instructions_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "gx_tools": [
+        "gx_capability_inspect",
+        "gx_grid_measurement",
+        "gx_job_cancel",
+        "gx_job_status",
+        "gx_job_submit",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context",
+        "gx_wait_job"
+      ],
+      "model": "gpt-6.1-sol",
+      "role": "evidence_reviewer",
+      "spawn_agent": true,
+      "thread": "01a20907-43e2-71f0-bbb9-e927c08e5ef2",
+      "tool_schema_bytes": 22859,
+      "workflow": "science_grid@2"
+    },
+    {
+      "base_instructions_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "gx_tools": [
+        "gx_capability_inspect",
+        "gx_grid_measurement",
+        "gx_job_cancel",
+        "gx_job_status",
+        "gx_job_submit",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context",
+        "gx_wait_job"
+      ],
+      "model": "gpt-6.1-sol",
+      "role": "planner",
+      "spawn_agent": true,
+      "thread": "01a20907-449a-7621-a8e4-56759c0d70a5",
+      "tool_schema_bytes": 22859,
+      "workflow": "science_grid@2"
+    },
+    {
+      "base_instructions_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "gx_tools": [
+        "gx_capability_inspect",
+        "gx_grid_measurement",
+        "gx_job_cancel",
+        "gx_job_status",
+        "gx_job_submit",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context",
+        "gx_wait_job"
+      ],
+      "model": "gpt-6.1-sol",
+      "role": "researcher",
+      "spawn_agent": true,
+      "thread": "01a20907-4514-7c82-b8fc-ff81b32910e3",
+      "tool_schema_bytes": 22859,
+      "workflow": "science_grid@2"
+    },
+    {
+      "base_instructions_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "gx_tools": [
+        "gx_capability_inspect",
+        "gx_grid_measurement",
+        "gx_job_cancel",
+        "gx_job_status",
+        "gx_job_submit",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context",
+        "gx_wait_job"
+      ],
+      "model": "gpt-6.1-sol",
+      "role": "executor",
+      "spawn_agent": true,
+      "thread": "01a20907-457e-7743-acb3-40d6a4e4633e",
+      "tool_schema_bytes": 22859,
+      "workflow": "science_grid@2"
+    },
+    {
+      "base_instructions_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "gx_tools": [
+        "gx_grid_measurement",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context"
+      ],
+      "model": "gpt-6.1-sol",
+      "role": "evidence_reviewer",
+      "spawn_agent": false,
+      "thread": "01a20907-45fd-74d3-bfd6-d6bfa90ba483",
+      "tool_schema_bytes": 16863,
+      "workflow": "science_grid@3"
+    },
+    {
+      "base_instructions_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "gx_tools": [
+        "gx_grid_measurement",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context"
+      ],
+      "model": "gpt-6.1-sol",
+      "role": "planner",
+      "spawn_agent": false,
+      "thread": "01a20907-4668-72d2-9a8b-75b450e3cdf7",
+      "tool_schema_bytes": 16863,
+      "workflow": "science_grid@3"
+    },
+    {
+      "base_instructions_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "gx_tools": [
+        "gx_capability_inspect",
+        "gx_job_cancel",
+        "gx_job_status",
+        "gx_job_submit",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context",
+        "gx_wait_job"
+      ],
+      "model": "gpt-6.1-sol",
+      "role": "researcher",
+      "spawn_agent": false,
+      "thread": "01a20907-46d6-7370-a254-481eba0dc9b8",
+      "tool_schema_bytes": 18329,
+      "workflow": "science_grid@3"
+    },
+    {
+      "base_instructions_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "gx_tools": [
+        "gx_capability_inspect",
+        "gx_job_status",
+        "gx_job_submit",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context",
+        "gx_wait_job"
+      ],
+      "model": "gpt-6.1-sol",
+      "role": "executor",
+      "spawn_agent": false,
+      "thread": "01a20907-4743-79c3-95e4-dd5a65a7626d",
+      "tool_schema_bytes": 18057,
+      "workflow": "science_grid@3"
+    }
+  ]
+}

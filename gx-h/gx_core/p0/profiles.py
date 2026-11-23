@@ -60,8 +60,10 @@ def read_overrides():
 
 
 def _route_fields(value):
-    if not isinstance(value, dict) or set(value) - {"provider", "model", "effort", "tools"}:
-        raise ValueError("Profile entries accept provider, model, effort and tools")
+    if not isinstance(value, dict) or set(value) - {"provider", "model", "effort", "tools", "multi_agent"}:
+        raise ValueError("Profile entries accept provider, model, effort, tools and multi_agent")
+    if "multi_agent" in value and type(value["multi_agent"]) is not bool:
+        raise ValueError("multi_agent must be a boolean")
     if "provider" in value:
         if value["provider"] is None:
             raise ValueError("Supply a Codex provider ID")
@@ -155,6 +157,40 @@ def selected_tools(available, names):
     if missing:
         raise ValueError("GX tools unavailable for this root: " + ", ".join(sorted(missing)))
     return [by_name[name] for name in names]
+
+
+_DELIVER = {"gx_task_context", "gx_read_artifact", "gx_submit_product"}
+_GRID_REVIEW = _DELIVER | {"gx_grid_measurement"}
+_COMPUTE = _DELIVER | {"gx_capability_inspect", "gx_job_submit", "gx_job_status", "gx_wait_job"}
+_ROLE_TOOLS = {
+    "evidence_reviewer": _GRID_REVIEW,
+    "planner": _GRID_REVIEW,
+    "researcher": _COMPUTE | {"gx_job_cancel"},
+    "executor": _COMPUTE,
+}
+
+
+def available_for_role(available, role, profile, *, scoped):
+    """A frozen role override can assign a run plugin or independent computation."""
+    if "tools" in profile or not scoped or role == "main":
+        return selected_tools(available, profile.get("tools"))
+    allowed = _ROLE_TOOLS.get(role, _DELIVER)
+    return [tool for tool in available if tool["name"] in allowed]
+
+
+def worker_instructions(names, *, delegate):
+    guidance = ["Base your product on the cited evidence, including observations and evaluations."]
+    if "gx_read_artifact" in names:
+        guidance.append("Read missing cited originals with gx_read_artifact.")
+    if "gx_task_context" in names:
+        guidance.append("Refresh gx_task_context after a change.")
+    if "gx_wait_job" in names:
+        guidance.append("End the turn when gx_wait_job parks the attempt.")
+    if delegate and "gx_read_artifact" in names:
+        guidance.append("Give direct native children the exact references for their analysis. "
+                        "Children may read cited artifacts and retry a read during verification.")
+    guidance.append("Submit your own product with gx_submit_product.")
+    return " ".join(guidance)
 
 
 def model_catalog(client, provider):

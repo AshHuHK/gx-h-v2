@@ -1,0 +1,11 @@
+--- a/gx-h/gx_core/p0/roots.py
++++ b/gx-h/gx_core/p0/roots.py
+@@ -473,8 +473,4 @@
+             config.update({"features.multi_agent_v2.enabled": True, "features.multi_agent_v2_dynamic_tools": True})
+         instructions = WORKER_INSTRUCTIONS
+-        if self._role_tools and not main:
+-            names = (json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None
+-                     else [tool["name"] for tool in self.worker_tools])
+-            instructions = profiles.worker_instructions(names, delegate=delegate)
+         params = {"modelProvider":row["provider"] or host_policy.p0_provider_for_run(self.run),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
+                   "config":config, "developerInstructions":row["brief"] if main else

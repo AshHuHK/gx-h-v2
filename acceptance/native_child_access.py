@@ -13,7 +13,7 @@ import time
 from unittest.mock import patch
 
 from native_probe import CHILD, PACKAGE, Peer, Probe, _proxy_preflight, find_binary
-from native_probe_peer import tool
+from native_probe_peer import tool, wire_catalog
 from gx_core import budgets
 from gx_core.artifacts.service import ArtifactService
 from gx_core.p0 import schema
@@ -34,6 +34,8 @@ class ChildPeer(Peer):
 
     def record(self, body):
         row, n = super().record(body)
+        if getattr(self, "observe_catalogs", False):
+            row["gx_catalog"] = sorted(name for name in wire_catalog(body)[1] if name.startswith("gx_"))
         phase = row["scenario"] + "-"
         replies = {}
         for item in body.get("input", []):
@@ -95,7 +97,7 @@ class ChildPeer(Peer):
         return self.message(row["id"], "I read the original notebook.")
 
 
-def run(directory, binary, *, drop_spawn=False):
+def run(directory, binary, *, drop_spawn=False, role_profile=None):
     version = subprocess.check_output([str(binary), "--version"], text=True).strip()
     if version != "codex-cli 0.169.0":
         raise RuntimeError("This probe requires Codex 0.169.0")
@@ -105,6 +107,7 @@ def run(directory, binary, *, drop_spawn=False):
     if binary_sha != lock["linux_x64"]["binary_sha256"]:
         raise RuntimeError("The Codex binary differs from the pinned Linux release")
     peer = ChildPeer()
+    peer.observe_catalogs = role_profile is not None
     threading.Thread(target=peer.serve_forever, daemon=True).start()
     probe = Probe(directory / "official", binary, peer)
     cfg = probe.home / "config.toml"
@@ -112,14 +115,25 @@ def run(directory, binary, *, drop_spawn=False):
                    .replace("multi_agent_v2_dynamic_tools = true", "multi_agent_v2_dynamic_tools = false"))
     knobs = {"GX_P0_TEST": "1", "GX_P0_TEST_PROVIDER": probe.provider, "GX_P0_MODEL": "gpt-6.1-sol",
              "GX_P0_CODEX": str(binary), "CODEX_HOME": str(probe.home)}
+    if role_profile is not None:
+        profile_path = directory / "profiles.json"
+        profile_path.write_text(json.dumps({"roles": {"evidence_reviewer": role_profile}}))
+        knobs["GX_P0_PROFILE"] = str(profile_path)
     callbacks, dropped, lost_spawn, tasks = [], [], [], {}
     completed = set()
     try:
         with patch.dict(os.environ, knobs), closing(store.open_store(directory / "gx.sqlite")) as conn:
             schema.install(conn)
             budget = budgets.create_root(conn, run_id=None, profile_name="p0", actor="probe")
+            options = {}
+            if role_profile is not None:
+                from gx_core.hostobs.host_policy import p0_host
+                document, digest, host = p0_host()
+                options = {"workflow_id": "science_grid", "workflow_version": "3", "host": host,
+                           "agent_policy": document, "pins": {"agent_policy_sha256": digest}}
+                profile_path.unlink()  # Both connections must use the saved Run selection.
             rid = records.create_run(conn, objective="Review notebook entry", project_ref="read", actor="probe",
-                                     budget_ref=budget)
+                                     budget_ref=budget, **options)
             other = records.create_run(conn, objective="Other notebook", project_ref="unrelated", actor="probe")
             for status in ("AUDITING", "PLANNING", "ACTIVE"):
                 store.transition(conn, machine="run", subject_id=rid, to_state=status, actor="probe")
@@ -228,7 +242,10 @@ def run(directory, binary, *, drop_spawn=False):
                         next_reconcile = time.monotonic() + 0.25
                     return False
                 until(roots, settled)
+                # As in the warm dispatch, let the driver finish waking the root before the peer can issue calls.
+                peer.gate.clear()
                 restored = roots.dispatch(task)
+                peer.gate.set()
                 until(roots, lambda: peer.child_done.is_set())
                 tasks["after"] = counts()
             has = lambda phase, label, success: any(c["phase"] == phase and c["thread"] == child
@@ -253,6 +270,11 @@ def run(directory, binary, *, drop_spawn=False):
                                           and restored["lease_id"] == lease}
             if drop_spawn:
                 verdict["missed_spawn_recovered"] = bool(lost_spawn) and verdict["warm_success"]
+            if role_profile is not None:
+                verdict["child_inherited_assigned_catalog"] = set(inherited) == set(role_profile["tools"])
+                for child_flag, label in ((False, "root"), (True, "child")):
+                    first = next(row for row in peer.rows if row["scenario"] == "warm" and row["child"] == child_flag)
+                    verdict[label + "_wire_catalog_matches_assignment"] = set(first["gx_catalog"]) == set(role_profile["tools"])
             return {"pass": all(verdict.values()), "checks": verdict, "codex_version": version, "binary_sha256": binary_sha,
                     "provider": "scripted loopback Responses", "run_id": rid, "task_id": task,
                     "root_id": tid, "lease_id": lease, "attempt": restored["attempt"], "counts": tasks,

@@ -30,6 +30,20 @@ def names(value):
     return []
 
 
+def wire_catalog(body):
+    """The pinned host can declare tools directly or inside a Responses Lite input item."""
+    specs = list(body.get("tools") or [])
+    for item in body.get("input", ()):
+        if item.get("type") == "additional_tools":
+            specs.extend(item["tools"])
+    exposed = set(names(specs))
+    for group in specs:
+        for tool in group.get("tools", ()):
+            if group.get("name") == "functions" and tool.get("name") == "exec":
+                exposed.update(re.findall(r"^### `([\w.-]+)`$", tool.get("description", ""), re.MULTILINE))
+    return specs, exposed
+
+
 class Peer(ThreadingHTTPServer):
     daemon_threads = True
 

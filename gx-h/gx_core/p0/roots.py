@@ -100,6 +100,7 @@ class Roots:
         self.run = conn.execute("SELECT * FROM runs WHERE run_id=?",(run_id,)).fetchone()
         if not self.run:
             raise ScopeDenied("unknown GX run")
+        self._role_tools = (self.run["workflow_id"], self.run["workflow_version"]) == ("science_grid", "3")
         self.cwd, self.argv, self.env = Path(cwd).resolve(), argv, env
         self.token_budget = token_budget
         self.worker_tools = [*WORKER_TOOLS, *worker_tools]
@@ -356,7 +357,8 @@ class Roots:
         profile = host_policy.p0_role_for_run(self.run, role)
         provider = profile.get("provider") or host_policy.p0_provider_for_run(self.run)
         available = self.main_tools if task is None else self.worker_tools
-        tool_names = [tool["name"] for tool in profiles.selected_tools(available, profile.get("tools"))]
+        tool_names = [tool["name"] for tool in profiles.available_for_role(
+            available, role, profile, scoped=self._role_tools)]
         rootdir.mkdir(mode=0o700, parents=True, exist_ok=False)
         if task is None:
             brief = MAIN_INSTRUCTIONS
@@ -378,7 +380,7 @@ class Roots:
                           "effort,brief,provider,tool_names_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (key,self.run_id,
                           task["task_id"] if task is not None else None, attempt, lease,
                           str(rootdir), role, profile["model"], profile["effort"], brief, provider,
-                          ids.canonical_json(tool_names) if "provider" in profile else None))
+                          ids.canonical_json(tool_names) if self._role_tools or "provider" in profile else None))
         if task is not None:
             self._allow_refs(key, [packet["input"], getattr(current, "citations", current)])
         return self._row(key)
@@ -491,16 +493,28 @@ class Roots:
         main = row["task_id"] is None
         tools = self._tools_for(row) if new or self.terminal_products else []
         direct_product = self.terminal_products and not main and any(tool["name"] == "gx_submit_product" for tool in tools)
+        profile = host_policy.p0_role_for_run(self.run, row["role"])
+        delegate = profile.get("multi_agent", False if self._role_tools else None)
         config = {"features.goals": not main, "features.shell_tool": False, "features.unified_exec": False,
                   "features.multi_agent":True,"features.apps":False,"features.plugins":False,"features.hooks":False,
                   "mcp_servers":self.disabled_mcp,"web_search":"disabled","model_reasoning_effort":row["effort"]}
-        if not main:
+        if delegate is not None:
+            # 0.169 also consults the model catalog's multi_agent_version when agents.enabled is true.
+            config.update({"agents.enabled": delegate, "features.multi_agent": delegate,
+                           "features.multi_agent_v2.enabled": delegate,
+                           "features.multi_agent_v2_dynamic_tools": delegate and not main})
+        elif not main:
             config.update({"features.multi_agent_v2.enabled": True, "features.multi_agent_v2_dynamic_tools": True})
         if direct_product:
             config.update(self._product_tool_config)
+        instructions = WORKER_INSTRUCTIONS
+        if self._role_tools and not main:
+            names = (json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None
+                     else [tool["name"] for tool in self.worker_tools])
+            instructions = profiles.worker_instructions(names, delegate=delegate)
         params = {"modelProvider":row["provider"] or host_policy.p0_provider_for_run(self.run),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
                   "config":config, "developerInstructions":row["brief"] if main else
-                  WORKER_INSTRUCTIONS+"\n"+row["brief"]}
+                  instructions+"\n"+row["brief"]}
         if new:
             params["experimentalRawEvents"] = True
             params["environments"] = []

@@ -19,6 +19,8 @@
 }
 ```
 
+`science_grid@3` 的 `evidence_reviewer` 与 `planner` 默认可以读取任务和产物、提交结果。已绑定的网格插件还会提供 `gx_grid_measurement`。`researcher` 与 `executor` 可以查看能力、提交和查询分配的 Job，也可以等待结果。研究员还可以取消自己的 Job。各角色默认单独执行。某项分工需要原生子代理时，可在对应角色设置中加入 `"multi_agent": true`。直接子代理继承父线程的工具目录，GX 允许其读取分配给父线程的原始产物，提交成果和管理 Job 仍由父线程负责。
+
 字段按 `default`、`task_classes`、`roles` 的顺序覆盖。`profiles` 会列出可用角色。任务类别包括 `PLANNING`、`AUTHORING`、`VERIFICATION`、`EXECUTION` 和 `TESTING`。省略 `effort` 时，协调和决策角色默认 `ultra`，复杂科研、验证和代码工作默认 `max`，简单执行和测试默认 `xhigh`。本地测试模式的默认值也是 `xhigh`。显式填写时可使用所选模型目录中的档位名。新生产项目由官方 `model/list` 核对目标模型与档位；冷恢复沿用该项目冻结的角色设置。工具名必须来自该 Root 的实际 GX 工具，持久 Worker 需要 `gx_submit_product` 交付成果。
 
 同一工作区的 Run 共享供应商正式发布的限流窗口。GX 保留原任务和等待中的租约，窗口重置后继续准入。部署可以在 `gx-h/config/limits.json` 的 `native_provider.parallel_turns` 中为指定供应商设置并发上限。新项目接入缺少限额反馈的供应商时默认并发为 1，可通过项目的 `max_parallel_roots` 显式设置。窗口缺少重置时间时，GX 按 `native_provider.retry_seconds` 安排下一次尝试，默认 60 秒。

@@ -247,6 +247,85 @@ class TurnMeterTests(unittest.TestCase):
         self.assertEqual(budgets.state(self.db, self.budget)["spent"], {"tokens":28,"api_calls":1})
         self.assertEqual(self.db.execute("SELECT awaiting_turn FROM p0_native_child_meters").fetchone()[0], 0)
 
+    def child_followup_history(self):
+        owner = self.start()
+        self.delivery.observe_descendant("item/completed", {"threadId": "root", "turnId": owner,
+            "item": {"id": "spawn", "type": "subAgentActivity", "kind": "started", "agentThreadId": "child"}})
+        child = {"id": "child", "parentThreadId": "root", "sessionId": "root",
+                 "source": {"subAgent": {"thread_spawn": {"parent_thread_id": "root"}}}}
+        first = {"id": "earlier", "rootTurnId": owner, "status": "completed", "items": [], "itemsView": "full"}
+        self.delivery.verify_descendants({"child": {**child, "turns": [first]}})
+        self.delivery.observe_descendant("item/completed", {"threadId": "root", "turnId": owner,
+            "item": {"id": "followup", "type": "subAgentActivity", "kind": "interacted", "agentThreadId": "child"}})
+        follow = {"id": "followup-turn", "rootTurnId": owner, "status": "interrupted", "items": [],
+                  "completedAt": None, "itemsView": "full"}
+        return child, follow
+
+    def test_replayed_idle_interruption_does_not_end_new_native_child_turn(self):
+        child, turn = self.child_followup_history()
+        def terminal():
+            return self.db.execute("SELECT terminal FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
+                                   (child["id"], turn["id"])).fetchone()[0]
+
+        # Codex 0.169.0 briefly normalizes this waking turn to interrupted. The
+        # same process then reports it active, with the same causal IDs.
+        self.delivery.verify_descendants({"child": {**child, "status": {"type": "idle"}, "turns": [turn]}})
+        self.assertEqual(terminal(), 0)
+        active = {**turn, "status": "inProgress"}
+        self.delivery.verify_descendants({"child": {**child, "status": {"type": "active"}, "turns": [active]}})
+        self.assertEqual(terminal(), 0)
+        self.delivery.observe_descendant("turn/completed", {"threadId": child["id"],
+                                         "turn": {**turn, "status": "completed"}})
+        self.assertEqual(terminal(), 1)
+
+    def test_cold_child_with_recorded_abort_time_stays_terminal_without_live_end(self):
+        child, turn = self.child_followup_history()
+        self.delivery = RootDelivery(self.peer)
+        history = {"child": {**child, "status": {"type": "notLoaded"},
+                             "turns": [{**turn, "completedAt": 1746222000}]}}
+        self.delivery.verify_descendants(history)
+        self.delivery.verify_descendants(history)
+        row = self.db.execute("SELECT terminal,children_known,measured_tokens FROM p0_native_child_usage "
+                              "WHERE child_id=? AND turn_id=?", (child["id"], turn["id"])).fetchone()
+        self.assertEqual(tuple(row), (1, 1, None))
+        self.assertEqual(budgets.state(self.db, self.budget)["spent"], {})
+
+    def test_cold_child_abort_boundary_settles_exactly_once_without_history_timestamp(self):
+        self.db.execute("UPDATE runs SET inputs_json=? WHERE run_id=?", (json.dumps({"inputs": {
+            "p0_spec": {"metering": {"rollout_diagnostics": True}}}}), self.run))
+        owner = self.start()
+        self.delivery.observe_descendant("item/completed", {"threadId": "root", "turnId": owner,
+            "item": {"type": "subAgentActivity", "kind": "started", "agentThreadId": "child"}})
+        self.raw(owner, "parent-response", 15)
+        self.sample(owner, 15)
+        self.complete()
+        self.assertTrue(budgets.state(self.db, self.budget)["reserved"])
+        path = self.directory / "official-child.jsonl"
+        receipt = {"thread_id": "child", "turn_id": "child-turn", "root_turn_id": owner, "session_id": "root",
+                   "response_id": "child-response", "usage": {"total_tokens": 9}, "turn_token_usage": {"total_tokens": 9}}
+        entries = [
+            {"type": "session_meta", "payload": {"id": "child"}},
+            {"type": "event_msg", "payload": {"type": "task_started", "turn_id": "child-turn", "root_turn_id": owner}},
+            {"type": "token_usage_record", "payload": receipt},
+            {"type": "event_msg", "payload": {"type": "token_count", "info": {"total_token_usage": {"total_tokens": 9}}}},
+            {"type": "event_msg", "payload": {"type": "turn_aborted", "turn_id": "child-turn", "root_turn_id": owner}},
+        ]
+        path.write_text("".join(json.dumps(row) + "\n" for row in entries))
+        turn = {"id": "child-turn", "rootTurnId": owner, "status": "interrupted", "completedAt": None,
+                "items": [], "itemsView": "full"}
+        history = {"child": {"id": "child", "parentThreadId": "root", "sessionId": "root", "status": {"type": "notLoaded"},
+                             "source": {"subAgent": {"thread_spawn": {"parent_thread_id": "root"}}},
+                             "path": str(path), "turns": [turn]}}
+        self.delivery = RootDelivery(self.peer)
+        self.delivery.verify_descendants(history)
+        self.delivery.verify_descendants(history)
+        state = budgets.state(self.db, self.budget)
+        self.assertEqual(state["spent"], {"api_calls": 1, "tokens": 24})
+        self.assertEqual(state["reserved"], {})
+        row = self.db.execute("SELECT terminal,measured_tokens,total_tokens FROM p0_native_child_usage "
+                              "WHERE child_id='child' AND turn_id='child-turn'").fetchone()
+        self.assertEqual(tuple(row), (1, 9, 9))
+
     def test_unloaded_child_requires_its_original_session_and_complete_response_records(self):
         self.db.execute("UPDATE runs SET inputs_json=? WHERE run_id=?",(json.dumps({"inputs":{
             "p0_spec":{"metering":{"rollout_diagnostics":True}}}}),self.run))

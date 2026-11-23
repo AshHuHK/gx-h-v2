@@ -92,6 +92,9 @@ def render(root, root_key, packet):
                 body = json.loads(data.decode("utf-8"))
             except (UnicodeDecodeError, json.JSONDecodeError) as exc:
                 raise SchemaInvalid(f"invalid JSON in assigned Artifact {ref}") from exc
+            if not isinstance(body, dict):
+                lazy[ref] = {"sha256": digest, "reason": "original_on_demand"}
+                continue
             entry = {"sha256": digest, "content": body}
             added = len(ids.canonical_json({ref: entry}).encode("utf-8")) - 2 + bool(preloaded)
             if payload_bytes + added <= PRELOAD_BYTES:
@@ -101,7 +104,7 @@ def render(root, root_key, packet):
                 # Same transitive access as an explicit read of this summary:
                 # preserve direct lazy reads of original observations and inputs.
                 root._allow_refs(root_key, body)
-                if meta["kind"] == "research_evidence" and isinstance(body, dict):
+                if meta["kind"] == "research_evidence":
                     for route in body.get("routes", []):
                         if isinstance(route, dict) and isinstance(route.get("evaluation_ref"), str):
                             summaries[route["evaluation_ref"]] = "score_evaluation"

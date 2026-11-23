@@ -101,7 +101,17 @@ class GridBrief(unittest.TestCase):
             return {"turn_id": "turn"}
         with patch.object(root, "_materialize", return_value=row["thread_id"]), patch.object(root, "deliver", deliver):
             root.dispatch(task)
-        self.assertEqual(messages, [row["brief"]])
+            self.conn.execute("INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,human,"
+                              "interrupt,state,method,turn_id) VALUES(?,?,?,?,?,0,0,'acknowledged','turn/start','turn')",
+                              (self.run, "start:"+row["root_key"], row["thread_id"], "client",
+                               hashlib.sha256(row["brief"].encode()).hexdigest()))
+            self.conn.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,terminal_status) "
+                              "VALUES(?,'turn','interrupted')", (row["thread_id"],))
+            root.dispatch(task)
+        first, resumed = messages
+        self.assertEqual(first, row["brief"])
+        self.assertNotIn(row["brief"], resumed)
+        self.assertIn("gx_task_context", resumed)
         self.assertEqual(self.conn.execute("SELECT count(*) FROM p0_root_calls").fetchone()[0], 0)
         for ref in (obs, data):
             self.assertEqual(self.call(root, row, "gx_read_artifact", {"ref": ref}), self.documents[ref])
@@ -205,6 +215,24 @@ class GridBrief(unittest.TestCase):
             root._claim(task)
         self.assertIsNone(self.conn.execute("SELECT root_key FROM p0_roots WHERE task_id=?", (task,)).fetchone())
         self.assertEqual(self.conn.execute("SELECT status FROM tasks WHERE task_id=?", (task,)).fetchone()[0], "READY")
+
+    def test_raw_arrays_structures_papers_and_provenance_stay_lazy(self):
+        array = self.publish("research_evidence", [{"sample": 7}])
+        structure = self.publish("research_proposal", "ATOM coordinate line", serialized="ATOM coordinate line",
+                                 media="chemical/x-pdb")
+        paper = self.publish("paper", {"text": "original full text"})
+        sequences = self.publish("sequence_collection", ["sequence data"])
+        analysis = self.publish("analysis_program", {"data": "recorded raw compute output"})
+        root, row = self.start(self.task({"output_kind": "science_assessment", "proposal_ref": structure,
+                                         "evidence_refs": [array, paper, sequences, analysis]}))
+        packet = self.packet(row)
+        self.assertEqual(packet["preloaded_artifacts"], {})
+        for ref in (array, structure, paper, sequences, analysis):
+            self.assertEqual(packet["lazy_artifacts"][ref], {
+                "reason": "original_on_demand", "sha256": self.assets.describe(ref)["sha256"]})
+        self.assertEqual(self.call(root, row, "gx_read_artifact", {"ref": array}), self.documents[array])
+        self.assertNotIn("ATOM coordinate line", row["brief"])
+        self.assertNotIn("recorded raw compute output", row["brief"])
 
     def test_pinned_old_request_bytes(self):
         run = self.create_run("2")

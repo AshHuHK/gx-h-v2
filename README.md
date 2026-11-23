@@ -1,4 +1,10 @@
-# GX-H v3 科研插件平台
+# GX-H v3.1 科研执行开发分支
+
+新项目可在研究规格中设置 `"workflow": "science_grid"`、`"workflow_version": "3"` 和 `"plugins": ["org.gx.science-grid@3.0.0"]`，然后通过原有 `bin/gx-p0 start` 入口启动。可以先执行 `bin/gx-p0 plugin verify org.gx.science-grid@3.0.0` 核对安装。已有项目按各自保存的版本恢复。开发分支的模型请求、结算、科研证据和启动示例见本版验收记录。[源码与基线](V31_SOURCE_AND_BASELINE.md) · [提交与科研工作流](V31_B1_SUBMISSION_PROTOCOL.md) · [角色与简报效率](V31_B2_B3_EFFICIENCY.md) · [适用范围与科研质量](V31_LIMITATIONS_AND_NEXT_STEPS.md)
+
+本次验收的产品提交为 `9cd6655`。同题 13 波完成了 26 个项目；另一个带中途补充资料的两轮数值研究通过独立复算。13 波中一笔最终响应缺少用量回执，历史账本保留估算。原始测试和分组对照记录在 [验收目录](acceptance/v31)。
+
+## v3 插件平台
 
 在 v3 安装目录中，操作员可以按版本安装本地科研插件。GX 校验审核过的包内容，在独立 Python 命名空间中执行 `register(ctx)`，并列出插件贡献的工作流、工具和计算能力。现有项目继续使用各自保存的工作流和科研记录。
 

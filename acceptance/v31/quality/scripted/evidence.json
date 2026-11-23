@@ -1,0 +1,1186 @@
+{
+  "artifacts": {
+    "gxa_01m84ghbv3vjxzeqfk": {
+      "body": {
+        "attempt_id": "case_74de037ff5b3eedadc60725c1df0b7b29dc901b278cffc6a4693ee20880abfc4",
+        "count_at_or_above": 1,
+        "input_ref": "gxa_01m84ghbthjtvxb4hb",
+        "input_sha256": "c85dab975f7a4f0a90ae1bd6c87df1933b0fc69b2af619425e4264fcc21335cb",
+        "max_score": -0.24999999999999997,
+        "observations": 1,
+        "threshold": -0.25
+      },
+      "bytes": 295,
+      "kind": "score_evaluation",
+      "sha256": "7ce43cbabb6e8736da8f6892cb5b33b797b62a16aaf913c8ccb9de8e245aa88d"
+    },
+    "gxa_01m84ghbwafg2ymddv": {
+      "body": {
+        "attempt_id": "case_20599373b6c6cdf4951bb1b9037c652ce84f91b7033aec3c23213fb8d487be99",
+        "count_at_or_above": 0,
+        "input_ref": "gxa_01m84ghbvmecnahnqd",
+        "input_sha256": "68e4b87ea8b4ab39471ff136af8286809623988058a0796da1400663f409f082",
+        "max_score": -0.25000000000000006,
+        "observations": 1,
+        "threshold": -0.25
+      },
+      "bytes": 295,
+      "kind": "score_evaluation",
+      "sha256": "dddb87eead17f7f1e38617c5334dee6915e61cee6fed5d5755459382d073be29"
+    },
+    "gxa_01m84ghbxqeyfepr3h": {
+      "body": {
+        "attempt_id": "case_d24a5f19d1ce09a3666c4f5d00130fdf43d075876d19ec3e22edcdd7448df748",
+        "count_at_or_above": 1,
+        "input_ref": "gxa_01m84ghbx29y29mqqk",
+        "input_sha256": "6109d102c4034dd9384d7c99cb21b48b582e706282f9c45490e85b33398b9e80",
+        "max_score": -0.25,
+        "observations": 1,
+        "threshold": -0.25
+      },
+      "bytes": 280,
+      "kind": "score_evaluation",
+      "sha256": "366f5017d3a057c64f9fd5a69e66c3d71395e71af78f22be82b07bedc5fe1f8c"
+    },
+    "gxa_01m84ghby8bvmqv0aq": {
+      "body": {
+        "candidates": [
+          {
+            "candidate_id": "low-a",
+            "x": 0
+          },
+          {
+            "candidate_id": "low-b",
+            "x": 0.5
+          },
+          {
+            "candidate_id": "low-c",
+            "x": 1
+          }
+        ],
+        "method_id": "fixture-grid",
+        "method_version": "1",
+        "synthetic": true
+      },
+      "bytes": 176,
+      "kind": "grid_input",
+      "sha256": "2ab7ff3dfc6cffedec1610dea15f9ad0fe31da3cfc3d11b12813e003070d1042"
+    },
+    "gxa_01m84ghbyqm80nmdck": {
+      "body": {
+        "candidates": [
+          {
+            "candidate_id": "high-a",
+            "x": 1.5
+          },
+          {
+            "candidate_id": "high-b",
+            "x": 1.75
+          },
+          {
+            "candidate_id": "high-c",
+            "x": 2.5
+          }
+        ],
+        "method_id": "fixture-grid",
+        "method_version": "1",
+        "synthetic": true
+      },
+      "bytes": 184,
+      "kind": "grid_input",
+      "sha256": "6fcba6b72addaf2523639edbc93e618b5503ebde934acdc6d1d674f04a5c40de"
+    },
+    "gxa_01m84ghbz644e3rg7p": {
+      "body": {
+        "author_principal": "",
+        "evaluation_item": {
+          "item_id": "evaluation",
+          "version": 1
+        },
+        "evaluator": {
+          "id": "grid_score_20ebc74ffa6d1adb62205f15d91f234b9e5783286abb36875667f2a57e973f42",
+          "spec_hash": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f"
+        },
+        "method": "fixture-grid@1",
+        "objective": "Discriminate between two rival hypotheses on the specified finite grids. H_low predicts the low interval alone contains a point reaching the cutoff. H_high predicts the high interval alone does. Both or neither would refute both. Use actual measurements. Compare two acquisition methods on the qualifying interval: the unique quadratic interpolant and piecewise-linear interpolation of that interval's three measured coordinates. When the follow-up controller catalog arrives, evaluate each method on its permitted coordinates and choose its maximum. Measure the two choices in one new grid, with candidate IDs 'quadratic' and 'linear' identifying the method, then close. Cite the scores. In the final decision compare the held-out measurements and give the limits of the comparison. Preserve contrary evidence.",
+        "objective_item": {
+          "item_id": "objective",
+          "version": 1
+        },
+        "paths": [
+          {
+            "claim_scope": "interpretation",
+            "expected_reaches_threshold": true,
+            "hypothesis_id": "gxh_7a5829d3d3a592252ef6a5b27c506960b75b0ef288bc2328be8b64f619489d08",
+            "hypothesis_key": "low",
+            "id": "low",
+            "input_ref": "gxa_01m84ghby8bvmqv0aq",
+            "prediction": "H_low predicts a crossing on this finite grid; H_high predicts none."
+          },
+          {
+            "claim_scope": "interpretation",
+            "expected_reaches_threshold": true,
+            "hypothesis_id": "gxh_bcc98972bcc20610c38ba1a1af4cc69e4066887e6d9d1875f1a550d07ba86ebb",
+            "hypothesis_key": "high",
+            "id": "high",
+            "input_ref": "gxa_01m84ghbyqm80nmdck",
+            "prediction": "H_high predicts a crossing on this finite grid; H_low predicts none."
+          }
+        ],
+        "previous_decision_ref": null,
+        "requires_interpretation": true,
+        "round": 0,
+        "run_id": "gxr_01m84ghbs3q005p52r",
+        "threshold": -0.25
+      },
+      "bytes": 1988,
+      "kind": "research_proposal",
+      "sha256": "ca7ada30ac35eb2afd9c4c74568643d3c9e49de485e58777e83c0ac4c18ed2cd"
+    },
+    "gxa_01m84ghd9m5519sntq": {
+      "body": {
+        "provenance": {
+          "client_message_id": "follow-up-controller-catalog",
+          "run_id": "gxr_01m84ghbs3q005p52r"
+        },
+        "segments": [
+          {
+            "segment_id": "note",
+            "text": "Controller catalog revision 7. The follow-up experiment can run only at these four previously untested coordinates: [1.625, 1.8125, 2.125, 2.375]. The interpolators must use this catalog. The restriction applies to future measurements only.",
+            "text_sha256": "b6462afad6366290c019fa46240fdf6114df9f8bb7c73ab5055b66a4c13af6c1"
+          }
+        ],
+        "source_id": "gxs_01m84ghd52mfpygpda",
+        "text": "Controller catalog revision 7. The follow-up experiment can run only at these four previously untested coordinates: [1.625, 1.8125, 2.125, 2.375]. The interpolators must use this catalog. The restriction applies to future measurements only."
+      },
+      "bytes": 754,
+      "kind": "operator_source",
+      "sha256": "e893f02e9bf82fd9aac93ef903d43e48ff37f333fc15f843f89d5b3914d55d1b"
+    },
+    "gxa_01m84ghe0qcmcwqc4v": {
+      "body": {
+        "provenance": {
+          "client_message_id": "earlier-score-export",
+          "run_id": "gxr_01m84ghbs3q005p52r"
+        },
+        "segments": [
+          {
+            "segment_id": "note",
+            "text": "Archived score export (unsigned; calibration metadata missing). It claims that x=1 on this same scale measured exactly 0, implying that the low interval contains a crossing. Check this against the current run's observation at x=1 before using it.",
+            "text_sha256": "c32b410a1d7ca8ba7e7037d0e020d4316ce18589cd2438a2778cff35eb6d031b"
+          }
+        ],
+        "source_id": "gxs_01m84ghdw7cpz3khhn",
+        "text": "Archived score export (unsigned; calibration metadata missing). It claims that x=1 on this same scale measured exactly 0, implying that the low interval contains a crossing. Check this against the current run's observation at x=1 before using it."
+      },
+      "bytes": 758,
+      "kind": "operator_source",
+      "sha256": "831c0105c84e4bc74d566be4d59c5260e1cb8802d71bd0d0ddb9c2ab967124ad"
+    },
+    "gxa_01m84gheq3j2d2mge2": {
+      "body": {
+        "input_sha256": "2ab7ff3dfc6cffedec1610dea15f9ad0fe31da3cfc3d11b12813e003070d1042",
+        "method_id": "fixture-grid",
+        "method_version": "1",
+        "observations": [
+          {
+            "candidate_id": "low-a",
+            "score": -4,
+            "x": 0
+          },
+          {
+            "candidate_id": "low-b",
+            "score": -2.25,
+            "x": 0.5
+          },
+          {
+            "candidate_id": "low-c",
+            "score": -1,
+            "x": 1
+          }
+        ],
+        "operation_id": "science:r0:35e31cf02aa8ba6381dfef31a3b604cce801b661bce2be029c4a4b891e34230b",
+        "scientific_claims": false,
+        "synthetic": true
+      },
+      "bytes": 445,
+      "kind": "synthetic_grid",
+      "sha256": "6dc577efefea37281a49fe7d1ee8130e4c811b1dcc1e55309925b03f2896b2fc"
+    },
+    "gxa_01m84ghes36g8jsrdx": {
+      "body": {
+        "input_sha256": "6fcba6b72addaf2523639edbc93e618b5503ebde934acdc6d1d674f04a5c40de",
+        "method_id": "fixture-grid",
+        "method_version": "1",
+        "observations": [
+          {
+            "candidate_id": "high-a",
+            "score": -0.25,
+            "x": 1.5
+          },
+          {
+            "candidate_id": "high-b",
+            "score": -0.0625,
+            "x": 1.75
+          },
+          {
+            "candidate_id": "high-c",
+            "score": -0.25,
+            "x": 2.5
+          }
+        ],
+        "operation_id": "science:r0:8a6f51c2c2c6fb92ebdd8b71f4b82f8c9646b7f03d13b6f1fb2e365598b12c5d",
+        "scientific_claims": false,
+        "synthetic": true
+      },
+      "bytes": 461,
+      "kind": "synthetic_grid",
+      "sha256": "bb9f299f2f07fb7831eb6f639884266059ad119619105cdfa99f1f0ab9d85c81"
+    },
+    "gxa_01m84ghexkdaxcmjt0": {
+      "body": {
+        "attempt_id": "gxe_46e985ffa8398e821d5436758fdc628d5933945085dee3d90413b1fa93983b32",
+        "count_at_or_above": 0,
+        "input_ref": "gxa_01m84gheq3j2d2mge2",
+        "input_sha256": "6dc577efefea37281a49fe7d1ee8130e4c811b1dcc1e55309925b03f2896b2fc",
+        "max_score": -1,
+        "observations": 3,
+        "threshold": -0.25
+      },
+      "bytes": 276,
+      "kind": "score_evaluation",
+      "sha256": "e88de2c024b8fa2b6da03bfa1868cb828c2aef8019efd5c6c173f8abb8afa05c"
+    },
+    "gxa_01m84ghey9y2pwns15": {
+      "body": {
+        "attempt_id": "gxe_fc79d07957d9ca8ad27effea0498fd4bf6fd61a33a4ff910e44b5fb8f6c4945c",
+        "count_at_or_above": 3,
+        "input_ref": "gxa_01m84ghes36g8jsrdx",
+        "input_sha256": "bb9f299f2f07fb7831eb6f639884266059ad119619105cdfa99f1f0ab9d85c81",
+        "max_score": -0.0625,
+        "observations": 3,
+        "threshold": -0.25
+      },
+      "bytes": 281,
+      "kind": "score_evaluation",
+      "sha256": "5d5d2c63542a82822557c7894d0c2fdd629e80e3a91d5e1ef9d92523792c41e7"
+    },
+    "gxa_01m84gheyry379rrkd": {
+      "body": {
+        "proposal_ref": "gxa_01m84ghbz644e3rg7p",
+        "routes": [
+          {
+            "eval_id": "gxe_46e985ffa8398e821d5436758fdc628d5933945085dee3d90413b1fa93983b32",
+            "evaluation_ref": "gxa_01m84ghexkdaxcmjt0",
+            "failure": null,
+            "input_ref": "gxa_01m84ghby8bvmqv0aq",
+            "job_id": "gxj_01m84ghc0hbcnfa7pg",
+            "observations_ref": "gxa_01m84gheq3j2d2mge2",
+            "outcome_kind": "valid_scientific_outcome",
+            "path_id": "low",
+            "status": "SUCCEEDED"
+          },
+          {
+            "eval_id": "gxe_fc79d07957d9ca8ad27effea0498fd4bf6fd61a33a4ff910e44b5fb8f6c4945c",
+            "evaluation_ref": "gxa_01m84ghey9y2pwns15",
+            "failure": null,
+            "input_ref": "gxa_01m84ghbyqm80nmdck",
+            "job_id": "gxj_01m84ghc8kzgjcrv46",
+            "observations_ref": "gxa_01m84ghes36g8jsrdx",
+            "outcome_kind": "valid_scientific_outcome",
+            "path_id": "high",
+            "status": "SUCCEEDED"
+          }
+        ]
+      },
+      "bytes": 721,
+      "kind": "research_evidence",
+      "sha256": "1272df25d32a45bf306188b7794f19e04447772c59ede0ad30a89f9b74b7a423"
+    },
+    "gxa_01m84ghh3838881rvs": {
+      "body": {
+        "assessment_mode": "independent_review",
+        "contract_digest": "37663f1657bfd9828c2fe25ab6dc0b4abf41c2cda670574607619ff38b49c491",
+        "evidence_refs": [
+          "gxa_01m84gheyry379rrkd"
+        ],
+        "findings": [
+          {
+            "evaluation_ref": "gxa_01m84ghexkdaxcmjt0",
+            "evidence_ref": "gxa_01m84gheyry379rrkd",
+            "input_ref": "gxa_01m84ghby8bvmqv0aq",
+            "job_id": "gxj_01m84ghc0hbcnfa7pg",
+            "measurement_note": "The original observations cover the frozen grid.",
+            "measurement_valid": true,
+            "observations_ref": "gxa_01m84gheq3j2d2mge2",
+            "outcome_kind": "valid_scientific_outcome",
+            "path_id": "low",
+            "proposal_ref": "gxa_01m84ghbz644e3rg7p",
+            "qualifying_source_ids": [],
+            "reaches_threshold": false,
+            "reason": "Measured maximum -1 falls below the cutoff -0.25 on low.",
+            "risk": "Limited to the specified samples and score scale.",
+            "supported": false
+          },
+          {
+            "evaluation_ref": "gxa_01m84ghey9y2pwns15",
+            "evidence_ref": "gxa_01m84gheyry379rrkd",
+            "input_ref": "gxa_01m84ghbyqm80nmdck",
+            "job_id": "gxj_01m84ghc8kzgjcrv46",
+            "measurement_note": "The original observations cover the frozen grid.",
+            "measurement_valid": true,
+            "observations_ref": "gxa_01m84ghes36g8jsrdx",
+            "outcome_kind": "valid_scientific_outcome",
+            "path_id": "high",
+            "proposal_ref": "gxa_01m84ghbz644e3rg7p",
+            "qualifying_source_ids": [],
+            "reaches_threshold": true,
+            "reason": "Measured maximum -0.0625 crosses the cutoff -0.25 on high.",
+            "risk": "Limited to the specified samples and score scale.",
+            "supported": true
+          }
+        ],
+        "intent_responses": [],
+        "proposal_ref": "gxa_01m84ghbz644e3rg7p",
+        "source_reviews": [
+          {
+            "artifact_ref": "gxa_01m84ghd9m5519sntq",
+            "compared_paths": [
+              "low",
+              "high"
+            ],
+            "disposition": "accepted",
+            "evidence_refs": [
+              "gxa_01m84gheyry379rrkd",
+              "gxa_01m84gheq3j2d2mge2",
+              "gxa_01m84ghexkdaxcmjt0",
+              "gxa_01m84ghes36g8jsrdx",
+              "gxa_01m84ghey9y2pwns15"
+            ],
+            "qualifies_paths": [],
+            "reason": "Use the permitted follow-up coordinates. The catalog does not alter the original measurements.",
+            "source_id": "gxs_01m84ghd52mfpygpda"
+          },
+          {
+            "artifact_ref": "gxa_01m84ghe0qcmcwqc4v",
+            "compared_paths": [
+              "low"
+            ],
+            "disposition": "rejected",
+            "evidence_refs": [
+              "gxa_01m84gheyry379rrkd",
+              "gxa_01m84gheq3j2d2mge2",
+              "gxa_01m84ghexkdaxcmjt0"
+            ],
+            "qualifies_paths": [],
+            "reason": "The original observation at x=1 is -1, contradicting the archived 0.",
+            "source_id": "gxs_01m84ghdw7cpz3khhn"
+          }
+        ]
+      },
+      "bytes": 2172,
+      "kind": "science_assessment",
+      "sha256": "96b8fcfa65c9633eb70ef9e0510a1aaba525ec35782ffd5f8de90d0cdb549d83"
+    },
+    "gxa_01m84ghjh9fj62f7se": {
+      "body": {
+        "assessment_ref": "gxa_01m84ghh3838881rvs",
+        "continue_paths": [
+          "high"
+        ],
+        "next_grids": {
+          "high": {
+            "candidates": [
+              {
+                "candidate_id": "quadratic",
+                "x": 2.125
+              },
+              {
+                "candidate_id": "linear",
+                "x": 1.8125
+              }
+            ],
+            "method_id": "fixture-grid",
+            "method_version": "1",
+            "synthetic": true
+          }
+        },
+        "proposal_ref": "gxa_01m84ghbz644e3rg7p",
+        "reason": "Only H_high survives the finite test. The catalog restricts acquisition. Quadratic interpolation selects 2.125; piecewise-linear selects 1.8125. Measure their head-to-head on the same score scale.",
+        "source_decisions": [
+          {
+            "artifact_ref": "gxa_01m84ghd9m5519sntq",
+            "disposition": "accepted",
+            "evidence_refs": [
+              "gxa_01m84gheq3j2d2mge2",
+              "gxa_01m84ghes36g8jsrdx"
+            ],
+            "reason": "Use the permitted follow-up coordinates. The catalog does not alter the original measurements.",
+            "source_id": "gxs_01m84ghd52mfpygpda"
+          },
+          {
+            "artifact_ref": "gxa_01m84ghe0qcmcwqc4v",
+            "disposition": "rejected",
+            "evidence_refs": [
+              "gxa_01m84gheq3j2d2mge2"
+            ],
+            "reason": "The original observation at x=1 is -1, contradicting the archived 0.",
+            "source_id": "gxs_01m84ghdw7cpz3khhn"
+          }
+        ],
+        "stop_reason": null
+      },
+      "bytes": 1042,
+      "kind": "science_decision",
+      "sha256": "e63954c04bda2c7b5f275f13e714a15085ab71e700fdc317532dd237999bf3e1"
+    },
+    "gxa_01m84ghjraf3bsktzt": {
+      "body": {
+        "candidates": [
+          {
+            "candidate_id": "quadratic",
+            "x": 2.125
+          },
+          {
+            "candidate_id": "linear",
+            "x": 1.8125
+          }
+        ],
+        "method_id": "fixture-grid",
+        "method_version": "1",
+        "synthetic": true
+      },
+      "bytes": 157,
+      "kind": "grid_input",
+      "sha256": "50836a18e9bbaff5800ef6b38c6d9d1d5301377c70ba2187f9761887a1de1d33"
+    },
+    "gxa_01m84ghjrw4djzezrg": {
+      "body": {
+        "author_principal": "01a20908-c5ec-7360-9913-dff219f614bb",
+        "evaluation_item": {
+          "item_id": "evaluation",
+          "version": 1
+        },
+        "evaluator": {
+          "id": "grid_score_20ebc74ffa6d1adb62205f15d91f234b9e5783286abb36875667f2a57e973f42",
+          "spec_hash": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f",
+          "version": "6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f"
+        },
+        "method": "fixture-grid@1",
+        "objective": "Discriminate between two rival hypotheses on the specified finite grids. H_low predicts the low interval alone contains a point reaching the cutoff. H_high predicts the high interval alone does. Both or neither would refute both. Use actual measurements. Compare two acquisition methods on the qualifying interval: the unique quadratic interpolant and piecewise-linear interpolation of that interval's three measured coordinates. When the follow-up controller catalog arrives, evaluate each method on its permitted coordinates and choose its maximum. Measure the two choices in one new grid, with candidate IDs 'quadratic' and 'linear' identifying the method, then close. Cite the scores. In the final decision compare the held-out measurements and give the limits of the comparison. Preserve contrary evidence.",
+        "objective_item": {
+          "item_id": "objective",
+          "version": 1
+        },
+        "paths": [
+          {
+            "claim_scope": "interpretation",
+            "expected_reaches_threshold": true,
+            "hypothesis_id": "gxh_bcc98972bcc20610c38ba1a1af4cc69e4066887e6d9d1875f1a550d07ba86ebb",
+            "hypothesis_key": "high",
+            "id": "high",
+            "input_ref": "gxa_01m84ghjraf3bsktzt",
+            "prediction": "H_high predicts a crossing on this finite grid; H_low predicts none."
+          }
+        ],
+        "previous_decision_ref": "gxa_01m84ghjh9fj62f7se",
+        "requires_interpretation": true,
+        "round": 1,
+        "run_id": "gxr_01m84ghbs3q005p52r",
+        "threshold": -0.25
+      },
+      "bytes": 1735,
+      "kind": "research_proposal",
+      "sha256": "a00adc6a05920d48a79b79e614887aa0ece6cf8dcee32fb01944415b0b1a2630"
+    },
+    "gxa_01m84ghka9wbrb61xb": {
+      "body": {
+        "input_sha256": "50836a18e9bbaff5800ef6b38c6d9d1d5301377c70ba2187f9761887a1de1d33",
+        "method_id": "fixture-grid",
+        "method_version": "1",
+        "observations": [
+          {
+            "candidate_id": "quadratic",
+            "score": -0.015625,
+            "x": 2.125
+          },
+          {
+            "candidate_id": "linear",
+            "score": -0.03515625,
+            "x": 1.8125
+          }
+        ],
+        "operation_id": "science:r1:d535f08851c1db041d5854b864cd293df67d92c120b83c4a805ffdc9419d03f3",
+        "scientific_claims": false,
+        "synthetic": true
+      },
+      "bytes": 422,
+      "kind": "synthetic_grid",
+      "sha256": "5f3b718b83db281fe050db6ffbae0653da865f9c0ce582329554a03c076c7859"
+    },
+    "gxa_01m84ghke1z7g5cm0n": {
+      "body": {
+        "attempt_id": "gxe_0a790f7e0f828dae5ec6e4c4807e93f39145c9be80d835e809a9d2ae1c6e9eae",
+        "count_at_or_above": 2,
+        "input_ref": "gxa_01m84ghka9wbrb61xb",
+        "input_sha256": "5f3b718b83db281fe050db6ffbae0653da865f9c0ce582329554a03c076c7859",
+        "max_score": -0.015625,
+        "observations": 2,
+        "threshold": -0.25
+      },
+      "bytes": 283,
+      "kind": "score_evaluation",
+      "sha256": "402c86ed946c01d4318679c128039991a284c5c23cca71bfeda3f0f13095ccb5"
+    },
+    "gxa_01m84ghkenmps60121": {
+      "body": {
+        "proposal_ref": "gxa_01m84ghjrw4djzezrg",
+        "routes": [
+          {
+            "eval_id": "gxe_0a790f7e0f828dae5ec6e4c4807e93f39145c9be80d835e809a9d2ae1c6e9eae",
+            "evaluation_ref": "gxa_01m84ghke1z7g5cm0n",
+            "failure": null,
+            "input_ref": "gxa_01m84ghjraf3bsktzt",
+            "job_id": "gxj_01m84ghjtk8hmf07cm",
+            "observations_ref": "gxa_01m84ghka9wbrb61xb",
+            "outcome_kind": "valid_scientific_outcome",
+            "path_id": "high",
+            "status": "SUCCEEDED"
+          }
+        ]
+      },
+      "bytes": 387,
+      "kind": "research_evidence",
+      "sha256": "3197022c12e2feb342d0deb668abf3a750d5b4ee59b6305e07c4abe6f8bc9d4b"
+    },
+    "gxa_01m84ghm4vhd7cd998": {
+      "body": {
+        "assessment_mode": "independent_review",
+        "contract_digest": "8f03f762152411fc97b2ed4451f26c21ded18d4bfc8f4b6b10a9dcd441a64ea2",
+        "evidence_refs": [
+          "gxa_01m84ghkenmps60121"
+        ],
+        "findings": [
+          {
+            "evaluation_ref": "gxa_01m84ghke1z7g5cm0n",
+            "evidence_ref": "gxa_01m84ghkenmps60121",
+            "input_ref": "gxa_01m84ghjraf3bsktzt",
+            "job_id": "gxj_01m84ghjtk8hmf07cm",
+            "measurement_note": "The original observations cover the frozen grid.",
+            "measurement_valid": true,
+            "observations_ref": "gxa_01m84ghka9wbrb61xb",
+            "outcome_kind": "valid_scientific_outcome",
+            "path_id": "high",
+            "proposal_ref": "gxa_01m84ghjrw4djzezrg",
+            "qualifying_source_ids": [],
+            "reaches_threshold": true,
+            "reason": "Measured maximum -0.015625 crosses the cutoff -0.25 on high.",
+            "risk": "Limited to the specified samples and score scale.",
+            "supported": true
+          }
+        ],
+        "intent_responses": [],
+        "proposal_ref": "gxa_01m84ghjrw4djzezrg",
+        "source_reviews": []
+      },
+      "bytes": 856,
+      "kind": "science_assessment",
+      "sha256": "1ee3f2368951666105bcbddfd25f6c2daf943201c7d5131eec647ed409255ebb"
+    },
+    "gxa_01m84ghn68eq4q5tw8": {
+      "body": {
+        "assessment_ref": "gxa_01m84ghm4vhd7cd998",
+        "continue_paths": [],
+        "next_grids": {},
+        "proposal_ref": "gxa_01m84ghjrw4djzezrg",
+        "reason": "quadratic choice x=2.125 measured -0.015625; linear choice x=1.8125 measured -0.0351562. quadratic selected the better candidate in this finite catalog. This single noiseless comparison does not establish performance on other response surfaces.",
+        "source_decisions": [],
+        "stop_reason": "completed_head_to_head"
+      },
+      "bytes": 436,
+      "kind": "science_decision",
+      "sha256": "e3bfe682b639838d892bb2341043562b698881ac7aa6c60b37c9c39e94750778"
+    },
+    "gxa_01m84ghnbfmbhqdvwx": {
+      "body": {
+        "rounds": [
+          {
+            "artifact_ref": "gxa_01m84ghjh9fj62f7se",
+            "assessment_mode": "independent_review",
+            "assessment_ref": "gxa_01m84ghh3838881rvs",
+            "evidence_ref": "gxa_01m84gheyry379rrkd",
+            "proposal_ref": "gxa_01m84ghbz644e3rg7p",
+            "round": 0,
+            "submission_id": "gxsb_01m84ghjhn3a2h80sz",
+            "task_id": "gxt_01m84ghh9zwyaw3wcj"
+          },
+          {
+            "artifact_ref": "gxa_01m84ghn68eq4q5tw8",
+            "assessment_mode": "independent_review",
+            "assessment_ref": "gxa_01m84ghm4vhd7cd998",
+            "evidence_ref": "gxa_01m84ghkenmps60121",
+            "proposal_ref": "gxa_01m84ghjrw4djzezrg",
+            "round": 1,
+            "submission_id": "gxsb_01m84ghn6c6tpqfyhr",
+            "task_id": "gxt_01m84ghmaw1e4msf2p"
+          }
+        ],
+        "run_id": "gxr_01m84ghbs3q005p52r",
+        "stop_reason": "completed_head_to_head"
+      },
+      "bytes": 665,
+      "kind": "research_report",
+      "sha256": "e3bd136433b4f30471a9e198e976db66d10562ffef99a2bb8ea0eab5d96a094b"
+    }
+  },
+  "decisions": [
+    {
+      "actions_json": "[{\"action\":\"prune\",\"path_id\":\"low\"},{\"action\":\"continue\",\"path_id\":\"high\"}]",
+      "created_at": "2026-11-23T15:31:40.908Z",
+      "decision_ref": "gxa_01m84ghjh9fj62f7se",
+      "reason": "Only H_high survives the finite test. The catalog restricts acquisition. Quadratic interpolation selects 2.125; piecewise-linear selects 1.8125. Measure their head-to-head on the same score scale.",
+      "reviewer_submission_id": "gxsb_01m84ghh3hwrsaekcr",
+      "round_index": 0,
+      "run_id": "gxr_01m84ghbs3q005p52r",
+      "stop_reason": null,
+      "submission_id": "gxsb_01m84ghjhn3a2h80sz"
+    },
+    {
+      "actions_json": "[{\"action\":\"stop\",\"path_id\":\"high\"}]",
+      "created_at": "2026-11-23T15:31:43.583Z",
+      "decision_ref": "gxa_01m84ghn68eq4q5tw8",
+      "reason": "quadratic choice x=2.125 measured -0.015625; linear choice x=1.8125 measured -0.0351562. quadratic selected the better candidate in this finite catalog. This single noiseless comparison does not establish performance on other response surfaces.",
+      "reviewer_submission_id": "gxsb_01m84ghm554y0za04t",
+      "round_index": 1,
+      "run_id": "gxr_01m84ghbs3q005p52r",
+      "stop_reason": "completed_head_to_head",
+      "submission_id": "gxsb_01m84ghn6c6tpqfyhr"
+    }
+  ],
+  "deliveries": [
+    {
+      "reservation_ref": "rsv_01m84ghfwtbdk3y21m",
+      "state": "acknowledged",
+      "thread_id": "01a20908-bf3b-7122-8960-d1ba1d91099f",
+      "turn_id": "01a20908-bfa1-7943-935e-8dbbf28385a3"
+    },
+    {
+      "reservation_ref": "rsv_01m84ghhg2a64h9z13",
+      "state": "acknowledged",
+      "thread_id": "01a20908-c5ec-7360-9913-dff219f614bb",
+      "turn_id": "01a20908-c607-7fd0-97c5-bcb9bae49c89"
+    },
+    {
+      "reservation_ref": "rsv_01m84ghkjrn7fw24rj",
+      "state": "acknowledged",
+      "thread_id": "01a20908-ce3f-70e3-b8c3-046d03de8d0c",
+      "turn_id": "01a20908-ce5f-7b70-92f3-fdddb8803031"
+    },
+    {
+      "reservation_ref": "rsv_01m84ghmh03hk9p5z6",
+      "state": "acknowledged",
+      "thread_id": "01a20908-d208-7a53-9044-48f431febcdb",
+      "turn_id": "01a20908-d226-7921-830e-84df264b7298"
+    }
+  ],
+  "jobs": [
+    {
+      "finished_at": "2026-11-23T15:31:36.825Z",
+      "idempotency_key": "job:gxr_01m84ghbs3q005p52r:grid:science:r0:35e31cf02aa8ba6381dfef31a3b604cce801b661bce2be029c4a4b891e34230b",
+      "input_manifest_ref": "gxa_01m84ghc081bd733vq",
+      "job_id": "gxj_01m84ghc0hbcnfa7pg",
+      "measured_json": "{\"cpu_seconds\":0.05,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.223}",
+      "status": "SUCCEEDED",
+      "submitted_at": "2026-11-23T15:31:34.239Z"
+    },
+    {
+      "finished_at": "2026-11-23T15:31:36.893Z",
+      "idempotency_key": "job:gxr_01m84ghbs3q005p52r:grid:science:r0:8a6f51c2c2c6fb92ebdd8b71f4b82f8c9646b7f03d13b6f1fb2e365598b12c5d",
+      "input_manifest_ref": "gxa_01m84ghc84ahk0nryv",
+      "job_id": "gxj_01m84ghc8kzgjcrv46",
+      "measured_json": "{\"cpu_seconds\":0.038,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.8,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.226}",
+      "status": "SUCCEEDED",
+      "submitted_at": "2026-11-23T15:31:34.602Z"
+    },
+    {
+      "finished_at": "2026-11-23T15:31:41.539Z",
+      "idempotency_key": "job:gxr_01m84ghbs3q005p52r:grid:science:r1:d535f08851c1db041d5854b864cd293df67d92c120b83c4a805ffdc9419d03f3",
+      "input_manifest_ref": "gxa_01m84ghjt2wzvsqt7v",
+      "job_id": "gxj_01m84ghjtk8hmf07cm",
+      "measured_json": "{\"cpu_seconds\":0.057,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.227}",
+      "status": "SUCCEEDED",
+      "submitted_at": "2026-11-23T15:31:41.193Z"
+    }
+  ],
+  "ledger": [
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":180000}",
+      "settled_at": "2026-11-23T15:31:39.502Z",
+      "status": "SETTLED",
+      "subject_id": "start:9975c91b-a185-44d2-9ecc-4df8da9ce4d3"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":180000}",
+      "settled_at": "2026-11-23T15:31:41.234Z",
+      "status": "SETTLED",
+      "subject_id": "start:41814eec-6879-41ed-86dc-846f2d694556"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":180000}",
+      "settled_at": "2026-11-23T15:31:42.610Z",
+      "status": "SETTLED",
+      "subject_id": "start:f7b7f4a1-3f5b-48ca-97f2-91dfa8e762c6"
+    },
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":180000}",
+      "settled_at": "2026-11-23T15:31:43.623Z",
+      "status": "SETTLED",
+      "subject_id": "start:f4e1f12e-86e1-4e91-a42d-59eb670d5cc6"
+    }
+  ],
+  "manifests": [
+    {
+      "admission_json": "{\"admitted_at\":\"2026-11-23T15:31:34.134Z\",\"argv\":[\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python\",\"-I\",\"-B\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/install/gx-h/adapters/local/p01_grid/worker.py\",\"--grid\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/state/jobs/gxj_01m84ghc0hbcnfa7pg/in/grid.json\",\"--operation\",\"science:r0:35e31cf02aa8ba6381dfef31a3b604cce801b661bce2be029c4a4b891e34230b\",\"--out\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/state/artifacts/.staging/jobs/gxj_01m84ghc0hbcnfa7pg/stg_3nlwn9xj\"],\"attempt_id\":null,\"backend\":\"detached_runner\",\"budget_reservation_ref\":\"rsv_01m84ghc3nxn64t80c\",\"capability\":{\"id\":\"fixture-grid\",\"sha256\":\"48f57e57c6751cf550348ba4fbae738648bd85b6f68e767e617695a8275d80dc\",\"version\":\"1\"},\"datasets\":[{\"id\":\"gxa_01m84ghby8bvmqv0aq\",\"sha256\":\"2ab7ff3dfc6cffedec1610dea15f9ad0fe31da3cfc3d11b12813e003070d1042\",\"version\":\"2ab7ff3dfc6cffedec1610dea15f9ad0fe31da3cfc3d11b12813e003070d1042\"}],\"evaluator\":{\"id\":\"grid_score_20ebc74ffa6d1adb62205f15d91f234b9e5783286abb36875667f2a57e973f42\",\"spec_hash\":\"6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f\",\"version\":\"6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f\"},\"external_data_paths\":[],\"hard_constraints_at_admission\":{\"methods\":{\"sha256\":\"967e3fa222a6001f4fc202d8365db12677ada4fb238e609bdda7a09bc1bfeacc\",\"version\":1}},\"input_manifest\":{\"artifact_ref\":\"gxa_01m84ghc081bd733vq\",\"sha256\":\"1f1c4c59f139af48cedf84f8a2c7fd93250eaca5742d5dea6b54438c648db26f\"},\"inputs\":[{\"artifact_ref\":\"gxa_01m84ghby8bvmqv0aq\",\"bytes\":176,\"role\":\"grid\",\"sha256\":\"2ab7ff3dfc6cffedec1610dea15f9ad0fe31da3cfc3d11b12813e003070d1042\"}],\"intent_dependencies\":{},\"job_attempt\":1,\"job_id\":\"gxj_01m84ghc0hbcnfa7pg\",\"limits\":{\"cpu_threads\":1,\"gpu\":null,\"memory_mib\":null,\"tightened\":{},\"wall_seconds\":30},\"model\":{\"applicability\":\"no learned model\",\"id\":null,\"provider\":null,\"weights\":[]},\"operation_key\":\"job:gxr_01m84ghbs3q005p52r:grid:science:r0:35e31cf02aa8ba6381dfef31a3b604cce801b661bce2be029c4a4b891e34230b\",\"owner\":{\"attempt_id\":null,\"kind\":\"workflow_node\",\"node_id\":\"experiment\",\"path_id\":\"low\",\"task_id\":null,\"workflow_id\":\"science_grid\",\"workflow_version\":\"3\"},\"parameters\":{\"operation\":\"science:r0:35e31cf02aa8ba6381dfef31a3b604cce801b661bce2be029c4a4b891e34230b\"},\"reproducibility\":{\"known_variation\":[\"process identifiers, wall time and resource measurements\"],\"level\":\"deterministic_synthetic_cpu\",\"replay\":\"numeric observations on frozen inputs\"},\"request_sha256\":\"5ed7c84fa6b9851eeeaa132cfbc978624271100907692a32370bdef35c8d28ac\",\"run_id\":\"gxr_01m84ghbs3q005p52r\",\"runtime\":{\"container_digest\":null,\"dependency_lock_scope\":\"interpreter and declared distributions\",\"env_id\":\"control-plane-python\",\"execution_host\":\"ash-gpu--e7ed9c93ca7b-kfaa4ldexx\",\"gpu\":null,\"kind\":\"SYSTEM_BINARY\",\"lockfile_ref\":null,\"machine\":\"x86_64\",\"observed_dependencies\":{\"distributions\":{},\"interpreter_sha256\":\"f3e3f561b473976be55d937616915d6c507dedcb3950c3ca72df786b28e8efdc\",\"python\":\"3.11.9\",\"requirements\":{}},\"observed_dependencies_sha256\":\"53e716d0f6700c6e2f062d3eb2201392c9fa145d364730d9bec17b6aa5ca6415\",\"os\":\"Linux\"},\"schema\":\"gx.execution-manifest.admission/1\",\"seeds\":{},\"source\":{\"files\":{\"entry_script\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\",\"gx_core/jobs/adapter_host.py\":\"d40145b94a68c688276dd0c372bc0b30ba378ad10259bcec59b40b200f760e63\",\"gx_core/jobs/executor.py\":\"e66d815807fa8b416652454fd18198d258bd4554f704d5e0ac355e38ed8a8087\",\"gx_core/jobs/resource_guard.py\":\"25ba017aabd111ec226b2bffeae20bfed91c542d1380c02c4df1e616a0369df6\",\"gx_core/jobs/service.py\":\"63b28c0988f1669118c4c0558500c933af33b87990dfa8cd337a7075cda468d1\",\"gx_core/p0/manifest.py\":\"de471a822f0bdded6b48cb8f8868271226b0445167824e92bf159c9e5061ce9b\",\"method_source\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\",\"parser\":\"c50e7044e37ef66018cd99f567e0a9ec69ee1f91bab595e634da797d44916d48\",\"runner\":\"a752445abbc817330b9b0e7136ab16f6ab9a65d844e775fa235c3e4d6ea3d179\"},\"method_source\":{\"path\":\"{harness}/adapters/local/p01_grid/worker.py\",\"sha256\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\"},\"scope\":\"method, GX Job runner, publication and adapter sources\",\"tree_sha256\":\"29d12e6a92b0c8acad05d2cc2df74181f57ebfe518080bf235d5740e0eee4811\"},\"task_id\":null}",
+      "admission_sha256": "2b49cd0315d9cb47897e2082a25934c9decf1230ecc68625ce3ae148656e4ba3",
+      "completion_json": "{\"admission_sha256\":\"2b49cd0315d9cb47897e2082a25934c9decf1230ecc68625ce3ae148656e4ba3\",\"backend\":\"detached_runner\",\"backend_job_id\":\"runner:2670690:2976735695\",\"current_at_completion\":true,\"exit_code\":0,\"failure\":null,\"finished_at\":\"2026-11-23T15:31:34.595Z\",\"gpu\":null,\"job_id\":\"gxj_01m84ghc0hbcnfa7pg\",\"logs\":[{\"artifact_ref\":\"gxa_01m84gheqe77q7h46j\",\"bytes\":0,\"kind\":\"job_stdout\",\"output_name\":\"stdout\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"validated\":false},{\"artifact_ref\":\"gxa_01m84gheqrydp00fgc\",\"bytes\":0,\"kind\":\"job_stderr\",\"output_name\":\"stderr\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"validated\":false}],\"measured\":{\"cpu_seconds\":0.05,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.223},\"outputs\":[{\"artifact_ref\":\"gxa_01m84gheq3j2d2mge2\",\"bytes\":445,\"kind\":\"synthetic_grid\",\"output_name\":\"observations.json\",\"runner_sha256\":\"6dc577efefea37281a49fe7d1ee8130e4c811b1dcc1e55309925b03f2896b2fc\",\"sha256\":\"6dc577efefea37281a49fe7d1ee8130e4c811b1dcc1e55309925b03f2896b2fc\",\"validated\":false}],\"recovery_artifact\":null,\"runner\":{\"files_truncated\":false,\"finished_at\":\"2026-11-23T15:31:34.595Z\",\"group_leftover_ended\":false,\"runner_pid\":2670690,\"runner_started\":\"2976735695\",\"started_at\":\"2026-11-23T15:31:34.277Z\",\"timeout_seconds\":30.0,\"tool_pid\":2670691,\"tool_started\":\"2976735700\",\"wall_seconds\":0.223},\"schema\":\"gx.execution-manifest.completion/1\",\"settled_at\":\"2026-11-23T15:31:36.825Z\",\"started_at\":\"2026-11-23T15:31:34.277Z\",\"status\":\"SUCCEEDED\",\"submitted_at\":\"2026-11-23T15:31:34.239Z\"}",
+      "completion_sha256": "2806d6fddc85d874ad8d932783a3bcbb1aced17608ad14096dd8ab1189ca4d30",
+      "job_id": "gxj_01m84ghc0hbcnfa7pg"
+    },
+    {
+      "admission_json": "{\"admitted_at\":\"2026-11-23T15:31:34.378Z\",\"argv\":[\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python\",\"-I\",\"-B\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/install/gx-h/adapters/local/p01_grid/worker.py\",\"--grid\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/state/jobs/gxj_01m84ghc8kzgjcrv46/in/grid.json\",\"--operation\",\"science:r0:8a6f51c2c2c6fb92ebdd8b71f4b82f8c9646b7f03d13b6f1fb2e365598b12c5d\",\"--out\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/state/artifacts/.staging/jobs/gxj_01m84ghc8kzgjcrv46/stg_1yogx60z\"],\"attempt_id\":null,\"backend\":\"detached_runner\",\"budget_reservation_ref\":\"rsv_01m84ghcb9q5zv3r7b\",\"capability\":{\"id\":\"fixture-grid\",\"sha256\":\"48f57e57c6751cf550348ba4fbae738648bd85b6f68e767e617695a8275d80dc\",\"version\":\"1\"},\"datasets\":[{\"id\":\"gxa_01m84ghbyqm80nmdck\",\"sha256\":\"6fcba6b72addaf2523639edbc93e618b5503ebde934acdc6d1d674f04a5c40de\",\"version\":\"6fcba6b72addaf2523639edbc93e618b5503ebde934acdc6d1d674f04a5c40de\"}],\"evaluator\":{\"id\":\"grid_score_20ebc74ffa6d1adb62205f15d91f234b9e5783286abb36875667f2a57e973f42\",\"spec_hash\":\"6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f\",\"version\":\"6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f\"},\"external_data_paths\":[],\"hard_constraints_at_admission\":{\"methods\":{\"sha256\":\"967e3fa222a6001f4fc202d8365db12677ada4fb238e609bdda7a09bc1bfeacc\",\"version\":1}},\"input_manifest\":{\"artifact_ref\":\"gxa_01m84ghc84ahk0nryv\",\"sha256\":\"ae60b98a2419891f25d9671a73745c5b793fd6be23745a3a7b5d8dacff92ede0\"},\"inputs\":[{\"artifact_ref\":\"gxa_01m84ghbyqm80nmdck\",\"bytes\":184,\"role\":\"grid\",\"sha256\":\"6fcba6b72addaf2523639edbc93e618b5503ebde934acdc6d1d674f04a5c40de\"}],\"intent_dependencies\":{},\"job_attempt\":1,\"job_id\":\"gxj_01m84ghc8kzgjcrv46\",\"limits\":{\"cpu_threads\":1,\"gpu\":null,\"memory_mib\":null,\"tightened\":{},\"wall_seconds\":30},\"model\":{\"applicability\":\"no learned model\",\"id\":null,\"provider\":null,\"weights\":[]},\"operation_key\":\"job:gxr_01m84ghbs3q005p52r:grid:science:r0:8a6f51c2c2c6fb92ebdd8b71f4b82f8c9646b7f03d13b6f1fb2e365598b12c5d\",\"owner\":{\"attempt_id\":null,\"kind\":\"workflow_node\",\"node_id\":\"experiment\",\"path_id\":\"high\",\"task_id\":null,\"workflow_id\":\"science_grid\",\"workflow_version\":\"3\"},\"parameters\":{\"operation\":\"science:r0:8a6f51c2c2c6fb92ebdd8b71f4b82f8c9646b7f03d13b6f1fb2e365598b12c5d\"},\"reproducibility\":{\"known_variation\":[\"process identifiers, wall time and resource measurements\"],\"level\":\"deterministic_synthetic_cpu\",\"replay\":\"numeric observations on frozen inputs\"},\"request_sha256\":\"df5f7f1bc308887273557ccb2b7bcf8c55c1125f716f69770b26e21554c020ce\",\"run_id\":\"gxr_01m84ghbs3q005p52r\",\"runtime\":{\"container_digest\":null,\"dependency_lock_scope\":\"interpreter and declared distributions\",\"env_id\":\"control-plane-python\",\"execution_host\":\"ash-gpu--e7ed9c93ca7b-kfaa4ldexx\",\"gpu\":null,\"kind\":\"SYSTEM_BINARY\",\"lockfile_ref\":null,\"machine\":\"x86_64\",\"observed_dependencies\":{\"distributions\":{},\"interpreter_sha256\":\"f3e3f561b473976be55d937616915d6c507dedcb3950c3ca72df786b28e8efdc\",\"python\":\"3.11.9\",\"requirements\":{}},\"observed_dependencies_sha256\":\"53e716d0f6700c6e2f062d3eb2201392c9fa145d364730d9bec17b6aa5ca6415\",\"os\":\"Linux\"},\"schema\":\"gx.execution-manifest.admission/1\",\"seeds\":{},\"source\":{\"files\":{\"entry_script\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\",\"gx_core/jobs/adapter_host.py\":\"d40145b94a68c688276dd0c372bc0b30ba378ad10259bcec59b40b200f760e63\",\"gx_core/jobs/executor.py\":\"e66d815807fa8b416652454fd18198d258bd4554f704d5e0ac355e38ed8a8087\",\"gx_core/jobs/resource_guard.py\":\"25ba017aabd111ec226b2bffeae20bfed91c542d1380c02c4df1e616a0369df6\",\"gx_core/jobs/service.py\":\"63b28c0988f1669118c4c0558500c933af33b87990dfa8cd337a7075cda468d1\",\"gx_core/p0/manifest.py\":\"de471a822f0bdded6b48cb8f8868271226b0445167824e92bf159c9e5061ce9b\",\"method_source\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\",\"parser\":\"c50e7044e37ef66018cd99f567e0a9ec69ee1f91bab595e634da797d44916d48\",\"runner\":\"a752445abbc817330b9b0e7136ab16f6ab9a65d844e775fa235c3e4d6ea3d179\"},\"method_source\":{\"path\":\"{harness}/adapters/local/p01_grid/worker.py\",\"sha256\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\"},\"scope\":\"method, GX Job runner, publication and adapter sources\",\"tree_sha256\":\"29d12e6a92b0c8acad05d2cc2df74181f57ebfe518080bf235d5740e0eee4811\"},\"task_id\":null}",
+      "admission_sha256": "d86477a53a2953f1351708b6640bc41401c616ca03ac92931c0d3e6f998c0b5a",
+      "completion_json": "{\"admission_sha256\":\"d86477a53a2953f1351708b6640bc41401c616ca03ac92931c0d3e6f998c0b5a\",\"backend\":\"detached_runner\",\"backend_job_id\":\"runner:2670694:2976735732\",\"current_at_completion\":true,\"exit_code\":0,\"failure\":null,\"finished_at\":\"2026-11-23T15:31:34.869Z\",\"gpu\":null,\"job_id\":\"gxj_01m84ghc8kzgjcrv46\",\"logs\":[{\"artifact_ref\":\"gxa_01m84ghesfrjgfbfmj\",\"bytes\":0,\"kind\":\"job_stdout\",\"output_name\":\"stdout\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"validated\":false},{\"artifact_ref\":\"gxa_01m84ghesv588pkcse\",\"bytes\":0,\"kind\":\"job_stderr\",\"output_name\":\"stderr\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"validated\":false}],\"measured\":{\"cpu_seconds\":0.038,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.8,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.226},\"outputs\":[{\"artifact_ref\":\"gxa_01m84ghes36g8jsrdx\",\"bytes\":461,\"kind\":\"synthetic_grid\",\"output_name\":\"observations.json\",\"runner_sha256\":\"bb9f299f2f07fb7831eb6f639884266059ad119619105cdfa99f1f0ab9d85c81\",\"sha256\":\"bb9f299f2f07fb7831eb6f639884266059ad119619105cdfa99f1f0ab9d85c81\",\"validated\":false}],\"recovery_artifact\":null,\"runner\":{\"files_truncated\":false,\"finished_at\":\"2026-11-23T15:31:34.869Z\",\"group_leftover_ended\":false,\"runner_pid\":2670694,\"runner_started\":\"2976735732\",\"started_at\":\"2026-11-23T15:31:34.639Z\",\"timeout_seconds\":30.0,\"tool_pid\":2670695,\"tool_started\":\"2976735736\",\"wall_seconds\":0.226},\"schema\":\"gx.execution-manifest.completion/1\",\"settled_at\":\"2026-11-23T15:31:36.893Z\",\"started_at\":\"2026-11-23T15:31:34.639Z\",\"status\":\"SUCCEEDED\",\"submitted_at\":\"2026-11-23T15:31:34.602Z\"}",
+      "completion_sha256": "a46574120b48319455b337611265b87da4a40264b8435debf1876147ceb5b489",
+      "job_id": "gxj_01m84ghc8kzgjcrv46"
+    },
+    {
+      "admission_json": "{\"admitted_at\":\"2026-11-23T15:31:41.104Z\",\"argv\":[\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python\",\"-I\",\"-B\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/install/gx-h/adapters/local/p01_grid/worker.py\",\"--grid\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/state/jobs/gxj_01m84ghjtk8hmf07cm/in/grid.json\",\"--operation\",\"science:r1:d535f08851c1db041d5854b864cd293df67d92c120b83c4a805ffdc9419d03f3\",\"--out\",\"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v31-quality/scripted/state/artifacts/.staging/jobs/gxj_01m84ghjtk8hmf07cm/stg_kj8rlcec\"],\"attempt_id\":null,\"backend\":\"detached_runner\",\"budget_reservation_ref\":\"rsv_01m84ghjxg5cy6e37z\",\"capability\":{\"id\":\"fixture-grid\",\"sha256\":\"48f57e57c6751cf550348ba4fbae738648bd85b6f68e767e617695a8275d80dc\",\"version\":\"1\"},\"datasets\":[{\"id\":\"gxa_01m84ghjraf3bsktzt\",\"sha256\":\"50836a18e9bbaff5800ef6b38c6d9d1d5301377c70ba2187f9761887a1de1d33\",\"version\":\"50836a18e9bbaff5800ef6b38c6d9d1d5301377c70ba2187f9761887a1de1d33\"}],\"evaluator\":{\"id\":\"grid_score_20ebc74ffa6d1adb62205f15d91f234b9e5783286abb36875667f2a57e973f42\",\"spec_hash\":\"6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f\",\"version\":\"6c557393cb677f0f73c90640652b54d35a4b7f199992c585cf46d6fdcef82c7f\"},\"external_data_paths\":[],\"hard_constraints_at_admission\":{\"methods\":{\"sha256\":\"967e3fa222a6001f4fc202d8365db12677ada4fb238e609bdda7a09bc1bfeacc\",\"version\":1}},\"input_manifest\":{\"artifact_ref\":\"gxa_01m84ghjt2wzvsqt7v\",\"sha256\":\"b2cb1a7d0e5df68357a5630384b9ea0ab9ab2a9af11108fa31227a03c3de6ad8\"},\"inputs\":[{\"artifact_ref\":\"gxa_01m84ghjraf3bsktzt\",\"bytes\":157,\"role\":\"grid\",\"sha256\":\"50836a18e9bbaff5800ef6b38c6d9d1d5301377c70ba2187f9761887a1de1d33\"}],\"intent_dependencies\":{},\"job_attempt\":1,\"job_id\":\"gxj_01m84ghjtk8hmf07cm\",\"limits\":{\"cpu_threads\":1,\"gpu\":null,\"memory_mib\":null,\"tightened\":{},\"wall_seconds\":30},\"model\":{\"applicability\":\"no learned model\",\"id\":null,\"provider\":null,\"weights\":[]},\"operation_key\":\"job:gxr_01m84ghbs3q005p52r:grid:science:r1:d535f08851c1db041d5854b864cd293df67d92c120b83c4a805ffdc9419d03f3\",\"owner\":{\"attempt_id\":null,\"kind\":\"workflow_node\",\"node_id\":\"experiment\",\"path_id\":\"high\",\"task_id\":null,\"workflow_id\":\"science_grid\",\"workflow_version\":\"3\"},\"parameters\":{\"operation\":\"science:r1:d535f08851c1db041d5854b864cd293df67d92c120b83c4a805ffdc9419d03f3\"},\"reproducibility\":{\"known_variation\":[\"process identifiers, wall time and resource measurements\"],\"level\":\"deterministic_synthetic_cpu\",\"replay\":\"numeric observations on frozen inputs\"},\"request_sha256\":\"9d669d6a0be6868734ce91528adc533cc62403cb7438e58dbc4dbe3e27ac88fb\",\"run_id\":\"gxr_01m84ghbs3q005p52r\",\"runtime\":{\"container_digest\":null,\"dependency_lock_scope\":\"interpreter and declared distributions\",\"env_id\":\"control-plane-python\",\"execution_host\":\"ash-gpu--e7ed9c93ca7b-kfaa4ldexx\",\"gpu\":null,\"kind\":\"SYSTEM_BINARY\",\"lockfile_ref\":null,\"machine\":\"x86_64\",\"observed_dependencies\":{\"distributions\":{},\"interpreter_sha256\":\"f3e3f561b473976be55d937616915d6c507dedcb3950c3ca72df786b28e8efdc\",\"python\":\"3.11.9\",\"requirements\":{}},\"observed_dependencies_sha256\":\"53e716d0f6700c6e2f062d3eb2201392c9fa145d364730d9bec17b6aa5ca6415\",\"os\":\"Linux\"},\"schema\":\"gx.execution-manifest.admission/1\",\"seeds\":{},\"source\":{\"files\":{\"entry_script\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\",\"gx_core/jobs/adapter_host.py\":\"d40145b94a68c688276dd0c372bc0b30ba378ad10259bcec59b40b200f760e63\",\"gx_core/jobs/executor.py\":\"e66d815807fa8b416652454fd18198d258bd4554f704d5e0ac355e38ed8a8087\",\"gx_core/jobs/resource_guard.py\":\"25ba017aabd111ec226b2bffeae20bfed91c542d1380c02c4df1e616a0369df6\",\"gx_core/jobs/service.py\":\"63b28c0988f1669118c4c0558500c933af33b87990dfa8cd337a7075cda468d1\",\"gx_core/p0/manifest.py\":\"de471a822f0bdded6b48cb8f8868271226b0445167824e92bf159c9e5061ce9b\",\"method_source\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\",\"parser\":\"c50e7044e37ef66018cd99f567e0a9ec69ee1f91bab595e634da797d44916d48\",\"runner\":\"a752445abbc817330b9b0e7136ab16f6ab9a65d844e775fa235c3e4d6ea3d179\"},\"method_source\":{\"path\":\"{harness}/adapters/local/p01_grid/worker.py\",\"sha256\":\"76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3\"},\"scope\":\"method, GX Job runner, publication and adapter sources\",\"tree_sha256\":\"29d12e6a92b0c8acad05d2cc2df74181f57ebfe518080bf235d5740e0eee4811\"},\"task_id\":null}",
+      "admission_sha256": "58c25140b65abe5e5ca3af03d8f272cf53fd6a9065d7df408c6389b3f01ce5dd",
+      "completion_json": "{\"admission_sha256\":\"58c25140b65abe5e5ca3af03d8f272cf53fd6a9065d7df408c6389b3f01ce5dd\",\"backend\":\"detached_runner\",\"backend_job_id\":\"runner:2672254:2976736391\",\"current_at_completion\":true,\"exit_code\":0,\"failure\":null,\"finished_at\":\"2026-11-23T15:31:41.456Z\",\"gpu\":null,\"job_id\":\"gxj_01m84ghjtk8hmf07cm\",\"logs\":[{\"artifact_ref\":\"gxa_01m84ghkap935eq3t3\",\"bytes\":0,\"kind\":\"job_stdout\",\"output_name\":\"stdout\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"validated\":false},{\"artifact_ref\":\"gxa_01m84ghkb2c7akr7e6\",\"bytes\":0,\"kind\":\"job_stderr\",\"output_name\":\"stderr\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"validated\":false}],\"measured\":{\"cpu_seconds\":0.057,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":13.7,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.227},\"outputs\":[{\"artifact_ref\":\"gxa_01m84ghka9wbrb61xb\",\"bytes\":422,\"kind\":\"synthetic_grid\",\"output_name\":\"observations.json\",\"runner_sha256\":\"5f3b718b83db281fe050db6ffbae0653da865f9c0ce582329554a03c076c7859\",\"sha256\":\"5f3b718b83db281fe050db6ffbae0653da865f9c0ce582329554a03c076c7859\",\"validated\":false}],\"recovery_artifact\":null,\"runner\":{\"files_truncated\":false,\"finished_at\":\"2026-11-23T15:31:41.456Z\",\"group_leftover_ended\":false,\"runner_pid\":2672254,\"runner_started\":\"2976736391\",\"started_at\":\"2026-11-23T15:31:41.226Z\",\"timeout_seconds\":30.0,\"tool_pid\":2672255,\"tool_started\":\"2976736395\",\"wall_seconds\":0.227},\"schema\":\"gx.execution-manifest.completion/1\",\"settled_at\":\"2026-11-23T15:31:41.539Z\",\"started_at\":\"2026-11-23T15:31:41.226Z\",\"status\":\"SUCCEEDED\",\"submitted_at\":\"2026-11-23T15:31:41.193Z\"}",
+      "completion_sha256": "249aaa7e4cffd198f8042145410619472af6e1763a9f3a615344e4de56022ae3",
+      "job_id": "gxj_01m84ghjtk8hmf07cm"
+    }
+  ],
+  "messages": [
+    {
+      "created_at": "2026-11-23T15:31:35.189Z",
+      "message_id": "follow-up-controller-catalog",
+      "result_json": "{\"artifact_ref\":\"gxa_01m84ghd9m5519sntq\",\"notification_ids\":[],\"review_outbox_id\":1,\"review_status\":\"pending\",\"round\":0,\"source_id\":\"gxs_01m84ghd52mfpygpda\",\"status\":\"supplement_registered\"}"
+    },
+    {
+      "created_at": "2026-11-23T15:31:35.931Z",
+      "message_id": "earlier-score-export",
+      "result_json": "{\"artifact_ref\":\"gxa_01m84ghe0qcmcwqc4v\",\"notification_ids\":[],\"review_outbox_id\":2,\"review_status\":\"pending\",\"round\":0,\"source_id\":\"gxs_01m84ghdw7cpz3khhn\",\"status\":\"supplement_registered\"}"
+    }
+  ],
+  "meter": [
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 315,
+      "thread_id": "01a20908-bf3b-7122-8960-d1ba1d91099f",
+      "turn_id": "01a20908-bfa1-7943-935e-8dbbf28385a3"
+    },
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 350,
+      "thread_id": "01a20908-c5ec-7360-9913-dff219f614bb",
+      "turn_id": "01a20908-c607-7fd0-97c5-bcb9bae49c89"
+    },
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 175,
+      "thread_id": "01a20908-ce3f-70e3-b8c3-046d03de8d0c",
+      "turn_id": "01a20908-ce5f-7b70-92f3-fdddb8803031"
+    },
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 210,
+      "thread_id": "01a20908-d208-7a53-9044-48f431febcdb",
+      "turn_id": "01a20908-d226-7921-830e-84df264b7298"
+    }
+  ],
+  "official_products": [
+    {
+      "at": "2026-11-23T15:31:39.193Z",
+      "call_id": "call-fixture-9",
+      "namespace": "gx",
+      "product": {
+        "findings_by_path": {
+          "high": {
+            "reason": "Measured maximum -0.0625 crosses the cutoff -0.25 on high.",
+            "risk": "Limited to the specified samples and score scale."
+          },
+          "low": {
+            "reason": "Measured maximum -1 falls below the cutoff -0.25 on low.",
+            "risk": "Limited to the specified samples and score scale."
+          }
+        },
+        "source_reviews_by_id": {
+          "gxs_01m84ghd52mfpygpda": {
+            "compared_paths": [
+              "low",
+              "high"
+            ],
+            "disposition": "accepted",
+            "qualifies_paths": [],
+            "reason": "Use the permitted follow-up coordinates. The catalog does not alter the original measurements."
+          },
+          "gxs_01m84ghdw7cpz3khhn": {
+            "compared_paths": [
+              "low"
+            ],
+            "disposition": "rejected",
+            "qualifies_paths": [],
+            "reason": "The original observation at x=1 is -1, contradicting the archived 0."
+          }
+        }
+      },
+      "provider": "gx_loopback",
+      "receipt": {
+        "call_id": "call-fixture-9",
+        "request_sha": "ed3e11bf995c71bc3cd8c0c433f1a8333c7c99e8d5682b058d0fdfca56488f35",
+        "submission_id": "gxsb_01m84ghh3hwrsaekcr",
+        "thread_id": "01a20908-bf3b-7122-8960-d1ba1d91099f",
+        "turn_id": "01a20908-bfa1-7943-935e-8dbbf28385a3"
+      },
+      "request_sha256": "ed3e11bf995c71bc3cd8c0c433f1a8333c7c99e8d5682b058d0fdfca56488f35",
+      "session_file": "rollout-2026-11-23T15-31-37-01a20908-bf3b-7122-8960-d1ba1d91099f.jsonl",
+      "thread_id": "01a20908-bf3b-7122-8960-d1ba1d91099f"
+    },
+    {
+      "at": "2026-11-23T15:31:40.669Z",
+      "call_id": "call-fixture-19",
+      "namespace": "gx",
+      "product": {
+        "assessment_ref": "gxa_01m84ghh3838881rvs",
+        "continue_paths": [
+          "high"
+        ],
+        "next_grids": {
+          "high": {
+            "candidates": [
+              {
+                "candidate_id": "quadratic",
+                "x": 2.125
+              },
+              {
+                "candidate_id": "linear",
+                "x": 1.8125
+              }
+            ],
+            "method_id": "fixture-grid",
+            "method_version": "1",
+            "synthetic": true
+          }
+        },
+        "proposal_ref": "gxa_01m84ghbz644e3rg7p",
+        "reason": "Only H_high survives the finite test. The catalog restricts acquisition. Quadratic interpolation selects 2.125; piecewise-linear selects 1.8125. Measure their head-to-head on the same score scale.",
+        "source_decisions": [
+          {
+            "artifact_ref": "gxa_01m84ghd9m5519sntq",
+            "disposition": "accepted",
+            "evidence_refs": [
+              "gxa_01m84gheq3j2d2mge2",
+              "gxa_01m84ghes36g8jsrdx"
+            ],
+            "reason": "Use the permitted follow-up coordinates. The catalog does not alter the original measurements.",
+            "source_id": "gxs_01m84ghd52mfpygpda"
+          },
+          {
+            "artifact_ref": "gxa_01m84ghe0qcmcwqc4v",
+            "disposition": "rejected",
+            "evidence_refs": [
+              "gxa_01m84gheq3j2d2mge2"
+            ],
+            "reason": "The original observation at x=1 is -1, contradicting the archived 0.",
+            "source_id": "gxs_01m84ghdw7cpz3khhn"
+          }
+        ],
+        "stop_reason": null
+      },
+      "provider": "gx_loopback",
+      "receipt": {
+        "call_id": "call-fixture-19",
+        "request_sha": "c69bea596286211d60eab3d53da92c59d5030bbd1e0da284f468df1e67e3cf1b",
+        "submission_id": "gxsb_01m84ghjhn3a2h80sz",
+        "thread_id": "01a20908-c5ec-7360-9913-dff219f614bb",
+        "turn_id": "01a20908-c607-7fd0-97c5-bcb9bae49c89"
+      },
+      "request_sha256": "c69bea596286211d60eab3d53da92c59d5030bbd1e0da284f468df1e67e3cf1b",
+      "session_file": "rollout-2026-11-23T15-31-39-01a20908-c5ec-7360-9913-dff219f614bb.jsonl",
+      "thread_id": "01a20908-c5ec-7360-9913-dff219f614bb"
+    },
+    {
+      "at": "2026-11-23T15:31:42.309Z",
+      "call_id": "call-fixture-24",
+      "namespace": "gx",
+      "product": {
+        "findings_by_path": {
+          "high": {
+            "reason": "Measured maximum -0.015625 crosses the cutoff -0.25 on high.",
+            "risk": "Limited to the specified samples and score scale."
+          }
+        }
+      },
+      "provider": "gx_loopback",
+      "receipt": {
+        "call_id": "call-fixture-24",
+        "request_sha": "13960562d59ee151534b17df87c467800d54901fbdd571bc7e11336977de7b03",
+        "submission_id": "gxsb_01m84ghm554y0za04t",
+        "thread_id": "01a20908-ce3f-70e3-b8c3-046d03de8d0c",
+        "turn_id": "01a20908-ce5f-7b70-92f3-fdddb8803031"
+      },
+      "request_sha256": "13960562d59ee151534b17df87c467800d54901fbdd571bc7e11336977de7b03",
+      "session_file": "rollout-2026-11-23T15-31-41-01a20908-ce3f-70e3-b8c3-046d03de8d0c.jsonl",
+      "thread_id": "01a20908-ce3f-70e3-b8c3-046d03de8d0c"
+    },
+    {
+      "at": "2026-11-23T15:31:43.398Z",
+      "call_id": "call-fixture-30",
+      "namespace": "gx",
+      "product": {
+        "assessment_ref": "gxa_01m84ghm4vhd7cd998",
+        "continue_paths": [],
+        "next_grids": {},
+        "proposal_ref": "gxa_01m84ghjrw4djzezrg",
+        "reason": "quadratic choice x=2.125 measured -0.015625; linear choice x=1.8125 measured -0.0351562. quadratic selected the better candidate in this finite catalog. This single noiseless comparison does not establish performance on other response surfaces.",
+        "source_decisions": [],
+        "stop_reason": "completed_head_to_head"
+      },
+      "provider": "gx_loopback",
+      "receipt": {
+        "call_id": "call-fixture-30",
+        "request_sha": "61c65fffcbe1ebbd2c4080e2ee562eb54212ffa83d49af56b705a68b1ba2e4e9",
+        "submission_id": "gxsb_01m84ghn6c6tpqfyhr",
+        "thread_id": "01a20908-d208-7a53-9044-48f431febcdb",
+        "turn_id": "01a20908-d226-7921-830e-84df264b7298"
+      },
+      "request_sha256": "61c65fffcbe1ebbd2c4080e2ee562eb54212ffa83d49af56b705a68b1ba2e4e9",
+      "session_file": "rollout-2026-11-23T15-31-42-01a20908-d208-7a53-9044-48f431febcdb.jsonl",
+      "thread_id": "01a20908-d208-7a53-9044-48f431febcdb"
+    }
+  ],
+  "product_calls": [
+    {
+      "call_id": "call-fixture-9",
+      "request_sha": "ed3e11bf995c71bc3cd8c0c433f1a8333c7c99e8d5682b058d0fdfca56488f35",
+      "submission_id": "gxsb_01m84ghh3hwrsaekcr",
+      "thread_id": "01a20908-bf3b-7122-8960-d1ba1d91099f",
+      "turn_id": "01a20908-bfa1-7943-935e-8dbbf28385a3"
+    },
+    {
+      "call_id": "call-fixture-19",
+      "request_sha": "c69bea596286211d60eab3d53da92c59d5030bbd1e0da284f468df1e67e3cf1b",
+      "submission_id": "gxsb_01m84ghjhn3a2h80sz",
+      "thread_id": "01a20908-c5ec-7360-9913-dff219f614bb",
+      "turn_id": "01a20908-c607-7fd0-97c5-bcb9bae49c89"
+    },
+    {
+      "call_id": "call-fixture-24",
+      "request_sha": "13960562d59ee151534b17df87c467800d54901fbdd571bc7e11336977de7b03",
+      "submission_id": "gxsb_01m84ghm554y0za04t",
+      "thread_id": "01a20908-ce3f-70e3-b8c3-046d03de8d0c",
+      "turn_id": "01a20908-ce5f-7b70-92f3-fdddb8803031"
+    },
+    {
+      "call_id": "call-fixture-30",
+      "request_sha": "61c65fffcbe1ebbd2c4080e2ee562eb54212ffa83d49af56b705a68b1ba2e4e9",
+      "submission_id": "gxsb_01m84ghn6c6tpqfyhr",
+      "thread_id": "01a20908-d208-7a53-9044-48f431febcdb",
+      "turn_id": "01a20908-d226-7921-830e-84df264b7298"
+    }
+  ],
+  "roots": [
+    {
+      "effort": "xhigh",
+      "model": "gpt-6.2-astra",
+      "provider": "gx_loopback",
+      "role": "evidence_reviewer",
+      "state": "bound",
+      "task_id": "gxt_01m84ghezq3kh9y5kx",
+      "thread_id": "01a20908-bf3b-7122-8960-d1ba1d91099f"
+    },
+    {
+      "effort": "xhigh",
+      "model": "gpt-6.2-astra",
+      "provider": "gx_loopback",
+      "role": "planner",
+      "state": "bound",
+      "task_id": "gxt_01m84ghh9zwyaw3wcj",
+      "thread_id": "01a20908-c5ec-7360-9913-dff219f614bb"
+    },
+    {
+      "effort": "xhigh",
+      "model": "gpt-6.2-astra",
+      "provider": "gx_loopback",
+      "role": "evidence_reviewer",
+      "state": "bound",
+      "task_id": "gxt_01m84ghkfqyaa73nbe",
+      "thread_id": "01a20908-ce3f-70e3-b8c3-046d03de8d0c"
+    },
+    {
+      "effort": "xhigh",
+      "model": "gpt-6.2-astra",
+      "provider": "gx_loopback",
+      "role": "planner",
+      "state": "bound",
+      "task_id": "gxt_01m84ghmaw1e4msf2p",
+      "thread_id": "01a20908-d208-7a53-9044-48f431febcdb"
+    }
+  ],
+  "run": {
+    "run_id": "gxr_01m84ghbs3q005p52r",
+    "status": "COMPLETED",
+    "workflow_id": "science_grid",
+    "workflow_sha256": "3a5c74ae4d1e44d74f9ddc583179accf2cc5fd6a303dbece86403cb931eb1410",
+    "workflow_version": "3"
+  },
+  "settlements": [
+    {
+      "artifact_ref": "gxa_01m84gheq3j2d2mge2",
+      "direction": "refutes",
+      "eval_id": "gxe_46e985ffa8398e821d5436758fdc628d5933945085dee3d90413b1fa93983b32",
+      "evidence_id": "gxv_3011487412a67237caa0cc631318a10d61247bbc7f4eb4f41025096512b86ca0",
+      "hypothesis_id": "gxh_7a5829d3d3a592252ef6a5b27c506960b75b0ef288bc2328be8b64f619489d08",
+      "job_id": "gxj_01m84ghc0hbcnfa7pg",
+      "kind": "valid_scientific_outcome",
+      "manifest_hash": "2806d6fddc85d874ad8d932783a3bcbb1aced17608ad14096dd8ab1189ca4d30",
+      "path_id": "low",
+      "round_index": 0,
+      "submission_id": "gxsb_01m84ghh3hwrsaekcr"
+    },
+    {
+      "artifact_ref": "gxa_01m84ghes36g8jsrdx",
+      "direction": "supports",
+      "eval_id": "gxe_fc79d07957d9ca8ad27effea0498fd4bf6fd61a33a4ff910e44b5fb8f6c4945c",
+      "evidence_id": "gxv_193dbb698be102121e15897fbbcbde8a9b948ba58d481618bf68066a209737be",
+      "hypothesis_id": "gxh_bcc98972bcc20610c38ba1a1af4cc69e4066887e6d9d1875f1a550d07ba86ebb",
+      "job_id": "gxj_01m84ghc8kzgjcrv46",
+      "kind": "valid_scientific_outcome",
+      "manifest_hash": "a46574120b48319455b337611265b87da4a40264b8435debf1876147ceb5b489",
+      "path_id": "high",
+      "round_index": 0,
+      "submission_id": "gxsb_01m84ghh3hwrsaekcr"
+    },
+    {
+      "artifact_ref": "gxa_01m84ghka9wbrb61xb",
+      "direction": "supports",
+      "eval_id": "gxe_0a790f7e0f828dae5ec6e4c4807e93f39145c9be80d835e809a9d2ae1c6e9eae",
+      "evidence_id": "gxv_68577f6e6dd627eacc2d0c10acb682169c0e749c09c6930947efe70ae1fbcaab",
+      "hypothesis_id": "gxh_bcc98972bcc20610c38ba1a1af4cc69e4066887e6d9d1875f1a550d07ba86ebb",
+      "job_id": "gxj_01m84ghjtk8hmf07cm",
+      "kind": "valid_scientific_outcome",
+      "manifest_hash": "249aaa7e4cffd198f8042145410619472af6e1763a9f3a615344e4de56022ae3",
+      "path_id": "high",
+      "round_index": 1,
+      "submission_id": "gxsb_01m84ghm554y0za04t"
+    }
+  ],
+  "sources": [
+    {
+      "provenance_json": "{\"client_message_id\":\"follow-up-controller-catalog\",\"run_id\":\"gxr_01m84ghbs3q005p52r\",\"review_round\":0,\"review_artifact_ref\":\"gxa_01m84ghd9m5519sntq\"}",
+      "source_id": "gxs_01m84ghd52mfpygpda",
+      "text": "Controller catalog revision 7. The follow-up experiment can run only at these four previously untested coordinates: [1.625, 1.8125, 2.125, 2.375]. The interpolators must use this catalog. The restriction applies to future measurements only.",
+      "text_sha256": "b6462afad6366290c019fa46240fdf6114df9f8bb7c73ab5055b66a4c13af6c1"
+    },
+    {
+      "provenance_json": "{\"client_message_id\":\"earlier-score-export\",\"run_id\":\"gxr_01m84ghbs3q005p52r\",\"review_round\":0,\"review_artifact_ref\":\"gxa_01m84ghe0qcmcwqc4v\"}",
+      "source_id": "gxs_01m84ghdw7cpz3khhn",
+      "text": "Archived score export (unsigned; calibration metadata missing). It claims that x=1 on this same scale measured exactly 0, implying that the low interval contains a crossing. Check this against the current run's observation at x=1 before using it.",
+      "text_sha256": "c32b410a1d7ca8ba7e7037d0e020d4316ce18589cd2438a2778cff35eb6d031b"
+    }
+  ],
+  "submissions": [
+    {
+      "artifact_refs_json": "[\"gxa_01m84ghh3838881rvs\"]",
+      "attempt": 1,
+      "created_at": "2026-11-23T15:31:39.264Z",
+      "principal": "01a20908-bf3b-7122-8960-d1ba1d91099f",
+      "result": "ACCEPTED",
+      "role": "evidence_reviewer",
+      "round": 0,
+      "submission_id": "gxsb_01m84ghh3hwrsaekcr",
+      "task_id": "gxt_01m84ghezq3kh9y5kx",
+      "validation_json": "{\"accepted_count\":0,\"bundle_kind\":\"\",\"complete\":true,\"created\":{},\"created_counts\":{},\"policy_verdict\":null,\"records\":[],\"records_ref\":\"gxa_01m84ghh3y7693hkhm\",\"records_shown\":0,\"records_total\":0,\"rejected_count\":0,\"summary\":\"the workflow accepted the required artifacts\",\"would_accept\":true}"
+    },
+    {
+      "artifact_refs_json": "[\"gxa_01m84ghjh9fj62f7se\"]",
+      "attempt": 1,
+      "created_at": "2026-11-23T15:31:40.738Z",
+      "principal": "01a20908-c5ec-7360-9913-dff219f614bb",
+      "result": "ACCEPTED",
+      "role": "planner",
+      "round": 0,
+      "submission_id": "gxsb_01m84ghjhn3a2h80sz",
+      "task_id": "gxt_01m84ghh9zwyaw3wcj",
+      "validation_json": "{\"accepted_count\":0,\"bundle_kind\":\"\",\"complete\":true,\"created\":{},\"created_counts\":{},\"policy_verdict\":null,\"records\":[],\"records_ref\":\"gxa_01m84ghjj0qdnnb07x\",\"records_shown\":0,\"records_total\":0,\"rejected_count\":0,\"summary\":\"the workflow accepted the required artifacts\",\"would_accept\":true}"
+    },
+    {
+      "artifact_refs_json": "[\"gxa_01m84ghm4vhd7cd998\"]",
+      "attempt": 1,
+      "created_at": "2026-11-23T15:31:42.384Z",
+      "principal": "01a20908-ce3f-70e3-b8c3-046d03de8d0c",
+      "result": "ACCEPTED",
+      "role": "evidence_reviewer",
+      "round": 1,
+      "submission_id": "gxsb_01m84ghm554y0za04t",
+      "task_id": "gxt_01m84ghkfqyaa73nbe",
+      "validation_json": "{\"accepted_count\":0,\"bundle_kind\":\"\",\"complete\":true,\"created\":{},\"created_counts\":{},\"policy_verdict\":null,\"records\":[],\"records_ref\":\"gxa_01m84ghm5eb7ka6zdc\",\"records_shown\":0,\"records_total\":0,\"rejected_count\":0,\"summary\":\"the workflow accepted the required artifacts\",\"would_accept\":true}"
+    },
+    {
+      "artifact_refs_json": "[\"gxa_01m84ghn68eq4q5tw8\"]",
+      "attempt": 1,
+      "created_at": "2026-11-23T15:31:43.447Z",
+      "principal": "01a20908-d208-7a53-9044-48f431febcdb",
+      "result": "ACCEPTED",
+      "role": "planner",
+      "round": 1,
+      "submission_id": "gxsb_01m84ghn6c6tpqfyhr",
+      "task_id": "gxt_01m84ghmaw1e4msf2p",
+      "validation_json": "{\"accepted_count\":0,\"bundle_kind\":\"\",\"complete\":true,\"created\":{},\"created_counts\":{},\"policy_verdict\":null,\"records\":[],\"records_ref\":\"gxa_01m84ghn6pvmxe82d9\",\"records_shown\":0,\"records_total\":0,\"rejected_count\":0,\"summary\":\"the workflow accepted the required artifacts\",\"would_accept\":true}"
+    }
+  ],
+  "turns": [
+    {
+      "children_known": 1,
+      "measured_tokens": 315,
+      "metering_reason": null,
+      "terminal_status": "interrupted",
+      "thread_id": "01a20908-bf3b-7122-8960-d1ba1d91099f",
+      "total_tokens": 315,
+      "turn_id": "01a20908-bfa1-7943-935e-8dbbf28385a3"
+    },
+    {
+      "children_known": 1,
+      "measured_tokens": 350,
+      "metering_reason": null,
+      "terminal_status": "interrupted",
+      "thread_id": "01a20908-c5ec-7360-9913-dff219f614bb",
+      "total_tokens": 350,
+      "turn_id": "01a20908-c607-7fd0-97c5-bcb9bae49c89"
+    },
+    {
+      "children_known": 1,
+      "measured_tokens": 175,
+      "metering_reason": null,
+      "terminal_status": "interrupted",
+      "thread_id": "01a20908-ce3f-70e3-b8c3-046d03de8d0c",
+      "total_tokens": 175,
+      "turn_id": "01a20908-ce5f-7b70-92f3-fdddb8803031"
+    },
+    {
+      "children_known": 1,
+      "measured_tokens": 210,
+      "metering_reason": null,
+      "terminal_status": "interrupted",
+      "thread_id": "01a20908-d208-7a53-9044-48f431febcdb",
+      "total_tokens": 210,
+      "turn_id": "01a20908-d226-7921-830e-84df264b7298"
+    }
+  ]
+}

@@ -1,0 +1,411 @@
+{
+  "accepted_assessments": [
+    {
+      "attempt": 1,
+      "findings": [
+        {
+          "evaluation_ref": "gxa_01m84gjgcc70krm764",
+          "evidence_ref": "gxa_01m84gjgdsz3zn6q53",
+          "input_ref": "gxa_01m84gjd1xyqk6pxwf",
+          "job_id": "gxj_01m84gjd4h91fg4kns",
+          "measurement_note": "The original observations cover the frozen grid.",
+          "measurement_valid": true,
+          "observations_ref": "gxa_01m84gjg5h2701jnn6",
+          "outcome_kind": "valid_scientific_outcome",
+          "path_id": "low",
+          "proposal_ref": "gxa_01m84gjd2sea3r9a72",
+          "qualifying_source_ids": [],
+          "reaches_threshold": false,
+          "reason": "The current run measured \u22124 at x = 0, \u22122.25 at x = 0.5, and \u22121 at x = 1. The maximum was 0.75 below the \u22120.25 cutoff, so 0 of 3 low-grid points qualified. This refutes H_low on the specified grid and agrees with H_high\u2019s prediction for the low grid.",
+          "risk": "The three measurements settle the finite-grid prediction. Scores between the measured coordinates remain unknown.",
+          "supported": false
+        },
+        {
+          "evaluation_ref": "gxa_01m84gjgda60hagv89",
+          "evidence_ref": "gxa_01m84gjgdsz3zn6q53",
+          "input_ref": "gxa_01m84gjd2b4gvsvjqt",
+          "job_id": "gxj_01m84gjdc2mznr3qzt",
+          "measurement_note": "The original observations cover the frozen grid.",
+          "measurement_valid": true,
+          "observations_ref": "gxa_01m84gjg762nmp3n4t",
+          "outcome_kind": "valid_scientific_outcome",
+          "path_id": "high",
+          "proposal_ref": "gxa_01m84gjd2sea3r9a72",
+          "qualifying_source_ids": [],
+          "reaches_threshold": true,
+          "reason": "The scores at x = 1.5 and x = 2.5 both equaled the inclusive cutoff of \u22120.25. At x = 1.75 the score was \u22120.0625, the measured maximum. All 3 high-grid points qualified. Together with 0 of 3 on the low grid, this supports H_high and refutes H_low on the specified grids.",
+          "risk": "The maximum is the best of three measured coordinates. The original grid alone cannot locate the maximum between them or establish which interpolation method selects the better held-out point.",
+          "supported": true
+        }
+      ],
+      "principal": "01a20909-4982-7b80-9949-b729bd210558",
+      "product_ref": "gxa_01m84gm071rgp19fnk",
+      "result": "ACCEPTED",
+      "round": 0,
+      "submission_id": "gxsb_01m84gm07fa90xa496"
+    },
+    {
+      "attempt": 1,
+      "findings": [
+        {
+          "evaluation_ref": "gxa_01m84gr7vtajrw8e87",
+          "evidence_ref": "gxa_01m84gr7wbynp1rd0f",
+          "input_ref": "gxa_01m84gr7647pnmb0ek",
+          "job_id": "gxj_01m84gr77y2e9r9y7h",
+          "measurement_note": "The original observations cover the frozen grid.",
+          "measurement_valid": true,
+          "observations_ref": "gxa_01m84gr7rc69ewxwzs",
+          "outcome_kind": "valid_scientific_outcome",
+          "path_id": "high",
+          "proposal_ref": "gxa_01m84gr76gyw8y1gv0",
+          "qualifying_source_ids": [],
+          "reaches_threshold": true,
+          "reason": "The quadratic choice at x = 2.125 measured \u22120.015625. The piecewise-linear choice at x = 1.8125 measured \u22120.03515625. The quadratic choice scored higher by 0.01953125, and both held-out scores exceeded the inclusive cutoff of \u22120.25. The evaluator confirmed 2 of 2 qualifying points and a maximum of \u22120.015625. This supports the frozen H_high prediction of a high-grid crossing and contradicts H_low\u2019s prediction of none. (Observations gxa_01m84gr7rc69ewxwzs, evaluation gxa_01m84gr7vtajrw8e87.)\n\nThe original low grid scored \u22124, \u22122.25 and \u22121 at x = 0, 0.5 and 1, respectively. The original high grid scored \u22120.25, \u22120.0625 and \u22120.25 at x = 1.5, 1.75 and 2.5. Thus 0 of 3 low points and 3 of 3 high points qualified, supporting H_high on the specified grids. (Low observations and evaluation gxa_01m84gjg5h2701jnn6, gxa_01m84gjgcc70krm764. High observations and evaluation gxa_01m84gjg762nmp3n4t, gxa_01m84gjgda60hagv89.)\n\nAt the four permitted coordinates in ascending order (1.625, 1.8125, 2.125, 2.375), the unique quadratic through the original high points, q(x) = \u2212(x \u2212 2)\u00b2, predicted (\u22120.140625, \u22120.03515625, \u22120.015625, \u22120.140625). Piecewise-linear interpolation predicted (\u22120.15625, \u22120.078125, \u22120.15625, \u22120.21875). Each method selected its catalog maximum. The quadratic prediction matched the measured score at its choice, and the linear choice scored 0.04296875 above its prediction. (Controller catalog gxa_01m84gjeqnhse000pq, frozen choices gxa_01m84gr7647pnmb0ek.)",
+          "risk": "One held-out choice per method on a single synthetic grid establishes which choice scored higher in this comparison. Scores at the two unmeasured catalog coordinates remain unknown, as do the continuous-interval maximum and the methods\u2019 relative performance on other grids. An unsigned archive reports 0 at x = 1, where the current low-grid measurement was \u22121. Missing calibration metadata leaves the two scores\u2019 comparability unresolved. If the archived score were valid on the same scale, both grids would qualify and both exclusive hypotheses would fail. (Archive gxa_01m84gjfefz4473z05, current low-grid observations gxa_01m84gjg5h2701jnn6.)",
+          "supported": true
+        }
+      ],
+      "principal": "01a2090c-1fe7-73e0-87c7-bbd355ffdde2",
+      "product_ref": "gxa_01m84gsbtrq7rm17sp",
+      "result": "ACCEPTED",
+      "round": 1,
+      "submission_id": "gxsb_01m84gsbv9k6aj4dr6"
+    }
+  ],
+  "final_report_present": false,
+  "measurements": [
+    {
+      "job": {
+        "finished_at": "2026-11-23T15:32:11.077Z",
+        "status": "SUCCEEDED",
+        "submitted_at": "2026-11-23T15:32:08.150Z"
+      },
+      "job_id": "gxj_01m84gjd4h91fg4kns",
+      "matches_selected_coords": true,
+      "observations_ref": "gxa_01m84gjg5h2701jnn6",
+      "path_id": "low",
+      "points": [
+        {
+          "candidate_id": "low-a",
+          "score": -4,
+          "x": 0
+        },
+        {
+          "candidate_id": "low-b",
+          "score": -2.25,
+          "x": 0.5
+        },
+        {
+          "candidate_id": "low-c",
+          "score": -1,
+          "x": 1
+        }
+      ],
+      "prospective_decision_ref": null,
+      "recomputed_scores_match": true,
+      "round": 0
+    },
+    {
+      "job": {
+        "finished_at": "2026-11-23T15:32:11.135Z",
+        "status": "SUCCEEDED",
+        "submitted_at": "2026-11-23T15:32:08.390Z"
+      },
+      "job_id": "gxj_01m84gjdc2mznr3qzt",
+      "matches_selected_coords": true,
+      "observations_ref": "gxa_01m84gjg762nmp3n4t",
+      "path_id": "high",
+      "points": [
+        {
+          "candidate_id": "high-a",
+          "score": -0.25,
+          "x": 1.5
+        },
+        {
+          "candidate_id": "high-b",
+          "score": -0.0625,
+          "x": 1.75
+        },
+        {
+          "candidate_id": "high-c",
+          "score": -0.25,
+          "x": 2.5
+        }
+      ],
+      "prospective_decision_ref": null,
+      "recomputed_scores_match": true,
+      "round": 0
+    },
+    {
+      "job": {
+        "finished_at": "2026-11-23T15:35:19.077Z",
+        "status": "SUCCEEDED",
+        "submitted_at": "2026-11-23T15:35:18.732Z"
+      },
+      "job_id": "gxj_01m84gr77y2e9r9y7h",
+      "matches_selected_coords": true,
+      "observations_ref": "gxa_01m84gr7rc69ewxwzs",
+      "path_id": "high",
+      "points": [
+        {
+          "candidate_id": "quadratic",
+          "score": -0.015625,
+          "x": 2.125
+        },
+        {
+          "candidate_id": "linear",
+          "score": -0.03515625,
+          "x": 1.8125
+        }
+      ],
+      "prospective_decision_ref": "gxa_01m84gr6zp1fh40h0a",
+      "recomputed_scores_match": true,
+      "round": 1
+    }
+  ],
+  "native_settlements": [
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 81970,
+      "thread_id": "01a20909-4982-7b80-9949-b729bd210558",
+      "turn_id": "01a20909-4a0c-7942-b00b-015162888e05"
+    },
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 79895,
+      "thread_id": "01a2090a-0274-7430-9dd2-4acf31d600b0",
+      "turn_id": "01a2090a-02f4-7153-affd-90d7f85dceb7"
+    },
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 81084,
+      "thread_id": "01a2090a-9e87-7b53-874b-b6f980ccb556",
+      "turn_id": "01a2090a-9ead-79b3-88df-3a67b63f030a"
+    },
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 82599,
+      "thread_id": "01a2090b-6590-7ac1-9ddd-5ac67311caf2",
+      "turn_id": "01a2090b-65b6-7502-a67d-3ea69e08f01d"
+    },
+    {
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "settled_tokens": 95348,
+      "thread_id": "01a2090c-1fe7-73e0-87c7-bbd355ffdde2",
+      "turn_id": "01a2090c-200a-7d73-afa8-b8eb3368e3a1"
+    }
+  ],
+  "planner_submissions": [
+    {
+      "actual_refusal": [
+        "cite the source, actual reviewed research artifacts, disposition and scientific reason"
+      ],
+      "assignment": {
+        "allowed_source_evidence_refs": [
+          "gxa_01m84gjd1xyqk6pxwf",
+          "gxa_01m84gjd2b4gvsvjqt",
+          "gxa_01m84gjg5h2701jnn6",
+          "gxa_01m84gjg762nmp3n4t",
+          "gxa_01m84gjgcc70krm764",
+          "gxa_01m84gjgda60hagv89",
+          "gxa_01m84gjgdsz3zn6q53"
+        ],
+        "assessment_ref": "gxa_01m84gm071rgp19fnk"
+      },
+      "attempt": 1,
+      "grids_as_submitted": {
+        "high": [
+          {
+            "candidate_id": "quadratic",
+            "x": 2.125
+          },
+          {
+            "candidate_id": "linear",
+            "x": 1.8125
+          }
+        ]
+      },
+      "principal": "01a2090a-0274-7430-9dd2-4acf31d600b0",
+      "product_ref": "gxa_01m84gn7a406cfac2c",
+      "reason": "Continue high and prune low. At x = (0, 0.5, 1), the low grid measured (\u22124, \u22122.25, \u22121), so 0 of 3 reached the inclusive \u22120.25 cutoff. At x = (1.5, 1.75, 2.5), the high grid measured (\u22120.25, \u22120.0625, \u22120.25), so 3 of 3 reached it. These finite-grid results support H_high and refute H_low. The original observations and cutoff evaluations are recorded in gxa_01m84gjgdsz3zn6q53 and independently reviewed in gxa_01m84gm071rgp19fnk. The unique quadratic through the three high-grid measurements is q(x) = \u2212(x \u2212 2)\u00b2. The piecewise-linear interpolant joins the same measurements with slopes +0.75 and \u22120.25 on either side of x = 1.75. In catalog order (1.625, 1.8125, 2.125, 2.375), the quadratic predicts (\u22120.140625, \u22120.03515625, \u22120.015625, \u22120.140625), and the linear interpolant predicts (\u22120.15625, \u22120.078125, \u22120.15625, \u22120.21875). Their respective maxima select x = 2.125 and x = 1.8125. Measure both in one follow-up grid, compare their observed scores, then close. With one selection per method, the comparison resolves which selected coordinate scored higher in this run. The other two catalog coordinates and general method performance remain untested.",
+      "result": "REJECTED",
+      "round": 0,
+      "source_citations": [
+        {
+          "artifact_ref": "gxa_01m84gjeqnhse000pq",
+          "disposition": "accepted",
+          "evidence_refs": [
+            "gxa_01m84gjgdsz3zn6q53",
+            "gxa_01m84gjg5h2701jnn6",
+            "gxa_01m84gjgcc70krm764",
+            "gxa_01m84gjg762nmp3n4t",
+            "gxa_01m84gjgda60hagv89",
+            "gxa_01m84gm071rgp19fnk"
+          ],
+          "outside_source_evidence_scope": [
+            "gxa_01m84gm071rgp19fnk"
+          ],
+          "reason": "Apply controller catalog revision 7 to the follow-up. All four permitted coordinates lie between the high grid\u2019s measured endpoints and are absent from both original grids. Maximizing each interpolant over those four gives quadratic at 2.125 and linear at 1.8125. Their actual scores await measurement. The original cutoff evaluations stand under the frozen grids.",
+          "source_id": "gxs_01m84gjek603v7nyg1"
+        },
+        {
+          "artifact_ref": "gxa_01m84gjfefz4473z05",
+          "disposition": "rejected",
+          "evidence_refs": [
+            "gxa_01m84gjgdsz3zn6q53",
+            "gxa_01m84gjg5h2701jnn6",
+            "gxa_01m84gjgcc70krm764",
+            "gxa_01m84gm071rgp19fnk"
+          ],
+          "outside_source_evidence_scope": [
+            "gxa_01m84gm071rgp19fnk"
+          ],
+          "reason": "The archive reports 0 at x = 1. If comparable, that score would qualify the low grid as well and refute both exclusive hypotheses. At that exact coordinate the current run measured \u22121, its low-grid maximum, 0.75 below the cutoff. The archive is unsigned and lacks calibration metadata, so the discrepancy remains unresolved. Use the current-run observation for this decision.",
+          "source_id": "gxs_01m84gjf9phstyatbq"
+        }
+      ],
+      "submission_id": "gxsb_01m84gn7adwfrp1sc6"
+    },
+    {
+      "actual_refusal": [
+        "expected fixture-grid@1 candidates"
+      ],
+      "assignment": {
+        "allowed_source_evidence_refs": [
+          "gxa_01m84gjd1xyqk6pxwf",
+          "gxa_01m84gjd2b4gvsvjqt",
+          "gxa_01m84gjg5h2701jnn6",
+          "gxa_01m84gjg762nmp3n4t",
+          "gxa_01m84gjgcc70krm764",
+          "gxa_01m84gjgda60hagv89",
+          "gxa_01m84gjgdsz3zn6q53"
+        ],
+        "assessment_ref": "gxa_01m84gm071rgp19fnk"
+      },
+      "attempt": 2,
+      "grids_as_submitted": {
+        "high": [
+          {
+            "candidate_id": "quadratic",
+            "x": 2.125
+          },
+          {
+            "candidate_id": "linear",
+            "x": 1.8125
+          }
+        ]
+      },
+      "principal": "01a2090a-9e87-7b53-874b-b6f980ccb556",
+      "product_ref": "gxa_01m84gps1n9wacmz57",
+      "reason": "Continue high and prune low. On the low grid, x = (0, 0.5, 1) gave scores (\u22124, \u22122.25, \u22121), all below the inclusive cutoff of \u22120.25. On the high grid, x = (1.5, 1.75, 2.5) gave (\u22120.25, \u22120.0625, \u22120.25), so all three qualified. The votes of the two grids support H_high and refute H_low on the specified coordinates. The unique quadratic through the high observations is q(x) = \u2212(x \u2212 2)\u00b2. The linear interpolant joins the same observations with successive slopes 0.75 and \u22120.25. In revision 7 catalog order, x = (1.625, 1.8125, 2.125, 2.375), the quadratic predicts (\u22120.140625, \u22120.03515625, \u22120.015625, \u22120.140625) and the linear interpolant predicts (\u22120.15625, \u22120.078125, \u22120.15625, \u22120.21875). Their respective maxima select quadratic at 2.125 and linear at 1.8125. Run these two candidates in one held-out grid and close after comparing their measured scores. That comparison will rank the two selected coordinates on this catalog, with one observation per method and no estimate of variability or general method superiority.",
+      "result": "REJECTED",
+      "round": 0,
+      "source_citations": [
+        {
+          "artifact_ref": "gxa_01m84gjeqnhse000pq",
+          "disposition": "accepted",
+          "evidence_refs": [
+            "gxa_01m84gjgdsz3zn6q53",
+            "gxa_01m84gjg5h2701jnn6",
+            "gxa_01m84gjgcc70krm764",
+            "gxa_01m84gjg762nmp3n4t",
+            "gxa_01m84gjgda60hagv89"
+          ],
+          "outside_source_evidence_scope": [],
+          "reason": "Revision 7 specifies the feasible coordinates for the follow-up. Comparison with both original grids confirms that all four catalog coordinates are fresh and lie between the high-grid endpoints. Restricting each interpolant to those coordinates selects 2.125 and 1.8125, respectively. Their scores still require measurement.",
+          "source_id": "gxs_01m84gjek603v7nyg1"
+        },
+        {
+          "artifact_ref": "gxa_01m84gjfefz4473z05",
+          "disposition": "rejected",
+          "evidence_refs": [
+            "gxa_01m84gjgdsz3zn6q53",
+            "gxa_01m84gjg5h2701jnn6",
+            "gxa_01m84gjgcc70krm764"
+          ],
+          "outside_source_evidence_scope": [],
+          "reason": "The archived score of 0 at x = 1 would qualify and would give crossings on both grids. The current observation low-c at that coordinate scored \u22121, and the low-grid evaluation counted zero crossings. The export is unsigned and lacks the calibration metadata needed to establish a common scale. The discrepancy remains unresolved. Use the measured \u22121 for this run.",
+          "source_id": "gxs_01m84gjf9phstyatbq"
+        }
+      ],
+      "submission_id": "gxsb_01m84gps25ks8d865n"
+    },
+    {
+      "actual_refusal": [],
+      "assignment": {
+        "allowed_source_evidence_refs": [
+          "gxa_01m84gjd1xyqk6pxwf",
+          "gxa_01m84gjd2b4gvsvjqt",
+          "gxa_01m84gjg5h2701jnn6",
+          "gxa_01m84gjg762nmp3n4t",
+          "gxa_01m84gjgcc70krm764",
+          "gxa_01m84gjgda60hagv89",
+          "gxa_01m84gjgdsz3zn6q53"
+        ],
+        "assessment_ref": "gxa_01m84gm071rgp19fnk"
+      },
+      "attempt": 3,
+      "grids_as_submitted": {
+        "high": {
+          "candidates": [
+            {
+              "candidate_id": "quadratic",
+              "x": 2.125
+            },
+            {
+              "candidate_id": "linear",
+              "x": 1.8125
+            }
+          ],
+          "method_id": "fixture-grid",
+          "method_version": "1",
+          "synthetic": true
+        }
+      },
+      "principal": "01a2090b-6590-7ac1-9ddd-5ac67311caf2",
+      "product_ref": "gxa_01m84gr6zp1fh40h0a",
+      "reason": "Continue high and prune low. On the original low grid, x = (0, 0.5, 1) scored (\u22124, \u22122.25, \u22121). On the original high grid, x = (1.5, 1.75, 2.5) scored (\u22120.25, \u22120.0625, \u22120.25). With the inclusive cutoff of \u22120.25, 0 of 3 low points and 3 of 3 high points qualified. This supports H_high and refutes H_low on the specified finite grids. The original observations and evaluations agree with the independent assessment (gxa_01m84gjg5h2701jnn6, gxa_01m84gjgcc70krm764, gxa_01m84gjg762nmp3n4t, gxa_01m84gjgda60hagv89, gxa_01m84gm071rgp19fnk).\n\nThe unique quadratic through the three high observations is q(x) = \u2212(x \u2212 2)\u00b2. The piecewise-linear interpolant has slope 0.75 up to x = 1.75 and \u22120.25 thereafter. At catalog coordinates (1.625, 1.8125, 2.125, 2.375), the respective predicted scores are (\u22120.140625, \u22120.03515625, \u22120.015625, \u22120.140625) for the quadratic and (\u22120.15625, \u22120.078125, \u22120.15625, \u22120.21875) for the piecewise-linear fit. Their maxima select x = 2.125 for 'quadratic' and x = 1.8125 for 'linear'. Measure both in one grid, compare their observed scores, then close. One held-out choice per method can establish which choice scored higher on this fixture. General method performance and scores at the other catalog coordinates remain unresolved.",
+      "result": "ACCEPTED",
+      "round": 0,
+      "source_citations": [
+        {
+          "artifact_ref": "gxa_01m84gjeqnhse000pq",
+          "disposition": "accepted",
+          "evidence_refs": [
+            "gxa_01m84gjgdsz3zn6q53",
+            "gxa_01m84gjg5h2701jnn6",
+            "gxa_01m84gjgcc70krm764",
+            "gxa_01m84gjg762nmp3n4t",
+            "gxa_01m84gjgda60hagv89"
+          ],
+          "outside_source_evidence_scope": [],
+          "reason": "Apply controller revision 7 to the follow-up only. All four permitted coordinates are untested and lie between the outer high-grid observations. Maximizing each interpolant over those four gives a quadratic prediction of \u22120.015625 at 2.125 and a piecewise-linear prediction of \u22120.078125 at 1.8125. Their actual scores require measurement. The initial low and high cutoff counts remain 0 and 3.",
+          "source_id": "gxs_01m84gjek603v7nyg1"
+        },
+        {
+          "artifact_ref": "gxa_01m84gjfefz4473z05",
+          "disposition": "rejected",
+          "evidence_refs": [
+            "gxa_01m84gjgdsz3zn6q53",
+            "gxa_01m84gjg5h2701jnn6",
+            "gxa_01m84gjgcc70krm764"
+          ],
+          "outside_source_evidence_scope": [],
+          "reason": "The archive reports 0 at x = 1. If comparable, that score would qualify the low grid as well as the high grid and refute both exclusive hypotheses. The original low-c observation at the same coordinate measured \u22121, and its evaluation found zero qualifying low points. The unsigned export lacks calibration metadata that could establish a common scale or explain the discrepancy. Use the current-run observation for this decision and retain the archived claim as unresolved contrary evidence.",
+          "source_id": "gxs_01m84gjf9phstyatbq"
+        }
+      ],
+      "submission_id": "gxsb_01m84gr707b3737ey5"
+    }
+  ],
+  "run": {
+    "run_id": "gxr_01m84gjcy0r9znwb45",
+    "status": "PAUSED",
+    "workflow_sha256": "3a5c74ae4d1e44d74f9ddc583179accf2cc5fd6a303dbece86403cb931eb1410"
+  }
+}

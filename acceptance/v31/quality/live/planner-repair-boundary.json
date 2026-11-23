@@ -1,0 +1,76 @@
+{
+  "captured": "2026-11-23T15:44:45.435707+00:00",
+  "revision": "0db83d7eca05c7503afd2ff7f894a5758b38590d",
+  "independent_review_sha256": "1f366c56b96db291e2cd5be41a5bea0811a5fc20a08bbcab4ffd4449225e3079",
+  "original_records": [
+    {
+      "submission_id": "gxsb_01m84gn7adwfrp1sc6",
+      "thread_id": "01a2090a-0274-7430-9dd2-4acf31d600b0",
+      "task_id": "gxt_01m84gm0dpsb9723wf",
+      "attempt": 1,
+      "turn_id": "01a2090a-02f4-7153-affd-90d7f85dceb7",
+      "call_id": "call_ffaf770bee5d43849b906df20d5729eb",
+      "product_ref": "gxa_01m84gn7a406cfac2c",
+      "terminal_reason": "GX_TERMINAL_REJECTED",
+      "interrupt_ack_at": "2026-11-23T15:33:40.380Z",
+      "validation_failure": {
+        "code": "SCHEMA_INVALID",
+        "index": -1,
+        "message": "cite the source, actual reviewed research artifacts, disposition and scientific reason",
+        "ok": false
+      },
+      "actual_next_grids": {
+        "high": [
+          {
+            "candidate_id": "quadratic",
+            "x": 2.125
+          },
+          {
+            "candidate_id": "linear",
+            "x": 1.8125
+          }
+        ]
+      },
+      "declared_next_grids_schema": {
+        "type": "object"
+      },
+      "contract_digest": "d64b4dbbc808319688a499a86d5a859c90250e2a66a753be6f16adf827b6f82e",
+      "recorded_repairs_for_thread": 0
+    },
+    {
+      "submission_id": "gxsb_01m84gps25ks8d865n",
+      "thread_id": "01a2090a-9e87-7b53-874b-b6f980ccb556",
+      "task_id": "gxt_01m84gm0dpsb9723wf",
+      "attempt": 2,
+      "turn_id": "01a2090a-9ead-79b3-88df-3a67b63f030a",
+      "call_id": "call_9ecaea7ecaec44848221af23f76957d3",
+      "product_ref": "gxa_01m84gps1n9wacmz57",
+      "terminal_reason": "GX_TERMINAL_REJECTED",
+      "interrupt_ack_at": "2026-11-23T15:34:31.311Z",
+      "validation_failure": {
+        "code": "SCHEMA_INVALID",
+        "index": -1,
+        "message": "expected fixture-grid@1 candidates",
+        "ok": false
+      },
+      "actual_next_grids": {
+        "high": [
+          {
+            "candidate_id": "quadratic",
+            "x": 2.125
+          },
+          {
+            "candidate_id": "linear",
+            "x": 1.8125
+          }
+        ]
+      },
+      "declared_next_grids_schema": {
+        "type": "object"
+      },
+      "contract_digest": "d64b4dbbc808319688a499a86d5a859c90250e2a66a753be6f16adf827b6f82e",
+      "recorded_repairs_for_thread": 0
+    }
+  ],
+  "interpretation": "The first denied payload cited an additional assessment artifact in research-only source evidence. The second fixed those references but still supplied an array in next_grids.high instead of the required fixture-grid object. The outer object passed the model-visible structural contract. The second submission was published as rejected and interrupted; the planner retried on a new Attempt. The observed shape error did not use same-Attempt repair."
+}

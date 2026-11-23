@@ -246,9 +246,13 @@ class GridBrief(unittest.TestCase):
         self.assertEqual(root._settings(row, new=True)["developerInstructions"],
                          roots.WORKER_INSTRUCTIONS + "\n" + row["brief"])
         self.assertFalse(grid_brief.includes_artifacts(row["brief"]))
-        # Older @3 attempts also keep their original frozen transport on restart.
-        self.conn.execute("UPDATE runs SET workflow_version='3' WHERE run_id=?", (run,))
-        cold = roots.Roots(self.conn, run_id=run, cwd=self.directory)
-        self.assertEqual(cold._claim(task)["brief"], row["brief"])
-        self.assertEqual(cold._settings(row, new=False)["developerInstructions"],
-                         root._settings(row, new=True)["developerInstructions"])
+        # A persisted @3 packet created before B3 keeps its B2 role routing,
+        # full developer brief and original delivery bytes on restart.
+        prior_task = self.task(inputs)
+        with patch.object(grid_brief, "applies", return_value=False):
+            prior, old = self.start(prior_task)
+        previous = prior._settings(old, new=True)["developerInstructions"]
+        self.assertTrue(previous.endswith("\n" + old["brief"]))
+        cold = roots.Roots(self.conn, run_id=self.run, cwd=self.directory)
+        self.assertEqual(cold._claim(prior_task)["brief"], old["brief"])
+        self.assertEqual(cold._settings(old, new=False)["developerInstructions"], previous)

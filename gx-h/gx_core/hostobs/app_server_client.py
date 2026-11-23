@@ -20,6 +20,12 @@ import time
 from typing import Any, Protocol
 
 
+# A GX handler returns this only after a terminal dynamic call is committed.
+# Codex then cancels its pending request as part of the exact Turn's interrupt.
+# A normal None is still a JSON null response.
+NO_TOOL_RESPONSE = object()
+
+
 class AppServerError(Exception):
     """Base protocol/transport error; never a business outcome or retry grant."""
 
@@ -534,8 +540,8 @@ class AppServerClient:
         self._write({"method": method, "params": {} if params is None else params}, self._deadline(timeout))
 
     def response_received(self, request_id: int) -> ReceivedMessage | None:
-        """Return arrival metadata for the most recent max_pending responses."""
-        return self._history.get(request_id)
+        """Return an outstanding reply's arrival metadata or a recently consumed reply."""
+        return self._responses.get(request_id) or self._history.get(request_id)
 
     @property
     def callbacks_paused(self) -> bool:
@@ -671,7 +677,8 @@ class AppServerClient:
             raise primary from exc
         finally:
             self._in_callback = False
-        if "id" in message:
+        if ("id" in message and
+                not (message["method"] == "item/tool/call" and result is NO_TOOL_RESPONSE)):
             response = {"id": message["id"], "result": result} if callback is not None else {
                 "id": message["id"], "error": {"code": -32601, "message": "No client handler for server request"}}
             try:

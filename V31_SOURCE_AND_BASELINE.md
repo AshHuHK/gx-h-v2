@@ -29,3 +29,9 @@
 v3 的 364 次响应中，260 次来自 reviewer，104 次来自 planner。同一响应可以含多个工具调用。v3 的 `gx_read_artifact` 回调有 700 次，`gx_task_context` 有 99 次。单凭这两个数字无法判定其中多少次读取冗余。公开历史汇总的 input tokens 使用 turn 粒度；统计时不将这些数字摊到各响应。[历史 v3 回执](acceptance/v3/performance/p1/summary.json) · [复算脚本](acceptance/v31/source_baseline.py)
 
 复算命令为 `python acceptance/v31/source_baseline.py --output /tmp/gx-v31-baseline.json`。原 v3 的提交回调 p95 仍为待签收项；本次开发的测试针对修订包指定的请求数、交付、科学质量及用量指标。[原性能记录](acceptance/v3/performance/COMPARISON.md)
+
+## 逐响应归因与中断实测
+
+对两组历史数据再读取各自 78 份原始官方 rollout，先核对已交付的文件散列，再按响应 ID 关联逐响应使用量与实际工具。v3 的 364 个响应中，157 个归为 READ、78 个 PRODUCE、129 个 POST_SUBMIT。后者对应 3,243,664 个 token。v2.1 的 369 个响应中相同三类为 156、78、134，另有 1 个信息不足；POST_SUBMIT 对应 3,319,370 个 token。分类表示相对提交的位置，不能证明换用另一条协议就会节约相同数目的 token。直接从原始逐响应记录得到的首请求平均输入分别为 v3 的 21,085.36 和 v2.1 的 20,899.31。该补充计算使用了公开 turn 汇总之外的证据。[原始记录核对及归因](acceptance/v31/attribution/historical-attribution.json)
+
+固定 ELF 对接本地 scripted Responses 服务，完成 204 个事务与线路探针。200 个普通用例按接受、终局拒绝各 100 个，另有 4 个故障及子代理情形。全部 204 个原 turn 都有官方取消证据，GX 正常工具回复为 0，提交后的模型请求为 0，估算结算为 0。运行中的子代理使预留保持 HELD，父用量 70，加上子代理确认的 183，最后一次结清 253。对已丢失中断命令的情形，原 turn 的权威记录仍在执行，随后对同一 turn 补发一次中断；仅丢回执的情形查询到已中断，未再发起中断。测试里的模型和 token 用量由环回服务提供，宿主和协议使用真实 Codex。整条测试运行在 7,358 个测试 token 上。[逐轮线路、账本和子代理证据](acceptance/v31/terminal-protocol.json) · [探针源代码](acceptance/v31/terminal_protocol_probe.py)

@@ -123,6 +123,30 @@ class AppServerClientTests(unittest.TestCase):
         self.addCleanup(client.close)
         return client
 
+    def test_terminal_dynamic_call_suppresses_only_its_wire_reply(self):
+        client, transport = self.client([
+            {"id": 1, "method": "item/tool/call"},
+            {"id": 2, "method": "item/tool/call"},
+            {"id": 3, "method": "item/tool/call"},
+        ], on_server_request=lambda received: {
+            1: app.NO_TOOL_RESPONSE,
+            2: {"success": False, "contentItems": []},
+            3: None,
+        }[received.message["id"]])
+        client.run_until(lambda frame: frame.message["id"] == 3)
+        self.assertEqual(transport.writes, [
+            {"id": 2, "result": {"success": False, "contentItems": []}},
+            {"id": 3, "result": None},
+        ])
+
+    def test_no_tool_response_cannot_suppress_other_request_methods(self):
+        client, transport = self.client([{"id": 1, "method": "different/method"}],
+                                        on_server_request=lambda _: app.NO_TOOL_RESPONSE)
+        with self.assertRaises(app.AppServerCallbackError) as caught:
+            client.run_until(lambda _: True)
+        self.assertEqual(caught.exception.stage, "result_encoding")
+        self.assertEqual(transport.writes, [])
+
     def test_explicit_start_and_context_have_no_implicit_protocol_or_process(self):
         transport = MemoryTransport()
         with mock.patch.object(app.subprocess, "Popen", side_effect=AssertionError("no implicit process")):

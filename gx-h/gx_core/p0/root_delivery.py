@@ -834,6 +834,11 @@ class RootDelivery:
                     row = self.conn.execute("SELECT * FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
                                             (child_id, turn["id"])).fetchone()
                     proof = self._recorded(child_id, turn["id"], meter["root_id"], owner, row["prior_tokens"])
+                    # Codex 0.169.0 can project a waking turn as interrupted before
+                    # its live status arrives. That projection has no completion time.
+                    if (turn["status"] == "interrupted" and turn.get("completedAt") is None
+                            and not row["terminal"] and proof is None):
+                        continue
                     measured, cumulative = proof or (None, None)
                     total = cumulative if cumulative is not None else row["total_tokens"]
                     metering.observe(self.conn,self.run_id,meter["root_id"],child_id,turn["id"],total,

@@ -41,6 +41,7 @@ class _LiveReceipts:
     unpaired_snapshot: bool = False
     latest_total: int | None = None
     repeated_total: bool = False
+    cancelled_submit_after: int | None = None
 
     def snapshot(self, total):
         # The pinned host can emit an unchanged count after receiving rate limits
@@ -536,6 +537,16 @@ class RootDelivery:
 
     def _terminal(self, thread_id, turn, *, measured=None, children_known=0):
         meter_limits.ended(self.conn,thread_id,turn["id"],turn["status"])
+        # A lost terminal notification can be recovered on the original connection.
+        # Pair the native cancellation of the pending submit with the last raw
+        # completion and its cumulative snapshot. Earlier/intermediate counts alone
+        # cannot attest an interrupted turn. Keep live coverage until the pair arrives.
+        live = self._live.get((thread_id, turn["id"]))
+        if (measured is None and turn["status"] == "interrupted" and live and live.responses
+                and live.cancelled_submit_after == live.responses_at_snapshot == len(live.responses)
+                and not live.unpaired_snapshot and all(v is not None for v in live.responses.values())):
+            measured, known = self._live_end(thread_id, turn)
+            children_known = max(children_known, known)
         if measured is None:
             held = self.conn.execute(
                 "SELECT prior_tokens FROM p0_root_deliveries JOIN budget_reservations USING(reservation_ref) "
@@ -625,7 +636,13 @@ class RootDelivery:
             return
         with store.transaction(self.conn):
             if method in ("item/started", "item/completed"):
-                self._arrived(thread_id, turn_id, params.get("item") or {})
+                item = params.get("item") or {}
+                if (method == "item/completed" and item.get("type") == "dynamicToolCall"
+                        and item.get("tool") == "gx_submit_product" and item.get("status") == "failed"
+                        and item.get("success") is False and item.get("contentItems") == []
+                        and (live := self._live.get((thread_id, turn_id)))):
+                    live.cancelled_submit_after = len(live.responses)
+                self._arrived(thread_id, turn_id, item)
             elif method == "thread/tokenUsage/updated":
                 total = (params.get("tokenUsage") or {}).get("total", {}).get("totalTokens")
                 earlier = self.conn.execute("SELECT total_tokens,terminal_status FROM p0_root_turn_usage "
@@ -639,7 +656,10 @@ class RootDelivery:
                     self.conn.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,total_tokens) VALUES(?,?,?) "
                                       "ON CONFLICT(thread_id,turn_id) DO UPDATE SET total_tokens="
                                       "max(coalesce(total_tokens,0),excluded.total_tokens)", (thread_id, turn_id, total))
-                    self._settle(thread_id, turn_id)
+                    if earlier and earlier["terminal_status"] == "interrupted" and live and live.cancelled_submit_after is not None:
+                        self._terminal(thread_id, {"id": turn_id, "status": "interrupted"})
+                    else:
+                        self._settle(thread_id, turn_id)
                     if (earlier and earlier["terminal_status"]=="completed" and earlier["total_tokens"] is not None
                             and total>earlier["total_tokens"]):
                         metering.settle_cumulative(self.conn,thread_id,turn_id)

@@ -1,0 +1,47 @@
+{
+  "workflow_id": "science_grid",
+  "version": "3",
+  "description": "Compare frozen grid measurements and commission independent interpretation where the evidence requires it.",
+  "entry_transitions": [
+    "AUDITING",
+    "PLANNING",
+    "ACTIVE"
+  ],
+  "nodes": [
+    {
+      "name": "proposal",
+      "work": "mechanical",
+      "deps": []
+    },
+    {
+      "name": "experiment",
+      "work": "stage",
+      "deps": [
+        "proposal"
+      ]
+    },
+    {
+      "name": "assessment",
+      "work": "stage",
+      "artifact_task_kind": "research_round",
+      "deps": [
+        "experiment"
+      ]
+    },
+    {
+      "name": "decision",
+      "work": "stage",
+      "artifact_task_kind": "research_round",
+      "deps": [
+        "assessment"
+      ]
+    },
+    {
+      "name": "report",
+      "work": "mechanical",
+      "deps": [
+        "decision"
+      ]
+    }
+  ]
+}

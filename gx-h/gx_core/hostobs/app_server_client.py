@@ -406,6 +406,7 @@ class AppServerClient:
         self._pending: set[int] = set()
         self._responses: dict[int, ReceivedMessage] = {}
         self._history: dict[int, ReceivedMessage] = {}
+        self._retired: dict[int, None] = {}
         self._events: deque[ReceivedMessage] = deque()
         self._callbacks_paused = False
         self._deferred_events: deque[tuple[ReceivedMessage, int]] = deque()
@@ -543,6 +544,24 @@ class AppServerClient:
         """Return an outstanding reply's arrival metadata or a recently consumed reply."""
         return self._responses.get(request_id) or self._history.get(request_id)
 
+    def retire(self, request_id: int) -> bool:
+        """Release a request after its owner has independently reconciled its effects.
+
+        No frame is sent. An outstanding reply already read is consumed immediately.
+        For a missing reply, retain its exact ID to absorb one eventual response.
+        At most max_events missing replies are remembered. A still later unmatched
+        frame closes the connection under the usual unsolicited-response rule.
+        """
+        self._ready()
+        if type(request_id) is not int or request_id not in self._pending:
+            return False
+        self._pending.remove(request_id)
+        if self._responses.pop(request_id, None) is None:
+            self._retired[request_id] = None
+            if len(self._retired) > self.max_events:
+                del self._retired[next(iter(self._retired))]
+        return True
+
     @property
     def callbacks_paused(self) -> bool:
         return self._callbacks_paused
@@ -627,11 +646,14 @@ class AppServerClient:
         if "method" not in message:
             request_id = message["id"]
             # str and int ids are distinct; bool was rejected by _envelope.
-            if type(request_id) is not int or request_id not in self._pending or request_id in self._responses:
+            if type(request_id) is int and request_id in self._retired:
+                del self._retired[request_id]
+            elif type(request_id) is int and request_id in self._pending and request_id not in self._responses:
+                self._responses[request_id] = received
+            else:
                 primary = AppServerProtocolError("unsolicited or duplicate App Server response")
                 self._close_preserving(primary)
                 raise primary
-            self._responses[request_id] = received
             self._history[request_id] = received
             if len(self._history) > self.max_pending:
                 del self._history[next(iter(self._history))]

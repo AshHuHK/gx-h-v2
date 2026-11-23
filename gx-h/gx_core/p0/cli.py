@@ -119,6 +119,9 @@ def start(conn, directory, spec, *, run_key=None, run_id=None):
             raise ValueError("This state already belongs to a different project specification")
         run_key = current["run_key"]
     workflow, version = packages.research_ref(spec, current)
+    if (workflow, version) == ("science_grid", "3"):
+        from .terminal_products import repair_limit
+        repair_limit(spec)
     flow = service.default_registry(conn, workflow_id=workflow, version=version).get(workflow, version)
     service.seams.workflow_admission(conn, workflow_id=workflow, version=version,
                                     sha256=flow.digest(), sources_complete=flow.sources_complete())

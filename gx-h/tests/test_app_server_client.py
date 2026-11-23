@@ -147,6 +147,45 @@ class AppServerClientTests(unittest.TestCase):
         self.assertEqual(caught.exception.stage, "result_encoding")
         self.assertEqual(transport.writes, [])
 
+    def test_unconsumed_interrupt_reply_outlives_recent_response_history(self):
+        client, _ = self.client([{"id": i, "result": {}} for i in range(1, 5)], max_pending=2)
+        original = client.send("turn/interrupt", {"threadId": "same", "turnId": "same-turn"})
+        for _ in range(3):
+            self.assertEqual(client.request("thread/read", {"threadId": "another"}), {})
+        self.assertEqual(client.response_received(original).receive_seq, 1)
+        self.assertEqual(client.wait(original), {})
+        self.assertIsNone(client.response_received(original))
+
+    def test_retired_interrupt_frees_capacity_and_absorbs_one_late_reply(self):
+        client, _ = self.client([{"id": 4, "result": {}}, {"id": 5, "result": {"checked": True}},
+                                 {"id": 4, "result": {}}], max_pending=2)
+        for _ in range(4):
+            request = client.send("turn/interrupt", {"threadId": "root", "turnId": "original"})
+            self.assertTrue(client.retire(request))
+            self.assertFalse(client.retire(request))
+        self.assertFalse(client.retire(5))
+        self.assertEqual(client.pending_ids, ())
+        self.assertEqual(client.request("thread/read", {"threadId": "root"}), {"checked": True})
+        self.assertEqual(client.response_received(4).receive_seq, 1)
+        with self.assertRaises(app.AppServerProtocolError):
+            client.run_until(lambda _: True)
+
+    def test_retiring_received_reply_never_excuses_a_duplicate(self):
+        client, _ = self.client([{"id": 1, "result": {}}, {"id": 2, "result": {}},
+                                 {"id": 1, "result": {}}])
+        original = client.send("turn/interrupt")
+        self.assertEqual(client.request("thread/read"), {})
+        self.assertTrue(client.retire(original))
+        with self.assertRaises(app.AppServerProtocolError):
+            client.run_until(lambda _: True)
+
+    def test_retirement_keeps_only_a_bounded_set_of_exact_late_ids(self):
+        client, _ = self.client([{"id": 1, "result": {}}], max_events=2)
+        for _ in range(3):
+            self.assertTrue(client.retire(client.send("turn/interrupt")))
+        with self.assertRaises(app.AppServerProtocolError):
+            client.run_until(lambda _: True)
+
     def test_explicit_start_and_context_have_no_implicit_protocol_or_process(self):
         transport = MemoryTransport()
         with mock.patch.object(app.subprocess, "Popen", side_effect=AssertionError("no implicit process")):

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import tempfile
 import time
@@ -13,7 +14,7 @@ from ..artifacts.service import ArtifactService
 from ..domain import clock, ids, machines
 from ..errors import GxError, HoldActive, IllegalTransition, OutcomeUnknown, ScopeDenied, SchemaInvalid
 from ..hostobs import host_policy
-from ..hostobs.app_server_client import AppServerClient, AppServerResponseError
+from ..hostobs.app_server_client import AppServerClient, AppServerResponseError, NO_TOOL_RESPONSE
 from ..orchestration.dispatch_preparation import DispatchPreparation
 from ..persistence import records, store
 from ..scheduling import dispatch as scheduler, snapshot
@@ -22,7 +23,7 @@ from ..teams.service import TeamService, default_lease_seconds
 from . import compute
 from . import profiles
 from ..orchestration.service import hooks_for_run
-from . import activity, waits
+from . import activity, terminal_products, waits
 
 
 def _tool(name, description, key, schema):
@@ -117,6 +118,8 @@ class Roots:
         self._ordinary_forks = set()
         self._goal_queue = set()
         self.delivery = RootDelivery(self)
+        self.terminal_products = terminal_products.TerminalProducts(self) if terminal_products.enabled(self.run) else None
+        self._product_tool_config = terminal_products.direct_tool_config({}) if self.terminal_products else {}
         self.heartbeats = activity.Heartbeats(self)
         self.account_provider = "openai"
 
@@ -160,6 +163,8 @@ class Roots:
             # Raw effective configuration can contain credentials and never enters GX or a prompt.
             effective = self._request("config/read",{"cwd":str(self.cwd),"includeLayers":False})["config"]
             self.disabled_mcp = {name:{"enabled":False} for name in effective.get("mcp_servers",{})}
+            if self.terminal_products:
+                self._product_tool_config = terminal_products.direct_tool_config(effective)
             endpoints = selection.get("test_endpoints", {provider: selection.get("test_base_url")})
             for name in sorted(providers):
                 url = profiles.provider_endpoint(name, effective, test_mode=selection.get("test_mode"), environ=env)
@@ -179,9 +184,11 @@ class Roots:
         if self.client:
             self.client.close()
 
-    def _request(self, method, params):
+    def _request(self, method, params, *, timeout=None):
         if self.conn.in_transaction:
             raise RuntimeError("commit GX before an external RPC")
+        if timeout is not None:
+            return self.client.request(method, params, timeout=timeout)
         return self.client.request(method, params)
 
     def _binding(self, thread_id):
@@ -231,6 +238,8 @@ class Roots:
 
     def _ended_turn(self, thread_id, turn):
         row = self._binding(thread_id)
+        if self.terminal_products and self.terminal_products.is_terminal(thread_id, turn["id"]):
+            return
         if activity.terminal_backoff(self.conn, row, turn):
             return
         if not row["task_id"] or row["wait_job_id"]:
@@ -260,6 +269,8 @@ class Roots:
                     task_id=row["task_id"], lease_ref=row["lease_id"], reason=reason)
 
     def poll(self, seconds=0.1):
+        if self.terminal_products:
+            self.terminal_products.flush()
         self.delivery.maintain()
         self.delivery.flush_interrupts()
         self.heartbeats.poll()
@@ -268,6 +279,8 @@ class Roots:
         self._flush_goals()
         seconds = max(seconds,0.001)
         event = self.client.run_until(lambda _: True, timeout=max(1, seconds+1), poll_interval=seconds)
+        if self.terminal_products:
+            self.terminal_products.flush()
         self._verify_child_reads()
         self._flush_goals()
         return bool(event)
@@ -457,20 +470,47 @@ class Roots:
         names = json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None else None
         return profiles.selected_tools(available, names)
 
+    def _product_tools(self, row, tools):
+        task = self.conn.execute("SELECT input_json FROM tasks WHERE task_id=? AND run_id=?",
+                                 (row["task_id"], self.run_id)).fetchone()
+        contract = store.loads(task, "input_json", {}).get("product_contract")
+        if not contract:
+            return tools
+        paging = ""
+        if "schema_ref" in contract:
+            self._artifact_access(row, contract["schema_ref"])
+            schema = ArtifactService(self.conn).read_json(contract["schema_ref"])
+            paging = (" Read the full product_contract.schema_ref from the task brief with gx_read_artifact,"
+                      " starting at offset=0 and continuing at metadata.next_offset.")
+        else:
+            schema = contract["schema"]
+        return [_tool(tool["name"], tool["description"] + paging, "product", schema)
+                if tool["name"] == "gx_submit_product" else tool for tool in tools]
+
     def _settings(self, row, *, new):
         main = row["task_id"] is None
+        tools = self._tools_for(row) if new or self.terminal_products else []
+        direct_product = self.terminal_products and not main and any(tool["name"] == "gx_submit_product" for tool in tools)
         config = {"features.goals": not main, "features.shell_tool": False, "features.unified_exec": False,
                   "features.multi_agent":True,"features.apps":False,"features.plugins":False,"features.hooks":False,
                   "mcp_servers":self.disabled_mcp,"web_search":"disabled","model_reasoning_effort":row["effort"]}
         if not main:
             config.update({"features.multi_agent_v2.enabled": True, "features.multi_agent_v2_dynamic_tools": True})
+        if direct_product:
+            config.update(self._product_tool_config)
         params = {"modelProvider":row["provider"] or host_policy.p0_provider_for_run(self.run),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
                   "config":config, "developerInstructions":row["brief"] if main else
                   WORKER_INSTRUCTIONS+"\n"+row["brief"]}
         if new:
             params["experimentalRawEvents"] = True
             params["environments"] = []
-            params["dynamicTools"] = self._tools_for(row)
+            params["dynamicTools"] = tools
+            if direct_product:
+                tools = self._product_tools(row, params["dynamicTools"])
+                params["dynamicTools"] = [
+                    {"type": "namespace", "name": terminal_products.NAMESPACE,
+                     "description": "Submit the final scientific product directly to GX.", "tools": [tool]}
+                    if tool["name"] == "gx_submit_product" else tool for tool in tools]
         return params
 
     @staticmethod
@@ -728,6 +768,8 @@ class Roots:
         row = self._binding(thread_id)
         if not row or row["task_id"] is None:
             return
+        if self.terminal_products and row["goal_desired"] == "complete":
+            return
         latest = self.conn.execute("SELECT d.turn_id,u.terminal_status FROM p0_root_deliveries d "
                                    "LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) WHERE d.thread_id=? "
                                    "AND d.method='turn/start' AND d.state='acknowledged' ORDER BY d.rowid DESC LIMIT 1",
@@ -744,6 +786,8 @@ class Roots:
             self.client.run_until(matches,timeout=4,poll_interval=2)
         row = self._binding(thread_id)
         desired = "paused" if row["wait_job_id"] else row["goal_desired"]
+        if self.terminal_products and desired == "complete":
+            return
         if desired not in ("complete","paused"):
             if not latest or self.active_turns.get(thread_id) != latest["turn_id"]:
                 # A later turn/started (or cold resume's observed in-progress turn) completes
@@ -767,6 +811,8 @@ class Roots:
             row = self._binding(thread_id)
             if not row or not row["goal_desired"]:
                 continue
+            if self.terminal_products and row["goal_desired"] == "complete":
+                continue  # The committed submission owns Goal completion and the exact Turn interrupt.
             if row["goal_desired"] == "active":
                 hold = self.conn.execute("SELECT token_budget FROM p0_root_deliveries WHERE thread_id=? "
                                          "AND method='turn/start' ORDER BY rowid DESC LIMIT 1",(thread_id,)).fetchone()
@@ -781,30 +827,60 @@ class Roots:
     def _callback(self, received):
         started = time.monotonic_ns()
         p = received.message.get("params") or {}
-        disposition = "ERROR"
+        status = "ERROR"
+        suppress = False
         try:
             if received.message["method"] != "item/tool/call":
                 # An unexpected approval, credential or user input request never grants authority.
                 raise ScopeDenied("P0 handles only official dynamic tool calls")
-            out = self._call(p)
-            disposition = "SUCCESS"
+            try:
+                out = self._call(p)
+            except SchemaInvalid as exc:
+                if p.get("tool") == "gx_submit_product" and not self.terminal_products:
+                    status = "SCHEMA_INVALID"
+                if (not self.terminal_products or p.get("tool") != "gx_submit_product"
+                        or exc.details.get("category") != "product_structure" or not exc.details.get("contract_digest")):
+                    raise
+                out = self.terminal_products.failed_call(p, exc)
+            status = "SUCCESS"
             if p.get("tool") == "gx_submit_product" and isinstance(out, dict):
-                disposition = {"ACCEPTED":"ACCEPTED", "REJECTED":"TERMINAL_REJECTED"}.get(out.get("task_status"), disposition)
+                if out.get("category") == "product_structure":
+                    status = "SCHEMA_INVALID_LIMIT" if out["terminal"] else "SCHEMA_INVALID"
+                    suppress = out["terminal"] or self.terminal_products.is_terminal(p["threadId"], p["turnId"])
+                    if suppress:
+                        return NO_TOOL_RESPONSE
+                    return {"success": False, "contentItems": [{"type": "inputText", "text": ids.canonical_json(out)}]}
+                if out.get("task_status") in ("ACCEPTED", "REJECTED"):
+                    status = "ACCEPTED" if out["task_status"] == "ACCEPTED" else "TERMINAL_REJECTED"
+                    if self.terminal_products:
+                        suppress = True
+                        return NO_TOOL_RESPONSE
             return {"success":True,"contentItems":[{"type":"inputText","text":ids.canonical_json(out)}]}
         except (GxError, KeyError, ValueError, TypeError) as exc:
-            if isinstance(exc, SchemaInvalid) and p.get("tool") == "gx_submit_product":
-                disposition = "SCHEMA_INVALID"
+            if (self.terminal_products and received.message["method"] == "item/tool/call"
+                    and isinstance(p.get("threadId"), str) and isinstance(p.get("turnId"), str)
+                    and self.terminal_products.is_terminal(p["threadId"], p["turnId"])):
+                # A second call from the same response may arrive while Codex closes the
+                # first. Its live authorization was refused. Leave both requests to abort.
+                suppress = True
+                return NO_TOOL_RESPONSE
             return {"success":False,"contentItems":[{"type":"inputText","text":json.dumps({"error":str(exc)})}]}
 
         finally:
-            if received.message["method"] == "item/tool/call":
-                self.delivery.attribution.outcome(p, disposition)
-            metrics.record("p0_callback", started=started, run_id=self.run_id,
-                           thread_id=p.get("threadId"), turn_id=p.get("turnId"), tool=p.get("tool"))
+            try:
+                self.delivery.attribution.outcome(p, status)
+                metrics.record("p0_callback", started=started, run_id=self.run_id,
+                               thread_id=p.get("threadId"), turn_id=p.get("turnId"), tool=p.get("tool"))
+            except Exception:
+                if not suppress:
+                    raise
+                # An observer must not turn committed science into a JSON-RPC handler error.
+                logging.getLogger(__name__).warning("GX terminal callback diagnostics unavailable")
 
     def _call(self,p):
         tid,turn,call_id,tool,args = (p[k] for k in ("threadId","turnId","callId","tool","arguments"))
-        if (p.get("namespace") or not all(isinstance(v,str) and v for v in (tid,turn,call_id,tool))
+        namespace = terminal_products.NAMESPACE if self.terminal_products and tool == "gx_submit_product" else None
+        if ((p.get("namespace") or None) != namespace or not all(isinstance(v,str) and v for v in (tid,turn,call_id,tool))
                 or not isinstance(args,dict)):
             raise ScopeDenied("GX tools require an official dynamic tool request")
         envelope = {"thread_id":tid,"turn_id":turn,"call_id":call_id}
@@ -844,14 +920,21 @@ class Roots:
                 if tool not in {spec["name"] for spec in self._tools_for(parent)}:
                     raise ScopeDenied("the parent root does not expose this tool")
                 return self._read_artifact(parent, args)
+            if self.terminal_products:
+                failure = self.terminal_products.replayed_failure(tid, turn, call_id, digest)
+                if failure is not None:
+                    return failure
             if self.active_turns.get(tid) != turn:
-                raise ScopeDenied("GX tools require a current official root turn")
+                if not (self.terminal_products and tool == "gx_submit_product"
+                        and self.terminal_products.is_terminal(tid, turn, call_id)):
+                    raise ScopeDenied("GX tools require a current official root turn")
             receipt = self.conn.execute("SELECT * FROM p0_root_calls WHERE thread_id=? AND call_id=?",
                                         (tid,call_id)).fetchone()
             if receipt:
                 if receipt["turn_id"]!=turn or receipt["request_sha"]!=digest:
                     raise ScopeDenied("conflicting root callback identifier")
-                requires_live_task = tool in self._plugin_tools or tool in ("gx_read_artifact", "gx_task_context")
+                requires_live_task = (tool in self._plugin_tools or tool in ("gx_read_artifact", "gx_task_context")
+                                      or self.terminal_products and tool != "gx_submit_product")
                 if row["task_id"] is None or not requires_live_task:
                     return json.loads(receipt["result_json"])
             main = row["task_id"] is None
@@ -883,6 +966,12 @@ class Roots:
                     answer = self._park_job(row, args["job_id"], turn_id=turn)
                 elif tool == "gx_submit_product" and set(args) == {"product"} and isinstance(args["product"],dict):
                     answer = self._submit(row,args["product"],envelope)
+                elif tool == "gx_submit_product" and self.terminal_products:
+                    task = self.conn.execute("SELECT input_json FROM tasks WHERE task_id=?", (row["task_id"],)).fetchone()
+                    contract = store.loads(task, "input_json").get("product_contract") or {}
+                    raise SchemaInvalid("submit exactly one product object", details={"category": "product_structure",
+                        "contract_digest": contract.get("digest") or ids.sha256_of_obj(next(
+                            spec["inputSchema"] for spec in tools if spec["name"] == tool)), "pointer": "/product"})
                 elif tool in self._plugin_tools:
                     answer = self.worker_call.invoke(self, row, tool, args, envelope)
                 elif self.worker_call and tool not in {spec["name"] for spec in WORKER_TOOLS}:
@@ -904,7 +993,7 @@ class Roots:
         return answer
 
     def _artifact_access(self, binding, ref):
-        allowed = self.conn.execute("SELECT media_type,rel_path FROM p0_root_artifact_reads JOIN artifacts USING(artifact_ref) "
+        allowed = self.conn.execute("SELECT media_type,rel_path,kind FROM p0_root_artifact_reads JOIN artifacts USING(artifact_ref) "
                                     "WHERE root_key=? AND artifact_ref=? AND (run_id=? OR run_id IS NULL)",
                                     (binding["root_key"], ref, self.run_id)).fetchone()
         if not allowed:
@@ -923,6 +1012,9 @@ class Roots:
             not media and Path(allowed["rel_path"]).suffix.lower() == ".json")
         if is_json and offset is None:
             return assets.read_json(ref)
+        if self.terminal_products and offset is not None and allowed["kind"] == "grid_product_schema":
+            # Codex truncates large dynamic tool outputs a second time after GX returns them.
+            return assets.get(ref, offset=offset, max_bytes=4096, max_encoded_bytes=4096)
         return assets.get(ref, offset=offset)
 
     def _submit(self, binding, product, envelope):
@@ -930,8 +1022,12 @@ class Roots:
             run_id=self.run_id, task_id=binding["task_id"], lease_ref=binding["lease_id"],
             brief_sha256=ids.sha256_of_obj(binding["brief"]), product=product, callback=envelope)
         thread_id = binding["thread_id"]
-        self.conn.execute("UPDATE p0_roots SET goal_desired='complete' WHERE thread_id=?", (thread_id,))
-        store.on_transaction_end(self.conn, on_commit=lambda: self._goal_queue.add(thread_id))
+        if self.terminal_products:
+            reason = {"ACCEPTED": "GX_ACCEPTED", "REJECTED": "GX_TERMINAL_REJECTED"}[answer["task_status"]]
+            self.terminal_products.record(thread_id, envelope["turn_id"], envelope["call_id"], reason)
+        else:
+            self.conn.execute("UPDATE p0_roots SET goal_desired='complete' WHERE thread_id=?", (thread_id,))
+            store.on_transaction_end(self.conn, on_commit=lambda: self._goal_queue.add(thread_id))
         return answer
 
     def _grant_job_outputs(self, root_key, job):

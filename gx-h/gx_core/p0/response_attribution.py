@@ -158,6 +158,9 @@ class Attribution:
 
 def _tool_class(tool):
     name, namespace = tool['tool'], tool.get('namespace')
+    # science_grid@3 exposes its terminal submission directly to the model.
+    if (namespace, name) == ('gx', 'gx_submit_product'):
+        return 'PRODUCE'
     if namespace in (None, 'functions'):
         if name in READ:
             return 'READ'

@@ -1839,12 +1839,31 @@ class TeamService:
             kind = store.loads(task, "input_json", {}).get("output_kind")
             if not kind or store.loads(task, "acceptance_json", {}).get("validate_workflow_product") is not True:
                 raise SchemaInvalid("this task has no pinned workflow product validator")
-            ref = self.artifacts.put(
+            workflow = None
+            refusal = None
+            if (run["workflow_id"], run["workflow_version"]) == ("science_grid", "3"):
+                workflow = self._product_workflow(conn, run)
+                assigned = task_mapping(conn, task)
+                try:
+                    # The versioned workflow validates model fields before any Artifact
+                    # exists, then binds its frozen evidence and evaluator-owned values.
+                    product = workflow.prepare_native_product(conn, assigned, product)
+                except SchemaInvalid as exc:
+                    if exc.details.get("category") != "product_semantic":
+                        raise
+                    # Preserve the structurally valid authored body and the reason the
+                    # workflow could not derive a scientifically admissible product.
+                    refusal = self._product_refusal(task, exc)
+            published = self.artifacts.put(
                 run_id=run_id, task_id=task_id, kind=kind, media_type="application/json",
                 content=ids.canonical_json(product), origin="HOST_PUT", put_by=callback["thread_id"],
-            ).artifact_ref
+            )
+            if workflow is not None:
+                self.artifacts.discard_on_rollback(published)
+            ref = published.artifact_ref
             bundle_ref = self._bundle_ref(task, [self.artifacts.describe(ref)])
-            verdict = self._judge(conn, task, lease_ref, bundle_ref, artifact_refs=[ref])
+            verdict = refusal or self._apply_judgment(conn, task, self._prepare_judgment(
+                conn, task, lease_ref, bundle_ref, artifact_refs=[ref], workflow=workflow))
             states = ["SUBMITTED", "VALIDATING"]
             if task["status"] == "CLAIMED":
                 states.insert(0, "RUNNING")
@@ -1858,7 +1877,8 @@ class TeamService:
                 "content_sha256": ids.sha256_of_obj(product), "worker_observation_id": None,
                 "policy_verdict": None, "bundle_kind": task["bundle_kind"], "artifact_refs": [ref],
             }
-            result = self._conclude(conn, task, lease_ref, submission, verdict, {})
+            result = self._conclude(conn, task, lease_ref, submission, verdict, {},
+                                    discard_on_rollback=workflow is not None)
             return {**result, "artifact_ref": ref}
 
     def submit(self, *, task_id: str, lease_ref: str, artifact_refs: Sequence[str],
@@ -2156,7 +2176,13 @@ class TeamService:
         prepared = self._prepare_judgment(conn, row, lease_ref, bundle_ref, artifact_refs=artifact_refs)
         return self._apply_judgment(conn, row, prepared)
 
-    def _prepare_judgment(self, conn, row, lease_ref, bundle_ref, *, artifact_refs):
+    @staticmethod
+    def _product_refusal(row, error):
+        return BundleVerdict(row["bundle_kind"] or "", [RecordVerdict(
+            index=-1, ok=False, code=error.code, message=error.message)],
+            accepted=False, summary="workflow product refused")
+
+    def _prepare_judgment(self, conn, row, lease_ref, bundle_ref, *, artifact_refs, workflow=None):
         """Read the pinned originals and run any read-only workflow product validator."""
         bundle = self.artifacts.read_json(bundle_ref) if bundle_ref is not None else None
         task = task_mapping(conn, self._task_row(conn, row["task_id"]))
@@ -2167,12 +2193,12 @@ class TeamService:
             task["lease_id"] = lease_ref
         check_product = task["acceptance"].get("validate_workflow_product") is True
         if check_product:
-            workflow = self._product_workflow(conn, self._run_row(conn, row["run_id"]))
+            if workflow is None:
+                workflow = self._product_workflow(conn, self._run_row(conn, row["run_id"]))
             try:
                 workflow.task_product_validator(conn, task, bundle)
             except SchemaInvalid as error:
-                return task, bundle, BundleVerdict(row["bundle_kind"] or "", [RecordVerdict(index=-1, ok=False,
-                    code=error.code, message=error.message)], accepted=False, summary="workflow product refused")
+                return task, bundle, self._product_refusal(row, error)
         if bundle_ref is None:
             summary = ("the workflow accepted the required artifacts" if check_product else
                        "every required artifact was handed in and re-hashed")
@@ -2196,24 +2222,28 @@ class TeamService:
         return verdict
 
     def _publish_verdict(self, conn: sqlite3.Connection, row: sqlite3.Row, submission_id: str,
-                         verdict: BundleVerdict) -> str:
+                         verdict: BundleVerdict, *, discard_on_rollback=False) -> str:
         body = json.dumps(framework.full_view(verdict), ensure_ascii=False, sort_keys=True).encode("utf-8")
-        published = ArtifactService(conn).publish_bytes(
+        assets = ArtifactService(conn)
+        published = assets.publish_bytes(
             namespace=f"{row['run_id']}/verdicts", rel_path=f"{row['task_id']}/{submission_id}.json",
             kind=VERDICT_KIND, data=body, run_id=row["run_id"], task_id=row["task_id"],
             media_type="application/json",
             provenance={"submission_id": submission_id, "bundle_kind": verdict.bundle_kind},
             actor=self._writer, origin="BACKEND",
         )
+        if discard_on_rollback:
+            assets.discard_on_rollback(published)
         return published.artifact_ref
 
     def _conclude(self, conn: sqlite3.Connection, row: sqlite3.Row, lease_ref: str | None,
                   base: Mapping[str, Any], verdict: BundleVerdict, policy: Mapping[str, Any],
-                  *, existing: bool = False) -> dict[str, Any]:
+                  *, existing: bool = False, discard_on_rollback=False) -> dict[str, Any]:
         """Record a judged submission and move its task to ACCEPTED or REJECTED."""
         task_id, run_id = row["task_id"], row["run_id"]
         result = "ACCEPTED" if verdict.accepted else "REJECTED"
-        records_ref = self._publish_verdict(conn, row, base["submission_id"], verdict)
+        records_ref = self._publish_verdict(conn, row, base["submission_id"], verdict,
+                                            discard_on_rollback=discard_on_rollback)
         view, complete = framework.bounded_view(verdict, max_bytes=VERDICT_BUDGET)
         # What the validator created can be as long as the bundle: the response carries the
         # count of each kind and the first few ids, the verdict artifact carries them all.

@@ -54,7 +54,18 @@ def snapshot(conn, run_id=None):
             entry["metering_reason"] = ("awaiting delivery receipt" if not entry["turn_id"] else
                                         "awaiting terminal turn" if not entry["terminal_status"] else
                                         "awaiting attributable usage")
+    grid_evidence = {}
+    if (run["workflow_id"], run["workflow_version"]) == ("science_grid", "3"):
+        from workflows.science_grid_v3.settlement import current_evidence
+        grid_evidence["current_evidence"] = [
+            {key: row[key] for key in ("path_id", "job_id", "eval_id", "evidence_id", "assessment_ref", "direction")}
+            for row in current_evidence(conn, rid, verify_bytes=False)]
     binding = store.loads(run, "inputs_json").get("plugin_binding") if '"plugin_binding"' in (run["inputs_json"] or "") else None
+    close = {}
+    if (run["workflow_id"], run["workflow_version"]) == ("science_grid", "3"):
+        from .terminal_products import pending
+        if pending_turns := pending(conn, rid):
+            close["pending_terminal_turns"] = [dict(row) for row in pending_turns]
     return {
         "project": run["project_ref"], "run_id": rid, "run_key": run["run_key"], "status": run["status"],
         "run_objective": run["objective"],
@@ -66,6 +77,7 @@ def snapshot(conn, run_id=None):
         "metering": metering.inspect(conn, rid),
         "supplements": records.source_status(conn, rid),
         "reviews": records.review_history(conn, rid),
+        **grid_evidence,
         "node": checkpoint["node"] if checkpoint else None, "round": state.get("round"),
         "report_ref": state.get("outputs", {}).get("report", {}).get("artifact_ref"),
         "rounds": state.get("scratch", {}).get("history", []),
@@ -73,6 +85,7 @@ def snapshot(conn, run_id=None):
         "jobs": rows("SELECT job_id,status,scheduler_ref FROM jobs WHERE run_id=? ORDER BY rowid"),
         "tasks": rows("SELECT task_id,role,stage,status,attempt FROM tasks WHERE run_id=? ORDER BY rowid"),
         "unsettled_turns": unsettled,
+        **close,
         "pending_deliveries": rows("SELECT outbox_id,topic,attempts,last_error FROM outbox "
                                    "WHERE run_id=? AND topic LIKE 'p0.%' AND consumed_at IS NULL"),
         "replies": rows("SELECT m.message_id,r.turn_id,r.status,r.response FROM p0_main_replies r "
@@ -275,12 +288,18 @@ class Driver:
                 self._retry_at[oid] = time.monotonic() + min(30, 2 ** min(row["attempts"], 5))
 
     def reconcile_costs(self):
-        pending = self.conn.execute(
+        from . import terminal_products
+        pending = {row[0] for row in self.conn.execute(
             "SELECT DISTINCT d.thread_id FROM p0_root_deliveries d JOIN budget_reservations b "
             "ON b.reservation_ref=d.reservation_ref WHERE d.run_id=? AND b.status='HELD'",
-            (self.rid,)).fetchall()
-        for row in pending:
-            self.native.reconcile_meter(row["thread_id"])
+            (self.rid,))}
+        run = project(self.conn, self.rid)
+        terminals = terminal_products.pending(self.conn, self.rid) if run and terminal_products.enabled(run) else []
+        pending.update(row["thread_id"] for row in terminals)
+        for thread in sorted(pending):
+            self.native.reconcile_meter(thread)
+        if terminals:
+            self.native.terminal_products.flush()
 
     def drive(self, timeout):
         passes = self.passes(time.monotonic() + timeout)
@@ -347,6 +366,12 @@ class Driver:
                             time.sleep(delay)
                         continue
                 result = snapshot(self.conn, self.rid)
+                if (self._native and (run["workflow_id"], run["workflow_version"]) == ("science_grid", "3")
+                        and self.native.terminal_products.due):
+                    self.native.terminal_products.flush()
+                    if result.get("pending_terminal_turns"):
+                        self.native.poll(0.01 if shared else 0.2)
+                        continue
                 if held:
                     result["driver"] = "usage_pending"
                 return result

@@ -109,6 +109,17 @@ class AttributionTests(unittest.TestCase):
         self.assertEqual(r['by_class']['UNCLASSIFIED']['usage']['input_tokens'],
                          {'observed_count': 0, 'observed_sum': None})
 
+    def test_namespaced_direct_submission_requires_the_exact_terminal_tool(self):
+        self.item('function_call', 'bad', namespace='gx', name='gx_read_artifact')
+        self.complete('r0')
+        self.item('function_call', 'submit', namespace='gx', name='gx_submit_product')
+        self.complete('r1')
+        self.delivery.attribution.outcome({**self.envelope, 'namespace': 'gx', 'tool': 'gx_submit_product',
+                                          'callId': 'submit'}, 'ACCEPTED')
+        self.complete('r2')
+        self.assertEqual([r['request_class'] for r in self.report()['responses']],
+                         ['UNCLASSIFIED', 'PRODUCE', 'POST_SUBMIT'])
+
     def test_native_child_uses_causal_root_and_its_own_stream(self):
         self.conn.execute("INSERT INTO p0_native_child_meters(child_id,run_id,root_id,parent_id,owner_turn,metadata_verified) "
                           "VALUES('child',?,'root','root',?,1)", (self.run, self.turn))

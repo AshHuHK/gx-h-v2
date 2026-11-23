@@ -500,6 +500,31 @@ class ArtifactService:
                      "task_id": task_id},
         )
 
+    def discard_on_rollback(self, published: PublishedArtifact) -> None:
+        """Enroll new bytes in the enclosing managed submission transaction."""
+        if published.reused:
+            return
+        target = Path(published.path)
+        identity = target.stat()
+
+        def discard():
+            # An outer rollback releases SQLite's writer. Another writer may already
+            # have adopted this immutable path, so reacquire it before checking/removing.
+            acquire = not self.conn.in_transaction
+            if acquire:
+                self.conn.execute("BEGIN IMMEDIATE")
+            try:
+                registered = self.conn.execute("SELECT 1 FROM artifacts WHERE namespace=? AND rel_path=?",
+                                               (published.namespace, published.rel_path)).fetchone()
+                if registered is None and target.exists() and os.path.samestat(target.stat(), identity):
+                    target.unlink()
+                    sync_directory_chain(target.parent, target.parent)
+            finally:
+                if acquire:
+                    self.conn.rollback()
+
+        store.on_transaction_end(self.conn, on_rollback=discard)
+
     def publish_bytes(
         self,
         *,

@@ -53,6 +53,7 @@ class Model(Peer):
         super().__init__()
         self.case, self.mode = case, mode
         self.gate.clear()
+        self.committed = threading.Event()
         self.release_extra = threading.Event()
 
     def record(self, body):
@@ -121,9 +122,9 @@ def v3_store(conn, url, probe, expected):
     return run, inputs, product
 
 
-def trial(directory, binary, entry, case, mode, expected):
+def trial(directory, binary, entry, case, mode, expected, *, model=None, post_commit_delay=0.25, missing_final=False):
     legacy = case == "legacy_yield_control"
-    model = Model(case, mode)
+    model = model or Model(case, mode)
     with ExitStack() as stack:
         threading.Thread(target=model.serve_forever, daemon=True).start()
         stack.callback(model.server_close)
@@ -177,7 +178,7 @@ def trial(directory, binary, entry, case, mode, expected):
                 rec["events"].append({"seq": frame.receive_seq, "type": "dynamicToolCall", "id": item["id"],
                                       "namespace": item.get("namespace"), "status": item["status"]})
             if method == "rawResponse/completed":
-                rec["events"].append({"seq": frame.receive_seq, "type": method, "id": p["responseId"],
+                rec["events"].append({"seq": frame.receive_seq, "type": method, "id": p["responseId"], "t": time.monotonic(),
                                       "usage": p.get("usage")})
             original_observe(frame)
         def callback(frame):
@@ -193,6 +194,7 @@ def trial(directory, binary, entry, case, mode, expected):
             assert result is NO_TOOL_RESPONSE and len(committed) == 1 and committed[0]["result"] == expected, (
                 rec["observed_calls"], committed, result)
             rec.update(committed_at=time.monotonic(), submission=committed[0])
+            model.committed.set()
             return result
         client.on_notification, client.on_server_request = observe, callback
         work = roots.dispatch(task)
@@ -202,7 +204,8 @@ def trial(directory, binary, entry, case, mode, expected):
         client.run_until(lambda f: f.message.get("method") == "item/tool/call", timeout=10)
         if legacy:
             client.request("thread/goal/set", {"threadId": thread, "status": "complete", "origin": "automatic"})
-        time.sleep(0.25)  # Force the legacy yield window open even under an idle local host.
+        if post_commit_delay:
+            time.sleep(post_commit_delay)
         if legacy:
             client.request("turn/interrupt", {"threadId": thread, "turnId": turn})
             client.run_until(lambda f: f.message.get("method") == "turn/completed", timeout=5)
@@ -231,9 +234,13 @@ def trial(directory, binary, entry, case, mode, expected):
             assert model.rows[-1]["held_until_turn_interrupted"] and sum(observed_usage.values()) == 35
         else:
             assert rec["observed_calls"][0]["namespace"] == "gx" and not rec["post_commit_requests"], rec
-            assert rec["final_meter"]["confidence"] == "PROVIDER_CONFIRMED", rec
-            assert observed_usage == {r["id"]: r["usage"]["total_tokens"] for r in model.rows}, rec
-            assert rec["final_meter"]["settled_tokens"] == sum(observed_usage.values())
+            if missing_final:
+                assert rec["requests_without_native_usage_receipt"] == [model.rows[-1]["id"]], rec
+                assert rec["final_meter"]["budget_status"] == "HELD" and rec["final_meter"]["settled_tokens"] is None, rec
+            else:
+                assert rec["final_meter"]["confidence"] == "PROVIDER_CONFIRMED", rec
+                assert observed_usage == {r["id"]: r["usage"]["total_tokens"] for r in model.rows}, rec
+                assert rec["final_meter"]["settled_tokens"] == sum(observed_usage.values())
             assert model.rows[0]["catalog"]["direct_product_groups"] == [["gx_submit_product"]], model.rows
             assert "existing_group" in roots._product_tool_config["features.code_mode.direct_only_tool_namespaces"]
             assert len(model.rows) == (1 if mode == "direct" else 2)

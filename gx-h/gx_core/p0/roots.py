@@ -684,8 +684,9 @@ class Roots:
         row = self._binding(thread_id)
         if not row:
             raise ScopeDenied("unknown Codex root")
+        terminal = self.terminal_products and self.terminal_products.for_thread(thread_id)
         if thread_id not in self.loaded:
-            if self.terminal_products and self.terminal_products.for_thread(thread_id):
+            if terminal:
                 # Attaching can wake a persisted active Goal before the resume reply arrives.
                 # Read the committed Root's history and let the terminal owner close its
                 # existing Goal through the official unloaded-thread API.
@@ -694,10 +695,19 @@ class Roots:
                     raise ScopeDenied("official history returned a different root")
                 self.delivery.attached(thread_id, thread)
                 self.delivery.reconcile(thread_id)
-                return
+                if not meter_only or not self.delivery.needs_terminal_snapshot(thread_id, terminal["turn_id"]):
+                    return
+                # A resume emits a public cumulative snapshot unavailable in passive history.
+                # Only a verified, already closed Goal can be attached for this one receipt.
+                goal = self._request("thread/goal/get", {"threadId": thread_id}).get("goal")
+                if not goal or goal.get("threadId") != thread_id or goal.get("status") not in ("complete", "budgetLimited"):
+                    return
             if meter_only:
                 self._meter_only.add(thread_id)
-            result = self._request("thread/resume", {**self._settings(row,new=False),"threadId":thread_id})
+            settings = self._settings(row, new=False)
+            if terminal:
+                settings["config"]["features.goals"] = False
+            result = self._request("thread/resume", {**settings, "threadId": thread_id})
             self._verify_settings(row, result)
             thread = result["thread"]
             if thread["id"] != thread_id or not self._matches(row,thread):
@@ -710,7 +720,7 @@ class Roots:
                     if not meter_only:
                         self.heartbeats.observed(thread_id, turn["id"])
         self.delivery.reconcile(thread_id)
-        if meter_only:
+        if meter_only or terminal:
             return
         self._meter_only.discard(thread_id)
         if row["task_id"] and thread_id not in self.active_turns:
@@ -906,6 +916,8 @@ class Roots:
 
         finally:
             try:
+                if suppress and (p.get("namespace"), p.get("tool")) == (terminal_products.NAMESPACE, "gx_submit_product"):
+                    self.terminal_products.await_live_response(p)
                 self.delivery.attribution.outcome(p, status)
                 metrics.record("p0_callback", started=started, run_id=self.run_id,
                                thread_id=p.get("threadId"), turn_id=p.get("turnId"), tool=p.get("tool"))

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import time
 
 from ..domain import clock, ids
@@ -9,6 +10,7 @@ from ..errors import SchemaInvalid, ScopeDenied
 from ..hostobs.app_server_client import AppServerResponseError, AppServerTimeout
 from ..persistence import store
 from ..teams.service import TeamService
+from . import metering
 from .root_delivery import TERMINAL
 
 NAMESPACE = "gx"
@@ -56,6 +58,7 @@ class TerminalProducts:
     rpc_timeout = 2
     per_pass = 2
     pending_per_method = 8
+    response_grace_seconds = 1.0
 
     def __init__(self, roots):
         self.roots = roots
@@ -63,7 +66,7 @@ class TerminalProducts:
         spec = store.loads(roots.run, "inputs_json", {}).get("inputs", {}).get("p0_spec", {})
         self.limit = repair_limit(spec)
         self.due = {(row["thread_id"], row["turn_id"]): 0.0 for row in pending(self.conn, roots.run_id)}
-        self.fresh = set()
+        self.fresh = {}
         self.late_rpcs = {}
         self.late_results = {}
         self.retire_after = {}
@@ -77,9 +80,17 @@ class TerminalProducts:
 
         def committed():
             self.due[thread, turn] = 0.0
-            self.fresh.add((thread, turn))
+            self.fresh[thread, turn] = None
 
         store.on_transaction_end(self.conn, on_commit=committed)
+
+    def await_live_response(self, params):
+        thread, turn, call = (params[name] for name in ("threadId", "turnId", "callId"))
+        key = (thread, turn)
+        if (key in self.fresh and self.fresh[key] is None
+                and self.roots.delivery.attribution.pending_direct_product(thread, turn, call)
+                and self.is_terminal(thread, turn, call)):
+            self.fresh[key] = (call, time.monotonic() + self.response_grace_seconds)
 
     def for_thread(self, thread):
         return self.conn.execute("SELECT e.turn_id,e.call_id FROM p0_root_terminals e "
@@ -199,7 +210,7 @@ class TerminalProducts:
     def _error(exc):
         return str(exc.code) if isinstance(exc, AppServerResponseError) else "timeout"
 
-    def _deliver(self, thread, turn, live):
+    def _deliver(self, thread, turn, live, stream):
         state = self.conn.execute(
             "SELECT e.goal_checked_at,u.terminal_status FROM p0_root_terminals e "
             "LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) WHERE e.thread_id=? AND e.turn_id=?",
@@ -216,6 +227,20 @@ class TerminalProducts:
         if state["terminal_status"]:
             self._turn_closed(thread, turn)
             return goal_done
+        if stream and self.roots.active_turns.get(thread) == turn:
+            call, deadline = stream
+            now = time.monotonic()
+            if now < deadline:
+                try:
+                    complete = metering.terminal_response_observed(self.conn, thread, turn, call)
+                except sqlite3.Error:
+                    complete = False
+                if not complete:
+                    # This exact unanswered direct call blocks the next inference. Keep pumping
+                    # the existing stream outside the callback until completion or the deadline.
+                    self.fresh[thread, turn] = stream
+                    self.due[thread, turn] = min(deadline, now + 0.025)
+                    return False
         if not live or self.roots.active_turns.get(thread) != turn:
             original = self._turn(thread, turn)
             if original and original["status"] in TERMINAL:
@@ -256,9 +281,9 @@ class TerminalProducts:
         for _, key in due[:self.per_pass]:
             self.due[key] = now + self.retry_seconds
             live = key in self.fresh
-            self.fresh.discard(key)
+            stream = self.fresh.pop(key, None)
             try:
-                if self._deliver(*key, live):
+                if self._deliver(*key, live, stream):
                     self.due.pop(key)
                     self.cursors.pop(key, None)
                     self.late_results = {op: result for op, result in self.late_results.items() if op[1] != key[0]}

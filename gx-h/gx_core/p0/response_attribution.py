@@ -61,6 +61,11 @@ class Attribution:
     def end(self, thread, turn):
         self.turns.pop((thread, turn), None)
 
+    def pending_direct_product(self, thread, turn, call):
+        state = self.turns.get((thread, turn))
+        item = state.pending.get(call) if state else None
+        return bool(item and item[:2] == ('gx_submit_product', 'gx'))
+
     def item(self, thread, turn, item):
         kind = item.get('type')
         if kind not in CALL_TYPES and kind not in ('custom_tool_call_output', 'function_call_output'):

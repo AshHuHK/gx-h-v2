@@ -32,12 +32,16 @@ class AdversePlanner(study.StudyPeer):
         direct, = [t for group in body["tools"] if group.get("name") == "gx" for t in group["tools"]
                    if t["name"] == "gx_submit_product"]
         props = direct["parameters"]["properties"]["product"]["properties"]
-        assert all(word in str(props["next_grids"]) for word in ("method_id", "method_version", "synthetic", "candidates"))
+        assigned_grid = transport["schema"]["properties"]["next_grids"]["additionalProperties"]
+        assert props["next_grids"]["additionalProperties"] == assigned_grid
+        assert props["pivots"]["items"]["properties"]["grid"] == assigned_grid
         assert all(word in str(props["source_decisions"]) for word in ("observations_ref", "assessment_ref", "artifact_ref"))
         args = json.loads(event["arguments"])
         product = args["product"]
         if brief["attempt"] == 1:
             draft = "secondary_citation_with_valid_grid"
+            detail["advertised_grid"] = props["next_grids"]
+            detail["advertised_source_evidence"] = props["source_decisions"]["items"]["properties"]["evidence_refs"]
             product["source_decisions"][0]["evidence_refs"].append(product["assessment_ref"])
         elif brief["attempt"] == 2 and not repairs:
             draft = "bare_candidate_list"

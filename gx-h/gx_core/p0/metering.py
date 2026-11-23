@@ -265,8 +265,8 @@ def maintain(conn, run_id):
             meter_limits.check(conn,run_id,row["thread_id"])
 
 
-def inspect(conn, run_id):
-    from . import meter_limits
+def inspect(conn, run_id, *, include_responses=False):
+    from . import meter_limits, response_attribution
     if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_meter_turns'").fetchone():
         return {"threads":[],"turns":[],"adjustments":[],"interrupts":[],"risk":{}}
     def rows(sql):
@@ -278,6 +278,12 @@ def inspect(conn, run_id):
               "interrupts":rows("SELECT * FROM p0_meter_interrupts WHERE run_id=? ORDER BY requested_at"),
               "risk":meter_limits.run_risk(conn,run_id), "token_unit":"provider totalTokens, including cached input once",
               "provider_money_cost":None}
+    if conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_response_attribution'").fetchone():
+        if include_responses:
+            result["response_attribution"] = response_attribution.report(conn, run_id)
+        else:
+            result["attributed_response_count"] = conn.execute(
+                "SELECT count(*) FROM p0_response_attribution WHERE run_id=?", (run_id,)).fetchone()[0]
     for thread in result["threads"]:
         total = thread["observed_total"]
         thread["unresolved_delta"] = None if total is None else total - (thread["reconciled_total"] or 0)

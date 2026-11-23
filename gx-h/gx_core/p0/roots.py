@@ -781,16 +781,24 @@ class Roots:
     def _callback(self, received):
         started = time.monotonic_ns()
         p = received.message.get("params") or {}
+        disposition = "ERROR"
         try:
             if received.message["method"] != "item/tool/call":
                 # An unexpected approval, credential or user input request never grants authority.
                 raise ScopeDenied("P0 handles only official dynamic tool calls")
             out = self._call(p)
+            disposition = "SUCCESS"
+            if p.get("tool") == "gx_submit_product" and isinstance(out, dict):
+                disposition = {"ACCEPTED":"ACCEPTED", "REJECTED":"TERMINAL_REJECTED"}.get(out.get("task_status"), disposition)
             return {"success":True,"contentItems":[{"type":"inputText","text":ids.canonical_json(out)}]}
         except (GxError, KeyError, ValueError, TypeError) as exc:
+            if isinstance(exc, SchemaInvalid) and p.get("tool") == "gx_submit_product":
+                disposition = "SCHEMA_INVALID"
             return {"success":False,"contentItems":[{"type":"inputText","text":json.dumps({"error":str(exc)})}]}
 
         finally:
+            if received.message["method"] == "item/tool/call":
+                self.delivery.attribution.outcome(p, disposition)
             metrics.record("p0_callback", started=started, run_id=self.run_id,
                            thread_id=p.get("threadId"), turn_id=p.get("turnId"), tool=p.get("tool"))
 

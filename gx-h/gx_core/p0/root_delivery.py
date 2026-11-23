@@ -14,7 +14,7 @@ from ..errors import (BudgetExceeded, HoldActive, IdempotencyConflict, LeaseExpi
                       OutcomeUnknown, SchemaInvalid, ScopeDenied)
 from ..hostobs.app_server_client import AppServerResponseError
 from ..persistence import store
-from . import activity, meter_limits, metering, team_admission, waits
+from . import activity, meter_limits, metering, response_attribution, team_admission, waits
 from .profiles import CODEX_VERSION
 
 ACTOR = "p0-root"
@@ -143,6 +143,7 @@ class RootDelivery:
         self.roots = roots
         self.conn = roots.conn
         self.run_id = roots.run_id
+        self.attribution = response_attribution.Attribution(self.conn, self.run_id)
         self._verify_after = {}
         self._live = {}
         self._paths = {}
@@ -159,8 +160,10 @@ class RootDelivery:
     def _evidence(self, method, params, thread_id, turn_id):
         key = (thread_id, turn_id)
         if method == "turn/started":
+            self.attribution.start(thread_id, turn_id)
             self._live.setdefault(key, _LiveReceipts())
         elif method == "rawResponseItem/completed":
+            self.attribution.item(thread_id, turn_id, params.get("item") or {})
             if call_id := _queued_message(params.get("item") or {}):
                 owner = self.conn.execute("SELECT owner_turn FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
                                           key).fetchone()
@@ -172,6 +175,7 @@ class RootDelivery:
                 metering.response(self.conn,thread_id,turn_id,rid,tokens)
                 owner = self.conn.execute("SELECT root_id,metadata_verified FROM p0_native_child_meters WHERE child_id=?",
                                           (thread_id,)).fetchone()
+                self.attribution.completed(owner["root_id"] if owner else thread_id, thread_id, turn_id, params)
                 if not owner or owner["metadata_verified"]:
                     meter_limits.check(self.conn,self.run_id,owner["root_id"] if owner else thread_id)
             if key not in self._live:
@@ -182,6 +186,7 @@ class RootDelivery:
             receipts[rid] = tokens
 
     def _live_end(self, thread_id, turn):
+        self.attribution.end(thread_id, turn["id"])
         live = self._live.pop((thread_id, turn["id"]), None)
         if live is None:
             return None, 0
@@ -609,7 +614,7 @@ class RootDelivery:
         if method not in ("turn/started", "rawResponse/completed", "rawResponseItem/completed", "item/started",
                           "item/completed", "thread/tokenUsage/updated", "turn/completed"):
             return
-        if method == "rawResponseItem/completed" and not _queued_message(params.get("item") or {}):
+        if method == "rawResponseItem/completed" and not response_attribution.is_tool_item(params.get("item") or {}):
             return
         thread_id = params.get("threadId")
         turn_id = params.get("turnId") or (params.get("turn") or {}).get("id")
@@ -682,6 +687,9 @@ class RootDelivery:
             return
         activity = method in ("item/started", "item/completed")
         item = params.get("item") or {}
+        if method == "item/completed" and item.get("type") in ("collabAgentToolCall", "dynamicToolCall", "mcpToolCall"):
+            if isinstance(item.get("id"), str) and isinstance(item.get("status"), str):
+                self.attribution.model_outcome(sender, tid, item["id"], item["status"])
         if activity:
             if item.get("type") != "subAgentActivity" or item.get("kind") not in ("started", "interacted"):
                 return

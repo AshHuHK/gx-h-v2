@@ -160,7 +160,10 @@ def observe_wire(save):
         p = m.get("params") or {}
         if method in methods:
             requests[m["id"]] = method
-            save("rpc_sent", method=method, id=m["id"], pid=transport.process.pid, params=select(p))
+            params = select(p)
+            if method == "thread/resume":
+                params["goals_enabled"] = (p.get("config") or {}).get("features.goals")
+            save("rpc_sent", method=method, id=m["id"], pid=transport.process.pid, params=params)
         elif "method" not in m and m.get("id") in callback_ids:
             save("callback_reply_written", id=m["id"], call=callback_ids[m["id"]])
         return outgoing(transport, line, timeout)
@@ -225,6 +228,19 @@ def worker(args):
     traces = observe_wire(save)
     with traces[0], traces[1]:
         if phase == "cold":
+            if args.public_only:
+                sessions = str(Path(os.environ["CODEX_HOME"]).resolve() / "sessions") + os.sep
+
+                def no_private_rollout(event, arguments):
+                    if event == "open" and isinstance(arguments[0], (str, bytes)):
+                        path = os.path.abspath(os.fsdecode(arguments[0]))
+                        if path.startswith(sessions) and path.endswith(".jsonl"):
+                            save("disallowed_gx_rollout_open", name=Path(path).name)
+                            raise PermissionError(
+                                "the public-only fixture denies private native rollout reads"
+                            )
+
+                sys.addaudithook(no_private_rollout)
             with native_state(args.state), closing(store.open_store(args.state / "gx.db")) as c:
                 rid = c.execute("SELECT run_id FROM runs").fetchone()[0]
                 d = Driver(c, args.state, rid)
@@ -330,6 +346,9 @@ def run(args, result):
     spec = specification(install, 0, "east")
     spec.update(workflow_version="3", plugins=["org.gx.science-grid@3.0.0"])
     spec["proposal"]["requires_interpretation"] = True
+    if args.public_only:
+        spec["metering"] = {**spec.get("metering", {}), "rollout_diagnostics": False}
+    result["public_only"] = args.public_only
     spec_file = work / "spec.json"
     spec_file.write_text(json.dumps(spec))
     model = grid.ReviewerPeer()
@@ -393,6 +412,8 @@ def run(args, result):
                     "--trace",
                     str(trace),
                 ]
+            if args.public_only and phase != "start":
+                argv.append("--public-only")
             before = server.request_count
             proc = subprocess.run(
                 argv, env=env, cwd=install, capture_output=True, text=True, timeout=110
@@ -491,6 +512,33 @@ def run(args, result):
             (turn, cold["meter"]["terminal_status"]) in map(tuple, r.get("turns", []))
             for r in result["cold_history"]
         )
+        if args.public_only:
+            evidence = [r for r in wire() if r["phase"] == "cold"]
+            assert not any(r["type"] == "disallowed_gx_rollout_open" for r in evidence)
+            confirmed_goal = False
+            quiet_resumes = []
+            for record in evidence:
+                if record["type"] == "rpc_returned" and record.get("method") in (
+                    "thread/goal/get",
+                    "thread/goal/set",
+                ):
+                    confirmed_goal = record.get("goal_status") in ("complete", "budgetLimited")
+                if record["type"] == "rpc_sent" and record.get("method") == "thread/resume":
+                    assert confirmed_goal and record["params"]["goals_enabled"] is False, record
+                    quiet_resumes.append(record["id"])
+            snapshots = [
+                r["usage"]["total"]["totalTokens"]
+                for r in evidence
+                if r["type"] == "observable"
+                and r.get("method") == "thread/tokenUsage/updated"
+                and r["params"].get("turnId") == turn
+            ]
+            assert quiet_resumes and snapshots
+            result["cold_public_evidence"] = {
+                "guarded_resume_ids": quiet_resumes,
+                "exact_turn_cumulative": snapshots,
+                "gx_private_rollout_opens": 0,
+            }
         final = run_phase("finish")
         suffix = snapshot(state, thread)
         result["after_full_project"] = suffix
@@ -543,6 +591,7 @@ def run(args, result):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--commit", default=B1)
+    parser.add_argument("--public-only", action="store_true")
     parser.add_argument("--patch", action="append", type=Path, default=[])
     parser.add_argument("--expect", choices=("corrected", "regression", "passive"), default="corrected")
     parser.add_argument("--worker", choices=("crash", "cold", "finish"))

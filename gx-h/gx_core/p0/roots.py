@@ -676,6 +676,16 @@ class Roots:
         if not row:
             raise ScopeDenied("unknown Codex root")
         if thread_id not in self.loaded:
+            if self.terminal_products and self.terminal_products.for_thread(thread_id):
+                # Attaching can wake a persisted active Goal before the resume reply arrives.
+                # Read the committed Root's history and let the terminal owner close its
+                # existing Goal through the official unloaded-thread API.
+                thread = self._request("thread/read", {"threadId": thread_id, "includeTurns": True})["thread"]
+                if thread["id"] != thread_id or not self._matches(row, thread):
+                    raise ScopeDenied("official history returned a different root")
+                self.delivery.attached(thread_id, thread)
+                self.delivery.reconcile(thread_id)
+                return
             if meter_only:
                 self._meter_only.add(thread_id)
             result = self._request("thread/resume", {**self._settings(row,new=False),"threadId":thread_id})
@@ -715,7 +725,8 @@ class Roots:
             else:
                 self._resume(thread_id, meter_only=True)
         except AppServerResponseError as exc:
-            missing = {f"thread not found: {thread_id}", f"no rollout found for thread id {thread_id}",
+            missing = {f"thread not found: {thread_id}", f"thread not loaded: {thread_id}",
+                       f"no rollout found for thread id {thread_id}",
                        f"no rollout found for conversation id {thread_id}"}
             if exc.code != -32600 or exc.message not in missing:
                 raise

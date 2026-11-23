@@ -81,11 +81,14 @@ class TerminalProducts:
 
         store.on_transaction_end(self.conn, on_commit=committed)
 
+    def for_thread(self, thread):
+        return self.conn.execute("SELECT e.turn_id,e.call_id FROM p0_root_terminals e "
+                                 "JOIN p0_roots r USING(thread_id) WHERE e.thread_id=? AND r.run_id=?",
+                                 (thread, self.roots.run_id)).fetchone()
+
     def is_terminal(self, thread, turn, call=None):
-        row = self.conn.execute("SELECT e.call_id FROM p0_root_terminals e JOIN p0_roots r USING(thread_id) "
-                                "WHERE e.thread_id=? AND e.turn_id=? AND r.run_id=?",
-                                (thread, turn, self.roots.run_id)).fetchone()
-        return bool(row and (call is None or row["call_id"] == call))
+        row = self.for_thread(thread)
+        return bool(row and row["turn_id"] == turn and (call is None or row["call_id"] == call))
 
     def replayed_failure(self, thread, turn, call, request_sha):
         row = self.conn.execute(

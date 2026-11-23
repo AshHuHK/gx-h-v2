@@ -11,7 +11,7 @@ from gx_core import budgets
 from gx_core.artifacts import ArtifactService
 from gx_core.domain import ids
 from gx_core.errors import ScopeDenied
-from gx_core.hostobs.app_server_client import AppServerTimeout, NO_TOOL_RESPONSE, ReceivedMessage
+from gx_core.hostobs.app_server_client import AppServerResponseError, AppServerTimeout, NO_TOOL_RESPONSE, ReceivedMessage
 from gx_core.orchestration.service import default_registry
 from gx_core.p0 import intent, schema, terminal_products
 from gx_core.p0.roots import Roots
@@ -245,6 +245,46 @@ class TerminalProductTests(unittest.TestCase):
         self.assertEqual(len(owner.late_rpcs), 3)
         self.assertEqual(self.table("p0_root_terminals")[0]["interrupt_attempts"], 2)
         self.assertTrue(terminal_products.pending(self.conn, self.run))
+
+    def test_cold_terminal_reads_history_and_closes_persisted_active_goal_without_resuming(self):
+        self.assertIs(self.submit(self.good), NO_TOOL_RESPONSE)
+        cold = self.native(active=False)
+        turns = [{"id": "other", "status": "completed"}, {"id": "turn", "status": "interrupted"}]
+        history = {"id": "reviewer", "sessionId": "reviewer", "source": "appServer", "cwd": str(self.directory),
+                   "status": {"type": "notLoaded"}, "turns": turns}
+        calls = []
+
+        def rpc(method, params, **kwargs):
+            self.assertEqual(params["threadId"], "reviewer")
+            calls.append(method)
+            if method == "thread/read":
+                if calls.count(method) == 1:
+                    raise AppServerResponseError(ReceivedMessage(1, {"id": 1, "error": {
+                        "code": -32600, "message": "thread not loaded: reviewer"}}))
+                self.assertTrue(params["includeTurns"])
+                return {"thread": history}
+            if method == "thread/goal/get":
+                return {"goal": {"status": "active"}}
+            if method == "thread/goal/set":
+                self.assertEqual(params["status"], "complete")
+                return {"goal": {"status": "complete"}}
+            self.assertEqual(method, "thread/turns/list")
+            return {"data": turns}
+
+        cold._request = rpc
+        cold.reconcile_meter("reviewer")
+        self.assertTrue(terminal_products.pending(self.conn, self.run))
+        cold.reconcile_meter("reviewer")
+        cold.terminal_products.flush()
+        self.assertFalse(terminal_products.pending(self.conn, self.run))
+        cold._resume("reviewer")  # A later non-meter caller cannot wake the closed root either.
+        self.assertEqual(calls, ["thread/read", "thread/read", "thread/goal/get", "thread/goal/set",
+                                 "thread/turns/list", "thread/read"])
+        self.assertNotIn("reviewer", cold.loaded)
+        self.assertEqual(self.table("p0_root_turn_usage")[0]["turn_id"], "turn")
+        with patch.object(cold, "_request", return_value={"thread": {**history, "cwd": "/other"}}):
+            with self.assertRaises(ScopeDenied):
+                cold.reconcile_meter("reviewer")
 
     def test_child_charge_waits_for_verified_terminal_child_usage(self):
         budget = budgets.create_root(self.conn, run_id=self.run, profile_name="p0", actor="test",

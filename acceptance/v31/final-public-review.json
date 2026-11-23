@@ -1,0 +1,515 @@
+{
+  "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "build": {
+    "files": 471,
+    "git_commit": "9cd66551145927f23a1e6b9d3dd03298eb7e35a4",
+    "runtime_tree_sha256": "c984e951c698d30d5f71b37744547566a76ca09044741f19c6d0b5865016fb21"
+  },
+  "commands": [
+    {
+      "argv": [
+        "start",
+        "--run-key",
+        "west",
+        "--spec",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/var/gate/final-public-review/spec.json"
+      ],
+      "elapsed_s": 1.773,
+      "exit": 0,
+      "requests": 0
+    },
+    {
+      "argv": [
+        "run",
+        "--timeout",
+        "120"
+      ],
+      "elapsed_s": 3.5697,
+      "exit": 0,
+      "requests": 6
+    },
+    {
+      "argv": [
+        "run",
+        "--timeout",
+        "5"
+      ],
+      "elapsed_s": 0.7345,
+      "exit": 0,
+      "requests": 0
+    }
+  ],
+  "compaction_http_requests": 0,
+  "current_evidence_ids": [
+    "gxv_c32d8a6fd5949574e9b57ff75d5065fff7958435193b2b991808a2ae97e60716",
+    "gxv_c98d5450b2b9413a47f493196c2fdcb63351d3d76239d3079546a7bca3f713df"
+  ],
+  "fixture": "scripted Responses at 127.0.0.1, 35 supplied tokens per response",
+  "invalid_call_id": null,
+  "invalid_error": null,
+  "mode": "review",
+  "observed": {
+    "artifact_index_sha256": "a2fae5d3ae146c7cc23945661a14c1b2f8b284c698dcef51ba4e11a112f1cc8b",
+    "assessment_ref": "gxa_01m84hrwf8155x39e7",
+    "checked_preloaded_refs": 5,
+    "decision": {
+      "assessment_ref": "gxa_01m84hrwf8155x39e7",
+      "continue_paths": [],
+      "next_grids": {},
+      "proposal_ref": "gxa_01m84hrsk4v8pwnzjt",
+      "reason": "The prospective round budget has been reached.",
+      "stop_reason": "round_budget"
+    },
+    "decision_ref": "gxa_01m84hrx88jxwbqvk9",
+    "duplicate_product_artifacts": 0,
+    "jobs": [
+      {
+        "idempotency_key": "job:gxr_01m84hrscbh8bnbwvw:grid:science:r0:c2b7b89ae569259dc5f7b948c01f822b4cd18d8b48adb6ba075b91df2b9eaa46",
+        "job_id": "gxj_01m84hrsmzv885rmjt",
+        "status": "SUCCEEDED"
+      },
+      {
+        "idempotency_key": "job:gxr_01m84hrscbh8bnbwvw:grid:science:r0:cdb6c68ac476d166cc034bf585e63006145097cb4ad3ad5361855d6734b4a871",
+        "job_id": "gxj_01m84hrsx3nc3vdzsh",
+        "status": "SUCCEEDED"
+      }
+    ],
+    "native_turns": [
+      {
+        "budget_status": "SETTLED",
+        "confidence": "PROVIDER_CONFIRMED",
+        "settled_tokens": 105,
+        "thread_id": "01a2091c-6fe1-7d11-b0f2-de3c63bed07a",
+        "turn_id": "01a2091c-702c-7d22-a4bc-a9b8d6b345b5"
+      },
+      {
+        "budget_status": "SETTLED",
+        "confidence": "PROVIDER_CONFIRMED",
+        "settled_tokens": 105,
+        "thread_id": "01a2091c-7367-7663-85d3-206b1a95bcba",
+        "turn_id": "01a2091c-7383-7892-a655-5f5b5b68a427"
+      }
+    ],
+    "orphan_artifact_files": 0,
+    "published_artifacts": 30,
+    "repair_receipts": [],
+    "report_ref": "gxa_01m84hrxefeqht0evb",
+    "routes": {
+      "west-near": {
+        "evaluation": "gxa_01m84hrv4k0t92benr",
+        "job": "gxj_01m84hrsmzv885rmjt",
+        "points": [
+          {
+            "candidate_id": "00-west-path_a-1",
+            "score": -0.390625,
+            "x": 1.375
+          },
+          {
+            "candidate_id": "00-west-path_a-2",
+            "score": -0.015625,
+            "x": 1.875
+          },
+          {
+            "candidate_id": "00-west-path_a-3",
+            "score": -0.140625,
+            "x": 2.375
+          }
+        ],
+        "supported": true,
+        "threshold": -0.25
+      },
+      "west-offset": {
+        "evaluation": "gxa_01m84hrv5t5wgf2eqs",
+        "job": "gxj_01m84hrsx3nc3vdzsh",
+        "points": [
+          {
+            "candidate_id": "00-west-path_b-1",
+            "score": -21.390625,
+            "x": -2.625
+          },
+          {
+            "candidate_id": "00-west-path_b-2",
+            "score": -17.015625,
+            "x": -2.125
+          },
+          {
+            "candidate_id": "00-west-path_b-3",
+            "score": -13.140625,
+            "x": -1.625
+          }
+        ],
+        "supported": false,
+        "threshold": -0.25
+      }
+    },
+    "run": {
+      "run_id": "gxr_01m84hrscbh8bnbwvw",
+      "status": "COMPLETED",
+      "workflow_id": "science_grid",
+      "workflow_sha256": "3a5c74ae4d1e44d74f9ddc583179accf2cc5fd6a303dbece86403cb931eb1410",
+      "workflow_version": "3"
+    },
+    "settlements": [
+      {
+        "assessment_ref": "gxa_01m84hrwf8155x39e7",
+        "direction": "supports",
+        "eval_id": "gxe_f0e006c9bb3b8d41e8568f56cf4f5ac38a27614ed8fa175d3371d822f896dd48",
+        "evidence_id": "gxv_c32d8a6fd5949574e9b57ff75d5065fff7958435193b2b991808a2ae97e60716",
+        "job_id": "gxj_01m84hrsmzv885rmjt",
+        "kind": "valid_scientific_outcome",
+        "path_id": "west-near"
+      },
+      {
+        "assessment_ref": "gxa_01m84hrwf8155x39e7",
+        "direction": "refutes",
+        "eval_id": "gxe_654897d1d7af07c568f664d21b88f9b318d66c429c144bffa52e3687be5a0ad1",
+        "evidence_id": "gxv_c98d5450b2b9413a47f493196c2fdcb63351d3d76239d3079546a7bca3f713df",
+        "job_id": "gxj_01m84hrsx3nc3vdzsh",
+        "kind": "valid_scientific_outcome",
+        "path_id": "west-offset"
+      }
+    ],
+    "stale_preloads": 0,
+    "submissions": [
+      {
+        "artifact_refs_json": "[\"gxa_01m84hrwf8155x39e7\"]",
+        "attempt": 1,
+        "principal": "01a2091c-6fe1-7d11-b0f2-de3c63bed07a",
+        "result": "ACCEPTED",
+        "role": "evidence_reviewer",
+        "submission_id": "gxsb_01m84hrwft1bp40v6z",
+        "task_id": "gxt_01m84hrv7sazzd1rfb"
+      },
+      {
+        "artifact_refs_json": "[\"gxa_01m84hrx88jxwbqvk9\"]",
+        "attempt": 1,
+        "principal": "01a2091c-7367-7663-85d3-206b1a95bcba",
+        "result": "ACCEPTED",
+        "role": "planner",
+        "submission_id": "gxsb_01m84hrx8p365da305",
+        "task_id": "gxt_01m84hrwnpp3ra3an1"
+      }
+    ],
+    "terminal_receipts": [
+      {
+        "attempt": 1,
+        "call_id": "call-fixture-3",
+        "reason": "GX_ACCEPTED",
+        "submission_id": "gxsb_01m84hrwft1bp40v6z",
+        "task_id": "gxt_01m84hrv7sazzd1rfb",
+        "thread_id": "01a2091c-6fe1-7d11-b0f2-de3c63bed07a",
+        "turn_id": "01a2091c-702c-7d22-a4bc-a9b8d6b345b5"
+      },
+      {
+        "attempt": 1,
+        "call_id": "call-fixture-6",
+        "reason": "GX_ACCEPTED",
+        "submission_id": "gxsb_01m84hrx8p365da305",
+        "task_id": "gxt_01m84hrwnpp3ra3an1",
+        "thread_id": "01a2091c-7367-7663-85d3-206b1a95bcba",
+        "turn_id": "01a2091c-7383-7892-a655-5f5b5b68a427"
+      }
+    ]
+  },
+  "official_version": "codex-cli 0.169.0",
+  "passed": true,
+  "post_terminal_requests": 0,
+  "responses": [
+    {
+      "at_utc": "2026-11-23T15:53:08.567539+00:00",
+      "brief_in_instructions": false,
+      "brief_in_model_input": true,
+      "gx_tools": [
+        "gx_grid_measurement",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context"
+      ],
+      "http_body_bytes": 38036,
+      "id": "fixture-1",
+      "json_payload_bytes": 38036,
+      "model": "gpt-6.2-astra",
+      "output_kind": "science_assessment",
+      "peer": "127.0.0.1",
+      "reasoning_effort": "xhigh",
+      "ref": "gxa_01m84hrtxbzmef0fz9",
+      "round": 0,
+      "submit_namespace": "gx",
+      "task_id": "gxt_01m84hrv7sazzd1rfb",
+      "tool": "gx_read_artifact"
+    },
+    {
+      "at_utc": "2026-11-23T15:53:08.670048+00:00",
+      "brief_in_instructions": false,
+      "brief_in_model_input": true,
+      "gx_tools": [
+        "gx_grid_measurement",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context"
+      ],
+      "http_body_bytes": 38854,
+      "id": "fixture-2",
+      "json_payload_bytes": 38854,
+      "model": "gpt-6.2-astra",
+      "output_kind": "science_assessment",
+      "peer": "127.0.0.1",
+      "reasoning_effort": "xhigh",
+      "ref": "gxa_01m84hrtzdvq0yqt4p",
+      "round": 0,
+      "submit_namespace": "gx",
+      "task_id": "gxt_01m84hrv7sazzd1rfb",
+      "tool": "gx_read_artifact"
+    },
+    {
+      "at_utc": "2026-11-23T15:53:08.773625+00:00",
+      "brief_in_instructions": false,
+      "brief_in_model_input": true,
+      "gx_tools": [
+        "gx_grid_measurement",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context"
+      ],
+      "http_body_bytes": 39678,
+      "id": "fixture-3",
+      "json_payload_bytes": 39678,
+      "model": "gpt-6.2-astra",
+      "output_kind": "science_assessment",
+      "peer": "127.0.0.1",
+      "reasoning_effort": "xhigh",
+      "round": 0,
+      "submit_namespace": "gx",
+      "task_id": "gxt_01m84hrv7sazzd1rfb",
+      "tool": "gx_submit_product"
+    },
+    {
+      "at_utc": "2026-11-23T15:53:09.343166+00:00",
+      "brief_in_instructions": false,
+      "brief_in_model_input": true,
+      "gx_tools": [
+        "gx_grid_measurement",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context"
+      ],
+      "http_body_bytes": 39458,
+      "id": "fixture-4",
+      "json_payload_bytes": 39458,
+      "model": "gpt-6.2-astra",
+      "output_kind": "science_decision",
+      "peer": "127.0.0.1",
+      "reasoning_effort": "xhigh",
+      "ref": "gxa_01m84hrtxbzmef0fz9",
+      "round": 0,
+      "submit_namespace": "gx",
+      "task_id": "gxt_01m84hrwnpp3ra3an1",
+      "tool": "gx_read_artifact"
+    },
+    {
+      "at_utc": "2026-11-23T15:53:09.458823+00:00",
+      "brief_in_instructions": false,
+      "brief_in_model_input": true,
+      "gx_tools": [
+        "gx_grid_measurement",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context"
+      ],
+      "http_body_bytes": 40276,
+      "id": "fixture-5",
+      "json_payload_bytes": 40276,
+      "model": "gpt-6.2-astra",
+      "output_kind": "science_decision",
+      "peer": "127.0.0.1",
+      "reasoning_effort": "xhigh",
+      "ref": "gxa_01m84hrtzdvq0yqt4p",
+      "round": 0,
+      "submit_namespace": "gx",
+      "task_id": "gxt_01m84hrwnpp3ra3an1",
+      "tool": "gx_read_artifact"
+    },
+    {
+      "at_utc": "2026-11-23T15:53:09.570847+00:00",
+      "brief_in_instructions": false,
+      "brief_in_model_input": true,
+      "gx_tools": [
+        "gx_grid_measurement",
+        "gx_read_artifact",
+        "gx_submit_product",
+        "gx_task_context"
+      ],
+      "http_body_bytes": 41100,
+      "id": "fixture-6",
+      "json_payload_bytes": 41100,
+      "model": "gpt-6.2-astra",
+      "output_kind": "science_decision",
+      "peer": "127.0.0.1",
+      "reasoning_effort": "xhigh",
+      "round": 0,
+      "submit_namespace": "gx",
+      "task_id": "gxt_01m84hrwnpp3ra3an1",
+      "tool": "gx_submit_product"
+    }
+  ],
+  "saved_binding": {
+    "capabilities": [
+      {
+        "capability_version": "fixture-grid@1",
+        "content_artifact_ref": "gxa_01m84hrsadhp32ss47",
+        "manifest_sha256": "8c617d22dbcbb57ea3e9521be41adc4c195a94fd38593ab7edd64fb23c2b96ce",
+        "portable_sha256": "b69193d4546b42225261484872718eb475478c5836377de6cacd6b8c38b9f12f"
+      }
+    ],
+    "packages": [
+      {
+        "api_version": "1.0",
+        "id": "org.gx.science-grid",
+        "sha256": "f2b268b1a48a891eb06044cd632e2d0893072cf74bc69624db763948b5f3bfcc",
+        "version": "3.0.0"
+      }
+    ],
+    "workflow": {
+      "id": "science_grid",
+      "sha256": "3a5c74ae4d1e44d74f9ddc583179accf2cc5fd6a303dbece86403cb931eb1410",
+      "version": "3"
+    }
+  },
+  "spec": {
+    "max_parallel_roots": 2,
+    "max_rounds": 1,
+    "objective": "Use measured CPU grid outputs to compare two finite sets of coordinates for score(x)=-(x-2)^2. Review both sets against each run's frozen cutoff and close the single-round comparison.",
+    "plugins": [
+      "org.gx.science-grid@3.0.0"
+    ],
+    "project": "v3-multiroot-finite-grid",
+    "proposal": {
+      "paths": [
+        {
+          "grid": {
+            "candidates": [
+              {
+                "candidate_id": "00-west-path_a-1",
+                "x": 1.375
+              },
+              {
+                "candidate_id": "00-west-path_a-2",
+                "x": 1.875
+              },
+              {
+                "candidate_id": "00-west-path_a-3",
+                "x": 2.375
+              }
+            ],
+            "fixture_version": "1",
+            "method_id": "fixture-grid",
+            "method_version": "1",
+            "synthetic": true
+          },
+          "id": "west-near",
+          "prediction": "A coordinate in this west grid has measured score at or above -0.25."
+        },
+        {
+          "grid": {
+            "candidates": [
+              {
+                "candidate_id": "00-west-path_b-1",
+                "x": -2.625
+              },
+              {
+                "candidate_id": "00-west-path_b-2",
+                "x": -2.125
+              },
+              {
+                "candidate_id": "00-west-path_b-3",
+                "x": -1.625
+              }
+            ],
+            "fixture_version": "1",
+            "method_id": "fixture-grid",
+            "method_version": "1",
+            "synthetic": true
+          },
+          "id": "west-offset",
+          "prediction": "A coordinate in this west grid has measured score at or above -0.25."
+        }
+      ],
+      "requires_interpretation": true,
+      "threshold": -0.25
+    },
+    "run_budget": {
+      "api_calls": 3,
+      "cpu_seconds": 120,
+      "gpu_jobs": 0,
+      "gpu_minutes": 0,
+      "job_submissions": 2,
+      "tokens": 440000,
+      "wall_hours": 2,
+      "worker_tasks": 6
+    },
+    "teams": [
+      {
+        "limits": {
+          "api_calls": 3,
+          "tokens": 435000,
+          "worker_tasks": 5
+        },
+        "max_parallel_roots": 1,
+        "name": "West grid",
+        "roles": [
+          "planner",
+          "evidence_reviewer"
+        ],
+        "team_id": "west"
+      }
+    ],
+    "turn_token_budget": 180000,
+    "workflow": "science_grid",
+    "workflow_version": "3",
+    "workspace": {
+      "max_parallel_roots": 2
+    },
+    "workspace_budget": {
+      "api_calls": 6,
+      "cpu_seconds": 300,
+      "gpu_jobs": 0,
+      "gpu_minutes": 0,
+      "job_submissions": 4,
+      "tokens": 900000,
+      "wall_hours": 6,
+      "worker_tasks": 12
+    }
+  },
+  "visible_submissions": [
+    {
+      "call_id": "call-fixture-3",
+      "kind": "science_assessment",
+      "product": {
+        "findings_by_path": {
+          "west-near": {
+            "reason": "Best measured score -0.015625 reached the threshold -0.25.",
+            "risk": "This finite coordinate set does not establish behavior outside the measured points."
+          },
+          "west-offset": {
+            "reason": "Best measured score -13.1406 fell below the threshold -0.25.",
+            "risk": "This finite coordinate set does not establish behavior outside the measured points."
+          }
+        }
+      },
+      "task_id": "gxt_01m84hrv7sazzd1rfb"
+    },
+    {
+      "call_id": "call-fixture-6",
+      "kind": "science_decision",
+      "product": {
+        "assessment_ref": "gxa_01m84hrwf8155x39e7",
+        "continue_paths": [],
+        "next_grids": {},
+        "proposal_ref": "gxa_01m84hrsk4v8pwnzjt",
+        "reason": "The prospective round budget has been reached.",
+        "stop_reason": "round_budget"
+      },
+      "task_id": "gxt_01m84hrwnpp3ra3an1"
+    }
+  ]
+}

@@ -23,7 +23,7 @@ from ..teams.service import TeamService, default_lease_seconds
 from . import compute, grid_brief
 from . import profiles
 from ..orchestration.service import hooks_for_run
-from . import activity, terminal_products, waits
+from . import activity, grid_planner, terminal_products, waits
 
 
 def _tool(name, description, key, schema):
@@ -367,6 +367,8 @@ class Roots:
             view = TeamService(self.conn).task(task_id)
             packet = {k: view[k] for k in ("task_id", "role", "kind", "input", "acceptance",
                                            "required_artifacts", "previous_attempts", "dependencies")}
+            if self.terminal_products:
+                grid_planner.bind(packet)
             current = hooks_for_run(self.conn, self.run_id).build_task_context(self.conn, self.run_id, task_id, attempt)
             packet.update(attempt=attempt, run_objective=self.run["objective"],
                           intent=current["intent"], supplement_sources=current["supplement_sources"],
@@ -481,7 +483,7 @@ class Roots:
     def _product_tools(self, row, tools):
         task = self.conn.execute("SELECT input_json FROM tasks WHERE task_id=? AND run_id=?",
                                  (row["task_id"], self.run_id)).fetchone()
-        contract = store.loads(task, "input_json", {}).get("product_contract")
+        contract = grid_planner.assigned(row) or store.loads(task, "input_json", {}).get("product_contract")
         if not contract:
             return tools
         paging = ""
@@ -1004,7 +1006,7 @@ class Roots:
                     answer = self._submit(row,args["product"],envelope)
                 elif tool == "gx_submit_product" and self.terminal_products:
                     task = self.conn.execute("SELECT input_json FROM tasks WHERE task_id=?", (row["task_id"],)).fetchone()
-                    contract = store.loads(task, "input_json").get("product_contract") or {}
+                    contract = grid_planner.assigned(row) or store.loads(task, "input_json").get("product_contract") or {}
                     raise SchemaInvalid("submit exactly one product object", details={"category": "product_structure",
                         "contract_digest": contract.get("digest") or ids.sha256_of_obj(next(
                             spec["inputSchema"] for spec in tools if spec["name"] == tool)), "pointer": "/product"})
@@ -1055,9 +1057,17 @@ class Roots:
         return assets.get(ref, offset=offset)
 
     def _submit(self, binding, product, envelope):
-        answer = TeamService(self.conn).submit_workflow_product(
-            run_id=self.run_id, task_id=binding["task_id"], lease_ref=binding["lease_id"],
-            brief_sha256=ids.sha256_of_obj(binding["brief"]), product=product, callback=envelope)
+        transport = grid_planner.assigned(binding) if self.terminal_products else None
+        if transport:
+            grid_planner.validate_grids(product, transport)
+        try:
+            answer = TeamService(self.conn).submit_workflow_product(
+                run_id=self.run_id, task_id=binding["task_id"], lease_ref=binding["lease_id"],
+                brief_sha256=ids.sha256_of_obj(binding["brief"]), product=product, callback=envelope)
+        except SchemaInvalid as exc:
+            if transport and exc.details.get("category") == "product_structure":
+                exc.details["contract_digest"] = transport["digest"]
+            raise
         thread_id = binding["thread_id"]
         if self.terminal_products:
             reason = {"ACCEPTED": "GX_ACCEPTED", "REJECTED": "GX_TERMINAL_REJECTED"}[answer["task_status"]]

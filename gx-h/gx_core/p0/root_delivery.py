@@ -79,7 +79,7 @@ def _stored_child_session(thread, meter):
         return False
 
 
-def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start):
+def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start, *, terminal_call=None, prior=None):
     """Corroborate a cold 0.169.0 snapshot with its exact official response records.
 
     A completed response emits a TokenCount even if its provider omitted usage.
@@ -90,10 +90,19 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start):
         header = json.loads(stream.readline())
         if header.get("type") != "session_meta" or header["payload"].get("id") != thread_id:
             return None
+        strict = terminal_call is not None
+        if strict and (header["payload"].get("session_id") != session_id
+                       or header["payload"].get("cli_version") != CODEX_VERSION or prior is None):
+            return None
         if start:
             stream.seek(start)
         capture = False
-        receipts = set()
+        receipts = {}
+        final_submit = False
+        final_response_id = None
+        cancelled = False
+        reported_thread_total = None
+        last_tokens = None
         cost = 0
         cumulative = None
         awaiting_count = False
@@ -111,8 +120,20 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start):
             elif not capture:
                 continue
             elif entry.get("type") == "response_item":
+                if (strict and thread_id == session_id and payload.get("type") == "function_call"
+                        and payload.get("namespace") == "gx" and payload.get("name") == "gx_submit_product"
+                        and payload.get("call_id") == terminal_call):
+                    final_submit = True
                 if call_id := _queued_message(payload):
                     messages.add(call_id)
+            elif kind == "item_completed" and strict and thread_id == session_id:
+                item = payload.get("item") or {}
+                if (final_submit and final_response_id and item.get("type") == "DynamicToolCall"
+                        and item.get("tool") == "gx_submit_product" and item.get("namespace") == "gx"
+                        and item.get("id") == terminal_call and item.get("status") == "failed"
+                        and item.get("success") is False
+                        and item.get("error") == "dynamic tool call was cancelled before receiving a response"):
+                    cancelled = True
             elif entry.get("type") == "token_usage_record":
                 response_id = payload.get("response_id")
                 tokens = _token_count((payload.get("usage") or {}).get("total_tokens"))
@@ -120,8 +141,16 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start):
                         (payload.get("thread_id"), payload.get("turn_id"), payload.get("session_id"),
                          payload.get("root_turn_id")) != (thread_id, turn_id, session_id, owner_turn)):
                     return None
-                receipts.add(response_id)
+                if not isinstance(response_id, str) or (strict and final_response_id is not None):
+                    return None
+                receipts[response_id] = last_tokens = tokens
+                if final_submit:
+                    final_response_id = response_id
                 cost += tokens
+                if strict:
+                    reported_thread_total = _token_count((payload.get("thread_token_usage") or {}).get("total_tokens"))
+                    if reported_thread_total != prior + cost:
+                        return None
                 if (payload.get("turn_token_usage") or {}).get("total_tokens") != cost:
                     return None
                 awaiting_count = True
@@ -130,11 +159,20 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start):
                 cumulative = _token_count((info.get("total_token_usage") or {}).get("total_tokens"))
                 if not awaiting_count or cumulative is None:
                     return None
+                if strict and (cumulative != reported_thread_total or
+                        _token_count((info.get("last_token_usage") or {}).get("total_tokens")) != last_tokens):
+                    return None
                 awaiting_count = False
             elif kind in ("task_complete", "turn_complete", "turn_aborted"):
+                # The cold root stopped while its committed direct call was awaiting a
+                # reply. A completed child instead supplies its own terminal boundary.
+                if strict and (payload.get("root_turn_id") != owner_turn or
+                        (thread_id == session_id and (not cancelled or kind != "turn_aborted")) or
+                        (thread_id != session_id and kind == "turn_aborted")):
+                    return None
                 if (payload.get("turn_id") == turn_id and receipts and not awaiting_count
                         and cumulative is not None):
-                    return cost, cumulative, stream.tell(), messages
+                    return cost, cumulative, stream.tell(), messages, receipts
                 return None
     return None
 
@@ -151,6 +189,7 @@ class RootDelivery:
         self._read_at = {}
         self._checked = {}
         self._queued_messages = set()
+        self._cancelled_products = {}
 
     def _queued(self, sender, turn_id, owner_turn, call_id):
         self._queued_messages.add((sender, turn_id, call_id))
@@ -205,7 +244,9 @@ class RootDelivery:
             self._paths[thread_id] = Path(thread["path"])
         pending = self.conn.execute(
             "SELECT d.turn_id,d.state FROM p0_root_deliveries d LEFT JOIN budget_reservations r "
-            "USING(reservation_ref) WHERE thread_id=? AND (r.status='HELD' OR d.state='sending')",
+            "USING(reservation_ref) LEFT JOIN p0_meter_turns mt ON mt.reservation_ref=d.reservation_ref "
+            "WHERE thread_id=? AND (r.status='HELD' OR d.state='sending' OR (mt.confidence='ESTIMATED' AND EXISTS "
+            "(SELECT 1 FROM p0_root_terminals e WHERE e.thread_id=d.thread_id AND e.turn_id=d.turn_id)))",
             (thread_id,)).fetchall()
         targets = {row["turn_id"] for row in pending}
         with store.transaction(self.conn):
@@ -213,25 +254,45 @@ class RootDelivery:
                 if turn["id"] in targets or None in targets:
                     self._history(thread_id, turn)
 
+    def _terminal_call(self, root, turn):
+        row = self.conn.execute("SELECT call_id FROM p0_root_terminals WHERE thread_id=? AND turn_id=?",
+                                (root, turn)).fetchone()
+        return row[0] if row else None
+
     def _recorded(self, thread_id, turn_id, session_id, owner_turn, prior):
         path = self._paths.get(thread_id)
         if not path or not metering.rollout_diagnostics(self.conn,self.run_id):
             return None
+        terminal_call = self._terminal_call(session_id, owner_turn)
+        if terminal_call and prior is None:
+            return None
         key = thread_id, turn_id
         try:
             stat = path.stat()
-            stamp = (stat.st_dev, stat.st_ino, stat.st_mtime_ns, stat.st_size)
+            stamp = (stat.st_dev, stat.st_ino, stat.st_mtime_ns, stat.st_size, terminal_call, prior)
             checked = self._checked.get(key)
             if checked and checked[0] == stamp:
-                return checked[1]
-            offset = self._read_at.get(thread_id, 0)
-            result = _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, offset)
-            if result is None and offset:
-                result = _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, 0)
+                result = checked[1]
+            else:
+                offset = self._read_at.get(thread_id, 0)
+                result = _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, offset,
+                                         terminal_call=terminal_call, prior=prior)
+                if result is None and offset:
+                    result = _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, 0,
+                                             terminal_call=terminal_call, prior=prior)
+                self._checked[key] = stamp, result
         except (OSError, ValueError, KeyError, TypeError, AttributeError):
             # Remote, compressed, incomplete, rotated or older histories may
             # not expose the required records. Their original hold stays open.
             return None
+        if result and terminal_call:
+            observed = self.conn.execute("SELECT turn_id,response_id,tokens,conflicting FROM p0_meter_responses "
+                "WHERE thread_id=? AND (turn_id=? OR response_id IN (SELECT value FROM json_each(?)))",
+                (thread_id, turn_id, json.dumps(list(result[4]))))
+            for receipt in observed:
+                if (receipt["turn_id"] != turn_id or receipt["conflicting"] or receipt["response_id"] not in result[4] or
+                        (receipt["tokens"] is not None and result[4][receipt["response_id"]] != receipt["tokens"])):
+                    return None
         if result and (prior is None or result[1] - prior == result[0]):
             for call_id in result[3]:
                 self._queued(thread_id, turn_id, owner_turn, call_id)
@@ -239,7 +300,6 @@ class RootDelivery:
             result = result[:2]
         else:
             result = None
-        self._checked[key] = stamp, result
         return result
 
     def _history(self, thread_id, turn):
@@ -535,6 +595,21 @@ class RootDelivery:
             return
         metering.confirm(self.conn,row["reservation_ref"],actual)
 
+    def _terminal_cost(self, thread, turn):
+        call = self._cancelled_products.get((thread, turn))
+        if not call or self._terminal_call(thread, turn) != call:
+            return None
+        return metering.terminal_response_cost(self.conn, thread, turn, call)
+
+    def needs_terminal_snapshot(self, thread, turn):
+        row = self.conn.execute("SELECT prior_tokens,total_tokens FROM p0_meter_native_turns WHERE thread_id=? "
+            "AND turn_id=? AND terminal_status='interrupted' AND (budget_status='HELD' OR confidence='ESTIMATED')",
+            (thread, turn)).fetchone()
+        if not row or row['prior_tokens'] is None:
+            return False
+        exact = self._terminal_cost(thread, turn)
+        return exact is not None and (row['total_tokens'] is None or row['total_tokens'] < row['prior_tokens'] + exact)
+
     def _terminal(self, thread_id, turn, *, measured=None, children_known=0):
         meter_limits.ended(self.conn,thread_id,turn["id"],turn["status"])
         # A lost terminal notification can be recovered on the original connection.
@@ -547,20 +622,31 @@ class RootDelivery:
                 and not live.unpaired_snapshot and all(v is not None for v in live.responses.values())):
             measured, known = self._live_end(thread_id, turn)
             children_known = max(children_known, known)
+        recovered_total = None
         if measured is None:
             held = self.conn.execute(
-                "SELECT prior_tokens FROM p0_root_deliveries JOIN budget_reservations USING(reservation_ref) "
-                "WHERE thread_id=? AND turn_id=? AND status='HELD'", (thread_id, turn["id"])).fetchone()
-            if held:
+                "SELECT prior_tokens,total_tokens FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=? "
+                "AND (budget_status='HELD' OR confidence='ESTIMATED')", (thread_id, turn["id"])).fetchone()
+            if held and turn["status"] == "interrupted":
+                public_cost = self._terminal_cost(thread_id, turn["id"])
+                if (public_cost is not None and held["prior_tokens"] is not None
+                        and held["total_tokens"] == held["prior_tokens"] + public_cost):
+                    measured = public_cost
+            if held and measured is None:
                 proof = self._recorded(thread_id, turn["id"], thread_id, turn["id"], held["prior_tokens"])
-                if proof:
+                if proof and (held["total_tokens"] is None or held["total_tokens"] <= proof[1]):
                     measured = proof[0]
+                    if self._terminal_call(thread_id, turn["id"]):
+                        recovered_total = proof[1]
+                        metering.observe(self.conn, self.run_id, thread_id, thread_id, turn["id"], recovered_total,
+                                         source="official terminal response history")
         self.conn.execute(
-            "INSERT INTO p0_root_turn_usage(thread_id,turn_id,terminal_status,measured_tokens,children_known) "
-            "VALUES(?,?,?,?,?) ON CONFLICT(thread_id,turn_id) DO UPDATE SET terminal_status=excluded.terminal_status,"
+            "INSERT INTO p0_root_turn_usage(thread_id,turn_id,terminal_status,measured_tokens,children_known,total_tokens) "
+            "VALUES(?,?,?,?,?,?) ON CONFLICT(thread_id,turn_id) DO UPDATE SET terminal_status=excluded.terminal_status,"
+            "total_tokens=coalesce(excluded.total_tokens,total_tokens),"
             "measured_tokens=coalesce(excluded.measured_tokens,measured_tokens),"
             "children_known=max(children_known,excluded.children_known)",
-            (thread_id, turn["id"], turn["status"], measured, children_known))
+            (thread_id, turn["id"], turn["status"], measured, children_known, recovered_total))
         self.conn.execute("UPDATE p0_root_deliveries SET state='acknowledged',turn_id=target_turn "
                           "WHERE run_id=? AND thread_id=? AND method='turn/interrupt' AND target_turn=? "
                           "AND state='sending'", (self.run_id, thread_id, turn["id"]))
@@ -606,6 +692,12 @@ class RootDelivery:
                                            "reservation_ref", "token_budget")}
 
     def _arrived(self, thread_id, turn_id, item):
+        # The official history omits the native error string but retains the precise
+        # canceled item and its failed/empty outcome. Match the GX commit separately.
+        if (item.get('type') == 'dynamicToolCall' and item.get('namespace') == 'gx'
+                and item.get('tool') == 'gx_submit_product' and item.get('status') == 'failed'
+                and item.get('success') is False and item.get('contentItems') == []):
+            self._cancelled_products[thread_id, turn_id] = item.get('id')
         if item.get("type") != "userMessage" or not isinstance(item.get("clientId"), str):
             return
         content = item.get("content")
@@ -656,7 +748,8 @@ class RootDelivery:
                     self.conn.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,total_tokens) VALUES(?,?,?) "
                                       "ON CONFLICT(thread_id,turn_id) DO UPDATE SET total_tokens="
                                       "max(coalesce(total_tokens,0),excluded.total_tokens)", (thread_id, turn_id, total))
-                    if earlier and earlier["terminal_status"] == "interrupted" and live and live.cancelled_submit_after is not None:
+                    if (earlier and earlier["terminal_status"] == "interrupted" and
+                            ((live and live.cancelled_submit_after is not None) or (thread_id, turn_id) in self._cancelled_products)):
                         self._terminal(thread_id, {"id": turn_id, "status": "interrupted"})
                     else:
                         self._settle(thread_id, turn_id)
@@ -871,7 +964,9 @@ class RootDelivery:
         """Recover exact input receipts and terminal turns from the official history."""
         rows = self.conn.execute(
             "SELECT d.* FROM p0_root_deliveries d LEFT JOIN budget_reservations r ON r.reservation_ref=d.reservation_ref "
-            "WHERE d.run_id=? AND d.thread_id=? AND (d.state='sending' OR r.status='HELD')",
+            "LEFT JOIN p0_meter_turns mt ON mt.reservation_ref=d.reservation_ref WHERE d.run_id=? AND d.thread_id=? "
+            "AND (d.state='sending' OR r.status='HELD' OR (mt.confidence='ESTIMATED' AND EXISTS "
+            "(SELECT 1 FROM p0_root_terminals e WHERE e.thread_id=d.thread_id AND e.turn_id=d.turn_id)))",
             (self.run_id, thread_id)).fetchall()
         if not rows:
             return

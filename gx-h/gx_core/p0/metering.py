@@ -72,6 +72,42 @@ def response(conn, thread, turn, response_id, tokens):
         "tokens=coalesce(tokens,excluded.tokens)",(thread,response_id,turn,tokens))
 
 
+def _terminal_response(conn, thread, turn, call):
+    return conn.execute(
+        "SELECT a.response_id,a.request_ordinal,a.conflicting FROM p0_response_tools m "
+        "JOIN p0_response_attribution a USING(thread_id,turn_id,response_id) "
+        "JOIN p0_root_terminals e ON e.thread_id=m.thread_id AND e.turn_id=m.turn_id AND e.call_id=m.call_id "
+        "WHERE m.thread_id=? AND m.turn_id=? AND m.source='MODEL' AND m.call_id=? "
+        "AND m.namespace='gx' AND m.tool='gx_submit_product'", (thread, turn, call)).fetchone()
+
+
+def terminal_response_observed(conn, thread, turn, call):
+    """The linked raw completion arrived, including a provider completion with null usage."""
+    return _terminal_response(conn, thread, turn, call) is not None
+
+
+def terminal_response_cost(conn, thread, turn, call):
+    """Exact public raw receipts through the direct terminal call, with continuous live coverage."""
+    final = _terminal_response(conn, thread, turn, call)
+    if not final or final['conflicting'] or final['request_ordinal'] is None:
+        return None
+    rows = conn.execute(
+        'SELECT a.request_ordinal,a.response_id,a.total_tokens,a.conflicting,m.tokens,m.conflicting AS raw_conflict '
+        'FROM p0_response_attribution a LEFT JOIN p0_meter_responses m USING(thread_id,turn_id,response_id) '
+        'WHERE a.thread_id=? AND a.turn_id=? ORDER BY a.request_ordinal', (thread, turn)).fetchall()
+    raw_count = conn.execute('SELECT count(*) FROM p0_meter_responses WHERE thread_id=? AND turn_id=?',
+                             (thread, turn)).fetchone()[0]
+    if len(rows) != final['request_ordinal'] or raw_count != len(rows) or rows[-1]['response_id'] != final['response_id']:
+        return None
+    total = 0
+    for ordinal, row in enumerate(rows, 1):
+        if (row['request_ordinal'] != ordinal or row['conflicting'] or row['raw_conflict']
+                or row['total_tokens'] is None or row['tokens'] != row['total_tokens']):
+            return None
+        total += row['total_tokens']
+    return total
+
+
 def _raw_lower(conn, thread, turn):
     return conn.execute("SELECT coalesce(sum(tokens),0) FROM p0_meter_responses WHERE thread_id=? "
                         "AND turn_id=? AND conflicting=0",(thread,turn)).fetchone()[0]
@@ -281,6 +317,16 @@ def inspect(conn, run_id, *, include_responses=False):
     if conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_response_attribution'").fetchone():
         if include_responses:
             result["response_attribution"] = response_attribution.report(conn, run_id)
+            # A host-created extra Goal Turn has no GX reservation. Its thread-wide
+            # cumulative counter does not establish that Turn's incremental cost.
+            result["unreserved_native_turns"] = rows(
+                "SELECT u.thread_id,u.turn_id,u.terminal_status,u.total_tokens AS reported_thread_total,"
+                "count(m.response_id) AS observed_response_count,"
+                "sum(CASE WHEN m.conflicting=0 THEN m.tokens END) AS observed_response_lower_bound "
+                "FROM p0_root_turn_usage u JOIN p0_roots r USING(thread_id) LEFT JOIN p0_meter_responses m "
+                "ON m.thread_id=u.thread_id AND m.turn_id=u.turn_id WHERE r.run_id=? AND NOT EXISTS "
+                "(SELECT 1 FROM p0_meter_native_turns d WHERE d.thread_id=u.thread_id AND d.turn_id=u.turn_id) "
+                "GROUP BY u.thread_id,u.turn_id ORDER BY u.thread_id,u.rowid")
         else:
             result["attributed_response_count"] = conn.execute(
                 "SELECT count(*) FROM p0_response_attribution WHERE run_id=?", (run_id,)).fetchone()[0]

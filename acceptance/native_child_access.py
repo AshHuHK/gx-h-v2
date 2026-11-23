@@ -13,7 +13,7 @@ import time
 from unittest.mock import patch
 
 from native_probe import CHILD, PACKAGE, Peer, Probe, _proxy_preflight, find_binary
-from native_probe_peer import tool, wire_catalog
+from native_probe_peer import declared_calls, tool, wire_catalog
 from gx_core import budgets
 from gx_core.artifacts.service import ArtifactService
 from gx_core.p0 import schema
@@ -22,6 +22,10 @@ from gx_core.persistence import records, store
 
 
 ORIGINAL = "Observation 7: μ = 0.25 ± 0.01.\nOriginal notebook entry."
+
+
+class ChildProbeTimeout(AssertionError):
+    pass
 
 
 class ChildPeer(Peer):
@@ -35,7 +39,10 @@ class ChildPeer(Peer):
     def record(self, body):
         row, n = super().record(body)
         if getattr(self, "observe_catalogs", False):
-            row["gx_catalog"] = sorted(name for name in wire_catalog(body)[1] if name.startswith("gx_"))
+            specs, exposed = wire_catalog(body)
+            row["gx_catalog"] = sorted(name for name in exposed if name.startswith("gx_"))
+            row["submit_namespace"] = next((namespace for namespace, name in declared_calls(specs)
+                                            if name == "gx_submit_product"), None)
         phase = row["scenario"] + "-"
         replies = {}
         for item in body.get("input", []):
@@ -88,7 +95,8 @@ class ChildPeer(Peer):
             if not any("-other-" in k for k in replies):
                 return read(self.foreign, "other")
             if not any("-write-" in k for k in replies):
-                return call("gx_submit_product", {"product": {"note": "child attempt"}}, "write")
+                return call("gx_submit_product", {"product": {"note": "child attempt"}}, "write",
+                            row.get("submit_namespace"))
         elif not any("-expired-" in k for k in replies):
             self.expire.set()
             self.expired.wait(15)
@@ -97,7 +105,7 @@ class ChildPeer(Peer):
         return self.message(row["id"], "I read the original notebook.")
 
 
-def run(directory, binary, *, drop_spawn=False, role_profile=None):
+def run(directory, binary, *, drop_spawn=False, drop_cold_start=True, role_profile=None):
     version = subprocess.check_output([str(binary), "--version"], text=True).strip()
     if version != "codex-cli 0.169.0":
         raise RuntimeError("This probe requires Codex 0.169.0")
@@ -119,7 +127,7 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
         profile_path = directory / "profiles.json"
         profile_path.write_text(json.dumps({"roles": {"evidence_reviewer": role_profile}}))
         knobs["GX_P0_PROFILE"] = str(profile_path)
-    callbacks, dropped, lost_spawn, tasks = [], [], [], {}
+    callbacks, dropped, cold_started, lost_spawn, tasks = [], [], [], [], {}
     completed = set()
     try:
         with patch.dict(os.environ, knobs), closing(store.open_store(directory / "gx.sqlite")) as conn:
@@ -152,7 +160,7 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
                 return Roots(conn, run_id=rid, cwd=probe.cwd, argv=argv, env=probe.env, token_budget=4000)
             def counts():
                 return {t: conn.execute("SELECT count(*) FROM " + t).fetchone()[0] for t in ("tasks", "leases")}
-            def trace(roots, drop=None):
+            def trace(roots, cold_child=None):
                 previous = roots.client.on_server_request
                 def callback(frame):
                     p = frame.message["params"]
@@ -173,16 +181,18 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
                         return
                     if m["method"] == "turn/completed":
                         completed.add((m["params"]["threadId"], m["params"]["turn"]["id"]))
-                    if drop and m["method"] == "turn/started" and m["params"]["threadId"] == drop:
-                        dropped.append(m["params"]["turn"]["id"])
-                    else:
-                        notify(frame)
+                    if cold_child and m["method"] == "turn/started" and m["params"]["threadId"] == cold_child:
+                        cold_started.append(m["params"]["turn"]["id"])
+                        if drop_cold_start:
+                            dropped.append(m["params"]["turn"]["id"])
+                            return
+                    notify(frame)
                 roots.client.on_notification = observe
             def until(roots, done):
                 deadline = time.monotonic() + 25
                 while not done():
                     if time.monotonic() >= deadline:
-                        raise AssertionError(f"{peer.plan} timed out: {callbacks!r}; requests {peer.scenario_count}")
+                        raise ChildProbeTimeout(f"{peer.plan} timed out: {callbacks!r}; requests {peer.scenario_count}")
                     roots.poll(.025)
                     peer.driver_polled.set()
                     if peer.expire.is_set() and not peer.expired.is_set():
@@ -212,7 +222,8 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
                 if first["type"] != "session_meta" or first["payload"]["id"] != child:
                     raise AssertionError("The official child metadata did not match its rollout")
                 child_meta = first["payload"]
-                inherited = [spec["name"] for spec in child_meta["dynamic_tools"]]
+                inherited_calls = list(declared_calls(child_meta["dynamic_tools"]))
+                inherited = [name for namespace, name in inherited_calls]
                 peer.scenario("fork")
                 fork = roots._request("thread/fork", {"threadId": tid})["thread"]
                 fork_turn = roots._request("turn/start", {"threadId": fork["id"],
@@ -230,7 +241,7 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
             peer.child_done.clear()
             conn.execute("UPDATE jobs SET status='SUCCEEDED' WHERE job_id=?", (peer.job,))
             with connect() as roots:
-                trace(roots, drop=child)
+                trace(roots, cold_child=child)
                 cold_facts = roots._request("thread/read", {"threadId": child})["thread"]
                 next_reconcile = 0
                 def settled():
@@ -246,7 +257,12 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
                 peer.gate.clear()
                 restored = roots.dispatch(task)
                 peer.gate.set()
-                until(roots, lambda: peer.child_done.is_set())
+                try:
+                    until(roots, lambda: peer.child_done.is_set())
+                except ChildProbeTimeout:
+                    if role_profile is None:
+                        raise
+                    # Keep the actual wire catalogs and callbacks from an unsuccessful role probe.
                 tasks["after"] = counts()
             has = lambda phase, label, success: any(c["phase"] == phase and c["thread"] == child
                 and f"-{label}-" in c["call"] and c["success"] == success for c in callbacks)
@@ -257,8 +273,8 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
             verdict = {"warm_retry": has("warm", "source", False), "warm_success": has("warm", "source", True),
                        "native_child_inherited_read": child_meta.get("multi_agent_version") == "v2" and
                                                       "gx_read_artifact" in inherited,
-                       "cold_retry": bool(dropped) and has("cold", "source", False),
                        "cold_success": has("cold", "source", True),
+                       "cold_child_finished": peer.child_done.is_set(),
                        "original_in_child_input": all(any(p == phase and c for p,c,k in peer.model_reads)
                                                       for phase in ("warm", "cold")),
                        "unrelated_artifact_denied": denied(child, "warm", "not been cited", "-other-"),
@@ -268,13 +284,19 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
                        "other_run_root_denied": denied(other_id, "other_root", "another GX run"),
                        "same_task_lease": tasks["before"] == tasks["after"] == {"tasks": 1, "leases": 1}
                                           and restored["lease_id"] == lease}
+            if drop_cold_start:
+                verdict["cold_retry"] = bool(dropped) and has("cold", "source", False)
+            else:
+                verdict["cold_start_delivered"] = bool(cold_started) and not dropped
             if drop_spawn:
                 verdict["missed_spawn_recovered"] = bool(lost_spawn) and verdict["warm_success"]
             if role_profile is not None:
                 verdict["child_inherited_assigned_catalog"] = set(inherited) == set(role_profile["tools"])
+                verdict["child_inherited_submit_namespace"] = ("gx", "gx_submit_product") in inherited_calls
                 for child_flag, label in ((False, "root"), (True, "child")):
                     first = next(row for row in peer.rows if row["scenario"] == "warm" and row["child"] == child_flag)
                     verdict[label + "_wire_catalog_matches_assignment"] = set(first["gx_catalog"]) == set(role_profile["tools"])
+                    verdict[label + "_wire_submit_namespace"] = first["submit_namespace"] == "gx"
             return {"pass": all(verdict.values()), "checks": verdict, "codex_version": version, "binary_sha256": binary_sha,
                     "provider": "scripted loopback Responses", "run_id": rid, "task_id": task,
                     "root_id": tid, "lease_id": lease, "attempt": restored["attempt"], "counts": tasks,
@@ -288,7 +310,8 @@ def run(directory, binary, *, drop_spawn=False, role_profile=None):
                     "child_metadata": {k: facts.get(k) for k in ("id","parentThreadId","sessionId","forkedFromId","source")},
                     "cold_child_metadata": {k: cold_facts.get(k) for k in ("id","parentThreadId","sessionId","forkedFromId","source")},
                     "fork_metadata": {k: fork.get(k) for k in ("id","parentThreadId","sessionId","forkedFromId","source")},
-                    "spawn_notifications_dropped": lost_spawn, "cold_turn_started_notification_dropped": dropped,
+                    "spawn_notifications_dropped": lost_spawn, "cold_turn_started_notifications": cold_started,
+                    "cold_turn_started_notification_dropped": dropped,
                     "callbacks": callbacks, "child_observations": peer.model_reads}
     finally:
         peer.gate.set()

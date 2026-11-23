@@ -44,6 +44,16 @@ def wire_catalog(body):
     return specs, exposed
 
 
+def declared_calls(specs):
+    """Flatten the official function/namespace schema while retaining each call's namespace."""
+    for spec in specs:
+        if spec.get("type") == "namespace":
+            for leaf in spec["tools"]:
+                yield spec["name"], leaf["name"]
+        else:
+            yield None, spec["name"]
+
+
 class Peer(ThreadingHTTPServer):
     daemon_threads = True
 

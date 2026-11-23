@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import threading
@@ -17,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT / "acceptance"), str(ROOT / "gx-h")]
 from native_child_access import run as child_read
 from native_probe import INIT, Peer, Probe, _proxy_preflight
-from native_probe_peer import wire_catalog
+from native_probe_peer import declared_calls, wire_catalog
 from gx_core.hostobs import host_policy
 from gx_core.hostobs.app_server_client import AppServerClient
 from gx_core.p0 import profiles, schema
@@ -49,6 +50,8 @@ class WirePeer(Peer):
         specs, names = wire_catalog(body)
         row["tool_names"] = sorted(names)
         row["spawn_in_catalog"] = "spawn_agent" in names
+        row["submit_namespace"] = next((namespace for namespace, name in declared_calls(specs)
+                                        if name == "gx_submit_product"), None)
         row["tool_bytes"] = len(json.dumps(specs, ensure_ascii=False, separators=(",", ":")).encode())
         base = body.get("instructions") or next(part["text"] for item in body["input"]
             if item.get("role") == "developer" for part in item.get("content", ())
@@ -95,8 +98,10 @@ def catalogs(work, binary):
                     names = sorted({name for name in observed["tool_names"] if name.startswith("gx_")})
                     assert names == sorted(json.loads(row["tool_names_json"])), (version, role, names)
                     assert observed["spawn_in_catalog"] == (version == "2"), (version, role, observed["tool_names"])
+                    assert observed["submit_namespace"] == ("gx" if version == "3" else None)
                     results.append({"workflow": "science_grid@" + version, "role": role, "thread": tid,
                         "model": observed["wire_model"], "gx_tools": names, "spawn_agent": observed["spawn_in_catalog"],
+                        "submit_namespace": observed["submit_namespace"],
                         "tool_schema_bytes": observed["tool_bytes"],
                         "base_instructions_sha256": observed["base_instructions_sha256"]})
             assert len({row["base_instructions_sha256"] for row in results}) == 1
@@ -109,6 +114,7 @@ def catalogs(work, binary):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--drop-cold-start", action="store_true", help="also exercise lost live child-start recovery")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--binary", type=Path, default=ROOT / "vendor/codex-runtime/package/vendor/"
                         "x86_64-unknown-linux-musl/bin/codex")
@@ -122,12 +128,18 @@ def main():
         work = Path(temporary)
         with patch("gx_core.p0.roots.tempfile.gettempdir", return_value=work):
             wire = catalogs(work, binary)
-            delegated = child_read(work, binary, role_profile=assigned)
+            delegated = child_read(work, binary, role_profile=assigned, drop_cold_start=args.drop_cold_start)
     history = paid_calls()
     for row in wire:
         if row["workflow"] == "science_grid@3":
             assert set(history["calls"]["candidate"].get(row["role"], ())) <= set(row["gx_tools"])
-    result = {"binary_sha256": locked, "fixture": "official stdio App Server with loopback scripted Responses",
+    commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    modified = subprocess.check_output(["git", "diff", "--name-only", "HEAD", "--", "gx-h/gx_core", "gx-h/config",
+                                        "gx-h/plugins", "gx-h/workflows"], cwd=ROOT, text=True).splitlines()
+    fixtures = ["acceptance/v31/b2/role_probe.py", "acceptance/native_probe_peer.py", "acceptance/native_child_access.py"]
+    result = {"product_commit": commit, "modified_product_files": modified,
+              "fixture_sha256": {path: hash_file(ROOT / path) for path in fixtures},
+              "binary_sha256": locked, "fixture": "official stdio App Server with loopback scripted Responses",
               "wire_catalogs": wire, "historical_callbacks": history, "explicit_review_assignment": assigned,
               "native_child": delegated}
     args.output.parent.mkdir(parents=True, exist_ok=True)

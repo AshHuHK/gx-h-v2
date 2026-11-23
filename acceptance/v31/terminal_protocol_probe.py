@@ -39,7 +39,7 @@ def digest(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def identity():
+def identity(extra_sources=()):
     assets = PACKAGE / "release-assets"
     lock = json.loads((assets / "lock.json").read_text())
     binary = PACKAGE / "vendor/codex-runtime/package" / lock["linux_x64"]["binary"]
@@ -50,6 +50,7 @@ def identity():
         "codex-rs/app-server/src/outgoing_message.rs",
         "codex-rs/app-server/src/request_processors/turn_processor.rs",
         "codex-rs/core/src/tools/handlers/dynamic.rs",
+        *extra_sources,
     ]
     checked = {}
     with tarfile.open(archive, "r|gz") as tar:

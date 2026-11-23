@@ -1,0 +1,76 @@
+{
+  "run": "gxr_01m84gvc16wgkaphvg",
+  "task": "gxt_01m84gvc18k9brbx6d",
+  "initial": {
+    "status": "CLAIMED",
+    "attempt": 1,
+    "lease_id": "gxl_01m84gvc8w70kf0cye",
+    "expires_at": "2026-11-23T16:37:01.980Z",
+    "principal": "01a2090d-b125-7be3-9a55-2cdac45c6c3e"
+  },
+  "after": {
+    "status": "CLAIMED",
+    "attempt": 1,
+    "lease_id": "gxl_01m84gvc8w70kf0cye",
+    "expires_at": "2026-11-23T17:32:02.174Z",
+    "principal": "01a2090d-b125-7be3-9a55-2cdac45c6c3e"
+  },
+  "callbacks": [
+    {
+      "thread_id": "01a2090d-b125-7be3-9a55-2cdac45c6c3e",
+      "turn_id": "01a2090d-b142-7122-8101-872ba945ef3b",
+      "call_id": "response-1",
+      "status": "CLAIMED",
+      "attempt": 1,
+      "lease_id": "gxl_01m84gvc8w70kf0cye",
+      "expires_at": "2026-11-23T17:32:02.174Z",
+      "principal": "01a2090d-b125-7be3-9a55-2cdac45c6c3e",
+      "at": "2026-11-23T16:32:02.179Z",
+      "task": "gxt_01m84gvc18k9brbx6d"
+    },
+    {
+      "thread_id": "01a2090d-b125-7be3-9a55-2cdac45c6c3e",
+      "turn_id": "01a2090d-b142-7122-8101-872ba945ef3b",
+      "call_id": "response-2",
+      "status": "CLAIMED",
+      "attempt": 1,
+      "lease_id": "gxl_01m84gvc8w70kf0cye",
+      "expires_at": "2026-11-23T17:32:02.174Z",
+      "principal": "01a2090d-b125-7be3-9a55-2cdac45c6c3e",
+      "at": "2026-11-23T16:39:32.245Z",
+      "task": "gxt_01m84gvc18k9brbx6d"
+    }
+  ],
+  "renewals": [
+    {
+      "attempt": 1,
+      "expires_at": "2026-11-23T17:32:02.174Z",
+      "lease_id": "gxl_01m84gvc8w70kf0cye",
+      "previous_expires_at": "2026-11-23T16:37:01.980Z"
+    }
+  ],
+  "durable_tool_receipts": [
+    {
+      "thread_id": "01a2090d-b125-7be3-9a55-2cdac45c6c3e",
+      "call_id": "response-1",
+      "turn_id": "01a2090d-b142-7122-8101-872ba945ef3b"
+    },
+    {
+      "thread_id": "01a2090d-b125-7be3-9a55-2cdac45c6c3e",
+      "call_id": "response-2",
+      "turn_id": "01a2090d-b142-7122-8101-872ba945ef3b"
+    }
+  ],
+  "default_lease_seconds": 3600,
+  "clock": "GX time advanced by default TTL minus 300 seconds, then by 450 seconds; real native process and callbacks.",
+  "checks": {
+    "two_accepted_callbacks_on_same_attempt": true,
+    "second_callback_after_original_expiry": true,
+    "same_lease_renewed": true,
+    "two_durable_tool_receipts": true
+  },
+  "version": "codex-cli 0.169.0",
+  "sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "schema_sha256": "ab77d6681eb73d62b7b0d736a2416ac3a43bd9dcf668b5eb7c7a47db76e20f17",
+  "scope": "official app server, local scripted provider, actual GX"
+}

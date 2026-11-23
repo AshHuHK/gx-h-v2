@@ -20,7 +20,7 @@ from ..persistence import records, store
 from ..scheduling import dispatch as scheduler, snapshot
 from ..teams import recovery
 from ..teams.service import TeamService, default_lease_seconds
-from . import compute
+from . import compute, grid_brief
 from . import profiles
 from ..orchestration.service import hooks_for_run
 from . import activity, terminal_products, waits
@@ -375,7 +375,10 @@ class Roots:
             extra = {name: value for name, value in current.items() if name not in ("task_id", "intent", "supplement_sources")}
             if extra:
                 packet["workflow_context"] = extra
-            brief = "GX task brief\n" + json.dumps(packet, ensure_ascii=False)
+            preload = grid_brief.applies(self.run, packet["input"])
+            # Reference grants belong to the new root. Fill its packet after
+            # those grants, in this same claim transaction.
+            brief = "" if preload else grid_brief.PREFIX + json.dumps(packet, ensure_ascii=False)
         self.conn.execute("INSERT INTO p0_roots(root_key,run_id,task_id,attempt,lease_id,cwd,role,model,"
                           "effort,brief,provider,tool_names_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (key,self.run_id,
                           task["task_id"] if task is not None else None, attempt, lease,
@@ -383,6 +386,9 @@ class Roots:
                           ids.canonical_json(tool_names) if self._role_tools or "provider" in profile else None))
         if task is not None:
             self._allow_refs(key, [packet["input"], getattr(current, "citations", current)])
+            if preload:
+                self.conn.execute("UPDATE p0_roots SET brief=? WHERE root_key=?",
+                                  (grid_brief.render(self, key, packet), key))
         return self._row(key)
 
     def _allow_refs(self, root_key, value):
@@ -512,9 +518,10 @@ class Roots:
             names = (json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None
                      else [tool["name"] for tool in self.worker_tools])
             instructions = profiles.worker_instructions(names, delegate=delegate)
+        worker_context = grid_brief.GUIDANCE if grid_brief.includes_artifacts(row["brief"]) else row["brief"]
         params = {"modelProvider":row["provider"] or host_policy.p0_provider_for_run(self.run),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
                   "config":config, "developerInstructions":row["brief"] if main else
-                  instructions+"\n"+row["brief"]}
+                  instructions+"\n"+worker_context}
         if new:
             params["experimentalRawEvents"] = True
             params["environments"] = []
@@ -766,7 +773,11 @@ class Roots:
         if prior and (prior["terminal_status"] in ("interrupted","failed") or
                 (prior["terminal_status"] and waits.deferred_turn(self.conn, row["root_key"], prior["turn_id"]))):
             event_id = "resume:"+prior["turn_id"]
-        receipt = self.deliver(tid, row["brief"], event_id=event_id)
+        text = row["brief"]
+        if event_id.startswith("resume:") and grid_brief.includes_artifacts(text):
+            text = ("Resume your assigned task. Use gx_task_context for current Intent and supplemental "
+                    "sources, then continue with the frozen Artifacts in your original brief.")
+        receipt = self.deliver(tid, text, event_id=event_id)
         return {**self._binding(tid), "turn_id":receipt["turn_id"]}
 
     def thread_for_lease(self, task_id, lease_id):
@@ -1006,8 +1017,9 @@ class Roots:
             self._allow_refs(binding["root_key"], answer)
         return answer
 
-    def _artifact_access(self, binding, ref):
-        allowed = self.conn.execute("SELECT media_type,rel_path,kind FROM p0_root_artifact_reads JOIN artifacts USING(artifact_ref) "
+    def _artifact_access(self, binding, ref, *, metadata=False):
+        columns = "media_type,rel_path,kind,bytes,sha256" if metadata else "media_type,rel_path,kind"
+        allowed = self.conn.execute(f"SELECT {columns} FROM p0_root_artifact_reads JOIN artifacts USING(artifact_ref) "
                                     "WHERE root_key=? AND artifact_ref=? AND (run_id=? OR run_id IS NULL)",
                                     (binding["root_key"], ref, self.run_id)).fetchone()
         if not allowed:

@@ -54,7 +54,15 @@ class RoleTools(unittest.TestCase):
         self.assertEqual(set(json.loads(row["tool_names_json"])), expected)
         brief = json.loads(row["brief"].split("\n", 1)[1])
         self.assertEqual(set(brief["gx_tools"]), expected)
-        self.assertEqual({spec["name"] for spec in settings["dynamicTools"]}, expected)
+        qualified = []
+        for spec in settings["dynamicTools"]:
+            if spec.get("type") == "namespace":
+                qualified.extend((spec["name"], leaf["name"]) for leaf in spec["tools"])
+            else:
+                qualified.append((None, spec["name"]))
+        direct = roots.run["workflow_version"] == "3"
+        self.assertCountEqual(qualified, [("gx" if direct and name == "gx_submit_product" else None, name)
+                                          for name in expected])
         self.assertNotIn("baseInstructions", settings)
         return settings
 

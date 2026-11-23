@@ -326,7 +326,7 @@ def run():
                         **({"turn_id": params["turnId"]} if "turnId" in params else {}),
                     }
                 )
-                if method == "thread/resume":
+                if method == "thread/read":
                     b = n._binding(f["thread"])
                     return {
                         "modelProvider": b["provider"],
@@ -356,7 +356,7 @@ def run():
             n._request = scripted
             terminal.retry_seconds = 0
             dispatch.reconcile_costs()
-            assert calls[0]["method"] == "thread/resume" and "thread/turns/list" in [
+            assert calls[0]["method"] == "thread/read" and "thread/turns/list" in [
                 x["method"] for x in calls
             ]
             assert terminal.due and calls[-1]["method"] == "turn/interrupt"

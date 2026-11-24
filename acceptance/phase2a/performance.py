@@ -4,6 +4,7 @@ import argparse
 from collections import Counter, defaultdict
 import gzip
 import hashlib
+import heapq
 import json
 import math
 from pathlib import Path
@@ -59,7 +60,7 @@ def transaction_summary(writes):
         ],
         "slow_samples": {
             field: [{key: row[key] for key in fields}
-                    for row in sorted(modern, key=lambda r: r[field], reverse=True)[:5]]
+                    for row in heapq.nlargest(5, modern, key=lambda r: r[field])]
             for field in SQLITE_TIMES
         },
     }

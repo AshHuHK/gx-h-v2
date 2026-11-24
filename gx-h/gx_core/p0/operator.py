@@ -14,7 +14,7 @@ PREFIX = "My requested action is "
 INTENT = {"change", "cancel_jobs", "confirm", "proposal", "supplement", "text"}
 READS = {"status", "inspect", "usage", "pending", "audit"}
 CONTROL = {"pause", "resume", "cancel", "retry", "recover"}
-KINDS = READS | CONTROL | {"budget_preview", "budget_apply"}
+KINDS = READS | CONTROL | {"budget_preview", "budget_apply", "usage_resolve"}
 
 
 def local_context(conn):
@@ -48,6 +48,9 @@ def _check(action):
         optional = {"reason"} if kind in CONTROL else set()
         if not intent._keys(action, {"kind"}, optional) or ("reason" in action and not intent._text(action["reason"])):
             raise SchemaInvalid("Unexpected operator action fields or empty reason")
+    elif kind == "usage_resolve":
+        from . import operator_usage
+        operator_usage.check(action)
     elif kind == "budget_preview":
         if (not intent._keys(action, {"kind", "resource", "limit"}, {"budget_scope"})
                 or action.get("budget_scope", "run") not in ("run", "project")
@@ -90,7 +93,7 @@ def submit(ctx, rid, action, message_id=None, *, queue_only=False):
     _check(action)
     if message_id is not None and not intent._text(message_id):
         raise SchemaInvalid("Supply a nonempty message ID")
-    with store.transaction(ctx.conn):
+    with store.transaction(ctx.conn,transaction_owner="Operator",operation="submit",run_id=rid):
         prior = _message(ctx.conn, message_id) if message_id else None
         text = PREFIX + ids.canonical_json(action)
         # Retain an earlier native --action kind=text's real receipt on replay.
@@ -135,7 +138,7 @@ def _apply_or_reject(ctx, rid, mid):
     except GxError as exc:
         if exc.side_effect_status == "UNKNOWN":
             raise
-        with store.transaction(ctx.conn):
+        with store.transaction(ctx.conn,transaction_owner="Operator",operation="reject",run_id=rid):
             updated = ctx.conn.execute("UPDATE p0_operator_messages SET rejected=? WHERE run_id=? AND message_id=? "
                                        "AND rejected IS NULL AND result_json IS NULL", (exc.message, rid, mid))
             if updated.rowcount:
@@ -160,15 +163,23 @@ def _consume(ctx, rid, mid):
     if kind in CONTROL:
         # Job cancellation and recovery use their existing outside-transaction protocols.
         result = _control(ctx, run, mid, action)
-    with store.transaction(ctx.conn):
+    if kind in READS:
+        result = _read(ctx, run, kind, mid)
+        read_digest = ids.sha256_of_obj(result)
+    proof = None
+    if kind == "usage_resolve" and action.get("source") == "codex-rollout":
+        from . import operator_usage
+        proof = operator_usage.prepare_history(ctx.conn,rid,action)
+    with store.transaction(ctx.conn,transaction_owner="Operator",operation="apply",run_id=rid):
         fresh = _message(ctx.conn, mid)
         if fresh["result_json"]:
             saved = json.loads(fresh["result_json"])
             if kind in READS and saved.get("local_read") == kind:
-                return _read(ctx, run, kind, mid)
+                return result
             return saved
-        if kind in READS:
-            result = _read(ctx, run, kind, mid)
+        if kind == "usage_resolve":
+            from . import operator_usage
+            result = operator_usage.perform(ctx,rid,mid,action,proof)
         elif kind in INTENT:
             result = intent._apply_local(ctx.conn, rid, mid, action)
         elif kind in ("budget_preview", "budget_apply"):
@@ -180,7 +191,7 @@ def _consume(ctx, rid, mid):
         ctx.conn.execute("UPDATE p0_operator_messages SET result_json=? WHERE message_id=?",
                          (ids.canonical_json(receipt), mid))
         _event(ctx, rid, mid, "applied", {"action": kind, "status": result.get("status"),
-                                         "result_sha256": ids.sha256_of_obj(result)})
+                                         "result_sha256": read_digest if kind in READS else ids.sha256_of_obj(result)})
     return result
 
 
@@ -261,6 +272,15 @@ def add_commands(commands):
     parser.add_argument("--preview-sha256")
     parser.add_argument("--acknowledge-consequences", choices=(intent.IMPACT_ACK, intent.CANCEL_ACK))
     parser.add_argument("--output", type=Path, help="Write the audit report to this JSON file")
+    from . import operator_usage
+    parser.add_argument("--reservation-ref")
+    parser.add_argument("--decision", choices=operator_usage.DECISIONS)
+    parser.add_argument("--source", choices=operator_usage.SOURCES)
+    parser.add_argument("--thread-id")
+    parser.add_argument("--turn-id")
+    parser.add_argument("--response-id")
+    parser.add_argument("--acceptance-event-id",type=int)
+    parser.add_argument("--approve-release",action="store_const",const=True,help="Release the explicitly accepted exposure")
 
 
 def cli_action(args):
@@ -269,7 +289,8 @@ def cli_action(args):
         raise SchemaInvalid("--output belongs to the audit command")
     action = {"kind": kind}
     for field in ("reason", "resource", "limit", "budget_scope", "preview_id", "preview_sha256",
-                  "acknowledge_consequences"):
+                  "acknowledge_consequences","reservation_ref","decision","source","thread_id","turn_id",
+                  "response_id","acceptance_event_id","approve_release"):
         value = getattr(args, field)
         if value is not None:
             action[field] = int(value) if field == "limit" and value.is_integer() else value

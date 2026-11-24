@@ -555,8 +555,10 @@ class Driver:
         for at in (lease, *(w.get("next_retry_at") for w in self._waits.values())):
             if at and at > checked_at:
                 due.append(time.monotonic() - clock.age_seconds(at))
+        from . import operator_usage
         for owner, args in ((JobService.next_poll_seconds, (self.conn, self.rid, checked_at)),
-                            (metering.next_deadline_seconds, (self.conn, self.rid))):
+                            (metering.next_deadline_seconds, (self.conn, self.rid)),
+                            (operator_usage.next_alert_seconds, (self.conn, self.rid))):
             sampled_at = time.monotonic()
             seconds = owner(*args)
             if seconds is not None:

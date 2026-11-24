@@ -858,6 +858,38 @@ def adjust_settled_tokens(conn, reservation_ref, *, delta, adjustment_id, actor)
                            subject_id=row["budget_ref"], evidence_level="EXECUTION_OBSERVED", payload=facts)
 
 
+def record_released_native_usage(conn, reservation_ref, *, actual, previous, key, actor, run_id):
+    """Book evidence of use after releasing a native hold, including a closed funding line."""
+    actual = _amounts(actual, what="native usage")
+    previous = _amounts(previous, what="prior native usage") if previous else {}
+    with store.transaction(conn, transaction_owner="Budget", operation="record_released_native_usage", run_id=run_id) as tx:
+        row = _reservation(tx, reservation_ref)
+        if row["status"] != RELEASED or row["subject_kind"] != "native_turn":
+            raise IllegalTransition("late native usage requires its released native reservation")
+        facts = {"reservation_ref":reservation_ref, "receipt_key":key, "previous":previous, "actual":actual}
+        seen = tx.execute("SELECT event_id,payload_json FROM events WHERE kind='budget.released_native_usage' "
+                          "AND subject_id=? AND json_extract(payload_json,'$.receipt_key')=?", (row["budget_ref"],key)).fetchone()
+        if seen:
+            if store.loads(seen,"payload_json") != facts:
+                raise IdempotencyConflict("the released native usage receipt already has a different amount")
+            return seen["event_id"]
+        budget = _row(tx, row["budget_ref"])
+        deltas = {k:actual.get(k,0)-previous.get(k,0) for k in actual.keys() | previous.keys()
+                  if k in store.loads(budget,"limits_json",{})}
+        while True:
+            spent = store.loads(budget,"spent_json",{})
+            for name, delta in deltas.items():
+                if spent.get(name,0) + delta < 0:
+                    raise IllegalTransition("a correction would erase unrelated native spending")
+                spent[name] = _clean(spent.get(name,0) + delta)
+            _write(tx,budget["budget_ref"],spent=spent)
+            if not budget["parent_ref"] or _funding_state(tx,budget["budget_ref"]) == HELD:
+                break
+            budget = _row(tx,budget["parent_ref"])
+        return store.append_event(tx,kind="budget.released_native_usage",actor=actor,run_id=run_id,
+            subject_kind="budget",subject_id=row["budget_ref"],evidence_level="EXECUTION_OBSERVED",payload=facts)
+
+
 def _settle_result(conn: sqlite3.Connection, row: sqlite3.Row, used: Mapping[str, Any],
                    held: Mapping[str, Any], *, reused: bool) -> dict[str, Any]:
     budget = _row(conn, row["budget_ref"])

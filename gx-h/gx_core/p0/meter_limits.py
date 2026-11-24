@@ -140,7 +140,7 @@ def _risk(conn, limit, spent, reserved, active, *, scope, closed=(), refs=None):
 def scopes(conn, run_id, ref):
     project = conn.execute("SELECT project_ref FROM runs WHERE run_id=?",(run_id,)).fetchone()[0]
     active = conn.execute("SELECT d.* FROM p0_meter_native_turns d JOIN runs r USING(run_id) WHERE r.project_ref=? "
-        "AND (d.budget_status='HELD' OR (d.estimated_at IS NOT NULL AND EXISTS (SELECT 1 FROM "
+        "AND (d.budget_status='HELD' OR (d.budget_status='RELEASED' AND d.attribution IS NOT 'TURN') OR (d.estimated_at IS NOT NULL AND EXISTS (SELECT 1 FROM "
         "p0_native_child_usage u JOIN p0_native_child_meters m USING(child_id) WHERE m.root_id=d.thread_id "
         "AND u.owner_turn=d.turn_id AND u.terminal=0)))",(project,)).fetchall()
     closed = _closed_exposure(conn, project)

@@ -256,10 +256,12 @@ class RootDelivery:
             raise OutcomeUnknown("Codex returned another thread for metering")
         if thread.get("path"):
             self._paths[thread_id] = Path(thread["path"])
+            metering.remember_host_history(self.conn, self.run_id, thread_id, thread_id, thread)
         pending = self.conn.execute(
             "SELECT d.turn_id,d.state FROM p0_root_deliveries d LEFT JOIN budget_reservations r "
             "USING(reservation_ref) LEFT JOIN p0_meter_turns mt ON mt.reservation_ref=d.reservation_ref "
-            "WHERE thread_id=? AND (r.status='HELD' OR d.state='sending' OR (mt.confidence='ESTIMATED' AND EXISTS "
+            "WHERE thread_id=? AND (r.status='HELD' OR d.state='sending' OR (r.status='RELEASED' AND EXISTS "
+            "(SELECT 1 FROM p0_usage_releases x WHERE x.reservation_ref=r.reservation_ref AND x.confirmation_event_id IS NULL)) OR (mt.confidence='ESTIMATED' AND EXISTS "
             "(SELECT 1 FROM p0_root_terminals e WHERE e.thread_id=d.thread_id AND e.turn_id=d.turn_id)))",
             (thread_id,)).fetchall()
         targets = {row["turn_id"] for row in pending}
@@ -353,6 +355,7 @@ class RootDelivery:
             raise OutcomeUnknown("Codex returned a different thread")
         if thread.get("path"):
             self._paths[thread_id] = Path(thread["path"])
+            metering.remember_host_history(self.conn, self.run_id, thread_id, thread_id, thread)
         status = thread["status"]["type"]
         if status == "idle":
             return None
@@ -564,71 +567,7 @@ class RootDelivery:
         self._settle(row["thread_id"], turn_id)
 
     def _settle(self, thread_id, turn_id):
-        metering.terminal(self.conn,thread_id,turn_id)
-        metering.recover_late_response_cost(self.conn, thread_id, turn_id)
-        row = self.conn.execute(
-            "SELECT d.reservation_ref,d.prior_tokens,u.total_tokens,u.measured_tokens,u.children_known "
-            "FROM p0_root_deliveries d "
-            "JOIN p0_root_turn_usage u USING(thread_id,turn_id) JOIN budget_reservations r "
-            "ON r.reservation_ref=d.reservation_ref WHERE d.thread_id=? AND d.turn_id=? "
-            "AND d.state='acknowledged' AND u.terminal_status IS NOT NULL AND (r.status='HELD' OR EXISTS "
-            "(SELECT 1 FROM p0_meter_turns m WHERE m.reservation_ref=r.reservation_ref AND "
-            "m.confidence IN ('ESTIMATED','PROVIDER_RECONCILED') AND m.attribution IS NOT 'TURN'))",
-            (thread_id, turn_id)).fetchone()
-        if row is None:
-            return
-        prior = row["prior_tokens"]
-        if prior is None and row["measured_tokens"] is not None and row["total_tokens"] is not None:
-            predecessor = self.conn.execute(
-                "SELECT r.status,u.total_tokens,u.terminal_status FROM p0_root_deliveries d "
-                "JOIN budget_reservations r USING(reservation_ref) LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) "
-                "WHERE d.thread_id=? AND d.method='turn/start' AND r.status<>'RELEASED' "
-                "AND r.rowid<(SELECT rowid FROM budget_reservations WHERE reservation_ref=?) "
-                "ORDER BY r.rowid DESC LIMIT 1", (thread_id, row["reservation_ref"])).fetchone()
-            if (predecessor and predecessor["status"] == "SETTLED" and predecessor["terminal_status"]
-                    and predecessor["total_tokens"] == row["total_tokens"] - row["measured_tokens"]):
-                prior = predecessor["total_tokens"]
-                self.conn.execute("UPDATE p0_root_deliveries SET prior_tokens=? WHERE reservation_ref=? "
-                                  "AND prior_tokens IS NULL", (prior, row["reservation_ref"]))
-        reason = None
-        if metering.receipt_conflict(self.conn, thread_id, turn_id):
-            reason = "conflicting provider response identity or usage"
-        elif row["total_tokens"] is None:
-            reason = "missing cumulative usage for this turn"
-        elif prior is None:
-            reason = "historical turn was admitted without an attributable baseline"
-        elif row["measured_tokens"] is None:
-            reason = "cumulative usage is awaiting complete matching provider receipts"
-        elif row["total_tokens"] - prior != row["measured_tokens"]:
-            provisional = self.conn.execute("SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND estimated_at IS NOT NULL "
-                                            "AND sequence<(SELECT rowid FROM budget_reservations WHERE reservation_ref=?)",
-                                            (thread_id, row["reservation_ref"])).fetchone()
-            if not provisional or not metering.covered_response_cost(self.conn, thread_id, turn_id, row["measured_tokens"]):
-                reason = "cumulative usage is awaiting complete matching provider receipts"
-        if not row["children_known"]:
-            reason = reason or "native child activity has not been reconciled"
-        pending = self.conn.execute(
-            "SELECT 1 FROM p0_native_child_meters WHERE root_id=? AND owner_turn=? AND awaiting_turn=1 LIMIT 1",
-            (thread_id, turn_id)).fetchone()
-        if pending:
-            reason = reason or "awaiting the native child's turn"
-        actual = row["measured_tokens"] or 0
-        children = self.conn.execute(
-            "SELECT m.metadata_verified,u.* FROM p0_native_child_usage u JOIN p0_native_child_meters m USING(child_id) "
-            "WHERE m.root_id=? AND u.owner_turn=?", (thread_id, turn_id))
-        for child in children:
-            if (not child["metadata_verified"] or not child["terminal"] or not child["children_known"]
-                    or child["prior_tokens"] is None or child["total_tokens"] is None
-                    or child["total_tokens"] - child["prior_tokens"] != child["measured_tokens"]):
-                reason = reason or "awaiting attributable final usage from native child " + child["child_id"]
-                break
-            actual += child["measured_tokens"]
-        self.conn.execute("UPDATE p0_root_turn_usage SET metering_reason=? WHERE thread_id=? AND turn_id=? "
-                          "AND metering_reason IS NOT ?", (reason, thread_id, turn_id, reason))
-        if reason:
-            waits.meter_pending(self.conn, thread_id, turn_id)
-            return
-        metering.confirm(self.conn,row["reservation_ref"],actual)
+        metering.reconcile_turn(self.conn, thread_id, turn_id)
 
     def _terminal_cost(self, thread, turn):
         call = self._cancelled_products.get((thread, turn))
@@ -638,7 +577,7 @@ class RootDelivery:
 
     def needs_terminal_snapshot(self, thread, turn):
         row = self.conn.execute("SELECT prior_tokens,total_tokens FROM p0_meter_native_turns WHERE thread_id=? "
-            "AND turn_id=? AND terminal_status='interrupted' AND (budget_status='HELD' OR confidence='ESTIMATED')",
+            "AND turn_id=? AND terminal_status='interrupted' AND (budget_status IN ('HELD','RELEASED') OR confidence='ESTIMATED')",
             (thread, turn)).fetchone()
         if not row or row['prior_tokens'] is None:
             return False
@@ -661,7 +600,7 @@ class RootDelivery:
         if measured is None:
             held = self.conn.execute(
                 "SELECT prior_tokens,total_tokens FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=? "
-                "AND (budget_status='HELD' OR confidence='ESTIMATED')", (thread_id, turn["id"])).fetchone()
+                "AND (budget_status IN ('HELD','RELEASED') OR confidence='ESTIMATED')", (thread_id, turn["id"])).fetchone()
             if held and turn["status"] == "interrupted":
                 public_cost = self._terminal_cost(thread_id, turn["id"])
                 if (public_cost is not None and held["prior_tokens"] is not None
@@ -962,6 +901,7 @@ class RootDelivery:
                 self.conn.execute("UPDATE p0_native_child_meters SET metadata_verified=1 WHERE child_id=?", (child_id,))
                 if thread.get("path"):
                     self._paths[child_id] = Path(thread["path"])
+                    metering.remember_host_history(self.conn, self.run_id, meter["root_id"], child_id, thread)
                 for turn in thread.get("turns", []):
                     owner = self._child_start(meter, turn)
                     if not owner or turn.get("status") not in TERMINAL:

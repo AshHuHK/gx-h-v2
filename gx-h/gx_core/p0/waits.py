@@ -284,7 +284,7 @@ def meter_settled(conn, thread_id, turn_id):
         return
     for row in conn.execute(
             "SELECT d.reservation_ref FROM p0_root_deliveries d JOIN budget_reservations b USING(reservation_ref)"
-            " WHERE d.run_id=? AND d.thread_id=? AND d.turn_id=? AND d.method='turn/start' AND b.status='SETTLED'",
+            " WHERE d.run_id=? AND d.thread_id=? AND d.turn_id=? AND d.method='turn/start' AND b.status IN ('SETTLED','RELEASED')",
             (root["run_id"], thread_id, turn_id)):
         finish(conn, root["root_key"], "metering", row[0])
 

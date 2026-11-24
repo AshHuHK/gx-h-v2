@@ -15,16 +15,21 @@ def policy(conn, run_id):
 
 
 def validate_policy(value):
-    if not isinstance(value, dict) or value.keys() - {"grace_seconds", "soft_tokens", "rollout_diagnostics"}:
-        raise SchemaInvalid("metering accepts grace_seconds, soft_tokens and rollout_diagnostics")
+    if not isinstance(value, dict) or value.keys() - {"grace_seconds", "soft_tokens", "rollout_diagnostics", "unresolved_alert_seconds"}:
+        raise SchemaInvalid("unexpected field in metering policy")
     for name, amount in value.items():
+        if name == "unresolved_alert_seconds":
+            if (not isinstance(amount, list) or len(amount) != 3 or any(type(n) is not int or n <= 0 for n in amount)
+                    or amount != sorted(set(amount))):
+                raise SchemaInvalid("unresolved_alert_seconds requires three increasing positive integer thresholds")
+            continue
         if name=="rollout_diagnostics" and type(amount) is bool:
             continue
         if name=="rollout_diagnostics":
             raise SchemaInvalid("metering.rollout_diagnostics requires a boolean")
         if type(amount) is not int or amount < 0:
             raise SchemaInvalid(f"metering.{name} requires a nonnegative integer")
-    return {"grace_seconds":30, **value}
+    return {"grace_seconds":30, "unresolved_alert_seconds":[3600,86400,259200], **value}
 
 
 def rollout_diagnostics(conn, run_id):
@@ -64,6 +69,21 @@ def _row(conn, reservation):
     return conn.execute("SELECT * FROM p0_meter_native_turns WHERE reservation_ref=?", (reservation,)).fetchone()
 
 
+def remember_host_history(conn, run_id, root, thread, official):
+    """Remember only a path returned by Codex for this bound native thread."""
+    from pathlib import Path
+    path = official.get("path")
+    if official.get("id") != thread or not isinstance(path,str) or not Path(path).is_absolute():
+        return
+    old = conn.execute("SELECT run_id,root_id,path FROM p0_usage_host_histories WHERE thread_id=?", (thread,)).fetchone()
+    if old and (old["run_id"] != run_id or old["root_id"] != root or old["path"] == path):
+        return
+    with store.transaction(conn,transaction_owner="Usage",operation="remember_official_history",run_id=run_id):
+        conn.execute("INSERT INTO p0_usage_host_histories(thread_id,run_id,root_id,path) VALUES(?,?,?,?) "
+                     "ON CONFLICT(thread_id) DO UPDATE SET path=excluded.path WHERE run_id=excluded.run_id "
+                     "AND root_id=excluded.root_id AND path<>excluded.path", (thread,run_id,root,path))
+
+
 def response(conn, thread, turn, response_id, tokens):
     if not isinstance(response_id, str) or not response_id:
         return False
@@ -99,10 +119,10 @@ def late_response(conn, thread, turn, *, child):
     return False
 
 
-def recover_late_response_cost(conn, thread, turn, *, child=False):
+def recover_late_response_cost(conn, thread, turn, *, child=False, attached=False):
     # A completed response belongs to its explicit Turn. Recover its complete cost only
     # when every recorded request has a usable receipt and the scoped interval balances.
-    if not conn.execute("SELECT 1 FROM p0_meter_receipt_intervals WHERE thread_id=? AND turn_id=? AND late_receipt=1 AND disputed=0",
+    if not attached and not conn.execute("SELECT 1 FROM p0_meter_receipt_intervals WHERE thread_id=? AND turn_id=? AND late_receipt=1 AND disputed=0",
                         (thread, turn)).fetchone():
         return
     if child:
@@ -265,7 +285,8 @@ def common_funding_prefix(conn, row):
     # No aggregate can divide an ambiguous interval between funding lines or remove a
     # historical payment whose amount is unknown. Unreserved host traffic has no payer.
     invalid = conn.execute("SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND sequence<=? "
-                           "AND (budget_ref<>? OR (budget_status='SETTLED' AND settled_tokens IS NULL)) LIMIT 1",
+                           "AND (budget_ref<>? OR (budget_status='SETTLED' AND settled_tokens IS NULL) "
+                           "OR (budget_status='RELEASED' AND attribution IS NOT 'TURN')) LIMIT 1",
                            (row["thread_id"], row["sequence"], row["budget_ref"])).fetchone()
     return not invalid and not unreserved_root_turns(conn, row["thread_id"])
 
@@ -405,9 +426,91 @@ def _late_funding_delta(conn, row, amount, difference):
     return target - _prior_cost(conn, through, inclusive=True), through["reservation_ref"]
 
 
+def reconcile_turn(conn, thread_id, turn_id):
+    terminal(conn,thread_id,turn_id)
+    recover_late_response_cost(conn, thread_id, turn_id)
+    row = conn.execute(
+        "SELECT d.reservation_ref,d.prior_tokens,u.total_tokens,u.measured_tokens,u.children_known "
+        "FROM p0_root_deliveries d "
+        "JOIN p0_root_turn_usage u USING(thread_id,turn_id) JOIN budget_reservations r "
+        "ON r.reservation_ref=d.reservation_ref WHERE d.thread_id=? AND d.turn_id=? "
+        "AND d.state='acknowledged' AND u.terminal_status IS NOT NULL AND (r.status='HELD' OR EXISTS "
+        "(SELECT 1 FROM p0_meter_turns m WHERE m.reservation_ref=r.reservation_ref AND "
+        "(m.confidence IN ('ESTIMATED','PROVIDER_RECONCILED') OR (r.status='RELEASED' AND EXISTS "
+        "(SELECT 1 FROM p0_usage_releases x WHERE x.reservation_ref=r.reservation_ref))) AND m.attribution IS NOT 'TURN'))",
+        (thread_id, turn_id)).fetchone()
+    if row is None:
+        return
+    prior = row["prior_tokens"]
+    if prior is None and row["measured_tokens"] is not None and row["total_tokens"] is not None:
+        predecessor = conn.execute(
+            "SELECT r.status,u.total_tokens,u.terminal_status FROM p0_root_deliveries d "
+            "JOIN budget_reservations r USING(reservation_ref) LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) "
+            "WHERE d.thread_id=? AND d.method='turn/start' AND r.status<>'RELEASED' "
+            "AND r.rowid<(SELECT rowid FROM budget_reservations WHERE reservation_ref=?) "
+            "ORDER BY r.rowid DESC LIMIT 1", (thread_id, row["reservation_ref"])).fetchone()
+        if (predecessor and predecessor["status"] == "SETTLED" and predecessor["terminal_status"]
+                and predecessor["total_tokens"] == row["total_tokens"] - row["measured_tokens"]):
+            prior = predecessor["total_tokens"]
+            conn.execute("UPDATE p0_root_deliveries SET prior_tokens=? WHERE reservation_ref=? "
+                              "AND prior_tokens IS NULL", (prior, row["reservation_ref"]))
+    reason = None
+    if receipt_conflict(conn, thread_id, turn_id):
+        reason = "conflicting provider response identity or usage"
+    elif row["total_tokens"] is None:
+        reason = "missing cumulative usage for this turn"
+    elif prior is None:
+        reason = "historical turn was admitted without an attributable baseline"
+    elif row["measured_tokens"] is None:
+        reason = "cumulative usage is awaiting complete matching provider receipts"
+    elif row["total_tokens"] - prior != row["measured_tokens"]:
+        provisional = conn.execute("SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND estimated_at IS NOT NULL "
+                                        "AND sequence<(SELECT rowid FROM budget_reservations WHERE reservation_ref=?)",
+                                        (thread_id, row["reservation_ref"])).fetchone()
+        if not provisional or not covered_response_cost(conn, thread_id, turn_id, row["measured_tokens"]):
+            reason = "cumulative usage is awaiting complete matching provider receipts"
+    if not row["children_known"]:
+        reason = reason or "native child activity has not been reconciled"
+    pending = conn.execute(
+        "SELECT 1 FROM p0_native_child_meters WHERE root_id=? AND owner_turn=? AND awaiting_turn=1 LIMIT 1",
+        (thread_id, turn_id)).fetchone()
+    if pending:
+        reason = reason or "awaiting the native child's turn"
+    actual = row["measured_tokens"] or 0
+    children = conn.execute(
+        "SELECT m.metadata_verified,u.* FROM p0_native_child_usage u JOIN p0_native_child_meters m USING(child_id) "
+        "WHERE m.root_id=? AND u.owner_turn=?", (thread_id, turn_id))
+    for child in children:
+        if (not child["metadata_verified"] or not child["terminal"] or not child["children_known"]
+                or child["prior_tokens"] is None or child["total_tokens"] is None
+                or child["total_tokens"] - child["prior_tokens"] != child["measured_tokens"]):
+            reason = reason or "awaiting attributable final usage from native child " + child["child_id"]
+            break
+        actual += child["measured_tokens"]
+    conn.execute("UPDATE p0_root_turn_usage SET metering_reason=? WHERE thread_id=? AND turn_id=? "
+                      "AND metering_reason IS NOT ?", (reason, thread_id, turn_id, reason))
+    if reason:
+        waits.meter_pending(conn, thread_id, turn_id)
+        return
+    confirm(conn,row["reservation_ref"],actual)
+
 def confirm(conn, reservation, amount):
     row = _row(conn, reservation)
-    if row["budget_status"] == "HELD":
+    if row["budget_status"] == "RELEASED":
+        released = conn.execute("SELECT * FROM p0_usage_releases WHERE reservation_ref=?", (reservation,)).fetchone()
+        if not released or released["confirmation_event_id"] is not None:
+            return
+        event = budgets.record_released_native_usage(conn,reservation,actual={"tokens":amount,"api_calls":1},
+            previous={"tokens":released["known_tokens"],"api_calls":released["known_api_calls"]},
+            key="official:"+reservation,actor=ACTOR,run_id=row["run_id"])
+        receipt = store.append_event(conn,kind="usage.released_receipt_confirmed",actor=ACTOR,run_id=row["run_id"],
+            subject_kind="native_turn",subject_id=reservation,prev_state="UNRESOLVED",new_state="PROVIDER_CONFIRMED",
+            evidence_level="EXECUTION_OBSERVED",payload={"operator_event_id":released["operator_event_id"],"budget_event_id":event,
+                "thread_id":row["thread_id"],"turn_id":row["turn_id"],"tokens":amount,"budget_status":"RELEASED"})
+        conn.execute("UPDATE p0_usage_releases SET confirmation_event_id=? WHERE reservation_ref=?", (receipt,reservation))
+        conn.execute("UPDATE p0_meter_turns SET confidence='PROVIDER_CONFIRMED',settled_tokens=?,"
+                     "observed_lower_bound=?,attribution='TURN' WHERE reservation_ref=?", (amount,amount,reservation))
+    elif row["budget_status"] == "HELD":
         budgets.settle(conn, reservation, actual={"tokens":amount, "api_calls":1}, actor=ACTOR,
                        confidence="PROVIDER_CONFIRMED")
         conn.execute("UPDATE p0_meter_turns SET confidence='PROVIDER_CONFIRMED',settled_tokens=?,"
@@ -478,11 +581,14 @@ def next_deadline_seconds(conn, run_id):
 
 def maintain(conn, run_id):
     """Process elapsed grace periods in the Driver's existing local maintenance pass."""
-    if next_deadline_seconds(conn, run_id) != 0:
+    from . import operator_usage
+    grace_due = next_deadline_seconds(conn, run_id) == 0
+    due_alerts = operator_usage.due_alerts(conn,run_id)
+    if not grace_due and not due_alerts:
         return
     grace = policy(conn, run_id)["grace_seconds"]
     with store.transaction(conn, transaction_owner="Usage", operation="maintain", run_id=run_id):
-        rows = conn.execute("SELECT * "+_OUTSTANDING+" ORDER BY sequence",(run_id,)).fetchall()
+        rows = conn.execute("SELECT * "+_OUTSTANDING+" ORDER BY sequence",(run_id,)).fetchall() if grace_due else []
         for row in rows:
             if not row["terminal_at"]:
                 terminal(conn,row["thread_id"],row["turn_id"])
@@ -496,8 +602,8 @@ def maintain(conn, run_id):
                                     (row["reservation_ref"],)).fetchone()
                 grant = store.loads(hold, "amounts_json", {}).get("tokens")
             if type(grant) is not int or grant <= 0 or receipt_conflict(conn, row["thread_id"], row["turn_id"]):
-                conn.execute("UPDATE p0_meter_turns SET confidence='UNRESOLVED' WHERE reservation_ref=?",
-                             (row["reservation_ref"],))
+                conn.execute("UPDATE p0_meter_turns SET confidence='UNRESOLVED',unresolved_at=coalesce(unresolved_at,?) "
+                             "WHERE reservation_ref=?", (clock.now_iso(),row["reservation_ref"]))
                 continue
             estimate = max(grant, lower)
             budgets.settle(conn,row["reservation_ref"],actual={"tokens":estimate,"api_calls":1},
@@ -515,6 +621,7 @@ def maintain(conn, run_id):
                 _reconcile(conn, _row(conn, row["reservation_ref"]), confirmed=True)
             from . import meter_limits
             meter_limits.check(conn,run_id,row["thread_id"])
+        operator_usage.emit_alerts(conn, run_id, due_alerts)
 
 
 def inspect(conn, run_id, *, include_responses=False):
@@ -566,6 +673,8 @@ def _inspect(conn, run_id, *, include_responses):
             "WHERE d.run_id=? ORDER BY a.event_id"))
     result["cost_report"] = metering_report.classified_cost(conn, run_id, result["threads"], result["turns"],
                                                           result["adjustments"])
+    from . import operator_usage
+    result["unresolved_cases"], result["unresolved_alerts"] = operator_usage.inspect(conn, run_id)
     accounts = {r["thread_id"]:r for r in result["cost_report"]["threads"]}
     for thread in result["threads"]:
         account = accounts[thread["thread_id"]]

@@ -1,6 +1,6 @@
 # Phase 2A 实现与启动
 
-GX 能在同一个静态 Workflow Run 内保留待决策分支，继续对账已经提交的 Job，并把其输出交给其他依赖已满足的节点。项目的正式目标、预算、产物和计量仍存放在原 GX 项目中。基线为 `v3.2-p2@51e0e13`。[改动前调用链](PHASE_2A_SOURCE_MAP.md) · [Phase 1.5 的 11 项决定](V32_PHASE_1_5_DELTA.md) · [受测提交及运行记录](PHASE_2A_ACCEPTANCE_REPORT.md)
+GX 能在同一个静态 Workflow Run 内保留待决策分支，继续对账已经提交的 Job，并把其输出交给其他依赖已满足的节点。项目的正式目标、预算、产物和计量仍存放在原 GX 项目中。基线为 `v3.2-p2@51e0e13`，最终受测产品为 `c15eada`。15 项矩阵中 14 项通过，P2A-09 的未结条件记录在验收报告。[改动前调用链](PHASE_2A_SOURCE_MAP.md) · [Phase 1.5 的 11 项决定](V32_PHASE_1_5_DELTA.md) · [受测提交及运行记录](PHASE_2A_ACCEPTANCE_REPORT.md)
 
 | 原有入口 | 代码行为 |
 |---|---|
@@ -33,3 +33,18 @@ bin/gx-p0 resume --state "$state_dir" --run-id "$run_id" --timeout 5
 ```
 
 GX 意外退出后再对原目录运行 `run`。人为暂停后使用 `resume`。要继续需要模型的工作，在原有 Codex 登录和发行物可用的环境中，以未设置 `GX_CODEX_OFFLINE` 的新 Driver 打开原目录。验收用的三分支静态图在独立临时状态中通过现有 Workflow 注册，对外运行的生产工作流保留原版本绑定。[CLI](gx-h/gx_core/p0/cli.py) · [验收图](acceptance/phase2a/static_case.py) · [故障注入及进程观测](acceptance/phase2a/cross_process.py)
+
+## 复跑断电、恢复和性能验证
+
+本机的官方 ELF 路径已记录在回执中；在另一台机器上，把 `GX_P0_CODEX` 指向同一锁定发行物，并将 `--clash` 指向可执行的 Mihomo。此命令要求 Linux 支持独立的 user/network namespace。夹具先在该命名空间建立本机官方宿主和脚本化 Responses 连接，取得真实回执后终止宿主。它只向自己的测试进程发送信号，使用临时项目目录，所有请求都留在环回环境。
+
+```bash
+proof_dir=$(mktemp -d)
+export GX_P0_CODEX=$(python -c 'import json; print(json.load(open("acceptance/phase2a/cross-process/invocation.json"))["GX_P0_CODEX"])')
+GX_CODEX_OFFLINE=0 python acceptance/phase2a/regression/loopback.py \
+  --clash ../../clash/clash.new --receipt "$proof_dir/network.json" -- \
+  python acceptance/phase2a/cross_process.py --output "$proof_dir/cross"
+python acceptance/phase2a/performance.py "$proof_dir/cross" --output "$proof_dir/performance"
+```
+
+检查 `cross/observations.json` 中的 `codex_spawns_after_stop`、`duplicates` 和各 Run 的 `offline_deterministic_completions`。同时保留两组事件、原 Job 结果、SQLite 快照及性能原始样本。[本次命令和源码身份](acceptance/phase2a/cross-process/invocation.json) · [本次性能命令](acceptance/phase2a/performance/invocation.json)

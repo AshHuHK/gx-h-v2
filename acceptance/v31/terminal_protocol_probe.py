@@ -33,6 +33,8 @@ from gx_core.p0 import schema
 from gx_core.p0.roots import Roots
 from gx_core.persistence import records, store
 
+CANCELLATION_REASON = "dynamic tool call was cancelled before receiving a response"
+
 
 def digest(path):
     with path.open("rb") as stream:
@@ -50,6 +52,11 @@ def identity(extra_sources=(), *, runtime=PACKAGE):
         "codex-rs/app-server/src/outgoing_message.rs",
         "codex-rs/app-server/src/request_processors/turn_processor.rs",
         "codex-rs/core/src/tools/handlers/dynamic.rs",
+        "codex-rs/core/src/tasks/mod.rs",
+        "codex-rs/core/src/session/turn.rs",
+        "codex-rs/core/src/session/mod.rs",
+        "codex-rs/rollout/src/policy.rs",
+        "codex-rs/app-server-protocol/src/protocol/v2/item.rs",
         *extra_sources,
     ]
     checked = {}
@@ -163,6 +170,13 @@ class Wire:
                 if self.trial["fault"] == "delayed_usage":
                     self.withheld.append(line)
                 continue
+            if self.trial["fault"] == "lost_raw_cancel" and method == "rawResponseItem/completed":
+                params = msg["params"]
+                item = params["item"]
+                if (params["threadId"], params["turnId"], item.get("call_id"), item["type"]) == (
+                        self.trial.get("thread_id"), self.trial.get("turn_id"), self.trial.get("call_id"), "function_call_output"):
+                    self.trial["injected_receipt_faults"].append({"method": method, "params": params})
+                    continue
             if (interrupt_ack or complete) and self.trial["fault"] in ("lost_receipts", "delayed_receipts"):
                 self.trial["injected_receipt_faults"].append(
                     {"method": method or "turn/interrupt reply", "id": msg.get("id"),
@@ -237,6 +251,56 @@ def observe(trial, original, frame):
         trial["events"].append({"seq": frame.receive_seq, "t": time.monotonic(), "method": m, "thread": p.get("threadId"),
             "turn": p.get("turnId") or (p.get("turn") or {}).get("id"), **event})
     original(frame)
+
+
+def verify_cancellation(roots, trial):
+    # The pinned core emits DynamicToolCall completion before the separate model-history
+    # output drain. Forced teardown can interrupt the drain after the 100 ms grace.
+    thread, turn, call = trial["thread_id"], trial["turn_id"], trial["call_id"]
+    scope = (thread, turn, call)
+    def raw_outputs():
+        return [e for e in trial["events"] if e["method"] == "rawResponseItem/completed"
+                and e.get("type") == "function_call_output" and (e["thread"], e["turn"], e["call_id"]) == scope]
+
+    deadline = time.monotonic() + 1
+    while not raw_outputs() and time.monotonic() < deadline:
+        roots.client.run_until(lambda f: f.message.get("method") == "rawResponseItem/completed",
+                               timeout=1, poll_interval=0.1)
+    outputs = raw_outputs()
+    if outputs:
+        assert all(e["output"] == CANCELLATION_REASON for e in outputs), outputs
+        assert trial["fault"] != "lost_raw_cancel", outputs
+        trial["cancellation_proof"] = {"source": "rawResponseItem/completed", "sequences": [e["seq"] for e in outputs]}
+        return
+
+    # Require the exact same reason and identities from the official core completion.
+    # The v2 public item projects status and success but omits the core's error field.
+    # This file belongs to the isolated official-host test fixture.
+    live, = [e for e in trial["events"] if e["method"] == "item/completed" and (e["thread"], e["turn"]) == scope[:2]
+             and e["item"]["type"] == "dynamicToolCall" and e["item"]["id"] == call]
+    for item in (live["item"], trial["turn_history"]["call"]):
+        assert (item["tool"], item["status"], item["success"], item["contentItems"]) == (
+            "gx_submit_product", "failed", False, []), item
+    sessions = Path(roots.env["CODEX_HOME"]) / "sessions"
+    path, = sessions.rglob(f"rollout-*-{thread}.jsonl")
+    completions = []
+    with path.open() as stream:
+        for line in stream:
+            data = json.loads(line)
+            receipt = data["payload"]
+            item = receipt.get("item") or {}
+            if (data["type"], receipt.get("type"), receipt.get("thread_id"), receipt.get("turn_id"),
+                    item.get("type"), item.get("id")) == ("event_msg", "item_completed", *scope[:2], "DynamicToolCall", call):
+                completions.append(data)
+    receipt, = completions
+    item = receipt["payload"]["item"]
+    assert (item["tool"], item["status"], item["success"], item["content_items"], item["error"]) == (
+        "gx_submit_product", "failed", False, [], CANCELLATION_REASON), receipt
+    if trial["fault"] == "lost_raw_cancel":
+        assert len(trial["injected_receipt_faults"]) == 1
+        assert trial["injected_receipt_faults"][0]["params"]["item"]["output"] == CANCELLATION_REASON
+    trial["cancellation_proof"] = {"source": "official core item_completed", "raw_drain_seconds": 1,
+                                   "live_sequence": live["seq"], "rollout_name": path.name, "receipt": receipt}
 
 
 def cold_usage(roots, trial):
@@ -369,6 +433,7 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence, 
         assert history["status"] == "interrupted" and len(cancelled) == 1
         assert cancelled[0]["status"] == "failed" and cancelled[0]["success"] is False, cancelled
         trial["turn_history"] = {"id": history["id"], "status": history["status"], "call": cancelled[0]}
+        verify_cancellation(roots, trial)
         roots.reconcile_meter(thread)
         if fault == "running_child":
             trial["while_child_running"] = meter(reader, thread, turn)
@@ -422,9 +487,6 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence, 
             assert trial["final_meter"]["settled_tokens"] == sum(r["usage"]["total_tokens"] for r in trial["model_requests"])
         assert trial["committed_at"] <= trial["goal_complete_write"]["t"] <= trial["goal_complete_at"]
         assert trial["goal_complete_at"] <= trial["interrupt_writes"][0]["t"] and not trial["tool_responses_written"]
-        assert any(event.get("type") == "function_call_output" and event.get("call_id") == trial["call_id"]
-                   and event.get("output") == "dynamic tool call was cancelled before receiving a response"
-                   for event in trial["events"]), trial["events"]
         assert submissions(reader, task) == [trial["committed"]]
         trial["budget_settlements"] = [dict(row) for row in reader.execute(
             "SELECT event_id,json_extract(payload_json,'$.actual.tokens') AS tokens FROM events "
@@ -443,7 +505,7 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence, 
     return trial
 
 
-def run(repetitions, only=None, *, closure_usage=False, runtime=PACKAGE):
+def run(repetitions, only=None, *, closure_usage=False, runtime=PACKAGE, partial_output=None):
     _proxy_preflight()
     binary, version = identity(runtime=runtime)
     if closure_usage:
@@ -471,11 +533,22 @@ def run(repetitions, only=None, *, closure_usage=False, runtime=PACKAGE):
         sequence = [(status, "none") for _ in range(repetitions) for status in ("ACCEPTED", "REJECTED")]
         sequence.extend([("ACCEPTED", "lost_interrupt"), ("REJECTED", "lost_receipts"),
                          ("ACCEPTED", "delayed_receipts"), ("ACCEPTED", "running_child")])
-        if only in ("delayed_usage", "lost_usage"):
+        if only in ("delayed_usage", "lost_usage", "lost_raw_cancel"):
             sequence = [("ACCEPTED", only)]
         elif only:
             sequence = [case for case in sequence if case[1] == only]
         results, run_ids = [], []
+        def preserve_partial(exc_type, exc, traceback):
+            if exc is None or partial_output is None:
+                return
+            passed_trials = {r["id"] for r in results}
+            unfinished = [r for r in peer.trials.values() if r["id"] not in passed_trials]
+            partial = {"passed": False, "started_utc": started, "failed_utc": datetime.now(timezone.utc).isoformat(),
+                       "identity": version, "run_ids": run_ids, "exception": exc_type.__name__, "message": str(exc),
+                       "planned_trials": len(sequence), "completed_trial_count": len(results),
+                       "trials": results, "unfinished_trials": unfinished}
+            partial_output.write_text(json.dumps(partial, separators=(",", ":")) + "\n")
+        stack.push(preserve_partial)
         # Each sample is an independent task. Partition test cases within one GX Run's
         # existing worker-task and API-call budgets without increasing either ceiling.
         limits = budgets.profile("p0")["limits"]
@@ -518,7 +591,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repetitions", type=int, default=100, help="repetitions per accepted/rejected outcome")
     parser.add_argument("--only", choices=("none", "lost_interrupt", "lost_receipts",
-                                          "delayed_receipts", "running_child", "delayed_usage", "lost_usage"))
+                                          "delayed_receipts", "running_child", "delayed_usage", "lost_usage", "lost_raw_cancel"))
     parser.add_argument("--output", type=Path, default=Path(__file__).with_name("terminal-protocol.json"))
     parser.add_argument("--runtime", type=Path, default=PACKAGE, help="Directory containing the locked unpacked native runtime")
     parser.add_argument("--closure-usage", action="store_true",
@@ -526,6 +599,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.repetitions < 1:
         parser.error("--repetitions must be positive")
-    result = run(args.repetitions, args.only, closure_usage=args.closure_usage, runtime=args.runtime.resolve())
+    result = run(args.repetitions, args.only, closure_usage=args.closure_usage, runtime=args.runtime.resolve(),
+                 partial_output=args.output.with_suffix(".partial.json"))
     args.output.write_text(json.dumps(result, separators=(",", ":")) + "\n")
     print(json.dumps({k: result[k] for k in ("trial_count", "counts", "faults", "passed")}))

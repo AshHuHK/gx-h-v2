@@ -71,6 +71,7 @@ from ..errors import (
     GxError,
     IllegalTransition,
     OutcomeUnknown,
+    ResourceDenied,
     SchemaInvalid,
     StaleRevision,
 )
@@ -1335,6 +1336,17 @@ class Engine:
         wait = self._wait_by_ref(run_id, branches.waits(checkpoint), ref)
         interrupt = InterruptRequest.from_dict(wait["interrupt"])
         mark = wait["controller_ran"]
+        if interrupt.kind == "stage" and interrupt.payload.get("wait_for") == "cpu.threads_free":
+            from ..jobs.capacity import cpu_room
+            room = cpu_room(conn)
+            needed = interrupt.payload["required_threads"]
+            # A changed limit may make the request permanently too large. In that case
+            # re-enter once so Job admission reports its new refusal to the workflow.
+            ready = needed <= room["free"] or needed > room["allowed"]
+            waiting = None if ready else DependencyUnmet(
+                interrupt.reason, details={"run_id": run_id, "rule": "cpu.threads_free", "needed": needed,
+                                           "free": room["free"], "holders": room["holders"]})
+            return Standing(ready, ready, False, ready, waiting=waiting, stage_needs=())
         if "reenter_round" in wait and (interrupt.tasks or interrupt.job_refs or interrupt.approval_ref):
             # The old node's result was invalidated by an explicit rewind. Before a
             # new-round once key can run, the original commissioned work must settle.
@@ -1535,7 +1547,21 @@ class Engine:
                                                evidence_level="EXECUTION_OBSERVED",
                                                payload={"stage": name, "round": ctx.round})
                     if stopped is None:
-                        result = node.fn(ctx)
+                        try:
+                            result = node.fn(ctx)
+                        except ResourceDenied as exc:
+                            facts = exc.details
+                            needed = facts.get("needed")
+                            allowed = facts.get("allowed")
+                            if (not node.idempotent or facts.get("rule") != "cpu.threads_free"
+                                    or not facts.get("holders") or type(needed) is not int
+                                    or type(allowed) is not int or not 0 < needed <= allowed):
+                                raise
+                            # Admission owns the quota across all Runs. Park this stage on
+                            # available threads, including when another Run owns every Job.
+                            result = NodeResult(interrupt=InterruptRequest(kind="stage", reason=exc.message,
+                                payload={"stage": name, "waiting_state": "WAITING_EXTERNAL_JOB",
+                                         "wait_for": "cpu.threads_free", "required_threads": needed}))
                         with store.transaction(
                             self.conn, transaction_owner="Engine", operation="checkpoint_node", run_id=run_id,
                         ) as conn:

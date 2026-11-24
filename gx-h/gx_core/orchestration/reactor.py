@@ -494,9 +494,11 @@ def derive_waiting(ctx: Ctx,run_id: str) -> None:
         return
     checkpoint = store.latest_checkpoint(ctx.conn, run_id)
     state=store.loads(checkpoint,"state_json",{}) or {}
-    if len(state.get("node_waits", {})) > 1 or (state.get("pending_interrupt") or {}).get("kind")!="stage":
-        # Mixed waits already project their selected head. A Job on a sibling
-        # branch cannot change this stage into an external-Job wait.
+    pending = state.get("pending_interrupt") or {}
+    if (len(state.get("node_waits", {})) > 1 or pending.get("kind") != "stage"
+            or (pending.get("payload") or {}).get("wait_for") == "cpu.threads_free"):
+        # Mixed waits already project their selected head. A CPU admission wait
+        # can be held entirely by another Run, outside the local counts below.
         return
     approvals=ctx.conn.execute("SELECT 1 FROM approvals WHERE run_id=? AND status='PENDING'"
         " AND action_kind IN ('model_switch','worker_refusal') LIMIT 1",(run_id,)).fetchone()

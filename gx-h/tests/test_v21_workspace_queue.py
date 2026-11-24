@@ -2,15 +2,18 @@
 from argparse import Namespace
 from contextlib import closing
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
 
-from gx_core.errors import OutcomeUnknown
+from gx_core.errors import DependencyUnmet, OutcomeUnknown, ResourceDenied
 from gx_core.hostobs.app_server_client import AppServerDisconnected, AppServerTimeout
+from gx_core.jobs.limits import cpu_threads_finding
 from gx_core.jobs.service import JobService
 from gx_core.native_release import native_state
+from gx_core.orchestration import reactor, service
 from gx_core.orchestration.engine import Engine
 from gx_core.p0 import cli, coordinator, operator, profiles, workspace
 from gx_core.persistence import store
@@ -18,6 +21,68 @@ from tests.test_tl1a_geometry import OfflineIngress
 
 
 class WorkspaceQueueTests(unittest.TestCase):
+    def test_cpu_request_larger_than_the_entire_pool_preserves_admission_refusal(self):
+        refusal = cpu_threads_finding(3, free=0, allowed=2, held=2, holders=["other-job"])
+        state = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        with native_state(state) as site, closing(store.open_store(site.db_path)) as conn:
+            with patch.object(JobService, "_threads_or_refuse", side_effect=refusal), self.assertRaises(ResourceDenied) as seen:
+                cli.start(conn, state, cli.demo_spec(), run_key="oversized")
+            self.assertIs(seen.exception, refusal)
+            run = workspace.find_run(conn, run_key="oversized")["run_id"]
+            self.assertFalse(Engine(conn, service.default_registry()).waits(run))
+            self.assertEqual(conn.execute("SELECT count(*) FROM jobs WHERE run_id=?", (run,)).fetchone()[0], 0)
+
+    def test_partial_start_waits_for_sibling_job_threads_and_reuses_admitted_work(self):
+        self.enterContext(patch.dict(os.environ, GX_TEST_RESOURCE_PROFILE="deterministic", GX_CODEX_OFFLINE="1"))
+        state = Path(self.enterContext(tempfile.TemporaryDirectory())) / "state"
+        spec = cli.demo_spec()
+        # Simulate a submitter that stopped between admission and launch. Its real
+        # CREATED Jobs and reservations hold both threads until their owner releases them.
+        def admitted(service, row):
+            return service.view(row)
+        with native_state(state) as site, closing(store.open_store(site.db_path)) as conn:
+            with patch.object(cli, "Driver", OfflineIngress), patch.object(
+                    Engine, "start", side_effect=AppServerDisconnected("before first checkpoint")):
+                with self.assertRaises(AppServerDisconnected):
+                    cli.start(conn, state, spec)
+            run = workspace.find_run(conn)["run_id"]
+            with patch.object(JobService, "_start", admitted):
+                sibling = cli.start(conn, state, spec, run_key="B")["run_id"]
+            held = [row[0] for row in conn.execute(
+                "SELECT job_id FROM jobs WHERE run_id=? AND status='CREATED' ORDER BY rowid", (sibling,))]
+            self.assertEqual(len(held), 2)
+        recovered = cli.execute(Namespace(command="resume", state=state, run_id=run, timeout=.3))
+        self.assertEqual(recovered["status"], "WAITING_EXTERNAL_JOB")
+        with closing(store.open_store(state / "gx.db")) as conn:
+            engine = Engine(conn, service.default_registry())
+            wait = engine.waits(run)["experiment"]
+            self.assertEqual(wait["interrupt"]["payload"]["required_threads"], 1)
+            self.assertEqual(wait["interrupt"]["payload"]["wait_for"], "cpu.threads_free")
+            self.assertFalse(engine.standing(run, interrupt_ref=wait["interrupt_ref"]).complete)
+            with self.assertRaises(DependencyUnmet):
+                engine.resume(run_id=run, interrupt_ref=wait["interrupt_ref"])
+            def own_jobs():
+                return [row[0] for row in conn.execute("SELECT job_id FROM jobs WHERE run_id=? ORDER BY rowid", (run,))]
+            self.assertEqual(own_jobs(), [])
+            jobs = JobService(conn)
+            jobs.cancel(held[0], reason="release one thread")
+            self.assertTrue(engine.standing(run, interrupt_ref=wait["interrupt_ref"]).complete)
+            with patch.object(JobService, "_start", admitted):
+                reactor.drive_science(cli.context(conn), run)
+            first, = own_jobs()
+            blocked = engine.waits(run)["experiment"]["interrupt_ref"]
+            self.assertFalse(engine.standing(run, interrupt_ref=blocked).complete)
+            self.assertIsNone(reactor.drive_science(cli.context(conn), run))
+            self.assertEqual(engine.waits(run)["experiment"]["interrupt_ref"], blocked)
+            jobs.cancel(held[1], reason="release remaining thread")
+            reactor.drive_science(cli.context(conn), run)
+            first_again, second = own_jobs()
+            self.assertEqual(first, first_again)
+            self.assertEqual([jobs.wait(job_id, 30)["status"] for job_id in (first, second)], ["SUCCEEDED"] * 2)
+            self.assertEqual(len(workspace.list_runs(conn)), 2)
+            self.assertEqual(conn.execute("SELECT count(*) FROM p0_human_inputs WHERE run_id=?", (run,)).fetchone()[0], 1)
+            self.assertFalse(engine.state(run)["failed_nodes"])
+
     def test_start_while_active_replay_rejection_and_status(self):
         with tempfile.TemporaryDirectory() as tmp:
             state = Path(tmp) / "state"

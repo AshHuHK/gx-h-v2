@@ -1,0 +1,122 @@
+{
+  "baseline": "d5df10e7ff4d93e3f3e104c042f797eb92ad49d6",
+  "overlay_sha256": {
+    "gx-h/gx_core/orchestration/engine.py": "af2ffebd0a8dedb0f3321d7047460905232a23d421e111088344f316eda715c1",
+    "gx-h/gx_core/orchestration/reactor.py": "b4f4ea61dbfed2135306c2ddf3c7838489c176fbd478d71f681d1eb90db07ddc",
+    "gx-h/tests/test_v21_workspace_queue.py": "916f07e967d554c13d75443224e0d3694afb8c964e69fd7e5ec9a1a380b29b6b"
+  },
+  "profile": "deterministic",
+  "runs": [
+    {
+      "name": "baseline-forced",
+      "workdir": "gx-h",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_v21_workspace_queue.WorkspaceQueueTests.test_partial_start_waits_for_sibling_job_threads_and_reuses_admitted_work",
+        "tests.test_v21_workspace_queue.WorkspaceQueueTests.test_cpu_request_larger_than_the_entire_pool_preserves_admission_refusal"
+      ],
+      "returncode": 1
+    },
+    {
+      "name": "cordis",
+      "workdir": ".",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "scripts/release_assets.py",
+        "cordis"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "candidate-forced",
+      "workdir": "gx-h",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_v21_workspace_queue.WorkspaceQueueTests.test_partial_start_waits_for_sibling_job_threads_and_reuses_admitted_work",
+        "tests.test_v21_workspace_queue.WorkspaceQueueTests.test_cpu_request_larger_than_the_entire_pool_preserves_admission_refusal"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "candidate-neighbors",
+      "workdir": "gx-h",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_v21_workspace_queue",
+        "tests.test_phase2a_engine",
+        "tests.test_phase2a_driver",
+        "tests.test_p2a_idle",
+        "tests.test_v3_dispatch",
+        "tests.test_v21_compute",
+        "tests.test_cpu_runner"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "candidate-repeat",
+      "workdir": "gx-h",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_v21_workspace_queue.WorkspaceQueueTests.test_partial_start_waits_for_sibling_job_threads_and_reuses_admitted_work",
+        "tests.test_v21_workspace_queue.WorkspaceQueueTests.test_cpu_request_larger_than_the_entire_pool_preserves_admission_refusal"
+      ],
+      "returncode": 0
+    }
+  ],
+  "snapshots": [
+    {
+      "database": "baseline/test_cpu_request_larger_than_the_entire_pool_preserves_admission_refusal/gx.db",
+      "sha256": "b591e661b2e3690831bdf84192156c3324a6079e14739d0910e8ce53f52dabbf",
+      "events": 33,
+      "integrity_check": "ok"
+    },
+    {
+      "database": "baseline/test_partial_start_waits_for_sibling_job_threads_and_reuses_admitted_work/gx.db",
+      "sha256": "b405003bed610adeedfa57f48ae4845d579c2a04400ceedeba7f69b813bd744c",
+      "events": 60,
+      "integrity_check": "ok"
+    },
+    {
+      "database": "candidate/test_cpu_request_larger_than_the_entire_pool_preserves_admission_refusal/gx.db",
+      "sha256": "a5fc9f96727cea79f379e379e9babde295d7c1c544cd696c2035266210fa265f",
+      "events": 33,
+      "integrity_check": "ok"
+    },
+    {
+      "database": "candidate/test_partial_start_waits_for_sibling_job_threads_and_reuses_admitted_work/gx.db",
+      "sha256": "0630afd69ad9006607e4efe4ca6a1c4134177fdd5fbf14b7c22b929c1b2eb6a5",
+      "events": 92,
+      "integrity_check": "ok"
+    }
+  ],
+  "capture": {
+    "script": "capture.py",
+    "command": [
+      "<python>",
+      "-B",
+      "capture.py",
+      "<destination>"
+    ],
+    "baseline_returncode": 1,
+    "candidate_returncode": 0,
+    "offline": true,
+    "initial_export_attempt": "The observation script initially requested runs.run_key, stored on a separate workspace table. Its two logs are retained as before-capture.log and after-capture.log. The final export reads actual run IDs and statuses."
+  }
+}

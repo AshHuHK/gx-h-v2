@@ -25,6 +25,10 @@
 
 相邻的 27 个既有测试在相同确定性 profile、原有模拟原生传输下全部通过。首轮有一次混合工作区恢复在进入等待前被 CPU 准入拒绝，当时另一个 Run 的 Job 占满该库的两个线程。该用例独立复跑通过，整组同配置复跑也通过。另一次诊断显式设置 `GX_CODEX_OFFLINE=1`，导致 6 个依赖模拟原生传输的测试失败。更早的导出遗漏打包的 Cordis 依赖，随后使用发行包自带的离线安装命令恢复。上述输出分别完整保存在 `regression/`、`isolated-mixed/`、`regression-repeat/`、`regression-same-profile/` 和 `previous-export/`。[各次命令及退出状态](acceptance/closure/idle-history/dc70b1133e4f/receipt.json)
 
+随后，干净提交 `d5df10e` 的完整套件再次遇到同一 CPU 准入错误。确定性复现让同库另一个 Run 的两个 Job 在实际获得准入后留在 `CREATED`，两者占满线程配额。原实现将可恢复的临时拒绝当作阶段执行失败。修复后，可重入阶段以 `WAITING_EXTERNAL_JOB` 保存检查点，冷启动通过 Job 服务的 `cpu_room` 检查整个工作区的实际可用线程。释放一个槽位只准入一个操作，随后再次等待。第二个槽位释放后，重试复用第一个 Job，两个原定操作均成功完成。需要的线程数超过总配额时，保留原始拒绝。[首轮集成记录](acceptance/closure/runs/full-d5df10e-20261124T1533Z/summary.json) · [检查点与准入实现](gx-h/gx_core/orchestration/engine.py) · [等待状态投影](gx-h/gx_core/orchestration/reactor.py)
+
+固定占用的复现用例在原版本失败。修复后的两项定向测试连续两次通过，47 项相邻回归全部通过，覆盖原有混合工作区恢复、阶段隔离、空闲唤醒和实际分离式 Job。修复前后的数据库和事件记录均已归档，4 份快照通过 SQLite 完整性检查。[修复验证回执](acceptance/closure/idle-history/cpu-admission/receipt.json) · [原始数据库与日志](acceptance/closure/idle-history/cpu-admission/raw.tar.gz)
+
 早期统一验收还曾用整个暂停快照返回时间判断唤醒，受额外快照读取影响超出测试上限 5.2 毫秒。修正后的测试分别测量计划等待、实际唤醒和持久化结算时间。原失败包和仅重跑失败项的记录保存在 `early-public/`。[归档及校验清单](acceptance/closure/idle-history/dc70b1133e4f/manifest.sha256)
 
 在发行目录可复跑所选用例，并校验已交付的统一证据包。将 `--python` 指向已安装本发行依赖的解释器。

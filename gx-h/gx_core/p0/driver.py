@@ -479,7 +479,7 @@ class Driver:
             native.deliver(thread_id, "GX updated this task. " + ids.canonical_json(content),
                            event_id=event_id, interrupt=interrupt)
 
-    def reconcile_costs(self, *, refresh=False):
+    def reconcile_costs(self, *, refresh=True):
         from . import terminal_products
         pending = {row[0] for row in self.conn.execute(
             "SELECT DISTINCT thread_id FROM p0_meter_native_turns WHERE run_id=? AND "
@@ -487,16 +487,23 @@ class Driver:
             "WHERE e.thread_id=p0_meter_native_turns.thread_id AND e.turn_id=p0_meter_native_turns.turn_id)))",
             (self.rid,))}
         run = project(self.conn, self.rid)
-        terminals = terminal_products.pending(self.conn, self.rid) if run and terminal_products.enabled(run) else []
-        pending.update(row["thread_id"] for row in terminals)
-        self._checked_costs.intersection_update(pending)
-        for thread in sorted(pending if refresh else pending - self._checked_costs):
+        closing_threads = ({row["thread_id"] for row in terminal_products.pending(self.conn, self.rid)}
+                           if run and terminal_products.enabled(run) else set())
+        pending.update(closing_threads)
+        # A passive read during Goal closure cannot collect the cumulative snapshot returned by
+        # a guarded attach after closure. Revisit that thread when the terminal owner completes.
+        reads = {(thread, thread in closing_threads) for thread in pending}
+        self._checked_costs.intersection_update(reads)
+        for read in sorted(reads if refresh else reads - self._checked_costs):
+            thread, _ = read
             if not refresh and thread in getattr(self._native, "loaded", ()):
                 # New live turns deliver their own observations; reconnects begin with an empty loaded set.
-                self._checked_costs.add(thread)
+                self._checked_costs.add(read)
                 continue
             if self._native_call("usage", thread, lambda native: native.reconcile_meter(thread)) is not _DEFERRED:
-                self._checked_costs.add(thread)
+                self._checked_costs.add(read)
+        if closing_threads and self._native is not None:
+            self._native_call("connection", self.rid, lambda native: native.terminal_products.flush())
         for owner, thread in tuple(self._waits):
             if owner == "usage" and thread not in pending:
                 self._end_native_wait((owner, thread))

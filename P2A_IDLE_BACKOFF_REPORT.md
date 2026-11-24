@@ -17,7 +17,7 @@
 - 两个入口共用工作区等待器。它在检查待办事项前打开命名管道，扫描与进入等待之间到达的消息也可唤醒。SQLite 写入方在最外层提交和事务结束回调之后发出提示。读事务、仅回滚的写入和 Driver 自己的连接都不会产生自唤醒。分离式 Runner 在原子发布状态后发出同类提示，包含写完结果后的终态发布。[等待器](gx-h/gx_core/p0/idle.py) · [事务提交](gx-h/gx_core/persistence/store.py) · [Job Runner](gx-h/gx_core/jobs/runner.py)
 - 原生 stdout、stderr 的可读描述符与工作区通知在同一 selector 上等待。原有传输负责实际读写，多个 Run 仍在同一条 Driver 线程上推进。一项任务释放跨 Run 的工作区或提供方配额时，相关调度会重新检查准入。原有传输故障退避与限额仍由各自的业务模块执行。[传输](gx-h/gx_core/hostobs/app_server_client.py) · [共享协调器](gx-h/gx_core/p0/coordinator.py)
 - 每次休眠取指数退避和生效期限中的最早值。期限来自 Job、Usage 宽限期、Lease、活跃原生心跳、终态产物、消息或调度重试以及 CLI 总超时。恢复时由原 Job、Lease 和计量服务执行状态转换。Usage 可在离线状态按宽限期结算。[Driver](gx-h/gx_core/p0/driver.py) · [Job](gx-h/gx_core/jobs/service.py) · [计量](gx-h/gx_core/p0/metering.py)
-- 同机 GX 生产者可主动通知。跨主机共享盘、绕过 GX 事务接口的写入、通知丢失时，普通空闲复查上限为 4 秒，存在开放 Job 时为 1 秒。若文件系统不能创建 FIFO，等待器每 250 毫秒检查一次 SQLite 版本，保留同样的业务期限。数据库工作、已在执行的同步回调和内核调度时间均可能增加端到端延迟。表中的等待返回与账本提交各有独立时间戳。[等待器](gx-h/gx_core/p0/idle.py) · [Job 期限](gx-h/gx_core/jobs/service.py)
+- 同机 GX 生产者可主动通知。普通 Driver 空闲退避的上限为 4 秒，开放 Job 的复查上限为 1 秒。P2A.1 将原先仅在无法打开 FIFO 时启用的 SQLite 版本复查扩展到所有等待器。每 250 毫秒读取一次连接版本，仍按最近的业务期限返回。数据库工作、已在执行的同步回调和内核调度时间均可能增加端到端延迟。表中的等待返回与账本提交各有独立时间戳。[等待器](gx-h/gx_core/p0/idle.py) · [Job 期限](gx-h/gx_core/jobs/service.py)
 
 ## 复跑与历史
 
@@ -37,3 +37,19 @@
 bin/gx-acceptance run phase2a --case IDLE01 --case IDLE02 --case IDLE03 --python ../gx-h-v-3-2/.venv/bin/python
 bin/gx-acceptance verify idle-final --runs-dir acceptance/closure/idle-history
 ```
+
+## P2A.1 工作区 FIFO 交接
+
+公共 `run` 和 `resume` 在 `.native.lock` 的独占锁内打开工作区等待器。直接调用 `Driver.drive` 或 `WorkspaceWait` 也能打开读取端，另一个进程可在前一读取端关闭前持有相同 inode。现在每个等待器仅关闭自己的描述符，FIFO 名称跨正常退出和异常退出保留。读写双方均要求实际节点为当前有效 UID 持有、模式为 `0600` 的 FIFO，并在打开后核对类型、权限和 inode。普通文件、符号链接、其他属主或错误权限的节点留给其所有者处理。生产者在事务外发通知，待办提交和分离式 Job 的状态发布沿用原有接口。[工作区锁](gx-h/gx_core/native_release.py) · [CLI](gx-h/gx_core/p0/cli.py) · [读写端校验](gx-h/gx_core/jobs/wakeup.py) · [等待器](gx-h/gx_core/p0/idle.py)
+
+两次确定性离线验收各通过 5 项。旧版在交接时删除了后继读取端使用的名称，还复现了两读取者竞争一个字节时的 `EAGAIN`。修复版的第二个进程先确认原生锁被占用，随后接管原锁及同一 FIFO。进入等待前发送的纯 Job 提示两次均可读取，在已阻塞时发出的提示分别在 0.215 和 0.271 毫秒后唤醒。替换 FIFO 后，两个仍持有旧描述符的进程在 SQLite 提交后约 149 毫秒返回。单读取端对照中，旧版耗尽 1 秒等待，修复版在提交后 202 毫秒观察到变化。两份 SQLite 备份均通过完整性检查，行内容逐项匹配原始记录。[专项回执](acceptance/p2a1/fifo/result.json) · [测试源码](gx-h/tests/test_p2a1_fifo.py)
+
+| 同一 IDLE01 Run 的真实空闲窗口 | 墙钟秒 | 进程 CPU 秒 | 实际阻塞秒 | 等待次数 | SQLite 版本读取次数，含首次 | 每秒读取 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `61ea96d` | 5.012 | 0.063 | 4.948 | 6 | 1 | 0.20 |
+| 修复首轮 | 5.025 | 0.126 | 4.679 | 6 | 20 | 3.98 |
+| 同版复跑 | 5.029 | 0.091 | 4.951 | 6 | 20 | 3.98 |
+
+SQLite trace 回调记录每次版本读取的单调时钟。健康 FIFO 上的额外复查维持约每秒 4 次，两轮 Driver 均只进入 6 次阻塞等待。版本变化是复查提示，事务回调、Job 的持久化文件及其原有复查期限仍由各自模块处理。22 项既有空闲、CLI 恢复和 CPU Job 回归全部通过。[原始时序、负例及快照](acceptance/p2a1/fifo/raw.tar.gz) · [校验清单](acceptance/p2a1/fifo/manifest.sha256)
+
+在发行目录可独立执行 `bin/gx-acceptance run hardening --case FIFO`。专项也可在 `gx-h` 下直接运行 `python -B -m unittest -v tests.test_p2a1_fifo`，设置 `GX_FIFO_EVIDENCE` 为新目录即可保存同样的时序与快照。

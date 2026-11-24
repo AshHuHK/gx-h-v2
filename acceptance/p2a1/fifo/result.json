@@ -1,0 +1,168 @@
+{
+  "base": "61ea96daa218719a7663cb8fc8b404256560b124",
+  "files": {
+    "gx-h/gx_core/jobs/wakeup.py": "70bc3d98da3821a074e1daca1fa66f615d7974d09a88ebb31b370ae91cf572e8",
+    "gx-h/gx_core/p0/idle.py": "fc300ff0b30db9ca6b7cfacbf45ad9c11dfe7927f467a90573fc513d7b62dd0d",
+    "gx-h/tests/test_p2a1_fifo.py": "11e9644c59a46b1d40ce2ada920c9610c5837a52f6af4c67eaad3e52a737c85d"
+  },
+  "commands": [
+    {
+      "label": "final-before",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_p2a1_fifo"
+      ],
+      "cwd": "gx-h",
+      "source": "final-baseline",
+      "returncode": 1
+    },
+    {
+      "label": "final-first",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_p2a1_fifo"
+      ],
+      "cwd": "gx-h",
+      "source": "final-source",
+      "returncode": 0
+    },
+    {
+      "label": "final-repeat",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_p2a1_fifo"
+      ],
+      "cwd": "gx-h",
+      "source": "final-source",
+      "returncode": 0
+    },
+    {
+      "label": "idle-neighbors",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_p2a_idle",
+        "tests.test_phase2a_driver",
+        "tests.test_cpu_runner",
+        "tests.test_v21_workspace_queue"
+      ],
+      "source": "candidate-source",
+      "returncode": 0
+    }
+  ],
+  "evidence_class": "SCRIPTED",
+  "profile": "deterministic",
+  "results": {
+    "baseline": {
+      "idle": {
+        "wall_s": 5.011786699295044,
+        "process_cpu_s": 0.062523251,
+        "reads_including_initial": 1,
+        "reads_per_second": 0.1995296408246304,
+        "blocked_s": 4.947796940803528,
+        "waits": 6
+      }
+    },
+    "first": {
+      "idle": {
+        "wall_s": 5.02459130063653,
+        "process_cpu_s": 0.12583236400000009,
+        "reads_including_initial": 20,
+        "reads_per_second": 3.9804232430737883,
+        "blocked_s": 4.678526688367128,
+        "waits": 6
+      },
+      "late_hint_to_return_s": 0.0002146512269973755,
+      "early_hint_wait_s": 8.662790060043335e-05,
+      "commit_one_hint_to_two_readers_s": [
+        0.00039801374077796936,
+        0.00023421645164489746
+      ],
+      "orphaned_fd_commit_to_two_readers_s": [
+        0.149199016392231,
+        0.14953632280230522
+      ],
+      "database_sha256": "eb5baa2c6ec81352584b201bec4a5dacb0bd2f818b83cd0a87fa165b741b50ed",
+      "database_integrity": "ok",
+      "committed_rows": 3,
+      "foreign_owner_case": {
+        "kind": "owner",
+        "owner": 65534,
+        "reader_euid": 0,
+        "mode": "0o600",
+        "inode": 351797493
+      }
+    },
+    "repeat": {
+      "idle": {
+        "wall_s": 5.029204834252596,
+        "process_cpu_s": 0.09130990400000005,
+        "reads_including_initial": 20,
+        "reads_per_second": 3.97677180769915,
+        "blocked_s": 4.950535003095865,
+        "waits": 6
+      },
+      "late_hint_to_return_s": 0.00027070939540863037,
+      "early_hint_wait_s": 9.706616401672363e-05,
+      "commit_one_hint_to_two_readers_s": [
+        0.00034359097480773926,
+        0.00026735663414001465
+      ],
+      "orphaned_fd_commit_to_two_readers_s": [
+        0.1490282230079174,
+        0.14908621460199356
+      ],
+      "database_sha256": "2592975ce7ad060c9dacff6f6aa8fedeb32138b1c73078e6973d2250b2f7a6ee",
+      "database_integrity": "ok",
+      "committed_rows": 3,
+      "foreign_owner_case": {
+        "kind": "owner",
+        "owner": 65534,
+        "reader_euid": 0,
+        "mode": "0o600",
+        "inode": 351800373
+      }
+    }
+  },
+  "standalone_stale_comparison": {
+    "before": {
+      "open_inode": 351931686,
+      "replacement_inode": 351931687,
+      "writer_pid": 2739968,
+      "reader_pid": 2739954,
+      "woke_on_commit": false,
+      "commit_to_return_s": 0.9899383522570133,
+      "requested_wait_s": 1
+    },
+    "after": {
+      "open_inode": 351931682,
+      "replacement_inode": 351931683,
+      "writer_pid": 2740153,
+      "reader_pid": 2740125,
+      "woke_on_commit": true,
+      "commit_to_return_s": 0.20182349905371666,
+      "requested_wait_s": 1
+    }
+  },
+  "exploratory": "First in-development combined run read the version at every wait entry and surfaced a no-net-change SQLite version bump. The final reader observes the 250ms fallback cadence across calls. The combined run also intersected a pending unrelated metering migration. All 22 original neighbor tests passed in a frozen baseline export with the final two production file hashes.",
+  "case_status": {
+    "FIFO": "PASS",
+    "baseline_new_check": "EXPECTED_FAIL",
+    "existing_neighbors": "22/22"
+  }
+}

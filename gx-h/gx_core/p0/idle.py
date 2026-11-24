@@ -2,15 +2,15 @@
 
 import os
 import selectors
-import stat
 import time
 
-from ..jobs.wakeup import PIPE_NAME
+from ..jobs.wakeup import PIPE_NAME, open_fifo
 from ..persistence import store
 
 
 MIN_SECONDS = 0.1
 MAX_SECONDS = 4.0
+VERSION_CHECK_SECONDS = .25
 
 
 class WorkspaceWait:
@@ -21,33 +21,26 @@ class WorkspaceWait:
         self.path = store.data_root(conn) / PIPE_NAME
         self.fd = None
         self.version = conn.execute("PRAGMA data_version").fetchone()[0]
+        self.next_version_check = 0.
 
     def __enter__(self):
         try:
-            try:
-                os.mkfifo(self.path, 0o600)
-            except FileExistsError:
-                pass  # An abruptly terminated Driver may leave its empty FIFO behind.
-            fd = os.open(self.path, os.O_RDWR | os.O_NONBLOCK | os.O_NOFOLLOW)
-            if stat.S_ISFIFO(os.fstat(fd).st_mode):
-                self.fd = fd
-            else:
-                os.close(fd)
+            os.mkfifo(self.path, 0o600)
         except OSError:
-            pass  # Some filesystems cannot host a FIFO. Keep servicing the same deadlines.
+            pass  # Reuse an existing private FIFO where available.
+        self.fd = open_fifo(self.path, os.O_RDWR)
+        if self.fd is not None:
+            self.next_version_check = time.monotonic() + VERSION_CHECK_SECONDS
         store.driver_connections.add(self.conn)
         return self
 
     def __exit__(self, *exc):
         store.driver_connections.discard(self.conn)
         if self.fd is not None:
-            try:
-                if os.path.samestat(os.fstat(self.fd), self.path.lstat()):
-                    self.path.unlink()
-            except FileNotFoundError:
-                pass
-            finally:
-                os.close(self.fd)
+            # The stable workspace name also serves the next owner and any direct
+            # library reader. Only this descriptor belongs to this waiter.
+            os.close(self.fd)
+            self.fd = None
 
     def wait(self, seconds, drivers=()):
         """None wakes the workspace, a set identifies native peers, an empty set is a timeout."""
@@ -60,19 +53,25 @@ class WorkspaceWait:
                 for fd in driver.read_fds:
                     selector.register(fd, selectors.EVENT_READ, driver.rid)
             until = time.monotonic() + seconds
+            ready = set()
             while True:
-                left = until - time.monotonic()
-                if self.fd is None:
+                # Another reader may drain the hint, and some writers bypass the
+                # FIFO. Keep a bounded fallback across both long and short waits.
+                now = time.monotonic()
+                if None in ready or now >= self.next_version_check:
                     version = self.conn.execute("PRAGMA data_version").fetchone()[0]
-                    if version != self.version:
-                        self.version = version
+                    changed = self.version != version
+                    self.version = version
+                    self.next_version_check = now + VERSION_CHECK_SECONDS
+                    if None in ready or changed:
+                        if self.fd is not None:
+                            try:
+                                os.read(self.fd, 65536)
+                            except BlockingIOError:
+                                pass  # A peer already drained the readable hint.
                         return None
-                if left <= 0:
-                    return set()
-                ready = {key.data for key, _ in selector.select(left if self.fd is not None else min(left, .25))}
                 if ready:
-                    break
-        if None in ready:
-            os.read(self.fd, 65536)
-            return None
-        return ready
+                    return ready
+                if now >= until:
+                    return set()
+                ready = {key.data for key, _ in selector.select(min(until, self.next_version_check) - now)}

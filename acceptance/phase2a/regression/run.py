@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import hashlib
 import json
-import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -15,7 +14,19 @@ import tempfile
 BASELINE = "51e0e13583d95e9cad1386e1d4c77324977e97ea"
 B2 = "a691a4012d16bf813eaaf652a2cabc09881f8f2a"
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO))
+from acceptance.closure.profile import test_environment
 CATALOG_DIGEST = "a6540498a669ec2c510048de812fef7ff5c971bdf30ee788966224e884c3edc0"
+# Original gate membership is recorded in final-v2/summary.json.
+GATE_OPERATIONS = {
+    "P2A-09": ("terminal-protocol", "terminal-code-mode", "terminal-stream", "terminal-crash",
+               "terminal-late", "terminal-public-crash"),
+    "P2A-10": ("public-repair", "schema-transport", "suite"),
+    "P2A-11": ("child-scope", "child-lost-start", "suite", "inherited-case-ids"),
+    "P2A-12": ("brief-replay", "brief-wire", "suite"),
+    "P2A-13": ("public-deterministic", "public-review", "at2-preservation", "at2-checkpoint", "at2-cold"),
+    "REG01": ("suite", "inherited-case-ids"),
+}
 
 
 def utc():
@@ -54,18 +65,16 @@ def bootstrap(args, out, stage):
     profile = next(entry for entry in json.loads(args.catalog.read_bytes())["models"] if entry["slug"] == "gpt-6.2-astra")
     model_digest = hashlib.sha256(json.dumps(profile, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     assert model_digest == CATALOG_DIGEST
-    (stage / "var").mkdir(exist_ok=True)
-    (stage / "var/cli-home").mkdir()
-    (stage / "var/cli-home/.codex").mkdir()
+    env = test_environment(stage / "var", python=Path(sys.executable), binary=binary)
     catalog = stage / "var/catalog.json"
     save(catalog, {"models": [profile]})
     save(out / "dependencies.json", {"git_commit": git("rev-parse", "HEAD", cwd=stage),
          "git_tree": git("rev-parse", "HEAD^{tree}", cwd=stage), "baseline": BASELINE,
-         "codex": subprocess.check_output([binary, "--version"], text=True, env={**os.environ, "CODEX_HOME": str(stage / "var/cli-home/.codex")}).strip(),
+         "codex": subprocess.check_output([binary, "--version"], text=True, env=env).strip(),
          "source_commit": lock["source"]["commit"], "files_sha256": digests,
          "catalog_entry_sha256": model_digest, "catalog_slug": profile["slug"],
          "catalog_use": "Input schema fixture for local scripted Responses",
-         "python": sys.version.split()[0], "node": subprocess.check_output(["node", "--version"], text=True).strip(),
+         "python": sys.version.split()[0], "node": subprocess.check_output(["node", "--version"], text=True, env=env).strip(),
          "stage": str(stage), "runner_sha256": sha(Path(__file__)),
          "isolation_runner_sha256": sha(Path(__file__).with_name("loopback.py"))})
     python = stage / ".venv/bin/python"
@@ -76,7 +85,7 @@ def bootstrap(args, out, stage):
              [python, "-B", "scripts/release_assets.py", "cordis"])
     with (out / "setup.log").open("w") as log:
         for command in setup:
-            subprocess.run(command, check=True, cwd=stage, stdout=log, stderr=subprocess.STDOUT)
+            subprocess.run(command, check=True, cwd=stage, stdout=log, stderr=subprocess.STDOUT, env=env)
     return python, binary, catalog
 
 
@@ -89,14 +98,29 @@ def experiment(args):
     revision = git("rev-parse", "--verify", args.revision + "^{commit}")
     stage = Path(tempfile.mkdtemp(prefix="gx-p2a-reg-")) / "release"
     subprocess.run(["git", "worktree", "add", "--quiet", "--detach", str(stage), revision], cwd=REPO, check=True)
+    try:
+        return run_probes(args, out, revision, stage)
+    finally:
+        if args.gate or args.closure_usage:
+            with (out / "worktree-cleanup.log").open("w") as log:
+                cleanup = subprocess.run(["git", "worktree", "remove", "--force", str(stage)], cwd=REPO,
+                                         stdout=log, stderr=subprocess.STDOUT)
+                print(f"git worktree remove exit {cleanup.returncode}", file=log)
+            if cleanup.returncode == 0:
+                stage.parent.rmdir()
+
+
+def run_probes(args, out, revision, stage):
     python, binary, catalog = bootstrap(args, out, stage)
     work = stage / "var"
-    env = {key: os.environ[key] for key in ("PATH", "LANG", "LC_ALL", "LD_LIBRARY_PATH", "HTTP_PROXY", "http_proxy",
-                                            "HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy", "NO_PROXY", "no_proxy") if key in os.environ}
-    env.update(PATH=str(python.parent) + os.pathsep + env["PATH"], PYTHONDONTWRITEBYTECODE="1",
-               HOME=str(work / "cli-home"), CODEX_HOME=str(work / "cli-home/.codex"))
+    env = test_environment(work, python=python, binary=binary)
     records = {}
+    selected = {name for gate in args.gate for name in GATE_OPERATIONS[gate]} if args.gate else None
+    if selected is not None and "REG01" in args.gate:
+        selected.add("extra-child-observation")
     def run(name, *command):
+        if selected is not None and name not in selected:
+            return None
         argv = [str(value) for value in command]
         result = {"argv": argv, "started_utc": utc(), "cwd": str(stage)}
         with (out / (name + ".log")).open("w") as log:
@@ -119,14 +143,16 @@ def experiment(args):
                      *(["--drop-cold-start"] if drop else []))
 
     def broad():
+        if selected is not None and "suite" not in selected:
+            return
         directory = out / "suite"
         probe("suite", "v21/regression.py", "--commit", revision, "--native", "--out", directory)
         probe("inherited-case-ids", "v3/compare_regression.py", directory)
-        comparison = (out / "inherited-case-ids.log").read_text()
-        try:
-            save(out / "inherited-case-ids.json", json.loads(comparison))
-        except ValueError:
-            pass
+        if (out / "inherited-case-ids.log").exists():
+            try:
+                save(out / "inherited-case-ids.json", json.loads((out / "inherited-case-ids.log").read_text()))
+            except ValueError:
+                pass
         import re
         row = re.compile(r"^test_\w+ \(([^()]+)\) \.\.\. (.*)$", re.M)
         counts = {}
@@ -142,8 +168,8 @@ def experiment(args):
             raise RuntimeError("Missing/changed baseline v3.1 test identities")
 
     def at2_cold():
-        if not probe("at2-checkpoint", "v3/staging/cold_fixture.py", "--work", work / "at2",
-                     "--output", out / "at2-checkpoint.json"):
+        if probe("at2-checkpoint", "v3/staging/cold_fixture.py", "--work", work / "at2",
+                 "--output", out / "at2-checkpoint.json") == 0:
             probe("at2-cold", "v3/staging/replay_checkpoint.py", "--baseline", out / "at2-checkpoint.json",
                   "--candidate", revision, "--audit", work / "at2-replay", "--output", out / "at2-cold.json")
 
@@ -160,7 +186,7 @@ def experiment(args):
         for mode in ("deterministic", "review", "repair"):
             probe("public-" + mode, "v31/public_grid.py", "--commit", revision, "--mode", mode, "--work",
                   work / ("public-" + mode), "--out", out / ("public-" + mode + ".json"))
-        if not probe("schema-transport", "v31/schema_transport.py"):
+        if probe("schema-transport", "v31/schema_transport.py") == 0:
             shutil.copyfile(stage / "acceptance/v31/schema-transport.json", out / "schema-transport.json")
 
     def extra_child_observation():
@@ -169,6 +195,7 @@ def experiment(args):
 
     def protocol():
         return probe("terminal-protocol", "v31/terminal_protocol_probe.py", "--repetitions", "100",
+                     *(["--closure-usage"] if args.closure_usage else []),
                      "--output", out / "terminal-protocol.json")
 
     def briefs():
@@ -203,10 +230,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--phase", choices=("preflight", "full"), required=True)
     parser.add_argument("--revision", required=True)
+    parser.add_argument("--gate", choices=GATE_OPERATIONS, action="append", default=[],
+                        help="Only run the operations belonging to these gates (repeatable)")
+    parser.add_argument("--closure-usage", action="store_true",
+                        help="Exercise the closure usage contract in the original terminal protocol workload")
     parser.add_argument("--cache", type=Path, required=True, help="Read-only runtime release")
     parser.add_argument("--source-db", type=Path, required=True, help="Original historical @2 snapshot")
     parser.add_argument("--historical-briefs", type=Path, default=REPO.parent / "scratchpad/v3-real-performance/p1-2476f2b-xhigh",
                         help="Historical @2 workspaces for read-only preload replay")
     parser.add_argument("--catalog", type=Path, required=True, help="Local Codex model schema cache")
     parser.add_argument("--out", type=Path, required=True, help="New evidence directory")
-    sys.exit(experiment(parser.parse_args()))
+    arguments = parser.parse_args()
+    if arguments.phase != "full" and (arguments.gate or arguments.closure_usage):
+        parser.error("--gate and --closure-usage require --phase full")
+    sys.exit(experiment(arguments))

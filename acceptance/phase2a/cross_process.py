@@ -18,7 +18,6 @@ import threading
 import time
 import traceback
 import uuid
-from types import SimpleNamespace
 
 
 HERE = Path(__file__).resolve().parent
@@ -31,7 +30,7 @@ from gx_core.artifacts import ArtifactService
 from gx_core.domain import ids
 from gx_core.native_release import native_state
 from gx_core.orchestration import service
-from gx_core.p0 import cli, driver as driver_module, operator, schema
+from gx_core.p0 import cli, idle, operator, schema
 from gx_core.p0.driver import Driver, context
 from gx_core.p0.profiles import CODEX_VERSION, clash_env
 from gx_core.persistence import store
@@ -145,19 +144,21 @@ def first_driver(conn, state, out, case):
 
 def drive(conn, state, run_id, seconds, *, measure_sleeps=False):
     wakeups = []
-    def timed_sleep(delay):
+    wait = idle.WorkspaceWait.wait
+    def timed_wait(listener, delay, drivers=()):
         started = time.monotonic_ns()
-        time.sleep(delay)
+        ready = wait(listener, delay, drivers)
         wakeups.append({"requested_seconds": delay, "elapsed_seconds": (time.monotonic_ns() - started) / 1e9,
-                        "woke_at_ns": time.time_ns()})
+                        "woke_at_ns": time.time_ns(), "source": "workspace" if ready is None else
+                        "native" if ready else "deadline"})
+        return ready
     r0 = resource.getrusage(resource.RUSAGE_SELF)
     start = time.monotonic_ns()
     driver = Driver(conn, state.directory, run_id)
     try:
         with ExitStack() as instruments:
             if measure_sleeps:
-                clock = SimpleNamespace(**{**vars(time), "sleep": timed_sleep})
-                instruments.enter_context(patch.object(driver_module, "time", clock))
+                instruments.enter_context(patch.object(idle.WorkspaceWait, "wait", timed_wait))
             instruments.enter_context(metrics.identity(run_id=run_id))
             result = driver.drive(seconds)
     finally:
@@ -387,7 +388,11 @@ def check(out, case, mixed, final, host, commands):
             "idle": idle}
 
 
-def main(out):
+CHECKS = {"P2A-01": "steady", "P2A-02": "restart", "P2A-03": "steady", "P2A-04": "restart",
+          "P2A-05": "restart", "P2A-06": "restart", "P2A-07": "restart", "P2A-14": "restart"}
+
+
+def main(out, checks=None):
     if out.exists() and any(out.iterdir()):
         raise ValueError("Use a fresh output directory")
     out.mkdir(parents=True, exist_ok=True)
@@ -399,7 +404,13 @@ def main(out):
     version = subprocess.check_output([binary, "--version"], text=True).strip()
     assert version == "codex-cli " + CODEX_VERSION, version
     cases = {}
+    failures = {}
+    scenarios = {CHECKS[key] for key in checks or CHECKS}
+    if checks and "P2A-14" in checks:
+        scenarios.add("steady")  # The performance reducer also compares the steady run.
     for name in ("steady", "restart"):
+        if name not in scenarios:
+            continue
         with tempfile.TemporaryDirectory(prefix="gx2a-") as temp, Peer() as peer:
             work = Path(temp)
             probe = Probe(work / "host", binary, peer)
@@ -410,24 +421,30 @@ def main(out):
                 run_env = {**probe.env, **{k: v for k, v in env.items() if k.lower().endswith("_proxy")},
                            "GX_P0_TEST": "1", "GX_P0_TEST_PROVIDER": probe.provider,
                            "GX_P0_CODEX": str(binary), "TMPDIR": str(work), "PYTHONDONTWRITEBYTECODE": "1"}
-                cases[name] = case_run(out / name, work / "gx", name, run_env, peer)
+                observation = case_run(out / name, work / "gx", name, run_env, peer)
                 assert len(peer.rows) == 1, peer.rows
+                cases[name] = observation
+            except Exception:
+                failures[name] = traceback.format_exc()
             finally:
                 peer.gate.set()
                 peer.shutdown()
                 listener.join(5)
     result = {"source": source, "cases": cases, "codex_binary": str(binary), "codex_version": version,
-              "codex_sha256": ids.sha256_of_file(binary), "idle": cases["restart"]["idle"],
+              "codex_sha256": ids.sha256_of_file(binary), "idle": cases.get("restart", {}).get("idle"),
               "codex_spawns_after_stop": sum(c["codex_spawns_after_stop"] for c in cases.values()),
               "duplicates": {k: sum(c["duplicates"][k] for c in cases.values()) for k in ("node", "artifact", "settlement")},
               "offline_deterministic_completions": {k: c["offline_deterministic_completions"] for k,c in cases.items()},
-              "exit_code": 0, "evidence_class": "SCRIPTED; real OS processes, official host on loopback, real local grid Job"}
-    checks = {"01": "steady", "02": "restart", "03": "steady", "04": "restart", "05": "restart",
-              "06": "restart", "07": "restart", "14": "restart"}
-    result["matrix"] = {"P2A-" + n: {"case": case, "run_id": cases[case]["run_id"], "state": "PASS",
-                                      "evidence": case + "/events.jsonl"} for n, case in checks.items()}
+              "exit_code": int(bool(failures)), "evidence_class": "SCRIPTED; real OS processes, official host on loopback, real local grid Job"}
+    result["matrix"] = {key: {"case": case, "run_id": cases[case]["run_id"], "state": "PASS",
+                              "evidence": case + "/events.jsonl"} for key, case in CHECKS.items() if case in cases}
+    if failures:
+        save(out / "failure.json", {"exit_code": 1, "scenarios": failures})
+        result["matrix"].update({key: {"case": case, "state": "FAIL", "evidence": "failure.json"}
+                                 for key, case in CHECKS.items() if case in failures})
     save(out / "observations.json", result)
     print(json.dumps({"matrix": list(result["matrix"]), "duplicates": result["duplicates"], "idle": result["idle"]}))
+    return result["exit_code"]
 
 
 if __name__ == "__main__":
@@ -436,13 +453,14 @@ if __name__ == "__main__":
     parser.add_argument("--private", type=Path)
     parser.add_argument("--case", choices=("steady", "restart"))
     parser.add_argument("--worker", choices=("first", "recovery", "idle"))
+    parser.add_argument("--check", choices=CHECKS, action="append", help="select a matrix scenario (repeatable)")
     args = parser.parse_args()
     args.output = args.output.resolve()
     if args.worker:
         worker(args)
     else:
         try:
-            main(args.output)
+            sys.exit(main(args.output, args.check))
         except Exception:
             # A caller supplying an existing evidence directory must never overwrite its result.
             if (args.output / "failure.json").exists() or (args.output / "observations.json").exists():

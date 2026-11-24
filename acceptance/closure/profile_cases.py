@@ -22,6 +22,7 @@ sys.path.insert(0, str(REPO))
 from acceptance.closure.profile import test_environment
 
 BASELINE = REPO / "acceptance/phase2a/regression/final-v2/batch/suite/python-full.log"
+BASELINE_REVISION = "78a8b07766376d93a458e5175c41f1f327ff8f36"
 PROBE = Path(__file__).with_name("profile_probe.py")
 CASE_LINE = re.compile(r"^test_\w+ \(([^()]+)\) \.\.\. ?(.*)$", re.M)
 FAILURE_LINE = re.compile(r"^(?:FAIL|ERROR): [^\n(]+ \(([^()]+)\)([^\n]*)$", re.M)
@@ -67,6 +68,7 @@ def unittest_rows(text):
 def original_failures(path):
     """Import original unittest tracebacks, pytest summary lines, or a JSON list of identities."""
     text = path.read_text()
+    reviews = {}
     if path.suffix.lower() == ".json":
         document = json.loads(text)
         items = document["failures"] if isinstance(document, dict) else document
@@ -75,6 +77,20 @@ def original_failures(path):
         values = [(item, item, "") if isinstance(item, str) else
                   (item.get("original_id", item["test_id"]), item["test_id"], item.get("original_error", ""))
                   for item in items]
+        for item in items:
+            if isinstance(item, dict) and item.get("classification"):
+                category = item["classification"]
+                if category not in {"environment", "fixture", "regression", "unresolved"}:
+                    raise ValueError(f"unknown original failure classification {category!r}")
+                if item.get("reason") and item.get("evidence"):
+                    evidence = (path.parent / item["evidence"]).resolve()
+                    review = {"classification": category, "reason": item["reason"], "evidence": str(evidence)}
+                    if evidence.is_file():
+                        review["evidence_sha256"] = sha(evidence)
+                    else:
+                        review.update(classification="unresolved", original_claim=category,
+                                      reason=f"The evidence file for the supplied {category} classification is unavailable.")
+                    reviews[item.get("original_id", item["test_id"])] = review
     else:
         values = []
         for block in re.split(r"^={6,}\s*$", text, flags=re.M):
@@ -92,7 +108,7 @@ def original_failures(path):
             name = ".".join([Path(module).stem, *parts]).split("[", 1)[0]
         if original_id in result:
             raise ValueError(f"duplicate original failure {original_id}")
-        result[original_id] = (name, trace or "")
+        result[original_id] = (name, trace or "", reviews.get(original_id))
     return result
 
 
@@ -164,7 +180,9 @@ def baseline_run(args, work):
     else:
         (out / "suite-invocation.log").write_text("Reused the matching Python discovery receipt and verified its raw log.\n")
     write_json(out / "suite-invocation.json", receipt)
-    reference = unittest_rows(BASELINE.read_text())
+    original_log = subprocess.check_output(
+        ["git", "show", f"{BASELINE_REVISION}:{BASELINE.relative_to(REPO).as_posix()}"], cwd=REPO)
+    reference = unittest_rows(original_log.decode())
     if len(reference) != 465:
         raise ValueError("historical Python baseline must contain exactly 465 unique identities")
     measured = unittest_rows((suite_dir / "python-full.log").read_text())
@@ -178,32 +196,54 @@ def baseline_run(args, work):
         if not matches:
             failures.append(name)
     write_json(out / "baseline-465.json", ledger)
+    additional = sorted(measured.keys() - reference.keys())
+    additional_nonpassing = {name: measured[name] for name in additional if measured[name]["outcome"] != "ok"}
     source = args.original_failures
-    imported = original_failures(source) if source else {}
+    imported = {}
+    import_issue = None
+    if source:
+        try:
+            imported = original_failures(source)
+        except (OSError, KeyError, TypeError, ValueError) as err:
+            import_issue = f"Unable to read the supplied original failure records: {err}"
     verdicts = []
-    for original_id, (name, trace) in imported.items():
+    for original_id, (name, trace, review) in imported.items():
         now = measured.get(name, {"outcome": "missing"})
         classification, reason = failure_verdict(trace, now)
+        if review:
+            classification, reason = review["classification"], review["reason"]
         if name not in reference:
             classification, reason = "unresolved", "Supplied identity is outside the historical set of 465."
         verdicts.append({"original_id": original_id, "test_id": name, "current_outcome": now["outcome"], "classification": classification,
-                         "reason": reason, "original_trace_sha256": hashlib.sha256(trace.encode()).hexdigest() if trace else None})
+                         "reason": reason, "source_review": review,
+                         "original_trace_sha256": hashlib.sha256(trace.encode()).hexdigest() if trace else None})
     issue = None
-    if source is None:
+    if import_issue:
+        issue = import_issue
+    elif source is None:
         issue = "The closure package reports 42 original failures without identifying them or supplying their tracebacks."
     elif len(imported) != 42:
         issue = f"The supplied source identifies {len(imported)} distinct failures of the expected 42."
     elif any(row["classification"] == "unresolved" for row in verdicts):
         issue = "Original failures without case-specific causal evidence remain unresolved."
     write_json(out / "original-42.json", {"expected": 42, "identified": len(imported),
-                                         "distinct_test_ids": len({case for case, _ in imported.values()}),
+                                         "distinct_test_ids": len({case for case, _, _ in imported.values()}),
                                          "source": str(source) if source else None,
-                                         "source_sha256": sha(source) if source else None, "issue": issue, "cases": verdicts})
-    return {"status": "FAIL" if failures or receipt["exit_code"] else "PARTIAL" if issue else "PASS",
-            "revision": commit, "baseline_log": str(BASELINE.relative_to(REPO)), "baseline_log_sha256": sha(BASELINE),
+                                         "source_sha256": sha(source) if source and source.is_file() else None,
+                                         "issue": issue, "cases": verdicts})
+    failed_run = bool(failures or additional_nonpassing or receipt["exit_code"])
+    problems = []
+    if failed_run:
+        problems.append(f"Python suite exited {receipt['exit_code']}. {len(failures)} original identities changed or failed "
+                        f"and {len(additional_nonpassing)} additional cases did not pass.")
+    if issue:
+        problems.append(issue)
+    return {"status": "FAIL" if failed_run else "PARTIAL" if issue else "PASS",
+            "revision": commit, "baseline_revision": BASELINE_REVISION,
+            "baseline_log": str(BASELINE.relative_to(REPO)), "baseline_log_sha256": hashlib.sha256(original_log).hexdigest(),
             "baseline_count": len(reference), "baseline_outcomes": dict(Counter(r["measured"]["outcome"] for r in ledger)),
-            "additional_ids": sorted(measured.keys() - reference.keys()), "failed_baseline_ids": failures,
-            "original_ids_obtained": len(imported), "issue": issue,
+            "additional_ids": additional, "additional_nonpassing": additional_nonpassing, "failed_baseline_ids": failures,
+            "original_ids_obtained": len(imported), "issue": " ".join(problems) or None,
             "evidence": ["baseline-465.json", "original-42.json", "suite/python-full.log", "suite/summary.json",
                          "suite-invocation.json", "suite-invocation.log"]}
 

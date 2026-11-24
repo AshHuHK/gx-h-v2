@@ -1,7 +1,7 @@
 """Summarize actual Phase 2A cross-process receipts. Requires no live transport."""
 
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 import gzip
 import hashlib
 import json
@@ -11,6 +11,7 @@ from pathlib import Path
 
 METRICS = {"workflow_ready_scan", "p0_driver_cycle", "job_reconcile", "db_transaction"}
 PHASES = (("steady", "first"), ("restart", "first"), ("restart", "recovery"), ("restart", "idle"))
+SQLITE_TIMES = ("duration_ms", "lock_wait_ms", "body_ms", "finish_ms")
 
 
 def quantiles(values):
@@ -25,6 +26,42 @@ def quantiles(values):
         "p50": round(values[math.ceil(.50 * len(values)) - 1], 6),
         "p95": round(values[math.ceil(.95 * len(values)) - 1], 6),
         "max": round(values[-1], 6),
+    }
+
+
+def transaction_summary(writes):
+    """Reduce measured writer attempts. Historical rows have only total and acquire."""
+    groups = defaultdict(list)
+    modern = []
+    legacy = 0
+    for row in writes:
+        if "transaction_owner" not in row:
+            legacy += 1
+            continue
+        groups[row["transaction_owner"], row["operation"]].append(row)
+        modern.append(row)
+
+    def distribution(rows):
+        return {
+            "attempts": len(rows),
+            "outcomes": dict(Counter(row["commit_or_rollback"] for row in rows)),
+            **{field: quantiles(row[field] for row in rows) for field in SQLITE_TIMES},
+        }
+
+    fields = ("transaction_owner", "operation", "run_id", "observed_ns", "commit_or_rollback",
+              "rows_changed", *SQLITE_TIMES)
+    return {
+        "all": distribution(modern),
+        "legacy_rows_without_phase_labels": legacy,
+        "by_owner_operation": [
+            {"transaction_owner": owner, "operation": operation, **distribution(rows)}
+            for (owner, operation), rows in sorted(groups.items())
+        ],
+        "slow_samples": {
+            field: [{key: row[key] for key in fields}
+                    for row in sorted(modern, key=lambda r: r[field], reverse=True)[:5]]
+            for field in SQLITE_TIMES
+        },
     }
 
 
@@ -59,6 +96,8 @@ def summarize(samples):
         "sqlite_writer_acquire_ms": quantiles(s["lock_acquire_ms"] for s in writes),
         "sqlite_writer_hold_through_commit_or_rollback_ms": quantiles(
             s["duration_ms"] - s["lock_acquire_ms"] for s in writes),
+        **({"sqlite_transactions": transaction_summary(writes)} if any(
+            "transaction_owner" in s for s in writes) else {}),
     }
 
 
@@ -113,13 +152,24 @@ def write_records(path, rows):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("case_dirs", nargs="+", type=Path,
-                        help="independent completed cross_process.py evidence directories")
+    parser.add_argument("inputs", nargs="+", type=Path, help="cross_process.py case directories or metrics files")
+    parser.add_argument("--transaction-metrics", action="store_true",
+                        help="summarize writer attempts from GX metrics JSONL or JSONL.GZ files")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    cases = [p.resolve() for p in args.case_dirs]
+    cases = [p.resolve() for p in args.inputs]
     if len(cases) != len(set(cases)):
-        parser.error("each case directory must be distinct")
+        parser.error("each input must be distinct")
+    if args.transaction_metrics:
+        writes = []
+        for path in cases:
+            opener = gzip.open if path.suffix == ".gz" else open
+            with opener(path, "rt", encoding="utf-8") as stream:
+                writes.extend(row for line in stream if (row := json.loads(line))["kind"] == "db_transaction")
+        result = transaction_summary(writes)
+        args.output.mkdir(parents=True, exist_ok=True)
+        (args.output / "summary.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+        return
 
     samples = []
     observations = []

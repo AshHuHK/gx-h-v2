@@ -12,6 +12,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+import tarfile
 import tempfile
 import time
 from unittest.mock import patch
@@ -81,6 +82,12 @@ def exercise(conn, directory, out):
         if time.monotonic() >= deadline:
             raise TimeoutError("local fixture Jobs did not produce their runner receipts")
         time.sleep(0.05)
+    with tarfile.open(out / "runner-records.tar.gz", "w:gz") as bundle:
+        for job, receipt in receipts.items():
+            for name in ("runner.json", "status.json", "outcome.json", "stdout.log", "stderr.log"):
+                path = receipt.with_name(name)
+                if path.is_file():
+                    bundle.add(path, arcname=f"{job}/{name}")
 
     jobs = JobService(conn)
     before = {name: snapshot(conn, job) for name, job in ids.items()}
@@ -142,7 +149,9 @@ def exercise(conn, directory, out):
     assert snapshot(conn, primary)["reservation_status"] == "HELD"
     recovered = seams.reconcile_jobs(conn, run_id=run, actor=actor)
     assert recovered == [{"from": "OUTCOME_UNKNOWN", "to": "SUCCEEDED", "job_id": primary}], recovered
-    assert observe_grid(conn, primary)["observations"]["observations"][0]["score"] == 0
+    result = observe_grid(conn, primary)
+    assert result["observations"]["observations"][0]["score"] == 0
+    (out / "observations.json").write_bytes(storage.artifact_service(conn).read_bytes(result["observations_ref"]))
     after = {name: snapshot(conn, job) for name, job in ids.items()}
     assert seams.reconcile_jobs(conn, run_id=run, actor=actor) == []
     assert all(snapshot(conn, job) == after[name] for name, job in ids.items())
@@ -207,7 +216,7 @@ def main(out):
                   source_sha256={p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in relevant},
                   child_processes=commands, codex_spawn_count=codex, duplicate_launch_count=len(launches)-len(set(launches)),
                   evidence_files=["before.sqlite.gz", "deferred.sqlite.gz", "after.sqlite.gz", "events.json",
-                                  "reconcile-metrics.json"])
+                                  "reconcile-metrics.json", "runner-records.tar.gz", "observations.json"])
     save(out / "result.json", result)
     print(f"P2A-15 passed for Run {result['run_id']} with {len(launches)} original Jobs and {codex} Codex launches")
 

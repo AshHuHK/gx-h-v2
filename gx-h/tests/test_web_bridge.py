@@ -2,6 +2,7 @@
 
 import http.client
 import json
+from contextlib import closing
 import sqlite3
 import tempfile
 import threading
@@ -75,7 +76,7 @@ class WebBridgeTests(unittest.TestCase):
         self.assertEqual(project_messages.take_for_turn(self.state, "root"), [])
 
     def test_event_cursor_replays_only_later_project_transitions(self):
-        with sqlite3.connect(self.state / "gx.db") as db:
+        with closing(sqlite3.connect(self.state / "gx.db")) as db:
             db.executescript("""
                 CREATE TABLE runs (run_id TEXT, project_ref TEXT);
                 INSERT INTO runs VALUES ('r1','demo'),('r2','other');

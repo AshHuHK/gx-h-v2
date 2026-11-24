@@ -1,4 +1,5 @@
 """Provider response boundaries, code-mode joins, incomplete evidence and the existing budget."""
+from contextlib import closing
 import sqlite3
 import unittest
 
@@ -56,7 +57,7 @@ class AttributionTests(unittest.TestCase):
         self.assertEqual(report['first_request_input_tokens'][0]['input_tokens'], 20)
         self.assertEqual(self.fixture.budget()['spent'], {'api_calls': 1, 'tokens': 26})
         # A read-only report has no budget side effect, even when reopened.
-        with sqlite3.connect(self.conn.execute('PRAGMA database_list').fetchone()['file']) as reopened:
+        with closing(sqlite3.connect(self.conn.execute('PRAGMA database_list').fetchone()['file'])) as reopened:
             reopened.row_factory = sqlite3.Row
             self.assertEqual(attr.report(reopened, self.run), report)
         self.assertEqual(self.fixture.budget()['spent'], {'api_calls': 1, 'tokens': 26})

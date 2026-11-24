@@ -1,12 +1,17 @@
 """Exercise the official Root callback shape and real detached Job/Artifact owners."""
 import json
+import os
+import signal
+import sys
 from pathlib import Path
 import unittest
 from unittest.mock import patch
 
 from gx_core import budgets
 from gx_core.artifacts import ArtifactService
+from gx_core.capabilities import manifest as capability_manifest
 from gx_core.hostobs.app_server_client import ReceivedMessage
+from gx_core.jobs import runner
 from gx_core.jobs.service import JobService
 from gx_core.p0 import compute, manifest, waits
 from gx_core.persistence import store
@@ -165,17 +170,34 @@ class ComputeTest(unittest.TestCase):
         self.assertIsNone(compute.pending_wait(self.db,self.row["root_key"]))
 
     def test_existing_job_limits_stop_bounded_compute_load(self):
-        raw = self.publish("bounded-input", [1] * 310000)
-        self.db.execute("INSERT INTO p0_root_artifact_reads VALUES(?,?)", (self.row["root_key"],raw))
-        terms = ["sum(data['wide'])"] * 28
-        request = self.proposal("limited-cpu",inputs={"wide":raw},script="{'gap': sum(["+",".join(terms)+"])}",
-                                tighten={"wall_seconds":1})
-        jid = self.invoke("gx_job_submit",request)["job_id"]
-        view = self.finish(jid)
-        self.assertEqual(view["status"],"FAILED")
-        self.assertFalse(manifest.read_manifest(self.db,jid)["completion"]["outputs"])
-        self.assertTrue(view["failure"].get("timed_out") or view["failure"]["observed"] == "signal")
-        self.observations["wall_limit"] = {"job_id":jid, "failure":view["failure"], "measured":view["measured"]}
+        # Substitute just the workload. Job admission, independent process supervision,
+        # deadline, termination and result collection all use their production owners.
+        launch = capability_manifest.launch_plan
+        def waiting_child(*args, **kwargs):
+            plan = launch(*args, **kwargs)
+            plan.argv = [sys.executable, "-I", "-S", "-c",
+                         "import os, signal; print(os.getpid(), flush=True); signal.pause()"]
+            return plan
+
+        jid = self.invoke("gx_job_submit", self.proposal("limited-wall", tighten={"wall_seconds": 1}))["job_id"]
+        with patch.object(capability_manifest, "launch_plan", side_effect=waiting_child):
+            view = self.finish(jid)
+        completion = manifest.read_manifest(self.db, jid)["completion"]
+        outcome = json.loads(self.db.execute("SELECT outcome_json FROM jobs WHERE job_id=?", (jid,)).fetchone()[0])
+        self.assertEqual((view["status"], outcome["result"], view["failure"]["observed"]),
+                         ("FAILED", "timed_out", "timed_out"))
+        self.assertFalse(completion["outputs"])
+        tool = outcome["runner"]
+        stdout = next(item for item in completion["logs"] if item["kind"] == "job_stdout")
+        self.assertEqual(int(self.assets.read_bytes(stdout["artifact_ref"])), tool["tool_pid"])
+        self.assertEqual(tool["timeout_seconds"], 1)
+        self.assertIn(outcome["signal"], (signal.SIGTERM, signal.SIGKILL))
+        self.assertIsNotNone(tool["tool_started"])
+        self.assertNotEqual(runner.start_ticks(tool["tool_pid"]), tool["tool_started"])
+        self.observations["wall_limit"] = {"job_id": jid, "runner": tool, "result": outcome["result"],
+                                          "failure": view["failure"], "measured": view["measured"],
+                                          "signal": outcome["signal"], "pid_at_start": tool["tool_pid"],
+                                          "original_process_gone": True, "output_count": len(completion["outputs"])}
         small = self.proposal("limited-memory",tighten={"memory_mib":1})
         jid = self.invoke("gx_job_submit",small)["job_id"]
         view=self.finish(jid)
@@ -183,6 +205,8 @@ class ComputeTest(unittest.TestCase):
         self.assertFalse(manifest.read_manifest(self.db,jid)["completion"]["outputs"])
         self.assertIn("rss_limit",view["failure"]["summary"])
         self.observations["memory_limit"] = {"job_id":jid, "failure":view["failure"], "measured":view["measured"]}
+        if evidence := os.environ.get("GX_TIMEOUT_EVIDENCE"):
+            Path(evidence).write_text(json.dumps(self.observations, indent=2) + "\n")
 
     def test_cancel_and_fence_before_scheduling(self):
         jid=self.invoke("gx_job_submit",self.proposal("cancel"))["job_id"]

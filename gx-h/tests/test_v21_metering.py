@@ -1,5 +1,6 @@
 """GX token accounting over real SQLite, with controllable native protocol notifications."""
 import json
+from contextlib import closing
 import sqlite3
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -48,7 +49,7 @@ class ThreadAccounts(unittest.TestCase):
         with patch.object(Path,"open",side_effect=AssertionError("meter read a rollout on a normal live turn")):
             f.complete()
         f.sample(turn,31)
-        with sqlite3.connect(self.fx.directory/"ledger.sqlite") as check:
+        with closing(sqlite3.connect(self.fx.directory/"ledger.sqlite")) as check:
             self.assertEqual(check.execute("SELECT observed_total,reconciled_total,anomaly_total FROM p0_meter_threads"
                                            ).fetchone(),(35,35,31))
         self.assertEqual(self.status()["turns"][0]["confidence"],"PROVIDER_CONFIRMED")

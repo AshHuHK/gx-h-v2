@@ -2,6 +2,7 @@
 import json
 import os
 from pathlib import Path
+from contextlib import closing
 import sqlite3
 from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
@@ -15,7 +16,7 @@ from gx_core.persistence import store
 
 class Measurements(TestCase):
     def test_router_preserves_multiple_snapshots_and_missing_fields(self):
-        with TemporaryDirectory() as tmp, sqlite3.connect(":memory:") as db:
+        with TemporaryDirectory() as tmp, closing(sqlite3.connect(":memory:")) as db:
             trace = Path(tmp) / "trace.jsonl"
             router = NativeRouter(db, project_ref="p01", max_turns=1, max_workers=1,
                                   tool_policy={"allow_mutations": False, "max_callbacks": 1})
@@ -32,7 +33,7 @@ class Measurements(TestCase):
             self.assertTrue(all(row["last"] is None and row["total"]["inputTokens"] is None for row in rows))
 
     def test_unwritable_trace_keeps_transaction(self):
-        with TemporaryDirectory() as tmp, sqlite3.connect(":memory:") as db:
+        with TemporaryDirectory() as tmp, closing(sqlite3.connect(":memory:")) as db:
             with mock.patch.dict(os.environ, GX_METRICS_FILE=tmp):
                 with store.transaction(db):
                     db.execute("CREATE TABLE committed(value integer)")

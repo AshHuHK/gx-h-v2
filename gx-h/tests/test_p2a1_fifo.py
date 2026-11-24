@@ -196,6 +196,7 @@ class FifoLifecycle(unittest.TestCase):
         observations = []
         for kind in ("file", "symlink", "permissions", "owner"):
             with self.subTest(kind=kind), ExitStack() as resources:
+                ownership = {}
                 if kind == "file":
                     self.path.write_bytes(b"unchanged")
                 elif kind == "symlink":
@@ -206,13 +207,8 @@ class FifoLifecycle(unittest.TestCase):
                     resources.callback(os.close, watcher)
                     if kind == "permissions":
                         self.path.chmod(0o620)
-                    elif os.geteuid() == 0:
-                        try:
-                            os.chown(self.path, 65534, -1)
-                        except PermissionError:  # Some rootless containers map UID 0.
-                            resources.enter_context(patch.object(os, "geteuid", return_value=65534))
                     else:
-                        resources.enter_context(patch.object(os, "geteuid", return_value=os.geteuid() + 1))
+                        ownership = self.foreign_owner(resources)
                 original = self.path.lstat()
                 with WorkspaceWait(self.db) as listener:
                     self.assertIsNone(listener.fd)
@@ -227,9 +223,40 @@ class FifoLifecycle(unittest.TestCase):
                     with self.assertRaises(BlockingIOError):
                         os.read(watcher, 1)
                 observations.append({"kind": kind, "owner": original.st_uid, "reader_euid": os.geteuid(),
-                                     "mode": oct(stat.S_IMODE(original.st_mode)), "inode": original.st_ino})
+                                     "mode": oct(stat.S_IMODE(original.st_mode)), "inode": original.st_ino,
+                                     **ownership})
                 self.path.unlink()
         self.save("path-validation.json", observations)
+
+    def foreign_owner(self, resources):
+        uid_map = [list(map(int, line.split())) for line in Path("/proc/self/uid_map").read_text().splitlines()]
+        foreign_uid = 65534 if os.geteuid() != 65534 else 65533
+        detail = {"uid_map": uid_map, "tested_owner": foreign_uid}
+        try:
+            os.chown(self.path, foreign_uid, -1)
+        except OSError as error:
+            mapped = any(first <= foreign_uid < first + count for first, _, count in uid_map)
+            if error.errno not in (errno.EACCES, errno.EPERM) and not (error.errno == errno.EINVAL and not mapped):
+                raise
+            detail.update(owner_source="fixture_lstat", chown_errno=error.errno)
+        else:
+            self.assertEqual(self.path.lstat().st_uid, foreign_uid)
+            return dict(detail, owner_source="filesystem")
+
+        # A single-UID namespace cannot chown to another UID. Supply only this
+        # FIFO's lstat owner to the wakeup module; all I/O and real credentials stay intact.
+        def foreign_lstat(path):
+            info = os.lstat(path)
+            if Path(path) != self.path:
+                return info
+            fields = list(info)
+            fields[stat.ST_UID] = foreign_uid
+            return os.stat_result(fields)
+
+        local_os = SimpleNamespace(**vars(os))
+        local_os.lstat = foreign_lstat
+        resources.enter_context(patch.object(wakeup, "os", local_os))
+        return detail
 
     def test_readiness_may_be_drained_before_read(self):
         with WorkspaceWait(self.db) as listener, ExitStack() as handles:

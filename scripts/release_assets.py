@@ -119,15 +119,16 @@ def install_codex(supplied):
             "official_codex": str(binary), "binary_sha256": digest(binary)}
 
 
-def install_cordis():
-    manifest = ROOT / LOCK["cordis_lock"]
+def install_cordis(*, manifest=None, archives=None, env=None, npm="npm"):
+    manifest = manifest or ROOT / LOCK["cordis_lock"]
+    archives = archives or ASSETS / "npm"
     packages = {k: v for k, v in json.loads(manifest.read_text())["packages"].items() if k}
     with tempfile.TemporaryDirectory(dir=manifest.parent) as tmp:
         stage = Path(tmp)
         for name in ("package.json", "package-lock.json"):
             shutil.copyfile(manifest.parent / name, stage / name)
         for pin in packages.values():
-            archive = ASSETS / "npm" / pin["resolved"].rsplit("/", 1)[1]
+            archive = archives / pin["resolved"].rsplit("/", 1)[1]
             key = cache_key(pin["integrity"])
             algorithm, expected = integrity_digest(pin["integrity"])
             checked(archive, expected, algorithm)
@@ -136,8 +137,8 @@ def install_cordis():
             shutil.copyfile(archive, cached)
         target = manifest.parent / "node_modules"
         if not target.exists():
-            subprocess.run(["npm", "ci", "--offline", "--ignore-scripts", "--no-fund", "--no-audit",
-                            "--cache", str(stage / "cache")], cwd=stage, check=True, stdout=subprocess.DEVNULL)
+            subprocess.run([npm, "ci", "--offline", "--ignore-scripts", "--no-fund", "--no-audit",
+                            "--cache", str(stage / "cache")], cwd=stage, check=True, stdout=subprocess.DEVNULL, env=env)
             (stage / "node_modules").rename(target)
     for path, pin in packages.items():
         installed = json.loads((manifest.parent / path / "package.json").read_text())

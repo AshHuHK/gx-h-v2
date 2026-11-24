@@ -16,6 +16,7 @@ import time
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 from acceptance.closure.profile import test_environment
+from scripts.acceptance_dependencies import inspect_python, runtime, verify_assets
 PRODUCT = ('gx-h/', 'bin/', 'codex_adapter/', 'examples/', 'scripts/')
 PROTOCOL = ('native_activity.py','native_budget.py','native_cumulative.py','native_events.py','native_refusal.py','native_child.py','native_wake.py')
 
@@ -83,14 +84,26 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
             archive.extractall(package,filter='data')
         if process.wait():
             raise RuntimeError('failed to extract requested checkout')
+    # Historical named revisions can predate the runtime declaration. Verify their
+    # own committed dependencies against the current deterministic runtime lock.
+    current_pins = json.loads((REPO / "release-assets/lock.json").read_text())["deterministic_test_runtime"]
+    lock, requirements, cordis, archives = verify_assets(package, historical_pins=current_pins)
+    pins = lock.get("deterministic_test_runtime", current_pins)
+    _, node, npm, py_version, node_version, npm_version, env = runtime(
+        REPO, checkout, python=Path(sys.executable), node=None, env=env, pins=pins)
     manifest={p.relative_to(package).as_posix():digest(p) for p in sorted(package.rglob('*')) if p.is_file()}
     save(out/'files.json',manifest)
     product={name:sha for name,sha in manifest.items() if name.startswith(PRODUCT)}
     content_hash=hashlib.sha256(json.dumps(product,sort_keys=True,separators=(',',':')).encode()).hexdigest()
     summary={'commit':commit,'verified_product_commit':product_commit or commit,'started_utc':utc(),'source_file_manifest':'files.json','product_files':len(product),
              'requested_test_profile':env['GX_TEST_RESOURCE_PROFILE'],'test_environment_sha256':digest(REPO/'acceptance/closure/profile.py'),
-             'product_sha256':content_hash,'product_prefixes':PRODUCT,'node_version':subprocess.check_output(
-                 ['node','--version'],text=True,env=env).strip(),'python_version':sys.version.split()[0],'operations':{},
+             'product_sha256':content_hash,'product_prefixes':PRODUCT,'node_version':"v"+node_version,
+             'python_version':py_version, 'operations':{},
+             'dependency_preflight':{'node':str(node),'npm':str(npm),'npm_version':npm_version,
+                  'runtime_lock_source':'named checkout' if 'deterministic_test_runtime' in lock else 'acceptance runner',
+                  'runtime_pins':pins,'release_lock_sha256':digest(package/'release-assets/lock.json'),
+                  'cordis_lock_sha256':digest(cordis),'requirements_sha256':digest(requirements),
+                  'offline_archive_sha256':archives},
              'class':'Local Python, SQLite and CPU Job fixtures. Official-protocol scenarios use pinned Codex with a scripted loopback provider.'}
     def execute(label, command, cwd):
         start=utc()
@@ -126,6 +139,9 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
         for name,command in installs:
             if record(name,command,package):
                 return 2
+        summary['dependency_preflight']['installed_python'] = inspect_python(
+            venv, env, py_version, lock["scientific_review"]["wheels"])
+        summary['dependency_preflight']['installed_node_modules'] = json.loads((out/'offline-cordis.log').read_text())
         env['PATH']=str(venv/'bin')+os.pathsep+env['PATH']
         if binary is not None:
             lock=json.loads((package/'release-assets/lock.json').read_text())

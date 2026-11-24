@@ -44,7 +44,7 @@ def brief_sizes(state):
 def compare_case(revision, mode, work):
     work.mkdir()
     result = {}
-    args = SimpleNamespace(commit=revision, mode=mode, lane="west", wave=0)
+    args = SimpleNamespace(commit=revision, mode=mode, lane="west", wave=0, rollout_diagnostics=True)
     public.run(args, result, work)
     observed = result["observed"]
     outcomes = {path: {k: route[k] for k in ("points", "threshold", "supported")}
@@ -70,7 +70,9 @@ def compare_case(revision, mode, work):
             "http_requests": len(requests), "compaction_http_requests": result["compaction_http_requests"],
             "post_terminal_requests": result["post_terminal_requests"],
             "total_http_request_bytes": sum(r["http_body_bytes"] for r in requests),
-            "scripted_provider_tokens": sum(r["settled_tokens"] for r in observed["native_turns"]),
+            "scripted_provider_tokens": result["scripted_provider_tokens"],
+            "native_turns": observed["native_turns"],
+            "rollout_diagnostics": result["spec"]["metering"]["rollout_diagnostics"],
             "start_and_run_seconds": round(sum(c["elapsed_s"] for c in result["commands"][:2]), 4),
             "terminal_cold_replay_requests": result["commands"][-1]["requests"], "workers": packets}
 

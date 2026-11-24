@@ -145,13 +145,14 @@ class Peer(BaseHTTPRequestHandler):
             self.server.record(metadata)
             self.send_error(400, "Unexpected acceptance fixture input")
             return
+        usage = {"input_tokens": 30, "output_tokens": 5, "total_tokens": 35}
+        metadata["scripted_provider_tokens"] = usage["total_tokens"]
         self.server.record(metadata)
         if (self.server.fault_enabled and metadata.get("tool") == "gx_submit_product"
                 and metadata.get("round") == 0 and metadata["output_kind"] == "science_assessment"):
             self.server.fault_enabled = False
             self.server.fault_ready.set()
             self.server.fault_release.wait(timeout=20)
-        usage = {"input_tokens": 30, "output_tokens": 5, "total_tokens": 35}
         events = [{"type": "response.created", "response": {"id": ident}},
                   {"type": "response.output_item.done", "item": item},
                   {"type": "response.completed", "response": {"id": ident, "usage": usage}}]

@@ -203,6 +203,8 @@ def run(args, result, work):
     result["build"] = stage_source(work, install, commit)
     spec = specification(install, args.wave, args.lane)
     spec.update(workflow_version="3", plugins=["org.gx.science-grid@3.0.0"])
+    if getattr(args, "rollout_diagnostics", False):
+        spec.setdefault("metering", {})["rollout_diagnostics"] = True
     if args.mode == "deterministic":
         for route in spec["proposal"]["paths"]:
             route["claim_scope"] = "finite_grid_threshold"
@@ -255,7 +257,9 @@ def run(args, result, work):
         assert all("error" not in row for row in server.rows)
         turns = result["observed"]["native_turns"]
         assert all(row["budget_status"] == "SETTLED" and row["confidence"] == "PROVIDER_CONFIRMED" for row in turns), turns
-        assert sum(row["settled_tokens"] for row in turns) == server.request_count * 35, turns
+        assert len(server.rows) == server.request_count
+        result["scripted_provider_tokens"] = sum(row["scripted_provider_tokens"] for row in server.rows)
+        assert sum(row["settled_tokens"] for row in turns) == result["scripted_provider_tokens"], turns
         successful_calls = {row["call_id"]:row for row in result["observed"]["terminal_receipts"]}
         by_task = {}
         for row in server.rows:

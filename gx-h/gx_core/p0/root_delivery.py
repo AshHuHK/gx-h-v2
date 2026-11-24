@@ -79,6 +79,28 @@ def _stored_child_session(thread, meter):
         return False
 
 
+def _cancelled_history_call(payload, thread_id, turn_id, call_id):
+    item = payload.get("item") or {}
+    return ((payload.get("thread_id"), payload.get("turn_id")) == (thread_id, turn_id)
+            and item.get("type") == "DynamicToolCall" and item.get("tool") == "gx_submit_product"
+            and item.get("namespace") == "gx" and item.get("id") == call_id
+            and item.get("status") == "failed" and item.get("success") is False and item.get("content_items") == []
+            and item.get("error") == "dynamic tool call was cancelled before receiving a response")
+
+
+def _terminal_history_marker(entry_type, kind, payload, thread_id, turn_id, call_id):
+    # An interrupted direct submit can end between the scoped TokenUsageRecord and
+    # its later TokenCount notification. Only these host bookkeeping records may
+    # sit between that final response and the exact abort when the mirror is absent.
+    if kind == "thread_goal_updated":
+        return payload.get("threadId") == thread_id and (payload.get("goal") or {}).get("threadId") == thread_id
+    if kind == "item_completed":
+        return _cancelled_history_call(payload, thread_id, turn_id, call_id)
+    metadata = payload.get("internal_chat_message_metadata_passthrough") or {}
+    return (entry_type == "response_item" and payload.get("type") == "message" and payload.get("role") == "user"
+            and metadata.get("turn_id") == turn_id and metadata.get("content_item_kinds") == ["generic.turn_aborted"])
+
+
 def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start, *, terminal_call=None, prior=None):
     """Corroborate a cold 0.169.0 snapshot with its exact official response records.
 
@@ -100,6 +122,7 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start, *, 
         receipts = {}
         final_submit = False
         final_response_id = None
+        unmirrored_submit = False
         cancelled = False
         reported_thread_total = None
         last_tokens = None
@@ -110,7 +133,11 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start, *, 
         for line in stream:
             entry = json.loads(line)
             payload = entry.get("payload") or {}
-            kind = payload.get("type") if entry.get("type") == "event_msg" else None
+            entry_type = entry.get("type")
+            kind = payload.get("type") if entry_type == "event_msg" else None
+            if unmirrored_submit and entry_type != "token_usage_record" and kind not in ("turn_aborted", "token_count"):
+                unmirrored_submit = final_response_id is not None and _terminal_history_marker(
+                    entry_type, kind, payload, thread_id, turn_id, terminal_call)
             if kind in ("task_started", "turn_started"):
                 if capture:
                     return None
@@ -123,16 +150,13 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start, *, 
                 if (strict and thread_id == session_id and payload.get("type") == "function_call"
                         and payload.get("namespace") == "gx" and payload.get("name") == "gx_submit_product"
                         and payload.get("call_id") == terminal_call):
+                    metadata = payload.get("internal_chat_message_metadata_passthrough") or {}
+                    unmirrored_submit = not final_submit and metadata.get("turn_id") == turn_id
                     final_submit = True
                 if call_id := _queued_message(payload):
                     messages.add(call_id)
             elif kind == "item_completed" and strict and thread_id == session_id:
-                item = payload.get("item") or {}
-                if (final_submit and final_response_id and item.get("type") == "DynamicToolCall"
-                        and item.get("tool") == "gx_submit_product" and item.get("namespace") == "gx"
-                        and item.get("id") == terminal_call and item.get("status") == "failed"
-                        and item.get("success") is False
-                        and item.get("error") == "dynamic tool call was cancelled before receiving a response"):
+                if final_submit and final_response_id and _cancelled_history_call(payload, thread_id, turn_id, terminal_call):
                     cancelled = True
             elif entry.get("type") == "token_usage_record":
                 response_id = payload.get("response_id")
@@ -170,9 +194,11 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start, *, 
                         (thread_id == session_id and (not cancelled or kind != "turn_aborted")) or
                         (thread_id != session_id and kind == "turn_aborted")):
                     return None
-                if (payload.get("turn_id") == turn_id and receipts and not awaiting_count
-                        and cumulative is not None):
-                    return cost, cumulative, stream.tell(), messages, receipts
+                if payload.get("turn_id") == turn_id and receipts:
+                    if not awaiting_count and cumulative is not None:
+                        return cost, cumulative, stream.tell(), messages, receipts
+                    if unmirrored_submit and cancelled and kind == "turn_aborted" and payload.get("reason") == "interrupted":
+                        return cost, reported_thread_total, stream.tell(), messages, receipts
                 return None
     return None
 

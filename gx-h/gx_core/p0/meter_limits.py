@@ -32,21 +32,43 @@ def _exposure(conn, active):
     for root,(held,lower) in roots.items():
         total = conn.execute("SELECT sum(observed_total) FROM p0_meter_threads WHERE root_id=?",(root,)).fetchone()[0]
         if total is not None:
-            settled = conn.execute("SELECT coalesce(sum(settled_tokens),0)+(SELECT coalesce(sum(delta),0) "
-                "FROM p0_meter_adjustments WHERE root_id=?) FROM p0_meter_native_turns WHERE thread_id=?",
-                (root,root)).fetchone()[0]
+            last = conn.execute("SELECT thread_id,sequence FROM p0_meter_native_turns WHERE thread_id=? "
+                                "ORDER BY sequence DESC LIMIT 1", (root,)).fetchone()
+            settled = metering._prior_cost(conn, last, inclusive=True)
             roots[root] = (held,max(lower,total-settled))
     return (sum(lower for held,lower in roots.values()),sum(max(0,lower-held) for held,lower in roots.values()),
             sum(max(0,held-lower) for held,lower in roots.values()))
 
 
-def _risk(conn, limit, spent, reserved, active, *, scope):
+def _closed_exposure(conn, project):
+    # A fully settled root can still publish previously unseen, unassigned thread usage.
+    # Keep it in the common funding scope without attaching it to a completed Turn.
+    late = ""
+    if metering.has_receipt_adjustments(conn):
+        late = "+ coalesce((SELECT delta FROM p0_meter_receipt_adjustments a WHERE a.reservation_ref=d.reservation_ref),0)"
+    rows = conn.execute(
+        "WITH observed AS (SELECT t.root_id,sum(t.observed_total) AS tokens FROM p0_meter_threads t "
+        "JOIN runs r USING(run_id) WHERE r.project_ref=? GROUP BY t.root_id), "
+        "closed AS (SELECT d.thread_id,group_concat(DISTINCT d.budget_ref) AS refs,"
+        "sum(coalesce(d.settled_tokens,0)" + late + ") AS paid FROM p0_meter_native_turns d "
+        "JOIN observed o ON o.root_id=d.thread_id GROUP BY d.thread_id HAVING sum(d.budget_status='HELD')=0) "
+        "SELECT c.thread_id,c.refs,o.tokens-c.paid-coalesce((SELECT sum(delta) FROM p0_meter_adjustments a "
+        "WHERE a.root_id=c.thread_id),0) AS residual FROM closed c JOIN observed o ON o.root_id=c.thread_id "
+        "WHERE residual>0", (project,))
+    return [(r["thread_id"], set(r["refs"].split(",")), r["residual"]) for r in rows]
+
+
+def _risk(conn, limit, spent, reserved, active, *, scope, closed=(), refs=None):
     observed, over_holds, unobserved = _exposure(conn,active)
+    live = {r["thread_id"] for r in active}
+    residual = sum(n for root, owners, n in closed if root not in live and (refs is None or owners <= refs))
+    observed += residual
+    over_holds += residual
     return {"scope":scope,"hard_tokens":limit,"settled_tokens":spent,"reserved_tokens":reserved,
             "observed_in_flight_tokens":observed,"observed_plus_settled":spent+observed,
             "committed_tokens":spent+reserved+over_holds,
             "available_tokens":None if limit is None else limit-spent-reserved-over_holds,
-            "active_root_count":len({r["thread_id"] for r in active}),
+            "unfunded_closed_thread_tokens":residual, "active_root_count":len(live),
             "largest_active_turn_grant":max((r["token_budget"] or 0 for r in active),default=0),
             "unobserved_reserved_tokens":unobserved,
             "provider_maximum_overshoot_tokens":None,
@@ -60,21 +82,22 @@ def scopes(conn, run_id, ref):
         "AND (d.budget_status='HELD' OR (d.estimated_at IS NOT NULL AND EXISTS (SELECT 1 FROM "
         "p0_native_child_usage u JOIN p0_native_child_meters m USING(child_id) WHERE m.root_id=d.thread_id "
         "AND u.owner_turn=d.turn_id AND u.terminal=0)))",(project,)).fetchall()
+    closed = _closed_exposure(conn, project)
     while ref:
         line = conn.execute("SELECT limits_json,parent_ref FROM budgets WHERE budget_ref=?",(ref,)).fetchone()
         refs,spent,held = _subtree(conn,ref)
         yield _risk(conn,store.loads(line,"limits_json",{}).get("tokens"),spent,held,
-                    [r for r in active if r["budget_ref"] in refs],scope=ref)
+                    [r for r in active if r["budget_ref"] in refs],scope=ref,closed=closed,refs=refs)
         ref = line["parent_ref"]
     phase = budgets.project_budget_state(conn,project)
     if phase and "tokens" in phase["limits"]:
         yield _risk(conn,phase["limits"]["tokens"],phase["spent"]["tokens"],phase["reserved"]["tokens"],
-                    active,scope="project:"+project)
+                    active,scope="project:"+project,closed=closed)
     items = [item["value"]["max"] for item in budgets._formal_project_limits(conn,project)
              if item["value"]["resource"] == "tokens"]
     if items:
         used,held = budgets._project_usage(conn,project)
-        yield _risk(conn,min(items),used["tokens"],held["tokens"],active,scope="intent:"+project)
+        yield _risk(conn,min(items),used["tokens"],held["tokens"],active,scope="intent:"+project,closed=closed)
 
 
 def run_risk(conn, run_id):

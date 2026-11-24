@@ -214,18 +214,29 @@ class RootDelivery:
             with store.transaction(
                 self.conn, transaction_owner="Usage", operation="record_response", run_id=self.run_id,
             ):
-                metering.response(self.conn,thread_id,turn_id,rid,tokens)
+                changed = metering.response(self.conn,thread_id,turn_id,rid,tokens)
                 owner = self.conn.execute("SELECT root_id,metadata_verified FROM p0_native_child_meters WHERE child_id=?",
                                           (thread_id,)).fetchone()
                 self.attribution.completed(owner["root_id"] if owner else thread_id, thread_id, turn_id, params)
+                if changed and tokens is not None and metering.late_response(self.conn, thread_id, turn_id, child=bool(owner)):
+                    if owner:
+                        metering.recover_late_response_cost(self.conn, thread_id, turn_id, child=True)
+                        scope = self.conn.execute("SELECT owner_turn FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
+                                                  (thread_id, turn_id)).fetchone()
+                        self._settle(owner["root_id"], scope[0])
+                    else:
+                        self._settle(thread_id, turn_id)
                 if not owner or owner["metadata_verified"]:
                     meter_limits.check(self.conn,self.run_id,owner["root_id"] if owner else thread_id)
             if key not in self._live:
                 return
             receipts = self._live[key].responses
-            if not rid or (rid in receipts and receipts[rid] != tokens):
-                tokens = None
-            receipts[rid] = tokens
+            if not rid:
+                receipts[rid] = None
+            elif rid not in receipts or receipts[rid] is None:
+                receipts[rid] = tokens
+            elif tokens is not None and receipts[rid] != tokens:
+                receipts[rid] = None
 
     def _live_end(self, thread_id, turn):
         self.attribution.end(thread_id, turn["id"])
@@ -546,12 +557,15 @@ class RootDelivery:
 
     def _settle(self, thread_id, turn_id):
         metering.terminal(self.conn,thread_id,turn_id)
+        metering.recover_late_response_cost(self.conn, thread_id, turn_id)
         row = self.conn.execute(
             "SELECT d.reservation_ref,d.prior_tokens,u.total_tokens,u.measured_tokens,u.children_known "
             "FROM p0_root_deliveries d "
             "JOIN p0_root_turn_usage u USING(thread_id,turn_id) JOIN budget_reservations r "
             "ON r.reservation_ref=d.reservation_ref WHERE d.thread_id=? AND d.turn_id=? "
-            "AND d.state='acknowledged' AND u.terminal_status IS NOT NULL AND r.status='HELD'",
+            "AND d.state='acknowledged' AND u.terminal_status IS NOT NULL AND (r.status='HELD' OR EXISTS "
+            "(SELECT 1 FROM p0_meter_turns m WHERE m.reservation_ref=r.reservation_ref AND "
+            "m.confidence IN ('ESTIMATED','PROVIDER_RECONCILED') AND m.attribution IS NOT 'TURN'))",
             (thread_id, turn_id)).fetchone()
         if row is None:
             return
@@ -569,17 +583,22 @@ class RootDelivery:
                 self.conn.execute("UPDATE p0_root_deliveries SET prior_tokens=? WHERE reservation_ref=? "
                                   "AND prior_tokens IS NULL", (prior, row["reservation_ref"]))
         reason = None
-        if row["total_tokens"] is None:
+        if metering.receipt_conflict(self.conn, thread_id, turn_id):
+            reason = "conflicting provider response identity or usage"
+        elif row["total_tokens"] is None:
             reason = "missing cumulative usage for this turn"
         elif prior is None:
             reason = "historical turn was admitted without an attributable baseline"
-        elif row["measured_tokens"] is None or (row["total_tokens"] - prior != row["measured_tokens"] and
-            not self.conn.execute("SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND estimated_at IS NOT NULL "
-                                  "AND sequence<(SELECT rowid FROM budget_reservations WHERE reservation_ref=?)",
-                                  (thread_id,row["reservation_ref"])).fetchone()):
+        elif row["measured_tokens"] is None:
             reason = "cumulative usage is awaiting complete matching provider receipts"
-        elif not row["children_known"]:
-            reason = "native child activity has not been reconciled"
+        elif row["total_tokens"] - prior != row["measured_tokens"]:
+            provisional = self.conn.execute("SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND estimated_at IS NOT NULL "
+                                            "AND sequence<(SELECT rowid FROM budget_reservations WHERE reservation_ref=?)",
+                                            (thread_id, row["reservation_ref"])).fetchone()
+            if not provisional or not metering.covered_response_cost(self.conn, thread_id, turn_id, row["measured_tokens"]):
+                reason = "cumulative usage is awaiting complete matching provider receipts"
+        if not row["children_known"]:
+            reason = reason or "native child activity has not been reconciled"
         pending = self.conn.execute(
             "SELECT 1 FROM p0_native_child_meters WHERE root_id=? AND owner_turn=? AND awaiting_turn=1 LIMIT 1",
             (thread_id, turn_id)).fetchone()
@@ -758,7 +777,8 @@ class RootDelivery:
                     live.snapshot(total)
                 if _token_count(total) is not None and not self.conn.execute(
                         "SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=? "
-                        "AND budget_status='SETTLED' AND estimated_at IS NULL",(thread_id,turn_id)).fetchone():
+                        "AND budget_status='SETTLED' AND (estimated_at IS NULL OR attribution='TURN')",
+                        (thread_id,turn_id)).fetchone():
                     self.conn.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,total_tokens) VALUES(?,?,?) "
                                       "ON CONFLICT(thread_id,turn_id) DO UPDATE SET total_tokens="
                                       "max(coalesce(total_tokens,0),excluded.total_tokens)", (thread_id, turn_id, total))
@@ -877,6 +897,7 @@ class RootDelivery:
                         metering.observe(self.conn,self.run_id,child["root_id"],sender,tid,total)
                     self.conn.execute("UPDATE p0_native_child_usage SET total_tokens=max(coalesce(total_tokens,0),?) "
                                       "WHERE child_id=? AND turn_id=?", (total, sender, tid))
+                    metering.recover_late_response_cost(self.conn, sender, tid, child=True)
             elif turn.get("status") in TERMINAL:
                 measured, known = self._live_end(sender, turn)
                 meter_limits.ended(self.conn,sender,tid,turn["status"])

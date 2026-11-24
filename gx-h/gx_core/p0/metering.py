@@ -48,7 +48,8 @@ def observe(conn, run_id, root, thread, turn, total, *, source="thread/tokenUsag
         return
     sealed = (thread == root and conn.execute(
         "SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=? "
-        "AND confidence='PROVIDER_CONFIRMED' AND total_tokens IS NOT NULL AND total_tokens<>?",
+        "AND (confidence='PROVIDER_CONFIRMED' OR (confidence='PROVIDER_RECONCILED' AND attribution='TURN')) "
+        "AND total_tokens IS NOT NULL AND total_tokens<>?",
         (thread,turn,total)).fetchone())
     if sealed or (old["observed_total"] is not None and total < old["observed_total"]):
         conn.execute("UPDATE p0_meter_threads SET anomaly_total=?,anomaly_at=? WHERE thread_id=? "
@@ -64,12 +65,62 @@ def _row(conn, reservation):
 
 
 def response(conn, thread, turn, response_id, tokens):
-    if not isinstance(response_id,str) or not response_id:
-        return
-    conn.execute("INSERT INTO p0_meter_responses(thread_id,response_id,turn_id,tokens) VALUES(?,?,?,?) "
+    if not isinstance(response_id, str) or not response_id:
+        return False
+    result = conn.execute(
+        "INSERT INTO p0_meter_responses(thread_id,response_id,turn_id,tokens) VALUES(?,?,?,?) "
         "ON CONFLICT(thread_id,response_id) DO UPDATE SET conflicting=conflicting OR turn_id<>excluded.turn_id "
         "OR (tokens IS NOT NULL AND excluded.tokens IS NOT NULL AND tokens<>excluded.tokens), "
-        "tokens=coalesce(tokens,excluded.tokens)",(thread,response_id,turn,tokens))
+        "tokens=coalesce(tokens,excluded.tokens) WHERE (tokens IS NULL AND excluded.tokens IS NOT NULL) "
+        "OR turn_id<>excluded.turn_id OR (conflicting=0 AND tokens<>excluded.tokens)",
+        (thread, response_id, turn, tokens))
+    if result.rowcount:
+        original = conn.execute("SELECT turn_id FROM p0_meter_responses WHERE thread_id=? AND response_id=?",
+                                (thread, response_id)).fetchone()[0]
+        if original != turn:
+            conn.executemany("INSERT INTO p0_meter_receipt_intervals(thread_id,turn_id,disputed) VALUES(?,?,1) "
+                             "ON CONFLICT(thread_id,turn_id) DO UPDATE SET disputed=1 WHERE disputed=0",
+                             [(thread, original), (thread, turn)])
+    return bool(result.rowcount)
+
+
+def late_response(conn, thread, turn, *, child):
+    """Only newly delivered receipts can complete a terminal interval from raw rows."""
+    if child:
+        terminal = conn.execute("SELECT terminal FROM p0_native_child_usage WHERE child_id=? AND turn_id=?",
+                                (thread, turn)).fetchone()
+    else:
+        terminal = conn.execute("SELECT terminal_status FROM p0_root_turn_usage WHERE thread_id=? AND turn_id=?",
+                                (thread, turn)).fetchone()
+    if terminal and terminal[0]:
+        conn.execute("INSERT INTO p0_meter_receipt_intervals(thread_id,turn_id,late_receipt) VALUES(?,?,1) "
+                     "ON CONFLICT(thread_id,turn_id) DO UPDATE SET late_receipt=1 WHERE late_receipt=0", (thread, turn))
+        return True
+    return False
+
+
+def recover_late_response_cost(conn, thread, turn, *, child=False):
+    # A completed response belongs to its explicit Turn. Recover its complete cost only
+    # when every recorded request has a usable receipt and the scoped interval balances.
+    if not conn.execute("SELECT 1 FROM p0_meter_receipt_intervals WHERE thread_id=? AND turn_id=? AND late_receipt=1 AND disputed=0",
+                        (thread, turn)).fetchone():
+        return
+    if child:
+        row = conn.execute("SELECT prior_tokens,total_tokens,children_known FROM p0_native_child_usage "
+                           "WHERE child_id=? AND turn_id=?", (thread, turn)).fetchone()
+    else:
+        row = conn.execute("SELECT prior_tokens,total_tokens,children_known FROM p0_meter_native_turns "
+                           "WHERE thread_id=? AND turn_id=?", (thread, turn)).fetchone()
+    if not row or not row["children_known"] or row["prior_tokens"] is None or row["total_tokens"] is None:
+        return
+    raw = conn.execute("SELECT sum(tokens) AS tokens,count(*) AS n,count(tokens) AS known,max(conflicting) AS bad "
+                       "FROM p0_meter_responses WHERE thread_id=? AND turn_id=?", (thread, turn)).fetchone()
+    if (not raw["n"] or raw["bad"] or raw["n"] != raw["known"]
+            or raw["tokens"] != row["total_tokens"] - row["prior_tokens"]):
+        return
+    table, field = ("p0_native_child_usage", "child_id") if child else ("p0_root_turn_usage", "thread_id")
+    conn.execute(f"UPDATE {table} SET measured_tokens=? WHERE {field}=? AND turn_id=? AND measured_tokens IS NOT ?",
+                 (raw["tokens"], thread, turn, raw["tokens"]))
 
 
 def _terminal_response(conn, thread, turn, call):
@@ -133,11 +184,41 @@ def children(conn, row):
 
 def _prior_cost(conn, row, *, inclusive):
     op = "<=" if inclusive else "<"
+    late = ""
+    # Public status can inspect an older ledger without installing migrations.
+    if has_receipt_adjustments(conn):
+        late = " + coalesce((SELECT delta FROM p0_meter_receipt_adjustments WHERE reservation_ref=d.reservation_ref),0)"
     return conn.execute(
         "SELECT coalesce(sum(coalesce(settled_tokens,0) + coalesce((SELECT sum(a.delta) "
-        "FROM p0_meter_adjustments a WHERE a.through_reservation=d.reservation_ref),0)),0) "
+        "FROM p0_meter_adjustments a WHERE a.through_reservation=d.reservation_ref),0)" + late + "),0) "
         "FROM p0_meter_native_turns d WHERE thread_id=? AND sequence"+op+"?",
         (row["thread_id"],row["sequence"])).fetchone()[0]
+
+
+def has_receipt_adjustments(conn):
+    return bool(conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_meter_receipt_adjustments'").fetchone())
+
+
+def receipt_conflict(conn, root, turn):
+    return bool(conn.execute(
+        "WITH scopes(thread_id,turn_id) AS (SELECT ?,? UNION ALL SELECT u.child_id,u.turn_id "
+        "FROM p0_native_child_usage u JOIN p0_native_child_meters m USING(child_id) WHERE m.root_id=? AND u.owner_turn=?) "
+        "SELECT 1 FROM scopes s WHERE EXISTS (SELECT 1 FROM p0_meter_responses r WHERE r.thread_id=s.thread_id "
+        "AND r.turn_id=s.turn_id AND r.conflicting=1) OR EXISTS (SELECT 1 FROM p0_meter_receipt_intervals i "
+        "WHERE i.thread_id=s.thread_id AND i.turn_id=s.turn_id AND i.disputed=1) LIMIT 1",
+        (root, turn, root, turn)).fetchone())
+
+
+def covered_response_cost(conn, thread, turn, amount):
+    """A known first live request and continuous, individually receipted requests through terminal."""
+    coverage = conn.execute(
+        "SELECT count(*) AS n,count(DISTINCT a.request_ordinal) AS ordinals,min(a.request_ordinal) AS first,"
+        "max(a.request_ordinal) AS last,sum(r.tokens) AS tokens,count(r.tokens) AS known,"
+        "max(r.conflicting OR coalesce(a.conflicting,1)) AS disputed FROM p0_meter_responses r "
+        "LEFT JOIN p0_response_attribution a USING(thread_id,turn_id,response_id) "
+        "WHERE r.thread_id=? AND r.turn_id=?", (thread, turn)).fetchone()
+    return bool(coverage["n"] and coverage["first"] == 1 and coverage["last"] == coverage["ordinals"]
+                == coverage["n"] == coverage["known"] and not coverage["disputed"] and coverage["tokens"] == amount)
 
 
 def observation(conn, row):
@@ -150,7 +231,8 @@ def observation(conn, row):
             continue
         if u["total_tokens"] is not None:
             members[u["child_id"]] = max(members.get(u["child_id"],0),u["total_tokens"])
-        eligible &= bool(u["terminal"] and u["children_known"] and u["total_tokens"] is not None)
+        eligible &= bool(u["terminal"] and u["children_known"] and u["total_tokens"] is not None
+                         and u["prior_tokens"] is not None and u["measured_tokens"] == u["total_tokens"] - u["prior_tokens"])
         if u["owner_turn"] == row["turn_id"]:
             lower += max(u["measured_tokens"] or 0,_raw_lower(conn,u["child_id"],u["turn_id"]))
     pending = conn.execute(
@@ -158,8 +240,10 @@ def observation(conn, row):
         "d.thread_id=m.root_id AND d.turn_id=m.owner_turn WHERE d.thread_id=? AND d.sequence<=? "
         "AND (m.metadata_verified=0 OR m.awaiting_turn=1) LIMIT 1", (row["thread_id"],row["sequence"])).fetchone()
     cumulative = None if row["total_tokens"] is None else row["total_tokens"] + sum(members.values())
-    if cumulative is not None:
-        lower = max(lower, cumulative - _prior_cost(conn,row,inclusive=False))
+    if not members and not lower and cumulative is not None and row["prior_tokens"] is not None:
+        # A previous root-only checkpoint can support the existing grant; an unreceipted
+        # surplus above the grant remains at thread scope in the funding risk report.
+        lower = max(0, min(row["token_budget"] or 0, cumulative - row["prior_tokens"]))
     return cumulative, max(0,lower), eligible and not pending, members
 
 
@@ -167,7 +251,7 @@ def _reconcile(conn, row, *, confirmed=False, late=False):
     if not row or row["budget_status"] != "SETTLED":
         return
     estimates = conn.execute("SELECT * FROM p0_meter_native_turns WHERE thread_id=? "
-        "AND sequence<=? AND estimated_at IS NOT NULL ORDER BY sequence", (row["thread_id"],row["sequence"])).fetchall()
+        "AND sequence<=? AND estimated_at IS NOT NULL AND attribution IS NOT 'TURN' ORDER BY sequence", (row["thread_id"],row["sequence"])).fetchall()
     if not estimates:
         if confirmed:
             cumulative,_,complete,members = observation(conn,row)
@@ -226,7 +310,7 @@ def _checkpoint(conn, row, members):
 def late_cumulative(conn, root, turn):
     row = conn.execute("SELECT * FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=? "
                        "AND budget_status='SETTLED'", (root,turn)).fetchone()
-    if row and row["estimated_at"] and row["total_tokens"] is not None and row["prior_tokens"] is not None:
+    if row and row["estimated_at"] and row["attribution"] != "TURN" and row["total_tokens"] is not None and row["prior_tokens"] is not None:
         exact = row["measured_tokens"] == row["total_tokens"]-row["prior_tokens"]
         if exact:
             exact = all(u["terminal"] and u["measured_tokens"] is not None and u["prior_tokens"] is not None
@@ -236,20 +320,44 @@ def late_cumulative(conn, root, turn):
 
 
 def confirm(conn, reservation, amount):
-    budgets.settle(conn,reservation,actual={"tokens":amount,"api_calls":1},actor=ACTOR,
-                   confidence="PROVIDER_CONFIRMED")
-    conn.execute("UPDATE p0_meter_turns SET confidence='PROVIDER_CONFIRMED',settled_tokens=?,"
-                 "observed_lower_bound=?,attribution='TURN' WHERE reservation_ref=?", (amount,amount,reservation))
-    row = _row(conn,reservation)
-    _reconcile(conn,row,confirmed=True)
-    waits.meter_settled(conn,row["thread_id"],row["turn_id"])
+    row = _row(conn, reservation)
+    if row["budget_status"] == "HELD":
+        budgets.settle(conn, reservation, actual={"tokens":amount, "api_calls":1}, actor=ACTOR,
+                       confidence="PROVIDER_CONFIRMED")
+        conn.execute("UPDATE p0_meter_turns SET confidence='PROVIDER_CONFIRMED',settled_tokens=?,"
+                     "observed_lower_bound=?,attribution='TURN' WHERE reservation_ref=?", (amount, amount, reservation))
+    elif row["attribution"] != "TURN":
+        original = conn.execute("SELECT event_id FROM events WHERE kind='budget.settled' AND subject_id=? AND "
+                                "json_extract(payload_json,'$.reservation_ref')=? ORDER BY event_id LIMIT 1",
+                                (row["budget_ref"], reservation)).fetchone()
+        if original is None or row["settled_tokens"] is None:
+            return  # Historical payments without a traceable original event remain unresolved.
+        previous = conn.execute("SELECT coalesce(sum(delta),0) FROM p0_meter_adjustments WHERE reservation_ref=?",
+                                (reservation,)).fetchone()[0]
+        delta = amount - row["settled_tokens"] - previous
+        event = store.append_event(conn, kind="usage.receipt_adjusted", actor=ACTOR, run_id=row["run_id"],
+            subject_kind="native_turn", subject_id=reservation, evidence_level="EXECUTION_OBSERVED",
+            payload={"confidence":"PROVIDER_CONFIRMED", "settlement_event_id":original[0],
+                     "thread_id":row["thread_id"], "turn_id":row["turn_id"], "tokens":amount, "delta_tokens":delta})
+        conn.execute("INSERT INTO p0_meter_receipt_adjustments VALUES(?,?,?,?,?,?)",
+                     (reservation, original[0], event, amount, delta, clock.now_iso()))
+        if delta:
+            budgets.adjust_settled_tokens(conn, reservation, delta=delta,
+                                         adjustment_id="turn-receipt:" + reservation, actor=ACTOR)
+        conn.execute("UPDATE p0_meter_turns SET confidence='PROVIDER_RECONCILED',attribution='TURN' "
+                     "WHERE reservation_ref=?", (reservation,))
+    else:
+        return
+    _reconcile(conn, _row(conn, reservation), confirmed=True)
+    waits.meter_settled(conn, row["thread_id"], row["turn_id"])
 
 
 def settle_cumulative(conn, root, turn):
     """A live resumed thread may publish cumulative usage without raw response frames."""
     row = conn.execute("SELECT * FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=? "
                        "AND budget_status='HELD' AND terminal_status='completed'",(root,turn)).fetchone()
-    if not row or row["prior_tokens"] is None or row["total_tokens"] is None or row["total_tokens"]<=row["prior_tokens"]:
+    if (not row or row["prior_tokens"] is None or row["total_tokens"] is None or row["total_tokens"]<=row["prior_tokens"]
+            or receipt_conflict(conn, root, turn)):
         return
     cumulative,_,complete,_ = observation(conn,row)
     if not complete or cumulative is None:
@@ -257,6 +365,9 @@ def settle_cumulative(conn, root, turn):
     previous = conn.execute("SELECT * FROM p0_meter_native_turns WHERE thread_id=? AND sequence<? "
                             "ORDER BY sequence DESC LIMIT 1",(root,row["sequence"])).fetchone()
     before = observation(conn,previous)[0] if previous else 0
+    if not previous or not conn.execute("SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND sequence<? "
+                                        "AND estimated_at IS NOT NULL", (root, row["sequence"])).fetchone():
+        return  # No earlier provisional funding to reconcile. An unreceipted Turn waits for its grace.
     # The delta can contain unresolved earlier work. Keep its turn attribution empty.
     amount = max(0,cumulative-(before if before is not None else row["prior_tokens"]))
     budgets.settle(conn,row["reservation_ref"],actual={"tokens":amount,"api_calls":1},
@@ -266,20 +377,28 @@ def settle_cumulative(conn, root, turn):
     _reconcile(conn,_row(conn,row["reservation_ref"]),confirmed=True)
     waits.meter_settled(conn,root,turn)
 
-def maintain(conn, run_id):
-    """DB-only grace processing, also usable with an offline or paused native connection."""
+_OUTSTANDING = ("FROM p0_meter_native_turns WHERE run_id=? AND budget_status='HELD' AND state='acknowledged' "
+                "AND terminal_status IS NOT NULL AND coalesce(confidence,'RESERVED')<>'UNRESOLVED'")
+
+
+def next_deadline_seconds(conn, run_id):
     if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_meter_turns'").fetchone():
-        return
-    outstanding = ("FROM p0_meter_native_turns WHERE run_id=? AND budget_status='HELD' "
-                   "AND state='acknowledged' AND terminal_status IS NOT NULL")
-    oldest = conn.execute("SELECT terminal_at "+outstanding+" ORDER BY terminal_at LIMIT 1",(run_id,)).fetchone()
+        return None
+    oldest = conn.execute("SELECT terminal_at " + _OUTSTANDING + " ORDER BY terminal_at LIMIT 1", (run_id,)).fetchone()
     if not oldest:
+        return None
+    if not oldest["terminal_at"]:
+        return 0.0
+    return max(0.0, policy(conn, run_id)["grace_seconds"] - clock.age_seconds(oldest["terminal_at"]))
+
+
+def maintain(conn, run_id):
+    """Process elapsed grace periods in the Driver's existing local maintenance pass."""
+    if next_deadline_seconds(conn, run_id) != 0:
         return
-    grace = policy(conn,run_id)["grace_seconds"]
-    if oldest["terminal_at"] and clock.age_seconds(oldest["terminal_at"])<grace:
-        return
+    grace = policy(conn, run_id)["grace_seconds"]
     with store.transaction(conn, transaction_owner="Usage", operation="maintain", run_id=run_id):
-        rows = conn.execute("SELECT * "+outstanding+" ORDER BY sequence",(run_id,)).fetchall()
+        rows = conn.execute("SELECT * "+_OUTSTANDING+" ORDER BY sequence",(run_id,)).fetchall()
         for row in rows:
             if not row["terminal_at"]:
                 terminal(conn,row["thread_id"],row["turn_id"])
@@ -287,7 +406,16 @@ def maintain(conn, run_id):
             if clock.age_seconds(row["terminal_at"]) < grace:
                 continue
             cumulative,lower,_,_ = observation(conn,row)
-            estimate = max(row["token_budget"],lower)
+            grant = row["token_budget"]
+            if grant is None:
+                hold = conn.execute("SELECT amounts_json FROM budget_reservations WHERE reservation_ref=?",
+                                    (row["reservation_ref"],)).fetchone()
+                grant = store.loads(hold, "amounts_json", {}).get("tokens")
+            if type(grant) is not int or grant <= 0 or receipt_conflict(conn, row["thread_id"], row["turn_id"]):
+                conn.execute("UPDATE p0_meter_turns SET confidence='UNRESOLVED' WHERE reservation_ref=?",
+                             (row["reservation_ref"],))
+                continue
+            estimate = max(grant, lower)
             budgets.settle(conn,row["reservation_ref"],actual={"tokens":estimate,"api_calls":1},
                            actor=ACTOR,confidence="ESTIMATED")
             conn.execute("UPDATE p0_meter_turns SET confidence='ESTIMATED',estimated_at=?,settled_tokens=?,"
@@ -302,9 +430,19 @@ def maintain(conn, run_id):
 
 
 def inspect(conn, run_id, *, include_responses=False):
-    from . import meter_limits, response_attribution
+    # Related observations can arrive on another connection during a status request.
+    # A deferred read savepoint keeps the four cost classes on one SQLite snapshot.
+    conn.execute("SAVEPOINT p0_meter_report")
+    try:
+        return _inspect(conn, run_id, include_responses=include_responses)
+    finally:
+        conn.execute("RELEASE p0_meter_report")
+
+
+def _inspect(conn, run_id, *, include_responses):
+    from . import meter_limits, metering_report, response_attribution
     if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_meter_turns'").fetchone():
-        return {"threads":[],"turns":[],"adjustments":[],"interrupts":[],"risk":{}}
+        return {"threads":[],"turns":[],"adjustments":[],"interrupts":[],"risk":{},"cost_report":None}
     def rows(sql):
         return [dict(r) for r in conn.execute(sql,(run_id,))]
     result = {"threads":rows("SELECT * FROM p0_meter_threads WHERE run_id=? ORDER BY thread_id"),
@@ -330,7 +468,19 @@ def inspect(conn, run_id, *, include_responses=False):
         else:
             result["attributed_response_count"] = conn.execute(
                 "SELECT count(*) FROM p0_response_attribution WHERE run_id=?", (run_id,)).fetchone()[0]
+    for entry in result["adjustments"]:
+        entry["basis"] = "THREAD_BUDGET_CHECKPOINT"
+    if has_receipt_adjustments(conn):
+        result["adjustments"].extend(rows(
+            "SELECT a.*,'turn-receipt:'||a.reservation_ref AS adjustment_id,NULL AS reported_total,d.thread_id AS root_id,"
+            "a.reservation_ref AS through_reservation,'TURN_RECEIPT' AS basis "
+            "FROM p0_meter_receipt_adjustments a JOIN p0_meter_native_turns d USING(reservation_ref) "
+            "WHERE d.run_id=? ORDER BY a.event_id"))
+    result["cost_report"] = metering_report.classified_cost(conn, run_id, result["threads"], result["turns"],
+                                                          result["adjustments"])
+    accounts = {r["thread_id"]:r for r in result["cost_report"]["threads"]}
     for thread in result["threads"]:
-        total = thread["observed_total"]
-        thread["unresolved_delta"] = None if total is None else total - (thread["reconciled_total"] or 0)
+        account = accounts[thread["thread_id"]]
+        thread["turn_attributed_total"] = account["turn_attributed_total"]
+        thread["unresolved_delta"] = account["unattributed_delta"]
     return result

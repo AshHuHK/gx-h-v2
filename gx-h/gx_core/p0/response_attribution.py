@@ -124,9 +124,14 @@ class Attribution:
         if not inserted.rowcount:
             old = self.conn.execute('SELECT * FROM p0_response_attribution WHERE thread_id=? AND response_id=?',
                                     (thread, rid)).fetchone()
-            if old['turn_id'] != turn or tuple(old[k] for k in TOKEN_FIELDS) != usage:
+            if old['turn_id'] != turn or any(old[k] is not None and v is not None and old[k] != v
+                                             for k, v in zip(TOKEN_FIELDS, usage)):
                 self.conn.execute('UPDATE p0_response_attribution SET conflicting=1 WHERE thread_id=? AND response_id=?',
                                   (thread, rid))
+            elif any(old[k] is None and v is not None for k, v in zip(TOKEN_FIELDS, usage)):
+                fields = ','.join(f'{k}=coalesce({k},?)' for k in TOKEN_FIELDS)
+                self.conn.execute(f'UPDATE p0_response_attribution SET {fields} WHERE thread_id=? AND response_id=?',
+                                  (*usage, thread, rid))
             # Do not give a delayed duplicate any pending calls from the next response.
             return
         state.ordinal = ordinal

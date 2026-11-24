@@ -1,0 +1,31 @@
+{
+  "input_bytes": 1048576,
+  "input_digest": "8f990ba0b577b51cf009ea049368c16bbda1b21e1b93be07a824758bb253c39b",
+  "observed_inside_transaction": [
+    {
+      "call": "selected input .read_bytes",
+      "owner": "Run",
+      "operation": "run_start",
+      "count": 1
+    },
+    {
+      "call": "ArtifactService.publish_bytes",
+      "owner": "Run",
+      "operation": "run_start",
+      "count": 1
+    },
+    {
+      "call": "ArtifactService.publish_bytes",
+      "owner": "Engine",
+      "operation": "execute_node",
+      "count": 1
+    }
+  ],
+  "fixture_result": "PASS",
+  "reactor_test": "test_phase2a_resume_policy.BranchResumePolicy.test_two_reactors_observing_same_ready_stage_consume_it_once",
+  "reactor_transactions": 2,
+  "reactor_rows_changed": [
+    4,
+    0
+  ]
+}

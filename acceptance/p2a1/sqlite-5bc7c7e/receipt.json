@@ -1,0 +1,24 @@
+{
+  "revision": "5bc7c7e89d883f7ea014d3c7ef0180ce5065fd32",
+  "initial_dirty_state": [],
+  "verified_finished_dirty_state": [],
+  "evidence_class": "SCRIPTED",
+  "targeted_args": [
+    "python",
+    "-B",
+    "acceptance/p2a1/sqlite_boundaries.py",
+    "--output",
+    "FRESH_DIRECTORY"
+  ],
+  "supplement_args": [
+    "python",
+    "-B",
+    "acceptance/p2a1/sqlite-5bc7c7e/supplement/reproduce.py",
+    "CHECKOUT_AT_REVISION",
+    "FRESH_DIRECTORY"
+  ],
+  "before_fix_provenance": {
+    "operator": "Concurrent development checkout at f797776, before its uncommitted Budget fix. Result and transaction rows copied as recorded.",
+    "queue": "Development draft cpu_queue.waiters with recorded module digest. Fresh WAL, 1/100/400 synthetic active Runs, 12 other branch records and 2 KiB context per checkpoint, five real reads under BEGIN IMMEDIATE per size."
+  }
+}

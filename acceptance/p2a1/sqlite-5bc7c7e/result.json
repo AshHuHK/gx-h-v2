@@ -1,0 +1,168 @@
+{
+  "calls_inside_writer": [],
+  "case_id": "SQLITE-BOUNDARIES",
+  "checks": {
+    "all_changed_transactions_tagged": true,
+    "complete_phase_timings": true,
+    "heavy_operations_outside_writer": true,
+    "indexed_fair_queue_head": true,
+    "observed_writers": true,
+    "run_ids_match_created_runs": true,
+    "run_start_replay_identity": true,
+    "workloads_completed": true
+  },
+  "evidence_class": "SCRIPTED",
+  "observed_boundaries": [
+    {
+      "count": 2,
+      "operation": "run_start",
+      "owner": "Run",
+      "physicality": "physical"
+    },
+    {
+      "count": 2,
+      "operation": "checkpoint_node",
+      "owner": "Engine",
+      "physicality": "physical"
+    },
+    {
+      "count": 1,
+      "operation": "prepare_run",
+      "owner": "P01Fixture",
+      "physicality": "physical"
+    },
+    {
+      "count": 5,
+      "operation": "admit",
+      "owner": "JobService",
+      "physicality": "physical"
+    },
+    {
+      "count": 1,
+      "operation": "resume",
+      "owner": "Engine",
+      "physicality": "physical"
+    },
+    {
+      "count": 1,
+      "operation": "create_probe_run",
+      "owner": "Capability",
+      "physicality": "physical"
+    },
+    {
+      "count": 1,
+      "operation": "verify_descendant",
+      "owner": "RootDelivery",
+      "physicality": "physical"
+    },
+    {
+      "count": 1,
+      "operation": "remember_official_history",
+      "owner": "Usage",
+      "physicality": "physical"
+    },
+    {
+      "count": 1,
+      "operation": "maintain",
+      "owner": "Usage",
+      "physicality": "physical"
+    },
+    {
+      "count": 7,
+      "operation": "submit",
+      "owner": "Operator",
+      "physicality": "physical"
+    },
+    {
+      "count": 5,
+      "operation": "apply",
+      "owner": "Operator",
+      "physicality": "physical"
+    },
+    {
+      "count": 2,
+      "operation": "reject",
+      "owner": "Operator",
+      "physicality": "physical"
+    },
+    {
+      "count": 1,
+      "operation": "record_released_native_usage",
+      "owner": "Budget",
+      "physicality": "nested"
+    }
+  ],
+  "outside_call_counts": {
+    "gx_core.jobs.capacity.cpu_state": 13,
+    "gx_core.jobs.capacity.jobs_state": 10,
+    "gx_core.jobs.capacity.sample_admission": 6,
+    "gx_core.jobs.run_resources.observe": 3,
+    "gx_core.jobs.wakeup.notify": 50,
+    "gx_core.metrics.record_transaction": 63,
+    "gx_core.p0.manifest._runtime": 5,
+    "gx_core.p0.manifest._source": 5,
+    "gx_core.p0.metering_report.classified_cost": 4,
+    "gx_core.p0.operator._read": 3,
+    "gx_core.p0.operator_usage.prepare_history": 1
+  },
+  "passed": true,
+  "queue_scaling": [
+    {
+      "head_only_without_checkpoint_reads": true,
+      "lookup_ms": {
+        "max": 0.117224,
+        "n": 5,
+        "p50": 0.033101,
+        "p95": 0.117224
+      },
+      "tables_read": [
+        "job_cpu_waits",
+        "runs",
+        "sqlite_master"
+      ],
+      "waiting_runs": 1
+    },
+    {
+      "head_only_without_checkpoint_reads": true,
+      "lookup_ms": {
+        "max": 0.135988,
+        "n": 5,
+        "p50": 0.032592,
+        "p95": 0.135988
+      },
+      "tables_read": [
+        "job_cpu_waits",
+        "runs",
+        "sqlite_master"
+      ],
+      "waiting_runs": 100
+    },
+    {
+      "head_only_without_checkpoint_reads": true,
+      "lookup_ms": {
+        "max": 0.223945,
+        "n": 5,
+        "p50": 0.033664,
+        "p95": 0.223945
+      },
+      "tables_read": [
+        "job_cpu_waits",
+        "runs",
+        "sqlite_master"
+      ],
+      "waiting_runs": 400
+    }
+  ],
+  "run_ids": [
+    "gxr_01m87agm8xbrpwbmr3",
+    "gxr_01m87agmg4j08p1avk",
+    "gxr_01m87agn30f9v4jvzg",
+    "gxr_01m87agn6qzqvzawv4",
+    "gxr_01m87agnb9399mnrb3"
+  ],
+  "source_commit": "5bc7c7e89d883f7ea014d3c7ef0180ce5065fd32",
+  "status": "PASS",
+  "unobserved_required_labels": [],
+  "workload_error": null,
+  "writer_samples": 29
+}

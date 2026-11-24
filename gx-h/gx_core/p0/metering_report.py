@@ -3,6 +3,35 @@ from collections import Counter
 import json
 
 
+def _turn_cost(ticket, grant, scoped_lower, confirmed, child_in_flight, disputed, exceeds_receipt):
+    estimated = ticket["estimated_at"] is not None
+    gaps = []
+    if confirmed is None:
+        if not ticket["terminal_status"]:
+            gaps.append("ROOT_TERMINAL_UNOBSERVED")
+        if child_in_flight:
+            gaps.append("CHILD_TERMINAL_UNOBSERVED")
+        if disputed:
+            gaps.append("DISPUTED_RECEIPTS")
+        if exceeds_receipt:
+            gaps.append("SCOPED_USAGE_EXCEEDS_CONFIRMED_TOTAL")
+        gaps.append("INCOMPLETE_END_USAGE")
+    risk = "PROVIDER_CONFIRMED" if confirmed is not None else (
+        "ESTIMATE_POSSIBLY_UNDERSTATED" if estimated else "UNRESOLVED")
+    return {
+        "estimate_policy": "ESTIMATED_CONSERVATIVE" if estimated else None,
+        "risk": risk,
+        "turn_grant_tokens": grant,
+        "scoped_observed_lower_bound_tokens": scoped_lower,
+        "observed_lower_bound_at_estimate_tokens": ticket["observed_lower_bound"] if estimated else None,
+        "original_estimate_tokens": ticket["settled_tokens"] if estimated else None,
+        "provider_confirmed_total_tokens": confirmed,
+        # A GX grant does not impose a maximum on upstream requests in this Turn.
+        "unobserved_tokens_upper_bound": 0 if confirmed is not None else None,
+        "evidence_gaps": gaps,
+    }
+
+
 def classified_cost(conn, run_id, threads, reservations, adjustments):
     # Receipts without a snapshot still belong to their verified thread. A native child
     # has no GX reservation of its own. Its owner is solely the funding relationship.
@@ -10,8 +39,13 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
     owners.update((r["thread_id"], r["root_id"]) for r in threads)
     owners.update((r[0], r[0]) for r in conn.execute(
         "SELECT thread_id FROM p0_roots WHERE run_id=? AND thread_id IS NOT NULL", (run_id,)))
-    owners.update((r[0], r[1]) for r in conn.execute(
-        "SELECT child_id,root_id FROM p0_native_child_meters WHERE run_id=? AND metadata_verified=1", (run_id,)))
+    child_in_flight = set()
+    for child in conn.execute("SELECT child_id,root_id,owner_turn,metadata_verified,awaiting_turn "
+                              "FROM p0_native_child_meters WHERE run_id=?", (run_id,)):
+        if child["metadata_verified"]:
+            owners[child["child_id"]] = child["root_id"]
+        if child["awaiting_turn"] or not child["metadata_verified"]:
+            child_in_flight.add((child["root_id"], child["owner_turn"]))
     snapshots = {r["thread_id"]: r["observed_total"] for r in threads}
     raw = {}
     known = {}
@@ -32,16 +66,19 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
                 "SELECT thread_id,turn_id FROM p0_meter_receipt_intervals WHERE disputed=1 "
                 "AND thread_id IN (SELECT value FROM json_each(?))", (scope,))}
         for r in conn.execute(
-            "SELECT thread_id,turn_id,measured_tokens,turn_id FROM p0_root_turn_usage "
+            "SELECT thread_id,turn_id,measured_tokens,turn_id,NULL AS child_terminal FROM p0_root_turn_usage "
             "WHERE thread_id IN (SELECT value FROM json_each(?)) UNION ALL "
-            "SELECT child_id,turn_id,measured_tokens,owner_turn FROM p0_native_child_usage "
+            "SELECT child_id,turn_id,measured_tokens,owner_turn,terminal FROM p0_native_child_usage "
             "WHERE child_id IN (SELECT value FROM json_each(?))", (scope, scope)):
             known[r[0], r[1]] = r[2]
             funded_turn[r[0], r[1]] = (owners[r[0]], r[3])
+            if r["child_terminal"] == 0:
+                child_in_flight.add(funded_turn[r[0], r[1]])
 
     by_turn = []
     totals = Counter()
     unreserved = Counter()
+    scoped = Counter()
     paid_turns = {(r["thread_id"], r["turn_id"]) for r in reservations}
     conflicting_turns = set()
     for thread, turn in sorted(raw.keys() | known.keys() | disputes):
@@ -57,7 +94,10 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
         tokens = max(sources) if sources else None
         if tokens is not None:
             totals[thread] += tokens
-            if funded_turn.get((thread, turn), (thread, turn)) not in paid_turns:
+            funded = funded_turn.get((thread, turn), (thread, turn))
+            if funded in paid_turns:
+                scoped[funded] += tokens
+            else:
                 unreserved[owners[thread]] += tokens
         by_turn.append({"thread_id":thread, "turn_id":turn, "provider_confirmed_tokens":tokens,
                         "response_count":receipt["n"] if receipt else 0,
@@ -81,6 +121,13 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
     for item in adjustments:
         signed[item["reservation_ref"]] += item["delta"]
     unresolved = []
+    possibly_understated = []
+    # Imported deliveries can lack token_budget while the original reservation
+    # retains the grant used by the estimator.
+    missing_grants = [t["reservation_ref"] for t in reservations if t["token_budget"] is None]
+    grants = dict(conn.execute("SELECT reservation_ref,json_extract(amounts_json,'$.tokens') "
+                              "FROM budget_reservations WHERE reservation_ref IN (SELECT value FROM json_each(?))",
+                              (json.dumps(missing_grants),))) if missing_grants else {}
     for ticket in reservations:
         ref, root = ticket["reservation_ref"], ticket["thread_id"]
         if ticket["settled_tokens"] is not None:
@@ -99,10 +146,21 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
                 ticket["usage_class"] = "UNRESOLVED"
         else:
             ticket["usage_class"] = "UNRESOLVED"
-        if (root, ticket["turn_id"]) in conflicting_turns:
+        key = root, ticket["turn_id"]
+        confirmed = (confirmed_late.get(ref, ticket["settled_tokens"])
+                     if ticket["usage_class"] == "PROVIDER_CONFIRMED" else None)
+        lower = scoped.get(key)
+        exceeds_receipt = confirmed is not None and lower is not None and lower > confirmed
+        if key in conflicting_turns or (confirmed is not None and (exceeds_receipt or key in child_in_flight)):
             ticket["usage_class"] = "UNRESOLVED"
+            confirmed = None
         if ticket["usage_class"] == "UNRESOLVED":
             unresolved.append(ref)
+        ticket["cost_assessment"] = _turn_cost(
+            ticket, grants.get(ref, ticket["token_budget"]), confirmed if confirmed is not None else lower,
+            confirmed, key in child_in_flight, key in conflicting_turns, exceeds_receipt)
+        if ticket["cost_assessment"]["risk"] == "ESTIMATE_POSSIBLY_UNDERSTATED":
+            possibly_understated.append(ref)
 
     # Report only the provisional exposure above the evidence on the same funding root.
     # A snapshot residual has no Turn owner and is never distributed to resize Turn costs.
@@ -112,4 +170,5 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
             "ESTIMATED":{"tokens":estimated, "provisional_budget_tokens":sum(original.values())},
             "UNRESOLVED":{"tokens":None, "reservation_refs":unresolved},
             "UNATTRIBUTED_DELTA":{"tokens":sum(item["unattributed_delta"] or 0 for item in accounts)},
+            "possibly_understated_estimate_refs":possibly_understated,
             "threads":accounts, "turn_receipts":by_turn}

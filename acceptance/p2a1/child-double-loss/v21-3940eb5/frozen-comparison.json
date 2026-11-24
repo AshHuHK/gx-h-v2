@@ -1,0 +1,48 @@
+{
+  "native-late-child": {
+    "returncode": 0,
+    "frozen_sha256": "d02d7b0d30be1f805614d4f183775f438fb2960b27052b95c3a56452e9f507be",
+    "frozen_checks": [
+      "parent_held_at_completion",
+      "no_followup_turn_while_child_pending",
+      "no_new_reservation_while_child_pending",
+      "correct_child_attribution",
+      "settled_once",
+      "followup_then_settled",
+      "one_followup_model_request",
+      "new_gx_store_attempted_zero_rollout_opens"
+    ],
+    "additional_checks": [
+      "original_parent_and_child_requests"
+    ]
+  },
+  "native-incomplete-child": {
+    "returncode": 0,
+    "frozen_sha256": "3b22431d236e00861ba9655c5a71ed52e22af17a8d645a817a1828372800215a",
+    "frozen_checks": [
+      "parent_observed_terminal_child_pending",
+      "official_parent_child_connection",
+      "missing_child_not_assumed_free",
+      "conservative_estimate_released_hold",
+      "no_duplicate_child_or_model_call",
+      "unresolved_child_not_refunded",
+      "new_gx_store_attempted_zero_rollout_opens"
+    ],
+    "additional_checks": []
+  },
+  "native-unloaded-child": {
+    "returncode": 0,
+    "frozen_sha256": "c3dd0e52d82333a91cee9958c952ae1ac8ee8eb6161d3fb7e74b54350d4c9c1b",
+    "frozen_checks": [
+      "official_candidate_has_same_root_and_turn",
+      "cold_unloaded_child_identity_is_incomplete",
+      "missing_child_remains_unknown",
+      "one_provisional_charge_and_no_new_calls",
+      "new_gx_store_attempted_zero_rollout_opens"
+    ],
+    "additional_checks": [
+      "child_unverified_without_cold_history",
+      "unloaded_child_verification_matches_terminal_history"
+    ]
+  }
+}

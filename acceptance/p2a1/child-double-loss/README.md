@@ -25,3 +25,13 @@
 - 在本目录执行 `sha256sum -c manifest.sha256` 可核验全部文件。已准备好依赖的发布目录支持 `bin/gx-acceptance run hardening --case CHILD-DOUBLE-LOSS`。旧门禁的完整启动方式见 [网络与启动记录](eb0cd52/network.json)。
 
 公共入口也通过同一用例，自动打包、校验后为 PASS。这个运行在并行开发工作树进行，环境回执保留当时的 SHA 与文件差异。上表候选列取自独立冻结工作树。[公共入口结果](public-cli/child-gate/summary.json)
+
+## 长临时目录复验
+
+完整回归嵌套运行时，原夹具在绑定 Unix 套接字时因路径过长退出。版本 `096a82d` 为套接字单独创建 `/tmp` 下的私有短目录，工作库、Codex 状态和证据继续使用调用方指定的位置。旧 supplemental 和新用例入口在同一隔离网络命名空间内各实际执行一次。两次原路径等效长度均为 258 字节，实测新地址为 29 字节，退出后地址均已清理。两个原始 Job 各自只提交一次。额外注入读取线程启动异常，验证当时启动的官方主机已退出、stdin/stdout 已关闭。[长路径对照及异常清理记录](long-tmpdir/096a82d/result.json)
+
+公共 `hardening` 入口也在长 TMPDIR 下通过，归档校验覆盖 22 份原始记录。[长路径公共入口](long-tmpdir/096a82d/public-cli/long-socket/summary.json)
+
+## 继承的 v2.1 原生子线程回归
+
+版本 `3940eb5` 以原 v2.1 执行器重跑完整子用量、缺失子用量、快速完成后冷读三个官方场景，三项退出码均为 0。冻结的断言名称全部保留，原始回执哈希逐一吻合。快速完成场景中，只读取线程摘要时，官方返回 `notLoaded` 和子线程自己的 `sessionId`。读取带 Turn 的父、子历史后，同时观测到原父 spawn 项、同一个子 ID、精确父来源和带完成时间的因果 Turn。GX 核验位从 0 变为 1。子用量仍未知，账本记录一次 100 tokens 的估算，没有调整或额外模型请求。五项范围负例和既有子线程读取回归通过。[三个官方场景](v21-3940eb5/suite/summary.json) [快速完成的官方历史](v21-3940eb5/suite/native/native-unloaded-child.json) [冻结断言比较](v21-3940eb5/frozen-comparison.json) [范围控制](v21-3940eb5/scope-controls.log)

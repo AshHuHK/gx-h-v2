@@ -1,5 +1,7 @@
 # GX-H v3.2 静态工作流与 P2A.1
 
+P2A 已冻结于本地标签 `v3.2-p2a.1`。同一提交通过 38 项全量验收和 13 项专项验收，T03 的 42 项历史失败已逐项核对。签收报告附原始记录、复验命令、升级和回退步骤，以及 P2B 的 GraphVersion 写事务门槛。[P2A.1 签收报告](P2A1_HARDENING_REPORT.md)
+
 GX 在 Codex 断开时仍可管理已有 Job、保留等待和恢复静态工作流。当前分支的 Closure 提供用量对账、事务计时和可中断的空闲等待。查看现有项目以 `bin/gx-p0 status --state DIR --run-id RUN` 为入口，逐线程成本位于 `metering.cost_report`。[原 Phase 2A 恢复验证](PHASE_2A_ACCEPTANCE_REPORT.md) · [计量设计](P2A_09_USAGE_RECONCILIATION_REPORT.md) · [签收范围与回退](P2A_CLOSURE_LIMITATIONS.md)
 
 在本机已有固定 Codex 缓存与历史夹具时，从仓库根目录运行以下命令。输出首行是运行 ID；将它替换到后两条命令的 `RUN_ID` 中。其他部署的缓存路径、分类与失败续跑参数见验收说明。[命令与输入](P2A_ACCEPTANCE_AUTOMATION_REPORT.md)
@@ -9,8 +11,6 @@ bin/gx-acceptance run all
 bin/gx-acceptance report RUN_ID
 bin/gx-acceptance verify RUN_ID
 ```
-
-P2A.1 的逐项验收、复跑命令、未决预留处理及历史库回退示例见专项报告。新增检查可用 `bin/gx-acceptance run hardening` 单独执行。工作区 CPU 排队与成本估算均由 GX 原有 Job 和计量路径管理。[P2A.1 签收与操作说明](P2A1_HARDENING_REPORT.md)
 
 ## v3.1 科研执行
 

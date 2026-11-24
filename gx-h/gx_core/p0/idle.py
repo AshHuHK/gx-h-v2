@@ -36,11 +36,18 @@ class WorkspaceWait:
 
     def __exit__(self, *exc):
         store.driver_connections.discard(self.conn)
+        self._close_fifo()
+
+    def _close_fifo(self):
         if self.fd is not None:
             # The stable workspace name also serves the next owner and any direct
             # library reader. Only this descriptor belongs to this waiter.
-            os.close(self.fd)
+            fd = self.fd
             self.fd = None
+            try:
+                os.close(fd)
+            except OSError:
+                pass
 
     def wait(self, seconds, drivers=()):
         """None wakes the workspace, a set identifies native peers, an empty set is a timeout."""
@@ -48,7 +55,11 @@ class WorkspaceWait:
             return set()
         with selectors.DefaultSelector() as selector:
             if self.fd is not None:
-                selector.register(self.fd, selectors.EVENT_READ, None)
+                try:
+                    selector.register(self.fd, selectors.EVENT_READ, None)
+                except OSError:
+                    self._close_fifo()
+                    self.next_version_check = 0.
             for driver in drivers:
                 for fd in driver.read_fds:
                     selector.register(fd, selectors.EVENT_READ, driver.rid)
@@ -69,6 +80,8 @@ class WorkspaceWait:
                                 os.read(self.fd, 65536)
                             except BlockingIOError:
                                 pass  # A peer already drained the readable hint.
+                            except OSError:
+                                self._close_fifo()
                         return None
                 if ready:
                     return ready

@@ -1,6 +1,8 @@
 """Local process handoff, durable commit fallback and FIFO path ownership."""
 
 from contextlib import ExitStack, closing
+import errno
+import fcntl
 import json
 import multiprocessing
 import os
@@ -9,6 +11,7 @@ import sqlite3
 import stat
 import tempfile
 import time
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -242,7 +245,43 @@ class FifoLifecycle(unittest.TestCase):
                 self.assertIsNone(listener.wait(2))
             self.assertEqual(drained, [b"w"])
             self.assertEqual(listener.wait(.02), set())
-        self.save("read-race.json", {"drained_bytes": len(drained[0]), "next_wait": "timeout"})
+        # A high-numbered, closed descriptor produces actual kernel EBADF without
+        # being reused by the selector's new epoll descriptor.
+        with WorkspaceWait(self.db) as listener, ExitStack() as handles:
+            high = fcntl.fcntl(listener.fd, fcntl.F_DUPFD_CLOEXEC, 128)
+            os.close(high)
+            os.close(listener.fd)
+            listener.fd = high
+            native, writer = os.pipe()
+            handles.callback(os.close, native)
+            handles.callback(os.close, writer)
+            os.write(writer, b"native ready")
+            ready = listener.wait(1, [SimpleNamespace(read_fds=(native,), rid="peer")])
+            self.assertEqual(ready, {"peer"})
+            self.assertIsNone(listener.fd)
+            with closing(store.connect(self.workspace / "gx.db")) as other:
+                other.execute("INSERT INTO fifo_probe VALUES('registration failed')")
+            self.assertIsNone(listener.wait(1))
+        with WorkspaceWait(self.db) as listener:
+            wakeup.notify(self.workspace)
+            observed = []
+            def closed_read(fd, size):
+                os.close(fd)
+                try:
+                    return read(fd, size)
+                except OSError as error:
+                    observed.append(error.errno)
+                    raise
+            with patch.object(os, "read", side_effect=closed_read):
+                self.assertIsNone(listener.wait(1))
+            self.assertEqual(observed, [errno.EBADF])
+            self.assertIsNone(listener.fd)
+            with closing(store.connect(self.workspace / "gx.db")) as other:
+                other.execute("INSERT INTO fifo_probe VALUES('read failed')")
+            self.assertIsNone(listener.wait(1))
+        self.save("read-race.json", {"drained_bytes": len(drained[0]), "next_wait": "timeout",
+                                     "native_ready_after_fifo_registration_error": sorted(ready),
+                                     "read_errno": observed[0], "subsequent_commits_observed": 2})
 
     def test_healthy_fifo_idle_driver_version_check_frequency(self):
         # Reuse the IDLE01 Run and its offline Driver so the read cost is measured

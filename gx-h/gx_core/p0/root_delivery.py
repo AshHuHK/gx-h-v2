@@ -885,16 +885,22 @@ class RootDelivery:
                     or not isinstance(facts, dict) or facts.get("parent_thread_id") != expected):
                 continue
             if thread.get("sessionId") != meter["root_id"]:
-                cached = (meter["metadata_verified"] and thread.get("sessionId")==child_id
-                          and (thread.get("status") or {}).get("type")=="notLoaded"
-                          and thread.get("cliVersion")==CODEX_VERSION)
-                diagnostic = (not cached and metering.rollout_diagnostics(self.conn,self.run_id)
-                              and _stored_child_session(thread,meter))
-                if not (cached or diagnostic) or not self.conn.execute(
-                        "SELECT 1 FROM p0_root_deliveries WHERE run_id=? AND thread_id=? AND turn_id=? "
-                        "AND method='turn/start' AND state='acknowledged'",
-                        (self.run_id, meter["root_id"], meter["owner_turn"])).fetchone():
+                # 0.169 reports the unloaded child's own ID as sessionId. Its
+                # completed Turn still names the original GX-funded root Turn.
+                if (thread.get("sessionId") != child_id or (thread.get("status") or {}).get("type") != "notLoaded"
+                        or thread.get("cliVersion") != CODEX_VERSION or not self.conn.execute(
+                            "SELECT 1 FROM p0_root_deliveries WHERE run_id=? AND thread_id=? AND turn_id=? "
+                            "AND method='turn/start' AND state='acknowledged'",
+                            (self.run_id, meter["root_id"], meter["owner_turn"])).fetchone()):
                     continue
+                if not meter["metadata_verified"]:
+                    closed_child = expected == meter["root_id"] and any(
+                        turn.get("id") and turn.get("rootTurnId") == meter["owner_turn"]
+                        and turn.get("status") in TERMINAL and type(turn.get("completedAt")) is int
+                        for turn in thread.get("turns", []))
+                    if not closed_child and not (metering.rollout_diagnostics(self.conn, self.run_id)
+                                                 and _stored_child_session(thread, meter)):
+                        continue
             with store.transaction(
                 self.conn, transaction_owner="RootDelivery", operation="verify_descendant", run_id=self.run_id,
             ):

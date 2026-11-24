@@ -326,6 +326,28 @@ class TurnMeterTests(unittest.TestCase):
                               "WHERE child_id='child' AND turn_id='child-turn'").fetchone()
         self.assertEqual(tuple(row), (1, 9, 9))
 
+    def test_unloaded_child_uses_its_completed_causal_turn_after_both_live_receipts_are_lost(self):
+        owner = self.start()
+        self.delivery.observe_descendant("item/completed", {"threadId": "root", "turnId": owner, "item": {
+            "type": "subAgentActivity", "kind": "started", "agentThreadId": "child"}})
+        turn = {"id": "ct", "rootTurnId": owner, "status": "completed", "completedAt": 1777000000,
+                "itemsView": "full", "items": []}
+        thread = {"id": "child", "sessionId": "child", "cliVersion": "0.169.0", "status": {"type": "notLoaded"},
+                  "source": {"subAgent": {"thread_spawn": {"parent_thread_id": "root"}}}, "parentThreadId": "root",
+                  "forkedFromId": None, "turns": [turn]}
+        invalid = ({"parentThreadId": "foreign"}, {"sessionId": "foreign"}, {"forkedFromId": "other"},
+                   {"source": "user"}, {"turns": [{**turn, "rootTurnId": "unrelated"}]},
+                   {"turns": [{**turn, "completedAt": None}]}, {"turns": [{**turn, "status": "inProgress"}]})
+        for change in invalid:
+            with self.subTest(change=change):
+                self.delivery.verify_descendants({"child": {**thread, **change}})
+                self.assertEqual(self.db.execute("SELECT metadata_verified FROM p0_native_child_meters").fetchone()[0], 0)
+                self.assertIsNone(self.db.execute("SELECT 1 FROM p0_native_child_usage").fetchone())
+        self.delivery.verify_descendants({"child": thread})
+        fact = self.db.execute("SELECT child_id,turn_id,owner_turn,terminal FROM p0_native_child_usage").fetchone()
+        self.assertEqual(tuple(fact), ("child", "ct", owner, 1))
+        self.assertEqual(self.db.execute("SELECT metadata_verified FROM p0_native_child_meters").fetchone()[0], 1)
+
     def test_unloaded_child_requires_its_original_session_and_complete_response_records(self):
         self.db.execute("UPDATE runs SET inputs_json=? WHERE run_id=?",(json.dumps({"inputs":{
             "p0_spec":{"metering":{"rollout_diagnostics":True}}}}),self.run))

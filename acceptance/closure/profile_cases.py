@@ -66,9 +66,10 @@ def unittest_rows(text):
     return rows
 
 
-def original_failures(path):
+def original_failures(path, text=None):
     """Import original unittest/pytest logs, JUnit reports, or a JSON failure list."""
-    text = path.read_text()
+    if text is None:
+        text = path.read_text()
     reviews = {}
     if path.suffix.lower() == ".json":
         document = json.loads(text)
@@ -216,9 +217,15 @@ def baseline_run(args, work):
     source = args.original_failures
     imported = {}
     import_issue = None
+    original_input = None
+    original_digest = None
     if source:
         try:
-            imported = original_failures(source)
+            raw = source.read_bytes()
+            original_input = "original-input" + (source.suffix if source.suffix.lower() in {".json", ".xml"} else ".log")
+            (out / original_input).write_bytes(raw)
+            original_digest = hashlib.sha256(raw).hexdigest()
+            imported = original_failures(source, raw.decode("utf-8-sig"))
         except (OSError, KeyError, TypeError, ValueError, ElementTree.ParseError) as err:
             import_issue = f"Unable to read the supplied original failure records: {err}"
     verdicts = []
@@ -244,7 +251,7 @@ def baseline_run(args, work):
     write_json(out / "original-42.json", {"expected": 42, "identified": len(imported),
                                          "distinct_test_ids": len({case for case, _, _ in imported.values()}),
                                          "source": str(source) if source else None,
-                                         "source_sha256": sha(source) if source and source.is_file() else None,
+                                         "archived_input": original_input, "source_sha256": original_digest,
                                          "issue": issue, "cases": verdicts})
     failed_run = bool(failures or additional_nonpassing or receipt["exit_code"] or observed_profile != "deterministic")
     problems = []
@@ -263,7 +270,7 @@ def baseline_run(args, work):
             "additional_ids": additional, "additional_nonpassing": additional_nonpassing, "failed_baseline_ids": failures,
             "original_ids_obtained": len(imported), "issue": " ".join(problems) or None,
             "evidence": ["baseline-465.json", "original-42.json", "suite/python-full.log", "suite/summary.json",
-                         "suite-invocation.json", "suite-invocation.log"]}
+                         "suite-invocation.json", "suite-invocation.log", *([original_input] if original_input else [])]}
 
 
 def probe_cases(args, work):

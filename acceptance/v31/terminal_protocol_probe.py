@@ -39,10 +39,10 @@ def digest(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def identity(extra_sources=()):
+def identity(extra_sources=(), *, runtime=PACKAGE):
     assets = PACKAGE / "release-assets"
     lock = json.loads((assets / "lock.json").read_text())
-    binary = PACKAGE / "vendor/codex-runtime/package" / lock["linux_x64"]["binary"]
+    binary = runtime / "vendor/codex-runtime/package" / lock["linux_x64"]["binary"]
     archive = assets / lock["source"]["file"]
     source_paths = [
         "codex-rs/app-server/src/bespoke_event_handling.rs",
@@ -56,7 +56,7 @@ def identity(extra_sources=()):
     with tarfile.open(archive, "r|gz") as tar:
         for member in tar:
             if member.name in source_paths:
-                actual = digest(PACKAGE / "vendor/codex" / member.name)
+                actual = digest(runtime / "vendor/codex" / member.name)
                 assert actual == hashlib.sha256(tar.extractfile(member).read()).hexdigest()
                 checked[member.name] = actual
     assert set(checked) == set(source_paths)
@@ -64,7 +64,7 @@ def identity(extra_sources=()):
         "source_commit_in_release_lock": lock["source"]["commit"],
         "source_tag": lock["source"]["tag"], "source_archive_sha256": digest(archive),
         "verified_source_files": checked, "binary_sha256": digest(binary),
-        "binary_package_sha256": digest(assets / lock["linux_x64"]["file"]),
+        "binary_package_sha256": digest(runtime / "release-assets" / lock["linux_x64"]["file"]),
     }
     assert receipt["source_archive_sha256"] == lock["source"]["sha256"]
     assert receipt["binary_sha256"] == lock["linux_x64"]["binary_sha256"]
@@ -176,14 +176,17 @@ class Wire:
         return getattr(self.real, name)
 
 
-def initial_store(conn, url, provider):
+def initial_store(conn, url, provider, *, metering_grace=None):
     schema.install(conn)
     workflow = default_registry().get("science_grid", "2")
     with store.transaction(conn):
         budget = budgets.create_root(conn, run_id=None, actor="protocol-fixture", profile_name="p0")
+        inputs = None
+        if metering_grace is not None:
+            inputs = {"inputs": {"p0_spec": {"metering": {"grace_seconds": metering_grace}}}}
         run = records.create_run(conn, objective="Exercise terminal delivery for synthetic failed measurements",
             project_ref="terminal-protocol", actor="fixture", budget_ref=budget, workflow_id="science_grid",
-            workflow_version="2", pins={"workflow_sha256": workflow.digest()},
+            workflow_version="2", pins={"workflow_sha256": workflow.digest()}, inputs=inputs,
             host={"policy_selection": {"test_mode": True, "model_provider": provider, "test_base_url": url}})
         for state in ("AUDITING", "PLANNING", "ACTIVE"):
             store.transition(conn, machine="run", subject_id=run, to_state=state, actor="fixture")
@@ -281,7 +284,7 @@ def cold_usage(roots, trial):
         assert not record["turns_started"] and not record["new_model_requests"], record
 
 
-def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
+def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence, *, missing_usage=None):
     marker = f"GX_ABORT_{number:04d}"
     condition = None if expected == "ACCEPTED" else False
     product = {"proposal_ref": proposal, "evidence_refs": [evidence], "findings": [{"path_id": "sample",
@@ -391,7 +394,10 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
             if (unsettled["budget_status"] == "HELD" and unsettled["terminal_status"] == "interrupted"
                     and unsettled["metering_reason"] == "missing cumulative usage for this turn"):
                 cold_usage(roots, trial)
-                assert trial["cold_usage"]["snapshots"], (marker, unsettled, trial["cold_usage"], trial["events"])
+                if not trial["cold_usage"]["snapshots"]:
+                    if missing_usage is None or fault != "none":
+                        raise AssertionError((marker, unsettled, trial["cold_usage"], trial["events"]))
+                    trial["official_usage_missing"] = missing_usage(roots, trial)
         if fault == "running_child":
             trial["children"] = [dict(x) for x in reader.execute(
                 "SELECT m.child_id,m.parent_id,m.root_id,m.metadata_verified,u.turn_id,u.owner_turn,u.terminal,"
@@ -408,9 +414,12 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
             delivered = [e["tokens"] for e in trial["events"] if e["method"] == "thread/tokenUsage/updated"
                          and e["thread"] == thread and e["turn"] == turn and e["seq"] > interrupted]
             assert delivered and delivered == [r["tokens"] for r in trial["injected_receipt_faults"]]
-        assert trial["final_meter"]["budget_status"] == "SETTLED" and not trial["final_meter"]["estimated_at"], (
-            marker, fault, trial["final_meter"], trial["events"])
-        assert trial["final_meter"]["settled_tokens"] == sum(r["usage"]["total_tokens"] for r in trial["model_requests"])
+        assert trial["final_meter"]["budget_status"] == "SETTLED", (marker, fault, trial["final_meter"], trial["events"])
+        if "official_usage_missing" in trial:
+            assert trial["final_meter"]["estimated_at"] and trial["final_meter"]["confidence"] == "ESTIMATED"
+        else:
+            assert not trial["final_meter"]["estimated_at"], (marker, fault, trial["final_meter"], trial["events"])
+            assert trial["final_meter"]["settled_tokens"] == sum(r["usage"]["total_tokens"] for r in trial["model_requests"])
         assert trial["committed_at"] <= trial["goal_complete_write"]["t"] <= trial["goal_complete_at"]
         assert trial["goal_complete_at"] <= trial["interrupt_writes"][0]["t"] and not trial["tool_responses_written"]
         assert any(event.get("type") == "function_call_output" and event.get("call_id") == trial["call_id"]
@@ -434,9 +443,11 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
     return trial
 
 
-def run(repetitions, only=None):
+def run(repetitions, only=None, *, closure_usage=False, runtime=PACKAGE):
     _proxy_preflight()
-    binary, version = identity()
+    binary, version = identity(runtime=runtime)
+    if closure_usage:
+        from closure.official_usage import GRACE_SECONDS, reconcile_natural
     started = datetime.now(timezone.utc).isoformat()
     with tempfile.TemporaryDirectory(prefix="gx-terminal-wire-") as tmp, ExitStack() as stack:
         folder = Path(tmp)
@@ -470,7 +481,8 @@ def run(repetitions, only=None):
         limits = budgets.profile("p0")["limits"]
         batch_size = min(limits["worker_tasks"], limits["api_calls"])
         for offset in range(0, len(sequence), batch_size):
-            run_id, proposal, evidence = initial_store(conn, f"http://127.0.0.1:{peer.server_port}/v1", probe.provider)
+            run_id, proposal, evidence = initial_store(conn, f"http://127.0.0.1:{peer.server_port}/v1", probe.provider,
+                                                      metering_grace=GRACE_SECONDS if closure_usage else None)
             run_ids.append(run_id)
             index = offset
             end = min(offset + batch_size, len(sequence))
@@ -481,7 +493,8 @@ def run(repetitions, only=None):
                     while index < end:
                         expected, fault = sequence[index]
                         index += 1
-                        trial = trial_run(roots, reader, peer, index, expected, fault, proposal, evidence)
+                        trial = trial_run(roots, reader, peer, index, expected, fault, proposal, evidence,
+                                          missing_usage=reconcile_natural if closure_usage else None)
                         results.append(trial)
                         if "cold_usage" in trial:
                             break  # This host released its writer for a cold receipt.
@@ -497,7 +510,8 @@ def run(repetitions, only=None):
             "TeamService, AppServerClient, GX budget ledger and official Codex with loopback scripted model",
             "trials": results, "trial_count": len(results), "counts": dict(Counter(r["expected"] for r in results)),
             "faults": dict(Counter(r["fault"] for r in results)), "post_terminal_requests": 0,
-            "normal_terminal_tool_responses": 0, "estimated_settlements": 0, "passed": True}
+            "normal_terminal_tool_responses": 0, "estimated_settlements": sum(
+                bool(r["final_meter"]["estimated_at"]) for r in results), "passed": True}
 
 
 if __name__ == "__main__":
@@ -506,9 +520,12 @@ if __name__ == "__main__":
     parser.add_argument("--only", choices=("none", "lost_interrupt", "lost_receipts",
                                           "delayed_receipts", "running_child", "delayed_usage", "lost_usage"))
     parser.add_argument("--output", type=Path, default=Path(__file__).with_name("terminal-protocol.json"))
+    parser.add_argument("--runtime", type=Path, default=PACKAGE, help="Directory containing the locked unpacked native runtime")
+    parser.add_argument("--closure-usage", action="store_true",
+                        help="Verify pending and product-maintained estimated billing after a naturally missing cold receipt")
     args = parser.parse_args()
     if args.repetitions < 1:
         parser.error("--repetitions must be positive")
-    result = run(args.repetitions, args.only)
+    result = run(args.repetitions, args.only, closure_usage=args.closure_usage, runtime=args.runtime.resolve())
     args.output.write_text(json.dumps(result, separators=(",", ":")) + "\n")
     print(json.dumps({k: result[k] for k in ("trial_count", "counts", "faults", "passed")}))

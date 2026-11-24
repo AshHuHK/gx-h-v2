@@ -58,7 +58,7 @@ class InterruptedPeer(Peer):
         self.release = threading.Event()
 
 
-def measure(probe):
+def measure(probe, *, metering_grace=None):
     env = {**probe.env, 'GX_P0_TEST': '1', 'GX_P0_MODEL': 'gpt-6.1-sol',
            'GX_P0_TEST_PROVIDER': probe.provider, 'GX_P0_CODEX': str(probe.binary)}
     db = probe.directory / 'gx.db'
@@ -93,8 +93,15 @@ def measure(probe):
         with closing(store.open_store(db)) as conn:
             schema.install(conn)
             budget = budgets.create_root(conn, run_id=None, profile_name='p0', actor='probe')
+            inputs = None
+            if metering_grace is not None:
+                inputs = {'inputs': {'p0': True, 'p0_spec': {'metering': {'grace_seconds': metering_grace}}}}
             run = records.create_run(conn, objective='Measure a cancelled model exchange',
-                                     project_ref='interrupt', actor='probe', budget_ref=budget)
+                                     project_ref='interrupt', actor='probe', budget_ref=budget, inputs=inputs)
+            if metering_grace is not None:
+                with store.transaction(conn):
+                    for status in ('AUDITING', 'PLANNING', 'ACTIVE'):
+                        store.transition(conn, machine='run', subject_id=run, to_state=status, actor='fixture')
             with connect(conn) as roots:
                 observe(roots)
                 root = roots.ensure_main()

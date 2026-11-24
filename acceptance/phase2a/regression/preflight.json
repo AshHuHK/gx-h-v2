@@ -2,21 +2,83 @@
   "phase": "baseline preflight",
   "baseline_commit": "51e0e13583d95e9cad1386e1d4c77324977e97ea",
   "reference_v31_product_commit": "9cd66551145927f23a1e6b9d3dd03298eb7e35a4",
-  "baseline_product_trees_equal": ["gx-h", "bin", "examples", "scripts", "codex_adapter", "release-assets"],
+  "baseline_product_trees_equal": [
+    "gx-h",
+    "bin",
+    "examples",
+    "scripts",
+    "codex_adapter",
+    "release-assets"
+  ],
   "dependency_receipt": "baseline-known-gates/dependencies.json",
   "isolation_receipt": "baseline-known-gates-network.json",
   "local_execution": "fresh user+network namespace, only loopback up, genuine Mihomo in rule mode with all upstream traffic rejected, original six proxy settings and both NO_PROXY settings retained",
-  "baseline_historical_database": {"business_tables": 114, "writable_opens": 2, "status": "PASS", "evidence": "baseline-known-gates/at2-preservation.json"},
-  "baseline_official_child": {"role_catalogs": 8, "checks": 19, "status": "PASS", "evidence": "baseline-known-gates/child-lost-start.json"},
-  "baseline_exploratory_case": {"status": "TIMEOUT", "command": "native_child_access.py --drop-spawn", "warm_phase": "registered child; read authorized artifact; denied ordinary fork, unrelated root and unrelated artifact", "cold_phase": "timed out waiting for reserved budget to settle before dispatch", "evidence": "baseline/child-lost-start.log", "distinction": "This additional combined warm spawn loss + cold start loss in the standalone legacy probe differs from the recorded v3.1 P2A-11 role-scoped lost-cold-start gate."},
-  "gates": {
-    "P2A-09": ["v31/terminal_protocol_probe.py --repetitions 100", "v31/terminal_code_mode_probe.py", "v31/terminal_stream_probe.py", "v31/terminal_crash_concurrency.py", "v31/terminal_late_receipts.py", "v31/terminal_official_crash.py --public-only --expect corrected"],
-    "P2A-10": ["v31/public_grid.py --mode repair", "v31/schema_transport.py", "full suite terminal-product tests"],
-    "P2A-11": ["v31/b2/role_probe.py", "v31/b2/role_probe.py --drop-cold-start", "v21/regression.py --native measured child completion, missing child, unloaded child and cumulative/interrupt usage scenarios"],
-    "P2A-12": ["v31/brief_replay.py offline against 13 retained state DBs", "v31/brief_wire.py historical B2 and frozen candidate both measured", "full suite byte, UTF-8, source change, integrity and paging tests"],
-    "P2A-13": ["v31/public_grid.py --mode deterministic", "v31/public_grid.py --mode review", "v31/historical_migration.py on historical original backup", "v3/staging/cold_fixture.py and v3/staging/replay_checkpoint.py on separate private @2 state for rollback and completion"],
-    "full": ["v21/regression.py --native, including Python, P0, Node, generator, 13 focused official traces and 17 official existing traces", "v3/compare_regression.py", "baseline v3.1 Python case IDs and skip reasons"]
+  "baseline_historical_database": {
+    "business_tables": 114,
+    "writable_opens": 2,
+    "status": "PASS",
+    "evidence": "baseline-known-gates/at2-preservation.json"
   },
-  "expected_python_baseline": {"total": 446, "passed": 442, "skipped": 4, "skip_reason": "Optional DeepSeek SDK environment absent"},
+  "baseline_official_child": {
+    "role_catalogs": 8,
+    "checks": 19,
+    "status": "PASS",
+    "evidence": "baseline-known-gates/child-lost-start.json"
+  },
+  "baseline_exploratory_case": {
+    "status": "TIMEOUT",
+    "command": "native_child_access.py --drop-spawn",
+    "warm_phase": "registered child; read authorized artifact; denied ordinary fork, unrelated root and unrelated artifact",
+    "cold_phase": "timed out waiting for reserved budget to settle before dispatch",
+    "evidence": "baseline/child-lost-start.log",
+    "distinction": "This additional combined warm spawn loss + cold start loss in the standalone legacy probe differs from the recorded v3.1 P2A-11 role-scoped lost-cold-start gate.",
+    "additional_evidence": [
+      "baseline-standalone-repeat/child.log",
+      "baseline-combined-loss/observation.json"
+    ],
+    "independent_reproductions": 3
+  },
+  "gates": {
+    "P2A-09": [
+      "v31/terminal_protocol_probe.py --repetitions 100",
+      "v31/terminal_code_mode_probe.py",
+      "v31/terminal_stream_probe.py",
+      "v31/terminal_crash_concurrency.py",
+      "v31/terminal_late_receipts.py",
+      "v31/terminal_official_crash.py --public-only --expect corrected"
+    ],
+    "P2A-10": [
+      "v31/public_grid.py --mode repair",
+      "v31/schema_transport.py",
+      "full suite terminal-product tests"
+    ],
+    "P2A-11": [
+      "v31/b2/role_probe.py",
+      "v31/b2/role_probe.py --drop-cold-start",
+      "v21/regression.py --native measured child completion, missing child, unloaded child and cumulative/interrupt usage scenarios"
+    ],
+    "P2A-12": [
+      "v31/brief_replay.py offline against 13 retained state DBs",
+      "v31/brief_wire.py historical B2 and frozen candidate both measured",
+      "full suite byte, UTF-8, source change, integrity and paging tests"
+    ],
+    "P2A-13": [
+      "v31/public_grid.py --mode deterministic",
+      "v31/public_grid.py --mode review",
+      "v31/historical_migration.py on historical original backup",
+      "v3/staging/cold_fixture.py and v3/staging/replay_checkpoint.py on separate private @2 state for rollback and completion"
+    ],
+    "full": [
+      "v21/regression.py --native, including Python, P0, Node, generator, 13 focused official traces and 17 official existing traces",
+      "v3/compare_regression.py",
+      "baseline v3.1 Python case IDs and skip reasons"
+    ]
+  },
+  "expected_python_baseline": {
+    "total": 446,
+    "passed": 442,
+    "skipped": 4,
+    "skip_reason": "Optional DeepSeek SDK environment absent"
+  },
   "frozen_full_batch": "await implementation freeze"
 }

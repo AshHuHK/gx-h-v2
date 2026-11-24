@@ -155,6 +155,13 @@ class Wire:
             complete = (method == "turn/completed" and msg["params"]["turn"]["id"] == self.trial.get("turn_id"))
             if interrupt_ack:
                 self.trial["server_interrupt_replies"].append(msg)
+            if (self.trial["fault"] == "delayed_usage" and method == "thread/tokenUsage/updated"
+                    and msg["params"]["threadId"] == self.trial.get("thread_id")
+                    and msg["params"]["turnId"] == self.trial.get("turn_id")):
+                self.trial["injected_receipt_faults"].append({"method": method,
+                    "turn_id": msg["params"]["turnId"], "tokens": msg["params"]["tokenUsage"]["total"]["totalTokens"]})
+                self.withheld.append(line)
+                continue
             if (interrupt_ack or complete) and self.trial["fault"] in ("lost_receipts", "delayed_receipts"):
                 self.trial["injected_receipt_faults"].append(
                     {"method": method or "turn/interrupt reply", "id": msg.get("id"),
@@ -318,11 +325,23 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
             trial["while_child_running"] = meter(reader, thread, turn)
             assert trial["while_child_running"]["budget_status"] == "HELD", trial["while_child_running"]
             peer.release_child.set()
+        first_meter = meter(reader, thread, turn)
+        if fault == "delayed_usage":
+            assert first_meter["terminal_status"] == "interrupted" and first_meter["budget_status"] == "HELD"
+            wire.replay = True
+        if first_meter["budget_status"] == "HELD":
+            trial["meter_before_drain"] = first_meter
+            # Turn completion and its cumulative usage are distinct official notifications.
             deadline = time.monotonic() + 10
             while meter(reader, thread, turn)["budget_status"] == "HELD" and time.monotonic() < deadline:
-                client.run_until(lambda _: False, timeout=1, poll_interval=0.04)
-                roots.delivery.verify_descendants()
+                client.run_until(lambda f: f.message.get("method") == "thread/tokenUsage/updated"
+                                 and f.message["params"].get("threadId") == thread
+                                 and f.message["params"].get("turnId") == turn,
+                                 timeout=1, poll_interval=0.15)
+                if fault == "running_child":
+                    roots.delivery.verify_descendants()
                 roots.reconcile_meter(thread)
+        if fault == "running_child":
             trial["children"] = [dict(x) for x in reader.execute(
                 "SELECT m.child_id,m.parent_id,m.root_id,m.metadata_verified,u.turn_id,u.owner_turn,u.terminal,"
                 "u.measured_tokens FROM p0_native_child_meters m JOIN p0_native_child_usage u USING(child_id) "
@@ -330,6 +349,11 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
             assert len(trial["children"]) == 1 and trial["children"][0]["metadata_verified"]
             assert trial["children"][0]["terminal"] and trial["children"][0]["measured_tokens"] == 183
         trial["final_meter"] = meter(reader, thread, turn)
+        if fault == "delayed_usage":
+            interrupted = next(e["seq"] for e in trial["events"] if e["method"] == "turn/completed" and e["turn"] == turn)
+            delivered = [e["tokens"] for e in trial["events"] if e["method"] == "thread/tokenUsage/updated"
+                         and e["thread"] == thread and e["turn"] == turn and e["seq"] > interrupted]
+            assert delivered and delivered == [r["tokens"] for r in trial["injected_receipt_faults"]]
         assert trial["final_meter"]["budget_status"] == "SETTLED" and not trial["final_meter"]["estimated_at"], (
             marker, fault, trial["final_meter"], trial["events"])
         assert trial["final_meter"]["settled_tokens"] == sum(r["usage"]["total_tokens"] for r in trial["model_requests"])
@@ -381,7 +405,9 @@ def run(repetitions, only=None):
         sequence = [(status, "none") for _ in range(repetitions) for status in ("ACCEPTED", "REJECTED")]
         sequence.extend([("ACCEPTED", "lost_interrupt"), ("REJECTED", "lost_receipts"),
                          ("ACCEPTED", "delayed_receipts"), ("ACCEPTED", "running_child")])
-        if only:
+        if only == "delayed_usage":
+            sequence = [("ACCEPTED", only)]
+        elif only:
             sequence = [case for case in sequence if case[1] == only]
         results, run_ids = [], []
         # Each sample is an independent task. Partition test cases within one GX Run's
@@ -414,7 +440,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repetitions", type=int, default=100, help="repetitions per accepted/rejected outcome")
     parser.add_argument("--only", choices=("none", "lost_interrupt", "lost_receipts",
-                                          "delayed_receipts", "running_child"))
+                                          "delayed_receipts", "running_child", "delayed_usage"))
     parser.add_argument("--output", type=Path, default=Path(__file__).with_name("terminal-protocol.json"))
     args = parser.parse_args()
     if args.repetitions < 1:

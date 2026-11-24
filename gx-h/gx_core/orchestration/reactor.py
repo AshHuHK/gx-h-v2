@@ -245,7 +245,7 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
                 return None
             service._require_no_held_submission(tx, run_id)
             begun = engine.begin_advance(tx, run_id=run_id, actor=backend.actor, retry_failed=False)
-    return engine.advance_resumed(begun)
+    return engine.advance_resumed(begun, report_branch_failures=True)
 
 
 def on_submission_accepted(ctx: Ctx, run_id: str, row: sqlite3.Row, payload: Mapping[str, Any]) -> dict[str, Any]:

@@ -10,7 +10,7 @@ from .domain import clock, machines
 from .errors import GxError
 from .jobs import executor, service as jobs
 from .orchestration import service as runs
-from .orchestration.engine import Engine, NOT_A_CHANGE
+from .orchestration.engine import DRIVE_STATES, NOT_A_CHANGE, Engine
 from .persistence import store
 from .scheduling import dispatch, snapshot
 
@@ -25,6 +25,8 @@ def _reconcile_reason(conn, job, due):
         raise ValueError("invalid Job directory identifier")
     directory = executor.paths(store.data_root(conn) / "jobs", job_id).job_dir
     seen = executor.observe(directory, runner_pid=job["runner_pid"], runner_started=job["runner_started"])
+    if seen.get("deferred"):
+        return None
     observed = seen["state"]
     if observed == executor.FINISHED:
         receipt = seen["outcome"]
@@ -42,9 +44,9 @@ def _reconcile_reason(conn, job, due):
     return None
 
 
-def _only_stage_job_progress(conn, run_id, state, standing, snapshot_jobs, waiting_job_ids):
+def _only_stage_job_progress(conn, run_id, wait, standing, snapshot_jobs, waiting_job_ids):
     """A stage may resume on any changed fact. A runner starting alone needs no Root turn."""
-    pending = state["pending_interrupt"]
+    pending = wait["interrupt"]
     payload = pending.get("payload") or {}
     if (pending.get("kind") != "stage" or payload.get("waiting_state") != "WAITING_EXTERNAL_JOB"
             or pending.get("tasks") or pending.get("approval_ref") or payload.get("approval_refs")
@@ -55,15 +57,15 @@ def _only_stage_job_progress(conn, run_id, state, standing, snapshot_jobs, waiti
     if (not refs or not refs.issubset(waiting_job_ids)
             or not refs.issubset(job.job_id for job in snapshot_jobs if job.status in running)):
         return False
-    mark = state.get("controller_ran") or {}
+    mark = wait.get("controller_ran") or {}
     if mark.get("event_id") is None or Engine._limits_sha256() != mark.get("limits_sha256"):
         return False
     # Use the stage owner's cursor and exclusions. A result, a new scientific
     # fact or a change on a different Job still gives the controller its turn.
     events = conn.execute("SELECT kind,subject_id,prev_state,new_state FROM events WHERE run_id=? AND event_id>?",
                           (run_id, mark["event_id"]))
-    return all(kind in NOT_A_CHANGE or (kind == "job.transition" and subject in refs
-               and before in running | {jobs.SUBMITTING} and after in running)
+    return all(kind in NOT_A_CHANGE or (kind == "run.transition" and before in DRIVE_STATES and after in DRIVE_STATES)
+               or (kind == "job.transition" and subject in refs and before in running | {jobs.SUBMITTING} and after in running)
                for kind, subject, before, after in events)
 
 
@@ -181,30 +183,29 @@ def _run_work(conn, run, view, child_refs):
                     actions.append(f"{run_id} settle held task {task.task_id} attempt {task.attempt} "
                                    f"after approval {task.hold_approval_id} {row[0]}")
 
-    checkpoint = store.latest_checkpoint(conn, run_id)
-    if checkpoint is None:
+    if not run["workflow_id"]:
         return
-    state = store.loads(checkpoint, "state_json", {})
-    pending = state.get("pending_interrupt") or {}
-    payload = pending.get("payload") or {}
-    if pending.get("kind") in ("client_work", "external_job"):
-        # A live Job or task named by this interrupt keeps the gate open. Do not
-        # reload a scientific workflow merely to repeat that fact at each poll.
-        live_tasks = set(plan.progress.in_flight)
-        open_busy_tasks = {tid for tid in busy_tasks if tid in snap.by_id
-                           and snap.by_id[tid].status not in machines.terminal_states("task")}
-        if busy_jobs.intersection(pending.get("job_refs", ())) or (live_tasks | open_busy_tasks).intersection(pending.get("tasks", ())):
-            return
     registry = runs.default_registry(conn, workflow_id=run["workflow_id"], version=run["workflow_version"])
     workflow = registry.get(run["workflow_id"], str(run["workflow_version"]))
+    engine = Engine(conn, registry)
+    position = engine.state(run_id)
+    if not position["checkpoint_seq"]:
+        return
     if workflow.digest() != run["workflow_sha256"]:
         view["blockers"].append(f"{run_id} exact workflow version unavailable")
         return
-    engine = Engine(conn, registry)
-    idle = engine.idle(run_id)
+    for node, failure in position["failed_nodes"].items():
+        view["blockers"].append(f"{run_id} node {node} failed ({failure['code']}): {failure['message']}")
+    waits = position["node_waits"].values()
+    idle = engine.idle(run_id, retry_failed=False)
     coverage = {}
-    if workflow.objective_coverage and (idle or payload.get("wait_for") == "child_runs"):
-        coverage = workflow.objective_coverage(conn, run_id)
+    if workflow.objective_coverage and (idle or any(
+            wait["interrupt"].get("payload", {}).get("wait_for") == "child_runs" for wait in waits)):
+        try:
+            coverage = workflow.objective_coverage(conn, run_id)
+        except GxError as exc:
+            view["blockers"].append(f"{run_id} objective coverage {exc.code}: {exc.message}")
+            idle = False  # The whole-run continuation requires child coverage. Other waits have their own predicates.
         child_refs.extend(coverage.get("pending_child_run_ids", ()))
         for request in coverage.get("child_requests", ()):
             workflow_id = request.get("workflow_id") or (request.get("workflow") or {}).get("id")
@@ -212,10 +213,19 @@ def _run_work(conn, run, view, child_refs):
             if workflow_id and key:
                 actions.append(f"{run_id} gx_run_start requested child {workflow_id} idempotency_key={key} "
                                "using current objective coverage.child_requests")
-    if pending and (run["status"] in machines.waiting_states("run") or run["status"] == "ACTIVE"):
-        if dispatch.run_holding_approvals(snap):
+    if dispatch.run_holding_approvals(snap) or "RUNNING" in position["node_states"].values():
+        return
+    live_tasks = set(plan.progress.in_flight) | {tid for tid in busy_tasks if tid in snap.by_id
+                                                and snap.by_id[tid].status not in machines.terminal_states("task")}
+
+    def inspect_wait(wait):
+        pending = wait["interrupt"]
+        payload = pending.get("payload") or {}
+        ref = wait["interrupt_ref"]
+        if pending["kind"] in ("client_work", "external_job") and (
+                busy_jobs.intersection(pending.get("job_refs", ())) or live_tasks.intersection(pending.get("tasks", ()))):
             return
-        standing = engine.standing(run_id)
+        standing = engine.standing(run_id, interrupt_ref=ref)
         if payload.get("wait_for") == "case_selection" and not standing.complete:
             scope = payload.get("execution_scope", "batch")
             if scope == "project":
@@ -232,17 +242,23 @@ def _run_work(conn, run, view, child_refs):
                 "next_action": pending["reason"]})
         elif payload.get("coordinator_action") and not standing.complete:
             if not snap.limits.holds:
-                ref = payload.get("handoff_ref") or run["interrupt_ref"]
-                actions.append(f"{run_id} coordinator decision on {ref}: {payload['coordinator_action']}")
-        elif (standing.complete if science else standing.resumable) and not _only_stage_job_progress(conn, run_id, state, standing,
-                                                                  snap.jobs, view["waiting_job_ids"]):
-            runs._require_no_held_submission(conn, run_id)
-            runs._require_workers_on_policy(conn, run_id, pending)
-            ref = state.get("interrupt_ref") or run["interrupt_ref"]
-            offer(f"{run_id} gx_run_resume interrupt {ref} checkpoint {checkpoint['seq']}", mechanical=True)
-    elif idle and not snap.limits.holds and not dispatch.run_holding_approvals(snap) and not (
-            coverage and engine._open_child_work(conn, run, coverage)):
-        offer(f"{run_id} gx_run_control continue idle checkpoint {checkpoint['seq']}", mechanical=True)
+                handoff = payload.get("handoff_ref") or ref
+                actions.append(f"{run_id} coordinator decision on {handoff}: {payload['coordinator_action']}")
+        elif (standing.complete if science else standing.resumable) and not _only_stage_job_progress(
+                conn, run_id, wait, standing, snap.jobs, view["waiting_job_ids"]):
+            runs._require_no_held_submission(conn, run_id, pending=pending)
+            runs._require_workers_on_policy(conn, run_id, pending, round_index=wait["round"])
+            offer(f"{run_id} gx_run_resume interrupt {ref} checkpoint {position['checkpoint_seq']}", mechanical=True)
+
+    if run["status"] in DRIVE_STATES:
+        for wait in waits:
+            try:
+                inspect_wait(wait)
+            except GxError as exc:
+                view["blockers"].append(f"{run_id} node {wait['node']} {exc.code}: {exc.message}")
+    if idle and not snap.limits.holds and not (coverage and engine._open_child_work(conn, run, coverage)):
+        runs._require_no_held_submission(conn, run_id)
+        offer(f"{run_id} gx_run_control continue idle checkpoint {position['checkpoint_seq']}", mechanical=True)
 
 
 def project_objective_key(project_ref: str) -> str:
@@ -331,7 +347,7 @@ def _linked_runs(root, children):
 
 def _project_runs(conn, project_ref, run_id):
     rows = list(conn.execute("SELECT run_id, project_ref, status, objective, objective_id, budget_ref,"
-                             " workflow_id, workflow_version, workflow_sha256, interrupt_ref,"
+                             " workflow_id, workflow_version, workflow_sha256,"
                              " json_extract(inputs_json,'$.inputs.parent_run_id') AS parent,"
                              " json_extract(inputs_json,'$.inputs.study_run_id') AS study_parent,"
                              " json_extract(inputs_json,'$.qualification_onboarding_run_id') AS qualification_owner"
@@ -387,15 +403,16 @@ def _progress_counts(conn, run_id, by_id, children, anchor):
     if run_id is not None:
         # Unlike a parent_run_id embedded in the scientific inputs, a commissioned
         # child is named by the run-start key recorded when its parent first waited.
-        # Read the small run transition payloads, including previously settled rounds.
+        # Read earlier branch waits and the run transitions written by historical stores.
         scope_children = {parent: set(ids) for parent, ids in children.items()}
         if run_id in by_id:
             requests = conn.execute(
-                "SELECT DISTINCT e.subject_id, json_extract(i.response_json,'$.run_id') FROM json_each(?) p"
-                " CROSS JOIN events e ON e.subject_kind='run' AND e.subject_id=p.value"
+                "SELECT DISTINCT e.run_id, json_extract(i.response_json,'$.run_id') FROM json_each(?) p"
+                " CROSS JOIN events e ON e.run_id=p.value"
                 " CROSS JOIN json_each(e.payload_json,'$.payload.child_requests') req"
                 " JOIN idempotency i ON i.idempotency_key=? || json_extract(req.value,'$.idempotency_key')"
-                " WHERE req.type='object' AND e.kind='run.transition' AND e.new_state='WAITING_CLIENT'"
+                " WHERE req.type='object' AND (e.kind='workflow.node_waiting'"
+                " OR (e.kind='run.transition' AND e.new_state='WAITING_CLIENT'))"
                 " AND json_extract(e.payload_json,'$.payload.wait_for')='child_runs'"
                 " AND i.scope='gx_run_start' AND i.side_effect_status='APPLIED' AND i.completed_at IS NOT NULL",
                 (json.dumps(list(by_id)), store.tool_key("gx_run_start", "")))

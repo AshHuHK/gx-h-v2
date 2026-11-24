@@ -1,5 +1,7 @@
 # P2A Closure 的签收范围与恢复
 
+以下记录对应原 Closure 冻结版。随后交付的分类 JSON、原始日志、两组同源码对照与当前升级回退步骤已纳入 P2A.1。[P2A.1 验证与回退](P2A1_HARDENING_REPORT.md)
+
 ## 历史失败的可追溯范围
 
 两份历史 Phase 2A 日志各含相同的 465 个原始测试身份，均为 461 通过、4 个可选 DeepSeek SDK 用例跳过。按 UTF-8、逐行排序、末尾换行生成的身份清单 SHA-256 为 4dd9d8a43e6f2cbcab75a48a1d8a071373cea3cccdb9af547f8a35b3c7a97259。用户给出的 Closure ZIP 提到另一次运行失败 42 项，六个成员中没有该次测试 ID、失败输出、执行配置或原始 JUnit。对本地相邻 release、Git 记录、临时运行目录和归档的检索也没有找回该次清单。T03 的当次逐项复跑和历史失败原因具有不同的证据范围。保留当次每个身份和原有跳过原因；要判断各个历史失败属于环境、夹具或产品回归，仍需原始失败明细。[原冻结日志](acceptance/phase2a/regression/final-v2/batch/suite/python-full.log) · [环境复测与身份账本](P2A_TEST_ENVIRONMENT_REPORT.md)

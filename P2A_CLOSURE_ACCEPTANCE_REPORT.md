@@ -1,5 +1,7 @@
 # P2A Closure 集成验收
 
+本文保存原冻结版 `3a08a9d` 当时的判定与回执。P2A.1 随后取得 42 项历史失败原件，新的归因、复跑与阶段签收见专项报告。[P2A.1 签收记录](P2A1_HARDENING_REPORT.md)
+
 **签收结论为 PARTIAL，37 项通过，1 项部分完成，0 项失败。** 冻结版 `3a08a9d1c36759686d29743c75d789cd959848a1` 于 2026-11-24 16:04–16:11 UTC 在干净的独立工作树完成全量运行。原 Phase 2A 通过 15/15，Closure 通过 19/20，附加检查通过 3/3。T03 已逐项复跑原有 465 个测试，461 个通过、4 个沿用原跳过。另一次历史运行报告的 42 项失败缺少测试身份与原始错误，可独立归因 0/42。[冻结版逐项结果](acceptance/closure/runs/frozen-3a08a9d/summary.json) · [版本与环境](acceptance/closure/runs/frozen-3a08a9d/environment.json)
 
 ## 运行记录与修复

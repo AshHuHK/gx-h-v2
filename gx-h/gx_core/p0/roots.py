@@ -81,6 +81,12 @@ def require_binding(conn, run_id, thread_id):
     return dict(row)
 
 
+def thread_for_lease(conn, run_id, task_id, lease_id):
+    row = conn.execute("SELECT thread_id FROM p0_roots WHERE run_id=? AND task_id=? AND lease_id=?",
+                       (run_id, task_id, lease_id)).fetchone()
+    return row["thread_id"] if row else None
+
+
 def _artifact_refs(value):
     if isinstance(value, str) and ids.kind_of(value) == "artifact":
         yield value
@@ -804,9 +810,7 @@ class Roots:
         return {**self._binding(tid), "turn_id":receipt["turn_id"]}
 
     def thread_for_lease(self, task_id, lease_id):
-        row = self.conn.execute("SELECT thread_id FROM p0_roots WHERE run_id=? AND task_id=? AND lease_id=?",
-                                (self.run_id,task_id,lease_id)).fetchone()
-        return row["thread_id"] if row else None
+        return thread_for_lease(self.conn, self.run_id, task_id, lease_id)
 
     def deliver(self, thread_id, text, *, event_id, interrupt=False):
         self._resume(thread_id)

@@ -167,7 +167,8 @@ def drive_workspace(conn, directory, timeout):
                 driver, passes = drivers[rid]
                 inbox = _inbox_version(conn, rid)
                 try:
-                    next(passes)
+                    delay = next(passes)
+                    retry_at[rid] = time.monotonic() + (delay or 0)
                 except StopIteration as end:
                     driver.close()
                     del drivers[rid]
@@ -194,7 +195,11 @@ def drive_workspace(conn, directory, timeout):
                 from .workspace import release_finished
                 release_finished(conn)
                 return {**overview(conn), **({"plugin_waits": plugin_waits} if plugin_waits else {})}
-            time.sleep(min(0.035, max(0, deadline - time.monotonic())))
+            now = time.monotonic()
+            # A new CLI can enqueue at any time. Live native clients request shorter service intervals.
+            due = [retry_at[rid] for rid in drivers if rid in retry_at]
+            delay = max(0.01, min(due, default=now + 0.25) - now)
+            time.sleep(min(0.25, delay, max(0, deadline - now)))
         result = overview(conn)
         if plugin_waits:
             result["plugin_waits"] = plugin_waits

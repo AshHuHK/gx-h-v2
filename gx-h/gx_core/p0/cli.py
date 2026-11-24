@@ -18,7 +18,13 @@ from ..native_release import native_state, ReleaseStateError
 from ..orchestration import packages, service
 from ..persistence import store
 from . import deployment, intent
-from .driver import Driver, context, enqueue, project, snapshot
+from .driver import Driver, context, enqueue, native_waits, project, snapshot
+
+
+class InitialIntentPending(AppServerDisconnected):
+    def __init__(self, run_id, message_id):
+        super().__init__("Initial Intent is waiting for its native receipt: " + message_id)
+        self.run_id = run_id
 
 
 def demo_spec():
@@ -163,6 +169,9 @@ def start(conn, directory, spec, *, run_key=None, run_id=None):
                     driver.close()
                 row = conn.execute("SELECT result_json,rejected FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
             if not row["result_json"] or json.loads(row["result_json"]).get("status") != "committed":
+                if not row["rejected"] and any(w["owner"] == "message" and w["reference"] == mid
+                                               for w in native_waits(conn, rid)):
+                    raise InitialIntentPending(rid, mid)
                 raise ValueError("Initial Intent is pending: " + str(row["rejected"] or mid))
         # The workflow reads the objective and prospective criterion. Individual tasks and Jobs
         # bind their own narrower inputs where they are created.
@@ -189,14 +198,21 @@ def run_until_stopped(conn, directory, rid, timeout):
     deadline = time.monotonic() + timeout
     failures = 0
     while time.monotonic() < deadline:
-        driver = Driver(conn, directory, rid)
+        driver = None
         try:
+            if not store.latest_checkpoint(conn, rid):
+                run = project(conn, rid)
+                start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"], run_id=rid)
+            driver = Driver(conn, directory, rid)
             result = driver.drive(deadline - time.monotonic())
             if result["status"] in machines.terminal_states("run"):
                 from .workspace import release_finished
                 release_finished(conn)
                 result.update(snapshot(conn, rid))
             return result
+        except InitialIntentPending:
+            # No checkpoint can run before this specific original human input is authorized.
+            failures += 1
         except (AppServerDisconnected, AppServerTimeout, OutcomeUnknown) as exc:
             failures += 1
             # GX effects are already durable. The new client inspects history and
@@ -206,7 +222,8 @@ def run_until_stopped(conn, directory, rid, timeout):
                                    subject_kind="run", subject_id=rid, reason=type(exc).__name__,
                                    evidence_level="EXECUTION_OBSERVED", payload={"attempt": failures})
         finally:
-            driver.close()
+            if driver:
+                driver.close()
         time.sleep(min(5, 0.2 * 2 ** min(failures, 5), max(0, deadline - time.monotonic())))
     result = snapshot(conn, rid)
     result["driver"] = "time_limit"
@@ -292,15 +309,16 @@ def execute(args):
             if args.command == "start":
                 spec = packages.example(args.example) if args.example else json.loads(args.spec.read_text())
                 operator.authorize_project(operator.local_context(conn), spec["project"])
-                return start(conn, directory, spec, run_key=args.run_key)
+                try:
+                    return start(conn, directory, spec, run_key=args.run_key)
+                except InitialIntentPending as exc:
+                    return {**snapshot(conn, exc.run_id), "driver": "initial_intent_pending"}
             if args.command == "run" and selected is None:
                 authorize_workspace(conn)
                 return coordinator.drive_workspace(conn, directory, args.timeout)
             run = selected_run(conn)
             if args.command == "resume" and run["status"] == "PAUSED":
                 change_state(conn, run, "continue")
-            if args.command != "message" and not store.latest_checkpoint(conn, run["run_id"]):
-                start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"], run_id=run["run_id"])
             if args.command != "message":
                 return run_until_stopped(conn, directory, run["run_id"], args.timeout)
             driver = Driver(conn, directory, run["run_id"])
@@ -326,7 +344,8 @@ def execute(args):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, epilog=
+        "Set GX_CODEX_OFFLINE=1 to drive saved work with Codex and App Server stopped.")
     commands = parser.add_subparsers(dest="command", required=True)
     deployment.add_commands(commands)
     from ..plugins.cli import add_commands as add_plugin_commands

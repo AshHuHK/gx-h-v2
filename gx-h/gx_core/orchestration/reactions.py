@@ -11,11 +11,9 @@ from . import expansion, seams
 
 def _open_stage(conn: sqlite3.Connection, run_id: str, task: sqlite3.Row) -> str | None:
     """Use the stage which still owns the task in the current workflow round."""
-    run = conn.execute("SELECT phase FROM runs WHERE run_id=?", (run_id,)).fetchone()
     stage = task["stage"]
-    if stage and run and stage == run["phase"]:
-        if expansion.task_round(conn, task["task_id"]) == expansion.current_round(conn, run_id):
-            return stage
+    if stage and expansion.open_stage_round(conn, run_id, stage) == expansion.task_round(conn, task["task_id"]):
+        return stage
     return None
 
 

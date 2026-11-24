@@ -53,10 +53,11 @@ import inspect
 import os
 import sqlite3
 import sys
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
-from .. import config, contracts
+from .. import config, contracts, metrics
 from ..context import Ctx
 from ..domain import clock, ids, machines
 from ..errors import (
@@ -66,6 +67,7 @@ from ..errors import (
     ConcurrentRun,
     ContentHashMismatch,
     DependencyUnmet,
+    EvaluatorInvalid,
     GxError,
     IllegalTransition,
     OutcomeUnknown,
@@ -74,7 +76,7 @@ from ..errors import (
 )
 from ..persistence import store
 from ..teams import recovery
-from . import seams
+from . import branches, seams
 
 RUN = "run"
 
@@ -83,7 +85,9 @@ RUN = "run"
 #: a reaction that failed or was refused. Counted as changes, a coordinator that renews its
 #: lease before each resume would run a waiting node again every time it asked.
 NOT_A_CHANGE = ("run.coordinator", "run.coordinator_lease", "schedule.reaction_failed",
-                "schedule.reaction_refused")
+                "schedule.reaction_refused", "workflow.node_waiting", "workflow.stage_entered",
+                "run.resume_recovered")
+DRIVE_STATES = ("ACTIVE", *sorted(machines.waiting_states(RUN)))
 
 # --------------------------------------------------------------------- interrupt kinds
 
@@ -863,6 +867,7 @@ class Engine:
             "round": 0,
             "outputs": {},
             "scratch": {},
+            "node_waits": {},
             "pending_interrupt": None,
             "interrupt_ref": None,
         }
@@ -953,8 +958,9 @@ class Engine:
         row = conn.execute("SELECT * FROM runs WHERE run_id=?", (run_id,)).fetchone()
         status = row["status"]
         state = dict(checkpoint.state)
-        half_resumed = status == "ACTIVE" and bool(state.get("pending_interrupt"))
-        if status == "ACTIVE" and not half_resumed and _advance_live(state):
+        state["node_waits"] = branches.waits(checkpoint)
+        half_resumed = status == "ACTIVE" and bool(state["node_waits"])
+        if status == "ACTIVE" and _advance_live(state):
             # Contract r5: a second advance while one is in progress answers CONCURRENT_RUN.
             raise ConcurrentRun(
                 f"run {run_id} is being advanced by another call; a resume waits until that call ends",
@@ -966,21 +972,16 @@ class Engine:
                 details={"run_id": run_id, "status": status,
                          "waiting_states": sorted(machines.waiting_states(RUN))},
             )
-        pending_ref = state.get("interrupt_ref")
-        if not pending_ref or interrupt_ref != pending_ref:
-            raise IllegalTransition(
-                f"run {run_id} is waiting on interrupt {pending_ref!r}, not {interrupt_ref!r}",
-                details={"run_id": run_id, "pending_interrupt_ref": pending_ref,
-                         "supplied_interrupt_ref": interrupt_ref},
-            )
+        wait = self._wait_by_ref(run_id, state["node_waits"], interrupt_ref)
+        name = wait["node"]
         # What the node waits for has come, or has come back as it is: every terminal outcome
         # is handed to the node (design r2.2 §2.5.1), and a run in which nothing is open,
         # pending or waited for is resumed into a decision (§2.5.2). Otherwise it still waits.
-        standing = self.standing(run_id, conn=conn)
+        standing = self.standing(run_id, conn=conn, interrupt_ref=interrupt_ref)
         if standing.waiting is not None:
             # Contract r5: refused with the needs still open (each a need of the closed
             # vocabulary; work in flight is waited for and is no need).
-            needs = self.waiting_needs(run_id, conn=conn, stage_needs=standing.stage_needs)
+            needs = self.waiting_needs(run_id, conn=conn, interrupt_ref=interrupt_ref, stage_needs=standing.stage_needs)
             standing.waiting.details.setdefault("needs", needs)
             raise standing.waiting
 
@@ -994,7 +995,7 @@ class Engine:
                 reason=f"resume {interrupt_ref}", evidence_level="EXECUTION_OBSERVED",
                 extra_updates={"interrupt_ref": None},
                 payload={"interrupt_ref": interrupt_ref, "submission_refs": list(refs),
-                         "node": checkpoint.node,
+                         "node": name,
                          "standing": {"complete": standing.complete, "handed_back": standing.handed_back,
                                       "quiescent": standing.quiescent},
                          "outstanding": dict(standing.outstanding)},
@@ -1005,23 +1006,31 @@ class Engine:
                 conn, kind="run.resume_recovered", actor=actor, run_id=run_id, subject_kind=RUN,
                 subject_id=run_id, reason=f"resume {interrupt_ref} of a run left ACTIVE with it pending",
                 evidence_level="EXECUTION_OBSERVED",
-                payload={"interrupt_ref": interrupt_ref, "node": checkpoint.node},
+                payload={"interrupt_ref": interrupt_ref, "node": name},
             )
+        del state["node_waits"][name]
         state["pending_interrupt"] = None
         state["interrupt_ref"] = None
+        # A crash between clearance and execution still delivers submissions only to
+        # this node, including an empty but authorized approval resume.
+        reentered = "reenter_round" in wait
+        state.setdefault("resumptions", {})[name] = {
+            "submissions": [] if reentered else list(refs), "round": wait.get("reenter_round", wait["round"]),
+            "reentered": reentered,
+        }
         state["advance"] = _new_advance(actor)
         self.checkpointer.save(
             conn, run_id=run_id, workflow_id=workflow.workflow_id,
-            workflow_version=workflow.version, node=checkpoint.node, state=state,
+            workflow_version=workflow.version, node=name, state=state,
         )
         return {"run_id": run_id, "workflow": workflow, "state": state, "actor": actor,
                 "submissions": refs}
 
-    def advance_resumed(self, begun: Mapping[str, Any]) -> dict[str, Any]:
-        """Run the nodes after a :meth:`begin_resume` that has committed."""
+    def advance_resumed(self, begun: Mapping[str, Any], *, report_branch_failures: bool = False) -> dict[str, Any]:
+        """Drive a committed advance. The reactor reports an isolated failure and keeps serving other runs."""
         return self._advance(
             run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
-            actor=begun["actor"], submissions=begun["submissions"], resumed=True,
+            actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
         )
 
     def _release_advance(self, run_id: str, workflow: "Workflow", advance_id: str | None) -> None:
@@ -1040,51 +1049,93 @@ class Engine:
                 interrupt_ref=latest.interrupt_ref,
             )
 
-    def idle(self, run_id: str) -> bool:
-        """Whether a run is ACTIVE with nothing pending and nobody advancing it.
+    def waits(self, run_id: str, *, conn: sqlite3.Connection | None = None) -> dict[str, dict]:
+        """All current branch waits with their stable references; reads old checkpoints too."""
+        return branches.waits(self.checkpointer.latest(conn or self.conn, run_id))
 
-        That is where a run stands after a pause is lifted, where a resume leaves it when
-        a node raised, and where it is left when the process that was advancing it died
-        between two nodes (once that process's advance lease has lapsed). Either way it
-        continues from its last checkpoint, and nothing else will move it.
-        """
+    @staticmethod
+    def _wait_by_ref(run_id, waits, ref):
+        for wait in waits.values():
+            if ref and wait["interrupt_ref"] == ref:
+                return wait
+        raise IllegalTransition(f"run {run_id} has no pending interrupt {ref!r}",
+                                details={"run_id": run_id, "supplied_interrupt_ref": ref,
+                                         "pending_interrupt_refs": [w["interrupt_ref"] for w in waits.values()]})
+
+    def pending_for(self, run_id, interrupt_ref, *, conn=None):
+        return self._wait_by_ref(run_id, self.waits(run_id, conn=conn), interrupt_ref)["interrupt"]
+
+    def idle(self, run_id: str, *, retry_failed: bool = True) -> bool:
+        """An unowned advance can execute, recover its last step, or park its recorded waits."""
         row = self._run_row(run_id)
         checkpoint = self.checkpointer.latest(self.conn, run_id)
-        return (row["status"] == "ACTIVE" and checkpoint is not None
-                and not checkpoint.state.get("pending_interrupt")
-                and not _advance_live(checkpoint.state))
+        if checkpoint is None or _advance_live(checkpoint.state):
+            return False
+        active = row["status"] == "ACTIVE"
+        if not active and row["status"] not in machines.waiting_states(RUN):
+            return False
+        state = checkpoint.state
+        waits = branches.waits(checkpoint)
+        if not waits and not state.get("failed_nodes"):
+            return active
+        if retry_failed and state.get("failed_nodes"):
+            return True
+        if active and waits and not state.get("pending_interrupt"):
+            return True  # killed between recording a branch wait and parking the Run
+        if not self.registry.has(checkpoint.workflow_id, checkpoint.workflow_version):
+            return False
+        workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
+        return "READY" in branches.node_states(workflow, {**state, "node_waits": waits}).values()
 
-    def advance(self, *, run_id: str, actor: str = "engine") -> dict[str, Any]:
+    def advance(self, *, run_id: str, actor: str = "engine", retry_failed: bool = True) -> dict[str, Any]:
         """Drive an idle run on from its last checkpoint. Completed nodes are not redone.
 
         The idle check and the taking of the advance lease are one transaction, so two
         callers that both found the run idle cannot both drive it.
         """
-        config.check_holds(self.hold_scope)
         with store.transaction(self.conn) as conn:
-            checkpoint = self.checkpointer.latest(conn, run_id)
-            if checkpoint is None:
-                raise SchemaInvalid(f"run {run_id} has no checkpoint; it was never started",
-                                    details={"run_id": run_id})
-            if not self.idle(run_id):
-                row = self._run_row(run_id)
-                raise IllegalTransition(
-                    f"run {run_id} is {row['status']}"
-                    + (" and waiting on an interrupt; it continues with gx_run_resume"
-                       if checkpoint.state.get("pending_interrupt")
-                       else " and another call is advancing it" if _advance_live(checkpoint.state)
-                       else "; there is nothing to drive on"),
-                    details={"run_id": run_id, "status": row["status"],
-                             "interrupt_ref": checkpoint.state.get("interrupt_ref")},
-                )
-            workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
-            state = dict(checkpoint.state)
-            state["advance"] = _new_advance(actor)
-            self.checkpointer.save(
-                conn, run_id=run_id, workflow_id=workflow.workflow_id,
-                workflow_version=workflow.version, node=checkpoint.node, state=state,
+            begun = self.begin_advance(conn, run_id=run_id, actor=actor, retry_failed=retry_failed)
+        return self.advance_resumed(begun)
+
+    def begin_advance(self, conn: sqlite3.Connection, *, run_id: str, actor: str = "engine",
+                      retry_failed: bool = True) -> dict[str, Any]:
+        """Claim an idle advance inside the same transaction as the caller's policy checks."""
+        if not conn.in_transaction:
+            raise SchemaInvalid("begin_advance requires a write transaction", details={"run_id": run_id})
+        config.check_holds(self.hold_scope)
+        checkpoint = self.checkpointer.latest(conn, run_id)
+        if checkpoint is None:
+            raise SchemaInvalid(f"run {run_id} has no checkpoint; it was never started",
+                                details={"run_id": run_id})
+        if not self.idle(run_id, retry_failed=retry_failed):
+            row = self._run_row(run_id)
+            raise IllegalTransition(
+                f"run {run_id} is {row['status']}"
+                + (" and waiting on an interrupt; it continues with gx_run_resume"
+                   if checkpoint.state.get("pending_interrupt")
+                   else " and another call is advancing it" if _advance_live(checkpoint.state)
+                   else "; there is nothing to drive on"),
+                details={"run_id": run_id, "status": row["status"],
+                         "interrupt_ref": checkpoint.state.get("interrupt_ref")},
             )
-        return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor, resumed=True)
+        workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
+        state = dict(checkpoint.state)
+        state["node_waits"] = branches.waits(checkpoint)
+        if self._run_row(run_id)["status"] != "ACTIVE":
+            store.transition(conn, machine=RUN, subject_id=run_id, to_state="ACTIVE", actor=actor,
+                             reason="continue an independent workflow branch",
+                             extra_updates={"interrupt_ref": None}, evidence_level="EXECUTION_OBSERVED")
+        elif state.get("interrupt_ref"):
+            conn.execute("UPDATE runs SET interrupt_ref=NULL WHERE run_id=?", (run_id,))
+        state.update(pending_interrupt=None, interrupt_ref=None)
+        if retry_failed:
+            state.pop("failed_nodes", None)
+        state["advance"] = _new_advance(actor)
+        self.checkpointer.save(
+            conn, run_id=run_id, workflow_id=workflow.workflow_id,
+            workflow_version=workflow.version, node=checkpoint.node, state=state,
+        )
+        return {"run_id": run_id, "workflow": workflow, "state": state, "actor": actor, "submissions": ()}
 
     def state(self, run_id: str) -> dict[str, Any]:
         row = self._run_row(run_id)
@@ -1092,6 +1143,17 @@ class Engine:
         pending = None
         if checkpoint is not None and checkpoint.state.get("pending_interrupt"):
             pending = dict(checkpoint.state["pending_interrupt"])
+        waits = branches.waits(checkpoint)
+        positions = {}
+        if checkpoint and self.registry.has(checkpoint.workflow_id, checkpoint.workflow_version):
+            workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
+            positions = branches.node_states(workflow, {**checkpoint.state, "node_waits": waits})
+            if row["status"] == "ACTIVE" and _advance_live(checkpoint.state):
+                ready = [n for n, status in positions.items() if status == "READY"]
+                selected = next((n for n in ready if n in checkpoint.state.get("resumptions", {})),
+                                next(iter(ready), None))
+                if selected:
+                    positions[selected] = "RUNNING"
         return {
             "run_id": run_id,
             "status": row["status"],
@@ -1102,6 +1164,9 @@ class Engine:
             "checkpoint_seq": checkpoint.seq if checkpoint else 0,
             "interrupt_ref": row["interrupt_ref"],
             "pending_interrupt": pending,
+            "node_waits": waits,
+            "node_states": positions,
+            "failed_nodes": dict(checkpoint.state.get("failed_nodes", {})) if checkpoint else {},
             "completed_nodes": list(checkpoint.state.get("completed", [])) if checkpoint else [],
         }
 
@@ -1224,9 +1289,14 @@ class Engine:
         """The run's last event that is a change a node could act on. Renewing or handing over
         the coordinator lease is none, and neither is the reactor's record of its own failure."""
         marks = ",".join("?" for _ in NOT_A_CHANGE)
+        # Selecting another branch and returning to a parked projection changes
+        # no input of this controller. Otherwise two incomplete stages wake each
+        # other forever on their own park / resume traffic.
+        states = ",".join("?" for _ in DRIVE_STATES)
         return int(conn.execute(
-            f"SELECT COALESCE(MAX(event_id), 0) AS n FROM events WHERE run_id=? AND kind NOT IN ({marks})",
-            (run_id, *NOT_A_CHANGE)).fetchone()["n"])
+            f"SELECT COALESCE(MAX(event_id), 0) AS n FROM events WHERE run_id=? AND kind NOT IN ({marks}) "
+            f"AND NOT(kind='run.transition' AND prev_state IN ({states}) AND new_state IN ({states}))",
+            (run_id, *NOT_A_CHANGE, *DRIVE_STATES, *DRIVE_STATES)).fetchone()["n"])
 
     @staticmethod
     def _limits_sha256() -> str | None:
@@ -1237,7 +1307,8 @@ class Engine:
         """The pair the no-spin rule compares (§2.5.4), as it is now: stored when a node parks."""
         return {"event_id": self._last_change(conn, run_id), "limits_sha256": self._limits_sha256()}
 
-    def standing(self, run_id: str, *, conn: sqlite3.Connection | None = None) -> Standing:
+    def standing(self, run_id: str, *, conn: sqlite3.Connection | None = None,
+                 interrupt_ref: str | None = None) -> Standing:
         """Where the run's pending interrupt stands, and whether a resume would be accepted. Reads only.
 
         * **complete**: every item is what the node waits for. Resumable.
@@ -1253,18 +1324,26 @@ class Engine:
         conn = conn or self.conn
         checkpoint = self.checkpointer.latest(conn, run_id)
         state = checkpoint.state if checkpoint is not None else {}
-        pending = state.get("pending_interrupt")
-        if not pending:
+        ref = interrupt_ref or state.get("interrupt_ref")
+        if not ref:
             return Standing(False, False, False, False, waiting=IllegalTransition(
                 f"run {run_id} waits on no interrupt", details={"run_id": run_id}))
-        interrupt = InterruptRequest.from_dict(pending)
+        wait = self._wait_by_ref(run_id, branches.waits(checkpoint), ref)
+        interrupt = InterruptRequest.from_dict(wait["interrupt"])
+        mark = wait["controller_ran"]
+        if "reenter_round" in wait and (interrupt.tasks or interrupt.job_refs or interrupt.approval_ref):
+            # The old node's result was invalidated by an explicit rewind. Before a
+            # new-round once key can run, the original commissioned work must settle.
+            refusal, outstanding = self._outstanding(conn, run_id, interrupt, strict=True)
+            return Standing(refusal is None, refusal is None, False, refusal is None,
+                            waiting=refusal, outstanding=outstanding)
         if interrupt.kind == "stage":
             workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
             name = str(interrupt.payload["stage"])
             rule = workflow.stage_rules.get(name)
             if rule is None:
                 raise SchemaInvalid(f"stage {name!r} has no installed completion rule")
-            view = dict(rule(conn, run_id, int(state.get("round", 0))))
+            view = dict(rule(conn, run_id, int(wait["round"])))
             complete = bool(view.get("complete"))
             if interrupt.payload.get("wait_for") == "child_runs":
                 # The children progress in separate runs. A parent event does
@@ -1275,7 +1354,6 @@ class Engine:
                 return Standing(complete, complete, False, complete, waiting=waiting,
                                 stage_needs=view.get("needs") or ())
             quiescent = bool(view.get("quiescent")) and not complete
-            mark = state.get("controller_ran") or {}
             changed = (self._last_change(conn, run_id) > int(mark.get("event_id") or 0)
                        or self._limits_sha256() != mark.get("limits_sha256"))
             refusal = None if complete or quiescent or changed else DependencyUnmet(
@@ -1288,8 +1366,7 @@ class Engine:
             return Standing(True, True, False, True)
         still_open, _open_items = self._outstanding(conn, run_id, interrupt, strict=False)
         handed_back = still_open is None
-        quiescent = bool(self._check(conn, run_id).quiescent)
-        mark = state.get("controller_ran") or {}
+        quiescent = not state.get("failed_nodes") and bool(self._check(conn, run_id).quiescent)
         changed = (self._last_change(conn, run_id) > int(mark.get("event_id") or 0)
                    or self._limits_sha256() != mark.get("limits_sha256"))
         waiting: GxError | None = None
@@ -1297,7 +1374,7 @@ class Engine:
             waiting = None
         elif handed_back:
             waiting = DependencyUnmet(
-                f"run {run_id} cannot resume: nothing has changed since its node {checkpoint.node!r} last "
+                f"run {run_id} cannot resume: nothing has changed since its node {wait['node']!r} last "
                 "ran and saw " + ", ".join(f"{item} {st or 'missing'}" for item, st in sorted(outstanding.items()))
                 + ", and other work of the run is still open",
                 details={"run_id": run_id, "outstanding": dict(outstanding), "reason": "nothing_changed"},
@@ -1343,12 +1420,13 @@ class Engine:
 
     def _advance(
         self, *, run_id: str, workflow: Workflow, state: dict[str, Any], actor: str,
-        submissions: Sequence[str] = (), resumed: bool = False,
+        resumed: bool = False, report_branch_failures: bool = False,
     ) -> dict[str, Any]:
         advance_id = (state.get("advance") or {}).get("id")
         try:
             return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
-                                       submissions=submissions, resumed=resumed, advance_id=advance_id)
+                                       resumed=resumed, advance_id=advance_id,
+                                       report_branch_failures=report_branch_failures)
         except BaseException:
             try:
                 self._release_advance(run_id, workflow, advance_id)
@@ -1358,18 +1436,15 @@ class Engine:
 
     def _advance_nodes(
         self, *, run_id: str, workflow: Workflow, state: dict[str, Any], actor: str,
-        submissions: Sequence[str], resumed: bool, advance_id: str | None,
+        resumed: bool, advance_id: str | None, report_branch_failures: bool,
     ) -> dict[str, Any]:
         """The nodes of one advance. ``advance_id`` is this call's lease: before every node it
         must still be the run's, so a pause, a cancel or another advancer that took over a
         lapsed lease stops this one."""
-        completed: list[str] = list(state.get("completed", []))
         from ..p0.waits import is_p0_run
         operation_budgets = is_p0_run(self._run_row(run_id))
-        carry_submissions = tuple(submissions)
-        # Stated by the caller, not inferred from submission_refs: an approval resume
-        # legitimately carries none, and a node branching on ctx.resumed would be lied to.
-        resumed_once = resumed
+        resumed_once = resumed and not state.get("resumptions") and not state.get("node_waits")
+        last_failure = None
 
         # The next node is recomputed every iteration rather than walked once, because a
         # rewind puts earlier nodes back on the list. A hard step bound keeps a
@@ -1377,9 +1452,32 @@ class Engine:
         max_steps = len(workflow.order) * (self._round_budget() + 2) + 10
         steps = 0
         while True:
-            remaining = [n for n in workflow.order if n not in completed]
-            if not remaining:
-                break
+            started = time.monotonic_ns() if metrics.enabled() else None
+            positions = branches.node_states(workflow, state)
+            ready = [name for name, status in positions.items() if status == "READY"]
+            name = next((n for n in ready if n in state.get("resumptions", {})), next(iter(ready), None))
+            if started is not None:
+                metrics.record("workflow_ready_scan", started=started, run_id=run_id, selected_node=name,
+                               ready_count=len(ready), parked_count=len(state.get("node_waits", {})),
+                               failed_count=len(state.get("failed_nodes", {})))
+            if name is None:
+                if state.get("node_waits"):
+                    with store.transaction(self.conn) as conn:
+                        stopped = self._advance_stopped(conn, run_id, advance_id)
+                        if stopped:
+                            return self._response(run_id, warnings=[stopped], conn=conn)
+                        response = self._park_waits(conn, run_id, workflow, state, actor)
+                    return self._settled_response(run_id, actor, response, operation_budgets)
+                if failures := state.get("failed_nodes"):
+                    if last_failure is not None and not report_branch_failures:
+                        raise last_failure
+                    self._release_advance(run_id, workflow, advance_id)
+                    warnings = [f"{name} failed ({failure['code']}): {failure['message']}"
+                                for name, failure in failures.items()]
+                    warnings.append("Use gx_run_control continue to retry failed nodes: " + ", ".join(failures))
+                    return self._response(run_id, warnings=warnings)
+                return self._finish(run_id=run_id, workflow=workflow, state=state, actor=actor)
+            completed = list(state.get("completed", ()))
             steps += 1
             if steps > max_steps:
                 raise SchemaInvalid(
@@ -1387,7 +1485,6 @@ class Engine:
                     f"{workflow.workflow_id}@{workflow.version}; refusing to spin",
                     details={"run_id": run_id, "completed": completed},
                 )
-            name = remaining[0]
             node = workflow.node(name)
 
             # Every iteration re-reads the authority: a limit, a hold, a budget or a
@@ -1404,13 +1501,14 @@ class Engine:
                     node=name, keys=exhausted, budget=budget,
                 )
 
+            handoff = state.get("resumptions", {}).pop(name, None)
             ctx = NodeContext(
                 conn=self.conn, run_id=run_id, workflow_id=workflow.workflow_id,
                 workflow_version=workflow.version, node=name, actor=actor,
                 inputs=state.get("inputs", {}), outputs=state.get("outputs", {}),
-                state=state.setdefault("scratch", {}), submissions=carry_submissions,
-                resumed=resumed_once, revision=revision, budget=budget,
-                round_index=int(state.get("round", 0)),
+                state=state.setdefault("scratch", {}), submissions=handoff["submissions"] if handoff else (),
+                resumed=(not handoff.get("reentered", False)) if handoff else resumed_once, revision=revision, budget=budget,
+                round_index=int(handoff["round"] if handoff else state.get("round", 0)),
                 rounds_left=max(0, self._round_budget() - int(state.get("round", 0))),
                 teams=self.teams, services=self.services, gx=self.ctx,
             )
@@ -1435,7 +1533,8 @@ class Engine:
                             if stopped is None:
                                 outcome = self._run_node(conn, node, ctx, run_id=run_id, workflow=workflow,
                                                          state=state, actor=actor, name=name,
-                                                         completed=completed, result=result,computed=True)
+                                                         completed=completed, result=result, computed=True,
+                                                         other_ready=len(ready) > 1)
                             else:
                                 outcome = ("stopped", self._response(run_id, node=name,
                                                                     warnings=[stopped], conn=conn))
@@ -1448,37 +1547,49 @@ class Engine:
                             outcome = ("stopped", self._response(run_id, node=name, warnings=[stopped], conn=conn))
                         else:
                             outcome = self._run_node(conn, node, ctx, run_id=run_id, workflow=workflow,
-                                                     state=state, actor=actor, name=name, completed=completed)
-            except sqlite3.Error:
+                                                     state=state, actor=actor, name=name, completed=completed,
+                                                     other_ready=len(ready) > 1)
+            except (sqlite3.Error, OSError):
                 raise
             except Exception as exc:
                 if operation_budgets and isinstance(exc, BudgetExceeded):
-                    waiting = self._wait_for_admission(run_id, workflow, state, actor, name, exc, advance_id)
+                    waiting = self._wait_for_admission(run_id, workflow, state, actor, name, exc, advance_id,
+                                                       other_ready=len(ready) > 1)
                     if waiting is not None:
+                        if waiting == "branch_wait":
+                            resumed_once = False
+                            continue
                         return waiting
-                self._node_failed(run_id=run_id, workflow=workflow, state=state, actor=actor, node=name, exc=exc)
-                raise
+                # GX authority, budget, ownership and uncertain external outcomes keep
+                # their original refusal. A workflow node's own failure isolates its descendants.
+                branch_failure = not isinstance(exc, GxError) or isinstance(exc, (SchemaInvalid, EvaluatorInvalid))
+                self._node_failed(run_id=run_id, workflow=workflow, state=state, actor=actor, node=name,
+                                  exc=exc, advance_id=advance_id, isolate=branch_failure)
+                if not branch_failure:
+                    raise
+                last_failure = exc
+                resumed_once = False
+                continue
             kind, payload = outcome
-            if kind == "ended":
-                # The run was stopped by the node, or by the engine for it: its jobs are asked
-                # to end after that has committed and outside any transaction, as a cancel does.
-                self._end_jobs(run_id, actor, reason=str((payload.get("warnings") or ["the run was stopped"])[0]))
-            if kind == "paused" and not operation_budgets:
-                # Jobs whose tool has not started would start while the run is paused: they are
-                # ended, after the pause has committed and outside any transaction.
-                self._hold_jobs(run_id, actor, reason=str((payload.get("warnings") or ["the run is paused"])[0]))
-            if kind in ("stopped", "parked", "paused", "ended"):
+            if kind == "stopped":
                 return payload
+            if kind in ("parked", "paused", "ended"):
+                return self._settled_response(run_id, actor, payload, operation_budgets)
             # Submissions belong to the interrupt that was just cleared, not to the nodes
             # that run after it; a rewind put earlier nodes back on the list. The same holds
             # for "this node is run again after a resume": it is said to the first node only.
-            carry_submissions = ()
             resumed_once = False
-            completed = list(state["completed"])
 
-        return self._finish(run_id=run_id, workflow=workflow, state=state, actor=actor)
+    def _settled_response(self, run_id, actor, response, operation_budgets):
+        """Notify the Job owner of whole-run decisions only after the checkpoint commits."""
+        reason = (response.get("warnings") or [response["status"]])[0]
+        if response["status"] == "STOPPED":
+            self._end_jobs(run_id, actor, reason=reason)
+        elif response["status"] == "PAUSED" and not operation_budgets:
+            self._hold_jobs(run_id, actor, reason=reason)
+        return response
 
-    def _wait_for_admission(self, run_id, workflow, state, actor, node, refusal, advance_id):
+    def _wait_for_admission(self, run_id, workflow, state, actor, node, refusal, advance_id, *, other_ready):
         """A spending owner refused this operation. Let commissioned work settle before pausing."""
         from ..scheduling import needs as vocabulary
         needs = []
@@ -1496,10 +1607,13 @@ class Engine:
             stopped = self._advance_stopped(conn, run_id, advance_id)
             if stopped:
                 return self._response(run_id, node=node, warnings=[stopped], conn=conn)
+            state.clear()
+            state.update(self.checkpointer.latest(conn, run_id).state)
             outstanding = self._objective_work(conn, run_id, refusal.message, runnable_only=True)
             if outstanding:
-                return self._park(conn, run_id=run_id, workflow=workflow, state=state, actor=actor,
-                                  node=node, interrupt=outstanding)
+                answer = self._park(conn, run_id=run_id, workflow=workflow, state=state, actor=actor,
+                                    node=node, interrupt=outstanding, other_ready=other_ready)
+                return answer if answer is not None else "branch_wait"
             return self._pause(conn, run_id=run_id, workflow=workflow, state=state, actor=actor,
                                node=node, reason=refusal.message, needs=needs)
 
@@ -1516,30 +1630,32 @@ class Engine:
         return None
 
     def _node_failed(self, *, run_id: str, workflow: "Workflow", state: dict[str, Any], actor: str,
-                     node: str, exc: BaseException) -> None:
-        """A node raised: its transaction is gone. Say so, and leave the run idle (ENG-07, R1).
-
-        The run is ACTIVE with nothing pending, so ``gx_run_control continue`` runs the node
-        again; the failure is an event a status can show, never a silent ACTIVE.
-        """
+                     node: str, exc: BaseException, advance_id: str | None, isolate: bool) -> None:
+        """Record a rolled-back attempt under its original advance fence."""
         code = getattr(exc, "code", None) or type(exc).__name__
         message = str(getattr(exc, "message", None) or exc)[:500]
-        try:
-            with store.transaction(self.conn) as conn:
-                store.append_event(
-                    conn, kind="workflow.node_failed", actor=actor, run_id=run_id, subject_kind="workflow",
-                    subject_id=f"{workflow.workflow_id}@{workflow.version}", reason=f"{code}: {message}",
-                    evidence_level="EXECUTION_OBSERVED",
-                    payload={"node": node, "code": code, "message": message,
-                             "continue_with": "gx_run_control action=continue"},
-                )
-        except sqlite3.Error:  # pragma: no cover - the store itself is failing; the raise says why
-            pass
+        with store.transaction(self.conn) as conn:
+            if self._advance_stopped(conn, run_id, advance_id):
+                raise exc
+            failure = {"node": node, "code": code, "message": message, "since": clock.now_iso(),
+                       "continue_with": "gx_run_control action=continue"}
+            store.append_event(conn, kind="workflow.node_failed", actor=actor, run_id=run_id, subject_kind="workflow",
+                               subject_id=f"{workflow.workflow_id}@{workflow.version}", reason=f"{code}: {message}",
+                               evidence_level="EXECUTION_OBSERVED", payload=failure)
+            if isolate:
+                latest = self.checkpointer.latest(conn, run_id)
+                # A failed node can have mutated Python scratch or outputs before its
+                # transaction rolled back. Continue only from the committed snapshot.
+                state.clear()
+                state.update(latest.state)
+                state.setdefault("failed_nodes", {})[node] = failure
+                self.checkpointer.save(conn, run_id=run_id, workflow_id=workflow.workflow_id,
+                                       workflow_version=workflow.version, node=node, state=state)
 
     def _run_node(self, conn: sqlite3.Connection, node: "Node", ctx: "NodeContext", *, run_id: str,
                   workflow: "Workflow", state: dict[str, Any], actor: str, name: str,
                   completed: list[str], result: "NodeResult | None" = None,
-                  computed: bool = False) -> tuple[str, Any]:
+                  computed: bool = False, other_ready: bool = False) -> tuple[str, Any]:
         """One node, inside its transaction: ``("parked", response)``, ``("rewound", None)``
         or ``("done", None)``. Never an exception for an ordinary end: raising inside the
         transaction would roll back the park it describes."""
@@ -1583,22 +1699,11 @@ class Engine:
             if node.work == "stage" and result.interrupt.kind != "stage":
                 raise SchemaInvalid("a stage controller parks under one stage interrupt",
                                     details={"node": name, "kind": result.interrupt.kind})
-            dead_end = self._dead_end(conn, run_id, name, result.interrupt)
-            if dead_end is not None:
-                # The node asks to wait for something nothing open can provide. A run does not
-                # stall silently (design r2.2 §2.5.2): it pauses on what a person or the machine
-                # can clear, and stops, with the reason, when nothing can.
-                if dead_end["needs"]:
-                    return "paused", self._pause(
-                        conn, run_id=run_id, workflow=workflow, state=state, actor=actor, node=name,
-                        reason=dead_end["reason"], needs=dead_end["needs"], decided=dead_end["decision"])
-                return "ended", self._stop(
-                    conn, run_id=run_id, workflow=workflow, state=state, actor=actor, node=name,
-                    reason=dead_end["reason"], rule="quiescent", decided=dead_end["decision"])
-            return "parked", self._park(
+            answer = self._park(
                 conn, run_id=run_id, workflow=workflow, state=state, actor=actor,
-                node=name, interrupt=result.interrupt,
+                node=name, interrupt=result.interrupt, other_ready=other_ready, round_index=ctx.round,
             )
+            return ("parked", answer) if answer is not None else ("branch_wait", None)
         if result.reenter is not None:
             rewound = self._rewind(
                 conn, run_id=run_id, workflow=workflow, state=state, actor=actor,
@@ -1610,7 +1715,7 @@ class Engine:
             # let the graph finish so the run stops explicitly.
         outputs = dict(result.outputs or {})
         if node.work == "stage":
-            conn.execute("UPDATE runs SET phase=NULL WHERE run_id=?",(run_id,))
+            conn.execute("UPDATE runs SET phase=NULL WHERE run_id=? AND phase=?", (run_id, name))
         state.setdefault("outputs", {})[name] = outputs
         completed.append(name)
         state["completed"] = completed
@@ -1673,14 +1778,28 @@ class Engine:
             )
             return False
 
-        cut = order.index(target)
-        keep = [n for n in order[:cut] if n in state.get("completed", [])]
+        affected = {target, node}
+        for name in order:
+            if affected.intersection(workflow.node(name).deps):
+                affected.add(name)
+        keep = [n for n in state.get("completed", ()) if n not in affected]
         dropped = [n for n in state.get("completed", []) if n not in keep]
         state["completed"] = keep
         state["round"] = round_index + 1
         outputs = state.setdefault("outputs", {})
         for name in dropped:
             outputs.pop(name, None)
+        waits = state.get("node_waits", {})
+        # Existing explicit replan owners reconcile Jobs and retire their original
+        # task/interrupt before invoking this method without an advance lease.
+        if not state.get("advance") and not state.get("pending_interrupt"):
+            waits.pop(node, None)
+        for name in affected:
+            if name in waits:
+                waits[name]["reenter_round"] = round_index + 1
+            state.get("failed_nodes", {}).pop(name, None)
+            state.get("resumptions", {}).pop(name, None)
+        state.update(pending_interrupt=None, interrupt_ref=None)
         prev_rev, new_rev = store.bump_revision(conn, run_id)
         store.append_event(
             conn, kind="workflow.reentered", actor=actor, run_id=run_id,
@@ -1699,20 +1818,58 @@ class Engine:
     def _park(
         self, conn: sqlite3.Connection, *, run_id: str, workflow: Workflow,
         state: dict[str, Any], actor: str, node: str, interrupt: InterruptRequest,
-    ) -> dict[str, Any]:
+        other_ready: bool = False, round_index: int | None = None,
+    ) -> dict[str, Any] | None:
+        """Commit this wait with its node effects. Retain the advance while a sibling is ready."""
         interrupt_ref = ids.new_id("interrupt")
-        state["pending_interrupt"] = interrupt.as_dict()
-        state["interrupt_ref"] = interrupt_ref
-        state.pop("advance", None)          # parked: nobody is advancing it any more
+        pending = interrupt.as_dict()
+        wait = branches.wait_record(node, pending, interrupt_ref, clock.now_iso(),
+                                    state.get("round", 0) if round_index is None else round_index, {})
+        state.setdefault("node_waits", {})[node] = wait
+        store.append_event(conn, kind="workflow.node_waiting", actor=actor, run_id=run_id,
+                           subject_kind="workflow", subject_id=f"{workflow.workflow_id}@{workflow.version}",
+                           reason=interrupt.reason, evidence_level="EXECUTION_OBSERVED",
+                           payload={"node": node, "interrupt_ref": interrupt_ref, **pending})
+        wait["controller_ran"] = self._controller_ran(conn, run_id)
+        if not other_ready:
+            return self._park_waits(conn, run_id, workflow, state, actor, just_parked=node)
+        self.checkpointer.save(conn, run_id=run_id, workflow_id=workflow.workflow_id,
+                               workflow_version=workflow.version, node=node, state=state)
+        return None
+
+    def _park_waits(self, conn, run_id, workflow, state, actor, *, just_parked=None):
+        """Maintain the historic single-wait view when no independent node can execute."""
+        waits = state["node_waits"]
+        node = next((name for name in workflow.order if name in waits), next(iter(waits)))
+        wait = waits[node]
+        interrupt_ref, pending = wait["interrupt_ref"], wait["interrupt"]
+        interrupt = InterruptRequest.from_dict(pending)
+        # An unrun sibling could commission the work a waiting node needs. Apply
+        # the existing dead-end rule only when the static graph has no ready node,
+        # with every wait outstanding and no failed branch available for recovery.
+        dead = None if state.get("failed_nodes") else self._dead_end(conn, run_id, node, interrupt)
+        if dead and all(self._outstanding(conn, run_id, InterruptRequest.from_dict(other["interrupt"]),
+                                          strict=True)[0] is not None
+                        for name, other in waits.items() if name != node):
+            del waits[node]
+            if dead["needs"]:
+                return self._pause(conn, run_id=run_id, workflow=workflow, state=state, actor=actor, node=node,
+                                   reason=dead["reason"], needs=dead["needs"], decided=dead["decision"])
+            return self._stop(conn, run_id=run_id, workflow=workflow, state=state, actor=actor, node=node,
+                              reason=dead["reason"], rule="quiescent", decided=dead["decision"])
+        state.update(pending_interrupt=pending, interrupt_ref=interrupt_ref)
+        state.pop("advance", None)
+        if interrupt.kind == "stage":
+            conn.execute("UPDATE runs SET phase=? WHERE run_id=?", (node, run_id))
         store.transition(
             conn, machine=RUN, subject_id=run_id, to_state=interrupt.waiting_state, actor=actor,
             reason=interrupt.reason, evidence_level="EXECUTION_OBSERVED",
             extra_updates={"interrupt_ref": interrupt_ref},
             payload={"node": node, "interrupt_ref": interrupt_ref, **interrupt.as_dict()},
         )
-        # What the node saw when it last ran: a resume that would only show it the same
-        # again is refused (design r2.2 §2.5.4), unless the run has become quiescent.
-        state["controller_ran"] = self._controller_ran(conn, run_id)
+        if just_parked is not None:
+            waits[just_parked]["controller_ran"] = self._controller_ran(conn, run_id)
+        state["controller_ran"] = wait["controller_ran"]
         self.checkpointer.save(
             conn, run_id=run_id, workflow_id=workflow.workflow_id,
             workflow_version=workflow.version, node=node, state=state,
@@ -1781,6 +1938,7 @@ class Engine:
         return needs
 
     def waiting_needs(self, run_id: str, *, conn: sqlite3.Connection | None = None,
+                      interrupt_ref: str | None = None,
                       stage_needs: Sequence[Mapping[str, Any]] | None = None) -> list[dict[str, Any]]:
         """The needs of the run as it now waits (contract r5 ``stage.needs``, and a refused
         resume's details): :meth:`named_needs`, and the approval its pending interrupt waits
@@ -1790,12 +1948,14 @@ class Engine:
         conn = conn or self.conn
         needs = self.named_needs(conn, run_id)
         checkpoint = self.checkpointer.latest(conn, run_id)
-        pending = (checkpoint.state.get("pending_interrupt") if checkpoint is not None else None) or {}
+        ref = interrupt_ref or (checkpoint.state.get("interrupt_ref") if checkpoint else None)
+        wait = self._wait_by_ref(run_id, branches.waits(checkpoint), ref) if ref else {}
+        pending = wait.get("interrupt") or {}
         if pending.get("kind") == "stage":
             if stage_needs is None:
                 workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
                 rule = workflow.stage_rules[str(pending["payload"]["stage"])]
-                stage_needs = rule(conn, run_id, int(checkpoint.state.get("round", 0))).get("needs") or ()
+                stage_needs = rule(conn, run_id, int(wait["round"])).get("needs") or ()
             existing = {ids.canonical_json(item) for item in needs}
             needs.extend(dict(item) for item in stage_needs if ids.canonical_json(item) not in existing)
         approval_ref = pending.get("approval_ref")
@@ -1900,6 +2060,8 @@ class Engine:
         state.pop("advance", None)
         state["pending_interrupt"] = None
         state["interrupt_ref"] = None
+        state["node_waits"] = {}
+        state.pop("resumptions", None)
         self.checkpointer.save(
             conn, run_id=run_id, workflow_id=workflow.workflow_id,
             workflow_version=workflow.version, node=node, state=state,
@@ -1911,6 +2073,9 @@ class Engine:
         node: str, keys: Sequence[str], budget: Mapping[str, Any] | None,
     ) -> dict[str, Any]:
         with store.transaction(self.conn) as conn:
+            stopped = self._advance_stopped(conn, run_id, (state.get("advance") or {}).get("id"))
+            if stopped is not None:
+                return self._response(run_id, node=node, warnings=[stopped], conn=conn)
             # The checkpoint first, so the pause names the checkpoint it continues from and
             # not the one before it (audit ENG-14).
             state.pop("advance", None)

@@ -31,6 +31,24 @@ def current_round(conn: sqlite3.Connection, run_id: str) -> int:
     return int((store.loads(row, "payload_json", {}) or {}).get("round") or 0) if row else 0
 
 
+def open_stage_round(conn: sqlite3.Connection, run_id: str, stage: str) -> int | None:
+    """A stage may be the executing controller or one of several checkpointed waits."""
+    row = conn.execute("SELECT phase FROM runs WHERE run_id=?", (run_id,)).fetchone()
+    if row is None:
+        return None
+    checkpoint = store.latest_checkpoint(conn, run_id)
+    state = store.loads(checkpoint, "state_json", {}) or {}
+    wait = state.get("node_waits", {}).get(stage)
+    if wait and wait["interrupt"]["kind"] == "stage":
+        return int(wait["round"])
+    if row["phase"] == stage and stage not in state.get("failed_nodes", {}):
+        handoff = state.get("resumptions", {}).get(stage)
+        if handoff:
+            return int(handoff["round"])
+        return int(state["round"]) if "round" in state else current_round(conn, run_id)
+    return None
+
+
 def round_start(conn: sqlite3.Connection, run_id: str, index: int) -> int:
     if index == 0:
         return 0
@@ -48,12 +66,26 @@ def task_round(conn: sqlite3.Connection, task_id: str) -> int:
     prior = conn.execute("SELECT payload_json FROM events WHERE run_id=? AND kind='workflow.reentered'"
                          " AND event_id<? ORDER BY event_id DESC LIMIT 1",
                          (row["run_id"], row["event_id"])).fetchone()
-    return int((store.loads(prior, "payload_json", {}) or {}).get("round") or 0) if prior else 0
+    if prior is None:
+        return 0
+    # A controller resumed after an independent rewind can still be expanding
+    # the original stage round. Its own expansion record gives the actual round.
+    expansion = conn.execute(
+        "SELECT json_extract(e.payload_json,'$.round') FROM events e WHERE e.run_id=? "
+        "AND e.kind='schedule.expanded' AND e.event_id>=? AND EXISTS "
+        "(SELECT 1 FROM json_each(e.payload_json,'$.created') WHERE value=?) ORDER BY e.event_id LIMIT 1",
+        (row["run_id"], row["event_id"], task_id)).fetchone()
+    if expansion and expansion[0] is not None:
+        return int(expansion[0])
+    return int((store.loads(prior, "payload_json", {}) or {}).get("round") or 0)
 
 
 def stage_tasks(conn: sqlite3.Connection, run_id: str, stage: str,
                 index: int | None = None) -> list[sqlite3.Row]:
-    index = current_round(conn, run_id) if index is None else index
+    if index is None:
+        index = open_stage_round(conn, run_id, stage)
+        if index is None:
+            index = current_round(conn, run_id)
     rows=list(conn.execute("SELECT * FROM tasks WHERE run_id=? ORDER BY rowid",(run_id,)))
     rounds={row["task_id"]:task_round(conn,row["task_id"]) for row in rows}
     members={row["task_id"] for row in rows if row["stage"]==stage and rounds[row["task_id"]]==index}
@@ -102,9 +134,10 @@ def guard(conn: sqlite3.Connection, run_id: str, *, stage: str | None,
                                           "WAITING_EXTERNAL_JOB", "WAITING_APPROVAL"):
         raise PhaseDenied("tasks expand only while the run is dispatching",
                           details={"run_id": run_id, "status": None if run is None else run["status"]})
-    if stage is not None and run["phase"] != stage:
+    expected_round = open_stage_round(conn, run_id, stage) if stage is not None else current_round(conn, run_id)
+    if stage is not None and expected_round is None:
         raise StaleRevision("the expansion's stage has closed", details={"stage": stage, "phase": run["phase"]})
-    if round_index is not None and current_round(conn, run_id) != round_index:
+    if round_index is not None and expected_round != round_index:
         raise StaleRevision("the expansion's round has closed", details={"round": round_index})
     return run
 

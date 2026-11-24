@@ -167,6 +167,8 @@ enabled = false
 ''')
         env = {key: os.environ[key] for key in ("PATH", "LANG", "LD_LIBRARY_PATH", "http_proxy", "https_proxy",
             "all_proxy", "no_proxy", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY") if key in os.environ}
+        from gx_core.resource_profile import child_resource_environment
+        env.update(child_resource_environment())
         env.update(CODEX_HOME=str(codex_dir), HOME=str(folder), CODEX_APP_SERVER_CHATGPT_BASE_URL=url)
         if source_host:
             env["GX_CODEX_HOST"] = str(Path(source_host).resolve())

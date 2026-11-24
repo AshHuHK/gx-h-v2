@@ -10,6 +10,7 @@ from gx_core.capabilities import storage
 from gx_core.capabilities.shipped import ensure_grid as activate_grid
 from gx_core.context import Ctx, Principal
 from gx_core.jobs.service import JobService, PURPOSE_WORKFLOW
+from gx_core.jobs.run_resources import observe
 from gx_core.persistence import records, store
 
 
@@ -27,14 +28,21 @@ def project_run(conn):
 def prepare(ctx):
     conn = ctx.conn
     project = json.loads((DATA / "project.json").read_text())
-    with store.transaction(conn):
+    existing = project_run(conn)
+    if existing:
+        return existing["run_id"]
+    resources = observe()
+    created = {}
+    with store.transaction(conn, transaction_owner="P01Fixture", operation="prepare_run", created_run=created):
         existing = project_run(conn)
         if existing:
+            created["run_id"] = existing["run_id"]
             return existing["run_id"]
         budget = budgets.create_root(conn, run_id=None, actor=ctx.actor)
         run = records.create_run(conn, objective=project["objective"]["description"],
                                  project_ref=PROJECT, actor=ctx.actor, budget_ref=budget,
-                                 inputs=project, host={"kind": "offline_scripted"})
+                                 inputs=project, host={"kind": "offline_scripted"}, resource_profile=resources)
+        created["run_id"] = run
         for state in ("AUDITING", "PLANNING", "ACTIVE"):
             store.transition(conn, machine="run", subject_id=run, to_state=state, actor=ctx.actor)
         artifacts = storage.artifact_service(conn)

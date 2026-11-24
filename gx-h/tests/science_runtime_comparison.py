@@ -103,6 +103,8 @@ enabled = false
 ''')
         backend = "codex_source_host" if source_host else "codex_app_server"
         env = {k: v for k, v in os.environ.items() if k.lower().endswith("_proxy") or k in ("PATH","LANG")}
+        from gx_core.resource_profile import child_resource_environment
+        env.update(child_resource_environment())
         env.update(CODEX_HOME=str(codex_dir), HOME=str(folder))
         selection = {"CODEX_HOME": str(codex_dir)}
         if source_host:

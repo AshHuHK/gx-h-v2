@@ -17,6 +17,7 @@ from gx_core.orchestration import reactor, service
 from gx_core.orchestration.engine import Engine
 from gx_core.p0 import cli, coordinator, operator, profiles, workspace
 from gx_core.persistence import store
+from tests.resource_scope import controlled_resources
 from tests.test_tl1a_geometry import OfflineIngress
 
 
@@ -33,7 +34,7 @@ class WorkspaceQueueTests(unittest.TestCase):
             self.assertEqual(conn.execute("SELECT count(*) FROM jobs WHERE run_id=?", (run,)).fetchone()[0], 0)
 
     def test_partial_start_waits_for_sibling_job_threads_and_reuses_admitted_work(self):
-        self.enterContext(patch.dict(os.environ, GX_TEST_RESOURCE_PROFILE="deterministic", GX_CODEX_OFFLINE="1"))
+        self.enterContext(patch.dict(os.environ, controlled_resources(), GX_CODEX_OFFLINE="1"))
         state = Path(self.enterContext(tempfile.TemporaryDirectory())) / "state"
         spec = cli.demo_spec()
         # Simulate a submitter that stopped between admission and launch. Its real

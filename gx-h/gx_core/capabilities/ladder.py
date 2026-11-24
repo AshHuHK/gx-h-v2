@@ -311,15 +311,25 @@ def probe_run(ctx: Ctx, view: Mapping[str, Any]) -> str:
             raise ScopeDenied("standalone capability probes need one authorized project or an owning run")
     if not ctx.principal.may_access_project(project):
         raise ScopeDenied("the capability probe project is outside the caller's scope")
-    with store.transaction(conn) as txn:
-        row = txn.execute("SELECT run_id FROM runs WHERE project_ref=? AND objective=?"
-                          " AND workflow_id IS NULL ORDER BY rowid LIMIT 1", (project, objective)).fetchone()
+    find_run = ("SELECT run_id FROM runs WHERE project_ref=? AND objective=?"
+                " AND workflow_id IS NULL ORDER BY rowid LIMIT 1")
+    row = conn.execute(find_run, (project, objective)).fetchone()
+    if row is not None:
+        return row["run_id"]
+    from ..jobs.run_resources import observe
+    resources = observe()
+    created = {}
+    with store.transaction(conn, transaction_owner="Capability", operation="create_probe_run", created_run=created) as txn:
+        row = txn.execute(find_run, (project, objective)).fetchone()
         if row is not None:
-            return row["run_id"]
+            created["run_id"] = row["run_id"]
+            return created["run_id"]
         inputs = {}
         budget_ref = budgets.create_root(txn, run_id=None, actor=ctx.actor)
-        return records.create_run(txn, objective=objective, project_ref=project,
-                                  actor=ctx.actor, budget_ref=budget_ref, inputs=inputs)
+        created["run_id"] = records.create_run(txn, objective=objective, project_ref=project,
+                                               actor=ctx.actor, budget_ref=budget_ref, inputs=inputs,
+                                               resource_profile=resources)
+        return created["run_id"]
 
 
 def materialise(ctx: Ctx, run_id: str, view: Mapping[str, Any], request: Any, *, label: str,

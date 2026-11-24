@@ -21,6 +21,7 @@ from xml.etree import ElementTree
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 from acceptance.closure.profile import test_environment
+from acceptance.closure import profile_scope_case
 
 BASELINE = REPO / "acceptance/phase2a/regression/final-v2/batch/suite/python-full.log"
 BASELINE_REVISION = "78a8b07766376d93a458e5175c41f1f327ff8f36"
@@ -390,6 +391,7 @@ def probe_cases(args, work):
             assert row["refusal"]["details"]["rule"] == "cpu.threads_free" and row["gpu_devices"] == [], row
             assert row["gpu_source"] == "supplied" and len(set(row["admitted_job_ids"])) == 3, row
             assert row["shipped_policy_on_two_cpus"] == 1, row
+            assert row["memory"]["available_mib"] == 4096 and row["resource_profile"]["mode"] == "deterministic", row
     elif case == "T02":
         markers = {"CLAUDECODE": "1", "CLAUDE_CODE_ENTRYPOINT": "profile-test", "CLAUDE_CODE_SESSION_ID": "test-session",
                    "CLAUDE_PROJECT_DIR": "/fixture", "CLAUDE_CODE_EXECPATH": "/fixture/claude",
@@ -410,6 +412,7 @@ def probe_cases(args, work):
         samples = [isolated, marked]
     else:
         row = measure("real-admission", env)
+        assert row["resource_profile"]["source"] == "host" and row["memory"]["source"].startswith("cgroup"), row
         limits = json.loads((REPO / "gx-h/config/limits.json").read_text())["cpu"]
         quota = row["quota_cpus"] or row["logical_cpus"] or 1
         assert row["configured_limits"] == limits and row["cpu_source"] != "deterministic test profile", row
@@ -421,7 +424,7 @@ def probe_cases(args, work):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--case", choices=("T01", "T02", "T03", "REAL_RESOURCES"), required=True)
+    parser.add_argument("--case", choices=("T01", "T02", "T03", "REAL_RESOURCES", "PROFILE-SCOPE"), required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--python", type=Path, default=Path(sys.executable))
     parser.add_argument("--binary", type=Path)
@@ -437,7 +440,8 @@ def main():
         parser.error("output directory must be new or empty")
     try:
         with tempfile.TemporaryDirectory(prefix="gx-case-") as temp:
-            result = (baseline_run if args.case == "T03" else probe_cases)(args, Path(temp))
+            handler = {"T03": baseline_run, "PROFILE-SCOPE": profile_scope_case.run}.get(args.case, probe_cases)
+            result = handler(args, Path(temp))
     except Exception as err:
         import traceback
         (args.out / "exception.log").write_text(traceback.format_exc())

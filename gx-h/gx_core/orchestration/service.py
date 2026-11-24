@@ -586,7 +586,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
             budget_json=profile.get("limits") or {}, constraints=constraints, budget_ref=budget_ref,
             workflow_id=workflow.workflow_id, workflow_version=workflow.version, pins=pins,
             agent_policy_ref=f"{('config/role_policy.codex.json' if policy.get('policy_host') == 'codex' else 'config/role_policy.json')}@{policy_sha}", agent_policy=policy,
-            inputs={"inputs": inputs, "files": files}, host=host,
+            inputs={"inputs": inputs, "files": files}, host=host, resource_profile=resource_profile,
         )
         if p0:
             from ..p0 import team_admission, workspace
@@ -664,6 +664,9 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
                 "coordinator_lease_ref": lease["lease_id"], "admission": admission}
 
     key = store.tool_key("gx_run_start", args["idempotency_key"])
+    from ..jobs.run_resources import observe
+    previous = conn.execute("SELECT 1 FROM idempotency WHERE idempotency_key=?", (key,)).fetchone()
+    resource_profile = None if previous else observe()
     created, replayed = store.run_idempotent(conn, key, "gx_run_start", request, create)
     run_id = created["run_id"]
     # Creation has committed (or this exact request replayed that committed
@@ -1459,6 +1462,7 @@ def run_resume(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
     TeamService(conn, ctx=ctx).lazy(run_id=run_id)
     settled_at = store.current_revision(conn, run_id)
     engine = _engine(ctx, run_id)
+    cpu_sample = engine.cpu_resume_sample(engine.waits(run_id).values(), args["interrupt_ref"])
     # One decision under one write lock (SCHEDULING_DESIGN r2 §2.5.3): who may resume, at which
     # revision, with nothing held, with every interrupt item cleared, and the move to ACTIVE
     # with a checkpoint that no longer waits. A refusal at any step changes nothing -- the
@@ -1474,7 +1478,7 @@ def run_resume(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
         _require_workers_on_policy(tx, run_id, pending)
         begun.update(engine.begin_resume(
             tx, run_id=run_id, interrupt_ref=args["interrupt_ref"],
-            submission_refs=args.get("submission_refs") or [],
+            submission_refs=args.get("submission_refs") or [], cpu_sample=cpu_sample,
             expected_revision=settled_at, actor=ctx.actor,
         ))
         return {"run_id": run_id, "interrupt_ref": args["interrupt_ref"]}

@@ -94,10 +94,24 @@ def cpu_state() -> dict[str, Any]:
 
 
 def memory_state() -> dict[str, Any]:
+    if config.deterministic_test_resources():
+        return {"source": "deterministic test profile", "cgroup_limit_mib": 4096,
+                "cgroup_in_use_mib": 0, "available_mib": 4096}
     limit, current = _read(CGROUP / "memory.max"), _read(CGROUP / "memory.current")
+    maximum = int(limit) // 2**20 if limit and limit.isdigit() else None
+    used = int(current) // 2**20 if current and current.isdigit() else None
+    free = None
+    meminfo = _read(Path("/proc/meminfo")) or ""
+    for line in meminfo.splitlines():
+        if line.startswith("MemAvailable:"):
+            free = int(line.split()[1]) // 1024
+            break
+    if maximum is not None and used is not None:
+        remaining = max(0, maximum - used)
+        free = min(free, remaining) if free is not None else remaining
     return {
-        "cgroup_limit_mib": int(limit) // 2**20 if limit and limit.isdigit() else None,
-        "cgroup_in_use_mib": int(current) // 2**20 if current and current.isdigit() else None,
+        "source": "cgroup v2 memory.max/current and /proc/meminfo",
+        "cgroup_limit_mib": maximum, "cgroup_in_use_mib": used, "available_mib": free,
     }
 
 

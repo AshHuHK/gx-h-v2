@@ -38,6 +38,8 @@ class IdleBackoff(unittest.TestCase):
         self.enterContext(patch.dict(os.environ, {"GX_CODEX_OFFLINE": "1"}))
         self.child_env = {"HOME": str(self.dir), "PATH": os.defpath, "GX_CODEX_OFFLINE": "1",
                           "PYTHONNOUSERSITE": "1", **profiles.proxy_settings()}
+        from gx_core.resource_profile import child_resource_environment
+        self.child_env.update(child_resource_environment())
         self.rid = self.run_record()
 
     def tearDown(self):

@@ -49,6 +49,8 @@ META_CONTRACT_SHA256 = "contract_sha256"
 # --------------------------------------------------------------------------- connect
 
 def connect(path: str | Path | None = None, *, timeout: float = 30.0) -> sqlite3.Connection:
+    from ..jobs.run_resources import process_observation
+    process_observation()
     target = Path(path) if path is not None else config.db_path()
     if str(target) != ":memory:":
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -519,6 +521,7 @@ def _finish_transaction(callbacks: Sequence[Callable[[], None]], *, committed: b
 def transaction(
     conn: sqlite3.Connection, *, transaction_owner: str = "unattributed",
     operation: str = "unattributed", run_id: str | None = None,
+    created_run: dict[str, Any] | None = None,
 ) -> Iterator[sqlite3.Connection]:
     """A re-entrant unit of work.
 
@@ -611,7 +614,7 @@ def transaction(
         else:
             _SAVEPOINT_DEPTH.pop(key, None)
         if timed and released is not None:
-            metrics.record_transaction(transaction_owner, operation, run_id,
+            metrics.record_transaction(transaction_owner, operation, (created_run or {}).get("run_id", run_id),
                                        (acquired - started) / 1_000_000,
                                        (body_end - acquired) / 1_000_000,
                                        (released - body_end) / 1_000_000, result, rows_changed)
@@ -1054,9 +1057,15 @@ def run_idempotent(
     outside (a scheduler, a download) must persist its intent before the outside call
     and reconcile afterwards, which one enclosing transaction cannot do.
     """
-    with transaction(conn, transaction_owner="Store", operation="run_idempotent", run_id=request.get("run_id")) as tx:
+    starting_run = scope == "gx_run_start"
+    created_run = {} if starting_run else None
+    with transaction(conn, transaction_owner="Run" if starting_run else "Store",
+                     operation="run_start" if starting_run else "run_idempotent",
+                     run_id=request.get("run_id"), created_run=created_run) as tx:
         record = begin_idempotent(tx, key, scope, request)
         if record.replay and record.response is not None:
+            if starting_run:
+                created_run["run_id"] = record.response.get("run_id")
             return dict(record.response), True
         if not record.fresh:
             raise OutcomeUnknown(
@@ -1066,6 +1075,8 @@ def run_idempotent(
                          "side_effect_status": record.side_effect_status},
             )
         response = fn(tx)
+        if starting_run:
+            created_run["run_id"] = response["run_id"]
         complete_idempotent(tx, key, response)
         return response, False
 

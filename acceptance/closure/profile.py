@@ -1,9 +1,34 @@
 """Construct an isolated child environment for GX acceptance commands."""
 
+import fcntl
+from functools import lru_cache
 import os
 from pathlib import Path
 import shutil
 import sys
+import tempfile
+import threading
+
+
+_scope_lock = threading.Lock()
+
+
+@lru_cache(maxsize=1)
+def _scope_for_process(pid: int):
+    # The descriptor stays in the launching process. Even children that close all
+    # inherited fds can check the kernel's owner/byte range in /proc/locks.
+    handle = tempfile.TemporaryFile(dir="/tmp")
+    fcntl.lockf(handle, fcntl.LOCK_EX | fcntl.LOCK_NB, 1, 0x47585032)
+    stat = os.fstat(handle.fileno())
+    locator = f"{pid}/{os.major(stat.st_dev):02x}:{os.minor(stat.st_dev):02x}:{stat.st_ino}"
+    return handle, locator
+
+
+def controlled_resources() -> dict[str, str]:
+    """Select fixture resources for this acceptance launcher and its descendants."""
+    with _scope_lock:
+        _, locator = _scope_for_process(os.getpid())
+    return {"GX_TEST_RESOURCE_PROFILE": "deterministic", "GX_ACCEPTANCE_RESOURCE_SCOPE": locator}
 
 
 def test_environment(work: Path, *, profile: str = "deterministic", python: Path | None = None,
@@ -20,7 +45,10 @@ def test_environment(work: Path, *, profile: str = "deterministic", python: Path
     path = [str(Path(python or sys.executable).absolute().parent)]
     if binary is not None:
         path.append(str(Path(binary).absolute().parent))
-    for tool in ("node", "npm", "git", *(("nvidia-smi",) if profile == "real" else ())):
+    if profile == "real":
+        # Prefer the system's GPU driver utility over any incidental tool directory.
+        path.extend(os.defpath.split(os.pathsep))
+    for tool in ("node", "npm", "git"):
         if program := shutil.which(tool):
             path.append(str(Path(program).absolute().parent))
     path.extend(("/usr/local/sbin", "/usr/local/bin", "/usr/sbin", "/usr/bin", "/sbin", "/bin"))
@@ -39,7 +67,7 @@ def test_environment(work: Path, *, profile: str = "deterministic", python: Path
     env.update(proxy)
     env.update({key.lower(): value for key, value in proxy.items()})
     if profile == "deterministic":
-        env.update(GX_TEST_RESOURCE_PROFILE="deterministic", CUDA_VISIBLE_DEVICES="",
+        env.update(controlled_resources(), CUDA_VISIBLE_DEVICES="",
                    OMP_NUM_THREADS="2", OPENBLAS_NUM_THREADS="2", MKL_NUM_THREADS="2")
     elif "CUDA_VISIBLE_DEVICES" in os.environ:
         env["CUDA_VISIBLE_DEVICES"] = os.environ["CUDA_VISIBLE_DEVICES"]

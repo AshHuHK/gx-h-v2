@@ -88,6 +88,7 @@ def snapshot(conn, run_id=None):
     return {
         "project": run["project_ref"], "run_id": rid, "run_key": run["run_key"], "status": run["status"],
         "run_objective": run["objective"],
+        "resource_profile": (store.loads(run, "host_json") or {}).get("resource_profile"),
         "workflow": {"id": run["workflow_id"], "version": run["workflow_version"]},
         **({"plugin_binding": binding} if binding is not None else {}),
         "pause": store.loads(run, "paused_json"),

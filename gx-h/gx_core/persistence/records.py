@@ -35,6 +35,7 @@ def create_run(
     agent_policy: Mapping[str, Any] | None = None,
     inputs: Mapping[str, Any] | None = None,
     host: Mapping[str, Any] | None = None,
+    resource_profile: Mapping[str, Any] | None = None,
 ) -> str:
     """Create a run in its initial state.
 
@@ -46,6 +47,10 @@ def create_run(
     run_id = ids.new_id("run")
     now = clock.now_iso()
     pins = dict(pins or {})
+    if resource_profile is None:
+        from ..jobs.run_resources import process_observation
+        resource_profile = process_observation()
+    host = {**(host or {}), "resource_profile": resource_profile}
     conn.execute(
         "INSERT INTO runs(run_id, project_ref, objective, status, phase, revision, workflow_id,"
         " workflow_version, budget_ref, budget_json, constraints_json, agent_policy_ref,"
@@ -58,7 +63,7 @@ def create_run(
             store._j(constraints or {}), agent_policy_ref, store._j(dict(agent_policy or {})),
             pins.get("contract_version"), pins.get("contract_sha256"),
             pins.get("workflow_sha256"), pins.get("agent_policy_sha256"),
-            store._j(dict(inputs or {})), store._j(dict(host or {})), now, now,
+            store._j(dict(inputs or {})), store._j(host), now, now,
         ),
     )
     store.append_event(
@@ -66,7 +71,8 @@ def create_run(
         subject_id=run_id, new_state=machines.initial_state("run"), new_revision=0,
         evidence_level="EXECUTION_OBSERVED",
         payload={"objective": objective, "project_ref": project_ref,
-                 "workflow": {"id": workflow_id, "version": workflow_version}, "pins": pins},
+                 "workflow": {"id": workflow_id, "version": workflow_version}, "pins": pins,
+                 "resource_profile": resource_profile},
     )
     return run_id
 

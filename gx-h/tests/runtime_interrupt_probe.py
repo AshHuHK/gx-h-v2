@@ -51,6 +51,8 @@ hooks=false
 enabled=false
 ''')
         env = {k: v for k, v in os.environ.items() if k.lower().endswith("_proxy") or k in ("PATH", "LANG")}
+        from gx_core.resource_profile import child_resource_environment
+        env.update(child_resource_environment())
         env.update(CODEX_HOME=tmp, HOME=tmp)
         client = AppServerClient(argv=[str(binary), "--outcome-directory", str(folder / "outcomes")],
                                  cwd=tmp, env=env, default_timeout=15)

@@ -34,11 +34,13 @@ def measure_resources(conn, *, real):
     snapshot = capacity.snapshot(conn)
     cpu = snapshot["cpu"]
     reading = probe.read_gpu_state()
+    stamp = json.loads(conn.execute("SELECT host_json FROM runs WHERE run_id=?", (run,)).fetchone()[0])["resource_profile"]
     result = {"allowed": cpu["threads_allowed_for_jobs"], "logical_cpus": cpu["logical_cpus"],
               "quota_cpus": cpu["cgroup_quota_cpus"], "cpu_source": cpu["source"],
               "configured_limits": config.cpu_limits(), "free": cpu["threads_free"],
               "gpu_source": reading["source"], "gpu_devices": reading["devices"], "gpu_problems": reading["problems"],
-              "affinity_count": len(os.sched_getaffinity(0))}
+              "affinity_count": len(os.sched_getaffinity(0)), "memory": capacity.memory_state(),
+              "run_id": run, "resource_profile": stamp}
     if real:
         job = submit("real-admission")
         ended = jobs.wait(job["job_id"], timeout_seconds=20)

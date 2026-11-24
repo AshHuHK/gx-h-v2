@@ -49,6 +49,8 @@ enabled = false
 enabled = false
 ''')
     env = {k: os.environ[k] for k in ("PATH", "LANG", "LC_ALL", "LD_LIBRARY_PATH") if k in os.environ}
+    from gx_core.resource_profile import child_resource_environment
+    env.update(child_resource_environment())
     env.update(CODEX_HOME=str(home), HOME=str(work), GX_P0_CODEX=codex, GX_P0_TEST="1", GX_P0_TEST_PROVIDER="gx_loopback",
                PYTHONDONTWRITEBYTECODE="1", CODEX_APP_SERVER_CHATGPT_BASE_URL=url)
     from gx_core.p0.profiles import clash_env

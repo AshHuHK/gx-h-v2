@@ -124,7 +124,7 @@ def migrate(conn: sqlite3.Connection) -> str:
             conn.execute(statement)
         _stamp(conn)
     else:
-        with transaction(conn) as tx:
+        with transaction(conn, transaction_owner="Store", operation="migrate_schema") as tx:
             for statement in _ddl_statements():
                 tx.execute(statement)
             _stamp(tx)
@@ -201,7 +201,7 @@ def _resync_same_major(conn: sqlite3.Connection, meta: dict[str, str]) -> None:
                      "installed_contract_sha256": contracts.contract_digest()["__combined__"]},
         )
     previous = meta.get(META_CONTRACT_SHA256)
-    with transaction(conn) as tx:
+    with transaction(conn, transaction_owner="Store", operation="resync_schema") as tx:
         if read_meta(tx).get(META_CONTRACT_SHA256) == contracts.contract_digest()["__combined__"]:
             return  # another process brought it up to date while this one waited for the lock
         for table, clause in additions:
@@ -246,7 +246,7 @@ def ensure_schema(conn: sqlite3.Connection) -> str:
         # look again: of several processes started on a new tree, one creates the store
         # and the others wait here and find it made.
         created = False
-        with transaction(conn) as tx:
+        with transaction(conn, transaction_owner="Store", operation="initialize_schema") as tx:
             meta = read_meta(tx)
             if not meta:
                 others = tx.execute(
@@ -998,7 +998,7 @@ def settle_answer(conn: sqlite3.Connection, key: str, answer: dict[str, Any]) ->
     key -- the first one included -- returns that one, so the same request under the same
     key gets the same answer however many processes sent it. The key must be completed.
     """
-    with transaction(conn) as tx:
+    with transaction(conn, transaction_owner="Store", operation="settle_answer", run_id=answer.get("run_id")) as tx:
         stored = stored_response(tx, key)
         if stored is None:
             raise OutcomeUnknown(f"idempotency key {key!r} has no completed record to settle an answer on",
@@ -1035,7 +1035,7 @@ def run_idempotent(
     outside (a scheduler, a download) must persist its intent before the outside call
     and reconcile afterwards, which one enclosing transaction cannot do.
     """
-    with transaction(conn) as tx:
+    with transaction(conn, transaction_owner="Store", operation="run_idempotent", run_id=request.get("run_id")) as tx:
         record = begin_idempotent(tx, key, scope, request)
         if record.replay and record.response is not None:
             return dict(record.response), True

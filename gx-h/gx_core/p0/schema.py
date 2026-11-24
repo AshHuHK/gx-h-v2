@@ -36,7 +36,7 @@ def install(conn):
         pending.append((key, digest, statements))
     if not pending:
         return
-    with store.transaction(conn) as tx:
+    with store.transaction(conn, transaction_owner="Store", operation="install_p0_schema") as tx:
         for key, digest, statements in pending:
             row = tx.execute("SELECT value FROM schema_meta WHERE key=?", (key,)).fetchone()
             if row and row[0] == digest:

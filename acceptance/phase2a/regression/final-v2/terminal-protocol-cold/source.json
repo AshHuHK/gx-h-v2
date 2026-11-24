@@ -1,0 +1,168 @@
+{
+  "product_commit": "c15eada9611f60519bafbb3366c908629dbea157",
+  "product_tree_sha": "13ac06f15406a561969dfe51621089912deeaacc",
+  "fixture_commit": "ad327cd97e30fbf1f009ae43addb5a8734b78446",
+  "fixture_sha256": "dfb5f21fc86f53e540a45f5e8062c66a4ee1832a2612b33f9c033e20ea6b0a84",
+  "only_tracked_difference": "acceptance/v31/terminal_protocol_probe.py",
+  "driver_sha256": "53143f20a2f096150deb4979bc2060e4355038e8ca7c33027b3b720544c390c4",
+  "runs": {
+    "released-drop": {
+      "network_receipt": "released-drop-network.json",
+      "network_sha256": "1dcd78d65788bb9b270ef1c293ef0add7e159bd371de6c2d0d54986f5db903eb",
+      "log": "released-drop.log",
+      "log_sha256": "23ca76ba6b42e0f80281fffef4745070e743e2a7e63c92ba8995a8f70358c024",
+      "exit_code": 0,
+      "argv": [
+        "/tmp/gx-p2a-reg-die9z444/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_protocol_probe.py",
+        "--repetitions",
+        "1",
+        "--only",
+        "lost_usage",
+        "--output",
+        "/tmp/gx-terminal-usage-Ls4BFV/released-drop.json"
+      ],
+      "result": "released-drop.json",
+      "result_sha256": "949f04598e7595c0a050aa7366ce2b81e0bee3bb7f7b3b3cd034f36810d87524",
+      "trial_count": 1,
+      "passed": true,
+      "trace": "GX_ABORT_0001",
+      "thread_id": "01a20b1b-19c7-7522-9970-2f6267b97505",
+      "turn_id": "01a20b1b-1a19-7451-8e1d-ddc4e868321d",
+      "withheld": [
+        {
+          "method": "thread/tokenUsage/updated",
+          "turn_id": "01a20b1b-1a19-7451-8e1d-ddc4e868321d",
+          "tokens": 35
+        }
+      ],
+      "cold": {
+        "thread_id": "01a20b1b-19c7-7522-9970-2f6267b97505",
+        "turn_id": "01a20b1b-1a19-7451-8e1d-ddc4e868321d",
+        "snapshots": [
+          35
+        ],
+        "turns_started": [],
+        "original_unsubscribe": "unsubscribed",
+        "original_host_exit": 0,
+        "goal_status": "complete",
+        "goals_enabled": false,
+        "new_model_requests": []
+      },
+      "final_meter": {
+        "reservation_ref": "rsv_01m85hp6gm1vhj1sre",
+        "budget_status": "SETTLED",
+        "confidence": "PROVIDER_CONFIRMED",
+        "terminal_status": "interrupted",
+        "measured_tokens": 35,
+        "settled_tokens": 35,
+        "estimated_at": null,
+        "metering_reason": null
+      },
+      "settlements": [
+        {
+          "event_id": 19,
+          "tokens": 35
+        }
+      ]
+    },
+    "released-cases": {
+      "network_receipt": "released-cases-network.json",
+      "network_sha256": "4236f3100b74f78cd2aac6ac92841e84636b074c32a67ab98fe50708fed04808",
+      "log": "released-cases.log",
+      "log_sha256": "90c98a2a7c845171cb936633a30002141952b2f3825f2fbeb116b389d6eb7fd2",
+      "exit_code": 0,
+      "argv": [
+        "/tmp/gx-p2a-reg-die9z444/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_protocol_probe.py",
+        "--repetitions",
+        "100",
+        "--output",
+        "/tmp/gx-terminal-usage-Ls4BFV/released-cases.json"
+      ],
+      "result": "released-cases.json",
+      "result_sha256": "1f6de37e21a1e5b968c62a989b16ff98dff43d8512e78c90d53908e5dbc8883b",
+      "trial_count": 204,
+      "passed": true
+    },
+    "released-cases-b": {
+      "network_receipt": "released-cases-b-network.json",
+      "network_sha256": "0a04b970b6c5dd1db1e0aee354292123f4dfc052eab159db486ff2a2271ae251",
+      "log": "released-cases-b.log",
+      "log_sha256": "c6169b3202f67bb64d29602d71e7a9ac847511b106fbb31bef50a2d3e1a32110",
+      "exit_code": 1,
+      "argv": [
+        "/tmp/gx-p2a-reg-die9z444/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_protocol_probe.py",
+        "--repetitions",
+        "100",
+        "--output",
+        "/tmp/gx-terminal-usage-Ls4BFV/released-cases-b.json"
+      ],
+      "trace": "GX_ABORT_0005",
+      "thread_id": "01a20b1b-291f-7fa1-bb5b-44820aa6e1d4",
+      "turn_id": "01a20b1b-2a2b-7901-bf25-9b98f69e8c16",
+      "last_measured_ledger_before_cold": {
+        "reservation_ref": "rsv_01m85hpah1njf8szsv",
+        "budget_status": "HELD",
+        "confidence": "RESERVED",
+        "terminal_status": "interrupted",
+        "measured_tokens": 35,
+        "settled_tokens": null,
+        "estimated_at": null,
+        "metering_reason": "missing cumulative usage for this turn"
+      },
+      "cold": {
+        "thread_id": "01a20b1b-291f-7fa1-bb5b-44820aa6e1d4",
+        "turn_id": "01a20b1b-2a2b-7901-bf25-9b98f69e8c16",
+        "snapshots": [],
+        "turns_started": [],
+        "original_unsubscribe": "unsubscribed",
+        "original_host_exit": 0,
+        "goal_status": "complete",
+        "goals_enabled": false,
+        "new_model_requests": []
+      },
+      "live_events": [
+        {
+          "seq": 162,
+          "t": 29802122.812697046,
+          "method": "rawResponseItem/completed",
+          "thread": "01a20b1b-291f-7fa1-bb5b-44820aa6e1d4",
+          "turn": "01a20b1b-2a2b-7901-bf25-9b98f69e8c16",
+          "type": "function_call",
+          "name": "gx_submit_product",
+          "call_id": "call-probe-response-5"
+        },
+        {
+          "seq": 163,
+          "t": 29802122.813135937,
+          "method": "rawResponse/completed",
+          "thread": "01a20b1b-291f-7fa1-bb5b-44820aa6e1d4",
+          "turn": "01a20b1b-2a2b-7901-bf25-9b98f69e8c16",
+          "response_id": "probe-response-5",
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 172,
+          "t": 29802123.693693444,
+          "method": "turn/completed",
+          "thread": "01a20b1b-291f-7fa1-bb5b-44820aa6e1d4",
+          "turn": "01a20b1b-2a2b-7901-bf25-9b98f69e8c16",
+          "status": "interrupted",
+          "error": null
+        }
+      ]
+    }
+  }
+}

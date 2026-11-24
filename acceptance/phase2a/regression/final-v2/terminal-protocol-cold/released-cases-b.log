@@ -1,0 +1,12 @@
+WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir "/tmp" (codex_home: AbsolutePathBuf("/tmp/gx-terminal-wire-jff8dk_o/peer/codex-home"))
+Traceback (most recent call last):
+  File "/tmp/gx-terminal-usage-Ls4BFV/release/acceptance/v31/terminal_protocol_probe.py", line 512, in <module>
+    result = run(args.repetitions, args.only)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-terminal-usage-Ls4BFV/release/acceptance/v31/terminal_protocol_probe.py", line 484, in run
+    trial = trial_run(roots, reader, peer, index, expected, fault, proposal, evidence)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-terminal-usage-Ls4BFV/release/acceptance/v31/terminal_protocol_probe.py", line 394, in trial_run
+    assert trial["cold_usage"]["snapshots"], (marker, unsettled, trial["cold_usage"], trial["events"])
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+AssertionError: ('GX_ABORT_0005', {'reservation_ref': 'rsv_01m85hpah1njf8szsv', 'budget_status': 'HELD', 'confidence': 'RESERVED', 'terminal_status': 'interrupted', 'measured_tokens': 35, 'settled_tokens': None, 'estimated_at': None, 'metering_reason': 'missing cumulative usage for this turn'}, {'thread_id': '01a20b1b-291f-7fa1-bb5b-44820aa6e1d4', 'turn_id': '01a20b1b-2a2b-7901-bf25-9b98f69e8c16', 'snapshots': [], 'turns_started': [], 'original_unsubscribe': 'unsubscribed', 'original_host_exit': 0, 'goal_status': 'complete', 'goals_enabled': False, 'new_model_requests': []}, [{'seq': 162, 't': 29802122.812697046, 'method': 'rawResponseItem/completed', 'thread': '01a20b1b-291f-7fa1-bb5b-44820aa6e1d4', 'turn': '01a20b1b-2a2b-7901-bf25-9b98f69e8c16', 'type': 'function_call', 'name': 'gx_submit_product', 'call_id': 'call-probe-response-5'}, {'seq': 163, 't': 29802122.813135937, 'method': 'rawResponse/completed', 'thread': '01a20b1b-291f-7fa1-bb5b-44820aa6e1d4', 'turn': '01a20b1b-2a2b-7901-bf25-9b98f69e8c16', 'response_id': 'probe-response-5', 'usage': {'totalTokens': 35, 'inputTokens': 30, 'cachedInputTokens': 0, 'cacheWriteInputTokens': 0, 'outputTokens': 5, 'reasoningOutputTokens': 0}}, {'seq': 172, 't': 29802123.693693444, 'method': 'turn/completed', 'thread': '01a20b1b-291f-7fa1-bb5b-44820aa6e1d4', 'turn': '01a20b1b-2a2b-7901-bf25-9b98f69e8c16', 'status': 'interrupted', 'error': None}])

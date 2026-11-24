@@ -163,6 +163,10 @@ def experiment(args):
         if not probe("schema-transport", "v31/schema_transport.py"):
             shutil.copyfile(stage / "acceptance/v31/schema-transport.json", out / "schema-transport.json")
 
+    def extra_child_observation():
+        return run("extra-child-observation", python, "-B", Path(__file__).with_name("standalone_child.py"),
+                   "--stage", stage, "--out", out / "extra-child")
+
     def protocol():
         return probe("terminal-protocol", "v31/terminal_protocol_probe.py", "--repetitions", "100",
                      "--output", out / "terminal-protocol.json")
@@ -177,7 +181,7 @@ def experiment(args):
             raise ValueError("baseline preflight uses the original phase baseline")
         jobs = [historical, lambda: child(True)]
     else:
-        jobs = [broad, protocol, at2_cold, surface, public_grid, briefs, child, lambda: child(True), historical]
+        jobs = [broad, protocol, at2_cold, surface, public_grid, briefs, child, lambda: child(True), historical, extra_child_observation]
     errors = []
     with ThreadPoolExecutor(max_workers=3) as pool:
         futures = [pool.submit(job) for job in jobs]

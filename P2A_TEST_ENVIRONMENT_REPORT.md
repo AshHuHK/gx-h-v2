@@ -19,7 +19,9 @@
 
 用例身份来自 frozen final-v2 的原始 `python-full.log`，SHA-256 为 `1f3b2d106f3b125b8ec5dafaa89ee1a6b4605f25dd88196d64abf52706a483fd`。复跑使用相同的 Python 3.11、哈希锁定的本地 NumPy/Biopython wheels、离线 Cordis 和 Codex 0.169.0。原始日志中的四个跳过是两个可选 DSH activity 用例和两个 DSH runtime 用例。本次逐项结果保存在压缩包的 `T03/evidence/baseline-465.json`，其中每行保留身份、基线结果、实测结果及跳过原因。旧的 42 项登记在相邻的 `original-42.json`，保留预期数量、缺失来源和空的已识别集合。[原依赖摘要](acceptance/phase2a/regression/final-v2/batch/dependencies.json) · [本次原始证据](acceptance/closure/profile-history/20261124T111105Z-ebd13f73e167/raw.tar.gz)
 
-按身份复核能够读取原始 unittest 失败段、pytest 的失败摘要，或包含 `test_id` 及可选 `original_error` 的 JSON 列表。同一测试方法的多个 subTest 保留各自原始标题。保留的 v3.1 失败日志实际包含 6 个失败标题、3 个不同方法，读取器逐项对应这 6 个标题。该历史运行有 428 个测试，故只能用于核验读取器。原始异常和实测对照共同说明环境原因时，可归为 `environment`。JSON 也可携带独立复核给出的 `classification`、`reason` 和 `evidence` 文件，原判与证据摘要会一并保留，支持 `environment`、`fixture`、`regression`、`unresolved`。单独看到这次通过会保留 `unresolved`。[复核实现](acceptance/closure/profile_cases.py) · [真实 subTest 失败日志](acceptance/v31/regression-b2/python-full.log)
+独立复查覆盖用户 ZIP、相邻 GX 包、Git 历史记录及本地测试和复核日志。保留的两轮 Phase 2A 都有相同的 465 个身份，各自记录 461 通过、4 跳过。更早的 465 项运行属于不同套件。当前缺失的是报告 42 个失败的那一次输出。[第一轮 Phase 2A 原始日志](acceptance/phase2a/regression/final/batch/suite/python-full.log) · [最终冻结版日志](acceptance/phase2a/regression/final-v2/batch/suite/python-full.log)
+
+按身份复核能够读取原始 unittest 失败段、pytest 的失败摘要、JUnit XML，或包含 `test_id` 及可选 `original_error` 的 JSON 列表。同一测试方法的多个 subTest 保留各自原始标题。保留的 v3.1 失败日志实际包含 6 个失败标题、3 个不同方法，读取器逐项对应这 6 个标题。该历史运行有 428 个测试，故只能用于核验读取器。原始异常和实测对照共同说明环境原因时，可归为 `environment`。JSON 也可携带独立复核给出的 `classification`、`reason` 和 `evidence` 文件，原判与证据摘要会一并保留，支持 `environment`、`fixture`、`regression`、`unresolved`。单独看到这次通过会保留 `unresolved`。[复核实现](acceptance/closure/profile_cases.py) · [真实 subTest 失败日志](acceptance/v31/regression-b2/python-full.log)
 
 ## 复跑与校验
 

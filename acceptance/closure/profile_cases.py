@@ -16,6 +16,7 @@ import subprocess
 import sys
 import tempfile
 from unittest.mock import patch
+from xml.etree import ElementTree
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
@@ -66,7 +67,7 @@ def unittest_rows(text):
 
 
 def original_failures(path):
-    """Import original unittest tracebacks, pytest summary lines, or a JSON list of identities."""
+    """Import original unittest/pytest logs, JUnit reports, or a JSON failure list."""
     text = path.read_text()
     reviews = {}
     if path.suffix.lower() == ".json":
@@ -91,6 +92,15 @@ def original_failures(path):
                         review.update(classification="unresolved", original_claim=category,
                                       reason=f"The evidence file for the supplied {category} classification is unavailable.")
                     reviews[item.get("original_id", item["test_id"])] = review
+    elif path.suffix.lower() == ".xml":
+        values = []
+        document = ElementTree.fromstring(text)
+        for test in document.iter("testcase"):
+            identity = ".".join(filter(None, [test.get("classname"), test.get("name")]))
+            for error in test:
+                if error.tag in {"failure", "error"}:
+                    trace = "\n".join([error.get("message", ""), error.text or ""])
+                    values.append((f"{error.tag}: {identity}", identity, trace))
     else:
         values = []
         for block in re.split(r"^={6,}\s*$", text, flags=re.M):
@@ -106,6 +116,10 @@ def original_failures(path):
         if "::" in name:
             module, *parts = name.split("::")
             name = ".".join([Path(module).stem, *parts]).split("[", 1)[0]
+        # Some JUnit writers keep test-package prefixes and parameter suffixes.
+        method = re.search(r"(?:^|\.)(test_\w+\.\w+\.test_\w+)(?:$|\[|\s)", name)
+        if method:
+            name = method[1]
         if original_id in result:
             raise ValueError(f"duplicate original failure {original_id}")
         result[original_id] = (name, trace or "", reviews.get(original_id))
@@ -205,7 +219,7 @@ def baseline_run(args, work):
     if source:
         try:
             imported = original_failures(source)
-        except (OSError, KeyError, TypeError, ValueError) as err:
+        except (OSError, KeyError, TypeError, ValueError, ElementTree.ParseError) as err:
             import_issue = f"Unable to read the supplied original failure records: {err}"
     verdicts = []
     for original_id, (name, trace, review) in imported.items():
@@ -328,7 +342,7 @@ def main():
     parser.add_argument("--binary", type=Path)
     parser.add_argument("--commit", default="HEAD", help="Git revision whose isolated Python suite will run")
     parser.add_argument("--suite-evidence", type=Path, help="reuse a matching fresh deterministic Python suite receipt")
-    parser.add_argument("--original-failures", type=Path, help="original dated unittest/pytest log or JSON identities")
+    parser.add_argument("--original-failures", type=Path, help="original unittest/pytest log, JUnit XML, or JSON identities")
     args = parser.parse_args()
     args.out = args.out.resolve()
     args.python = args.python.absolute()

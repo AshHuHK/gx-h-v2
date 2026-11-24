@@ -130,6 +130,7 @@ class Wire:
         self.pending = {}
         self.withheld = deque()
         self.replay = False
+        self.deferred_interrupt = None
 
     def write_line(self, line, timeout):
         msg = json.loads(line)
@@ -145,7 +146,21 @@ class Wire:
                            "dropped": not writes and self.trial["fault"] == "lost_interrupt"})
             if writes[-1]["dropped"]:
                 return
+            if self.trial["fault"] == "lost_receipts_in_progress" and len(writes) == 1:
+                self.deferred_interrupt = line
+                return
         self.real.write_line(line, timeout)
+
+    def release_original_interrupt(self, history):
+        if self.deferred_interrupt is None:
+            return
+        msg = json.loads(self.deferred_interrupt)
+        params = msg["params"]
+        assert (params["threadId"], params["turnId"], history["id"], history["status"]) == (
+            self.trial["thread_id"], self.trial["turn_id"], self.trial["turn_id"], "inProgress")
+        self.real.write_line(self.deferred_interrupt, timeout=2)
+        self.deferred_interrupt = None
+        self.trial["original_interrupt_released_after_history"] = {"id": msg["id"], "params": params, "t": time.monotonic()}
 
     def read_line(self, timeout):
         deadline = time.monotonic() + timeout
@@ -159,7 +174,8 @@ class Wire:
             msg = json.loads(line)
             method = msg.get("method")
             interrupt_ack = not method and msg.get("id") in self.pending
-            complete = (method == "turn/completed" and msg["params"]["turn"]["id"] == self.trial.get("turn_id"))
+            complete = (method == "turn/completed" and (msg["params"]["threadId"], msg["params"]["turn"]["id"])
+                        == (self.trial.get("thread_id"), self.trial.get("turn_id")))
             if interrupt_ack:
                 self.trial["server_interrupt_replies"].append(msg)
             if (self.trial["fault"] in ("delayed_usage", "lost_usage") and method == "thread/tokenUsage/updated"
@@ -184,10 +200,11 @@ class Wire:
                 if matched and call and (raw or live):
                     self.trial["injected_receipt_faults"].append({"method": method, "params": params})
                     continue
-            if (interrupt_ack or complete) and self.trial["fault"] in ("lost_receipts", "delayed_receipts"):
+            if (interrupt_ack or complete) and self.trial["fault"] in (
+                    "lost_receipts", "delayed_receipts", "lost_receipts_in_progress"):
                 self.trial["injected_receipt_faults"].append(
-                    {"method": method or "turn/interrupt reply", "id": msg.get("id"),
-                     "status": msg.get("params", {}).get("turn", {}).get("status")})
+                    {"method": method or "turn/interrupt reply", "id": msg.get("id"), "thread": self.trial["thread_id"],
+                     "turn": self.trial["turn_id"], "status": msg.get("params", {}).get("turn", {}).get("status")})
                 if self.trial["fault"] == "delayed_receipts":
                     self.withheld.append(line)
                 continue
@@ -434,34 +451,56 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence, 
         assert goal["goal"]["status"] == "complete"
         trial["goal_complete_at"] = time.monotonic()
         time.sleep(delay_ms / 1000)
-        def read_turn():
+        def read_turn(timeout=None):
             turns = client.request("thread/turns/list", {"threadId": thread, "sortDirection": "desc",
-                                   "itemsView": "full", "limit": 2})["data"]
+                                   "itemsView": "full", "limit": 2}, timeout=timeout)["data"]
             return next(item for item in turns if item["id"] == turn)
+
+        def history_observation(native_turn):
+            return {"thread_id": thread, "turn_id": native_turn["id"], "status": native_turn["status"],
+                    "items": [{"id": i["id"], "tool": i.get("tool"), "status": i.get("status")}
+                              for i in native_turn["items"] if i["type"] == "dynamicToolCall"],
+                    "observed_at": time.monotonic()}
         def terminal(frame):
             msg = frame.message
             return (msg.get("method") == "turn/completed" and msg["params"]["threadId"] == thread
                     and msg["params"]["turn"]["id"] == turn)
         interrupt = client.send("turn/interrupt", params)
         try:
-            client.run_until(terminal, timeout=0.18 if fault in ("lost_interrupt", "lost_receipts",
-                                                                 "delayed_receipts") else 8)
+            client.run_until(terminal, timeout=0.18 if fault in (
+                "lost_interrupt", "lost_receipts", "delayed_receipts", "lost_receipts_in_progress") else 8)
         except AppServerTimeout:
             history = read_turn()
             assert submissions(reader, task) == [trial["committed"]]
-            trial["fallback_observations"].append({"turn_id": history["id"], "status": history["status"],
-                "items": [{"id": i["id"], "status": i.get("status")} for i in history["items"]
-                          if i["type"] == "dynamicToolCall"], "submission_id": trial["committed"]["submission_id"]})
-            if history["status"] == "inProgress":
+            first = history_observation(history)
+            trial["fallback_observations"].append({**first, "submission_id": trial["committed"]["submission_id"]})
+            trail = trial["interrupt_history"] = [first]
+            wire.release_original_interrupt(history)  # Only the deterministic in-progress timing control delays this write.
+            if fault == "lost_interrupt":
+                assert history["status"] == "inProgress" and trial["interrupt_writes"][0]["dropped"]
+                assert not trial["tool_responses_written"] and not any(
+                    i["id"] == trial["call_id"] and i.get("status") in ("failed", "completed") for i in first["items"])
                 interrupt = client.send("turn/interrupt", params)
-                client.run_until(terminal, timeout=8)
-            else:
-                assert history["status"] == "interrupted", history
+            # Acknowledgement loss can leave the real Turn in progress while the tool is
+            # already cancelled. Query the original Turn until its authoritative terminal
+            # state is visible; its deliberately lost notification cannot wake the caller.
+            deadline = time.monotonic() + 8
+            while history["status"] == "inProgress":
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise AppServerTimeout(f"original Turn still in progress after interrupt: {trail[-1]}")
+                client.run_until(terminal, timeout=remaining, poll_interval=min(.1, remaining))
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise AppServerTimeout(f"original Turn has no final history before deadline: {trail[-1]}")
+                history = read_turn(timeout=remaining)
+                trail.append(history_observation(history))
+            assert history["status"] == "interrupted", history
         if fault == "delayed_receipts":
             wire.replay = True
             client.run_until(terminal, timeout=5)
             client.wait(interrupt, timeout=2)
-        elif fault != "lost_receipts":
+        elif fault not in ("lost_receipts", "lost_receipts_in_progress"):
             client.wait(interrupt, timeout=2)
         history = read_turn()
         cancelled = [i for i in history["items"] if i["type"] == "dynamicToolCall" and i["id"] == trial["call_id"]]
@@ -532,8 +571,18 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence, 
             "SELECT settlement_id,kind FROM science_settlements WHERE task_id=? AND kind IN "
             "('infrastructure_failure','agent_execution_failure')", (task,))]
         assert not trial["root_failures"]
-        if fault in ("lost_interrupt", "lost_receipts", "delayed_receipts"):
+        if fault in ("lost_interrupt", "lost_receipts", "delayed_receipts", "lost_receipts_in_progress"):
             assert len(trial["fallback_observations"]) == 1
+        if fault == "lost_receipts_in_progress":
+            assert trial["interrupt_history"][0]["status"] == "inProgress"
+            assert trial["interrupt_history"][-1]["status"] == "interrupted"
+            assert trial["original_interrupt_released_after_history"]["id"] == interrupt
+        if fault in ("lost_receipts", "lost_receipts_in_progress"):
+            hidden = trial["injected_receipt_faults"]
+            assert [r["id"] for r in hidden if r["method"] == "turn/interrupt reply"] == [interrupt], hidden
+            assert trial["server_interrupt_replies"] == [{"id": interrupt, "result": {}}]
+            assert [(r["thread"], r["turn"], r["status"]) for r in hidden if r["method"] == "turn/completed"] == [
+                (thread, turn, "interrupted")], hidden
         assert len(trial["interrupt_writes"]) == (2 if fault == "lost_interrupt" else 1)
         if "cold_usage" not in trial:
             client.request("thread/unsubscribe", {"threadId": thread})
@@ -570,6 +619,8 @@ def run(repetitions, only=None, *, closure_usage=False, runtime=PACKAGE, partial
                          ("ACCEPTED", "delayed_receipts"), ("ACCEPTED", "running_child")])
         if only in ("delayed_usage", "lost_usage", "lost_raw_cancel", "lost_cancel_mirrors"):
             sequence = [("ACCEPTED", only)]
+        elif only == "lost_receipts_in_progress":
+            sequence = [("REJECTED", only)]
         elif only:
             sequence = [case for case in sequence if case[1] == only]
         results, run_ids = [], []
@@ -626,7 +677,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repetitions", type=int, default=100, help="repetitions per accepted/rejected outcome")
     parser.add_argument("--only", choices=("none", "lost_interrupt", "lost_receipts",
-                                          "delayed_receipts", "running_child", "delayed_usage", "lost_usage", "lost_raw_cancel", "lost_cancel_mirrors"))
+                                          "delayed_receipts", "running_child", "delayed_usage", "lost_usage", "lost_raw_cancel", "lost_cancel_mirrors",
+                                          "lost_receipts_in_progress"))
     parser.add_argument("--output", type=Path, default=Path(__file__).with_name("terminal-protocol.json"))
     parser.add_argument("--runtime", type=Path, default=PACKAGE, help="Directory containing the locked unpacked native runtime")
     parser.add_argument("--closure-usage", action="store_true",

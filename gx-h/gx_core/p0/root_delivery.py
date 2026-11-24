@@ -419,7 +419,8 @@ class RootDelivery:
             raise HoldActive("waiting for the preceding Codex turn's usage and descendants",
                              details={**dict(pending), "reason": "native_usage_pending"})
         previous = self.conn.execute("SELECT * FROM p0_meter_native_turns WHERE thread_id=? "
-            "AND budget_status='SETTLED' ORDER BY sequence DESC LIMIT 1",(thread_id,)).fetchone()
+            "AND (budget_status='SETTLED' OR (budget_status='RELEASED' AND attribution='TURN')) "
+            "ORDER BY sequence DESC LIMIT 1",(thread_id,)).fetchone()
         if previous and previous["estimated_at"] is None and (
                 previous["terminal_status"] is None or previous["total_tokens"] is None):
             raise HoldActive("the preceding charged turn lacks its cumulative baseline", details={

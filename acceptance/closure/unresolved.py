@@ -1,7 +1,8 @@
 """Run offline operator usage decisions against disk-backed GX stores and save the evidence."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import closing
+from contextlib import closing, redirect_stdout
+import io
 import json
 from pathlib import Path
 import sys
@@ -12,9 +13,10 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT/"gx-h"), str(ROOT/"gx-h/tests")]
 from gx_core import budgets
+from gx_core.context import Principal
 from gx_core.domain import clock
 from gx_core.errors import PermissionDenied, SchemaInvalid, StaleRevision
-from gx_core.p0 import driver, metering, operator, schema
+from gx_core.p0 import cli, metering, operator, schema
 from gx_core.p0.profiles import CODEX_VERSION
 from gx_core.persistence import records, store
 from test_p0_meter_recovery import TurnMeterTests, Peer, RootDelivery
@@ -91,7 +93,17 @@ class OperatorUsage(unittest.TestCase):
         ref,_=self.unresolved()
         self.assertEqual(metering.policy(self.db,self.new_run("defaults"))["unresolved_alert_seconds"],[3600,86400,259200])
         other=self.new_run("different",[10,20,30])
-        self.assertEqual(metering.policy(self.db,other)["unresolved_alert_seconds"],[10,20,30])
+        second_budget=budgets.create_root(self.db,run_id=other,profile_name="p0",actor="fixture",limits={"api_calls":2})
+        self.db.execute("UPDATE runs SET budget_ref=? WHERE run_id=?",(second_budget,other))
+        other_hold=budgets.reserve(self.db,budget_ref=second_budget,subject_kind="native_turn",subject_id="other-input",
+                                   amounts={"api_calls":1},actor="fixture")["reservation_ref"]
+        self.db.execute("INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,human,interrupt,state,"
+            "method,turn_id,reservation_ref) VALUES(?,'other-input','other-root','other-client','digest',0,0,'acknowledged',"
+            "'turn/start','other-turn',?)",(other,other_hold))
+        self.db.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,terminal_status) VALUES('other-root','other-turn','completed')")
+        metering.maintain(self.db,other)
+        clock.advance(1.1)
+        metering.maintain(self.db,other)
         original=budgets.state(self.db,self.f.budget)
         for n in (2,2,2):
             clock.advance(n)
@@ -105,6 +117,10 @@ class OperatorUsage(unittest.TestCase):
             again=operator.submit(operator.local_context(conn),self.run,{"kind":"usage"},"status")["result"]["metering"]
             self.assertEqual(again["unresolved_alerts"],alerts)
         self.assertEqual(self.db.execute("SELECT count(*) FROM events WHERE kind='usage.unresolved_alert'").fetchone()[0],3)
+        self.assertEqual(metering.inspect(self.db,other)["unresolved_alerts"],[])
+        clock.advance(4.1)
+        metering.maintain(self.db,other)
+        self.assertEqual([a["threshold_seconds"] for a in metering.inspect(self.db,other)["unresolved_alerts"]],[10])
         for bad in ([],[2,1,3],[1,1,2],[True,2,3],[0,2,3]):
             with self.assertRaises(SchemaInvalid):
                 metering.validate_policy({"unresolved_alert_seconds":bad})
@@ -118,6 +134,15 @@ class OperatorUsage(unittest.TestCase):
             self.act(ref,"attach-evidence","wrong",thread_id="foreign",turn_id=turn,response_id="observed")
         with self.assertRaises(SchemaInvalid):
             self.act(ref,"attach-evidence","amount",thread_id="root",turn_id=turn,response_id="observed",tokens=999)
+        local=operator.local_context(self.db)
+        with self.assertRaises(PermissionDenied):
+            operator.submit(local.child(principal=Principal("another","operator",("other-project",),source="local_operator")),
+                            self.run,{"kind":"usage_resolve","decision":"keep-unresolved","reason":"no scope","reservation_ref":ref},"forbidden")
+        evidence_action={"kind":"usage_resolve","decision":"keep-unresolved","reservation_ref":ref,"reason":"queued by first operator"}
+        first=local.child(principal=Principal("original-operator",local.principal.scope,local.principal.project_refs,source="local_operator"))
+        operator.submit(first,self.run,evidence_action,"queued-key",queue_only=True)
+        replay=operator.submit(local,self.run,evidence_action,"queued-key")["result"]
+        self.assertEqual(replay["operator_subject"],"original-operator")
         attached=self.act(ref,"attach-evidence","genuine",thread_id="root",turn_id=turn,response_id="observed")
         self.assertEqual(attached["evidence"]["tokens"],17)
         waiting=self.act(ref,"reconcile","not-ready")
@@ -126,6 +151,28 @@ class OperatorUsage(unittest.TestCase):
         self.assertEqual(kept,self.act(ref,"keep-unresolved","keep"))
         self.assertEqual(budgets.state(self.db,self.f.budget),old_budget)
         self.snapshot("receipt_incomplete")
+
+    def test_disputed_measurement_releases_only_uncontested_receipts(self):
+        turn = self.f.start()
+        self.f.raw(turn,"uncontested",17)
+        self.f.raw(turn,"conflicting",90)
+        self.f.complete()
+        self.f.raw(turn,"conflicting",100)
+        clock.advance(2)
+        metering.maintain(self.db,self.run)
+        ticket=self.snapshot("conflicting_original_measurement")["turns"][0]
+        self.assertEqual((ticket["confidence"],ticket["measured_tokens"]),("UNRESOLVED",107))
+        ref=ticket["reservation_ref"]
+        args=["operator","usage-resolve","--state",str(self.directory),"--run-id",self.run,"--reservation-ref",ref,
+              "--reason","Charge verified components","--decision","accept-exposure","--message-id","accepted"]
+        with redirect_stdout(io.StringIO()) as stream:
+            self.assertEqual(cli.main(args),0)
+        accepted=json.loads(stream.getvalue())["result"]
+        self.assertEqual(accepted["before"]["confirmed_lower_bound"],17)
+        released=self.act(ref,"release-hold","separate",approve_release=True,acceptance_event_id=accepted["operator_event_id"])
+        self.assertEqual(released["after"]["settled_tokens"],17)
+        self.assertEqual(budgets.state(self.db,self.f.budget)["spent"],{"api_calls":1,"tokens":17})
+        self.snapshot("released_disputed")
 
     def test_release_then_distinct_late_cost_under_closed_funding(self):
         fund=budgets.open_child(self.db,parent_ref=self.f.budget,subject_kind="team",subject_id="A",
@@ -182,6 +229,13 @@ class OperatorUsage(unittest.TestCase):
         self.assertEqual(final["turns"][0]["budget_status"],"RELEASED")
         self.assertEqual(budgets.state(self.db,self.f.budget)["spent"],{"api_calls":1,"tokens":29})
         self.assertEqual(len(self.f.peer.sent),1)
+        second=self.f.delivery.deliver("root","independently funded",event_id="new-input")["turn_id"]
+        self.f.delivery.observe("turn/started",{"threadId":"root","turn":{"id":second}})
+        self.f.raw(second,"new-receipt",7)
+        self.f.sample(second,36)
+        self.f.complete()
+        self.assertEqual(self.snapshot("next_work_after_release")["turns"][-1]["confidence"],"PROVIDER_CONFIRMED")
+        self.assertEqual(budgets.state(self.db,self.f.budget)["spent"],{"api_calls":2,"tokens":36})
 
     def test_later_bound_source_verifies_ids_and_reconciles(self):
         ref,turn=self.unresolved()

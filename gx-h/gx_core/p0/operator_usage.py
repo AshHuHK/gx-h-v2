@@ -1,6 +1,7 @@
 """Local operator decisions on existing native usage, with durable age-based notices."""
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from .. import budgets
@@ -42,6 +43,11 @@ def _cases(conn, run_id, ref=None):
             conn.execute("PRAGMA table_info(p0_meter_turns)")) else "NULL"
     disputed = (" OR EXISTS(SELECT 1 FROM p0_meter_receipt_intervals i WHERE i.disputed=1 AND "
                 "i.thread_id=d.thread_id AND i.turn_id=d.turn_id)") if installed else ""
+    if installed:
+        disputed += (" OR EXISTS(SELECT 1 FROM p0_native_child_meters cm JOIN p0_native_child_usage cu USING(child_id) "
+                     "WHERE cm.root_id=d.thread_id AND cm.metadata_verified=1 AND cu.owner_turn=d.turn_id AND "
+                     "(EXISTS(SELECT 1 FROM p0_meter_receipt_intervals i WHERE i.thread_id=cu.child_id AND i.turn_id=cu.turn_id AND i.disputed=1) "
+                     "OR EXISTS(SELECT 1 FROM p0_meter_responses x WHERE x.thread_id=cu.child_id AND x.turn_id=cu.turn_id AND x.conflicting=1)))")
     target = " AND d.reservation_ref=?" if ref is not None else ""
     rows = conn.execute(
         "SELECT d.*,b.amounts_json,b.created_at," + date + " AS unresolved_at,coalesce(" + date +
@@ -162,6 +168,7 @@ def prepare_history(conn, run_id, action):
     path = Path(bound["path"])
     try:
         with path.open("rb") as stream:
+            original = os.fstat(stream.fileno())
             header = json.loads(stream.readline())
         meta = header["payload"]
         if (header["type"] != "session_meta" or meta.get("id") != thread or meta.get("session_id") != row["thread_id"]
@@ -174,9 +181,21 @@ def prepare_history(conn, run_id, action):
         if not proof or action["response_id"] not in proof[4] or proof[1]-prior != proof[0]:
             raise ValueError("complete scoped token usage is unavailable")
         cost,total,end,_,receipts = proof
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            current = os.fstat(stream.fileno())
+            if (original.st_dev,original.st_ino,original.st_mtime_ns)!=(current.st_dev,current.st_ino,current.st_mtime_ns):
+                raise ValueError("history changed during verification")
+            remaining = end
+            while remaining:
+                chunk = stream.read(min(65536,remaining))
+                if not chunk:
+                    raise ValueError("history ended before the verified terminal boundary")
+                digest.update(chunk)
+                remaining -= len(chunk)
         return {"source":"codex-rollout","path":str(path),"thread_id":thread,"turn_id":turn,
                 "response_id":action["response_id"],"cumulative":total,"tokens":cost,"receipts":receipts,"end_offset":end,
-                "scope_sha256":hashlib.sha256(json.dumps([thread,turn,total,receipts],sort_keys=True).encode()).hexdigest()}
+                "prefix_sha256":digest.hexdigest()}
     except (OSError,ValueError,KeyError,TypeError,AttributeError) as exc:
         raise SchemaInvalid("the host-bound official history does not verify: " + str(exc)) from exc
 
@@ -196,9 +215,12 @@ def _attach(conn, row, action, proof):
         if any(r["turn_id"] != turn or r["conflicting"] or r["response_id"] not in proof["receipts"] or
                (r["tokens"] is not None and r["tokens"] != proof["receipts"][r["response_id"]]) for r in existing):
             raise SchemaInvalid("the official history conflicts with previously recorded response IDs or amounts")
+        table,key = ("p0_native_child_usage","child_id") if child else ("p0_root_turn_usage","thread_id")
+        local = conn.execute(f"SELECT total_tokens,measured_tokens FROM {table} WHERE {key}=? AND turn_id=?",(thread,turn)).fetchone()
+        if not local or (local["total_tokens"] or 0)>proof["cumulative"] or (local["measured_tokens"] or 0)>proof["tokens"]:
+            raise SchemaInvalid("the native history precedes a newer scoped observation")
         for response_id,tokens in proof["receipts"].items():
             metering.response(conn,thread,turn,response_id,tokens)
-        table,key = ("p0_native_child_usage","child_id") if child else ("p0_root_turn_usage","thread_id")
         conn.execute(f"UPDATE {table} SET total_tokens=?,measured_tokens=? WHERE {key}=? AND turn_id=?",
                      (proof["cumulative"],proof["tokens"],thread,turn))
         metering.observe(conn,row["run_id"],row["thread_id"],thread,turn,proof["cumulative"],source="official operator-attached history")

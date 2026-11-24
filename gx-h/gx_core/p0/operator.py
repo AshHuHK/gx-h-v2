@@ -119,17 +119,21 @@ def consume_queued(ctx, rid, row):
     if not _local_row(row) or _native_owns(ctx.conn, rid, row["message_id"]):
         return False
     authorized(ctx, rid)
-    origin = ctx.conn.execute("SELECT payload_json FROM events WHERE run_id=? AND kind='p0.operator.submitted' "
-                              "AND subject_id=? ORDER BY event_id LIMIT 1", (rid, row["message_id"])).fetchone()
-    if origin:
-        data = json.loads(origin[0])
-        ctx = ctx.child(principal=Principal(data["subject"], SCOPE_OPERATOR, tuple(data["project_refs"]),
-                                            source="local_operator"))
+    ctx = _submitted_context(ctx,rid,row["message_id"])
     try:
         _apply_or_reject(ctx, rid, row["message_id"])
     except GxError:
         pass
     return True
+
+
+def _submitted_context(ctx, rid, mid):
+    origin = ctx.conn.execute("SELECT payload_json FROM events WHERE run_id=? AND kind='p0.operator.submitted' "
+                              "AND subject_id=? ORDER BY event_id LIMIT 1", (rid,mid)).fetchone()
+    if not origin:
+        return ctx
+    data = json.loads(origin[0])
+    return ctx.child(principal=Principal(data["subject"], SCOPE_OPERATOR, tuple(data["project_refs"]),source="local_operator"))
 
 
 def _apply_or_reject(ctx, rid, mid):
@@ -139,6 +143,9 @@ def _apply_or_reject(ctx, rid, mid):
         if exc.side_effect_status == "UNKNOWN":
             raise
         with store.transaction(ctx.conn,transaction_owner="Operator",operation="reject",run_id=rid):
+            saved = _message(ctx.conn,mid)
+            if saved["result_json"] and json.loads(saved["action_json"])["kind"] == "usage_resolve":
+                return json.loads(saved["result_json"])
             updated = ctx.conn.execute("UPDATE p0_operator_messages SET rejected=? WHERE run_id=? AND message_id=? "
                                        "AND rejected IS NULL AND result_json IS NULL", (exc.message, rid, mid))
             if updated.rowcount:
@@ -151,6 +158,9 @@ def _consume(ctx, rid, mid):
     row = _message(ctx.conn, mid)
     action = json.loads(row["action_json"])
     kind = _check(action)
+    if kind == "usage_resolve":
+        ctx = _submitted_context(ctx,rid,mid)
+        authorized(ctx,rid)
     if row["rejected"]:
         raise SchemaInvalid(row["rejected"])
     if row["result_json"]:
@@ -172,6 +182,8 @@ def _consume(ctx, rid, mid):
         proof = operator_usage.prepare_history(ctx.conn,rid,action)
     with store.transaction(ctx.conn,transaction_owner="Operator",operation="apply",run_id=rid):
         fresh = _message(ctx.conn, mid)
+        if fresh["rejected"]:
+            raise SchemaInvalid(fresh["rejected"])
         if fresh["result_json"]:
             saved = json.loads(fresh["result_json"])
             if kind in READS and saved.get("local_read") == kind:

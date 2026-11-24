@@ -95,12 +95,20 @@ def response(conn, thread, turn, response_id, tokens):
         "OR turn_id<>excluded.turn_id OR (conflicting=0 AND tokens<>excluded.tokens)",
         (thread, response_id, turn, tokens))
     if result.rowcount:
-        original = conn.execute("SELECT turn_id FROM p0_meter_responses WHERE thread_id=? AND response_id=?",
-                                (thread, response_id)).fetchone()[0]
+        recorded = conn.execute("SELECT turn_id,conflicting FROM p0_meter_responses WHERE thread_id=? AND response_id=?",
+                                (thread, response_id)).fetchone()
+        original = recorded["turn_id"]
         if original != turn:
             conn.executemany("INSERT INTO p0_meter_receipt_intervals(thread_id,turn_id,disputed) VALUES(?,?,1) "
                              "ON CONFLICT(thread_id,turn_id) DO UPDATE SET disputed=1 WHERE disputed=0",
                              [(thread, original), (thread, turn)])
+        if recorded["conflicting"]:
+            for affected in {turn,original}:
+                conn.execute("UPDATE p0_meter_turns SET unresolved_at=? WHERE unresolved_at IS NULL AND reservation_ref IN ("
+                    "SELECT reservation_ref FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=? UNION "
+                    "SELECT d.reservation_ref FROM p0_native_child_usage u JOIN p0_native_child_meters m USING(child_id) "
+                    "JOIN p0_meter_native_turns d ON d.thread_id=m.root_id AND d.turn_id=u.owner_turn "
+                    "WHERE m.metadata_verified=1 AND u.child_id=? AND u.turn_id=?)", (clock.now_iso(),thread,affected,thread,affected))
     return bool(result.rowcount)
 
 
@@ -192,6 +200,18 @@ def terminal_response_cost(conn, thread, turn, call):
 def _raw_lower(conn, thread, turn):
     return conn.execute("SELECT coalesce(sum(tokens),0) FROM p0_meter_responses WHERE thread_id=? "
                         "AND turn_id=? AND conflicting=0",(thread,turn)).fetchone()[0]
+
+
+def _receipt_floor(conn, thread, turn, measured):
+    raw = _raw_lower(conn,thread,turn)
+    if measured is None or measured <= raw:
+        return raw
+    disputed = conn.execute("SELECT 1 FROM p0_meter_responses WHERE thread_id=? AND turn_id=? AND conflicting=1",
+                            (thread,turn)).fetchone()
+    if not disputed and conn.execute("SELECT 1 FROM sqlite_master WHERE name='p0_meter_receipt_intervals'").fetchone():
+        disputed = conn.execute("SELECT 1 FROM p0_meter_receipt_intervals WHERE thread_id=? AND turn_id=? AND disputed=1",
+                                (thread,turn)).fetchone()
+    return raw if disputed else measured
 
 
 def terminal(conn, root, turn):
@@ -294,7 +314,7 @@ def common_funding_prefix(conn, row):
 def observation(conn, row, *, interval_floor=True):
     members = {}
     eligible = bool(row["children_known"])
-    lower = max(row["measured_tokens"] or 0,_raw_lower(conn,row["thread_id"],row["turn_id"]))
+    lower = _receipt_floor(conn,row["thread_id"],row["turn_id"],row["measured_tokens"])
     for u in children(conn, row):
         if not u["metadata_verified"]:
             eligible = False
@@ -304,7 +324,7 @@ def observation(conn, row, *, interval_floor=True):
         eligible &= bool(u["terminal"] and u["children_known"] and u["total_tokens"] is not None
                          and u["prior_tokens"] is not None and u["measured_tokens"] == u["total_tokens"] - u["prior_tokens"])
         if u["owner_turn"] == row["turn_id"]:
-            lower += max(u["measured_tokens"] or 0,_raw_lower(conn,u["child_id"],u["turn_id"]))
+            lower += _receipt_floor(conn,u["child_id"],u["turn_id"],u["measured_tokens"])
     pending = conn.execute(
         "SELECT 1 FROM p0_native_child_meters m JOIN p0_meter_native_turns d ON "
         "d.thread_id=m.root_id AND d.turn_id=m.owner_turn WHERE d.thread_id=? AND d.sequence<=? "

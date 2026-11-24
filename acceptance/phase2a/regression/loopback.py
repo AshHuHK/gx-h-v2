@@ -13,6 +13,17 @@ import tempfile
 import time
 
 
+ROOT = Path(__file__).resolve().parents[3]
+
+
+def validated_outer_scope():
+    if "GX_TEST_RESOURCE_PROFILE" not in os.environ:
+        return False
+    sys.path.insert(0, str(ROOT / "gx-h"))
+    from gx_core.resource_profile import deterministic_test_resources
+    return deterministic_test_resources()
+
+
 CONFIG = """port: 7890
 socks-port: 7891
 bind-address: 127.0.0.1
@@ -46,6 +57,19 @@ def local_listeners():
 def run(args):
     identity = os.readlink("/proc/self/ns/net")
     assert identity != args.outer_namespace
+    user_namespace = os.readlink("/proc/self/ns/user")
+    assert user_namespace != args.outer_user_namespace
+    child = os.environ.copy()
+    if args.delegated_deterministic:
+        if child.get("GX_TEST_RESOURCE_PROFILE") != "deterministic":
+            raise ValueError("delegated deterministic resources require their validated outer profile")
+        # After unshare the inner UID may lack access to the outer holder's fdinfo.
+        # This acceptance launcher owns the inner lock until its command terminates.
+        sys.path.insert(0, str(ROOT))
+        from acceptance.closure.profile import controlled_resources
+        child.update(controlled_resources())
+    elif "GX_TEST_RESOURCE_PROFILE" in child:
+        raise ValueError("the outer launcher did not validate the requested resource profile")
     # No network device or default route may carry this fixture's traffic off host.
     interfaces = dict(socket.if_nameindex())
     assert set(interfaces.values()) <= {"lo", "tunl0"}
@@ -86,9 +110,14 @@ def run(args):
                            "proxy_program_sha256": sha(args.clash), "proxy_config": CONFIG,
                            "outer_proxy_listeners": json.loads(args.outer_listeners),
                            "isolated_proxy_listeners": local_listeners(), "original_proxy_environment": True,
-                           "command": args.command, "started_unix": time.time()}
+                           "command": args.command, "started_unix": time.time(),
+                           "resource_profile": "deterministic" if args.delegated_deterministic else "real",
+                           "outer_user_namespace": args.outer_user_namespace, "fixture_user_namespace": user_namespace,
+                           "outer_uid_map": args.outer_uid_map, "fixture_uid_map": Path("/proc/self/uid_map").read_text().strip(),
+                           "outer_scope": os.environ.get("GX_ACCEPTANCE_RESOURCE_SCOPE") if args.delegated_deterministic else None,
+                           "fixture_scope": child.get("GX_ACCEPTANCE_RESOURCE_SCOPE") if args.delegated_deterministic else None}
                 args.receipt.write_text(json.dumps(receipt, indent=2) + "\n")
-                completed = subprocess.run(args.command)
+                completed = subprocess.run(args.command, env=child)
                 receipt.update(exit_code=completed.returncode, finished_unix=time.time())
                 args.receipt.write_text(json.dumps(receipt, indent=2) + "\n")
                 return completed.returncode
@@ -107,6 +136,9 @@ if __name__ == "__main__":
     p.add_argument("--receipt", type=Path, required=True)
     p.add_argument("--outer-namespace")
     p.add_argument("--outer-listeners")
+    p.add_argument("--outer-user-namespace", help=argparse.SUPPRESS)
+    p.add_argument("--outer-uid-map", help=argparse.SUPPRESS)
+    p.add_argument("--delegated-deterministic", action="store_true", help=argparse.SUPPRESS)
     p.add_argument("command", nargs=argparse.REMAINDER)
     args = p.parse_args()
     if args.command[:1] == ["--"]:
@@ -114,9 +146,15 @@ if __name__ == "__main__":
     if not args.command:
         p.error("an explicit command is required")
     if args.outer_namespace is None:
+        if args.delegated_deterministic:
+            p.error("deterministic delegation is selected by the outer acceptance launcher")
+        controlled = validated_outer_scope()
         argv = ["unshare", "--user", "--map-root-user", "--net", sys.executable, __file__,
                 "--clash", str(args.clash.resolve()), "--receipt", str(args.receipt.resolve()),
                 "--outer-namespace", os.readlink("/proc/self/ns/net"),
-                "--outer-listeners", json.dumps(local_listeners()), "--", *args.command]
+                "--outer-user-namespace", os.readlink("/proc/self/ns/user"),
+                "--outer-uid-map", Path("/proc/self/uid_map").read_text().strip(),
+                "--outer-listeners", json.dumps(local_listeners()),
+                *(["--delegated-deterministic"] if controlled else []), "--", *args.command]
         os.execvp("unshare", argv)
     sys.exit(run(args))

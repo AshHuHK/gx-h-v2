@@ -1,0 +1,397 @@
+{
+  "all_batch_operations_exited_zero": false,
+  "baseline_commit": "51e0e13583d95e9cad1386e1d4c77324977e97ea",
+  "broad_regression": {
+    "existing_official": 17,
+    "focused_official": 13,
+    "generator_returncode": 0,
+    "inherited_case_ids_passed": true,
+    "node": {
+      "cancelled": 0,
+      "fail": 0,
+      "pass": 2,
+      "skipped": 0,
+      "tests": 2
+    },
+    "official_receipts_passed": 17,
+    "p0": {
+      "errors": 0,
+      "failure_details": [],
+      "failures": 0,
+      "passed": 127,
+      "skip_details": [],
+      "skipped": 0,
+      "total": 127
+    },
+    "python": {
+      "errors": 0,
+      "failure_details": [],
+      "failures": 0,
+      "passed": 461,
+      "skip_details": [
+        "test_gx_run_uses_sdk_model_then_returns_to_native_decision (test_dsh_activity.DSHActivityTest.test_gx_run_uses_sdk_model_then_returns_to_native_decision) ... skipped 'install runtime/dsh-sdk/.venv first'",
+        "test_reported_model_mismatch_keeps_response_and_refuses_delivery (test_dsh_activity.DSHActivityTest.test_reported_model_mismatch_keeps_response_and_refuses_delivery) ... skipped 'install runtime/dsh-sdk/.venv first'",
+        "test_close_cold_resume_and_observe_prior_evidence (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_cold_resume_and_observe_prior_evidence) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'",
+        "test_close_while_recorded_response_is_pending (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_while_recorded_response_is_pending) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'"
+      ],
+      "skipped": 4,
+      "total": 465
+    },
+    "v31_case_identity": {
+      "p0-focused": {
+        "baseline": 127,
+        "changed_skips": [],
+        "measured": 127,
+        "missing": []
+      },
+      "python-full": {
+        "baseline": 446,
+        "changed_skips": [],
+        "measured": 465,
+        "missing": []
+      }
+    }
+  },
+  "dependency_receipt": "batch/dependencies.json",
+  "evidence_class": "SCRIPTED and OFFICIAL_HOST_LOOPBACK",
+  "full_execution": "batch/execution.json",
+  "gates": {
+    "P2A-09": {
+      "code_mode_cases": 5,
+      "completed_terminal_report": false,
+      "failed_original_trial": {
+        "captured_methods": [
+          "rawResponseItem/completed",
+          "rawResponse/completed",
+          "item/completed",
+          "rawResponseItem/completed",
+          "turn/completed"
+        ],
+        "fault": "none",
+        "meter": {
+          "budget_status": "HELD",
+          "confidence": "RESERVED",
+          "estimated_at": null,
+          "measured_tokens": 35,
+          "metering_reason": "missing cumulative usage for this turn",
+          "reservation_ref": "rsv_01m85gwvp8cvb9ydwp",
+          "settled_tokens": null,
+          "terminal_status": "interrupted"
+        },
+        "trial": "GX_ABORT_0023"
+      },
+      "late_responses": 8,
+      "operations": [
+        "terminal-protocol",
+        "terminal-code-mode",
+        "terminal-stream",
+        "terminal-crash",
+        "terminal-late",
+        "terminal-public-crash"
+      ],
+      "outcomes": null,
+      "passed": false,
+      "post_terminal_requests": null,
+      "public_crash": true,
+      "stream_cases": 5,
+      "trials": null,
+      "unmodified_repetitions": {
+        "baseline": {
+          "commit": "51e0e13583d95e9cad1386e1d4c77324977e97ea",
+          "failure": {
+            "captured_methods": [
+              "rawResponseItem/completed",
+              "rawResponse/completed",
+              "item/completed",
+              "turn/completed"
+            ],
+            "fault": "none",
+            "meter": {
+              "budget_status": "HELD",
+              "confidence": "RESERVED",
+              "estimated_at": null,
+              "measured_tokens": 35,
+              "metering_reason": "missing cumulative usage for this turn",
+              "reservation_ref": "rsv_01m85h0xq6w2vd4pm2",
+              "settled_tokens": null,
+              "terminal_status": "interrupted"
+            },
+            "trial": "GX_ABORT_0045"
+          },
+          "log": "terminal-protocol-controls/baseline/protocol.log",
+          "returncode": 1
+        },
+        "candidate": {
+          "commit": "c15eada9611f60519bafbb3366c908629dbea157",
+          "failure": {
+            "captured_methods": [
+              "rawResponseItem/completed",
+              "rawResponse/completed",
+              "item/completed",
+              "rawResponseItem/completed",
+              "turn/completed"
+            ],
+            "fault": "none",
+            "meter": {
+              "budget_status": "HELD",
+              "confidence": "RESERVED",
+              "estimated_at": null,
+              "measured_tokens": 35,
+              "metering_reason": "missing cumulative usage for this turn",
+              "reservation_ref": "rsv_01m85h1608f4ye11xr",
+              "settled_tokens": null,
+              "terminal_status": "interrupted"
+            },
+            "trial": "GX_ABORT_0068"
+          },
+          "log": "terminal-protocol-controls/candidate/protocol.log",
+          "returncode": 1
+        }
+      }
+    },
+    "P2A-10": {
+      "duplicate_product_artifacts": 0,
+      "full_schema_digest": "8b7f663c089517e4582b1ebda0e1a95380b25b743ab06eea4cad842eb1a50e41",
+      "operations": [
+        "public-repair",
+        "schema-transport",
+        "suite"
+      ],
+      "orphan_files": 0,
+      "passed": true,
+      "repair_receipts": [
+        {
+          "attempt": 1,
+          "call_id": "call-fixture-3",
+          "category": "product_structure",
+          "contract_digest": "5cda42265ae0f5dadeff009ac30dc7aff7c91f529a221bd17bf1868ab97e65cb",
+          "response_json": "{\"category\":\"product_structure\",\"code\":\"SCHEMA_INVALID\",\"contract_digest\":\"5cda42265ae0f5dadeff009ac30dc7aff7c91f529a221bd17bf1868ab97e65cb\",\"error\":\"/findings_by_path: Missing required field 'west-near'.\",\"failure_count\":1,\"max_failures\":2,\"pointer\":\"/findings_by_path\",\"terminal\":false}",
+          "task_id": "gxt_01m85gxk0hsravnzcq"
+        }
+      ],
+      "retrieved_schema_digest": "8b7f663c089517e4582b1ebda0e1a95380b25b743ab06eea4cad842eb1a50e41",
+      "schema_pages": 8,
+      "schema_paths": 32,
+      "terminal_receipts": [
+        {
+          "attempt": 1,
+          "call_id": "call-fixture-4",
+          "reason": "GX_ACCEPTED",
+          "submission_id": "gxsb_01m85gxksb8dn6vp1p",
+          "task_id": "gxt_01m85gxk0hsravnzcq",
+          "thread_id": "01a20b0e-cd8b-7c82-ade8-628efe1d68d4",
+          "turn_id": "01a20b0e-cdaf-7302-99f0-ebf9aabea5d9"
+        },
+        {
+          "attempt": 1,
+          "call_id": "call-fixture-7",
+          "reason": "GX_ACCEPTED",
+          "submission_id": "gxsb_01m85gxm7v7hsqz19y",
+          "task_id": "gxt_01m85gxkwscqqwp4me",
+          "thread_id": "01a20b0e-cffb-72c3-8957-affad580c923",
+          "turn_id": "01a20b0e-d00a-7083-8072-6b36fce58638"
+        }
+      ]
+    },
+    "P2A-11": {
+      "child-lost-start": {
+        "checks": 19,
+        "cold_start_notifications_dropped": 1,
+        "scoped_child_passed": true,
+        "wire_catalogs": 8
+      },
+      "child-scope": {
+        "checks": 19,
+        "cold_start_notifications_dropped": 0,
+        "scoped_child_passed": true,
+        "wire_catalogs": 8
+      },
+      "operations": [
+        "child-scope",
+        "child-lost-start",
+        "suite",
+        "inherited-case-ids"
+      ],
+      "passed": true
+    },
+    "P2A-12": {
+      "historical": {
+        "assignments_by_role": {
+          "evidence_reviewer": 52,
+          "planner": 26
+        },
+        "historical_exact_context_reads": 78,
+        "historical_reads_now_in_brief": 338,
+        "max_preloaded_payload_bytes": 4722,
+        "runs": 26,
+        "stale_preloaded_refs": 0,
+        "verified_refs": 338,
+        "waves": 13
+      },
+      "late_source": {
+        "disposition": "rejected",
+        "jobs": 2,
+        "replay_requests": 0,
+        "source_preloaded": false,
+        "stale_preloads": 0,
+        "unconsumed_supplement_events": 0
+      },
+      "operations": [
+        "brief-replay",
+        "brief-wire",
+        "suite"
+      ],
+      "passed": true,
+      "replayed_assignments": 78,
+      "wire_arms": {
+        "deterministic": [
+          "b3",
+          "b2"
+        ],
+        "review": [
+          "b2",
+          "b3"
+        ]
+      }
+    },
+    "P2A-13": {
+      "cold_completion": {
+        "accepted_decisions": 3,
+        "cpu_jobs": 4,
+        "final_facts_sha256": "41173cadd8cca64e0ee66778f1fc8655d3181efc5023f7f21e9d5d9c35fd4331",
+        "native_turns": 7,
+        "original_job_receipts_equal": true,
+        "remaining_reservations": {
+          "api_calls": 0,
+          "cpu_seconds": 0,
+          "job_submissions": 0,
+          "tokens": 0,
+          "worker_tasks": 0
+        },
+        "report_ref": "gxa_01m85gx709qw6qy0aj",
+        "settled_budget": {
+          "api_calls": 7,
+          "cpu_seconds": 4,
+          "job_submissions": 4,
+          "tokens": 1400,
+          "worker_tasks": 6
+        },
+        "submissions": 6,
+        "terminal_replay_extra_calls": 0,
+        "total_fixture_responses_including_source": 40
+      },
+      "cold_result": "PASS",
+      "database_sha256": "35ac81b908ae1c01bdd8289e23533b839e3addaf6044b6fc41f295affe7a2b2b",
+      "operations": [
+        "public-deterministic",
+        "public-review",
+        "at2-preservation",
+        "at2-checkpoint",
+        "at2-cold"
+      ],
+      "passed": true,
+      "public": {
+        "deterministic": {
+          "duplicate_product_artifacts": 0,
+          "jobs": [
+            {
+              "idempotency_key": "job:gxr_01m85gx99xaxfjd7ca:grid:science:r0:7637c3ab3f515b6d380e517a44217419a7ca17e9d175a34ffa5e564b11437a57",
+              "job_id": "gxj_01m85gx9b4e1wrr7t2",
+              "status": "SUCCEEDED"
+            },
+            {
+              "idempotency_key": "job:gxr_01m85gx99xaxfjd7ca:grid:science:r0:0b769147bacc38bdbf194892745334d187d6bbfcb222dbfff60a1f735bc69327",
+              "job_id": "gxj_01m85gx9gn2vpnpqbr",
+              "status": "SUCCEEDED"
+            }
+          ],
+          "orphan_artifact_files": 0,
+          "settlements": [
+            {
+              "assessment_ref": "gxa_01m85gxabqgmhvk31v",
+              "direction": "supports",
+              "eval_id": "gxe_46a1e6fb18c76e5116b58f66f2a86b5d2a5930439f122188bc383282af1a2352",
+              "evidence_id": "gxv_d7a7b22c9935c3bbdc02b50b23054292128c22fe165764ec318f57a1c29da7bc",
+              "job_id": "gxj_01m85gx9b4e1wrr7t2",
+              "kind": "valid_scientific_outcome",
+              "path_id": "west-near"
+            },
+            {
+              "assessment_ref": "gxa_01m85gxabqgmhvk31v",
+              "direction": "refutes",
+              "eval_id": "gxe_bb0ebd2b7ad732f063145100764095be5c4f3eccd806759ab83ca40a3b589c51",
+              "evidence_id": "gxv_8f91318f3c131cded09ddcd6b66e32e72912d62204a7a92c8285f6fd70c4e987",
+              "job_id": "gxj_01m85gx9gn2vpnpqbr",
+              "kind": "valid_scientific_outcome",
+              "path_id": "west-offset"
+            }
+          ],
+          "stale_preloads": 0
+        },
+        "review": {
+          "duplicate_product_artifacts": 0,
+          "jobs": [
+            {
+              "idempotency_key": "job:gxr_01m85gxdax6wbbnefa:grid:science:r0:648b77f5d2ec2aeb9f19ceeb275f4994ee98dcf70038fe6dac22cf919fb11585",
+              "job_id": "gxj_01m85gxdcefgf7dxvb",
+              "status": "SUCCEEDED"
+            },
+            {
+              "idempotency_key": "job:gxr_01m85gxdax6wbbnefa:grid:science:r0:cdaa97baa9006f534d496c689c995822017eac2a9c3952fe38ae16632e4e0eaa",
+              "job_id": "gxj_01m85gxdj4nqmb1bhx",
+              "status": "SUCCEEDED"
+            }
+          ],
+          "orphan_artifact_files": 0,
+          "settlements": [
+            {
+              "assessment_ref": "gxa_01m85gxf5v3wqzqvg8",
+              "direction": "supports",
+              "eval_id": "gxe_b7b73714451919ec0de3732c02d2f28d417f9a05b89a7f352fe2dcdcc3844ed3",
+              "evidence_id": "gxv_9a24966b3778e1a0ec87bba926ddb47a73275d261cf3b356de6d6bab302cff9a",
+              "job_id": "gxj_01m85gxdcefgf7dxvb",
+              "kind": "valid_scientific_outcome",
+              "path_id": "west-near"
+            },
+            {
+              "assessment_ref": "gxa_01m85gxf5v3wqzqvg8",
+              "direction": "refutes",
+              "eval_id": "gxe_82f71f768f04b44ec62f38c96dfd0c557571749f52a425173817f1f696c8f72d",
+              "evidence_id": "gxv_9f05f7110a75fa802bccc1d314bb2a019b5b81f2817ae4ed55d93d214a252492",
+              "job_id": "gxj_01m85gxdj4nqmb1bhx",
+              "kind": "valid_scientific_outcome",
+              "path_id": "west-offset"
+            }
+          ],
+          "stale_preloads": 0
+        }
+      },
+      "rollback_verified": true,
+      "tables_preserved": 114,
+      "writable_opens": 2
+    }
+  },
+  "named_required_gates_passed": false,
+  "network_receipt": "network.json",
+  "supplemental_combined_loss": {
+    "baseline_observations": 3,
+    "baseline_source": "../preflight.json",
+    "candidate": {
+      "fixture_timeout_seconds": 25,
+      "observed_status": "COLD_SETTLEMENT_TIMEOUT",
+      "returncode": 1,
+      "revision": "c15eada9611f60519bafbb3366c908629dbea157"
+    },
+    "candidate_meter_snapshots": 6,
+    "frozen_baseline": {
+      "fixture_timeout_seconds": 25,
+      "observed_status": "COLD_SETTLEMENT_TIMEOUT",
+      "returncode": 1,
+      "revision": "51e0e13583d95e9cad1386e1d4c77324977e97ea"
+    },
+    "observational_wrapper_exit": 0,
+    "source": "batch/extra-child/observation.json"
+  },
+  "tested_commit": "c15eada9611f60519bafbb3366c908629dbea157",
+  "tested_git_tree": "13ac06f15406a561969dfe51621089912deeaacc"
+}

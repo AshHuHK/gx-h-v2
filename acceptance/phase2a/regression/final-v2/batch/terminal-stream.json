@@ -1,0 +1,1071 @@
+{
+  "success": true,
+  "completed_utc": "2026-11-24T00:57:26.656824+00:00",
+  "identity": {
+    "source_commit_in_release_lock": "d32063f96c2dff1dc96af839b3952abb6acfeda4",
+    "source_tag": "rust-v0.169.0",
+    "source_archive_sha256": "ed604080584e0236b39da1662baecd8c5b735e6cd998cd2f1f5c2e38d3014bd7",
+    "verified_source_files": {
+      "codex-rs/app-server/src/bespoke_event_handling.rs": "74a17ccb69fd166069730ab89bc2f8ded7000cbb433e2bdf5c5edd5fa0d1c5f0",
+      "codex-rs/app-server/src/dynamic_tools.rs": "b93d2e6adb139da47f1e0479f5c0099b5c2b612ed1080e12917a4b590eb286c0",
+      "codex-rs/app-server/src/outgoing_message.rs": "c6a200bbced4757e7337a9eeb6e729d124c14dab62eb01baf65833b4742643dd",
+      "codex-rs/app-server/src/request_processors/turn_processor.rs": "3f25538caa6c51acc20121d77058d8dc3cd71b93d116266e30eaf01183977e01",
+      "codex-rs/core/src/tools/handlers/dynamic.rs": "97986c9a4af552ff6f069781f7c3356d0ad671596376f6084c3d3d871870eb94",
+      "codex-rs/core/src/tools/spec_plan.rs": "a89b773ca46a4c85668f1bf9598fbf47c8541b35308133762e01b4c477dc28ae",
+      "codex-rs/core/src/tools/spec_plan_strict_third_party_tests.rs": "c64c2259957aa36667af322b07da8fcbcc5bd6acc3b8e05fac584653fc96b169",
+      "codex-rs/core/src/tools/spec_plan_tests.rs": "8d49d4e931031a5a341d5a9f6f80804120b4ea1b69985310d74a1410854c02a8"
+    },
+    "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+    "binary_package_sha256": "89801b4b97faba562eb80fe0a833159ac79399be674022f4b1a0ccab1d153faa"
+  },
+  "model": "gpt-6.2-astra",
+  "loopback": true,
+  "test_sha256": "3a7ed5da2dfc1ee1b100b436e09c9419252d15bd08ca655466f79ee37b664780",
+  "trials": [
+    {
+      "case": "already_complete",
+      "mode": "code_mode_only",
+      "catalog_mode_override": false,
+      "fault": "none",
+      "run": "gxr_01m85gx9mze2zp5sm0",
+      "task": "gxt_01m85gx9wd19znk0bk",
+      "expected": "ACCEPTED",
+      "interrupt_writes": [
+        {
+          "id": 10,
+          "params": {
+            "threadId": "01a20b0e-a7c1-75c1-857d-c3fc711c3eeb",
+            "turnId": "01a20b0e-a7e6-7001-90b9-94e5993ed3ec"
+          },
+          "t": 29801302.567038476,
+          "dropped": false
+        }
+      ],
+      "tool_responses_written": [],
+      "server_interrupt_replies": [
+        {
+          "id": 10,
+          "result": {}
+        }
+      ],
+      "observed_calls": [
+        {
+          "seq": 29,
+          "namespace": "gx",
+          "call": "direct-submit",
+          "tool": "gx_submit_product"
+        }
+      ],
+      "events": [
+        {
+          "seq": 20,
+          "type": "custom_tool_call",
+          "call_id": "inspect-and-attempt-nested",
+          "name": "exec",
+          "namespace": "functions"
+        },
+        {
+          "seq": 21,
+          "type": "rawResponse/completed",
+          "id": "wire-response-1",
+          "t": 29801302.449051663,
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 23,
+          "type": "custom_tool_call_output",
+          "call_id": "inspect-and-attempt-nested",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+            },
+            {
+              "type": "input_text",
+              "text": "{\"matches\":[],\"plain\":\"undefined\",\"grouped\":\"undefined\",\"reader\":\"function\"}"
+            },
+            {
+              "type": "input_text",
+              "text": "TypeError"
+            }
+          ]
+        },
+        {
+          "seq": 26,
+          "type": "function_call",
+          "call_id": "direct-submit",
+          "name": "gx_submit_product",
+          "namespace": "gx"
+        },
+        {
+          "seq": 27,
+          "type": "rawResponse/completed",
+          "id": "wire-response-2",
+          "t": 29801302.523225687,
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 34,
+          "type": "dynamicToolCall",
+          "id": "direct-submit",
+          "namespace": "gx",
+          "status": "failed"
+        },
+        {
+          "seq": 35,
+          "type": "function_call_output",
+          "call_id": "direct-submit",
+          "output": "dynamic tool call was cancelled before receiving a response"
+        }
+      ],
+      "requests": [
+        {
+          "id": "wire-response-1",
+          "t": 29801302.441136703,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801302.4421422,
+          "completion_write_at": 29801302.442144874
+        },
+        {
+          "id": "wire-response-2",
+          "t": 29801302.5162482,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801302.516939893,
+          "completion_write_at": 29801302.516943756
+        }
+      ],
+      "thread": "01a20b0e-a7c1-75c1-857d-c3fc711c3eeb",
+      "turn_id": "01a20b0e-a7e6-7001-90b9-94e5993ed3ec",
+      "encoded_worker_override": {
+        "features.code_mode.direct_only_tool_namespaces": [
+          "existing_group",
+          "gx"
+        ],
+        "features.code_mode_only_strict_3p_tools": false
+      },
+      "committed_at": 29801302.556872215,
+      "submission": {
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "submission_id": "gxsb_01m85gxa6bard1yxc4",
+        "result": "ACCEPTED",
+        "lease_id": "gxl_01m85gx9xms6n5rr5b",
+        "records_artifact_ref": "gxa_01m85gxa6eeyytjp3c",
+        "artifact_refs_json": "[\"gxa_01m85gxa65svrpmkwe\"]"
+      },
+      "goal_complete_write": {
+        "id": 9,
+        "params": {
+          "threadId": "01a20b0e-a7c1-75c1-857d-c3fc711c3eeb",
+          "origin": "automatic",
+          "status": "complete"
+        },
+        "t": 29801302.558466543
+      },
+      "terminal_receipt": {
+        "thread_id": "01a20b0e-a7c1-75c1-857d-c3fc711c3eeb",
+        "turn_id": "01a20b0e-a7e6-7001-90b9-94e5993ed3ec",
+        "call_id": "direct-submit",
+        "reason": "GX_ACCEPTED",
+        "recorded_at": "2026-11-24T00:57:19.824Z",
+        "goal_checked_at": "2026-11-24T00:57:19.839Z",
+        "interrupt_ack_at": "2026-11-24T00:57:19.860Z",
+        "goal_last_error": null,
+        "interrupt_last_error": null,
+        "interrupt_attempts": 1
+      },
+      "history_terminal": "interrupted",
+      "final_meter": {
+        "reservation_ref": "rsv_01m85gx9z2y96wh3c1",
+        "budget_status": "SETTLED",
+        "confidence": "PROVIDER_CONFIRMED",
+        "terminal_status": "interrupted",
+        "measured_tokens": 70,
+        "settled_tokens": 70,
+        "estimated_at": null,
+        "metering_reason": null
+      },
+      "post_commit_requests": [],
+      "requests_without_native_usage_receipt": [],
+      "response_grace_seconds": 1.0,
+      "commit_to_interrupt_seconds": 0.010166261345148087
+    },
+    {
+      "case": "late_accepted",
+      "mode": "code_mode_only",
+      "catalog_mode_override": false,
+      "fault": "none",
+      "run": "gxr_01m85gxaq3mfsm22k4",
+      "task": "gxt_01m85gxayn9ax7yvzt",
+      "expected": "ACCEPTED",
+      "interrupt_writes": [
+        {
+          "id": 10,
+          "params": {
+            "threadId": "01a20b0e-abf7-7cc2-8c62-76fe6554be2b",
+            "turnId": "01a20b0e-ac19-7e53-a579-641ef78960f4"
+          },
+          "t": 29801303.945085943,
+          "dropped": false
+        }
+      ],
+      "tool_responses_written": [],
+      "server_interrupt_replies": [
+        {
+          "id": 10,
+          "result": {}
+        }
+      ],
+      "observed_calls": [
+        {
+          "seq": 28,
+          "namespace": "gx",
+          "call": "direct-submit",
+          "tool": "gx_submit_product"
+        }
+      ],
+      "events": [
+        {
+          "seq": 20,
+          "type": "custom_tool_call",
+          "call_id": "inspect-and-attempt-nested",
+          "name": "exec",
+          "namespace": "functions"
+        },
+        {
+          "seq": 21,
+          "type": "rawResponse/completed",
+          "id": "wire-response-1",
+          "t": 29801303.535904508,
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 23,
+          "type": "custom_tool_call_output",
+          "call_id": "inspect-and-attempt-nested",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+            },
+            {
+              "type": "input_text",
+              "text": "{\"matches\":[],\"plain\":\"undefined\",\"grouped\":\"undefined\",\"reader\":\"function\"}"
+            },
+            {
+              "type": "input_text",
+              "text": "TypeError"
+            }
+          ]
+        },
+        {
+          "seq": 26,
+          "type": "function_call",
+          "call_id": "direct-submit",
+          "name": "gx_submit_product",
+          "namespace": "gx"
+        },
+        {
+          "seq": 32,
+          "type": "rawResponse/completed",
+          "id": "wire-response-2",
+          "t": 29801303.932569403,
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 33,
+          "type": "dynamicToolCall",
+          "id": "direct-submit",
+          "namespace": "gx",
+          "status": "failed"
+        },
+        {
+          "seq": 34,
+          "type": "function_call_output",
+          "call_id": "direct-submit",
+          "output": "dynamic tool call was cancelled before receiving a response"
+        }
+      ],
+      "requests": [
+        {
+          "id": "wire-response-1",
+          "t": 29801303.527950287,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801303.528685797,
+          "completion_write_at": 29801303.52868887
+        },
+        {
+          "id": "wire-response-2",
+          "t": 29801303.596647415,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801303.597333,
+          "completion_write_at": 29801303.93131678
+        }
+      ],
+      "thread": "01a20b0e-abf7-7cc2-8c62-76fe6554be2b",
+      "turn_id": "01a20b0e-ac19-7e53-a579-641ef78960f4",
+      "encoded_worker_override": {
+        "features.code_mode.direct_only_tool_namespaces": [
+          "existing_group",
+          "gx"
+        ],
+        "features.code_mode_only_strict_3p_tools": false
+      },
+      "committed_at": 29801303.63116893,
+      "submission": {
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "submission_id": "gxsb_01m85gxb7z89d3s7hb",
+        "result": "ACCEPTED",
+        "lease_id": "gxl_01m85gxaz5dx03ec7q",
+        "records_artifact_ref": "gxa_01m85gxb81h0m0mmgs",
+        "artifact_refs_json": "[\"gxa_01m85gxb7skqwj3swm\"]"
+      },
+      "goal_complete_write": {
+        "id": 9,
+        "params": {
+          "threadId": "01a20b0e-abf7-7cc2-8c62-76fe6554be2b",
+          "origin": "automatic",
+          "status": "complete"
+        },
+        "t": 29801303.632435393
+      },
+      "terminal_receipt": {
+        "thread_id": "01a20b0e-abf7-7cc2-8c62-76fe6554be2b",
+        "turn_id": "01a20b0e-ac19-7e53-a579-641ef78960f4",
+        "call_id": "direct-submit",
+        "reason": "GX_ACCEPTED",
+        "recorded_at": "2026-11-24T00:57:20.899Z",
+        "goal_checked_at": "2026-11-24T00:57:20.912Z",
+        "interrupt_ack_at": "2026-11-24T00:57:21.240Z",
+        "goal_last_error": null,
+        "interrupt_last_error": null,
+        "interrupt_attempts": 1
+      },
+      "history_terminal": "interrupted",
+      "final_meter": {
+        "reservation_ref": "rsv_01m85gxb0myerg4737",
+        "budget_status": "SETTLED",
+        "confidence": "PROVIDER_CONFIRMED",
+        "terminal_status": "interrupted",
+        "measured_tokens": 70,
+        "settled_tokens": 70,
+        "estimated_at": null,
+        "metering_reason": null
+      },
+      "post_commit_requests": [],
+      "requests_without_native_usage_receipt": [],
+      "response_grace_seconds": 1.0,
+      "commit_to_interrupt_seconds": 0.31391701102256775
+    },
+    {
+      "case": "late_rejected",
+      "mode": "code_mode_only",
+      "catalog_mode_override": false,
+      "fault": "none",
+      "run": "gxr_01m85gxc8j1ngdncz7",
+      "task": "gxt_01m85gxchqj7tgs9gm",
+      "expected": "REJECTED",
+      "interrupt_writes": [
+        {
+          "id": 10,
+          "params": {
+            "threadId": "01a20b0e-b248-7730-adb7-0b3c75faa544",
+            "turnId": "01a20b0e-b267-76f2-801f-8c2b756b6be4"
+          },
+          "t": 29801305.550426744,
+          "dropped": false
+        }
+      ],
+      "tool_responses_written": [],
+      "server_interrupt_replies": [
+        {
+          "id": 10,
+          "result": {}
+        }
+      ],
+      "observed_calls": [
+        {
+          "seq": 28,
+          "namespace": "gx",
+          "call": "direct-submit",
+          "tool": "gx_submit_product"
+        }
+      ],
+      "events": [
+        {
+          "seq": 20,
+          "type": "custom_tool_call",
+          "call_id": "inspect-and-attempt-nested",
+          "name": "exec",
+          "namespace": "functions"
+        },
+        {
+          "seq": 21,
+          "type": "rawResponse/completed",
+          "id": "wire-response-1",
+          "t": 29801305.13249222,
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 23,
+          "type": "custom_tool_call_output",
+          "call_id": "inspect-and-attempt-nested",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+            },
+            {
+              "type": "input_text",
+              "text": "{\"matches\":[],\"plain\":\"undefined\",\"grouped\":\"undefined\",\"reader\":\"function\"}"
+            },
+            {
+              "type": "input_text",
+              "text": "TypeError"
+            }
+          ]
+        },
+        {
+          "seq": 26,
+          "type": "function_call",
+          "call_id": "direct-submit",
+          "name": "gx_submit_product",
+          "namespace": "gx"
+        },
+        {
+          "seq": 32,
+          "type": "rawResponse/completed",
+          "id": "wire-response-2",
+          "t": 29801305.537709814,
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 33,
+          "type": "dynamicToolCall",
+          "id": "direct-submit",
+          "namespace": "gx",
+          "status": "failed"
+        },
+        {
+          "seq": 34,
+          "type": "function_call_output",
+          "call_id": "direct-submit",
+          "output": "dynamic tool call was cancelled before receiving a response"
+        }
+      ],
+      "requests": [
+        {
+          "id": "wire-response-1",
+          "t": 29801305.124040455,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801305.124757513,
+          "completion_write_at": 29801305.124760874
+        },
+        {
+          "id": "wire-response-2",
+          "t": 29801305.203081425,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801305.20374564,
+          "completion_write_at": 29801305.536424786
+        }
+      ],
+      "thread": "01a20b0e-b248-7730-adb7-0b3c75faa544",
+      "turn_id": "01a20b0e-b267-76f2-801f-8c2b756b6be4",
+      "encoded_worker_override": {
+        "features.code_mode.direct_only_tool_namespaces": [
+          "existing_group",
+          "gx"
+        ],
+        "features.code_mode_only_strict_3p_tools": false
+      },
+      "committed_at": 29801305.236288995,
+      "submission": {
+        "status": "REJECTED",
+        "attempt": 1,
+        "submission_id": "gxsb_01m85gxct2eqgg5fmy",
+        "result": "REJECTED",
+        "lease_id": "gxl_01m85gxchxnbfs2tmq",
+        "records_artifact_ref": "gxa_01m85gxct5g4skkjff",
+        "artifact_refs_json": "[\"gxa_01m85gxct0y50dqdxh\"]"
+      },
+      "goal_complete_write": {
+        "id": 9,
+        "params": {
+          "threadId": "01a20b0e-b248-7730-adb7-0b3c75faa544",
+          "origin": "automatic",
+          "status": "complete"
+        },
+        "t": 29801305.238003563
+      },
+      "terminal_receipt": {
+        "thread_id": "01a20b0e-b248-7730-adb7-0b3c75faa544",
+        "turn_id": "01a20b0e-b267-76f2-801f-8c2b756b6be4",
+        "call_id": "direct-submit",
+        "reason": "GX_TERMINAL_REJECTED",
+        "recorded_at": "2026-11-24T00:57:22.503Z",
+        "goal_checked_at": "2026-11-24T00:57:22.518Z",
+        "interrupt_ack_at": "2026-11-24T00:57:22.844Z",
+        "goal_last_error": null,
+        "interrupt_last_error": null,
+        "interrupt_attempts": 1
+      },
+      "history_terminal": "interrupted",
+      "final_meter": {
+        "reservation_ref": "rsv_01m85gxck3zej18cfm",
+        "budget_status": "SETTLED",
+        "confidence": "PROVIDER_CONFIRMED",
+        "terminal_status": "interrupted",
+        "measured_tokens": 70,
+        "settled_tokens": 70,
+        "estimated_at": null,
+        "metering_reason": null
+      },
+      "post_commit_requests": [],
+      "requests_without_native_usage_receipt": [],
+      "response_grace_seconds": 1.0,
+      "commit_to_interrupt_seconds": 0.3141377493739128
+    },
+    {
+      "case": "never_completes",
+      "mode": "code_mode_only",
+      "catalog_mode_override": false,
+      "fault": "none",
+      "run": "gxr_01m85gxdtcdpr9rdh2",
+      "task": "gxt_01m85gxe1nxbcb2x4e",
+      "expected": "ACCEPTED",
+      "interrupt_writes": [
+        {
+          "id": 10,
+          "params": {
+            "threadId": "01a20b0e-b848-7ba2-a580-e3822193b007",
+            "turnId": "01a20b0e-b868-7dd1-9577-30b4727cb20b"
+          },
+          "t": 29801307.80234656,
+          "dropped": false
+        }
+      ],
+      "tool_responses_written": [],
+      "server_interrupt_replies": [
+        {
+          "id": 10,
+          "result": {}
+        }
+      ],
+      "observed_calls": [
+        {
+          "seq": 28,
+          "namespace": "gx",
+          "call": "direct-submit",
+          "tool": "gx_submit_product"
+        }
+      ],
+      "events": [
+        {
+          "seq": 20,
+          "type": "custom_tool_call",
+          "call_id": "inspect-and-attempt-nested",
+          "name": "exec",
+          "namespace": "functions"
+        },
+        {
+          "seq": 21,
+          "type": "rawResponse/completed",
+          "id": "wire-response-1",
+          "t": 29801306.691418014,
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 23,
+          "type": "custom_tool_call_output",
+          "call_id": "inspect-and-attempt-nested",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+            },
+            {
+              "type": "input_text",
+              "text": "{\"matches\":[],\"plain\":\"undefined\",\"grouped\":\"undefined\",\"reader\":\"function\"}"
+            },
+            {
+              "type": "input_text",
+              "text": "TypeError"
+            }
+          ]
+        },
+        {
+          "seq": 26,
+          "type": "function_call",
+          "call_id": "direct-submit",
+          "name": "gx_submit_product",
+          "namespace": "gx"
+        },
+        {
+          "seq": 32,
+          "type": "dynamicToolCall",
+          "id": "direct-submit",
+          "namespace": "gx",
+          "status": "failed"
+        },
+        {
+          "seq": 33,
+          "type": "function_call_output",
+          "call_id": "direct-submit",
+          "output": "dynamic tool call was cancelled before receiving a response"
+        }
+      ],
+      "requests": [
+        {
+          "id": "wire-response-1",
+          "t": 29801306.68431428,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801306.685022064,
+          "completion_write_at": 29801306.68502506
+        },
+        {
+          "id": "wire-response-2",
+          "t": 29801306.771566335,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801306.77232677
+        }
+      ],
+      "thread": "01a20b0e-b848-7ba2-a580-e3822193b007",
+      "turn_id": "01a20b0e-b868-7dd1-9577-30b4727cb20b",
+      "encoded_worker_override": {
+        "features.code_mode.direct_only_tool_namespaces": [
+          "existing_group",
+          "gx"
+        ],
+        "features.code_mode_only_strict_3p_tools": false
+      },
+      "committed_at": 29801306.794797774,
+      "submission": {
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "submission_id": "gxsb_01m85gxeay1388ta1n",
+        "result": "ACCEPTED",
+        "lease_id": "gxl_01m85gxe1w2kqzyj46",
+        "records_artifact_ref": "gxa_01m85gxeaz4earybzk",
+        "artifact_refs_json": "[\"gxa_01m85gxeavx9mk9me4\"]"
+      },
+      "goal_complete_write": {
+        "id": 9,
+        "params": {
+          "threadId": "01a20b0e-b848-7ba2-a580-e3822193b007",
+          "origin": "automatic",
+          "status": "complete"
+        },
+        "t": 29801306.79621704
+      },
+      "terminal_receipt": {
+        "thread_id": "01a20b0e-b848-7ba2-a580-e3822193b007",
+        "turn_id": "01a20b0e-b868-7dd1-9577-30b4727cb20b",
+        "call_id": "direct-submit",
+        "reason": "GX_ACCEPTED",
+        "recorded_at": "2026-11-24T00:57:24.064Z",
+        "goal_checked_at": "2026-11-24T00:57:24.076Z",
+        "interrupt_ack_at": "2026-11-24T00:57:25.096Z",
+        "goal_last_error": null,
+        "interrupt_last_error": null,
+        "interrupt_attempts": 1
+      },
+      "history_terminal": "interrupted",
+      "final_meter": {
+        "reservation_ref": "rsv_01m85gxe358m4rg04x",
+        "budget_status": "HELD",
+        "confidence": "RESERVED",
+        "terminal_status": "interrupted",
+        "measured_tokens": null,
+        "settled_tokens": null,
+        "estimated_at": null,
+        "metering_reason": "cumulative usage is awaiting complete matching provider receipts"
+      },
+      "post_commit_requests": [],
+      "requests_without_native_usage_receipt": [
+        "wire-response-2"
+      ],
+      "response_grace_seconds": 1.0,
+      "commit_to_interrupt_seconds": 1.0075487866997719
+    },
+    {
+      "case": "without_grace",
+      "mode": "code_mode_only",
+      "catalog_mode_override": false,
+      "fault": "none",
+      "run": "gxr_01m85gxfvgngdnx0ap",
+      "task": "gxt_01m85gxg2xew7txh9z",
+      "expected": "ACCEPTED",
+      "interrupt_writes": [
+        {
+          "id": 10,
+          "params": {
+            "threadId": "01a20b0e-c07c-7fe2-be0d-ba59c118285d",
+            "turnId": "01a20b0e-c09c-72d1-a264-6b882471219c"
+          },
+          "t": 29801308.89978613,
+          "dropped": false
+        }
+      ],
+      "tool_responses_written": [],
+      "server_interrupt_replies": [
+        {
+          "id": 10,
+          "result": {}
+        }
+      ],
+      "observed_calls": [
+        {
+          "seq": 28,
+          "namespace": "gx",
+          "call": "direct-submit",
+          "tool": "gx_submit_product"
+        }
+      ],
+      "events": [
+        {
+          "seq": 20,
+          "type": "custom_tool_call",
+          "call_id": "inspect-and-attempt-nested",
+          "name": "exec",
+          "namespace": "functions"
+        },
+        {
+          "seq": 21,
+          "type": "rawResponse/completed",
+          "id": "wire-response-1",
+          "t": 29801308.772430312,
+          "usage": {
+            "totalTokens": 35,
+            "inputTokens": 30,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 5,
+            "reasoningOutputTokens": 0
+          }
+        },
+        {
+          "seq": 23,
+          "type": "custom_tool_call_output",
+          "call_id": "inspect-and-attempt-nested",
+          "output": [
+            {
+              "type": "input_text",
+              "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+            },
+            {
+              "type": "input_text",
+              "text": "{\"matches\":[],\"plain\":\"undefined\",\"grouped\":\"undefined\",\"reader\":\"function\"}"
+            },
+            {
+              "type": "input_text",
+              "text": "TypeError"
+            }
+          ]
+        },
+        {
+          "seq": 26,
+          "type": "function_call",
+          "call_id": "direct-submit",
+          "name": "gx_submit_product",
+          "namespace": "gx"
+        },
+        {
+          "seq": 32,
+          "type": "dynamicToolCall",
+          "id": "direct-submit",
+          "namespace": "gx",
+          "status": "failed"
+        },
+        {
+          "seq": 33,
+          "type": "function_call_output",
+          "call_id": "direct-submit",
+          "output": "dynamic tool call was cancelled before receiving a response"
+        }
+      ],
+      "requests": [
+        {
+          "id": "wire-response-1",
+          "t": 29801308.76464965,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801308.765313957,
+          "completion_write_at": 29801308.76531697
+        },
+        {
+          "id": "wire-response-2",
+          "t": 29801308.84801569,
+          "model": "gpt-6.2-astra",
+          "catalog": {
+            "location": [
+              "input.additional_tools"
+            ],
+            "direct_product_groups": [
+              [
+                "gx_submit_product"
+              ]
+            ],
+            "nested_code_available": true
+          },
+          "usage": {
+            "input_tokens": 30,
+            "output_tokens": 5,
+            "total_tokens": 35
+          },
+          "sent_item_at": 29801308.848677915,
+          "completion_write_at": 29801309.18978546
+        }
+      ],
+      "thread": "01a20b0e-c07c-7fe2-be0d-ba59c118285d",
+      "turn_id": "01a20b0e-c09c-72d1-a264-6b882471219c",
+      "encoded_worker_override": {
+        "features.code_mode.direct_only_tool_namespaces": [
+          "existing_group",
+          "gx"
+        ],
+        "features.code_mode_only_strict_3p_tools": false
+      },
+      "committed_at": 29801308.889634352,
+      "submission": {
+        "status": "ACCEPTED",
+        "attempt": 1,
+        "submission_id": "gxsb_01m85gxgc817m64g76",
+        "result": "ACCEPTED",
+        "lease_id": "gxl_01m85gxg3efbj75k2h",
+        "records_artifact_ref": "gxa_01m85gxgcb9fg21ddg",
+        "artifact_refs_json": "[\"gxa_01m85gxgc291xkhynb\"]"
+      },
+      "goal_complete_write": {
+        "id": 9,
+        "params": {
+          "threadId": "01a20b0e-c07c-7fe2-be0d-ba59c118285d",
+          "origin": "automatic",
+          "status": "complete"
+        },
+        "t": 29801308.891386375
+      },
+      "terminal_receipt": {
+        "thread_id": "01a20b0e-c07c-7fe2-be0d-ba59c118285d",
+        "turn_id": "01a20b0e-c09c-72d1-a264-6b882471219c",
+        "call_id": "direct-submit",
+        "reason": "GX_ACCEPTED",
+        "recorded_at": "2026-11-24T00:57:26.157Z",
+        "goal_checked_at": "2026-11-24T00:57:26.172Z",
+        "interrupt_ack_at": "2026-11-24T00:57:26.193Z",
+        "goal_last_error": null,
+        "interrupt_last_error": null,
+        "interrupt_attempts": 1
+      },
+      "history_terminal": "interrupted",
+      "final_meter": {
+        "reservation_ref": "rsv_01m85gxg4qfbkzxa9w",
+        "budget_status": "HELD",
+        "confidence": "RESERVED",
+        "terminal_status": "interrupted",
+        "measured_tokens": null,
+        "settled_tokens": null,
+        "estimated_at": null,
+        "metering_reason": "cumulative usage is awaiting complete matching provider receipts"
+      },
+      "post_commit_requests": [],
+      "requests_without_native_usage_receipt": [
+        "wire-response-2"
+      ],
+      "response_grace_seconds": 0,
+      "commit_to_interrupt_seconds": 0.010151777416467667
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "outer_namespace": "net:[4026546625]",
+  "fixture_namespace": "net:[4026551197]",
+  "interfaces": {
+    "1": "lo",
+    "2": "tunl0"
+  },
+  "ipv4_routes": [],
+  "ipv6_route_interfaces": [
+    "lo"
+  ],
+  "proxy_program": "Mihomo Meta v1.19.31 linux amd64 with go1.26.8 Mon Sep 14 13:23:45 UTC 2026",
+  "proxy_program_sha256": "12d97b7b7fa22cb4456e62c6e35db4be952dbb1c53eacaa9ef437c95d5068a9d",
+  "proxy_config": "port: 7890\nsocks-port: 7891\nbind-address: 127.0.0.1\nallow-lan: false\nmode: rule\nlog-level: warning\nipv6: false\ngeo-auto-update: false\ndisable-keep-alive: true\ndns:\n  enable: false\nrules:\n  - MATCH,REJECT\n",
+  "outer_proxy_listeners": {
+    "7890": true,
+    "7891": false
+  },
+  "isolated_proxy_listeners": {
+    "7890": true,
+    "7891": true
+  },
+  "original_proxy_environment": true,
+  "command": [
+    "python",
+    "acceptance/phase2a/regression/run.py",
+    "--phase",
+    "full",
+    "--revision",
+    "c15eada9611f60519bafbb3366c908629dbea157",
+    "--cache",
+    "../gx-h-v-3",
+    "--source-db",
+    "../gx-h-v-3/var/v3-staging/frozen-a05dcef/snapshot/project/gx.db",
+    "--historical-briefs",
+    "../scratchpad/v3-real-performance/p1-2476f2b-xhigh",
+    "--catalog",
+    "../scratchpad/v3-real-performance/p1-2476f2b-xhigh/codex-home/models_cache.json",
+    "--out",
+    "acceptance/phase2a/regression/final-v2/batch"
+  ],
+  "started_unix": 1795481805.9832182,
+  "exit_code": 1,
+  "finished_unix": 1795482121.7051382
+}

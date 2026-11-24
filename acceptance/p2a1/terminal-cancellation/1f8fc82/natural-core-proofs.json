@@ -1,0 +1,647 @@
+[
+  {
+    "id": "GX_ABORT_0023",
+    "expected": "ACCEPTED",
+    "fault": "none",
+    "run_id": "gxr_01m87bf1aw3k0x4m6e",
+    "task_id": "gxt_01m87bf8gg7c6gcfnw",
+    "thread_id": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+    "turn_id": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+    "call_id": "call-probe-response-23",
+    "events": [
+      {
+        "seq": 792,
+        "t": 29862708.176133662,
+        "method": "rawResponseItem/completed",
+        "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+        "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+        "type": "function_call",
+        "name": "gx_submit_product",
+        "call_id": "call-probe-response-23"
+      },
+      {
+        "seq": 793,
+        "t": 29862708.176529843,
+        "method": "rawResponse/completed",
+        "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+        "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+        "response_id": "probe-response-23",
+        "usage": {
+          "totalTokens": 35,
+          "inputTokens": 30,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 5,
+          "reasoningOutputTokens": 0
+        }
+      },
+      {
+        "seq": 799,
+        "t": 29862708.21294745,
+        "method": "item/completed",
+        "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+        "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+        "item": {
+          "type": "dynamicToolCall",
+          "id": "call-probe-response-23",
+          "namespace": null,
+          "tool": "gx_submit_product",
+          "arguments": {
+            "product": {
+              "proposal_ref": "gxa_01m87bf1aymqsryztg",
+              "evidence_refs": [
+                "gxa_01m87bf1azbbx0rt17"
+              ],
+              "findings": [
+                {
+                  "path_id": "sample",
+                  "reason": "The fixture measurement failed.",
+                  "evaluation_ref": null,
+                  "supported": null
+                }
+              ]
+            }
+          },
+          "status": "failed",
+          "contentItems": [],
+          "success": false,
+          "durationMs": 28,
+          "startedAtMs": 1795543245454,
+          "completedAtMs": 1795543245483
+        }
+      },
+      {
+        "seq": 803,
+        "t": 29862708.489155572,
+        "method": "turn/completed",
+        "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+        "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+        "status": "interrupted",
+        "error": null
+      }
+    ],
+    "model_requests": [
+      {
+        "id": "probe-response-23",
+        "child": false,
+        "model": "gpt-6.1-sol",
+        "t": 29862708.16993196,
+        "trial": "GX_ABORT_0023",
+        "usage": {
+          "input_tokens": 30,
+          "output_tokens": 5,
+          "total_tokens": 35
+        }
+      }
+    ],
+    "tool_responses_written": [],
+    "post_terminal_model_requests": [],
+    "turn_history": {
+      "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+      "id": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+      "status": "interrupted",
+      "call": {
+        "type": "dynamicToolCall",
+        "id": "call-probe-response-23",
+        "namespace": null,
+        "tool": "gx_submit_product",
+        "arguments": {
+          "product": {
+            "proposal_ref": "gxa_01m87bf1aymqsryztg",
+            "evidence_refs": [
+              "gxa_01m87bf1azbbx0rt17"
+            ],
+            "findings": [
+              {
+                "path_id": "sample",
+                "reason": "The fixture measurement failed.",
+                "evaluation_ref": null,
+                "supported": null
+              }
+            ]
+          }
+        },
+        "status": "failed",
+        "contentItems": [],
+        "success": false,
+        "durationMs": 28,
+        "startedAtMs": 1795543245454,
+        "completedAtMs": 1795543245483
+      }
+    },
+    "cancellation_proof": {
+      "source": "official core item_completed",
+      "raw_drain_seconds": 1,
+      "live_sequence": 799,
+      "rollout_name": "rollout-2026-11-24T18-00-45-01a20eb7-a226-7c72-801b-5a03f0a117a1.jsonl",
+      "receipt": {
+        "timestamp": "2026-11-24T18:00:45.483Z",
+        "ordinal": 17,
+        "type": "event_msg",
+        "payload": {
+          "type": "item_completed",
+          "thread_id": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+          "turn_id": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+          "item": {
+            "type": "DynamicToolCall",
+            "id": "call-probe-response-23",
+            "tool": "gx_submit_product",
+            "arguments": {
+              "product": {
+                "proposal_ref": "gxa_01m87bf1aymqsryztg",
+                "evidence_refs": [
+                  "gxa_01m87bf1azbbx0rt17"
+                ],
+                "findings": [
+                  {
+                    "path_id": "sample",
+                    "reason": "The fixture measurement failed.",
+                    "evaluation_ref": null,
+                    "supported": null
+                  }
+                ]
+              }
+            },
+            "status": "failed",
+            "content_items": [],
+            "success": false,
+            "error": "dynamic tool call was cancelled before receiving a response",
+            "duration": {
+              "secs": 0,
+              "nanos": 28543426
+            }
+          },
+          "started_at_ms": 1795543245454,
+          "completed_at_ms": 1795543245483
+        }
+      }
+    },
+    "cancellation_diagnostics": {
+      "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+      "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+      "call": "call-probe-response-23",
+      "rollouts": [
+        "rollout-2026-11-24T18-00-45-01a20eb7-a226-7c72-801b-5a03f0a117a1.jsonl"
+      ],
+      "live_sequences": [
+        799
+      ],
+      "records": [
+        {
+          "ordinal": 1,
+          "type": "event_msg",
+          "event": "task_started",
+          "thread": null,
+          "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+          "item": null,
+          "call": null,
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 10,
+          "type": "turn_context",
+          "event": null,
+          "thread": null,
+          "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+          "item": null,
+          "call": null,
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 13,
+          "type": "event_msg",
+          "event": "item_completed",
+          "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+          "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+          "item": "UserMessage",
+          "call": "01a20eb7-a259-75b2-8f65-f4238a0ec215",
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 14,
+          "type": "response_item",
+          "event": "function_call",
+          "thread": null,
+          "turn": null,
+          "item": null,
+          "call": "call-probe-response-23",
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 15,
+          "type": "token_usage_record",
+          "event": null,
+          "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+          "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+          "item": null,
+          "call": null,
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 17,
+          "type": "event_msg",
+          "event": "item_completed",
+          "thread": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+          "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+          "item": "DynamicToolCall",
+          "call": "call-probe-response-23",
+          "tool": "gx_submit_product",
+          "status": "failed",
+          "error": "dynamic tool call was cancelled before receiving a response"
+        },
+        {
+          "ordinal": 18,
+          "type": "response_item",
+          "event": "function_call_output",
+          "thread": null,
+          "turn": null,
+          "item": null,
+          "call": "call-probe-response-23",
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 20,
+          "type": "event_msg",
+          "event": "turn_aborted",
+          "thread": null,
+          "turn": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+          "item": null,
+          "call": null,
+          "tool": null,
+          "status": null,
+          "error": null
+        }
+      ],
+      "rollout_sha256": "734da514cbda637c051c8f8fb4b9bfb46ea8fb53fd4b79848155a6cc38ade034",
+      "same_scope_core_completions": [
+        {
+          "timestamp": "2026-11-24T18:00:45.483Z",
+          "ordinal": 17,
+          "type": "event_msg",
+          "payload": {
+            "type": "item_completed",
+            "thread_id": "01a20eb7-a226-7c72-801b-5a03f0a117a1",
+            "turn_id": "01a20eb7-a23b-7c41-ba8e-279fa322d168",
+            "item": {
+              "type": "DynamicToolCall",
+              "id": "call-probe-response-23",
+              "tool": "gx_submit_product",
+              "arguments": {
+                "product": {
+                  "proposal_ref": "gxa_01m87bf1aymqsryztg",
+                  "evidence_refs": [
+                    "gxa_01m87bf1azbbx0rt17"
+                  ],
+                  "findings": [
+                    {
+                      "path_id": "sample",
+                      "reason": "The fixture measurement failed.",
+                      "evaluation_ref": null,
+                      "supported": null
+                    }
+                  ]
+                }
+              },
+              "status": "failed",
+              "content_items": [],
+              "success": false,
+              "error": "dynamic tool call was cancelled before receiving a response",
+              "duration": {
+                "secs": 0,
+                "nanos": 28543426
+              }
+            },
+            "started_at_ms": 1795543245454,
+            "completed_at_ms": 1795543245483
+          }
+        }
+      ]
+    },
+    "final_meter": {
+      "reservation_ref": "rsv_01m87bf8hr3cb9bz8c",
+      "budget_status": "SETTLED",
+      "confidence": "ESTIMATED",
+      "terminal_status": "interrupted",
+      "measured_tokens": 35,
+      "settled_tokens": 800,
+      "estimated_at": "2026-11-24T18:01:15.765Z",
+      "metering_reason": "missing cumulative usage for this turn"
+    },
+    "budget_settlements": [
+      {
+        "event_id": 262,
+        "tokens": 800
+      }
+    ]
+  },
+  {
+    "id": "GX_ABORT_0136",
+    "expected": "REJECTED",
+    "fault": "none",
+    "run_id": "gxr_01m87bgvya6j18reqt",
+    "task_id": "gxt_01m87bh1cxt5ba8vrn",
+    "thread_id": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+    "turn_id": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+    "call_id": "call-probe-response-136",
+    "events": [
+      {
+        "seq": 547,
+        "t": 29862766.801077727,
+        "method": "rawResponseItem/completed",
+        "thread": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+        "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+        "type": "function_call",
+        "name": "gx_submit_product",
+        "call_id": "call-probe-response-136"
+      },
+      {
+        "seq": 548,
+        "t": 29862766.80150451,
+        "method": "rawResponse/completed",
+        "thread": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+        "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+        "response_id": "probe-response-136",
+        "usage": {
+          "totalTokens": 35,
+          "inputTokens": 30,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 5,
+          "reasoningOutputTokens": 0
+        }
+      },
+      {
+        "seq": 557,
+        "t": 29862767.152462848,
+        "method": "turn/completed",
+        "thread": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+        "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+        "status": "interrupted",
+        "error": null
+      }
+    ],
+    "model_requests": [
+      {
+        "id": "probe-response-136",
+        "child": false,
+        "model": "gpt-6.1-sol",
+        "t": 29862766.793176897,
+        "trial": "GX_ABORT_0136",
+        "usage": {
+          "input_tokens": 30,
+          "output_tokens": 5,
+          "total_tokens": 35
+        }
+      }
+    ],
+    "tool_responses_written": [],
+    "post_terminal_model_requests": [],
+    "turn_history": {
+      "thread": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+      "id": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+      "status": "interrupted",
+      "call": {
+        "type": "dynamicToolCall",
+        "id": "call-probe-response-136",
+        "namespace": null,
+        "tool": "gx_submit_product",
+        "arguments": {
+          "product": {
+            "proposal_ref": "gxa_01m87bgvyfpnx5qyyh",
+            "evidence_refs": [
+              "gxa_01m87bgvyjcg7a2r8e"
+            ],
+            "findings": [
+              {
+                "path_id": "sample",
+                "reason": "The fixture measurement failed.",
+                "evaluation_ref": null,
+                "supported": false
+              }
+            ]
+          }
+        },
+        "status": "failed",
+        "contentItems": [],
+        "success": false,
+        "durationMs": 45,
+        "startedAtMs": 1795543304080,
+        "completedAtMs": 1795543304125
+      }
+    },
+    "cancellation_proof": {
+      "source": "official core item_completed",
+      "raw_drain_seconds": 1,
+      "live_sequence": null,
+      "rollout_name": "rollout-2026-11-24T18-01-43-01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c.jsonl",
+      "receipt": {
+        "timestamp": "2026-11-24T18:01:44.126Z",
+        "ordinal": 17,
+        "type": "event_msg",
+        "payload": {
+          "type": "item_completed",
+          "thread_id": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+          "turn_id": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+          "item": {
+            "type": "DynamicToolCall",
+            "id": "call-probe-response-136",
+            "tool": "gx_submit_product",
+            "arguments": {
+              "product": {
+                "proposal_ref": "gxa_01m87bgvyfpnx5qyyh",
+                "evidence_refs": [
+                  "gxa_01m87bgvyjcg7a2r8e"
+                ],
+                "findings": [
+                  {
+                    "path_id": "sample",
+                    "reason": "The fixture measurement failed.",
+                    "evaluation_ref": null,
+                    "supported": false
+                  }
+                ]
+              }
+            },
+            "status": "failed",
+            "content_items": [],
+            "success": false,
+            "error": "dynamic tool call was cancelled before receiving a response",
+            "duration": {
+              "secs": 0,
+              "nanos": 45129962
+            }
+          },
+          "started_at_ms": 1795543304080,
+          "completed_at_ms": 1795543304125
+        }
+      }
+    },
+    "cancellation_diagnostics": {
+      "thread": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+      "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+      "call": "call-probe-response-136",
+      "rollouts": [
+        "rollout-2026-11-24T18-01-43-01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c.jsonl"
+      ],
+      "live_sequences": [],
+      "records": [
+        {
+          "ordinal": 1,
+          "type": "event_msg",
+          "event": "task_started",
+          "thread": null,
+          "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+          "item": null,
+          "call": null,
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 10,
+          "type": "turn_context",
+          "event": null,
+          "thread": null,
+          "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+          "item": null,
+          "call": null,
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 13,
+          "type": "event_msg",
+          "event": "item_completed",
+          "thread": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+          "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+          "item": "UserMessage",
+          "call": "01a20eb8-873f-7de0-8a04-58ac54bad05a",
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 14,
+          "type": "response_item",
+          "event": "function_call",
+          "thread": null,
+          "turn": null,
+          "item": null,
+          "call": "call-probe-response-136",
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 15,
+          "type": "token_usage_record",
+          "event": null,
+          "thread": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+          "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+          "item": null,
+          "call": null,
+          "tool": null,
+          "status": null,
+          "error": null
+        },
+        {
+          "ordinal": 17,
+          "type": "event_msg",
+          "event": "item_completed",
+          "thread": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+          "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+          "item": "DynamicToolCall",
+          "call": "call-probe-response-136",
+          "tool": "gx_submit_product",
+          "status": "failed",
+          "error": "dynamic tool call was cancelled before receiving a response"
+        },
+        {
+          "ordinal": 19,
+          "type": "event_msg",
+          "event": "turn_aborted",
+          "thread": null,
+          "turn": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+          "item": null,
+          "call": null,
+          "tool": null,
+          "status": null,
+          "error": null
+        }
+      ],
+      "rollout_sha256": "ec40c09213a50b7104ecab085676b2cd2ab2c8dd40996731d86a6007716d5e54",
+      "same_scope_core_completions": [
+        {
+          "timestamp": "2026-11-24T18:01:44.126Z",
+          "ordinal": 17,
+          "type": "event_msg",
+          "payload": {
+            "type": "item_completed",
+            "thread_id": "01a20eb8-85ac-74f2-8ad7-3d7a1199fc7c",
+            "turn_id": "01a20eb8-85bd-7ac3-a0eb-5103fb51f649",
+            "item": {
+              "type": "DynamicToolCall",
+              "id": "call-probe-response-136",
+              "tool": "gx_submit_product",
+              "arguments": {
+                "product": {
+                  "proposal_ref": "gxa_01m87bgvyfpnx5qyyh",
+                  "evidence_refs": [
+                    "gxa_01m87bgvyjcg7a2r8e"
+                  ],
+                  "findings": [
+                    {
+                      "path_id": "sample",
+                      "reason": "The fixture measurement failed.",
+                      "evaluation_ref": null,
+                      "supported": false
+                    }
+                  ]
+                }
+              },
+              "status": "failed",
+              "content_items": [],
+              "success": false,
+              "error": "dynamic tool call was cancelled before receiving a response",
+              "duration": {
+                "secs": 0,
+                "nanos": 45129962
+              }
+            },
+            "started_at_ms": 1795543304080,
+            "completed_at_ms": 1795543304125
+          }
+        }
+      ]
+    },
+    "final_meter": {
+      "reservation_ref": "rsv_01m87bh1dt1mt1ysfw",
+      "budget_status": "SETTLED",
+      "confidence": "ESTIMATED",
+      "terminal_status": "interrupted",
+      "measured_tokens": 35,
+      "settled_tokens": 800,
+      "estimated_at": "2026-11-24T18:02:14.429Z",
+      "metering_reason": "missing cumulative usage for this turn"
+    },
+    "budget_settlements": [
+      {
+        "event_id": 1515,
+        "tokens": 800
+      }
+    ]
+  }
+]

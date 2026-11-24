@@ -22,4 +22,6 @@
 
 - 候选原始请求、官方帧、丢失开始帧时间线、冷读回包、SQLite 压缩备份以及宽限期前后的账本均在 [候选证据](eb0cd52/supplemental/evidence/receipt.json)。[候选外层门禁](eb0cd52/supplemental/observation.json) 记录原始命令和内层返回码。[范围负例与计量测试](eb0cd52/scope-controls.log) 共 26 条通过。
 - 历史对照只将候选的两个验收脚本复制进旧工作树，两边回执的脚本 SHA256 相同。[历史回执](baseline-61ea96d/evidence/receipt.json) 保留真实非零结果。[历史终态回包](baseline-61ea96d/evidence/cold-history.jsonl) 与 [历史 SQLite](baseline-61ea96d/evidence/ledger.sqlite.gz) 可交叉核对旧版本未建立已验证子 Turn 的原因。
-- 在本目录执行 `sha256sum -c manifest.sha256` 可核验全部文件。已准备好依赖的发布目录支持 `bin/gx-acceptance run --case CHILD-DOUBLE-LOSS`。旧门禁的完整启动方式见 [网络与启动记录](eb0cd52/network.json)。
+- 在本目录执行 `sha256sum -c manifest.sha256` 可核验全部文件。已准备好依赖的发布目录支持 `bin/gx-acceptance run hardening --case CHILD-DOUBLE-LOSS`。旧门禁的完整启动方式见 [网络与启动记录](eb0cd52/network.json)。
+
+公共入口也通过同一用例，自动打包、校验后为 PASS。这个运行在并行开发工作树进行，环境回执保留当时的 SHA 与文件差异。上表候选列取自独立冻结工作树。[公共入口结果](public-cli/child-gate/summary.json)

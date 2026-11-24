@@ -1,0 +1,118 @@
+{
+  "topic": "P2A.1 T03 historical evidence intake",
+  "examined_utc": "2026-11-24T17:28:37+00:00",
+  "source_tree": "61ea96daa218719a7663cb8fc8b404256560b124",
+  "historical_group": {
+    "reported_failed": 42,
+    "reported_suite_size": 465,
+    "identified_from_original_run": 0,
+    "verdict": "PARTIAL",
+    "source_of_count": {
+      "path": "GX_H_P2A_Closure_Package.zip",
+      "sha256": "afca692f1d4c379601912b5f0ffe2be8244cb7b92c0a54b65f0a41271d7ff302",
+      "member": "GX_H_P2A_Closure_Package/README.md",
+      "line": 7
+    }
+  },
+  "separate_reported_rerun": {
+    "requested_filename": "gx-deterministic-rerun-3a08a9d.log",
+    "reported_failures": 13,
+    "found_on_search": false,
+    "verified_failure_ids": []
+  },
+  "search_scope": {
+    "filename_roots": [
+      "gx-auto workspace and its sibling releases",
+      "/tmp",
+      "/workspace",
+      "/mnt"
+    ],
+    "filename_max_depth": 14,
+    "filename_terms": [
+      "3a08a9d",
+      "deterministic rerun",
+      "historical or original failure",
+      "original 42",
+      "42 classification",
+      "failure classification",
+      "42 environment"
+    ],
+    "attachment_locations": "/mnt and /workspace were empty. No upload or attachment directory was present at /mnt/data, /uploads, /tmp/uploads or the workspace root.",
+    "archive_sets": [
+      "release acceptance/closure archived runs and profile history",
+      "release and adjacent GX handoff ZIPs",
+      "temporary gx-p2a-closure run archives"
+    ],
+    "unique_archives_inspected": 23,
+    "source_check": "Compared archive member names and archived original-42 records. Checked unittest/pytest failure summaries from the release and temporary closure run directories. Checked tracked history for matching handoff filenames."
+  },
+  "retained_witnesses": {
+    "tested_product": "3a08a9d1c36759686d29743c75d789cd959848a1",
+    "archives": {
+      "frozen-3a08a9d": {
+        "path": "acceptance/closure/runs/frozen-3a08a9d/raw.tar.gz",
+        "sha256": "2135c0d90b3714e6bae1810174d2555de6ecaf7f41fd037f2face507cba82902"
+      },
+      "retry-3a08a9d": {
+        "path": "acceptance/closure/runs/retry-3a08a9d/raw.tar.gz",
+        "sha256": "df5c4b05b77824bcdbea6f9de83bb07482cd2d8db9f9803dbab2a670be7f3d44"
+      }
+    },
+    "common_original_record": {
+      "member": "T03/evidence/original-42.json",
+      "sha256": "4dcb0ff51daa656c9b2adb5710360fda4c80c5f3c2844cd2f46446640079b288",
+      "identified": 0,
+      "source": null
+    },
+    "common_discovery_log": {
+      "member": "T03/evidence/suite/python-full.log",
+      "sha256": "4cb4984c0fb9393b425a21bcd67ce78936fe5151f97d051836b47242cf3b369e",
+      "tests": 476,
+      "skipped": 4,
+      "failures": 0,
+      "errors": 0
+    },
+    "original_465_log": {
+      "path": "acceptance/phase2a/regression/final-v2/batch/suite/python-full.log",
+      "sha256": "1f3b2d106f3b125b8ec5dafaa89ee1a6b4605f25dd88196d64abf52706a483fd",
+      "tests": 465,
+      "skipped": 4,
+      "failures": 0,
+      "errors": 0
+    },
+    "sibling_list": {
+      "path_from_workspace": "gxdesign-harness/releases/science-native-v1/scratchpad/native_followup_repairs_20261118/original-failure-ids.txt",
+      "sha256": "8d4b5dc239ead3049784caaa565decafbf66c4968403443ac9934458f7d6496e",
+      "entries": 18,
+      "exact_matches_in_original_465": 0
+    }
+  },
+  "missing_historical_inputs": [
+    "Original failure output or identity list for the 42 cases, including distinct subTest headings where applicable",
+    "Tracebacks and dated revision/dirty state, command and execution-environment evidence for the originating run to support per-case attribution"
+  ],
+  "intake_at_source_tree": {
+    "command": [
+      "bin/gx-acceptance",
+      "run",
+      "all",
+      "--case",
+      "T03",
+      "--original-failures",
+      "<original-source-path>"
+    ],
+    "accepted_sources": [
+      "unittest failure output",
+      "pytest failure summary",
+      "JUnit XML",
+      "JSON list or object with a failures list"
+    ],
+    "json_fields": [
+      "test_id",
+      "original_id (optional distinct heading)",
+      "original_error (if available)",
+      "classification, reason, evidence (if reviewed)"
+    ],
+    "evidence_reference": "Relative evidence paths resolve from the classification JSON directory. Supply the referenced files together with that JSON."
+  }
+}

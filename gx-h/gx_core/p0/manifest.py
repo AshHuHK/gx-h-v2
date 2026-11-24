@@ -100,7 +100,14 @@ def _runtime(env, resources, preflight):
             "gpu": {"requested": resources["gpu"], "preflight": preflight} if resources["gpu"] else None}
 
 
-def admit(conn, job_id, *, launch, bundle, env, inputs, resources, preflight):
+def prepare_runtime(launch, bundle, env, resources, preflight):
+    """Freeze filesystem-backed source and interpreter observations before the Job writer."""
+    capability = launch["capability_version"]
+    return {"source": _source(launch, bundle), "runtime": _runtime(env, resources, preflight),
+            "pinned_method": capability in shipped.MANIFESTS and shipped.portable_digest(bundle) == shipped.pin(capability)}
+
+
+def admit(conn, job_id, *, launch, bundle, inputs, resources, prepared):
     """Called under the same write lock as the new Job and its budget reservation."""
     row = conn.execute("SELECT * FROM jobs WHERE job_id=?", (job_id,)).fetchone()
     cap = launch["capability_version"]
@@ -131,7 +138,7 @@ def admit(conn, job_id, *, launch, bundle, env, inputs, resources, preflight):
     params = launch["parameters"]
     levels = {"level": "provenance", "replay": "requires original runtime and data",
               "known_variation": ["host runtime and external inputs may vary"]}
-    pinned_method = cap in shipped.MANIFESTS and shipped.portable_digest(bundle) == shipped.pin(cap)
+    pinned_method = prepared["pinned_method"]
     if pinned_method and cap == shipped.GRID:
         levels = {"level": "deterministic_synthetic_cpu", "replay": "numeric observations on frozen inputs",
                   "known_variation": ["process identifiers, wall time and resource measurements"]}
@@ -154,13 +161,13 @@ def admit(conn, job_id, *, launch, bundle, env, inputs, resources, preflight):
                                                     "sha256": launch["input_manifest_sha256"]},
         "datasets": [{"id": e["artifact_ref"], "version": e["sha256"], "sha256": e["sha256"]}
                      for e in frozen_inputs], "external_data_paths": method["required_data"],
-        "source": _source(launch, bundle), "capability": {"id": row["capability_id"],
+        "source": prepared["source"], "capability": {"id": row["capability_id"],
                     "version": row["capability_version"], "sha256": launch["manifest_sha256"]},
         "model": {"id": None, "provider": None, "weights": launch["weights"],
                   "applicability": "no learned model" if pinned_method else "as declared by capability"},
         "parameters": params, "seeds": {k: v for k, v in params.items() if "seed" in k.lower()},
         "argv": launch["argv"], "limits": resources, "budget_reservation_ref": row["reservation_ref"],
-        "runtime": _runtime(env, resources, preflight), "evaluator": _evaluation(conn, binding),
+        "runtime": prepared["runtime"], "evaluator": _evaluation(conn, binding),
         "reproducibility": levels,
     }
     conn.execute("INSERT INTO p0_execution_manifests(job_id,admission_json,admission_sha256) VALUES(?,?,?)",

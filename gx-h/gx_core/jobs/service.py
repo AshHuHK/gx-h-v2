@@ -677,6 +677,7 @@ class JobService:
             staging_ref = str(Path(out_dir).relative_to(storage.store_dir(conn)))
 
             from . import capacity, cpu_queue
+            prepared = execution_manifest.prepare_runtime(intent, capability["bundle"], env, resources, preflight)
             sample = capacity.sample_admission(conn)
             with store.transaction(conn, transaction_owner="JobService", operation="admit", run_id=run_id) as txn:
                 if reserved_job_id is not None:
@@ -718,8 +719,8 @@ class JobService:
                      clock.now_iso(), lease_ref, step_index, attempt),
                 )
                 cpu_queue.admitted(txn, key)
-                execution_manifest.admit(txn, job_id, launch=intent, bundle=capability["bundle"], env=env,
-                                         inputs=listed, resources=resources, preflight=preflight)
+                execution_manifest.admit(txn, job_id, launch=intent, bundle=capability["bundle"],
+                                         inputs=listed, resources=resources, prepared=prepared)
                 store.append_event(
                     txn, kind="job.created", actor=self.actor, run_id=run_id, subject_kind="job",
                     subject_id=job_id, new_state=CREATED, evidence_level="EXECUTION_OBSERVED",

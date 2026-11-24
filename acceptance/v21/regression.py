@@ -7,7 +7,6 @@ import json
 import os
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import sys
 import tarfile
@@ -19,6 +18,21 @@ sys.path.insert(0, str(REPO))
 from acceptance.closure.profile import test_environment
 PRODUCT = ('gx-h/', 'bin/', 'codex_adapter/', 'examples/', 'scripts/')
 PROTOCOL = ('native_activity.py','native_budget.py','native_cumulative.py','native_events.py','native_refusal.py','native_child.py','native_wake.py')
+
+PREFLIGHT = """
+import json
+from gx_core import config
+from gx_core.capabilities import probe
+from gx_core.hostobs.native_app_server import _proxy_preflight
+from gx_core.jobs import capacity
+
+_proxy_preflight()
+cpu = capacity.cpu_state()
+gpu = probe.read_gpu_state()
+print(json.dumps({"cpu_source": cpu["source"], "logical_cpus": cpu["logical_cpus"],
+                  "quota_cpus": cpu["cgroup_quota_cpus"], "cpu_limits": config.cpu_limits(),
+                  "gpu_source": gpu["source"], "gpu_devices": len(gpu["devices"])}))
+"""
 
 
 def utc():
@@ -46,10 +60,14 @@ def unit_counts(log):
 
 
 def run_suite(commit, out, *, native, selected, product_commit, python_only=False, binary=None):
+    scratch=tempfile.TemporaryDirectory(prefix='gx-v21-regression-')
+    checkout=Path(scratch.name)
+    if native and binary is None:
+        binary=REPO/'vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex'
+    env=test_environment(checkout/'profile', binary=binary)
     if product_commit:
         subprocess.run(['git','diff','--exit-code','--quiet',product_commit,commit,'--',
-                        *[p.rstrip('/') for p in PRODUCT],'release-assets'],cwd=REPO,check=True)
-    checkout=Path(tempfile.mkdtemp(prefix='gx-v21-regression-'))
+                        *[p.rstrip('/') for p in PRODUCT],'release-assets'],cwd=REPO,check=True,env=env)
     package=checkout/'package'
     package.mkdir()
     paths=['gx-h','bin','codex_adapter','examples','scripts','release-assets/lock.json','release-assets/npm',
@@ -57,10 +75,10 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
     if native:
         # Retain only acceptance sources and fixtures in the reproducible checkout.
         paths += subprocess.check_output(['git','ls-tree','--name-only','-r',commit,'acceptance'],cwd=REPO,
-                  text=True).splitlines()
+                  text=True,env=env).splitlines()
         paths=[p for p in paths if not p.startswith('acceptance/') or
                (p.endswith('.py') and (len(Path(p).parts)==2 or Path(p).name in PROTOCOL))]
-    with subprocess.Popen(['git','archive',commit,*paths],cwd=REPO,stdout=subprocess.PIPE) as process:
+    with subprocess.Popen(['git','archive',commit,*paths],cwd=REPO,stdout=subprocess.PIPE,env=env) as process:
         with tarfile.open(mode='r|',fileobj=process.stdout) as archive:
             archive.extractall(package,filter='data')
         if process.wait():
@@ -69,11 +87,8 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
     save(out/'files.json',manifest)
     product={name:sha for name,sha in manifest.items() if name.startswith(PRODUCT)}
     content_hash=hashlib.sha256(json.dumps(product,sort_keys=True,separators=(',',':')).encode()).hexdigest()
-    if native and binary is None:
-        binary=REPO/'vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex'
-    env=test_environment(checkout/'profile', binary=binary)
     summary={'commit':commit,'verified_product_commit':product_commit or commit,'started_utc':utc(),'source_file_manifest':'files.json','product_files':len(product),
-             'test_resource_profile':env['GX_TEST_RESOURCE_PROFILE'],'test_environment_sha256':digest(REPO/'acceptance/closure/profile.py'),
+             'requested_test_profile':env['GX_TEST_RESOURCE_PROFILE'],'test_environment_sha256':digest(REPO/'acceptance/closure/profile.py'),
              'product_sha256':content_hash,'product_prefixes':PRODUCT,'node_version':subprocess.check_output(
                  ['node','--version'],text=True,env=env).strip(),'python_version':sys.version.split()[0],'operations':{},
              'class':'Local Python, SQLite and CPU Job fixtures. Official-protocol scenarios use pinned Codex with a scripted loopback provider.'}
@@ -93,9 +108,14 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
         return operation['returncode']
 
     try:
-        if record('clash-preflight', [sys.executable, '-B', '-c',
-                  'from gx_core.hostobs.native_app_server import _proxy_preflight; _proxy_preflight()'], package/'gx-h'):
+        if record('clash-preflight', [sys.executable, '-B', '-c', PREFLIGHT], package/'gx-h'):
             return 2
+        observed=json.loads((out/'clash-preflight.log').read_text())
+        summary['resource_observation']=observed
+        summary['test_resource_profile']='deterministic' if observed == {
+            'cpu_source':'deterministic test profile','logical_cpus':2,'quota_cpus':2,
+            'cpu_limits':{'max_pool_workers':2,'max_quota_fraction':1},
+            'gpu_devices':0,'gpu_source':'supplied'} else 'real'
         venv=checkout/'venv'
         python=venv/'bin/python'
         wheels=package/'release-assets/python'
@@ -170,7 +190,7 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
         print('PASS' if summary['passed'] else 'FAIL', {k:v['returncode'] for k,v in summary['operations'].items()})
         return 0 if summary['passed'] else 1
     finally:
-        shutil.rmtree(checkout)
+        scratch.cleanup()
 
 
 if __name__=='__main__':

@@ -186,6 +186,7 @@ def baseline_run(args, work):
     if len(reference) != 465:
         raise ValueError("historical Python baseline must contain exactly 465 unique identities")
     measured = unittest_rows((suite_dir / "python-full.log").read_text())
+    observed_profile = json.loads((suite_dir / "summary.json").read_text()).get("test_resource_profile")
     failures = []
     ledger = []
     for name, previous in reference.items():
@@ -231,15 +232,18 @@ def baseline_run(args, work):
                                          "source": str(source) if source else None,
                                          "source_sha256": sha(source) if source and source.is_file() else None,
                                          "issue": issue, "cases": verdicts})
-    failed_run = bool(failures or additional_nonpassing or receipt["exit_code"])
+    failed_run = bool(failures or additional_nonpassing or receipt["exit_code"] or observed_profile != "deterministic")
     problems = []
     if failed_run:
         problems.append(f"Python suite exited {receipt['exit_code']}. {len(failures)} original identities changed or failed "
                         f"and {len(additional_nonpassing)} additional cases did not pass.")
+    if observed_profile != "deterministic":
+        problems.append(f"The staged product observed resource profile {observed_profile!r}.")
     if issue:
         problems.append(issue)
     return {"status": "FAIL" if failed_run else "PARTIAL" if issue else "PASS",
             "revision": commit, "baseline_revision": BASELINE_REVISION,
+            "resource_profile": observed_profile,
             "baseline_log": str(BASELINE.relative_to(REPO)), "baseline_log_sha256": hashlib.sha256(original_log).hexdigest(),
             "baseline_count": len(reference), "baseline_outcomes": dict(Counter(r["measured"]["outcome"] for r in ledger)),
             "additional_ids": additional, "additional_nonpassing": additional_nonpassing, "failed_baseline_ids": failures,

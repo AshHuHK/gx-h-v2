@@ -9,14 +9,13 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "gx-h"))
 from examples.p01_fixture import ACTOR, CAPABILITY, activate_grid, prepare, tasks
-from gx_core import config
+from gx_core import api, config
 from gx_core.capabilities import probe
 from gx_core.context import Ctx, Principal
 from gx_core.errors import ResourceDenied
 from gx_core.hostobs import caller, detect
 from gx_core.jobs import capacity
 from gx_core.jobs.service import JobService, PURPOSE_WORKFLOW
-from gx_core.orchestration import service
 from gx_core.persistence import store
 
 
@@ -46,6 +45,10 @@ def measure_resources(conn, *, real):
         result.update(job_id=job["job_id"], job_status=ended["status"], output_count=len(ended["outputs"]))
         return result
 
+    shipped = json.loads((config.CONFIG_DIR / "limits.json").read_text())
+    result["shipped_policy_on_two_cpus"] = capacity.cpu_room(
+        conn, cpu={"logical_cpus": 2, "cgroup_quota_cpus": 2}, limits=shipped)["allowed"]
+
     # Hold each admitted row before launch. The third submit sees both committed
     # reservations. Real admission, cancellation and re-admission do all writes.
     with patch.object(JobService, "_start", lambda self, row: dict(row)):
@@ -66,10 +69,18 @@ def measure_resources(conn, *, real):
 
 
 def measure_client(conn):
-    ctx = Ctx(conn=conn, principal=Principal(subject="profile-reader", scope="operator"), tool="gx_run_start")
-    record = service._host_record(ctx, None)
+    start = api.dispatch("gx_run_start", {
+        "objective": "Measure an example count", "project_ref": "profile-detection", "budget_profile": "cpu_only",
+        "workflow": {"id": "module_collaboration", "version": "1"},
+        "inputs": {"modules": [{"key": "counts", "question": "Which rows have the same count?"}]},
+        "idempotency_key": "profile-detection",
+    }, principal=Principal(subject="profile-reader", scope="operator"), conn=conn)
+    record = detect.host_record()
+    stored = conn.execute("SELECT host_json FROM runs").fetchone()
     observed = caller.facts()
     return {"kind": record["kind"], "basis": record["kind_basis"], "detected": detect.detected()["kind"],
+            "run_started": start["ok"], "run_start_error": (start.get("error") or {}).get("code"),
+            "stored_host": json.loads(stored["host_json"])["kind"] if stored else None,
             "marker_names": sorted(key for key in os.environ if key.startswith("CLAUDE")),
             "ambient_sentinel_present": "GX_UNLISTED_HOST_MARKER" in os.environ,
             "tool_shell_marker": observed["tool_shell_variable_set"], "hook_marker": observed["hook_variable_set"],

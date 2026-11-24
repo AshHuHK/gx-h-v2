@@ -202,6 +202,7 @@ def probe_cases(args, work):
             assert (row["held_when_full"], row["free_when_full"], row["free_after_cancel"]) == (2, 0, 1), row
             assert row["refusal"]["details"]["rule"] == "cpu.threads_free" and row["gpu_devices"] == [], row
             assert row["gpu_source"] == "supplied" and len(set(row["admitted_job_ids"])) == 3, row
+            assert row["shipped_policy_on_two_cpus"] == 1, row
     elif case == "T02":
         markers = {"CLAUDECODE": "1", "CLAUDE_CODE_ENTRYPOINT": "profile-test", "CLAUDE_CODE_SESSION_ID": "test-session",
                    "CLAUDE_PROJECT_DIR": "/fixture", "CLAUDE_CODE_EXECPATH": "/fixture/claude",
@@ -217,6 +218,8 @@ def probe_cases(args, work):
         assert (marked["kind"], marked["basis"]) == ("claude_code", "launch_environment"), marked
         assert not isolated["hook_marker"] and not isolated["tool_shell_marker"], isolated
         assert marked["hook_marker"] and marked["tool_shell_marker"], marked
+        assert isolated["run_started"] and isolated["stored_host"] == "other_verified", isolated
+        assert not marked["run_started"] and marked["run_start_error"] == "CLIENT_CAPABILITY_MISSING", marked
         samples = [isolated, marked]
     else:
         row = measure("real-admission", env)

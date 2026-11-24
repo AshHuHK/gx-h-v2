@@ -9,7 +9,7 @@ from test_usage import UsageClosure
 
 
 CONTROLS = {"B01":"U04", "B02":"U03", "B03":"U06", "B04":"U07", "B05":"U05", "B06":"U04", "B07":"U04", "B08":"U04",
-            "B09":"U05", "B10":"U04", "B11":"U04"}
+            "B09":"U05", "B10":"U04", "B11":"U04", "B12":"U05"}
 
 
 def run(directory, selected=None):

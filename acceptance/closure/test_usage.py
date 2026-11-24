@@ -172,7 +172,7 @@ class UsageClosure(unittest.TestCase):
             self.assertEqual((risk["settled_tokens"],risk["unfunded_closed_thread_tokens"],risk["observed_plus_settled"]),
                              (20,50,70))
 
-    def test_B05_unknown_historical_cost_preserves_spent(self):
+    def legacy_with_new_exact_turn(self):
         self.funding_fixture()
         first = self.funded_turn()
         ref = self.inspect("admitted")["turns"][0]["reservation_ref"]
@@ -197,6 +197,9 @@ class UsageClosure(unittest.TestCase):
         self.assertEqual(after["adjustments"],[])
         self.assertEqual(after["cost_report"]["UNRESOLVED"]["reservation_refs"],[ref])
         self.assertIsNone(after["turns"][0]["settled_tokens"])
+
+    def test_B05_unknown_historical_cost_preserves_spent(self):
+        self.legacy_with_new_exact_turn()
         goal = "new-host-turn"
         self.f.delivery.observe("turn/started", {"threadId":"root","turn":{"id":goal}})
         self.f.raw(goal,"new-host-50",50)
@@ -208,6 +211,23 @@ class UsageClosure(unittest.TestCase):
         self.f.sample(third,175)
         active = self.inspect("legacy_with_additional_open_turn")["risk"]
         self.assertEqual((active["settled_tokens"],active["observed_plus_settled"]),(120,175))
+
+    def test_B12_post_legacy_raw_only_counts_without_a_checkpoint(self):
+        old = "host-before-unknown-bill"
+        self.f.raw(old,"old-host-25",25)
+        self.f.delivery.observe("turn/completed", {"threadId":"root","turn":{"id":old,"status":"interrupted"}})
+        self.legacy_with_new_exact_turn()
+        self.f.delivery.observe("turn/started", {"threadId":"root","turn":{"id":old}})
+        self.assertEqual(self.inspect("older_receipt_after_delayed_start")["risk"]["observed_plus_settled"],120)
+        goal = "host-after-unknown-bill"
+        self.f.delivery.observe("turn/started", {"threadId":"root","turn":{"id":goal}})
+        self.f.raw(goal,"host-250",250)
+        self.f.delivery.observe("turn/completed", {"threadId":"root","turn":{"id":goal,"status":"interrupted"}})
+        closed = self.inspect("new_raw_receipt_without_cumulative")["risk"]
+        self.assertEqual((closed["settled_tokens"],closed["observed_plus_settled"]),(120,370))
+        self.funded_turn()
+        active = self.inspect("post_legacy_raw_with_open_turn")["risk"]
+        self.assertEqual((active["settled_tokens"],active["observed_plus_settled"],active["committed_tokens"]),(120,370,470))
 
     def signed_active(self, final, total, scoped):
         self.funding_fixture()

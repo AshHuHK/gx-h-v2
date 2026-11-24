@@ -246,6 +246,21 @@ def unreserved_root_turns(conn, root):
         "WHERE d.thread_id=? AND d.turn_id=e.turn_id)", (root, root, root, root, root)).fetchall()
 
 
+def observe_legacy_host_start(conn, run_id, root, turn):
+    # A fresh official turn/started gives later raw-only receipts a causal boundary,
+    # including across restart. Previously known or GX-funded Turns retain their history.
+    prior = conn.execute(
+        "SELECT max(sequence) FROM p0_meter_native_turns WHERE thread_id=? AND budget_status='SETTLED' "
+        "AND settled_tokens IS NULL AND NOT EXISTS (SELECT 1 FROM p0_meter_native_turns WHERE thread_id=? AND turn_id=?) "
+        "AND NOT EXISTS (SELECT 1 FROM p0_root_turn_usage WHERE thread_id=? AND turn_id=?) "
+        "AND NOT EXISTS (SELECT 1 FROM p0_meter_responses WHERE thread_id=? AND turn_id=?)",
+        (root, root, turn, root, turn, root, turn)).fetchone()[0]
+    if prior is not None:
+        with store.transaction(conn, transaction_owner="Usage", operation="record_legacy_host_start", run_id=run_id):
+            conn.execute("INSERT INTO p0_meter_receipt_intervals(thread_id,turn_id,started_after_legacy_sequence) "
+                         "VALUES(?,?,?) ON CONFLICT(thread_id,turn_id) DO NOTHING", (root, turn, prior))
+
+
 def common_funding_prefix(conn, row):
     # No aggregate can divide an ambiguous interval between funding lines or remove a
     # historical payment whose amount is unknown. Unreserved host traffic has no payer.

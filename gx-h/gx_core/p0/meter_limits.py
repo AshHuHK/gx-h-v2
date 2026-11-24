@@ -46,8 +46,12 @@ def _post_legacy_exposure(conn, root, last, extra):
             growth += max(0, row["observed_total"] - baseline)
     paid_since = metering._prior_cost(conn, last, inclusive=True, after_sequence=legacy["sequence"])
     boundary = anchors[root]
-    unreserved = sum(r["receipted"] for r in extra if boundary is not None and r["total_tokens"] is not None
-                     and r["total_tokens"] - r["receipted"] >= boundary)
+    started_after = set()
+    if any(c[1] == "started_after_legacy_sequence" for c in conn.execute("PRAGMA table_info(p0_meter_receipt_intervals)")):
+        started_after = {r[0] for r in conn.execute("SELECT turn_id FROM p0_meter_receipt_intervals "
+                        "WHERE thread_id=? AND started_after_legacy_sequence>=?", (root,legacy["sequence"]))}
+    unreserved = sum(r["receipted"] for r in extra if r["turn_id"] in started_after
+                     or (boundary is not None and r["total_tokens"] is not None and r["total_tokens"] - r["receipted"] >= boundary))
     return max(0, growth - paid_since), unreserved
 
 
@@ -96,11 +100,11 @@ def _closed_exposure(conn, project):
         "closed AS (SELECT d.thread_id,max(d.sequence) AS sequence,group_concat(DISTINCT d.budget_ref) AS refs,"
         "count(*) FILTER(WHERE d.budget_status='SETTLED' AND d.settled_tokens IS NULL) AS unknown,"
         "sum(coalesce(d.settled_tokens,0)" + late + ") AS paid FROM p0_meter_native_turns d "
-        "JOIN observed o ON o.root_id=d.thread_id GROUP BY d.thread_id HAVING sum(d.budget_status='HELD')=0) "
+        "JOIN runs r USING(run_id) WHERE r.project_ref=? GROUP BY d.thread_id HAVING sum(d.budget_status='HELD')=0) "
         "SELECT c.thread_id,c.refs,c.sequence,c.unknown,o.tokens-c.paid-coalesce((SELECT sum(delta) FROM p0_meter_adjustments a "
-        "WHERE a.root_id=c.thread_id),0) AS residual FROM closed c JOIN observed o ON o.root_id=c.thread_id "
+        "WHERE a.root_id=c.thread_id),0) AS residual FROM closed c LEFT JOIN observed o ON o.root_id=c.thread_id "
         "WHERE c.unknown>0 OR residual>0 OR EXISTS (SELECT 1 FROM p0_meter_responses m WHERE m.thread_id=c.thread_id AND NOT EXISTS "
-        "(SELECT 1 FROM p0_meter_native_turns d WHERE d.thread_id=m.thread_id AND d.turn_id=m.turn_id))", (project,))
+        "(SELECT 1 FROM p0_meter_native_turns d WHERE d.thread_id=m.thread_id AND d.turn_id=m.turn_id))", (project,project))
     closed = []
     for row in rows:
         root = row["thread_id"]

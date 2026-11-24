@@ -200,6 +200,7 @@ class RootDelivery:
     def _evidence(self, method, params, thread_id, turn_id):
         key = (thread_id, turn_id)
         if method == "turn/started":
+            metering.observe_legacy_host_start(self.conn, self.run_id, thread_id, turn_id)
             self.attribution.start(thread_id, turn_id)
             self._live.setdefault(key, _LiveReceipts())
         elif method == "rawResponseItem/completed":

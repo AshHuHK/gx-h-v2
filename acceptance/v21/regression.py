@@ -15,6 +15,8 @@ import tempfile
 import time
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO))
+from acceptance.closure.profile import test_environment
 PRODUCT = ('gx-h/', 'bin/', 'codex_adapter/', 'examples/', 'scripts/')
 PROTOCOL = ('native_activity.py','native_budget.py','native_cumulative.py','native_events.py','native_refusal.py','native_child.py','native_wake.py')
 
@@ -43,7 +45,7 @@ def unit_counts(log):
             'skip_details':skips,'failure_details':failures}
 
 
-def run_suite(commit, out, *, native, selected, product_commit):
+def run_suite(commit, out, *, native, selected, product_commit, python_only=False, binary=None):
     if product_commit:
         subprocess.run(['git','diff','--exit-code','--quiet',product_commit,commit,'--',
                         *[p.rstrip('/') for p in PRODUCT],'release-assets'],cwd=REPO,check=True)
@@ -67,15 +69,13 @@ def run_suite(commit, out, *, native, selected, product_commit):
     save(out/'files.json',manifest)
     product={name:sha for name,sha in manifest.items() if name.startswith(PRODUCT)}
     content_hash=hashlib.sha256(json.dumps(product,sort_keys=True,separators=(',',':')).encode()).hexdigest()
-    env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'}
+    if native and binary is None:
+        binary=REPO/'vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex'
+    env=test_environment(checkout/'profile', binary=binary)
     summary={'commit':commit,'verified_product_commit':product_commit or commit,'started_utc':utc(),'source_file_manifest':'files.json','product_files':len(product),
              'product_sha256':content_hash,'product_prefixes':PRODUCT,'node_version':subprocess.check_output(
-                 ['node','--version'],text=True).strip(),'python_version':sys.version.split()[0],'operations':{},
+                 ['node','--version'],text=True,env=env).strip(),'python_version':sys.version.split()[0],'operations':{},
              'class':'Local Python, SQLite and CPU Job fixtures. Official-protocol scenarios use pinned Codex with a scripted loopback provider.'}
-    sys.path.insert(0,str(package/'gx-h'))
-    from gx_core.hostobs.native_app_server import _proxy_preflight
-    _proxy_preflight()
-
     def execute(label, command, cwd):
         start=utc()
         elapsed=time.monotonic()
@@ -92,6 +92,9 @@ def run_suite(commit, out, *, native, selected, product_commit):
         return operation['returncode']
 
     try:
+        if record('clash-preflight', [sys.executable, '-B', '-c',
+                  'from gx_core.hostobs.native_app_server import _proxy_preflight; _proxy_preflight()'], package/'gx-h'):
+            return 2
         venv=checkout/'venv'
         python=venv/'bin/python'
         wheels=package/'release-assets/python'
@@ -103,17 +106,19 @@ def run_suite(commit, out, *, native, selected, product_commit):
             if record(name,command,package):
                 return 2
         env['PATH']=str(venv/'bin')+os.pathsep+env['PATH']
-        if native:
-            binary=REPO/'vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex'
+        if binary is not None:
             lock=json.loads((package/'release-assets/lock.json').read_text())
-            summary['native_binary']={'version':subprocess.check_output([binary,'--version'],text=True).strip(),
+            summary['native_binary']={'version':subprocess.check_output([binary,'--version'],text=True,env=env).strip(),
                                       'sha256':digest(binary)}
             if summary['native_binary']['version']!='codex-cli 0.169.0' or summary['native_binary']['sha256']!=lock['linux_x64']['binary_sha256']:
                 raise ValueError('binary does not match release lock')
             env['PATH']=str(binary.parent)+os.pathsep+env['PATH']
             env['GX_P0_CODEX']=str(binary)
         gx=package/'gx-h'
-        if not selected:
+        if python_only:
+            record('python-full',[python,'-B','-m','unittest','discover','-s','tests','-v'],gx)
+            summary['python_counts']=unit_counts(out/'python-full.log')
+        elif not selected:
             commands={'python-full':[python,'-B','-m','unittest','discover','-s','tests','-v'],
                       'generator':[python,'-B','adapters/hosts/generate.py','--check'],
                       'node':['node','--experimental-strip-types','--test','runtime/plugin-host/host.test.ts']}
@@ -172,11 +177,16 @@ if __name__=='__main__':
     parser.add_argument('--native',action='store_true',help='also run the committed 2.1 protocol probes against the local locked ELF')
     parser.add_argument('--native-case',action='append',default=[],help='run only this named official scenario (repeatable)')
     parser.add_argument('--product-commit',help='verify the selected commit has identical production, test and dependency trees')
+    parser.add_argument('--python-only',action='store_true',help='run the original Python discovery suite in its isolated checkout')
+    parser.add_argument('--binary',type=Path,help='explicit local Codex binary matching the release lock')
     args=parser.parse_args()
+    if args.python_only and (args.native or args.native_case):
+        parser.error('--python-only and native protocol suites are separate selections')
     args.out.mkdir(parents=True,exist_ok=True)
     commit=subprocess.check_output(['git','rev-parse','--verify',args.commit+'^{commit}'],cwd=REPO,text=True).strip()
     product=None
     if args.product_commit:
         product=subprocess.check_output(['git','rev-parse','--verify',args.product_commit+'^{commit}'],cwd=REPO,text=True).strip()
     raise SystemExit(run_suite(commit,args.out.resolve(),native=args.native or bool(args.native_case),
-                               selected=args.native_case,product_commit=product))
+                               selected=args.native_case,product_commit=product,python_only=args.python_only,
+                               binary=args.binary.absolute() if args.binary else None))

@@ -12,6 +12,7 @@ that cannot be tightened while work is running.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +31,15 @@ def _read(name: str) -> dict[str, Any]:
 
 def limits() -> dict[str, Any]:
     """Always a fresh read. Do not cache."""
-    return _read("limits.json")
+    document = _read("limits.json")
+    if deterministic_test_resources():
+        document["cpu"].update(max_pool_workers=2, max_quota_fraction=1.0)
+    return document
+
+
+def deterministic_test_resources() -> bool:
+    """Select the two-core, CPU-only fixture explicitly for an acceptance process."""
+    return os.environ.get("GX_TEST_RESOURCE_PROFILE") == "deterministic"
 
 
 def paths() -> dict[str, Any]:

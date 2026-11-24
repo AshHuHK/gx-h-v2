@@ -72,6 +72,9 @@ def read_gpu_state(*, nvidia_smi_output: str | None = None) -> dict[str, Any]:
     if nvidia_smi_output is not None:
         devices, problems = parse_nvidia_smi(nvidia_smi_output)
         return {**base, "source": SOURCE_SUPPLIED, "devices": devices, "problems": problems}
+    if config.deterministic_test_resources():
+        return {**base, "source": SOURCE_SUPPLIED, "devices": [],
+                "problems": ["deterministic test profile has no GPU"]}
     binary = shutil.which(NVIDIA_SMI_ARGV[0])
     if binary is None:
         return {**base, "source": SOURCE_OBSERVED, "devices": [],

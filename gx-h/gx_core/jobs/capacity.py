@@ -61,6 +61,9 @@ def _read(path: Path) -> str | None:
 
 def cpu_state() -> dict[str, Any]:
     """The CPU this process is allowed, from the cgroup, and how pressed it is."""
+    if config.deterministic_test_resources():
+        return {"logical_cpus": 2, "cgroup_quota_cpus": 2.0,
+                "source": "deterministic test profile", "load_average": None}
     state: dict[str, Any] = {"logical_cpus": os.cpu_count(), "cgroup_quota_cpus": None,
                              "source": "cgroup v2 cpu.max"}
     raw = _read(CGROUP / "cpu.max")

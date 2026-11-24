@@ -115,7 +115,9 @@ def main():
         conn = stack.enter_context(closing(store.open_store(temp / "fixture.db")))
         roots, row, inputs, rules = assignment(conn, temp, probe.provider)
         settings = roots._settings(row, new=True)
-        requested, = [t["inputSchema"] for t in settings["dynamicTools"] if t["name"] == "gx_submit_product"]
+        submit_group, = [group for group in settings["dynamicTools"]
+                         if group.get("type") == "namespace" and group["name"] == "gx"]
+        requested, = [tool["inputSchema"] for tool in submit_group["tools"] if tool["name"] == "gx_submit_product"]
         complete = requested["properties"]["product"]
         ref = inputs["product_contract"]["schema_ref"]
         assert complete == rules.schema() == ArtifactService(conn).read_json(ref)

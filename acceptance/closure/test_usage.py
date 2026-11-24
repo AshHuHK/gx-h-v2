@@ -173,6 +173,7 @@ class UsageClosure(unittest.TestCase):
                              (20,50,70))
 
     def test_B05_unknown_historical_cost_preserves_spent(self):
+        self.funding_fixture()
         first = self.funded_turn()
         ref = self.inspect("admitted")["turns"][0]["reservation_ref"]
         with store.transaction(self.db):
@@ -196,6 +197,17 @@ class UsageClosure(unittest.TestCase):
         self.assertEqual(after["adjustments"],[])
         self.assertEqual(after["cost_report"]["UNRESOLVED"]["reservation_refs"],[ref])
         self.assertIsNone(after["turns"][0]["settled_tokens"])
+        goal = "new-host-turn"
+        self.f.delivery.observe("turn/started", {"threadId":"root","turn":{"id":goal}})
+        self.f.raw(goal,"new-host-50",50)
+        self.f.sample(goal,170)
+        self.f.delivery.observe("turn/completed", {"threadId":"root","turn":{"id":goal,"status":"completed"}})
+        closed = self.inspect("legacy_with_proven_new_host_receipt")["risk"]
+        self.assertEqual((closed["settled_tokens"], closed["observed_plus_settled"]),(120,170))
+        third = self.funded_turn()
+        self.f.sample(third,175)
+        active = self.inspect("legacy_with_additional_open_turn")["risk"]
+        self.assertEqual((active["settled_tokens"],active["observed_plus_settled"]),(120,175))
 
     def signed_active(self, final, total, scoped):
         self.funding_fixture()
@@ -247,6 +259,50 @@ class UsageClosure(unittest.TestCase):
         self.assertEqual(after["cost_report"]["ESTIMATED"]["provisional_budget_tokens"],0)
         self.assertEqual(after["risk"]["settled_tokens"],145)
         self.assertEqual([r["usage_class"] for r in after["turns"]],["PROVIDER_CONFIRMED"]*2)
+
+    def test_B09_simultaneous_historical_holds_keep_distinct_receipts(self):
+        self.funding_fixture()
+        first = self.funded_turn()
+        self.f.raw(first,"first-response",180)
+        self.f.complete()
+        newer = budgets.reserve(self.db,budget_ref=self.f.budget,subject_kind="native_turn",subject_id="older-format",
+                                amounts={"tokens":100,"api_calls":1},actor="review")
+        self.db.execute("INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,human,interrupt,"
+                        "state,method,turn_id,reservation_ref,token_budget,prior_tokens) "
+                        "VALUES(?,'older-format','root','older','hash',0,0,'acknowledged','turn/start','later',?,100,NULL)",
+                        (self.run,newer["reservation_ref"]))
+        self.f.delivery.observe("turn/started", {"threadId":"root","turn":{"id":"later"}})
+        self.f.raw("later","second-response",160)
+        self.f.raw("later","second-response",160)
+        risk = self.inspect("two_simultaneous_historical_holds")["risk"]
+        self.assertEqual((risk["reserved_tokens"],risk["observed_plus_settled"],risk["committed_tokens"]),(200,340,340))
+
+    def signed_after_close(self, tokens):
+        self.funding_fixture()
+        a,b = self.leaf("old"),self.leaf("new")
+        first = self.funded_turn(a)
+        self.f.raw(first,"original",None)
+        self.f.complete()
+        clock.advance(31)
+        self.drive()
+        budgets.release(self.db,budgets.FUND_PREFIX+a,actor="review",reason="child completed")
+        new = self.funded_turn(b)
+        self.f.raw(first,"original",tokens)
+        self.f.sample(first,tokens)
+        self.f.sample(new,tokens+8)
+        self.f.raw(new,"independent",8)
+        self.f.complete()
+        view = self.inspect("signed_correction_of_closed_budget")
+        self.assertEqual(budgets.state(self.db,a)["spent"]["tokens"],tokens)
+        self.assertEqual(budgets.state(self.db,b)["spent"]["tokens"],8)
+        self.assertEqual(view["risk"]["observed_plus_settled"],tokens+8)
+        self.assertEqual(view["risk"]["settled_tokens"],tokens+8)
+
+    def test_B10_positive_receipt_after_funding_close(self):
+        self.signed_after_close(140)
+
+    def test_B11_negative_receipt_after_funding_close(self):
+        self.signed_after_close(60)
 
     def test_U01_official_receipt_exactly_once(self):
         turn = self.f.start()

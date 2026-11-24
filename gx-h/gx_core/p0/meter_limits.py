@@ -21,16 +21,46 @@ def _subtree(conn, ref):
     return {r["budget_ref"] for r in rows},spent,reserved
 
 
+def _post_legacy_exposure(conn, root, last, extra):
+    # The cash behind an old unitemized settlement is already present in spent.
+    # A recorded scoped snapshot still bounds subsequent, independently observed growth.
+    legacy = conn.execute("SELECT * FROM p0_meter_native_turns WHERE thread_id=? AND sequence<=? "
+                          "AND budget_status='SETTLED' AND settled_tokens IS NULL ORDER BY sequence DESC LIMIT 1",
+                          (root, last["sequence"])).fetchone()
+    anchors = {root:legacy["total_tokens"]}
+    for child in metering.children(conn, legacy):
+        if child["metadata_verified"]:
+            key = child["child_id"]
+            old = anchors.get(key)
+            if old is None or (child["total_tokens"] is not None and child["total_tokens"] > old):
+                anchors[key] = child["total_tokens"]
+    growth = 0
+    for row in conn.execute("SELECT thread_id,observed_total FROM p0_meter_threads WHERE root_id=?", (root,)):
+        key = row["thread_id"]
+        if key not in anchors and conn.execute(
+                "SELECT 1 FROM p0_native_child_usage u JOIN p0_meter_native_turns d ON d.thread_id=? "
+                "AND d.turn_id=u.owner_turn WHERE u.child_id=? AND d.sequence>?", (root,key,legacy["sequence"])).fetchone():
+            anchors[key] = 0
+        baseline = anchors.get(key)
+        if baseline is not None and row["observed_total"] is not None:
+            growth += max(0, row["observed_total"] - baseline)
+    paid_since = metering._prior_cost(conn, last, inclusive=True, after_sequence=legacy["sequence"])
+    boundary = anchors[root]
+    unreserved = sum(r["receipted"] for r in extra if boundary is not None and r["total_tokens"] is not None
+                     and r["total_tokens"] - r["receipted"] >= boundary)
+    return max(0, growth - paid_since), unreserved
+
+
 def _exposure(conn, active, refs):
     roots = {}
     for row in active:
         held, lower = roots.get(row["thread_id"], (0, 0))
-        _, observed, _, _ = metering.observation(conn, row)
+        _, observed, _, _ = metering.observation(conn, row, interval_floor=False)
         if row["budget_status"] == "HELD":
             held += row["token_budget"] or 0
         else:
             observed = max(0, observed - (row["settled_tokens"] or 0))
-        roots[row["thread_id"]] = (held, max(lower, observed))
+        roots[row["thread_id"]] = (held, lower + observed)
     observed = over_holds = unobserved = 0
     for root, (held, lower) in roots.items():
         unreserved = 0
@@ -41,10 +71,13 @@ def _exposure(conn, active, refs):
             last = conn.execute("SELECT thread_id,sequence FROM p0_meter_native_turns WHERE thread_id=? "
                                 "ORDER BY sequence DESC LIMIT 1", (root,)).fetchone()
             paid = metering._prior_cost(conn, last, inclusive=True)
-            if paid is not None:
-                unreserved = sum(r["receipted"] for r in metering.unreserved_root_turns(conn, root))
-                if total is not None:
-                    lower = max(lower, total - unreserved - paid)
+            extra = metering.unreserved_root_turns(conn, root)
+            if paid is None:
+                residual, unreserved = _post_legacy_exposure(conn, root, last, extra)
+            else:
+                residual = max(0, total - paid) if total is not None else 0
+                unreserved = sum(r["receipted"] for r in extra)
+            lower = max(lower, residual - unreserved)
         observed += lower + unreserved
         over_holds += unreserved + max(0, lower - held)
         unobserved += max(0, held - lower)
@@ -60,17 +93,26 @@ def _closed_exposure(conn, project):
     rows = conn.execute(
         "WITH observed AS (SELECT t.root_id,sum(t.observed_total) AS tokens FROM p0_meter_threads t "
         "JOIN runs r USING(run_id) WHERE r.project_ref=? GROUP BY t.root_id), "
-        "closed AS (SELECT d.thread_id,group_concat(DISTINCT d.budget_ref) AS refs,"
+        "closed AS (SELECT d.thread_id,max(d.sequence) AS sequence,group_concat(DISTINCT d.budget_ref) AS refs,"
+        "count(*) FILTER(WHERE d.budget_status='SETTLED' AND d.settled_tokens IS NULL) AS unknown,"
         "sum(coalesce(d.settled_tokens,0)" + late + ") AS paid FROM p0_meter_native_turns d "
-        "JOIN observed o ON o.root_id=d.thread_id GROUP BY d.thread_id HAVING sum(d.budget_status='HELD')=0 "
-        "AND count(*) FILTER(WHERE d.budget_status='SETTLED' AND d.settled_tokens IS NULL)=0) "
-        "SELECT c.thread_id,c.refs,o.tokens-c.paid-coalesce((SELECT sum(delta) FROM p0_meter_adjustments a "
+        "JOIN observed o ON o.root_id=d.thread_id GROUP BY d.thread_id HAVING sum(d.budget_status='HELD')=0) "
+        "SELECT c.thread_id,c.refs,c.sequence,c.unknown,o.tokens-c.paid-coalesce((SELECT sum(delta) FROM p0_meter_adjustments a "
         "WHERE a.root_id=c.thread_id),0) AS residual FROM closed c JOIN observed o ON o.root_id=c.thread_id "
-        "WHERE residual>0 OR EXISTS (SELECT 1 FROM p0_meter_responses m WHERE m.thread_id=c.thread_id AND NOT EXISTS "
+        "WHERE c.unknown>0 OR residual>0 OR EXISTS (SELECT 1 FROM p0_meter_responses m WHERE m.thread_id=c.thread_id AND NOT EXISTS "
         "(SELECT 1 FROM p0_meter_native_turns d WHERE d.thread_id=m.thread_id AND d.turn_id=m.turn_id))", (project,))
-    return [(r["thread_id"], set(r["refs"].split(",")),
-             max(r["residual"] or 0, sum(t["receipted"] for t in metering.unreserved_root_turns(conn, r["thread_id"]))))
-            for r in rows]
+    closed = []
+    for row in rows:
+        root = row["thread_id"]
+        extra = metering.unreserved_root_turns(conn, root)
+        if row["unknown"]:
+            residual, unreserved = _post_legacy_exposure(conn, root, row, extra)
+        else:
+            residual, unreserved = row["residual"] or 0, sum(r["receipted"] for r in extra)
+        exposure = max(residual, unreserved)
+        if exposure:
+            closed.append((root, set(row["refs"].split(",")), exposure))
+    return closed
 
 
 def _risk(conn, limit, spent, reserved, active, *, scope, closed=(), refs=None):

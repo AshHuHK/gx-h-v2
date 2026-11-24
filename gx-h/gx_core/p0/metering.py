@@ -192,7 +192,7 @@ def children(conn, row):
         (row["thread_id"],row["sequence"])).fetchall()
 
 
-def _prior_cost(conn, row, *, inclusive):
+def _prior_cost(conn, row, *, inclusive, after_sequence=0):
     op = "<=" if inclusive else "<"
     late = ""
     # Public status can inspect an older ledger without installing migrations.
@@ -202,8 +202,8 @@ def _prior_cost(conn, row, *, inclusive):
         "SELECT CASE WHEN count(*) FILTER(WHERE budget_status='SETTLED' AND settled_tokens IS NULL)=0 THEN "
         "coalesce(sum(coalesce(settled_tokens,0) + coalesce((SELECT sum(a.delta) "
         "FROM p0_meter_adjustments a WHERE a.through_reservation=d.reservation_ref),0)" + late + "),0) END "
-        "FROM p0_meter_native_turns d WHERE thread_id=? AND sequence"+op+"?",
-        (row["thread_id"],row["sequence"])).fetchone()[0]
+        "FROM p0_meter_native_turns d WHERE thread_id=? AND sequence"+op+"? AND sequence>?",
+        (row["thread_id"],row["sequence"],after_sequence)).fetchone()[0]
 
 
 def has_receipt_adjustments(conn):
@@ -255,7 +255,7 @@ def common_funding_prefix(conn, row):
     return not invalid and not unreserved_root_turns(conn, row["thread_id"])
 
 
-def observation(conn, row):
+def observation(conn, row, *, interval_floor=True):
     members = {}
     eligible = bool(row["children_known"])
     lower = max(row["measured_tokens"] or 0,_raw_lower(conn,row["thread_id"],row["turn_id"]))
@@ -274,7 +274,7 @@ def observation(conn, row):
         "d.thread_id=m.root_id AND d.turn_id=m.owner_turn WHERE d.thread_id=? AND d.sequence<=? "
         "AND (m.metadata_verified=0 OR m.awaiting_turn=1) LIMIT 1", (row["thread_id"],row["sequence"])).fetchone()
     cumulative = None if row["total_tokens"] is None else row["total_tokens"] + sum(members.values())
-    if not members and not lower and cumulative is not None and row["prior_tokens"] is not None:
+    if interval_floor and not members and not lower and cumulative is not None and row["prior_tokens"] is not None:
         previous = conn.execute("SELECT total_tokens,confidence,attribution FROM p0_meter_native_turns "
                                 "WHERE thread_id=? AND sequence<? ORDER BY sequence DESC LIMIT 1",
                                 (row["thread_id"], row["sequence"])).fetchone()

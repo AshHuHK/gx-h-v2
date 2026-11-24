@@ -21,9 +21,16 @@ def read(path):
     return json.loads(path.read_text())
 
 
+def stream_sha256(source):
+    digest = hashlib.sha256()
+    for chunk in iter(lambda: source.read(1024 * 1024), b""):
+        digest.update(chunk)
+    return digest.hexdigest()
+
+
 def sha256(path):
     with path.open("rb") as source:
-        return hashlib.file_digest(source, "sha256").hexdigest()
+        return stream_sha256(source)
 
 
 def write_manifest(path, files):
@@ -81,7 +88,7 @@ def check(run, extract_to=None):
             if not member.isfile() or name in seen or name not in raw:
                 raise IntegrityError(f"unexpected archive member: {name}")
             with archive.extractfile(member) as source:
-                if hashlib.file_digest(source, "sha256").hexdigest() != raw[name]:
+                if stream_sha256(source) != raw[name]:
                     raise IntegrityError(f"checksum mismatch: raw/{name}")
             seen.add(name)
     if seen != set(raw):

@@ -18,7 +18,7 @@ import time
 import uuid
 
 from acceptance.closure import archive
-from acceptance.closure.cases import IDLE, MATRIX, ORIGINAL, PHASE, ROOT, SUPPLEMENTAL, observed, plan, row
+from acceptance.closure.cases import HARDENING, IDLE, MATRIX, ORIGINAL, PHASE, ROOT, SUITES, SUPPLEMENTAL, observed, plan, row
 from acceptance.closure.profile import test_environment
 
 
@@ -36,18 +36,39 @@ def git(*args):
     return subprocess.check_output(["git", *args], cwd=ROOT)
 
 
+def run_interpreter(args):
+    pin = archive.read(ROOT / "release-assets/lock.json")["deterministic_test_runtime"]["python"]
+    if platform.python_version() == pin:
+        return None
+    cache = args.cache or ROOT.parent / "gx-h-v-3"
+    minor = ".".join(pin.split(".")[:2])
+    for seed in dict.fromkeys(filter(None, (args.python, ROOT / ".venv/bin/python", cache / ".venv/bin/python",
+                                            shutil.which("python" + minor), shutil.which("python")))):
+        if not Path(seed).is_file() or not os.access(seed, os.X_OK):
+            continue
+        version = subprocess.run([seed, "-I", "-S", "-c", "import platform; print(platform.python_version())"],
+                                 capture_output=True, text=True)
+        if version.returncode == 0 and version.stdout.strip() == pin:
+            return str(seed)
+    raise ValueError(f"this suite requires Python {pin}; supply --python or --cache with the locked local installation")
+
+
 def configure(args):
     default_cache = ROOT if (ROOT / "vendor/codex-runtime").is_dir() else ROOT.parent / "gx-h-v-3"
     args.cache = (args.cache or default_cache).resolve()
     lock = archive.read(ROOT / "release-assets/lock.json")["linux_x64"]
     args.binary = (args.binary or args.cache / "vendor/codex-runtime/package" / lock["binary"]).absolute()
-    args.python = (args.python or args.cache / ".venv/bin/python").absolute()
+    args.python = Path(args.python or sys.executable).absolute()
+    args.node = args.node.absolute() if args.node else None
     args.clash = (args.clash or shutil.which("mihomo") or ROOT.parent.parent / "clash/clash.new")
     args.clash = Path(args.clash).absolute()
     args.source_db = (args.source_db or args.cache / "var/v3-staging/frozen-a05dcef/snapshot/project/gx.db").resolve()
     args.historical_briefs = (args.historical_briefs or ROOT.parent /
                               "scratchpad/v3-real-performance/p1-2476f2b-xhigh").resolve()
     args.catalog = (args.catalog or args.historical_briefs / "codex-home/models_cache.json").resolve()
+    supplied_history = ROOT / "gx-historical-42-classification.json"
+    if args.original_failures is None and args.suite in {"all", "hardening"} and supplied_history.is_file():
+        args.original_failures = supplied_history
     if args.original_failures:
         args.original_failures = args.original_failures.resolve()
 
@@ -65,20 +86,20 @@ def environment(args):
         "worktree_code_delta_sha256": changes.hexdigest(),
         "platform": platform.platform(), "machine": platform.machine(),
         "launcher": {"executable": sys.executable, "python": platform.python_version(), "sqlite": sqlite3.sqlite_version},
-        "paths": {key: str(getattr(args, key)) for key in
-                  ("cache", "python", "binary", "clash", "source_db", "historical_briefs", "catalog")},
+        "paths": {key: str(getattr(args, key)) if getattr(args, key) else None for key in
+                  ("cache", "python", "node", "binary", "clash", "source_db", "historical_briefs", "catalog")},
         "original_failures": str(args.original_failures) if args.original_failures else None,
         "invocation": sys.argv, "invocation_cwd": os.getcwd(),
         "classes": ["SCRIPTED", "OFFICIAL_HOST_LOOPBACK", "LIVE_MODEL", "REAL_COMPUTE", "INDEPENDENT_REVIEW"],
     }
     if args.python.is_file() and os.access(args.python, os.X_OK):
-        command = [args.python, "-I", "-c", "import json,platform,sqlite3; "
+        command = [args.python, "-I", "-S", "-c", "import json,platform,sqlite3; "
                    "print(json.dumps({'python':platform.python_version(),'sqlite':sqlite3.sqlite_version}))"]
         with tempfile.TemporaryDirectory(prefix="gx-acceptance-version-") as work:
             env = test_environment(Path(work), python=args.python)
             result = subprocess.run(command, capture_output=True, text=True, env=env)
         if result.returncode == 0:
-            info["test_interpreter"] = json.loads(result.stdout)
+            info["seed_interpreter"] = json.loads(result.stdout)
     return info
 
 
@@ -101,10 +122,32 @@ def runout(steps):
     return "PASS"
 
 
+def prepare_dependencies(args, raw, scratch):
+    # Report/verify remain independent of the currently installed test runtimes.
+    from scripts.acceptance_dependencies import prepare
+
+    out = raw / "dependency-bootstrap"
+    out.mkdir()
+    requested = {"python": str(args.python), "node": str(args.node) if args.node else None}
+    try:
+        result = prepare(ROOT, scratch / "locked-runtime", python=args.python, node=args.node,
+                         env=test_environment(scratch / "preflight", python=args.python))
+        archive.save(out / "receipt.json", result)
+        args.python = Path(result["python"]["path"])
+        args.node = Path(result["node"]["path"])
+        if not args.python.is_file() or not args.node.is_file():
+            raise FileNotFoundError("prepared Python or Node executable is missing")
+    except (OSError, ValueError, KeyError, RuntimeError, subprocess.CalledProcessError) as error:
+        message = f"{type(error).__name__}: {error}"
+        archive.save(out / "failure.json", {"requested": requested, "error": message})
+        return "locked dependency preflight failed: " + message
+    return None
+
+
 def prior_discovery(previous, prior, info, scratch):
-    # Only reuse already passing discovery when the unfinished work is historical adjudication.
+    # This receipt is a candidate for discovery reuse; profile_cases validates the exact inner command and log.
     item = prior["cases"].get("T03", {})
-    if (item.get("status") != "PARTIAL" or prior.get("sha") != info["sha"]
+    if (item.get("status") not in {"PASS", "PARTIAL"} or prior.get("sha") != info["sha"]
             or prior.get("code_delta") != info["worktree_code_delta_sha256"]):
         return None
     prefix = "T03/evidence/suite/"
@@ -121,7 +164,7 @@ def prior_discovery(previous, prior, info, scratch):
     return dest
 
 
-def execute_step(args, step, raw, scratch, interrupted, previous_suite):
+def execute_step(args, step, raw, scratch, interrupted, previous_suite, dependency_error):
     directory = raw / step.name
     directory.mkdir()
     console = directory / "console.log"
@@ -137,10 +180,17 @@ def execute_step(args, step, raw, scratch, interrupted, previous_suite):
                 "--receipt", str(directory / "network.json"), "--", *argv]
     profile = "real" if "REAL_RESOURCES" in step.ids else "deterministic"
     env = test_environment(scratch / step.name, profile=profile, python=args.python, binary=args.binary)
-    if step.name == "sqlite":
+    if args.node:
+        env["PATH"] = os.pathsep.join(dict.fromkeys([
+            str(args.python.parent), str(args.node.parent), *env["PATH"].split(os.pathsep)]))
+    if step.name in {"sqlite", "sqlite-boundaries"}:
         env["PYTHONPATH"] = str(ROOT / "gx-h")
     if step.name in IDLE:
         env["GX_IDLE_EVIDENCE"] = str(directory / "evidence")
+    if step.name == "fifo":
+        env["GX_FIFO_EVIDENCE"] = str(directory / "evidence")
+    if step.name == "timeout":
+        env["GX_TIMEOUT_EVIDENCE"] = str(directory / "timeout.json")
     receipt = {"name": step.name, "cases": list(step.ids), "classes": list(step.classes),
                "argv": argv, "cwd": str(step.cwd), "profile": profile, "started_utc": utc(),
                "source": "named Git commit" if step.name in {"v31-regression", "T03"} else "working tree",
@@ -158,6 +208,8 @@ def execute_step(args, step, raw, scratch, interrupted, previous_suite):
     try:
         if interrupted:
             raise InterruptedError("not started after interruption")
+        if dependency_error:
+            raise FileNotFoundError(dependency_error)
         if missing:
             raise FileNotFoundError("missing local input: " + ", ".join(missing))
         with console.open("w") as log:
@@ -191,18 +243,19 @@ def execute_step(args, step, raw, scratch, interrupted, previous_suite):
     return receipt, results
 
 
-def reproduction(args, run, failed):
+def reproduction(args, run, failed, requested):
     command = [str(CLI), "run", args.suite, "--runs-dir", str(run.parent), "--failed-only", run.name]
-    for key in ("cache", "python", "binary", "clash", "source_db", "historical_briefs", "catalog", "original_failures"):
-        if getattr(args, key):
-            command.extend(["--" + key.replace("_", "-"), str(getattr(args, key))])
+    for key, value in requested.items():
+        if value:
+            command.extend(["--" + key.replace("_", "-"), str(value)])
     return {"failed_or_incomplete": failed, "argv": command, "shell": shlex.join(command)}
 
 
 def merge_observations(previous, current):
     checks = [previous, current]
     state = runout({"first": previous, "second": current})
-    return {**row(state, previous["evidence"]), "operation": previous["operation"],
+    reason = next((item.get("reason") for item in checks if item["status"] == state and item.get("reason")), None)
+    return {**row(state, previous["evidence"], reason), "operation": previous["operation"],
             "classes": sorted(set(previous["classes"] + current["classes"])), "checks": checks}
 
 
@@ -236,7 +289,7 @@ def finish_regression(cases, prior, run_id, info):
 
 def run(args):
     runs = args.runs_dir.resolve()
-    suite_ids = (*MATRIX, *(SUPPLEMENTAL if args.suite == "all" else ("OFFICIAL-USAGE",)))
+    suite_ids = SUITES[args.suite]
     prior = None
     if args.failed_only:
         previous = run_path(runs, args.failed_only)
@@ -256,8 +309,16 @@ def run(args):
     unknown = set(selection) - set(suite_ids)
     if unknown:
         raise ValueError("case is outside this suite: " + ", ".join(sorted(unknown)))
+    discovery = None
+    if args.discovery_run:
+        if "T03" not in selection:
+            raise ValueError("--discovery-run requires selection of T03")
+        discovery_path = run_path(runs, args.discovery_run)
+        archive.check(discovery_path)
+        discovery = archive.read(discovery_path / "summary.json")
     configure(args)
     info = environment(args)
+    requested = {**info["paths"], "original_failures": info["original_failures"]}
     run_id = args.run_id or (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:12])
     target = run_path(runs, run_id)
     target.mkdir(parents=True, exist_ok=False)
@@ -268,12 +329,31 @@ def run(args):
     commands, cases = [], {}
     scope = "failed-only" if prior else ("selected" if args.case else "full")
     source = {"run_id": prior["run_id"], "manifest_sha256": archive.sha256(previous / "manifest.sha256")} if prior else None
-    archive.save(raw / "selection.json", {"scope": scope, "cases": selection, "parent": source})
+    receipt_source = ({"run_id": discovery["run_id"], "manifest_sha256":
+                       archive.sha256(discovery_path / "manifest.sha256")} if discovery else None)
+    archive.save(raw / "selection.json", {"scope": scope, "cases": selection, "parent": source,
+                                         "discovery_source": receipt_source})
     interrupted = False
     with tempfile.TemporaryDirectory(prefix="gx-acceptance-runtime-") as work:
-        previous_suite = prior_discovery(previous, prior, info, Path(work)) if prior and "T03" in selection else None
+        scratch = Path(work)
+        args.seed_python = args.python
+        args.dependency_control_work = scratch / "dependency-controls"
+        previous_suite = None
+        if "T03" in selection:
+            if discovery:
+                previous_suite = prior_discovery(discovery_path, discovery, info, scratch)
+            elif prior:
+                previous_suite = prior_discovery(previous, prior, info, scratch)
+        dependency_error = prepare_dependencies(args, raw, scratch) if selection else None
+        if selection and not dependency_error:
+            locked = archive.read(raw / "dependency-bootstrap/receipt.json")
+            info["test_interpreter"] = {"python": locked["python"]["version"], "sqlite": locked["python"]["sqlite"],
+                                        "executable": locked["python"]["path"]}
+            info["test_node"] = {key: locked["node"][key] for key in ("path", "version", "npm", "npm_version")}
+            info["dependency_receipt"] = "dependency-bootstrap/receipt.json"
+            archive.save(target / "environment.json", info)
         for step in plan(args, selection, raw, info["sha"]):
-            receipt, results = execute_step(args, step, raw, Path(work), interrupted, previous_suite)
+            receipt, results = execute_step(args, step, raw, scratch, interrupted, previous_suite, dependency_error)
             interrupted |= bool(receipt.get("interrupted"))
             commands.append(receipt)
             for case, result in results.items():
@@ -291,9 +371,13 @@ def run(args):
                "cases": cases, "failed_or_incomplete": failed, "code_delta": info["worktree_code_delta_sha256"],
                "original_count": len(set(cases) & set(ORIGINAL)), "matrix_count": len(set(cases) & set(MATRIX)),
                "supplemental_count": len(set(cases) & set(SUPPLEMENTAL))}
+    if args.suite == "hardening":
+        summary["hardening_count"] = len(set(cases) & set(HARDENING))
+    if receipt_source:
+        summary["discovery_source"] = receipt_source
     archive.save(target / "summary.json", summary)
     archive.save(target / "commands.json", commands)
-    archive.save(target / "reproduce.json", reproduction(args, target, failed))
+    archive.save(target / "reproduce.json", reproduction(args, target, failed, requested))
     archive.package(target, raw)
     verification = archive.check(target)
     shutil.rmtree(raw)
@@ -305,13 +389,16 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers(dest="action", required=True)
     execute = subs.add_parser("run", help="execute all selected cases and archive a new run")
-    execute.add_argument("suite", choices=("phase2a", "all"))
+    execute.add_argument("suite", choices=SUITES)
     group = execute.add_mutually_exclusive_group()
-    group.add_argument("--case", action="append", choices=(*MATRIX, *SUPPLEMENTAL), help="repeatable case selector")
+    group.add_argument("--case", action="append", choices=tuple(dict.fromkeys((*MATRIX, *SUPPLEMENTAL, *HARDENING))),
+                       help="repeatable case selector")
     group.add_argument("--failed-only", "--only-failed", metavar="RUN_ID",
                        help="retry only failed, blocked or partial cases in a verified prior run")
     execute.add_argument("--run-id", help="optional new run ID; existing directories are preserved")
-    for name in ("cache", "python", "binary", "clash", "source-db", "historical-briefs", "catalog", "original-failures"):
+    execute.add_argument("--discovery-run", metavar="RUN_ID",
+                         help="reuse a verified same-revision Python discovery for T03 historical adjudication")
+    for name in ("cache", "python", "node", "binary", "clash", "source-db", "historical-briefs", "catalog", "original-failures"):
         execute.add_argument("--" + name, type=Path)
     report = subs.add_parser("report", help="read the verified result of a run")
     report.add_argument("run_id")
@@ -324,6 +411,10 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.action == "run":
+            interpreter = run_interpreter(args)
+            if interpreter:
+                command = [interpreter, "-I", "-S", "-B", str(CLI), *(sys.argv[1:] if argv is None else argv)]
+                return subprocess.run(command).returncode
             return run(args)
         target = run_path(args.runs_dir.resolve(), args.run_id)
         verification = archive.check(target, getattr(args, "extract_to", None))

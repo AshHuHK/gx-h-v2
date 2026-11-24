@@ -9,6 +9,7 @@ from acceptance.closure.archive import read
 ROOT = Path(__file__).resolve().parents[2]
 PHASE = ROOT / "acceptance/phase2a"
 CLOSURE = ROOT / "acceptance/closure"
+HARDEN = ROOT / "acceptance/hardening"
 ORIGINAL = tuple(f"P2A-{index:02}" for index in range(1, 16))
 USAGE = tuple(f"U{index:02}" for index in range(1, 9))
 PROFILE = ("T01", "T02", "T03")
@@ -18,6 +19,9 @@ IDLE = ("IDLE01", "IDLE02", "IDLE03")
 CROSS = (*ORIGINAL[:7], "P2A-14")
 MATRIX = (*ORIGINAL, *USAGE, *PROFILE, *DATABASE, *AUTOMATION, *IDLE, "REG01")
 SUPPLEMENTAL = ("OFFICIAL-USAGE", "REAL_RESOURCES", "LEGACY-LEDGER")
+HARDENING = ("DEPENDENCIES", "CHILD-DOUBLE-LOSS", "OPERATOR-USAGE", "ESTIMATE-RISK", "FIFO",
+             "PROFILE-SCOPE", "T01", "T02", "REAL_RESOURCES", "TIMEOUT", "FAIRNESS", "SQLITE-BOUNDARIES", "T03")
+SUITES = {"phase2a": (*MATRIX, "OFFICIAL-USAGE"), "all": (*MATRIX, *SUPPLEMENTAL), "hardening": HARDENING}
 SCRIPT = ("SCRIPTED",)
 OFFICIAL = ("SCRIPTED", "OFFICIAL_HOST_LOOPBACK")
 
@@ -33,16 +37,17 @@ class Step:
     requirements: tuple = ()
     namespace: bool = False
     cwd: Path = ROOT
+    artifacts: tuple = ()
 
 
 def plan(args, selected, raw, revision):
     steps = []
     def add(name, ids, command, receipt, *, classes=SCRIPT, kind="exit", requires=(),
-            namespace=False, cwd=ROOT):
+            namespace=False, cwd=ROOT, artifacts=()):
         requested = tuple(item for item in ids if item in selected)
         if requested:
             steps.append(Step(name, requested, [str(arg) for arg in command], classes, receipt,
-                              kind, tuple(requires), namespace, cwd))
+                              kind, tuple(requires), namespace, cwd, tuple(artifacts)))
 
     py = [args.python, "-B"]
     def out(name):
@@ -70,7 +75,7 @@ def plan(args, selected, raw, revision):
         arg for case in selected_usage for arg in ("--case", case)]
     add("usage", USAGE, [*py, CLOSURE / "usage.py", "--output", out("usage"), *usage_filter],
         "evidence/result.json", kind="matrix")
-    for case in (*PROFILE, "REAL_RESOURCES"):
+    for case in (*PROFILE, "PROFILE-SCOPE", "REAL_RESOURCES"):
         extra = ["--original-failures", args.original_failures] if case == "T03" and args.original_failures else []
         add(case, (case,), [*py, CLOSURE / "profile_cases.py", "--case", case, "--out", out(case),
                            "--python", args.python, "--binary", args.binary, "--commit", revision, *extra],
@@ -88,7 +93,39 @@ def plan(args, selected, raw, revision):
         args.cache, "--output", raw / "official-usage/result.json"], "result.json", classes=OFFICIAL,
         requires=(args.binary,), namespace=True)
     add("legacy-ledger", ("LEGACY-LEDGER",), [*py, CLOSURE / "legacy_ledger.py", "--out",
-        raw / "legacy-ledger/result.json"], "result.json")
+        raw / "legacy-ledger/result.json"], "result.json", kind="hardening")
+    add("dependencies", ("DEPENDENCIES",), [args.python, "-I", "-B", ROOT / "scripts/acceptance_dependencies.py",
+        "--check-controls", "--work", args.dependency_control_work, "--python", args.seed_python,
+        *(["--node", args.node] if args.node else []),
+        "--output", raw / "dependencies/result.json"], "result.json", kind="hardening")
+    add("child-double-loss", ("CHILD-DOUBLE-LOSS",), [*py, CLOSURE / "child_double_loss.py", "--out",
+        out("child-double-loss"), "--binary", args.binary], "evidence/receipt.json", classes=OFFICIAL,
+        kind="hardening", requires=(args.binary,), namespace=True, artifacts=tuple("evidence/" + name for name in
+        ("manifest.json", "official-wire.jsonl", "lost-start.json", "before-recovery.json", "after-history.json",
+         "cold-history.jsonl", "post-grace.json", "repeat-driver.json", "provider-requests.json", "ledger.sqlite.gz")))
+    add("operator-usage", ("OPERATOR-USAGE",), [*py, CLOSURE / "unresolved.py", "--output",
+        out("operator-usage")], "evidence/result.json", kind="hardening")
+    add("operator-usage-official", ("OPERATOR-USAGE",), [*py, CLOSURE / "unresolved_host.py", "--output",
+        out("operator-usage-official")], "evidence/result.json", kind="hardening", classes=OFFICIAL,
+        requires=(args.binary,), namespace=True, artifacts=("evidence/ledger.db",))
+    add("estimate-risk", ("ESTIMATE-RISK",), [*py, HARDEN / "estimate_risk.py", "--output",
+        out("estimate-risk")], "evidence/result.json", kind="hardening")
+    add("fifo", ("FIFO",), [*py, "-m", "unittest", "-v", "tests.test_p2a1_fifo"], "console.log",
+        kind="unittest", cwd=ROOT / "gx-h", artifacts=tuple("evidence/" + name for name in
+        ("handoff.json", "fallback.json", "fallback.db", "path-validation.json", "read-race.json", "idle-overhead.json")))
+    add("timeout", ("TIMEOUT",), [*py, "-m", "unittest", "-v",
+        "tests.test_v21_compute.ComputeTest.test_existing_job_limits_stop_bounded_compute_load"],
+        "console.log", kind="unittest", cwd=ROOT / "gx-h", artifacts=("timeout.json",))
+    add("fairness", ("FAIRNESS",), [*py, HARDEN / "cpu_fairness.py", "--output", out("fairness")],
+        "evidence/receipt.json", kind="hardening", classes=("SCRIPTED", "REAL_COMPUTE"),
+        artifacts=("evidence/events.jsonl", "evidence/gx.db.gz"))
+    add("sqlite-boundaries", ("SQLITE-BOUNDARIES",), [*py, ROOT / "acceptance/p2a1/sqlite_boundaries.py",
+        "--output", out("sqlite-boundaries")], "evidence/result.json", kind="hardening",
+        artifacts=("evidence/summary.json", "evidence/transactions.jsonl", "evidence/source-audit.json"))
+    if args.suite == "hardening":
+        add("T03-intake", ("T03",), [*py, HARDEN / "test_historical_intake.py", "-v"],
+            "console.log", kind="unittest")
+        steps.sort(key=lambda step: HARDENING.index(step.ids[0]))
     return steps
 
 
@@ -105,6 +142,12 @@ def supporting_files(step, data, case):
         return [item["name"] for item in data["snapshots"]]
     if step.name == "usage":
         return [data["cases"][case][key] for key in ("ledger", "events", "observations")]
+    if step.name == "operator-usage":
+        return [item[key] for item in data["cases"].values() for key in ("ledger", "events", "observations")]
+    if step.name == "estimate-risk":
+        return [item[key] for item in data["cases"] for key in ("status_path", "usage_path", "events_path")]
+    if step.kind == "profile":
+        return data["evidence"]
     if step.name == "sqlite":
         return ("gx.db", "metrics.jsonl", "summary.json")
     if step.name == "performance":
@@ -112,14 +155,50 @@ def supporting_files(step, data, case):
     return ()
 
 
+def hardening_result(step, case, data, returncode, evidence):
+    if "status" in data:
+        status = data["status"]
+    else:
+        status = "PASS" if data["passed"] is True else "FAIL"
+    if status not in {"PASS", "FAIL", "PARTIAL", "BLOCKED"}:
+        raise ValueError(f"unexpected {case} status {status!r}")
+    if status != "PASS":
+        return row(status, evidence, data.get("reason") or data.get("issue"))
+    if returncode != 0 or data.get("passed", True) is not True:
+        return row("FAIL", evidence, "contradictory subprocess exit or pass flag")
+    if case == "CHILD-DOUBLE-LOSS" and not (data["closure"] == "CLOSED" and data["run_id"]
+            and data["checks"] and all(value is True for value in data["checks"].values())):
+        return row("FAIL", evidence, "child double-loss receipt lacks a closed run")
+    if step.name == "operator-usage" and not (data["cases"] and all(
+            item["status"] == "PASS" for item in data["cases"].values())):
+        return row("FAIL", evidence, "operator probe reports incomplete cases")
+    if case == "ESTIMATE-RISK" and {item["name"] for item in data["cases"] if item["status"] == "PASS"} != {
+            "parent", "parent_with_child"}:
+        return row("FAIL", evidence, "missing parent or child exposure observation")
+    if case == "LEGACY-LEDGER":
+        restored = data["closure_ledgers"]
+        if not (len(data["cases"]) == 2 and len(data["rollback_revision"]) == 40 and set(restored) == {"U05", "B05"}
+                and all(len(item["restored_backup_sha256"]) == 64 and item["restored_token_balance"] == item["token_balance"]
+                        for item in restored.values())):
+            return row("FAIL", evidence, "missing original ledger or verified rollback balance")
+    return row(status, evidence)
+
+
 def observed(step, directory, returncode):
     source = directory / step.receipt
     evidence = f"{step.name}/{step.receipt}"
     if not source.is_file():
         return {case: row("FAIL", f"{step.name}/console.log", f"missing {step.receipt}") for case in step.ids}
+    missing = [name for name in step.artifacts
+               if not (directory / name).is_file() or not (directory / name).stat().st_size]
+    if missing:
+        return {case: row("FAIL", evidence, "missing raw evidence: " + ", ".join(missing)) for case in step.ids}
     if step.kind == "unittest":
         import re
-        ok = returncode == 0 and re.search(r"^Ran [1-9]\d* tests? in ", source.read_text(), re.M)
+        output = source.read_text()
+        ok = returncode == 0 and re.search(r"^Ran [1-9]\d* tests? in ", output, re.M)
+        if step.name in {"fifo", "timeout", "T03-intake"}:
+            ok = ok and re.search(r"^OK$", output, re.M)
         return {case: row("PASS" if ok else "FAIL", evidence) for case in step.ids}
     data = read(source)
     if not isinstance(data, dict) or not data:
@@ -130,6 +209,8 @@ def observed(step, directory, returncode):
             operations = data["operations"]
             failed = [name for name in GATE_OPERATIONS[case]
                       if operations.get(name, {}).get("returncode") != 0]
+            if case == "REG01" and operations.get("extra-child-observation", {}).get("returncode") != 0:
+                failed.append("extra-child-observation")
             if failed:
                 results[case] = row("FAIL", evidence, "failed/missing operations: " + ", ".join(failed))
             elif data.get("errors") or data.get("tracked_product_changes"):
@@ -143,6 +224,10 @@ def observed(step, directory, returncode):
                     results[case]["supplemental_child_observation"] = {
                         "status": child["observed_status"], "returncode": child["returncode"],
                         "evidence": f"{step.name}/evidence/extra-child/observation.json"}
+                    if child["observed_status"] != "PASS" or child["returncode"] != 0:
+                        results[case].update(status="FAIL", reason="double-loss child did not settle")
+                else:
+                    results[case].update(status="FAIL", reason="missing double-loss child observation")
         elif step.kind == "cross":
             result = data["matrix"][case]
             lock = read(ROOT / "release-assets/lock.json")["linux_x64"]
@@ -163,11 +248,15 @@ def observed(step, directory, returncode):
         elif step.kind == "checks":
             ok = returncode == 0 and data["checks"][case] is True
             results[case] = row("PASS" if ok else "FAIL", evidence)
+        elif step.kind == "hardening":
+            results[case] = hardening_result(step, case, data, returncode, evidence)
         else:
             ok = returncode == 0 and data.get("passed", True) and data.get("exit_code", 0) == 0
             results[case] = row("PASS" if ok else "FAIL", evidence)
-        if results[case]["status"] == "PASS":
-            missing = [name for name in supporting_files(step, data, case) if not (source.parent / name).is_file()]
+        if results[case]["status"] == "PASS" or (step.kind == "profile" and results[case]["status"] == "PARTIAL"):
+            missing = [name for name in supporting_files(step, data, case)
+                       if not (source.parent / name).resolve().is_relative_to(source.parent.resolve())
+                       or not (source.parent / name).is_file()]
             if missing:
                 results[case] = row("FAIL", evidence, "missing evidence files: " + ", ".join(missing))
     if returncode and all(record["status"] == "PASS" for record in results.values()):

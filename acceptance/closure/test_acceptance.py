@@ -12,7 +12,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from acceptance.closure import archive
-from acceptance.closure.cases import GATE_OPERATIONS, MATRIX
+from acceptance.closure.cases import GATE_OPERATIONS, HARDENING, MATRIX, Step, SUITES, observed
 
 
 class Automation(unittest.TestCase):
@@ -101,6 +101,40 @@ class Automation(unittest.TestCase):
         self.assertEqual((no_op["status"], no_op["cases"]), ("NO_FAILURES", {}))
         print(json.dumps({"first_manifest": original["manifest.sha256"], "retry_cases": list(retry["cases"]),
                           "overwrite_rejected": True, "clean_retry": no_op["status"]}))
+
+    def test_hardening_and_original_have_separate_case_selection(self):
+        self.assertEqual(len(set(SUITES["all"])), 38)
+        self.assertEqual(len(set(SUITES["hardening"])), 13)
+        self.assertIn("T03", HARDENING)
+        result = self.command("run", "hardening", "--case", "P2A-08", expected=2)
+        self.assertIn("case is outside this suite", result.stderr)
+
+    def test_reg01_exposes_unsettled_child_even_after_successful_wrapper_exit(self):
+        step = Step("v31-regression", ("REG01",), [], ("OFFICIAL_HOST_LOOPBACK",), "execution.json", "regression")
+        operations = {name: {"returncode": 0} for name in GATE_OPERATIONS["REG01"]}
+        operations["extra-child-observation"] = {"returncode": 0}
+        archive.save(self.runs / step.receipt, {"operations": operations})
+        child = self.runs / "extra-child/observation.json"
+        self.assertEqual(observed(step, self.runs, 0)["REG01"]["status"], "FAIL")
+        child.parent.mkdir()
+        archive.save(child, {"observed_status": "COLD_SETTLEMENT_TIMEOUT", "returncode": 1})
+        result = observed(step, self.runs, 0)["REG01"]
+        self.assertEqual(result["status"], "FAIL")
+        self.assertEqual(result["supplemental_child_observation"]["returncode"], 1)
+        archive.save(child, {"observed_status": "PASS", "returncode": 0})
+        self.assertEqual(observed(step, self.runs, 0)["REG01"]["status"], "PASS")
+
+    def test_focused_checks_require_their_observed_artifacts(self):
+        step = Step("timeout", ("TIMEOUT",), [], ("SCRIPTED",), "console.log", "unittest",
+                    artifacts=("timeout.json",))
+        log = self.runs / "console.log"
+        log.write_text("Ran 1 test in 0.25s\n\nOK\n")
+        self.assertEqual(observed(step, self.runs, 0)["TIMEOUT"]["status"], "FAIL")
+        archive.save(self.runs / "timeout.json", {"wall_limit": {"result": "timed_out"}})
+        log.write_text("Ran 1 test in 0.25s\n\nOK (skipped=1)\n")
+        self.assertEqual(observed(step, self.runs, 0)["TIMEOUT"]["status"], "FAIL")
+        log.write_text("Ran 1 test in 0.25s\n\nOK\n")
+        self.assertEqual(observed(step, self.runs, 0)["TIMEOUT"]["status"], "PASS")
 
 
 if __name__ == "__main__":

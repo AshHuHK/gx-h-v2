@@ -1,5 +1,7 @@
 # Phase 2A 验收命令和证据
 
+P2A.1 专项使用 `bin/gx-acceptance run hardening`，沿用本页的报告、归档校验和失败续跑命令。当前运行会从锁定并校验的本地依赖创建私有 Python 环境。新矩阵、冻结版本及 T03 历史材料的复核方式见 [P2A.1 加固报告](P2A1_HARDENING_REPORT.md)。
+
 从发布仓库执行以下命令可在当前版本重跑验收。所有输入取自本地。输出默认保存在 `var/acceptance/<run-id>/`。程序先打印本次运行 ID 和绝对目录，结束时打印结论、归档成员数和压缩包 SHA-256。
 
 ```sh

@@ -258,6 +258,37 @@ def cpu_room(conn: sqlite3.Connection, *, limits: Mapping[str, Any] | None = Non
     }
 
 
+def sample_admission(conn):
+    """Take physical CPU/runner observations before competing for the SQLite writer."""
+    limits = config.limits()
+    jobs = jobs_state(conn)
+    room = cpu_room(conn, limits=limits, cpu=cpu_state(), jobs=jobs)
+    observed = {(job["job_id"], job["recorded_status"]): job["holding_cpu_threads"] for job in jobs["jobs"]}
+    return room["allowed"], start_deadline_seconds(limits), observed
+
+
+def admission_room(conn, sample):
+    """Count current claims under the writer, including every concurrently admitted Job."""
+    allowed, start_deadline, observed = sample
+    statuses = (CREATED, *IN_FLIGHT)
+    marks = ",".join("?" for _ in statuses)
+    rows = conn.execute(f"SELECT job_id,status,created_at,resources_json FROM jobs WHERE status IN ({marks})", statuses)
+    holders = []
+    held = 0
+    for row in rows:
+        resources = store.loads(row, "resources_json", {})
+        if row["status"] == CREATED:
+            holding = resources.get("gpu") is None and clock.age_seconds(row["created_at"]) <= start_deadline
+        else:
+            # A new or changed in-flight row has no matching sample. Keep its claim
+            # until the next observation can release it, including an uncertain launch.
+            holding = observed.get((row["job_id"], row["status"]), True)
+        if holding:
+            holders.append(row["job_id"])
+            held += resources["cpu_threads"]
+    return {"allowed": allowed, "held": held, "free": max(0, allowed - held), "holders": holders}
+
+
 # ------------------------------------------------------------------------------ snapshot
 
 def _switch_view(spec: Mapping[str, Any]) -> dict[str, Any]:
@@ -284,6 +315,11 @@ def snapshot(conn: sqlite3.Connection) -> dict[str, Any]:
     jobs = jobs_state(conn)
     room = cpu_room(conn, limits=limits, cpu=cpu, jobs=jobs)
     allowed = room["allowed"]
+    from . import cpu_queue
+    queue = cpu_queue.positions(conn, allowed)
+    cpu["admission_waiters"] = [{**ticket, "wait_seconds": max(0.0, clock.age_seconds(ticket["since"])),
+                                 "eligible": index == 0 and ticket["required_threads"] <= room["free"]}
+                                for index, ticket in enumerate(queue)]
     cpu.update(
         threads_allowed_for_jobs=allowed, threads_held_by_our_jobs=room["held"], threads_free=room["free"],
         threads_held_by=room["holders"], max_threads_per_job=int(cpu_limits["max_pool_workers"]), rule=room["rule"],
@@ -415,6 +451,8 @@ def fits(conn: sqlite3.Connection, capability_version: str,
     for reason in now["can_start"]["cpu_job"]["reasons"]:
         if reason.startswith("hold "):                      # an operator's hold; the threads are said above
             note("not_now", reason)
+    if queue := now["cpu"].get("admission_waiters"):
+        note("not_now", f"CPU admission is waiting for {queue[0]['run_id']} / {queue[0]['node']}")
     gpu = resources["gpu"]
     queue_reasons: list[str] = []
     if gpu is not None:

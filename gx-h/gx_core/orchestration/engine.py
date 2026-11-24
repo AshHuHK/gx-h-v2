@@ -635,6 +635,8 @@ class StoreCheckpointer(Checkpointer):
         self, conn: sqlite3.Connection, *, run_id: str, workflow_id: str, workflow_version: str,
         node: str, state: Mapping[str, Any], interrupt_ref: str | None = None,
     ) -> str:
+        from ..jobs import cpu_queue
+        cpu_queue.retire_obsolete(conn, run_id, state)
         return store.save_checkpoint(
             conn, run_id=run_id, workflow_id=workflow_id, workflow_version=workflow_version,
             node=node, state=dict(state), interrupt_ref=interrupt_ref,
@@ -1019,6 +1021,8 @@ class Engine:
             "submissions": [] if reentered else list(refs), "round": wait.get("reenter_round", wait["round"]),
             "reentered": reentered,
         }
+        if "cpu_admission" in wait:
+            state["resumptions"][name]["cpu_admission"] = wait["cpu_admission"]
         state["advance"] = _new_advance(actor)
         self.checkpointer.save(
             conn, run_id=run_id, workflow_id=workflow.workflow_id,
@@ -1342,7 +1346,9 @@ class Engine:
             needed = interrupt.payload["required_threads"]
             # A changed limit may make the request permanently too large. In that case
             # re-enter once so Job admission reports its new refusal to the workflow.
-            ready = needed <= room["free"] or needed > room["allowed"]
+            from ..jobs import cpu_queue
+            job_key = wait.get("cpu_admission")
+            ready = needed > room["allowed"] or cpu_queue.refusal(conn, room, needed, job_key) is None
             waiting = None if ready else DependencyUnmet(
                 interrupt.reason, details={"run_id": run_id, "rule": "cpu.threads_free", "needed": needed,
                                            "free": room["free"], "holders": room["holders"]})
@@ -1554,14 +1560,15 @@ class Engine:
                             needed = facts.get("needed")
                             allowed = facts.get("allowed")
                             if (not node.idempotent or facts.get("rule") != "cpu.threads_free"
-                                    or not facts.get("holders") or type(needed) is not int
+                                    or not (facts.get("holders") or facts.get("ahead")) or type(needed) is not int
                                     or type(allowed) is not int or not 0 < needed <= allowed):
                                 raise
                             # Admission owns the quota across all Runs. Park this stage on
                             # available threads, including when another Run owns every Job.
                             result = NodeResult(interrupt=InterruptRequest(kind="stage", reason=exc.message,
                                 payload={"stage": name, "waiting_state": "WAITING_EXTERNAL_JOB",
-                                         "wait_for": "cpu.threads_free", "required_threads": needed}))
+                                         "wait_for": "cpu.threads_free", "required_threads": needed,
+                                         "job_key": facts.get("job_key")}))
                         with store.transaction(
                             self.conn, transaction_owner="Engine", operation="checkpoint_node", run_id=run_id,
                         ) as conn:
@@ -1868,10 +1875,15 @@ class Engine:
         wait = branches.wait_record(node, pending, interrupt_ref, clock.now_iso(),
                                     state.get("round", 0) if round_index is None else round_index, {})
         state.setdefault("node_waits", {})[node] = wait
-        store.append_event(conn, kind="workflow.node_waiting", actor=actor, run_id=run_id,
+        waiting_event = store.append_event(conn, kind="workflow.node_waiting", actor=actor, run_id=run_id,
                            subject_kind="workflow", subject_id=f"{workflow.workflow_id}@{workflow.version}",
                            reason=interrupt.reason, evidence_level="EXECUTION_OBSERVED",
                            payload={"node": node, "interrupt_ref": interrupt_ref, **pending})
+        if interrupt.payload.get("wait_for") == "cpu.threads_free" and interrupt.payload.get("job_key"):
+            from ..jobs import cpu_queue
+            wait["cpu_admission"] = interrupt.payload["job_key"]
+            cpu_queue.park(conn, run_id, node, wait["cpu_admission"], interrupt.payload["required_threads"],
+                           wait["since"], waiting_event)
         wait["controller_ran"] = self._controller_ran(conn, run_id)
         if not other_ready:
             return self._park_waits(conn, run_id, workflow, state, actor, just_parked=node)

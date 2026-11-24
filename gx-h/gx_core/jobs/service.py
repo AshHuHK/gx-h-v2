@@ -676,6 +676,8 @@ class JobService:
             executor.write_spec(job, spec)
             staging_ref = str(Path(out_dir).relative_to(storage.store_dir(conn)))
 
+            from . import capacity, cpu_queue
+            sample = capacity.sample_admission(conn)
             with store.transaction(conn, transaction_owner="JobService", operation="admit", run_id=run_id) as txn:
                 if reserved_job_id is not None:
                     validate_proposal(txn, reserved_job_id, request)
@@ -698,7 +700,7 @@ class JobService:
                 budget_ref = team_funding(txn, run_id, task_id, budget_ref, admit=True)
                 from ..p0.meter_limits import check_soft
                 check_soft(txn,run_id,task_id)
-                self._threads_or_refuse(txn, resources)
+                self._threads_or_refuse(txn, resources, key=key, sample=sample)
                 reservation = budgets.reserve(txn, budget_ref=budget_ref, subject_kind="job",
                                               subject_id=job_id, amounts=amounts, actor=self.actor)
                 txn.execute(
@@ -715,6 +717,7 @@ class JobService:
                      int(resources["wall_seconds"]), staging_ref, reservation["reservation_ref"],
                      clock.now_iso(), lease_ref, step_index, attempt),
                 )
+                cpu_queue.admitted(txn, key)
                 execution_manifest.admit(txn, job_id, launch=intent, bundle=capability["bundle"], env=env,
                                          inputs=listed, resources=resources, preflight=preflight)
                 store.append_event(
@@ -733,7 +736,7 @@ class JobService:
         return self._row(job_id)
 
     @staticmethod
-    def _threads_or_refuse(conn: sqlite3.Connection, resources: Mapping[str, Any]) -> None:
+    def _threads_or_refuse(conn: sqlite3.Connection, resources: Mapping[str, Any], *, key=None, sample=None) -> None:
         """Audit J8 (the lead's ruling, 2026-11-12T21:57Z): a job is admitted only while the
         threads it needs are free, by the count ``capacity.fits`` reads (``capacity.cpu_room``)
         and in its words (``limits.cpu_threads_finding``), so that what fits says and what
@@ -742,9 +745,9 @@ class JobService:
         and its threads. Refused here nothing is written: no row, no hold."""
         from . import capacity                              # imported late: it imports this module
 
-        room = capacity.cpu_room(conn)
-        refusal = limits_mod.cpu_threads_finding(resources["cpu_threads"], free=room["free"], allowed=room["allowed"],
-                                                 held=room["held"], holders=room["holders"])
+        room = capacity.admission_room(conn, sample) if sample is not None else capacity.cpu_room(conn)
+        from . import cpu_queue
+        refusal = cpu_queue.refusal(conn, room, resources["cpu_threads"], key)
         if refusal is not None:
             raise refusal
 

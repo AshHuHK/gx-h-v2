@@ -342,6 +342,83 @@
         "T03",
         "REG01"
       ]
+    },
+    {
+      "run_id": "p2a1-hardening-1f8fc82",
+      "suite": "hardening",
+      "status": "PASS",
+      "sha": "1f8fc82c500bc51c9409a01b10b8a4769345030d",
+      "started_utc": "2026-11-24T18:12:03.132811+00:00",
+      "finished_utc": "2026-11-24T18:17:13.136678+00:00",
+      "initial_dirty_state": [],
+      "case_counts": {
+        "PASS": 13
+      },
+      "raw_files": 163,
+      "manifest_sha256": "6a1eae64428ab67bc282d36dd782cf7601266c338d1255ced2cf90c1c05cf1c9",
+      "raw_sha256": "721906326414aef8a9abe857af086840087715749d907718b6197611ee955bbd",
+      "console_sha256": "6649fb45c1741e09a5201708c3e92b155e8f5291e07aeeda9d3d70188c534fb7",
+      "summary": "p2a1-hardening-1f8fc82/summary.json",
+      "manifest": "p2a1-hardening-1f8fc82/manifest.sha256",
+      "console": "p2a1-hardening-1f8fc82.log",
+      "sqlite_quick_check_count": 16,
+      "event_files": 13,
+      "historical_failures": {
+        "identified": 42,
+        "distinct": 40,
+        "dispositions": {
+          "environment": 42
+        },
+        "measured_outcomes": {
+          "ok": 42
+        },
+        "classification_sha256": "62289254eab65c5d0674ef61eb91d872fed36b6a57228b40331539b947e01f75",
+        "raw_log_sha256": "0d72a9b90dc9ca54a7461fe6bdfe0e027fdc2f43bc1b9ec7e95924e248f625b9",
+        "baseline_count": 465,
+        "baseline_outcomes": {
+          "ok": 461,
+          "skipped": 4
+        },
+        "discovery_mode": "executed"
+      },
+      "child": {
+        "status": "PASS",
+        "closure": "CLOSED",
+        "extra_model_requests": 0,
+        "duplicate_jobs": 0
+      },
+      "fairness": {
+        "status": "PASS",
+        "checks": {
+          "cold_process_reopened_queue": true,
+          "cross_connection_admission": true,
+          "noncompute_sibling_progressed": true,
+          "older_two_threads_progressed": true,
+          "original_grid_scores_verified": true,
+          "paused_and_cancelled_excluded": true,
+          "returned_first_slot_preserved": true,
+          "superseded_checkpoint_released": true
+        }
+      },
+      "sqlite": {
+        "status": "PASS",
+        "checks": {
+          "all_changed_transactions_tagged": true,
+          "complete_phase_timings": true,
+          "heavy_operations_outside_writer": true,
+          "indexed_fair_queue_head": true,
+          "observed_writers": true,
+          "run_ids_match_created_runs": true,
+          "run_start_replay_identity": true,
+          "workloads_completed": true
+        }
+      },
+      "discovery_source": {
+        "manifest_sha256": "4669dc2d3e4f7a6b44fae8ea3132b7613d32cecf9eae30b9fbb235615c541dbe",
+        "run_id": "p2a1-baseline-1f8fc82"
+      },
+      "role": "1f8fc82 独立硬化运行，早先全量的发现结果不合格，故实际重新发现全部用例",
+      "during_discovery_load_sample": "host-load-during-independent-discovery.json"
     }
   ]
 }

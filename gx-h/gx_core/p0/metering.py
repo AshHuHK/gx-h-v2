@@ -456,7 +456,7 @@ def reconcile_turn(conn, thread_id, turn_id):
         "ON r.reservation_ref=d.reservation_ref WHERE d.thread_id=? AND d.turn_id=? "
         "AND d.state='acknowledged' AND u.terminal_status IS NOT NULL AND (r.status='HELD' OR EXISTS "
         "(SELECT 1 FROM p0_meter_turns m WHERE m.reservation_ref=r.reservation_ref AND "
-        "(m.confidence IN ('ESTIMATED','PROVIDER_RECONCILED') OR (r.status='RELEASED' AND EXISTS "
+        "(m.confidence IN ('ESTIMATED','PROVIDER_RECONCILED','HISTORICAL_SETTLED') OR (r.status='RELEASED' AND EXISTS "
         "(SELECT 1 FROM p0_usage_releases x WHERE x.reservation_ref=r.reservation_ref))) AND m.attribution IS NOT 'TURN'))",
         (thread_id, turn_id)).fetchone()
     if row is None:

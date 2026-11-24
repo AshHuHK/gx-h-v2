@@ -53,7 +53,7 @@ def _cases(conn, run_id, ref=None):
         "SELECT d.*,b.amounts_json,b.created_at," + date + " AS unresolved_at,coalesce(" + date +
         ",m.terminal_at,b.settled_at,b.created_at) AS since FROM p0_meter_native_turns d "
         "JOIN budget_reservations b USING(reservation_ref) LEFT JOIN p0_meter_turns m USING(reservation_ref) "
-        "WHERE d.run_id=? " + target + " AND (d.confidence='UNRESOLVED' OR (d.confidence='HISTORICAL_SETTLED' AND d.settled_tokens IS NULL) "
+        "WHERE d.run_id=? " + target + " AND (d.confidence IN ('UNRESOLVED','HISTORICAL_SETTLED') "
         "OR (d.budget_status='HELD' AND d.state='sending') " + disputed + " OR EXISTS(SELECT 1 FROM p0_meter_responses x "
         "WHERE x.thread_id=d.thread_id AND x.turn_id=d.turn_id AND x.conflicting=1)) ORDER BY d.sequence",
         (run_id,ref) if ref is not None else (run_id,))

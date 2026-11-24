@@ -263,6 +263,31 @@ class OperatorUsage(unittest.TestCase):
         self.assertEqual(budgets.state(self.db,self.f.budget)["spent"],{"api_calls":1,"tokens":42})
         self.snapshot("reconciled")
 
+    def test_known_historical_debit_requires_evidence_for_turn_attribution(self):
+        turn = self.f.start()
+        self.f.raw(turn,"old-official",38)
+        self.f.sample(turn,38)
+        self.f.complete()
+        ref=self.db.execute("SELECT reservation_ref FROM p0_meter_native_turns WHERE turn_id=?",(turn,)).fetchone()[0]
+        # z_v21_metering seeded the original event amount and HISTORICAL_TURN. The original
+        # follow-up migration classifies an old store lacking the detailed measured bill.
+        self.db.execute("UPDATE p0_meter_turns SET attribution='HISTORICAL_TURN' WHERE reservation_ref=?",(ref,))
+        self.db.execute("UPDATE p0_root_turn_usage SET measured_tokens=NULL WHERE thread_id='root' AND turn_id=?",(turn,))
+        self.db.executescript((ROOT/"gx-h/gx_core/p0/zz_v21_historical_meter.sql").read_text())
+        before=self.snapshot("v21_historical_38")
+        self.assertEqual(before["cost_report"]["UNRESOLVED"]["reservation_refs"],[ref])
+        self.assertEqual([c["reservation_ref"] for c in before["unresolved_cases"]],[ref])
+        self.assertEqual(self.act(ref,"reconcile","no-evidence")["after"]["usage_confidence"],"HISTORICAL_SETTLED")
+        with self.assertRaises(SchemaInvalid):
+            self.act(ref,"attach-evidence","invalid",thread_id="root",turn_id=turn,response_id="not-official")
+        self.assertEqual(budgets.state(self.db,self.f.budget)["spent"],{"api_calls":1,"tokens":38})
+        self.act(ref,"attach-evidence","attach",thread_id="root",turn_id=turn,response_id="old-official")
+        self.act(ref,"reconcile","verified")
+        after=self.snapshot("verified_historical_38")
+        self.assertEqual(after["unresolved_cases"],[])
+        self.assertEqual((after["turns"][0]["usage_class"],after["adjustments"][0]["delta"]),("PROVIDER_CONFIRMED",0))
+        self.assertEqual(budgets.state(self.db,self.f.budget)["spent"],{"api_calls":1,"tokens":38})
+
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

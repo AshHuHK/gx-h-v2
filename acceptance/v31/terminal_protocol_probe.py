@@ -155,12 +155,13 @@ class Wire:
             complete = (method == "turn/completed" and msg["params"]["turn"]["id"] == self.trial.get("turn_id"))
             if interrupt_ack:
                 self.trial["server_interrupt_replies"].append(msg)
-            if (self.trial["fault"] == "delayed_usage" and method == "thread/tokenUsage/updated"
+            if (self.trial["fault"] in ("delayed_usage", "lost_usage") and method == "thread/tokenUsage/updated"
                     and msg["params"]["threadId"] == self.trial.get("thread_id")
                     and msg["params"]["turnId"] == self.trial.get("turn_id")):
                 self.trial["injected_receipt_faults"].append({"method": method,
                     "turn_id": msg["params"]["turnId"], "tokens": msg["params"]["tokenUsage"]["total"]["totalTokens"]})
-                self.withheld.append(line)
+                if self.trial["fault"] == "delayed_usage":
+                    self.withheld.append(line)
                 continue
             if (interrupt_ack or complete) and self.trial["fault"] in ("lost_receipts", "delayed_receipts"):
                 self.trial["injected_receipt_faults"].append(
@@ -233,6 +234,51 @@ def observe(trial, original, frame):
         trial["events"].append({"seq": frame.receive_seq, "t": time.monotonic(), "method": m, "thread": p.get("threadId"),
             "turn": p.get("turnId") or (p.get("turn") or {}).get("id"), **event})
     original(frame)
+
+
+def cold_usage(roots, trial):
+    """Read @2's original interrupted turn after its Goal has been verified complete."""
+    thread, turn = trial["thread_id"], trial["turn_id"]
+    record = {"thread_id": thread, "turn_id": turn, "snapshots": [], "turns_started": []}
+    trial["cold_usage"] = record
+    prior = roots.client.transport.process
+    record["original_unsubscribe"] = roots._request("thread/unsubscribe", {"threadId": thread})["status"]
+    prior.stdin.close()
+    record["original_host_exit"] = prior.wait(timeout=8)
+    assert record["original_host_exit"] == 0
+    roots.client.close()
+    with Roots(roots.conn, run_id=roots.run_id, cwd=roots.cwd, argv=roots.argv, env=roots.env) as cold:
+        binding = cold._binding(thread)
+        def check_thread(history):
+            assert binding["thread_id"] == history["id"] == thread and cold._matches(binding, history)
+            match, = [entry for entry in history["turns"] if entry["id"] == turn]
+            assert match["status"] == "interrupted"
+        def receive(frame):
+            msg = frame.message
+            params = msg.get("params", {})
+            if msg["method"] == "thread/tokenUsage/updated" and (params["threadId"], params["turnId"]) == (thread, turn):
+                record["snapshots"].append(params["tokenUsage"]["total"]["totalTokens"])
+            if msg["method"] == "turn/started":
+                record["turns_started"].append(params["turn"]["id"])
+            cold._observe(frame)
+        check_thread(cold._request("thread/read", {"threadId": thread, "includeTurns": True})["thread"])
+        goal = cold._request("thread/goal/get", {"threadId": thread})["goal"]
+        assert goal["threadId"] == thread and goal["status"] == "complete"
+        record["goal_status"] = goal["status"]
+        settings = cold._settings(binding, new=False)
+        settings["config"]["features.goals"] = False
+        record["goals_enabled"] = settings["config"]["features.goals"]
+        with patch.object(cold.client, "on_notification", receive):
+            resumed = cold._request("thread/resume", {**settings, "threadId": thread})
+            cold._verify_settings(binding, resumed)
+            check_thread(resumed["thread"])
+            cold.delivery.attached(thread, resumed["thread"])
+            deadline = time.monotonic() + 5
+            while not record["snapshots"] and time.monotonic() < deadline:
+                cold.client.run_until(lambda _: bool(record["snapshots"]), timeout=1, poll_interval=0.15)
+            cold.delivery.reconcile(thread)
+        record["new_model_requests"] = [r["id"] for r in trial["model_requests"] if r["t"] > trial["committed_at"]]
+        assert not record["turns_started"] and not record["new_model_requests"], record
 
 
 def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
@@ -341,6 +387,11 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
                 if fault == "running_child":
                     roots.delivery.verify_descendants()
                 roots.reconcile_meter(thread)
+            unsettled = meter(reader, thread, turn)
+            if (unsettled["budget_status"] == "HELD" and unsettled["terminal_status"] == "interrupted"
+                    and unsettled["metering_reason"] == "missing cumulative usage for this turn"):
+                cold_usage(roots, trial)
+                assert trial["cold_usage"]["snapshots"], (marker, unsettled, trial["cold_usage"], trial["events"])
         if fault == "running_child":
             trial["children"] = [dict(x) for x in reader.execute(
                 "SELECT m.child_id,m.parent_id,m.root_id,m.metadata_verified,u.turn_id,u.owner_turn,u.terminal,"
@@ -349,6 +400,9 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
             assert len(trial["children"]) == 1 and trial["children"][0]["metadata_verified"]
             assert trial["children"][0]["terminal"] and trial["children"][0]["measured_tokens"] == 183
         trial["final_meter"] = meter(reader, thread, turn)
+        if fault == "lost_usage":
+            assert trial["injected_receipt_faults"] and trial["cold_usage"]["snapshots"][-1] == (
+                trial["injected_receipt_faults"][-1]["tokens"])
         if fault == "delayed_usage":
             interrupted = next(e["seq"] for e in trial["events"] if e["method"] == "turn/completed" and e["turn"] == turn)
             delivered = [e["tokens"] for e in trial["events"] if e["method"] == "thread/tokenUsage/updated"
@@ -375,7 +429,8 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence):
         if fault in ("lost_interrupt", "lost_receipts", "delayed_receipts"):
             assert len(trial["fallback_observations"]) == 1
         assert len(trial["interrupt_writes"]) == (2 if fault == "lost_interrupt" else 1)
-        client.request("thread/unsubscribe", {"threadId": thread})
+        if "cold_usage" not in trial:
+            client.request("thread/unsubscribe", {"threadId": thread})
     return trial
 
 
@@ -405,7 +460,7 @@ def run(repetitions, only=None):
         sequence = [(status, "none") for _ in range(repetitions) for status in ("ACCEPTED", "REJECTED")]
         sequence.extend([("ACCEPTED", "lost_interrupt"), ("REJECTED", "lost_receipts"),
                          ("ACCEPTED", "delayed_receipts"), ("ACCEPTED", "running_child")])
-        if only == "delayed_usage":
+        if only in ("delayed_usage", "lost_usage"):
             sequence = [("ACCEPTED", only)]
         elif only:
             sequence = [case for case in sequence if case[1] == only]
@@ -417,12 +472,21 @@ def run(repetitions, only=None):
         for offset in range(0, len(sequence), batch_size):
             run_id, proposal, evidence = initial_store(conn, f"http://127.0.0.1:{peer.server_port}/v1", probe.provider)
             run_ids.append(run_id)
-            with Roots(conn, run_id=run_id, cwd=probe.cwd, argv=[str(binary), "app-server",
-                       "--listen", "stdio://"], env=probe.env, token_budget=800) as roots:
-                version["app_server_initialize_user_agent"] = roots.client.response_received(1).message["result"]["userAgent"]
-                for i, (expected, fault) in enumerate(sequence[offset:offset + batch_size], offset + 1):
-                    results.append(trial_run(roots, reader, peer, i, expected, fault, proposal, evidence))
-                roots.client.run_until(lambda _: False, timeout=1, poll_interval=0.3)
+            index = offset
+            end = min(offset + batch_size, len(sequence))
+            while index < end:
+                with Roots(conn, run_id=run_id, cwd=probe.cwd, argv=[str(binary), "app-server",
+                           "--listen", "stdio://"], env=probe.env, token_budget=800) as roots:
+                    version["app_server_initialize_user_agent"] = roots.client.response_received(1).message["result"]["userAgent"]
+                    while index < end:
+                        expected, fault = sequence[index]
+                        index += 1
+                        trial = trial_run(roots, reader, peer, index, expected, fault, proposal, evidence)
+                        results.append(trial)
+                        if "cold_usage" in trial:
+                            break  # This host released its writer for a cold receipt.
+                    else:
+                        roots.client.run_until(lambda _: False, timeout=1, poll_interval=0.3)
         for result in results:
             post_terminal = [r["id"] for r in result["model_requests"] if r["t"] > result["committed_at"]]
             assert not post_terminal, (result["id"], post_terminal)
@@ -440,7 +504,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repetitions", type=int, default=100, help="repetitions per accepted/rejected outcome")
     parser.add_argument("--only", choices=("none", "lost_interrupt", "lost_receipts",
-                                          "delayed_receipts", "running_child", "delayed_usage"))
+                                          "delayed_receipts", "running_child", "delayed_usage", "lost_usage"))
     parser.add_argument("--output", type=Path, default=Path(__file__).with_name("terminal-protocol.json"))
     args = parser.parse_args()
     if args.repetitions < 1:

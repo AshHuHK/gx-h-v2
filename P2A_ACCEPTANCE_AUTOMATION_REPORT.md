@@ -44,3 +44,11 @@ bin/gx-acceptance run all --failed-only <run-id>
 三项均执行了公开 CLI。AC01 通过分支回滚与重试用例核对命令、日志、退出码、版本与报告。AC02 解开真实 SQLite 备份，完整性检查得到 `ok`，读取 11 条工作流事件。故意修改内层内容哈希并重新计算外层清单后，`verify` 仍以 2 退出并指出具体文件。AC03 使用缺少指定官方二进制的用例和可正常运行的独立用例构造混合结果，确认重跑只选前者、原文件字节不变、复用旧目录被拒绝，也验证全部通过后没有测试需要重跑。[三项执行摘要](acceptance/closure/automation-history/automation-checked/summary.json) · [原始输出清单](acceptance/closure/automation-history/automation-checked/raw-files.sha256)
 
 开发过程中，AC02 首次用内存反序列化打开带 WAL 标志的已解压备份，SQLite 报错。修复夹具后，使用新文件的只读 immutable 连接进行完整性检查。实际调用 `--failed-only acdb-first` 只执行 AC02，退出 0。初次失败包与后续通过包分别包含 13 个、3 个可校验的原始成员。二者是开发期复现材料，最终冻结候选的整体验收见独立报告。[初次失败](acceptance/closure/automation-history/acdb-first/summary.json) · [精确续跑](acceptance/closure/automation-history/acdb-retry/summary.json) · [Closure 总验收](P2A_CLOSURE_ACCEPTANCE_REPORT.md)
+
+## 冻结版本的整体验收
+
+最终从独立检出的 `3a08a9d1c36759686d29743c75d789cd959848a1` 执行 `run all`。原 Phase 2A 为 15/15，Closure 为 19 项通过和 T03 部分完成，另有 3/3 项补充检查通过。原 465 个测试身份中，461 个通过，4 个沿用基线跳过原因。原始材料只提供另一次执行的失败总数 42，当前仍缺少该次失败的身份和日志。全量包内 345 个文件通过逐项校验，其中 50 份 SQLite 快照解压后通过 `PRAGMA quick_check`，另含 37 份事件轨迹。[冻结版结果](acceptance/closure/runs/frozen-3a08a9d/summary.json) · [完整归档清单](acceptance/closure/runs/frozen-3a08a9d/manifest.sha256)
+
+同一冻结版本执行 `--failed-only frozen-3a08a9d` 后，只启动 T03，耗时 0.697 秒。它复用已校验的父包发现日志，逐项核对原有用例，并保留了资料仍待补齐的结论。新归档包含 11 个原始成员，记录父包 manifest 的完整 SHA-256。[续跑结果](acceptance/closure/runs/retry-3a08a9d/summary.json) · [命令和耗时](acceptance/closure/runs/retry-3a08a9d/commands.json) · [全部运行索引](acceptance/closure/runs/index.json)
+
+中间冻结版 `fa8bba9` 记录了子任务 HTTP 请求迟于父回合结束到达时的计数误判。使用同一官方宿主控制请求顺序后，父回合结束、提前提交被拒、委派的子任务结算、后续回合完成四个时点分别有 2、2、3、4 个请求。修正后的探针从子任务结算后计数，核对只有一个新增父请求，并保存每个阶段的请求 ID 和归属。旧检查在这一时序下失败，两个额外的负对照也验证探针可拒绝重复请求和归属于子任务的请求。[受控对照](acceptance/closure/child-request-order/comparison.json) · [原失败包](acceptance/closure/runs/frozen-fa8bba9/summary.json)

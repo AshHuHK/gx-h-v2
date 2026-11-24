@@ -348,6 +348,17 @@ class TurnMeterTests(unittest.TestCase):
         self.assertEqual(tuple(fact), ("child", "ct", owner, 1))
         self.assertEqual(self.db.execute("SELECT metadata_verified FROM p0_native_child_meters").fetchone()[0], 1)
 
+        # Even a stale meter claiming this parent for a different Run cannot spend it.
+        foreign = records.create_run(self.db, objective="Other project", project_ref="foreign", actor="probe")
+        self.db.execute("INSERT INTO p0_native_child_meters(child_id,run_id,root_id,parent_id,owner_turn) "
+                        "VALUES('foreign-child',?,'root','root',?)", (foreign, owner))
+        foreign_roots = Roots(self.db, run_id=foreign, cwd=self.directory)
+        foreign_roots.delivery.verify_descendants({"foreign-child": {**thread, "id": "foreign-child",
+                                                                      "sessionId": "foreign-child"}})
+        self.assertEqual(self.db.execute("SELECT metadata_verified FROM p0_native_child_meters "
+                                         "WHERE child_id='foreign-child'").fetchone()[0], 0)
+        self.assertIsNone(self.db.execute("SELECT 1 FROM p0_native_child_usage WHERE child_id='foreign-child'").fetchone())
+
     def test_unloaded_child_requires_its_original_session_and_complete_response_records(self):
         self.db.execute("UPDATE runs SET inputs_json=? WHERE run_id=?",(json.dumps({"inputs":{
             "p0_spec":{"metering":{"rollout_diagnostics":True}}}}),self.run))

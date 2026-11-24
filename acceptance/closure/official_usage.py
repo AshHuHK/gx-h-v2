@@ -120,7 +120,7 @@ def snapshot(conn, destination):
 
 
 def run(runtime, output):
-    from acc1_child_late import measure as child_measurement
+    from acc1_child_late import DelayedChildRequestPeer, measure as child_measurement
     from acc1_interrupted_meter import InterruptedPeer, measure as interrupted_measurement
     from acc1_protocol import fixture, binary_facts, run_case, _proxy_preflight
     _proxy_preflight()
@@ -137,9 +137,15 @@ def run(runtime, output):
         assert [r["usage"]["totalTokens"] if r["usage"] else None for r in observed] == expected
         assert len({r["responseId"] for r in observed}) == 2 and wire["new_provider_requests_during_replay"] == 0
         results["wire_controls"][case] = wire
-    with fixture(binary) as probe:
+    with fixture(binary, peer_type=DelayedChildRequestPeer) as probe:
         child = child_measurement(probe)
         assert child["passed"] and all(child["checks"].values())
+        beginning = child["parent_completed"]["provider_requests"]
+        original = child["child_completed"]["provider_requests"]
+        final = child["after_followup"]["provider_requests"]
+        assert [len(beginning), len(original), len(final)] == [2, 3, 4]
+        results["wire_controls"]["delayed_child_request"] = {
+            "parent_completed": beginning, "child_settled": original, "followup_completed": final}
         with closing(store.open_store(probe.directory / "gx.db")) as conn:
             receipts = native_receipts(conn, child["run"])
             parent = child["root"]

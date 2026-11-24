@@ -1,0 +1,173 @@
+{
+  "evidence_class": "OFFICIAL_HOST_LOOPBACK",
+  "binary": {
+    "version": "codex-cli 0.169.0",
+    "sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b"
+  },
+  "observations": {
+    "previous": {
+      "source_sha256": "c32c0fb020fb30fa3d02f8ec739f7c96fe0d11da03db881ea3d69979a3dca3c6",
+      "passed": false,
+      "checks": {
+        "parent_held_at_completion": true,
+        "no_followup_turn_while_child_pending": true,
+        "no_new_reservation_while_child_pending": true,
+        "correct_child_attribution": true,
+        "settled_once": true,
+        "followup_then_settled": true,
+        "one_followup_model_request": false
+      },
+      "final_provider_requests": [
+        {
+          "id": "response-1",
+          "child": false,
+          "scenario": "delayed_child"
+        },
+        {
+          "id": "response-2",
+          "child": false,
+          "scenario": "delayed_child"
+        },
+        {
+          "id": "response-3",
+          "child": true,
+          "scenario": "delayed_child"
+        },
+        {
+          "id": "response-4",
+          "child": false,
+          "scenario": "plain"
+        }
+      ],
+      "premature": {
+        "error": "HOLD_ACTIVE",
+        "explanation": "HOLD_ACTIVE: waiting for the preceding Codex turn's usage and descendants"
+      },
+      "ledger_after_child": {
+        "api_calls": 1,
+        "tokens": 253
+      },
+      "ledger_after_followup": {
+        "api_calls": 2,
+        "tokens": 288
+      }
+    },
+    "candidate": {
+      "source_sha256": "39f27717f8ccde6a538c4f7d8ef15bfd0686d08ecdf02e2654106dee2d567fcf",
+      "passed": true,
+      "checks": {
+        "parent_held_at_completion": true,
+        "no_followup_turn_while_child_pending": true,
+        "no_new_reservation_while_child_pending": true,
+        "original_parent_and_child_requests": true,
+        "correct_child_attribution": true,
+        "settled_once": true,
+        "followup_then_settled": true,
+        "one_followup_model_request": true
+      },
+      "final_provider_requests": [
+        {
+          "id": "response-1",
+          "child": false,
+          "scenario": "delayed_child"
+        },
+        {
+          "id": "response-2",
+          "child": false,
+          "scenario": "delayed_child"
+        },
+        {
+          "id": "response-3",
+          "child": true,
+          "scenario": "delayed_child"
+        },
+        {
+          "id": "response-4",
+          "child": false,
+          "scenario": "plain"
+        }
+      ],
+      "premature": {
+        "error": "HOLD_ACTIVE",
+        "explanation": "HOLD_ACTIVE: waiting for the preceding Codex turn's usage and descendants"
+      },
+      "ledger_after_child": {
+        "api_calls": 1,
+        "tokens": 253
+      },
+      "ledger_after_followup": {
+        "api_calls": 2,
+        "tokens": 288
+      },
+      "phases": {
+        "parent_completed": [
+          {
+            "id": "response-1",
+            "child": false,
+            "scenario": "delayed_child"
+          },
+          {
+            "id": "response-2",
+            "child": false,
+            "scenario": "delayed_child"
+          }
+        ],
+        "still_waiting": [
+          {
+            "id": "response-1",
+            "child": false,
+            "scenario": "delayed_child"
+          },
+          {
+            "id": "response-2",
+            "child": false,
+            "scenario": "delayed_child"
+          }
+        ],
+        "child_completed": [
+          {
+            "id": "response-1",
+            "child": false,
+            "scenario": "delayed_child"
+          },
+          {
+            "id": "response-2",
+            "child": false,
+            "scenario": "delayed_child"
+          },
+          {
+            "id": "response-3",
+            "child": true,
+            "scenario": "delayed_child"
+          }
+        ],
+        "after_followup": [
+          {
+            "id": "response-1",
+            "child": false,
+            "scenario": "delayed_child"
+          },
+          {
+            "id": "response-2",
+            "child": false,
+            "scenario": "delayed_child"
+          },
+          {
+            "id": "response-3",
+            "child": true,
+            "scenario": "delayed_child"
+          },
+          {
+            "id": "response-4",
+            "child": false,
+            "scenario": "plain"
+          }
+        ]
+      },
+      "synthetic_negative_controls": {
+        "extra_request_rejected": true,
+        "child_in_followup_slot_rejected": true
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@ Design rules this module exists to enforce:
 from __future__ import annotations
 
 import json
+import os
 import re
 import sqlite3
 import time
@@ -26,6 +27,7 @@ from typing import Any, Callable, Iterator, Sequence
 
 from .. import config, contracts, metrics
 from ..domain import clock, ids, machines
+from ..jobs import wakeup
 from ..errors import (
     ArtifactNotFound,
     BudgetExceeded,
@@ -461,6 +463,19 @@ class _TransactionEnd:
 
 _TRANSACTION_END: dict[int, list[_TransactionEnd]] = {}
 
+# The active Driver observes progress on its own connection. Other writers send a
+# hint after commit, including another connection in this same process.
+driver_connections: set[sqlite3.Connection] = set()
+
+
+def _notify_driver(conn: sqlite3.Connection) -> None:
+    try:
+        location = conn.execute("PRAGMA database_list").fetchone()[2]
+    except sqlite3.Error:
+        return  # Failure to send a local hint does not change the outcome of a completed transaction.
+    if location:
+        wakeup.notify(os.path.dirname(location))
+
 
 def on_transaction_end(
     conn: sqlite3.Connection, *, on_commit: Callable[[], None] | None = None,
@@ -539,7 +554,7 @@ def transaction(
     stack = _TRANSACTION_END.setdefault(key, [])
     # total_changes is a connection counter, including writes later undone. Track
     # discarded savepoints in memory so rows_changed describes committed row changes.
-    counting = timed or (stack and stack[0].changes_at_entry is not None)
+    counting = outer or (stack and stack[0].changes_at_entry is not None)
     frame = _TransactionEnd(owns_transaction=outer,
                             changes_at_entry=conn.total_changes if counting else None)
     stack.append(frame)
@@ -568,17 +583,21 @@ def transaction(
         if timed:
             released = time.monotonic_ns()
             result, rows_changed = "rollback", 0
-        elif frame.changes_at_entry is not None:
+        elif not outer and frame.changes_at_entry is not None:
             stack[-2].discarded_changes += conn.total_changes - frame.changes_at_entry
         _finish_transaction(list(reversed(frame.rollback)), committed=False, original=exc)
         raise
     else:
         if outer:
+            rows_changed = conn.total_changes - frame.changes_at_entry - frame.discarded_changes
             if timed:
                 released = time.monotonic_ns()
                 result = "commit"
-                rows_changed = conn.total_changes - frame.changes_at_entry - frame.discarded_changes
-            _finish_transaction(frame.commit, committed=True)
+            try:
+                _finish_transaction(frame.commit, committed=True)
+            finally:
+                if rows_changed and conn not in driver_connections:
+                    _notify_driver(conn)
         elif len(stack) > 1:
             stack[-2].commit.extend(frame.commit)
             stack[-2].rollback.extend(frame.rollback)

@@ -1,0 +1,267 @@
+{
+  "evidence_class": "SCRIPTED",
+  "base_commit": "e9246ac10eab6d2b83ba801285b2f975fb4adda5",
+  "source_set_sha256": "dc70b1133e4f77297097116180c1996634713db5076f945030588314bf977efd",
+  "source_files": {
+    "gx-h/gx_core/hostobs/app_server_client.py": "b6338b0169161699b70aee884adcc0054a8a25c5fbd87764d1f0bd8781d34cc0",
+    "gx-h/gx_core/jobs/runner.py": "5437eb6cd80460dd9e55d3320261d8da7169378ecee5996639e8653146afbde5",
+    "gx-h/gx_core/jobs/service.py": "25d4381496b5aa70de2a4f001dabf1428cf3baeef53e6cb3bc38763c9168c3b6",
+    "gx-h/gx_core/jobs/wakeup.py": "6a0413cd9572be4356da76d6a2e348a87c1ffcf2d5e33ddc852aa3607cd94fcf",
+    "gx-h/gx_core/p0/cli.py": "e0aaab796e2b9a8542636deb43de59b4056121f0fee99b30e3f8ae6db787f8d2",
+    "gx-h/gx_core/p0/compute.py": "03ba87217892a811dbb6844718fb9361dfa8f0ca0ee4ca4a65f1ec87772cbfa5",
+    "gx-h/gx_core/p0/coordinator.py": "16b3889ac5bfa472cee4decb8532d253fd583afdf50f75200f94270bfe6f2d86",
+    "gx-h/gx_core/p0/driver.py": "2b44fd52373ddfc4765add2ccb31b71ab6eb4891c41d762ce1a8d35af497184e",
+    "gx-h/gx_core/p0/idle.py": "00f894ff7e04da58ae1a0646382301230200f861ee9f7691cf32883276074b82",
+    "gx-h/gx_core/persistence/store.py": "a44af29ba65afcd6e5f120f0d17fcab61d1008fe5fc5dba3c0a6ae6142abbd9f",
+    "gx-h/tests/test_p2a_idle.py": "71830e48ea7209a8d6111da010c339d6b5ce6f9e188062043b3ca2b0f05a4c29",
+    "acceptance/phase2a/cross_process.py": "2d6284c0dd83a87c9a5ebc48362790d7a01bc7a679613ddfa24e7fbccefb6ab8"
+  },
+  "python_sqlite": "3.11.9 3.45.3",
+  "kernel": "5.15.0-41-generic",
+  "test_profile": "deterministic",
+  "commands": [
+    {
+      "label": "cordis",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "scripts/release_assets.py",
+        "cordis"
+      ],
+      "cwd": "<source>/.",
+      "returncode": 0
+    },
+    {
+      "label": "first",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_p2a_idle"
+      ],
+      "cwd": "<source>/gx-h",
+      "returncode": 0
+    },
+    {
+      "label": "repeat",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_p2a_idle"
+      ],
+      "cwd": "<source>/gx-h",
+      "returncode": 0
+    },
+    {
+      "label": "regression",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_phase2a_driver",
+        "tests.test_v3_dispatch",
+        "tests.test_v21_compute",
+        "tests.test_cpu_runner",
+        "tests.test_v21_workspace_queue"
+      ],
+      "cwd": "<source>/gx-h",
+      "returncode": 1
+    },
+    {
+      "label": "isolated-mixed",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_v21_workspace_queue.WorkspaceQueueTests.test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace"
+      ],
+      "cwd": "<source>/gx-h",
+      "returncode": 0,
+      "additional_parent_env": {
+        "GX_CODEX_OFFLINE": "1"
+      }
+    },
+    {
+      "label": "regression-repeat",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "-v",
+        "tests.test_phase2a_driver",
+        "tests.test_v3_dispatch",
+        "tests.test_v21_compute",
+        "tests.test_cpu_runner",
+        "tests.test_v21_workspace_queue"
+      ],
+      "cwd": "<source>/gx-h",
+      "returncode": 1,
+      "additional_parent_env": {
+        "GX_CODEX_OFFLINE": "1"
+      }
+    },
+    {
+      "label": "regression-same-profile",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_phase2a_driver",
+        "tests.test_v3_dispatch",
+        "tests.test_v21_compute",
+        "tests.test_cpu_runner",
+        "tests.test_v21_workspace_queue"
+      ],
+      "cwd": "<source>/gx-h",
+      "returncode": 0
+    },
+    {
+      "label": "real-idle",
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3-2/.venv/bin/python",
+        "-B",
+        "/tmp/gx-idle-verified-lnwz8nr4/raw/real-idle/probe.py"
+      ],
+      "cwd": "<source>/gx-h",
+      "returncode": 0
+    }
+  ],
+  "snapshots": [
+    {
+      "snapshot": "first/evidence/test_idle01_exponential_cap_and_reset/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "first/evidence/test_idle02_committed_inbox_interrupts_single_and_workspace/gx.db",
+      "integrity": "ok",
+      "database_events": 10,
+      "archived_events": 10
+    },
+    {
+      "snapshot": "first/evidence/test_idle02_detached_outcome_interrupts_an_existing_wait/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "first/evidence/test_idle02_rollback_does_not_wake_and_native_pipe_wakes_only_its_run/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "first/evidence/test_idle02_signals_interrupt_both_blocked_cli_modes/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "first/evidence/test_idle02_store_version_wakes_when_filesystem_cannot_create_fifo/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "first/evidence/test_idle03_job_and_lease_clip_a_long_wait/gx.db",
+      "integrity": "ok",
+      "database_events": 3,
+      "archived_events": 3
+    },
+    {
+      "snapshot": "first/evidence/test_idle03_product_services_job_and_lease_at_their_own_deadlines/gx.db",
+      "integrity": "ok",
+      "database_events": 9,
+      "archived_events": 9
+    },
+    {
+      "snapshot": "first/evidence/test_idle03_stopped_run_wakes_at_usage_grace_and_settles/gx.db",
+      "integrity": "ok",
+      "database_events": 4,
+      "archived_events": 4
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle01_exponential_cap_and_reset/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle02_committed_inbox_interrupts_single_and_workspace/gx.db",
+      "integrity": "ok",
+      "database_events": 10,
+      "archived_events": 10
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle02_detached_outcome_interrupts_an_existing_wait/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle02_rollback_does_not_wake_and_native_pipe_wakes_only_its_run/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle02_signals_interrupt_both_blocked_cli_modes/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle02_store_version_wakes_when_filesystem_cannot_create_fifo/gx.db",
+      "integrity": "ok",
+      "database_events": 2,
+      "archived_events": 2
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle03_job_and_lease_clip_a_long_wait/gx.db",
+      "integrity": "ok",
+      "database_events": 3,
+      "archived_events": 3
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle03_product_services_job_and_lease_at_their_own_deadlines/gx.db",
+      "integrity": "ok",
+      "database_events": 9,
+      "archived_events": 9
+    },
+    {
+      "snapshot": "repeat/evidence/test_idle03_stopped_run_wakes_at_usage_grace_and_settles/gx.db",
+      "integrity": "ok",
+      "database_events": 4,
+      "archived_events": 4
+    }
+  ],
+  "source_files_still_match": true,
+  "checked_out_source_files_match": true,
+  "observations": {
+    "closure_focused": {
+      "first": "9/9",
+      "repeat": "9/9"
+    },
+    "direct_wait_probe": "real-idle",
+    "adjacent_initial": "One mixed-workspace resume received RESOURCE_DENIED before entering the wait because existing Jobs held 2 of 2 CPU threads. See regression/console.log.",
+    "adjacent_retry": "The isolated mixed-workspace case passed. An intermediate run with GX_CODEX_OFFLINE=1 also disabled six existing simulated-native dispatch cases. Retained as a different environment. Same deterministic profile, with original command and mock-native behavior restored, passed 27/27 (regression-same-profile).",
+    "previous_export": "The first export predated this file set and lacked the packaged Cordis dependency. See previous-export/source.json and previous-export/regression/console.log. The cordis command uses the on-disk release asset.",
+    "previous_workspace": "Earlier working-tree run with short wall time limits and its independent workspace-module replay are in previous-worktree. It is not evidence for the frozen exact source set.",
+    "earlier_automation": "Original automated IDLE03 return-time assertion and its failed-only replay are archived in early-public. Current tests measure the specific sleep, wake time and the ledger event.",
+    "execution_class": "SCRIPTED with real local processes, SQLite and kernel signals. No live model calls."
+  }
+}

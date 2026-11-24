@@ -1,6 +1,6 @@
 """Drive a saved GX project. SQLite commits precede every native message delivery."""
 
-from contextlib import ExitStack
+from contextlib import ExitStack, nullcontext
 import hashlib
 import json
 import os
@@ -19,7 +19,7 @@ from ..orchestration import branches, reactor, service
 from ..orchestration.engine import StoreCheckpointer
 from ..persistence import store
 from ..research import records
-from . import intent, intent_budget, waits
+from . import idle, intent, intent_budget, waits
 from .roots import Roots, thread_for_lease
 
 
@@ -145,6 +145,10 @@ class Driver:
                              and w["next_retry_at"]), default="")
         self._checked_costs = set()
         self._sent = {}
+        self.idle_seconds = idle.MIN_SECONDS
+        self.wake_at = 0.
+        self.made_progress = False
+        self._dispatch_deadlines = ()
 
     def main_read(self, tool, args, envelope):
         if tool == "gx_propose_intent" and set(args) == {"candidate"}:
@@ -435,6 +439,7 @@ class Driver:
         marks = ",".join("?" for _ in topics)
         rows = self.conn.execute(f"SELECT * FROM outbox WHERE run_id=? AND consumed_at IS NULL "
                                  f"AND topic IN ({marks}) ORDER BY outbox_id", (self.rid, *topics)).fetchall()
+        consumed = False
         for row in rows:
             oid = row["outbox_id"]
             if time.monotonic() < self._retry_at.get(oid, 0):
@@ -464,7 +469,7 @@ class Driver:
                 with store.transaction(
                     self.conn, transaction_owner="Outbox", operation="complete_delivery", run_id=self.rid,
                 ) as tx:
-                    store.complete_outbox(tx, oid, "gx-p0")
+                    consumed |= store.complete_outbox(tx, oid, "gx-p0")
                 self._end_native_wait(("outbox", str(oid)))
             except (BudgetExceeded, HoldActive) as exc:
                 if isinstance(exc, BudgetExceeded):
@@ -475,6 +480,7 @@ class Driver:
                 ) as tx:
                     store.fail_outbox(tx, oid, type(exc).__name__ + ": " + str(exc)[:240])
                 self._retry_at[oid] = time.monotonic() + min(30, 2 ** min(row["attempts"], 5))
+        return consumed
 
     def _notify(self, native, thread_id, payload, oid):
         from .impact import notification_content
@@ -520,27 +526,85 @@ class Driver:
             if owner == "usage" and thread not in pending:
                 self._end_native_wait((owner, thread))
 
-    def drive(self, timeout):
-        passes = self.passes(time.monotonic() + timeout)
+    @property
+    def read_fds(self):
+        client = getattr(self._native, "client", None)
+        return getattr(getattr(client, "transport", None), "read_fds", ())
+
+    def wake(self):
+        self.idle_seconds = idle.MIN_SECONDS
+
+    def _event_id(self):
+        return self.conn.execute("SELECT MAX(event_id) FROM events WHERE run_id=?", (self.rid,)).fetchone()[0]
+
+    def _next_delay(self, checked_at, started, deadline):
+        from . import metering
+        now = time.monotonic()
+        due = [deadline, now + self.idle_seconds]
+        due.extend(t for t in (*self._dispatch_deadlines, *self._retry_at.values()) if t > started)
+        heartbeat = getattr(self._native, "heartbeats", None)
+        connection_wait = self._waits.get(("connection", self.rid), {}).get("next_retry_at")
+        if not connection_wait or connection_wait <= checked_at:
+            if heartbeat and self._native.active_turns:
+                due.append(heartbeat.next_probe)
+            if products := getattr(self._native, "terminal_products", None):
+                due.extend(products.due.values())
+        lease = self.conn.execute("SELECT min(l.expires_at) FROM leases l JOIN tasks t ON t.task_id=l.task_id "
+                                  "JOIN runs r ON r.run_id=t.run_id WHERE t.run_id=? AND l.released_at IS NULL "
+                                  "AND l.expires_at>? AND r.status<>'PAUSED'", (self.rid, checked_at)).fetchone()[0]
+        for at in (lease, *(w.get("next_retry_at") for w in self._waits.values())):
+            if at and at > checked_at:
+                due.append(time.monotonic() - clock.age_seconds(at))
+        for owner, args in ((JobService.next_poll_seconds, (self.conn, self.rid, checked_at)),
+                            (metering.next_deadline_seconds, (self.conn, self.rid))):
+            sampled_at = time.monotonic()
+            seconds = owner(*args)
+            if seconds is not None:
+                due.append(sampled_at + seconds)
+        self.idle_seconds = min(idle.MAX_SECONDS, 2 * self.idle_seconds)
+        self.wake_at = min(due)
+        return max(0, self.wake_at - time.monotonic())
+
+    def drive(self, timeout, *, waiter=None):
+        passes = self.passes(time.monotonic() + timeout, waiter=waiter)
         while True:
             try:
                 next(passes)
             except StopIteration as end:
                 return end.value
 
-    def passes(self, deadline, *, shared=False):
+    def passes(self, deadline, *, shared=False, waiter=None):
         """Yield between passes so other runs can progress on the same SQLite connection."""
+        context = nullcontext(waiter) if shared or waiter is not None else idle.WorkspaceWait(self.conn)
+        with context as listener:
+            return (yield from self._passes(deadline, shared, listener))
+
+    def _passes(self, deadline, shared, listener):
         cycles = self._cycles(deadline, shared)
         delay = 0
+        last_event = self._event_id()
         while time.monotonic() < deadline:
-            yield delay
-            if not shared and delay:
-                time.sleep(min(delay, max(0, deadline - time.monotonic())))
+            yield min(delay, max(0, self.wake_at - time.monotonic()))
+            if listener and delay:
+                ready = listener.wait(self.wake_at - time.monotonic(), (self,))
+                if ready is None or ready:
+                    self.wake()
             if time.monotonic() >= deadline:
                 break
+            cycle_start = time.monotonic()
             started = time.monotonic_ns()
+            checked_at = clock.now_iso()
             try:
-                delay = next(cycles)
+                activity = next(cycles)
+                event = self._event_id()
+                self.made_progress = bool(activity or event != last_event)
+                last_event = event
+                if self.made_progress:
+                    self.wake()
+                    self.wake_at = 0.
+                    delay = 0
+                else:
+                    delay = self._next_delay(checked_at, cycle_start, deadline)
             except StopIteration as end:
                 return end.value
             finally:
@@ -561,7 +625,6 @@ class Driver:
                 service.hooks_for_run(self.conn, self.rid)
             except VersionImmutable as exc:
                 return {**snapshot(self.conn, self.rid), "driver": "plugin_unavailable", "reason": exc.message}
-        idle_delay = 0.15
         sent = self._sent
         retry_delay = {}
         admission_retries = {}
@@ -571,10 +634,11 @@ class Driver:
             admission_retries[key] = (delay, time.monotonic() + delay, watch)
         last_terminal_event = None
         while time.monotonic() < deadline:
+            metering.maintain(self.conn, self.rid)
             self._exhausted.clear()
             pending_messages = self.messages(local_only=True)
-            self.deliveries(_LOCAL_TOPICS)
-            compute.drain(self.conn, self.rid)
+            progressed = self.deliveries(_LOCAL_TOPICS)
+            progressed = compute.drain(self.conn, self.rid) or progressed
             replies = self.conn.execute("SELECT m.message_id FROM p0_operator_messages m "
                     "JOIN p0_root_deliveries d ON d.run_id=m.run_id AND d.event_id=('human:'||m.message_id) "
                     "LEFT JOIN p0_main_replies r USING(message_id) WHERE m.run_id=? AND m.result_json IS NOT NULL "
@@ -590,44 +654,43 @@ class Driver:
                 # lazy owns Job reconciliation, team settlement and reaction to the committed triggers.
                 reactor.lazy(self.ctx, self.rid)
                 reactor.drive_science(self.ctx, self.rid)
-            metering.maintain(self.conn, self.rid)
-
             # Every operation which may open or use the App Server follows the local work above.
             run = project(self.conn, self.rid)
             self.reconcile_costs(refresh=run["status"] in stopped and last_terminal_event is None)
             self.messages(pending=pending_messages)
             for row in replies:
                 self.finish_main(row[0], wait=0)
-            self.deliveries(_NATIVE_TOPICS)
+            progressed = self.deliveries(_NATIVE_TOPICS) or progressed
             run = project(self.conn, self.rid)
             self._retire_resolved_waits()
             if run["status"] in stopped:
                 # A pause or final scientific decision can commit while an admitted
                 # native turn is still streaming. Drain its receipt before closing.
-                if self._native and self._native.active_turns:
-                    self._poll(0.01 if shared else 0.2)
-                    yield 0.035
+                if self._native and (self._native.active_turns or getattr(self._native, "_child_turns", {})):
+                    yield self._poll(0.001) or progressed
                     continue
                 if last_terminal_event is None:
                     last_terminal_event = time.monotonic()
-                held = self.conn.execute("SELECT terminal_status,state FROM p0_meter_native_turns WHERE run_id=? "
+                held = self.conn.execute("SELECT confidence FROM p0_meter_native_turns WHERE run_id=? "
                                          "AND budget_status='HELD'", (self.rid,)).fetchall()
                 if held:
                     # Parents may finish before the last child reports usage. Drain the live
                     # connection while it has traffic, then expose genuinely missing receipts.
-                    estimable = any(row["terminal_status"] and row["state"] == "acknowledged" for row in held)
-                    if estimable or self._native is None or time.monotonic() - last_terminal_event < 3:
-                        delay = min(0.01 if shared else 0.2, max(0, deadline - time.monotonic()))
-                        if self._poll(delay):
+                    estimable = metering.next_deadline_seconds(self.conn, self.rid) is not None
+                    unresolved = all(row["confidence"] == "UNRESOLVED" for row in held)
+                    if estimable or (self._native is None and not unresolved) or (
+                            self._native and time.monotonic() - last_terminal_event < 3):
+                        activity = self._poll(0.001)
+                        if activity:
                             last_terminal_event = time.monotonic()
-                        yield 0.035 if self._native else 0.5
+                        self._dispatch_deadlines = (last_terminal_event + 3,)
+                        yield activity or progressed
                         continue
                 result = snapshot(self.conn, self.rid)
                 outstanding_delivery = any(w["owner"] in ("message", "outbox", "reply") for w in result["native_waits"])
                 if (outstanding_delivery or result.get("pending_terminal_turns") or
                         any(not machines.is_terminal("job", j["status"]) for j in result["jobs"])):
-                    self._poll(0.01 if shared else 0.2)
-                    yield 0.035 if self._native else 0.5
+                    yield self._poll(0.001) or progressed
                     continue
                 if self._native and getattr(self._native, "terminal_products", None) and self._native.terminal_products.due:
                     self._native_call("connection", self.rid, lambda n: n.terminal_products.flush())
@@ -645,7 +708,6 @@ class Driver:
                                       "LEFT JOIN jobs j ON j.job_id=r.wait_job_id WHERE t.run_id=? "
                                       "AND t.status IN ('READY','CLAIMED','RUNNING') ORDER BY t.rowid",
                                       (self.rid,)).fetchall()
-            progressed = False
             opened = {}
             if admission_retries:
                 ready_attempts = {(t["task_id"], t["attempt"] + 1) for t in tasks if t["status"] == "READY"}
@@ -697,13 +759,13 @@ class Driver:
                     admission_retries.pop(key, None)
                     sent[key] = receipt.get("turn_id")
                     progressed = True
-            if self._poll(min(0.01 if shared else 0.2, max(0.001, deadline - time.monotonic()))):
+            self._dispatch_deadlines = tuple(item[1] for item in (*retry_delay.values(), *admission_retries.values()))
+            if self._poll(0.001):
                 # Drain a burst of native items before sleeping or re-reading every GX checkpoint.
                 until = min(deadline, time.monotonic() + (0.025 if shared else 0.15))
                 while time.monotonic() < until and self._poll(0.005):
                     pass
-                idle_delay = 0.1
-                yield 0.035 if shared else 0
+                yield True
                 continue
             if self._exhausted and not progressed and self._native and not self._native.active_turns:
                 active_job = self.conn.execute(
@@ -716,8 +778,7 @@ class Driver:
                                         "reason":"budget_exhausted: "+cause.message,
                                         "idempotency_key":str(uuid.uuid4())})
                     return snapshot(self.conn, self.rid)
-            idle_delay = 0.1 if progressed else min(1, idle_delay * 1.3)
-            yield 0.035 if shared and self._native else idle_delay
+            yield progressed
         result = snapshot(self.conn, self.rid)
         result["driver"] = "time_limit"
         return result

@@ -64,12 +64,11 @@ import traceback
 resource_guard_mod = None
 
 
-def _load_resource_guard():
-    # -I intentionally removes the script directory from sys.path. Only this
-    # code-owned sibling contains the job resource observation functions.
+def _load_sibling(name):
+    # The isolated interpreter removes the script directory from sys.path.
     import importlib.util
-    location = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resource_guard.py")
-    found = importlib.util.spec_from_file_location("gx_job_resource_guard", location)
+    location = os.path.join(os.path.dirname(os.path.abspath(__file__)), name + ".py")
+    found = importlib.util.spec_from_file_location("gx_job_" + name, location)
     module = importlib.util.module_from_spec(found)
     found.loader.exec_module(module)
     return module
@@ -476,7 +475,12 @@ class Runner:
         if self.spec.get("resource_guard") or self.spec.get("gpu"):
             global resource_guard_mod
             if resource_guard_mod is None:
-                resource_guard_mod = _load_resource_guard()
+                resource_guard_mod = _load_sibling("resource_guard")
+        try:
+            self._notify = _load_sibling("wakeup").notify
+        except FileNotFoundError:
+            self._notify = None  # An older standalone runner layout still publishes its durable files.
+        self.workspace = os.path.dirname(os.path.dirname(self.job_dir))
         self.pid = os.getpid()
         self.started = start_ticks(self.pid)
         self.terminate_requested = False
@@ -491,6 +495,8 @@ class Runner:
                       "runner_pid": self.pid, "runner_started": self.started, "at": now_iso(),
                       **{**{k: v for k, v in self.state.items() if k.startswith("tool_")}, **extra}}
         write_json_atomic(self.path("status.json"), self.state)
+        if self._notify:
+            self._notify(self.workspace)
 
     def heartbeat(self, *, force: bool = False) -> None:
         now = time.monotonic()

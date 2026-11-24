@@ -339,18 +339,19 @@ def _submit(conn, row, proposal):
 
 
 def drain(conn, run_id):
-    """One coordinator pass for outstanding requests. Scientific work stays in detached Jobs."""
+    """Consume one bounded batch and report progress to the scheduling Driver."""
     rows = conn.execute("SELECT * FROM outbox WHERE run_id=? AND consumed_at IS NULL AND topic IN (?,?)"
                         " ORDER BY outbox_id LIMIT 32", (run_id,SUBMIT,CANCEL)).fetchall()
     if not rows:
-        return
+        return False
     # An overlapping cold coordinator must not stage the same preallocated ID twice.
     fd = os.open(storage.store_dir(conn),os.O_RDONLY | os.O_DIRECTORY)
     try:
         try:
             fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError:
-            return
+            return False
+        consumed = False
         for outbox in rows:
             p = store.loads(outbox,"payload_json")
             req = conn.execute("SELECT * FROM p0_job_proposals WHERE job_id=?", (p["job_id"],)).fetchone()
@@ -390,6 +391,7 @@ def drain(conn, run_id):
                     with store.transaction(conn):
                         store.fail_outbox(conn,outbox["outbox_id"],str(exc))
             with store.transaction(conn):
-                store.complete_outbox(conn,outbox["outbox_id"],"p0.compute")
+                consumed |= store.complete_outbox(conn,outbox["outbox_id"],"p0.compute")
+        return consumed
     finally:
         os.close(fd)

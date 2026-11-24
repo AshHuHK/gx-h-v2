@@ -8,6 +8,7 @@ from ..errors import GxError, OutcomeUnknown
 from ..hostobs.app_server_client import AppServerDisconnected, AppServerTimeout
 from ..persistence import store
 from .driver import Driver, snapshot
+from .idle import WorkspaceWait
 
 
 TRANSIENT = (AppServerDisconnected, AppServerTimeout, OutcomeUnknown)
@@ -135,6 +136,11 @@ def _inbox_version(conn, rid):
 
 
 def drive_workspace(conn, directory, timeout):
+    with WorkspaceWait(conn) as listener:
+        return _drive_workspace(conn, directory, timeout, listener)
+
+
+def _drive_workspace(conn, directory, timeout, listener):
     from .workspace import list_runs
     deadline = time.monotonic() + timeout
     drivers, finished, retry_at, failures = {}, {}, {}, {}
@@ -167,11 +173,18 @@ def drive_workspace(conn, directory, timeout):
                 driver, passes = drivers[rid]
                 inbox = _inbox_version(conn, rid)
                 try:
-                    delay = next(passes)
-                    retry_at[rid] = time.monotonic() + (delay or 0)
+                    next(passes)
+                    retry_at[rid] = driver.wake_at
+                    if driver.made_progress:
+                        # A committed result can open another run's workspace/provider slot.
+                        for sibling, (other, _) in drivers.items():
+                            if sibling != rid:
+                                other.wake()
+                                retry_at.pop(sibling, None)
                 except StopIteration as end:
                     driver.close()
                     del drivers[rid]
+                    retry_at.pop(rid, None)
                     if end.value and end.value.get("driver") != "time_limit":
                         finished[rid] = (end.value["status"], inbox)
                         if end.value.get("driver") == "plugin_unavailable":
@@ -196,10 +209,14 @@ def drive_workspace(conn, directory, timeout):
                 release_finished(conn)
                 return {**overview(conn), **({"plugin_waits": plugin_waits} if plugin_waits else {})}
             now = time.monotonic()
-            # A new CLI can enqueue at any time. Live native clients request shorter service intervals.
-            due = [retry_at[rid] for rid in drivers if rid in retry_at]
-            delay = max(0.01, min(due, default=now + 0.25) - now)
-            time.sleep(min(0.25, delay, max(0, deadline - now)))
+            due = [deadline, *retry_at.values()]
+            due.extend(retry_at.get(rid, now) for rid in drivers)
+            for row in conn.execute("SELECT outbox_id FROM outbox WHERE topic=? AND consumed_at IS NULL", (START_TOPIC,)):
+                due.append(start_retry_at.get(row[0], now))
+            ready = listener.wait(min(due) - time.monotonic(), (driver for driver, _ in drivers.values()))
+            for rid in drivers if ready is None else ready:
+                drivers[rid][0].wake()
+                retry_at.pop(rid, None)
         result = overview(conn)
         if plugin_waits:
             result["plugin_waits"] = plugin_waits

@@ -19,6 +19,7 @@ from ..orchestration import packages, service
 from ..persistence import store
 from . import deployment, intent
 from .driver import Driver, context, enqueue, native_waits, project, snapshot
+from .idle import WorkspaceWait
 
 
 class InitialIntentPending(AppServerDisconnected):
@@ -195,6 +196,11 @@ def change_state(conn, run, action):
 
 
 def run_until_stopped(conn, directory, rid, timeout):
+    with WorkspaceWait(conn) as listener:
+        return _run_until_stopped(conn, directory, rid, timeout, listener)
+
+
+def _run_until_stopped(conn, directory, rid, timeout, listener):
     deadline = time.monotonic() + timeout
     failures = 0
     while time.monotonic() < deadline:
@@ -204,7 +210,7 @@ def run_until_stopped(conn, directory, rid, timeout):
                 run = project(conn, rid)
                 start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"], run_id=rid)
             driver = Driver(conn, directory, rid)
-            result = driver.drive(deadline - time.monotonic())
+            result = driver.drive(deadline - time.monotonic(), waiter=listener)
             if result["status"] in machines.terminal_states("run"):
                 from .workspace import release_finished
                 release_finished(conn)
@@ -213,8 +219,10 @@ def run_until_stopped(conn, directory, rid, timeout):
         except InitialIntentPending:
             # No checkpoint can run before this specific original human input is authorized.
             failures += 1
+            bootstrap = True
         except (AppServerDisconnected, AppServerTimeout, OutcomeUnknown) as exc:
             failures += 1
+            bootstrap = False
             # GX effects are already durable. The new client inspects history and
             # existing task leases before sending anything with the same event key.
             with store.transaction(conn) as tx:
@@ -224,7 +232,11 @@ def run_until_stopped(conn, directory, rid, timeout):
         finally:
             if driver:
                 driver.close()
-        time.sleep(min(5, 0.2 * 2 ** min(failures, 5), max(0, deadline - time.monotonic())))
+        retry = min(deadline, time.monotonic() + min(5, 0.2 * 2 ** min(failures, 5)))
+        while time.monotonic() < retry:
+            ready = listener.wait(retry - time.monotonic())
+            if bootstrap and ready is None:
+                break
     result = snapshot(conn, rid)
     result["driver"] = "time_limit"
     return result

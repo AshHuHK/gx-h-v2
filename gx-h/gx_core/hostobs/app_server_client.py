@@ -185,6 +185,11 @@ class StdioTransport:
         return bytes(self._stderr)
 
     @property
+    def read_fds(self) -> tuple[int, ...]:
+        """Expose readiness to a shared Driver. The transport still owns all pipe reads."""
+        return tuple(key.fd for key in self._selector.get_map().values() if key.events & selectors.EVENT_READ)
+
+    @property
     def cleanup_pending(self) -> bool:
         return self._closed and not self._cleanup_complete
 

@@ -114,6 +114,7 @@ PURPOSE_WORKFLOW = "workflow_step"       # a step of a backend-owned workflow th
 PURPOSES = (PURPOSE_PATH, PURPOSE_PROBE, PURPOSE_REFERENCE, PURPOSE_EVALUATION, PURPOSE_WORKFLOW)
 
 MAX_WAIT_SECONDS = 60
+MAX_POLL_SECONDS = 1.0
 #: How long a job may sit in SUBMITTING with no runner on record before reconcile says
 #: nothing ran. Inside it the launcher may still be at work: a submission in flight is not
 #: a dead one.
@@ -1245,7 +1246,7 @@ class JobService:
                 view["waited_seconds"] = round(waited, 3)
                 return view
             time.sleep(min(pause, max(0.0, limit - waited)))
-            pause = min(pause * 1.5, 1.0)
+            pause = min(pause * 1.5, MAX_POLL_SECONDS)
 
     # ------------------------------------------------------------------------ cancel
 
@@ -1464,6 +1465,31 @@ class JobService:
         return answers
 
     # --------------------------------------------------------------------- reconcile
+
+    @staticmethod
+    def next_poll_seconds(conn: sqlite3.Connection, run_id: str, checked_at: str) -> float | None:
+        """Next look after a reconciliation, including starts and runners still handing off."""
+        states = (CREATED, *IN_FLIGHT)
+        rows = conn.execute("SELECT status,created_at,submitted_at,observed_at,resources_json,timeout_seconds "
+                            f"FROM jobs WHERE run_id=? AND status IN ({','.join('?' * len(states))})",
+                            (run_id, *states)).fetchall()
+        if not rows:
+            return None
+        checked = clock.parse(checked_at)
+        due = checked + timedelta(seconds=MAX_POLL_SECONDS)
+        limits = config.limits()
+        for row in rows:
+            deadlines = [clock.parse(leases.job_deadline(row, limits=limits, at=checked_at)["deadline_at"])]
+            if row["status"] == CREATED:
+                deadlines.append(clock.parse(row["created_at"]) + timedelta(seconds=start_deadline_seconds(limits)))
+            elif row["status"] == SUBMITTING:
+                deadlines.append(clock.parse(row["observed_at"] or row["created_at"]) +
+                                 timedelta(seconds=SUBMIT_GRACE_SECONDS))
+            for when in deadlines:
+                # An unavailable backend may leave a past-due Job open. Poll again at the normal bound.
+                if checked < when < due:
+                    due = when
+        return max(0.0, (due - clock.now()).total_seconds())
 
     def reconcile(self, run_id: str | None = None) -> list[dict[str, Any]]:
         """Look again at every job that has not ended (of one run, or of the store), and settle

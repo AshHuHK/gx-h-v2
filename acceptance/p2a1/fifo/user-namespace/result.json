@@ -1,0 +1,90 @@
+{
+  "tested_commit": "c9fc23f2882c3a9a0ad050076d3c54904f40eb25",
+  "class": "SCRIPTED",
+  "profile": "deterministic",
+  "source_sha256": {
+    "gx-h/gx_core/jobs/wakeup.py": "70bc3d98da3821a074e1daca1fa66f615d7974d09a88ebb31b370ae91cf572e8",
+    "gx-h/gx_core/p0/idle.py": "110ee6d48227a45793c6acb22ece5e83f240b655505ad0cf6ff5b440d16a255e",
+    "gx-h/tests/test_p2a1_fifo.py": "7ffe84912a44ee0d84e28efda2c1bb18e9360edeec6c2aec824e3c807055c28d"
+  },
+  "original_discovery": {
+    "commit": "5bc7c7e89d883f7ea014d3c7ef0180ce5065fd32",
+    "total": 482,
+    "errors": 1,
+    "skipped": 4,
+    "error": "fixture chown returned EINVAL for unmapped UID 65534",
+    "raw": "original-discovery/python-full.log"
+  },
+  "cases": {
+    "baseline": {
+      "returncode": 1,
+      "command": "baseline/invocation.json",
+      "log": "baseline/console.log",
+      "network": "baseline/network.json"
+    },
+    "frozen-host": {
+      "returncode": 0,
+      "command": "frozen-host/invocation.json",
+      "log": "frozen-host/console.log",
+      "owner": {
+        "kind": "owner",
+        "owner": 65534,
+        "reader_euid": 0,
+        "mode": "0o600",
+        "inode": 352649535,
+        "uid_map": [
+          [
+            0,
+            0,
+            4294967295
+          ]
+        ],
+        "tested_owner": 65534,
+        "owner_source": "filesystem"
+      },
+      "sqlite_integrity": "ok",
+      "committed_rows": 3
+    },
+    "frozen-ns": {
+      "returncode": 0,
+      "command": "frozen-ns/invocation.json",
+      "log": "frozen-ns/console.log",
+      "network": "frozen-ns/network.json",
+      "owner": {
+        "kind": "owner",
+        "owner": 0,
+        "reader_euid": 0,
+        "mode": "0o600",
+        "inode": 352649537,
+        "uid_map": [
+          [
+            0,
+            0,
+            1
+          ]
+        ],
+        "tested_owner": 65534,
+        "owner_source": "fixture_lstat",
+        "chown_errno": 22
+      },
+      "sqlite_integrity": "ok",
+      "committed_rows": 3
+    },
+    "mutant-host": {
+      "returncode": 1,
+      "command": "mutant-host/invocation.json",
+      "log": "mutant-host/console.log"
+    },
+    "mutant-ns": {
+      "returncode": 1,
+      "command": "mutant-ns/invocation.json",
+      "log": "mutant-ns/console.log",
+      "network": "mutant-ns/network.json"
+    }
+  },
+  "isolated_owner_mutation": "mutant.patch",
+  "archive": {
+    "members": 27,
+    "sha256": "508df8ddbabef193b67518127d99c1555eb32cfe403e98c7224dfbe9f3c7fc27"
+  }
+}

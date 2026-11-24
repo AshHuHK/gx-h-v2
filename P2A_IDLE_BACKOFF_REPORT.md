@@ -54,4 +54,6 @@ SQLite trace 回调记录每次版本读取的单调时钟。健康 FIFO 上的�
 
 在 Linux 上关闭真实描述符后，修复前的等待器在 epoll 注册和退出清理时均抛出 `EBADF`。冻结提交 `b1a0ad0` 还覆盖了 FIFO 就绪后、读取前描述符失效的情况。两种故障下等待器都继续运行，原生管道的就绪事件仍送达，每次故障后的数据库提交也都被观察到。该提交的独立导出连续两轮各通过 5 项，22 项相邻回归全部通过。两轮空闲各阻塞 6 次，累计均为 4.86 秒，进程 CPU 分别为 0.112 和 0.137 秒。含初始化在内，两轮各读取 20 次版本，实测每秒 3.84 和 3.70 次。[冻结版本回执](acceptance/p2a1/fifo/descriptor-errors/result.json) · [内核错误、原始时序及数据库](acceptance/p2a1/fifo/descriptor-errors/raw.tar.gz)
 
+完整 Python 回归在 `5bc7c7e` 的 482 项测试中记录到 1 个夹具错误。验收命名空间只映射 UID 0，内核以 `EINVAL` 拒绝将 FIFO 属主改为 65534。`c9fc23f` 在宿主上仍以 UID 65534 真实持有的 FIFO 验证拒绝，在单 UID 命名空间里仅对目标 FIFO 的 `lstat` 属主读数使用夹具，并保存 UID 映射及内核错误。该提交的干净导出在两种环境各通过 5 项。独立副本取掉属主比较后，两边的负例都在读取端错误打开 FIFO 时失败。[宿主和命名空间对照](acceptance/p2a1/fifo/user-namespace/result.json) · [原回归日志、属主记录及反向验证](acceptance/p2a1/fifo/user-namespace/raw.tar.gz)
+
 在发行目录可独立执行 `bin/gx-acceptance run hardening --case FIFO`。专项也可在 `gx-h` 下直接运行 `python -B -m unittest -v tests.test_p2a1_fifo`，设置 `GX_FIFO_EVIDENCE` 为新目录即可保存同样的时序与快照。

@@ -1,0 +1,339 @@
+{
+  "acceptance": "P2A-08",
+  "branches": {
+    "A": [
+      "A"
+    ],
+    "C": [
+      "C"
+    ],
+    "bad": [
+      "bad",
+      "bad_child"
+    ]
+  },
+  "codex_spawns": 0,
+  "command": [
+    "python",
+    "acceptance/phase2a/branch_failure.py",
+    "--output",
+    "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/branch-failure"
+  ],
+  "commit": "2a9ec17b2b5858737838e816ee9023cafda11de0",
+  "cwd": "/tmp/gx-phase2a-a08-2a9ec17",
+  "dirty_state": "",
+  "duplicate_completions": 0,
+  "durable_failed_node_effects": 0,
+  "evidence_class": "SCRIPTED",
+  "evidence_path": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/branch-failure",
+  "exit_code": 0,
+  "files_sha256": {
+    "after_failure.sqlite.gz": "47380e2ed2d8e7aae72db034da435d2d8f520849c2455332102277a3908eff37",
+    "after_retry.sqlite.gz": "1e1bc85454edd79cc0c878ea772ebf0dc8e17e9e3c56f6ea47617a883430cac2",
+    "before.sqlite.gz": "64aadf8c6933c8bc65a3ea2586f083abd26b53e0895d823ec9d4f3eb430e97b7",
+    "events.json": "ddbfc022597f43a5fd2bea6b918e1d68973885b6d7c29c73fba42d3e54b7e7a7",
+    "unittest.log": "15308f434f2c30066c6224b882ad1f8cd04347723de3a8bdb8225b0a45479d88"
+  },
+  "job_ids": [],
+  "phases": {
+    "after_failure": {
+      "checkpoint": {
+        "completed": [
+          "C"
+        ],
+        "controller_ran": {
+          "event_id": 4,
+          "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+        },
+        "failed_nodes": {
+          "bad": {
+            "code": "ValueError",
+            "continue_with": "gx_run_control action=continue",
+            "message": "invalid measurement",
+            "node": "bad",
+            "since": "2026-11-24T00:51:49.572Z"
+          }
+        },
+        "inputs": {},
+        "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+        "node_waits": {
+          "A": {
+            "controller_ran": {
+              "event_id": 4,
+              "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+            },
+            "interrupt": {
+              "approval_ref": "approval-A",
+              "job_refs": [],
+              "kind": "approval",
+              "payload": {},
+              "reason": "Operator decision",
+              "required_artifacts": [],
+              "tasks": []
+            },
+            "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+            "next_retry_at": null,
+            "node": "A",
+            "owner": "operator",
+            "reason": "Operator decision",
+            "references": [
+              "approval-A"
+            ],
+            "round": 0,
+            "since": "2026-11-24T00:51:49.598Z",
+            "status": "WAITING_HUMAN"
+          }
+        },
+        "outputs": {
+          "C": {
+            "resumed": false,
+            "round": 0,
+            "submissions": []
+          }
+        },
+        "pending_interrupt": {
+          "approval_ref": "approval-A",
+          "job_refs": [],
+          "kind": "approval",
+          "payload": {},
+          "reason": "Operator decision",
+          "required_artifacts": [],
+          "tasks": []
+        },
+        "round": 0,
+        "scratch": {},
+        "workflow_digest": "fd1fbcefd2544f6cad401d96f4867a995556f61c99811e5b8009228bf4f1d6a0",
+        "workflow_id": "static",
+        "workflow_version": "1"
+      },
+      "checkpoint_seq": 5,
+      "completed_nodes": [
+        "C"
+      ],
+      "completion_counts": {
+        "C": 1
+      },
+      "events": 7,
+      "failed_nodes": {
+        "bad": {
+          "code": "ValueError",
+          "continue_with": "gx_run_control action=continue",
+          "message": "invalid measurement",
+          "node": "bad",
+          "since": "2026-11-24T00:51:49.572Z"
+        }
+      },
+      "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+      "last_event_id": 7,
+      "node": "A",
+      "node_states": {
+        "A": "WAITING_HUMAN",
+        "C": "COMPLETED",
+        "bad": "FAILED",
+        "bad_child": "BLOCKED"
+      },
+      "node_waits": {
+        "A": {
+          "controller_ran": {
+            "event_id": 4,
+            "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+          },
+          "interrupt": {
+            "approval_ref": "approval-A",
+            "job_refs": [],
+            "kind": "approval",
+            "payload": {},
+            "reason": "Operator decision",
+            "required_artifacts": [],
+            "tasks": []
+          },
+          "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+          "next_retry_at": null,
+          "node": "A",
+          "owner": "operator",
+          "reason": "Operator decision",
+          "references": [
+            "approval-A"
+          ],
+          "round": 0,
+          "since": "2026-11-24T00:51:49.598Z",
+          "status": "WAITING_HUMAN"
+        }
+      },
+      "pending_interrupt": {
+        "approval_ref": "approval-A",
+        "job_refs": [],
+        "kind": "approval",
+        "payload": {},
+        "reason": "Operator decision",
+        "required_artifacts": [],
+        "tasks": []
+      },
+      "revision": 4,
+      "run_id": "gxr_01m85gk7nfgzm7ntmb",
+      "status": "WAITING_APPROVAL",
+      "workflow_id": "static",
+      "workflow_version": "1"
+    },
+    "after_retry": {
+      "checkpoint": {
+        "completed": [
+          "C",
+          "bad",
+          "bad_child"
+        ],
+        "controller_ran": {
+          "event_id": 4,
+          "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+        },
+        "inputs": {},
+        "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+        "node_waits": {
+          "A": {
+            "controller_ran": {
+              "event_id": 4,
+              "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+            },
+            "interrupt": {
+              "approval_ref": "approval-A",
+              "job_refs": [],
+              "kind": "approval",
+              "payload": {},
+              "reason": "Operator decision",
+              "required_artifacts": [],
+              "tasks": []
+            },
+            "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+            "next_retry_at": null,
+            "node": "A",
+            "owner": "operator",
+            "reason": "Operator decision",
+            "references": [
+              "approval-A"
+            ],
+            "round": 0,
+            "since": "2026-11-24T00:51:49.598Z",
+            "status": "WAITING_HUMAN"
+          }
+        },
+        "outputs": {
+          "C": {
+            "resumed": false,
+            "round": 0,
+            "submissions": []
+          },
+          "bad": {
+            "resumed": false,
+            "round": 0,
+            "submissions": []
+          },
+          "bad_child": {
+            "resumed": false,
+            "round": 0,
+            "submissions": []
+          }
+        },
+        "pending_interrupt": {
+          "approval_ref": "approval-A",
+          "job_refs": [],
+          "kind": "approval",
+          "payload": {},
+          "reason": "Operator decision",
+          "required_artifacts": [],
+          "tasks": []
+        },
+        "round": 0,
+        "scratch": {},
+        "workflow_digest": "fd1fbcefd2544f6cad401d96f4867a995556f61c99811e5b8009228bf4f1d6a0",
+        "workflow_id": "static",
+        "workflow_version": "1"
+      },
+      "checkpoint_seq": 9,
+      "completed_nodes": [
+        "C",
+        "bad",
+        "bad_child"
+      ],
+      "completion_counts": {
+        "C": 1,
+        "bad": 1,
+        "bad_child": 1
+      },
+      "events": 11,
+      "failed_nodes": {},
+      "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+      "last_event_id": 11,
+      "node": "A",
+      "node_states": {
+        "A": "WAITING_HUMAN",
+        "C": "COMPLETED",
+        "bad": "COMPLETED",
+        "bad_child": "COMPLETED"
+      },
+      "node_waits": {
+        "A": {
+          "controller_ran": {
+            "event_id": 4,
+            "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+          },
+          "interrupt": {
+            "approval_ref": "approval-A",
+            "job_refs": [],
+            "kind": "approval",
+            "payload": {},
+            "reason": "Operator decision",
+            "required_artifacts": [],
+            "tasks": []
+          },
+          "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+          "next_retry_at": null,
+          "node": "A",
+          "owner": "operator",
+          "reason": "Operator decision",
+          "references": [
+            "approval-A"
+          ],
+          "round": 0,
+          "since": "2026-11-24T00:51:49.598Z",
+          "status": "WAITING_HUMAN"
+        }
+      },
+      "pending_interrupt": {
+        "approval_ref": "approval-A",
+        "job_refs": [],
+        "kind": "approval",
+        "payload": {},
+        "reason": "Operator decision",
+        "required_artifacts": [],
+        "tasks": []
+      },
+      "revision": 8,
+      "run_id": "gxr_01m85gk7nfgzm7ntmb",
+      "status": "WAITING_APPROVAL",
+      "workflow_id": "static",
+      "workflow_version": "1"
+    },
+    "before": {
+      "checkpoint": null,
+      "checkpoint_seq": 0,
+      "completed_nodes": [],
+      "completion_counts": {},
+      "events": 1,
+      "failed_nodes": {},
+      "interrupt_ref": null,
+      "last_event_id": 1,
+      "node": null,
+      "node_states": {},
+      "node_waits": {},
+      "pending_interrupt": null,
+      "revision": 0,
+      "run_id": "gxr_01m85gk7nfgzm7ntmb",
+      "status": "CREATED",
+      "workflow_id": null,
+      "workflow_version": null
+    }
+  },
+  "run_id": "gxr_01m85gk7nfgzm7ntmb",
+  "subprocess_launches": [],
+  "test": "test_failed_branch_rolls_back_and_manual_retry_reuses_other_branches"
+}

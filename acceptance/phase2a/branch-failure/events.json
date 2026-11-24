@@ -1,0 +1,249 @@
+[
+  {
+    "actor": "test",
+    "event_id": 1,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "run.created",
+    "new_revision": 0,
+    "new_state": "CREATED",
+    "payload": {
+      "objective": "independent branches",
+      "pins": {},
+      "project_ref": "static",
+      "workflow": {
+        "id": "static",
+        "version": "1"
+      }
+    },
+    "prev_revision": null,
+    "prev_state": null,
+    "reason": null,
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_kind": "run",
+    "ts": "2026-11-24T00:51:49.551Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 2,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "run.transition",
+    "new_revision": 1,
+    "new_state": "PLANNING",
+    "payload": {
+      "workflow_id": "static",
+      "workflow_version": "1"
+    },
+    "prev_revision": 0,
+    "prev_state": "CREATED",
+    "reason": "workflow static@1 start",
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_kind": "run",
+    "ts": "2026-11-24T00:51:49.568Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 3,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "run.transition",
+    "new_revision": 2,
+    "new_state": "ACTIVE",
+    "payload": {
+      "workflow_id": "static",
+      "workflow_version": "1"
+    },
+    "prev_revision": 1,
+    "prev_state": "PLANNING",
+    "reason": "workflow static@1 start",
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_kind": "run",
+    "ts": "2026-11-24T00:51:49.568Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 4,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "workflow.node_failed",
+    "new_revision": null,
+    "new_state": null,
+    "payload": {
+      "code": "ValueError",
+      "continue_with": "gx_run_control action=continue",
+      "message": "invalid measurement",
+      "node": "bad",
+      "since": "2026-11-24T00:51:49.572Z"
+    },
+    "prev_revision": null,
+    "prev_state": null,
+    "reason": "ValueError: invalid measurement",
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "static@1",
+    "subject_kind": "workflow",
+    "ts": "2026-11-24T00:51:49.572Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 5,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "workflow.node_waiting",
+    "new_revision": null,
+    "new_state": null,
+    "payload": {
+      "approval_ref": "approval-A",
+      "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+      "job_refs": [],
+      "kind": "approval",
+      "node": "A",
+      "payload": {},
+      "reason": "Operator decision",
+      "required_artifacts": [],
+      "tasks": []
+    },
+    "prev_revision": null,
+    "prev_state": null,
+    "reason": "Operator decision",
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "static@1",
+    "subject_kind": "workflow",
+    "ts": "2026-11-24T00:51:49.598Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 6,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "workflow.node_completed",
+    "new_revision": 3,
+    "new_state": null,
+    "payload": {
+      "node": "C",
+      "output_keys": [
+        "resumed",
+        "round",
+        "submissions"
+      ]
+    },
+    "prev_revision": 2,
+    "prev_state": null,
+    "reason": null,
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "static@1",
+    "subject_kind": "workflow",
+    "ts": "2026-11-24T00:51:49.599Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 7,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "run.transition",
+    "new_revision": 4,
+    "new_state": "WAITING_APPROVAL",
+    "payload": {
+      "approval_ref": "approval-A",
+      "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+      "job_refs": [],
+      "kind": "approval",
+      "node": "A",
+      "payload": {},
+      "reason": "Operator decision",
+      "required_artifacts": [],
+      "tasks": []
+    },
+    "prev_revision": 3,
+    "prev_state": "ACTIVE",
+    "reason": "Operator decision",
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_kind": "run",
+    "ts": "2026-11-24T00:51:49.599Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 8,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "run.transition",
+    "new_revision": 5,
+    "new_state": "ACTIVE",
+    "payload": {},
+    "prev_revision": 4,
+    "prev_state": "WAITING_APPROVAL",
+    "reason": "continue an independent workflow branch",
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_kind": "run",
+    "ts": "2026-11-24T00:51:49.620Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 9,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "workflow.node_completed",
+    "new_revision": 6,
+    "new_state": null,
+    "payload": {
+      "node": "bad",
+      "output_keys": [
+        "resumed",
+        "round",
+        "submissions"
+      ]
+    },
+    "prev_revision": 5,
+    "prev_state": null,
+    "reason": null,
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "static@1",
+    "subject_kind": "workflow",
+    "ts": "2026-11-24T00:51:49.620Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 10,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "workflow.node_completed",
+    "new_revision": 7,
+    "new_state": null,
+    "payload": {
+      "node": "bad_child",
+      "output_keys": [
+        "resumed",
+        "round",
+        "submissions"
+      ]
+    },
+    "prev_revision": 6,
+    "prev_state": null,
+    "reason": null,
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "static@1",
+    "subject_kind": "workflow",
+    "ts": "2026-11-24T00:51:49.621Z"
+  },
+  {
+    "actor": "engine",
+    "event_id": 11,
+    "evidence_level": "EXECUTION_OBSERVED",
+    "kind": "run.transition",
+    "new_revision": 8,
+    "new_state": "WAITING_APPROVAL",
+    "payload": {
+      "approval_ref": "approval-A",
+      "interrupt_ref": "gxi_01m85gk7pyraw2tkg8",
+      "job_refs": [],
+      "kind": "approval",
+      "node": "A",
+      "payload": {},
+      "reason": "Operator decision",
+      "required_artifacts": [],
+      "tasks": []
+    },
+    "prev_revision": 7,
+    "prev_state": "ACTIVE",
+    "reason": "Operator decision",
+    "run_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_id": "gxr_01m85gk7nfgzm7ntmb",
+    "subject_kind": "run",
+    "ts": "2026-11-24T00:51:49.677Z"
+  }
+]

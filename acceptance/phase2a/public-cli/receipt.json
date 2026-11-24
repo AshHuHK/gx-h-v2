@@ -1,0 +1,234 @@
+{
+  "class": "SCRIPTED",
+  "commit": "2a9ec17b2b5858737838e816ee9023cafda11de0",
+  "dirty_before": "",
+  "GX_CODEX_OFFLINE": "1",
+  "invocations": [
+    {
+      "argv": [
+        "bin/gx-p0",
+        "start",
+        "--state",
+        "/tmp/gx-2a-public-1mU9qLrP/project",
+        "--run-key",
+        "offline-demo",
+        "--spec",
+        "examples/paired-grid.json"
+      ],
+      "cwd": "/tmp/gx-2a-public-1mU9qLrP/tree",
+      "returncode": 0,
+      "started": 1795481495.6782074,
+      "seconds": 1.108,
+      "status": "WAITING_EXTERNAL_JOB",
+      "driver": null,
+      "run_id": "gxr_01m85gjtnb3q6syjqn",
+      "nodes": {
+        "experiment": "WAITING_JOB"
+      },
+      "completed": [
+        "proposal"
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m85gjtsd29877n1h",
+          "status": "SUBMITTED",
+          "scheduler_ref": "runner:72451:2980095925"
+        },
+        {
+          "job_id": "gxj_01m85gjtz0mjvme671",
+          "status": "SUBMITTED",
+          "scheduler_ref": "runner:72522:2980095943"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "run",
+        "--state",
+        "/tmp/gx-2a-public-1mU9qLrP/project",
+        "--timeout",
+        "5"
+      ],
+      "cwd": "/tmp/gx-2a-public-1mU9qLrP/tree",
+      "returncode": 75,
+      "started": 1795481496.7861865,
+      "seconds": 5.463,
+      "status": "WAITING_CLIENT",
+      "driver": "time_limit",
+      "run_id": "gxr_01m85gjtnb3q6syjqn",
+      "nodes": {
+        "assessment": "WAITING_AGENT_TASK"
+      },
+      "completed": [
+        "proposal",
+        "experiment"
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m85gjtsd29877n1h",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72451:2980095925"
+        },
+        {
+          "job_id": "gxj_01m85gjtz0mjvme671",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72522:2980095943"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "status",
+        "--state",
+        "/tmp/gx-2a-public-1mU9qLrP/project",
+        "--run-id",
+        "gxr_01m85gjtnb3q6syjqn"
+      ],
+      "cwd": "/tmp/gx-2a-public-1mU9qLrP/tree",
+      "returncode": 0,
+      "started": 1795481502.249173,
+      "seconds": 0.428,
+      "status": "WAITING_CLIENT",
+      "driver": null,
+      "run_id": "gxr_01m85gjtnb3q6syjqn",
+      "nodes": {
+        "assessment": "WAITING_AGENT_TASK"
+      },
+      "completed": [
+        "proposal",
+        "experiment"
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m85gjtsd29877n1h",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72451:2980095925"
+        },
+        {
+          "job_id": "gxj_01m85gjtz0mjvme671",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72522:2980095943"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "stop",
+        "--state",
+        "/tmp/gx-2a-public-1mU9qLrP/project",
+        "--run-id",
+        "gxr_01m85gjtnb3q6syjqn"
+      ],
+      "cwd": "/tmp/gx-2a-public-1mU9qLrP/tree",
+      "returncode": 0,
+      "started": 1795481502.6773562,
+      "seconds": 0.515,
+      "status": "PAUSED",
+      "driver": null,
+      "run_id": "gxr_01m85gjtnb3q6syjqn",
+      "nodes": {
+        "assessment": "WAITING_AGENT_TASK"
+      },
+      "completed": [
+        "proposal",
+        "experiment"
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m85gjtsd29877n1h",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72451:2980095925"
+        },
+        {
+          "job_id": "gxj_01m85gjtz0mjvme671",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72522:2980095943"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "resume",
+        "--state",
+        "/tmp/gx-2a-public-1mU9qLrP/project",
+        "--run-id",
+        "gxr_01m85gjtnb3q6syjqn",
+        "--timeout",
+        "2"
+      ],
+      "cwd": "/tmp/gx-2a-public-1mU9qLrP/tree",
+      "returncode": 75,
+      "started": 1795481503.1925132,
+      "seconds": 2.685,
+      "status": "WAITING_CLIENT",
+      "driver": "time_limit",
+      "run_id": "gxr_01m85gjtnb3q6syjqn",
+      "nodes": {
+        "assessment": "WAITING_AGENT_TASK"
+      },
+      "completed": [
+        "proposal",
+        "experiment"
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m85gjtsd29877n1h",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72451:2980095925"
+        },
+        {
+          "job_id": "gxj_01m85gjtz0mjvme671",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72522:2980095943"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "bin/gx-p0",
+        "status",
+        "--state",
+        "/tmp/gx-2a-public-1mU9qLrP/project",
+        "--run-id",
+        "gxr_01m85gjtnb3q6syjqn"
+      ],
+      "cwd": "/tmp/gx-2a-public-1mU9qLrP/tree",
+      "returncode": 0,
+      "started": 1795481505.877645,
+      "seconds": 0.427,
+      "status": "WAITING_CLIENT",
+      "driver": null,
+      "run_id": "gxr_01m85gjtnb3q6syjqn",
+      "nodes": {
+        "assessment": "WAITING_AGENT_TASK"
+      },
+      "completed": [
+        "proposal",
+        "experiment"
+      ],
+      "jobs": [
+        {
+          "job_id": "gxj_01m85gjtsd29877n1h",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72451:2980095925"
+        },
+        {
+          "job_id": "gxj_01m85gjtz0mjvme671",
+          "status": "SUCCEEDED",
+          "scheduler_ref": "runner:72522:2980095943"
+        }
+      ]
+    }
+  ],
+  "result": "PASS",
+  "historical_workflow": {
+    "id": "science_grid",
+    "version": "2"
+  },
+  "run_id": "gxr_01m85gjtnb3q6syjqn",
+  "paid_calls": 0
+}

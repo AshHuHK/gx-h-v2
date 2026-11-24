@@ -1,0 +1,188 @@
+{
+  "candidate_source": "2743c67",
+  "stdlib_only_source": "60f2584",
+  "runtime_context": "OFFLINE deterministic suite. The 3.13 warning investigation is a separate diagnostic and uses five selected tests.",
+  "locked": {
+    "python": "3.11.9",
+    "node": "22.17.0",
+    "npm": "10.9.2",
+    "sqlite": "3.45.3",
+    "private_modules": {
+      "biopython": "1.88",
+      "numpy": "1.26.4"
+    },
+    "cordis": {
+      "node_modules/@deepseek-ai/cordis": "4.1.0",
+      "node_modules/@deepseek-ai/cosmokit": "1.9.0",
+      "node_modules/@deepseek-ai/dsh-scope": "0.2.2-rc.5",
+      "node_modules/@standard-schema/spec": "1.1.0"
+    },
+    "lock_sha256": {
+      "release-assets/lock.json": "455687ada55deecf9d72117ee90ee49d1f598e44ec9e1b84202fe472fc4a3e36",
+      "release-assets/python/requirements.lock": "bd2ca6f9fd8fcded8af09b11e62740584c03e8ea1d102b3a8b3262faab2664b0",
+      "gx-h/runtime/plugin-host/package-lock.json": "a1dd6306154631d3c0a93a4d8a4813110d341799274422cc46d1af3f21d77afc"
+    },
+    "asset_sha256": {
+      "biopython-1.88-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl": "99e1f7022ab8eee2ae9e9a05b66ad183b9fe4eeb4e561a65ed0fd85eef5f8267",
+      "numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "ec58f02bdf7b9ff35c17a8b2d76cdfc45ba97a55d2d921bbd7ec79c7d591c9e5",
+      "cordis-4.1.0.tgz": "3b0099a6aa9b0b52c3e199042acf6f1ae195c5690f7de11aa61171bca7752eca",
+      "cosmokit-1.9.0.tgz": "6225043dbc7f6ff6c7cb104bc381b74c972577967ad827af26180719e17ff71d",
+      "dsh-scope-0.2.2-rc.5.tgz": "daa7eb76bf5642404e149a44a1091cd97648dc537bf360ad22842286a7754b3a",
+      "spec-1.1.0.tgz": "a7cb7268be280ab518d450f8c3b07c86f23417225c0ab53691ed59b3067cceaf"
+    },
+    "node_host_tests": 2
+  },
+  "proof": {
+    "clean_shell": "A route-preserving env -i with a fresh HOME, pinned binaries and no user module search path. Commands, namespace and route receipts are in named-{controls,suite,timeout}-network.json.",
+    "private_seed": "A fresh seed venv containing an instrumented sitecustomize.py was used for the separate 60f2584 control. Its marker was absent after successful provisioning through -I -S. Only locked packages were imported in the resulting venv.",
+    "expected_failures": {
+      "controls": {
+        "wrong_python": "Python version mismatch: found 3.11.9, release lock requires 0.0.0",
+        "wrong_node": "Node version mismatch: found 22.17.0, release lock requires 0.0.0",
+        "missing_wheel": "[Errno 2] No such file or directory: '/tmp/p2a1-dependencies-20261124/named-controls-env/damaged-release/release-assets/python/biopython-1.88-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl'",
+        "wrong_wheel_digest": "sha256 mismatch for /tmp/p2a1-dependencies-20261124/named-controls-env/damaged-release/release-assets/python/biopython-1.88-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl"
+      },
+      "actual_python": "Python version mismatch: found 3.10.12, release lock requires 3.11.9",
+      "actual_node": "Node version mismatch: found 12.22.9, release lock requires 22.17.0"
+    }
+  },
+  "clean_suite": {
+    "sha": "2743c675155801a7bd24243e05c68e0d00cf2de7",
+    "summary": "named-suite/summary.json",
+    "outcomes": {
+      "errors": 0,
+      "failure_details": [],
+      "failures": 0,
+      "passed": 472,
+      "skip_details": [
+        "test_gx_run_uses_sdk_model_then_returns_to_native_decision (test_dsh_activity.DSHActivityTest.test_gx_run_uses_sdk_model_then_returns_to_native_decision) ... skipped 'install runtime/dsh-sdk/.venv first'",
+        "test_reported_model_mismatch_keeps_response_and_refuses_delivery (test_dsh_activity.DSHActivityTest.test_reported_model_mismatch_keeps_response_and_refuses_delivery) ... skipped 'install runtime/dsh-sdk/.venv first'",
+        "test_close_cold_resume_and_observe_prior_evidence (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_cold_resume_and_observe_prior_evidence) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'",
+        "test_close_while_recorded_response_is_pending (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_while_recorded_response_is_pending) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'"
+      ],
+      "skipped": 4,
+      "total": 476
+    },
+    "test_resource_profile": "deterministic",
+    "passed": true,
+    "preflight_sha256": "29fa34b11c187551517795082ef0a6c953b8b34814351e71faa429c6d4edddbb"
+  },
+  "timeout": {
+    "source": "2743c67",
+    "case": "tests.test_v21_compute.ComputeTest.test_existing_job_limits_stop_bounded_compute_load",
+    "deadline_seconds": 1.0,
+    "wall_seconds": 1.027,
+    "child_pid": 2738586,
+    "process_start_ticks": "2986119426",
+    "signal": 15,
+    "observed": "timed_out",
+    "original_process_gone": true,
+    "output_count": 0,
+    "memory_failure": "runner_error: host_process_peak_rss_limit"
+  },
+  "sqlite": {
+    "source_before": "61ea96d",
+    "source_after": "61ea96d with only four test files from 2743c67",
+    "historical_file": "gx-historical-42-failures-78a8b07.log",
+    "sha256": "0d72a9b90dc9ca54a7461fe6bdfe0e027fdc2f43bc1b9ec7e95924e248f625b9",
+    "historical_unclosed_warning_lines": [
+      23,
+      26,
+      77,
+      80
+    ],
+    "original_allocation_identity": "unknown; original emission sites are JSON encoder/decoder and it explicitly asks to enable tracemalloc",
+    "historical_metrics_diagnostic_lines": [
+      22
+    ],
+    "named_metrics_diagnostic": {
+      "case": "test_unwritable_trace_keeps_transaction",
+      "line": 140,
+      "outcome": "ok",
+      "reason": "The fixture passes an existing directory as the trace file and verifies the transaction commit."
+    },
+    "explicit_connection_ownership": {
+      "tests_before_after": [
+        24,
+        24
+      ],
+      "usable_after_return_before_after": [
+        5,
+        0
+      ]
+    },
+    "direct_resourcewarning": {
+      "runtime": "3.13.14 (main, Aug  5 2026, 15:44:26) [Clang 22.1.3 ]",
+      "sqlite": "3.53.1",
+      "same_five_cases": [
+        {
+          "id": "test_p01_metrics.Measurements.test_router_preserves_multiple_snapshots_and_missing_fields",
+          "allocation": "test_p01_metrics.py:18"
+        },
+        {
+          "id": "test_p01_metrics.Measurements.test_unwritable_trace_keeps_transaction",
+          "allocation": "test_p01_metrics.py:35"
+        },
+        {
+          "id": "test_v31_response_attribution.AttributionTests.test_measured_raw_breakdown_missing_fields_replay_and_single_authoritative_bill",
+          "allocation": "test_v31_response_attribution.py:59"
+        },
+        {
+          "id": "test_web_bridge.WebBridgeTests.test_event_cursor_replays_only_later_project_transitions",
+          "allocation": "test_web_bridge.py:78"
+        },
+        {
+          "id": "test_v21_metering.ThreadAccounts.test_cumulative_includes_cached_input_once_and_regressions_survive_reopen",
+          "allocation": "test_v21_metering.py:51"
+        }
+      ],
+      "warning_counts_before_after": [
+        5,
+        0
+      ],
+      "case_results_before_after": [
+        "5 PASS",
+        "5 PASS"
+      ]
+    }
+  },
+  "reproduce": {
+    "required": "Linux x86_64, CPython 3.11.9, Node 22.17.0 with its npm 10.9.2; bundled wheels/tarballs are sufficient. Only the optional warning diagnostic uses CPython 3.13.",
+    "dependencies": "<python3.11> -I scripts/acceptance_dependencies.py --check-controls --python <python3.11> --node <node22>/bin/node --work <new-private-work> --output <receipt.json>",
+    "timeout": "cd gx-h && GX_TIMEOUT_EVIDENCE=<receipt.json> <prepared-venv>/bin/python -B -m unittest -v tests.test_v21_compute.ComputeTest.test_existing_job_limits_stop_bounded_compute_load",
+    "full": "<python3.11> -B acceptance/v21/regression.py --commit 2743c67 --python-only --binary <locked-codex> --out <new-evidence-directory>",
+    "warning": "From each gx-h checkout: <python3.13> -I -X tracemalloc=5 -B <unpacked>/sqlite313.py <new-warning-receipt.json>. Full executable commands including the local Clash namespace are in the corresponding *-network.json."
+  },
+  "archive_sha256": "a50b305fc705ee9affb1c1eac92409e47c08b45e593228edd8d9b7524545d776",
+  "members_sha256": {
+    "named-controls.json": "29fa34b11c187551517795082ef0a6c953b8b34814351e71faa429c6d4edddbb",
+    "named-controls-network.json": "dfd6d484d45602e4507232cc06ecc7748e343219fd443bea4304f97e65cd5167",
+    "named-suite.log": "41d0c1239ece74c4f3760dec7e189aaa43c6fed04f756e56c60a9025a4a488f3",
+    "named-suite-network.json": "050df486886b5c5e77982e214f0828f16a4f928f6547b74def905e176d1783cd",
+    "named-timeout.json": "a6e42b530ee9c350230c978cc38026c0d3fceb5ce2c077341ed3972515fe7805",
+    "named-timeout.log": "73ab25fc8f6d221cb7c62b8fdb76beafc60ce1f4b3ad3100a970e426206b96dd",
+    "named-timeout-network.json": "ad5a146e1c72c2a956648219dcbc6edf1ca8d18bd89bdef76c3e5dba6b5be11e",
+    "seed-isolation.json": "99a09cd4e7832bd8cef4cad107c8f6180bc142a001d8e7af9777e540d24b5817",
+    "wrong-actual-node.json": "032c5b1bee2fdb0fb075ee8486cb3290b4250d1f6a40a6773009d94cc92c679c",
+    "wrong-actual-python.json": "4d85c79b4fbfa69747ee8435d5e63e195d4d89ec98d0dac80949586fd0762556",
+    "sqlite_handles.py": "d366839f0d73fc31beb27e6cc3517fc2e0ccebd521c81c35ff19e38e314268d7",
+    "sqlite-before-final.json": "5e4ec179ca471aa36d0f44d3d65d3d59594dd059c473711c73760f76a485244e",
+    "sqlite-before-final.log": "e2f3b2cfd83c9a117fae61091b25c199e4a85bd9e962cdaf9e6dd317b6e89f1b",
+    "sqlite-after-final.json": "5cec3d8830860c81dd4450468d279e3689dccec192a20bbce6693e5b82f50a0d",
+    "sqlite-after-final.log": "01ccc982173e763cbbc2e9e35fa502b743f4aeb17697571c09765c4342a90673",
+    "sqlite313.py": "d7c120f440344ba57053ed6bca4746506200c47aeb29b8562894ce360b2d150e",
+    "sqlite313-baseline.json": "95d35f4b183c9b3fd1ff5829b301c141178a5afd0bd197e36799955fbc5df7ab",
+    "sqlite313-patched.json": "aa9ae96480f98b6206f8e8faa29c35ac3df64a6a7fd27b62f17ffb705ad9bfa0",
+    "sqlite313-baseline-network.json": "a449b4d18015ec4a1d551e4d5ffa98bc4c83341be6337d33fccddd78e48de49f",
+    "sqlite313-patched-network.json": "ebaed3a41fc64901ec15e033aace3a4d969136f5a464c2a97e919abd651a748c",
+    "sqlite313-baseline.log": "6dfc3b98a2543c7e9b3141c707ee500d5afe8e061a0bf21f9618991f431f9e1a",
+    "sqlite313-patched.log": "6dfc3b98a2543c7e9b3141c707ee500d5afe8e061a0bf21f9618991f431f9e1a",
+    "named-suite/clash-preflight.log": "d825030cd6df2c46246717545316efc4c1d6be5a79e4f744139af35faf85a68b",
+    "named-suite/files.json": "6e49dd1d394b44c974cd78070bc787612fdc0c704d59b4e725231e3fed455521",
+    "named-suite/offline-cordis.log": "4b0bf6bd7da0f1a656783576ec8c83bbd614476007bf46adc86cdef3c5cf775a",
+    "named-suite/offline-wheels.log": "a27cf847c6a4326a9950d8952f418ab623bfd6cf796746f7ed333ca9a0fc47db",
+    "named-suite/python-full.log": "e568495ce95ab6ec62cf6abc02be25ef67dd19fbece66c1840e4374d3f9a45c7",
+    "named-suite/summary.json": "ba377e9daf6b45a0e0551aeb0db06c1804a46dad68625f34163ee78a0ecdd786",
+    "named-suite/venv.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

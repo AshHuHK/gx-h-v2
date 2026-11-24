@@ -1,0 +1,520 @@
+{
+  "cases": {
+    "restart": {
+      "audited_execs": 4,
+      "branch_nodes": {
+        "A": [
+          "A1",
+          "A2"
+        ],
+        "B": [
+          "B1",
+          "B2",
+          "B3"
+        ],
+        "C": [
+          "C1"
+        ]
+      },
+      "codex_spawns_after_stop": 0,
+      "commands": [
+        {
+          "command": [
+            "/opt/conda/bin/python",
+            "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/source/acceptance/phase2a/cross_process.py",
+            "--output",
+            "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/cross-process/restart",
+            "--private",
+            "/tmp/gx2a-xs273yfj/gx",
+            "--case",
+            "restart",
+            "--worker",
+            "first"
+          ],
+          "end_ns": 1795481470721171227,
+          "exit": -9,
+          "gx_pid": 69755,
+          "phase": "first",
+          "start_ns": 1795481469263776469
+        },
+        {
+          "command": [
+            "/opt/conda/bin/python",
+            "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/source/acceptance/phase2a/cross_process.py",
+            "--output",
+            "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/cross-process/restart",
+            "--private",
+            "/tmp/gx2a-xs273yfj/gx",
+            "--case",
+            "restart",
+            "--worker",
+            "recovery"
+          ],
+          "end_ns": 1795481478485883015,
+          "exit": 0,
+          "gx_pid": 69966,
+          "phase": "recovery",
+          "start_ns": 1795481475717414410
+        },
+        {
+          "command": [
+            "/opt/conda/bin/python",
+            "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/source/acceptance/phase2a/cross_process.py",
+            "--output",
+            "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/cross-process/restart",
+            "--private",
+            "/tmp/gx2a-xs273yfj/gx",
+            "--case",
+            "restart",
+            "--worker",
+            "idle"
+          ],
+          "end_ns": 1795481484068374642,
+          "exit": 0,
+          "gx_pid": 71332,
+          "phase": "idle",
+          "start_ns": 1795481478529840948
+        }
+      ],
+      "cut_ns": 1795481470278494986,
+      "duplicates": {
+        "artifact": 0,
+        "node": 0,
+        "settlement": 0
+      },
+      "held_usage": [
+        {
+          "amounts_json": "{\"api_calls\":1,\"tokens\":128}",
+          "event_id": "human:38aa2457-3da9-4041-8890-2c5768b558d7",
+          "reservation_ref": "rsv_01m85gj13p051v1ctj",
+          "state": "acknowledged",
+          "status": "HELD",
+          "thread_id": "01a20b09-0457-7362-bc24-3938819a68ad",
+          "turn_id": "01a20b09-047c-71c2-87eb-6b859a36af79"
+        }
+      ],
+      "idle": {
+        "driver": "time_limit",
+        "driver_cycles": 9,
+        "involuntary_context_switches": 3,
+        "pid": 71332,
+        "process_cpu_seconds": 0.19977999999999996,
+        "sleep_wakeups": [
+          {
+            "elapsed_seconds": 0.195068556,
+            "requested_seconds": 0.195,
+            "woke_at_ns": 1795481479234981728
+          },
+          {
+            "elapsed_seconds": 0.253578187,
+            "requested_seconds": 0.2535,
+            "woke_at_ns": 1795481479505405044
+          },
+          {
+            "elapsed_seconds": 0.32979878,
+            "requested_seconds": 0.32955,
+            "woke_at_ns": 1795481479853060312
+          },
+          {
+            "elapsed_seconds": 0.428566192,
+            "requested_seconds": 0.42841500000000005,
+            "woke_at_ns": 1795481480306828928
+          },
+          {
+            "elapsed_seconds": 0.557028889,
+            "requested_seconds": 0.5569395,
+            "woke_at_ns": 1795481480878208474
+          },
+          {
+            "elapsed_seconds": 0.724115065,
+            "requested_seconds": 0.7240213500000001,
+            "woke_at_ns": 1795481481619616053
+          },
+          {
+            "elapsed_seconds": 0.94131626,
+            "requested_seconds": 0.9412277550000002,
+            "woke_at_ns": 1795481482576541136
+          },
+          {
+            "elapsed_seconds": 1.000087664,
+            "requested_seconds": 1,
+            "woke_at_ns": 1795481483592508499
+          },
+          {
+            "elapsed_seconds": 0.391444426,
+            "requested_seconds": 0.3913613334298134,
+            "woke_at_ns": 1795481484000318823
+          }
+        ],
+        "status": "WAITING_CLIENT",
+        "voluntary_context_switches": 38,
+        "wall_seconds": 5.02086548
+      },
+      "job_id": "gxj_01m85gj1d5bzc543c2",
+      "job_settlement": [
+        {
+          "event_id": 43,
+          "ref": "rsv_01m85gj1eha5ey5hqn"
+        }
+      ],
+      "offline_deterministic_completions": [
+        "admit",
+        "C1",
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "raw_artifact": {
+        "artifact_ref": "gxa_01m85gj73chpmf1r8r",
+        "job_id": "gxj_01m85gj1d5bzc543c2",
+        "kind": "synthetic_grid",
+        "rel_path": "files/observations.json",
+        "sha256": "37c0616ce45edc23ad345efeab738ef6b13228373e770e08cfda8a32f26b2280"
+      },
+      "run_id": "gxr_01m85gj0txa6xhaakj",
+      "scoped_native_waits": [
+        {
+          "attempts": 0,
+          "disconnected": true,
+          "next_retry_at": null,
+          "owner": "usage",
+          "reason": "Codex disabled by GX_CODEX_OFFLINE",
+          "reference": "01a20b09-0457-7362-bc24-3938819a68ad",
+          "run_id": "gxr_01m85gj0txa6xhaakj",
+          "since": "2026-11-24T00:51:10.649Z"
+        },
+        {
+          "attempts": 0,
+          "disconnected": true,
+          "next_retry_at": null,
+          "owner": "task",
+          "reason": "Codex disabled by GX_CODEX_OFFLINE",
+          "reference": "gxt_01m85gj1hr7h5vshqx",
+          "run_id": "gxr_01m85gj0txa6xhaakj",
+          "since": "2026-11-24T00:51:10.649Z"
+        }
+      ],
+      "task_id": "gxt_01m85gj1hr7h5vshqx",
+      "terminal_outbox": [
+        {
+          "attempts": 0,
+          "consumed_at": "2026-11-24T00:51:16.231Z",
+          "outbox_id": 3,
+          "payload_json": "{\"event_id\":42,\"path_id\":null,\"purpose\":\"workflow_step\",\"run_id\":\"gxr_01m85gj0txa6xhaakj\",\"status\":\"SUCCEEDED\",\"subject\":\"gxj_01m85gj1d5bzc543c2\",\"task_id\":null}",
+          "topic": "job.terminal"
+        }
+      ],
+      "wait": {
+        "controller_ran": {
+          "event_id": 33,
+          "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+        },
+        "interrupt": {
+          "approval_ref": null,
+          "job_refs": [],
+          "kind": "client_work",
+          "payload": {
+            "wait_for": "decision"
+          },
+          "reason": "A1 requires the planner decision",
+          "required_artifacts": [],
+          "tasks": [
+            "gxt_01m85gj1hr7h5vshqx"
+          ]
+        },
+        "interrupt_ref": "gxi_01m85gj1mxsj75f5af",
+        "next_retry_at": null,
+        "node": "A1",
+        "owner": "coordinator",
+        "reason": "A1 requires the planner decision",
+        "references": [
+          "gxt_01m85gj1hr7h5vshqx"
+        ],
+        "round": 0,
+        "since": "2026-11-24T00:51:10.621Z",
+        "status": "WAITING_DECISION"
+      }
+    },
+    "steady": {
+      "audited_execs": 4,
+      "branch_nodes": {
+        "A": [
+          "A1",
+          "A2"
+        ],
+        "B": [
+          "B1",
+          "B2",
+          "B3"
+        ],
+        "C": [
+          "C1"
+        ]
+      },
+      "codex_spawns_after_stop": 0,
+      "commands": [
+        {
+          "command": [
+            "/opt/conda/bin/python",
+            "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/source/acceptance/phase2a/cross_process.py",
+            "--output",
+            "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/cross-process/steady",
+            "--private",
+            "/tmp/gx2a-2ntrbg2e/gx",
+            "--case",
+            "steady",
+            "--worker",
+            "first"
+          ],
+          "end_ns": 1795481468797047699,
+          "exit": 0,
+          "gx_pid": 69271,
+          "phase": "first",
+          "start_ns": 1795481459208850181
+        }
+      ],
+      "cut_ns": 1795481465659536099,
+      "duplicates": {
+        "artifact": 0,
+        "node": 0,
+        "settlement": 0
+      },
+      "held_usage": [
+        {
+          "amounts_json": "{\"api_calls\":1,\"tokens\":128}",
+          "event_id": "human:1753ad7e-01c1-4eb2-93f6-2154f4d92668",
+          "reservation_ref": "rsv_01m85ghqcx2gv3bav3",
+          "state": "acknowledged",
+          "status": "HELD",
+          "thread_id": "01a20b08-dd69-7481-b680-6f42b10cbbff",
+          "turn_id": "01a20b08-dda2-7881-9ebe-4777622d6052"
+        }
+      ],
+      "idle": null,
+      "job_id": "gxj_01m85ghqg773hamdtj",
+      "job_settlement": [
+        {
+          "event_id": 42,
+          "ref": "rsv_01m85ghqjdmmcmf0dt"
+        }
+      ],
+      "offline_deterministic_completions": [
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "raw_artifact": {
+        "artifact_ref": "gxa_01m85ghwtmf8y8nhvr",
+        "job_id": "gxj_01m85ghqg773hamdtj",
+        "kind": "synthetic_grid",
+        "rel_path": "files/observations.json",
+        "sha256": "37c0616ce45edc23ad345efeab738ef6b13228373e770e08cfda8a32f26b2280"
+      },
+      "run_id": "gxr_01m85ghq2502xam9p0",
+      "scoped_native_waits": [
+        {
+          "attempts": 0,
+          "disconnected": true,
+          "next_retry_at": null,
+          "owner": "usage",
+          "reason": "Codex disabled by GX_CODEX_OFFLINE",
+          "reference": "01a20b08-dd69-7481-b680-6f42b10cbbff",
+          "run_id": "gxr_01m85ghq2502xam9p0",
+          "since": "2026-11-24T00:51:05.712Z"
+        },
+        {
+          "attempts": 0,
+          "disconnected": true,
+          "next_retry_at": null,
+          "owner": "task",
+          "reason": "Codex disabled by GX_CODEX_OFFLINE",
+          "reference": "gxt_01m85ghqng3ztj4tkb",
+          "run_id": "gxr_01m85ghq2502xam9p0",
+          "since": "2026-11-24T00:51:05.712Z"
+        }
+      ],
+      "task_id": "gxt_01m85ghqng3ztj4tkb",
+      "terminal_outbox": [
+        {
+          "attempts": 0,
+          "consumed_at": "2026-11-24T00:51:05.695Z",
+          "outbox_id": 1,
+          "payload_json": "{\"event_id\":41,\"path_id\":null,\"purpose\":\"workflow_step\",\"run_id\":\"gxr_01m85ghq2502xam9p0\",\"status\":\"SUCCEEDED\",\"subject\":\"gxj_01m85ghqg773hamdtj\",\"task_id\":null}",
+          "topic": "job.terminal"
+        }
+      ],
+      "wait": {
+        "controller_ran": {
+          "event_id": 33,
+          "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+        },
+        "interrupt": {
+          "approval_ref": null,
+          "job_refs": [],
+          "kind": "client_work",
+          "payload": {
+            "wait_for": "decision"
+          },
+          "reason": "A1 requires the planner decision",
+          "required_artifacts": [],
+          "tasks": [
+            "gxt_01m85ghqng3ztj4tkb"
+          ]
+        },
+        "interrupt_ref": "gxi_01m85ghqrkw5bxx6zh",
+        "next_retry_at": null,
+        "node": "A1",
+        "owner": "coordinator",
+        "reason": "A1 requires the planner decision",
+        "references": [
+          "gxt_01m85ghqng3ztj4tkb"
+        ],
+        "round": 0,
+        "since": "2026-11-24T00:51:00.499Z",
+        "status": "WAITING_DECISION"
+      }
+    }
+  },
+  "codex_binary": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/.npm-global/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin/codex",
+  "codex_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "codex_spawns_after_stop": 0,
+  "codex_version": "codex-cli 0.169.0",
+  "duplicates": {
+    "artifact": 0,
+    "node": 0,
+    "settlement": 0
+  },
+  "evidence_class": "SCRIPTED; real OS processes, official host on loopback, real local grid Job",
+  "exit_code": 0,
+  "idle": {
+    "driver": "time_limit",
+    "driver_cycles": 9,
+    "involuntary_context_switches": 3,
+    "pid": 71332,
+    "process_cpu_seconds": 0.19977999999999996,
+    "sleep_wakeups": [
+      {
+        "elapsed_seconds": 0.195068556,
+        "requested_seconds": 0.195,
+        "woke_at_ns": 1795481479234981728
+      },
+      {
+        "elapsed_seconds": 0.253578187,
+        "requested_seconds": 0.2535,
+        "woke_at_ns": 1795481479505405044
+      },
+      {
+        "elapsed_seconds": 0.32979878,
+        "requested_seconds": 0.32955,
+        "woke_at_ns": 1795481479853060312
+      },
+      {
+        "elapsed_seconds": 0.428566192,
+        "requested_seconds": 0.42841500000000005,
+        "woke_at_ns": 1795481480306828928
+      },
+      {
+        "elapsed_seconds": 0.557028889,
+        "requested_seconds": 0.5569395,
+        "woke_at_ns": 1795481480878208474
+      },
+      {
+        "elapsed_seconds": 0.724115065,
+        "requested_seconds": 0.7240213500000001,
+        "woke_at_ns": 1795481481619616053
+      },
+      {
+        "elapsed_seconds": 0.94131626,
+        "requested_seconds": 0.9412277550000002,
+        "woke_at_ns": 1795481482576541136
+      },
+      {
+        "elapsed_seconds": 1.000087664,
+        "requested_seconds": 1,
+        "woke_at_ns": 1795481483592508499
+      },
+      {
+        "elapsed_seconds": 0.391444426,
+        "requested_seconds": 0.3913613334298134,
+        "woke_at_ns": 1795481484000318823
+      }
+    ],
+    "status": "WAITING_CLIENT",
+    "voluntary_context_switches": 38,
+    "wall_seconds": 5.02086548
+  },
+  "matrix": {
+    "P2A-01": {
+      "case": "steady",
+      "evidence": "steady/events.jsonl",
+      "run_id": "gxr_01m85ghq2502xam9p0",
+      "state": "PASS"
+    },
+    "P2A-02": {
+      "case": "restart",
+      "evidence": "restart/events.jsonl",
+      "run_id": "gxr_01m85gj0txa6xhaakj",
+      "state": "PASS"
+    },
+    "P2A-03": {
+      "case": "steady",
+      "evidence": "steady/events.jsonl",
+      "run_id": "gxr_01m85ghq2502xam9p0",
+      "state": "PASS"
+    },
+    "P2A-04": {
+      "case": "restart",
+      "evidence": "restart/events.jsonl",
+      "run_id": "gxr_01m85gj0txa6xhaakj",
+      "state": "PASS"
+    },
+    "P2A-05": {
+      "case": "restart",
+      "evidence": "restart/events.jsonl",
+      "run_id": "gxr_01m85gj0txa6xhaakj",
+      "state": "PASS"
+    },
+    "P2A-06": {
+      "case": "restart",
+      "evidence": "restart/events.jsonl",
+      "run_id": "gxr_01m85gj0txa6xhaakj",
+      "state": "PASS"
+    },
+    "P2A-07": {
+      "case": "restart",
+      "evidence": "restart/events.jsonl",
+      "run_id": "gxr_01m85gj0txa6xhaakj",
+      "state": "PASS"
+    },
+    "P2A-14": {
+      "case": "restart",
+      "evidence": "restart/events.jsonl",
+      "run_id": "gxr_01m85gj0txa6xhaakj",
+      "state": "PASS"
+    }
+  },
+  "offline_deterministic_completions": {
+    "restart": [
+      "admit",
+      "C1",
+      "B1",
+      "B2",
+      "B3"
+    ],
+    "steady": [
+      "B1",
+      "B2",
+      "B3"
+    ]
+  },
+  "source": {
+    "command": [
+      "/opt/conda/bin/python",
+      "acceptance/phase2a/cross_process.py",
+      "--output",
+      "/tmp/gx-phase2a-frozen-2a9ec17b2-vo09sqh4/cross-process"
+    ],
+    "commit": "2a9ec17b2b5858737838e816ee9023cafda11de0",
+    "dirty": ""
+  }
+}

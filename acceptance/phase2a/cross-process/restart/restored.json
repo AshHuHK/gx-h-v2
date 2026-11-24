@@ -1,0 +1,203 @@
+{
+  "artifacts": [
+    {
+      "artifact_ref": "gxa_01m85gj1agg9261y50",
+      "job_id": null,
+      "kind": "grid_input",
+      "rel_path": "input.json",
+      "sha256": "8287b6e7ae2061151d489e373105376a25611adf5989e3299f9e517309dfa624"
+    },
+    {
+      "artifact_ref": "gxa_01m85gj1d3gy02fe2c",
+      "job_id": null,
+      "kind": "input_manifest",
+      "rel_path": "manifests/input_4fc7910fce50c7dd.json",
+      "sha256": "4fc7910fce50c7dde332a05cb796e75cb9acd1b27e72169d4681846d72a8923f"
+    },
+    {
+      "artifact_ref": "gxa_01m85gj1mxt8rqxmnm",
+      "job_id": null,
+      "kind": "brief",
+      "rel_path": "brief/06d3e965dae5740d61a478d7.md",
+      "sha256": "06d3e965dae5740d61a478d7986248a1cc171cc4dd260f5abd526fa2c5c8d072"
+    }
+  ],
+  "completed": [
+    {
+      "event_id": 28,
+      "node": "admit"
+    },
+    {
+      "event_id": 36,
+      "node": "C1"
+    }
+  ],
+  "engine": {
+    "checkpoint_seq": 6,
+    "completed_nodes": [
+      "admit",
+      "C1"
+    ],
+    "failed_nodes": {},
+    "interrupt_ref": "gxi_01m85gj1mxsj75f5af",
+    "node": "A1",
+    "node_states": {
+      "A1": "WAITING_DECISION",
+      "A2": "BLOCKED",
+      "B1": "WAITING_JOB",
+      "B2": "BLOCKED",
+      "B3": "BLOCKED",
+      "C1": "COMPLETED",
+      "admit": "COMPLETED"
+    },
+    "node_waits": {
+      "A1": {
+        "controller_ran": {
+          "event_id": 33,
+          "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+        },
+        "interrupt": {
+          "approval_ref": null,
+          "job_refs": [],
+          "kind": "client_work",
+          "payload": {
+            "wait_for": "decision"
+          },
+          "reason": "A1 requires the planner decision",
+          "required_artifacts": [],
+          "tasks": [
+            "gxt_01m85gj1hr7h5vshqx"
+          ]
+        },
+        "interrupt_ref": "gxi_01m85gj1mxsj75f5af",
+        "next_retry_at": null,
+        "node": "A1",
+        "owner": "coordinator",
+        "reason": "A1 requires the planner decision",
+        "references": [
+          "gxt_01m85gj1hr7h5vshqx"
+        ],
+        "round": 0,
+        "since": "2026-11-24T00:51:10.621Z",
+        "status": "WAITING_DECISION"
+      },
+      "B1": {
+        "controller_ran": {
+          "event_id": 33,
+          "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+        },
+        "interrupt": {
+          "approval_ref": null,
+          "job_refs": [
+            "gxj_01m85gj1d5bzc543c2"
+          ],
+          "kind": "external_job",
+          "payload": {},
+          "reason": "B1 needs its submitted grid result",
+          "required_artifacts": [],
+          "tasks": []
+        },
+        "interrupt_ref": "gxi_01m85gj1mz9azv821c",
+        "next_retry_at": null,
+        "node": "B1",
+        "owner": "job",
+        "reason": "B1 needs its submitted grid result",
+        "references": [
+          "gxj_01m85gj1d5bzc543c2"
+        ],
+        "round": 0,
+        "since": "2026-11-24T00:51:10.623Z",
+        "status": "WAITING_JOB"
+      }
+    },
+    "pending_interrupt": {
+      "approval_ref": null,
+      "job_refs": [],
+      "kind": "client_work",
+      "payload": {
+        "wait_for": "decision"
+      },
+      "reason": "A1 requires the planner decision",
+      "required_artifacts": [],
+      "tasks": [
+        "gxt_01m85gj1hr7h5vshqx"
+      ]
+    },
+    "revision": 5,
+    "run_id": "gxr_01m85gj0txa6xhaakj",
+    "status": "WAITING_CLIENT",
+    "workflow_id": "phase2a_static",
+    "workflow_version": "1"
+  },
+  "jobs": [
+    {
+      "exit_code": null,
+      "job_id": "gxj_01m85gj1d5bzc543c2",
+      "reservation_ref": "rsv_01m85gj1eha5ey5hqn",
+      "runner_pid": 69832,
+      "runner_started": "2980093323",
+      "scheduler_ref": "runner:69832:2980093323",
+      "staging_ref": "artifacts/.staging/jobs/gxj_01m85gj1d5bzc543c2/stg_q0vmcu9q",
+      "status": "RUNNING"
+    }
+  ],
+  "outbox": [
+    {
+      "attempts": 0,
+      "consumed_at": null,
+      "outbox_id": 1,
+      "payload_json": "{\"attempts\":0,\"disconnected\":true,\"next_retry_at\":null,\"owner\":\"usage\",\"reason\":\"Codex disabled by GX_CODEX_OFFLINE\",\"reference\":\"01a20b09-0457-7362-bc24-3938819a68ad\",\"run_id\":\"gxr_01m85gj0txa6xhaakj\",\"since\":\"2026-11-24T00:51:10.649Z\"}",
+      "topic": "p0.native.wait"
+    },
+    {
+      "attempts": 0,
+      "consumed_at": null,
+      "outbox_id": 2,
+      "payload_json": "{\"attempts\":0,\"disconnected\":true,\"next_retry_at\":null,\"owner\":\"task\",\"reason\":\"Codex disabled by GX_CODEX_OFFLINE\",\"reference\":\"gxt_01m85gj1hr7h5vshqx\",\"run_id\":\"gxr_01m85gj0txa6xhaakj\",\"since\":\"2026-11-24T00:51:10.649Z\"}",
+      "topic": "p0.native.wait"
+    }
+  ],
+  "outputs": {
+    "C1": {
+      "states_at_C1": {
+        "A1": "WAITING_DECISION",
+        "A2": "BLOCKED",
+        "B1": "WAITING_JOB",
+        "B2": "BLOCKED",
+        "B3": "BLOCKED",
+        "C1": "RUNNING",
+        "admit": "COMPLETED"
+      }
+    },
+    "admit": {
+      "input_sha256": "8287b6e7ae2061151d489e373105376a25611adf5989e3299f9e517309dfa624",
+      "job_id": "gxj_01m85gj1d5bzc543c2"
+    }
+  },
+  "settlements": [
+    {
+      "event_id": 31,
+      "ref": "rsv_01m85gj1htmknfxt3x"
+    }
+  ],
+  "tasks": [
+    {
+      "attempt": 0,
+      "lease_id": null,
+      "role": "planner",
+      "status": "READY",
+      "task_id": "gxt_01m85gj1hr7h5vshqx"
+    }
+  ],
+  "usage": [
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":128}",
+      "event_id": "human:38aa2457-3da9-4041-8890-2c5768b558d7",
+      "reservation_ref": "rsv_01m85gj13p051v1ctj",
+      "state": "acknowledged",
+      "status": "HELD",
+      "thread_id": "01a20b09-0457-7362-bc24-3938819a68ad",
+      "turn_id": "01a20b09-047c-71c2-87eb-6b859a36af79"
+    }
+  ]
+}

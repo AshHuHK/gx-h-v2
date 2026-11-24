@@ -1,0 +1,255 @@
+{
+  "cpu": {
+    "driver": "time_limit",
+    "involuntary_context_switches": 1,
+    "pid": 69966,
+    "process_cpu_seconds": 0.14104499999999998,
+    "sleep_wakeups": [],
+    "status": "WAITING_CLIENT",
+    "voluntary_context_switches": 89,
+    "wall_seconds": 2.020966217
+  },
+  "official_host_pids": [],
+  "state": {
+    "artifacts": [
+      {
+        "artifact_ref": "gxa_01m85gj1agg9261y50",
+        "job_id": null,
+        "kind": "grid_input",
+        "rel_path": "input.json",
+        "sha256": "8287b6e7ae2061151d489e373105376a25611adf5989e3299f9e517309dfa624"
+      },
+      {
+        "artifact_ref": "gxa_01m85gj1d3gy02fe2c",
+        "job_id": null,
+        "kind": "input_manifest",
+        "rel_path": "manifests/input_4fc7910fce50c7dd.json",
+        "sha256": "4fc7910fce50c7dde332a05cb796e75cb9acd1b27e72169d4681846d72a8923f"
+      },
+      {
+        "artifact_ref": "gxa_01m85gj1mxt8rqxmnm",
+        "job_id": null,
+        "kind": "brief",
+        "rel_path": "brief/06d3e965dae5740d61a478d7.md",
+        "sha256": "06d3e965dae5740d61a478d7986248a1cc171cc4dd260f5abd526fa2c5c8d072"
+      },
+      {
+        "artifact_ref": "gxa_01m85gj73chpmf1r8r",
+        "job_id": "gxj_01m85gj1d5bzc543c2",
+        "kind": "synthetic_grid",
+        "rel_path": "files/observations.json",
+        "sha256": "37c0616ce45edc23ad345efeab738ef6b13228373e770e08cfda8a32f26b2280"
+      },
+      {
+        "artifact_ref": "gxa_01m85gj73dje9f5qq5",
+        "job_id": "gxj_01m85gj1d5bzc543c2",
+        "kind": "job_stdout",
+        "rel_path": "logs/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "artifact_ref": "gxa_01m85gj73eatxsd7rh",
+        "job_id": "gxj_01m85gj1d5bzc543c2",
+        "kind": "job_stderr",
+        "rel_path": "logs/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "artifact_ref": "gxa_01m85gj74sz53c10cc",
+        "job_id": null,
+        "kind": "phase2a_summary",
+        "rel_path": "summary.json",
+        "sha256": "e74cb2b514506a6fcec98050bf678f24893b765b6e7c4ab3183ea196b495fccd"
+      }
+    ],
+    "completed": [
+      {
+        "event_id": 28,
+        "node": "admit"
+      },
+      {
+        "event_id": 36,
+        "node": "C1"
+      },
+      {
+        "event_id": 46,
+        "node": "B1"
+      },
+      {
+        "event_id": 48,
+        "node": "B2"
+      },
+      {
+        "event_id": 49,
+        "node": "B3"
+      }
+    ],
+    "engine": {
+      "checkpoint_seq": 11,
+      "completed_nodes": [
+        "admit",
+        "C1",
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "failed_nodes": {},
+      "interrupt_ref": "gxi_01m85gj1mxsj75f5af",
+      "node": "A1",
+      "node_states": {
+        "A1": "WAITING_DECISION",
+        "A2": "BLOCKED",
+        "B1": "COMPLETED",
+        "B2": "COMPLETED",
+        "B3": "COMPLETED",
+        "C1": "COMPLETED",
+        "admit": "COMPLETED"
+      },
+      "node_waits": {
+        "A1": {
+          "controller_ran": {
+            "event_id": 33,
+            "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+          },
+          "interrupt": {
+            "approval_ref": null,
+            "job_refs": [],
+            "kind": "client_work",
+            "payload": {
+              "wait_for": "decision"
+            },
+            "reason": "A1 requires the planner decision",
+            "required_artifacts": [],
+            "tasks": [
+              "gxt_01m85gj1hr7h5vshqx"
+            ]
+          },
+          "interrupt_ref": "gxi_01m85gj1mxsj75f5af",
+          "next_retry_at": null,
+          "node": "A1",
+          "owner": "coordinator",
+          "reason": "A1 requires the planner decision",
+          "references": [
+            "gxt_01m85gj1hr7h5vshqx"
+          ],
+          "round": 0,
+          "since": "2026-11-24T00:51:10.621Z",
+          "status": "WAITING_DECISION"
+        }
+      },
+      "pending_interrupt": {
+        "approval_ref": null,
+        "job_refs": [],
+        "kind": "client_work",
+        "payload": {
+          "wait_for": "decision"
+        },
+        "reason": "A1 requires the planner decision",
+        "required_artifacts": [],
+        "tasks": [
+          "gxt_01m85gj1hr7h5vshqx"
+        ]
+      },
+      "revision": 10,
+      "run_id": "gxr_01m85gj0txa6xhaakj",
+      "status": "WAITING_CLIENT",
+      "workflow_id": "phase2a_static",
+      "workflow_version": "1"
+    },
+    "jobs": [
+      {
+        "exit_code": 0,
+        "job_id": "gxj_01m85gj1d5bzc543c2",
+        "reservation_ref": "rsv_01m85gj1eha5ey5hqn",
+        "runner_pid": 69832,
+        "runner_started": "2980093323",
+        "scheduler_ref": "runner:69832:2980093323",
+        "staging_ref": "artifacts/.staging/jobs/gxj_01m85gj1d5bzc543c2/stg_q0vmcu9q",
+        "status": "SUCCEEDED"
+      }
+    ],
+    "outbox": [
+      {
+        "attempts": 0,
+        "consumed_at": null,
+        "outbox_id": 1,
+        "payload_json": "{\"attempts\":0,\"disconnected\":true,\"next_retry_at\":null,\"owner\":\"usage\",\"reason\":\"Codex disabled by GX_CODEX_OFFLINE\",\"reference\":\"01a20b09-0457-7362-bc24-3938819a68ad\",\"run_id\":\"gxr_01m85gj0txa6xhaakj\",\"since\":\"2026-11-24T00:51:10.649Z\"}",
+        "topic": "p0.native.wait"
+      },
+      {
+        "attempts": 0,
+        "consumed_at": null,
+        "outbox_id": 2,
+        "payload_json": "{\"attempts\":0,\"disconnected\":true,\"next_retry_at\":null,\"owner\":\"task\",\"reason\":\"Codex disabled by GX_CODEX_OFFLINE\",\"reference\":\"gxt_01m85gj1hr7h5vshqx\",\"run_id\":\"gxr_01m85gj0txa6xhaakj\",\"since\":\"2026-11-24T00:51:10.649Z\"}",
+        "topic": "p0.native.wait"
+      },
+      {
+        "attempts": 0,
+        "consumed_at": "2026-11-24T00:51:16.231Z",
+        "outbox_id": 3,
+        "payload_json": "{\"event_id\":42,\"path_id\":null,\"purpose\":\"workflow_step\",\"run_id\":\"gxr_01m85gj0txa6xhaakj\",\"status\":\"SUCCEEDED\",\"subject\":\"gxj_01m85gj1d5bzc543c2\",\"task_id\":null}",
+        "topic": "job.terminal"
+      }
+    ],
+    "outputs": {
+      "B1": {
+        "job_id": "gxj_01m85gj1d5bzc543c2",
+        "raw_ref": "gxa_01m85gj73chpmf1r8r"
+      },
+      "B2": {
+        "ref": "gxa_01m85gj74sz53c10cc",
+        "sha256": "e74cb2b514506a6fcec98050bf678f24893b765b6e7c4ab3183ea196b495fccd"
+      },
+      "B3": {
+        "job_id": "gxj_01m85gj1d5bzc543c2",
+        "max_score": -9,
+        "raw_ref": "gxa_01m85gj73chpmf1r8r"
+      },
+      "C1": {
+        "states_at_C1": {
+          "A1": "WAITING_DECISION",
+          "A2": "BLOCKED",
+          "B1": "WAITING_JOB",
+          "B2": "BLOCKED",
+          "B3": "BLOCKED",
+          "C1": "RUNNING",
+          "admit": "COMPLETED"
+        }
+      },
+      "admit": {
+        "input_sha256": "8287b6e7ae2061151d489e373105376a25611adf5989e3299f9e517309dfa624",
+        "job_id": "gxj_01m85gj1d5bzc543c2"
+      }
+    },
+    "settlements": [
+      {
+        "event_id": 31,
+        "ref": "rsv_01m85gj1htmknfxt3x"
+      },
+      {
+        "event_id": 43,
+        "ref": "rsv_01m85gj1eha5ey5hqn"
+      }
+    ],
+    "tasks": [
+      {
+        "attempt": 0,
+        "lease_id": null,
+        "role": "planner",
+        "status": "READY",
+        "task_id": "gxt_01m85gj1hr7h5vshqx"
+      }
+    ],
+    "usage": [
+      {
+        "amounts_json": "{\"api_calls\":1,\"tokens\":128}",
+        "event_id": "human:38aa2457-3da9-4041-8890-2c5768b558d7",
+        "reservation_ref": "rsv_01m85gj13p051v1ctj",
+        "state": "acknowledged",
+        "status": "HELD",
+        "thread_id": "01a20b09-0457-7362-bc24-3938819a68ad",
+        "turn_id": "01a20b09-047c-71c2-87eb-6b859a36af79"
+      }
+    ]
+  }
+}

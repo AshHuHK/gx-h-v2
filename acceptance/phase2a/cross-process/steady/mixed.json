@@ -1,0 +1,188 @@
+{
+  "artifacts": [
+    {
+      "artifact_ref": "gxa_01m85ghqdjqy7vek8v",
+      "job_id": null,
+      "kind": "grid_input",
+      "rel_path": "input.json",
+      "sha256": "8287b6e7ae2061151d489e373105376a25611adf5989e3299f9e517309dfa624"
+    },
+    {
+      "artifact_ref": "gxa_01m85ghqg3d643tz18",
+      "job_id": null,
+      "kind": "input_manifest",
+      "rel_path": "manifests/input_1d23de1ccbaef150.json",
+      "sha256": "1d23de1ccbaef1506d52434631d4202165bb4e0563276eda1ef02942905eee6d"
+    },
+    {
+      "artifact_ref": "gxa_01m85ghqrjdwrnj8bp",
+      "job_id": null,
+      "kind": "brief",
+      "rel_path": "brief/59b40c256611e1b9c853695e.md",
+      "sha256": "59b40c256611e1b9c853695eb404e0b6bc93871fc082a4ca09b5b7695c4d2af9"
+    }
+  ],
+  "completed": [
+    {
+      "event_id": 28,
+      "node": "admit"
+    },
+    {
+      "event_id": 36,
+      "node": "C1"
+    }
+  ],
+  "engine": {
+    "checkpoint_seq": 6,
+    "completed_nodes": [
+      "admit",
+      "C1"
+    ],
+    "failed_nodes": {},
+    "interrupt_ref": "gxi_01m85ghqrkw5bxx6zh",
+    "node": "A1",
+    "node_states": {
+      "A1": "WAITING_DECISION",
+      "A2": "BLOCKED",
+      "B1": "WAITING_JOB",
+      "B2": "BLOCKED",
+      "B3": "BLOCKED",
+      "C1": "COMPLETED",
+      "admit": "COMPLETED"
+    },
+    "node_waits": {
+      "A1": {
+        "controller_ran": {
+          "event_id": 33,
+          "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+        },
+        "interrupt": {
+          "approval_ref": null,
+          "job_refs": [],
+          "kind": "client_work",
+          "payload": {
+            "wait_for": "decision"
+          },
+          "reason": "A1 requires the planner decision",
+          "required_artifacts": [],
+          "tasks": [
+            "gxt_01m85ghqng3ztj4tkb"
+          ]
+        },
+        "interrupt_ref": "gxi_01m85ghqrkw5bxx6zh",
+        "next_retry_at": null,
+        "node": "A1",
+        "owner": "coordinator",
+        "reason": "A1 requires the planner decision",
+        "references": [
+          "gxt_01m85ghqng3ztj4tkb"
+        ],
+        "round": 0,
+        "since": "2026-11-24T00:51:00.499Z",
+        "status": "WAITING_DECISION"
+      },
+      "B1": {
+        "controller_ran": {
+          "event_id": 33,
+          "limits_sha256": "41cd57621bf69b52e1f34446f091aa9c8c574e570ba0613f68bfbc259ff37d89"
+        },
+        "interrupt": {
+          "approval_ref": null,
+          "job_refs": [
+            "gxj_01m85ghqg773hamdtj"
+          ],
+          "kind": "external_job",
+          "payload": {},
+          "reason": "B1 needs its submitted grid result",
+          "required_artifacts": [],
+          "tasks": []
+        },
+        "interrupt_ref": "gxi_01m85ghqrm4pyst5vk",
+        "next_retry_at": null,
+        "node": "B1",
+        "owner": "job",
+        "reason": "B1 needs its submitted grid result",
+        "references": [
+          "gxj_01m85ghqg773hamdtj"
+        ],
+        "round": 0,
+        "since": "2026-11-24T00:51:00.500Z",
+        "status": "WAITING_JOB"
+      }
+    },
+    "pending_interrupt": {
+      "approval_ref": null,
+      "job_refs": [],
+      "kind": "client_work",
+      "payload": {
+        "wait_for": "decision"
+      },
+      "reason": "A1 requires the planner decision",
+      "required_artifacts": [],
+      "tasks": [
+        "gxt_01m85ghqng3ztj4tkb"
+      ]
+    },
+    "revision": 5,
+    "run_id": "gxr_01m85ghq2502xam9p0",
+    "status": "WAITING_CLIENT",
+    "workflow_id": "phase2a_static",
+    "workflow_version": "1"
+  },
+  "jobs": [
+    {
+      "exit_code": null,
+      "job_id": "gxj_01m85ghqg773hamdtj",
+      "reservation_ref": "rsv_01m85ghqjdmmcmf0dt",
+      "runner_pid": 69331,
+      "runner_started": "2980092311",
+      "scheduler_ref": "runner:69331:2980092311",
+      "staging_ref": "artifacts/.staging/jobs/gxj_01m85ghqg773hamdtj/stg_4xvxh4pw",
+      "status": "SUBMITTED"
+    }
+  ],
+  "outbox": [],
+  "outputs": {
+    "C1": {
+      "states_at_C1": {
+        "A1": "WAITING_DECISION",
+        "A2": "BLOCKED",
+        "B1": "WAITING_JOB",
+        "B2": "BLOCKED",
+        "B3": "BLOCKED",
+        "C1": "RUNNING",
+        "admit": "COMPLETED"
+      }
+    },
+    "admit": {
+      "input_sha256": "8287b6e7ae2061151d489e373105376a25611adf5989e3299f9e517309dfa624",
+      "job_id": "gxj_01m85ghqg773hamdtj"
+    }
+  },
+  "settlements": [
+    {
+      "event_id": 31,
+      "ref": "rsv_01m85ghqnje36nq8xb"
+    }
+  ],
+  "tasks": [
+    {
+      "attempt": 0,
+      "lease_id": null,
+      "role": "planner",
+      "status": "READY",
+      "task_id": "gxt_01m85ghqng3ztj4tkb"
+    }
+  ],
+  "usage": [
+    {
+      "amounts_json": "{\"api_calls\":1,\"tokens\":128}",
+      "event_id": "human:1753ad7e-01c1-4eb2-93f6-2154f4d92668",
+      "reservation_ref": "rsv_01m85ghqcx2gv3bav3",
+      "state": "acknowledged",
+      "status": "HELD",
+      "thread_id": "01a20b08-dd69-7481-b680-6f42b10cbbff",
+      "turn_id": "01a20b08-dda2-7881-9ebe-4777622d6052"
+    }
+  ]
+}

@@ -1,0 +1,329 @@
+{
+  "errors": [],
+  "operations": {
+    "at2-checkpoint": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v3/staging/cold_fixture.py",
+        "--work",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/at2-checkpoint.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:12.202197+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:00.704864+00:00"
+    },
+    "at2-cold": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v3/staging/replay_checkpoint.py",
+        "--baseline",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/at2-checkpoint.json",
+        "--candidate",
+        "2a9ec17b2b5858737838e816ee9023cafda11de0",
+        "--audit",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2-replay",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/at2-cold.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:20.281713+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:12.204864+00:00"
+    },
+    "at2-preservation": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/historical_migration.py",
+        "--install",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release",
+        "--source",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/var/v3-staging/frozen-a05dcef/snapshot/project/gx.db",
+        "--baseline",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/acceptance/v3/staging/cold-baseline.json",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/at2-preservation.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:52:16.374426+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:52:15.649028+00:00"
+    },
+    "brief-replay": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/brief_replay.py",
+        "--states",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/p1-2476f2b-xhigh",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/brief-replay.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:52.977997+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:51.823582+00:00"
+    },
+    "brief-wire": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/brief_wire.py",
+        "--b2",
+        "a691a4012d16bf813eaaf652a2cabc09881f8f2a",
+        "--b3",
+        "2a9ec17b2b5858737838e816ee9023cafda11de0",
+        "--work",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/brief-wire",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/brief-wire.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:52:18.856832+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:52.979745+00:00"
+    },
+    "child-lost-start": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/b2/role_probe.py",
+        "--binary",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/child-lost-start.json",
+        "--drop-cold-start"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:52:15.647025+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:52:09.419170+00:00"
+    },
+    "child-scope": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/b2/role_probe.py",
+        "--binary",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/child-scope.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:52:09.417012+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:52:03.258048+00:00"
+    },
+    "extra-child-observation": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/standalone_child.py",
+        "--stage",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/extra-child"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:52:44.747014+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:52:16.376401+00:00"
+    },
+    "inherited-case-ids": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v3/compare_regression.py",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/suite"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:55:52.058582+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:55:51.862947+00:00"
+    },
+    "public-deterministic": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/public_grid.py",
+        "--commit",
+        "2a9ec17b2b5858737838e816ee9023cafda11de0",
+        "--mode",
+        "deterministic",
+        "--work",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/public-deterministic",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/public-deterministic.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:52.090538+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:47.925602+00:00"
+    },
+    "public-repair": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/public_grid.py",
+        "--commit",
+        "2a9ec17b2b5858737838e816ee9023cafda11de0",
+        "--mode",
+        "repair",
+        "--work",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/public-repair",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/public-repair.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:52:01.912344+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:57.022018+00:00"
+    },
+    "public-review": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/public_grid.py",
+        "--commit",
+        "2a9ec17b2b5858737838e816ee9023cafda11de0",
+        "--mode",
+        "review",
+        "--work",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/public-review",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/public-review.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:57.020009+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:52.092548+00:00"
+    },
+    "schema-transport": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/schema_transport.py"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:52:03.256012+00:00",
+      "returncode": 1,
+      "started_utc": "2026-11-24T00:52:01.914264+00:00"
+    },
+    "suite": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v21/regression.py",
+        "--commit",
+        "2a9ec17b2b5858737838e816ee9023cafda11de0",
+        "--native",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/suite"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:55:51.858361+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:00.703802+00:00"
+    },
+    "terminal-code-mode": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_code_mode_probe.py",
+        "--catalog",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/catalog.json",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/terminal-code-mode.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:29.388663+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:20.284281+00:00"
+    },
+    "terminal-crash": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_crash_concurrency.py",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/terminal-crash.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:41.893705+00:00",
+      "returncode": 1,
+      "started_utc": "2026-11-24T00:51:39.827176+00:00"
+    },
+    "terminal-late": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_late_receipts.py",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/terminal-late.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:42.158178+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:41.895694+00:00"
+    },
+    "terminal-protocol": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_protocol_probe.py",
+        "--repetitions",
+        "100",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/terminal-protocol.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:47.923510+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:00.704340+00:00"
+    },
+    "terminal-public-crash": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_official_crash.py",
+        "--public-only",
+        "--expect",
+        "corrected",
+        "--commit",
+        "2a9ec17b2b5858737838e816ee9023cafda11de0",
+        "--work",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/terminal-public-crash",
+        "--out",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/terminal-public-crash.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:51.821714+00:00",
+      "returncode": 1,
+      "started_utc": "2026-11-24T00:51:42.160006+00:00"
+    },
+    "terminal-stream": {
+      "argv": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/.venv/bin/python",
+        "-B",
+        "acceptance/v31/terminal_stream_probe.py",
+        "--catalog",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/catalog.json",
+        "--output",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/terminal-stream.json"
+      ],
+      "cwd": "/tmp/gx-p2a-reg-0s7_m2lh/release",
+      "finished_utc": "2026-11-24T00:51:39.825342+00:00",
+      "returncode": 0,
+      "started_utc": "2026-11-24T00:51:29.390630+00:00"
+    }
+  },
+  "passed": false,
+  "phase": "full",
+  "revision": "2a9ec17b2b5858737838e816ee9023cafda11de0",
+  "tracked_product_changes": ""
+}

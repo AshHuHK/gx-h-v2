@@ -1,0 +1,112 @@
+{
+  "all_required_gates_passed": false,
+  "broad_regression": {
+    "generator_returncode": 0,
+    "inherited_case_ids": {
+      "p0-focused": {
+        "baseline": 127,
+        "changed_skips": [],
+        "measured": 127,
+        "missing": []
+      },
+      "python-full": {
+        "baseline": 446,
+        "changed_skips": [],
+        "measured": 465,
+        "missing": []
+      }
+    },
+    "node": {
+      "cancelled": 0,
+      "fail": 0,
+      "pass": 2,
+      "skipped": 0,
+      "tests": 2
+    },
+    "official_existing": 17,
+    "official_focused": 13,
+    "p0": {
+      "errors": 0,
+      "failure_details": [],
+      "failures": 0,
+      "passed": 127,
+      "skip_details": [],
+      "skipped": 0,
+      "total": 127
+    },
+    "python": {
+      "errors": 0,
+      "failure_details": [],
+      "failures": 0,
+      "passed": 461,
+      "skip_details": [
+        "test_gx_run_uses_sdk_model_then_returns_to_native_decision (test_dsh_activity.DSHActivityTest.test_gx_run_uses_sdk_model_then_returns_to_native_decision) ... skipped 'install runtime/dsh-sdk/.venv first'",
+        "test_reported_model_mismatch_keeps_response_and_refuses_delivery (test_dsh_activity.DSHActivityTest.test_reported_model_mismatch_keeps_response_and_refuses_delivery) ... skipped 'install runtime/dsh-sdk/.venv first'",
+        "test_close_cold_resume_and_observe_prior_evidence (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_cold_resume_and_observe_prior_evidence) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'",
+        "test_close_while_recorded_response_is_pending (test_dsh_runtime.DeepSeekRuntimeProcess.test_close_while_recorded_response_is_pending) ... skipped 'install the optional DSH Python SDK/runtime wheel pair'"
+      ],
+      "skipped": 4,
+      "total": 465
+    }
+  },
+  "evidence_class": "SCRIPTED and OFFICIAL_HOST_LOOPBACK",
+  "failures": {
+    "schema-transport": 1,
+    "terminal-crash": 1,
+    "terminal-public-crash": 1
+  },
+  "gates": {
+    "P2A-09": {
+      "evidence": [
+        "batch/terminal-crash.log",
+        "batch/terminal-public-crash.json"
+      ],
+      "failed_operations": [
+        "terminal-crash",
+        "terminal-public-crash"
+      ],
+      "passed": false,
+      "terminal_protocol_trials": 204
+    },
+    "P2A-10": {
+      "baseline_reproduction": "schema-baseline/invocation.json",
+      "candidate_error": "batch/schema-transport.log",
+      "failed_operation": "schema-transport",
+      "passed": false,
+      "public_same_attempt_repair": true
+    },
+    "P2A-11": {
+      "evidence": [
+        "batch/child-scope.json",
+        "batch/child-lost-start.json",
+        "batch/inherited-case-ids.json"
+      ],
+      "passed": true
+    },
+    "P2A-12": {
+      "evidence": [
+        "batch/brief-replay.json",
+        "batch/brief-wire.json"
+      ],
+      "passed": true
+    },
+    "P2A-13": {
+      "evidence": [
+        "batch/public-deterministic.json",
+        "batch/public-review.json",
+        "batch/at2-cold.json",
+        "batch/at2-preservation.json"
+      ],
+      "passed": true
+    }
+  },
+  "supplemental_combined_loss": {
+    "actual_exit": 1,
+    "baseline": "../preflight.json",
+    "evidence": "batch/extra-child/observation.json",
+    "meter_snapshots": 5,
+    "observed_status": "COLD_SETTLEMENT_TIMEOUT"
+  },
+  "tested_commit": "2a9ec17b2b5858737838e816ee9023cafda11de0",
+  "tested_git_tree": "8910ee426431dfad74a82def84e9b5f7bf391142"
+}

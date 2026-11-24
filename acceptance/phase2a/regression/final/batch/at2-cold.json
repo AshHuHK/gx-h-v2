@@ -1,0 +1,160 @@
+{
+  "binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "candidate": {
+    "files": 476,
+    "git_commit": "2a9ec17b2b5858737838e816ee9023cafda11de0",
+    "runtime_tree_sha256": "2f28bda269b0b217e06f7a6fbc0ff9e1bf3ccd8a2642da025436ede249fc33fd"
+  },
+  "candidate_p0_migrations": {
+    "p0.migration.driver.sql": "6ea8bc262d10989cad78bf2eed81afb454d5681d98a63179f7f7bca3fd8cf70d",
+    "p0.migration.intent.sql": "58dd8f979012a67f51fe7e9a2d6846c638ca150279cad1445c25aa61f48d9837",
+    "p0.migration.manifest.sql": "c413c17493c3cd496ef69c8347ccc9abcd255ff234a48c5afbf4288da8256910",
+    "p0.migration.root_child_usage.sql": "1d3778ab18d00c23435584f246a2078bb455da90572f5eef058863effbf65f34",
+    "p0.migration.root_creations.sql": "1135c0f32c4fdefd206c8e5c198121c5ee8b0fa6417b67d50324c9fc0e8b6d5b",
+    "p0.migration.root_delivery.sql": "fb6c77d216fedfebd0b4de6e8aef1c828177c3c5e6e2e97c13146f4835b97526",
+    "p0.migration.root_usage_receipts.sql": "4a4c987c09886f5085b1b33629708b7c33bd96716dc9dd549f61977d798a3110",
+    "p0.migration.root_waking_activity.sql": "9998c13945187456c24ef34f0b7bf7f504092f06729bd96943cc814315c5bacb",
+    "p0.migration.roots.sql": "3884869aef4aa0a56fa23f5d0cdcdc98200578f48f9d0f77de221d5d7d3ab194",
+    "p0.migration.roots_profiles.sql": "2024cc33321616f8bfc72251bb804ebccdb5f759196748abfb20557e0789ed19",
+    "p0.migration.science.sql": "a1d5047107e8c605034ae55064ca6ffcfe613adbeb06942484c12f0ce231332e",
+    "p0.migration.team_admission.sql": "fc6db90c6658eb46bf7f89f386f44fb44e275642b7c408f5a6e1c971c99b6c7a",
+    "p0.migration.waits.sql": "8be9feb5ab27e66f1c057039581d579c679581bffca8e8254c68c6df7c1f8be6",
+    "p0.migration.workspace.sql": "bef768bae4843ae37b92b7488e1656d8c8af98eaa61a6c26dd9c74298e5bcb6f",
+    "p0.migration.y_v21_legacy_meter.sql": "6486b351f15d887070c3c431e74d47068e60bed62de05b37ba7a442a6d300d36",
+    "p0.migration.z_v21_metering.sql": "7950b2bf25cb4c48d0dafb833f19b8c22bf035faea8b71e205799735c9bcfa7e",
+    "p0.migration.z_v21_response_receipts.sql": "3714281fa0410193c6862ce089f273d6914065bf35678cc3393d4cd49d676648",
+    "p0.migration.zz_v21_activity.sql": "9c1429b03e267115a14d61eeb161350c0fb320884317bd6a13d7e37695b24d4a",
+    "p0.migration.zz_v21_compute.sql": "96b341bc31c7c1729cbdf8206c858ffe3e1dd5f2da338b07c9b8bc2187068dad",
+    "p0.migration.zz_v21_historical_meter.sql": "5968e58b9c7f688cfd8eabbe51a69164f02af390be080feef89cd92348db68e0",
+    "p0.migration.zz_v31_grid_evaluator.sql": "101010a9a9ae679c5970e4c0ced7416a1d870c627b68d1944604cedc1c2e1262",
+    "p0.migration.zz_v31_response_attribution.sql": "8c052542e898fdb7d0259e40064e9fb0e2a6d955d94fa56328844d549c52e5ef",
+    "p0.migration.zz_v31_terminal_products.sql": "b05a1785e90d013c9f023207c1e65d8fb1a779780e4e5d07c51b5d2684376a4e"
+  },
+  "command": [
+    ".venv/bin/python",
+    "-B",
+    "acceptance/v3/staging/replay_checkpoint.py",
+    "--baseline",
+    "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/at2-checkpoint.json",
+    "--candidate",
+    "2a9ec17b2b5858737838e816ee9023cafda11de0",
+    "--audit",
+    "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2-replay",
+    "--output",
+    "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx_v_3_2_persistent/acceptance/phase2a/regression/final/batch/at2-cold.json"
+  ],
+  "commands": [
+    {
+      "command": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/install/bin/gx-p0",
+        "stop",
+        "--state",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/project"
+      ],
+      "exit_code": 0,
+      "new_fixture_responses": 0,
+      "stage": "candidate-write",
+      "status": "PAUSED"
+    },
+    {
+      "command": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/install/bin/gx-p0",
+        "status",
+        "--state",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/project"
+      ],
+      "exit_code": 0,
+      "new_fixture_responses": 0,
+      "stage": "restored-v2.1",
+      "status": "PAUSED"
+    },
+    {
+      "command": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/install/bin/gx-p0",
+        "run",
+        "--state",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/project",
+        "--timeout",
+        "10"
+      ],
+      "exit_code": 0,
+      "new_fixture_responses": 0,
+      "stage": "restored-v2.1",
+      "status": "PAUSED"
+    },
+    {
+      "command": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/install/bin/gx-p0",
+        "resume",
+        "--state",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/project",
+        "--timeout",
+        "100"
+      ],
+      "exit_code": 0,
+      "new_fixture_responses": 24,
+      "stage": "candidate-cold",
+      "status": "COMPLETED"
+    },
+    {
+      "command": [
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/install/bin/gx-p0",
+        "run",
+        "--state",
+        "/tmp/gx-p2a-reg-0s7_m2lh/release/var/at2/project",
+        "--timeout",
+        "10"
+      ],
+      "exit_code": 0,
+      "new_fixture_responses": 0,
+      "stage": "candidate-terminal",
+      "status": "COMPLETED"
+    }
+  ],
+  "completion": {
+    "accepted_decisions": 3,
+    "cpu_jobs": 4,
+    "final_facts_sha256": "1c6e7f5d14f4d87af93e2535a256da99b8ee9554ae4ca045fe749541e1152d0f",
+    "native_turns": 7,
+    "original_job_receipts_equal": true,
+    "remaining_reservations": {
+      "api_calls": 0,
+      "cpu_seconds": 0,
+      "job_submissions": 0,
+      "tokens": 0,
+      "worker_tasks": 0
+    },
+    "report_ref": "gxa_01m85gja2a6dpkv2yf",
+    "settled_budget": {
+      "api_calls": 7,
+      "cpu_seconds": 4,
+      "job_submissions": 4,
+      "tokens": 1400,
+      "worker_tasks": 6
+    },
+    "submissions": 6,
+    "terminal_replay_extra_calls": 0,
+    "total_fixture_responses_including_source": 40
+  },
+  "ended_utc": "2026-11-24T00:51:20.236833+00:00",
+  "exit_code": 0,
+  "mode": "official Codex CLI; synthetic localhost Responses; detached CPU Jobs",
+  "result": "PASS",
+  "rollback_verified": true,
+  "source": "acceptance/v3/staging/replay_checkpoint.py",
+  "source_commit": "a05dcef64522fbbbc12120b1d78da518e6886b10",
+  "source_snapshot": {
+    "db_sha256": "e6272ab4a1d24ea4abb75b2e4b9b5fd86e74a8cfa1b9d85ca138fed81adfa218",
+    "original_facts_sha256": "ee00d4a89c4b9c6d75d1aacf9acd132a5c29230883900322ba945de51c528f7e",
+    "run": {
+      "agent_policy_sha256": "177311eb936f5705d640c7a7804aa4bcf448b1eb68053e3cb365c55bbc8661db",
+      "run_id": "gxr_01m85ghs17pjyr89vk",
+      "status": "PAUSED",
+      "workflow_id": "science_grid",
+      "workflow_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467",
+      "workflow_version": "2"
+    }
+  },
+  "started_utc": "2026-11-24T00:51:12.330136+00:00",
+  "test": "writable candidate open, rollback and legacy run cold continuation"
+}

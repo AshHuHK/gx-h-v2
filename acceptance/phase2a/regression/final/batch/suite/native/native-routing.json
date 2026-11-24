@@ -1,0 +1,161 @@
+{
+  "run": "gxr_01m85gr1fqjktz18mb",
+  "initialize": [
+    {
+      "experimentalApi": true,
+      "optOutNotificationMethods": [
+        "item/agentMessage/delta",
+        "item/plan/delta",
+        "item/reasoning/textDelta",
+        "item/reasoning/summaryTextDelta",
+        "item/commandExecution/outputDelta",
+        "item/fileChange/outputDelta"
+      ]
+    }
+  ],
+  "native_turn": "01a20b0c-06f8-7900-a5a4-3b3f08280a69",
+  "notification_counts": {
+    "thread/started": 1,
+    "thread/status/changed": 2,
+    "turn/started": 1,
+    "rawResponseItem/completed": 10,
+    "item/started": 3,
+    "item/completed": 3,
+    "rawResponse/completed": 2,
+    "thread/tokenUsage/updated": 2,
+    "account/rateLimits/updated": 2,
+    "thread/readState/changed": 1,
+    "turn/completed": 1
+  },
+  "callbacks": [
+    {
+      "thread_id": "01a20b0c-06d5-7d71-baab-99786560604b",
+      "turn_id": "01a20b0c-06f8-7900-a5a4-3b3f08280a69",
+      "call_id": "response-1",
+      "name": "gx_probe_identity"
+    }
+  ],
+  "provider_rows": [
+    {
+      "provider": "local_probe",
+      "bucket": "codex",
+      "model": null,
+      "primary_json": "{\"usedPercent\": 100, \"resetsAt\": 1795481727}",
+      "secondary_json": null,
+      "blocked_until": null,
+      "source": "account/rateLimits/updated",
+      "observed_at": "2026-11-24T00:54:27.499Z"
+    }
+  ],
+  "admitted_ledger": {
+    "budget_ref": "gxb_01m85gr1fpa0zp1v7c",
+    "parent_ref": null,
+    "run_id": null,
+    "limits": {
+      "api_calls": 25,
+      "tokens": 10000
+    },
+    "spent": {
+      "api_calls": 1,
+      "tokens": 70
+    },
+    "reserved": {},
+    "available": {
+      "api_calls": 24,
+      "tokens": 9930
+    },
+    "reservations": [
+      {
+        "reservation_ref": "rsv_01m85gr1qmv26d0b4j",
+        "subject_kind": "native_turn",
+        "subject_id": "human:one",
+        "amounts": {
+          "api_calls": 1,
+          "tokens": 100
+        },
+        "status": "SETTLED",
+        "created_at": "2026-11-24T00:54:27.316Z",
+        "settled_at": "2026-11-24T00:54:27.508Z"
+      }
+    ],
+    "open": true,
+    "funding": null
+  },
+  "blocked_task": {
+    "code": "HOLD_ACTIVE",
+    "details": {
+      "reason": "provider_backoff",
+      "provider": "local_probe",
+      "resets_at": 1795481727,
+      "event_id": "claim:gxt_01m85gr1xqtd9pdfts"
+    }
+  },
+  "task_after_refusal": {
+    "status": "READY",
+    "attempt": 0,
+    "lease_id": null
+  },
+  "cold_existing_root": {
+    "code": "HOLD_ACTIVE",
+    "details": {
+      "reason": "provider_backoff",
+      "provider": "local_probe",
+      "resets_at": 1795481727,
+      "event_id": "human:two"
+    }
+  },
+  "blocked_model_calls": 0,
+  "blocked_ledger": {
+    "budget_ref": "gxb_01m85gr1fpa0zp1v7c",
+    "parent_ref": null,
+    "run_id": null,
+    "limits": {
+      "api_calls": 25,
+      "tokens": 10000
+    },
+    "spent": {
+      "api_calls": 1,
+      "tokens": 70
+    },
+    "reserved": {},
+    "available": {
+      "api_calls": 24,
+      "tokens": 9930
+    },
+    "reservations": [
+      {
+        "reservation_ref": "rsv_01m85gr1qmv26d0b4j",
+        "subject_kind": "native_turn",
+        "subject_id": "human:one",
+        "amounts": {
+          "api_calls": 1,
+          "tokens": 100
+        },
+        "status": "SETTLED",
+        "created_at": "2026-11-24T00:54:27.316Z",
+        "settled_at": "2026-11-24T00:54:27.508Z"
+      }
+    ],
+    "open": true,
+    "funding": null
+  },
+  "after_reset_model_calls": 1,
+  "followup": {
+    "succeeded": true,
+    "turn": "01a20b0c-08cd-7a60-9861-151e6241202a"
+  },
+  "checks": {
+    "production_init_exactly_six": true,
+    "streamed_text_delta_filtered": true,
+    "turn_item_usage_rate_and_raw_preserved": true,
+    "actual_tool_callback": true,
+    "admitted_turn_drained": true,
+    "new_task_rejected_before_claim": true,
+    "cold_existing_root_backoff": true,
+    "admitted_after_provider_reset": true
+  },
+  "version": "codex-cli 0.169.0",
+  "sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "schema_sha256": "ab77d6681eb73d62b7b0d736a2416ac3a43bd9dcf668b5eb7c7a47db76e20f17",
+  "scope": "official app server, local scripted provider, actual GX"
+}

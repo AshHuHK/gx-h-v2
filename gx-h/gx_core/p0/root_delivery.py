@@ -211,7 +211,9 @@ class RootDelivery:
         elif method == "rawResponse/completed":
             rid = params.get("responseId")
             tokens = _token_count((params.get("usage") or {}).get("totalTokens"))
-            with store.transaction(self.conn):
+            with store.transaction(
+                self.conn, transaction_owner="Usage", operation="record_response", run_id=self.run_id,
+            ):
                 metering.response(self.conn,thread_id,turn_id,rid,tokens)
                 owner = self.conn.execute("SELECT root_id,metadata_verified FROM p0_native_child_meters WHERE child_id=?",
                                           (thread_id,)).fetchone()
@@ -249,7 +251,9 @@ class RootDelivery:
             "(SELECT 1 FROM p0_root_terminals e WHERE e.thread_id=d.thread_id AND e.turn_id=d.turn_id)))",
             (thread_id,)).fetchall()
         targets = {row["turn_id"] for row in pending}
-        with store.transaction(self.conn):
+        with store.transaction(
+            self.conn, transaction_owner="RootDelivery", operation="attach_thread", run_id=self.run_id,
+        ):
             for turn in thread.get("turns", []):
                 if turn["id"] in targets or None in targets:
                     self._history(thread_id, turn)
@@ -464,7 +468,9 @@ class RootDelivery:
                                                        "key": exhausted["key"]}) from exc
 
     def _prepare(self, thread_id, text, event_id, human, interrupt, client_id, active):
-        with store.transaction(self.conn):
+        with store.transaction(
+            self.conn, transaction_owner="RootDelivery", operation="prepare_delivery", run_id=self.run_id,
+        ):
             try:
                 return self._try_prepare(thread_id, text, event_id, human, interrupt, client_id, active)
             except (BudgetExceeded, HoldActive) as exc:
@@ -479,7 +485,9 @@ class RootDelivery:
         raise denied
 
     def _try_prepare(self, thread_id, text, event_id, human, interrupt, client_id, active):
-        with store.transaction(self.conn):
+        with store.transaction(
+            self.conn, transaction_owner="RootDelivery", operation="reserve_delivery", run_id=self.run_id,
+        ):
             row = self._get(event_id)
             if row:
                 if (row["thread_id"], row["text_sha256"], row["client_id"], row["human"], row["interrupt"]) != (
@@ -670,7 +678,9 @@ class RootDelivery:
                     if not original:
                         continue
                     if original["status"] in TERMINAL:
-                        with store.transaction(self.conn):
+                        with store.transaction(
+                            self.conn, transaction_owner="RootDelivery", operation="reconcile_interrupt", run_id=self.run_id,
+                        ):
                             meter_limits.ended(self.conn,thread,tid,original["status"])
                         continue
                     if original["status"] != "inProgress":
@@ -680,7 +690,9 @@ class RootDelivery:
                 if exc.code not in (-32600,-32602):
                     raise
                 continue  # A racing completion is reconciled by its actual turn ID.
-            with store.transaction(self.conn):
+            with store.transaction(
+                self.conn, transaction_owner="RootDelivery", operation="acknowledge_interrupt", run_id=self.run_id,
+            ):
                 self.conn.execute("UPDATE p0_meter_interrupts SET sent_at=coalesce(sent_at,?) "
                                   "WHERE thread_id=? AND turn_id=?", (clock.now_iso(),thread,tid))
 
@@ -726,7 +738,9 @@ class RootDelivery:
         if method in ("turn/started", "rawResponse/completed", "rawResponseItem/completed"):
             self._evidence(method, params, thread_id, turn_id)
             return
-        with store.transaction(self.conn):
+        with store.transaction(
+            self.conn, transaction_owner="RootDelivery", operation="observe_root", run_id=self.run_id,
+        ):
             if method in ("item/started", "item/completed"):
                 item = params.get("item") or {}
                 if (method == "item/completed" and item.get("type") == "dynamicToolCall"
@@ -840,7 +854,9 @@ class RootDelivery:
             return
         if not child:
             return
-        with store.transaction(self.conn):
+        with store.transaction(
+            self.conn, transaction_owner="RootDelivery", operation="observe_descendant", run_id=self.run_id,
+        ):
             if method == "turn/started":
                 if self._child_start(child, turn):
                     self._evidence(method, params, sender, tid)
@@ -911,7 +927,9 @@ class RootDelivery:
                         "AND method='turn/start' AND state='acknowledged'",
                         (self.run_id, meter["root_id"], meter["owner_turn"])).fetchone():
                     continue
-            with store.transaction(self.conn):
+            with store.transaction(
+                self.conn, transaction_owner="RootDelivery", operation="verify_descendant", run_id=self.run_id,
+            ):
                 self.conn.execute("UPDATE p0_native_child_meters SET metadata_verified=1 WHERE child_id=?", (child_id,))
                 if thread.get("path"):
                     self._paths[child_id] = Path(thread["path"])
@@ -992,12 +1010,16 @@ class RootDelivery:
                         if entry.get("turnId") != tid:
                             raise OutcomeUnknown("Codex returned an item from a different turn")
                         item = entry["item"]
-                        with store.transaction(self.conn):
+                        with store.transaction(
+                            self.conn, transaction_owner="RootDelivery", operation="reconcile_item", run_id=self.run_id,
+                        ):
                             self.observe_descendant("item/completed", {"threadId": thread_id, "turnId": tid, "item": item})
                             self._arrived(thread_id, tid, item)
                     pending = {eid: target for eid, target in pending.items() if self._get(eid)["state"] == "sending"}
                 if terminal:
-                    with store.transaction(self.conn):
+                    with store.transaction(
+                        self.conn, transaction_owner="RootDelivery", operation="reconcile_turn", run_id=self.run_id,
+                    ):
                         self._terminal(thread_id, turn, children_known=int(inspect_items))
                 targets.discard(tid)
                 if not pending and not targets:
@@ -1007,7 +1029,9 @@ class RootDelivery:
                 raise
 
     def _refused(self, event_id):
-        with store.transaction(self.conn):
+        with store.transaction(
+            self.conn, transaction_owner="RootDelivery", operation="refuse_delivery", run_id=self.run_id,
+        ):
             row = self._get(event_id)
             if row["state"] == "sending":
                 if row["reservation_ref"]:
@@ -1047,7 +1071,9 @@ class RootDelivery:
                 response = self.roots._request(method, params)
             except AppServerResponseError as exc:
                 if method == "turn/start" and activity.rate_refusal(exc.data):
-                    with store.transaction(self.conn):
+                    with store.transaction(
+                        self.conn, transaction_owner="RootDelivery", operation="record_rate_refusal", run_id=self.run_id,
+                    ):
                         latest = self._get(event_id)
                         if latest["state"] == "acknowledged":
                             return self._receipt(latest)
@@ -1069,7 +1095,9 @@ class RootDelivery:
             turn_id = (response.get("turn") or {}).get("id") if method == "turn/start" else response.get("turnId", active)
             if not turn_id or (active and turn_id != active):
                 raise OutcomeUnknown("Codex did not return the expected turn receipt")
-            with store.transaction(self.conn):
+            with store.transaction(
+                self.conn, transaction_owner="RootDelivery", operation="acknowledge_delivery", run_id=self.run_id,
+            ):
                 self._ack(event_id, turn_id)
             receipt = self._receipt(self._get(event_id))
             if receipt["method"] == "turn/start" and not human and self.roots._binding(thread_id).get("task_id"):

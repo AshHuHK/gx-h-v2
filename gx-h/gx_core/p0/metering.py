@@ -278,7 +278,7 @@ def maintain(conn, run_id):
     grace = policy(conn,run_id)["grace_seconds"]
     if oldest["terminal_at"] and clock.age_seconds(oldest["terminal_at"])<grace:
         return
-    with store.transaction(conn):
+    with store.transaction(conn, transaction_owner="Usage", operation="maintain", run_id=run_id):
         rows = conn.execute("SELECT * "+outstanding+" ORDER BY sequence",(run_id,)).fetchall()
         for row in rows:
             if not row["terminal_at"]:

@@ -455,6 +455,8 @@ class _TransactionEnd:
     owns_transaction: bool
     commit: list[Callable[[], None]] = field(default_factory=list)
     rollback: list[Callable[[], None]] = field(default_factory=list)
+    changes_at_entry: int | None = None
+    discarded_changes: int = 0
 
 
 _TRANSACTION_END: dict[int, list[_TransactionEnd]] = {}
@@ -499,7 +501,10 @@ def _finish_transaction(callbacks: Sequence[Callable[[], None]], *, committed: b
 
 
 @contextmanager
-def transaction(conn: sqlite3.Connection) -> Iterator[sqlite3.Connection]:
+def transaction(
+    conn: sqlite3.Connection, *, transaction_owner: str = "unattributed",
+    operation: str = "unattributed", run_id: str | None = None,
+) -> Iterator[sqlite3.Connection]:
     """A re-entrant unit of work.
 
     The outermost call issues ``BEGIN IMMEDIATE`` so two writers serialise rather than
@@ -510,24 +515,41 @@ def transaction(conn: sqlite3.Connection) -> Iterator[sqlite3.Connection]:
     copies drift apart.
 
     Rolling back an inner block releases only its savepoint; the outer block decides
-    whether the whole unit survives.
+    whether the whole unit survives. Optional telemetry measures the physical writer
+    once. Callers supply constant owner/operation labels and the run they already own.
     """
     key = id(conn)
     depth = _SAVEPOINT_DEPTH.get(key, 0)
     outer = depth == 0 and not conn.in_transaction
     name = f"gx_sp_{depth + 1}"
     timed = outer and metrics.enabled()
-    started = time.monotonic_ns() if timed else None
-    conn.execute("BEGIN IMMEDIATE" if outer else f"SAVEPOINT {name}")
+    if timed:
+        started = time.monotonic_ns()
+    try:
+        conn.execute("BEGIN IMMEDIATE" if outer else f"SAVEPOINT {name}")
+    except sqlite3.Error:
+        if timed:
+            elapsed = (time.monotonic_ns() - started) / 1_000_000
+            metrics.record_transaction(transaction_owner, operation, run_id, elapsed, 0., 0.,
+                                       "begin_failed", 0)
+        raise
     if timed:
         acquired = time.monotonic_ns()
     released = None
-    frame = _TransactionEnd(owns_transaction=outer)
     stack = _TRANSACTION_END.setdefault(key, [])
+    # total_changes is a connection counter, including writes later undone. Track
+    # discarded savepoints in memory so rows_changed describes committed row changes.
+    counting = timed or (stack and stack[0].changes_at_entry is not None)
+    frame = _TransactionEnd(owns_transaction=outer,
+                            changes_at_entry=conn.total_changes if counting else None)
     stack.append(frame)
     _SAVEPOINT_DEPTH[key] = depth + 1
     try:
-        yield conn
+        try:
+            yield conn
+        finally:
+            if timed:
+                body_end = time.monotonic_ns()
         conn.execute("COMMIT" if outer else f"RELEASE {name}")
     except BaseException as exc:
         # COMMIT itself can fail (for example a deferred constraint); the effects must
@@ -545,20 +567,23 @@ def transaction(conn: sqlite3.Connection) -> Iterator[sqlite3.Connection]:
                                           "rollback_error": str(rollback_error)[:1000]}) from exc
         if timed:
             released = time.monotonic_ns()
+            result, rows_changed = "rollback", 0
+        elif frame.changes_at_entry is not None:
+            stack[-2].discarded_changes += conn.total_changes - frame.changes_at_entry
         _finish_transaction(list(reversed(frame.rollback)), committed=False, original=exc)
         raise
     else:
         if outer:
             if timed:
                 released = time.monotonic_ns()
+                result = "commit"
+                rows_changed = conn.total_changes - frame.changes_at_entry - frame.discarded_changes
             _finish_transaction(frame.commit, committed=True)
         elif len(stack) > 1:
             stack[-2].commit.extend(frame.commit)
             stack[-2].rollback.extend(frame.rollback)
+            stack[-2].discarded_changes += frame.discarded_changes
     finally:
-        if timed and released is not None:
-            metrics.record("db_transaction", duration_ms=(released - started) / 1_000_000,
-                           lock_acquire_ms=(acquired - started) / 1_000_000)
         stack.pop()
         if not stack:
             _TRANSACTION_END.pop(key, None)
@@ -566,6 +591,11 @@ def transaction(conn: sqlite3.Connection) -> Iterator[sqlite3.Connection]:
             _SAVEPOINT_DEPTH[key] = depth
         else:
             _SAVEPOINT_DEPTH.pop(key, None)
+        if timed and released is not None:
+            metrics.record_transaction(transaction_owner, operation, run_id,
+                                       (acquired - started) / 1_000_000,
+                                       (body_end - acquired) / 1_000_000,
+                                       (released - body_end) / 1_000_000, result, rows_changed)
 
 
 def _j(value: Any) -> str:

@@ -515,7 +515,8 @@ class JobService:
         from ..p0.team_admission import team_funding
         budget_ref = team_funding(self.conn, request["run_id"], request.get("task_id"), budget_ref, admit=True)
         self._refuse_prohibited_lines(self.conn, budget_ref=budget_ref, amounts=amounts)
-        self._budget_would_hold(budgets, budget_ref=budget_ref, job_id=ids.new_id("job"), amounts=amounts)
+        self._budget_would_hold(budgets, run_id=request["run_id"], budget_ref=budget_ref,
+                                job_id=ids.new_id("job"), amounts=amounts)
         self._threads_or_refuse(self.conn, resources)
 
     def _admit(self, request: Mapping[str, Any], request_sha: str, key: str, *, reserved_job_id=None) -> sqlite3.Row:
@@ -608,7 +609,7 @@ class JobService:
             # one. It is held only in the transaction that writes the row: a submitter that dies
             # between the two leaves neither a hold nor a row (audit J9).
             self._refuse_prohibited_lines(conn, budget_ref=budget_ref, amounts=amounts)
-            self._budget_would_hold(budgets, budget_ref=budget_ref, job_id=job_id, amounts=amounts)
+            self._budget_would_hold(budgets, run_id=run_id, budget_ref=budget_ref, job_id=job_id, amounts=amounts)
 
             preflight: dict[str, Any] = {}
             gpu = resources["gpu"]
@@ -674,7 +675,7 @@ class JobService:
             executor.write_spec(job, spec)
             staging_ref = str(Path(out_dir).relative_to(storage.store_dir(conn)))
 
-            with store.transaction(conn) as txn:
+            with store.transaction(conn, transaction_owner="JobService", operation="admit", run_id=run_id) as txn:
                 if reserved_job_id is not None:
                     validate_proposal(txn, reserved_job_id, request)
                 if txn.execute("SELECT 1 FROM jobs WHERE idempotency_key=?", (key,)).fetchone() is not None:
@@ -870,13 +871,15 @@ class JobService:
                                  "needed": needed, "budget_ref": ref, "job_budget_ref": budget_ref})
             ref = row["parent_ref"]
 
-    def _budget_would_hold(self, budgets: Any, *, budget_ref: str, job_id: str,
+    def _budget_would_hold(self, budgets: Any, *, run_id: str, budget_ref: str, job_id: str,
                            amounts: Mapping[str, Any]) -> None:
         """Ask the budget whether it would hold ``amounts`` now, holding nothing: the same
         ``reserve`` as admission makes, in a transaction that is rolled back. BUDGET_EXCEEDED
         is raised exactly as reserve() raises it."""
         try:
-            with store.transaction(self.conn) as txn:
+            with store.transaction(
+                self.conn, transaction_owner="JobService", operation="probe_budget", run_id=run_id,
+            ) as txn:
                 budgets.reserve(txn, budget_ref=budget_ref, subject_kind="job", subject_id=job_id,
                                 amounts=amounts, actor=self.actor)
                 raise _DryRun
@@ -1002,7 +1005,9 @@ class JobService:
                 self._fail_unstarted(row, f"{exc.code}: {exc.message}", failure_class="resource",
                                      because="switch" if isinstance(exc, ApprovalRequired) else "gpu_preflight")
                 raise self._named(exc, job_id) from None
-            with store.transaction(conn) as txn:
+            with store.transaction(
+                conn, transaction_owner="JobService", operation="save_preflight", run_id=row["run_id"],
+            ) as txn:
                 txn.execute("UPDATE jobs SET preflight_json=? WHERE job_id=?",
                             (ids.canonical_json(preflight), job_id))
             refusing = self._refusing_approval(job_id, intent)
@@ -1037,7 +1042,9 @@ class JobService:
             raise self._named(ArtifactNotFound(f"job {job_id} has no launch specification any more"),
                               job_id)
         try:
-            with store.transaction(conn) as txn:
+            with store.transaction(
+                conn, transaction_owner="JobService", operation="begin_submission", run_id=row["run_id"],
+            ) as txn:
                 current = self._row(job_id)
                 if current["status"] != CREATED:
                     # A concurrent replay acquired the same launch intent.
@@ -1065,7 +1072,9 @@ class JobService:
             raise self._named(ResourceDenied(f"job {job_id} could not be started: {exc}",
                                              details={"failure_class": "environment"}), job_id) from exc
         now = clock.now_iso()
-        with store.transaction(conn) as txn:
+        with store.transaction(
+            conn, transaction_owner="JobService", operation="record_submission", run_id=row["run_id"],
+        ) as txn:
             current = self._row(job_id)
             if current["status"] not in (SUBMITTING, OUTCOME_UNKNOWN):
                 # A separate observer already found the detached runner or its outcome.
@@ -1114,7 +1123,9 @@ class JobService:
         """A job whose tool never ran: FAILED, its hold returned, an approval it was waiting
         for withdrawn, its directories removed. ``because`` names what stopped it, for a
         scheduler (``switch``, ``gpu_preflight``, ``approval_refused``, ``start_deadline``)."""
-        with store.transaction(self.conn) as txn:
+        with store.transaction(
+            self.conn, transaction_owner="JobService", operation="fail_unstarted", run_id=row["run_id"],
+        ) as txn:
             current = txn.execute("SELECT * FROM jobs WHERE job_id=?", (row["job_id"],)).fetchone()
             if current["status"] != row["status"] or current["status"] not in (CREATED, SUBMITTING):
                 return
@@ -1257,7 +1268,9 @@ class JobService:
         if status in (SUBMITTING, OUTCOME_UNKNOWN):
             return self._cancel_unsettled(row, observation, reason, idempotency_key)
         if status == CREATED:
-            with store.transaction(self.conn) as txn:
+            with store.transaction(
+                self.conn, transaction_owner="JobService", operation="cancel_unstarted", run_id=row["run_id"],
+            ) as txn:
                 current = self._row(job_id)
                 if current["status"] == CREATED:
                     approvals = self._withdraw_approvals(txn, row, f"cancelled: {reason}")
@@ -1275,7 +1288,9 @@ class JobService:
             executor.remove_tree(self._paths(job_id).job_dir)
             return {"job_id": job_id, "status": CANCELLED, "note": "the job had not started"}
         if status != CANCEL_REQUESTED:
-            with store.transaction(self.conn) as txn:
+            with store.transaction(
+                self.conn, transaction_owner="JobService", operation="request_cancel", run_id=row["run_id"],
+            ) as txn:
                 store.transition(
                     txn, machine=MACHINE, subject_id=job_id, to_state=CANCEL_REQUESTED,
                     actor=self.actor, bump=False, reason=reason[:500],
@@ -1320,7 +1335,9 @@ class JobService:
                     "note": (f"{how} and how it ended could not be read; it is cancelled with that "
                              "recorded, charged one submission, and what is left of its job and staging "
                              "directories is kept")}
-        with store.transaction(self.conn) as txn:
+        with store.transaction(
+            self.conn, transaction_owner="JobService", operation="cancel_unsettled", run_id=row["run_id"],
+        ) as txn:
             store.append_event(
                 txn, kind="job.cancel_requested", actor=self.actor, run_id=row["run_id"],
                 subject_kind="job", subject_id=job_id, reason=reason[:500],
@@ -1347,7 +1364,9 @@ class JobService:
         job_id = row["job_id"]
         now = clock.now_iso()
         resources = store.loads(row, "resources_json", {}) or {}
-        with store.transaction(self.conn) as txn:
+        with store.transaction(
+            self.conn, transaction_owner="JobService", operation="cancel_unreadable", run_id=row["run_id"],
+        ) as txn:
             current = txn.execute("SELECT status FROM jobs WHERE job_id=?", (job_id,)).fetchone()["status"]
             if current != OUTCOME_UNKNOWN:
                 return current
@@ -1559,7 +1578,9 @@ class JobService:
             # named. That is not "nothing ran": it stays unknown until a person looks.
             observation["reason"] = ("earlier evidence of this job could not be read and no runner "
                                      "record can be found now; nothing is decided")
-            with store.transaction(self.conn) as txn:
+            with store.transaction(
+                self.conn, transaction_owner="JobService", operation="observe_unknown", run_id=row["run_id"],
+            ) as txn:
                 txn.execute("UPDATE jobs SET observed_at=? WHERE job_id=?",
                             (observation["observed_at"], job_id))
             return observation
@@ -1638,7 +1659,9 @@ class JobService:
         if "runner_pid" in updates:
             reason = (f"runner found again from {observation.get('identity_from')} in its job "
                       f"directory; observed {state.lower()}")
-        with store.transaction(self.conn) as txn:
+        with store.transaction(
+            self.conn, transaction_owner="JobService", operation="record_observation", run_id=row["run_id"],
+        ) as txn:
             current = txn.execute("SELECT status FROM jobs WHERE job_id=?", (job_id,)).fetchone()["status"]
             if current in TERMINAL:
                 return observation
@@ -1734,7 +1757,9 @@ class JobService:
         """Record that the job's evidence cannot be read. Decides nothing else: no outcome,
         no charge, no publication, nothing removed, no runner started or ended."""
         reason = str(observation.get("reason") or "the job's evidence cannot be read")
-        with store.transaction(self.conn) as txn:
+        with store.transaction(
+            self.conn, transaction_owner="JobService", operation="mark_unknown", run_id=row["run_id"],
+        ) as txn:
             current = txn.execute("SELECT status FROM jobs WHERE job_id=?", (row["job_id"],)).fetchone()
             if current["status"] in TERMINAL:
                 return
@@ -1797,7 +1822,9 @@ class JobService:
         recovery = None
         if to_state != SUCCEEDED and self._side_effect(outcome) != "NONE" and row["staging_ref"]:
             recovery = retained.inventory(storage.store_dir(self.conn), row, intent, outcome)
-        with store.transaction(self.conn) as txn:
+        with store.transaction(
+            self.conn, transaction_owner="JobService", operation="settle", run_id=row["run_id"],
+        ) as txn:
             current = txn.execute("SELECT * FROM jobs WHERE job_id=?", (job_id,)).fetchone()
             if current["status"] in TERMINAL:
                 return  # another process settled it between our observation and this lock

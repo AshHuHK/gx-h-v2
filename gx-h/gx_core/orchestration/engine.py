@@ -871,7 +871,7 @@ class Engine:
             "pending_interrupt": None,
             "interrupt_ref": None,
         }
-        with store.transaction(self.conn) as conn:
+        with store.transaction(self.conn, transaction_owner="Engine", operation="start", run_id=run_id) as conn:
             # Looked at under the write lock: two calls that both found no checkpoint before
             # taking it would otherwise both start the run, and a run that has gone on to
             # ACTIVE or WAITING_APPROVAL may legally move to PLANNING, so the second start
@@ -921,7 +921,7 @@ class Engine:
                   "word for an approval or jump to an arbitrary node",
                 details={"rejected_arguments": sorted(unsupported)},
             )
-        with store.transaction(self.conn) as conn:
+        with store.transaction(self.conn, transaction_owner="Engine", operation="resume", run_id=run_id) as conn:
             begun = self.begin_resume(conn, run_id=run_id, interrupt_ref=interrupt_ref,
                                       submission_refs=submission_refs,
                                       expected_revision=expected_revision, actor=actor)
@@ -1037,7 +1037,9 @@ class Engine:
         """Give back this call's advance lease, if the run still carries it."""
         if not advance_id:
             return
-        with store.transaction(self.conn) as conn:
+        with store.transaction(
+            self.conn, transaction_owner="Engine", operation="release_advance", run_id=run_id,
+        ) as conn:
             latest = self.checkpointer.latest(conn, run_id)
             if latest is None or (latest.state.get("advance") or {}).get("id") != advance_id:
                 return
@@ -1093,7 +1095,9 @@ class Engine:
         The idle check and the taking of the advance lease are one transaction, so two
         callers that both found the run idle cannot both drive it.
         """
-        with store.transaction(self.conn) as conn:
+        with store.transaction(
+            self.conn, transaction_owner="Engine", operation="begin_advance", run_id=run_id,
+        ) as conn:
             begun = self.begin_advance(conn, run_id=run_id, actor=actor, retry_failed=retry_failed)
         return self.advance_resumed(begun)
 
@@ -1462,7 +1466,9 @@ class Engine:
                                failed_count=len(state.get("failed_nodes", {})))
             if name is None:
                 if state.get("node_waits"):
-                    with store.transaction(self.conn) as conn:
+                    with store.transaction(
+                        self.conn, transaction_owner="Engine", operation="park_waits", run_id=run_id,
+                    ) as conn:
                         stopped = self._advance_stopped(conn, run_id, advance_id)
                         if stopped:
                             return self._response(run_id, warnings=[stopped], conn=conn)
@@ -1518,7 +1524,9 @@ class Engine:
                     # Controllers gather and validate outside the write lock. Each
                     # expansion commits on its own; the advance lease fences this
                     # controller's eventual checkpoint from pause/cancel/takeover.
-                    with store.transaction(self.conn) as conn:
+                    with store.transaction(
+                        self.conn, transaction_owner="Engine", operation="enter_node", run_id=run_id,
+                    ) as conn:
                         stopped = self._advance_stopped(conn, run_id, advance_id)
                         if stopped is None and self._run_row(run_id)["phase"] != name:
                             conn.execute("UPDATE runs SET phase=? WHERE run_id=?", (name, run_id))
@@ -1528,7 +1536,9 @@ class Engine:
                                                payload={"stage": name, "round": ctx.round})
                     if stopped is None:
                         result = node.fn(ctx)
-                        with store.transaction(self.conn) as conn:
+                        with store.transaction(
+                            self.conn, transaction_owner="Engine", operation="checkpoint_node", run_id=run_id,
+                        ) as conn:
                             stopped = self._advance_stopped(conn, run_id, advance_id)
                             if stopped is None:
                                 outcome = self._run_node(conn, node, ctx, run_id=run_id, workflow=workflow,
@@ -1541,7 +1551,9 @@ class Engine:
                     else:
                         outcome = ("stopped", self._response(run_id, node=name, warnings=[stopped]))
                 else:
-                    with store.transaction(self.conn) as conn:
+                    with store.transaction(
+                        self.conn, transaction_owner="Engine", operation="execute_node", run_id=run_id,
+                    ) as conn:
                         stopped = self._advance_stopped(conn, run_id, advance_id)
                         if stopped is not None:
                             outcome = ("stopped", self._response(run_id, node=name, warnings=[stopped], conn=conn))
@@ -1603,7 +1615,9 @@ class Engine:
                 subject["budget_ref"] = ref
             needs.append(vocabulary.need("budget_line", f"{amount} {key} for the requested operation",
                                          clear_by=vocabulary.PERSON, why=refusal.message, subject=subject))
-        with store.transaction(self.conn) as conn:
+        with store.transaction(
+            self.conn, transaction_owner="Engine", operation="wait_for_admission", run_id=run_id,
+        ) as conn:
             stopped = self._advance_stopped(conn, run_id, advance_id)
             if stopped:
                 return self._response(run_id, node=node, warnings=[stopped], conn=conn)
@@ -1634,7 +1648,9 @@ class Engine:
         """Record a rolled-back attempt under its original advance fence."""
         code = getattr(exc, "code", None) or type(exc).__name__
         message = str(getattr(exc, "message", None) or exc)[:500]
-        with store.transaction(self.conn) as conn:
+        with store.transaction(
+            self.conn, transaction_owner="Engine", operation="record_node_failure", run_id=run_id,
+        ) as conn:
             if self._advance_stopped(conn, run_id, advance_id):
                 raise exc
             failure = {"node": node, "code": code, "message": message, "since": clock.now_iso(),
@@ -2072,7 +2088,9 @@ class Engine:
         self, *, run_id: str, workflow: Workflow, state: dict[str, Any], actor: str,
         node: str, keys: Sequence[str], budget: Mapping[str, Any] | None,
     ) -> dict[str, Any]:
-        with store.transaction(self.conn) as conn:
+        with store.transaction(
+            self.conn, transaction_owner="Engine", operation="pause_for_budget", run_id=run_id,
+        ) as conn:
             stopped = self._advance_stopped(conn, run_id, (state.get("advance") or {}).get("id"))
             if stopped is not None:
                 return self._response(run_id, node=node, warnings=[stopped], conn=conn)
@@ -2140,7 +2158,7 @@ class Engine:
     def _finish(
         self, *, run_id: str, workflow: Workflow, state: dict[str, Any], actor: str
     ) -> dict[str, Any]:
-        with store.transaction(self.conn) as conn:
+        with store.transaction(self.conn, transaction_owner="Engine", operation="finish", run_id=run_id) as conn:
             run = self._run_row(run_id)
             stopped = self._advance_stopped(conn, run_id, (state.get("advance") or {}).get("id"))
             if stopped is not None:

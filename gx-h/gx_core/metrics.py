@@ -34,7 +34,7 @@ def record(kind, *, started=None, **fields):
         return
     try:
         data = dict.fromkeys(_FIELDS)
-        data.update(_identity.get())
+        data.update((key, value) for key, value in _identity.get().items() if key in _FIELDS)
         data.update(fields)
         if started is not None:
             data["duration_ms"] = (time.monotonic_ns() - started) / 1_000_000
@@ -52,6 +52,16 @@ def record(kind, *, started=None, **fields):
         if error not in _warned:
             _warned.add(error)
             logging.getLogger(__name__).warning("GX metrics unavailable (%s)", error)
+
+
+def record_transaction(transaction_owner, operation, run_id, lock_wait_ms, body_ms, finish_ms,
+                       commit_or_rollback, rows_changed):
+    """One physical SQLite writer attempt. Called after SQLite releases the lock."""
+    record("db_transaction", transaction_owner=transaction_owner, operation=operation,
+           run_id=run_id if run_id is not None else _identity.get().get("run_id"),
+           lock_wait_ms=lock_wait_ms, body_ms=body_ms, finish_ms=finish_ms,
+           duration_ms=lock_wait_ms + body_ms + finish_ms,
+           lock_acquire_ms=lock_wait_ms, commit_or_rollback=commit_or_rollback, rows_changed=rows_changed)
 
 
 def codex_usage(params, sequence, adapter_instance_id):

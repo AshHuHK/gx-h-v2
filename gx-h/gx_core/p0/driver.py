@@ -120,7 +120,7 @@ def snapshot(conn, run_id=None):
 def enqueue(conn, rid, action, text, message_id=None):
     mid = message_id or str(uuid.uuid4())
     encoded = ids.canonical_json(action)
-    with store.transaction(conn) as tx:
+    with store.transaction(conn, transaction_owner="Driver", operation="enqueue_message", run_id=rid) as tx:
         prev = tx.execute("SELECT * FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
         if prev:
             if (prev["run_id"], prev["action_json"], prev["message_text"]) != (rid, encoded, text):
@@ -231,7 +231,7 @@ class Driver:
         if not attempted and prior and (prior["reason"], prior["next_retry_at"]) == (reason, retry_at):
             return retry_at
         owner, ref = key
-        with store.transaction(self.conn):
+        with store.transaction(self.conn, transaction_owner="Driver", operation="defer_native", run_id=self.rid):
             # Bootstrap recovery and a cold Driver can both have observed the same missing wait.
             saved = self._scoped_waits(key).fetchone()
             prior = store.loads(saved, "payload_json") if saved else None
@@ -263,7 +263,9 @@ class Driver:
 
     def _end_native_wait(self, key):
         if key in self._waits or self._scoped_waits(key).fetchone():
-            with store.transaction(self.conn):
+            with store.transaction(
+                self.conn, transaction_owner="Driver", operation="end_native_wait", run_id=self.rid,
+            ):
                 for row in self._scoped_waits(key).fetchall():
                     wait = store.loads(row, "payload_json")
                     if root := wait.get("root_key"):
@@ -304,7 +306,9 @@ class Driver:
             if prior and (root_key := prior.get("root_key")):
                 # Re-open only the retained attempt, under the existing capacity check, before a native write.
                 from .team_admission import require_capacity
-                with store.transaction(self.conn):
+                with store.transaction(
+                    self.conn, transaction_owner="Driver", operation="reopen_native", run_id=self.rid,
+                ):
                     root = self.conn.execute("SELECT r.* FROM p0_roots r JOIN tasks t ON r.lease_id=t.lease_id "
                         "WHERE r.root_key=? AND t.status IN ('CLAIMED','RUNNING')", (root_key,)).fetchone()
                     if root:
@@ -364,7 +368,9 @@ class Driver:
                 native_blocked = True
             except (ArtifactNotFound, IdempotencyConflict, PermissionDenied, SchemaInvalid, StaleRevision) as exc:
                 # Transport and uncertain native outcomes remain durable and can be reconciled.
-                with store.transaction(self.conn) as tx:
+                with store.transaction(
+                    self.conn, transaction_owner="Driver", operation="reject_message", run_id=self.rid,
+                ) as tx:
                     tx.execute("UPDATE p0_operator_messages SET rejected=? WHERE message_id=? AND result_json IS NULL",
                                (str(exc)[:500], mid))
                 self._end_native_wait(("message", mid))
@@ -381,7 +387,9 @@ class Driver:
         def accepted(thread_id, turn_id, message_id):
             if (thread_id, message_id) != (thread, mid):
                 raise ValueError("Human turn acknowledgment does not match the submitted input")
-            with store.transaction(self.conn) as tx:
+            with store.transaction(
+                self.conn, transaction_owner="Driver", operation="accept_message", run_id=self.rid,
+            ) as tx:
                 result = intent.accept_input(tx, self.rid, thread_id, turn_id, message_id)
                 tx.execute("UPDATE p0_operator_messages SET result_json=? WHERE message_id=?",
                            (ids.canonical_json(result), mid))
@@ -419,7 +427,7 @@ class Driver:
         if turn is not None and turn is not _DEFERRED:
             reply = "\n".join(item["text"] for item in turn.get("items", [])
                                if item.get("type") == "agentMessage")
-            with store.transaction(db) as tx:
+            with store.transaction(db, transaction_owner="Driver", operation="save_reply", run_id=self.rid) as tx:
                 tx.execute("INSERT OR IGNORE INTO p0_main_replies VALUES(?,?,?,?)",
                            (mid, row["turn_id"], turn["status"], reply))
 
@@ -453,14 +461,18 @@ class Driver:
                             self._notify(native, thread, payload, oid)) is _DEFERRED:
                         continue
                     # A task with no Root will see current Intent in its first brief.
-                with store.transaction(self.conn) as tx:
+                with store.transaction(
+                    self.conn, transaction_owner="Outbox", operation="complete_delivery", run_id=self.rid,
+                ) as tx:
                     store.complete_outbox(tx, oid, "gx-p0")
                 self._end_native_wait(("outbox", str(oid)))
             except (BudgetExceeded, HoldActive) as exc:
                 if isinstance(exc, BudgetExceeded):
                     self._exhausted["outbox:"+str(oid)] = exc
             except Exception as exc:
-                with store.transaction(self.conn) as tx:
+                with store.transaction(
+                    self.conn, transaction_owner="Outbox", operation="fail_delivery", run_id=self.rid,
+                ) as tx:
                     store.fail_outbox(tx, oid, type(exc).__name__ + ": " + str(exc)[:240])
                 self._retry_at[oid] = time.monotonic() + min(30, 2 ** min(row["attempts"], 5))
 

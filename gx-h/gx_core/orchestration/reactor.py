@@ -152,7 +152,7 @@ def _record_refusal(ctx: Ctx, run_id: str, refusal: Mapping[str, Any], waiting: 
     ).fetchone()
     if seen is not None:
         return
-    with store.transaction(conn) as tx:
+    with store.transaction(conn, transaction_owner="Reactor", operation="record_refusal", run_id=run_id) as tx:
         store.append_event(
             tx, kind=EVENT_REFUSED, actor=ctx.actor, run_id=run_id, subject_kind="run", subject_id=run_id,
             reason=str(refusal["message"])[:500], evidence_level="EXECUTION_OBSERVED",
@@ -219,7 +219,7 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
     workflow = service._pinned_workflow(conn, run)
     verified = service.require_pins(run, workflow)
     begun = None
-    with store.transaction(conn) as tx:
+    with store.transaction(conn, transaction_owner="Reactor", operation="drive_science", run_id=run_id) as tx:
         run = _run(tx, run_id)
         if run["status"] not in {"ACTIVE", *machines.waiting_states("run")}:
             return None
@@ -355,7 +355,7 @@ def _record_failure(ctx: Ctx, run_id: str, row: sqlite3.Row, payload: Mapping[st
     is_parked = count >= FAILURES_BEFORE_PARKED or not retryable
     trigger = _trigger(row, payload)
     try:
-        with store.transaction(conn) as tx:
+        with store.transaction(conn, transaction_owner="Reactor", operation="record_failure", run_id=run_id) as tx:
             state = {"code": code, "message": message[:300], "count": count, "parked": is_parked,
                      "retryable": retryable, "after_event_id": last_change(tx, run_id),
                      "workflow_sha256": _run(tx, run_id)["workflow_sha256"], "limits_sha256": limits_sha256()}
@@ -403,10 +403,12 @@ def _react_to(ctx: Ctx, run_id: str, row: sqlite3.Row, *, retry_parked: bool) ->
                    if outcome.get("budget_line") else None)
         encoded = ids.canonical_json(pending) if pending else None
         if row["last_error"] != encoded:
-            with store.transaction(conn) as tx:
+            with store.transaction(
+                conn, transaction_owner="Reactor", operation="defer_outbox", run_id=run_id,
+            ) as tx:
                 tx.execute("UPDATE outbox SET last_error=? WHERE outbox_id=?", (encoded, row["outbox_id"]))
         return {**trigger, **outcome, "outcome": "deferred", "why": outcome["defer"]}
-    with store.transaction(conn) as tx:
+    with store.transaction(conn, transaction_owner="Reactor", operation="complete_outbox", run_id=run_id) as tx:
         if store.complete_outbox(tx, int(row["outbox_id"]), ctx.actor):
             store.append_event(
                 tx, kind=EVENT_REACTED, actor=ctx.actor, run_id=run_id,
@@ -504,7 +506,9 @@ def derive_waiting(ctx: Ctx,run_id: str) -> None:
     jobs=ctx.conn.execute("SELECT 1 FROM jobs WHERE run_id=? AND status IN ('CREATED','SUBMITTING','SUBMITTED','QUEUED','RUNNING','CANCEL_REQUESTED') LIMIT 1",(run_id,)).fetchone()
     target="WAITING_APPROVAL" if approvals else "WAITING_CLIENT" if opened else "WAITING_EXTERNAL_JOB" if jobs else "WAITING_APPROVAL"
     if target!=run["status"]:
-        with store.transaction(ctx.conn) as tx:
+        with store.transaction(
+            ctx.conn, transaction_owner="Reactor", operation="derive_waiting", run_id=run_id,
+        ) as tx:
             current=_run(tx,run_id)
             latest = store.latest_checkpoint(tx, run_id)
             if (latest is not None and latest["seq"] == checkpoint["seq"] and

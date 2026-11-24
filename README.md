@@ -1,4 +1,4 @@
-# GX-H v3.2 静态工作流与 P2A Closure
+# GX-H v3.2 静态工作流与 P2A.1
 
 GX 在 Codex 断开时仍可管理已有 Job、保留等待和恢复静态工作流。当前分支的 Closure 提供用量对账、事务计时和可中断的空闲等待。查看现有项目以 `bin/gx-p0 status --state DIR --run-id RUN` 为入口，逐线程成本位于 `metering.cost_report`。[原 Phase 2A 恢复验证](PHASE_2A_ACCEPTANCE_REPORT.md) · [计量设计](P2A_09_USAGE_RECONCILIATION_REPORT.md) · [签收范围与回退](P2A_CLOSURE_LIMITATIONS.md)
 
@@ -9,6 +9,8 @@ bin/gx-acceptance run all
 bin/gx-acceptance report RUN_ID
 bin/gx-acceptance verify RUN_ID
 ```
+
+P2A.1 的逐项验收、复跑命令、未决预留处理及历史库回退示例见专项报告。新增检查可用 `bin/gx-acceptance run hardening` 单独执行。工作区 CPU 排队与成本估算均由 GX 原有 Job 和计量路径管理。[P2A.1 签收与操作说明](P2A1_HARDENING_REPORT.md)
 
 ## v3.1 科研执行
 

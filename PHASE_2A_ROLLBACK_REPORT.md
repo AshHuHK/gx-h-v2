@@ -1,6 +1,6 @@
 # Phase 2A 静态 Run 回退演练
 
-**PASS（SCRIPTED）。** 冻结候选 `2a9ec17b2b5858737838e816ee9023cafda11de0` 可写重开历史 `science_grid@2` 项目后，基线 `51e0e13583d95e9cad1386e1d4c77324977e97ea` 从升级前保存的回退点重开。七条 CLI 命令均以 0 退出，返回同一个暂停 Run。回退点、候选重开后和恢复基线后三份数据库逐字节一致。演练使用干净的冻结提交和无外部路由的临时网络命名空间。[逐阶段回执](acceptance/phase2a/rollback/receipt.json) · [完整 CLI 输出](acceptance/phase2a/rollback/cli.jsonl.gz)
+**PASS（SCRIPTED）。** 冻结候选 `c15eada9611f60519bafbb3366c908629dbea157` 可写重开历史 `science_grid@2` 项目后，基线 `51e0e13583d95e9cad1386e1d4c77324977e97ea` 从升级前保存的回退点重开。七条 CLI 命令均以 0 退出，返回同一个暂停 Run。回退点、候选重开后和恢复基线后三份数据库逐字节一致。演练使用干净的冻结提交和无外部路由的临时网络命名空间。[逐阶段回执](acceptance/phase2a/rollback/receipt.json) · [完整 CLI 输出](acceptance/phase2a/rollback/cli.jsonl.gz)
 
 ## 演练边界与方法
 
@@ -29,7 +29,7 @@
 
 ## 同一版本的 Job 状态后端故障演练
 
-**P2A-15 PASS（SCRIPTED）。** 独立 Run `gxr_01m85gj49ky8jh265g` 实际启动两个本机 CPU Job。隐藏整个后端目录时，两个 Job 都推迟对账。仅让 `gxj_01m85gj4e5aj1th20y` 的读取超时时，它保持 `SUBMITTED` 和原预留。同一轮对账把另一 Job `gxj_01m85gj4sehy4anfxp` 按退出码 1 结为 `FAILED`。随后注入损坏的回执，前者进入 `OUTCOME_UNKNOWN` 并保留预留。再次读取原成功回执后，使用同一 Job ID、调度引用和预留结为 `SUCCEEDED`。再次对账的变更数为 0。两个 Job 各有一次预算结算和一条终态 outbox，各自只启动一次。Codex 启动次数为 0。[Job 回执](acceptance/phase2a/jobs/result.json) · [对账指标](acceptance/phase2a/jobs/reconcile-metrics.json) · [启动器原件](acceptance/phase2a/jobs/runner-records.tar.gz)
+**P2A-15 PASS（SCRIPTED）。** 独立 Run `gxr_01m85gx9tmfj4bca5w` 实际启动两个本机 CPU Job。隐藏整个后端目录时，两个 Job 都推迟对账。仅让 `gxj_01m85gx9yxmnt1e3tk` 的读取超时时，它保持 `SUBMITTED` 和原预留。同一轮对账把另一 Job `gxj_01m85gxa4rjj1bbccj` 按退出码 1 结为 `FAILED`。随后注入损坏的回执，前者进入 `OUTCOME_UNKNOWN` 并保留预留。再次读取原成功回执后，使用同一 Job ID、调度引用和预留结为 `SUCCEEDED`。再次对账的变更数为 0。两个 Job 各有一次预算结算和一条终态 outbox，各自只启动一次。Codex 启动次数为 0。[Job 回执](acceptance/phase2a/jobs/result.json) · [对账指标](acceptance/phase2a/jobs/reconcile-metrics.json) · [启动器原件](acceptance/phase2a/jobs/runner-records.tar.gz)
 
 可以从快照和事件核对上述故障时序及已结账目。产出的 observation 使用合成输入 `x=2`，工具返回 `score=0`。[对账前](acceptance/phase2a/jobs/before.sqlite.gz) · [单个读取延迟期间](acceptance/phase2a/jobs/deferred.sqlite.gz) · [恢复后](acceptance/phase2a/jobs/after.sqlite.gz) · [关联事件](acceptance/phase2a/jobs/events.json) · [工具输出](acceptance/phase2a/jobs/observations.json)
 

@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -71,7 +72,7 @@ def runtime(root, work, *, python, node, env, pins):
                PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1", PIP_NO_INDEX="1",
                npm_config_offline="true", npm_config_globalconfig=os.devnull,
                npm_config_userconfig=str(work / "empty-npmrc"))
-    implementation, version = versions([python, "-I", "-c",
+    implementation, version = versions([python, "-I", "-S", "-c",
         "import platform; print(platform.python_implementation(), platform.python_version())"], env).split()
     check_version("Python implementation", implementation, pins["implementation"])
     check_version("Python", version, pins["python"])
@@ -113,7 +114,8 @@ def prepare(root, work, *, python, env, node=None):
 
     work.mkdir(parents=True, exist_ok=False)
     venv = work / "venv"
-    subprocess.run([python, "-I", "-m", "venv", venv], check=True, env=env)
+    venv_command = [python, "-I", "-S", "-m", "venv", venv]
+    subprocess.run(venv_command, check=True, env=env)
     child = venv / "bin/python"
     pip = [child, "-I", "-m", "pip", "--isolated", "--disable-pip-version-check", "install",
            "--no-index", "--no-cache-dir", "--require-hashes", "--find-links", requirements.parent, "-r", requirements]
@@ -130,7 +132,7 @@ def prepare(root, work, *, python, env, node=None):
             "executable_sha256": digest(node), "npm": str(npm), "npm_version": npm_version, "host": str(host),
             "packages": packages, "host_tests": node_check.stdout},
             "lock_sha256": lock_hashes, "offline_archive_sha256": archives,
-            "install_argv": [str(arg) for arg in pip]}
+            "venv_argv": [str(arg) for arg in venv_command], "install_argv": [str(arg) for arg in pip]}
 
 
 def dependency_controls(root, work, *, python, node, env):
@@ -189,7 +191,6 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--check-controls", action="store_true")
     args = parser.parse_args()
-    import tempfile
     with tempfile.TemporaryDirectory(prefix="gx-dependencies-profile-") as scratch:
         env = test_environment(Path(scratch), python=args.python)
         provision = dependency_controls if args.check_controls else prepare

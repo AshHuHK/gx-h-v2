@@ -132,7 +132,7 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
         venv=checkout/'venv'
         python=venv/'bin/python'
         wheels=package/'release-assets/python'
-        installs=[('venv',[sys.executable,'-m','venv',venv]),
+        installs=[('venv',[sys.executable,'-I','-S','-m','venv',venv]),
                   ('offline-wheels',[python,'-m','pip','--isolated','--disable-pip-version-check','install',
                      '--no-index','--no-cache-dir','--require-hashes','--find-links',wheels,'-r',wheels/'requirements.lock']),
                   ('offline-cordis',[python,'-B','scripts/release_assets.py','cordis'])]

@@ -1,0 +1,182 @@
+{
+  "run_id": "gxr_01m85gj49ky8jh265g",
+  "job_ids": {
+    "delayed_read": "gxj_01m85gj4e5aj1th20y",
+    "failed_tool": "gxj_01m85gj4sehy4anfxp"
+  },
+  "branch_ids": [],
+  "node_ids": [],
+  "before": {
+    "delayed_read": {
+      "job_id": "gxj_01m85gj4e5aj1th20y",
+      "status": "SUBMITTED",
+      "scheduler_ref": "runner:69917:2980093654",
+      "side_effect_status": "APPLIED",
+      "observed_at": "2026-11-24T00:51:13.818Z",
+      "reservation_ref": "rsv_01m85gj4g6jke1bp8g",
+      "reservation_status": "HELD",
+      "settlements": 0,
+      "terminal_outbox": 0,
+      "artifacts": []
+    },
+    "failed_tool": {
+      "job_id": "gxj_01m85gj4sehy4anfxp",
+      "status": "SUBMITTED",
+      "scheduler_ref": "runner:69921:2980093673",
+      "side_effect_status": "APPLIED",
+      "observed_at": "2026-11-24T00:51:14.006Z",
+      "reservation_ref": "rsv_01m85gj4vkh3dknjzf",
+      "reservation_status": "HELD",
+      "settlements": 0,
+      "terminal_outbox": 0,
+      "artifacts": []
+    }
+  },
+  "during": {
+    "delayed_read": {
+      "job_id": "gxj_01m85gj4e5aj1th20y",
+      "status": "SUBMITTED",
+      "scheduler_ref": "runner:69917:2980093654",
+      "side_effect_status": "APPLIED",
+      "observed_at": "2026-11-24T00:51:13.818Z",
+      "reservation_ref": "rsv_01m85gj4g6jke1bp8g",
+      "reservation_status": "HELD",
+      "settlements": 0,
+      "terminal_outbox": 0,
+      "artifacts": []
+    },
+    "failed_tool": {
+      "job_id": "gxj_01m85gj4sehy4anfxp",
+      "status": "FAILED",
+      "scheduler_ref": "runner:69921:2980093673",
+      "side_effect_status": "APPLIED",
+      "observed_at": "2026-11-24T00:51:14.351Z",
+      "reservation_ref": "rsv_01m85gj4vkh3dknjzf",
+      "reservation_status": "SETTLED",
+      "settlements": 1,
+      "terminal_outbox": 1,
+      "artifacts": [
+        "gxa_01m85gj59cstct4cqp",
+        "gxa_01m85gj59f7gyw2kad"
+      ]
+    }
+  },
+  "after": {
+    "delayed_read": {
+      "job_id": "gxj_01m85gj4e5aj1th20y",
+      "status": "SUCCEEDED",
+      "scheduler_ref": "runner:69917:2980093654",
+      "side_effect_status": "APPLIED",
+      "observed_at": "2026-11-24T00:51:14.396Z",
+      "reservation_ref": "rsv_01m85gj4g6jke1bp8g",
+      "reservation_status": "SETTLED",
+      "settlements": 1,
+      "terminal_outbox": 1,
+      "artifacts": [
+        "gxa_01m85gj5asdmg52rfk",
+        "gxa_01m85gj5atpmnphf65",
+        "gxa_01m85gj5avmc45z0pd"
+      ]
+    },
+    "failed_tool": {
+      "job_id": "gxj_01m85gj4sehy4anfxp",
+      "status": "FAILED",
+      "scheduler_ref": "runner:69921:2980093673",
+      "side_effect_status": "APPLIED",
+      "observed_at": "2026-11-24T00:51:14.351Z",
+      "reservation_ref": "rsv_01m85gj4vkh3dknjzf",
+      "reservation_status": "SETTLED",
+      "settlements": 1,
+      "terminal_outbox": 1,
+      "artifacts": [
+        "gxa_01m85gj59cstct4cqp",
+        "gxa_01m85gj59f7gyw2kad"
+      ]
+    }
+  },
+  "same_pass_peer_changes": [
+    {
+      "job_id": "gxj_01m85gj4sehy4anfxp",
+      "from": "SUBMITTED",
+      "to": "FAILED"
+    }
+  ],
+  "recovered": [
+    {
+      "job_id": "gxj_01m85gj4e5aj1th20y",
+      "from": "OUTCOME_UNKNOWN",
+      "to": "SUCCEEDED"
+    }
+  ],
+  "backend_directory_outage": "Job reconciliation deferred while the backend directory /tmp/gx-p2a15-oz7mvn9y/jobs is unavailable",
+  "duplicate_job_rows": 0,
+  "failed_read_timestamps_ns": [
+    1795481474299770048,
+    1795481474300005736,
+    1795481474300171260,
+    1795481474300861500,
+    1795481474357698395
+  ],
+  "status_during_outage": "Job reconciliation deferred while the status backend is temporarily unavailable (TimeoutError, [Errno 110] scripted status read timeout)",
+  "corrupt_record_control": "outcome.json exists and cannot be read (JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1))",
+  "unreadable_process_control": "Job reconciliation deferred while the status backend is temporarily unavailable (OSError, [Errno 116] scripted stale process handle)",
+  "test": "P2A-15",
+  "evidence_class": "SCRIPTED",
+  "scope": "JobService and the Driver's reconciliation seam",
+  "command": [
+    "/opt/conda/bin/python",
+    "-B",
+    "acceptance/phase2a/job_unavailable.py",
+    "--output",
+    "/tmp/gx-p2a-frozen-reopen.QKW0qDQU/jobs"
+  ],
+  "cwd": "/tmp/gx-p2a-frozen-reopen.QKW0qDQU/release",
+  "commit": "2a9ec17b2b5858737838e816ee9023cafda11de0",
+  "dirty_state": [],
+  "exit_code": 0,
+  "source_sha256": {
+    "gx-h/gx_core/jobs/executor.py": "0db98c6b8e1d0747c95bbb7af0111cef269f2ddca6b12d5a664ca61538b7cde0",
+    "gx-h/gx_core/jobs/service.py": "5c4353adde9a9cb285e5001e1b00e9714354c18827861a90f97d1612be951984",
+    "gx-h/gx_core/jobs/tools.py": "6585024e2011ed234b50601ee9b2a2f6e71d0a7786e037258bd4964e3917d4b9",
+    "gx-h/gx_core/capabilities/procs.py": "146da240a13ad7af668da9e03a5fdf0e3a311df0ed7a848cc1f64af847a3c6fa",
+    "gx-h/gx_core/project_work.py": "04f9de2401886fff7a6a05d42f0f8baac6f1c10ae9f945a21693012d7e960d97",
+    "acceptance/phase2a/job_unavailable.py": "ae5c86a37b77cba948f42be6414d9ddb79e09531f90ad59d951a993d3e09454e"
+  },
+  "child_processes": [
+    {
+      "executable": "python",
+      "detached_job": null
+    },
+    {
+      "executable": "python",
+      "detached_job": null
+    },
+    {
+      "executable": "python",
+      "detached_job": "gxj_01m85gj4e5aj1th20y"
+    },
+    {
+      "executable": "python",
+      "detached_job": null
+    },
+    {
+      "executable": "python",
+      "detached_job": "gxj_01m85gj4sehy4anfxp"
+    },
+    {
+      "executable": "python",
+      "detached_job": null
+    }
+  ],
+  "codex_spawn_count": 0,
+  "duplicate_launch_count": 0,
+  "evidence_files": [
+    "before.sqlite.gz",
+    "deferred.sqlite.gz",
+    "after.sqlite.gz",
+    "events.json",
+    "reconcile-metrics.json",
+    "runner-records.tar.gz",
+    "observations.json"
+  ]
+}

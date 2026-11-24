@@ -196,8 +196,10 @@ def worker(phase, work, out, binary):
 
 def command(phase, work, out, binary, env):
     argv = [sys.executable,"-B",str(Path(__file__).resolve()),"--worker",phase,"--work",str(work),"--out",str(out),"--binary",str(binary)]
+    # Both GX processes use this experiment's private Root storage even when
+    # their inner UID maps to a different host user.
     with (out / (phase + ".log")).open("w") as log:
-        return subprocess.Popen(argv, cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
+        return subprocess.Popen(argv, cwd=ROOT, env={**env, "TMPDIR": str(work)}, stdout=log, stderr=subprocess.STDOUT)
 
 
 def experiment(binary, out, work, socket_path):

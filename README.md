@@ -1,4 +1,16 @@
-# GX-H v3.1 科研执行开发分支
+# GX-H v3.2 静态工作流与 P2A Closure
+
+GX 在 Codex 断开时仍可管理已有 Job、保留等待和恢复静态工作流。当前分支的 Closure 提供用量对账、事务计时和可中断的空闲等待。查看现有项目以 `bin/gx-p0 status --state DIR --run-id RUN` 为入口，逐线程成本位于 `metering.cost_report`。[原 Phase 2A 恢复验证](PHASE_2A_ACCEPTANCE_REPORT.md) · [计量设计](P2A_09_USAGE_RECONCILIATION_REPORT.md) · [签收范围与回退](P2A_CLOSURE_LIMITATIONS.md)
+
+在本机已有固定 Codex 缓存与历史夹具时，从仓库根目录运行以下命令。输出首行是运行 ID；将它替换到后两条命令的 `RUN_ID` 中。其他部署的缓存路径、分类与失败续跑参数见验收说明。[命令与输入](P2A_ACCEPTANCE_AUTOMATION_REPORT.md)
+
+```bash
+bin/gx-acceptance run all
+bin/gx-acceptance report RUN_ID
+bin/gx-acceptance verify RUN_ID
+```
+
+## v3.1 科研执行
 
 新项目可在研究规格中设置 `"workflow": "science_grid"`、`"workflow_version": "3"` 和 `"plugins": ["org.gx.science-grid@3.0.0"]`，然后通过原有 `bin/gx-p0 start` 入口启动。可以先执行 `bin/gx-p0 plugin verify org.gx.science-grid@3.0.0` 核对安装。已有项目按各自保存的版本恢复。开发分支的模型请求、结算、科研证据和启动示例见本版验收记录。[源码与基线](V31_SOURCE_AND_BASELINE.md) · [提交与科研工作流](V31_B1_SUBMISSION_PROTOCOL.md) · [角色与简报效率](V31_B2_B3_EFFICIENCY.md) · [适用范围与科研质量](V31_LIMITATIONS_AND_NEXT_STEPS.md)
 

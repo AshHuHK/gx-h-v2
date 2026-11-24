@@ -156,11 +156,41 @@ def supporting_files(source, contents, out, imported):
     for key in ("original_run_log", "environment_file"):
         if document.get(key):
             files[key] = retain_original_file(source.parent, document[key], out, document.get(key + "_sha256"))
+    # Original handoffs may name the full test log in each case's evidence field.
+    if "original_run_log" not in files and imported:
+        reviews = [review for _, _, review in imported.values()]
+        if all(review and review.get("archived_evidence") for review in reviews):
+            cited = {review["archived_evidence"] for review in reviews}
+            if len(cited) == 1:
+                path = out / cited.pop()
+                if path.suffix.lower() in {".log", ".txt"} and FAILURE_LINE.search(path.read_text()):
+                    files["original_run_log"] = {k: reviews[0][k] for k in
+                                                 ("evidence", "archived_evidence", "evidence_sha256")}
     if "original_run_log" in files:
-        log_path = out / files["original_run_log"]["archived_evidence"]
-        actual = original_failures(log_path)
+        actual = original_failures(out / files["original_run_log"]["archived_evidence"])
         if Counter(case for case, _, _ in actual.values()) != Counter(case for case, _, _ in imported.values()):
             raise ValueError("classified identities differ from the supplied original failure log")
+        # Unittest's long header includes a method name, a qualified ID and optional
+        # subtest parameters. The reviewer's short header preserves status, ID and parameters.
+        headings = {heading: heading for heading in actual}
+        for heading in actual:
+            if match := FAILURE_LINE.fullmatch(heading):
+                short = heading.partition(":")[0] + ": " + match[1] + match[2]
+                headings[short] = heading
+        used = set()
+        for original_id, (name, excerpt, review) in imported.items():
+            heading = headings.get(original_id) or original_id
+            if heading not in actual:
+                matches = [key for key, (case, _, _) in actual.items() if case == name]
+                if original_id not in {name, "tests." + name} or len(matches) != 1:
+                    raise ValueError(f"original failure heading is ambiguous or differs: {original_id}")
+                heading, = matches
+            _, trace, _ = actual[heading]
+            if heading in used or (excerpt and excerpt not in trace):
+                raise ValueError(f"original traceback or heading differs: {original_id}")
+            used.add(heading)
+            if review:
+                review.update(matched_original_heading=heading, matched_trace_sha256=hashlib.sha256(trace.encode()).hexdigest())
     return files
 
 
@@ -257,6 +287,7 @@ def baseline_run(args, work):
     original_input = None
     original_digest = None
     supporting_inputs = {}
+    original_environment = None
     if source:
         try:
             raw = source.read_bytes()
@@ -266,6 +297,10 @@ def baseline_run(args, work):
             contents = raw.decode("utf-8-sig")
             imported = original_failures(source, contents, output=out)
             supporting_inputs = supporting_files(source, contents, out, imported)
+            if source.suffix.lower() == ".json":
+                doc = json.loads(contents)
+                if isinstance(doc, dict):
+                    original_environment = doc.get("source")
         except (OSError, KeyError, TypeError, ValueError, ElementTree.ParseError) as err:
             import_issue = f"Unable to read the supplied original failure records: {err}"
     verdicts = []
@@ -294,7 +329,7 @@ def baseline_run(args, work):
                                          "distinct_test_ids": len({case for case, _, _ in imported.values()}),
                                          "source": str(source) if source else None,
                                          "archived_input": original_input, "source_sha256": original_digest,
-                                         "supporting_inputs": supporting_inputs,
+                                         "supporting_inputs": supporting_inputs, "original_run_metadata": original_environment,
                                          "issue": issue, "cases": verdicts})
     failed_run = bool(failures or additional_nonpassing or receipt["exit_code"] or observed_profile != "deterministic")
     problems = []

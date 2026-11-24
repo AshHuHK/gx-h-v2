@@ -54,6 +54,32 @@ class HistoricalIntake(unittest.TestCase):
             self.assertEqual((out / files["environment_file"]["archived_evidence"]).read_bytes(),
                              environment.read_bytes())
 
+    def test_implicit_full_log_keeps_distinct_subtest_tracebacks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp)
+            out = source / "out"
+            out.mkdir()
+            log = source / "original.log"
+            case = "test_example.Probe.test_mode"
+            records = []
+            sections = []
+            for mode in ("cold", "warm"):
+                subtest = f" (mode='{mode}')"
+                sections.append(f"ERROR: test_mode ({case}){subtest}\nRuntimeError: {mode}")
+                records.append({"original_id": f"ERROR: {case}{subtest}", "test_id": case,
+                                "original_error": f"RuntimeError: {mode}", "classification": "environment",
+                                "reason": "original execution", "evidence": log.name})
+            log.write_text("\n======\n".join(sections))
+            bundle = source / "review.json"
+            bundle.write_text(json.dumps({"failures": records}))
+            rows = original_failures(bundle, output=out)
+            self.assertIn("original_run_log", supporting_files(bundle, bundle.read_text(), out, rows))
+            self.assertEqual(len({r["matched_trace_sha256"] for _, _, r in rows.values()}), 2)
+            records[0]["original_error"] = "RuntimeError: warm"
+            bundle.write_text(json.dumps({"failures": records}))
+            with self.assertRaisesRegex(ValueError, "traceback or heading differs"):
+                supporting_files(bundle, bundle.read_text(), out, original_failures(bundle, output=out))
+
     def test_external_reference_is_not_added_to_archived_user_material(self):
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)

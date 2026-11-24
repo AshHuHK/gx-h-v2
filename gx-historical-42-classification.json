@@ -1,0 +1,355 @@
+{
+ "source": {
+  "commit": "78a8b07",
+  "run_utc": "2026-11-24T09:17Z",
+  "python": "3.13.18",
+  "sqlite": "3.53.1",
+  "node": "v22.23.5",
+  "logical_cpus": 2,
+  "command": "env -i PATH HOME LANG=C.UTF-8 TMPDIR python3 -B -m unittest discover -s tests",
+  "resource_profile": "none (host CPU policy)",
+  "missing_dependencies": [
+   "Biopython (Bio)",
+   "@deepseek-ai/cordis (Node)"
+  ],
+  "rerun_log": "gx-deterministic-rerun-3a08a9d.log"
+ },
+ "failures": [
+  {
+   "original_id": "ERROR: test_grid_v3_execution.GridExecution.test_explicit_finite_scope_skips_model_review_and_keeps_job_provenance",
+   "test_id": "test_grid_v3_execution.GridExecution.test_explicit_finite_scope_skips_model_review_and_keeps_job_provenance",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_grid_v3_execution.GridExecution.test_populated_v2_ledger_survives_failed_then_replayed_migration",
+   "test_id": "test_grid_v3_execution.GridExecution.test_populated_v2_ledger_survives_failed_then_replayed_migration",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_grid_v3_execution.GridExecution.test_supplement_after_deterministic_assessment_reopens_real_review",
+   "test_id": "test_grid_v3_execution.GridExecution.test_supplement_after_deterministic_assessment_reopens_real_review",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_grid_v3_execution.GridExecution.test_uncertain_claim_requires_an_independent_reviewer_and_structure_precedes_io",
+   "test_id": "test_grid_v3_execution.GridExecution.test_uncertain_claim_requires_an_independent_reviewer_and_structure_precedes_io",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_replan.ChangedObjective.test_requires_matching_committed_plan_and_reenters_once",
+   "test_id": "test_p0_replan.ChangedObjective.test_requires_matching_committed_plan_and_reenters_once",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_resource_dimensions.ResourceDimensions.test_cold_resume_after_four_real_jobs_at_the_original_limit",
+   "test_id": "test_p0_resource_dimensions.ResourceDimensions.test_cold_resume_after_four_real_jobs_at_the_original_limit",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_accepted_decision_races_source_before_final_checkpoint",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_accepted_decision_races_source_before_final_checkpoint",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_acknowledged_natural_supplement_cannot_be_overtaken_by_scientific_close",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_acknowledged_natural_supplement_cannot_be_overtaken_by_scientific_close",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_cold_restart_between_source_commit_and_processing",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_cold_restart_between_source_commit_and_processing",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_new_items_reach_idle_and_active_turns_and_result_text",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_new_items_reach_idle_and_active_turns_and_result_text",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_priority_first_route",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_priority_first_route",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_priority_second_route_same_candidates",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_priority_second_route_same_candidates",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_source_between_completed_report_checkpoint_and_run_close",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_source_between_completed_report_checkpoint_and_run_close",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_source_commits_after_old_review_and_while_decision_is_running",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_source_commits_after_old_review_and_while_decision_is_running",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_review_sources.SourceDuringReview.test_source_commits_before_old_review_is_handed_in",
+   "test_id": "test_p0_review_sources.SourceDuringReview.test_source_commits_before_old_review_is_handed_in",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_science.CriterionDuringReview.test_changed_assessment_and_decision_use_fresh_products",
+   "test_id": "test_p0_science.CriterionDuringReview.test_changed_assessment_and_decision_use_fresh_products",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_p0_workspace.WorkspaceTests.test_public_keyed_starts_and_cold_replay",
+   "test_id": "test_p0_workspace.WorkspaceTests.test_public_keyed_starts_and_cold_replay",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_plugin_evaluator.ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt",
+   "test_id": "test_plugin_evaluator.ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt",
+   "original_error": "Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@deepseek-ai/cordis' imported from /home/claude/ashhuhk/gx-h-v2/gx-h/runtime/plugin-host/run.ts",
+   "classification": "environment",
+   "reason": "The Node plugin host could not load the package @deepseek-ai/cordis (ERR_MODULE_NOT_FOUND). The reviewer's sandbox did not have the release's bundled Node dependencies installed. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_plugin_evaluator.ScoreEvaluatorTest.test_pinned_input_version_relaunch_and_lost_reply",
+   "test_id": "test_plugin_evaluator.ScoreEvaluatorTest.test_pinned_input_version_relaunch_and_lost_reply",
+   "original_error": "Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@deepseek-ai/cordis' imported from /home/claude/ashhuhk/gx-h-v2/gx-h/runtime/plugin-host/run.ts",
+   "classification": "environment",
+   "reason": "The Node plugin host could not load the package @deepseek-ai/cordis (ERR_MODULE_NOT_FOUND). The reviewer's sandbox did not have the release's bundled Node dependencies installed. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_tl1a_geometry.GeometryWorkflow.test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project (situation='operator_paused')",
+   "test_id": "test_tl1a_geometry.GeometryWorkflow.test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_tl1a_geometry.GeometryWorkflow.test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project (situation='active_driver')",
+   "test_id": "test_tl1a_geometry.GeometryWorkflow.test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_tl1a_geometry.GeometryWorkflow.test_formal_geometry_criterion_and_changed_criterion_on_original_measurements",
+   "test_id": "test_tl1a_geometry.GeometryWorkflow.test_formal_geometry_criterion_and_changed_criterion_on_original_measurements",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_tl1a_geometry.GeometryWorkflow.test_quality_frozen_plan_real_jobs_independent_review_and_next_investigation",
+   "test_id": "test_tl1a_geometry.GeometryWorkflow.test_quality_frozen_plan_real_jobs_independent_review_and_next_investigation",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_tl1a_review_job.ReviewJob.test_four_job_cap_funds_one_review_then_stops",
+   "test_id": "test_tl1a_review_job.ReviewJob.test_four_job_cap_funds_one_review_then_stops",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_tl1a_review_job.ReviewJob.test_queue_wait_cold_resume_and_formal_results",
+   "test_id": "test_tl1a_review_job.ReviewJob.test_queue_wait_cold_resume_and_formal_results",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_tl1a_review_versions.ReviewContract.test_canonical_ids_settle_under_original_submission_and_v1_pin_survives",
+   "test_id": "test_tl1a_review_versions.ReviewContract.test_canonical_ids_settle_under_original_submission_and_v1_pin_survives",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_v21_teams.WorkspaceTeams.test_invalid_team_allocation_rolls_back_public_run_start",
+   "test_id": "test_v21_teams.WorkspaceTeams.test_invalid_team_allocation_rolls_back_public_run_start",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_v21_workspace_queue.WorkspaceQueueTests.test_partial_start_retry_preserves_run_and_allows_other_run_to_progress",
+   "test_id": "test_v21_workspace_queue.WorkspaceQueueTests.test_partial_start_retry_preserves_run_and_allows_other_run_to_progress",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_v21_workspace_queue.WorkspaceQueueTests.test_start_while_active_replay_rejection_and_status",
+   "test_id": "test_v21_workspace_queue.WorkspaceQueueTests.test_start_while_active_replay_rejection_and_status",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_v21_workspace_queue.WorkspaceQueueTests.test_uncreated_start_stays_pending_at_timeout_and_replays_after_restart",
+   "test_id": "test_v21_workspace_queue.WorkspaceQueueTests.test_uncreated_start_stays_pending_at_timeout_and_replays_after_restart",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_v21_workspace_queue.WorkspaceQueueTests.test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace (command='run')",
+   "test_id": "test_v21_workspace_queue.WorkspaceQueueTests.test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_v21_workspace_queue.WorkspaceQueueTests.test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace (command='resume')",
+   "test_id": "test_v21_workspace_queue.WorkspaceQueueTests.test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_v3_dispatch.GridDispatchPreparation.test_changed_criterion_runs_scorer_outside_writer_and_reuses_the_original_jobs",
+   "test_id": "test_v3_dispatch.GridDispatchPreparation.test_changed_criterion_runs_scorer_outside_writer_and_reuses_the_original_jobs",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "ERROR: test_v3_dispatch.GridDispatchPreparation.test_supplement_during_preparation_keeps_task_ready_for_current_context",
+   "test_id": "test_v3_dispatch.GridDispatchPreparation.test_supplement_during_preparation_keeps_task_ready_for_current_context",
+   "original_error": "gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "FAIL: test_p0_resource_dimensions.ResourceDimensions.test_specific_job_refusal_survives_resume_until_the_project_phase_changes",
+   "test_id": "test_p0_resource_dimensions.ResourceDimensions.test_specific_job_refusal_survives_resume_until_the_project_phase_changes",
+   "original_error": "AssertionError: 2 != 3",
+   "classification": "environment",
+   "reason": "Assertion on the number of Jobs (2 != 3) on a 2-CPU sandbox without the deterministic profile. The same test passes in the deterministic-profile rerun, consistent with the CPU-capacity cause. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "FAIL: test_science_activity_cycle.ScienceActivityCycle.test_assessment_crosses_http_and_decision_uses_saved_evidence",
+   "test_id": "test_science_activity_cycle.ScienceActivityCycle.test_assessment_crosses_http_and_decision_uses_saved_evidence",
+   "original_error": "RuntimeError: gx_run_start: {'ok': False, 'request_id': 'gxq_01m86df349j7831xxf', 'run_id': 'gxr_01m86df37pxj61wnb3', 'revision': 4, 'status': 'ACTIVE', 'data': {}, 'artifact_refs': [], 'warnings': [], 'error': {'code': 'RESOURCE_DENIED', 'message': \"needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended\", 'retryable': False, 'side_effect_status': 'PARTIAL', 'evidence_ref': ",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "FAIL: test_science_cycle.ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original",
+   "test_id": "test_science_cycle.ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original",
+   "original_error": "RuntimeError: gx_run_start: {'ok': False, 'request_id': 'gxq_01m86df44twbj24dk4', 'run_id': 'gxr_01m86df48j7b6zbsb5', 'revision': 4, 'status': 'ACTIVE', 'data': {}, 'artifact_refs': [], 'warnings': [], 'error': {'code': 'RESOURCE_DENIED', 'message': \"needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended\", 'retryable': False, 'side_effect_status': 'PARTIAL', 'evidence_ref': ",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "FAIL: test_science_cycle.ScienceCycle.test_project_driver_reconciles_without_a_model_turn",
+   "test_id": "test_science_cycle.ScienceCycle.test_project_driver_reconciles_without_a_model_turn",
+   "original_error": "RuntimeError: gx_run_start: {'ok': False, 'request_id': 'gxq_01m86df54w9vkagk2y', 'run_id': 'gxr_01m86df58n6hx77pqr', 'revision': 4, 'status': 'ACTIVE', 'data': {}, 'artifact_refs': [], 'warnings': [], 'error': {'code': 'RESOURCE_DENIED', 'message': \"needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended\", 'retryable': False, 'side_effect_status': 'PARTIAL', 'evidence_ref': ",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "FAIL: test_tl1a_review_job.ReviewJob.test_scientific_disagreement_and_unavailable_fit",
+   "test_id": "test_tl1a_review_job.ReviewJob.test_scientific_disagreement_and_unavailable_fit",
+   "original_error": "AssertionError: 'unavailable' != 'disagrees'",
+   "classification": "environment",
+   "reason": "The TL1A geometry reviewer returned status 'unavailable'. Its adapter imports Biopython (Bio), which was not installed in the reviewer's sandbox; the ImportError is caught and reported as unavailable. Still fails in the deterministic-profile rerun of 3a08a9d, where only the missing dependency remains.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "FAIL: test_v3_run_binding.RunPluginBinding.test_changed_package_blocks_only_dependent_run_and_preserves_receipts",
+   "test_id": "test_v3_run_binding.RunPluginBinding.test_changed_package_blocks_only_dependent_run_and_preserves_receipts",
+   "original_error": "AssertionError: 1 != 0 : ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "FAIL: test_v3_run_binding.RunPluginBinding.test_post_commit_partial_start_keeps_its_original_binding_before_any_job",
+   "test_id": "test_v3_run_binding.RunPluginBinding.test_post_commit_partial_start_keeps_its_original_binding_before_any_job",
+   "original_error": "AssertionError: 1 != 0 : ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  },
+  {
+   "original_id": "FAIL: test_v3_run_binding.RunPluginBinding.test_rollback_after_pin_and_cold_retry_preserve_one_run_and_its_jobs",
+   "test_id": "test_v3_run_binding.RunPluginBinding.test_rollback_after_pin_and_cold_retry_preserve_one_run_and_its_jobs",
+   "original_error": "AssertionError: 1 != 0 : ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended",
+   "classification": "environment",
+   "reason": "Job admission refused with RESOURCE_DENIED: on the reviewer's 2-CPU sandbox, without GX_TEST_RESOURCE_PROFILE, the CPU policy allowed one Job thread, so a test needing two concurrent Jobs was refused. Passes in the deterministic-profile rerun of 3a08a9d.",
+   "evidence": "gx-historical-42-failures-78a8b07.log"
+  }
+ ]
+}

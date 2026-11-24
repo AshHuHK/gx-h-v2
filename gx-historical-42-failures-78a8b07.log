@@ -1,0 +1,2017 @@
+.................................................................ssss...........EEEE..........................gx_task_finish raised an unhandled exception
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/api.py", line 268, in dispatch
+    result = ToolResult.coerce(handler(ctx, dict(clean)))
+                               ~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/teams/tools.py", line 90, in task_finish
+    out = _service(ctx).finish_task(task_id=args["task_id"], manifest_ref=args["manifest_ref"],
+                                    summary=args.get("summary"))
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/teams/service.py", line 1758, in finish_task
+    store.enqueue_outbox(conn, topic="submission.recorded",
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        idempotency_key=f"submission.recorded:{submission_id}",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        payload={"run_id": run_id, "event_id": event, "subject": submission_id, "task_id": task_id})
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/persistence/store.py", line 1294, in enqueue_outbox
+    cur = conn.execute(
+        "INSERT INTO outbox(created_at, topic, payload_json, idempotency_key, run_id) VALUES(?,?,?,?,?)",
+        (clock.now_iso(), topic, _j(payload), idempotency_key, payload.get("run_id")),
+    )
+sqlite3.IntegrityError: fixture: rollback before commit
+...............GX metrics unavailable (IsADirectoryError)
+../usr/local/lib/python3.13/json/decoder.py:361: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7f1d3726ec50>
+  obj, end = self.scan_once(s, idx)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.13/json/decoder.py:361: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7f1d3726e7a0>
+  obj, end = self.scan_once(s, idx)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+................................................................EE.continue of run gxr_01m86dedk950kwnhpz committed; the advance after it failed
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 2181, in run_control
+    advanced = engine.advance_resumed(begun)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+FEEEEEEEEE..............E.............................E.................EE..{"launch_id": "project-79028cffbe4e4bac89f629c159a39195", "project": "river-level-statistics", "work": "READY"}
+...{"launch_id": "project-925cf3d5232b4594bbfe77fb0e3c5ead", "project": "river-level-statistics", "work": "EMPTY"}
+{"launch_id": "project-14dcf660cf9d4337821993c37accb811", "project": "river-level-statistics", "work": "READY"}
+.{"launch_id": "project-b1c43fdf81dd448db890f43b377bae64", "project": "river-level-statistics", "work": "READY"}
+...{"launch_id": "project-216676569f304deeb47469b07b6202ca", "project": "river-level-statistics", "work": "READY"}
+.FFF.................................EEEEEEFE................................../usr/local/lib/python3.13/json/encoder.py:254: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7f1d3553ff10>
+  _iterencode = c_make_encoder(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..E.....E.EEEE...................................../usr/local/lib/python3.13/json/decoder.py:361: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7f1d3553fd30>
+  obj, end = self.scan_once(s, idx)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.........................EE........................FFF.127.0.0.1 - - [24/Nov/2026 09:17:31] "GET /api/science/conversations/demo/events?after=0 HTTP/1.1" 200 -
+.127.0.0.1 - - [24/Nov/2026 09:17:31] "POST /api/science/conversations/demo/messages HTTP/1.1" 409 -
+127.0.0.1 - - [24/Nov/2026 09:17:31] "POST /api/science/conversations/demo/messages HTTP/1.1" 202 -
+127.0.0.1 - - [24/Nov/2026 09:17:31] "POST /api/science/conversations/demo/messages HTTP/1.1" 202 -
+127.0.0.1 - - [24/Nov/2026 09:17:31] "POST /api/science/conversations/demo/messages HTTP/1.1" 409 -
+.127.0.0.1 - - [24/Nov/2026 09:17:31] "POST /api/science/conversations/demo/messages HTTP/1.1" 503 -
+127.0.0.1 - - [24/Nov/2026 09:17:31] "POST /api/science/conversations/demo/messages HTTP/1.1" 202 -
+.127.0.0.1 - - [24/Nov/2026 09:17:31] "POST /api/science/conversations/demo/messages HTTP/1.1" 202 -
+127.0.0.1 - - [24/Nov/2026 09:17:31] "POST /api/science/conversations/demo/messages HTTP/1.1" 403 -
+.127.0.0.1 - - [24/Nov/2026 09:17:31] "GET /api/science/conversations HTTP/1.1" 200 -
+127.0.0.1 - - [24/Nov/2026 09:17:31] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Nov/2026 09:17:31] "GET /api/science/conversations/demo HTTP/1.1" 200 -
+127.0.0.1 - - [24/Nov/2026 09:17:31] "GET /api/science/conversations/another HTTP/1.1" 404 -
+.
+======================================================================
+ERROR: test_explicit_finite_scope_skips_model_review_and_keeps_job_provenance (test_grid_v3_execution.GridExecution.test_explicit_finite_scope_skips_model_review_and_keeps_job_provenance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_grid_v3_execution.py", line 85, in test_explicit_finite_scope_skips_model_review_and_keeps_job_provenance
+    self.start(finite=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_grid_v3_execution.py", line 37, in start
+    self.run = service.run_start(driver.context(self.conn), {"objective": spec["objective"],
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "project_ref": "grid-science", "budget_profile": "p0", "workflow": {"id": "science_grid", "version": version},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0": True, "proposal": spec["proposal"], "max_rounds": 1, "p0_spec": spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key": "start"}, prepare_p0=bootstrap)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_populated_v2_ledger_survives_failed_then_replayed_migration (test_grid_v3_execution.GridExecution.test_populated_v2_ledger_survives_failed_then_replayed_migration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_grid_v3_execution.py", line 165, in test_populated_v2_ledger_survives_failed_then_replayed_migration
+    self.start(version="2")
+    ~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_grid_v3_execution.py", line 37, in start
+    self.run = service.run_start(driver.context(self.conn), {"objective": spec["objective"],
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "project_ref": "grid-science", "budget_profile": "p0", "workflow": {"id": "science_grid", "version": version},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0": True, "proposal": spec["proposal"], "max_rounds": 1, "p0_spec": spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key": "start"}, prepare_p0=bootstrap)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_supplement_after_deterministic_assessment_reopens_real_review (test_grid_v3_execution.GridExecution.test_supplement_after_deterministic_assessment_reopens_real_review)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_grid_v3_execution.py", line 130, in test_supplement_after_deterministic_assessment_reopens_real_review
+    self.start(finite=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_grid_v3_execution.py", line 37, in start
+    self.run = service.run_start(driver.context(self.conn), {"objective": spec["objective"],
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "project_ref": "grid-science", "budget_profile": "p0", "workflow": {"id": "science_grid", "version": version},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0": True, "proposal": spec["proposal"], "max_rounds": 1, "p0_spec": spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key": "start"}, prepare_p0=bootstrap)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_uncertain_claim_requires_an_independent_reviewer_and_structure_precedes_io (test_grid_v3_execution.GridExecution.test_uncertain_claim_requires_an_independent_reviewer_and_structure_precedes_io)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_grid_v3_execution.py", line 105, in test_uncertain_claim_requires_an_independent_reviewer_and_structure_precedes_io
+    self.start()
+    ~~~~~~~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_grid_v3_execution.py", line 37, in start
+    self.run = service.run_start(driver.context(self.conn), {"objective": spec["objective"],
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "project_ref": "grid-science", "budget_profile": "p0", "workflow": {"id": "science_grid", "version": version},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0": True, "proposal": spec["proposal"], "max_rounds": 1, "p0_spec": spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key": "start"}, prepare_p0=bootstrap)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_requires_matching_committed_plan_and_reenters_once (test_p0_replan.ChangedObjective.test_requires_matching_committed_plan_and_reenters_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_replan.py", line 30, in test_requires_matching_committed_plan_and_reenters_once
+    run = service.run_start(gx, {"objective":spec["objective"],"project_ref":"replan",
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "budget_profile":"p0","workflow":{"id":"science_grid","version":"1"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs":{"proposal":spec["proposal"],"max_rounds":3,"p0":True},"idempotency_key":"start"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        prepare_p0=bootstrap)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_cold_resume_after_four_real_jobs_at_the_original_limit (test_p0_resource_dimensions.ResourceDimensions.test_cold_resume_after_four_real_jobs_at_the_original_limit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_resource_dimensions.py", line 112, in test_cold_resume_after_four_real_jobs_at_the_original_limit
+    reactor.drive_science(context(db), run)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_accepted_decision_races_source_before_final_checkpoint (test_p0_review_sources.SourceDuringReview.test_accepted_decision_races_source_before_final_checkpoint)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_acknowledged_natural_supplement_cannot_be_overtaken_by_scientific_close (test_p0_review_sources.SourceDuringReview.test_acknowledged_natural_supplement_cannot_be_overtaken_by_scientific_close)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_cold_restart_between_source_commit_and_processing (test_p0_review_sources.SourceDuringReview.test_cold_restart_between_source_commit_and_processing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_new_items_reach_idle_and_active_turns_and_result_text (test_p0_review_sources.SourceDuringReview.test_new_items_reach_idle_and_active_turns_and_result_text)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_priority_first_route (test_p0_review_sources.SourceDuringReview.test_priority_first_route)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_priority_second_route_same_candidates (test_p0_review_sources.SourceDuringReview.test_priority_second_route_same_candidates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_source_between_completed_report_checkpoint_and_run_close (test_p0_review_sources.SourceDuringReview.test_source_between_completed_report_checkpoint_and_run_close)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_source_commits_after_old_review_and_while_decision_is_running (test_p0_review_sources.SourceDuringReview.test_source_commits_after_old_review_and_while_decision_is_running)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_source_commits_before_old_review_is_handed_in (test_p0_review_sources.SourceDuringReview.test_source_commits_before_old_review_is_handed_in)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_changed_assessment_and_decision_use_fresh_products (test_p0_science.CriterionDuringReview.test_changed_assessment_and_decision_use_fresh_products)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_science.py", line 229, in test_changed_assessment_and_decision_use_fresh_products
+    assigned = service.run_start(driver.context(conn), {"objective":spec["objective"],
+        "project_ref":"criterion-during-work","budget_profile":"p0","workflow":{"id":"science_grid","version":"1"},
+        "inputs":inputs,"idempotency_key":"criterion-run"},prepare_p0=bootstrap)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_public_keyed_starts_and_cold_replay (test_p0_workspace.WorkspaceTests.test_public_keyed_starts_and_cold_replay)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_workspace.py", line 62, in test_public_keyed_starts_and_cold_replay
+    first = cli.start(self.conn, self.directory, spec, run_key="A")
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/cli.py", line 179, in start
+    outcome = service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
+                      "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
+                      "inputs": inputs, "input_files": files, "idempotency_key": workspace.start_key(spec["project"], run_key)},
+                      prepare_p0=bootstrap, workspace_key=run_key, plugin_binding=bound)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_host_disposes_while_gx_job_keeps_its_owner_and_receipt (test_plugin_evaluator.ScoreEvaluatorTest.test_host_disposes_while_gx_job_keeps_its_owner_and_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/plugins/evaluator.py", line 77, in evaluate_scores
+    reply = subprocess.run(["node", "--experimental-strip-types", str(HOST / "run.ts")],
+                           input=json.dumps(payload, allow_nan=False), text=True,
+                           capture_output=True, timeout=60, check=True)
+  File "/usr/local/lib/python3.13/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['node', '--experimental-strip-types', '/home/claude/ashhuhk/gx-h-v2/gx-h/runtime/plugin-host/run.ts']' returned non-zero exit status 1.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_plugin_evaluator.py", line 99, in test_host_disposes_while_gx_job_keeps_its_owner_and_receipt
+    result = evaluate_scores(conn, **params)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/plugins/evaluator.py", line 81, in evaluate_scores
+    raise RuntimeError(f"score evaluator failed: {exc.stderr[-1500:]}") from exc
+RuntimeError: score evaluator failed: node:internal/modules/package_json_reader:314
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@deepseek-ai/cordis' imported from /home/claude/ashhuhk/gx-h-v2/gx-h/runtime/plugin-host/run.ts
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+    at packageResolve (node:internal/modules/esm/resolve:772:81)
+    at moduleResolve (node:internal/modules/esm/resolve:859:18)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v22.23.5
+
+
+======================================================================
+ERROR: test_pinned_input_version_relaunch_and_lost_reply (test_plugin_evaluator.ScoreEvaluatorTest.test_pinned_input_version_relaunch_and_lost_reply)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/plugins/evaluator.py", line 77, in evaluate_scores
+    reply = subprocess.run(["node", "--experimental-strip-types", str(HOST / "run.ts")],
+                           input=json.dumps(payload, allow_nan=False), text=True,
+                           capture_output=True, timeout=60, check=True)
+  File "/usr/local/lib/python3.13/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['node', '--experimental-strip-types', '/home/claude/ashhuhk/gx-h-v2/gx-h/runtime/plugin-host/run.ts']' returned non-zero exit status 1.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_plugin_evaluator.py", line 45, in test_pinned_input_version_relaunch_and_lost_reply
+    second = evaluate_scores(conn, **{**params, "attempt_id": "measure-2", "plugin_ref": plugin_ref("2")})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/plugins/evaluator.py", line 81, in evaluate_scores
+    raise RuntimeError(f"score evaluator failed: {exc.stderr[-1500:]}") from exc
+RuntimeError: score evaluator failed: node:internal/modules/package_json_reader:314
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@deepseek-ai/cordis' imported from /home/claude/ashhuhk/gx-h-v2/gx-h/runtime/plugin-host/run.ts
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+    at packageResolve (node:internal/modules/esm/resolve:772:81)
+    at moduleResolve (node:internal/modules/esm/resolve:859:18)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v22.23.5
+
+
+======================================================================
+ERROR: test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project (test_tl1a_geometry.GeometryWorkflow.test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project) (situation='operator_paused')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_geometry.py", line 165, in test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project
+    progress()
+    ~~~~~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_geometry.py", line 160, in progress
+    reactor.drive_science(gx, run)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project (test_tl1a_geometry.GeometryWorkflow.test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project) (situation='active_driver')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_geometry.py", line 165, in test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project
+    progress()
+    ~~~~~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_geometry.py", line 160, in progress
+    reactor.drive_science(gx, run)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_formal_geometry_criterion_and_changed_criterion_on_original_measurements (test_tl1a_geometry.GeometryWorkflow.test_formal_geometry_criterion_and_changed_criterion_on_original_measurements)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_geometry.py", line 230, in test_formal_geometry_criterion_and_changed_criterion_on_original_measurements
+    progress()
+    ~~~~~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_geometry.py", line 216, in progress
+    reactor.drive_science(context(conn), rid)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_quality_frozen_plan_real_jobs_independent_review_and_next_investigation (test_tl1a_geometry.GeometryWorkflow.test_quality_frozen_plan_real_jobs_independent_review_and_next_investigation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_geometry.py", line 117, in test_quality_frozen_plan_real_jobs_independent_review_and_next_investigation
+    reactor.drive_science(context(conn), run)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_four_job_cap_funds_one_review_then_stops (test_tl1a_review_job.ReviewJob.test_four_job_cap_funds_one_review_then_stops)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_review_job.py", line 93, in test_four_job_cap_funds_one_review_then_stops
+    self.exercise_study(4, [2])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_review_job.py", line 109, in exercise_study
+    reactor.drive_science(context(conn), run)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_queue_wait_cold_resume_and_formal_results (test_tl1a_review_job.ReviewJob.test_queue_wait_cold_resume_and_formal_results)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_review_job.py", line 90, in test_queue_wait_cold_resume_and_formal_results
+    self.exercise_study(6, [2, 3], record=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_review_job.py", line 109, in exercise_study
+    reactor.drive_science(context(conn), run)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_canonical_ids_settle_under_original_submission_and_v1_pin_survives (test_tl1a_review_versions.ReviewContract.test_canonical_ids_settle_under_original_submission_and_v1_pin_survives)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_review_versions.py", line 65, in test_canonical_ids_settle_under_original_submission_and_v1_pin_survives
+    reactor.drive_science(context(conn), rid)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/tl1a_geometry/nodes.py", line 229, in experiment
+    job = submit_geometry(ctx.conn, run_id=ctx.run_id, operation_id=operation(plan, protocol),
+                          structure_ref=plan["structure_ref"], protocol=protocol, criteria_ref=plan["criteria_ref"],
+                          quality_ref=plan["mask_ref"], binding={"workflow_id": ctx.workflow_id,
+                          "node_id": ctx.node, "evaluator": plan["evaluator"], "path_id": protocol})
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/geometry_workflow.py", line 20, in submit_geometry
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="tl1a-geometry",
+        capability=GEOMETRY, inputs=inputs, parameters={"protocol": protocol}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_invalid_team_allocation_rolls_back_public_run_start (test_v21_teams.WorkspaceTeams.test_invalid_team_allocation_rolls_back_public_run_start)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v21_teams.py", line 92, in test_invalid_team_allocation_rolls_back_public_run_start
+    started = cli.start(self.db,self.home,valid,run_key="A")
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/cli.py", line 179, in start
+    outcome = service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
+                      "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
+                      "inputs": inputs, "input_files": files, "idempotency_key": workspace.start_key(spec["project"], run_key)},
+                      prepare_p0=bootstrap, workspace_key=run_key, plugin_binding=bound)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_partial_start_retry_preserves_run_and_allows_other_run_to_progress (test_v21_workspace_queue.WorkspaceQueueTests.test_partial_start_retry_preserves_run_and_allows_other_run_to_progress)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v21_workspace_queue.py", line 101, in test_partial_start_retry_preserves_run_and_allows_other_run_to_progress
+    run_a = cli.start(conn, state, spec, run_key="A")["run_id"]
+            ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/cli.py", line 179, in start
+    outcome = service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
+                      "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
+                      "inputs": inputs, "input_files": files, "idempotency_key": workspace.start_key(spec["project"], run_key)},
+                      prepare_p0=bootstrap, workspace_key=run_key, plugin_binding=bound)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_start_while_active_replay_rejection_and_status (test_v21_workspace_queue.WorkspaceQueueTests.test_start_while_active_replay_rejection_and_status)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v21_workspace_queue.py", line 32, in test_start_while_active_replay_rejection_and_status
+    a = start("A")
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v21_workspace_queue.py", line 29, in start
+    return cli.execute(Namespace(command="start", state=state, spec=spec_file,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                 example=None, run_key=key))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/cli.py", line 313, in execute
+    return start(conn, directory, spec, run_key=args.run_key)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/cli.py", line 179, in start
+    outcome = service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
+                      "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
+                      "inputs": inputs, "input_files": files, "idempotency_key": workspace.start_key(spec["project"], run_key)},
+                      prepare_p0=bootstrap, workspace_key=run_key, plugin_binding=bound)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_uncreated_start_stays_pending_at_timeout_and_replays_after_restart (test_v21_workspace_queue.WorkspaceQueueTests.test_uncreated_start_stays_pending_at_timeout_and_replays_after_restart)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v21_workspace_queue.py", line 85, in test_uncreated_start_stays_pending_at_timeout_and_replays_after_restart
+    result = coordinator.drive_workspace(conn, state, 4)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/coordinator.py", line 170, in drive_workspace
+    delay = next(passes)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/driver.py", line 531, in passes
+    delay = next(cycles)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/driver.py", line 580, in _cycles
+    reactor.drive_science(self.ctx, self.rid)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/reactor.py", line 248, in drive_science
+    return engine.advance_resumed(begun, report_branch_failures=True)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1031, in advance_resumed
+    return self._advance(
+           ~~~~~~~~~~~~~^
+        run_id=begun["run_id"], workflow=begun["workflow"], state=dict(begun["state"]),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        actor=begun["actor"], resumed=True, report_branch_failures=report_branch_failures,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace (test_v21_workspace_queue.WorkspaceQueueTests.test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace) (command='run')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v21_workspace_queue.py", line 159, in test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace
+    sibling = cli.start(conn, state, spec, run_key="B")["run_id"]
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/cli.py", line 179, in start
+    outcome = service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
+                      "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
+                      "inputs": inputs, "input_files": files, "idempotency_key": workspace.start_key(spec["project"], run_key)},
+                      prepare_p0=bootstrap, workspace_key=run_key, plugin_binding=bound)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace (test_v21_workspace_queue.WorkspaceQueueTests.test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace) (command='resume')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v21_workspace_queue.py", line 159, in test_unkeyed_partial_start_resumes_by_saved_id_in_a_mixed_workspace
+    sibling = cli.start(conn, state, spec, run_key="B")["run_id"]
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/p0/cli.py", line 179, in start
+    outcome = service.run_start(context(conn), {"objective": spec["objective"], "project_ref": spec["project"],
+                      "budget_profile": budget_profile, "workflow": {"id": workflow, "version": version},
+                      "inputs": inputs, "input_files": files, "idempotency_key": workspace.start_key(spec["project"], run_key)},
+                      prepare_p0=bootstrap, workspace_key=run_key, plugin_binding=bound)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_changed_criterion_runs_scorer_outside_writer_and_reuses_the_original_jobs (test_v3_dispatch.GridDispatchPreparation.test_changed_criterion_runs_scorer_outside_writer_and_reuses_the_original_jobs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_dispatch.py", line 240, in setUp
+    self.f.setUp()
+    ~~~~~~~~~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+ERROR: test_supplement_during_preparation_keeps_task_ready_for_current_context (test_v3_dispatch.GridDispatchPreparation.test_supplement_during_preparation_keeps_task_ready_for_current_context)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_dispatch.py", line 240, in setUp
+    self.f.setUp()
+    ~~~~~~~~~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_review_sources.py", line 35, in setUp
+    self.run = service.run_start(driver.context(self.conn), {
+               ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "objective": spec["objective"], "project_ref": "late-source", "budget_profile": "p0",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "workflow": {"id":"science_grid","version":"2"},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "inputs": {"p0":True,"proposal":spec["proposal"],"max_rounds":self.rounds,"p0_spec":spec},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "idempotency_key":"start"}, prepare_p0=bind)["run_id"]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/service.py", line 693, in run_start
+    started = engine.start(
+        run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+        inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
+        actor=ctx.actor,
+    )
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 900, in start
+    return self._advance(run_id=run_id, workflow=workflow, state=state, actor=actor)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1427, in _advance
+    return self._advance_nodes(run_id=run_id, workflow=workflow, state=state, actor=actor,
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               resumed=resumed, advance_id=advance_id,
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               report_branch_failures=report_branch_failures)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/orchestration/engine.py", line 1530, in _advance_nodes
+    result = node.fn(ctx)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/workflows/science_grid/nodes.py", line 118, in experiment
+    job = submit_grid(ctx.conn, run_id=ctx.run_id, operation_id=_operation(ctx.round, path),
+                      input_ref=path["input_ref"], **binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/grid_workflow.py", line 11, in submit_grid
+    return submit_workflow_job(conn, run_id=run_id, operation_id=operation_id, family="grid",
+        capability=GRID, inputs={"grid": input_ref}, parameters={"operation": operation_id}, binding=binding)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/workflow.py", line 36, in submit_workflow_job
+    return jobs.submit(run_id=run_id, capability_version=capability, purpose=PURPOSE_WORKFLOW,
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       input_manifest_ref=manifest_ref, parameters=parameters, idempotency_key=key, binding=binding)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 390, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 699, in _admit
+    self._threads_or_refuse(txn, resources)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/gx_core/jobs/service.py", line 747, in _threads_or_refuse
+    raise refusal
+gx_core.errors.ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+======================================================================
+FAIL: test_specific_job_refusal_survives_resume_until_the_project_phase_changes (test_p0_resource_dimensions.ResourceDimensions.test_specific_job_refusal_survives_resume_until_the_project_phase_changes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_p0_resource_dimensions.py", line 52, in test_specific_job_refusal_survives_resume_until_the_project_phase_changes
+    self.assertEqual(len(jobs), 3)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 2 != 3
+
+======================================================================
+FAIL: test_assessment_crosses_http_and_decision_uses_saved_evidence (test_science_activity_cycle.ScienceActivityCycle.test_assessment_crosses_http_and_decision_uses_saved_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_science_activity_cycle.py", line 66, in test_assessment_crosses_http_and_decision_uses_saved_evidence
+    started = step("start", "--execution-profiles", str(profile_file))
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_science_activity_cycle.py", line 64, in step
+    self.assertEqual(proc.returncode, 0, proc.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 338, in <module>
+    main()
+    ~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 334, in main
+    print(json.dumps(execute(p.parse_args()), ensure_ascii=False, indent=2))
+                     ~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 266, in execute
+    peer.callback(
+    ~~~~~~~~~~~~~^
+        "gx_run_start",
+        ^^^^^^^^^^^^^^^
+    ...<7 lines>...
+        },
+        ^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 147, in callback
+    raise RuntimeError(f"{tool}: {payload}")
+RuntimeError: gx_run_start: {'ok': False, 'request_id': 'gxq_01m86df349j7831xxf', 'run_id': 'gxr_01m86df37pxj61wnb3', 'revision': 4, 'status': 'ACTIVE', 'data': {}, 'artifact_refs': [], 'warnings': [], 'error': {'code': 'RESOURCE_DENIED', 'message': "needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended", 'retryable': False, 'side_effect_status': 'PARTIAL', 'evidence_ref': None, 'suggested_recovery': 'Run creation is committed. Inspect gx_run_status for this run and recover the existing workflow; the supplied idempotency key retains its original creation refs.', 'details': {'rule': 'cpu.threads_free', 'needed': 1, 'free': 0, 'allowed': 1, 'held': 1, 'holders': ['gxj_01m86df3arareteb8c'], 'run_creation': {'run_id': 'gxr_01m86df37pxj61wnb3', 'budget_ref': 'gxb_01m86df37pbfmjkx25', 'objective_id': 'gxo_01m86df37q2sxcs4h3', 'coordinator_lease_ref': 'gxcl_01m86df37qyvbnm60s', 'idempotency_key': 'science-grid:main', 'side_effect_status': 'APPLIED'}}}}
+
+
+======================================================================
+FAIL: test_lost_handin_then_redelivery_preserves_each_original (test_science_cycle.ScienceCycle.test_lost_handin_then_redelivery_preserves_each_original)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_science_cycle.py", line 56, in test_lost_handin_then_redelivery_preserves_each_original
+    first = invoke("start")
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_science_cycle.py", line 53, in invoke
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 338, in <module>
+    main()
+    ~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 334, in main
+    print(json.dumps(execute(p.parse_args()), ensure_ascii=False, indent=2))
+                     ~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 266, in execute
+    peer.callback(
+    ~~~~~~~~~~~~~^
+        "gx_run_start",
+        ^^^^^^^^^^^^^^^
+    ...<7 lines>...
+        },
+        ^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 147, in callback
+    raise RuntimeError(f"{tool}: {payload}")
+RuntimeError: gx_run_start: {'ok': False, 'request_id': 'gxq_01m86df44twbj24dk4', 'run_id': 'gxr_01m86df48j7b6zbsb5', 'revision': 4, 'status': 'ACTIVE', 'data': {}, 'artifact_refs': [], 'warnings': [], 'error': {'code': 'RESOURCE_DENIED', 'message': "needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended", 'retryable': False, 'side_effect_status': 'PARTIAL', 'evidence_ref': None, 'suggested_recovery': 'Run creation is committed. Inspect gx_run_status for this run and recover the existing workflow; the supplied idempotency key retains its original creation refs.', 'details': {'rule': 'cpu.threads_free', 'needed': 1, 'free': 0, 'allowed': 1, 'held': 1, 'holders': ['gxj_01m86df4bsk3v30cz8'], 'run_creation': {'run_id': 'gxr_01m86df48j7b6zbsb5', 'budget_ref': 'gxb_01m86df48jqz6qe1hz', 'objective_id': 'gxo_01m86df48jpvrse305', 'coordinator_lease_ref': 'gxcl_01m86df48kambdtzkz', 'idempotency_key': 'science-grid:main', 'side_effect_status': 'APPLIED'}}}}
+
+
+======================================================================
+FAIL: test_project_driver_reconciles_without_a_model_turn (test_science_cycle.ScienceCycle.test_project_driver_reconciles_without_a_model_turn)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_science_cycle.py", line 28, in test_project_driver_reconciles_without_a_model_turn
+    self.assertEqual(started.returncode, 0, started.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 338, in <module>
+    main()
+    ~~~~^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 334, in main
+    print(json.dumps(execute(p.parse_args()), ensure_ascii=False, indent=2))
+                     ~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 266, in execute
+    peer.callback(
+    ~~~~~~~~~~~~~^
+        "gx_run_start",
+        ^^^^^^^^^^^^^^^
+    ...<7 lines>...
+        },
+        ^^
+    )
+    ^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/examples/science_cycle.py", line 147, in callback
+    raise RuntimeError(f"{tool}: {payload}")
+RuntimeError: gx_run_start: {'ok': False, 'request_id': 'gxq_01m86df54w9vkagk2y', 'run_id': 'gxr_01m86df58n6hx77pqr', 'revision': 4, 'status': 'ACTIVE', 'data': {}, 'artifact_refs': [], 'warnings': [], 'error': {'code': 'RESOURCE_DENIED', 'message': "needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended", 'retryable': False, 'side_effect_status': 'PARTIAL', 'evidence_ref': None, 'suggested_recovery': 'Run creation is committed. Inspect gx_run_status for this run and recover the existing workflow; the supplied idempotency key retains its original creation refs.', 'details': {'rule': 'cpu.threads_free', 'needed': 1, 'free': 0, 'allowed': 1, 'held': 1, 'holders': ['gxj_01m86df5c0rx4yksab'], 'run_creation': {'run_id': 'gxr_01m86df58n6hx77pqr', 'budget_ref': 'gxb_01m86df58nfvpemcgq', 'objective_id': 'gxo_01m86df58pxk2sz6q5', 'coordinator_lease_ref': 'gxcl_01m86df58pqgdfy8tw', 'idempotency_key': 'science-grid:main', 'side_effect_status': 'APPLIED'}}}}
+
+
+======================================================================
+FAIL: test_scientific_disagreement_and_unavailable_fit (test_tl1a_review_job.ReviewJob.test_scientific_disagreement_and_unavailable_fit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_tl1a_review_job.py", line 82, in test_scientific_disagreement_and_unavailable_fit
+    self.assertEqual(altered["status"], "disagrees")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'unavailable' != 'disagrees'
+- unavailable
++ disagrees
+
+
+======================================================================
+FAIL: test_changed_package_blocks_only_dependent_run_and_preserves_receipts (test_v3_run_binding.RunPluginBinding.test_changed_package_blocks_only_dependent_run_and_preserves_receipts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 134, in test_changed_package_blocks_only_dependent_run_and_preserves_receipts
+    original = self.start('composed', spec)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 53, in start
+    return self.cli('start', '--state', self.state, '--run-key', key, '--spec', self.spec_path, error=error)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 48, in cli
+    self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+
+======================================================================
+FAIL: test_post_commit_partial_start_keeps_its_original_binding_before_any_job (test_v3_run_binding.RunPluginBinding.test_post_commit_partial_start_keeps_its_original_binding_before_any_job)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 122, in test_post_commit_partial_start_keeps_its_original_binding_before_any_job
+    recovered = self.start('partial', spec)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 53, in start
+    return self.cli('start', '--state', self.state, '--run-key', key, '--spec', self.spec_path, error=error)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 48, in cli
+    self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+
+======================================================================
+FAIL: test_rollback_after_pin_and_cold_retry_preserve_one_run_and_its_jobs (test_v3_run_binding.RunPluginBinding.test_rollback_after_pin_and_cold_retry_preserve_one_run_and_its_jobs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 88, in test_rollback_after_pin_and_cold_retry_preserve_one_run_and_its_jobs
+    first = self.start('retry', spec)
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 53, in start
+    return self.cli('start', '--state', self.state, '--run-key', key, '--spec', self.spec_path, error=error)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/ashhuhk/gx-h-v2/gx-h/tests/test_v3_run_binding.py", line 48, in cli
+    self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : ResourceDenied: RESOURCE_DENIED: needs 1 threads and 0 are free: this store's jobs hold 1 of the 1 threads jobs may use (cpu.max_pool_workers, cpu.max_quota_fraction). Submit it again when one of them has ended
+
+
+----------------------------------------------------------------------
+Ran 465 tests in 129.808s
+
+FAILED (failures=8, errors=34, skipped=4)
+exit=1

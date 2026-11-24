@@ -44,7 +44,7 @@ def brief_sizes(state):
 def compare_case(revision, mode, work):
     work.mkdir()
     result = {}
-    args = SimpleNamespace(commit=revision, mode=mode, lane="west", wave=0, rollout_diagnostics=True)
+    args = SimpleNamespace(commit=revision, mode=mode, lane="west", wave=0)
     public.run(args, result, work)
     observed = result["observed"]
     outcomes = {path: {k: route[k] for k in ("points", "threshold", "supported")}

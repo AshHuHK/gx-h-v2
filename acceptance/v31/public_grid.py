@@ -203,8 +203,9 @@ def run(args, result, work):
     result["build"] = stage_source(work, install, commit)
     spec = specification(install, args.wave, args.lane)
     spec.update(workflow_version="3", plugins=["org.gx.science-grid@3.0.0"])
-    if getattr(args, "rollout_diagnostics", False):
-        spec.setdefault("metering", {})["rollout_diagnostics"] = True
+    # Every arm asserts exact paid usage. Both frozen products receive the same
+    # explicit permission to read the pinned host's scoped completion evidence.
+    spec.setdefault("metering", {})["rollout_diagnostics"] = True
     if args.mode == "deterministic":
         for route in spec["proposal"]["paths"]:
             route["claim_scope"] = "finite_grid_threshold"

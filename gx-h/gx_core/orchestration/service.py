@@ -333,7 +333,13 @@ def require_pins(run: sqlite3.Row, workflow: Workflow) -> dict[str, Any]:
     ``CONTENT_HASH_MISMATCH``. Either names both digests. A pin the run never recorded
     (a run created below the tool surface) is not compared.
     """
-    pinned, now = run_pins(run), installed_pins(workflow, run=run)
+    now = installed_pins(workflow, run=run)
+    _check_pins(run, now)
+    return now
+
+
+def _check_pins(run: sqlite3.Row, now: Mapping[str, Any]) -> None:
+    pinned = run_pins(run)
     if pinned["workflow_sha256"] and pinned["workflow_sha256"] != now["workflow_sha256"]:
         raise VersionImmutable(
             f"workflow {run['workflow_id']}@{run['workflow_version']} has changed since run "
@@ -351,7 +357,6 @@ def require_pins(run: sqlite3.Row, workflow: Workflow) -> dict[str, Any]:
                 details={"run_id": run["run_id"], "what": what, "pinned_sha256": pinned[key],
                          "installed_sha256": now[key]},
             )
-    return now
 
 
 # ---------------------------------------------------------------------- gx_run_start
@@ -1025,6 +1030,14 @@ def _run_status(ctx: Ctx, run_id: str) -> dict[str, Any]:
                       "gx_run_resume settles it, and gx_next_actions lists such tasks under blocked "
                       "until then"] if unsettled else []) + doubt_warnings,
     }
+    waits = engine.waits(run_id)
+    if waits:
+        result["workflow"]["node_waits"] = {
+            node: {key: wait[key] for key in ("status", "owner", "reason", "interrupt_ref", "references", "since", "next_retry_at")
+                   if key in wait} for node, wait in waits.items()
+        }
+    if engine_state.get("failed_nodes"):
+        result["workflow"]["failed_nodes"] = engine_state["failed_nodes"]
     # Frozen inputs are handed off by metadata only. Never expose their original
     # paths, arbitrary input objects or file contents through this read surface.
     inputs = store.loads(run, "inputs_json", {})
@@ -1439,7 +1452,7 @@ def run_resume(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
     if workflow is None:
         raise SchemaInvalid(f"run {run_id} was never started on a workflow", details={"run_id": run_id})
     require_coordinator(ctx,conn,run_id,args.get("coordinator_lease_ref"),renew=False)
-    require_pins(run, workflow)
+    verified_pins = require_pins(run, workflow)
     # The caller's view is checked against the run as it was asked about; what time and
     # decisions have settled is then settled, and stands on its own.
     store.check_revision(conn, run_id, args.get("expected_revision"))
@@ -1455,8 +1468,10 @@ def run_resume(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
 
     def resume(tx: sqlite3.Connection) -> dict[str, Any]:
         require_coordinator(ctx, tx, run_id, args.get("coordinator_lease_ref"))
-        _require_no_held_submission(tx, run_id)
-        _require_workers_on_policy(tx, run_id, engine.state(run_id).get("pending_interrupt") or {})
+        _check_pins(_run(tx, run_id), verified_pins)
+        pending = engine.pending_for(run_id, args["interrupt_ref"], conn=tx)
+        _require_no_held_submission(tx, run_id, pending=pending)
+        _require_workers_on_policy(tx, run_id, pending)
         begun.update(engine.begin_resume(
             tx, run_id=run_id, interrupt_ref=args["interrupt_ref"],
             submission_refs=args.get("submission_refs") or [],
@@ -1592,7 +1607,8 @@ def _after_commit(ctx: Ctx, run_id: str, exc: Exception, *, acted: str, with_wai
     return out
 
 
-def _require_no_held_submission(conn: sqlite3.Connection, run_id: str) -> None:
+def _require_no_held_submission(conn: sqlite3.Connection, run_id: str, *,
+                                pending: Mapping[str, Any] | None = None) -> None:
     """A run does not advance while a submission of any of its tasks waits for the user.
 
     Not only the tasks the interrupt names: a held review, or any side task, means the run
@@ -1601,8 +1617,11 @@ def _require_no_held_submission(conn: sqlite3.Connection, run_id: str) -> None:
     decision still open and the work then accepted into an ended run.
     """
     held = recovery.pending_holds(conn, run_id)
-    checkpoint=conn.execute("SELECT state_json FROM checkpoints WHERE run_id=? ORDER BY seq DESC LIMIT 1",(run_id,)).fetchone()
-    pending=((store.loads(checkpoint,"state_json",{}) or {}).get("pending_interrupt") or {}) if checkpoint else {}
+    if not held:
+        return
+    if pending is None:
+        checkpoint = store.latest_checkpoint(conn, run_id)
+        pending = (store.loads(checkpoint, "state_json", {}) or {}).get("pending_interrupt") or {}
     if pending.get("kind")=="stage":
         held=[item for item in held if conn.execute("SELECT 1 FROM approvals WHERE approval_id=?"
             " AND action_kind IN ('model_switch','worker_refusal')",(item["approval_id"],)).fetchone()]
@@ -1617,7 +1636,8 @@ def _require_no_held_submission(conn: sqlite3.Connection, run_id: str) -> None:
         )
 
 
-def _require_workers_on_policy(conn: sqlite3.Connection, run_id: str, pending: Mapping[str, Any]) -> None:
+def _require_workers_on_policy(conn: sqlite3.Connection, run_id: str, pending: Mapping[str, Any], *,
+                               round_index: int | None = None) -> None:
     """No accepted submission the run is about to build on came from outside the policy.
 
     A submission is judged against the policy when it is handed in, and held if the
@@ -1630,7 +1650,7 @@ def _require_workers_on_policy(conn: sqlite3.Connection, run_id: str, pending: M
     if pending.get("kind")=="stage":
         from . import expansion
         task_ids=[task["task_id"] for task in expansion.stage_tasks(conn,run_id,
-            str((pending.get("payload") or {}).get("stage")),expansion.current_round(conn,run_id))]
+            str((pending.get("payload") or {}).get("stage")),round_index)]
     for task_id in task_ids:
         submission = conn.execute(
             "SELECT * FROM submissions WHERE task_id=? AND result='ACCEPTED' ORDER BY rowid DESC LIMIT 1",
@@ -1995,7 +2015,8 @@ def run_control(ctx: Ctx, args: Mapping[str, Any], *, defer_advance: bool = Fals
         cancel_requested: list[str] = []
         needs: list[dict[str, Any]] = []
         recovery_point = None
-        engine_state = _engine(ctx.child(conn=tx), run_id).state(run_id)
+        engine = _engine(ctx.child(conn=tx), run_id)
+        engine_state = engine.state(run_id)
         point = {"status": status, "node": engine_state["node"],
                  "interrupt_ref": run["interrupt_ref"], "checkpoint_seq": engine_state["checkpoint_seq"]}
 
@@ -2009,11 +2030,13 @@ def run_control(ctx: Ctx, args: Mapping[str, Any], *, defer_advance: bool = Fals
                 payload={"action": "pause", "continue_from": point},
             )
             recovery_point = point
-        elif action == "continue" and status == "ACTIVE" and not engine_state["pending_interrupt"]:
+        elif action == "continue" and (
+                (status == "ACTIVE" and not engine_state["pending_interrupt"])
+                or (status in machines.waiting_states(RUN) and engine.idle(run_id))):
             # Not paused: left idle by a node that raised or a process that died between two
             # nodes. There is no state to change; the run is driven on after this transaction.
             # A run another call is still advancing is not idle, and is not driven twice.
-            if not _engine(ctx.child(conn=tx), run_id).idle(run_id):
+            if not engine.idle(run_id):
                 # Contract r5: CONCURRENT_RUN while another call is advancing the run.
                 raise ConcurrentRun(
                     f"run {run_id} is ACTIVE and another call is advancing it; there is nothing to "
@@ -2147,10 +2170,15 @@ def run_control(ctx: Ctx, args: Mapping[str, Any], *, defer_advance: bool = Fals
         # runs inside the control call's transaction. A replay finds the run already moved on,
         # or still idle if the first call died here, and then finishes the job.
         engine = _engine(ctx, run_id)
-        if engine.idle(run_id):
-            _require_no_held_submission(conn, run_id)
+        with store.transaction(conn) as tx:
+            begun = None
+            if engine.idle(run_id):
+                require_coordinator(ctx, tx, run_id, args.get("coordinator_lease_ref"), operator_may=True, renew=False)
+                _require_no_held_submission(tx, run_id)
+                begun = engine.begin_advance(tx, run_id=run_id, actor=ctx.actor)
+        if begun:
             try:
-                advanced = engine.advance(run_id=run_id, actor=ctx.actor)
+                advanced = engine.advance_resumed(begun)
             except Exception as exc:  # noqa: BLE001 - the continue is on record; see _after_commit
                 # gx_run_control declares no waiting_for, so the state is in the warning only.
                 advanced = _after_commit(ctx, run_id, exc, acted="continue", with_waiting=False)

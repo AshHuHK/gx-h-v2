@@ -16,7 +16,10 @@ from typing import Any, Callable, Mapping
 from .. import config
 from ..context import Ctx
 from ..domain import ids, machines
-from ..errors import ArtifactNotFound, ContentHashMismatch, GxError, VersionImmutable
+from ..errors import (
+    ApprovalRequired, ArtifactNotFound, ConcurrentRun, ContentHashMismatch, GxError, IllegalTransition,
+    ModelPolicyViolation, VersionImmutable,
+)
 from ..persistence import store
 from ..teams import recovery
 from . import expansion, reactions, seams
@@ -200,27 +203,49 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
         return None
     hooks.replan(conn, run_id)
     engine = service._engine(backend, run_id)
+    # An unchanged parked run needs no write transaction. The selected wait
+    # and its authority are checked again under the lock that consumes it.
+    ready_refs = set()
+    for wait in engine.waits(run_id).values():
+        ref = wait["interrupt_ref"]
+        try:
+            if engine.standing(run_id, interrupt_ref=ref).complete:
+                ready_refs.add(ref)
+        except IllegalTransition as exc:
+            if exc.details.get("supplied_interrupt_ref") != ref:
+                raise
+    if not ready_refs and not engine.idle(run_id, retry_failed=False):
+        return None
+    workflow = service._pinned_workflow(conn, run)
+    verified = service.require_pins(run, workflow)
+    begun = None
     with store.transaction(conn) as tx:
         run = _run(tx, run_id)
         if run["status"] not in {"ACTIVE", *machines.waiting_states("run")}:
             return None
-        workflow = service._pinned_workflow(tx, run)
-        service.require_pins(run, workflow)
-        checkpoint = store.latest_checkpoint(tx, run_id)
-        if checkpoint is None:
+        if (workflow.workflow_id, workflow.version) != (run["workflow_id"], run["workflow_version"]):
             return None
-        pending = store.loads(checkpoint, "state_json", {}).get("pending_interrupt")
-        if pending:
-            if not engine.standing(run_id, conn=tx).complete:
+        service._check_pins(run, verified)
+        for wait in engine.waits(run_id, conn=tx).values():
+            ref = wait["interrupt_ref"]
+            if ref not in ready_refs or not engine.standing(run_id, conn=tx, interrupt_ref=ref).complete:
+                continue
+            try:
+                service._require_no_held_submission(tx, run_id, pending=wait["interrupt"])
+                service._require_workers_on_policy(tx, run_id, wait["interrupt"], round_index=wait.get("round"))
+            except (ApprovalRequired, ModelPolicyViolation):
+                continue
+            try:
+                begun = engine.begin_resume(tx, run_id=run_id, interrupt_ref=ref, actor=backend.actor)
+            except ConcurrentRun:
+                return None
+            break
+        if begun is None:
+            if not engine.idle(run_id, retry_failed=False):
                 return None
             service._require_no_held_submission(tx, run_id)
-            service._require_workers_on_policy(tx, run_id, pending)
-            begun = engine.begin_resume(tx, run_id=run_id, interrupt_ref=checkpoint["interrupt_ref"], actor=backend.actor)
-        elif run["status"] == "ACTIVE" and engine.idle(run_id):
-            begun = None
-        else:
-            return None
-    return engine.advance_resumed(begun) if begun else engine.advance(run_id=run_id, actor=backend.actor)
+            begun = engine.begin_advance(tx, run_id=run_id, actor=backend.actor, retry_failed=False)
+    return engine.advance_resumed(begun)
 
 
 def on_submission_accepted(ctx: Ctx, run_id: str, row: sqlite3.Row, payload: Mapping[str, Any]) -> dict[str, Any]:
@@ -465,9 +490,11 @@ def derive_waiting(ctx: Ctx,run_id: str) -> None:
     run=_run(ctx.conn,run_id)
     if run["status"] not in machines.waiting_states("run"):
         return
-    checkpoint=ctx.conn.execute("SELECT state_json,node FROM checkpoints WHERE run_id=? ORDER BY seq DESC LIMIT 1",(run_id,)).fetchone()
+    checkpoint = store.latest_checkpoint(ctx.conn, run_id)
     state=store.loads(checkpoint,"state_json",{}) or {}
-    if (state.get("pending_interrupt") or {}).get("kind")!="stage":
+    if len(state.get("node_waits", {})) > 1 or (state.get("pending_interrupt") or {}).get("kind")!="stage":
+        # Mixed waits already project their selected head. A Job on a sibling
+        # branch cannot change this stage into an external-Job wait.
         return
     approvals=ctx.conn.execute("SELECT 1 FROM approvals WHERE run_id=? AND status='PENDING'"
         " AND action_kind IN ('model_switch','worker_refusal') LIMIT 1",(run_id,)).fetchone()
@@ -479,7 +506,9 @@ def derive_waiting(ctx: Ctx,run_id: str) -> None:
     if target!=run["status"]:
         with store.transaction(ctx.conn) as tx:
             current=_run(tx,run_id)
-            if current["status"] in machines.waiting_states("run") and current["status"]!=target:
+            latest = store.latest_checkpoint(tx, run_id)
+            if (latest is not None and latest["seq"] == checkpoint["seq"] and
+                    current["status"] in machines.waiting_states("run") and current["status"]!=target):
                 store.transition(tx,machine="run",subject_id=run_id,to_state=target,actor=ctx.actor,
                     reason="the stage's waiting state follows its stored tasks, jobs and approvals",
                     evidence_level="EXECUTION_OBSERVED",payload=recovery.derived({"stage":checkpoint["node"]}))

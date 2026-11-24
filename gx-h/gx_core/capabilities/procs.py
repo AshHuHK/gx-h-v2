@@ -103,7 +103,7 @@ def run_bounded(
     }
 
 
-def process_start_ticks(pid: int) -> str | None:
+def process_start_ticks(pid: int, *, raise_unreadable: bool = False) -> str | None:
     """When ``pid`` started, in clock ticks since boot, or None if there is no such process.
 
     A pid alone is not an identity: the kernel reuses it. A pid together with its start
@@ -112,7 +112,11 @@ def process_start_ticks(pid: int) -> str | None:
     try:
         with open(f"/proc/{pid}/stat", "rb") as handle:
             raw = handle.read().decode("utf-8", "replace")
+    except (FileNotFoundError, ProcessLookupError):
+        return None
     except OSError:
+        if raise_unreadable:
+            raise
         return None
     # The command name is in parentheses and may itself contain spaces or parentheses.
     tail = raw.rsplit(") ", 1)
@@ -127,10 +131,10 @@ def process_start_ticks(pid: int) -> str | None:
     return fields[19]
 
 
-def is_alive(pid: int | None, started: str | None) -> bool:
+def is_alive(pid: int | None, started: str | None, *, raise_unreadable: bool = False) -> bool:
     if not pid or not started:
         return False
-    return process_start_ticks(int(pid)) == str(started)
+    return process_start_ticks(int(pid), raise_unreadable=raise_unreadable) == str(started)
 
 
 __all__ = ["MAX_CAPTURED_CHARS", "MINIMAL_ENV", "is_alive", "kill_group", "process_start_ticks",

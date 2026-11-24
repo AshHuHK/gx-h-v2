@@ -59,7 +59,7 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any, Mapping
 
-from .. import config, contracts
+from .. import config, contracts, metrics
 from ..capabilities import environments, probe, registry, storage
 from ..capabilities import manifest as manifest_mod
 from ..context import SCOPE_WORKER, Ctx, Principal
@@ -269,7 +269,8 @@ class JobService:
         return row
 
     def _paths(self, job_id: str) -> executor.JobPaths:
-        return executor.paths(storage.jobs_root(self.conn), job_id)
+        # Admission creates these directories. Status must see when the backend directory is missing.
+        return executor.paths(storage.store_dir(self.conn) / "jobs", job_id)
 
     def _staging(self, row: sqlite3.Row) -> Path | None:
         return storage.store_dir(self.conn) / row["staging_ref"] if row["staging_ref"] else None
@@ -317,6 +318,8 @@ class JobService:
             view["artifact_refs"].append(recovery_ref)
         if (observation or {}).get("reason"):
             view["observation"] = observation["reason"]
+        if (observation or {}).get("deferred"):
+            view["reconciliation_deferred"] = True
         return view
 
     # ------------------------------------------------------------------------ submit
@@ -1474,13 +1477,20 @@ class JobService:
         if run_id is not None:
             query += " AND run_id=?"
             params.append(run_id)
+        started = time.monotonic_ns()
+        rows = self.conn.execute(query + " ORDER BY created_at", params).fetchall()
         changed = []
-        for row in self.conn.execute(query + " ORDER BY created_at", params).fetchall():
+        deferred = 0
+        for row in rows:
             before = row["status"]
-            self._reconcile_one(row)
+            observation = self._reconcile_one(row)
+            if observation and observation.get("deferred"):
+                deferred += 1
             after = self._row(row["job_id"])
             if after["status"] != before:
                 changed.append({"job_id": row["job_id"], "from": before, "to": after["status"]})
+        metrics.record("job_reconcile", started=started, run_id=run_id, open_jobs=len(rows),
+                       changed_jobs=len(changed), deferred_jobs=deferred)
         return changed
 
     def _reconcile_one(self, row: sqlite3.Row) -> dict[str, Any] | None:
@@ -1493,6 +1503,7 @@ class JobService:
         the job. "Not there" is different from "cannot be read": a runner records itself
         before it starts the tool and writes its outcome before it exits, so a missing
         record is itself an observation.
+        A temporary backend failure supplies no new observation. The next poll retries it.
         """
         status = row["status"]
         if status in TERMINAL:
@@ -1500,9 +1511,17 @@ class JobService:
         if status == CREATED:
             return self._look_at_created(row)
         job_id = row["job_id"]
-        job = self._paths(job_id)
-        observation = executor.observe(job.job_dir, runner_pid=row["runner_pid"],
-                                       runner_started=row["runner_started"])
+        try:
+            job = self._paths(job_id)
+            observation = executor.observe(job.job_dir, runner_pid=row["runner_pid"],
+                                           runner_started=row["runner_started"])
+        except OSError as exc:
+            if not executor.temporarily_unavailable(exc):
+                raise
+            return executor.observation_error(exc)
+        if observation.get("deferred"):
+            # A failed status lookup provides no new Job fact. Keep its last observation and hold.
+            return observation
         state = observation["state"]
 
         if self.conn.in_transaction:

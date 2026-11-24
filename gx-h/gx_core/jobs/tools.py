@@ -90,7 +90,9 @@ def _warn_about(ctx: Ctx, view: Mapping[str, Any]) -> None:
     if view["stale"]:
         ctx.warn("the runner is alive and has not written a heartbeat recently; the status is "
                  "the last one it reported")
-    if view["status"] == job_service.OUTCOME_UNKNOWN:
+    if view.get("reconciliation_deferred"):
+        ctx.warn(view["observation"])
+    elif view["status"] == job_service.OUTCOME_UNKNOWN:
         ctx.warn("how this job is doing cannot be read, so nothing was decided about it: "
                  f"{view.get('observation') or 'no reason recorded'}. Do not submit it again; ask "
                  "again later, or cancel it to stop waiting")

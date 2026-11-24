@@ -22,6 +22,7 @@ job read that way is UNKNOWN, never lost and never failed.
 
 from __future__ import annotations
 
+import errno
 import json
 import os
 import shutil
@@ -124,7 +125,8 @@ def read_json(path: Path) -> dict[str, Any] | None:
 def read_record(path: Path) -> tuple[dict[str, Any] | None, str | None]:
     """``(document, problem)``. Both None when the file does not exist; a problem when it
     exists and cannot be read. The runner writes every record whole (write, fsync, rename),
-    so a record that does not parse was not left half-written by it."""
+    so a record that does not parse was not left half-written by it. A temporary I/O
+    failure propagates to the observation for the next poll."""
     path = Path(path)
     try:
         with open(path, encoding="utf-8") as handle:
@@ -132,6 +134,8 @@ def read_record(path: Path) -> tuple[dict[str, Any] | None, str | None]:
     except FileNotFoundError:
         return None, None
     except (OSError, ValueError) as exc:
+        if isinstance(exc, OSError) and temporarily_unavailable(exc):
+            raise
         return None, f"{path.name} exists and cannot be read ({type(exc).__name__}: {str(exc)[:200]})"
     if not isinstance(value, dict):
         return None, f"{path.name} exists and is not a JSON object"
@@ -187,6 +191,22 @@ def launch(job_dir: Path) -> dict[str, Any]:
     return {"runner_pid": int(answer["runner_pid"]), "runner_started": str(answer["runner_started"])}
 
 
+def temporarily_unavailable(error: OSError) -> bool:
+    """A failed read that gives no evidence about the Job or its runner."""
+    return isinstance(error, (TimeoutError, ConnectionError, BlockingIOError, InterruptedError)) or error.errno in {
+        errno.ESTALE, errno.EIO, errno.EBUSY, errno.ENETDOWN, errno.ENETUNREACH, errno.EHOSTUNREACH, errno.ENOTCONN,
+    }
+
+
+def observation_error(error: OSError) -> dict[str, Any]:
+    deferred = temporarily_unavailable(error)
+    reason = ("Job reconciliation deferred while the status backend is temporarily unavailable"
+              if deferred else "Job status unreadable")
+    return {"observed_at": clock.now_iso(), "state": UNKNOWN, "outcome": None, "status": None,
+            "runner_alive": None, "heartbeat_age_seconds": None, "stale": False, "deferred": deferred,
+            "reason": f"{reason} ({type(error).__name__}, {str(error)[:200]})"}
+
+
 def observe(job_dir: Path, *, runner_pid: int | None = None,
             runner_started: str | None = None) -> dict[str, Any]:
     """What can be seen of a job now. Reads files and ``/proc``; changes nothing.
@@ -197,27 +217,35 @@ def observe(job_dir: Path, *, runner_pid: int | None = None,
     ``status.json``.
     """
     job_dir = Path(job_dir)
+    try:
+        seen = _observe(job_dir, runner_pid, runner_started)
+        # Check after the reads. Storage can disappear between the first lookup and a
+        # negative result, while an outcome or running status already read is positive evidence.
+        if seen["state"] in (NOT_STARTED, LOST, STARTING) and not job_dir.is_dir():
+            return _missing_directory(job_dir, seen)
+        return seen
+    except OSError as exc:
+        return observation_error(exc)
+
+
+def _missing_directory(job_dir: Path, record: dict[str, Any]) -> dict[str, Any]:
+    if not job_dir.parent.is_dir():
+        return {**record, "state": UNKNOWN, "runner_alive": None, "deferred": True,
+                "reason": f"Job reconciliation deferred while the backend directory {job_dir.parent} is unavailable"}
+    pid = record.get("runner_pid")
+    if not pid:
+        return {**record, "state": UNKNOWN, "runner_alive": None,
+                "reason": f"the job directory {job_dir} is gone and no runner is recorded on the job"}
+    if record["runner_alive"]:
+        return {**record, "state": STARTING, "reason": f"the job directory {job_dir} is gone and its runner pid {pid} is alive"}
+    return {**record, "state": UNKNOWN,
+            "reason": f"the job directory {job_dir} is gone and its runner pid {pid} is no longer alive"}
+
+
+def _observe(job_dir: Path, runner_pid: int | None, runner_started: str | None) -> dict[str, Any]:
     record: dict[str, Any] = {"observed_at": clock.now_iso(), "state": NOT_STARTED, "outcome": None,
                               "status": None, "runner_alive": False, "heartbeat_age_seconds": None,
                               "stale": False}
-    if not job_dir.is_dir():
-        # A job's directory is made before its row exists and is never removed while the job
-        # is open, so a missing one was taken away: whatever it said cannot be read.
-        if not (runner_pid and runner_started):
-            return {**record, "state": UNKNOWN, "runner_alive": None,
-                    "reason": f"the job directory {job_dir} is gone and no runner is recorded on the "
-                              "job: whether one ran, and how it ended, cannot be read"}
-        alive = procs.is_alive(runner_pid, runner_started)
-        record.update(runner_pid=runner_pid, runner_started=runner_started, runner_alive=alive,
-                      identity_from="job row")
-        if alive:
-            # It is running somewhere: it holds what it holds. What it will say cannot be read.
-            return {**record, "state": STARTING,
-                    "reason": f"the job directory {job_dir} is gone; its runner pid {runner_pid} is alive"}
-        return {**record, "state": UNKNOWN,
-                "reason": f"the job directory {job_dir} is gone and its runner pid {runner_pid} is not "
-                          "alive: how the job ended cannot be read"}
-
     outcome, outcome_problem = read_record(job_dir / "outcome.json")
     if outcome is not None:
         return {**record, "state": FINISHED, "outcome": outcome}
@@ -228,7 +256,7 @@ def observe(job_dir: Path, *, runner_pid: int | None = None,
         ("runner.json", launcher), ("job row", {"runner_pid": runner_pid, "runner_started": runner_started}),
         ("status.json", status))
     record.update(runner_pid=pid, runner_started=started, identity_from=source)
-    alive: bool | None = procs.is_alive(pid, started) if pid else None
+    alive: bool | None = procs.is_alive(pid, started, raise_unreadable=True) if pid else None
     record["runner_alive"] = alive
 
     if outcome_problem:
@@ -375,5 +403,5 @@ def remove_tree(path: Path | None) -> None:
 
 __all__ = ["FINISHED", "GPU_LOCK_TEMPLATE", "HEARTBEAT_SECONDS", "JobPaths", "LOST", "NOT_STARTED",
            "QUEUED", "RUNNER_PATH", "RUNNING", "RunnerLaunchFailed", "STARTING", "UNKNOWN", "end_orphans",
-           "gpu_lock_path", "gpu_queue", "launch", "observe", "paths", "read_json", "read_record",
-           "remove_tree", "request_cancel", "write_spec"]
+           "gpu_lock_path", "gpu_queue", "launch", "observation_error", "observe", "paths", "read_json", "read_record",
+           "remove_tree", "request_cancel", "temporarily_unavailable", "write_spec"]

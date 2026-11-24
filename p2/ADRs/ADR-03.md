@@ -1,6 +1,6 @@
 # ADR-03　人类 Goal、计算裁决与科学签署
 
-**状态为提议，待审阅。** Human/PI 决定研究范围、Goal 验收条件和硬预算。Evaluator 报告测量，GX 计算机械验收结果。超出机械标准的科学主张由 PI 对具体证据签署。
+**Phase 1.5 决策。** PI 拥有研究范围、Goal 验收条件和硬预算。未来首版 GraphVersion 之前，既有持久记录须能恢复同一 Run 的 Goal、硬预算、插件组合及初始化授权，供建图时复核。2A 静态 Workflow 继续用原有预算、产物、评估和结算所有者。[首次决策及作用域](ADR-01.md)
 
 ## Existing · 沿用的所有者
 
@@ -16,12 +16,12 @@ GX 在调用插件前保存规范化的人类输入。现有启动路径会合�
 
 ## New · Measurement、GX 裁决与 PI 签署
 
-Evaluator 返回有类型的 Measurement，包含指标名、有限数值、单位、有效性和来源引用。语义类别限定为直接测量、数值验证、模型派生代理、启发式指标、实验结果。GX 依据实际调用核对生产者及其已批准的摘要，绑定 Run、GraphVersion、节点、Attempt、适用的 Job 和输入 Artifact 摘要。GX 校验单位、类别、来源和完整性，再用已冻结的 Goal 比较规则写入 computational verdict。无类型的 pass、生产者返回的 `accepted`、未批准的替换均按无效输入处理。缺测或无效测量保留原因，不能形成支持或反驳结论。相同输入重放返回原裁决，准则改变时从原测量产生关联的新裁决。[现有插件接口](../../gx-h/gx_core/plugins/runtime_context.py#L165) · [grid 原始测量复核](../../gx-h/workflows/science_grid_v3/contract.py#L134) · [原输入复评回执](../../acceptance/runs/science/test_criterion_changes_before_original_evaluation_commits.json#L19)
+Evaluator 返回有类型的 Measurement，含指标名、有限数值、单位、有效性和来源，可区分直接测量、数值验证、模型代理、启发式指标和实验结果。2D 的通用 Product/Evidence 交付依据声明的产品或测量 schema，关联实际生产者、Run、节点及适用的 Job/Attempt 和输入摘要。GX 校验单位、类别、来源和完整性，用已冻结的 Goal 比较规则裁决。无类型的 pass、无效测量或未批准的生产者不能形成科学判决。大输入解析、摘要及纯计算在 Writer 外进行，提交时复核当前 Goal/授权、版本和幂等性，才登记 Evidence 与判决。历史 `science_grid@3` 的类型合同与回执沿原路径读取。[通用提交](ADR-05.md) · [Writer 边界](ADR-04.md) · [原始测量复核](../../gx-h/workflows/science_grid_v3/contract.py#L134) · [原输入复评](../../acceptance/runs/science/test_criterion_changes_before_original_evaluation_commits.json#L19)
 
 科学状态初始为 `PENDING_HUMAN`。例如，模型代理指标超过阈值可得到 computational PASS；结合或活性主张仍须满足该 Goal 所列证据条件。实际 PI 通过可信的人类入口签署或拒绝，GX 将身份、主张、Goal 版本及摘要、计算裁决和证据集摘要一同写入原有操作员回执与事件。证据或主张改变时，原签署只关联原版本。独立模型审阅和 Task 提交仍有各自的证据价值。已有本地 CLI 在受信进程中识别操作员，测试脚本也可驱动；自动化回执标明 `SCRIPTED`，正式结论须有真实人类签署记录。[证据层级](../../gx-h/contracts/labels.json#L72) · [本地操作员边界](../../gx-h/gx_core/p0/operator.py#L20) · [历史脚本身份](../../acceptance/runs/intent-cli-confirmations/summary.json#L113)
 
 ## Deferred · 验收与迁移边界
 
-本阶段只裁定接口。A04 验证两类 Codex 会话及插件通过显式字段、别名和 hook 放宽阈值或增加预算时，GX 拒绝整项提交。A08 对照原始数据核验 Measurement 与 GX 裁决，并拒绝无类型 pass。A09 在初建、amendment 和冷恢复验证未批准的生产者变更被拒。A22 验证代理达标时科学状态仍待签。可用脚本验证签署权限和摘要新鲜度，真实湿实验和具名 PI 签署随实际项目留证。
+2A 的静态产物与结算回归不要求引入全套 Goal/Measurement 类型。后续 A04 验证 Codex 两种会话或插件无法经字段、别名及 hook 放宽阈值或加预算。A08 验证 Measurement 与原始数据及 GX 裁决一致。A09 在建图、amendment 与恢复时验证生产者授权。A22 保留代理达标时的科学待签状态。真实湿实验及 PI 签署随实际项目留证。[验收矩阵](../ACCEPTANCE_MATRIX.md)
 
 历史 Run 继续用原 pin，保留旧判定和账目。此 ADR 复用现有表的版本化文档和事件，无需回填历史 Goal、Measurement 或签署。回退时恢复静止点的旧程序和状态副本，另存升级后已发生的 Job、结果与费用供对账。

@@ -1,0 +1,150 @@
+{
+  "evidence_class": "SCRIPTED (real Linux POSIX locks, spawn, loopback HTTP and GX SQLite)",
+  "failed_revision": "1f8fc82",
+  "corrected_revision": "e97ff086e936a2dcc0fa9f5738321f24131fecff",
+  "original_suite": {
+    "archive": "acceptance/hardening/runs/p2a1-baseline-1f8fc82/raw.tar.gz",
+    "file": "v31-regression/evidence/suite/python-full.log",
+    "file_sha256": "0c5314b81520ebe3f5126f0ed87f458bc5c088a0cb69cc083101f2b643617637",
+    "original_worker_failures": [
+      "test_lost_reply_blocks_duplicate_request_through_recovery",
+      "test_receipt_reopens_original_and_budget"
+    ],
+    "exception_lines": [
+      102,
+      117
+    ],
+    "assertion_lines": [
+      555,
+      563
+    ]
+  },
+  "diagnosis": "The test launcher held a kernel lock. The mutable global /proc/locks iteration sometimes omitted its entry while unrelated temporary files acquired or released locks. The spawned worker then failed GX import before contacting the loopback provider. Recovery correctly retained the unknown outcome.",
+  "kernel_observation": {
+    "original": {
+      "total_checks": 30740,
+      "total_misses": 1036
+    },
+    "candidate": {
+      "total_checks": 66817,
+      "total_misses": 0
+    }
+  },
+  "activity_controls": {
+    "repeat-baseline": {
+      "run": 60,
+      "failures": {},
+      "profile_error_traces": 0,
+      "exit_code": 0
+    },
+    "candidate-repeat": {
+      "run": 60,
+      "failures": {},
+      "profile_error_traces": 0,
+      "exit_code": 0
+    },
+    "business-original": {
+      "run": 60,
+      "failures": {
+        "test_lost_reply_blocks_duplicate_request_through_recovery": 2,
+        "test_receipt_reopens_original_and_budget": 2
+      },
+      "profile_error_traces": 4,
+      "exit_code": 1
+    },
+    "business-candidate": {
+      "run": 60,
+      "failures": {},
+      "profile_error_traces": 0,
+      "exit_code": 0
+    }
+  },
+  "scope_commands": {
+    "refused-gx-p0-deterministic": 1,
+    "refused-gx-p0-real": 1,
+    "refused-gx-deterministic": 1,
+    "refused-gx-real": 1,
+    "refused-gx-native-deterministic": 1,
+    "refused-gx-native-real": 1,
+    "refused-gx-project-deterministic": 1,
+    "refused-gx-project-real": 1,
+    "refused-gx-science-deterministic": 1,
+    "refused-gx-science-real": 1,
+    "refused-gx-web-deterministic": 1,
+    "refused-gx-web-real": 1,
+    "refused-guessed-marker": 1,
+    "refused-unlocked-file": 1,
+    "refused-wrong-lock-range": 1,
+    "refused-python-module": 1,
+    "refused-unrelated-launcher": 1,
+    "refused-expired-launcher": 1,
+    "ordinary-cli": 0,
+    "controlled-grandchild": 0,
+    "deterministic-start": 0,
+    "deterministic-reopen": 0,
+    "deterministic-replay": 0,
+    "real-start": 0,
+    "real-reopen": 0,
+    "real-replay": 0
+  },
+  "scope_outcome": "PASS",
+  "accepted_proof": "Matching live ancestor PID, descriptor, device/inode, POSIX advisory write lock and exact byte range come from the descriptor-specific kernel record. Each requested test scope is rechecked. Normal real-resource commands do not request a fixture scope.",
+  "model_tests": "Both original unittest methods, their five-second provider deadline, request-count assertions, idempotency and budget checks are unchanged. Each repetition runs independent SQLite and loopback HTTP fixtures.",
+  "reproduce": {
+    "kernel": "From an unpacked evidence directory: <python> -B compare_lock.py <checkout> <new-result.json>. The forced overlap is real and the number of misses on an old kernel traversal is scheduling-dependent.",
+    "activity": "<python> -B business.py <checkout> <new-private-work-dir> (stdout/stderr carry the original unittest results).",
+    "scope": "<python> -B acceptance/closure/profile_cases.py --case PROFILE-SCOPE --out <new-evidence-dir> --python <python> --binary <locked-codex>. The *-network.json files contain the complete local Clash namespace command and exit status for each measurement."
+  },
+  "archive_sha256": "d45ee045c46cf2c5bc452fa8084e9d4aa5ec6ad75a1ab2b06cf5d6209f9ea046",
+  "raw_files_sha256": {
+    "repeat.py": "bff7edc335fd6e67510e5cc48ccd9df3b8d5373c3688c63df90a85156ce39e75",
+    "business.py": "9da703d6a13d920b5b60928c27dc4bb3625167ef1e749bc0c53b559785485c69",
+    "compare_lock.py": "062b312a59d6f40064600702be1354a0ea62ce88f896b791a860f0872a962edb",
+    "repeat-baseline.log": "efc9d9f2daa9e456c77b0a6c9c446b22bd4900eff58e22799502d5caf9b0b97f",
+    "repeat-baseline-network.json": "b414aeeae598353ec6d5080e095a51d081b51ef66d84b09a10335e4eaa7a82b3",
+    "candidate-repeat.log": "70e291b441a6bea34b74d7c262c874381c2703cbd8f8fb3c48faef33b52b27d4",
+    "candidate-repeat-network.json": "8990e5d99fcbd243c537bd5bf96dfda4da5c00eeab1fe8217772cd8cfd310f50",
+    "business-original.log": "64693599287e279c01ae5f9149246a88453d15fddbe339d3bb19da5e18b8a43c",
+    "business-candidate.log": "0bd649bfcd93c334559ecd9d651c804e3d849fe890757ec0fdacb2302452dbef",
+    "business-original-network.json": "417015333ff193ee7fad752b21f3cae1560b71c044d4765b637c752becc38227",
+    "business-candidate-network.json": "0a27040ea25bb8aaeef08b5cdf6558ec5816888770458b89fa7a5eb21c8820be",
+    "kernel-original.json": "6c6b140348f0f5a776fb6d4b79f3b90fe2b509b3a46ddf5da4d0e1bfdf325307",
+    "kernel-candidate.json": "c9280a68cdcdb4eaec84a354dcac57b08ba3435e719e7f363b27494718c00897",
+    "kernel-original-network.json": "12620bc802d0f98f98f064203f350d0de300ac8aa4ce3c50abbbbcfcfcb28c31",
+    "kernel-candidate-network.json": "cbc6d6498fcc2ee4d3ec252e2f2c5f96eec72b5f442eea553c020e03411969b9",
+    "candidate-scope.log": "31fcb16fa00a4750cc2e85d979047aa13a3f9c2f8f2829ca5296eaff61d17ad7",
+    "candidate-scope-network.json": "fb26409b6c349784b7098e7962d968653ab0fe08091f4f74782a4aa5f6c432f9",
+    "candidate-scope/commands.json": "2b3ed196f3d63a2bc8666dabef035f18a7d1a00acdb2e39dcd61e7d7e1522a98",
+    "candidate-scope/controlled-grandchild.log": "6069f5e4c20ee29caa9fb6cd1f186dfd2a072ffe34c70ed5b5be0109554200cc",
+    "candidate-scope/deterministic-reopen.log": "6d22f78921ace8701c4479a5dc05308298bd4bcba8d7c526f87296859c55d856",
+    "candidate-scope/deterministic-replay.log": "6d22f78921ace8701c4479a5dc05308298bd4bcba8d7c526f87296859c55d856",
+    "candidate-scope/deterministic-start.log": "6d22f78921ace8701c4479a5dc05308298bd4bcba8d7c526f87296859c55d856",
+    "candidate-scope/deterministic-transactions.jsonl": "b67a83de6d7efd5eedcfaca9f596cb7b68c7282b1b895a6a40d195c986f6dfc0",
+    "candidate-scope/deterministic.sqlite.gz": "84aafa1425fd3db75f4c168e34a881cbdd9d90e64a6d656f9c93af40ad7bf0aa",
+    "candidate-scope/ordinary-cli.log": "6069f5e4c20ee29caa9fb6cd1f186dfd2a072ffe34c70ed5b5be0109554200cc",
+    "candidate-scope/real-reopen.log": "c084dcc31585a0009102efd9cba1a4f9f12ca9b1116af35ffab013f756e0c5ba",
+    "candidate-scope/real-replay.log": "c084dcc31585a0009102efd9cba1a4f9f12ca9b1116af35ffab013f756e0c5ba",
+    "candidate-scope/real-start.log": "c084dcc31585a0009102efd9cba1a4f9f12ca9b1116af35ffab013f756e0c5ba",
+    "candidate-scope/real-transactions.jsonl": "acf54a07674204a7161b12e3516efa0ce256884737e9d78d7e1506f03d571b30",
+    "candidate-scope/real.sqlite.gz": "a907a31199f4a5e22dd6bd8d8bbd174fcf985bced1c86a05cd2ad83fe3716b21",
+    "candidate-scope/refused-expired-launcher.log": "0a2dc7c314f604f9237614880ab890d39f524e4efc242eed14a2b27868a1eaca",
+    "candidate-scope/refused-guessed-marker.log": "0a2dc7c314f604f9237614880ab890d39f524e4efc242eed14a2b27868a1eaca",
+    "candidate-scope/refused-gx-deterministic.log": "915d60402bc7c8240712a4ce7d68aff1dbd0582121ba39a9d408796b82605971",
+    "candidate-scope/refused-gx-native-deterministic.log": "267ed2c5fc97d7a50d70b62e43495df90935d629f9f8a76ad418920c7974d95b",
+    "candidate-scope/refused-gx-native-real.log": "f3348c420ee29060f87e8bde1ab0f98ab2341ac1854e3fcc1f128a9378330c66",
+    "candidate-scope/refused-gx-p0-deterministic.log": "0a2dc7c314f604f9237614880ab890d39f524e4efc242eed14a2b27868a1eaca",
+    "candidate-scope/refused-gx-p0-real.log": "f8e4926f6d093d4f919bc2224bcb19592c9bae7f636b0363417b9b419a1a7628",
+    "candidate-scope/refused-gx-project-deterministic.log": "289b670f893945bc6de5035669c97febdb7f457100d1656254324cd75e95449e",
+    "candidate-scope/refused-gx-project-real.log": "d211beb584128b89ab2499901ceaf46fd7995af0550b7d84f4833c5647638990",
+    "candidate-scope/refused-gx-real.log": "9a31708da717bab741d7ede7a8c65ef37b386bdcec0ee2d0e5a073e94c0e5915",
+    "candidate-scope/refused-gx-science-deterministic.log": "62a2f24d2ac4373d468d3646d52034659f7940989c3b968750b3571b14cc3a1c",
+    "candidate-scope/refused-gx-science-real.log": "87ec4411910bd5e512b6e6d9b1328fdc9291c4f2cbef2a06adb734d8d3597b78",
+    "candidate-scope/refused-gx-web-deterministic.log": "d827caa3ba29b2c9ecc2bbfafcd76ecf8a0456f29ca0d585fe0661ccdbef43ff",
+    "candidate-scope/refused-gx-web-real.log": "3752629565fa43d94aaed1d362027f9816f0f8b6b8146dd50d521df3d3a47120",
+    "candidate-scope/refused-python-module.log": "915d60402bc7c8240712a4ce7d68aff1dbd0582121ba39a9d408796b82605971",
+    "candidate-scope/refused-unlocked-file.log": "0a2dc7c314f604f9237614880ab890d39f524e4efc242eed14a2b27868a1eaca",
+    "candidate-scope/refused-unrelated-launcher.log": "0a2dc7c314f604f9237614880ab890d39f524e4efc242eed14a2b27868a1eaca",
+    "candidate-scope/refused-wrong-lock-range.log": "0a2dc7c314f604f9237614880ab890d39f524e4efc242eed14a2b27868a1eaca",
+    "candidate-scope/result.json": "d5f8348abdb1bc5ef4df7d30290b8a946e72bc578178da8043180e2d1ae08554"
+  }
+}

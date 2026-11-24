@@ -9,6 +9,8 @@
 | T03 历史身份 | 真实执行原 `unittest discover -s tests -v`，耗时 166.378 秒。逐个匹配原修订的 465 个身份和跳过原因。历史 42 项的逐项归因待该次原始证据。 | SCRIPTED |
 | 真实资源准入 | 本机观测 224 个逻辑 CPU、24 核 cgroup quota，生产配置按 0.5 配额比例和 8 线程上限给出 8 个可用线程。`nvidia-smi` 返回 1 个设备。一个真实本地合成 CPU Job 经同一服务准入、启动并成功结束，产生 3 个输出。 | REAL_COMPUTE |
 
+T03 从命名提交导出的临时源码运行。T01、T02 与真实资源调用在同一时段的工作树中执行，运行环境文件列出了该时刻其他并行工程改动。[修订与工作树记录](acceptance/closure/profile-history/20261124T111105Z-ebd13f73e167/environment.json)
+
 ## 资源与环境入口
 
 验收进程通过 `GX_TEST_RESOURCE_PROFILE=deterministic` 选择固定观察值。两核夹具将 CPU 池设为 2、配额比例设为 1.0。容量快照与 `JobService.submit` 都通过 `cpu_room` 扣除同一 store 中已占用的线程。原生产配置在相同两核输入下实际给出 1 个 Job 线程。真实 profile 使用原配置、cgroup 读取和 GPU 探测。测试专门传入的 GPU 解析样本仍使用其自身输入。[资源选择](gx-h/gx_core/config.py) · [CPU 与 Job 容量](gx-h/gx_core/jobs/capacity.py) · [GPU 读取](gx-h/gx_core/capabilities/probe.py)
@@ -33,3 +35,5 @@ bin/gx-acceptance verify 20261124T111105Z-ebd13f73e167 --runs-dir acceptance/clo
 ```
 
 已校验并解包 39 份原始文件。压缩包 SHA-256 为 `55002f3d627f4888cde68da7968c2f66e26f41dde408f715d325a874fd6bcc2e`。两个确定性准入数据库各有 3 个 Job、28 个事件，真实资源数据库有 1 个 Job、30 个事件，三个快照的 SQLite 完整性检查均为 `ok`。[逐文件 SHA-256](acceptance/closure/profile-history/20261124T111105Z-ebd13f73e167/raw-files.sha256)
+
+在 `68a33ed` 上，套件从导出的产品中实测两核、两个 Job 线程和零个 GPU，156.989 秒完成 465 项。随后 T03 读取同次原始日志与运行回执，0.155 秒完成逐项对照，判定仍为 PARTIAL，执行模式为 `reused`。修改原始日志的负对照触发摘要不匹配。补充归档保留了原始日志、固定依赖、命令、网络环境以及 465 项的复用结果。[复用原始证据](acceptance/closure/profile-history/warm-68a33ed.tar.gz) · [归档 SHA-256](acceptance/closure/profile-history/warm-68a33ed.tar.sha256)

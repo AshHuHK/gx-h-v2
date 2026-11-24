@@ -79,27 +79,53 @@ def rapid_child(probe):
             roots.client.run_until(lambda f:f.message.get('method')=='turn/completed'
                                    and f.message['params']['threadId']==root,timeout=10)
             probe.peer.release_child.set()
-            roots.client.run_until(lambda f:f.message.get('method')=='turn/completed'
-                                   and f.message['params']['threadId']!=root,timeout=10)
-            child=db.execute('SELECT child_id FROM p0_native_child_meters WHERE root_id=?',(root,)).fetchone()[0]
+            completed=roots.client.run_until(lambda f:f.message.get('method')=='turn/completed'
+                                              and f.message['params']['threadId']!=root,timeout=10)
+            assert completed is not None
+            child=completed.message['params']['threadId']
+            child_turn=completed.message['params']['turn']['id']
+            warm=db.execute('SELECT metadata_verified FROM p0_native_child_meters WHERE root_id=? AND child_id=?',
+                            (root,child)).fetchone()[0]
         with connect() as roots:
             capture(roots,probe)
             roots.ensure_main()
             facts=roots._request('thread/read',{'threadId':child,'includeTurns':False})['thread']
+            parent_history=roots._request('thread/read',{'threadId':root,'includeTurns':True})['thread']
+            child_history=roots._request('thread/read',{'threadId':child,'includeTurns':True})['thread']
             clock.advance(2)
             roots.poll(.05)
             snapshot=accounting(db,run,budget)
             row=dict(db.execute('SELECT * FROM p0_native_child_meters WHERE child_id=?',(child,)).fetchone())
             usage=dict(db.execute('SELECT * FROM p0_native_child_usage WHERE child_id=?',(child,)).fetchone())
+        parent_items=[i for t in parent_history['turns'] if t['id']==turn for i in t.get('items',[])
+                      if i.get('type')=='subAgentActivity' and i.get('kind')=='started' and i.get('agentThreadId')==child]
+        child_turns=[{k:t.get(k) for k in ('id','rootTurnId','status','completedAt')} for t in child_history['turns']]
+        source=child_history.get('source')
+        spawn=source.get('subAgent',{}).get('thread_spawn',{}) if isinstance(source,dict) else {}
+        evidence={
+            'original_parent_spawn':parent_history['id']==parent_history['sessionId']==root and bool(parent_items),
+            'same_unloaded_child':child_history['id']==child_history['sessionId']==child and child!=root
+                and child_history['status']['type']=='notLoaded' and child_history['cliVersion']=='0.169.0',
+            'native_spawn_parent':child_history.get('parentThreadId')==spawn.get('parent_thread_id')==root
+                and child_history.get('forkedFromId') in (None,root),
+            'exact_completed_child_turn':any(t['id']==child_turn and t['rootTurnId']==turn and t['status']=='completed'
+                                             and type(t['completedAt']) is int for t in child_turns),
+        }
         checks={'official_candidate_has_same_root_and_turn':row['root_id']==root and row['parent_id']==root and
                         row['owner_turn']==turn and usage['owner_turn']==turn,
                 'cold_unloaded_child_identity_is_incomplete':facts['status']['type']=='notLoaded' and
-                       facts['sessionId']==child and row['metadata_verified']==0,
+                       facts['id']==facts['sessionId']==child and facts['sessionId']!=root and not facts.get('turns'),
+                'child_unverified_without_cold_history':warm==0,
+                'unloaded_child_verification_matches_terminal_history':row['metadata_verified']==int(all(evidence.values())),
                 'missing_child_remains_unknown':usage['measured_tokens'] is None and not snapshot['adjustments'],
                 'one_provisional_charge_and_no_new_calls':snapshot['spent']=={'api_calls':1,'tokens':100} and
                        snapshot['turns'][0]['confidence']=='ESTIMATED' and not snapshot['reserved'] and len(probe.peer.rows)==3}
         return {'run':run,'thread':root,'turn':turn,'stored_child':row,'stored_child_usage':usage,
-                'official_child_fields':{k:facts.get(k) for k in ('id','parentThreadId','sessionId','status')},
+                'official_child_fields':{k:facts.get(k) for k in ('id','parentThreadId','sessionId','status','turns')},
+                'official_terminal_history':{'parent':parent_history['id'],'parent_session':parent_history['sessionId'],
+                    'parent_turn':turn,'spawn_items':parent_items,'child_source':source,'child_turns':child_turns,
+                    'child':{k:child_history.get(k) for k in ('id','parentThreadId','sessionId','forkedFromId','status','cliVersion')},
+                    'live_completed_child_turn':child_turn,'metadata_verified_before_cold_read':warm,'evidence':evidence},
                 'snapshot':snapshot,'checks':checks}
 
 

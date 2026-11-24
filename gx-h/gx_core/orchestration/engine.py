@@ -924,15 +924,23 @@ class Engine:
                   "word for an approval or jump to an arbitrary node",
                 details={"rejected_arguments": sorted(unsupported)},
             )
+        cpu_sample = self.cpu_resume_sample(self.waits(run_id).values(), interrupt_ref)
         with store.transaction(self.conn, transaction_owner="Engine", operation="resume", run_id=run_id) as conn:
             begun = self.begin_resume(conn, run_id=run_id, interrupt_ref=interrupt_ref,
-                                      submission_refs=submission_refs,
+                                      submission_refs=submission_refs, cpu_sample=cpu_sample,
                                       expected_revision=expected_revision, actor=actor)
         return self.advance_resumed(begun)
 
+    def cpu_resume_sample(self, waits, interrupt_ref=None):
+        from ..jobs.capacity import sample_admission
+        if any((interrupt_ref is None or w["interrupt_ref"] == interrupt_ref)
+               and w["interrupt"].get("payload", {}).get("wait_for") == "cpu.threads_free" for w in waits):
+            return sample_admission(self.conn)
+        return None
+
     def begin_resume(
         self, conn: sqlite3.Connection, *, run_id: str, interrupt_ref: str,
-        submission_refs: Sequence[Any] = (), expected_revision: int | None = None, actor: str = "engine",
+        submission_refs: Sequence[Any] = (), expected_revision: int | None = None, actor: str = "engine", cpu_sample=None,
     ) -> dict[str, Any]:
         """Everything a resume decides, inside the caller's write transaction (R1, §2.5.3).
 
@@ -980,7 +988,7 @@ class Engine:
         # What the node waits for has come, or has come back as it is: every terminal outcome
         # is handed to the node (design r2.2 §2.5.1), and a run in which nothing is open,
         # pending or waited for is resumed into a decision (§2.5.2). Otherwise it still waits.
-        standing = self.standing(run_id, conn=conn, interrupt_ref=interrupt_ref)
+        standing = self.standing(run_id, conn=conn, interrupt_ref=interrupt_ref, cpu_sample=cpu_sample)
         if standing.waiting is not None:
             # Contract r5: refused with the needs still open (each a need of the closed
             # vocabulary; work in flight is waited for and is no need).
@@ -1317,7 +1325,7 @@ class Engine:
         return {"event_id": self._last_change(conn, run_id), "limits_sha256": self._limits_sha256()}
 
     def standing(self, run_id: str, *, conn: sqlite3.Connection | None = None,
-                 interrupt_ref: str | None = None) -> Standing:
+                 interrupt_ref: str | None = None, cpu_sample=None) -> Standing:
         """Where the run's pending interrupt stands, and whether a resume would be accepted. Reads only.
 
         * **complete**: every item is what the node waits for. Resumable.
@@ -1341,12 +1349,15 @@ class Engine:
         interrupt = InterruptRequest.from_dict(wait["interrupt"])
         mark = wait["controller_ran"]
         if interrupt.kind == "stage" and interrupt.payload.get("wait_for") == "cpu.threads_free":
-            from ..jobs.capacity import cpu_room
-            room = cpu_room(conn)
+            from ..jobs import capacity, cpu_queue
             needed = interrupt.payload["required_threads"]
+            if cpu_sample is None and conn.in_transaction:
+                # A caller already inside its own transaction has no fresh physical
+                # sample. Count recorded claims conservatively until Job admission.
+                cpu_sample = (interrupt.payload.get("allowed_threads", needed), float("inf"), {})
+            room = capacity.admission_room(conn, cpu_sample) if cpu_sample is not None else capacity.cpu_room(conn)
             # A changed limit may make the request permanently too large. In that case
             # re-enter once so Job admission reports its new refusal to the workflow.
-            from ..jobs import cpu_queue
             job_key = wait.get("cpu_admission")
             ready = needed > room["allowed"] or cpu_queue.refusal(conn, room, needed, job_key) is None
             waiting = None if ready else DependencyUnmet(
@@ -1568,7 +1579,7 @@ class Engine:
                             result = NodeResult(interrupt=InterruptRequest(kind="stage", reason=exc.message,
                                 payload={"stage": name, "waiting_state": "WAITING_EXTERNAL_JOB",
                                          "wait_for": "cpu.threads_free", "required_threads": needed,
-                                         "job_key": facts.get("job_key")}))
+                                         "allowed_threads": allowed, "job_key": facts.get("job_key")}))
                         with store.transaction(
                             self.conn, transaction_owner="Engine", operation="checkpoint_node", run_id=run_id,
                         ) as conn:

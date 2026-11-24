@@ -206,10 +206,12 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
     # An unchanged parked run needs no write transaction. The selected wait
     # and its authority are checked again under the lock that consumes it.
     ready_refs = set()
-    for wait in engine.waits(run_id).values():
+    waits = engine.waits(run_id).values()
+    cpu_sample = engine.cpu_resume_sample(waits)
+    for wait in waits:
         ref = wait["interrupt_ref"]
         try:
-            if engine.standing(run_id, interrupt_ref=ref).complete:
+            if engine.standing(run_id, interrupt_ref=ref, cpu_sample=cpu_sample).complete:
                 ready_refs.add(ref)
         except IllegalTransition as exc:
             if exc.details.get("supplied_interrupt_ref") != ref:
@@ -228,7 +230,7 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
         service._check_pins(run, verified)
         for wait in engine.waits(run_id, conn=tx).values():
             ref = wait["interrupt_ref"]
-            if ref not in ready_refs or not engine.standing(run_id, conn=tx, interrupt_ref=ref).complete:
+            if ref not in ready_refs or not engine.standing(run_id, conn=tx, interrupt_ref=ref, cpu_sample=cpu_sample).complete:
                 continue
             try:
                 service._require_no_held_submission(tx, run_id, pending=wait["interrupt"])
@@ -236,7 +238,7 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
             except (ApprovalRequired, ModelPolicyViolation):
                 continue
             try:
-                begun = engine.begin_resume(tx, run_id=run_id, interrupt_ref=ref, actor=backend.actor)
+                begun = engine.begin_resume(tx, run_id=run_id, interrupt_ref=ref, actor=backend.actor, cpu_sample=cpu_sample)
             except ConcurrentRun:
                 return None
             break

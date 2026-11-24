@@ -1,0 +1,50 @@
+WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir "/tmp" (codex_home: AbsolutePathBuf("/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/var/tmp/gx-terminal-wire-way6da82/peer/codex-home"))
+Traceback (most recent call last):
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/acceptance/v31/terminal_protocol_probe.py", line 447, in trial_run
+    client.run_until(terminal, timeout=0.18 if fault in ("lost_interrupt", "lost_receipts",
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 764, in run_until
+    if not self._pump(deadline, poll_at=poll_at):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 645, in _pump
+    received = self._receive(read_deadline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 609, in _receive
+    line = self._transport.read_line(_remaining(deadline))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/acceptance/v31/terminal_protocol_probe.py", line 158, in read_line
+    line = self.real.read_line(left)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 275, in read_line
+    self._io(deadline)
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 208, in _io
+    raise AppServerTimeout("App Server pipe IO timed out")
+gx_core.hostobs.app_server_client.AppServerTimeout: App Server pipe IO timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/acceptance/v31/terminal_protocol_probe.py", line 637, in <module>
+    result = run(args.repetitions, args.only, closure_usage=args.closure_usage, runtime=args.runtime.resolve(),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/acceptance/v31/terminal_protocol_probe.py", line 604, in run
+    trial = trial_run(roots, reader, peer, index, expected, fault, proposal, evidence,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/acceptance/v31/terminal_protocol_probe.py", line 457, in trial_run
+    client.run_until(terminal, timeout=8)
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 764, in run_until
+    if not self._pump(deadline, poll_at=poll_at):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 645, in _pump
+    received = self._receive(read_deadline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 609, in _receive
+    line = self._transport.read_line(_remaining(deadline))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/acceptance/v31/terminal_protocol_probe.py", line 158, in read_line
+    line = self.real.read_line(left)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 275, in read_line
+    self._io(deadline)
+  File "/tmp/gx-acceptance-runtime-xe9r110p/v31-regression/tmp/gx-p2a-reg-g47hna9i/release/gx-h/gx_core/hostobs/app_server_client.py", line 208, in _io
+    raise AppServerTimeout("App Server pipe IO timed out")
+gx_core.hostobs.app_server_client.AppServerTimeout: App Server pipe IO timed out

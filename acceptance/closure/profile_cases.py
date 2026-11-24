@@ -66,7 +66,27 @@ def unittest_rows(text):
     return rows
 
 
-def original_failures(path, text=None):
+def retain_original_file(source_dir, reference, output, expected_sha=None):
+    """Read one supplied supporting file and preserve the exact bytes used in adjudication."""
+    file = (source_dir / reference).resolve()
+    if not file.is_relative_to(source_dir.resolve()):
+        raise ValueError(f"evidence lies outside the supplied directory: {reference}")
+    raw = file.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if expected_sha and digest != expected_sha:
+        raise ValueError(f"original evidence hash mismatch: {reference}")
+    result = {"evidence": str(reference), "evidence_sha256": digest}
+    if output is not None:
+        directory = output / "original-evidence"
+        directory.mkdir(exist_ok=True)
+        target = directory / (digest + file.suffix)
+        if not target.exists():
+            target.write_bytes(raw)
+        result["archived_evidence"] = str(target.relative_to(output))
+    return result
+
+
+def original_failures(path, text=None, *, output=None):
     """Import original unittest/pytest logs, JUnit reports, or a JSON failure list."""
     if text is None:
         text = path.read_text()
@@ -85,13 +105,12 @@ def original_failures(path, text=None):
                 if category not in {"environment", "fixture", "regression", "unresolved"}:
                     raise ValueError(f"unknown original failure classification {category!r}")
                 if item.get("reason") and item.get("evidence"):
-                    evidence = (path.parent / item["evidence"]).resolve()
-                    review = {"classification": category, "reason": item["reason"], "evidence": str(evidence)}
-                    if evidence.is_file():
-                        review["evidence_sha256"] = sha(evidence)
-                    else:
-                        review.update(classification="unresolved", original_claim=category,
-                                      reason=f"The evidence file for the supplied {category} classification is unavailable.")
+                    review = {"classification": category, "reason": item["reason"], "evidence": item["evidence"]}
+                    try:
+                        review.update(retain_original_file(path.parent, item["evidence"], output,
+                                                           item.get("evidence_sha256")))
+                    except (OSError, ValueError) as exc:
+                        review.update(classification="unresolved", original_claim=category, reason=str(exc))
                     reviews[item.get("original_id", item["test_id"])] = review
     elif path.suffix.lower() == ".xml":
         values = []
@@ -125,6 +144,24 @@ def original_failures(path, text=None):
             raise ValueError(f"duplicate original failure {original_id}")
         result[original_id] = (name, trace or "", reviews.get(original_id))
     return result
+
+
+def supporting_files(source, contents, out, imported):
+    if source.suffix.lower() != ".json":
+        return {}
+    document = json.loads(contents)
+    if not isinstance(document, dict):
+        return {}
+    files = {}
+    for key in ("original_run_log", "environment_file"):
+        if document.get(key):
+            files[key] = retain_original_file(source.parent, document[key], out, document.get(key + "_sha256"))
+    if "original_run_log" in files:
+        log_path = out / files["original_run_log"]["archived_evidence"]
+        actual = original_failures(log_path)
+        if Counter(case for case, _, _ in actual.values()) != Counter(case for case, _, _ in imported.values()):
+            raise ValueError("classified identities differ from the supplied original failure log")
+    return files
 
 
 def failure_verdict(trace, now):
@@ -219,13 +256,16 @@ def baseline_run(args, work):
     import_issue = None
     original_input = None
     original_digest = None
+    supporting_inputs = {}
     if source:
         try:
             raw = source.read_bytes()
             original_input = "original-input" + (source.suffix if source.suffix.lower() in {".json", ".xml"} else ".log")
             (out / original_input).write_bytes(raw)
             original_digest = hashlib.sha256(raw).hexdigest()
-            imported = original_failures(source, raw.decode("utf-8-sig"))
+            contents = raw.decode("utf-8-sig")
+            imported = original_failures(source, contents, output=out)
+            supporting_inputs = supporting_files(source, contents, out, imported)
         except (OSError, KeyError, TypeError, ValueError, ElementTree.ParseError) as err:
             import_issue = f"Unable to read the supplied original failure records: {err}"
     verdicts = []
@@ -246,12 +286,15 @@ def baseline_run(args, work):
         issue = "The closure package reports 42 original failures without identifying them or supplying their tracebacks."
     elif len(imported) != 42:
         issue = f"The supplied source identifies {len(imported)} distinct failures of the expected 42."
+    elif source.suffix.lower() != ".json" or any(row["source_review"] is None for row in verdicts):
+        issue = "The original classification JSON with per-case reasons and evidence is required for historical sign-off."
     elif any(row["classification"] == "unresolved" for row in verdicts):
         issue = "Original failures without case-specific causal evidence remain unresolved."
     write_json(out / "original-42.json", {"expected": 42, "identified": len(imported),
                                          "distinct_test_ids": len({case for case, _, _ in imported.values()}),
                                          "source": str(source) if source else None,
                                          "archived_input": original_input, "source_sha256": original_digest,
+                                         "supporting_inputs": supporting_inputs,
                                          "issue": issue, "cases": verdicts})
     failed_run = bool(failures or additional_nonpassing or receipt["exit_code"] or observed_profile != "deterministic")
     problems = []

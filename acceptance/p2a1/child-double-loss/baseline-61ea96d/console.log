@@ -1,0 +1,20 @@
+WARNING: failed to clean up stale arg0 temp dirs: Cross-device link (os error 18)
+Traceback (most recent call last):
+  File "/tmp/gx-p21-child-baseline-61ea96d/acceptance/closure/child_double_loss.py", line 339, in <module>
+    main()
+  File "/tmp/gx-p21-child-baseline-61ea96d/acceptance/closure/child_double_loss.py", line 328, in main
+    receipt.update(experiment(binary,out,Path(tmp)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-p21-child-baseline-61ea96d/acceptance/closure/child_double_loss.py", line 257, in experiment
+    assert cold.wait(timeout=40) == 0, (out/"cold.log").read_text()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Traceback (most recent call last):
+  File "/tmp/gx-p21-child-baseline-61ea96d/acceptance/closure/child_double_loss.py", line 339, in <module>
+    main()
+  File "/tmp/gx-p21-child-baseline-61ea96d/acceptance/closure/child_double_loss.py", line 318, in main
+    worker(args.worker,args.work,out,binary)
+  File "/tmp/gx-p21-child-baseline-61ea96d/acceptance/closure/child_double_loss.py", line 144, in worker
+    assert usage is not None, "cold history did not identify a terminal child"
+           ^^^^^^^^^^^^^^^^^
+AssertionError: cold history did not identify a terminal child
+

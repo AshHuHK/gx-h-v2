@@ -1,0 +1,121 @@
+{
+  "balance": {
+    "budget_status": "SETTLED",
+    "confidence": "ESTIMATED",
+    "estimated_at": "2026-11-24T17:40:02.439Z",
+    "measured_tokens": null,
+    "observed_lower_bound": 35,
+    "read_at": "2026-11-24T17:40:02.496Z",
+    "reservation_ref": "rsv_01m87a93qg104v1ztx",
+    "settled_tokens": 1000,
+    "settlements": [
+      {
+        "event_id": 27,
+        "kind": "budget.settled",
+        "payload_json": {
+          "actual": {
+            "api_calls": 1,
+            "tokens": 1000
+          },
+          "confidence": "ESTIMATED",
+          "for": [
+            "native_turn",
+            "human:original-grid-check"
+          ],
+          "held": {
+            "api_calls": 1,
+            "tokens": 1000
+          },
+          "reservation_ref": "rsv_01m87a93qg104v1ztx",
+          "unbudgeted": {}
+        }
+      }
+    ],
+    "terminal_at": "2026-11-24T17:39:57.437Z",
+    "terminal_status": "completed",
+    "token_budget": 1000,
+    "total_tokens": 70
+  },
+  "child_meters": [
+    {
+      "awaiting_call_id": null,
+      "awaiting_turn": 0,
+      "child_id": "01a20ea4-90f3-7b11-8385-9138d3e110c1",
+      "metadata_verified": 1,
+      "owner_turn": "01a20ea4-8ef4-71c3-adc7-d7ccff1f402c",
+      "parent_id": "01a20ea4-8ebe-7a01-9aba-7b4240f6a984",
+      "root_id": "01a20ea4-8ebe-7a01-9aba-7b4240f6a984",
+      "run_id": "gxr_01m87a928pmbrgwf23"
+    }
+  ],
+  "child_turns": [
+    {
+      "child_id": "01a20ea4-90f3-7b11-8385-9138d3e110c1",
+      "children_known": 1,
+      "measured_tokens": null,
+      "owner_turn": "01a20ea4-8ef4-71c3-adc7-d7ccff1f402c",
+      "prior_tokens": 0,
+      "terminal": 1,
+      "total_tokens": null,
+      "turn_id": "01a20ea4-9104-7012-b6a6-4f8d25734816"
+    }
+  ],
+  "deliveries": [
+    {
+      "event_id": "human:original-grid-check",
+      "reservation_ref": "rsv_01m87a93qg104v1ztx",
+      "run_id": "gxr_01m87a928pmbrgwf23",
+      "thread_id": "01a20ea4-8ebe-7a01-9aba-7b4240f6a984",
+      "turn_id": "01a20ea4-8ef4-71c3-adc7-d7ccff1f402c"
+    }
+  ],
+  "jobs": [
+    {
+      "idempotency_key": "job:gxr_01m87a928pmbrgwf23:grid:original-grid",
+      "job_id": "gxj_01m87a92eeas8bmf6n",
+      "reservation_ref": "rsv_01m87a92g086x6t957",
+      "run_id": "gxr_01m87a928pmbrgwf23",
+      "scheduler_ref": "runner:2765752:2986145678",
+      "status": "SUCCEEDED"
+    }
+  ],
+  "native_funds": [
+    {
+      "budget_ref": "gxb_01m87a928n09br6kp5",
+      "reservation_ref": "rsv_01m87a93qg104v1ztx",
+      "run_id": "gxr_01m87a928pmbrgwf23",
+      "thread_id": "01a20ea4-8ebe-7a01-9aba-7b4240f6a984",
+      "turn_id": "01a20ea4-8ef4-71c3-adc7-d7ccff1f402c"
+    }
+  ],
+  "reservations": [
+    {
+      "budget_ref": "gxb_01m87a928n09br6kp5",
+      "reservation_ref": "rsv_01m87a92g086x6t957",
+      "status": "SETTLED"
+    },
+    {
+      "budget_ref": "gxb_01m87a928n09br6kp5",
+      "reservation_ref": "rsv_01m87a93qg104v1ztx",
+      "status": "SETTLED"
+    }
+  ],
+  "responses": [
+    {
+      "conflicting": 0,
+      "response_id": "response-1",
+      "thread_id": "01a20ea4-8ebe-7a01-9aba-7b4240f6a984",
+      "tokens": 35,
+      "turn_id": "01a20ea4-8ef4-71c3-adc7-d7ccff1f402c"
+    }
+  ],
+  "root_bindings": [
+    {
+      "lease_id": null,
+      "role": "main",
+      "run_id": "gxr_01m87a928pmbrgwf23",
+      "task_id": null,
+      "thread_id": "01a20ea4-8ebe-7a01-9aba-7b4240f6a984"
+    }
+  ]
+}

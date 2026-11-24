@@ -1,0 +1,48 @@
+{
+  "product_sha": "c369cd621a75c29664a943f7c048f406432ff6ab",
+  "scoped_run": "operator-c369cd6",
+  "source_clean": true,
+  "scripted_cases": {
+    "test_alerts_configured_per_run_durable_and_deduplicated": "PASS",
+    "test_disputed_measurement_releases_only_uncontested_receipts": "PASS",
+    "test_known_historical_debit_requires_evidence_for_turn_attribution": "PASS",
+    "test_later_bound_source_verifies_ids_and_reconciles": "PASS",
+    "test_official_references_scope_and_distinct_reconciliation": "PASS",
+    "test_release_ambiguous_send_keeps_identity_and_old_rights": "PASS",
+    "test_release_then_distinct_late_cost_under_closed_funding": "PASS"
+  },
+  "official_host": {
+    "evidence_class": "OFFICIAL_HOST_LOOPBACK",
+    "version": "codex-cli 0.169.0",
+    "host_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+    "thread_id": "01a20eaa-d0d1-7e40-9456-22984a7a1055",
+    "turn_id": "01a20eaa-d108-7ed1-b8d0-2d2ad184e1e4",
+    "response_id": "response-1",
+    "source": "codex-rollout",
+    "prefix_sha256": "97f2b4b4eb34afde11022315b037a8e630d76ec3f94b63942c8c372923b43438",
+    "rollout_sha256": "97f2b4b4eb34afde11022315b037a8e630d76ec3f94b63942c8c372923b43438",
+    "requests": 1,
+    "before": "UNRESOLVED",
+    "after_attaching": "HELD",
+    "after_reconcile": {
+      "api_calls": 1,
+      "tokens": 35
+    }
+  },
+  "original_historical_selector_failure": {
+    "product_sha": "5bc7c7e89d883f7ea014d3c7ef0180ce5065fd32",
+    "test_sha": "c369cd621a75c29664a943f7c048f406432ff6ab",
+    "command": "PYTHONPATH=acceptance/closure python -B -m unittest -v unresolved.OperatorUsage.test_known_historical_debit_requires_evidence_for_turn_attribution",
+    "fixture": "A real local GX budget.settled event for 38 tokens through the original V2.1 historical migration with missing measured usage. The input is scripted.",
+    "original_exit_code": 1,
+    "original_log": "original-reproduced.log",
+    "new_exit_code": 0,
+    "after": "38 tokens and one API call before and after attaching the original matching response; immutable signed adjustment of zero."
+  },
+  "legacy_tests": {
+    "count": 66,
+    "command": "legacy-66-command.json",
+    "console": "legacy-66.log",
+    "exit_code": 0
+  }
+}

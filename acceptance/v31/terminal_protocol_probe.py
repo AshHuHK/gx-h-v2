@@ -170,11 +170,18 @@ class Wire:
                 if self.trial["fault"] == "delayed_usage":
                     self.withheld.append(line)
                 continue
-            if self.trial["fault"] == "lost_raw_cancel" and method == "rawResponseItem/completed":
+            if self.trial["fault"] in ("lost_raw_cancel", "lost_cancel_mirrors") and method in (
+                    "rawResponseItem/completed", "item/completed"):
                 params = msg["params"]
                 item = params["item"]
-                if (params["threadId"], params["turnId"], item.get("call_id"), item["type"]) == (
-                        self.trial.get("thread_id"), self.trial.get("turn_id"), self.trial.get("call_id"), "function_call_output"):
+                matched = (params.get("threadId"), params.get("turnId")) == (
+                    self.trial.get("thread_id"), self.trial.get("turn_id"))
+                call = self.trial.get("call_id")
+                raw = (method == "rawResponseItem/completed" and item.get("type") == "function_call_output"
+                       and item.get("call_id") == call)
+                live = (self.trial["fault"] == "lost_cancel_mirrors" and method == "item/completed"
+                        and item.get("type") == "dynamicToolCall" and item.get("id") == call)
+                if matched and call and (raw or live):
                     self.trial["injected_receipt_faults"].append({"method": method, "params": params})
                     continue
             if (interrupt_ack or complete) and self.trial["fault"] in ("lost_receipts", "delayed_receipts"):
@@ -258,6 +265,14 @@ def verify_cancellation(roots, trial):
     # output drain. Forced teardown can interrupt the drain after the 100 ms grace.
     thread, turn, call = trial["thread_id"], trial["turn_id"], trial["call_id"]
     scope = (thread, turn, call)
+    history = trial["turn_history"]
+    public = history["call"]
+    assert (history["thread"], history["id"], history["status"], public["type"], public["id"], public["tool"],
+            public["status"], public["success"], public["contentItems"]) == (
+        thread, turn, "interrupted", "dynamicToolCall", call, "gx_submit_product", "failed", False, []), history
+    assert not trial["tool_responses_written"], trial["tool_responses_written"]
+    assert all(r["t"] <= trial["committed_at"] for r in trial["model_requests"]), trial["model_requests"]
+
     def raw_outputs():
         return [e for e in trial["events"] if e["method"] == "rawResponseItem/completed"
                 and e.get("type") == "function_call_output" and (e["thread"], e["turn"], e["call_id"]) == scope]
@@ -269,38 +284,58 @@ def verify_cancellation(roots, trial):
     outputs = raw_outputs()
     if outputs:
         assert all(e["output"] == CANCELLATION_REASON for e in outputs), outputs
-        assert trial["fault"] != "lost_raw_cancel", outputs
+        assert trial["fault"] not in ("lost_raw_cancel", "lost_cancel_mirrors"), outputs
         trial["cancellation_proof"] = {"source": "rawResponseItem/completed", "sequences": [e["seq"] for e in outputs]}
         return
 
-    # Require the exact same reason and identities from the official core completion.
-    # The v2 public item projects status and success but omits the core's error field.
-    # This file belongs to the isolated official-host test fixture.
-    live, = [e for e in trial["events"] if e["method"] == "item/completed" and (e["thread"], e["turn"]) == scope[:2]
-             and e["item"]["type"] == "dynamicToolCall" and e["item"]["id"] == call]
-    for item in (live["item"], trial["turn_history"]["call"]):
+    # The live and raw notifications are transport mirrors. The actual core
+    # item retains the cancellation reason omitted from the public Turn history.
+    live = [e for e in trial["events"] if e["method"] == "item/completed" and (e["thread"], e["turn"]) == scope[:2]
+            and e["item"]["type"] == "dynamicToolCall" and e["item"]["id"] == call]
+    sessions = Path(roots.env["CODEX_HOME"]) / "sessions"
+    paths = list(sessions.rglob(f"rollout-*-{thread}.jsonl"))
+    diagnostic = {"thread": thread, "turn": turn, "call": call, "rollouts": [p.name for p in paths],
+                  "live_sequences": [e["seq"] for e in live], "records": []}
+    trial["cancellation_diagnostics"] = diagnostic
+    assert len(live) <= 1, live
+    for event in live:
+        item = event["item"]
         assert (item["tool"], item["status"], item["success"], item["contentItems"]) == (
             "gx_submit_product", "failed", False, []), item
-    sessions = Path(roots.env["CODEX_HOME"]) / "sessions"
-    path, = sessions.rglob(f"rollout-*-{thread}.jsonl")
+    assert len(paths) == 1, ("missing or ambiguous official rollout", diagnostic)
+    path = paths[0]
+    contents = path.read_bytes()
+    diagnostic["rollout_sha256"] = hashlib.sha256(contents).hexdigest()
     completions = []
-    with path.open() as stream:
-        for line in stream:
-            data = json.loads(line)
-            receipt = data["payload"]
-            item = receipt.get("item") or {}
-            if (data["type"], receipt.get("type"), receipt.get("thread_id"), receipt.get("turn_id"),
-                    item.get("type"), item.get("id")) == ("event_msg", "item_completed", *scope[:2], "DynamicToolCall", call):
-                completions.append(data)
-    receipt, = completions
+    for line in contents.splitlines():
+        data = json.loads(line)
+        receipt = data["payload"]
+        item = receipt.get("item") or {}
+        if (receipt.get("turn_id") == turn or item.get("id") == call or receipt.get("call_id") == call):
+            diagnostic["records"].append({"ordinal": data.get("ordinal"), "type": data["type"],
+                "event": receipt.get("type"), "thread": receipt.get("thread_id"), "turn": receipt.get("turn_id"),
+                "item": item.get("type"), "call": item.get("id") or receipt.get("call_id"), "tool": item.get("tool"),
+                "status": item.get("status"), "error": item.get("error")})
+        if (data["type"], receipt.get("type"), receipt.get("thread_id"), receipt.get("turn_id"),
+                item.get("type"), item.get("id")) == ("event_msg", "item_completed", thread, turn, "DynamicToolCall", call):
+            completions.append(data)
+    diagnostic["same_scope_core_completions"] = completions
+    assert len(completions) == 1, ("exact official cancellation receipt unavailable", diagnostic)
+    receipt = completions[0]
     item = receipt["payload"]["item"]
     assert (item["tool"], item["status"], item["success"], item["content_items"], item["error"]) == (
         "gx_submit_product", "failed", False, [], CANCELLATION_REASON), receipt
-    if trial["fault"] == "lost_raw_cancel":
-        assert len(trial["injected_receipt_faults"]) == 1
-        assert trial["injected_receipt_faults"][0]["params"]["item"]["output"] == CANCELLATION_REASON
+    if trial["fault"] in ("lost_raw_cancel", "lost_cancel_mirrors"):
+        faults = trial["injected_receipt_faults"]
+        expected = ["rawResponseItem/completed"]
+        if trial["fault"] == "lost_cancel_mirrors":
+            expected.append("item/completed")
+        assert sorted(f["method"] for f in faults) == sorted(expected), faults
+        assert all(f["params"]["item"]["output"] == CANCELLATION_REASON
+                   for f in faults if f["method"] == "rawResponseItem/completed"), faults
     trial["cancellation_proof"] = {"source": "official core item_completed", "raw_drain_seconds": 1,
-                                   "live_sequence": live["seq"], "rollout_name": path.name, "receipt": receipt}
+                                   "live_sequence": live[0]["seq"] if live else None,
+                                   "rollout_name": path.name, "receipt": receipt}
 
 
 def cold_usage(roots, trial):
@@ -432,7 +467,7 @@ def trial_run(roots, reader, peer, number, expected, fault, proposal, evidence, 
         cancelled = [i for i in history["items"] if i["type"] == "dynamicToolCall" and i["id"] == trial["call_id"]]
         assert history["status"] == "interrupted" and len(cancelled) == 1
         assert cancelled[0]["status"] == "failed" and cancelled[0]["success"] is False, cancelled
-        trial["turn_history"] = {"id": history["id"], "status": history["status"], "call": cancelled[0]}
+        trial["turn_history"] = {"thread": thread, "id": history["id"], "status": history["status"], "call": cancelled[0]}
         verify_cancellation(roots, trial)
         roots.reconcile_meter(thread)
         if fault == "running_child":
@@ -533,7 +568,7 @@ def run(repetitions, only=None, *, closure_usage=False, runtime=PACKAGE, partial
         sequence = [(status, "none") for _ in range(repetitions) for status in ("ACCEPTED", "REJECTED")]
         sequence.extend([("ACCEPTED", "lost_interrupt"), ("REJECTED", "lost_receipts"),
                          ("ACCEPTED", "delayed_receipts"), ("ACCEPTED", "running_child")])
-        if only in ("delayed_usage", "lost_usage", "lost_raw_cancel"):
+        if only in ("delayed_usage", "lost_usage", "lost_raw_cancel", "lost_cancel_mirrors"):
             sequence = [("ACCEPTED", only)]
         elif only:
             sequence = [case for case in sequence if case[1] == only]
@@ -591,7 +626,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repetitions", type=int, default=100, help="repetitions per accepted/rejected outcome")
     parser.add_argument("--only", choices=("none", "lost_interrupt", "lost_receipts",
-                                          "delayed_receipts", "running_child", "delayed_usage", "lost_usage", "lost_raw_cancel"))
+                                          "delayed_receipts", "running_child", "delayed_usage", "lost_usage", "lost_raw_cancel", "lost_cancel_mirrors"))
     parser.add_argument("--output", type=Path, default=Path(__file__).with_name("terminal-protocol.json"))
     parser.add_argument("--runtime", type=Path, default=PACKAGE, help="Directory containing the locked unpacked native runtime")
     parser.add_argument("--closure-usage", action="store_true",

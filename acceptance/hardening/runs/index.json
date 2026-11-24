@@ -554,6 +554,157 @@
         "cpu_affinity_count": 224,
         "cpu_quota": "2400000 100000"
       }
+    },
+    {
+      "run_id": "p2a1-hardening-7a6f521",
+      "suite": "hardening",
+      "status": "FAIL",
+      "sha": "7a6f521a2dd58a6ac5240cf3383a58f954926884",
+      "started_utc": "2026-11-24T18:26:53.274798+00:00",
+      "finished_utc": "2026-11-24T18:27:57.990966+00:00",
+      "initial_dirty_state": [],
+      "case_counts": {
+        "FAIL": 2,
+        "PASS": 11
+      },
+      "raw_files": 140,
+      "manifest_sha256": "dd9542402bd70612e2d11a91b0b815b56d94fae879212c66bd0088975671cfc7",
+      "raw_sha256": "9f0384157ef2e0f0258e614d49cd814aa14c25a722e3d2f450cb297191916b61",
+      "console_sha256": "f5f7b55246184369e8fd69b8878ef6e2c83a5b38ba46a7ad1cf778d7e2a6365c",
+      "summary": "p2a1-hardening-7a6f521/summary.json",
+      "manifest": "p2a1-hardening-7a6f521/manifest.sha256",
+      "console": "p2a1-hardening-7a6f521.log",
+      "sqlite_quick_check_count": 14,
+      "event_files": 13,
+      "historical_failures": {
+        "identified": 42,
+        "distinct": 40,
+        "dispositions": {
+          "environment": 42
+        },
+        "measured_outcomes": {
+          "ok": 42
+        },
+        "classification_sha256": "62289254eab65c5d0674ef61eb91d872fed36b6a57228b40331539b947e01f75",
+        "raw_log_sha256": "0d72a9b90dc9ca54a7461fe6bdfe0e027fdc2f43bc1b9ec7e95924e248f625b9",
+        "baseline_count": 465,
+        "baseline_outcomes": {
+          "ok": 461,
+          "skipped": 4
+        },
+        "discovery_mode": "reused"
+      },
+      "fairness": {
+        "status": "PASS",
+        "checks": {
+          "cold_process_reopened_queue": true,
+          "cross_connection_admission": true,
+          "noncompute_sibling_progressed": true,
+          "older_two_threads_progressed": true,
+          "original_grid_scores_verified": true,
+          "paused_and_cancelled_excluded": true,
+          "returned_first_slot_preserved": true,
+          "superseded_checkpoint_released": true
+        }
+      },
+      "sqlite": {
+        "status": "PASS",
+        "checks": {
+          "all_changed_transactions_tagged": true,
+          "complete_phase_timings": true,
+          "heavy_operations_outside_writer": true,
+          "indexed_fair_queue_head": true,
+          "observed_writers": true,
+          "run_ids_match_created_runs": true,
+          "run_start_replay_identity": true,
+          "workloads_completed": true
+        }
+      },
+      "discovery_source": {
+        "manifest_sha256": "4ce051d43f9830d583af24384a41d13cd9fc52fe6c784b3e0160ccb7e28993ed",
+        "run_id": "p2a1-baseline-7a6f521"
+      },
+      "role": "公共硬化全组，保留两个在跨用户命名空间导入时失败的官方入口及其完整控制条件",
+      "failed_cases": [
+        "CHILD-DOUBLE-LOSS",
+        "OPERATOR-USAGE"
+      ],
+      "dependency_controls": {
+        "raw": "dependencies/result.json",
+        "checks": {
+          "clean_install": true,
+          "ambient_injection_excluded": true,
+          "missing_or_mismatched_dependencies_refused": true
+        },
+        "offline_archives": 6,
+        "expected_errors": [
+          "missing_wheel",
+          "wrong_node",
+          "wrong_python",
+          "wrong_wheel_digest"
+        ],
+        "locked_python": "3.11.9",
+        "locked_node": "22.17.0",
+        "locked_npm": "10.9.2"
+      },
+      "operator_controls": {
+        "raw": "operator-usage/evidence/result.json",
+        "counts": {
+          "PASS": 7
+        }
+      },
+      "timeout": {
+        "raw": "timeout/timeout.json",
+        "wall_outcome": "timed_out",
+        "original_process_gone": true,
+        "observed_wall_seconds": 1.041,
+        "memory_result": "runner_error"
+      },
+      "fifo": {
+        "raw": "fifo/evidence/idle-overhead.json",
+        "waits": [
+          {
+            "requested_s": 0.09977894648909569,
+            "blocked_s": 0.10023552179336548
+          },
+          {
+            "requested_s": 0.19943752512335777,
+            "blocked_s": 0.20044315978884697
+          },
+          {
+            "requested_s": 0.3996259905397892,
+            "blocked_s": 0.40073613077402115
+          },
+          {
+            "requested_s": 0.7994273230433464,
+            "blocked_s": 0.8004393167793751
+          },
+          {
+            "requested_s": 1.5994656644761562,
+            "blocked_s": 1.6006487868726254
+          },
+          {
+            "requested_s": 1.8409019596874714,
+            "blocked_s": 1.8420308791100979
+          }
+        ],
+        "reads_including_initial": 20,
+        "reads_per_second": 3.982925802455213,
+        "cpu_seconds": 0.080557722,
+        "wall_seconds": 5.021434240043163
+      },
+      "runtime": {
+        "python": "3.11.9",
+        "node": "22.17.0",
+        "npm": "10.9.2"
+      },
+      "host_load": {
+        "file": "p2a1-hardening-7a6f521-load.jsonl",
+        "sha256": "c9a644b9f11e7b50664fb8d1f597366fa7f458c3ba535ea7af5be0b90c73fdd3",
+        "samples": 4,
+        "cpu_affinity_count": 224,
+        "cpu_quota": "2400000 100000"
+      }
     }
   ]
 }

@@ -1,0 +1,981 @@
+{
+  "in_flight": {
+    "message_id": "18ff1bdb-8e7f-44cf-ac69-e4f2add8d38e",
+    "result": {
+      "run_id": "gxr_01m879y1hsyxzzk9m1",
+      "status": "CREATED",
+      "run_budget": {
+        "budget_ref": "gxb_01m879y1htsa2brs75",
+        "parent_ref": null,
+        "run_id": "gxr_01m879y1hsyxzzk9m1",
+        "limits": {
+          "api_calls": 3,
+          "tokens": 5000
+        },
+        "spent": {},
+        "reserved": {
+          "api_calls": 1,
+          "tokens": 800
+        },
+        "available": {
+          "api_calls": 2,
+          "tokens": 4200
+        },
+        "reservations": [
+          {
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "subject_kind": "native_turn",
+            "subject_id": "start",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 800
+            },
+            "status": "HELD",
+            "created_at": "2026-11-24T17:33:52.573Z",
+            "settled_at": null
+          }
+        ],
+        "open": true,
+        "funding": null
+      },
+      "metering": {
+        "threads": [
+          {
+            "thread_id": "child",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 400,
+            "observed_at": "2026-11-24T17:33:52.577Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": null,
+            "confidence": "OBSERVED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 400,
+            "unresolved_delta": 0
+          },
+          {
+            "thread_id": "root",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 600,
+            "observed_at": "2026-11-24T17:33:52.578Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": null,
+            "confidence": "OBSERVED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 600,
+            "unresolved_delta": 0
+          }
+        ],
+        "turns": [
+          {
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "thread_id": "root",
+            "turn_id": "turn-1",
+            "event_id": "start",
+            "state": "acknowledged",
+            "prior_tokens": 0,
+            "token_budget": 800,
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "budget_ref": "gxb_01m879y1htsa2brs75",
+            "sequence": 1,
+            "budget_status": "HELD",
+            "terminal_status": null,
+            "total_tokens": 600,
+            "measured_tokens": null,
+            "children_known": 0,
+            "metering_reason": null,
+            "terminal_at": null,
+            "confidence": "RESERVED",
+            "settled_tokens": null,
+            "observed_lower_bound": 0,
+            "estimate_snapshot": null,
+            "attribution": null,
+            "estimated_at": null,
+            "usage_class": "UNRESOLVED",
+            "cost_assessment": {
+              "estimate_policy": null,
+              "risk": "UNRESOLVED",
+              "turn_grant_tokens": 800,
+              "scoped_observed_lower_bound_tokens": 1000,
+              "observed_lower_bound_at_estimate_tokens": null,
+              "original_estimate_tokens": null,
+              "provider_confirmed_total_tokens": null,
+              "unobserved_tokens_upper_bound": null,
+              "evidence_gaps": [
+                "ROOT_TERMINAL_UNOBSERVED",
+                "CHILD_TERMINAL_UNOBSERVED",
+                "INCOMPLETE_END_USAGE"
+              ]
+            }
+          }
+        ],
+        "adjustments": [],
+        "interrupts": [],
+        "risk": {
+          "scope": "gxb_01m879y1htsa2brs75",
+          "hard_tokens": 5000,
+          "settled_tokens": 0,
+          "reserved_tokens": 800,
+          "observed_in_flight_tokens": 1000,
+          "observed_plus_settled": 1000,
+          "committed_tokens": 1000,
+          "available_tokens": 4000,
+          "unfunded_closed_thread_tokens": 0,
+          "active_root_count": 1,
+          "largest_active_turn_grant": 800,
+          "unobserved_reserved_tokens": 0,
+          "provider_maximum_overshoot_tokens": null,
+          "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound."
+        },
+        "token_unit": "provider totalTokens, including cached input once",
+        "provider_money_cost": null,
+        "attributed_response_count": 3,
+        "cost_report": {
+          "PROVIDER_CONFIRMED": {
+            "tokens": 1000
+          },
+          "ESTIMATED": {
+            "tokens": 0,
+            "provisional_budget_tokens": 0
+          },
+          "UNRESOLVED": {
+            "tokens": null,
+            "reservation_refs": [
+              "rsv_01m879y1hxjj6bymkj"
+            ]
+          },
+          "UNATTRIBUTED_DELTA": {
+            "tokens": 0
+          },
+          "possibly_understated_estimate_refs": [],
+          "threads": [
+            {
+              "thread_id": "child",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 400,
+              "turn_attributed_total": 400,
+              "unattributed_delta": 0
+            },
+            {
+              "thread_id": "root",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 600,
+              "turn_attributed_total": 600,
+              "unattributed_delta": 0
+            }
+          ],
+          "turn_receipts": [
+            {
+              "thread_id": "child",
+              "turn_id": "child-turn",
+              "provider_confirmed_tokens": 400,
+              "response_count": 2,
+              "receipts_with_usage": 1,
+              "disputed": false,
+              "conflicting_response_count": 0
+            },
+            {
+              "thread_id": "root",
+              "turn_id": "turn-1",
+              "provider_confirmed_tokens": 600,
+              "response_count": 1,
+              "receipts_with_usage": 1,
+              "disputed": false,
+              "conflicting_response_count": 0
+            }
+          ]
+        }
+      },
+      "project_limits": []
+    }
+  },
+  "before_grace": {
+    "message_id": "c8642e4e-b24f-42cd-a4ab-b6e520fae9e2",
+    "result": {
+      "run_id": "gxr_01m879y1hsyxzzk9m1",
+      "status": "CREATED",
+      "run_budget": {
+        "budget_ref": "gxb_01m879y1htsa2brs75",
+        "parent_ref": null,
+        "run_id": "gxr_01m879y1hsyxzzk9m1",
+        "limits": {
+          "api_calls": 3,
+          "tokens": 5000
+        },
+        "spent": {},
+        "reserved": {
+          "api_calls": 1,
+          "tokens": 800
+        },
+        "available": {
+          "api_calls": 2,
+          "tokens": 4200
+        },
+        "reservations": [
+          {
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "subject_kind": "native_turn",
+            "subject_id": "start",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 800
+            },
+            "status": "HELD",
+            "created_at": "2026-11-24T17:33:52.573Z",
+            "settled_at": null
+          }
+        ],
+        "open": true,
+        "funding": null
+      },
+      "metering": {
+        "threads": [
+          {
+            "thread_id": "child",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 400,
+            "observed_at": "2026-11-24T17:33:52.577Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": null,
+            "confidence": "OBSERVED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 400,
+            "unresolved_delta": 0
+          },
+          {
+            "thread_id": "root",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 600,
+            "observed_at": "2026-11-24T17:33:52.578Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": null,
+            "confidence": "OBSERVED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 600,
+            "unresolved_delta": 0
+          }
+        ],
+        "turns": [
+          {
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "thread_id": "root",
+            "turn_id": "turn-1",
+            "event_id": "start",
+            "state": "acknowledged",
+            "prior_tokens": 0,
+            "token_budget": 800,
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "budget_ref": "gxb_01m879y1htsa2brs75",
+            "sequence": 1,
+            "budget_status": "HELD",
+            "terminal_status": "completed",
+            "total_tokens": 600,
+            "measured_tokens": 600,
+            "children_known": 1,
+            "metering_reason": "awaiting attributable final usage from native child child",
+            "terminal_at": "2026-11-24T17:33:53.505Z",
+            "confidence": "RESERVED",
+            "settled_tokens": null,
+            "observed_lower_bound": 0,
+            "estimate_snapshot": null,
+            "attribution": null,
+            "estimated_at": null,
+            "usage_class": "UNRESOLVED",
+            "cost_assessment": {
+              "estimate_policy": null,
+              "risk": "UNRESOLVED",
+              "turn_grant_tokens": 800,
+              "scoped_observed_lower_bound_tokens": 1000,
+              "observed_lower_bound_at_estimate_tokens": null,
+              "original_estimate_tokens": null,
+              "provider_confirmed_total_tokens": null,
+              "unobserved_tokens_upper_bound": null,
+              "evidence_gaps": [
+                "CHILD_TERMINAL_UNOBSERVED",
+                "INCOMPLETE_END_USAGE"
+              ]
+            }
+          }
+        ],
+        "adjustments": [],
+        "interrupts": [],
+        "risk": {
+          "scope": "gxb_01m879y1htsa2brs75",
+          "hard_tokens": 5000,
+          "settled_tokens": 0,
+          "reserved_tokens": 800,
+          "observed_in_flight_tokens": 1000,
+          "observed_plus_settled": 1000,
+          "committed_tokens": 1000,
+          "available_tokens": 4000,
+          "unfunded_closed_thread_tokens": 0,
+          "active_root_count": 1,
+          "largest_active_turn_grant": 800,
+          "unobserved_reserved_tokens": 0,
+          "provider_maximum_overshoot_tokens": null,
+          "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound."
+        },
+        "token_unit": "provider totalTokens, including cached input once",
+        "provider_money_cost": null,
+        "attributed_response_count": 3,
+        "cost_report": {
+          "PROVIDER_CONFIRMED": {
+            "tokens": 1000
+          },
+          "ESTIMATED": {
+            "tokens": 0,
+            "provisional_budget_tokens": 0
+          },
+          "UNRESOLVED": {
+            "tokens": null,
+            "reservation_refs": [
+              "rsv_01m879y1hxjj6bymkj"
+            ]
+          },
+          "UNATTRIBUTED_DELTA": {
+            "tokens": 0
+          },
+          "possibly_understated_estimate_refs": [],
+          "threads": [
+            {
+              "thread_id": "child",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 400,
+              "turn_attributed_total": 400,
+              "unattributed_delta": 0
+            },
+            {
+              "thread_id": "root",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 600,
+              "turn_attributed_total": 600,
+              "unattributed_delta": 0
+            }
+          ],
+          "turn_receipts": [
+            {
+              "thread_id": "child",
+              "turn_id": "child-turn",
+              "provider_confirmed_tokens": 400,
+              "response_count": 2,
+              "receipts_with_usage": 1,
+              "disputed": false,
+              "conflicting_response_count": 0
+            },
+            {
+              "thread_id": "root",
+              "turn_id": "turn-1",
+              "provider_confirmed_tokens": 600,
+              "response_count": 1,
+              "receipts_with_usage": 1,
+              "disputed": false,
+              "conflicting_response_count": 0
+            }
+          ]
+        }
+      },
+      "project_limits": []
+    }
+  },
+  "estimated": {
+    "message_id": "529689b9-66d0-49ca-9572-00e0c38ecf59",
+    "result": {
+      "run_id": "gxr_01m879y1hsyxzzk9m1",
+      "status": "CREATED",
+      "run_budget": {
+        "budget_ref": "gxb_01m879y1htsa2brs75",
+        "parent_ref": null,
+        "run_id": "gxr_01m879y1hsyxzzk9m1",
+        "limits": {
+          "api_calls": 3,
+          "tokens": 5000
+        },
+        "spent": {
+          "api_calls": 1,
+          "tokens": 1000
+        },
+        "reserved": {},
+        "available": {
+          "api_calls": 2,
+          "tokens": 4000
+        },
+        "reservations": [
+          {
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "subject_kind": "native_turn",
+            "subject_id": "start",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 800
+            },
+            "status": "SETTLED",
+            "created_at": "2026-11-24T17:33:52.573Z",
+            "settled_at": "2026-11-24T17:34:25.405Z"
+          }
+        ],
+        "open": true,
+        "funding": null
+      },
+      "metering": {
+        "threads": [
+          {
+            "thread_id": "child",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 400,
+            "observed_at": "2026-11-24T17:33:52.577Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": null,
+            "confidence": "OBSERVED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 400,
+            "unresolved_delta": 0
+          },
+          {
+            "thread_id": "root",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 600,
+            "observed_at": "2026-11-24T17:33:52.578Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": null,
+            "confidence": "ESTIMATED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 600,
+            "unresolved_delta": 0
+          }
+        ],
+        "turns": [
+          {
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "thread_id": "root",
+            "turn_id": "turn-1",
+            "event_id": "start",
+            "state": "acknowledged",
+            "prior_tokens": 0,
+            "token_budget": 800,
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "budget_ref": "gxb_01m879y1htsa2brs75",
+            "sequence": 1,
+            "budget_status": "SETTLED",
+            "terminal_status": "completed",
+            "total_tokens": 600,
+            "measured_tokens": 600,
+            "children_known": 1,
+            "metering_reason": "awaiting attributable final usage from native child child",
+            "terminal_at": "2026-11-24T17:33:53.505Z",
+            "confidence": "ESTIMATED",
+            "settled_tokens": 1000,
+            "observed_lower_bound": 1000,
+            "estimate_snapshot": 1000,
+            "attribution": "PROVISIONAL_TURN",
+            "estimated_at": "2026-11-24T17:34:25.405Z",
+            "usage_class": "ESTIMATED",
+            "cost_assessment": {
+              "estimate_policy": "ESTIMATED_CONSERVATIVE",
+              "risk": "ESTIMATE_POSSIBLY_UNDERSTATED",
+              "turn_grant_tokens": 800,
+              "scoped_observed_lower_bound_tokens": 1000,
+              "observed_lower_bound_at_estimate_tokens": 1000,
+              "original_estimate_tokens": 1000,
+              "provider_confirmed_total_tokens": null,
+              "unobserved_tokens_upper_bound": null,
+              "evidence_gaps": [
+                "CHILD_TERMINAL_UNOBSERVED",
+                "INCOMPLETE_END_USAGE"
+              ]
+            }
+          }
+        ],
+        "adjustments": [],
+        "interrupts": [],
+        "risk": {
+          "scope": "gxb_01m879y1htsa2brs75",
+          "hard_tokens": 5000,
+          "settled_tokens": 1000,
+          "reserved_tokens": 0,
+          "observed_in_flight_tokens": 0,
+          "observed_plus_settled": 1000,
+          "committed_tokens": 1000,
+          "available_tokens": 4000,
+          "unfunded_closed_thread_tokens": 0,
+          "active_root_count": 1,
+          "largest_active_turn_grant": 800,
+          "unobserved_reserved_tokens": 0,
+          "provider_maximum_overshoot_tokens": null,
+          "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound."
+        },
+        "token_unit": "provider totalTokens, including cached input once",
+        "provider_money_cost": null,
+        "attributed_response_count": 3,
+        "cost_report": {
+          "PROVIDER_CONFIRMED": {
+            "tokens": 1000
+          },
+          "ESTIMATED": {
+            "tokens": 0,
+            "provisional_budget_tokens": 1000
+          },
+          "UNRESOLVED": {
+            "tokens": null,
+            "reservation_refs": []
+          },
+          "UNATTRIBUTED_DELTA": {
+            "tokens": 0
+          },
+          "possibly_understated_estimate_refs": [
+            "rsv_01m879y1hxjj6bymkj"
+          ],
+          "threads": [
+            {
+              "thread_id": "child",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 400,
+              "turn_attributed_total": 400,
+              "unattributed_delta": 0
+            },
+            {
+              "thread_id": "root",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 600,
+              "turn_attributed_total": 600,
+              "unattributed_delta": 0
+            }
+          ],
+          "turn_receipts": [
+            {
+              "thread_id": "child",
+              "turn_id": "child-turn",
+              "provider_confirmed_tokens": 400,
+              "response_count": 2,
+              "receipts_with_usage": 1,
+              "disputed": false,
+              "conflicting_response_count": 0
+            },
+            {
+              "thread_id": "root",
+              "turn_id": "turn-1",
+              "provider_confirmed_tokens": 600,
+              "response_count": 1,
+              "receipts_with_usage": 1,
+              "disputed": false,
+              "conflicting_response_count": 0
+            }
+          ]
+        }
+      },
+      "project_limits": []
+    }
+  },
+  "late_confirmed": {
+    "message_id": "c5ea1533-c177-4e7c-b200-2150a0097194",
+    "result": {
+      "run_id": "gxr_01m879y1hsyxzzk9m1",
+      "status": "CREATED",
+      "run_budget": {
+        "budget_ref": "gxb_01m879y1htsa2brs75",
+        "parent_ref": null,
+        "run_id": "gxr_01m879y1hsyxzzk9m1",
+        "limits": {
+          "api_calls": 3,
+          "tokens": 5000
+        },
+        "spent": {
+          "api_calls": 1,
+          "tokens": 1800
+        },
+        "reserved": {},
+        "available": {
+          "api_calls": 2,
+          "tokens": 3200
+        },
+        "reservations": [
+          {
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "subject_kind": "native_turn",
+            "subject_id": "start",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 800
+            },
+            "status": "SETTLED",
+            "created_at": "2026-11-24T17:33:52.573Z",
+            "settled_at": "2026-11-24T17:34:25.405Z"
+          }
+        ],
+        "open": true,
+        "funding": null
+      },
+      "metering": {
+        "threads": [
+          {
+            "thread_id": "child",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 1200,
+            "observed_at": "2026-11-24T17:34:26.362Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": 1200,
+            "confidence": "PROVIDER_RECONCILED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 1200,
+            "unresolved_delta": 0
+          },
+          {
+            "thread_id": "root",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 600,
+            "observed_at": "2026-11-24T17:33:52.578Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": 600,
+            "confidence": "PROVIDER_RECONCILED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 600,
+            "unresolved_delta": 0
+          }
+        ],
+        "turns": [
+          {
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "thread_id": "root",
+            "turn_id": "turn-1",
+            "event_id": "start",
+            "state": "acknowledged",
+            "prior_tokens": 0,
+            "token_budget": 800,
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "budget_ref": "gxb_01m879y1htsa2brs75",
+            "sequence": 1,
+            "budget_status": "SETTLED",
+            "terminal_status": "completed",
+            "total_tokens": 600,
+            "measured_tokens": 600,
+            "children_known": 1,
+            "metering_reason": null,
+            "terminal_at": "2026-11-24T17:33:53.505Z",
+            "confidence": "PROVIDER_RECONCILED",
+            "settled_tokens": 1000,
+            "observed_lower_bound": 1000,
+            "estimate_snapshot": 1000,
+            "attribution": "TURN",
+            "estimated_at": "2026-11-24T17:34:25.405Z",
+            "usage_class": "PROVIDER_CONFIRMED",
+            "cost_assessment": {
+              "estimate_policy": "ESTIMATED_CONSERVATIVE",
+              "risk": "PROVIDER_CONFIRMED",
+              "turn_grant_tokens": 800,
+              "scoped_observed_lower_bound_tokens": 1800,
+              "observed_lower_bound_at_estimate_tokens": 1000,
+              "original_estimate_tokens": 1000,
+              "provider_confirmed_total_tokens": 1800,
+              "unobserved_tokens_upper_bound": 0,
+              "evidence_gaps": []
+            }
+          }
+        ],
+        "adjustments": [
+          {
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "settlement_event_id": 8,
+            "event_id": 11,
+            "confirmed_tokens": 1800,
+            "delta": 800,
+            "created_at": "2026-11-24T17:34:26.363Z",
+            "adjustment_id": "turn-receipt:rsv_01m879y1hxjj6bymkj",
+            "reported_total": null,
+            "root_id": "root",
+            "through_reservation": "rsv_01m879y1hxjj6bymkj",
+            "basis": "TURN_RECEIPT"
+          }
+        ],
+        "interrupts": [],
+        "risk": {
+          "scope": "gxb_01m879y1htsa2brs75",
+          "hard_tokens": 5000,
+          "settled_tokens": 1800,
+          "reserved_tokens": 0,
+          "observed_in_flight_tokens": 0,
+          "observed_plus_settled": 1800,
+          "committed_tokens": 1800,
+          "available_tokens": 3200,
+          "unfunded_closed_thread_tokens": 0,
+          "active_root_count": 0,
+          "largest_active_turn_grant": 0,
+          "unobserved_reserved_tokens": 0,
+          "provider_maximum_overshoot_tokens": null,
+          "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound."
+        },
+        "token_unit": "provider totalTokens, including cached input once",
+        "provider_money_cost": null,
+        "attributed_response_count": 3,
+        "cost_report": {
+          "PROVIDER_CONFIRMED": {
+            "tokens": 1800
+          },
+          "ESTIMATED": {
+            "tokens": 0,
+            "provisional_budget_tokens": 0
+          },
+          "UNRESOLVED": {
+            "tokens": null,
+            "reservation_refs": []
+          },
+          "UNATTRIBUTED_DELTA": {
+            "tokens": 0
+          },
+          "possibly_understated_estimate_refs": [],
+          "threads": [
+            {
+              "thread_id": "child",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 1200,
+              "turn_attributed_total": 1200,
+              "unattributed_delta": 0
+            },
+            {
+              "thread_id": "root",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 600,
+              "turn_attributed_total": 600,
+              "unattributed_delta": 0
+            }
+          ],
+          "turn_receipts": [
+            {
+              "thread_id": "child",
+              "turn_id": "child-turn",
+              "provider_confirmed_tokens": 1200,
+              "response_count": 2,
+              "receipts_with_usage": 2,
+              "disputed": false,
+              "conflicting_response_count": 0
+            },
+            {
+              "thread_id": "root",
+              "turn_id": "turn-1",
+              "provider_confirmed_tokens": 600,
+              "response_count": 1,
+              "receipts_with_usage": 1,
+              "disputed": false,
+              "conflicting_response_count": 0
+            }
+          ]
+        }
+      },
+      "project_limits": []
+    }
+  },
+  "reopened": {
+    "message_id": "8be9864b-7ff6-4e8c-b924-22b129835b48",
+    "result": {
+      "run_id": "gxr_01m879y1hsyxzzk9m1",
+      "status": "CREATED",
+      "run_budget": {
+        "budget_ref": "gxb_01m879y1htsa2brs75",
+        "parent_ref": null,
+        "run_id": "gxr_01m879y1hsyxzzk9m1",
+        "limits": {
+          "api_calls": 3,
+          "tokens": 5000
+        },
+        "spent": {
+          "api_calls": 1,
+          "tokens": 1800
+        },
+        "reserved": {},
+        "available": {
+          "api_calls": 2,
+          "tokens": 3200
+        },
+        "reservations": [
+          {
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "subject_kind": "native_turn",
+            "subject_id": "start",
+            "amounts": {
+              "api_calls": 1,
+              "tokens": 800
+            },
+            "status": "SETTLED",
+            "created_at": "2026-11-24T17:33:52.573Z",
+            "settled_at": "2026-11-24T17:34:25.405Z"
+          }
+        ],
+        "open": true,
+        "funding": null
+      },
+      "metering": {
+        "threads": [
+          {
+            "thread_id": "child",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 1200,
+            "observed_at": "2026-11-24T17:34:26.362Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": 1200,
+            "confidence": "PROVIDER_RECONCILED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 1200,
+            "unresolved_delta": 0
+          },
+          {
+            "thread_id": "root",
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "root_id": "root",
+            "observed_total": 600,
+            "observed_at": "2026-11-24T17:33:52.578Z",
+            "observation_source": "thread/tokenUsage/updated",
+            "reconciled_total": 600,
+            "confidence": "PROVIDER_RECONCILED",
+            "anomaly_total": null,
+            "anomaly_at": null,
+            "turn_attributed_total": 600,
+            "unresolved_delta": 0
+          }
+        ],
+        "turns": [
+          {
+            "run_id": "gxr_01m879y1hsyxzzk9m1",
+            "thread_id": "root",
+            "turn_id": "turn-1",
+            "event_id": "start",
+            "state": "acknowledged",
+            "prior_tokens": 0,
+            "token_budget": 800,
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "budget_ref": "gxb_01m879y1htsa2brs75",
+            "sequence": 1,
+            "budget_status": "SETTLED",
+            "terminal_status": "completed",
+            "total_tokens": 600,
+            "measured_tokens": 600,
+            "children_known": 1,
+            "metering_reason": null,
+            "terminal_at": "2026-11-24T17:33:53.505Z",
+            "confidence": "PROVIDER_RECONCILED",
+            "settled_tokens": 1000,
+            "observed_lower_bound": 1000,
+            "estimate_snapshot": 1000,
+            "attribution": "TURN",
+            "estimated_at": "2026-11-24T17:34:25.405Z",
+            "usage_class": "PROVIDER_CONFIRMED",
+            "cost_assessment": {
+              "estimate_policy": "ESTIMATED_CONSERVATIVE",
+              "risk": "PROVIDER_CONFIRMED",
+              "turn_grant_tokens": 800,
+              "scoped_observed_lower_bound_tokens": 1800,
+              "observed_lower_bound_at_estimate_tokens": 1000,
+              "original_estimate_tokens": 1000,
+              "provider_confirmed_total_tokens": 1800,
+              "unobserved_tokens_upper_bound": 0,
+              "evidence_gaps": []
+            }
+          }
+        ],
+        "adjustments": [
+          {
+            "reservation_ref": "rsv_01m879y1hxjj6bymkj",
+            "settlement_event_id": 8,
+            "event_id": 11,
+            "confirmed_tokens": 1800,
+            "delta": 800,
+            "created_at": "2026-11-24T17:34:26.363Z",
+            "adjustment_id": "turn-receipt:rsv_01m879y1hxjj6bymkj",
+            "reported_total": null,
+            "root_id": "root",
+            "through_reservation": "rsv_01m879y1hxjj6bymkj",
+            "basis": "TURN_RECEIPT"
+          }
+        ],
+        "interrupts": [],
+        "risk": {
+          "scope": "gxb_01m879y1htsa2brs75",
+          "hard_tokens": 5000,
+          "settled_tokens": 1800,
+          "reserved_tokens": 0,
+          "observed_in_flight_tokens": 0,
+          "observed_plus_settled": 1800,
+          "committed_tokens": 1800,
+          "available_tokens": 3200,
+          "unfunded_closed_thread_tokens": 0,
+          "active_root_count": 0,
+          "largest_active_turn_grant": 0,
+          "unobserved_reserved_tokens": 0,
+          "provider_maximum_overshoot_tokens": null,
+          "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound."
+        },
+        "token_unit": "provider totalTokens, including cached input once",
+        "provider_money_cost": null,
+        "attributed_response_count": 3,
+        "cost_report": {
+          "PROVIDER_CONFIRMED": {
+            "tokens": 1800
+          },
+          "ESTIMATED": {
+            "tokens": 0,
+            "provisional_budget_tokens": 0
+          },
+          "UNRESOLVED": {
+            "tokens": null,
+            "reservation_refs": []
+          },
+          "UNATTRIBUTED_DELTA": {
+            "tokens": 0
+          },
+          "possibly_understated_estimate_refs": [],
+          "threads": [
+            {
+              "thread_id": "child",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 1200,
+              "turn_attributed_total": 1200,
+              "unattributed_delta": 0
+            },
+            {
+              "thread_id": "root",
+              "root_id": "root",
+              "thread_confirmed_cumulative": 600,
+              "turn_attributed_total": 600,
+              "unattributed_delta": 0
+            }
+          ],
+          "turn_receipts": [
+            {
+              "thread_id": "child",
+              "turn_id": "child-turn",
+              "provider_confirmed_tokens": 1200,
+              "response_count": 2,
+              "receipts_with_usage": 2,
+              "disputed": false,
+              "conflicting_response_count": 0
+            },
+            {
+              "thread_id": "root",
+              "turn_id": "turn-1",
+              "provider_confirmed_tokens": 600,
+              "response_count": 1,
+              "receipts_with_usage": 1,
+              "disputed": false,
+              "conflicting_response_count": 0
+            }
+          ]
+        }
+      },
+      "project_limits": []
+    }
+  }
+}

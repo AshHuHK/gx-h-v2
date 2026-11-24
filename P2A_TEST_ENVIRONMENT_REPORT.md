@@ -1,5 +1,22 @@
 # P2A 测试环境与 465 个用例的复核
 
+## P2A.1 生产资源与验收资源
+
+修订 `28ce66537905910530708e8a84e4fac7436391a4` 的干净 checkout 在外层设置了 `GX_TEST_RESOURCE_PROFILE=untrusted` 和无效 scope。公开 `bin/gx-acceptance run hardening` 执行 PROFILE-SCOPE、T01、T02、REAL_RESOURCES，四项均通过。归档包含 57 份原件。两个 Run 数据库均通过 SQLite 完整性检查。[专项摘要](acceptance/p2a1/profile-history/profile-scope-28ce665/summary.json) · [原始证据压缩包](acceptance/p2a1/profile-history/profile-scope-28ce665/raw.tar.gz) · [SHA-256 清单](acceptance/p2a1/profile-history/profile-scope-28ce665/manifest.sha256)
+
+| 场景 | 实测结果 |
+|---|---|
+| 普通产品入口 | `gx-p0`、`gx`、`gx-native`、`gx-project`、`gx-science`、`gx-web` 分别拒绝误设的 `deterministic` 和 `real`。Python 模块入口、猜测的定位符、持有真实锁的无关兄弟进程和已退出的持锁进程均被拒绝。|
+| 受控验收 | 启动者在匿名临时文件上持有一个 POSIX 字节范围锁。GX 从 Linux 内核核对锁持有者与进程祖先关系。正常的两层子进程可以使用夹具，子进程无需保留额外文件描述符。CPU 容量为 2 线程，内存观察固定为 4096 MiB，GPU 设备集为空。|
+| REAL_RESOURCES | 224 个逻辑 CPU、24 核 cgroup 配额、8 个可准入线程、230400 MiB cgroup 内存上限，驱动读得 1 张 GPU。调度器的 CUDA 可见性约束随环境保留。真实本地 Job `gxj_01m87aenxsqedggcth` 成功结束并产生 3 个输出。|
+| 每个 Run 的原始记录 | 公开 `gx-p0 start` 建立确定性 Run `gxr_01m87aec696vmyaw8h` 和真实 Run `gxr_01m87aeed6avsx51pj`。初次创建在同一提交内保存 `runs.host_json.resource_profile` 与 `run.created`，事务指标标为 `Run/run_start` 并带实际 Run ID。冷启动 status 和在另一种资源环境中重播相同键，均读回原始 CPU、内存、GPU 与时间。|
+
+可运行 `bin/gx-acceptance verify profile-scope-28ce665 --runs-dir acceptance/p2a1/profile-history` 验证专项包。固定内存值描述测试容量；本机物理容量和 Job 的操作系统资源限制仍从真实环境与 Job 规范取得。旧 Run 保留创建时已有的信息。[复现参数](acceptance/p2a1/profile-history/profile-scope-28ce665/reproduce.json) · [Run 采样](gx-h/gx_core/jobs/run_resources.py)
+
+## 原 P2A 交付记录
+
+下列 T03 判定对应原交付日期。P2A.1 已收录随后取得的 42 项原始日志和逐项归因。[原始日志](gx-historical-42-failures-78a8b07.log) · [逐项分类](gx-historical-42-classification.json)
+
 **T01、T02 和真实资源准入通过。T03 为 PARTIAL。** 在产品修订 `c3b7ae18094c9c08cf13cbc360c496af461309ce` 的固定环境中，原 465 个 Python 用例有 461 个通过，4 个沿用原有跳过原因，缺失、错误、失败和新增跳过均为 0。用户提供的闭包包记载另一轮运行有 42 项失败，未给出该轮的用例身份或原始日志。此次可核对 465 个身份，能关联到那 42 项的原始记录为 0。[本次运行摘要](acceptance/closure/profile-history/20261124T111105Z-ebd13f73e167/summary.json) · [原 465 项的逐项日志](acceptance/phase2a/regression/final-v2/batch/suite/python-full.log)
 
 | 场景 | 实测结果 | 证据类别 |

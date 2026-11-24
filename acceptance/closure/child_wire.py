@@ -1,4 +1,5 @@
 """A byte relay for severing one GX client while its official stdio host keeps running."""
+from contextlib import ExitStack, suppress
 import json
 from pathlib import Path
 import socket
@@ -28,22 +29,25 @@ def bridge(path):
 
 
 class Wire:
-    def __init__(self, directory, binary, env, out):
-        self.path = directory / "gx.sock"
+    def __init__(self, directory, binary, env, out, socket_path):
         self.frames = []
         self.errors = []
         self.closed = False
         self.root = None
         self.out = out
-        self.listener = socket.socket(socket.AF_UNIX)
-        self.listener.bind(str(self.path))
-        self.listener.listen(1)
-        self.log = (out / "official-host.log").open("w")
-        self.process = subprocess.Popen([str(binary), "app-server", "--listen", "stdio://"],
-                                       env=env, cwd=directory, stdin=subprocess.PIPE,
-                                       stdout=subprocess.PIPE, stderr=self.log)
-        self.reader = threading.Thread(target=self._session, daemon=True)
-        self.reader.start()
+        with ExitStack() as startup:
+            self.listener = startup.enter_context(socket.socket(socket.AF_UNIX))
+            self.listener.bind(str(socket_path))
+            self.listener.listen(1)
+            self.log = startup.enter_context((out / "official-host.log").open("w"))
+            self.process = subprocess.Popen([str(binary), "app-server", "--listen", "stdio://"],
+                                           env=env, cwd=directory, stdin=subprocess.PIPE,
+                                           stdout=subprocess.PIPE, stderr=self.log)
+            startup.callback(self.process.stdout.close)
+            startup.callback(self._stop_host)
+            self.reader = threading.Thread(target=self._session, daemon=True)
+            self.reader.start()
+            startup.pop_all()  # The fixture now owns these resources until shutdown.
 
     def _session(self):
         try:
@@ -87,14 +91,27 @@ class Wire:
         finally:
             self.closed = True
 
-    def shutdown(self):
-        try:
+    def _stop_host(self):
+        with suppress(BrokenPipeError):
             self.process.stdin.close()
+        try:
             self.process.wait(timeout=8)
         except subprocess.TimeoutExpired:
             self.process.terminate()
-            self.process.wait(timeout=5)
+            try:
+                self.process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.process.wait()
+
+    def shutdown(self):
+        if self.log.closed:
+            return
+        try:
+            self._stop_host()
         finally:
+            with suppress(OSError):
+                self.listener.shutdown(socket.SHUT_RDWR)
             self.listener.close()
             self.reader.join(timeout=3)
             self.process.stdout.close()

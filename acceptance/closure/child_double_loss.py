@@ -118,7 +118,7 @@ def worker(phase, work, out, binary):
     case = read(work / "case.json")
     with closing(store.open_store(work / "gx.sqlite")) as conn:
         if phase == "warm":
-            argv = [sys.executable, "-B", str(Path(__file__).with_name("child_wire.py")), str(work / "gx.sock")]
+            argv = [sys.executable, "-B", str(Path(__file__).with_name("child_wire.py")), case.pop("relay_socket")]
             with Roots(conn, run_id=case["run_id"], cwd=work/"official/work", argv=argv, env=os.environ, token_budget=1000) as roots:
                 root = roots.ensure_main()
                 turn = roots.human_turn("Delegate one check of the original local arithmetic Job " + case["job"],
@@ -200,7 +200,7 @@ def command(phase, work, out, binary, env):
         return subprocess.Popen(argv, cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
 
 
-def experiment(binary, out, work):
+def experiment(binary, out, work, socket_path):
     _proxy_preflight()
     lock = read(ROOT/"release-assets/lock.json")["linux_x64"]
     host = binary_facts(binary)
@@ -220,8 +220,8 @@ def experiment(binary, out, work):
     try:
         with patch.dict(os.environ, env):
             case = setup(work/"gx.sqlite")
-        save(work/"case.json",case)
-        wire = Wire(work,binary,env,out)
+        save(work/"case.json", {**case, "relay_socket": str(socket_path)})
+        wire = Wire(work, binary, env, out, socket_path)
         warm = command("warm",work,out,binary,env)
         wait_for((out/"warm-binding.json").exists,"persist original parent binding",proc=warm)
         case = read(out/"warm-binding.json")
@@ -292,7 +292,7 @@ def experiment(binary, out, work):
             if proc and proc.poll() is None:
                 proc.kill()
                 proc.wait()
-        if wire and wire.process.poll() is None:
+        if wire:
             wire.shutdown()
         peer.shutdown()
         peer.server_close()
@@ -324,8 +324,11 @@ def main():
     revision = subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
     receipt = {"status":"FAIL","closure":"OPEN","argv":sys.orig_argv,"revision":revision,"source_sha256":source}
     try:
-        with tempfile.TemporaryDirectory(prefix="gx-child-loss-") as tmp:
-            receipt.update(experiment(binary,out,Path(tmp)))
+        # Only the socket needs Linux's short sockaddr_un path. All other files
+        # stay under the caller's TMPDIR or requested evidence directory.
+        with tempfile.TemporaryDirectory(prefix="gx-child-loss-") as tmp, \
+                tempfile.TemporaryDirectory(prefix="gx-wire-", dir="/tmp") as sockets:
+            receipt.update(experiment(binary, out, Path(tmp), Path(sockets) / "gx.sock"))
     except Exception as exc:
         receipt["error"] = repr(exc)
         raise

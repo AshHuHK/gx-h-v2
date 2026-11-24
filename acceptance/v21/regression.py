@@ -73,6 +73,7 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
         binary=REPO/'vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex'
     env=test_environment(checkout/'profile', binary=binary)
     summary={'commit':commit,'verified_product_commit':product_commit or commit,'started_utc':utc(),'source_file_manifest':'files.json','product_files':len(product),
+             'test_resource_profile':env['GX_TEST_RESOURCE_PROFILE'],'test_environment_sha256':digest(REPO/'acceptance/closure/profile.py'),
              'product_sha256':content_hash,'product_prefixes':PRODUCT,'node_version':subprocess.check_output(
                  ['node','--version'],text=True,env=env).strip(),'python_version':sys.version.split()[0],'operations':{},
              'class':'Local Python, SQLite and CPU Job fixtures. Official-protocol scenarios use pinned Codex with a scripted loopback provider.'}
@@ -162,6 +163,8 @@ def run_suite(commit, out, *, native, selected, product_commit, python_only=Fals
                 summary['official_cases']={p.stem:json.loads(p.read_text())['status']
                                            for p in sorted((native_dir/'official-suite').glob('*.json'))}
         summary['ended_utc']=utc()
+        if (out/'python-full.log').is_file():
+            summary['python_log_sha256']=digest(out/'python-full.log')
         summary['passed']=all(op['returncode']==0 for op in summary['operations'].values())
         save(out/'summary.json',summary)
         print('PASS' if summary['passed'] else 'FAIL', {k:v['returncode'] for k,v in summary['operations'].items()})

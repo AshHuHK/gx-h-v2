@@ -24,7 +24,7 @@ from acceptance.closure.profile import test_environment
 BASELINE = REPO / "acceptance/phase2a/regression/final-v2/batch/suite/python-full.log"
 PROBE = Path(__file__).with_name("profile_probe.py")
 CASE_LINE = re.compile(r"^test_\w+ \(([^()]+)\) \.\.\. ?(.*)$", re.M)
-FAILURE_LINE = re.compile(r"^(?:FAIL|ERROR): [^\n(]+ \(([^()]+)\).*$", re.M)
+FAILURE_LINE = re.compile(r"^(?:FAIL|ERROR): [^\n(]+ \(([^()]+)\)([^\n]*)$", re.M)
 OUTCOME = re.compile(r"^(ok|FAIL|ERROR|skipped .+|expected failure|unexpected success)$", re.M)
 
 
@@ -43,8 +43,6 @@ def unittest_rows(text):
     rows = {}
     for index, start in enumerate(starts):
         name = start[1]
-        if name in rows:
-            raise ValueError(f"duplicate unittest identity {name}")
         end = starts[index + 1].start() if index + 1 < len(starts) else len(text)
         block = text[start.start(2):end].partition("\n=======")[0]
         found = OUTCOME.search(block)
@@ -53,7 +51,10 @@ def unittest_rows(text):
         if status.startswith("skipped "):
             skip_reason = ast.literal_eval(status.removeprefix("skipped "))
             status = "skipped"
-        rows[name] = {"outcome": status, "skip_reason": skip_reason}
+        # On a subTest failure unittest may print the parent method again
+        # before its final status. The summary count checks the unique methods.
+        if name not in rows or status != "unrecorded":
+            rows[name] = {"outcome": status, "skip_reason": skip_reason}
     for error in FAILURE_LINE.finditer(text):
         if error[1] in rows:
             rows[error[1]]["outcome"] = error[0].split(":", 1)[0]
@@ -71,24 +72,27 @@ def original_failures(path):
         items = document["failures"] if isinstance(document, dict) else document
         if not isinstance(items, list):
             raise ValueError("supply a JSON list or an object with a failures list")
-        values = [(item, "") if isinstance(item, str) else (item["test_id"], item.get("original_error", ""))
+        values = [(item, item, "") if isinstance(item, str) else
+                  (item.get("original_id", item["test_id"]), item["test_id"], item.get("original_error", ""))
                   for item in items]
     else:
         values = []
         for block in re.split(r"^={6,}\s*$", text, flags=re.M):
             error = FAILURE_LINE.search(block)
             if error:
-                values.append((error[1], block.strip()))
+                # unittest can report multiple subTest failures (and a teardown
+                # error) for one method. Retain the original complete heading.
+                values.append((error[0], error[1], block.strip()))
         if not values:
-            values = [(m[1], m[2]) for m in re.finditer(r"^(?:FAILED|ERROR)\s+(\S+?::\S+)(?: - (.*))?$", text, re.M)]
+            values = [(m[1], m[1], m[2]) for m in re.finditer(r"^(?:FAILED|ERROR)\s+(\S+?::\S+)(?: - (.*))?$", text, re.M)]
     result = {}
-    for name, trace in values:
+    for original_id, name, trace in values:
         if "::" in name:
             module, *parts = name.split("::")
-            name = ".".join([Path(module).stem, *parts])
-        if name in result:
-            raise ValueError(f"duplicate original failure {name}")
-        result[name] = trace or ""
+            name = ".".join([Path(module).stem, *parts]).split("[", 1)[0]
+        if original_id in result:
+            raise ValueError(f"duplicate original failure {original_id}")
+        result[original_id] = (name, trace or "")
     return result
 
 
@@ -99,6 +103,33 @@ def failure_verdict(trace, now):
         if re.search(r"jobs hold \d+ of the 1 threads jobs may use", trace):
             return "environment", "Original trace records a one-thread Job limit. The two-slot admission control passes (T01)."
     return "unresolved", "The supplied failure and current outcome do not establish its cause."
+
+
+def reuse_python_suite(candidate, revision, out):
+    summary = json.loads((candidate / "summary.json").read_text())
+    lock = json.loads((REPO / "release-assets/lock.json").read_text())
+    operations = summary["operations"]
+    python = operations["python-full"]
+    log = candidate / "python-full.log"
+    requirements = {
+        "revision": summary["commit"] == summary["verified_product_commit"] == revision,
+        "profile": summary["test_resource_profile"] == "deterministic"
+                   and summary["test_environment_sha256"] == sha(Path(__file__).with_name("profile.py")),
+        "locked Codex": summary["native_binary"]["sha256"] == lock["linux_x64"]["binary_sha256"],
+        "bootstrap": all(operations[name]["returncode"] == 0 for name in ("clash-preflight", "offline-cordis", "offline-wheels"))
+                     and {"--no-index", "--require-hashes"} <= set(operations["offline-wheels"]["command"]),
+        "discovery": python["command"] == ["$SCRATCH/venv/bin/python", "-B", "-m", "unittest", "discover", "-s", "tests", "-v"]
+                     and python["cwd"] == "$CHECKOUT/gx-h" and type(python["returncode"]) is int,
+        "raw log digest": summary["python_log_sha256"] == sha(log),
+    }
+    missing = [key for key, ok in requirements.items() if not ok]
+    if missing:
+        raise ValueError("suite evidence mismatch: " + ", ".join(missing))
+    out.mkdir()
+    for name in ("python-full.log", "summary.json"):
+        shutil.copyfile(candidate / name, out / name)
+    return {"mode": "reused", "suite_source": str(candidate), "source_summary_sha256": sha(candidate / "summary.json"),
+            "argv": python["command"], "cwd": python["cwd"], "exit_code": python["returncode"], "commit": revision}
 
 
 def baseline_run(args, work):
@@ -118,10 +149,21 @@ def baseline_run(args, work):
     command = [str(args.python), "-B", "acceptance/v21/regression.py", "--commit", commit,
                "--python-only", "--binary", str(binary), "--out", str(suite_dir)]
     env = test_environment(work, python=args.python, binary=binary)
-    with (out / "suite-invocation.log").open("w") as log:
-        run = subprocess.run(command, cwd=REPO, env=env, stdout=log, stderr=subprocess.STDOUT)
-    write_json(out / "suite-invocation.json", {"argv": command, "cwd": str(REPO), "exit_code": run.returncode,
-                                               "commit": commit, "environment_names": sorted(env)})
+    receipt = None
+    reuse_issue = None
+    if args.suite_evidence:
+        try:
+            receipt = reuse_python_suite(args.suite_evidence.resolve(), commit, suite_dir)
+        except (OSError, ValueError, KeyError, TypeError) as err:
+            reuse_issue = str(err)
+    if receipt is None:
+        with (out / "suite-invocation.log").open("w") as log:
+            run = subprocess.run(command, cwd=REPO, env=env, stdout=log, stderr=subprocess.STDOUT)
+        receipt = {"mode": "executed", "argv": command, "cwd": str(REPO), "exit_code": run.returncode,
+                   "commit": commit, "environment_names": sorted(env), "reuse_issue": reuse_issue}
+    else:
+        (out / "suite-invocation.log").write_text("Reused the matching Python discovery receipt and verified its raw log.\n")
+    write_json(out / "suite-invocation.json", receipt)
     reference = unittest_rows(BASELINE.read_text())
     if len(reference) != 465:
         raise ValueError("historical Python baseline must contain exactly 465 unique identities")
@@ -139,12 +181,12 @@ def baseline_run(args, work):
     source = args.original_failures
     imported = original_failures(source) if source else {}
     verdicts = []
-    for name, trace in imported.items():
+    for original_id, (name, trace) in imported.items():
         now = measured.get(name, {"outcome": "missing"})
         classification, reason = failure_verdict(trace, now)
         if name not in reference:
             classification, reason = "unresolved", "Supplied identity is outside the historical set of 465."
-        verdicts.append({"test_id": name, "current_outcome": now["outcome"], "classification": classification,
+        verdicts.append({"original_id": original_id, "test_id": name, "current_outcome": now["outcome"], "classification": classification,
                          "reason": reason, "original_trace_sha256": hashlib.sha256(trace.encode()).hexdigest() if trace else None})
     issue = None
     if source is None:
@@ -153,9 +195,11 @@ def baseline_run(args, work):
         issue = f"The supplied source identifies {len(imported)} distinct failures of the expected 42."
     elif any(row["classification"] == "unresolved" for row in verdicts):
         issue = "Original failures without case-specific causal evidence remain unresolved."
-    write_json(out / "original-42.json", {"expected": 42, "identified": len(imported), "source": str(source) if source else None,
+    write_json(out / "original-42.json", {"expected": 42, "identified": len(imported),
+                                         "distinct_test_ids": len({case for case, _ in imported.values()}),
+                                         "source": str(source) if source else None,
                                          "source_sha256": sha(source) if source else None, "issue": issue, "cases": verdicts})
-    return {"status": "FAIL" if failures or run.returncode else "PARTIAL" if issue else "PASS",
+    return {"status": "FAIL" if failures or receipt["exit_code"] else "PARTIAL" if issue else "PASS",
             "revision": commit, "baseline_log": str(BASELINE.relative_to(REPO)), "baseline_log_sha256": sha(BASELINE),
             "baseline_count": len(reference), "baseline_outcomes": dict(Counter(r["measured"]["outcome"] for r in ledger)),
             "additional_ids": sorted(measured.keys() - reference.keys()), "failed_baseline_ids": failures,
@@ -239,6 +283,7 @@ def main():
     parser.add_argument("--python", type=Path, default=Path(sys.executable))
     parser.add_argument("--binary", type=Path)
     parser.add_argument("--commit", default="HEAD", help="Git revision whose isolated Python suite will run")
+    parser.add_argument("--suite-evidence", type=Path, help="reuse a matching fresh deterministic Python suite receipt")
     parser.add_argument("--original-failures", type=Path, help="original dated unittest/pytest log or JSON identities")
     args = parser.parse_args()
     args.out = args.out.resolve()

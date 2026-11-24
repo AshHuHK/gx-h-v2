@@ -129,6 +129,7 @@ def exercise(args, output, scratch, report):
     report["historical_facts_sha256"] = digest(initial)
     report["run_id"] = rid
     report["timeline"] = []
+    log = output / "cli.jsonl.gz"
 
     def invoke(phase, revision, action):
         argv = [sys.executable, "-B", str(install / "bin/gx-p0"), action, "--state", str(project), "--run-id", rid]
@@ -138,6 +139,9 @@ def exercise(args, output, scratch, report):
         proc = subprocess.run(argv, cwd=install, env=env, capture_output=True, text=True, timeout=30)
         row.update(ended_utc=now(), exit_code=proc.returncode, stdout_sha256=hashlib.sha256(proc.stdout.encode()).hexdigest(),
                    stderr=proc.stderr)
+        raw = json.dumps({**row, "stdout": proc.stdout}, ensure_ascii=False) + "\n"
+        with log.open("ab") as stream:
+            stream.write(gzip.compress(raw.encode(), mtime=0))
         report["timeline"].append(row)
         check(proc.returncode == 0, f"{phase} {action}: {proc.stderr}")
         reply = json.loads(proc.stdout)
@@ -168,6 +172,7 @@ def exercise(args, output, scratch, report):
         for key in report["before"].keys() - {"sqlite"}:
             check(report[name][key] == report["before"][key], f"{name} changed {key}")
     check(sha(source / "gx.db") == expected["db_sha256"], "source DB changed")
+    report["cli_log"] = {"file": log.name, "sha256": sha(log)}
     report["network_attempts"] = len([line for line in attempts.read_text().splitlines() if line.startswith("socket.")])
     report["codex_spawn_attempts"] = attempts.read_text().splitlines().count("codex")
     def counts(view):

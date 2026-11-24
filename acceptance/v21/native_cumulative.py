@@ -97,8 +97,11 @@ def measure(probe, path):
                 'estimated_after_grace':estimate['turns'][0]['confidence']=='ESTIMATED' and
                        estimate['turns'][0]['observed_lower_bound']==35 and estimate['spent'].get('tokens')==100 and not estimate['reserved'],
                 'followup_paid_once':next_turn!=first and model_calls==3,
-                'later_cumulative_reconciles':len(corrections)==1 and corrections[0]['delta']==70-sum(t['settled_tokens'] for t in after['turns']) and
-                       corrections[0]['reported_total']==70 and after['spent']=={'tokens':70,'api_calls':2},
+                'cold_unreceipted_followup_waits_for_grace':path!='cold' or
+                       (immediate['turns'][1]['budget_status']=='HELD' and not immediate['adjustments'] and
+                        after['turns'][1]['estimated_at'] is not None),
+                'later_cumulative_reconciles':bool(corrections) and sum(a['delta'] for a in corrections)==70-sum(t['settled_tokens'] for t in after['turns']) and
+                       {a['reported_total'] for a in corrections}=={70} and after['spent']=={'tokens':70,'api_calls':2},
                 'original_estimate_and_uncertainty_auditable':after['turns'][0]['settled_tokens']==100 and
                        after['turns'][0]['estimated_at'] and after['turns'][0]['attribution']=='UNATTRIBUTED_THREAD_USAGE',
                 'second_turn_charged_with_credible_attribution':(
@@ -143,6 +146,9 @@ def cold_repeated(probe):
             probe.peer.scenario('single_response')
             probe.peer.item=lambda row,index:probe.peer.message(row['id'],'4')
             third=run_turn(roots,'third')
+            before_third_grace=accounting(db,run,budget)
+            clock.advance(2)
+            roots.poll(.05)
             final=accounting(db,run,budget)
         with connection() as roots:
             capture(roots,probe)
@@ -156,15 +162,17 @@ def cold_repeated(probe):
                 'no_final_assertion_on_unchanged_tail':immediate['turns'][1]['budget_status']=='HELD' and not immediate['adjustments'],
                 'two_provisional_charges_after_grace':after_grace['spent']=={'api_calls':2,'tokens':200} and
                      all(t['confidence']=='ESTIMATED' for t in after_grace['turns']) and not after_grace['adjustments'],
+                'unreceipted_third_turn_waited_for_grace':before_third_grace['turns'][2]['budget_status']=='HELD'
+                     and final['turns'][2]['estimated_at'] is not None,
                 'strictly_growing_later_cumulative_105':final['spent']=={'api_calls':3,'tokens':105} and not final['reserved'],
                 'both_original_estimates_remain_auditable':all(t['estimated_at'] and t['settled_tokens']==100
                      and t['attribution']=='UNATTRIBUTED_THREAD_USAGE' for t in final['turns'][:2]),
-                'adjustment_group_matches_one_cumulative_checkpoint':sum(a['delta'] for a in final['adjustments'])==-130
+                'adjustment_group_matches_one_cumulative_checkpoint':sum(a['delta'] for a in final['adjustments'])==105-sum(t['settled_tokens'] for t in final['turns'])
                      and {a['reported_total'] for a in final['adjustments']}=={105},
                 'replay_does_not_recharge':replay==final and len(probe.peer.rows)==5}
         return {'thread':thread,'turns':[first,second,third],'second_turn_cumulative_counts':second_counts,
                 'second_turn_raw_count':len(raw),'immediate_after_second':immediate,'after_second_grace':after_grace,
-                'final':final,'after_replay':replay,'rollout_denials':denials,'model_requests':len(probe.peer.rows),
+                'immediate_after_third':before_third_grace,'final':final,'after_replay':replay,'rollout_denials':denials,'model_requests':len(probe.peer.rows),
                 'scope':'Two incomplete native turns followed by one complete response. Elapsed GX grace simulated.',
                 'checks':checks}
 

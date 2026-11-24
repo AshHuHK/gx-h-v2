@@ -426,6 +426,13 @@ class RootDelivery:
             observed = self.conn.execute("SELECT observed_total FROM p0_meter_threads WHERE thread_id=?",
                                          (thread_id,)).fetchone()
             prior = (observed[0] if observed else None) or 0  # A provisional baseline; never an actual charge.
+        # A completed host-created Turn can lie between two paid inputs. Its scoped
+        # terminal high-water mark is the new baseline; its receipts stay unreserved.
+        extra = metering.unreserved_root_turns(self.conn, thread_id)
+        boundary = max((r["total_tokens"] for r in extra if r["terminal_status"] and r["total_tokens"] is not None),
+                       default=None)
+        if boundary is not None and (prior is None or boundary > prior):
+            prior = boundary
         run_ref = budgets.budget_for(self.conn, run_id=self.run_id)
         ref = team_admission.team_funding(self.conn,self.run_id,binding.get("task_id"),run_ref)
         risk_available = meter_limits.allowance(self.conn,self.run_id,ref,binding)

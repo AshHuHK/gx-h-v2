@@ -8,36 +8,47 @@ from . import metering, waits
 
 def _subtree(conn, ref):
     rows = conn.execute(
-        "WITH RECURSIVE tree(ref,funding) AS (SELECT ?,NULL UNION ALL "
-        "SELECT c.budget_ref,f.amounts_json FROM tree JOIN budgets c ON c.parent_ref=tree.ref "
-        "JOIN budget_reservations f ON f.reservation_ref=?||c.budget_ref AND f.status='HELD') "
-        "SELECT b.*,tree.funding FROM tree JOIN budgets b ON b.budget_ref=tree.ref",
+        "WITH RECURSIVE tree(ref,funding,open) AS (SELECT ?,NULL,1 UNION ALL "
+        "SELECT c.budget_ref,f.amounts_json,tree.open AND f.status='HELD' FROM tree JOIN budgets c ON c.parent_ref=tree.ref "
+        "LEFT JOIN budget_reservations f ON f.reservation_ref=?||c.budget_ref) "
+        "SELECT b.*,tree.funding,tree.open FROM tree JOIN budgets b ON b.budget_ref=tree.ref",
         (ref,budgets.FUND_PREFIX)).fetchall()
-    spent = sum(store.loads(r,"spent_json",{}).get("tokens",0) for r in rows)
+    # Closed children's balances already rolled up, while their unresolved exposure
+    # continues to belong to the same parent. Keep the full ownership set.
+    spent = sum(store.loads(r,"spent_json",{}).get("tokens",0) for r in rows if r["open"])
     reserved = sum(store.loads(r,"reserved_json",{}).get("tokens",0)
-                   -store.loads(r,"funding",{}).get("tokens",0) for r in rows)
+                   -store.loads(r,"funding",{}).get("tokens",0) for r in rows if r["open"])
     return {r["budget_ref"] for r in rows},spent,reserved
 
 
-def _exposure(conn, active):
+def _exposure(conn, active, refs):
     roots = {}
     for row in active:
-        held,lower = roots.get(row["thread_id"],(0,0))
-        _,observed,_,_ = metering.observation(conn,row)
-        if row["budget_status"]=="HELD":
+        held, lower = roots.get(row["thread_id"], (0, 0))
+        _, observed, _, _ = metering.observation(conn, row)
+        if row["budget_status"] == "HELD":
             held += row["token_budget"] or 0
         else:
-            observed = max(0,observed-(row["settled_tokens"] or 0))
-        roots[row["thread_id"]] = (held,max(lower,observed))
-    for root,(held,lower) in roots.items():
-        total = conn.execute("SELECT sum(observed_total) FROM p0_meter_threads WHERE root_id=?",(root,)).fetchone()[0]
-        if total is not None:
+            observed = max(0, observed - (row["settled_tokens"] or 0))
+        roots[row["thread_id"]] = (held, max(lower, observed))
+    observed = over_holds = unobserved = 0
+    for root, (held, lower) in roots.items():
+        unreserved = 0
+        owners = {r[0] for r in conn.execute("SELECT DISTINCT budget_ref FROM p0_meter_native_turns WHERE thread_id=?",
+                                              (root,))}
+        if refs is None or owners <= refs:
+            total = conn.execute("SELECT sum(observed_total) FROM p0_meter_threads WHERE root_id=?", (root,)).fetchone()[0]
             last = conn.execute("SELECT thread_id,sequence FROM p0_meter_native_turns WHERE thread_id=? "
                                 "ORDER BY sequence DESC LIMIT 1", (root,)).fetchone()
-            settled = metering._prior_cost(conn, last, inclusive=True)
-            roots[root] = (held,max(lower,total-settled))
-    return (sum(lower for held,lower in roots.values()),sum(max(0,lower-held) for held,lower in roots.values()),
-            sum(max(0,held-lower) for held,lower in roots.values()))
+            paid = metering._prior_cost(conn, last, inclusive=True)
+            if paid is not None:
+                unreserved = sum(r["receipted"] for r in metering.unreserved_root_turns(conn, root))
+                if total is not None:
+                    lower = max(lower, total - unreserved - paid)
+        observed += lower + unreserved
+        over_holds += unreserved + max(0, lower - held)
+        unobserved += max(0, held - lower)
+    return observed, over_holds, unobserved
 
 
 def _closed_exposure(conn, project):
@@ -51,15 +62,19 @@ def _closed_exposure(conn, project):
         "JOIN runs r USING(run_id) WHERE r.project_ref=? GROUP BY t.root_id), "
         "closed AS (SELECT d.thread_id,group_concat(DISTINCT d.budget_ref) AS refs,"
         "sum(coalesce(d.settled_tokens,0)" + late + ") AS paid FROM p0_meter_native_turns d "
-        "JOIN observed o ON o.root_id=d.thread_id GROUP BY d.thread_id HAVING sum(d.budget_status='HELD')=0) "
+        "JOIN observed o ON o.root_id=d.thread_id GROUP BY d.thread_id HAVING sum(d.budget_status='HELD')=0 "
+        "AND count(*) FILTER(WHERE d.budget_status='SETTLED' AND d.settled_tokens IS NULL)=0) "
         "SELECT c.thread_id,c.refs,o.tokens-c.paid-coalesce((SELECT sum(delta) FROM p0_meter_adjustments a "
         "WHERE a.root_id=c.thread_id),0) AS residual FROM closed c JOIN observed o ON o.root_id=c.thread_id "
-        "WHERE residual>0", (project,))
-    return [(r["thread_id"], set(r["refs"].split(",")), r["residual"]) for r in rows]
+        "WHERE residual>0 OR EXISTS (SELECT 1 FROM p0_meter_responses m WHERE m.thread_id=c.thread_id AND NOT EXISTS "
+        "(SELECT 1 FROM p0_meter_native_turns d WHERE d.thread_id=m.thread_id AND d.turn_id=m.turn_id))", (project,))
+    return [(r["thread_id"], set(r["refs"].split(",")),
+             max(r["residual"] or 0, sum(t["receipted"] for t in metering.unreserved_root_turns(conn, r["thread_id"]))))
+            for r in rows]
 
 
 def _risk(conn, limit, spent, reserved, active, *, scope, closed=(), refs=None):
-    observed, over_holds, unobserved = _exposure(conn,active)
+    observed, over_holds, unobserved = _exposure(conn,active,refs)
     live = {r["thread_id"] for r in active}
     residual = sum(n for root, owners, n in closed if root not in live and (refs is None or owners <= refs))
     observed += residual

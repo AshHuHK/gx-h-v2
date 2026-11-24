@@ -1,6 +1,6 @@
 """P2A U01–U08 against real GX SQLite, RootDelivery notifications and the offline Driver."""
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import closing
+from contextlib import closing, nullcontext
 import hashlib
 import json
 import os
@@ -81,6 +81,172 @@ class UsageClosure(unittest.TestCase):
                                            "source":{"subAgent":{"thread_spawn":{"parent_thread_id":"root"}}}}})
         deliver.observe_descendant("turn/started", {"threadId":child, "turn":{"id":child_turn, "rootTurnId":parent}})
         return {"threadId":child, "turnId":child_turn}
+
+    def funding_fixture(self):
+        self.f.budget = budgets.create_root(self.db, run_id=self.run, profile_name="p0", actor="review",
+                                            limits={"tokens":1500, "api_calls":12})
+        self.db.execute("UPDATE runs SET budget_ref=? WHERE run_id=?", (self.f.budget, self.run))
+
+    def funded_turn(self, fund=None):
+        route = patch("gx_core.p0.team_admission.team_funding", return_value=fund) if fund else nullcontext()
+        with route:
+            event = f"paid-{len(self.f.peer.turns) + 1}"
+            turn = self.f.delivery.deliver("root", event, event_id=event)["turn_id"]
+        self.f.delivery.observe("turn/started", {"threadId":"root", "turn":{"id":turn}})
+        return turn
+
+    def leaf(self, name):
+        return budgets.open_child(self.db, parent_ref=self.f.budget, subject_kind="team", subject_id=name,
+                                  limits={"tokens":400, "api_calls":4}, actor="review")["budget_ref"]
+
+    def common_case(self, separate):
+        self.funding_fixture()
+        a = self.leaf("A")
+        b = self.leaf("B") if separate else a
+        first = self.funded_turn(a)
+        self.f.raw(first, "late", None)
+        self.f.complete()
+        clock.advance(31)
+        self.drive()
+        second = self.funded_turn(b)
+        self.f.sample(second, 145)
+        self.f.complete()
+        before = self.inspect("145_pre_grace")
+        self.assertEqual(before["turns"][1]["budget_status"], "HELD")
+        self.assertEqual(before["adjustments"], [])
+        self.f.sample(first, 120)
+        self.f.raw(first, "late", 120)
+        after = self.inspect("120_attributed_to_first")
+        self.assertEqual([r["budget_status"] for r in after["turns"]], ["SETTLED","HELD"])
+        self.assertEqual(after["risk"]["settled_tokens"], 120)
+        self.assertEqual(after["risk"]["observed_plus_settled"], 145)
+        self.assertEqual(after["cost_report"]["UNATTRIBUTED_DELTA"]["tokens"], 25)
+        self.assertEqual(budgets.state(self.db, a)["spent"], {"api_calls":1,"tokens":120})
+        if separate:
+            self.assertEqual(budgets.state(self.db, b)["spent"], {})
+
+    def test_B01_different_funding_owners(self):
+        self.common_case(True)
+
+    def test_B02_same_fund_waits_for_grace(self):
+        self.common_case(False)
+
+    def test_B03_unreserved_turn_keeps_its_own_receipts(self):
+        self.funding_fixture()
+        first = self.funded_turn()
+        self.f.raw(first,"first",20)
+        self.f.sample(first,20)
+        self.f.complete()
+        host = "unreserved-goal"
+        self.f.delivery.observe("turn/started", {"threadId":"root", "turn":{"id":host}})
+        self.f.raw(host,"host",200)
+        self.f.sample(host,220)
+        self.f.delivery.observe("turn/completed", {"threadId":"root","turn":{"id":host,"status":"completed"}})
+        second = self.funded_turn()
+        self.f.raw(second,"missing",None)
+        self.f.sample(second,225)
+        self.f.complete()
+        clock.advance(31)
+        self.drive()
+        after = self.inspect("unreserved_charge_is_independent")
+        ticket = after["turns"][1]
+        self.assertEqual((ticket["prior_tokens"], ticket["observed_lower_bound"], ticket["settled_tokens"]), (220,0,100))
+        self.assertEqual(after["cost_report"]["PROVIDER_CONFIRMED"]["tokens"], 220)
+        self.assertEqual(after["cost_report"]["UNATTRIBUTED_DELTA"]["tokens"], 5)
+        self.assertEqual(after["cost_report"]["ESTIMATED"]["tokens"], 95)
+        self.assertEqual(after["risk"]["unfunded_closed_thread_tokens"], 200)
+        self.assertEqual(after["risk"]["observed_plus_settled"], 320)
+
+    def test_B04_closed_funding_line_retains_residual(self):
+        self.funding_fixture()
+        branch = self.leaf("closed")
+        first = self.funded_turn(branch)
+        self.f.raw(first,"actual",20)
+        self.f.sample(first,20)
+        self.f.complete()
+        self.f.sample("unreserved-goal",70)
+        before = self.inspect("open_funding")["risk"]
+        budgets.release(self.db, budgets.FUND_PREFIX+branch, actor="review", reason="completed")
+        after = self.inspect("closed_funding")["risk"]
+        for risk in (before, after):
+            self.assertEqual((risk["settled_tokens"],risk["unfunded_closed_thread_tokens"],risk["observed_plus_settled"]),
+                             (20,50,70))
+
+    def test_B05_unknown_historical_cost_preserves_spent(self):
+        first = self.funded_turn()
+        ref = self.inspect("admitted")["turns"][0]["reservation_ref"]
+        with store.transaction(self.db):
+            self.db.execute("UPDATE budgets SET spent_json=?,reserved_json='{}' WHERE budget_ref=?",
+                            (json.dumps({"tokens":100,"api_calls":1}),self.f.budget))
+            self.db.execute("UPDATE budget_reservations SET status='SETTLED',settled_at=? WHERE reservation_ref=?",
+                            (clock.now_iso(),ref))
+            self.db.execute("UPDATE p0_meter_turns SET terminal_at=?,confidence='HISTORICAL_SETTLED',"
+                            "attribution='HISTORICAL_TURN',settled_tokens=NULL WHERE reservation_ref=?", (clock.now_iso(),ref))
+            self.db.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,terminal_status,total_tokens,children_known) "
+                            "VALUES('root',?,'completed',100,1)", (first,))
+            metering.observe(self.db,self.run,"root","root",first,100)
+        self.f.peer.turns[-1]["status"] = "completed"
+        self.assertEqual(self.inspect("original_bill_unknown")["risk"]["observed_plus_settled"],100)
+        second = self.funded_turn()
+        self.f.raw(second,"new",20)
+        self.f.sample(second,120)
+        self.f.complete()
+        after = self.inspect("independent_new_charge")
+        self.assertEqual(after["risk"]["observed_plus_settled"],120)
+        self.assertEqual(after["adjustments"],[])
+        self.assertEqual(after["cost_report"]["UNRESOLVED"]["reservation_refs"],[ref])
+        self.assertIsNone(after["turns"][0]["settled_tokens"])
+
+    def signed_active(self, final, total, scoped):
+        self.funding_fixture()
+        first = self.funded_turn()
+        self.f.raw(first,"late",None)
+        self.f.complete()
+        clock.advance(31)
+        self.drive()
+        second = self.funded_turn()
+        self.f.raw(first,"late",final)
+        self.f.sample(first,final)
+        self.f.sample(second if scoped else "unreserved-goal",total)
+        after = self.inspect("active_turn_after_correction")
+        self.assertEqual(after["risk"]["observed_plus_settled"], total)
+        self.assertEqual(after["risk"]["settled_tokens"],final)
+        self.assertEqual([a["delta"] for a in after["adjustments"]],[final-100])
+
+    def test_B06_positive_adjustment_during_later_hold(self):
+        self.signed_active(140,150,True)
+
+    def test_B07_negative_adjustment_during_later_hold(self):
+        self.signed_active(60,95,False)
+
+    def test_B08_late_exact_within_already_funded_pool(self):
+        self.funding_fixture()
+        first = self.funded_turn()
+        self.f.raw(first,"known",35)
+        self.f.raw(first,"late",None)
+        self.f.sample(first,35)
+        self.f.complete()
+        clock.advance(31)
+        self.drive()
+        second = self.funded_turn()
+        self.f.sample(second,145)
+        self.f.complete()
+        self.assertEqual(self.inspect("pre_grace")["turns"][1]["budget_status"],"HELD")
+        clock.advance(31)
+        self.drive()
+        self.assertEqual(self.inspect("pooled")["risk"]["settled_tokens"],145)
+        self.f.sample(first,120)
+        self.f.raw(first,"late",85)
+        partial = self.inspect("first_exact")
+        self.assertEqual(partial["cost_report"]["PROVIDER_CONFIRMED"]["tokens"],120)
+        self.assertEqual(partial["cost_report"]["ESTIMATED"]["provisional_budget_tokens"],25)
+        self.assertEqual(partial["risk"]["settled_tokens"],145)
+        self.f.raw(second,"final",25)
+        after = self.inspect("all_exact")
+        self.assertEqual(after["cost_report"]["PROVIDER_CONFIRMED"]["tokens"],145)
+        self.assertEqual(after["cost_report"]["ESTIMATED"]["provisional_budget_tokens"],0)
+        self.assertEqual(after["risk"]["settled_tokens"],145)
+        self.assertEqual([r["usage_class"] for r in after["turns"]],["PROVIDER_CONFIRMED"]*2)
 
     def test_U01_official_receipt_exactly_once(self):
         turn = self.f.start()
@@ -274,7 +440,7 @@ class UsageClosure(unittest.TestCase):
         dbfile = self.f.directory / "ledger.sqlite"
         env = test_environment(self.f.directory / "child")
         env.update(PYTHONPATH=str(ROOT / "gx-h"), GX_CODEX_OFFLINE="1")
-        code = ("from contextlib import closing\nimport os,pathlib,sys\n"
+        code = ("from contextlib import closing, nullcontext\nimport os,pathlib,sys\n"
                 "from gx_core.persistence import store\nfrom gx_core.p0.driver import Driver\n"
                 "p=pathlib.Path(sys.argv[1])\n"
                 "with closing(store.open_store(p)) as db, closing(Driver(db,p.parent,sys.argv[2])) as owner:\n"

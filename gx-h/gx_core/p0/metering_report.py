@@ -41,6 +41,8 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
 
     by_turn = []
     totals = Counter()
+    unreserved = Counter()
+    paid_turns = {(r["thread_id"], r["turn_id"]) for r in reservations}
     conflicting_turns = set()
     for thread, turn in sorted(raw.keys() | known.keys() | disputes):
         receipt = raw.get((thread, turn))
@@ -55,6 +57,8 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
         tokens = max(sources) if sources else None
         if tokens is not None:
             totals[thread] += tokens
+            if funded_turn.get((thread, turn), (thread, turn)) not in paid_turns:
+                unreserved[owners[thread]] += tokens
         by_turn.append({"thread_id":thread, "turn_id":turn, "provider_confirmed_tokens":tokens,
                         "response_count":receipt["n"] if receipt else 0,
                         "receipts_with_usage":receipt["received"] if receipt else 0,
@@ -73,7 +77,7 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
     original = Counter()
     settled = Counter()
     signed = Counter()
-    confirmed_late = {a["reservation_ref"] for a in adjustments if a["basis"] == "TURN_RECEIPT"}
+    confirmed_late = {a["reservation_ref"]:a["confirmed_tokens"] for a in adjustments if a["basis"] == "TURN_RECEIPT"}
     for item in adjustments:
         signed[item["reservation_ref"]] += item["delta"]
     unresolved = []
@@ -87,6 +91,10 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
                 ticket["usage_class"] = "ESTIMATED"
             elif ticket["confidence"] == "PROVIDER_CONFIRMED" or ref in confirmed_late:
                 ticket["usage_class"] = "PROVIDER_CONFIRMED"
+                # Receipt-covered tokens in a common funding pool cease to be provisional,
+                # including funds that were originally booked on another same-fund Turn.
+                if ref in confirmed_late:
+                    original[root] += paid - confirmed_late[ref]
             else:
                 ticket["usage_class"] = "UNRESOLVED"
         else:
@@ -98,7 +106,8 @@ def classified_cost(conn, run_id, threads, reservations, adjustments):
 
     # Report only the provisional exposure above the evidence on the same funding root.
     # A snapshot residual has no Turn owner and is never distributed to resize Turn costs.
-    estimated = sum(min(amount, max(0, settled[root] - known_per_root[root])) for root, amount in original.items())
+    original = +original
+    estimated = sum(min(amount, max(0, settled[root] - (known_per_root[root] - unreserved[root]))) for root, amount in original.items())
     return {"PROVIDER_CONFIRMED":{"tokens":sum(totals.values())},
             "ESTIMATED":{"tokens":estimated, "provisional_budget_tokens":sum(original.values())},
             "UNRESOLVED":{"tokens":None, "reservation_refs":unresolved},

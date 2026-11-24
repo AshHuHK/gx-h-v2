@@ -1,6 +1,5 @@
 """Validate the acceptance launch scope before GX uses fixture resources."""
 
-from functools import lru_cache
 import os
 from pathlib import Path
 
@@ -16,12 +15,11 @@ class ResourceProfileError(ValueError):
     pass
 
 
-@lru_cache(maxsize=4)
-def _check_scope(pid: int, parent: int, locator: str) -> int:
-    owner_text, device_inode = locator.split("/", 1)
-    owner = int(owner_text)
-    if owner <= 0:
-        raise ValueError("invalid owner")
+def _check_scope(pid: int, parent: int, locator: str) -> None:
+    owner_text, descriptor_text, device_inode = locator.split("/")
+    owner, descriptor = int(owner_text), int(descriptor_text)
+    if owner <= 0 or descriptor < 0:
+        raise ValueError("invalid launcher or descriptor")
     ancestor = pid
     while ancestor != owner:
         if ancestor <= 1:
@@ -33,9 +31,12 @@ def _check_scope(pid: int, parent: int, locator: str) -> int:
             ancestor = int(stat.rsplit(")", 1)[1].split()[1])
     expected = ["POSIX", "ADVISORY", "WRITE", str(owner), device_inode,
                 str(SCOPE_LOCK_BYTE), str(SCOPE_LOCK_BYTE)]
-    with open("/proc/locks", encoding="ascii") as locks:
-        if any(line.split()[1:] == expected for line in locks):
-            return owner
+    # The global /proc/locks iteration can skip a held lock when unrelated locks
+    # change between reads. fdinfo describes this file and the kernel lock owner.
+    with open(f"/proc/{owner}/fdinfo/{descriptor}", encoding="ascii") as info:
+        if any(fields[0] == "lock:" and fields[2:] == expected
+               for line in info if (fields := line.split())):
+            return
     raise ValueError("launcher lock is absent")
 
 
@@ -49,9 +50,7 @@ def deterministic_test_resources() -> bool:
             "Remove it for a normal GX invocation with real host resources."
         )
     try:
-        owner = _check_scope(os.getpid(), os.getppid(), os.environ.get(SCOPE_VAR, ""))
-        # Cached scopes cease to be usable when their acceptance launcher exits.
-        os.kill(owner, 0)
+        _check_scope(os.getpid(), os.getppid(), os.environ.get(SCOPE_VAR, ""))
     except (ValueError, OSError, IndexError):
         raise ResourceProfileError(
             f"{PROFILE_VAR}=deterministic requires a live controlled acceptance launcher. "

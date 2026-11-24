@@ -1,6 +1,7 @@
 """Exercise profile selection, Run persistence and replay through packaged entry points."""
 
 from contextlib import closing
+import fcntl
 import gzip
 import json
 import os
@@ -8,6 +9,7 @@ from pathlib import Path
 import shutil
 import sqlite3
 import subprocess
+import tempfile
 from unittest.mock import patch
 
 from acceptance.closure.profile import test_environment
@@ -46,7 +48,17 @@ def run(args, work):
     for entry in sorted(entries):
         for value in ("deterministic", "real"):
             invoke(f"refused-{entry.name}-{value}", [entry, "--help"], {**real, OVERRIDE: value}, refuse=True)
-    invoke("refused-guessed-marker", [gx, "--help"], {**bare, SCOPE: f"{os.getpid()}/00:00:0"}, refuse=True)
+    invoke("refused-guessed-marker", [gx, "--help"], {**bare, SCOPE: f"{os.getpid()}/0/00:00:0"}, refuse=True)
+    # Even a real descriptor of the live parent must have the exact exclusive
+    # acceptance range.
+    with tempfile.TemporaryFile(dir=work) as handle:
+        stat = os.fstat(handle.fileno())
+        scope = f"{os.getpid()}/{handle.fileno()}/{os.major(stat.st_dev):02x}:{os.minor(stat.st_dev):02x}:{stat.st_ino}"
+        child = {**bare, SCOPE: scope}
+        invoke("refused-unlocked-file", [gx, "--help"], child, refuse=True)
+        fcntl.lockf(handle, fcntl.LOCK_EX, 1, 0)
+        invoke("refused-wrong-lock-range", [gx, "--help"], child, refuse=True)
+        fcntl.lockf(handle, fcntl.LOCK_UN, 1, 0)
     module = [args.python, "-B", "-m", "gx_core.p0.cli", "--help"]
     invoke("refused-python-module", module, {**bare, "PYTHONPATH": str(REPO / "gx-h")}, refuse=True)
     # A real lock owned by a sibling, then its expired locator, are insufficient.

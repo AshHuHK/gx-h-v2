@@ -16,11 +16,11 @@ _scope_lock = threading.Lock()
 @lru_cache(maxsize=1)
 def _scope_for_process(pid: int):
     # The descriptor stays in the launching process. Even children that close all
-    # inherited fds can check the kernel's owner/byte range in /proc/locks.
+    # inherited fds can read the lock on its specific descriptor in /proc/<pid>/fdinfo.
     handle = tempfile.TemporaryFile(dir="/tmp")
     fcntl.lockf(handle, fcntl.LOCK_EX | fcntl.LOCK_NB, 1, 0x47585032)
     stat = os.fstat(handle.fileno())
-    locator = f"{pid}/{os.major(stat.st_dev):02x}:{os.minor(stat.st_dev):02x}:{stat.st_ino}"
+    locator = f"{pid}/{handle.fileno()}/{os.major(stat.st_dev):02x}:{os.minor(stat.st_dev):02x}:{stat.st_ino}"
     return handle, locator
 
 

@@ -208,7 +208,11 @@ def _apply_ops(conn, plan, decision_ref):
             store.enqueue_outbox(conn, topic="v6.node", idempotency_key=key, payload=dispatch)
             dispatches.append(dispatch)
         elif op == "cancel_node":
+            v6_graph.require_cancellable(conn, run_id, spec["node"])
             _revoke(conn, run_id, "node_id", spec["node"])
+            store.append_event(conn, run_id=run_id, kind="v6.node.cancel_requested", actor=plan.thread_id,
+                subject_kind="node", subject_id=spec["node"], new_state="CANCEL_REQUESTED",
+                payload=dict(decision_id=decision_ref, op_digest=digest))
         elif op == "stop_branch":
             conn.execute("UPDATE v6_branches SET status='STOPPING',stop_decision_ref=?,stop_op_digest=? "
                          "WHERE run_id=? AND branch_id=?",

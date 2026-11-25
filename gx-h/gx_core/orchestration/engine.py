@@ -1111,13 +1111,22 @@ class Engine:
         from ..p0 import v6_goal
         run = self._run_row(run_id)
         if v6_goal.is_goal(run):
-            from ..p0 import v6_jobs
+            from ..errors import VersionImmutable
+            from ..p0 import v6_decisions, v6_jobs
             config.check_holds(self.hold_scope)
             result = {}
             if run["status"] in {"ACTIVE", *machines.waiting_states(RUN)}:
-                checkpoint = self.checkpointer.latest(self.conn, run_id)
+                self.conn.execute("SAVEPOINT v6_execution_head")
+                try:
+                    checkpoint = self.checkpointer.latest(self.conn, run_id)
+                    bound = checkpoint.state.get("head") if checkpoint else None
+                    if bound != v6_decisions.head(self.conn, run_id):
+                        raise VersionImmutable("The current checkpoint and adopted graph head differ")
+                    if checkpoint:
+                        v6_goal.instance(self.conn, run_id, checkpoint)
+                finally:
+                    self.conn.execute("RELEASE v6_execution_head")
                 if checkpoint:
-                    v6_goal.instance(self.conn, run_id, checkpoint)
                     result = v6_jobs.advance(self.conn, run_id)
                 task = v6_goal.ensure_task(self.conn, run_id)
                 if task:

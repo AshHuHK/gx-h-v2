@@ -167,9 +167,15 @@ def set_registry(registry: WorkflowRegistry | None) -> None:
 
 
 def _engine(ctx: Ctx, run_id: str | None = None) -> Engine:
+    run = _run(ctx.conn, run_id) if run_id is not None else None
+    if run is not None and not run["workflow_id"]:
+        from ..p0 import v6_goal
+        if v6_goal.is_goal(run):
+            # Goal instances resolve from the Run's immutable graph rows. A third-party
+            # static recipe should not be loaded merely to drive or inspect that Run.
+            return Engine(ctx.conn, WorkflowRegistry(), teams=TeamService(ctx.conn, ctx=ctx), ctx=ctx)
     registry = default_registry()
-    if run_id is not None:
-        run = _run(ctx.conn, run_id)
+    if run is not None:
         if run["workflow_id"]:
             try:
                 registry = default_registry(ctx.conn, workflow_id=run["workflow_id"], version=run["workflow_version"])
@@ -697,7 +703,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     # call may have died between creating the run and starting it), or waits a bounded
     # time for the call that is starting it, and settles one itself only after that. (A key
     # that already has its answer is found by that wait at once.)
-    engine = _engine(ctx, run_id)
+    engine = None if goal_mode else _engine(ctx, run_id)
     warnings: list[str] = []
     wait = False
     if inputs.get("p0") is True and not goal_mode:
@@ -857,6 +863,10 @@ def _waiting_for(conn: sqlite3.Connection, run: sqlite3.Row, engine_state: Mappi
     """What a run that is not moving is waiting for, and how it continues."""
     status = run["status"]
     pending = engine_state.get("pending_interrupt")
+    if status == "ACTIVE" and not run["workflow_id"]:
+        from ..p0 import v6_goal
+        if v6_goal.is_goal(run):
+            return v6_goal.waiting_for(conn, run["run_id"])
     if status == "ACTIVE" and idle:
         # Nothing pending and nobody advancing it: after a pause is lifted, a node that
         # raised, or a process that died between two nodes. Only `continue` moves it.

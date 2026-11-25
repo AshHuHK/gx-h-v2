@@ -265,11 +265,9 @@ def _events(conn, rid, after, budget_ref=None):
 def _matches(row, watches, rid):
     payload = store.loads(row, "payload_json")
     kind = row["kind"]
-    if kind == "v6.decision.superseded":
-        return payload.get("scope") == "run"
-    if kind == "v6.intent.changed":
-        return True
     events = {
+        "v6.decision.superseded": set(),
+        "v6.intent.changed": {"goal_changed"},
         "v6.node.settled": {"evidence_added", "job_settled"},
         "v6.observation.added": {"evidence_added"},
         "v6.claim.adopted": {"claim_changed"},
@@ -288,6 +286,8 @@ def _matches(row, watches, rid):
         payload.get("claim_ref"),
         payload.get("key"),
     }
+    if kind == "v6.intent.changed":
+        subjects.update(item["item_id"] for item in payload["items"])
     return any(w["event"] in events and w["subject_ref"] in subjects for w in watches)
 
 
@@ -509,6 +509,10 @@ def ensure_task(conn, run_id):
             or current["run_status"] != "ACTIVE"
             or v6_decisions.head(tx, run_id) != head
             or _open(tx, run_id)
+            or tx.execute(
+                "SELECT 1 FROM events WHERE run_id=? AND kind='v6.intent.changed' AND event_id>? LIMIT 1",
+                (run_id, cursor),
+            ).fetchone()
         ):
             return None
         return persist_brief(
@@ -534,7 +538,12 @@ def _prepare_brief(conn, run_id):
     if prior and not changed:
         watches = store.loads(prior, "receipt_json").get("reconsider_when", [])
         if not any(
-            _matches(row, watches, run_id)
+            row["kind"] == "v6.intent.changed"
+            or (
+                row["kind"] == "v6.decision.superseded"
+                and store.loads(row, "payload_json").get("scope") == "run"
+            )
+            or _matches(row, watches, run_id)
             for row in events
             if not (
                 row["kind"] == "v6.claim.adopted"
@@ -691,6 +700,38 @@ def impact(conn, rid, edits, *, commit):
     return report
 
 
+def waiting_for(conn, rid):
+    open_tasks = [
+        dict(row)
+        for row in conn.execute(
+            "SELECT d.task_id, d.scope, d.context_ref, t.status FROM v6_decision_tasks d JOIN tasks t "
+            "USING(task_id) WHERE d.run_id=? AND t.status NOT IN ('ACCEPTED','CANCELLED') ORDER BY t.rowid",
+            (rid,),
+        )
+    ]
+    if open_tasks:
+        return {"kind": "decision", "tasks": open_tasks, "continue_with": "gx-p0 run"}
+    nodes = [
+        dict(row)
+        for row in conn.execute(
+            "SELECT node_id,branch_id,status,job_id FROM v6_nodes WHERE run_id=? "
+            "AND status IN ('PENDING','RUNNING','CANCEL_REQUESTED') ORDER BY rowid",
+            (rid,),
+        )
+    ]
+    if nodes:
+        return {"kind": "nodes", "nodes": nodes, "continue_with": "gx-p0 run"}
+    prior = _latest(conn, rid)
+    if prior:
+        return {
+            "kind": "research_event",
+            "decision_ref": prior["decision_ref"],
+            "watches": store.loads(prior, "receipt_json")["reconsider_when"],
+            "continue_with": "gx-p0 run",
+        }
+    return None
+
+
 def projection(conn, run, meter):
     from . import v6_claims, v6_costs, v6_decisions
 
@@ -702,17 +743,22 @@ def projection(conn, run, meter):
         "goal_version": g["goal_version"],
         "graph_head": v6_decisions.head(conn, rid),
         "goal_status": g["status"],
+        "waiting_for": waiting_for(conn,rid) if run["status"] == "ACTIVE" else None,
         "capabilities": store.loads(g, "capabilities_json"),
         "materials": store.loads(g, "materials_json"),
         "resources": v6_costs.resource_report(conn, rid, meter=meter),
         "claims": v6_claims.current(conn, rid),
         "decisions": [
-            {**store.loads(r, "receipt_json"), "rationale":r["rationale"],
-             "evidence_refs":json.loads(r["refs"])}
+            {
+                **store.loads(r, "receipt_json"),
+                "rationale": r["rationale"],
+                "evidence_refs": json.loads(r["refs"]),
+            }
             for r in conn.execute(
                 "SELECT receipt_json,json_extract(request_json,'$.decision.rationale') AS rationale,"
                 "json_extract(request_json,'$.decision.evidence_refs') AS refs "
-                "FROM v6_decisions WHERE run_id=? ORDER BY rowid", (rid,)
+                "FROM v6_decisions WHERE run_id=? ORDER BY rowid",
+                (rid,),
             )
         ],
         "node_attempts": [

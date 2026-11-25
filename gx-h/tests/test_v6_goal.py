@@ -91,28 +91,42 @@ class GoalRuntime(unittest.TestCase):
         capture = v6_goal._brief
         filename = self.db.execute("PRAGMA database_list").fetchone()["file"]
         with closing(store.open_store(filename)) as writer:
+
             def simultaneously(*args):
                 v6_goal.record_observation(writer, self.rid, b, source="during-capture")
                 return capture(*args)
 
             with patch.object(v6_goal, "_brief", side_effect=simultaneously):
                 task = v6_goal.ensure_task(self.db, self.rid)
-        data = store.loads(self.db.execute("SELECT input_json FROM tasks WHERE task_id=?", (task,)).fetchone(),
-                           "input_json")
+        data = store.loads(
+            self.db.execute("SELECT input_json FROM tasks WHERE task_id=?", (task,)).fetchone(), "input_json"
+        )
         self.assertEqual(data["brief"]["evidence_refs"], [a, "earlier"])
         roots = self.native.roots
         row = roots._claim(task)
-        thread = roots._bind(row, {"id":"second-thread", "cwd":row["cwd"], "source":"appServer"})
+        thread = roots._bind(row, {"id": "second-thread", "cwd": row["cwd"], "source": "appServer"})
         turn = "second-turn"
         roots.active_turns[thread] = turn
-        self.db.execute("""INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,
+        self.db.execute(
+            """INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,
             human,interrupt,state,method,turn_id) VALUES(?,'second-start',?,'two',?,0,0,'acknowledged','turn/start',?)""",
-            (self.rid,thread,hashlib.sha256(row["brief"].encode()).hexdigest(),turn))
-        v6_decisions.adopt(self.db, run_id=self.rid, task_id=task, lease_id=row["lease_id"], thread_id=thread,
-                           turn_id=turn, call_id="second-decision", decision={**self.native.body, "evidence_refs":[a]})
+            (self.rid, thread, hashlib.sha256(row["brief"].encode()).hexdigest(), turn),
+        )
+        v6_decisions.adopt(
+            self.db,
+            run_id=self.rid,
+            task_id=task,
+            lease_id=row["lease_id"],
+            thread_id=thread,
+            turn_id=turn,
+            call_id="second-decision",
+            decision={**self.native.body, "evidence_refs": [a]},
+        )
         successor = v6_goal.ensure_task(self.db, self.rid)
-        fresh = store.loads(self.db.execute("SELECT input_json FROM tasks WHERE task_id=?", (successor,)).fetchone(),
-                            "input_json")["brief"]
+        fresh = store.loads(
+            self.db.execute("SELECT input_json FROM tasks WHERE task_id=?", (successor,)).fetchone(),
+            "input_json",
+        )["brief"]
         self.assertEqual([o["id"] for o in fresh["observations"]], ["during-capture"])
         self.assertEqual(set(fresh["evidence_refs"]), {a, b, "earlier", "during-capture"})
 

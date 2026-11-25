@@ -81,6 +81,15 @@ def _completed_dependency(conn, node):
     return bool(row and row["status"] in ("SUCCEEDED", "REUSED") and row["result_ref"])
 
 
+def require_cancellable(conn, run_id, node_id):
+    from ..jobs.service import TERMINAL
+    row = conn.execute("""SELECT n.status,j.status AS job_status FROM v6_nodes n
+        LEFT JOIN jobs j ON j.job_id=n.job_id WHERE n.run_id=? AND n.node_id=?""",
+        (run_id, node_id)).fetchone()
+    if not row or row["status"] not in ("PENDING", "RUNNING") or row["job_status"] in TERMINAL:
+        raise SchemaInvalid("Only pending or in-flight work can be cancelled")
+
+
 def _aliases(operations, request_key):
     aliases = {}
     for op in operations:
@@ -134,6 +143,7 @@ def compile_graph(conn, request, previous, visible_refs, capabilities):
         elif op == "cancel_node":
             if node not in nodes or nodes[node]["state"] != "ACTIVE":
                 raise SchemaInvalid("Only an active graph node can be cancelled")
+            require_cancellable(conn, run_id, node)
             nodes[node] = dict(nodes[node], state="CANCELLED")
         elif op == "close_run":
             graph["closed"] = True

@@ -206,6 +206,244 @@
             "question"
           ]
         }
+      },
+      "gx_open_module": {
+        "type": "function",
+        "name": "gx_open_module",
+        "description": "Delegate a scoped research assignment. Cite the granted inputs and methods, choose the round and allocate its resource ceilings. Reuse operation_key to retry the same delegation.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "module_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "module_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "focus": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_delivery": {
+              "type": "string",
+              "minLength": 1
+            },
+            "round": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "input_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "capabilities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "tools": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1},
+              "description": "Optional subset of the granted module tools for this instance."
+            },
+            "sub_budget": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "operation_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "wake_on": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "counterevidence",
+                  "gap",
+                  "partial"
+                ]
+              }
+            }
+          },
+          "required": [
+            "module_id",
+            "module_version",
+            "focus",
+            "expected_delivery",
+            "round",
+            "input_refs",
+            "capabilities",
+            "sub_budget",
+            "operation_key"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_cancel_module": {
+        "type": "function",
+        "name": "gx_cancel_module",
+        "description": "Cancel an open module instance while retaining its confirmed results and charges.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "module_instance_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "operation_key": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "module_instance_id",
+            "reason",
+            "operation_key"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_submit_module_report": {
+        "type": "function",
+        "name": "gx_submit_module_report",
+        "description": "Publish a scoped module report. Cite exact source references, preserve counterevidence and describe unfinished work. GX records authorship, checks scope and returns the report to the Lead.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "COMPLETE",
+                "PARTIAL"
+              ]
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true,
+                    "minItems": 1
+                  },
+                  "kind": {
+                    "enum": [
+                      "support",
+                      "counterevidence",
+                      "observation"
+                    ]
+                  }
+                },
+                "required": [
+                  "text",
+                  "source_refs"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "gaps": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "artifact_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "next_steps": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "operation_key": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "findings",
+            "gaps",
+            "artifact_refs",
+            "next_steps",
+            "operation_key"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_query_catalog": {
+        "type": "function",
+        "name": "gx_query_catalog",
+        "description": "Find granted research modules or methods by category or text. Supply a granted reference to inspect its full specification.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "module",
+                "method"
+              ]
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1
+            },
+            "category": {
+              "type": "string",
+              "minLength": 1
+            },
+            "query": {
+              "type": "string",
+              "minLength": 1
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        }
       }
     },
     "provider_tools": "Installed provider tools are offered only on runs holding their capability grant. The protein provider supplies gx_reevaluate_geometry for its geometry method.",

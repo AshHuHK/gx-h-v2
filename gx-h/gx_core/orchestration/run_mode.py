@@ -96,7 +96,7 @@ class StaticWorkflow:
 
 
 class ResearchGoal:
-    decision_tools = ("gx_decide_revision",)
+    decision_tools = ("gx_decide_revision", "gx_submit_module_report")
 
     def start_project(self, conn, directory, spec, run_key, current):
         from ..p0 import v6_goal
@@ -130,7 +130,7 @@ class ResearchGoal:
         from .. import config
         from ..domain import machines
         from ..errors import VersionImmutable
-        from ..p0 import v6_decisions, v6_goal, v6_jobs
+        from ..p0 import v6_decisions, v6_goal, v6_jobs, v62_modules
         config.check_holds(engine.hold_scope)
         run_id = run["run_id"]
         work = {}
@@ -148,6 +148,8 @@ class ResearchGoal:
                 engine.conn.execute("RELEASE v6_execution_head")
             if checkpoint:
                 work = v6_jobs.advance(engine.conn, run_id)
+            if run["status"] == "ACTIVE":
+                v62_modules.advance(engine.conn, run_id)
             task = v6_goal.ensure_task(engine.conn, run_id)
             if task:
                 work["decision_task_id"] = task
@@ -221,6 +223,6 @@ def specification(args):
     from ..p0 import v6_goal
     if getattr(args, "goal", None) is not None:
         return v6_goal.cli_spec(args)
-    if any(getattr(args, name, None) for name in ("goal_config", "input", "capability")):
-        raise ValueError("--goal-config, --input and --capability require --goal")
+    if any(getattr(args, name, None) for name in ("goal_config", "input", "capability", "research_effort")):
+        raise ValueError("--goal-config, --input, --capability and --research-effort require --goal")
     return packages.example(args.example) if args.example else json.loads(args.spec.read_text())

@@ -5,12 +5,12 @@ import hashlib
 import json
 from pathlib import Path
 
-from .. import budgets, contracts, registry
+from .. import budgets, contracts, registry, schema
 from ..domain import ids
-from ..errors import BY_CODE, BudgetExceeded, SchemaInvalid, ScopeDenied
+from ..errors import BY_CODE, BudgetExceeded, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
 from ..plugins import goal as goal_plugins
-from . import v6_claims, v6_delegation, v6_method_context
+from . import v6_claims, v6_delegation, v6_method_context, v62_native
 
 
 DECIDE = "gx_decide_revision"
@@ -59,11 +59,17 @@ def callback_for(name, *, conn=None, run_id=None):
 
 
 def assigned(row):
-    return bool(row.get("tool_names_json") and DECIDE in json.loads(row["tool_names_json"]))
+    # Keep the research host restrictions even when an instance has no callable method.
+    if (row.get("brief") or "").startswith(PREFIX):
+        return True
+    names = json.loads(row.get("tool_names_json") or "[]")
+    return DECIDE in names or v62_native.REPORT in names
 
 
 def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     """Select grants when freezing the Root. Resume reuses its persisted tool names."""
+    if brief and v62_native.module_scope(brief):
+        return v62_native.module_tools(read_tools, brief, decision_tool())
     catalog = [spec for spec in read_tools if spec["name"] in ("gx_read_artifact", "gx_task_context")]
     catalog.extend([decision_tool(), v6_claims.tool_spec()])
     if brief is None or (brief.get("scope", "run") == "run" and
@@ -74,6 +80,7 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     else:
         extras = goal_plugins.tools_for_catalog((brief or {}).get("capabilities", []))
     catalog.extend(tool.as_spec() for tool in extras.values())
+    catalog.extend(v62_native.lead_tools(brief or {}))
     return catalog
 
 
@@ -110,7 +117,10 @@ def brief(row):
 def current_context(conn, row):
     packet = brief(row)
     scope = packet.get("scope", "run")
-    if scope.startswith("branch:"):
+    if v62_native.module_scope(packet):
+        from . import v62_budget
+        current = v62_budget.view_for_scope(conn, row["run_id"], scope)
+    elif scope.startswith("branch:"):
         from .v6_jobs import branch_exposure
         limits = packet["budget"]["limits"]
         used = branch_exposure(conn, scope.removeprefix("branch:"))
@@ -149,6 +159,10 @@ def saved_result(receipt, turn, request_sha):
     return result
 
 
+@registry.native_goal_tool(v62_native.OPEN)
+@registry.native_goal_tool(v62_native.REPORT)
+@registry.native_goal_tool(v62_native.CANCEL)
+@registry.native_goal_tool(v62_native.QUERY)
 @registry.native_goal_tool(DECIDE)
 @registry.native_goal_tool(STAGE)
 @registry.native_goal_tool(DELEGATE)
@@ -166,33 +180,57 @@ def call(roots, p):
     receipt = roots.conn.execute("SELECT * FROM p0_root_calls WHERE thread_id=? AND call_id=?",
                                  (thread, call_id)).fetchone()
     request_sha = ids.sha256_of_obj([tool, args])
-    if receipt and tool in (DECIDE, DELEGATE):
+    if receipt and tool in (DECIDE, DELEGATE, v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL):
         return saved_result(receipt, turn, request_sha)
-    if roots.active_turns.get(thread) != turn:
-        raise ScopeDenied("A new decision requires the active official Root turn")
-    row = require_binding(roots.conn, roots.run_id, thread)
+    # Delegations and reports may be redelivered with a new call ID after
+    # release. Their owners verify the original task, lease, thread, turn and
+    # exact payload on replay, and the current live binding on first use.
+    if tool not in (v62_native.OPEN, v62_native.REPORT):
+        if roots.active_turns.get(thread) != turn:
+            raise ScopeDenied("A new decision requires the active official Root turn")
+        row = require_binding(roots.conn, roots.run_id, thread)
     if receipt:
+        packet = brief(row)
+        if v62_native.module_scope(packet):
+            v62_native.authorize_read(roots.conn, row, packet, tool, turn)
         return saved_result(receipt, turn, request_sha)
 
     identity = dict(run_id=roots.run_id, task_id=row["task_id"], lease_id=row["lease_id"],
                     thread_id=thread, turn_id=turn, call_id=call_id)
     if roots.conn.in_transaction:
         raise RuntimeError("Prepare scientific decisions outside the GX writer")
+    if tool in (v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY):
+        failures = schema.validate(args, contracts.native_goal_tool_spec(tool)["inputSchema"])
+        if failures:
+            raise SchemaInvalid("Invalid arguments to " + tool + ": " + ", ".join(failures))
     if tool == DECIDE:
         try:
             prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+        except StaleRevision as exc:
+            v6_decisions.reconsider_module_conflict(roots.conn, identity, exc)
+            raise
         except (BudgetExceeded, SchemaInvalid) as exc:
             remember_refusal(roots, p, request_sha, exc)
             raise
+    elif tool == v62_native.OPEN:
+        from . import v62_modules
+        prepared = v62_modules.prepare_open(roots.conn, **identity, payload=args)
+    elif tool == v62_native.REPORT:
+        from . import v62_reports
+        prepared = v62_reports.prepare_report(roots.conn, **identity, payload=args)
     elif tool == DELEGATE:
         prepared = v6_delegation.prepare(roots.conn, **identity, payload=args)
     elif tool == STAGE:
         task = roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?", (row["task_id"],)).fetchone()
         answer = v6_claims.stage(roots.conn, **identity, context_ref=task[0], payload=args,
                                  allowed_refs=task_refs(roots.conn, row))
-    else:
+    elif tool not in (v62_native.CANCEL, v62_native.QUERY):
         task = roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?", (row["task_id"],)).fetchone()
         answer = v6_method_context.call_tool(roots.conn, tool, args, context_ref=task[0], **identity)
+
+    if (tool in (v62_native.OPEN, v62_native.REPORT)
+            and not isinstance(prepared, dict) and roots.active_turns.get(thread) != turn):
+        raise ScopeDenied("A new delegation or report requires the active official Root turn")
 
     try:
         with store.transaction(roots.conn, transaction_owner="ScientificLead", operation="native_receipt", run_id=roots.run_id):
@@ -204,6 +242,22 @@ def call(roots, p):
             if tool == DECIDE:
                 answer = v6_decisions.commit(roots.conn, prepared)
                 roots.terminal_products.record(thread, turn, call_id, "GX_ACCEPTED")
+            elif tool == v62_native.OPEN:
+                answer = v62_modules.commit_open(roots.conn, prepared)
+            elif tool == v62_native.REPORT:
+                answer = v62_reports.commit_report(roots.conn, prepared)
+                if answer["author"]["call_id"] == call_id:
+                    roots.terminal_products.record(thread, turn, call_id, "GX_ACCEPTED")
+            elif tool == v62_native.CANCEL:
+                from . import v62_modules
+                answer = v62_modules.cancel_module(roots.conn, **identity, payload=args)
+            elif tool == v62_native.QUERY:
+                from . import v62_catalog
+                packet = brief(require_binding(roots.conn, roots.run_id, thread))
+                def query(arguments):
+                    return v62_catalog.query(roots.conn, roots.run_id, packet, arguments)
+                answer = (v62_native.perform_read(roots, row, p, packet, query)
+                          if v62_native.module_scope(packet) else query(args))
             elif tool == DELEGATE:
                 answer = v6_delegation.commit(roots.conn, prepared)
             elif tool != STAGE and isinstance(answer, dict) and "evaluation_ref" in answer:
@@ -215,6 +269,10 @@ def call(roots, p):
             roots.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                                (thread, call_id, turn, request_sha, ids.canonical_json(answer)))
             return answer
+    except StaleRevision as exc:
+        if tool == DECIDE:
+            v6_decisions.reconsider_module_conflict(roots.conn, identity, exc)
+        raise
     except (BudgetExceeded, SchemaInvalid) as exc:
         if tool == DECIDE:
             remember_refusal(roots, p, request_sha, exc)

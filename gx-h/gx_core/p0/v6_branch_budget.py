@@ -60,6 +60,9 @@ def available_tokens(conn, run_id, binding, available):
     if task["scope"] == "run":
         return available
     scope = task["scope"]
+    if scope.startswith("module:"):
+        from . import v62_budget
+        return v62_budget.available_tokens(conn, run_id, scope, available)
     branch_id = scope.removeprefix("branch:")
     v6_delegation.require_grant(conn, run_id, binding["task_id"], scope)
     branch = conn.execute("SELECT spec_json,status FROM v6_branches WHERE branch_id=? AND run_id=?",

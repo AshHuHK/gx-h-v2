@@ -202,6 +202,13 @@ def allowance(conn, run_id, ref, binding):
     crossed = [line for line in constrained if (line["observed_in_flight_tokens"] or line["scope"]!=ref)
                and line["observed_plus_settled"]>=line["hard_tokens"]]
     if crossed:
+        if all(line["scope"] == ref for line in crossed) and binding.get("task_id"):
+            from . import v6_native, v62_budget
+            if v6_native.assigned(binding):
+                scope = v62_budget.scope_for_task(conn, run_id, binding["task_id"])
+                if scope and scope.startswith("module:"):
+                    raise HoldActive("The module's reported native usage has reached its allocation",
+                                     details={**crossed[0], "reason": "budget_reserved", "module_scope": scope})
         team = conn.execute("SELECT team_id FROM p0_teams WHERE run_id=? AND budget_ref=?",(run_id,ref)).fetchone()
         if team and all(line["scope"]==ref for line in crossed):
             raise HoldActive("the team's reported native use reached its token budget",

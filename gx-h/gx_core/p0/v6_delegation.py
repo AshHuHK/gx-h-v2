@@ -98,7 +98,7 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, pay
         raise ScopeDenied("Only the Run Lead may delegate a branch decision")
     parent = store.loads(task, "snapshot_json")
     branch = next((b for b in parent["branches"] if b["branch_id"] == payload["branch_id"] and b["status"] == "OPEN"), None)
-    if branch is None:
+    if branch is None or branch["spec"].get("module_instance_id"):
         raise ScopeDenied("Choose an open branch from this frozen Lead brief")
     brief = _branch_brief(conn, task, branch, payload["question"])
     return Delegation(dict(identity, call_id=call_id), key, sha, brief, task["context_ref"], task["event_cursor"])
@@ -147,17 +147,17 @@ def commit(conn, plan):
         return answer
 
 
-def retire_stale(conn, run_id):
+def retire_stale(conn, run_id, *, cause_scope="run"):
     """Retire obsolete decision authority. Admitted Jobs continue with their own bindings."""
     if not conn.in_transaction:
         raise RuntimeError("Supersede old briefs in the graph adoption transaction")
     head = v6_decisions.head(conn, run_id)
     marks = ",".join("?" for _ in v6_goal.ACTIVE_TASKS)
     rows = conn.execute("SELECT d.task_id,d.scope FROM v6_decision_tasks d JOIN tasks t USING(task_id) "
-                        f"WHERE d.run_id=? AND d.base_json IS NOT ? AND t.status IN ({marks})",
+                        f"WHERE d.run_id=? AND d.scope NOT LIKE 'module:%' AND d.base_json IS NOT ? AND t.status IN ({marks})",
                         (run_id, store._j(head), *v6_goal.ACTIVE_TASKS)).fetchall()
     for row in rows:
         v6_goal.cancel_decision(conn, run_id, row["task_id"], reason="A new graph head superseded this frozen decision")
         kind = "v6.decision.superseded" if row["scope"] == "run" else "v6.branch.delegation_ended"
         store.append_event(conn, run_id=run_id, actor=v6_goal.ACTOR, kind=kind, subject_kind="task", subject_id=row["task_id"],
-                           payload={"scope": row["scope"], "head": head}, evidence_level="EXECUTION_OBSERVED")
+                           payload={"scope": row["scope"], "head": head, "cause_scope": cause_scope}, evidence_level="EXECUTION_OBSERVED")

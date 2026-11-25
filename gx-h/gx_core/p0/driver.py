@@ -486,7 +486,7 @@ class Driver:
                            event_id=event_id, interrupt=interrupt)
 
     def reconcile_costs(self, *, refresh=True):
-        from . import terminal_products
+        from . import terminal_products, v62_budget
         pending = {row[0] for row in self.conn.execute(
             "SELECT DISTINCT thread_id FROM p0_meter_native_turns WHERE run_id=? AND "
             "(budget_status='HELD' OR (confidence='ESTIMATED' AND EXISTS (SELECT 1 FROM p0_root_terminals e "
@@ -511,6 +511,9 @@ class Driver:
         for owner, thread in tuple(self._waits):
             if owner == "usage" and thread not in pending:
                 self._end_native_wait((owner, thread))
+        # A report can close a module before its native turn delivers the final
+        # usage receipt. The scientific Run may already be terminal on recovery.
+        v62_budget.release_finished(self.conn, self.rid)
 
     @property
     def read_fds(self):

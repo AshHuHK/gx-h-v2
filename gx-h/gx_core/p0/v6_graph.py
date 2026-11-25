@@ -88,7 +88,7 @@ def _aliases(operations, request_key):
     return aliases
 
 
-def compile_graph(conn, request, previous, visible_refs, capabilities):
+def compile_graph(conn, request, previous, visible_refs, capabilities, *, module=None, module_jobs=None):
     from . import v6_jobs
 
     scope, run_id = request["scope"], request["run_id"]
@@ -96,6 +96,14 @@ def compile_graph(conn, request, previous, visible_refs, capabilities):
     aliases = _aliases(decision["ops"], [run_id, request["context_ref"], request["idempotency_key"]])
     graph = json.loads(previous) if previous else {"branches": {}, "nodes": {}, "closed": False}
     branches, nodes = graph["branches"], graph["nodes"]
+    own_branch = module["branch_id"] if module is not None else scope.removeprefix("branch:")
+    if module is not None:
+        from . import v62_graph
+        v62_graph.require_operations(decision["ops"])
+        if own_branch in branches and branches[own_branch].get("module_instance_id") != module["module_instance_id"]:
+            raise ScopeDenied("The allocated branch is bound to a different owner")
+        if own_branch not in branches and any(op["op"] == "add_node" for op in decision["ops"]):
+            branches[own_branch] = dict(v62_graph.branch_spec(module), state="OPEN")
     resolved_ops = []
     changed = set()
     for index, source in enumerate(decision["ops"]):
@@ -107,9 +115,18 @@ def compile_graph(conn, request, previous, visible_refs, capabilities):
         for key in ("inputs", "depends_on"):
             if key in spec:
                 spec[key] = [aliases.get(ref, ref) for ref in spec[key]]
+        if op == "add_node" and "evidence_gate" in spec:
+            gate = dict(spec["evidence_gate"])
+            gate["producer_node"] = aliases.get(gate["producer_node"], gate["producer_node"])
+            if gate["source_ref"] not in visible_refs or gate["producer_node"] not in spec["depends_on"]:
+                raise ScopeDenied("A conditional Job needs a visible source and a declared producing dependency")
+            spec["evidence_gate"] = gate
         node = spec.get("node")
         branch = spec.get("branch") or nodes.get(node, {}).get("branch")
-        if scope != "run" and (op in ("open_branch", "close_run") or scope.removeprefix("branch:") != branch):
+        if op == "add_node" and (owner := branches.get(branch, {}).get("module_instance_id")):
+            if module is None or module["module_instance_id"] != owner:
+                raise ScopeDenied("Only the commissioned module may spend its branch allocation")
+        if scope != "run" and (op in ("open_branch", "close_run") or own_branch != branch):
             raise ScopeDenied("Operation exceeds the delegated branch")
         target = node or branch or run_id
         if target in changed:
@@ -144,7 +161,7 @@ def compile_graph(conn, request, previous, visible_refs, capabilities):
         for ref in spec["depends_on"]:
             if ref not in nodes:
                 raise SchemaInvalid("New dependency references an absent node")
-            if scope != "run" and nodes[ref]["branch"] != scope.removeprefix("branch:"):
+            if scope != "run" and nodes[ref]["branch"] != own_branch:
                 raise ScopeDenied("A branch may reuse granted artifacts; a cross-branch dependency requires the Lead")
         for ref in spec["inputs"]:
             if ref in nodes:
@@ -152,7 +169,10 @@ def compile_graph(conn, request, previous, visible_refs, capabilities):
                     raise SchemaInvalid("An input supplied by another node needs a dependency edge")
             elif ref not in visible_refs:
                 raise ScopeDenied("Node input was not granted in this decision context")
-        v6_jobs.validate_node(conn, run_id, spec, node_ids=producers, limits=branches[spec["branch"]]["budget_limits"])
+        minimum = v6_jobs.validate_node(conn, run_id, spec, node_ids=producers,
+                                        limits=branches[spec["branch"]]["budget_limits"])
+        if module_jobs is not None:
+            module_jobs.append((spec, minimum))
     for node, spec in nodes.items():
         if spec["state"] == "ACTIVE" and branches[spec["branch"]]["state"] == "OPEN":
             for dep in spec["depends_on"]:
@@ -170,7 +190,6 @@ def compile_graph(conn, request, previous, visible_refs, capabilities):
                for watch in decision["reconsider_when"]]
     subjects = {*branches, *nodes, *visible_refs, run_id, "run", "objective"}
     if scope != "run":
-        own_branch = scope.removeprefix("branch:")
         subjects = {*visible_refs, own_branch, "run", run_id, "objective",
                     *(nid for nid, spec in nodes.items() if spec["branch"] == own_branch)}
     for watch in watches:
@@ -183,7 +202,7 @@ def compile_graph(conn, request, previous, visible_refs, capabilities):
 def branch_demand(graph, resolved):
     active, additional = {}, Counter()
     for branch in graph["branches"].values():
-        if branch["state"] == "OPEN":
+        if branch["state"] == "OPEN" and not branch.get("module_instance_id"):
             active[branch["branch"]] = branch["budget_limits"]
     for item in resolved:
         if item["spec"]["op"] == "open_branch":

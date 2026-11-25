@@ -119,6 +119,8 @@ def run(args):
                     "workflows": sorted("@".join(ref) for ref in contributions.workflows),
                     "tools": sorted(contributions.tools),
                     "capabilities": sorted(contributions.capabilities),
+                    **({"research_modules": sorted("@".join(ref) for ref in contributions.research_modules)}
+                       if contributions.research_modules else {}),
                 },
             })
         result = {

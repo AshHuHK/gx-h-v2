@@ -8,7 +8,7 @@ from ..artifacts import ArtifactService, delivery
 from ..domain import clock, ids
 from ..errors import BudgetExceeded, IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
-from . import intent, v6_graph
+from . import intent, v6_graph, v62_graph
 
 INSTANCE = "gx.v6.instance"
 decision_schema = v6_graph.decision_schema
@@ -48,9 +48,24 @@ class Prepared:
     funding_pin: tuple | None
     config_pin: tuple
     capability_pins: dict
+    module_demand: dict
+    module_dependencies: dict
 
 
 def authority(conn, *, run_id, task_id, lease_id, thread_id, turn_id):
+    return _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
+                      thread_id=thread_id, turn_id=turn_id)[:4]
+
+
+def module_authority(conn, **identity):
+    """Bind module reads and decisions to the same current native turn and active grant."""
+    _, task, _, _, instance = _authority(conn, **identity)
+    if instance is None:
+        raise ScopeDenied("This native task has no module delegation")
+    return task, instance
+
+
+def _authority(conn, *, run_id, task_id, lease_id, thread_id, turn_id):
     from .roots import require_binding
     root = require_binding(conn, run_id, thread_id)
     if (root["task_id"], root["lease_id"]) != (task_id, lease_id):
@@ -73,7 +88,11 @@ def authority(conn, *, run_id, task_id, lease_id, thread_id, turn_id):
     if (not goal or goal["status"] != "OPEN" or goal["goal_version"] != task["goal_version"] or
             not objective or objective["status"] != "active" or objective["version"] != task["goal_version"]):
         raise StaleRevision("The human Goal or decision delegation changed before adoption")
-    if task["scope"] != "run":
+    module = None
+    if task["scope"].startswith("module:"):
+        from . import v62_modules
+        module = v62_modules.require_active(conn, run_id, task["scope"])
+    elif task["scope"] != "run":
         from .v6_delegation import require_grant
         require_grant(conn, run_id, task_id, task["scope"])
         branch = conn.execute("SELECT status FROM v6_branches WHERE run_id=? AND branch_id=?",
@@ -82,9 +101,9 @@ def authority(conn, *, run_id, task_id, lease_id, thread_id, turn_id):
             raise ScopeDenied("This decision branch is no longer open")
     base = json.loads(task["base_json"]) if task["base_json"] else None
     current = head(conn, run_id)
-    if base != current:
+    if base != current and not task["scope"].startswith("module:"):
         raise StaleRevision("The scoped brief is based on an older graph", details={"current_head": current})
-    return root, task, goal, base
+    return root, task, goal, base, module
 
 
 def _visible(conn, task, lease_id, thread_id, turn_id, decision):
@@ -148,10 +167,18 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         if (saved["task_id"], saved["lease_id"]) != (task_id, lease_id):
             raise IdempotencyConflict("Replay supplied a different task or lease")
         return saved
-    root, task, goal, base = authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
+    root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                         thread_id=thread_id, turn_id=turn_id)
+    original = base
+    if module is not None:
+        base = head(conn, run_id)
+        v62_graph.require_operations(decision["ops"])
     if base is None:
-        limit = json.loads(task["snapshot_json"]).get("budget", {}).get("initial_job_limit")
+        if module is None:
+            limit = json.loads(task["snapshot_json"]).get("budget", {}).get("initial_job_limit")
+        else:
+            limit = conn.execute("SELECT json_extract(inputs_json,'$.inputs.p0_spec.initial_job_limit') "
+                                 "FROM runs WHERE run_id=?", (run_id,)).fetchone()[0]
         if limit is not None and sum(op["op"] == "add_node" for op in decision["ops"]) > limit:
             raise BudgetExceeded(f"The first graph may commission at most {limit} Jobs")
     request = dict(schema_version="gx.v6.decision.1", run_id=run_id, decision_task_id=task_id, lease_id=lease_id,
@@ -159,14 +186,30 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
                    base=base, idempotency_key="v6.decision:" + ids.sha256_of_obj([thread_id, call_id]),
                    draft_sha256=ids.sha256_of_obj(decision), decision=json.loads(ids.canonical_json(decision)))
     refs = _visible(conn, task, lease_id, thread_id, turn_id, decision)
-    previous = conn.execute("SELECT graph_json FROM v6_graph_versions WHERE run_id=? AND version=?",
-                            (run_id, base["version"])).fetchone()[0] if base else None
+    previous = v62_graph.graph_at(conn, run_id, base)
+    allowed = json.loads(goal["capabilities_json"])
+    config_pin = (goal["capabilities_json"], goal["materials_json"])
+    if module is not None:
+        request.update(original_base=original, module_instance_id=module["module_instance_id"])
+        if base != original:
+            v62_graph.require_compatible(v62_graph.graph_at(conn, run_id, original), previous,
+                                        module["branch_id"], decision["ops"])
+        grant = json.loads(module["grant_json"])
+        if "gx_decide_revision" not in grant["tools"]:
+            raise ScopeDenied("This module's grant excludes graph decisions")
+        allowed = set(allowed) & set(grant["capabilities"])
+        config_pin = (module["grant_json"], module["snapshot_json"], module["budget_json"])
     caps = {op["capability"] for op in decision["ops"] if op["op"] == "add_node"}
     if any("@" not in cap for cap in caps):
         raise SchemaInvalid("A node requires a pinned capability id@version")
     cap_pins = _capability_pins(conn, caps)
+    module_jobs = [] if module is not None else None
     graph, ops, aliases, watches = v6_graph.compile_graph(conn, request, previous, refs,
-                                                         json.loads(goal["capabilities_json"]))
+                                                         allowed, module=module, module_jobs=module_jobs)
+    costs = v62_graph.job_demand(conn, run_id, module_jobs) if module_jobs else {}
+    dependencies = v62_graph.dependency_pins(conn, run_id, ops) if module is not None else {}
+    if costs:
+        v62_graph.require_budget(conn, module, costs)
     demand = v6_graph.branch_demand(graph, ops)
     _check_bans(conn, run_id, ops)
     funding = v6_graph.funding_pin(conn, run_id) if demand[1] else None
@@ -179,7 +222,7 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         graph.update(run_id=run_id, version=version, parent=base, decision_ref=manifest.entries[0]["artifact_ref"])
         result = dict(version=version, sha256=ids.sha256_of_obj(graph))
     return Prepared(request, thread_id, turn_id, call_id, manifest, ids.canonical_json(graph), result, ops,
-                    aliases, watches, funding, (goal["capabilities_json"], goal["materials_json"]), cap_pins)
+                    aliases, watches, funding, config_pin, cap_pins, costs, dependencies)
 
 
 def _revoke(conn, run_id, where, key):
@@ -188,9 +231,14 @@ def _revoke(conn, run_id, where, key):
                  "AND status IN ('PENDING','RUNNING')", (run_id, key))
 
 
-def _apply_ops(conn, plan, decision_ref):
+def _apply_ops(conn, plan, decision_ref, module):
     run_id = plan.request["run_id"]
     dispatches = []
+    if module is not None and any(item["spec"]["op"] == "add_node" for item in plan.resolved_ops):
+        branch = v62_graph.branch_spec(module)
+        conn.execute("INSERT INTO v6_branches(branch_id,run_id,decision_ref,spec_json) VALUES(?,?,?,?) "
+                     "ON CONFLICT(branch_id) DO NOTHING",
+                     (module["branch_id"], run_id, decision_ref, ids.canonical_json(branch)))
     # Declarations may be forward referenced in the same atomic draft.
     for item in plan.resolved_ops:
         spec = item["spec"]
@@ -235,7 +283,8 @@ def _apply_ops(conn, plan, decision_ref):
     return dispatches
 
 
-def _accept_task(conn, root, plan, decision_ref):
+def accept_product(conn, root, content_sha256, product_ref):
+    """Accept one native research product and retire just its short task/lease."""
     task_id = root["task_id"]
     states = ["SUBMITTED", "VALIDATING", "ACCEPTED"]
     if root["task_status"] == "CLAIMED":
@@ -245,14 +294,32 @@ def _accept_task(conn, root, plan, decision_ref):
         content_sha256,artifact_refs_json,accepted_count,result,created_at)
         VALUES(?,?,?,?,?,?,?,1,'ACCEPTED',?)""",
         (submission_id, task_id, root["lease_id"], root["attempt"], ids.sha256_of_obj(root["brief"]),
-         plan.request["draft_sha256"], ids.canonical_json([decision_ref]), clock.now_iso()))
+         content_sha256, ids.canonical_json([product_ref]), clock.now_iso()))
     for state in states:
         store.transition(conn, machine="task", subject_id=task_id, to_state=state, actor="v6.decision",
-                         bump=False, reason="Scoped native research decision validated and adopted",
+                         bump=False, reason="Scoped native research product accepted",
                          extra_updates={"owner": None, "lease_id": None} if state == "ACCEPTED" else None,
-                         payload=dict(decision_ref=decision_ref, submission_id=submission_id))
+                         payload=dict(decision_ref=product_ref, submission_id=submission_id))
     store.release_lease(conn, root["lease_id"])
     return submission_id
+
+
+def _require_close_context(conn, run_id, task):
+    # Early watches and sealed rounds are the only ways a module report enters a Run brief.
+    # A report may already exist even while its commissioning Lead keeps the round unsealed.
+    unseen = conn.execute("""
+        SELECT m.module_instance_id FROM v62_modules m JOIN v62_module_reports r USING(module_instance_id)
+        WHERE m.run_id=? AND NOT EXISTS (
+            SELECT 1 FROM v62_module_wakes w WHERE w.run_id=m.run_id AND w.event_id<=?
+            AND w.wake_key IN ('early:' || m.module_instance_id, 'round:' || m.round)
+        ) LIMIT 1""", (run_id, task["event_cursor"])).fetchone()
+    if unseen:
+        raise StaleRevision("A completed module report needs a fresh Lead decision before closure",
+                            details={"reason": "unseen_module_report", "module_instance_id": unseen[0],
+                                     "brief_cursor": task["event_cursor"]})
+    if conn.execute("SELECT 1 FROM v62_modules WHERE run_id=? AND status='OPEN' LIMIT 1",
+                    (run_id,)).fetchone():
+        raise ScopeDenied("Collect pending module reports or explicitly cancel their delegations before closure")
 
 
 def commit(conn, plan):
@@ -267,17 +334,31 @@ def commit(conn, plan):
                        decision=request["decision"])
         if saved is not None:
             return saved
-        root, task, goal, base = authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
+        root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                             thread_id=plan.thread_id, turn_id=plan.turn_id)
+        config = (goal["capabilities_json"], goal["materials_json"])
+        if module is not None:
+            config = (module["grant_json"], module["snapshot_json"], module["budget_json"])
+            actual = head(conn, run_id)
+            if base != request["original_base"] or actual != request["base"]:
+                raise StaleRevision("The graph moved after module preparation; obtain a fresh decision",
+                                    details={"reason": "module_graph_conflict", "current_head": actual})
+            if plan.module_dependencies:
+                v62_graph.recheck_dependencies(conn, run_id, plan)
+            if plan.module_demand:
+                v62_graph.require_budget(conn, module, plan.module_demand)
+            base = actual
         if ((base, task["goal_version"], task["context_ref"], task["scope"]) !=
                 (request["base"], request["goal_version"], request["context_ref"], request["scope"]) or
-                plan.config_pin != (goal["capabilities_json"], goal["materials_json"])):
+                plan.config_pin != config):
             raise StaleRevision("The approved materials, scope or decision premises changed")
         if _capability_pins(conn, plan.capability_pins) != plan.capability_pins:
             raise StaleRevision("A capability approval or content pin changed before adoption")
         _check_bans(conn, run_id, plan.resolved_ops)
         if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
             raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
+        if any(item["spec"]["op"] == "close_run" for item in plan.resolved_ops):
+            _require_close_context(conn, run_id, task)
         decision_ref, = delivery.register_manifest(ArtifactService(conn), plan.manifest, actor=plan.thread_id)
         claims = v6_claims.adopt(conn, run_id, task_id, lease_id, request["context_ref"],
                                  decision_ref, request["decision"])
@@ -288,10 +369,13 @@ def commit(conn, plan):
                 graph_json,decision_ref) VALUES(?,?,?,?,?,?)""",
                 (run_id, result["version"], result["sha256"], base["sha256"] if base else None,
                  plan.graph_json, decision_ref))
-            dispatches = _apply_ops(conn, plan, decision_ref)
+            dispatches = _apply_ops(conn, plan, decision_ref, module)
             checkpoint = store.save_checkpoint(conn, run_id=run_id, workflow_id=INSTANCE,
                 workflow_version=str(result["version"]), node="decision", state=dict(head=result, decision_ref=decision_ref))
-        submission = _accept_task(conn, root, plan, decision_ref)
+        if request["decision"].get("approve_nodes"):
+            from . import v62_evidence
+            v62_evidence.record_approvals(conn, request, decision_ref)
+        submission = accept_product(conn, root, request["draft_sha256"], decision_ref)
         receipt = dict(run_id=run_id, task_id=task_id, lease_id=lease_id, task_status="ACCEPTED",
                        decision_ref=decision_ref, decision_id=decision_ref, scope=task["scope"],
                        goal_version=task["goal_version"], context_ref=task["context_ref"], base=base,
@@ -300,6 +384,9 @@ def commit(conn, plan):
                        aliases=plan.aliases, reconsider_when=plan.watches, checkpoint_id=checkpoint,
                        dispatches=dispatches, submission_id=submission, claim_revisions=claims,
                        consumed_event_cursor=task["event_cursor"])
+        if "module_instance_id" in request:
+            receipt.update(module_instance_id=request["module_instance_id"],
+                           original_base=request["original_base"], adopted_base=base)
         receipt["event_id"] = store.append_event(conn, run_id=run_id, kind="v6.decision.committed",
             actor=plan.thread_id, subject_kind="decision", subject_id=decision_ref,
             payload=dict(decision_id=decision_ref, result_head=plan.result_head, task_id=task_id,
@@ -310,9 +397,51 @@ def commit(conn, plan):
              plan.call_id, ids.canonical_json(request), ids.canonical_json(receipt)))
         if checkpoint:
             from .v6_delegation import retire_stale
-            retire_stale(conn, run_id)
+            retire_stale(conn, run_id, cause_scope=task["scope"])
+            for item in plan.resolved_ops:
+                op = item["spec"]
+                if op["op"] == "stop_branch":
+                    from . import v62_modules
+                    v62_modules.cancel_for_graph(conn, run_id, op["branch"], reason=op["reason"])
+        if task["scope"] == "run":
+            from . import v62_reports
+            v62_reports.release_parent_rounds(conn, run_id, task_id)
         return receipt
 
 
+def reconsider_module_conflict(conn, identity, error):
+    """After rollback retire the authenticated brief that can no longer support this decision."""
+    reason = error.details.get("reason")
+    if reason not in ("module_graph_conflict", "unseen_module_report"):
+        return
+    from . import v6_goal
+    from ..errors import GxError
+    run_id = identity["run_id"]
+    with store.transaction(conn, transaction_owner="V6Decision", operation=reason, run_id=run_id):
+        try:
+            _, task, _, original = authority(conn, **{key: identity[key] for key in
+                ("run_id", "thread_id", "turn_id", "task_id", "lease_id")})
+        except GxError:
+            return  # A competing decision, revocation or prior conflict already retired the lease.
+        if reason == "unseen_module_report" and task["scope"] == "run":
+            from . import v62_reports
+            v6_goal.cancel_decision(conn, run_id, task["task_id"], reason=error.message)
+            v62_reports.release_parent_rounds(conn, run_id, task["task_id"])
+            store.append_event(conn, run_id=run_id, kind="v62.module.close_deferred", actor=identity["thread_id"],
+                               subject_kind="task", subject_id=task["task_id"], payload=error.details)
+            return
+        if reason != "module_graph_conflict" or not task["scope"].startswith("module:"):
+            return
+        v6_goal.cancel_decision(conn, run_id, task["task_id"], reason=error.message)
+        store.append_event(conn, run_id=run_id, kind="v62.module.graph_conflict", actor=identity["thread_id"],
+                           subject_kind="task", subject_id=task["task_id"],
+                           payload={"scope": task["scope"], "original_base": original,
+                                    "current_head": head(conn, run_id), **error.details})
+
+
 def adopt(conn, **native_call):
-    return commit(conn, prepare(conn, **native_call))
+    try:
+        return commit(conn, prepare(conn, **native_call))
+    except StaleRevision as exc:
+        reconsider_module_conflict(conn, native_call, exc)
+        raise

@@ -1,0 +1,119 @@
+{
+  "run_id": "gxr_01m89naz8pee4vec6g",
+  "report": {
+    "module_instance_id": "module_38c4713e2df66bc8f3a25ac63b0ea8b4",
+    "module_id": "data_inventory",
+    "module_version": "1",
+    "run_id": "gxr_01m89naz8pee4vec6g",
+    "scope": "module:module_38c4713e2df66bc8f3a25ac63b0ea8b4",
+    "round": 1,
+    "version": 1,
+    "goal_version": 1,
+    "status": "COMPLETE",
+    "author": {
+      "kind": "MODULE",
+      "task_id": "gxt_01m89nazcv9x1b11jt",
+      "context_ref": "gxcx_01m89nazcvjzndt8m2",
+      "run_id": "gxr_01m89naz8pee4vec6g",
+      "lease_id": "gxl_01m89nazd9dyrfr6c0",
+      "thread_id": "script-gxl_01m89nazd9dyrfr6c0",
+      "turn_id": "turn-gxl_01m89nazd9dyrfr6c0",
+      "call_id": "report"
+    },
+    "base": null,
+    "operation_key": "report",
+    "report_ref": "gxa_c92cdeb39e389b0e6eb66de5dfc00d1caad4a7ac8473fb30c44c390bc5b269b8",
+    "artifact_ref": "gxa_c92cdeb39e389b0e6eb66de5dfc00d1caad4a7ac8473fb30c44c390bc5b269b8",
+    "report_sha256": "de5fd33ac4c301cbf2ac7b8c57cc06fcea8b4084c00ce5dab500f4cfb409ef53",
+    "source_refs": [
+      "gxa_01m89naz8ztd9eacbf"
+    ],
+    "event_id": 49,
+    "wake_event_id": 50
+  },
+  "evidence_ref": "gxa_01m89nazec6t24k9ed",
+  "turn_id": "turn-gxl_01m89nazepxnkvj66d",
+  "lease_id": "gxl_01m89nazepxnkvj66d",
+  "refusal": {
+    "code": "SCHEMA_INVALID",
+    "details": {
+      "gap_results": [
+        {
+          "criterion": {
+            "applicability": "lab bench",
+            "data_ref": "gxa_01m89naz8ztd9eacbf",
+            "data_sha256": "fe92401b86e351c391eb34c220d33b86807de4526afdc8b4f8e0072023a4c4fb",
+            "measurement_schema": "public.instrument/1",
+            "nature": "observed",
+            "observable": "/viscosity",
+            "op": "gt",
+            "question": "Reference viscosity?",
+            "threshold": 2,
+            "version": 1
+          },
+          "gap_ref": "gap:113306966ccdf69a23e602239358affcc13857e7f8fa3575d61c3743235d3170",
+          "goal_version": 1,
+          "matches": [],
+          "reason": "no_matching_evidence",
+          "rejections": [
+            {
+              "artifact_ref": "gxa_01m89nazec6t24k9ed",
+              "reason": "missing_observable_or_schema"
+            }
+          ],
+          "report_ref": "gxa_c92cdeb39e389b0e6eb66de5dfc00d1caad4a7ac8473fb30c44c390bc5b269b8",
+          "through_cursor": 63
+        },
+        {
+          "criterion": {
+            "applicability": "lab bench",
+            "data_ref": "gxa_01m89naz8ztd9eacbf",
+            "data_sha256": "fe92401b86e351c391eb34c220d33b86807de4526afdc8b4f8e0072023a4c4fb",
+            "measurement_schema": "public.instrument/1",
+            "nature": "observed",
+            "observable": "/drift",
+            "op": "finite",
+            "question": "Drift?",
+            "version": 1
+          },
+          "gap_ref": "gap:fe3201b8c95b6527db6cf4368eadd6ba8f18ad32eb9a5770acd46ba66c3aadb8",
+          "goal_version": 1,
+          "matches": [
+            {
+              "applicability_scopes": [
+                "lab bench"
+              ],
+              "artifact_ref": "gxa_01m89nazec6t24k9ed",
+              "first_production_event": 62,
+              "job_id": null,
+              "measurement_schema": "public.instrument/1",
+              "nature": "observed",
+              "observable": "/drift",
+              "original_observations": [
+                {
+                  "artifact_ref": "gxa_01m89nazec6t24k9ed",
+                  "sha256": "609f1638ec40caf609825297d83014c1c606ed0bbf6ca720bb53949f5f763db4"
+                }
+              ],
+              "output_name": null,
+              "record_kind": "supplied_observation",
+              "sha256": "609f1638ec40caf609825297d83014c1c606ed0bbf6ca720bb53949f5f763db4",
+              "value": 0.25
+            }
+          ],
+          "reason": "matched",
+          "rejections": [],
+          "report_ref": "gxa_c92cdeb39e389b0e6eb66de5dfc00d1caad4a7ac8473fb30c44c390bc5b269b8",
+          "through_cursor": 63
+        }
+      ]
+    },
+    "evidence_ref": null,
+    "message": "The batch includes unresolved research gaps; submit matching gaps separately",
+    "retryable": false,
+    "side_effect_status": "NONE",
+    "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+  },
+  "resolution_events": [],
+  "paid_model_calls": 0
+}

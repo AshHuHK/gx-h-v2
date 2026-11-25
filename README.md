@@ -1,4 +1,8 @@
-# GX-H V6.2B 自主科研
+# GX-H V6.2.1 自主科研
+
+本版把原始材料、具名量測、Lead 實際收到的數字和正式主張連在一起。新 Goal 可採用同一套 deep 研究政策單層執行或委派。舊 Run 延用啟動時的證據政策及插件版本。[V6.2.1 驗收與回放](V621_ACCEPTANCE.md) · [座標材料取得與版本](examples/v621-coordinate-analysis/README.md) · [逐項機讀收據](acceptance/v621/receipts/index.json)
+
+## V6.2B 科研決策
 
 Lead 可以盤點資料與方法、調閱離線文獻、比較可證偽的假設，再根據發布的證據決定改路、維持或收斂。每項主張同時保留證據方向、成熟度與理由。可從同一個 Goal 入口啟動 quick、medium 或 deep 研究。[啟動與續跑](V62B_DEPLOYMENT.md) · [驗收結果與逐案收據](V62B_ACCEPTANCE.md)
 

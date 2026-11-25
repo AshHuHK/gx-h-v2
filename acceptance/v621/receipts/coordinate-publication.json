@@ -1,0 +1,365 @@
+{
+  "schema": "gx.v621.coordinate-publication-receipt/1",
+  "status": "PASS",
+  "case": "2RE9 ordered_backbone",
+  "run_id": "gxr_01m89nah7xra87mf0m",
+  "model": "Official Codex App Server with local scripted Responses",
+  "paid_model_calls": 0,
+  "provider_tokens": null,
+  "real_cpu_jobs": 1,
+  "original": {
+    "acquisition": {
+      "applicability": "model 1, entity 1, label chains A/B/C in the deposited asymmetric unit",
+      "artifact_ref": "gxa_01m89nah8rjyfg1qgs",
+      "data_refs": [],
+      "dependencies": {
+        "acquisition": [],
+        "data": [
+          "https://files.rcsb.org/download/2RE9.cif#sha256=8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        ],
+        "processing": [],
+        "publication": [
+          "https://doi.org/10.1016/j.bbrc.2007.09.097"
+        ],
+        "sample": [],
+        "sampling": [],
+        "source": [
+          "wwPDB:2RE9/revision/1.4"
+        ]
+      },
+      "measurement_schema": null,
+      "schema": "gx.acquisition/1",
+      "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "unknown_dependencies": [
+        "acquisition",
+        "sample",
+        "processing",
+        "sampling"
+      ]
+    },
+    "artifact_ref": "gxa_01m89nah8rjyfg1qgs",
+    "event_id": 22,
+    "scope": "run",
+    "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+    "source": "public-coordinate-record"
+  },
+  "source_descriptor_sha256": "6d5f5d3332ecc74514c66831005cadc07a3a680397289d63da76075b3cece9b4",
+  "job": {
+    "job_id": "gxj_01m89namnkv6e1nkjs",
+    "admission_event_id": 51,
+    "method": {
+      "id": "deposited-chain-geometry",
+      "sha256": "6a1ca0a48d532ab9affe9a56c3c2cb8f441d764d6070ad116f00963a84bbb59d",
+      "version": "2"
+    },
+    "input": {
+      "artifact_ref": "gxa_01m89nah8rjyfg1qgs",
+      "bytes": 507971,
+      "role": "structure",
+      "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+    },
+    "admission_sha256": "7ee17f6c49b4c7a7d3a475d9d794b4187465c9d2110931f5851dc79ef38a329e",
+    "manifest_sha256": "9bc30aa84133601c5a59777b5a5c1b215d63b13047d275ecac5a62c7d301fa90"
+  },
+  "output": {
+    "artifact_ref": "gxa_01m89nan2dwcb970ad",
+    "bytes": 888,
+    "declaration_name": "geometry.json",
+    "kind": "deposited_chain_geometry",
+    "nature": "analysis",
+    "output_name": "geometry.json",
+    "runner_sha256": "f0b083e153aa3ae2973f3480e0d28c31465b75c947fff7a91615939cf71e314f",
+    "sha256": "f0b083e153aa3ae2973f3480e0d28c31465b75c947fff7a91615939cf71e314f",
+    "source_inputs": [
+      {
+        "artifact_ref": "gxa_01m89nah8rjyfg1qgs",
+        "bytes": 507971,
+        "role": "structure",
+        "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+      }
+    ],
+    "validated": false
+  },
+  "metric": {
+    "admission_sha256": "7ee17f6c49b4c7a7d3a475d9d794b4187465c9d2110931f5851dc79ef38a329e",
+    "artifact_ref": "gxa_01m89nan2dwcb970ad",
+    "denominator": 164,
+    "display": "49/164 (0.299)",
+    "inputs": [
+      {
+        "artifact_ref": "gxa_01m89nah8rjyfg1qgs",
+        "bytes": 507971,
+        "role": "structure",
+        "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+      }
+    ],
+    "job_id": "gxj_01m89namnkv6e1nkjs",
+    "manifest_sha256": "9bc30aa84133601c5a59777b5a5c1b215d63b13047d275ecac5a62c7d301fa90",
+    "method": {
+      "id": "deposited-chain-geometry",
+      "sha256": "6a1ca0a48d532ab9affe9a56c3c2cb8f441d764d6070ad116f00963a84bbb59d",
+      "version": "2"
+    },
+    "metric_id": "coverage",
+    "metric_ref": "metric_5b0aefbdb5ca6fbabdde730b6a16724dd85eb252ab29a48b81e43747858d2d7e",
+    "numerator": 49,
+    "op": "ratio/1",
+    "output_name": "geometry.json",
+    "places": 3,
+    "provenance_cursor": 50,
+    "raw_value": "0.29878048780487804878048780487804878048780487804878",
+    "reader": "json/1",
+    "schema": "gx.verified_metric/1",
+    "scope": {
+      "chains": [
+        "A",
+        "B",
+        "C"
+      ],
+      "entity": "1",
+      "input_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "mask": "ordered_backbone",
+      "model": "1"
+    },
+    "selectors": {
+      "denominator": "/observed_union_residues",
+      "numerator": "/selected_residues"
+    },
+    "sha256": "f0b083e153aa3ae2973f3480e0d28c31465b75c947fff7a91615939cf71e314f",
+    "unit": "1",
+    "value": 0.29878048780487804
+  },
+  "independent_check": {
+    "source_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+    "implementation_sha256": "60726832bf57fba076ea11e9b28f91ed843b6036385d8ff799156145c44d89ba",
+    "parser": "Bio.PDB.MMCIF2Dict",
+    "numerator": 49,
+    "denominator": 164,
+    "ratio": 0.29878048780487804,
+    "integer_difference": 0,
+    "absolute_ratio_difference": 0.0,
+    "fraction_absolute_tolerance": 1e-12
+  },
+  "module_report": {
+    "report_ref": "gxa_7cb23993d53071fc6e1d30263b082752cccc7b2faeab7fc7f8e00aa12f668293",
+    "sha256": "b11a3cf6daf8528a61aa47029eb8c646e651f26ad280e9ca08dee336023ad317",
+    "event_id": 74,
+    "module": "module_a2c4c57a8e05804d30fce0c9abacff34",
+    "version": 1,
+    "finding": {
+      "source_refs": [
+        "gxa_01m89nan2dwcb970ad"
+      ],
+      "text": "Archive coverage is 49/164 (0.299)."
+    }
+  },
+  "delivered_lead": {
+    "kind": "Official Codex App Server with local scripted Responses",
+    "context_ref": "gxcx_01m89nans4hhkt997a",
+    "lease_id": "gxl_01m89nansfannh0pv0",
+    "thread_id": "01a21355-5740-7c22-9de8-afaa4b8cf00e",
+    "turn_id": "01a21355-5768-7453-8420-44d5981c40f3",
+    "delivery_state": "acknowledged",
+    "brief_sha256": "7cff17a0e147ae8c969daa59a6d73377475d94e1df402aea0aa218e0bd94582e",
+    "report_ref": "gxa_7cb23993d53071fc6e1d30263b082752cccc7b2faeab7fc7f8e00aa12f668293",
+    "metric_ref": "metric_5b0aefbdb5ca6fbabdde730b6a16724dd85eb252ab29a48b81e43747858d2d7e",
+    "finding": {
+      "source_refs": [
+        "gxa_01m89nan2dwcb970ad"
+      ],
+      "text": "Archive coverage is 49/164 (0.299)."
+    },
+    "session_sha256": "049fd310def93aaa2ba81e6d34f9ba36dc8ec9a2796c2e1ab0c1e3135e84090f",
+    "official_session": {
+      "id": "01a21355-5740-7c22-9de8-afaa4b8cf00e",
+      "cli_version": "0.169.0",
+      "model_provider": "gx_loopback"
+    },
+    "turn_context": {
+      "model": "gpt-6.2-astra",
+      "effort": "xhigh",
+      "turn_id": "01a21355-5768-7453-8420-44d5981c40f3"
+    },
+    "received_at": "2026-11-25T15:31:29.821Z",
+    "calls": [
+      {
+        "call_id": "call-fixture-8",
+        "tool": "gx_stage_claim",
+        "arguments_sha256": "0baeecded268a55582c727b58432fa97fd513af48a7b7a76c3e1190cb1b4eb92",
+        "wire_sha256": "3413b043d556dad78ed6f6355ebd8da052214f200fe26bdfc77261d091023734",
+        "official_session_line": 9
+      },
+      {
+        "call_id": "call-fixture-9",
+        "tool": "gx_decide_revision",
+        "arguments_sha256": "c02c2faff8aac6c5ac1a26249e74db43ef546dba0e35cb46d795fe5c9a34503f",
+        "wire_sha256": "9df8ecd98f2d74b0273758186015b66d1aa8b2a2028c1eba67382860b7d0b333",
+        "official_session_line": 14
+      }
+    ],
+    "model_wire_requests": 9
+  },
+  "public_claim": {
+    "claim_revision_id": "gxh_01m89nap9pg0p8es76@1",
+    "revision_sha256": "df5cd98e7c9a8427e9a3dfeef3764555e6c3451c063d0b4556a5d8ab659c39ea",
+    "statement": "Archive coverage is 49/164 (0.299).",
+    "scope": "model 1, entity 1, label chains A/B/C in the deposited asymmetric unit",
+    "limitations": "Sampling independence is unknown. The finding applies only to the deposited model.",
+    "decision_ref": "gxa_f9960f2d6f3b6ece6a48ce4ca684b5c1eb898d8b444b85696b8147a5355b1b10",
+    "event_id": 86,
+    "publication": {
+      "admissible_levels": [
+        "open",
+        "insufficient"
+      ],
+      "assessment_cursor": 78,
+      "claim_revision_id": "gxh_01m89nap9pg0p8es76@1",
+      "direction": "undetermined",
+      "level": "open",
+      "maturity": "grounded",
+      "opposing_refs": [],
+      "policy": "gx.claim-publication/1",
+      "proposal_ref": "gxa_01m89nap4kx9b30sqb",
+      "proposed_level": "open",
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited."
+      ],
+      "registration_event_id": null,
+      "scope": "model 1, entity 1, label chains A/B/C in the deposited asymmetric unit",
+      "supporting_refs": [],
+      "unmeasured_data_refs": []
+    }
+  },
+  "source_version": {
+    "git_head": "83e8f34d2886a5c4cedc966ec4a7dd7b2addf691",
+    "codex_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b"
+  },
+  "cold_recovery": {
+    "goal_status": "CLOSED",
+    "report_replays": 2,
+    "new_model_requests": 0
+  },
+  "control_run_id": "gxr_01m89nag1ygk6naczq",
+  "control_receipt_sha256": "5238dec6d946177180a2413330a8c18d23db7c37c87907d215ff0c5f08552f4a",
+  "refusals": {
+    "different_numerator": [
+      {
+        "input": "Observed coverage is 149/164.",
+        "source_ref": "gxa_01m89nag2x87pc5qvm",
+        "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}",
+        "callback": {
+          "key": "wrong-source-0",
+          "tool": "gx_submit_module_report",
+          "scope": "module:module_118018440fd37f74b230be2d784ed792",
+          "lease_id": "gxl_01m89nahtey2mcn8s2",
+          "task_id": "gxt_01m89nahsn6my54cg2",
+          "request_sha256": "d41cf4d25dac7bdb9b5dc7f764c103ee0453e806672e393db9aa28e0fa52378b",
+          "head_before": {
+            "version": 1,
+            "sha256": "f9102bb9a33fa9b6b54721f511e547ed397cfbb916571806d5acb86aa78af0ae"
+          },
+          "error": "SCHEMA_INVALID",
+          "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}",
+          "details": {},
+          "head_after": {
+            "version": 1,
+            "sha256": "f9102bb9a33fa9b6b54721f511e547ed397cfbb916571806d5acb86aa78af0ae"
+          }
+        }
+      },
+      {
+        "input": "The measured coverage is 149/164.",
+        "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}",
+        "callback": {
+          "key": "rejected-3",
+          "tool": "gx_submit_module_report",
+          "scope": "module:module_118018440fd37f74b230be2d784ed792",
+          "lease_id": "gxl_01m89nahtey2mcn8s2",
+          "task_id": "gxt_01m89nahsn6my54cg2",
+          "request_sha256": "ac4e85ea5e79778c1bf64d4cc8fce632e0583bd61eb3fc672ce8061fdf2530ea",
+          "head_before": {
+            "version": 1,
+            "sha256": "f9102bb9a33fa9b6b54721f511e547ed397cfbb916571806d5acb86aa78af0ae"
+          },
+          "error": "SCHEMA_INVALID",
+          "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}",
+          "details": {},
+          "head_after": {
+            "version": 1,
+            "sha256": "f9102bb9a33fa9b6b54721f511e547ed397cfbb916571806d5acb86aa78af0ae"
+          }
+        }
+      },
+      {
+        "claim": "The coverage is 149/164.",
+        "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}",
+        "callback": {
+          "key": "wrong-claim-9",
+          "tool": "gx_stage_claim",
+          "scope": "run",
+          "lease_id": "gxl_01m89naj4jj2k7brp2",
+          "task_id": "gxt_01m89naj49fb4av5pp",
+          "request_sha256": "cb515e79f2fbaaf45c04c8a1f8486715dad58be840fd404377d1d0529ec1c442",
+          "head_before": {
+            "version": 1,
+            "sha256": "f9102bb9a33fa9b6b54721f511e547ed397cfbb916571806d5acb86aa78af0ae"
+          },
+          "error": "SCHEMA_INVALID",
+          "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}",
+          "details": {},
+          "head_after": {
+            "version": 1,
+            "sha256": "f9102bb9a33fa9b6b54721f511e547ed397cfbb916571806d5acb86aa78af0ae"
+          }
+        }
+      },
+      {
+        "claim": "Published coverage is 149/164.",
+        "source_ref": "gxa_01m89nag2x87pc5qvm",
+        "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}",
+        "callback": {
+          "key": "wrong-claim-source",
+          "tool": "gx_stage_claim",
+          "scope": "run",
+          "lease_id": "gxl_01m89naj4jj2k7brp2",
+          "task_id": "gxt_01m89naj49fb4av5pp",
+          "request_sha256": "f92f6bb8877905d1904b3c53d83a8952d0c37e955af55a027b2afc4ae858b8a3",
+          "head_before": {
+            "version": 1,
+            "sha256": "f9102bb9a33fa9b6b54721f511e547ed397cfbb916571806d5acb86aa78af0ae"
+          },
+          "error": "SCHEMA_INVALID",
+          "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}",
+          "details": {},
+          "head_after": {
+            "version": 1,
+            "sha256": "f9102bb9a33fa9b6b54721f511e547ed397cfbb916571806d5acb86aa78af0ae"
+          }
+        }
+      }
+    ],
+    "foreign_original": {
+      "target_run_id": "gxr_01m89nak6kswjt2vsf",
+      "own_ref_same_bytes": "gxa_01m89nak7e3m6dsg3k",
+      "foreign_ref": "gxa_01m89nag2x87pc5qvm",
+      "source_id": "cross-run-original",
+      "argv": [
+        "observe",
+        "--state",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v621-validation/release-signoff-olRXr3/chain/controls/positive/study/state",
+        "--run-id",
+        "gxr_01m89nak6kswjt2vsf",
+        "--source",
+        "cross-run-original",
+        "--artifact-ref",
+        "gxa_01m89nag2x87pc5qvm",
+        "--sha256",
+        "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "--acquisition",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v621-validation/release-signoff-olRXr3/candidate/examples/v621-coordinate-analysis/2RE9.json"
+      ],
+      "returncode": 1,
+      "diagnostic": "SchemaInvalid: SCHEMA_INVALID: The observation needs a run-local artifact and a source ID"
+    }
+  }
+}

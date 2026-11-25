@@ -397,6 +397,8 @@ def main(argv=None):
             selector.add_argument("--spec", type=Path)
             selector.add_argument("--goal", help="Start from a human scientific question with no selected workflow")
             sub.add_argument("--goal-config", type=Path, help="JSON project, resource caps, capabilities and input files")
+            sub.add_argument("--research-effort", choices=("quick", "medium", "deep"),
+                             help="Select the research delegation policy for a Goal")
             sub.add_argument("--input", type=Path, action="append", help="Grant this immutable input to the Lead")
             sub.add_argument("--capability", action="append", help="Allow this installed method id@version")
             for alias, example in packages.installation()["examples"].items():

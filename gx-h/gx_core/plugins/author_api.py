@@ -7,6 +7,7 @@ callbacks to their Run and existing service owners when executing them.
 from __future__ import annotations
 
 import math
+import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, fields
 from pathlib import PurePosixPath
@@ -107,6 +108,7 @@ class Contributions:
     capabilities: tuple[str, ...]
     goal_methods: Mapping[str, GoalMethod]
     goal_tools: Mapping[str, GoalToolContribution]
+    research_modules: Mapping[tuple[str, str], Mapping[str, Any]]
 
 
 _Key = TypeVar("_Key")
@@ -228,10 +230,43 @@ class _GoalTools(_Registrar[str, GoalToolContribution]):
         self._add(name, GoalToolContribution(name, _copy_schema(schema, freeze=True), handler, description, capability))
 
 
+class _ResearchModules(_Registrar):
+    """Declare research roles independently of package identity and method implementations."""
+
+    def register(self, *, module_id, version, purpose, output, cost_class, focuses, instructions,
+                 capabilities, tools, input_roles, efforts=("medium", "deep")):
+        if not isinstance(module_id, str) or not re.fullmatch(r"[a-z][a-z0-9_.-]*", module_id):
+            raise ValueError("research module_id must be a stable identifier")
+        if not isinstance(version, str) or not re.fullmatch(r"[0-9][0-9A-Za-z.-]*", version):
+            raise ValueError("research module version must be an explicit version")
+        for name, value in (("purpose", purpose), ("output", output), ("cost_class", cost_class),
+                            ("instructions", instructions)):
+            _name(value, name)
+        groups = {"focuses": focuses, "capabilities": capabilities, "tools": tools,
+                  "input_roles": input_roles, "efforts": efforts}
+        for name, values in groups.items():
+            if not isinstance(values, (list, tuple)):
+                raise ValueError(f"{name} must be a list")
+            for value in values:
+                _name(value, name)
+            if len(set(values)) != len(values):
+                raise ValueError(f"{name} contains duplicate values")
+        if not focuses or not efforts or set(efforts) - {"medium", "deep"}:
+            raise ValueError("a research module needs a focus and at least one supported effort")
+        if "medium" in efforts and set(focuses) - {"data", "model", "workflow", "evaluation"}:
+            raise ValueError("medium supports data, model, workflow and evaluation inventory")
+        for capability in capabilities:
+            _parse_capability_version(capability)
+        self._add((module_id, version), _copy_schema({
+            "module_id": module_id, "version": version, "purpose": purpose, "output": output,
+            "cost_class": cost_class, "instructions": instructions, **groups,
+        }, freeze=True))
+
+
 class RegistrationContext:
     """The declarations for one call to a package entrypoint."""
 
-    __slots__ = ("workflows", "tools", "capabilities", "goal_methods", "goal_tools", "_snapshot", "_files")
+    __slots__ = ("workflows", "tools", "capabilities", "goal_methods", "goal_tools", "research_modules", "_snapshot", "_files")
 
     def __init__(self, files=None):
         self._files = files if files is not None else {}
@@ -240,6 +275,7 @@ class RegistrationContext:
         self.capabilities = _CapabilityRegistrar()
         self.goal_methods = _GoalMethods()
         self.goal_tools = _GoalTools()
+        self.research_modules = _ResearchModules()
         self._snapshot: Contributions | None = None
 
     def read_file(self, path: str) -> bytes:
@@ -254,5 +290,6 @@ class RegistrationContext:
                 capabilities=tuple(self.capabilities._seal()),
                 goal_methods=self.goal_methods._seal(),
                 goal_tools=self.goal_tools._seal(),
+                research_modules=self.research_modules._seal(),
             )
         return self._snapshot

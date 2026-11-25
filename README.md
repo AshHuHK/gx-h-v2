@@ -1,4 +1,6 @@
-# GX-H V6.1 自主科研
+# GX-H V6.2A 自主科研
+
+Scientific Lead 可在 medium 或 deep Goal 中，把本地資料盤點委派給 `data_inventory@1`。模組用自己的任務、租約及子預算執行已授權的 CPU Job，按來源回報；GX 重啟後可以從同一份已完成的量測繼續。預設 quick 使用單層 Lead。[啟動一個公開範例](examples/v62a-data-inventory/README.md) · [插件與 V6.2B 整合介面](V62A_MODULE_HANDOFF.md) · [工程驗收、遷移與回退](V62A_ACCEPTANCE.md)
 
 用一個問題開題。Scientific Lead 在原生 Codex 會話裡選擇研究方法，引用實際產物，決定繼續、改變分支或結題。GX 保存決定、執行圖、作業和帳本。提供研究題面與授權材料後，可以在第一次付費推理前檢查空圖與已建立的決策任務。[V6 部署、恢復與驗收](V6_DEPLOYMENT.md)
 

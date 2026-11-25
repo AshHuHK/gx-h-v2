@@ -3,7 +3,7 @@ import unittest
 
 from gx_core import api, contracts, registry
 from gx_core.errors import SchemaInvalid
-from gx_core.p0 import v6_claims, v6_delegation, v6_graph, v6_native
+from gx_core.p0 import v6_claims, v6_delegation, v6_graph, v6_native, v62_native
 
 
 class GoalToolContract(unittest.TestCase):
@@ -13,6 +13,8 @@ class GoalToolContract(unittest.TestCase):
             "gx_stage_claim": v6_claims.tool_spec(),
             "gx_delegate_branch": v6_delegation.TOOL,
         }
+        for native_name in (v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY):
+            implementations[native_name] = contracts.native_goal_tool_spec(native_name)
         doctor = api.doctor()
         self.assertEqual(doctor["registry"]["compatibility_only"]["native_goal_tools"], [])
         self.assertEqual(set(doctor["registry"]["published"]["native_goal_tools"]), implementations.keys())

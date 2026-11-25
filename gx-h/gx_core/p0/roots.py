@@ -22,7 +22,7 @@ from ..scheduling import dispatch as scheduler, snapshot
 from ..teams import recovery
 from ..teams.service import TeamService, default_lease_seconds
 from . import compute
-from . import profiles, v6_native
+from . import profiles, v6_native, v62_native
 from ..orchestration.service import hooks_for_run
 from . import activity, terminal_products, waits
 
@@ -369,6 +369,9 @@ class Roots:
         lead = self.mode.decision_task(task)
         if lead:
             frozen = store.loads(task, "input_json")["brief"]
+            if attempt > 1 and v62_native.module_scope(frozen):
+                from . import v62_modules
+                frozen = v62_modules.recovery_context(self.conn, self.run_id, frozen)
             tool_names = [tool["name"] for tool in v6_native.tool_specs(WORKER_TOOLS, frozen, conn=self.conn, run_id=self.run_id)]
         else:
             available = self.main_tools if task is None else self.worker_tools
@@ -402,7 +405,8 @@ class Roots:
                           str(rootdir), role, profile["model"], profile["effort"], brief, provider,
                           ids.canonical_json(tool_names) if lead or self._role_tools or "provider" in profile else None))
         if lead:
-            self._allow_refs(key, v6_native.task_refs(self.conn, task))
+            refs = frozen["evidence_refs"] if v62_native.module_scope(frozen) else v6_native.task_refs(self.conn, task)
+            self._allow_refs(key, refs)
         elif task is not None:
             self._allow_refs(key, [packet["input"], getattr(current, "citations", current)])
             if render:
@@ -549,15 +553,27 @@ class Roots:
                   "config":config, "developerInstructions":row["brief"] if main else
                   instructions+"\n"+worker_context}
         if lead:
-            params["developerInstructions"] = v6_native.INSTRUCTIONS
+            packet = v6_native.brief(row)
+            if v62_native.module_scope(packet):
+                v62_native.check_workspace(row)
+                params["developerInstructions"] = v62_native.module_instructions(packet)
+            else:
+                params["developerInstructions"] = v6_native.INSTRUCTIONS
+                if any(tool["name"] == v62_native.OPEN for tool in tools):
+                    params["developerInstructions"] += v62_native.LEAD_INSTRUCTIONS
+                if packet.get("research_evidence_version"):
+                    params["developerInstructions"] += v6_native.EVIDENCE_INSTRUCTIONS
         if new:
             params["experimentalRawEvents"] = True
             params["environments"] = []
             params["dynamicTools"] = tools
             if lead:
-                params["dynamicTools"] = [
-                    {"type": "namespace", "name": "gx", "description": "Adopt a scoped scientific decision.",
-                     "tools": [tool]} if tool["name"] == v6_native.DECIDE else tool for tool in tools]
+                direct = [tool for tool in tools if tool["name"] in self.mode.decision_tools]
+                params["dynamicTools"] = [tool for tool in tools if tool not in direct]
+                if direct:
+                    params["dynamicTools"].append({"type": "namespace", "name": "gx",
+                                                   "description": "Submit a terminal scientific decision.",
+                                                   "tools": direct})
             elif direct_product:
                 tools = self._product_tools(row, params["dynamicTools"])
                 params["dynamicTools"] = [
@@ -989,7 +1005,7 @@ class Roots:
                 if self.conn.in_transaction:
                     raise RuntimeError("complete the GX transaction before scientific calculation")
                 prepared = self.worker_prepare(binding,tool,args,envelope)
-        with store.transaction(self.conn):
+        with store.transaction(self.conn, transaction_owner="NativeRoot", operation="tool_callback", run_id=self.run_id):
             row = self._binding(tid)
             if not row:
                 if tool != "gx_read_artifact":
@@ -1011,6 +1027,8 @@ class Roots:
                     self._pending_child_reads[tid] = turn
                     raise ScopeDenied("GX is verifying the native child and its active turn. Retry gx_read_artifact.")
                 parent = require_binding(self.conn, self.run_id, meter["parent_id"])
+                if self.mode.decision_root(parent) and v62_native.module_scope(v6_native.brief(parent)):
+                    raise ScopeDenied("This local module has no native child delegation")
                 if tool not in {spec["name"] for spec in self._tools_for(parent)}:
                     raise ScopeDenied("the parent root does not expose this tool")
                 return self._read_artifact(parent, args)
@@ -1041,13 +1059,25 @@ class Roots:
                 answer = self.main_call(tool,args,envelope)
             else:
                 row = require_binding(self.conn,self.run_id,tid)
+                lead = self.mode.decision_root(row)
+                packet = v6_native.brief(row) if lead else {}
+                module = v62_native.module_scope(packet)
                 if receipt:
+                    if module:
+                        v62_native.authorize_read(self.conn, row, packet, tool, turn, args.get("ref"))
                     if tool == "gx_read_artifact":
                         self._artifact_access(row, args["ref"])
                     return json.loads(receipt["result_json"])
                 self.heartbeats.observed(tid, turn)
-                lead = self.mode.decision_root(row)
-                if lead and tool == "gx_task_context" and not args:
+                if module and tool in ("gx_task_context", "gx_read_artifact"):
+                    def read(arguments):
+                        if tool == "gx_read_artifact":
+                            return self._read_artifact(row, arguments)
+                        if arguments:
+                            raise SchemaInvalid("gx_task_context accepts no arguments")
+                        return v6_native.current_context(self.conn, row)
+                    answer = v62_native.perform_read(self, row, p, packet, read)
+                elif lead and tool == "gx_task_context" and not args:
                     answer = v6_native.current_context(self.conn, row)
                 elif tool == "gx_task_context" and not args:
                     answer = hooks_for_run(self.conn, self.run_id).build_task_context(

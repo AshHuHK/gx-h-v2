@@ -58,9 +58,13 @@ def _check_contributions(package: Package, contributions: Contributions) -> None
     declared = {extension.contract for extension in package.manifest.extensions}
     actual = {kind for kind, entries in (("workflow", contributions.workflows), ("tool", contributions.tools),
                                          ("capability", contributions.capabilities), ("goal_method", contributions.goal_methods),
-                                         ("goal_tool", contributions.goal_tools)) if entries}
+                                         ("goal_tool", contributions.goal_tools),
+                                         ("research_module", contributions.research_modules)) if entries}
     if declared != actual:
         raise ValueError(f"declared extensions {sorted(declared)} differ from registered contracts {sorted(actual)}")
+    module_ids = {(e.id, e.version) for e in package.manifest.extensions if e.contract == "research_module"}
+    if module_ids != set(contributions.research_modules):
+        raise ValueError("research module IDs and versions must match the package manifest")
     for ref in contributions.capabilities:
         if ("@" not in ref or "/" in ref) and ref not in package.files:
             raise ValueError(f"capability bundle {ref!r} is absent from the verified package")

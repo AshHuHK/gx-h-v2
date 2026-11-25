@@ -192,6 +192,45 @@
                   },
                   "question": {
                     "$ref": "#/$defs/text"
+                  },
+                  "evidence_gate": {
+                    "description": "Hold dispatch until a versioned producing node measured the named source and its JSON field equals the required value. Optionally wait for a subsequent evidence-citing Run Lead approval.",
+                    "type": "object",
+                    "properties": {
+                      "producer_node": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "producer_version": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "source_ref": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "pointer": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "equals": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "require_lead_review": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "producer_node",
+                      "producer_version",
+                      "source_ref",
+                      "pointer",
+                      "equals",
+                      "require_lead_review"
+                    ],
+                    "additionalProperties": false
                   }
                 }
               },
@@ -268,6 +307,14 @@
               }
             ]
           }
+        },
+        "approve_nodes": {
+          "description": "Pending nodes for which this Run Lead explicitly accepts the cited observed result.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "uniqueItems": true
         },
         "convergence": {
           "type": "object",

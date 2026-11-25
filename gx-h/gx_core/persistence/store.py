@@ -249,22 +249,30 @@ def contract_pin_matches(conn, pinned, installed):
     digest = contracts.contract_digest()
     if installed != digest["__combined__"]:
         return False
-    # Current stamps alone cannot authorize a historical Run. Use the receipt
-    # from the same transaction that verified/promoted the objects and stamped it.
-    old_ddl = contracts.additive_schema_sources().get(pinned)
-    if not old_ddl:
+    # Runs retain their original pins through multiple additive releases. Follow
+    # only chronological receipts in this store with each release's declared DDL.
+    declared = contracts.additive_schema_sources()
+    if pinned not in declared:
         return False
     stamp = read_meta(conn)
-    if (stamp.get(META_CONTRACT_SHA256), stamp.get(SCHEMA_META_KEY)) != (installed, digest["db_schema.sql"]):
+    current = (installed, digest["db_schema.sql"])
+    if (stamp.get(META_CONTRACT_SHA256), stamp.get(SCHEMA_META_KEY)) != current:
         return False
-    return conn.execute(
-        "SELECT 1 FROM events WHERE kind='store.contract_resynced' AND actor='backend' "
-        "AND subject_kind='store' AND json_extract(payload_json,'$.from_sha256')=? "
-        "AND json_extract(payload_json,'$.from_db_schema_sha256')=? "
-        "AND json_extract(payload_json,'$.to_sha256')=? "
-        "AND json_extract(payload_json,'$.to_db_schema_sha256')=? LIMIT 1",
-        (pinned, old_ddl, installed, digest["db_schema.sql"]),
-    ).fetchone() is not None
+    allowed = set(declared.items()) | {current}
+    reached = {(pinned, declared[pinned])}
+    receipts = conn.execute(
+        "SELECT json_extract(payload_json,'$.from_sha256'),json_extract(payload_json,'$.from_db_schema_sha256'),"
+        "json_extract(payload_json,'$.to_sha256'),json_extract(payload_json,'$.to_db_schema_sha256') "
+        "FROM events WHERE kind='store.contract_resynced' AND actor='backend' AND subject_kind='store' "
+        "ORDER BY event_id"
+    )
+    for old_sha, old_ddl, new_sha, new_ddl in receipts:
+        target = (new_sha, new_ddl)
+        if (old_sha, old_ddl) in reached and target in allowed:
+            if target == current:
+                return True
+            reached.add(target)
+    return False
 
 
 def ensure_schema(conn: sqlite3.Connection) -> str:

@@ -7,10 +7,10 @@ import sqlite3
 from ..domain import clock
 
 RULE_VERSION = 'gx-response-class/1'
-FINAL_TOOLS = frozenset({'gx_decide_revision', 'gx_submit_product'})
+FINAL_TOOLS = frozenset({'gx_decide_revision', 'gx_submit_product', 'gx_submit_module_report'})
 TOKEN_FIELDS = ('input_tokens', 'cached_input_tokens', 'output_tokens', 'reasoning_tokens', 'total_tokens')
-READ = {'gx_task_context', 'gx_read_artifact', 'gx_grid_measurement', 'gx_capability_inspect', 'gx_project_state'}
-CONTROL = {'gx_job_submit', 'gx_job_cancel', 'gx_job_status', 'gx_wait_job', 'gx_propose_intent'}
+READ = {'gx_task_context', 'gx_read_artifact', 'gx_grid_measurement', 'gx_capability_inspect', 'gx_project_state', 'gx_query_catalog'}
+CONTROL = {'gx_job_submit', 'gx_job_cancel', 'gx_job_status', 'gx_wait_job', 'gx_propose_intent', 'gx_open_module', 'gx_cancel_module'}
 TERMINAL = {'ACCEPTED', 'TERMINAL_REJECTED', 'SCHEMA_INVALID_LIMIT'}
 CALL_TYPES = {'function_call', 'custom_tool_call', 'local_shell_call', 'tool_search_call',
               'web_search_call', 'image_generation_call'}

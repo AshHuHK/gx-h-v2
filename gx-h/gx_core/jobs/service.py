@@ -515,6 +515,8 @@ class JobService:
                                        path_id=request["path_id"] if request["purpose"] == PURPOSE_PATH else None)
         from ..p0.team_admission import team_funding
         budget_ref = team_funding(self.conn, request["run_id"], request.get("task_id"), budget_ref, admit=True)
+        from ..p0 import v62_budget
+        budget_ref = v62_budget.job_funding(self.conn, request, budget_ref)
         self._refuse_prohibited_lines(self.conn, budget_ref=budget_ref, amounts=amounts)
         self._budget_would_hold(budgets, run_id=request["run_id"], budget_ref=budget_ref,
                                 job_id=ids.new_id("job"), amounts=amounts)
@@ -606,6 +608,8 @@ class JobService:
                                             path_id=path_id if purpose == PURPOSE_PATH else None)
             from ..p0.team_admission import team_funding
             budget_ref = team_funding(conn, run_id, task_id, budget_ref, admit=True)
+            from ..p0 import v62_budget
+            budget_ref = v62_budget.job_funding(conn, request, budget_ref)
             # The budget is asked here, before the preflight, because its refusal is the cheaper
             # one. It is held only in the transaction that writes the row: a submitter that dies
             # between the two leaves neither a hold nor a row (audit J9).
@@ -680,7 +684,8 @@ class JobService:
             prepared = execution_manifest.prepare_runtime(intent, capability["bundle"], env, resources, preflight)
             v6_node = (request.get("binding") or {}).get("v6_node_id")
             if v6_node:
-                from ..p0 import v6_jobs, v6_method_context
+                from ..p0 import v6_jobs, v6_method_context, v62_evidence
+                gate_proof = v62_evidence.prepare_dispatch(conn, request)
                 method_dependencies = v6_method_context.dependencies(
                     conn, run_id, request["capability_version"], env["python_executable"])
             sample = capacity.sample_admission(conn)
@@ -704,6 +709,7 @@ class JobService:
                 # must still be admitted under the caller's live lease, atomically.
                 self._lease_and_step(txn, request, purpose)
                 budget_ref = team_funding(txn, run_id, task_id, budget_ref, admit=True)
+                budget_ref = v62_budget.job_funding(txn, request, budget_ref)
                 from ..p0.meter_limits import check_soft
                 check_soft(txn,run_id,task_id)
                 self._threads_or_refuse(txn, resources, key=key, sample=sample)
@@ -724,6 +730,7 @@ class JobService:
                      clock.now_iso(), lease_ref, step_index, attempt),
                 )
                 if v6_node:
+                    v62_evidence.fence_dispatch(txn, request, gate_proof)
                     v6_jobs.fence_admission(txn, request, request_sha, key, job_id, amounts,
                                             prepared["runtime"], method_dependencies)
                 elif txn.execute("SELECT 1 FROM sqlite_master WHERE name='v6_goals'").fetchone() and txn.execute(
@@ -1058,6 +1065,11 @@ class JobService:
             raise self._named(ArtifactNotFound(f"job {job_id} has no launch specification any more"),
                               job_id)
         try:
+            from ..p0 import v62_evidence
+            request = intent["request"]
+            # A CREATED Job may be resumed after process death or waiting for resources.
+            # Verify immutable bytes outside the writer before starting its first process.
+            gate_proof = v62_evidence.prepare_dispatch(conn, request)
             with store.transaction(
                 conn, transaction_owner="JobService", operation="begin_submission", run_id=row["run_id"],
             ) as txn:
@@ -1067,7 +1079,8 @@ class JobService:
                     return self._submit_answer(current, replayed=True)
                 if (intent["request"].get("binding") or {}).get("v6_node_id"):
                     from ..p0 import v6_jobs
-                    v6_jobs.fence_launch(txn, intent["request"], job_id)
+                    v62_evidence.fence_dispatch(txn, request, gate_proof)
+                    v6_jobs.fence_launch(txn, request, job_id)
                 execution_manifest.check_launch(txn, job_id)
                 store.transition(txn, machine=MACHINE, subject_id=job_id, to_state=SUBMITTING,
                                  actor=self.actor, bump=False, evidence_level="EXECUTION_OBSERVED",

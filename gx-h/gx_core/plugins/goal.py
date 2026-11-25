@@ -37,12 +37,12 @@ def _methods(plugin):
     return loader.capability_references(plugin, plugin.contributions)
 
 
-def _discover(requested, references):
+def _discover(requested, references, *, module_providers=()):
     if not isinstance(references, list):
         raise SchemaInvalid("plugins must be a list of exact provider id@version references")
     explicit = _references(references)
     if not requested:
-        if explicit:
+        if set(explicit) - set(module_providers):
             raise SchemaInvalid("Selecting a Goal provider also requires a capability grant")
         return {}
     path = config.CONFIG_DIR / "workflow_packages.json"
@@ -54,7 +54,7 @@ def _discover(requested, references):
     release = json.loads((config.CONFIG_DIR / "shipped.json").read_text())
     standalone = release.get("standalone_goal_methods", ())
     provided = {}
-    used = set()
+    used = set(module_providers)
     for cap in requested:
         matches = []
         for pkg in available.plugins.values():
@@ -82,9 +82,10 @@ def _discover(requested, references):
     return provided
 
 
-def for_start(ctx, requested, references):
+def for_start(ctx, requested, references, *, module_catalog=None):
     """Attach approved bytes, then persist the composition with Run creation before Job admission."""
-    providers = _discover(requested, references)
+    owners = [_pin(m["plugin"]) for m in (module_catalog or {}).get("modules", [])]
+    providers = _discover(requested, references, module_providers=[(p.id, p.version) for p in owners])
     roots = {package.pin for package, _ in providers.values()}
     pins = sorted(_load(roots).plugins, key=lambda p: (p.id, p.version)) if roots else []
     catalog = []
@@ -97,6 +98,11 @@ def for_start(ctx, requested, references):
         method = view["manifest"]
         descriptor = {"method": method.get("method_card"), "inputs": manifest.input_roles(method),
                       "outputs": method["outputs"], "limitations": method.get("limitations")}
+        if module_catalog:
+            descriptor["cost_class"] = "gpu" if method["resources"].get("gpu") else "local_cpu"
+            descriptor["family"] = method["method_card"]["family"]
+            descriptor["output_summary"] = [{k: v for k, v in item.items() if k in ("name", "kind", "nature")}
+                                            for item in method["outputs"]]
         provider = {}
         if package:
             hooks = package.contributions.goal_methods.get(cap)
@@ -107,7 +113,10 @@ def for_start(ctx, requested, references):
         receipts.append(receipt)
     # Verify native tool names before the first Task can be issued.
     tools_for_catalog(catalog)
-    return catalog, {"kind": "goal", "packages": [_document(p) for p in pins], "capabilities": receipts}
+    closure = set(pins) | {_pin(p) for row in (module_catalog or {}).get("modules", [])
+                            for p in row["provider_closure"]}
+    return catalog, {"kind": "goal", "packages": [_document(p) for p in sorted(closure, key=lambda x: (x.id, x.version))],
+                     "capabilities": receipts}
 
 
 @lru_cache(maxsize=128)

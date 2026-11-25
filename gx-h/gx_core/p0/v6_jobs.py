@@ -94,6 +94,7 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
                     "shortfall_lines": sorted(short),
                 },
             )
+        return required
 
 
 def _node(conn, run_id, node_id):
@@ -113,6 +114,49 @@ def _live(node, expected):
         or node["goal_status"] != "OPEN"
     ):
         raise SchemaInvalid("Graph delegation is no longer active", details={"reason": "superseded_attempt"})
+
+
+def _runtime_identity(runtime):
+    # A device availability observation is made after the execution plan is sealed.
+    gpu = runtime.get("gpu")
+    return {**runtime, "gpu": gpu["requested"] if gpu else None}
+
+
+def confirmed_result_identity(conn, node_id, proof, *, verify_inputs=False):
+    """Bind a published (or reused) result to its frozen inputs, environment and original Job."""
+    attempt = conn.execute(
+        "SELECT n.run_id,n.status,n.job_id,n.exec_key,a.exec_key AS attempt_key,a.identity_json,a.reused_from "
+        "FROM v6_nodes n JOIN v6_job_attempts a USING(node_id) WHERE n.node_id=?", (node_id,)
+    ).fetchone()
+    admission, completion = proof["admission"], proof["completion"]
+    owner = admission["owner"]
+    if (not attempt or attempt["status"] not in {"SUCCEEDED", "REUSED"}
+            or attempt["job_id"] != proof["job_id"] or attempt["run_id"] != admission["run_id"]
+            or not completion or completion["status"] != "SUCCEEDED"
+            or owner.get("kind") != "graph_node"
+            or owner.get("node_id") != (attempt["reused_from"] or node_id)):
+        raise SchemaInvalid("The successful Job is not bound to this graph result")
+    identity = json.loads(attempt["identity_json"])
+    method = admission["capability"]
+    roles = [[entry["role"], entry["sha256"]] for entry in admission["inputs"]]
+    environment = _runtime_identity(admission["runtime"])
+    if (ids.sha256_of_obj(identity) != attempt["attempt_key"] or attempt["attempt_key"] != attempt["exec_key"]
+            or attempt["exec_key"] != owner.get("exec_key")
+            or identity["capability"] != f"{method['id']}@{method['version']}"
+            or identity["manifest_sha256"] != method["sha256"] or identity["roles"] != roles
+            or identity["parameters"] != admission["parameters"]
+            or _runtime_identity(identity["runtime"]) != environment):
+        raise SchemaInvalid("Graph execution identity differs from the Job's admitted inputs or runtime")
+    if verify_inputs:
+        if conn.in_transaction:
+            raise RuntimeError("Verify original input files outside the graph writer")
+        artifacts = storage.artifact_service(conn)
+        for entry in (admission["input_manifest"], *admission["inputs"]):
+            verified = artifacts.verify(entry["artifact_ref"])
+            if not verified["ok"] or verified["observed_sha256"] != entry["sha256"]:
+                raise SchemaInvalid("Original Job input differs from its admission receipt")
+    return {"exec_key": attempt["exec_key"], "input_sha256": admission["input_manifest"]["sha256"],
+            "environment_sha256": ids.sha256_of_obj(environment)}
 
 
 def _dependencies(conn, node, spec):
@@ -253,6 +297,7 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
     binding = request.get("binding") or {}
     node = _node(conn, request["run_id"], binding.get("v6_node_id"))
     _live(node, "PENDING")
+    _module_grant(conn, node, json.loads(node["spec_json"]))
     run_status = conn.execute("SELECT status FROM runs WHERE run_id=?", (request["run_id"],)).fetchone()[0]
     if run_status not in machines.machine("run")["executable"]:
         raise PhaseDenied("Run is no longer accepting Jobs", details={"status": run_status})
@@ -287,9 +332,7 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
         raise SchemaInvalid("Method dependencies changed after the graph node was prepared")
     compiled_env = identity["runtime"]
     # GPU availability is a launch observation. Runtime environment identity is frozen separately.
-    if {k: v for k, v in compiled_env.items() if k != "gpu"} != {
-        k: v for k, v in runtime.items() if k != "gpu"
-    }:
+    if _runtime_identity(compiled_env) != _runtime_identity(runtime):
         raise SchemaInvalid("Execution environment changed after the node was compiled")
     equivalent = conn.execute(
         "SELECT node_id FROM v6_nodes WHERE run_id=? AND exec_key=? AND node_id<>? "
@@ -305,9 +348,21 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
     _consume(conn, node)
 
 
+def _module_grant(conn, node, spec):
+    """Submitted graph work has its own identity; honor the module and source grant at admission."""
+    branch = json.loads(node["branch_spec"])
+    if "module_instance_id" in branch:
+        from . import v62_modules
+        module = v62_modules.require_active(conn, node["run_id"], "module:" + branch["module_instance_id"])
+        if module["branch_id"] != node["branch_id"] or spec["capability"] not in json.loads(module["grant_json"])["capabilities"]:
+            from ..errors import ScopeDenied
+            raise ScopeDenied("This module Job lost its capability grant")
+
+
 def fence_launch(conn, request, job_id):
     node = _node(conn, request["run_id"], request["binding"]["v6_node_id"])
     _live(node, "RUNNING")
+    _module_grant(conn, node, json.loads(node["spec_json"]))
     if node["job_id"] != job_id:
         raise SchemaInvalid("Node now belongs to another Job", details={"reason": "superseded_attempt"})
 
@@ -322,7 +377,7 @@ def _consume(conn, node):
     cpu_queue.admitted(conn, f"job:{node['run_id']}:{node['operation_key']}")
 
 
-def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_status=None, reason=None):
+def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_status=None, reason=None, evidence=None):
     with _tx(conn, node["run_id"], "settle_node") as tx:
         current = _node(tx, node["run_id"], node["node_id"])
         if current["status"] in NODE_TERMINAL:
@@ -331,6 +386,11 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
             return False
         if source:
             _live(current, "PENDING")
+            spec = json.loads(current["spec_json"])
+            _module_grant(tx, current, spec)
+            if spec.get("evidence_gate"):
+                from . import v62_evidence
+                v62_evidence.fence(tx, current, evidence)
             execution.require_current(tx, job_id)
         if current["status"] == "CANCEL_REQUESTED":
             status = "CANCELLED"  # Keep late result and actual Job status on their original identity.
@@ -454,6 +514,11 @@ def _run_node(conn, node, service):
         return "cancelled" if _finish(conn, node, "CANCELLED") else "waiting"
     _live(node, "PENDING")
     spec = json.loads(node["spec_json"])
+    _module_grant(conn, node, spec)
+    evidence = None
+    if spec.get("evidence_gate"):
+        from . import v62_evidence
+        evidence = v62_evidence.require_ready(conn, node, spec)
     refs = _dependencies(conn, node, spec)
     if refs is None:
         return "waiting"
@@ -481,6 +546,7 @@ def _run_node(conn, node, service):
             raise SchemaInvalid("Compiled attempt is incompatible with the currently installed method")
         # Hash the original bytes outside a write transaction; adoption retains the original Job identity.
         proof = execution.read_manifest(conn, source["job_id"])
+        confirmed_result_identity(conn, source["node_id"], proof, verify_inputs=True)
         completion = proof["completion"]
         output = next(
             (r for r in (completion or {}).get("outputs", []) if r["artifact_ref"] == source["result_ref"]),
@@ -502,6 +568,7 @@ def _run_node(conn, node, service):
                 node,
                 "REUSED",
                 source=source["node_id"],
+                evidence=evidence,
                 job_id=source["job_id"],
                 job_status="SUCCEEDED",
                 result=source["result_ref"],

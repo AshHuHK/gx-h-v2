@@ -25,6 +25,9 @@ def cli_spec(args):
         "budget_profile",
         "turn_token_budget",
         "initial_job_limit",
+        "research_effort",
+        "research_modules",
+        "module_policy",
         "input_files",
         "capabilities",
         "plugins",
@@ -49,6 +52,11 @@ def cli_spec(args):
         prepared.append({**entry, "path": str((base / entry["path"]).resolve())})
     prepared.extend({"path": str(p.resolve())} for p in args.input or ())
     spec["input_files"] = prepared
+    effort = getattr(args, "research_effort", None)
+    if effort is not None:
+        if "research_effort" in raw and raw["research_effort"] != effort:
+            raise SchemaInvalid("Conflicting research efforts in Goal config and command line")
+        spec["research_effort"] = effort
     if args.capability:
         if "capabilities" in raw:
             raise SchemaInvalid("Select capabilities in the config or on the command line")
@@ -95,9 +103,14 @@ def start(conn, spec, *, run_key, current):
         or len(requested) != len(set(requested))
     ):
         raise SchemaInvalid("capabilities must be a list of distinct, versioned methods")
-    public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []))
+    from . import v62_catalog
+
+    research_catalog = v62_catalog.for_start(spec)
+    public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []),
+                                                 module_catalog=research_catalog)
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
-    if spec.get("research_effort") in ("medium", "deep"):
+    if research_catalog is not None:
+        inputs["research_catalog"] = research_catalog
         inputs["research_evidence_version"] = "gx.research.v6.2b.1"
     action = initial_action(spec, basic_research_start(spec))
 
@@ -270,7 +283,7 @@ def _events(conn, rid, after, budget_ref=None):
         WHERE event_id>? AND (
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
                                   'v6.claim.adopted','v6.decision.superseded','v62.round.settled',
-                                  'v62.claim.reassessed') OR
+                                  'v62.claim.reassessed','v62.module.wake','v62.module.invalidated') OR
           (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
           OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
@@ -279,8 +292,13 @@ def _events(conn, rid, after, budget_ref=None):
         (budget_ref, rid, after, rid),
     ).fetchall()
 
+    from . import v62_lead
+
+    module_branches = v62_lead.branch_ids(conn, rid) if events else set()
     captured = []
     for row in events:
+        if module_branches and v62_lead.internal_event(row, module_branches):
+            continue
         if row["kind"] == "v6.claim.adopted":
             payload = store.loads(row, "payload_json")
             # Early receipts identify the decision directly; recover its scope from the
@@ -305,6 +323,8 @@ def _matches(row, watches, rid):
     kind = row["kind"]
     events = {
         "v6.decision.superseded": set(),
+        "v62.module.wake": set(),
+        "v62.module.invalidated": set(),
         "v6.intent.changed": {"goal_changed"},
         "v6.node.settled": {"evidence_added", "job_settled"},
         "v6.observation.added": {"evidence_added"},
@@ -388,7 +408,7 @@ def _run_wakes(conn, rid, prior, events):
         payload = store.loads(row, "payload_json")
         if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
             continue
-        if (row["kind"] == "v6.intent.changed" or _operator_evidence(conn, rid, row)
+        if (row["kind"] in {"v6.intent.changed", "v62.module.wake", "v62.module.invalidated"} or _operator_evidence(conn, rid, row)
                 or row["kind"] == "v6.decision.superseded" and payload.get("scope") == "run"
                 or row["kind"] == "v62.round.settled" and payload.get("reconsider")
                 or row["kind"] == "v62.claim.reassessed" and payload.get("critical_counterevidence")
@@ -475,28 +495,43 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             (rid,),
         )
     ]
+    from . import v62_catalog, v62_lead
+    research = data["inputs"].get("research_catalog")
+    module_branches = v62_lead.branch_ids(conn, rid) if research else set()
     for node in nodes:
-        node["wait"] = json.loads(node.pop("wait_json") or "null")
         spec = json.loads(node.pop("spec_json"))
-        node["commission"] = {
-            k: spec[k] for k in ("capability", "inputs", "depends_on", "parameters", "question") if k in spec
-        }
+        wait = node.pop("wait_json")
+        if node["branch_id"] in module_branches:
+            # Even the module-authored question or parameters can describe a new
+            # observation. Until a report is released the Lead sees only GX identities.
+            node.pop("exec_key")
+            node["result_ref"] = None
+        else:
+            node["wait"] = json.loads(wait or "null")
+            node["commission"] = {
+                k: spec[k] for k in ("capability", "inputs", "depends_on", "parameters", "question") if k in spec
+            }
+            if node["result_ref"]:
+                refs.append(node["result_ref"])
     branches = [
         dict(r)
         for r in conn.execute(
-            "SELECT branch_id,spec_json,status FROM v6_branches WHERE run_id=? " "ORDER BY rowid", (rid,)
+            "SELECT branch_id,spec_json,status FROM v6_branches WHERE run_id=? ORDER BY rowid", (rid,)
         )
     ]
     for branch in branches:
-        branch["spec"] = json.loads(branch.pop("spec_json"))
-    refs.extend(n["result_ref"] for n in nodes if n["result_ref"])
+        spec = json.loads(branch.pop("spec_json"))
+        branch["spec"] = ({"module_instance_id": spec["module_instance_id"]}
+                          if branch["branch_id"] in module_branches else spec)
     # Previous observations stay available for citation and scoped reads on continuation.
     for older in conn.execute(
-        "SELECT subject_id,json_extract(payload_json,'$.artifact_ref') AS ref "
+        "SELECT subject_id,json_extract(payload_json,'$.artifact_ref') AS ref, "
+        "json_extract(payload_json,'$.scope') AS scope "
         "FROM events WHERE run_id=? AND kind='v6.observation.added' AND event_id<=?",
         (rid, cursor),
     ):
-        refs.extend([older["subject_id"], older["ref"]])
+        if older["scope"] not in module_branches and not str(older["scope"]).startswith("module:"):
+            refs.extend([older["subject_id"], older["ref"]])
     catalog = [
         {k: v for k, v in row.items() if k != "content_artifact_ref"}
         for row in data["inputs"]["capability_catalog"]
@@ -533,6 +568,10 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         }
         for row in events
     ]
+    for change, event in zip(deltas, events):
+        if event["kind"] in {"v62.module.wake", "v62.module.invalidated"}:
+            payload = store.loads(event, "payload_json")
+            change.update({k: payload[k] for k in ("round", "reason", "module_instance_ids", "module_instance_id", "report_refs") if k in payload})
     budget = {k: account[k] for k in ("limits", "spent", "reserved", "available")}
     grant = data.get("inputs", {}).get("p0_spec", {})
     if head is None and "initial_job_limit" in grant:
@@ -562,6 +601,9 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "evidence_refs": list(dict.fromkeys(refs)),
         "budget": budget,
     }
+    if research:
+        brief = v62_catalog.project(conn, rid, brief)
+        v62_lead.attach_reports(conn, brief, cursor, research["policy"])
     if data["inputs"].get("research_evidence_version"):
         from . import v62_outputs, v62_rounds
         brief["research_evidence_version"] = data["inputs"]["research_evidence_version"]
@@ -630,6 +672,10 @@ def ensure_task(conn, run_id):
     if planned is None:
         return None
     run, goal, prior, head, cursor, key, brief = planned
+    delivery = brief
+    if "research_effort" in brief:
+        from . import v62_catalog, v62_lead
+        brief, delivery = v62_lead.deliver(conn, brief, v62_catalog.policy(conn, run_id)["brief_bytes"])
     with store.transaction(
         conn, transaction_owner="ScientificLead", operation="freeze_brief", run_id=run_id
     ) as tx:
@@ -653,7 +699,7 @@ def ensure_task(conn, run_id):
         ):
             return None
         return persist_brief(
-            tx, run_id, "run", brief, head, goal["goal_version"], key, cursor, run["budget_ref"]
+            tx, run_id, "run", brief, head, goal["goal_version"], key, cursor, run["budget_ref"], delivery_brief=delivery
         )
 
 
@@ -672,6 +718,10 @@ def _prepare_brief(conn, run_id):
         ).fetchone()
         is None
     )
+    if not prior and not changed and not events and conn.execute(
+        "SELECT 1 FROM v62_modules WHERE run_id=? AND status='OPEN' LIMIT 1", (run_id,)
+    ).fetchone():
+        return None
     branch_hits = _branch_watch_hits(conn, run_id, goal["goal_version"], events)
     if prior and not changed and not branch_hits and not _run_wakes(conn, run_id, prior, events):
         return None
@@ -692,7 +742,7 @@ def _prepare_brief(conn, run_id):
     return run, goal, prior, head, cursor, key, brief
 
 
-def persist_brief(tx, run_id, scope, brief, head, goal_version, event_key, cursor, budget_ref):
+def persist_brief(tx, run_id, scope, brief, head, goal_version, event_key, cursor, budget_ref, *, delivery_brief=None):
     """Save one scoped delegation and its frozen context under its caller's CAS transaction."""
     if not tx.in_transaction:
         raise RuntimeError("Freezing a decision task requires its owning transaction")
@@ -726,7 +776,7 @@ def persist_brief(tx, run_id, scope, brief, head, goal_version, event_key, curso
         role="planner",
         actor=ACTOR,
         budget_ref=budget_ref,
-        task_input={"context_ref": ref, "scope": scope, "brief": brief},
+        task_input={"context_ref": ref, "scope": scope, "brief": brief if delivery_brief is None else delivery_brief},
     )
     tx.execute(
         "INSERT INTO v6_decision_tasks(task_id,run_id,scope,context_ref,goal_version,base_json,"
@@ -854,6 +904,11 @@ def waiting_for(conn, rid):
             if reason:
                 node["wait"] = json.loads(reason)
         return {"kind": "nodes", "nodes": nodes, "continue_with": "gx-p0 run"}
+    modules = [dict(row) for row in conn.execute(
+        "SELECT module_instance_id,round,scope FROM v62_modules WHERE run_id=? AND status='OPEN' ORDER BY rowid", (rid,)
+    )]
+    if modules:
+        return {"kind": "module_reports", "modules": modules, "continue_with": "gx-p0 run"}
     prior = _latest(conn, rid)
     if prior:
         version = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]
@@ -877,7 +932,7 @@ def projection(conn, run, meter):
 
     rid = run["run_id"]
     g = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (rid,)).fetchone()
-    return {
+    result = {
         "mode": "goal",
         "goal": g["goal"],
         "goal_version": g["goal_version"],
@@ -910,3 +965,10 @@ def projection(conn, run, meter):
             )
         ],
     }
+    if store.loads(run, "inputs_json")["inputs"].get("research_catalog"):
+        result["research_modules"] = [dict(row) for row in conn.execute(
+            "SELECT m.module_instance_id,m.module_id,m.module_version,m.scope,m.round,m.status,m.budget_ref,r.report_ref "
+            "FROM v62_modules m LEFT JOIN v62_module_reports r USING(module_instance_id) WHERE m.run_id=? ORDER BY m.rowid",
+            (rid,),
+        )]
+    return result

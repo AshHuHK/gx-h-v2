@@ -466,6 +466,10 @@ class RootDelivery:
             prior = boundary
         run_ref = budgets.budget_for(self.conn, run_id=self.run_id)
         ref = team_admission.team_funding(self.conn,self.run_id,binding.get("task_id"),run_ref)
+        if binding.get("task_id"):
+            from . import v6_native, v62_budget
+            if v6_native.assigned(binding):
+                ref = v62_budget.native_funding(self.conn, self.run_id, binding["task_id"], ref)
         risk_available = meter_limits.allowance(self.conn,self.run_id,ref,binding)
         available = int(budgets.state(self.conn, ref)["available"].get("tokens", 0))
         if risk_available is not None:

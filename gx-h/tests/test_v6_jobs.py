@@ -13,11 +13,12 @@ from gx_core import budgets
 from gx_core.capabilities import shipped, storage
 from gx_core.context import Ctx, Principal
 from gx_core.domain import ids
-from gx_core.errors import BudgetExceeded, IdempotencyConflict
+from gx_core.errors import BudgetExceeded, IdempotencyConflict, SchemaInvalid
 from gx_core.jobs import executor
 from gx_core.jobs.service import JobService
 from gx_core.persistence import records, store
 from gx_core.p0 import schema, v6_jobs
+from gx_core.p0.manifest import read_manifest
 
 
 def crash_on_launch(db, run_id, log):
@@ -204,6 +205,23 @@ class DynamicJobs(unittest.TestCase):
             ],
             1,
         )
+
+    def test_recovered_evidence_binds_both_graph_nodes_to_the_original_job(self):
+        self.new("first")
+        original = self.settle("first")
+        self.new("same")
+        same = self.settle("same")
+        self.assertEqual("REUSED", same["status"])
+        proof = read_manifest(self.conn, original["job_id"])
+        expected = v6_jobs.confirmed_result_identity(self.conn, "first", proof, verify_inputs=True)
+        self.assertEqual(original["exec_key"], expected["exec_key"])
+        self.assertEqual(proof["admission"]["input_manifest"]["sha256"], expected["input_sha256"])
+        self.assertEqual(expected, v6_jobs.confirmed_result_identity(self.conn, "same", proof, verify_inputs=True))
+        self.conn.execute("UPDATE v6_job_attempts SET identity_json=json_set(identity_json,'$.runtime.env_id','other') "
+                          "WHERE node_id='same'")
+        with self.assertRaises(SchemaInvalid):
+            v6_jobs.confirmed_result_identity(self.conn, "same", proof)
+        self.assertEqual(1, self.conn.execute("SELECT count(*) FROM jobs").fetchone()[0])
 
     def test_new_compute_requires_an_affordable_branch_and_cache_hit_does_not_spend(self):
         original = self.new("first")

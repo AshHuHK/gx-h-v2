@@ -1,4 +1,6 @@
 """Report-scoped measurement summaries and pages derived from frozen named Job outputs."""
+import json
+
 from ..domain import ids
 from ..errors import SchemaInvalid
 from . import v621_metrics
@@ -36,16 +38,47 @@ def compact_rows(metrics):
     return result
 
 
-def priority(metrics, comparisons):
-    def matches(metric):
+def comparison_keys(conn, metrics, comparisons):
+    """Source-local rows matching the registered method, named output and frozen Job settings."""
+    if not metrics or not comparisons:
+        return set()
+    from ..capabilities import manifest, registry
+    from ..errors import GxError
+
+    matched = set()
+    parameters = {}
+    defaults = {}
+    for metric, row in zip(metrics, compact_rows(metrics), strict=True):
+        method = metric["method"]
+        capability = f"{method['id']}@{method['version']}"
         for comparison in comparisons:
-            spec = comparison.get("method") or {}
-            if (spec.get("capability") == metric.get("method") and spec.get("metric_id") == metric["metric_id"]
-                    and spec.get("unit") == metric["unit"] and spec.get("output_name") == metric.get("output_name")
-                    and all(metric.get("scope", {}).get(k,v) == v for k,v in spec.get("parameters", {}).items())):
-                return True
-        return False
-    return sorted(metrics, key=lambda m: not matches(m))
+            spec = comparison["method"]
+            if (spec["capability"] != capability or spec["output_name"] != metric["output_name"]
+                    or spec["metric_id"] != metric["metric_id"] or spec["unit"] != metric["unit"]
+                    or comparison.get("method_manifest_sha256", method["sha256"]) != method["sha256"]):
+                continue
+            job = (metric["job_id"], metric["admission_sha256"])
+            if job not in parameters:
+                saved = conn.execute("""SELECT json_extract(admission_json,'$.parameters')
+                    FROM p0_execution_manifests WHERE job_id=? AND admission_sha256=?""", job).fetchone()
+                parameters[job] = json.loads(saved[0]) if saved and saved[0] is not None else None
+            actual = parameters[job]
+            expected = spec["parameters"]
+            if actual is None:
+                continue
+            if expected.keys() < actual.keys():
+                # A registration may omit defaults explicitly declared by this exact executable.
+                if method["sha256"] not in defaults:
+                    try:
+                        bundle = registry.load_bundle(conn, method["id"], method["version"], expected_sha256=method["sha256"])
+                        defaults[method["sha256"]] = manifest.effective_parameters(bundle["manifest"], {})
+                    except GxError:
+                        defaults[method["sha256"]] = {}
+                expected = {**defaults[method["sha256"]], **expected}
+            if ids.canonical_json(actual) == ids.canonical_json(expected):
+                matched.add(row["key"])
+                break
+    return matched
 
 
 def page(conn, run_id, source, start):

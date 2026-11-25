@@ -485,14 +485,16 @@ def _compact(index):
     return entry
 
 
-def _preview(bundle, index, limit, comparisons=()):
+def _preview(bundle, index, limit):
     base = _base(bundle, index["report_ref"])
     full = {**base, **{k: bundle[k] for k in ("findings", "gaps", "next_steps", "artifact_refs")},
             "truncated": False}
     from . import v623_endpoints as endpoints
     automatic = bundle.get("schema") == endpoints.REPORT
     if automatic:
-        rows = endpoints.compact_rows(endpoints.priority(bundle["verified_metrics"], comparisons))
+        rows = endpoints.compact_rows(bundle["verified_metrics"])
+        preferred = set(index.get("comparison_endpoint_keys", ()))
+        rows.sort(key=lambda r: r["key"] not in preferred)
         full.update(endpoint_total=len(rows), endpoint_rows=rows, pending_endpoints=False)
     proof_fields = ("verified_metrics", "source_quotations") if "verified_metrics" in bundle else ("metrics", "source_quotations")
     for field in (*proof_fields, "qualitative_notes"):
@@ -613,11 +615,18 @@ def report_views(conn, run_id, *, per_report_bytes=4096, total_bytes=16384, thro
                             store.loads(module, "snapshot_json"), for_projection=True)
         except StaleRevision:
             bundle["applicability"] = "historical_revalidation_required"
-        released.append((bundle, _index_entry(bundle, ref)))
+        index = _index_entry(bundle, ref)
+        if comparisons and bundle.get("verified_metrics"):
+            from .v623_endpoints import comparison_keys
+            preferred = comparison_keys(conn, bundle["verified_metrics"], comparisons)
+            if preferred:
+                index["comparison_endpoint_keys"] = sorted(preferred)
+        released.append((bundle, index))
 
     # Decide which entries can fit before adding ordinary prose. Older adverse
     # findings retain priority even when newer routine reports fill the same cursor.
-    order = sorted(range(len(released)), key=lambda i: (not released[i][1].get("counterevidence"), -i))
+    order = sorted(range(len(released)), key=lambda i: (not released[i][1].get("counterevidence"),
+                   not released[i][1].get("comparison_endpoint_keys"), -i))
     previews = {}
     remaining = total_bytes - 2
     for position, i in enumerate(order):
@@ -625,7 +634,7 @@ def report_views(conn, run_id, *, per_report_bytes=4096, total_bytes=16384, thro
         available = remaining - bool(previews)
         share = available // (len(order) - position)
         limit = min(per_report_bytes, available, max(share, _size(_compact(index))))
-        preview = _preview(bundle, index, limit, comparisons)
+        preview = _preview(bundle, index, limit)
         if preview is not None:
             previews[i] = preview
             remaining = available - _size(preview)

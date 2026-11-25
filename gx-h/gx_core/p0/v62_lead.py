@@ -118,10 +118,13 @@ def deliver(conn, brief, limit):
         # Every value is bound to its own parent reference, including colliding metric names.
         items = [("module_reports", item, "report_ref") for item in [*adverse, *ordinary]]
         items.extend(("observations", item, "artifact_ref") for item in reversed(brief.get("observations", ())))
-        wanted = {(c["method"]["metric_id"], c["method"]["unit"]) for c in brief.get("comparisons", ())
-                  if c.get("method", {}).get("metric_id") and c["method"].get("unit")}
-        if wanted:
-            items.sort(key=lambda item: not any((r["id"],r["unit"]) in wanted for r in item[1].get("endpoint_rows", ())))
+        preferred = {row["report_ref"]: set(row.get("comparison_endpoint_keys", ())) for row in report_index}
+        comparisons = brief.get("comparisons", ())
+        for obs in brief.get("observations", ()):
+            if comparisons and obs.get("verified_metrics"):
+                preferred[obs["artifact_ref"]] = endpoints.comparison_keys(conn, obs["verified_metrics"], comparisons)
+        items.sort(key=lambda item: not any(row["key"] in preferred.get(item[1][item[2]], ())
+                                            for row in item[1].get("endpoint_rows", ())))
         for group, original, key in items:
             if not original.get("endpoint_total"):
                 continue
@@ -132,7 +135,7 @@ def deliver(conn, brief, limit):
                 if _size(packet) > room:
                     packet.pop("endpoints_available_in_full_brief")
                 continue
-            rows = sorted(original.get("endpoint_rows", ()), key=lambda r: (r["id"],r["unit"]) not in wanted)
+            rows = sorted(original.get("endpoint_rows", ()), key=lambda r: r["key"] not in preferred.get(ref, ()))
             endpoints.fit(summary, rows, original["endpoint_total"], lambda: _size(packet) <= room)
             placed[ref] = summary
         for group, original, key in items:

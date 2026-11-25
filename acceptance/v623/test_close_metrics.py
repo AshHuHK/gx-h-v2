@@ -56,7 +56,7 @@ class EndpointClose(unittest.TestCase):
                              {"type": "inputText", "text": ids.canonical_json(page)}]}})
         return page
 
-    def measured_multiple(self, *, worker_reads=False):
+    def measured_multiple(self, *, worker_reads=False, opening=None):
         directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
         config = {"research_effort": "deep", "research_modules": ["data_inventory@2"],
                   "plugins": ["org.gx.protein@0.3.0"], "capabilities": [METHOD],
@@ -71,7 +71,7 @@ class EndpointClose(unittest.TestCase):
                                     "worker_tasks": 8, "tokens": 8000})
         module = s.call(s.lead, "gx_open_module", {**grant, "module_version": "2"}, "commission")
         actor = s.bind(module["task_id"])
-        s.call(s.lead, v6_native.DECIDE, {"decision": draft()}, "wait")
+        s.call(s.lead, v6_native.DECIDE, {"decision": opening or draft()}, "wait")
         ops = [s.node(actor, f"input-{i}-{mask}", input_ref=ref, capability=METHOD, parameters={"mask": mask})
                for i, ref in enumerate(inputs) for mask in ("common_ca", "common_backbone", "ordered_backbone")]
         plan = draft(*ops, watches=[{"event": "job_settled", "subject_ref": op["node"]} for op in ops])
@@ -87,6 +87,11 @@ class EndpointClose(unittest.TestCase):
         s.advance()
         actor = s.next_actor(module["scope"])
         outputs = [n["result_ref"] for n in nodes]
+        if opening:
+            mask = opening["comparison_plan"]["method"]["parameters"]["mask"]
+            # The matching measurements intentionally arrive last at publication.
+            assets = ArtifactService(s.conn)
+            outputs.sort(key=lambda ref: assets.read_json(ref)["mask"] == mask)
         if worker_reads:
             for i, ref in enumerate(outputs):
                 page = self.read_page(s, actor, ref, 0, f"worker-page-{i}")
@@ -99,6 +104,56 @@ class EndpointClose(unittest.TestCase):
         report = ArtifactService(s.conn).read_json(submitted["report_ref"])
         self.assertEqual(len(report["verified_metrics"]), 6)
         return directory, s, actor, lead, nodes, submitted["report_ref"], report
+
+    def test_registered_mask_leads_in_a_tight_real_report(self):
+        from acceptance.v623.test_decision_action import comparison_open
+        from gx_core.p0 import v623_endpoints
+        opening = comparison_open()
+        _, s, _, lead, _, ref, report = self.measured_multiple(opening=opening)
+        metrics = report["verified_metrics"]
+        keys = {r["key"]:m for r,m in zip(v623_endpoints.compact_rows(metrics), metrics, strict=True)}
+        packet = actual_packet(s, lead)
+        delivered = next(r for r in packet["packet"]["module_reports"] if r["report_ref"] == ref)
+        mask = opening["comparison_plan"]["method"]["parameters"]["mask"]
+        order = [keys[r["key"]]["scope"]["mask"] for r in delivered["endpoint_rows"]]
+        self.assertEqual([m["scope"]["mask"] for m in metrics][-2:], [mask, mask])
+        self.assertTrue(delivered["pending_endpoints"])
+        trace("registered-endpoint-priority", {"cpu_jobs":len(metrics), "report_limit_bytes":512,
+              "delivered_utf8_bytes":len(ids.canonical_json(delivered).encode()),
+              "report_masks":[m["scope"]["mask"] for m in metrics], "delivered_masks":order,
+              "registered_mask":mask, "delivery_sha256":packet["text_sha256"], "pending":delivered["pending_endpoints"]})
+        self.assertEqual(order[:2], [mask, mask], f"delivered masks {order} from six settled Jobs")
+        self.assertEqual(delivered["endpoint_total"], 6)
+
+    def test_registered_endpoint_precedes_newer_direct_job_with_same_name_and_unit(self):
+        from acceptance.v623.test_decision_action import comparison_open
+        directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        with CloseStudy(directory/"direct", spec_updates={"research_effort":"deep", "research_modules":[],
+                "module_policy":{"brief_bytes":4096}, "initial_job_limit":2, "capabilities":[METHOD],
+                "plugins":["org.gx.protein@0.3.0"]}) as s:
+            opening = comparison_open()
+            opening["ops"][0]["budget_limits"] = {"job_submissions":2,"cpu_seconds":120}
+            ops = [s.node(s.lead, alias, s.materials[0], branch_id="local:route", capability=METHOD,
+                          parameters={"mask":mask}) for alias,mask in (("primary","common_ca"),("later","ordered_backbone"))]
+            ops[1]["depends_on"] = ["local:primary"]
+            opening["ops"].extend(ops)
+            opening["reconsider_when"] = [{"event":"job_settled","subject_ref":"local:later"}]
+            admitted = s.call(s.lead, v6_native.DECIDE, {"decision":opening}, "competing-jobs")
+            deadline = time.monotonic()+35
+            while time.monotonic()<deadline:
+                v6_jobs.advance(s.conn,s.run_id)
+                nodes = s.rows("SELECT node_id,result_ref,status FROM v6_nodes")
+                if len(nodes)==2 and all(n["status"] in v6_jobs.NODE_TERMINAL for n in nodes):
+                    break
+                time.sleep(.03)
+            self.assertEqual([n["status"] for n in nodes], ["SUCCEEDED"]*2)
+            expected = {n["result_ref"]:alias for alias,node in admitted["aliases"].items()
+                        for n in nodes if n["node_id"]==node}
+            lead = s.next_actor("run")
+            packet = actual_packet(s,lead)["packet"]
+            self.assertIn("full_brief_ref",packet)  # exercise the actual bounded transport
+            order = [expected[o["artifact_ref"]] for o in packet["observations"] if o.get("endpoint_rows")]
+            self.assertEqual(order,["local:primary","local:later"])
 
     def exported(self, directory, s, receipt):
         path = directory / "export"

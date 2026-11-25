@@ -76,18 +76,14 @@ class EndpointDelivery(unittest.TestCase):
             self.assertTrue(metric["metric_ref"].removeprefix("metric_").startswith(key))
             self.assertEqual(len(s.rows("SELECT job_id FROM jobs")),1)
 
-    def test_decision_endpoint_priority_resolvable_aliases_and_long_row(self):
-        methods=[{"method":dict(capability="method@1",metric_id="reading",unit="mV",output_name="science.json",
-                                  parameters={"mask":"selected"})}]
+    def test_resolvable_aliases_and_long_row(self):
         def metric(name,value,ref,mask):
             return {"metric_ref":"metric_"+ref,"metric_id":name,"method":"method@1","display":value,"unit":"mV",
                     "output_name":"science.json","scope":{"mask":mask}}
         ordinary=metric("context","metadata", "abcdef1234569"+"f"*51,"other")
         primary=metric("reading","49 mV", "abcdef1234568"+"f"*51,"selected")
         long=metric("annotation","註"*100,"125"*21+"a","other")
-        sorted_metrics=v623_endpoints.priority([ordinary,primary,long],methods)
-        self.assertEqual(sorted_metrics[0],primary)
-        a,b,c=v623_endpoints.compact_rows(sorted_metrics)
+        a,b,c=v623_endpoints.compact_rows([primary,ordinary,long])
         self.assertNotEqual(a["key"],b["key"])
         self.assertLessEqual(v623_endpoints.size(a),80)
         packed={}

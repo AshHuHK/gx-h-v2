@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "base": "47fc728d32bc10ba478df6a063529a8d98f98828",
+  "core_ready": "4422931fea3bf4f776e5d1820304c83564ae98d2",
+  "plugin_only": "3f51a539c6baa21b0132d92a81600d2c612c4572",
+  "old_live_run_id": "gxr_01m8871dsn80ypeaz1",
+  "observed_business_equal": true,
+  "source_hashes": {
+    "sqlite_sha256": "af2f91d1d07762c3eaeefa6fd9dba9b75278fb1394f5745372281218477bc3eb",
+    "custody_manifest_sha256": "7e700056f7c32a4b12ccb392faead2cfb98950e1018851fcc479674eac8e9ba4"
+  },
+  "observed_new_jobs": 0,
+  "observed_new_charges": 0,
+  "retained_provider_confirmed_tokens": 259718,
+  "scope": "Independent old live SQLite restoration at each commit. Two cold public candidate resumes then full V6 rollback per commit. Separate fresh V6 seed exercises old admitted Job driver crash and pending-outbox recovery on both candidates.",
+  "delta_check": {
+    "argv": [
+      "git",
+      "diff",
+      "--exit-code",
+      "4422931fea3bf4f776e5d1820304c83564ae98d2",
+      "3f51a539c6baa21b0132d92a81600d2c612c4572",
+      "--",
+      "gx-h/gx_core",
+      "gx-h/contracts"
+    ],
+    "exit": 0,
+    "all_changed_paths": [
+      "acceptance/closure/cases.py",
+      "acceptance/v61/csv_loopback.py",
+      "examples/plugins/sensor_calibration/gx_plugin.json",
+      "examples/plugins/sensor_calibration/methods/calibration.json",
+      "examples/plugins/sensor_calibration/methods/measure.py",
+      "examples/plugins/sensor_calibration/plugin.py",
+      "examples/v61-sensor-calibration/README.md",
+      "examples/v61-sensor-calibration/goal.md",
+      "examples/v61-sensor-calibration/grant.json",
+      "examples/v61-sensor-calibration/measurements.csv",
+      "examples/v61-sensor-calibration/package-pin.json"
+    ]
+  },
+  "source_records": {
+    "observed-4422931.json": "7ed4eb5cc667ea41eaa3a865af800c4f64531cd70f4d14d3cf0d4cd8ed59d4ca",
+    "seeded-4422931-baseline.json": "abd609031e6769df138628a85f49ceeb7af43685de2c8e1904a10ce333c63f8f",
+    "seeded-4422931-inflight.json": "f62e0e85f77729e548746e99640cbcd587f484c69cae19196e3af96acd80a165",
+    "seeded-4422931-pending.json": "c3204a933c8bf425282fe10adf7335738ffc9928555f338a60ff4dea7211eaa5",
+    "seeded-4422931-result.json": "093eeafaca6f7006ac104db93a2fd22807d10c0ad850499c25dd46776fee483b",
+    "seeded-4422931-terminal.json": "8c80e7261d3ca979ecd7ab19146b7c138550e31d863aa95ccaa69ce92a11154a",
+    "observed-3f51a53.json": "8c315b61ee715a2e094c42070e055f52d000b213ea8dd1fff78a989c9031f389",
+    "seeded-3f51a53-baseline.json": "5ab687ddb63dac5a798496f6a12c4bdaacad0e7cfa18f6edd051f1ec3d29e4b2",
+    "seeded-3f51a53-inflight.json": "8eb692115fb32a68efc99bfdd556da5ddec328f81ab47133996fbf51e70209cd",
+    "seeded-3f51a53-pending.json": "914ba6ce6af3a6c235a9bf6d68edc6d9217e6568ff803c0f3fb184a494afef24",
+    "seeded-3f51a53-result.json": "99fbd2a54b7fa75b515bd3d48af77dae3739a91487c947cb63d86a289610226f",
+    "seeded-3f51a53-terminal.json": "87918fb54f06307a5f7c3add3f2dfb6f1e7bb7edb37f0334afb6432072ecb019"
+  }
+}

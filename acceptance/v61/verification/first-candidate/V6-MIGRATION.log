@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/tmp/gx-v61-frozen-063fdbf80-q8z14sgh/release/acceptance/v6/engineering/public_cli.py", line 106, in <module>
+    receipt = {"goal": goal, "legacy": legacy}[args.case](Path(tmp), args.out)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-v61-frozen-063fdbf80-q8z14sgh/release/acceptance/v6/engineering/public_cli.py", line 88, in legacy
+    result = legacy_ledger.phase2a_ledger(source, state, {"SETTLED": 3})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-v61-frozen-063fdbf80-q8z14sgh/release/acceptance/closure/legacy_ledger.py", line 106, in phase2a_ledger
+    return {**verify(state, expected), "source": str(source.relative_to(ROOT)),
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-v61-frozen-063fdbf80-q8z14sgh/release/acceptance/closure/legacy_ledger.py", line 72, in verify
+    with closing(existing_db(state, readonly=False)) as db:
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gx-v61-frozen-063fdbf80-q8z14sgh/release/gx-h/gx_core/p0/cli.py", line 104, in existing_db
+    install(conn)
+  File "/tmp/gx-v61-frozen-063fdbf80-q8z14sgh/release/gx-h/gx_core/p0/schema.py", line 88, in install
+    verify_promoted(tx, require_all=True)
+  File "/tmp/gx-v61-frozen-063fdbf80-q8z14sgh/release/gx-h/gx_core/p0/schema.py", line 69, in verify_promoted
+    raise StoreUnavailable(
+gx_core.errors.StoreUnavailable: STORE_UNAVAILABLE: Published V6 schema object v6_goals differs from p0.migration.v6.sql

@@ -1,0 +1,26 @@
+{
+  "schema": "gx.archived-deposition.eligibility/1",
+  "scope": "Human TNFSF15/TL1A archived experimental coordinate quality control. No interventions or designs.",
+  "baseline": "f9231023b5c44c5d96ec1a974d639ea9dfe34613",
+  "references": {"2RE9": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b", "2O0O": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"},
+  "public_observation_scope": "Two archived reference depositions and their previously published QC results. No new endpoint of a potential third deposition examined before this freeze.",
+  "search": {
+    "as_of_utc_date": "2026-11-25",
+    "archives": ["RCSB PDB", "PDBe", "UniProt"],
+    "query_union": ["wwPDB polymer entity for human TNFSF15 mapped via UniProt official cross-references or PDBe mapping from current or historical accession", "RCSB entry search by TL1A, TNFSF15, or tumor necrosis factor ligand superfamily member 15"],
+    "fallback": "If a search endpoint is unavailable, archive successful Union branches and failed URLs/status, and disclose search scope.",
+    "snapshot": "Save request and original response hashes and timestamps. Use release date <= search day. If the archive contains future-dated releases, exclude them."
+  },
+  "priorities": ["Verified independent sample/data collection relative to both references", "Earliest original public PDB release in eligible group", "Lexical ascending PDB entry ID", "Lowest numeric target polymer entity ID", "Three lexicographically first distinct deposited target label_asym_ids in coordinate model 1"],
+  "eligibility": {
+    "origin": "Human TNFSF15 by deposited reference sequence, taxonomy/gene or UniProt crossreference and alignment. Include described complex, mutation or tagging as scope attributes.",
+    "experiment": "Experimental PDB model, physical sample and primary data. Three modelled deposited polypeptide chains of same target construct in one model/asymmetric unit. No symmetry operators or alternative models as substitutes for observed copies.",
+    "sampling": "Require a distinct acquisition, supported by the experimental record or its methods. X-ray evidence can be a dated new diffraction collection separated from both recorded collection dates plus distinguishable specimen/crystal or diffraction conditions, or a primary report explicitly documenting original sample and new collection. For a different experimental method require independent collection metadata and original sample preparation report. Different PDB ID, DOI, re-refinement or expanding symmetry alone is insufficient. Explicit reuse excludes. Unclear or missing provenance remains pending.",
+    "alignment": "Reference is 2RE9 entity 1 label entity_poly_seq. Map canonical SEQRES by global alignment, match 2, mismatch -1, gap open -5, extend -1; keep mapped reference/target positions only for identical residues. Accept a window when mappings of its positions agree across optimal alignments; otherwise mark ambiguous. Distinct target chain labels never identify equivalent cross-specimen copies.",
+    "windows": [[21,40],[101,120]],
+    "availability": "For each named mask, use only model 1 ATOM identity/presence (backbone N,CA,C,O or CA). Count matching residue identities in all three chains and the union. Original >=60 positions and >=60% of union; within window >=10 comparable positions; after removal >=60 and >=60% of original. Mark missing positions. At least one mapped window and mask must satisfy these rules. Supply only qualifying choices to the blinded operator.",
+    "public_endpoint": "Coordinates and prior reference results are public; archive metadata/catalog supports eligibility. Never claim worldwide novelty, unseen training data, or independent biological samples among the three pairs.",
+    "endpoint_embargo": "No use of x/y/z values for screening. No fitting, distances, RMSDs, rotation angles or leave-out results for new materials. Do not sort on or look for endpoint answers."
+  },
+  "selection": "Choose first eligible in frozen ranking. Preserve every excluded/pending candidate; eligible once enrolled stays enrolled. Blind code is opaque and must not encode accession. Keep identity crosswalk & raw bytes outside Lead workspace. No qualified entrant leaves the question unanswered."
+}

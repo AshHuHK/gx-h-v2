@@ -45,12 +45,12 @@ class FixtureOwner:
     deployment_id = "gx-official-host-local-responses"
     source = "SCRIPTED_LOOPBACK"
 
-    def __init__(self,slot,ready,wire):
+    def __init__(self,slot,ready,wire,*,step=None):
         from acceptance.v623.live.registration import P
         self.path = slot/"raw/scripted-provider"
         self.path.mkdir(exist_ok=True)
         self.wire = partial(offline.action,wire,slot/"raw/wire.json",assignment_complete=ready,
-                            step=partial(scientific_step,behavior=P["offline_rehearsal_choices"][slot.name]),write_lock=Lock())
+                            step=step or partial(scientific_step,behavior=P["offline_rehearsal_choices"][slot.name]),write_lock=Lock())
 
     def quote(self,request_id,body):
         sha = hashlib.sha256(body).hexdigest()

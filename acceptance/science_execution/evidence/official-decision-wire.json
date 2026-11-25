@@ -1,0 +1,60 @@
+{
+  "actual_paid_calls": 0,
+  "adopted_events": [
+    32
+  ],
+  "declared": {
+    "add_node_required": [
+      "op",
+      "capability",
+      "inputs",
+      "question"
+    ],
+    "description": "Submit the scientific reason and the operation to enact. Select delivered measurements by their exact row keys in metric_refs. GX binds their sources and the matching registered comparison, fills unique branch fields and wakes on Job results. With multiple matches, select from the comparison_id options in the reply. Legacy explicit fields remain valid. Example: {\"decision\":{\"rationale\":\"The calibration residual leaves the drift estimate uncertain; measure the second standard.\",\"metric_refs\":[\"<delivered row key>\"],\"ops\":[{\"op\":\"add_node\",\"capability\":\"<listed method@version>\",\"inputs\":[\"<second calibration standard ref>\"],\"parameters\":{\"channel\":\"<method-supported channel>\"},\"question\":\"Does drift persist on the second standard?\"}]}}",
+    "instructions_received": true,
+    "required": [
+      "rationale",
+      "ops"
+    ],
+    "schema_sha256": "19c793c693bd828922783c538ce6a1b1c8b41db878abcb15b0225be46dfd4413"
+  },
+  "errors": [],
+  "events": [
+    {
+      "kind": "v624.decision.rejected",
+      "payload": {
+        "attempt": 1,
+        "code": "SCHEMA_INVALID",
+        "field": "decision",
+        "previous_rejections": 0,
+        "reason": "DECISION_OBJECT_REQUIRED",
+        "submission": "cd62132da827111ce9946e366dc9f86cad0397d4bf1bd933bfc80b349a44aa3a"
+      },
+      "sequence": 25,
+      "subject": "3d73a6b6f6316349e23f0d26456fd95fe5724d956501c4d287bade31308755ee"
+    },
+    {
+      "kind": "v624.decision.corrected",
+      "payload": {
+        "attempt": 2,
+        "decision_event": 32,
+        "previous_rejections": 1,
+        "submission": "2d67c5387128780977e82a333cdef73f5cb8572c7518c11dead5640bd319a772"
+      },
+      "sequence": 33,
+      "subject": "3d73a6b6f6316349e23f0d26456fd95fe5724d956501c4d287bade31308755ee"
+    }
+  ],
+  "goal_run": "gxr_01m8ah667anymxbts5",
+  "official_binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "rejection_replies": [
+    {
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "reason": "DECISION_OBJECT_REQUIRED"
+    }
+  ],
+  "requests": 2,
+  "status": "CLOSED",
+  "transport": "pinned official Codex App Server / scripted localhost Responses"
+}

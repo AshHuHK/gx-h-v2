@@ -105,7 +105,7 @@ if __name__=="__main__" and len(sys.argv)==3 and sys.argv[1]=="_identity":
 
 
 @contextmanager
-def session(slot,binary,reg,ready,owner=None):
+def session(slot,binary,reg,ready,owner=None,*,fixture_step=None):
     """Launch ordinary GX Roots on a private native home with one metered provider and no ambient login."""
     from acceptance.v623.live import physical
     from acceptance.v623.live.transport import FixtureOwner,gateway
@@ -117,7 +117,7 @@ def session(slot,binary,reg,ready,owner=None):
     wire = read(wire_file) if wire_file.exists() else []
     fixture = reg["host"]=="offline"
     if fixture:
-        owner = FixtureOwner(slot,ready,wire)
+        owner = FixtureOwner(slot,ready,wire,step=fixture_step)
     elif owner is None or owner.source!="PRODUCTION" or owner.deployment_id!=reg["deployment_id"] or owner.contract_id!=reg["contract_id"]:
         raise ValueError("The approved provider deployment and bound contract are unavailable")
     meter = physical.FundedTransport(slot.parent/"funding.sqlite",series=reg["series"],slots=[i["slot"] for i in reg["slots"]],

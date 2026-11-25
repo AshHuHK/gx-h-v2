@@ -93,6 +93,8 @@ def _source(intent_doc, bundle):
     for name in ("resource_guard.py", "executor.py", "service.py"):
         files["gx_core/jobs/" + name] = ids.sha256_of_file(job_source / name)
     files["gx_core/p0/manifest.py"] = ids.sha256_of_file(__file__)
+    if any(item.get("nature") for item in bundle["manifest"]["outputs"]):
+        files["gx_core/p0/v62_outputs.py"] = ids.sha256_of_file(Path(__file__).with_name("v62_outputs.py"))
     return {"scope": "method, GX Job runner, publication and adapter sources", "files": files,
             "tree_sha256": ids.sha256_of_obj(files), "method_source": source}
 
@@ -182,6 +184,11 @@ def admit(conn, job_id, *, launch, bundle, inputs, resources, prepared):
         "runtime": prepared["runtime"], "evaluator": _evaluation(conn, binding),
         "reproducibility": levels,
     }
+    if any(item.get("nature") for item in method["outputs"]):
+        from .v62_outputs import freeze_declarations
+        doc.update(schema="gx.execution-manifest.admission/2",
+                   output_declarations=freeze_declarations(method["outputs"], frozen_inputs),
+                   provenance_cursor=conn.execute("SELECT COALESCE(MAX(event_id),0) FROM events").fetchone()[0])
     conn.execute("INSERT INTO p0_execution_manifests(job_id,admission_json,admission_sha256) VALUES(?,?,?)",
                  (job_id, ids.canonical_json(doc), ids.sha256_of_obj(doc)))
 
@@ -209,7 +216,7 @@ def check_launch(conn, job_id):
 
 def complete(conn, job_id):
     """The historical completion is immutable even if current scientific eligibility changes."""
-    head = conn.execute("SELECT admission_sha256 FROM p0_execution_manifests WHERE job_id=?",
+    head = conn.execute("SELECT admission_sha256,admission_json FROM p0_execution_manifests WHERE job_id=?",
                         (job_id,)).fetchone()
     if head is None:
         return  # Historical Jobs have no prospective P0 manifest.
@@ -227,6 +234,8 @@ def complete(conn, job_id):
            "outputs": [e for e in outputs if e["kind"] not in ("job_stdout", "job_stderr")],
            "logs": logs, "failure": out.get("failure"), "recovery_artifact": out.get("kept"),
            "current_at_completion": intent.job_current(conn, job_id)}
+    if "output_declarations" in store.loads(head, "admission_json"):
+        doc["schema"] = "gx.execution-manifest.completion/2"
     conn.execute("UPDATE p0_execution_manifests SET completion_json=?,completion_sha256=?"
                  " WHERE job_id=? AND completion_json IS NULL",
                  (ids.canonical_json(doc), ids.sha256_of_obj(doc), job_id))

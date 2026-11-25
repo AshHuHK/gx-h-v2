@@ -691,6 +691,15 @@
     ],
     "note": "What a host hands back for a task, except benchmark_bundle, which no task hands in: gx_ingest (source_kind rsi_benchmark) builds and judges it. Each has a schema in contracts/bundles.json and a validator that judges it record by record against what the backend holds."
   },
+  "output_nature": {
+    "values": ["observed", "analysis", "model_prediction"],
+    "definitions": {
+      "observed": "A measurement produced by the declared acquisition method.",
+      "analysis": "A result calculated from specified inputs, including metrics derived from experimental observations.",
+      "model_prediction": "An estimate produced by a model, with the applicability of that model."
+    },
+    "rule": "GX binds the declaration to a particular admitted output and its published bytes. An absent declaration is reported as unclassified."
+  },
   "artifact_origin": {
     "values": [
       "JOB_OUTPUT",

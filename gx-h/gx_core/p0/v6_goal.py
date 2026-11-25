@@ -197,7 +197,7 @@ def record_observation(conn, run_id, artifact_ref, *, source, scope="run", obser
     payload = {"source": source, "artifact_ref": artifact_ref, "scope": scope, "sha256": meta["sha256"]}
     if acquisition is not None:
         from . import v62_outputs
-        payload["acquisition"] = v62_outputs.acquisition_receipt(conn, run_id, artifact_ref, acquisition)
+        payload["acquisition"] = v62_outputs.acquisition_receipt(conn, run_id, artifact_ref, acquisition, scope=scope)
 
     def save(tx):
         eid = store.append_event(
@@ -271,6 +271,7 @@ def _events(conn, rid, after, budget_ref=None):
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
                                   'v6.claim.adopted','v6.decision.superseded','v62.round.settled',
                                   'v62.claim.reassessed') OR
+          (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
           OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
               subject_kind='budget' AND subject_id IN (SELECT ref FROM accounts))
@@ -311,6 +312,8 @@ def _matches(row, watches, rid):
         "v62.claim.reassessed": {"claim_changed"},
         "v62.round.settled": set(),
         "v62.module.wake": {"module_report"},
+        "v62.source.extracted": {"evidence_added"},
+        "v62.source.reviewed": {"evidence_added"},
         "run.transition": {"operator_reopened"},
     }.get(kind, {"budget_changed"})
     subjects = {
@@ -566,6 +569,13 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         # A released node exposes all its named outputs. The primary result
         # remains the graph dependency, including on cold continuation.
         visible = dict.fromkeys(brief["evidence_refs"])
+        # Module reads and drafts become shared only through A's report owner.
+        # Direct Lead reviews may be cited again on later frozen turns.
+        visible.update(dict.fromkeys(r[0] for r in conn.execute(
+            "SELECT subject_id FROM events WHERE run_id=? AND event_id<=? "
+            "AND kind IN ('v62.source.extracted','v62.source.reviewed') "
+            "AND json_extract(payload_json,'$.scope')='run'", (rid, cursor)
+        )))
         for node in brief["nodes"]:
             if node["result_ref"] and node["status"] in ("SUCCEEDED", "REUSED"):
                 node["outputs"] = v62_outputs.published_outputs(conn, rid, node["job_id"])

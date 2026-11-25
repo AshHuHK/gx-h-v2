@@ -60,6 +60,7 @@ HARNESS_ROOT = Path(__file__).resolve().parents[2]
 CAPABILITY_ID = re.compile(r"[a-z0-9][a-z0-9_.-]{0,63}")
 VERSION = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.+-]{0,63}")
 NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]{0,63}")
+GROUPED_ROLE = re.compile(r"input_[A-Za-z][A-Za-z0-9_]{0,30}")
 BINARY_NAME = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.+-]{0,63}")
 OUTPUT_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
 ARTIFACT_KIND = re.compile(r"[a-z][a-z0-9_]{0,63}")
@@ -227,7 +228,7 @@ def bundle_problems(bundle: Any) -> list[str]:
         found.extend(_rooted_path_problems(item, where=f"required_data[{index}]"))
     found.extend(_method_card_problems(manifest["method_card"]))
     found.extend(_resources_problems(manifest["resources"]))
-    found.extend(_outputs_problems(manifest["outputs"]))
+    found.extend(_outputs_problems(manifest))
     found.extend(_rooted_path_problems(manifest["source"]["path"], where="source.path"))
     digest = manifest["source"].get("sha256")
     if digest is not None and not SHA256.fullmatch(digest):
@@ -363,8 +364,11 @@ def _resources_problems(resources: Mapping[str, Any]) -> list[str]:
     return found
 
 
-def _outputs_problems(outputs: Sequence[Mapping[str, Any]]) -> list[str]:
+def _outputs_problems(manifest: Mapping[str, Any]) -> list[str]:
     found: list[str] = []
+    outputs = manifest["outputs"]
+    roles = set(input_roles(manifest))
+    grouped = "{inputs.json}" in manifest["entry"]["argv_template"]
     if not outputs:
         found.append("outputs is empty: a capability that declares no output produces nothing "
                      "a job could publish")
@@ -377,6 +381,10 @@ def _outputs_problems(outputs: Sequence[Mapping[str, Any]]) -> list[str]:
         if name in seen:
             found.append(f"outputs[{index}].name {name!r} is declared twice")
         seen.add(name)
+        origins = output.get("source_roles")
+        if origins is not None and (not output.get("nature") or not origins or len(origins) != len(set(origins))
+                or any(role not in roles and not (grouped and GROUPED_ROLE.fullmatch(role)) for role in origins)):
+            found.append(f"outputs[{index}].source_roles must identify distinct input roles of a classified output")
         kind = output["kind"]
         prefixed = kind.startswith((RAW_OUTPUT_PREFIX + ":", DIR_OUTPUT_PREFIX + ":"))
         published_as = kind.split(":", 1)[1] if prefixed else kind
@@ -486,7 +494,7 @@ def staged_roles(manifest, entries):
     if "{inputs.json}" not in manifest["entry"]["argv_template"]:
         return fixed
     extra = [e for e in entries if e["role"] not in fixed]
-    if (not 1 <= len(extra) <= 8 or any(not re.fullmatch(r"input_[A-Za-z][A-Za-z0-9_]{0,30}", e["role"]) for e in extra)
+    if (not 1 <= len(extra) <= 8 or any(not GROUPED_ROLE.fullmatch(e["role"]) for e in extra)
             or sum(e["bytes"] for e in extra) > 1048576 or any(e["bytes"] > 16384 for e in entries if e["role"] in fixed)):
         raise SchemaInvalid("Grouped inputs require 1–8 named artifacts (1 MiB total) and bounded specification files")
     return sorted({*fixed, *(e["role"] for e in extra)})

@@ -1841,7 +1841,8 @@ class JobService:
         adapter_record: dict[str, Any] = {}
         if to_state == SUCCEEDED:
             try:
-                bundle = registry.candidate(self.conn, intent["capability_version"])["bundle"]
+                bundle = registry.load_bundle(self.conn, row["capability_id"], row["capability_version"],
+                                              expected_sha256=intent["manifest_sha256"])
                 raw_outputs, documents_out, validated, adapter_record = self._collect(
                     row, intent, bundle, job, staging)
             except _OutputRefused as exc:
@@ -1926,6 +1927,8 @@ class JobService:
                     published.append({"output_name": name, "artifact_ref": artifact.artifact_ref,
                                       "kind": kind, "sha256": artifact.sha256, "bytes": artifact.bytes,
                                       "validated": validated.get(name, False)})
+                from ..p0.v62_outputs import bind_published
+                bind_published(txn, job_id, published)
             for name, path in (("stdout", job.stdout), ("stderr", job.stderr)):
                 data = _bounded_log(path)
                 if data is None:

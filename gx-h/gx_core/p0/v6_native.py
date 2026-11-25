@@ -16,6 +16,15 @@ from . import v6_claims, v6_delegation, v6_method_context
 
 
 DECIDE = "gx_decide_revision"
+EVIDENCE_INSTRUCTIONS = (
+    " Use the module catalogue to choose work that can discriminate among hypotheses. A report may "
+    "justify changing a commissioned investigation or keeping it; cite its source and give your reason "
+    "in the next decision. Treat method recommendations and predictions according to their recorded "
+    "nature. To test a new prediction, stage the observable, pinned measurement, applicable data and "
+    "criterion before its result is available. GX records the evidence maturity. Read research_progress "
+    "for open gaps, outstanding work and convergence options. When entering convergence, name the "
+    "surviving candidates, cite their evidence and identify the specification version."
+)
 STAGE = "gx_stage_claim"
 DELEGATE = "gx_delegate_branch"
 PREFIX = "GX research brief\n"

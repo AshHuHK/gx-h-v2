@@ -279,6 +279,13 @@ def execute(args):
             write_native_bytes(target, (json.dumps(output["result"], indent=2, ensure_ascii=False) + "\n").encode())
             return {"message_id": output["message_id"], "run_id": rid, "audit_file": str(args.output)}
         return output
+    if args.command == "observe":
+        from .v62_outputs import ingest_measurement
+        with closing(existing_db(directory, readonly=False)) as conn:
+            run = selected_run(conn)
+            return ingest_measurement(conn, run["run_id"], source=args.source, scope=args.scope,
+                                      path=args.input, metadata_path=args.acquisition,
+                                      actor=operator.local_context(conn).actor)
     if args.command == "team":
         from .team_admission import team_control, team_status
         with closing(existing_db(directory, readonly=args.operation == "status")) as conn:
@@ -371,11 +378,16 @@ def main(argv=None):
     add_plugin_commands(commands)
     from .operator import add_commands
     add_commands(commands)
-    for name in ("start", "status", "run", "resume", "stop", "message", "team"):
+    for name in ("start", "status", "run", "resume", "stop", "message", "team", "observe"):
         sub = commands.add_parser(name)
         sub.add_argument("--state", required=True, type=Path)
         if name != "start":
             sub.add_argument("--run-id", help="Select a run within this workspace")
+        if name == "observe":
+            sub.add_argument("--source", required=True, help="Stable citation for this original measurement")
+            sub.add_argument("--scope", default="run", help="Run or branch receiving this observation")
+            sub.add_argument("--input", type=Path, required=True, help="Original JSON measurement")
+            sub.add_argument("--acquisition", type=Path, required=True, help="JSON acquisition and sample provenance")
         if name == "team":
             sub.add_argument("--team-id")
             sub.add_argument("--operation", choices=("status", "pause", "resume"), default="status")

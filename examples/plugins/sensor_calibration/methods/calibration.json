@@ -1,0 +1,48 @@
+{
+  "manifest": {
+    "capability_id": "sensor-calibration",
+    "version": "1",
+    "kind": "UTILITY",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--samples",
+        "{in.samples}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "weights": [],
+    "required_data": [],
+    "method_card": {
+      "family": "paired-reference calibration",
+      "mechanism": "Subtract each paired reference voltage from the sensor reading.",
+      "objective": "Quantify signed bias and error magnitude by observed period.",
+      "estimator": "Arithmetic mean signed and absolute errors, and square root of the mean squared error, in mV.",
+      "training_data_lineage": "Deterministic arithmetic on user-supplied CSV rows."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.example.gx.sensor-calibration/1.0.0/methods/measure.py",
+      "sha256": "bafd3b7d69c46eaf435e3f14f7332d8d8507f6aac91efe29acabf0091c544cc6"
+    },
+    "licence": "UNVERIFIED",
+    "licence_basis": "Method source accompanies this repository.",
+    "limitations": "Descriptive comparisons apply to the recorded samples and supplied references. Attribution of drift requires suitable controls and additional sampling.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 15
+    },
+    "outputs": [
+      {
+        "name": "calibration.json",
+        "kind": "file:sensor_calibration",
+        "required": true
+      }
+    ]
+  },
+  "entry_script": "methods/measure.py"
+}

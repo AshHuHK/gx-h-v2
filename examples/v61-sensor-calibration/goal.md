@@ -1,0 +1,1 @@
+Do the supplied calibration readings show a change in signed voltage error between the two measurement periods relative to their paired references? Quantify the evidence and state what these samples can establish.

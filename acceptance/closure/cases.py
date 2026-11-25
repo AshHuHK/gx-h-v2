@@ -26,7 +26,7 @@ V6_ENGINEERING = ("V6-GOAL", "V6-MIGRATION", "V6-STATIC", "V6-DECISION", "V6-DIS
                   "V6-LOOPBACK", "V6-PROTEIN", "V6-CLAIMS", "V6-COSTS", "V6-EXPORT-NEGATIVES", "U04", "U08")
 V6_EXPORTS = ("V6-OBSERVED-EXPORT", "V6-CONTROLS-EXPORT")
 V61 = ROOT / "acceptance/v61"
-V61_ENGINEERING = ("V61-CONTRACT", "V61-UPGRADE", "V61-MODES", "V61-PROVIDERS", "V61-PROTEIN", "V61-OPENING-LIMIT")
+V61_ENGINEERING = ("V61-CONTRACT", "V61-UPGRADE", "V61-MODES", "V61-PROVIDERS", "V61-PROTEIN", "V61-OPENING-LIMIT", "V61-CSV")
 SUITES = {"phase2a": (*MATRIX, "OFFICIAL-USAGE"), "all": (*MATRIX, *SUPPLEMENTAL),
           "hardening": HARDENING, "v6-engineering": V6_ENGINEERING, "v6-exports": V6_EXPORTS,
           "v61-engineering": V61_ENGINEERING,
@@ -166,6 +166,11 @@ def plan(args, selected, raw, revision):
         requires=(baseline,) if baseline else (), classes=(*SCRIPT, "REAL_COMPUTE"))
     add("v61-modes", ("V61-MODES",), [*py, V61 / "modes.py", "--out", out("v61-modes")],
         "evidence/result.json", kind="hardening")
+    add("v61-csv", ("V61-CSV",), [*py, V61 / "csv_loopback.py", "--out", out("v61-csv"),
+        "--binary", args.binary], "evidence/result.json", kind="hardening", classes=(*OFFICIAL, "REAL_COMPUTE"),
+        requires=(args.binary,), namespace=True,
+        artifacts=tuple("evidence/" + name for name in ("commands.json", "requests.jsonl", "model-inputs.json",
+                                                        "observation.json", "job-outcome.json", "gx.db.gz")))
     for mode in ("observed", "controls"):
         case = "V6-" + mode.upper() + "-EXPORT"
         dataset, anchor = getattr(args, mode + "_export", None), getattr(args, mode + "_anchor", None)

@@ -1,0 +1,21 @@
+test_adverse_registered_reading_is_published_consistently (acceptance.v621.test_claim_publication.ClaimPublication.test_adverse_registered_reading_is_published_consistently) ... FAIL
+
+======================================================================
+FAIL: test_adverse_registered_reading_is_published_consistently (acceptance.v621.test_claim_publication.ClaimPublication.test_adverse_registered_reading_is_published_consistently)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-v6.2.1/acceptance/v621/test_claim_publication.py", line 58, in test_adverse_registered_reading_is_published_consistently
+    self.assertEqual(["contested"]*3, [published["level"],published["science"]["level"],operator["level"]],
+AssertionError: Lists differ: ['contested', 'contested', 'contested'] != ['limited_support', 'limited_support', 'limited_support']
+
+First differing element 0:
+'contested'
+'limited_support'
+
+- ['contested', 'contested', 'contested']
++ ['limited_support', 'limited_support', 'limited_support'] : GX tested/opposed became limited_support in the public adoption and status
+
+----------------------------------------------------------------------
+Ran 1 test in 2.115s
+
+FAILED (failures=1)

@@ -26,7 +26,8 @@
             "claim_changed",
             "job_settled",
             "budget_changed",
-            "operator_reopened"
+            "operator_reopened",
+            "module_report"
           ]
         },
         "subject_ref": {
@@ -266,6 +267,28 @@
                 }
               }
             ]
+          }
+        },
+        "convergence": {
+          "type": "object",
+          "description": "Enter convergence with these surviving candidates. Cite their published evidence in evidence_refs and explain the choice in rationale. GX saves this decision and closes ordinary exploration.",
+          "additionalProperties": false,
+          "required": [
+            "candidates",
+            "spec_version"
+          ],
+          "properties": {
+            "candidates": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/text"
+              }
+            },
+            "spec_version": {
+              "$ref": "#/$defs/text"
+            }
           }
         }
       },

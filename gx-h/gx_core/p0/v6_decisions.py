@@ -279,6 +279,10 @@ def commit(conn, plan):
         if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
             raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
         decision_ref, = delivery.register_manifest(ArtifactService(conn), plan.manifest, actor=plan.thread_id)
+        convergence = None
+        if "convergence" in request["decision"]:
+            from . import v62_rounds
+            convergence = v62_rounds.adopt(conn, request, decision_ref, task)
         claims = v6_claims.adopt(conn, run_id, task_id, lease_id, request["context_ref"],
                                  decision_ref, request["decision"])
         checkpoint, dispatches = None, []
@@ -300,6 +304,8 @@ def commit(conn, plan):
                        aliases=plan.aliases, reconsider_when=plan.watches, checkpoint_id=checkpoint,
                        dispatches=dispatches, submission_id=submission, claim_revisions=claims,
                        consumed_event_cursor=task["event_cursor"])
+        if convergence is not None:
+            receipt["convergence"] = convergence
         receipt["event_id"] = store.append_event(conn, run_id=run_id, kind="v6.decision.committed",
             actor=plan.thread_id, subject_kind="decision", subject_id=decision_ref,
             payload=dict(decision_id=decision_ref, result_head=plan.result_head, task_id=task_id,

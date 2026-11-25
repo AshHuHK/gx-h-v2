@@ -97,6 +97,8 @@ def start(conn, spec, *, run_key, current):
         raise SchemaInvalid("capabilities must be a list of distinct, versioned methods")
     public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []))
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
+    if spec.get("research_effort") in ("medium", "deep"):
+        inputs["research_evidence_version"] = "gx.research.v6.2b.1"
     action = initial_action(spec, basic_research_start(spec))
 
     def bootstrap(rid):
@@ -162,7 +164,7 @@ def start(conn, spec, *, run_key, current):
     return snapshot(conn, outcome["run_id"])
 
 
-def record_observation(conn, run_id, artifact_ref, *, source, scope="run", observation=None):
+def record_observation(conn, run_id, artifact_ref, *, source, scope="run", observation=None, acquisition=None):
     """Trusted input/measurement owner records a citation and immutable JSON from that run."""
     assets = ArtifactService(conn)
     meta = assets.describe(artifact_ref)
@@ -179,6 +181,9 @@ def record_observation(conn, run_id, artifact_ref, *, source, scope="run", obser
     if observation is not None and ids.canonical_json(observation) != ids.canonical_json(content):
         raise SchemaInvalid("The proposed observation differs from its artifact")
     payload = {"source": source, "artifact_ref": artifact_ref, "scope": scope, "sha256": meta["sha256"]}
+    if acquisition is not None:
+        from . import v62_outputs
+        payload["acquisition"] = v62_outputs.acquisition_receipt(conn, run_id, artifact_ref, acquisition)
 
     def save(tx):
         eid = store.append_event(
@@ -250,7 +255,8 @@ def _events(conn, rid, after, budget_ref=None):
         SELECT event_id,kind,subject_id,payload_json FROM events
         WHERE event_id>? AND (
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
-                                  'v6.claim.adopted','v6.decision.superseded') OR
+                                  'v6.claim.adopted','v6.decision.superseded','v62.round.settled',
+                                  'v62.claim.reassessed') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
           OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
               subject_kind='budget' AND subject_id IN (SELECT ref FROM accounts))
@@ -288,6 +294,8 @@ def _matches(row, watches, rid):
         "v6.node.settled": {"evidence_added", "job_settled"},
         "v6.observation.added": {"evidence_added"},
         "v6.claim.adopted": {"claim_changed"},
+        "v62.claim.reassessed": {"claim_changed"},
+        "v62.round.settled": set(),
         "run.transition": {"operator_reopened"},
     }.get(kind, {"budget_changed"})
     subjects = {
@@ -448,7 +456,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     grant = data.get("inputs", {}).get("p0_spec", {})
     if head is None and "initial_job_limit" in grant:
         budget["initial_job_limit"] = grant["initial_job_limit"]
-    return {
+    brief = {
         "run_id": rid,
         "scope": "run",
         "previous_decision": previous,
@@ -473,6 +481,10 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "evidence_refs": list(dict.fromkeys(refs)),
         "budget": budget,
     }
+    if data["inputs"].get("research_evidence_version"):
+        from . import v62_rounds
+        brief.update(v62_rounds.brief(conn, rid, cursor))
+    return brief
 
 
 def ensure_task(conn, run_id):
@@ -483,6 +495,10 @@ def ensure_task(conn, run_id):
     goal = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
     if not goal or goal["status"] != "OPEN" or run["status"] != "ACTIVE":
         return None
+    if store.loads(run, "inputs_json")["inputs"].get("research_evidence_version"):
+        from . import v62_maturity, v62_rounds
+        v62_maturity.reassess(conn, run_id)
+        v62_rounds.reconcile(conn, run_id)
     open_task = _open(conn, run_id)
     if open_task:
         if json.loads(open_task["base_json"] or "null") == v6_decisions.head(conn, run_id):
@@ -563,6 +579,8 @@ def _prepare_brief(conn, run_id):
         watches = store.loads(prior, "receipt_json").get("reconsider_when", [])
         if not any(
             row["kind"] == "v6.intent.changed"
+            or (row["kind"] == "v62.round.settled" and store.loads(row, "payload_json").get("reconsider"))
+            or (row["kind"] == "v62.claim.reassessed" and store.loads(row, "payload_json").get("critical_counterevidence"))
             or (
                 row["kind"] == "v6.decision.superseded"
                 and store.loads(row, "payload_json").get("scope") == "run"

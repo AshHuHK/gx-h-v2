@@ -16,3 +16,10 @@ bash acceptance/v621/compat/replay.sh "$scratch/upgrade" "$(git rev-parse HEAD)"
 `before.json` contains the original Run, assessed claim, report, pins, manifest SHA-256s and metering. `check.json` records the candidate reopens and second observation. `restored.json` records the genuine rollback. Each fixture has its own local run IDs and authoritative state. The original B public scientific report, protocol and scores are compared by content digest even when the candidate changes its implementation.
 
 The original A6 gate expects an unsatisfied condition to keep waiting. The candidate's new evidence policy permits a terminal false condition. To replay the original assertions with fresh Goals, run `python -B acceptance/v621/compat/legacy_a6.py --work /fresh/external/path` in the same offline test environment. Only the admission documents receive the explicit `gx.evidence/6.2` selection. The receipt reads the stored policy from each of the three Run databases.
+
+The released A1 and B engineering peers write numerical findings as prose. Select their original policy to check the original scientific assertions on the candidate. The wrapper records the admitted policy, Run and real Job count for every arm.
+
+```bash
+python -B acceptance/v621/compat/released_peers.py a1 --work "$scratch/old-a1" --binary "$binary"
+python -B acceptance/v621/compat/released_peers.py b4 --work "$scratch/old-b4" --binary "$binary"
+```

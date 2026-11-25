@@ -17,7 +17,7 @@ from ..errors import OutcomeUnknown
 from ..native_release import native_state, ReleaseStateError
 from ..orchestration import packages, service
 from ..persistence import store
-from . import deployment, intent
+from . import deployment, intent, v6_goal
 from .driver import Driver, context, enqueue, native_waits, project, snapshot
 from .idle import WorkspaceWait
 
@@ -110,7 +110,7 @@ def existing_db(directory, *, readonly):
 
 def start(conn, directory, spec, *, run_key=None, run_id=None):
     from . import workspace
-    if type(spec.get("max_rounds")) is not int or spec["max_rounds"] < 1:
+    if spec.get("mode") != "goal" and (type(spec.get("max_rounds")) is not int or spec["max_rounds"] < 1):
         raise ValueError("Supply a positive max_rounds")
     if not isinstance(spec.get("objective"), str) or not spec["objective"].strip():
         raise ValueError("Supply an objective")
@@ -125,6 +125,8 @@ def start(conn, directory, spec, *, run_key=None, run_id=None):
         if store.loads(current, "inputs_json")["inputs"]["p0_spec"] != spec:
             raise ValueError("This state already belongs to a different project specification")
         run_key = current["run_key"]
+    if spec.get("mode") == "goal":
+        return v6_goal.start(conn, spec, run_key=run_key, current=current)
     workflow, version = packages.research_ref(spec, current)
     if (workflow, version) == ("science_grid", "3"):
         from .terminal_products import repair_limit
@@ -206,8 +208,8 @@ def _run_until_stopped(conn, directory, rid, timeout, listener):
     while time.monotonic() < deadline:
         driver = None
         try:
-            if not store.latest_checkpoint(conn, rid):
-                run = project(conn, rid)
+            run = project(conn, rid)
+            if not v6_goal.is_goal(run) and not store.latest_checkpoint(conn, rid):
                 start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"], run_id=rid)
             driver = Driver(conn, directory, rid)
             result = driver.drive(deadline - time.monotonic(), waiter=listener)
@@ -240,6 +242,14 @@ def _run_until_stopped(conn, directory, rid, timeout, listener):
     result = snapshot(conn, rid)
     result["driver"] = "time_limit"
     return result
+
+
+def start_specification(args):
+    if getattr(args, "goal", None) is not None:
+        return v6_goal.cli_spec(args)
+    if any(getattr(args, name, None) for name in ("goal_config", "input", "capability")):
+        raise ValueError("--goal-config, --input and --capability require --goal")
+    return packages.example(args.example) if args.example else json.loads(args.spec.read_text())
 
 
 def execute(args):
@@ -319,7 +329,7 @@ def execute(args):
     try:
         with native_state(directory), closing(store.open_store(directory / "gx.db")) as conn:
             if args.command == "start":
-                spec = packages.example(args.example) if args.example else json.loads(args.spec.read_text())
+                spec = start_specification(args)
                 operator.authorize_project(operator.local_context(conn), spec["project"])
                 try:
                     return start(conn, directory, spec, run_key=args.run_key)
@@ -346,7 +356,7 @@ def execute(args):
                 driver.close()
     except ReleaseStateError as exc:
         if args.command == "start" and args.run_key and "another native client" in str(exc):
-            spec = packages.example(args.example) if args.example else json.loads(args.spec.read_text())
+            spec = start_specification(args)
             with closing(existing_db(directory, readonly=False)) as conn:
                 operator.authorize_project(operator.local_context(conn), spec["project"])
                 return coordinator.queue_start(conn, args.run_key, spec)
@@ -376,6 +386,10 @@ def main(argv=None):
             sub.add_argument("--run-key", help="Idempotent name for a workflow run sharing this workspace")
             selector = sub.add_mutually_exclusive_group(required=True)
             selector.add_argument("--spec", type=Path)
+            selector.add_argument("--goal", help="Start from a human scientific question with no selected workflow")
+            sub.add_argument("--goal-config", type=Path, help="JSON project, resource caps, capabilities and input files")
+            sub.add_argument("--input", type=Path, action="append", help="Grant this immutable input to the Lead")
+            sub.add_argument("--capability", action="append", help="Allow this installed method id@version")
             for alias, example in packages.installation()["examples"].items():
                 if not example.get("private"):
                     selector.add_argument("--" + alias, dest="example", action="store_const", const=alias,

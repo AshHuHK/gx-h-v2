@@ -25,6 +25,18 @@ def check_capability(conn, run_id, capability, *, review_probe=False):
 
 
 def _owner(conn, row, binding):
+    if binding.get("v6_node_id"):
+        # JobService has just adopted this exact operation in this writer.
+        node = conn.execute(
+            "SELECT n.node_id,n.version,n.branch_id,n.decision_ref,n.operation_key,a.plan_key,a.exec_key "
+            "FROM v6_nodes n JOIN v6_job_attempts a USING(node_id) WHERE n.run_id=? AND n.job_id=? AND n.node_id=?",
+            (row["run_id"],row["job_id"],binding["v6_node_id"])).fetchone()
+        if node is None:
+            _refuse("invalid_binding", "The dynamic node has no Job admission")
+        return {"kind":"graph_node","workflow_id":"gx.v6.instance","workflow_version":str(node["version"]),
+                "task_id":None,"attempt_id":node["operation_key"],"node_id":node["node_id"],
+                "branch_id":node["branch_id"],"decision_ref":node["decision_ref"],
+                "operation_key":node["operation_key"],"plan_key":node["plan_key"],"exec_key":node["exec_key"]}
     run = conn.execute("SELECT workflow_id, workflow_version FROM runs WHERE run_id=?",
                        (row["run_id"],)).fetchone()
     if binding.get("workflow_id") and binding["workflow_id"] != run["workflow_id"]:

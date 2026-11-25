@@ -201,6 +201,10 @@ def hooks_for_run(conn, run_id):
     """Resolve the exact saved binding before invoking any workflow behavior."""
     run = _run(conn, run_id)
     if not run["workflow_id"]:
+        from ..p0 import v6_goal
+        if v6_goal.is_goal(run):
+            from dataclasses import replace
+            return replace(DEFAULT_HOOKS, register_supplement=v6_goal.supplement)
         return DEFAULT_HOOKS
     flow = _pinned_workflow(conn, run)
     if run["workflow_sha256"] and flow.digest() != run["workflow_sha256"]:
@@ -293,7 +297,7 @@ def _run(conn: sqlite3.Connection, run_id: str) -> sqlite3.Row:
 
 # ------------------------------------------------------------------------------- pins
 
-def installed_pins(workflow: Workflow, *, run: Mapping[str, Any] | None = None,
+def installed_pins(workflow: Workflow | None, *, run: Mapping[str, Any] | None = None,
                    policy_sha256: str | None = None) -> dict[str, Any]:
     """Current pins in this run's immutable policy family, or an already selected new snapshot."""
     policy_sha = policy_sha256
@@ -302,7 +306,7 @@ def installed_pins(workflow: Workflow, *, run: Mapping[str, Any] | None = None,
     return {
         "contract_version": contracts.contract_version(),
         "contract_sha256": contracts.contract_digest()["__combined__"],
-        "workflow_sha256": workflow.digest(),
+        "workflow_sha256": workflow.digest() if workflow is not None else None,
         "agent_policy_sha256": policy_sha,
     }
 
@@ -510,21 +514,25 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     text = _objective_text(objective)
     project_ref = args["project_ref"]
     profile = seams.budget_profile(args["budget_profile"])
-    workflow_id, version = _workflow_ref(args.get("workflow"))
-    try:
-        workflow = default_registry(conn, workflow_id=workflow_id, version=version).get(workflow_id, version)
-    except ArtifactNotFound as exc:
-        failed = load_errors()
-        raise SchemaInvalid(
-            f"no workflow {workflow_id}@{version} is installed"
-            + (f"; the package workflows/{workflow_id} could not be loaded: {failed[workflow_id]}"
-               if workflow_id in failed else ""),
-            details={"workflow_id": workflow_id, "version": version, **(exc.details or {}),
-                     **({"load_error": failed[workflow_id]} if workflow_id in failed else {})},
-        ) from exc
-    admission = seams.workflow_admission(conn, workflow_id=workflow_id, version=version,
-                                         sha256=workflow.digest(),
-                                         sources_complete=workflow.sources_complete())
+    goal_mode = prepare_p0 is not None and args.get("inputs", {}).get("mode") == "goal"
+    workflow_id = version = workflow = None
+    admission = {}
+    if not goal_mode:
+        workflow_id, version = _workflow_ref(args.get("workflow"))
+        try:
+            workflow = default_registry(conn, workflow_id=workflow_id, version=version).get(workflow_id, version)
+        except ArtifactNotFound as exc:
+            failed = load_errors()
+            raise SchemaInvalid(
+                f"no workflow {workflow_id}@{version} is installed"
+                + (f"; the package workflows/{workflow_id} could not be loaded: {failed[workflow_id]}"
+                   if workflow_id in failed else ""),
+                details={"workflow_id": workflow_id, "version": version, **(exc.details or {}),
+                         **({"load_error": failed[workflow_id]} if workflow_id in failed else {})},
+            ) from exc
+        admission = seams.workflow_admission(conn, workflow_id=workflow_id, version=version,
+                                             sha256=workflow.digest(),
+                                             sources_complete=workflow.sources_complete())
     host = _host_record(ctx, args.get("host"))
     from ..hostobs import host_policy
     if prepare_p0 is not None:
@@ -545,7 +553,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     _require_capable_session(conn, host)
     files = _check_input_files(args.get("input_files") or [])
     inputs = dict(args.get("inputs") or {})
-    hooks = plugin_binding.hooks if plugin_binding else workflow.hooks
+    hooks = plugin_binding.hooks if plugin_binding else workflow.hooks if workflow else DEFAULT_HOOKS
     inputs = hooks.run_inputs(inputs)
     constraints = dict(args.get("constraints") or {})
     if inputs.get("p0") is True and prepare_p0 is None:
@@ -584,7 +592,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
         run_id = records.create_run(
             tx, objective=text, project_ref=project_ref, actor=ctx.actor,
             budget_json=profile.get("limits") or {}, constraints=constraints, budget_ref=budget_ref,
-            workflow_id=workflow.workflow_id, workflow_version=workflow.version, pins=pins,
+            workflow_id=workflow_id, workflow_version=version, pins=pins,
             agent_policy_ref=f"{('config/role_policy.codex.json' if policy.get('policy_host') == 'codex' else 'config/role_policy.json')}@{policy_sha}", agent_policy=policy,
             inputs={"inputs": inputs, "files": files}, host=host, resource_profile=resource_profile,
         )
@@ -652,7 +660,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
         store.append_event(
             tx, kind="run.pinned", actor=ctx.actor, run_id=run_id, subject_kind=RUN, subject_id=run_id,
             evidence_level="EXECUTION_OBSERVED",
-            payload={"pins": pins, "workflow": {"id": workflow.workflow_id, "version": workflow.version,
+            payload={"pins": pins, "workflow": {"id": workflow_id, "version": version,
                                                 "admission": admission},
                      "input_files": len(stored_files)},
         )
@@ -660,6 +668,10 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
             tx, run_id=run_id, host=str(host.get("kind") or "unknown"), owner=ctx.principal.subject,
             seconds=_coordinator_seconds(None), session_ref=host.get("session_ref"), actor=ctx.actor,
         )
+        if goal_mode:
+            # Goal, its immutable inputs, the first decision and all their authorizations
+            # are either visible together to another GX process or rolled back together.
+            prepare_p0(run_id)
         return {"run_id": run_id, "budget_ref": budget_ref, "objective_id": objective_id,
                 "coordinator_lease_ref": lease["lease_id"], "admission": admission}
 
@@ -688,13 +700,14 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     engine = _engine(ctx, run_id)
     warnings: list[str] = []
     wait = False
-    if inputs.get("p0") is True:
+    if inputs.get("p0") is True and not goal_mode:
         # The first native human turn authorizes the initial Intent before any node can submit a Job.
         prepare_p0(run_id)
-    if engine.state(run_id)["checkpoint_seq"] == 0:
+    # The first Goal checkpoint belongs to a graph the Lead actually proposed.
+    if not goal_mode and engine.state(run_id)["checkpoint_seq"] == 0:
         try:
             started = engine.start(
-                run_id=run_id, workflow_id=workflow.workflow_id, workflow_version=workflow.version,
+                run_id=run_id, workflow_id=workflow_id, workflow_version=version,
                 inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
                 actor=ctx.actor,
             )
@@ -703,7 +716,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
             if engine.state(run_id)["checkpoint_seq"] == 0:
                 raise
             wait = True                      # another call with this key started it first
-    else:
+    elif not goal_mode:
         wait = True
     if wait:
         answer = _await_answer(conn, key, seconds=START_ANSWER_WAIT_SECONDS)
@@ -727,7 +740,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     answer = {
         "run_id": run_id, "revision": int(run["revision"]), "status": run["status"],
         "budget_ref": created["budget_ref"], "objective_status": objective_row["status"],
-        "workflow": {"id": workflow.workflow_id, "version": workflow.version,
+        "workflow": {"id": workflow_id, "version": version,
                      "sha256": run["workflow_sha256"], **created["admission"]},
         "agent_policy_ref": run["agent_policy_ref"],
         "coordinator_lease_ref": created["coordinator_lease_ref"],
@@ -2169,6 +2182,10 @@ def run_control(ctx: Ctx, args: Mapping[str, Any], *, defer_advance: bool = Fals
                 f"{finished['released_holds']} unused hold(s) released, "
                 f"{finished['expired_worker_refusals']} obsolete worker refusal(s) withdrawn"]
     if action == "continue" and not defer_advance:
+        from ..p0 import v6_goal
+        if v6_goal.is_goal(_run(conn, run_id)):
+            _engine(ctx, run_id).advance(run_id=run_id, actor=ctx.actor)
+            return response
         # A run that came back to ACTIVE with nothing pending has no interrupt for anyone to
         # resume: it is driven on here, after the state change has committed, so a node never
         # runs inside the control call's transaction. A replay finds the run already moved on,

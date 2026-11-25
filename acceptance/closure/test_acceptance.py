@@ -109,6 +109,28 @@ class Automation(unittest.TestCase):
         result = self.command("run", "hardening", "--case", "P2A-08", expected=2)
         self.assertIn("case is outside this suite", result.stderr)
 
+    def test_v6_suite_dispatches_every_selected_case(self):
+        from types import SimpleNamespace
+        from acceptance.closure.cases import plan
+        args = SimpleNamespace(suite="v6", python=Path(sys.executable), binary=Path("/missing"), cache=self.runs,
+                               source_db=self.runs, historical_briefs=self.runs, catalog=self.runs,
+                               original_failures=None, dependency_control_work=self.runs, seed_python=Path(sys.executable),
+                               node=None)
+        selected = SUITES[args.suite]
+        steps = plan(args, selected, self.runs, "HEAD")
+        self.assertEqual(set(selected), {case for step in steps for case in step.ids})
+        self.assertTrue(all(step.argv and step.receipt for step in steps))
+        self.assertEqual(next(step for step in steps if step.name == "v6-loopback").classes,
+                         ("SCRIPTED", "OFFICIAL_HOST_LOOPBACK", "REAL_COMPUTE"))
+        self.assertNotIn("V6-LOOPBACK", SUITES["all"])
+        for step in steps:
+            if step.name.endswith("-export"):
+                self.assertEqual(step.classes, ("EXPORT_CONSISTENCY",))
+        step = next(step for step in steps if step.name == "v6-decision")
+        log = self.runs / step.receipt
+        log.write_text("Ran 2 tests in 0.01s\nOK (skipped=2)\n")
+        self.assertEqual(observed(step, self.runs, 0)[step.ids[0]]["status"], "FAIL")
+
     def test_reg01_exposes_unsettled_child_even_after_successful_wrapper_exit(self):
         step = Step("v31-regression", ("REG01",), [], ("OFFICIAL_HOST_LOOPBACK",), "execution.json", "regression")
         operations = {name: {"returncode": 0} for name in GATE_OPERATIONS["REG01"]}

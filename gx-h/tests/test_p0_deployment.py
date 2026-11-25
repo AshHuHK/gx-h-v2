@@ -60,6 +60,20 @@ class DeploymentTests(unittest.TestCase):
                 profiles.clash_env()
             connect.assert_called_once_with(("127.0.0.1", 7890), timeout=2)
 
+    def test_native_http_requires_both_protocol_routes_and_preserves_every_proxy(self):
+        with patch.object(profiles.socket, "create_connection") as connect:
+            settings = profiles.clash_env(native_http=True)
+            connect.assert_called_once_with(("127.0.0.1", 7890), timeout=2)
+            self.assertEqual(settings["ALL_PROXY"], "socks5h://127.0.0.1:7891")
+            self.assertEqual(settings["all_proxy"], settings["ALL_PROXY"])
+            self.assertEqual(settings["HTTPS_PROXY"], settings["HTTP_PROXY"])
+        with patch.object(profiles, "proxy_settings", return_value={"HTTP_PROXY": "http://127.0.0.1:7890"}):
+            with self.assertRaisesRegex(ConnectionError, "HTTPS_PROXY"):
+                profiles.clash_env(native_http=True)
+        with patch.object(profiles.socket, "create_connection", side_effect=ConnectionRefusedError):
+            with self.assertRaisesRegex(ConnectionError, "127.0.0.1:7890"):
+                profiles.clash_env(native_http=True)
+
     def test_status_reports_only_predefined_modes(self):
         for output, rc, expected in [
             ("Logged in using ChatGPT", 0, "chatgpt"),

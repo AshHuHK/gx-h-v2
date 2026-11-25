@@ -85,7 +85,10 @@ def snapshot(conn, run_id=None):
         from .terminal_products import pending
         if pending_turns := pending(conn, rid):
             close["pending_terminal_turns"] = [dict(row) for row in pending_turns]
+    from . import v6_goal
+    meter = metering.inspect(conn, rid)
     return {
+        **(v6_goal.projection(conn, run, meter) if v6_goal.is_goal(run) else {}),
         "project": run["project_ref"], "run_id": rid, "run_key": run["run_key"], "status": run["status"],
         "run_objective": run["objective"],
         "resource_profile": (store.loads(run, "host_json") or {}).get("resource_profile"),
@@ -95,7 +98,7 @@ def snapshot(conn, run_id=None):
         "attempt_waits": waits.pending(conn, rid),
         "native_waits": native_waits(conn, rid),
         "resource_limits": intent_budget.current_caps(conn, rid),
-        "metering": metering.inspect(conn, rid),
+        "metering": meter,
         "supplements": records.source_status(conn, rid),
         "reviews": records.review_history(conn, rid),
         **grid_evidence,
@@ -170,6 +173,11 @@ class Driver:
         if decision is not None:
             decision["pending_source_ids"] = [source["source_id"] for source in supplements
                                               if source["disposition"] == "pending"]
+        from . import v6_goal
+        if v6_goal.is_goal(run):
+            latest = conn.execute("SELECT receipt_json FROM v6_decisions WHERE run_id=? ORDER BY rowid DESC LIMIT 1",
+                                  (self.rid,)).fetchone()
+            decision = store.loads(latest, "receipt_json") if latest else None
         return {"run_id":self.rid, "status":run["status"],
                 "current_items":intent.active_items(conn, self.rid),
                 "supplements":supplements,

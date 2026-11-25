@@ -404,6 +404,8 @@ def _impact(conn, run_id, change_id, diffs, *, commit, cancel_jobs):
     report = []
     for target, edits in intent_targets(conn, run_id, diffs):
         effects = apply_impact(conn, target, change_id, edits, commit=commit)
+        from . import v6_goal
+        effects.extend(v6_goal.impact(conn, target, edits, commit=commit))
         if target != run_id:
             for effect in effects:
                 effect["run_id"] = target
@@ -431,7 +433,7 @@ def _dispositions(impact):
     # Earlier previews already recorded the disposition, subject, status and exact
     # lease. The added user-facing description does not change that consequence.
     return [{k: v for k, v in row.items() if k != "consequence"} for row in impact
-            if row["action"] in ("interrupt", "request_cancel") or
+            if row["action"] in ("interrupt", "request_cancel", "withdraw") or
             (row["object_type"] == "job" and row["action"] == "historical")]
 
 

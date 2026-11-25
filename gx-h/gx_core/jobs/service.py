@@ -678,6 +678,10 @@ class JobService:
 
             from . import capacity, cpu_queue
             prepared = execution_manifest.prepare_runtime(intent, capability["bundle"], env, resources, preflight)
+            v6_node = (request.get("binding") or {}).get("v6_node_id")
+            if v6_node:
+                from ..p0 import v6_jobs, v6_protein
+                method_dependencies = v6_protein.runtime_dependencies(request["capability_version"], env["python_executable"])
             sample = capacity.sample_admission(conn)
             with store.transaction(conn, transaction_owner="JobService", operation="admit", run_id=run_id) as txn:
                 if reserved_job_id is not None:
@@ -718,6 +722,12 @@ class JobService:
                      int(resources["wall_seconds"]), staging_ref, reservation["reservation_ref"],
                      clock.now_iso(), lease_ref, step_index, attempt),
                 )
+                if v6_node:
+                    v6_jobs.fence_admission(txn, request, request_sha, key, job_id, amounts,
+                                            prepared["runtime"], method_dependencies)
+                elif txn.execute("SELECT 1 FROM sqlite_master WHERE name='v6_goals'").fetchone() and txn.execute(
+                        "SELECT 1 FROM v6_goals WHERE run_id=?", (run_id,)).fetchone():
+                    raise ScopeDenied("Goal-only Jobs require an accepted node assignment")
                 cpu_queue.admitted(txn, key)
                 execution_manifest.admit(txn, job_id, launch=intent, bundle=capability["bundle"],
                                          inputs=listed, resources=resources, prepared=prepared)
@@ -1054,6 +1064,9 @@ class JobService:
                 if current["status"] != CREATED:
                     # A concurrent replay acquired the same launch intent.
                     return self._submit_answer(current, replayed=True)
+                if (intent["request"].get("binding") or {}).get("v6_node_id"):
+                    from ..p0 import v6_jobs
+                    v6_jobs.fence_launch(txn, intent["request"], job_id)
                 execution_manifest.check_launch(txn, job_id)
                 store.transition(txn, machine=MACHINE, subject_id=job_id, to_state=SUBMITTING,
                                  actor=self.actor, bump=False, evidence_level="EXECUTION_OBSERVED",

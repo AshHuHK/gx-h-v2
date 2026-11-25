@@ -21,7 +21,13 @@ MATRIX = (*ORIGINAL, *USAGE, *PROFILE, *DATABASE, *AUTOMATION, *IDLE, "REG01")
 SUPPLEMENTAL = ("OFFICIAL-USAGE", "REAL_RESOURCES", "LEGACY-LEDGER")
 HARDENING = ("DEPENDENCIES", "CHILD-DOUBLE-LOSS", "OPERATOR-USAGE", "ESTIMATE-RISK", "FIFO",
              "PROFILE-SCOPE", "T01", "T02", "REAL_RESOURCES", "TIMEOUT", "FAIRNESS", "SQLITE-BOUNDARIES", "T03")
-SUITES = {"phase2a": (*MATRIX, "OFFICIAL-USAGE"), "all": (*MATRIX, *SUPPLEMENTAL), "hardening": HARDENING}
+V6 = ROOT / "acceptance/v6"
+V6_ENGINEERING = ("V6-GOAL", "V6-MIGRATION", "V6-STATIC", "V6-DECISION", "V6-DISPATCH", "V6-NATIVE",
+                  "V6-LOOPBACK", "V6-PROTEIN", "V6-CLAIMS", "V6-COSTS", "V6-EXPORT-NEGATIVES", "U04", "U08")
+V6_EXPORTS = ("V6-OBSERVED-EXPORT", "V6-CONTROLS-EXPORT")
+SUITES = {"phase2a": (*MATRIX, "OFFICIAL-USAGE"), "all": (*MATRIX, *SUPPLEMENTAL),
+          "hardening": HARDENING, "v6-engineering": V6_ENGINEERING, "v6-exports": V6_EXPORTS,
+          "v6": (*V6_ENGINEERING, *V6_EXPORTS)}
 SCRIPT = ("SCRIPTED",)
 OFFICIAL = ("SCRIPTED", "OFFICIAL_HOST_LOOPBACK")
 
@@ -122,6 +128,32 @@ def plan(args, selected, raw, revision):
     add("sqlite-boundaries", ("SQLITE-BOUNDARIES",), [*py, ROOT / "acceptance/p2a1/sqlite_boundaries.py",
         "--output", out("sqlite-boundaries")], "evidence/result.json", kind="hardening",
         artifacts=("evidence/summary.json", "evidence/transactions.jsonl", "evidence/source-audit.json"))
+    for case, probe in (("V6-GOAL", "goal"), ("V6-MIGRATION", "legacy")):
+        add(case.lower(), (case,), [*py, V6 / "engineering/public_cli.py", probe, "--out", out(case.lower())],
+            "evidence/result.json", kind="hardening", artifacts=("evidence/commands.json", "evidence/gx.db.gz"))
+    for case, modules in (("V6-DECISION", ("test_v6_goal", "test_v6_decisions", "test_v6_operator_recovery")),
+                          ("V6-DISPATCH", ("test_v6_jobs",)), ("V6-NATIVE", ("test_v6_native", "test_v6_delegation")),
+                          ("V6-CLAIMS", ("test_v6_claims",)), ("V6-COSTS", ("test_v6_costs",))):
+        add(case.lower(), (case,), [*py, "-m", "unittest", "-v", *("tests." + name for name in modules)],
+            "console.log", kind="unittest", cwd=ROOT / "gx-h")
+    add("v6-protein", ("V6-PROTEIN",), [*py, "-m", "unittest", "-v", "tests.test_v6_protein"],
+        "console.log", kind="unittest", cwd=ROOT / "gx-h", classes=("SCRIPTED", "REAL_COMPUTE"),
+        artifacts=tuple("evidence/" + name for name in ("result.json", "inventory.json", "ca.json", "backbone.json", "review.json")))
+    add("v6-static", ("V6-STATIC",), [*py, ROOT / "acceptance/v31/public_grid.py", "--mode", "deterministic",
+        "--out", raw / "v6-static/result.json", "--work", args.dependency_control_work.parent / "v6-static-work"],
+        "result.json", kind="hardening", classes=(*OFFICIAL, "REAL_COMPUTE"), requires=(args.binary,), namespace=True)
+    add("v6-export-negatives", ("V6-EXPORT-NEGATIVES",),
+        [*py, "-m", "unittest", "discover", "-s", V6, "-p", "test_*.py", "-v"], "console.log", kind="unittest")
+    add("v6-loopback", ("V6-LOOPBACK",), [*py, V6 / "engineering/official.py", "--out", out("v6-loopback"),
+        "--binary", args.binary], "evidence/result.json", kind="hardening", classes=(*OFFICIAL, "REAL_COMPUTE"),
+        requires=(args.binary,), namespace=True, artifacts=("evidence/requests.jsonl", "evidence/gx.db.gz",
+                                                             "evidence/commands.json", "evidence/observation.json"))
+    for mode in ("observed", "controls"):
+        case = "V6-" + mode.upper() + "-EXPORT"
+        dataset, anchor = getattr(args, mode + "_export", None), getattr(args, mode + "_anchor", None)
+        add(case.lower(), (case,), [*py, V6 / "engineering/check_export.py", mode, "--out", raw / case.lower() / "result.json",
+            *(["--input-dir", dataset] if dataset else []), *(["--anchor", anchor] if anchor else [])],
+            "result.json", kind="hardening", classes=("EXPORT_CONSISTENCY",))
     if args.suite == "hardening":
         add("T03-intake", ("T03",), [*py, HARDEN / "test_historical_intake.py", "-v"],
             "console.log", kind="unittest")
@@ -197,7 +229,7 @@ def observed(step, directory, returncode):
         import re
         output = source.read_text()
         ok = returncode == 0 and re.search(r"^Ran [1-9]\d* tests? in ", output, re.M)
-        if step.name in {"fifo", "timeout", "T03-intake"}:
+        if step.name in {"fifo", "timeout", "T03-intake"} or step.name.startswith("v6-"):
             ok = ok and re.search(r"^OK$", output, re.M)
         return {case: row("PASS" if ok else "FAIL", evidence) for case in step.ids}
     data = read(source)

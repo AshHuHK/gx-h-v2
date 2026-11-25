@@ -21,7 +21,7 @@ from ..scheduling import dispatch as scheduler, snapshot
 from ..teams import recovery
 from ..teams.service import TeamService, default_lease_seconds
 from . import compute, grid_brief
-from . import profiles
+from . import profiles, v6_goal, v6_native
 from ..orchestration.service import hooks_for_run
 from . import activity, grid_planner, terminal_products, waits
 
@@ -106,6 +106,7 @@ class Roots:
         self.run = conn.execute("SELECT * FROM runs WHERE run_id=?",(run_id,)).fetchone()
         if not self.run:
             raise ScopeDenied("unknown GX run")
+        self._goal_mode = v6_goal.is_goal(self.run)
         self._role_tools = (self.run["workflow_id"], self.run["workflow_version"]) == ("science_grid", "3")
         self.cwd, self.argv, self.env = Path(cwd).resolve(), argv, env
         self.token_budget = token_budget
@@ -125,7 +126,8 @@ class Roots:
         self._ordinary_forks = set()
         self._goal_queue = set()
         self.delivery = RootDelivery(self)
-        self.terminal_products = terminal_products.TerminalProducts(self) if terminal_products.enabled(self.run) else None
+        terminal_delivery = self._goal_mode or terminal_products.enabled(self.run)
+        self.terminal_products = terminal_products.TerminalProducts(self) if terminal_delivery else None
         self._product_tool_config = terminal_products.direct_tool_config({}) if self.terminal_products else {}
         self.heartbeats = activity.Heartbeats(self)
         self.account_provider = "openai"
@@ -139,7 +141,7 @@ class Roots:
         providers = {route["provider"] for route in routes.values()} or {provider}
         if selection.get("test_mode") and len(providers) == 1:
             self.account_provider = next(iter(providers))
-        env = clash_env()
+        env = clash_env(native_http=True)
         if self.env is not None:
             proxy = {key:value for key,value in env.items() if key.lower() in
                      ("http_proxy","https_proxy","all_proxy","no_proxy")}
@@ -362,12 +364,19 @@ class Roots:
         role = task["role"] if task is not None else "main"
         profile = host_policy.p0_role_for_run(self.run, role)
         provider = profile.get("provider") or host_policy.p0_provider_for_run(self.run)
-        available = self.main_tools if task is None else self.worker_tools
-        tool_names = [tool["name"] for tool in profiles.available_for_role(
-            available, role, profile, scoped=self._role_tools)]
+        lead = self._goal_mode and task is not None and task["kind"] == "decide_revision"
+        if lead:
+            frozen = store.loads(task, "input_json")["brief"]
+            tool_names = [tool["name"] for tool in v6_native.tool_specs(WORKER_TOOLS, frozen)]
+        else:
+            available = self.main_tools if task is None else self.worker_tools
+            tool_names = [tool["name"] for tool in profiles.available_for_role(
+                available, role, profile, scoped=self._role_tools)]
         rootdir.mkdir(mode=0o700, parents=True, exist_ok=False)
         if task is None:
             brief = MAIN_INSTRUCTIONS
+        elif lead:
+            brief = v6_native.PREFIX + ids.canonical_json(frozen)
         else:
             task_id = task["task_id"]
             view = TeamService(self.conn).task(task_id)
@@ -391,8 +400,10 @@ class Roots:
                           "effort,brief,provider,tool_names_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (key,self.run_id,
                           task["task_id"] if task is not None else None, attempt, lease,
                           str(rootdir), role, profile["model"], profile["effort"], brief, provider,
-                          ids.canonical_json(tool_names) if self._role_tools or "provider" in profile else None))
-        if task is not None:
+                          ids.canonical_json(tool_names) if lead or self._role_tools or "provider" in profile else None))
+        if lead:
+            self._allow_refs(key, v6_native.task_refs(self.conn, task))
+        elif task is not None:
             self._allow_refs(key, [packet["input"], getattr(current, "citations", current)])
             if preload:
                 self.conn.execute("UPDATE p0_roots SET brief=? WHERE root_key=?",
@@ -484,6 +495,8 @@ class Roots:
     def _tools_for(self, row):
         available = self.main_tools if row["task_id"] is None else self.worker_tools
         names = json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None else None
+        if self._goal_mode and v6_native.assigned(row):
+            available = v6_native.tool_specs(WORKER_TOOLS)
         return profiles.selected_tools(available, names)
 
     def _product_tools(self, row, tools):
@@ -506,12 +519,16 @@ class Roots:
     def _settings(self, row, *, new):
         main = row["task_id"] is None
         tools = self._tools_for(row) if new or self.terminal_products else []
+        lead = self._goal_mode and v6_native.assigned(row)
         direct_product = self.terminal_products and not main and any(tool["name"] == "gx_submit_product" for tool in tools)
         profile = host_policy.p0_role_for_run(self.run, row["role"])
         delegate = profile.get("multi_agent", False if self._role_tools else None)
         config = {"features.goals": not main, "features.shell_tool": False, "features.unified_exec": False,
                   "features.multi_agent":True,"features.apps":False,"features.plugins":False,"features.hooks":False,
                   "mcp_servers":self.disabled_mcp,"web_search":"disabled","model_reasoning_effort":row["effort"]}
+        if lead:
+            delegate = False
+            config.update(v6_native.access_config())
         if delegate is not None:
             # 0.169 also consults the model catalog's multi_agent_version when agents.enabled is true.
             config.update({"agents.enabled": delegate, "features.multi_agent": delegate,
@@ -530,11 +547,17 @@ class Roots:
         params = {"modelProvider":row["provider"] or host_policy.p0_provider_for_run(self.run),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
                   "config":config, "developerInstructions":row["brief"] if main else
                   instructions+"\n"+worker_context}
+        if lead:
+            params["developerInstructions"] = v6_native.INSTRUCTIONS
         if new:
             params["experimentalRawEvents"] = True
             params["environments"] = []
             params["dynamicTools"] = tools
-            if direct_product:
+            if lead:
+                params["dynamicTools"] = [
+                    {"type": "namespace", "name": "gx", "description": "Adopt a scoped scientific decision.",
+                     "tools": [tool]} if tool["name"] == v6_native.DECIDE else tool for tool in tools]
+            elif direct_product:
                 tools = self._product_tools(row, params["dynamicTools"])
                 params["dynamicTools"] = [
                     {"type": "namespace", "name": terminal_products.NAMESPACE,
@@ -568,10 +591,14 @@ class Roots:
                                   (tid,row["lease_id"]))
         return tid
 
-    def _verify_settings(self, row, response):
+    def _verify_settings(self, row, response, settings=None):
         policy = response.get("sandbox") or {}
         observed = {"provider": response.get("modelProvider"), "model": response.get("model"),
                     "effort": response.get("reasoningEffort")}
+        if self._goal_mode and v6_native.assigned(row) and settings:
+            if (response.get("thread") or {}).get("environments") != []:
+                raise ScopeDenied("Official Scientific Lead thread must have zero attached execution environments")
+            observed["research_access"] = v6_native.record_access(settings, self._tools_for(row), response)
         self.conn.execute("UPDATE p0_roots SET effective_profile_json=? WHERE root_key=?",
                           (ids.canonical_json(observed), row["root_key"]))
         if (observed["model"] != row["model"] or observed["provider"] != (row["provider"] or host_policy.p0_provider_for_run(self.run))
@@ -647,13 +674,14 @@ class Roots:
         if not self._admit_creation(row):
             return self._materialize(self._row(row["root_key"]))
         try:
-            result = self._request("thread/start", self._settings(row, new=True))
+            settings = self._settings(row, new=True)
+            result = self._request("thread/start", settings)
         except AppServerResponseError as exc:
             if exc.code in (-32600,-32601,-32602):
                 self.conn.execute("UPDATE p0_roots SET state='prepared' WHERE root_key=? AND thread_id IS NULL",
                                   (row["root_key"],))
             raise
-        self._verify_settings(row, result)
+        self._verify_settings(row, result, settings)
         tid = self._bind(row,result["thread"])
         self.loaded.add(tid)
         return tid
@@ -706,7 +734,10 @@ class Roots:
                 # A resume emits a public cumulative snapshot unavailable in passive history.
                 # Only a verified, already closed Goal can be attached for this one receipt.
                 goal = self._request("thread/goal/get", {"threadId": thread_id}).get("goal")
-                if not goal or goal.get("threadId") != thread_id or goal.get("status") not in ("complete", "budgetLimited"):
+                if goal is None:
+                    if not (self._goal_mode and v6_native.assigned(row)):
+                        return
+                elif goal.get("threadId") != thread_id or goal.get("status") not in ("complete", "budgetLimited"):
                     return
             if meter_only:
                 self._meter_only.add(thread_id)
@@ -714,7 +745,7 @@ class Roots:
             if terminal:
                 settings["config"]["features.goals"] = False
             result = self._request("thread/resume", {**settings, "threadId": thread_id})
-            self._verify_settings(row, result)
+            self._verify_settings(row, result, settings)
             thread = result["thread"]
             if thread["id"] != thread_id or not self._matches(row,thread):
                 raise ScopeDenied("official resume returned a different root")
@@ -818,7 +849,9 @@ class Roots:
 
     def _goal_for_budget(self, thread_id, hold_tokens):
         row = self._binding(thread_id)
-        if not row or row["task_id"] is None:
+        if not row or row["task_id"] is None or self._goal_mode and v6_native.assigned(row):
+            # One frozen Lead task receives one GX-granted turn. Native automatic Goals can
+            # initiate another inference without a new decision event or GX reservation.
             return
         if self.terminal_products and row["goal_desired"] == "complete":
             return
@@ -895,6 +928,10 @@ class Roots:
                     raise
                 out = self.terminal_products.failed_call(p, exc)
             status = "SUCCESS"
+            if self._goal_mode and p.get("tool") == v6_native.DECIDE:
+                status = "ACCEPTED"
+                suppress = True
+                return NO_TOOL_RESPONSE
             if p.get("tool") == "gx_submit_product" and isinstance(out, dict):
                 if out.get("category") == "product_structure":
                     status = "SCHEMA_INVALID_LIMIT" if out["terminal"] else "SCHEMA_INVALID"
@@ -920,7 +957,7 @@ class Roots:
 
         finally:
             try:
-                if suppress and (p.get("namespace"), p.get("tool")) == (terminal_products.NAMESPACE, "gx_submit_product"):
+                if suppress and p.get("namespace") == terminal_products.NAMESPACE and p.get("tool") in terminal_products.FINAL_TOOLS:
                     self.terminal_products.await_live_response(p)
                 self.delivery.attribution.outcome(p, status)
                 metrics.record("p0_callback", started=started, run_id=self.run_id,
@@ -933,12 +970,15 @@ class Roots:
 
     def _call(self,p):
         tid,turn,call_id,tool,args = (p[k] for k in ("threadId","turnId","callId","tool","arguments"))
-        namespace = terminal_products.NAMESPACE if self.terminal_products and tool == "gx_submit_product" else None
+        terminal_tool = tool == "gx_submit_product" or self._goal_mode and tool == v6_native.DECIDE
+        namespace = terminal_products.NAMESPACE if self.terminal_products and terminal_tool else None
         if ((p.get("namespace") or None) != namespace or not all(isinstance(v,str) and v for v in (tid,turn,call_id,tool))
                 or not isinstance(args,dict)):
             raise ScopeDenied("GX tools require an official dynamic tool request")
         envelope = {"thread_id":tid,"turn_id":turn,"call_id":call_id}
         digest = ids.sha256_of_obj([tool,args])
+        if self._goal_mode and tool in (v6_native.DECIDE, v6_native.STAGE, v6_native.REEVALUATE, v6_native.DELEGATE):
+            return v6_native.call(self, p)
         prepared = None
         if self.worker_prepare and tool in self._extension_tools and tool not in self._plugin_tools:
             binding = require_binding(self.conn, self.run_id, tid)
@@ -1006,12 +1046,15 @@ class Roots:
                         self._artifact_access(row, args["ref"])
                     return json.loads(receipt["result_json"])
                 self.heartbeats.observed(tid, turn)
-                if tool == "gx_task_context" and not args:
+                lead = self._goal_mode and v6_native.assigned(row)
+                if lead and tool == "gx_task_context" and not args:
+                    answer = v6_native.current_context(self.conn, row)
+                elif tool == "gx_task_context" and not args:
                     answer = hooks_for_run(self.conn, self.run_id).build_task_context(
                         self.conn, self.run_id, row["task_id"], row["attempt"])
                     self._allow_refs(row["root_key"], getattr(answer, "citations", answer))
                 elif tool == "gx_read_artifact":
-                    answer = self._read_task_artifact(row, args)
+                    answer = self._read_artifact(row, args) if lead else self._read_task_artifact(row, args)
                 elif tool in compute.TOOL_MAP:
                     answer = compute.call(self.conn,row,tool,args)
                     if tool == "gx_job_status":
@@ -1035,6 +1078,8 @@ class Roots:
                         answer = self.worker_call(row,tool,args,envelope)
                 else:
                     raise SchemaInvalid("invalid arguments to the assigned GX tool")
+            if self._goal_mode and v6_native.assigned(row):
+                v6_native.record_call(self.conn, p)
             self.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                               (tid,call_id,turn,digest,ids.canonical_json(answer)))
             return answer

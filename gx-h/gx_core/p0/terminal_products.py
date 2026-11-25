@@ -11,6 +11,7 @@ from ..hostobs.app_server_client import AppServerResponseError, AppServerTimeout
 from ..persistence import store
 from ..teams.service import TeamService
 from . import metering
+from .response_attribution import FINAL_TOOLS
 from .root_delivery import TERMINAL
 
 NAMESPACE = "gx"

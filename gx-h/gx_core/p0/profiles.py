@@ -242,11 +242,19 @@ def proxy_settings() -> dict[str, str]:
     return {**values, **{key.lower(): value for key, value in values.items()}}
 
 
-def clash_env(*, check: bool = True) -> dict[str, str]:
+def clash_env(*, check: bool = True, native_http: bool = False) -> dict[str, str]:
     """Return the child environment and fail before network use if Clash is unavailable."""
     selected = proxy_settings()
     if check:
-        endpoints = dict.fromkeys(selected[k] for k in ("HTTP_PROXY","HTTPS_PROXY","ALL_PROXY") if k in selected)
+        if native_http:
+            # On Linux the pinned Codex host selects HTTP_PROXY for HTTP/WS and
+            # HTTPS_PROXY for HTTPS/WSS. Require both explicit routes; if one is
+            # missing, never let a provider client silently choose a direct route.
+            if not all(selected.get(k) for k in ("HTTP_PROXY", "HTTPS_PROXY")):
+                raise ConnectionError("Codex requires explicit HTTP_PROXY and HTTPS_PROXY for native transport")
+            endpoints = dict.fromkeys((selected["HTTP_PROXY"], selected["HTTPS_PROXY"]))
+        else:
+            endpoints = dict.fromkeys(selected[k] for k in ("HTTP_PROXY","HTTPS_PROXY","ALL_PROXY") if k in selected)
         for endpoint in endpoints:
             parsed = urlsplit(endpoint)
             port = parsed.port or (443 if parsed.scheme == "https" else 80)

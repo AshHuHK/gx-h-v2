@@ -6,7 +6,8 @@ from ..persistence import store
 from . import metering, waits
 
 
-def _subtree(conn, ref):
+def subtree_balances(conn, ref, lines):
+    """Account for work funded by this Run, eliminating internal allotments."""
     rows = conn.execute(
         "WITH RECURSIVE tree(ref,funding,open) AS (SELECT ?,NULL,1 UNION ALL "
         "SELECT c.budget_ref,f.amounts_json,tree.open AND f.status='HELD' FROM tree JOIN budgets c ON c.parent_ref=tree.ref "
@@ -15,10 +16,22 @@ def _subtree(conn, ref):
         (ref,budgets.FUND_PREFIX)).fetchall()
     # Closed children's balances already rolled up, while their unresolved exposure
     # continues to belong to the same parent. Keep the full ownership set.
-    spent = sum(store.loads(r,"spent_json",{}).get("tokens",0) for r in rows if r["open"])
-    reserved = sum(store.loads(r,"reserved_json",{}).get("tokens",0)
-                   -store.loads(r,"funding",{}).get("tokens",0) for r in rows if r["open"])
-    return {r["budget_ref"] for r in rows},spent,reserved
+    spent = dict.fromkeys(lines, 0)
+    reserved = dict.fromkeys(lines, 0)
+    for row in rows:
+        if row["open"]:
+            used = store.loads(row, "spent_json", {})
+            held = store.loads(row, "reserved_json", {})
+            funding = store.loads(row, "funding", {})
+            for key in spent:
+                spent[key] += used.get(key, 0)
+                reserved[key] += held.get(key, 0) - funding.get(key, 0)
+    return {r["budget_ref"] for r in rows}, spent, reserved
+
+
+def _subtree(conn, ref):
+    refs, spent, reserved = subtree_balances(conn, ref, ("tokens",))
+    return refs, spent["tokens"], reserved["tokens"]
 
 
 def _post_legacy_exposure(conn, root, last, extra):

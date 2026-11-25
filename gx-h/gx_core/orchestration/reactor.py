@@ -196,7 +196,12 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
     conn = ctx.conn
     backend = backend_ctx(conn)
     run = _run(conn, run_id)
-    if run["status"] not in {"ACTIVE", *machines.waiting_states("run")} or not run["workflow_id"]:
+    if run["status"] not in {"ACTIVE", *machines.waiting_states("run")}:
+        return None
+    if not run["workflow_id"]:
+        from ..p0 import v6_goal
+        if v6_goal.is_goal(run):
+            return service._engine(backend, run_id).advance(run_id=run_id, actor=backend.actor)
         return None
     hooks = service.hooks_for_run(conn, run_id)
     if not hooks.auto_advance:

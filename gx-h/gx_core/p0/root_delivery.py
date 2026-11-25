@@ -82,7 +82,7 @@ def _stored_child_session(thread, meter):
 def _cancelled_history_call(payload, thread_id, turn_id, call_id):
     item = payload.get("item") or {}
     return ((payload.get("thread_id"), payload.get("turn_id")) == (thread_id, turn_id)
-            and item.get("type") == "DynamicToolCall" and item.get("tool") == "gx_submit_product"
+            and item.get("type") == "DynamicToolCall" and item.get("tool") in response_attribution.FINAL_TOOLS
             and item.get("namespace") == "gx" and item.get("id") == call_id
             and item.get("status") == "failed" and item.get("success") is False and item.get("content_items") == []
             and item.get("error") == "dynamic tool call was cancelled before receiving a response")
@@ -148,7 +148,7 @@ def _recorded_usage(path, thread_id, turn_id, session_id, owner_turn, start, *, 
                 continue
             elif entry.get("type") == "response_item":
                 if (strict and thread_id == session_id and payload.get("type") == "function_call"
-                        and payload.get("namespace") == "gx" and payload.get("name") == "gx_submit_product"
+                        and payload.get("namespace") == "gx" and payload.get("name") in response_attribution.FINAL_TOOLS
                         and payload.get("call_id") == terminal_call):
                     metadata = payload.get("internal_chat_message_metadata_passthrough") or {}
                     unmirrored_submit = not final_submit and metadata.get("turn_id") == turn_id
@@ -470,6 +470,8 @@ class RootDelivery:
         available = int(budgets.state(self.conn, ref)["available"].get("tokens", 0))
         if risk_available is not None:
             available = min(available,risk_available)
+        from . import v6_branch_budget
+        available = v6_branch_budget.available_tokens(self.conn, self.run_id, binding, available)
         ceiling = self.roots.token_budget
         if ceiling is not None and (type(ceiling) is not int or ceiling <= 0):
             raise SchemaInvalid("the per-turn token allocation must be a positive integer")
@@ -700,7 +702,7 @@ class RootDelivery:
         # The official history omits the native error string but retains the precise
         # canceled item and its failed/empty outcome. Match the GX commit separately.
         if (item.get('type') == 'dynamicToolCall' and item.get('namespace') == 'gx'
-                and item.get('tool') == 'gx_submit_product' and item.get('status') == 'failed'
+                and item.get('tool') in response_attribution.FINAL_TOOLS and item.get('status') == 'failed'
                 and item.get('success') is False and item.get('contentItems') == []):
             self._cancelled_products[thread_id, turn_id] = item.get('id')
         if item.get("type") != "userMessage" or not isinstance(item.get("clientId"), str):
@@ -737,7 +739,7 @@ class RootDelivery:
             if method in ("item/started", "item/completed"):
                 item = params.get("item") or {}
                 if (method == "item/completed" and item.get("type") == "dynamicToolCall"
-                        and item.get("tool") == "gx_submit_product" and item.get("status") == "failed"
+                        and item.get("tool") in response_attribution.FINAL_TOOLS and item.get("status") == "failed"
                         and item.get("success") is False and item.get("contentItems") == []
                         and (live := self._live.get((thread_id, turn_id)))):
                     live.cancelled_submit_after = len(live.responses)

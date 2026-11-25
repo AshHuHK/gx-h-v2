@@ -9,6 +9,7 @@ from ..hostobs.app_server_client import AppServerDisconnected, AppServerTimeout
 from ..persistence import store
 from .driver import Driver, snapshot
 from .idle import WorkspaceWait
+from .v6_goal import is_goal
 
 
 TRANSIENT = (AppServerDisconnected, AppServerTimeout, OutcomeUnknown)
@@ -164,7 +165,7 @@ def _drive_workspace(conn, directory, timeout, listener):
                 if time.monotonic() < retry_at.get(rid, 0):
                     continue
                 if rid not in drivers:
-                    if not store.latest_checkpoint(conn, rid):
+                    if not is_goal(run) and not store.latest_checkpoint(conn, rid):
                         if _recover_partial_start(conn, run):
                             finished[rid] = (run["status"], _inbox_version(conn, rid))
                         continue

@@ -1108,6 +1108,21 @@ class Engine:
         The idle check and the taking of the advance lease are one transaction, so two
         callers that both found the run idle cannot both drive it.
         """
+        from ..p0 import v6_goal
+        run = self._run_row(run_id)
+        if v6_goal.is_goal(run):
+            from ..p0 import v6_jobs
+            config.check_holds(self.hold_scope)
+            result = {}
+            if run["status"] in {"ACTIVE", *machines.waiting_states(RUN)}:
+                checkpoint = self.checkpointer.latest(self.conn, run_id)
+                if checkpoint:
+                    v6_goal.instance(self.conn, run_id, checkpoint)
+                    result = v6_jobs.advance(self.conn, run_id)
+                task = v6_goal.ensure_task(self.conn, run_id)
+                if task:
+                    result["decision_task_id"] = task
+            return {**self.state(run_id), "work":result, "warnings":[]}
         with store.transaction(
             self.conn, transaction_owner="Engine", operation="begin_advance", run_id=run_id,
         ) as conn:
@@ -1162,7 +1177,13 @@ class Engine:
             pending = dict(checkpoint.state["pending_interrupt"])
         waits = branches.waits(checkpoint)
         positions = {}
-        if checkpoint and self.registry.has(checkpoint.workflow_id, checkpoint.workflow_version):
+        from ..p0 import v6_goal
+        if checkpoint and v6_goal.is_goal(row):
+            graph = v6_goal.instance(self.conn, run_id, checkpoint)
+            states = {r[0]:r[1] for r in self.conn.execute(
+                "SELECT node_id,status FROM v6_nodes WHERE run_id=?", (run_id,))}
+            positions = {n: states[n] for n in graph["nodes"]}
+        elif checkpoint and self.registry.has(checkpoint.workflow_id, checkpoint.workflow_version):
             workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
             positions = branches.node_states(workflow, {**checkpoint.state, "node_waits": waits})
             if row["status"] == "ACTIVE" and _advance_live(checkpoint.state):

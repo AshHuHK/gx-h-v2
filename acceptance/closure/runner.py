@@ -25,6 +25,7 @@ from acceptance.closure.profile import test_environment
 CLI = ROOT / "bin/gx-acceptance"
 DEFAULT_RUNS = ROOT / "var/acceptance"
 STATUS_CODES = {"PASS": 0, "NO_FAILURES": 0, "FAIL": 1, "PARTIAL": 2, "BLOCKED": 2}
+V6_EXPORT_INPUTS = ("observed_export", "observed_anchor", "controls_export", "controls_anchor")
 SOURCE_PATHS = ("gx-h", "bin", "codex_adapter", "examples", "scripts", "release-assets", ":(glob)acceptance/**/*.py")
 
 
@@ -55,12 +56,18 @@ def run_interpreter(args):
 
 def configure(args):
     default_cache = ROOT if (ROOT / "vendor/codex-runtime").is_dir() else ROOT.parent / "gx-h-v-3"
+    for name in V6_EXPORT_INPUTS:
+        value = getattr(args, name)
+        if value is not None:
+            setattr(args, name, value.resolve())
     args.cache = (args.cache or default_cache).resolve()
     lock = archive.read(ROOT / "release-assets/lock.json")["linux_x64"]
     args.binary = (args.binary or args.cache / "vendor/codex-runtime/package" / lock["binary"]).absolute()
     args.python = Path(args.python or sys.executable).absolute()
     args.node = args.node.absolute() if args.node else None
-    args.clash = (args.clash or shutil.which("mihomo") or ROOT.parent.parent / "clash/clash.new")
+    local_clash = (parent / "clash/clash.new" for parent in ROOT.parents)
+    args.clash = args.clash or shutil.which("mihomo") or next((p for p in local_clash if p.is_file()),
+                                                             ROOT.parent.parent / "clash/clash.new")
     args.clash = Path(args.clash).absolute()
     args.source_db = (args.source_db or args.cache / "var/v3-staging/frozen-a05dcef/snapshot/project/gx.db").resolve()
     args.historical_briefs = (args.historical_briefs or ROOT.parent /
@@ -87,7 +94,7 @@ def environment(args):
         "platform": platform.platform(), "machine": platform.machine(),
         "launcher": {"executable": sys.executable, "python": platform.python_version(), "sqlite": sqlite3.sqlite_version},
         "paths": {key: str(getattr(args, key)) if getattr(args, key) else None for key in
-                  ("cache", "python", "node", "binary", "clash", "source_db", "historical_briefs", "catalog")},
+                  ("cache", "python", "node", "binary", "clash", "source_db", "historical_briefs", "catalog", *V6_EXPORT_INPUTS)},
         "original_failures": str(args.original_failures) if args.original_failures else None,
         "invocation": sys.argv, "invocation_cwd": os.getcwd(),
         "classes": ["SCRIPTED", "OFFICIAL_HOST_LOOPBACK", "LIVE_MODEL", "REAL_COMPUTE", "INDEPENDENT_REVIEW"],
@@ -189,6 +196,8 @@ def execute_step(args, step, raw, scratch, interrupted, previous_suite, dependen
         env["GX_IDLE_EVIDENCE"] = str(directory / "evidence")
     if step.name == "fifo":
         env["GX_FIFO_EVIDENCE"] = str(directory / "evidence")
+    if step.name == "v6-protein":
+        env["GX_V6_PROTEIN_RECEIPT_DIR"] = str(directory / "evidence")
     if step.name == "timeout":
         env["GX_TIMEOUT_EVIDENCE"] = str(directory / "timeout.json")
     receipt = {"name": step.name, "cases": list(step.ids), "classes": list(step.classes),
@@ -391,7 +400,7 @@ def main(argv=None):
     execute = subs.add_parser("run", help="execute all selected cases and archive a new run")
     execute.add_argument("suite", choices=SUITES)
     group = execute.add_mutually_exclusive_group()
-    group.add_argument("--case", action="append", choices=tuple(dict.fromkeys((*MATRIX, *SUPPLEMENTAL, *HARDENING))),
+    group.add_argument("--case", action="append", choices=tuple(dict.fromkeys(case for suite in SUITES.values() for case in suite)),
                        help="repeatable case selector")
     group.add_argument("--failed-only", "--only-failed", metavar="RUN_ID",
                        help="retry only failed, blocked or partial cases in a verified prior run")
@@ -400,6 +409,9 @@ def main(argv=None):
                          help="reuse a verified same-revision Python discovery for T03 historical adjudication")
     for name in ("cache", "python", "node", "binary", "clash", "source-db", "historical-briefs", "catalog", "original-failures"):
         execute.add_argument("--" + name, type=Path)
+    for name in V6_EXPORT_INPUTS:
+        execute.add_argument("--" + name.replace("_", "-"), type=Path,
+                             help="V6 export directory or independently held reviewer anchor")
     report = subs.add_parser("report", help="read the verified result of a run")
     report.add_argument("run_id")
     report.add_argument("--json", action="store_true")

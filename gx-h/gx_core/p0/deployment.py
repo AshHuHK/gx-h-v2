@@ -34,7 +34,7 @@ def _login_state(env):
 
 
 def _login(args):
-    env = clash_env()
+    env = clash_env(native_http=True)
     if _version(env) != CODEX_VERSION:
         _print({"error": f"Select codex-cli {CODEX_VERSION} with GX_P0_CODEX."})
         return 1
@@ -143,7 +143,7 @@ def _doctor(args):
     if any(not local["providers"][name]["configured"] for name in providers):
         _print({**local, "ready": False})
         return 1
-    env = clash_env()
+    env = clash_env(native_http=True)
     version = _version(env)
     report = {"codex_version": version, "expected_version": CODEX_VERSION, "provider": provider, "model": model,
               "http_proxy": env.get("HTTP_PROXY"), "socks_proxy": env.get("ALL_PROXY"), "no_proxy": env["NO_PROXY"]}

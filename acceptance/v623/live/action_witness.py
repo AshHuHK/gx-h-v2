@@ -97,8 +97,17 @@ def trace_slot(work, number, protocol, outcomes):
 def visible_text(text):
     """Pseudonymize machine identifiers while preserving the author's exact scientific wording."""
     import re
-    return re.sub(r'\b(?:gx[a-z]*_|cmp_|branch_|module_|node_|job_|metric_)[a-zA-Z0-9_:@.-]+',
-                  '[reference]',str(text))
+    value=re.sub(r'\b(?:gx[a-z]*_|cmp_|branch_|module_|node_|job_|metric_)[a-zA-Z0-9_:@.-]+',
+                 '[reference]',str(text))
+    value=re.sub(r'(?<!\w)(?:P4|K7)(?!\w)','[material]',value,flags=re.I)
+    value=re.sub(r'\b(?:delegation[_ -]available|(?:single(?:[_ -](?:layer|lead|agent))?|'
+                 r'delegat(?:ed|ion(?:[_ -]enabled)?))[_ -](?:arm|condition)|'
+                 r'(?:arm|architecture)\s*[:=]\s*(?:single|delegated)|'
+                 r'data_inventory(?:@\d+)?|sub[- ]?agent|child model|delegated worker)\b',
+                 '[study role]',value,flags=re.I)
+    return re.sub(r'\b(?:gpt[- ][0-9]+(?:[.][0-9]+)*(?:-[a-z0-9]+)*|'
+                  r'Claude(?:[- ][0-9.]+)?|Codex|ChatGPT|DeepSeek|Gemini)\b','[model]',value,flags=re.I)
+
 
 
 def first_window(trace):

@@ -770,10 +770,22 @@ class Roots:
             if terminal:
                 settings["config"]["features.goals"] = False
             result = self._request("thread/resume", {**settings, "threadId": thread_id})
-            self._verify_settings(row, result, settings)
             thread = result["thread"]
             if thread["id"] != thread_id or not self._matches(row,thread):
                 raise ScopeDenied("official resume returned a different root")
+            if (self.mode.decision_root(row) and v621_policy.live_science(self.conn, self.run_id)
+                    and thread.get("environments") != []):
+                # thread/resume lacks the environments override accepted by thread/start.
+                # The pinned host can reconstruct the cwd's local default for a cold, idle thread.
+                if any(turn["status"] == "inProgress" for turn in thread.get("turns", [])):
+                    raise ScopeDenied("Cannot change the execution environments of an active Scientific Lead turn")
+                self._request("thread/settings/update", {"threadId": thread_id, "environments": []})
+                verified = self._request("thread/read", {"threadId": thread_id, "includeTurns": False})["thread"]
+                if verified["id"] != thread_id or not self._matches(row, verified) or verified.get("environments") != []:
+                    raise ScopeDenied("Official Scientific Lead resume did not confirm empty execution environments")
+                thread = {**thread, "environments": verified["environments"]}
+                result = {**result, "thread": thread}
+            self._verify_settings(row, result, settings)
             self.delivery.attached(thread_id, thread)
             self.loaded.add(thread_id)
             for turn in thread.get("turns",[]):

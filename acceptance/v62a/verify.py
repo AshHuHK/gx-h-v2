@@ -118,7 +118,9 @@ def report_checks(directory, root, index):
     a4, a5, a6, a7 = (cases[f"A{i}"] for i in range(4, 8))
     require(a4["old_actor"]["scope"] == a4["successor"]["scope"]
             and a4["old_actor"]["lease_id"] != a4["successor"]["lease_id"]
-            and len(a4["reports"]) == 1, "A4 did not continue the module on a new lease")
+            and len(a4["reports"]) == len({r["module_instance_id"] for r in a4["reports"]}) == 2
+            and any("module:" + r["module_instance_id"] == a4["old_actor"]["scope"] for r in a4["reports"]),
+            "A4 did not continue the module and its independent peer")
     require(a5["crash_exit"] == 83 and a5["old_lease"] != a5["new_lease"]
             and len(a5["confirmed_tool_executions"]) == len(a5["jobs_after"]) == len(a5["reports"]) == 1
             and a5["verified_reuse"]["original_job"] == a5["jobs_after"][0]["job_id"], "A5 recovery identity differs")

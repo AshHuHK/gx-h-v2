@@ -1,0 +1,22 @@
+test_only_confirmed_budget_change_wakes_and_funds_a_larger_branch (tests.test_v6_operator_recovery.OperatorRecovery.test_only_confirmed_budget_change_wakes_and_funds_a_larger_branch) ... ERROR
+
+======================================================================
+ERROR: test_only_confirmed_budget_change_wakes_and_funds_a_larger_branch (tests.test_v6_operator_recovery.OperatorRecovery.test_only_confirmed_budget_change_wakes_and_funds_a_larger_branch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/gx-h/tests/test_v6_operator_recovery.py", line 291, in test_only_confirmed_budget_change_wakes_and_funds_a_larger_branch
+    adopted = v6_decisions.adopt(conn, **lead, decision=decision(branch('local:broader-survey', jobs=6)))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/gx-h/gx_core/p0/v6_decisions.py", line 310, in adopt
+    return commit(conn, prepare(conn, **native_call))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/gx-h/gx_core/p0/v6_decisions.py", line 169, in prepare
+    v6_graph.check_funding(conn, run_id, goal["limits_json"], demand)
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/gx-h/gx_core/p0/v6_graph.py", line 238, in check_funding
+    raise BudgetExceeded(
+gx_core.errors.BudgetExceeded: BUDGET_EXCEEDED: New branches requested 6 job_submissions; at most 5 job_submissions can be newly committed. Revise the branch ceilings and resubmit.
+
+----------------------------------------------------------------------
+Ran 1 test in 1.377s
+
+FAILED (errors=1)

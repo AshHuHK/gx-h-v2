@@ -352,11 +352,27 @@ def prepare_observed_window(private, out, rid, captures):
         if not earlier or rollout is None:
             attempts.append({"decision_ref": decision_id, "result": "missing preceding capture or native rollout"})
             continue
-        before, _ = earlier[-1]
+        before, preceding = earlier[-1]
+        # A delta brief can cite measurements inherited from an earlier turn. Trace new
+        # numeric evidence to actual inputs of this turn. The complete citation list
+        # remains in the original decision (including earlier sources).
+        from native_witness import rollout as read_rollout, seen
+        witness = read_rollout(rollout, d, final)
+        packet = json.loads(witness["brief"].split("\n", 1)[1])
+        delivered = {o["artifact_ref"] for o in packet["observations"]
+                     if o.get("source_job_id") and o.get("artifact_ref")}
+        original = {a["artifact_ref"]: a for a in preceding["artifacts"] if a["job_id"]}
+        selections = []
+        for ref in request["decision"]["evidence_refs"]:
+            if ref in original and (ref in delivered or witness["reads"].get(ref)):
+                value = json.loads((before / "artifacts" / original[ref]["sha256"]).read_bytes())
+                if isinstance(value, (dict, list)) and value and seen(witness, ref, value):
+                    selections.append({"evidence_ref": ref, "pointer": ""})
         dest = private / f"window-{len(attempts):03d}.json"
         save(dest, {"before": str(before.relative_to(private)), "settled": "settled",
                     "reopened": "reopened", "decision_ref": decision_id,
-                    "rollout": str(rollout.relative_to(private)), "resume_receipt": "resume-invocation.json"})
+                    "rollout": str(rollout.relative_to(private)), "resume_receipt": "resume-invocation.json",
+                    "observations": selections})
         target = out / f"candidate-{len(attempts):03d}"
         cmd = [sys.executable, str(REPO / "acceptance/v6/export.py"), "bundle", "--mode", "observed",
                "--window", str(dest), "--out", str(target)]

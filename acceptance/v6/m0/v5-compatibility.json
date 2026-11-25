@@ -1,0 +1,50 @@
+{
+  "before": "afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd",
+  "baseline": "afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd",
+  "applied": [
+    "states.json:add:machines/claim",
+    "labels.json:add:claim_node_kind",
+    "labels.json:add:portfolio_pool",
+    "labels.json:add:critique_verdict",
+    "labels.json:add:noise_band_verdict",
+    "labels.json:add:revision_op",
+    "labels.json:add:watch_measure",
+    "labels.json:add:output_nature",
+    "labels.json:append:task_kind/values",
+    "labels.json:add:task_kind/needs_run/decide_revision",
+    "labels.json:add:task_kind/needs_run/critique_proposal",
+    "labels.json:append:trigger_topic/values",
+    "labels.json:add:trigger_topic/definitions/claim.transitioned",
+    "bundles.json:add:types/ClaimRecord",
+    "bundles.json:add:types/ClaimTransition",
+    "bundles.json:add:types/WatchCondition",
+    "bundles.json:add:types/PoolShare",
+    "bundles.json:add:types/RevisionOp",
+    "bundles.json:add:types/CritiqueRecord",
+    "bundles.json:add:types/OutputDecl/nature",
+    "bundles.json:add:types/CapabilityManifest/validation_refs",
+    "bundles.json:add:bundles/revision_bundle",
+    "bundles.json:add:bundles/claim_bundle",
+    "bundles.json:add:bundles/critique_bundle",
+    "db_schema.sql:add_column:evidence.graph_version",
+    "db_schema.sql:add_column:evaluations.graph_version",
+    "db_schema.sql:add_column:artifacts.graph_version",
+    "db_schema.sql:add_column:gaps.graph_version"
+  ],
+  "problems": [],
+  "sql": {
+    "ok": true,
+    "p0_migrations_applied": 28,
+    "last_migration": "zzzzzzzz_v5_research_state.sql",
+    "tables": 131
+  },
+  "after": "badf19c1832ac4cf5e739b7fd24410cd6b681483fb627bf8e42ae54db38c4caa",
+  "touched": [
+    "bundles.json",
+    "labels.json",
+    "states.json",
+    "db_schema.sql",
+    "CONTRACT_SHA"
+  ],
+  "written": false
+}

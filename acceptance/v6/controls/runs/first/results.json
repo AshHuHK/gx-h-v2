@@ -1,0 +1,890 @@
+{
+  "data": "synthetic matched controls with real isolated model decisions and actual Jobs",
+  "version": 1,
+  "worlds": [
+    {
+      "additional_turns": [
+        {
+          "budget_status": "HELD",
+          "confidence": "RESERVED",
+          "reservation_ref": "rsv_01m886fmw5srx4svy7",
+          "thread_id": "01a21067-d36f-7531-96d0-a43f3ec8d4b5",
+          "turn_id": "01a21067-d388-7352-88b1-0a3d75914c76"
+        }
+      ],
+      "adopted_base": {
+        "sha256": "fb6ae8b3b82e6eabfbe509f70fc5854d1a660041a44110fc7740ac508d0ea78d",
+        "version": 1
+      },
+      "adopted_head": {
+        "sha256": "1c54a1d9cadc304e3b0d534b5daed3787ad4a269d16a3d3c39f4965ab87471a1",
+        "version": 2
+      },
+      "call_id": "call_632fed63e7aa486092c7eedd5046b6d4",
+      "claim_revisions": [
+        {
+          "claim_ref": "gxa_01m886f879q3g4999v",
+          "claim_revision_id": "gxh_01m886fme6578pwwqr@1",
+          "limitations": "证据来自两条合成观测摘要。B/C、ordered_backbone、独立数值复核和跨结构推广均待检验。",
+          "science": {
+            "chain_pairs": [
+              "A/B",
+              "A/C"
+            ],
+            "level": "limited_support"
+          },
+          "scope": "当前 2RE9 研究简报中的 A/B 和 A/C 合成对照，仅涉及 common_ca 与 common_backbone 的链对内比较。",
+          "statement": "给定的两条合成观测均满足覆盖要求。对 A/B 和 A/C，从三链共有的 Cα 改用三链共有的主链原子时，各链对的拟合旋转角和 RMSD 变化均在预设容差内。"
+        }
+      ],
+      "decision_ref": "gxa_f5d225188146f5b8ee831a1c6cc57dd7bb2c0994b7e6ad9c0782ed3330f9f37f",
+      "effort": "xhigh",
+      "evidence_map": {
+        "gxa_01m88663tdjnezjcyn": "obs-17a",
+        "gxa_01m88663tkapyjp3a6": "obs-17b"
+      },
+      "evidence_sha256": {
+        "before": "4f68c73a97a7e3517299afc1583a9019bedf42627b2c857f13b10e4f0f642d66",
+        "packet": "6771e3f3571157b15e8a22acc6a0f6e94a2e1fd6e7e5b0f6b4f76b0d534e79d7",
+        "reopened": "23e197a61d8740c9245fe37399ce6f9c1bbc6616c7a57d88c061fb35fe8643a1",
+        "resume_invocation": "300ced3dbb29c97d084de352a66f5923c2cee25b84bb4602b4cbfd908427b444",
+        "rollout": "889c03dd3d67d221875ec10e9c1f68a271bb5c52dc2bcc2681acf8eeadc936c0",
+        "settled": "21831cd55c2a74e2376e9a4026db54511a2016d476ef3931c6dc1805154e348b"
+      },
+      "independent_numeric_check": [
+        {
+          "angle_within_tolerance": true,
+          "chain_pair": "A/B",
+          "coverage_pass": true,
+          "observation": "obs-17a",
+          "rmsd_within_tolerance": true,
+          "source_values": {
+            "abs_angle_change_deg": 0.12,
+            "abs_rmsd_change_angstrom": 0.04,
+            "chains": "A/B",
+            "fraction_of_observed_union": 0.86,
+            "masks": [
+              "common_ca",
+              "common_backbone"
+            ],
+            "matched_positions": 120
+          }
+        },
+        {
+          "angle_within_tolerance": true,
+          "chain_pair": "A/C",
+          "coverage_pass": true,
+          "observation": "obs-17b",
+          "rmsd_within_tolerance": true,
+          "source_values": {
+            "abs_angle_change_deg": 0.17,
+            "abs_rmsd_change_angstrom": 0.03,
+            "chains": "A/C",
+            "fraction_of_observed_union": 0.81,
+            "masks": [
+              "common_ca",
+              "common_backbone"
+            ],
+            "matched_positions": 112
+          }
+        }
+      ],
+      "jobs": [
+        {
+          "admission_request_sha256": "8e11adc530939ff050292bb5ab1525eda32e93cfc042e78312d2eb9adb65bb36",
+          "branch_id": "branch_cfd06806b3521044b9624007bd57c281",
+          "capability": "artifact-analysis@1",
+          "decision_id": "gxa_a237bacbdbb40c8a9f4b19330156bae7011e6456daf137ba98c35e287f0d9e4c",
+          "in_scored_decision": false,
+          "job_id": "gxj_01m88663n7c7sexkts",
+          "node_id": "node_f421e138c55a2e60734d371af9d28b75",
+          "operation_key": "v6.node:aa8efad420c2a059d886229059a86670f0eaeb81d3867459c3550bb99aede320",
+          "reservation": "rsv_01m88663rbmcskjmem",
+          "resource_measurement": {
+            "cpu_seconds": 0.078,
+            "limit_memory_mib": 128,
+            "limit_wall_seconds": 10,
+            "max_rss_mib": 14.8,
+            "memory_within_limit": true,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.216
+          },
+          "result_ref": "gxa_01m886ebr3xgyvjn1c",
+          "result_sha256": "ffa0651ef3845d20c833a9e2f6185b48d4bd37529c56acef3e47e7ca577c69a3",
+          "status": "SUCCEEDED"
+        },
+        {
+          "admission_request_sha256": "d8c3096e1b83e5e811f0b111b7298966e3b3c113c95ab73b300ae714d0d7996a",
+          "branch_id": "branch_db85caa9a641786d7e144ea8942e7922",
+          "capability": "tl1a-geometry@1",
+          "decision_id": "gxa_f5d225188146f5b8ee831a1c6cc57dd7bb2c0994b7e6ad9c0782ed3330f9f37f",
+          "in_scored_decision": true,
+          "job_id": "gxj_01m886fmfw8157vqbk",
+          "node_id": "node_753bfb4d4652788701dccfc51e397e05",
+          "operation_key": "v6.node:6294bf584a5efadb88da16c1c9297fde25ed831d6d95a281ece0c63b5c046577",
+          "reservation": "rsv_01m886fmgsptxcccx2",
+          "resource_measurement": {
+            "cpu_seconds": 0.086,
+            "limit_memory_mib": null,
+            "limit_wall_seconds": 30,
+            "max_rss_mib": 19.5,
+            "memory_check": "no memory_mib is declared for this job: nothing to check against",
+            "memory_within_limit": null,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.219
+          },
+          "result_ref": "gxa_01m886fmtpwcdwevrw",
+          "result_sha256": "a1caeac7ee76bc78591e38350d603366678580ba11ef299474a9362b16485a52",
+          "status": "SUCCEEDED"
+        },
+        {
+          "admission_request_sha256": "65db20c64c346ef0a7d27302204e61232959554b8f4272b5b6188d2cff513b85",
+          "branch_id": "branch_db85caa9a641786d7e144ea8942e7922",
+          "capability": "tl1a-geometry@1",
+          "decision_id": "gxa_f5d225188146f5b8ee831a1c6cc57dd7bb2c0994b7e6ad9c0782ed3330f9f37f",
+          "in_scored_decision": true,
+          "job_id": "gxj_01m886fmm80w833zmk",
+          "node_id": "node_c7569bc87b4b038338f612d8c533d3b8",
+          "operation_key": "v6.node:e85c2d1ec3c1bce197aa4e1ea931cd93a6b8ecafdebd4990d7971e8063419d5b",
+          "reservation": "rsv_01m886fmn4h18wx2zk",
+          "resource_measurement": {
+            "cpu_seconds": 0.089,
+            "limit_memory_mib": null,
+            "limit_wall_seconds": 30,
+            "max_rss_mib": 19.6,
+            "memory_check": "no memory_mib is declared for this job: nothing to check against",
+            "memory_within_limit": null,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.219
+          },
+          "result_ref": "gxa_01m886fmyxf6qf107c",
+          "result_sha256": "a4c4c2ba43be80c2f39abde5a22324be473c559d22369a7313580b91364eaea8",
+          "status": "SUCCEEDED"
+        }
+      ],
+      "ledger_at_reopen": {
+        "budget_ref": "gxb_01m88663dv9wrz2w8y",
+        "jobs_recorded": 3,
+        "lines": {
+          "api_calls": {
+            "booked": 1,
+            "limit": 4,
+            "remaining": 2,
+            "reserved": 1,
+            "unit": "calls"
+          },
+          "cpu_seconds": {
+            "booked": 3,
+            "limit": 300,
+            "remaining": 297,
+            "reserved": 0,
+            "unit": "CPU seconds"
+          },
+          "gpu_jobs": {
+            "booked": 0,
+            "limit": 0,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "GPU jobs"
+          },
+          "gpu_minutes": {
+            "booked": 0,
+            "limit": 0,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "GPU minutes"
+          },
+          "job_submissions": {
+            "booked": 3,
+            "limit": 3,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "submissions"
+          },
+          "tokens": {
+            "booked": 60486,
+            "limit": 1000000,
+            "remaining": 873978,
+            "reserved": 65536,
+            "unit": "tokens"
+          },
+          "wall_hours": {
+            "booked": 0,
+            "limit": 1,
+            "remaining": 1,
+            "reserved": 0,
+            "unit": "wall hours"
+          },
+          "worker_tasks": {
+            "booked": 0,
+            "limit": 20,
+            "remaining": 20,
+            "reserved": 0,
+            "unit": "tasks"
+          }
+        },
+        "measured_cpu": {
+          "observed": 0.253,
+          "observed_jobs": 3,
+          "pending_or_unmeasured_jobs": 0,
+          "unit": "CPU seconds"
+        },
+        "provider_charge": {
+          "amount": null,
+          "source": "provider_money_cost",
+          "unit": "USD"
+        },
+        "tokens": {
+          "possibly_understated": [],
+          "provider_attributed": 60486,
+          "provisional_booked": 0,
+          "unattributed_delta": 0,
+          "unit": "tokens",
+          "unresolved": [
+            "rsv_01m886fmw5srx4svy7"
+          ]
+        }
+      },
+      "model": "gpt-6.2-astra",
+      "native_tool_arguments": {
+        "decision": {
+          "evidence_refs": [
+            "gxa_01m886f879q3g4999v",
+            "gxa_01m88663tdjnezjcyn",
+            "gxa_01m88663tkapyjp3a6",
+            "gxa_01m88663e87tqqnjnw",
+            "gxa_01m88663e5efg4xbnw",
+            "gxa_01m88663e3a5bbc46v"
+          ],
+          "mode": "amend",
+          "ops": [
+            {
+              "branch": "branch_db85caa9a641786d7e144ea8942e7922",
+              "capability": "tl1a-geometry@1",
+              "depends_on": [],
+              "inputs": [
+                "gxa_01m88663e3a5bbc46v"
+              ],
+              "node": "local:common_ca",
+              "op": "add_node",
+              "parameters": {
+                "protocol": "common_ca"
+              },
+              "question": "在 2RE9 模型 1 中，用三链共有的 Cα 拟合 A/B、A/C、B/C 时，每个链对的覆盖、RMSD 和旋转角分别是多少？"
+            },
+            {
+              "branch": "branch_db85caa9a641786d7e144ea8942e7922",
+              "capability": "tl1a-geometry@1",
+              "depends_on": [],
+              "inputs": [
+                "gxa_01m88663e3a5bbc46v"
+              ],
+              "node": "local:common_backbone",
+              "op": "add_node",
+              "parameters": {
+                "protocol": "common_backbone"
+              },
+              "question": "在相同的 2RE9 坐标上，用三链共有的主链原子拟合时，A/B、A/C、B/C 各自的覆盖、RMSD 和旋转角是多少，以便逐链对与 Cα 拟合比较？"
+            }
+          ],
+          "rationale": "采纳仅限于两条合成观测的结论。A/B 与 A/C 的覆盖和变化量都符合预设判据，B/C 缺少同条件对照。将两次可用作业分别用于原始坐标的 common_ca 和 common_backbone，可直接补上 B/C，同时核验 A/B 与 A/C。对每个链对，先核对两种选择的覆盖，再比较同一链对的角度和 RMSD 变化。覆盖达标而变化超限提示对坐标选择敏感，覆盖不足则该链对仍待判定。",
+          "reconsider_when": [
+            {
+              "event": "job_settled",
+              "subject_ref": "local:common_ca"
+            },
+            {
+              "event": "job_settled",
+              "subject_ref": "local:common_backbone"
+            }
+          ]
+        }
+      },
+      "packet_id": "p17",
+      "provider": "openai",
+      "run_id": "gxr_01m88663dpt5071t0n",
+      "source_review_dir": "/tmp/gx-v6-controls-first-review/4ad9afadef461a7c",
+      "test_of_neutral_commissioning": "REVIEW",
+      "thread_id": "01a21067-38c1-7970-816a-b96add7499ae",
+      "turn_id": "01a21067-38e9-7410-8093-1211e4ebf0b9"
+    },
+    {
+      "additional_turns": [
+        {
+          "budget_status": "HELD",
+          "confidence": "RESERVED",
+          "reservation_ref": "rsv_01m886ff9xz2my8w4r",
+          "thread_id": "01a21067-bd22-70a3-89dd-d997d5060c00",
+          "turn_id": "01a21067-bd40-79e2-9258-13c97a444f79"
+        }
+      ],
+      "adopted_base": {
+        "sha256": "b53c0028d2d03919fd6ae6d86f8b396f23ca3be5284579720d5a0f5cf20ab101",
+        "version": 1
+      },
+      "adopted_head": {
+        "sha256": "7086244fe3a12422f794b08b2b74e27e7cf4bbb7878c9ccf189aa49233e0d557",
+        "version": 2
+      },
+      "call_id": "call_968d697b1f6e410b9d5237612be561b5",
+      "claim_revisions": [
+        {
+          "claim_ref": "gxa_01m886f1v7vcv757g1",
+          "claim_revision_id": "gxh_01m886fevswmrdzke1@1",
+          "limitations": "B/C、ordered_backbone 和其他结构的稳健性均未测定。合成差值尚待用 2RE9 存档坐标核对。",
+          "science": {
+            "chain_pairs": [
+              "A/B",
+              "A/C"
+            ],
+            "level": "mixed"
+          },
+          "scope": "两条已提供的合成观测，限于 A/B、A/C 各自在 common_ca 与 common_backbone 之间的比较。",
+          "statement": "在给定的合成观测中，从 common_ca 切换至 common_backbone 时，A/B 的角度和 RMSD 变化均在容差内，A/C 的两项变化均超过容差。"
+        }
+      ],
+      "decision_ref": "gxa_c07749a0715506d71f18b39785330ddc0ef96ee684fcf8ac0ed0818ab334637e",
+      "effort": "xhigh",
+      "evidence_map": {
+        "gxa_01m88662p5rffsfdkm": "obs-42a",
+        "gxa_01m88662pa23m24bv4": "obs-42b"
+      },
+      "evidence_sha256": {
+        "before": "4c2f819d8d332001f038ac4eb7d7495fe5efdf193a37d53cbc44087df3695cd5",
+        "packet": "378fffc1630f79be15a10b7e4e572d2912c99b18ed71521c0cc1431cf112fd61",
+        "reopened": "aba3c36bd7ba64d50fe7d3a56843cac0b48114c211c6ba00a4e50d1f70992a0b",
+        "resume_invocation": "70ccc93c5a097c8cf549638776c8cbd0d01c3878c116c8a8a59085f670d04b33",
+        "rollout": "7e6b2e9c055ce55f2fb28196dd175587986d7ba47521e7d99c50ec7156988681",
+        "settled": "389cea6d530e7b6d577bb5a9fd3dcefc9b08f03f101c776c0860483f90391351"
+      },
+      "independent_numeric_check": [
+        {
+          "angle_within_tolerance": true,
+          "chain_pair": "A/B",
+          "coverage_pass": true,
+          "observation": "obs-42a",
+          "rmsd_within_tolerance": true,
+          "source_values": {
+            "abs_angle_change_deg": 0.12,
+            "abs_rmsd_change_angstrom": 0.04,
+            "chains": "A/B",
+            "fraction_of_observed_union": 0.86,
+            "masks": [
+              "common_ca",
+              "common_backbone"
+            ],
+            "matched_positions": 120
+          }
+        },
+        {
+          "angle_within_tolerance": false,
+          "chain_pair": "A/C",
+          "coverage_pass": true,
+          "observation": "obs-42b",
+          "rmsd_within_tolerance": false,
+          "source_values": {
+            "abs_angle_change_deg": 1.14,
+            "abs_rmsd_change_angstrom": 0.31,
+            "chains": "A/C",
+            "fraction_of_observed_union": 0.81,
+            "masks": [
+              "common_ca",
+              "common_backbone"
+            ],
+            "matched_positions": 112
+          }
+        }
+      ],
+      "jobs": [
+        {
+          "admission_request_sha256": "9a0e1384a907aaf76a7b534c7101ea598879fbb0c681edbbfb8da01caba93671",
+          "branch_id": "branch_a9f2d321d3d5fa47cb4be912f93c2a05",
+          "capability": "artifact-analysis@1",
+          "decision_id": "gxa_120b0ed50630bd76f9c320f602660096d7acddb73c12c822d1c27fa04fdce6c1",
+          "in_scored_decision": false,
+          "job_id": "gxj_01m88662gy26p5dr7s",
+          "node_id": "node_74d38cd7d82c08ef0b2f925b10c96431",
+          "operation_key": "v6.node:139ed0296fca60b3a7c7e694347be0dfc727f145ce1901e2888252c3b11f3db9",
+          "reservation": "rsv_01m88662m4adv7gw54",
+          "resource_measurement": {
+            "cpu_seconds": 0.082,
+            "limit_memory_mib": 128,
+            "limit_wall_seconds": 10,
+            "max_rss_mib": 14.8,
+            "memory_within_limit": true,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.215
+          },
+          "result_ref": "gxa_01m886eap5t5ebysrk",
+          "result_sha256": "ffa0651ef3845d20c833a9e2f6185b48d4bd37529c56acef3e47e7ca577c69a3",
+          "status": "SUCCEEDED"
+        },
+        {
+          "admission_request_sha256": "3f4fee8d51531e89ae9fa56387b4f2c0d62c5f7c35896d304365ca011ab9eff9",
+          "branch_id": "branch_eab5de13559743b92e5b736cc3cea80e",
+          "capability": "tl1a-geometry@1",
+          "decision_id": "gxa_c07749a0715506d71f18b39785330ddc0ef96ee684fcf8ac0ed0818ab334637e",
+          "in_scored_decision": true,
+          "job_id": "gxj_01m886fex7g9p9k7qb",
+          "node_id": "node_d2a9252991ebbe066079532103e1367c",
+          "operation_key": "v6.node:8663e0576cc1f1be8ca48f1fdce29bf0c7cf0c486ced72adcb8e62d9ae4d512b",
+          "reservation": "rsv_01m886fey4ej3171ja",
+          "resource_measurement": {
+            "cpu_seconds": 0.083,
+            "limit_memory_mib": null,
+            "limit_wall_seconds": 30,
+            "max_rss_mib": 19.5,
+            "memory_check": "no memory_mib is declared for this job: nothing to check against",
+            "memory_within_limit": null,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.219
+          },
+          "result_ref": "gxa_01m886ff7x84hffkb3",
+          "result_sha256": "a1caeac7ee76bc78591e38350d603366678580ba11ef299474a9362b16485a52",
+          "status": "SUCCEEDED"
+        },
+        {
+          "admission_request_sha256": "012e2623416accd4cf7098e4347281d57ff463ee285e37b8f266b97ed376006a",
+          "branch_id": "branch_eab5de13559743b92e5b736cc3cea80e",
+          "capability": "tl1a-geometry@1",
+          "decision_id": "gxa_c07749a0715506d71f18b39785330ddc0ef96ee684fcf8ac0ed0818ab334637e",
+          "in_scored_decision": true,
+          "job_id": "gxj_01m886ff28en8rw861",
+          "node_id": "node_c2e31cb978a646a7e920160de1764cc6",
+          "operation_key": "v6.node:e71387465b45207c436655db0d774a85822ebf5872eea8dfe89299f95f6223fc",
+          "reservation": "rsv_01m886ff3bwd324591",
+          "resource_measurement": {
+            "cpu_seconds": 0.092,
+            "limit_memory_mib": null,
+            "limit_wall_seconds": 30,
+            "max_rss_mib": 19.5,
+            "memory_check": "no memory_mib is declared for this job: nothing to check against",
+            "memory_within_limit": null,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.22
+          },
+          "result_ref": "gxa_01m886ffd9x6qznxd6",
+          "result_sha256": "a4c4c2ba43be80c2f39abde5a22324be473c559d22369a7313580b91364eaea8",
+          "status": "SUCCEEDED"
+        }
+      ],
+      "ledger_at_reopen": {
+        "budget_ref": "gxb_01m886629q43vzz5vk",
+        "jobs_recorded": 3,
+        "lines": {
+          "api_calls": {
+            "booked": 1,
+            "limit": 4,
+            "remaining": 2,
+            "reserved": 1,
+            "unit": "calls"
+          },
+          "cpu_seconds": {
+            "booked": 3,
+            "limit": 300,
+            "remaining": 297,
+            "reserved": 0,
+            "unit": "CPU seconds"
+          },
+          "gpu_jobs": {
+            "booked": 0,
+            "limit": 0,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "GPU jobs"
+          },
+          "gpu_minutes": {
+            "booked": 0,
+            "limit": 0,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "GPU minutes"
+          },
+          "job_submissions": {
+            "booked": 3,
+            "limit": 3,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "submissions"
+          },
+          "tokens": {
+            "booked": 42942,
+            "limit": 1000000,
+            "remaining": 891522,
+            "reserved": 65536,
+            "unit": "tokens"
+          },
+          "wall_hours": {
+            "booked": 0,
+            "limit": 1,
+            "remaining": 1,
+            "reserved": 0,
+            "unit": "wall hours"
+          },
+          "worker_tasks": {
+            "booked": 0,
+            "limit": 20,
+            "remaining": 20,
+            "reserved": 0,
+            "unit": "tasks"
+          }
+        },
+        "measured_cpu": {
+          "observed": 0.257,
+          "observed_jobs": 3,
+          "pending_or_unmeasured_jobs": 0,
+          "unit": "CPU seconds"
+        },
+        "provider_charge": {
+          "amount": null,
+          "source": "provider_money_cost",
+          "unit": "USD"
+        },
+        "tokens": {
+          "possibly_understated": [],
+          "provider_attributed": 42942,
+          "provisional_booked": 0,
+          "unattributed_delta": 0,
+          "unit": "tokens",
+          "unresolved": [
+            "rsv_01m886ff9xz2my8w4r"
+          ]
+        }
+      },
+      "model": "gpt-6.2-astra",
+      "native_tool_arguments": {
+        "decision": {
+          "evidence_refs": [
+            "gxa_01m886f1v7vcv757g1",
+            "gxa_01m88662p5rffsfdkm",
+            "Synthetic contrast, observation 1",
+            "gxa_01m88662pa23m24bv4",
+            "Synthetic contrast, observation 2",
+            "gxa_01m88662a4znrntvq2",
+            "gxa_01m88662a14ykqy6va",
+            "gxa_01m886629y0yg6e17p"
+          ],
+          "mode": "amend",
+          "ops": [
+            {
+              "branch": "branch_eab5de13559743b92e5b736cc3cea80e",
+              "capability": "tl1a-geometry@1",
+              "depends_on": [],
+              "inputs": [
+                "gxa_01m886629y0yg6e17p"
+              ],
+              "node": "local:ca",
+              "op": "add_node",
+              "parameters": {
+                "protocol": "common_ca"
+              },
+              "question": "以三条链共有的 Cα 坐标拟合时，2RE9 中 A/B、A/C、B/C 各自的覆盖度、角度和 RMSD 是多少？"
+            },
+            {
+              "branch": "branch_eab5de13559743b92e5b736cc3cea80e",
+              "capability": "tl1a-geometry@1",
+              "depends_on": [],
+              "inputs": [
+                "gxa_01m886629y0yg6e17p"
+              ],
+              "node": "local:backbone",
+              "op": "add_node",
+              "parameters": {
+                "protocol": "common_backbone"
+              },
+              "question": "以三条链共有的主链原子拟合时，各链对的覆盖度、角度和 RMSD 是多少，以便按相同覆盖及容差门槛逐对与 Cα 拟合比较？"
+            }
+          ],
+          "rationale": "两条合成观测均达到覆盖门槛，但仅 A/B 的两项跨掩码变化均在容差内。用两次可用的拟合分别测量同一存档结构的两种掩码，可以核对该差异是否也见于存档坐标，并首次判定 B/C 在同一比较中的表现。沿用冻结的默认门槛，覆盖不足的链对保留为未定。",
+          "reconsider_when": [
+            {
+              "event": "job_settled",
+              "subject_ref": "local:ca"
+            },
+            {
+              "event": "job_settled",
+              "subject_ref": "local:backbone"
+            }
+          ]
+        }
+      },
+      "packet_id": "p42",
+      "provider": "openai",
+      "run_id": "gxr_01m886629jfqd8pysh",
+      "source_review_dir": "/tmp/gx-v6-controls-first-review/0dea5799cf6c326a",
+      "test_of_neutral_commissioning": "REVIEW",
+      "thread_id": "01a21067-3411-79d1-bfcc-871fb4b7f3e7",
+      "turn_id": "01a21067-3436-7840-8db7-197d1aef2c9d"
+    },
+    {
+      "additional_turns": [
+        {
+          "budget_status": "HELD",
+          "confidence": "RESERVED",
+          "reservation_ref": "rsv_01m886fcetdrxbk05m",
+          "thread_id": "01a21067-b1bf-7d20-86c8-23f6c7a7ea09",
+          "turn_id": "01a21067-b1df-7dd2-bee5-3c0c1a42c010"
+        }
+      ],
+      "adopted_base": {
+        "sha256": "9ab5bca22718cb762f1fff61c223ea423fbe9fbb2bc2f01fa55d715e4021a9da",
+        "version": 1
+      },
+      "adopted_head": {
+        "sha256": "70aa607b82e373ca5b3b816387c3044567013462c1a2daf64082e99aa27dda6c",
+        "version": 2
+      },
+      "call_id": "call_434f26c07a33438c9b9b5680c47d2b23",
+      "claim_revisions": [],
+      "decision_ref": "gxa_1ab7d0695090269fa03576f0d5ee3c991242d277d9aad451ef045cb3bfbd63df",
+      "effort": "xhigh",
+      "evidence_map": {
+        "gxa_01m88661hea5tc4x5q": "obs-63a"
+      },
+      "evidence_sha256": {
+        "before": "bfeba8edc39dcdf72a574ba02907c1a3a21c11c2847f813b93c6429f16593ce0",
+        "packet": "c3b98dace36cb9bc8e396e3045873dfa6392a6b29781fd249cb722d901fcdeff",
+        "reopened": "08f49ec0d5fe1a751431b7efe40d0484c23a34bcf865019b6e0cf5e82b344c26",
+        "resume_invocation": "e35e978975238b19127dc1028556305031924d7f2db8b8bdea3fcf765299fcde",
+        "rollout": "78808e30e0539b45177c1fd0a0cd714d4fc73e79dd66e5e496184dc7ce5e8c49",
+        "settled": "1c9016fab35260eda49fd91a562de3e08bd91bff38613cd96873f4c516f52a42"
+      },
+      "independent_numeric_check": [
+        {
+          "metadata": {
+            "coordinate_content_digest_equal": true,
+            "event": "export filename normalized",
+            "formerly": "coordinates-v1.cif",
+            "now": "coordinates_v1.cif"
+          },
+          "observation": "obs-63a"
+        }
+      ],
+      "jobs": [
+        {
+          "admission_request_sha256": "d3c8aa6a10a8c450ef56e2297f841824bcec0d72a9494807e7d4621cfa9b0a22",
+          "branch_id": "branch_2d04d08f394be900f0097ed2671d05e8",
+          "capability": "artifact-analysis@1",
+          "decision_id": "gxa_6856bfd8452ae25e7d8b3fd6e1f923f19be2403917ebeed0e31abc9d1c2f6742",
+          "in_scored_decision": false,
+          "job_id": "gxj_01m88661bgm98y2q8y",
+          "node_id": "node_90f2c267c589a4a29545c161e673c0b8",
+          "operation_key": "v6.node:3a6e9f18b9825d33070fcc32856f8ff14ebe2a81196525a50de67c6c99fddb27",
+          "reservation": "rsv_01m88661fbnvqdbssz",
+          "resource_measurement": {
+            "cpu_seconds": 0.072,
+            "limit_memory_mib": 128,
+            "limit_wall_seconds": 10,
+            "max_rss_mib": 14.8,
+            "memory_within_limit": true,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.217
+          },
+          "result_ref": "gxa_01m886edr2wdkxqjxy",
+          "result_sha256": "ffa0651ef3845d20c833a9e2f6185b48d4bd37529c56acef3e47e7ca577c69a3",
+          "status": "SUCCEEDED"
+        },
+        {
+          "admission_request_sha256": "6156e4fe4ca00e476ac79b5790bd37c0067d83c4cc1bfc8ca14776ae089c0cfd",
+          "branch_id": "branch_f565884426c156703b7f65c433bf08c9",
+          "capability": "tl1a-geometry@1",
+          "decision_id": "gxa_1ab7d0695090269fa03576f0d5ee3c991242d277d9aad451ef045cb3bfbd63df",
+          "in_scored_decision": true,
+          "job_id": "gxj_01m886fc1tbdk1yz9n",
+          "node_id": "node_0307dfc8d4222fbb380df7372c3e95c0",
+          "operation_key": "v6.node:4d9ecf27a07f0ad807e42e144c0703e163e8ef6198a127e663b8b17d6f75c3b7",
+          "reservation": "rsv_01m886fc2q38fhmj5p",
+          "resource_measurement": {
+            "cpu_seconds": 0.092,
+            "limit_memory_mib": null,
+            "limit_wall_seconds": 30,
+            "max_rss_mib": 19.9,
+            "memory_check": "no memory_mib is declared for this job: nothing to check against",
+            "memory_within_limit": null,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.217
+          },
+          "result_ref": "gxa_01m886fcch3tkbwny7",
+          "result_sha256": "a4c4c2ba43be80c2f39abde5a22324be473c559d22369a7313580b91364eaea8",
+          "status": "SUCCEEDED"
+        },
+        {
+          "admission_request_sha256": "9370eda3562a53a207ed1d10883f7c87a4d43371c275d6de97a4873a2b946870",
+          "branch_id": "branch_f565884426c156703b7f65c433bf08c9",
+          "capability": "tl1a-geometry@1",
+          "decision_id": "gxa_1ab7d0695090269fa03576f0d5ee3c991242d277d9aad451ef045cb3bfbd63df",
+          "in_scored_decision": true,
+          "job_id": "gxj_01m886fc69g2kq9t12",
+          "node_id": "node_cee15b3a06530297de0f99553aa4f2c5",
+          "operation_key": "v6.node:ae96624e24fabd9ee7db8893e511980bd12a746c92ed7cbc4055655cc7708342",
+          "reservation": "rsv_01m886fc76mgfh4wwq",
+          "resource_measurement": {
+            "cpu_seconds": 0.064,
+            "limit_memory_mib": null,
+            "limit_wall_seconds": 30,
+            "max_rss_mib": 19.6,
+            "memory_check": "no memory_mib is declared for this job: nothing to check against",
+            "memory_within_limit": null,
+            "result": "exited",
+            "started": true,
+            "wall_seconds": 0.218
+          },
+          "result_ref": "gxa_01m886fcgfwcthqbhd",
+          "result_sha256": "a1caeac7ee76bc78591e38350d603366678580ba11ef299474a9362b16485a52",
+          "status": "SUCCEEDED"
+        }
+      ],
+      "ledger_at_reopen": {
+        "budget_ref": "gxb_01m88660x8sv3pec14",
+        "jobs_recorded": 3,
+        "lines": {
+          "api_calls": {
+            "booked": 1,
+            "limit": 4,
+            "remaining": 2,
+            "reserved": 1,
+            "unit": "calls"
+          },
+          "cpu_seconds": {
+            "booked": 3,
+            "limit": 300,
+            "remaining": 297,
+            "reserved": 0,
+            "unit": "CPU seconds"
+          },
+          "gpu_jobs": {
+            "booked": 0,
+            "limit": 0,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "GPU jobs"
+          },
+          "gpu_minutes": {
+            "booked": 0,
+            "limit": 0,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "GPU minutes"
+          },
+          "job_submissions": {
+            "booked": 3,
+            "limit": 3,
+            "remaining": 0,
+            "reserved": 0,
+            "unit": "submissions"
+          },
+          "tokens": {
+            "booked": 27524,
+            "limit": 1000000,
+            "remaining": 906940,
+            "reserved": 65536,
+            "unit": "tokens"
+          },
+          "wall_hours": {
+            "booked": 0,
+            "limit": 1,
+            "remaining": 1,
+            "reserved": 0,
+            "unit": "wall hours"
+          },
+          "worker_tasks": {
+            "booked": 0,
+            "limit": 20,
+            "remaining": 20,
+            "reserved": 0,
+            "unit": "tasks"
+          }
+        },
+        "measured_cpu": {
+          "observed": 0.228,
+          "observed_jobs": 3,
+          "pending_or_unmeasured_jobs": 0,
+          "unit": "CPU seconds"
+        },
+        "provider_charge": {
+          "amount": null,
+          "source": "provider_money_cost",
+          "unit": "USD"
+        },
+        "tokens": {
+          "possibly_understated": [],
+          "provider_attributed": 27524,
+          "provisional_booked": 0,
+          "unattributed_delta": 0,
+          "unit": "tokens",
+          "unresolved": [
+            "rsv_01m886fcetdrxbk05m"
+          ]
+        }
+      },
+      "model": "gpt-6.2-astra",
+      "native_tool_arguments": {
+        "decision": {
+          "evidence_refs": [
+            "gxa_01m88660xksphc1a35",
+            "gxa_01m88660xp84fwz6e4",
+            "gxa_01m88660xh8zadv4qf",
+            "gxa_01m88661hea5tc4x5q"
+          ],
+          "mode": "amend",
+          "ops": [
+            {
+              "branch": "branch_f565884426c156703b7f65c433bf08c9",
+              "capability": "tl1a-geometry@1",
+              "depends_on": [],
+              "inputs": [
+                "gxa_01m88660xh8zadv4qf"
+              ],
+              "node": "local:backbone",
+              "op": "add_node",
+              "parameters": {
+                "protocol": "common_backbone"
+              },
+              "question": "在 2RE9 模型 1 的实体 1 中，取三条链共同观测到且占有率为正的主链原子，A–B、A–C、B–C 各自的残基覆盖率、RMSD 和无符号旋转角是多少？"
+            },
+            {
+              "branch": "branch_f565884426c156703b7f65c433bf08c9",
+              "capability": "tl1a-geometry@1",
+              "depends_on": [],
+              "inputs": [
+                "gxa_01m88660xh8zadv4qf"
+              ],
+              "node": "local:ca",
+              "op": "add_node",
+              "parameters": {
+                "protocol": "common_ca"
+              },
+              "question": "在同一模型中仅取三条链共同观测到且占有率为正的 Cα 原子，三个链对各自的残基覆盖率、RMSD 和无符号旋转角是多少，以便和同一链对的共有主链拟合逐项比较？"
+            }
+          ],
+          "rationale": "原记录只涉及一个链对和一种坐标定义，导出文件更名时坐标摘要相同。将两个可用作业用于同一份坐标、全部三个链对的平行拟合，可直接检验各链对对原子选取的敏感性。采用冻结的默认判据。每个链对在两种筛选下均须覆盖至少 60 个残基且达到已观测残基并集的 60%，才评估其跨筛选差值。角度绝对差至多 0.5° 且 RMSD 绝对差至多 0.15 Å 即达标。覆盖不足的链对保留为未定。推断范围限于这份结构和实际测量的两种筛选。",
+          "reconsider_when": [
+            {
+              "event": "job_settled",
+              "subject_ref": "local:backbone"
+            },
+            {
+              "event": "job_settled",
+              "subject_ref": "local:ca"
+            }
+          ]
+        }
+      },
+      "packet_id": "p63",
+      "provider": "openai",
+      "run_id": "gxr_01m88660x3357hk1pg",
+      "source_review_dir": "/tmp/gx-v6-controls-first-review/e8a1ac8357bde46e",
+      "test_of_neutral_commissioning": "FAIL",
+      "thread_id": "01a21067-489e-7502-a7f1-6b66d945a5fb",
+      "turn_id": "01a21067-48c2-7163-b1ee-76e081fd755e"
+    }
+  ]
+}

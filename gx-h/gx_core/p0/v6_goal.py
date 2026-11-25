@@ -63,7 +63,7 @@ def cli_spec(args):
 
 
 def start(conn, spec, *, run_key, current):
-    from ..capabilities import shipped
+    from ..capabilities import manifest, registry, shipped
     from ..orchestration import service
     from ..orchestration.hooks import basic_research_start
     from . import operator, v6_protein, workspace
@@ -103,10 +103,15 @@ def start(conn, spec, *, run_key, current):
     by_id = {row["capability_version"]: row for row in catalog}
     for pin in requested or ():
         if pin not in by_id:
-            if pin not in shipped.MANIFESTS:
-                raise SchemaInvalid(f"No installed goal capability for {pin!r}")
             receipt = shipped.attach(ctx, pin)
-            by_id[pin] = receipt
+            method = registry.resolve(conn, pin)["manifest"]
+            by_id[pin] = {
+                **receipt,
+                "method": method.get("method_card"),
+                "inputs": manifest.input_roles(method),
+                "outputs": method["outputs"],
+                "limitations": method.get("limitations"),
+            }
     public = [by_id[k] for k in requested] if requested is not None else catalog
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
     action = initial_action(spec, basic_research_start(spec))
@@ -117,6 +122,13 @@ def start(conn, spec, *, run_key, current):
             mid = str(uuid.uuid5(uuid.NAMESPACE_URL, "gx-p0-bootstrap/" + rid))
             if operator.apply_bootstrap(conn, rid, first, mid).get("status") != "committed":
                 raise SchemaInvalid("Initial Goal did not commit")
+        # Package-owned methods require an exact saved composition in the Job owner;
+        # a workspace registration on its own does not grant them to this Run.
+        from .manifest import check_capability
+
+        for entry in public:
+            if entry["capability_version"] not in shipped.MANIFESTS:
+                check_capability(conn, rid, entry["capability_version"])
         run = conn.execute("SELECT * FROM runs WHERE run_id=?", (rid,)).fetchone()
         objective = intent.read_item(conn, rid, "objective")
         if objective["value"] != spec["objective"]:
@@ -243,7 +255,7 @@ def instance(conn, rid, checkpoint):
 def _events(conn, rid, after, budget_ref=None):
     # A workspace-level change can have no run_id. Include only this account's
     # actual ancestry. Debits for ordinary model turns must not wake another turn.
-    return conn.execute(
+    events = conn.execute(
         """
         WITH RECURSIVE accounts(ref) AS (
             SELECT coalesce(?, budget_ref) FROM runs WHERE run_id=?
@@ -260,6 +272,26 @@ def _events(conn, rid, after, budget_ref=None):
         ) ORDER BY event_id""",
         (budget_ref, rid, after, rid),
     ).fetchall()
+
+    captured = []
+    for row in events:
+        if row["kind"] == "v6.claim.adopted":
+            payload = store.loads(row, "payload_json")
+            # Early receipts identify the decision directly; recover its scope from the
+            # immutable task even if the event itself did not yet carry that field.
+            if "scope" not in payload:
+                delegation = conn.execute(
+                    "SELECT t.scope FROM v6_decisions d JOIN v6_decision_tasks t USING(task_id) "
+                    "WHERE d.run_id=? AND d.decision_ref=?",
+                    (rid, payload["decision_ref"]),
+                ).fetchone()
+                if delegation:
+                    payload["scope"] = delegation["scope"]
+                    if delegation["scope"].startswith("branch:"):
+                        payload["branch_id"] = delegation["scope"].removeprefix("branch:")
+                    row = {**dict(row), "payload_json": store._j(payload)}
+        captured.append(row)
+    return captured
 
 
 def _matches(row, watches, rid):
@@ -743,7 +775,7 @@ def projection(conn, run, meter):
         "goal_version": g["goal_version"],
         "graph_head": v6_decisions.head(conn, rid),
         "goal_status": g["status"],
-        "waiting_for": waiting_for(conn,rid) if run["status"] == "ACTIVE" else None,
+        "waiting_for": waiting_for(conn, rid) if run["status"] == "ACTIVE" else None,
         "capabilities": store.loads(g, "capabilities_json"),
         "materials": store.loads(g, "materials_json"),
         "resources": v6_costs.resource_report(conn, rid, meter=meter),

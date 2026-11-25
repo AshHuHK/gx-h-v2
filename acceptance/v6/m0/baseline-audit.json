@@ -1,0 +1,81 @@
+{
+  "created_utc": "2026-11-25T01:44:59.055749+00:00",
+  "scope": "M0 engineering baseline, product branches tested before changes; no V6 decision inference",
+  "gx_h_v2": "e02df99757686982744813e5de745e86ef12e0a3",
+  "native": "23d581c27f46e65324246dff269b6ce77c9b3e9a",
+  "product_source_worktree_at_baseline": "",
+  "native_source_worktree_at_baseline": "",
+  "native_reuse_git_trees": {
+    "workflows/module_collaboration": "8d8f7b952bccb6a36c317bb542e24dc91e4e8993",
+    "gx_core/knowledge": "e9e9a9010de868362e5e4cad52ebf83ef72ea52b"
+  },
+  "platform": {
+    "python": "3.11.9",
+    "python_executable": "/opt/conda/bin/python3",
+    "node": "v22.17.0",
+    "npm": "10.9.2",
+    "arch": "x86_64",
+    "kernel": "5.15.0-41-generic",
+    "sqlite": "3.45.3",
+    "biopython": "1.88",
+    "numpy": "1.26.4",
+    "jsonschema": "4.19.2"
+  },
+  "kit_sha256": "7114563e391c2c1a51405ab01e4bbf58bde2e2bdb8f98f017ab58bf7e0f240da",
+  "v5_zip_sha256": "bd7e7d85eaf904b4399c7198b89abe94986be39878674001d2bc11ee6c5a6325",
+  "v5_inputs_match_original_zip": {
+    "contracts/contract-deltas.json": "fd6d4a733348da092e3b3930a4d4d98d432444124595e7f47a84a4ebbad5bf29",
+    "contracts/migrations/zzzzzzzz_v5_research_state.sql": "2794f967688c61e21372ab74c1e6e04653ad33bdd1b9d4abda7aa8e7635c5916",
+    "contracts/tools/apply_contract_deltas.py": "40a4bdea50d5961ee863eb8c7c306122b72d77ee445a4e1cb7707a0f6aa39aec",
+    "acceptance/v5_cases.json": "42fbc0e273090c2bdaf85698e54aea2acb4d300d5b3392e7315b22ed4d3c31b9"
+  },
+  "v5_dispositions_by_stage": {
+    "M3": 11,
+    "M1": 4,
+    "M0/M1": 2,
+    "M2": 12,
+    "M1/M2": 1,
+    "M2/M3": 2,
+    "M0/M2": 1
+  },
+  "v5_reference_cases_mapped_exactly_once": 33,
+  "v5_dry_run_same_as_packaging": true,
+  "plugin_receipt_same_as_packaging": true,
+  "fresh_vs_kit": {
+    "kit_record_id": "gxr_01m88424cctwgg1ryt",
+    "fresh_run_id": "gxr_01m885vthd28bbykes",
+    "equal_scientific_fields": true,
+    "artifact_bytes_identical_to_kit": false,
+    "hashes": {
+      "coordinate_quality": {
+        "fresh_sha256": "92a55bf4a268d1810c579245d5c950022999e26149b7b357597f84974e5e59c5",
+        "kit_sha256": "e649285b2e326cc973c3fb4be20bad8a27825b32e343c80d37278d104ade10b8"
+      },
+      "common_backbone": {
+        "fresh_sha256": "c978964bbad7f2ff5d10b43de419c48778ab1f05cab61b162dc4a500e182ad77",
+        "kit_sha256": "617756905c5b947305d5d957546cca031311314b379aecda2cb93321dd0c39cf"
+      },
+      "common_ca": {
+        "fresh_sha256": "732463f6e46be673534951125b394f8e7d6dbcb3ffdc6faa861971a5eadf7207",
+        "kit_sha256": "53f131a98ff38da34197fc5c8066530d81a4d55f64c1ce1afa72fe3eca919adb"
+      },
+      "ordered_backbone": {
+        "fresh_sha256": "0ee48b7b03c067984b961442769f68fc803a4667d4d9da211f177ba37bab9396",
+        "kit_sha256": "171dba67ea9c6cf530e20011b27acd64c97b4f7f9a42f457a84cef60f19b3993"
+      }
+    },
+    "hash_difference_verified_by_reconstruction": "Only runtime.python 3.11.9 versus 3.11.18 and the downstream inventory digest. Restoring both in a temporary byte string exactly reproduces each of the 4 kit hashes.",
+    "new_jobs": 4,
+    "added_jobs_on_cold_replay": 0,
+    "dataset_count": 1,
+    "independent_fits": 9
+  },
+  "initial_source_findings": {
+    "empty_goal": "p0.cli.start selects a research_ref and orchestration.service._workflow_ref falls back to science_grid; reactor.drive_science returns on empty workflow",
+    "dynamic_execution": "Engine looks up checkpoints by workflow id/version in installed registry; first graph adoption, native lead tool and dispatch fencing are V6 work",
+    "existing_owners": "Task/Lease/Roots, Driver, JobService, artifacts, Intent, budgets and outbox available",
+    "reuse": "Direct git-tree identity for native collaboration/memory; no code copy or replacement of their owners required"
+  },
+  "runtime_network": "offline local released wheels, fixture suite and CPU only",
+  "release_lock_sha256": "455687ada55deecf9d72117ee90ee49d1f598e44ec9e1b84202fe472fc4a3e36"
+}

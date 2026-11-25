@@ -1,0 +1,271 @@
+[
+  {
+    "argv": [
+      "/tmp/gx-acceptance-runtime-mwkyyg5z/locked-runtime/venv/bin/python",
+      "-B",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check/acceptance/phase2a/regression/loopback.py",
+      "--clash",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/clash/clash.new",
+      "--receipt",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/acceptance/v6/engineering/runs/v6-legacy-fe7ff69/raw/cross-process/network.json",
+      "--",
+      "/tmp/gx-acceptance-runtime-mwkyyg5z/locked-runtime/venv/bin/python",
+      "-B",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check/acceptance/phase2a/cross_process.py",
+      "--output",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/acceptance/v6/engineering/runs/v6-legacy-fe7ff69/raw/cross-process/evidence",
+      "--check",
+      "P2A-01",
+      "--check",
+      "P2A-02",
+      "--check",
+      "P2A-03",
+      "--check",
+      "P2A-04",
+      "--check",
+      "P2A-05",
+      "--check",
+      "P2A-06",
+      "--check",
+      "P2A-07",
+      "--check",
+      "P2A-14"
+    ],
+    "cases": [
+      "P2A-01",
+      "P2A-02",
+      "P2A-03",
+      "P2A-04",
+      "P2A-05",
+      "P2A-06",
+      "P2A-07",
+      "P2A-14"
+    ],
+    "classes": [
+      "SCRIPTED",
+      "OFFICIAL_HOST_LOOPBACK"
+    ],
+    "console": "cross-process/console.log",
+    "cwd": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check",
+    "environment": {
+      "ALL_PROXY": "socks5h://127.0.0.1:7891",
+      "CUDA_VISIBLE_DEVICES": "",
+      "GX_TEST_RESOURCE_PROFILE": "deterministic",
+      "HTTPS_PROXY": "http://127.0.0.1:7890",
+      "HTTP_PROXY": "http://127.0.0.1:7890",
+      "LANG": "C.UTF-8",
+      "MKL_NUM_THREADS": "2",
+      "NO_PROXY": "localhost,127.0.0.1,::1",
+      "OMP_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "PIP_NO_INDEX": "1",
+      "TZ": "UTC"
+    },
+    "executed": true,
+    "finished_utc": "2026-11-25T02:03:41.274151+00:00",
+    "name": "cross-process",
+    "network_receipt": "cross-process/network.json",
+    "profile": "deterministic",
+    "returncode": 0,
+    "seconds": 27.956901,
+    "source": "working tree",
+    "started_utc": "2026-11-25T02:03:13.315422+00:00"
+  },
+  {
+    "argv": [
+      "/tmp/gx-acceptance-runtime-mwkyyg5z/locked-runtime/venv/bin/python",
+      "-B",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check/acceptance/phase2a/performance.py",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/acceptance/v6/engineering/runs/v6-legacy-fe7ff69/raw/cross-process/evidence",
+      "--output",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/acceptance/v6/engineering/runs/v6-legacy-fe7ff69/raw/performance/evidence"
+    ],
+    "cases": [
+      "P2A-14"
+    ],
+    "classes": [
+      "SCRIPTED"
+    ],
+    "console": "performance/console.log",
+    "cwd": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check",
+    "environment": {
+      "ALL_PROXY": "socks5h://127.0.0.1:7891",
+      "CUDA_VISIBLE_DEVICES": "",
+      "GX_TEST_RESOURCE_PROFILE": "deterministic",
+      "HTTPS_PROXY": "http://127.0.0.1:7890",
+      "HTTP_PROXY": "http://127.0.0.1:7890",
+      "LANG": "C.UTF-8",
+      "MKL_NUM_THREADS": "2",
+      "NO_PROXY": "localhost,127.0.0.1,::1",
+      "OMP_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "PIP_NO_INDEX": "1",
+      "TZ": "UTC"
+    },
+    "executed": true,
+    "finished_utc": "2026-11-25T02:03:41.368115+00:00",
+    "name": "performance",
+    "profile": "deterministic",
+    "returncode": 0,
+    "seconds": 0.082956,
+    "source": "working tree",
+    "started_utc": "2026-11-25T02:03:41.282408+00:00"
+  },
+  {
+    "argv": [
+      "/tmp/gx-acceptance-runtime-mwkyyg5z/locked-runtime/venv/bin/python",
+      "-B",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check/acceptance/phase2a/branch_failure.py",
+      "--output",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/acceptance/v6/engineering/runs/v6-legacy-fe7ff69/raw/branch-failure/evidence"
+    ],
+    "cases": [
+      "P2A-08"
+    ],
+    "classes": [
+      "SCRIPTED"
+    ],
+    "console": "branch-failure/console.log",
+    "cwd": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check",
+    "environment": {
+      "ALL_PROXY": "socks5h://127.0.0.1:7891",
+      "CUDA_VISIBLE_DEVICES": "",
+      "GX_TEST_RESOURCE_PROFILE": "deterministic",
+      "HTTPS_PROXY": "http://127.0.0.1:7890",
+      "HTTP_PROXY": "http://127.0.0.1:7890",
+      "LANG": "C.UTF-8",
+      "MKL_NUM_THREADS": "2",
+      "NO_PROXY": "localhost,127.0.0.1,::1",
+      "OMP_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "PIP_NO_INDEX": "1",
+      "TZ": "UTC"
+    },
+    "executed": true,
+    "finished_utc": "2026-11-25T02:03:41.900901+00:00",
+    "name": "branch-failure",
+    "profile": "deterministic",
+    "returncode": 0,
+    "seconds": 0.522737,
+    "source": "working tree",
+    "started_utc": "2026-11-25T02:03:41.375376+00:00"
+  },
+  {
+    "argv": [
+      "/tmp/gx-acceptance-runtime-mwkyyg5z/locked-runtime/venv/bin/python",
+      "-B",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check/acceptance/phase2a/regression/loopback.py",
+      "--clash",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/clash/clash.new",
+      "--receipt",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/acceptance/v6/engineering/runs/v6-legacy-fe7ff69/raw/v31-regression/network.json",
+      "--",
+      "/tmp/gx-acceptance-runtime-mwkyyg5z/locked-runtime/venv/bin/python",
+      "-B",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check/acceptance/phase2a/regression/run.py",
+      "--phase",
+      "full",
+      "--revision",
+      "fe7ff695a7328c198ffb5bb90b50cc2391f6f397",
+      "--closure-usage",
+      "--cache",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3",
+      "--source-db",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-h-v-3/var/v3-staging/frozen-a05dcef/snapshot/project/gx.db",
+      "--historical-briefs",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/p1-2476f2b-xhigh",
+      "--catalog",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/scratchpad/v3-real-performance/p1-2476f2b-xhigh/codex-home/models_cache.json",
+      "--out",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/acceptance/v6/engineering/runs/v6-legacy-fe7ff69/raw/v31-regression/evidence",
+      "--gate",
+      "P2A-09",
+      "--gate",
+      "P2A-10",
+      "--gate",
+      "P2A-11",
+      "--gate",
+      "P2A-12",
+      "--gate",
+      "P2A-13",
+      "--gate",
+      "REG01"
+    ],
+    "cases": [
+      "P2A-09",
+      "P2A-10",
+      "P2A-11",
+      "P2A-12",
+      "P2A-13",
+      "REG01"
+    ],
+    "classes": [
+      "SCRIPTED",
+      "OFFICIAL_HOST_LOOPBACK"
+    ],
+    "console": "v31-regression/console.log",
+    "cwd": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check",
+    "environment": {
+      "ALL_PROXY": "socks5h://127.0.0.1:7891",
+      "CUDA_VISIBLE_DEVICES": "",
+      "GX_TEST_RESOURCE_PROFILE": "deterministic",
+      "HTTPS_PROXY": "http://127.0.0.1:7890",
+      "HTTP_PROXY": "http://127.0.0.1:7890",
+      "LANG": "C.UTF-8",
+      "MKL_NUM_THREADS": "2",
+      "NO_PROXY": "localhost,127.0.0.1,::1",
+      "OMP_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "PIP_NO_INDEX": "1",
+      "TZ": "UTC"
+    },
+    "executed": true,
+    "finished_utc": "2026-11-25T02:09:53.797048+00:00",
+    "name": "v31-regression",
+    "network_receipt": "v31-regression/network.json",
+    "profile": "deterministic",
+    "returncode": 0,
+    "seconds": 371.885744,
+    "source": "named Git commit",
+    "started_utc": "2026-11-25T02:03:41.908719+00:00"
+  },
+  {
+    "argv": [
+      "/tmp/gx-acceptance-runtime-mwkyyg5z/locked-runtime/venv/bin/python",
+      "-B",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check/acceptance/phase2a/job_unavailable.py",
+      "--output",
+      "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product/acceptance/v6/engineering/runs/v6-legacy-fe7ff69/raw/jobs/evidence"
+    ],
+    "cases": [
+      "P2A-15"
+    ],
+    "classes": [
+      "SCRIPTED"
+    ],
+    "console": "jobs/console.log",
+    "cwd": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-check",
+    "environment": {
+      "ALL_PROXY": "socks5h://127.0.0.1:7891",
+      "CUDA_VISIBLE_DEVICES": "",
+      "GX_TEST_RESOURCE_PROFILE": "deterministic",
+      "HTTPS_PROXY": "http://127.0.0.1:7890",
+      "HTTP_PROXY": "http://127.0.0.1:7890",
+      "LANG": "C.UTF-8",
+      "MKL_NUM_THREADS": "2",
+      "NO_PROXY": "localhost,127.0.0.1,::1",
+      "OMP_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "PIP_NO_INDEX": "1",
+      "TZ": "UTC"
+    },
+    "executed": true,
+    "finished_utc": "2026-11-25T02:09:56.268989+00:00",
+    "name": "jobs",
+    "profile": "deterministic",
+    "returncode": 0,
+    "seconds": 2.4598,
+    "source": "working tree",
+    "started_utc": "2026-11-25T02:09:53.806240+00:00"
+  }
+]

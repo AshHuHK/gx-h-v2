@@ -187,3 +187,119 @@ class GoalRuntime(unittest.TestCase):
         self.assertEqual(engine.state(self.rid)["workflow_id"], "gx.v6.instance")
         engine.advance(run_id=self.rid)
         self.assertEqual(store.latest_checkpoint(self.db, self.rid)["workflow_version"], "1")
+
+
+class GoalCapabilityAdmission(unittest.TestCase):
+    """Existing registry states are fixtures; exercise the normal Goal and Job owners."""
+
+    def setUp(self):
+        from pathlib import Path
+        import tempfile
+        from gx_core.native_release import native_state
+
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.directory = Path(temporary.name)
+        self.state = self.directory / "state"
+        self.db_path = self.state / "gx.db"
+        self.input = self.directory / "points.json"
+        self.input.write_text(
+            json.dumps(
+                {
+                    "fixture_version": "1",
+                    "synthetic": True,
+                    "method_id": "fixture-grid",
+                    "method_version": "1",
+                    "candidates": [{"candidate_id": "two", "x": 2}],
+                }
+            )
+        )
+        with native_state(self.state), closing(store.open_store(self.db_path)) as conn:
+            from gx_core.capabilities import shipped
+
+            shipped.ensure(context(conn), shipped.GRID)
+
+    def register_fixture(self, name, *, active, package_owned):
+        from gx_core.capabilities import registry, shipped
+
+        with closing(store.open_store(self.db_path)) as conn:
+            bundle = registry.candidate(conn, shipped.GRID)["bundle"]
+            bundle["manifest"]["capability_id"] = name
+            digest = shipped.portable_digest(bundle)
+            package = (
+                {"id": "org.fixture.range", "version": "1", "sha256": "a" * 64, "portable_sha256": digest}
+                if package_owned
+                else None
+            )
+            registered = registry.register_candidate(context(conn), bundle, installed_package=package)
+            # The registration owner starts at DRAFT. Seed the existing ACTIVE asset state
+            # separately from admission; these tests do not exercise governance approval.
+            if active:
+                conn.execute(
+                    "UPDATE assets SET status='ACTIVE' WHERE kind='TOOL_ADAPTER' AND asset_id=? AND version='1'",
+                    (name,),
+                )
+            return digest, registered
+
+    def start(self, name, **kwargs):
+        from tests.test_v6_operator_recovery import OperatorRecovery
+
+        return OperatorRecovery.cli(
+            self,
+            "start",
+            "--run-key",
+            name,
+            "--goal",
+            "Compute one grid observation.",
+            "--capability",
+            name + "@1",
+            "--input",
+            str(self.input),
+            **kwargs,
+        )
+
+    def test_default_registry_state_and_package_composition_are_checked_before_goal_creation(self):
+        self.register_fixture("pending-range", active=False, package_owned=False)
+        self.assertIn("not ACTIVE", self.start("pending-range", expected=1))
+        self.register_fixture("packaged-range", active=True, package_owned=True)
+        self.assertIn("outside this Run composition", self.start("packaged-range", expected=1))
+        with closing(store.open_store(self.db_path)) as conn:
+            for table in ("runs", "v6_goals", "v6_decision_tasks", "jobs", "budget_reservations"):
+                self.assertEqual(conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0], 0, table)
+
+    def test_approved_workspace_capability_keeps_exact_pin_through_real_job(self):
+        import time
+        from gx_core.p0 import v6_jobs
+        from tests import test_v6_operator_recovery as fixture
+
+        name = "workspace-range"
+        digest, registered = self.register_fixture(name, active=True, package_owned=False)
+        result = self.start(name)
+        self.run_id = result["run_id"]
+        self.assertEqual(result["capabilities"], {name + "@1": digest})
+        with closing(store.open_store(self.db_path)) as conn:
+            lead = fixture.OperatorRecovery.claim(self, conn)
+            op = fixture.node("local:measure", name + "@1", result["materials"])
+            op["parameters"] = {"operation": "grid-comparison"}
+            v6_decisions.adopt(conn, **lead, decision=fixture.decision(fixture.branch("local:counts"), op))
+            deadline = time.monotonic() + 10
+            while time.monotonic() < deadline:
+                v6_jobs.advance(conn, self.run_id)
+                row = conn.execute(
+                    "SELECT job_id,status,result_ref FROM v6_nodes WHERE run_id=?", (self.run_id,)
+                ).fetchone()
+                if row["status"] in v6_jobs.NODE_TERMINAL:
+                    break
+                time.sleep(0.05)
+            self.assertEqual(row["status"], "SUCCEEDED")
+            job = conn.execute(
+                "SELECT capability_id,capability_version,input_manifest_ref FROM jobs WHERE job_id=?",
+                (row["job_id"],),
+            ).fetchone()
+            self.assertEqual((job["capability_id"], job["capability_version"]), (name, "1"))
+            raw = ArtifactService(conn).read_json(row["result_ref"])
+            self.assertEqual(raw["observations"][0]["score"], 0)
+            execution = conn.execute(
+                "SELECT identity_json FROM v6_job_attempts WHERE run_id=?", (self.run_id,)
+            ).fetchone()
+            self.assertEqual(json.loads(execution[0])["manifest_sha256"], registered["manifest_sha256"])

@@ -1,0 +1,144 @@
+{
+  "arguments": {
+    "decision": {
+      "evidence_refs": [
+        "gxa_01m886be6jnhvmmqdy"
+      ],
+      "mode": "amend",
+      "ops": [
+        {
+          "alternative": "At least one chain pair changes beyond tolerance with atom choice or residue filtering, or a selection retains too few residues to judge broad agreement.",
+          "branch": "local:selection_sensitivity",
+          "budget_limits": {
+            "api_calls": 5,
+            "cpu_seconds": 300,
+            "job_submissions": 5,
+            "worker_tasks": 24
+          },
+          "discriminating_observation": "For each chain pair compare every protocol pair. Require both an RMSD difference ≤0.15 Å and an unsigned angle difference ≤0.5°. Assess coverage of each selection against both 60 residues and 60% of the observed residue union. Check independent reproduction within 0.001 Å and 0.01°.",
+          "hypothesis": "For each chain pair in 2RE9 model 1, RMSD and unsigned rotation angle agree within the registered comparison tolerances across the three coordinate selections, with adequate residue coverage.",
+          "method_family": "Matched rigid superposition under three coordinate selections with independent numerical review",
+          "op": "open_branch",
+          "stop_condition": "Assess each chain pair once the inventory, three fits and independent review settle. Limit any inference to the coordinates covered in this deposition and identify any comparison left unresolved by coverage, missing output or a reproduction discrepancy."
+        },
+        {
+          "branch": "local:selection_sensitivity",
+          "capability": "tl1a-coordinate-quality@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m886be6jnhvmmqdy"
+          ],
+          "node": "local:inventory",
+          "op": "add_node",
+          "parameters": {},
+          "question": "Which residues and atoms are observed in model 1, entity 1, chains A/B/C, and how much of the observed residue union does each registered selection retain?"
+        },
+        {
+          "branch": "local:selection_sensitivity",
+          "capability": "tl1a-geometry@1",
+          "depends_on": [
+            "local:inventory"
+          ],
+          "inputs": [
+            "gxa_01m886be6jnhvmmqdy",
+            "local:inventory"
+          ],
+          "node": "local:backbone",
+          "op": "add_node",
+          "parameters": {
+            "protocol": "common_backbone"
+          },
+          "question": "What coverage, RMSD and unsigned rotation angle does each chain pair yield using all positive-occupancy N, Cα, C and O atom identities shared by the three chains?"
+        },
+        {
+          "branch": "local:selection_sensitivity",
+          "capability": "tl1a-geometry@1",
+          "depends_on": [
+            "local:inventory"
+          ],
+          "inputs": [
+            "gxa_01m886be6jnhvmmqdy",
+            "local:inventory"
+          ],
+          "node": "local:alpha_carbon",
+          "op": "add_node",
+          "parameters": {
+            "protocol": "common_ca"
+          },
+          "question": "What coverage, RMSD and unsigned rotation angle does each chain pair yield using only positive-occupancy Cα identities shared by the three chains?"
+        },
+        {
+          "branch": "local:selection_sensitivity",
+          "capability": "tl1a-geometry@1",
+          "depends_on": [
+            "local:inventory"
+          ],
+          "inputs": [
+            "gxa_01m886be6jnhvmmqdy",
+            "local:inventory"
+          ],
+          "node": "local:ordered",
+          "op": "add_node",
+          "parameters": {
+            "protocol": "ordered_backbone"
+          },
+          "question": "What coverage, RMSD and unsigned rotation angle does each chain pair yield when all four backbone atoms must be present with occupancy 1 and B ≤40 Å² on all three chains?"
+        },
+        {
+          "branch": "local:selection_sensitivity",
+          "capability": "tl1a-review@1",
+          "depends_on": [
+            "local:backbone",
+            "local:alpha_carbon",
+            "local:ordered"
+          ],
+          "inputs": [
+            "gxa_01m886be6jnhvmmqdy",
+            "local:backbone",
+            "local:alpha_carbon",
+            "local:ordered"
+          ],
+          "node": "local:review",
+          "op": "add_node",
+          "parameters": {},
+          "question": "Does independent coordinate parsing and SVD superposition reproduce every protocol's results for A–B, A–C and B–C within the registered numerical tolerances?"
+        }
+      ],
+      "rationale": "2RE9 is the sole experimental source. Its three copies of entity 1 permit matched comparisons of A–B, A–C and B–C under three coordinate selections. Measuring coverage alongside each fit will distinguish agreement over a broadly observed structure from agreement confined to a small subset. Repeating all fits with a second implementation will check the numerical results. The current brief contains no fit measurements.",
+      "reconsider_when": [
+        {
+          "event": "job_settled",
+          "subject_ref": "local:review"
+        },
+        {
+          "event": "job_settled",
+          "subject_ref": "local:inventory"
+        },
+        {
+          "event": "job_settled",
+          "subject_ref": "local:backbone"
+        },
+        {
+          "event": "job_settled",
+          "subject_ref": "local:alpha_carbon"
+        },
+        {
+          "event": "job_settled",
+          "subject_ref": "local:ordered"
+        }
+      ]
+    }
+  },
+  "attempt": 1,
+  "call_id": "call_ab38e23196dc41e7bad88c93894ed247",
+  "namespace": "gx",
+  "native_rollout_name": "rollout-2026-11-25T01-50-34-01a21065-c2e8-7183-9e19-f3b3178b7d03.jsonl",
+  "response": {
+    "error": "BUDGET_EXCEEDED: Requested branch funding exceeds api_calls available to this Run"
+  },
+  "source": "official Codex rollout function_call + matching function_call_output",
+  "task_id": "gxt_01m886be7hh2nv04ea",
+  "thread_id": "01a21065-c2e8-7183-9e19-f3b3178b7d03",
+  "tool": "gx_decide_revision",
+  "turn_id": "01a21065-c314-76f2-b284-de788aa8ae01"
+}

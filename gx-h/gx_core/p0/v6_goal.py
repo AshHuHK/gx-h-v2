@@ -164,8 +164,15 @@ def start(conn, spec, *, run_key, current):
     return snapshot(conn, outcome["run_id"])
 
 
+def _is_json_artifact(meta):
+    media = (meta["media_type"] or "").partition(";")[0].strip().lower()
+    return media == "application/json" or media.endswith("+json") or (
+        not media and Path(meta["rel_path"]).suffix.lower() == ".json"
+    )
+
+
 def record_observation(conn, run_id, artifact_ref, *, source, scope="run", observation=None, acquisition=None):
-    """Trusted input/measurement owner records a citation and immutable JSON from that run."""
+    """Record a citation to verified, run-local material in its original media type."""
     assets = ArtifactService(conn)
     meta = assets.describe(artifact_ref)
     if meta["run_id"] != run_id or not source or not isinstance(source, str):
@@ -177,9 +184,16 @@ def record_observation(conn, run_id, artifact_ref, *, source, scope="run", obser
         ).fetchone()
     ):
         raise SchemaInvalid("The observation scope is unknown in this run")
-    content = assets.read_json(artifact_ref)
-    if observation is not None and ids.canonical_json(observation) != ids.canonical_json(content):
-        raise SchemaInvalid("The proposed observation differs from its artifact")
+    if _is_json_artifact(meta):
+        content = assets.read_json(artifact_ref)
+        if observation is not None and ids.canonical_json(observation) != ids.canonical_json(content):
+            raise SchemaInvalid("The proposed observation differs from its artifact")
+    elif observation is not None:
+        raise SchemaInvalid("A non-JSON observation is registered by its immutable artifact reference")
+    else:
+        verified = assets.verify(artifact_ref)
+        if not verified["ok"]:
+            raise SchemaInvalid("Observation bytes differ from the registered artifact", details=verified)
     payload = {"source": source, "artifact_ref": artifact_ref, "scope": scope, "sha256": meta["sha256"]}
     if acquisition is not None:
         from . import v62_outputs
@@ -316,6 +330,65 @@ def _matches(row, watches, rid):
     return any(w["event"] in events and w["subject_ref"] in subjects for w in watches)
 
 
+def _branch_watch_hits(conn, rid, goal_version, events):
+    """An active branch's last adopted watch can request one Run Lead judgment."""
+    hits = {}
+    if not events:
+        return hits
+    decisions = conn.execute(
+        "SELECT d.decision_ref,d.receipt_json,t.scope,c.event_cursor,b.branch_id,"
+        "json_extract(d.request_json,'$.decision.rationale') AS rationale FROM v6_decisions d "
+        "JOIN v6_decision_tasks t USING(task_id) JOIN research_contexts c ON c.context_ref=t.context_ref "
+        "JOIN v6_branches b ON b.run_id=d.run_id "
+        "AND t.scope='branch:'||b.branch_id WHERE b.status='OPEN' AND d.rowid IN ("
+        "SELECT max(x.rowid) FROM v6_decisions x JOIN v6_decision_tasks s USING(task_id) "
+        "WHERE x.run_id=? AND s.goal_version=? AND s.scope LIKE 'branch:%' GROUP BY s.scope) "
+        "ORDER BY b.branch_id", (rid, goal_version)
+    )
+    for decision in decisions:
+        watches = store.loads(decision, "receipt_json")["reconsider_when"]
+        for event in events:
+            payload = store.loads(event, "payload_json")
+            event_scope = payload.get("branch_id") or payload.get("scope") or "run"
+            if (event["event_id"] <= decision["event_cursor"]
+                    or event_scope not in ("run", decision["scope"], decision["branch_id"])
+                    or payload.get("decision_ref") == decision["decision_ref"] and event["kind"] == "v6.claim.adopted"):
+                continue
+            matched = [w for w in watches if _matches(event, [w], rid)]
+            if matched:
+                hits.setdefault(event["event_id"], []).append({
+                    "scope": decision["scope"], "branch_id": decision["branch_id"],
+                    "decision_ref": decision["decision_ref"], "previous_rationale": decision["rationale"],
+                    "matched_watches": matched,
+                })
+    return hits
+
+
+def _operator_evidence(conn, rid, row):
+    if row["kind"] != "v6.observation.added":
+        return False
+    return conn.execute(
+        "SELECT 1 FROM sources WHERE namespace=? AND source_id=? AND origin='human_input' "
+        "AND kind='operator_note' AND json_extract(provenance_json,'$.review_artifact_ref')=?",
+        (rid, row["subject_id"], store.loads(row, "payload_json")["artifact_ref"]),
+    ).fetchone() is not None
+
+
+def _run_wakes(conn, rid, prior, events):
+    watches = store.loads(prior, "receipt_json")["reconsider_when"]
+    for row in events:
+        payload = store.loads(row, "payload_json")
+        if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
+            continue
+        if (row["kind"] == "v6.intent.changed" or _operator_evidence(conn, rid, row)
+                or row["kind"] == "v6.decision.superseded" and payload.get("scope") == "run"
+                or row["kind"] == "v62.round.settled" and payload.get("reconsider")
+                or row["kind"] == "v62.claim.reassessed" and payload.get("critical_counterevidence")
+                or _matches(row, watches, rid)):
+            return True
+    return False
+
+
 def _open(conn, rid):
     marks = ",".join("?" for _ in ACTIVE_TASKS)
     return conn.execute(
@@ -368,7 +441,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             refs.append(ref)
             if row["kind"] == "v6.observation.added":
                 refs.append(facts["id"])
-            if meta["bytes"] <= 32_768:
+            if meta["bytes"] <= 32_768 and _is_json_artifact(meta):
                 content = ArtifactService(conn).read_json(ref)
                 job = (
                     conn.execute(
@@ -384,7 +457,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                         content = provider.project(content)
                 facts["observation"] = content
             else:
-                facts["read_with"] = "gx_read_artifact"
+                facts.update(read_with="gx_read_artifact", media_type=meta["media_type"], bytes=meta["bytes"])
         observations.append(facts)
     nodes = [
         dict(r)
@@ -575,24 +648,9 @@ def _prepare_brief(conn, run_id):
         ).fetchone()
         is None
     )
-    if prior and not changed:
-        watches = store.loads(prior, "receipt_json").get("reconsider_when", [])
-        if not any(
-            row["kind"] == "v6.intent.changed"
-            or (row["kind"] == "v62.round.settled" and store.loads(row, "payload_json").get("reconsider"))
-            or (row["kind"] == "v62.claim.reassessed" and store.loads(row, "payload_json").get("critical_counterevidence"))
-            or (
-                row["kind"] == "v6.decision.superseded"
-                and store.loads(row, "payload_json").get("scope") == "run"
-            )
-            or _matches(row, watches, run_id)
-            for row in events
-            if not (
-                row["kind"] == "v6.claim.adopted"
-                and store.loads(row, "payload_json").get("decision_ref") == prior["decision_ref"]
-            )
-        ):
-            return None
+    branch_hits = _branch_watch_hits(conn, run_id, goal["goal_version"], events)
+    if prior and not changed and not branch_hits and not _run_wakes(conn, run_id, prior, events):
+        return None
     head = v6_decisions.head(conn, run_id)
     cursor = events[-1]["event_id"] if events else last
     key = ids.sha256_of_obj([goal["goal_version"], head, cursor])
@@ -601,6 +659,12 @@ def _prepare_brief(conn, run_id):
     ).fetchone():
         return None
     brief = _brief(conn, run, goal, head, events, cursor, prior)
+    for change in brief["trigger"]["changes"]:
+        hits = branch_hits.get(change["event_id"], [])
+        if hits:
+            change["branch_watches"] = hits
+            brief["evidence_refs"].extend(hit["decision_ref"] for hit in hits)
+    brief["evidence_refs"] = list(dict.fromkeys(brief["evidence_refs"]))
     return run, goal, prior, head, cursor, key, brief
 
 
@@ -740,12 +804,13 @@ def impact(conn, rid, edits, *, commit):
 
 
 def waiting_for(conn, rid):
+    marks = ",".join("?" for _ in ACTIVE_TASKS)
     open_tasks = [
         dict(row)
         for row in conn.execute(
             "SELECT d.task_id, d.scope, d.context_ref, t.status FROM v6_decision_tasks d JOIN tasks t "
-            "USING(task_id) WHERE d.run_id=? AND t.status NOT IN ('ACCEPTED','CANCELLED') ORDER BY t.rowid",
-            (rid,),
+            f"USING(task_id) WHERE d.run_id=? AND t.status IN ({marks}) ORDER BY t.rowid",
+            (rid, *ACTIVE_TASKS),
         )
     ]
     if open_tasks:
@@ -762,11 +827,18 @@ def waiting_for(conn, rid):
         return {"kind": "nodes", "nodes": nodes, "continue_with": "gx-p0 run"}
     prior = _latest(conn, rid)
     if prior:
+        version = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]
+        events = _events(conn, rid, prior["event_cursor"])
+        watches = store.loads(prior, "receipt_json")["reconsider_when"]
+        if _run_wakes(conn, rid, prior, events) or _branch_watch_hits(conn, rid, version, events):
+            return {"kind": "research_event", "through_cursor": events[-1]["event_id"],
+                    "decision_ref": prior["decision_ref"], "watches": watches, "continue_with": "gx-p0 run"}
         return {
-            "kind": "research_event",
+            "kind": "operator",
+            "reason": "No runnable research node or decision remains. The persisted watches await new input.",
             "decision_ref": prior["decision_ref"],
-            "watches": store.loads(prior, "receipt_json")["reconsider_when"],
-            "continue_with": "gx-p0 run",
+            "watches": watches,
+            "continue_with": "gx-p0 message --supplement <new evidence>, or revise the formal Goal",
         }
     return None
 

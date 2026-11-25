@@ -310,6 +310,7 @@ def _matches(row, watches, rid):
         "v6.claim.adopted": {"claim_changed"},
         "v62.claim.reassessed": {"claim_changed"},
         "v62.round.settled": set(),
+        "v62.module.wake": {"module_report"},
         "run.transition": {"operator_reopened"},
     }.get(kind, {"budget_changed"})
     subjects = {
@@ -327,6 +328,10 @@ def _matches(row, watches, rid):
     }
     if kind == "v6.intent.changed":
         subjects.update(item["item_id"] for item in payload["items"])
+    if kind == "v62.module.wake":
+        modules = payload.get("module_instance_ids", ())
+        subjects.update(modules)
+        subjects.update("module:" + instance for instance in modules)
     return any(w["event"] in events and w["subject_ref"] in subjects for w in watches)
 
 

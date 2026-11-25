@@ -175,7 +175,16 @@ def compile_graph(conn, request, previous, visible_refs, capabilities):
                     *(nid for nid, spec in nodes.items() if spec["branch"] == own_branch)}
     for watch in watches:
         subject = watch["subject_ref"]
-        if subject not in subjects:
+        if watch["event"] == "module_report":
+            from . import v62_maturity
+            if scope != "run" or not v62_maturity.enrolled(conn, run_id):
+                raise ScopeDenied("Only the Run Lead can request an early module report")
+            if subject not in ("run", run_id) and not conn.execute(
+                "SELECT 1 FROM v62_modules WHERE run_id=? AND ? IN (module_instance_id,scope)",
+                (run_id, subject),
+            ).fetchone():
+                raise SchemaInvalid("The report watch must identify this Run or one of its assigned modules")
+        elif subject not in subjects:
             raise SchemaInvalid(f"Watch subject is outside the current graph and visible evidence: {subject}")
     return graph, resolved_ops, aliases, watches
 

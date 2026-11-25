@@ -55,6 +55,8 @@ def _promoted_objects():
 
 
 def verify_promoted(conn, *, require_all):
+    """Check objects already installed and identify DDL still owed by each unreceipted migration."""
+    missing = {}
     meta = store.read_meta(conn)
     installed = dict(conn.execute(
         "SELECT lower(name),sql FROM sqlite_schema "
@@ -64,12 +66,14 @@ def verify_promoted(conn, *, require_all):
         if key in meta and meta[key] != digest:
             raise ValueError(f"Applied P0 migration changed on disk: {key}")
         if name not in installed and not require_all and key not in meta:
-            continue  # An older store has not reached this migration.
+            missing.setdefault(key, []).append(sql)
+            continue
         if installed.get(name) != sql:
             raise StoreUnavailable(
                 f"Published V6 schema object {name} differs from {key}",
                 details={"reason": "contract_shape_mismatch", "object": name, "migration": key},
             )
+    return missing
 
 
 def install(conn):
@@ -84,15 +88,19 @@ def install(conn):
     if not pending:
         return
     with store.transaction(conn, transaction_owner="Store", operation="install_p0_schema") as tx:
-        if any(key in _PROMOTED for key, _, _ in pending):
-            verify_promoted(tx, require_all=True)
+        promoted_pending = any(key in _PROMOTED for key, _, _ in pending)
+        # An operator-only writable open keeps the old global contract stamp and
+        # may arrive before a full store open has installed the promoted objects.
+        missing = verify_promoted(tx, require_all=False) if promoted_pending else {}
         for key, digest, statements in pending:
             row = tx.execute("SELECT value FROM schema_meta WHERE key=?", (key,)).fetchone()
             if row and row[0] == digest:
                 continue
             if row:
                 raise ValueError(f"Incompatible P0 migration: {key}")
-            if key not in _PROMOTED:
-                for statement in statements:
-                    tx.execute(statement)
+            remaining = missing.get(key, ()) if key in _PROMOTED else statements
+            for statement in remaining:
+                tx.execute(statement)
             tx.execute("INSERT INTO schema_meta(key,value) VALUES(?,?)", (key, digest))
+        if promoted_pending:
+            verify_promoted(tx, require_all=True)

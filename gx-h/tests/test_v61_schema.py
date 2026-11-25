@@ -90,6 +90,28 @@ class PromotedSchema(unittest.TestCase):
                 "SELECT COUNT(*) FROM events WHERE kind='store.contract_resynced'").fetchone()[0], 1)
             schema.verify_promoted(reopened, require_all=True)
 
+    def test_operator_only_partial_p0_upgrade_is_atomic_and_preserves_original_store_stamp(self):
+        self.mark_old()
+        key = "p0.migration.v6_job_indexes.sql"
+        indexes = [r for r in schema._promoted_objects().items() if r[1][0] == key]
+        self.assertGreater(len(indexes), 1)
+        self.db.execute("DELETE FROM schema_meta WHERE key=?", (key,))
+        missing, collision = (entry[0] for entry in indexes[:2])
+        self.db.execute(f"DROP INDEX {missing}")
+        self.db.execute(f"DROP INDEX {collision}")
+        self.db.execute(f"CREATE INDEX {collision} ON jobs(job_id)")
+        with self.assertRaisesRegex(StoreUnavailable, collision):
+            schema.install(self.db)
+        self.assertNotIn(key, store.read_meta(self.db))
+        self.assertFalse(self.db.execute("SELECT 1 FROM sqlite_schema WHERE name=?", (missing,)).fetchone())
+        self.db.execute(f"DROP INDEX {collision}")
+        schema.install(self.db)
+        schema.install(self.db)
+        schema.verify_promoted(self.db, require_all=True)
+        self.assertEqual(store.read_meta(self.db)["contract_sha256"], self.v6["contract_sha256"])
+        self.assertEqual(self.db.execute(
+            "SELECT COUNT(*) FROM events WHERE kind='store.contract_resynced'").fetchone()[0], 0)
+
     def test_native_preflight_requires_known_old_pair_and_current_version(self):
         directory = Path(self.temp) / "owned"
         with native_state(directory, env={}) as state, closing(store.open_store(state.db_path)) as conn:

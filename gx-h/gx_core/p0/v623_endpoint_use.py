@@ -6,7 +6,7 @@ FIELDS = ("comparison_plan", "comparison_id", "disposition", "metric_refs", "aff
 INCOMPLETE_STOPS = {"UNREAD_EVIDENCE", "INSUFFICIENT_DATA", "BUDGET", "TIME_LIMIT", "OPERATOR"}
 
 
-def prepare(conn, task):
+def prepare(conn, task, *, metric_details=None):
     """Read immutable published outputs outside the writer, within the frozen task's scope."""
     from . import v623_endpoints
 
@@ -28,21 +28,78 @@ def prepare(conn, task):
         if not metrics:
             continue
         by_source[source] = {metric["metric_ref"] for metric in metrics}
+        if metric_details is not None:
+            metric_details.update((m["metric_ref"], m) for m in metrics)
         compact = v623_endpoints.compact_rows(metrics)
         for metric, short in zip(metrics, compact, strict=True):
             aliases[source + "#" + short["key"]] = metric["metric_ref"]
     return by_source, aliases
 
 
-def verify(conn, task, root, turn, decision, inventory, *, closing):
+def resolve_delivered(conn, task, root, turn, decision, inventory, *, received_metrics=None):
+    """Resolve each selected wire key against its own officially delivered source."""
+    from . import v623_exposure
+
+    by_source, aliases = inventory
+    proofs = v623_exposure.received(conn, run_id=root["run_id"], task_id=task["task_id"],
+                                    lease_id=root["lease_id"], thread_id=root["thread_id"], turn_id=turn,
+                                    aliases=aliases, by_source=True)
+    delivered = {key: proof for key, proof in proofs.items() if key[1] in by_source.get(key[0], ())}
+    if received_metrics is not None:
+        received_metrics.update((ref, proof) for (_, ref), proof in delivered.items())
+    sources = set(decision.get("evidence_refs", ()))
+    selected = {}
+    for citation in decision.get("metric_refs", ()):
+        matches = [(source, ref) for source, ref in delivered
+                   if citation == ref or aliases.get(source + "#" + citation) == ref or
+                   (citation.startswith(source + "#") and aliases.get(citation) == ref)]
+        if len(matches) > 1 and sources:
+            scoped = [key for key in matches if key[0] in sources]
+            if scoped:
+                matches = scoped
+        if not matches:
+            raise ScopeDenied("Select a row delivered to this Lead, or read the source's endpoint page first",
+                              details={"reason": "endpoint_not_received", "field": "metric_refs",
+                                       "citation": citation})
+        if len(matches) > 1:
+            choices = {key for key, ref in aliases.items() if (key.rsplit("#", 1)[0], ref) in matches}
+            raise SchemaInvalid("Choose the intended delivered source and row",
+                                details={"reason": "endpoint_ambiguous", "field": "metric_refs",
+                                         "options": sorted(choices)})
+        key, = matches
+        source, ref = key
+        if ref in selected:
+            raise SchemaInvalid("Select each concrete endpoint once",
+                                details={"reason": "duplicate_endpoint", "field": "metric_refs"})
+        selected[ref] = delivered[key]
+    if "metric_refs" in decision:
+        decision["metric_refs"] = list(selected)
+        decision["evidence_refs"] = list(dict.fromkeys([*decision["evidence_refs"],
+                                                       *(p["source_ref"] for p in selected.values())]))
+    return selected
+
+
+def verify(conn, task, root, turn, decision, inventory, *, closing, selected=None):
     """Fence actor receipts and resolve explicit citations inside the adoption transaction."""
     from . import v623_exposure
 
     by_source, aliases = inventory
     all_refs = set().union(*by_source.values())
-    exposures = v623_exposure.received(conn, run_id=root["run_id"], task_id=task["task_id"],
-                                       lease_id=root["lease_id"], thread_id=root["thread_id"], turn_id=turn,
-                                       aliases=aliases)
+    deliveries = v623_exposure.received(conn, run_id=root["run_id"], task_id=task["task_id"],
+                                        lease_id=root["lease_id"], thread_id=root["thread_id"], turn_id=turn,
+                                        aliases=aliases, by_source=selected is not None)
+    if selected is None:
+        exposures = deliveries
+    else:
+        exposures = {ref: proof for (source, ref), proof in deliveries.items() if ref in by_source.get(source, ())}
+        # Keep the exact source/official delivery selected in prepare. A second delivery
+        # of the same immutable endpoint via another report cannot substitute for it.
+        for ref, proof in selected.items():
+            current = deliveries.get((proof["source_ref"], ref))
+            if current is None or current["event_id"] < proof["event_id"]:
+                raise ScopeDenied("The selected endpoint delivery is no longer in the deciding Lead's scope",
+                                  details={"reason": "endpoint_not_received", "field": "metric_refs"})
+        exposures.update(selected)
     received = {ref for ref, proof in exposures.items() if ref in by_source.get(proof["source_ref"], ())}
     used = set()
     for citation in decision.get("metric_refs", []):

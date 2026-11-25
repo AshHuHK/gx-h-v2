@@ -25,7 +25,7 @@ class Controller(unittest.TestCase):
         self.work.mkdir()
         materials.prepare(self.work/"custody")
         spec = pilot.cohort_grant("single", self.p)
-        with Scenario(slot, spec_updates=spec) as scenario:
+        with Scenario(slot, spec_updates={**spec, "historical_replay": True}) as scenario:
             (slot/"raw").mkdir()
             with (slot/".lock").open("a") as lock:
                 cli = pilot.native.native_cli(slot,{**os.environ,"GX_CODEX_OFFLINE":"1"},lock.fileno())

@@ -12,7 +12,7 @@ def decision_schema():
     return contracts.native_goal_tool_spec("gx_decide_revision")["inputSchema"]["properties"]["decision"]
 
 
-def _shape(value, spec):
+def _shape(value, spec, *, measurement_branch=None):
     errors = schema.validate(value, spec)
     if errors:
         raise SchemaInvalid("; ".join(errors[:4]))
@@ -26,17 +26,24 @@ def _shape(value, spec):
         if spec.get("uniqueItems") and len(set(map(ids.canonical_json, value))) != len(value):
             raise SchemaInvalid("Repeated decision reference or watch")
         for item in value:
-            _shape(item, spec["items"])
+            _shape(item, spec["items"], measurement_branch=measurement_branch)
+    if "oneOf" in spec and not isinstance(value, dict):
+        raise SchemaInvalid("Expected a graph operation object")
     if isinstance(value, dict):
         if "oneOf" in spec:
             variant = next((candidate for candidate in spec["oneOf"]
                             if candidate["properties"]["op"]["const"] == value.get("op")), None)
             if not variant:
                 raise SchemaInvalid("Unknown graph operation")
-            _shape(value, variant)
+            # Only the private transport branch created for a single cheap measurement
+            # has no scientific hypothesis. An explicit opening uses the full contract.
+            if (measurement_branch and value.get("branch") == measurement_branch and
+                    value.get("op") == "open_branch" and set(value) == {"op", "branch", "budget_limits"}):
+                variant = dict(variant, required=["op", "branch", "budget_limits"])
+            _shape(value, variant, measurement_branch=measurement_branch)
         for name, child in spec.get("properties", {}).items():
             if name in value:
-                _shape(value[name], child)
+                _shape(value[name], child, measurement_branch=measurement_branch)
         if "propertyNames" in spec:
             if value.keys() - set(spec["propertyNames"]["enum"]):
                 raise SchemaInvalid("Unknown branch budget unit")
@@ -46,12 +53,12 @@ def _shape(value, spec):
                 raise SchemaInvalid("Branch budget exceeds the supported numeric range") from exc
 
 
-def validate_body(decision):
+def validate_body(decision, *, measurement_branch=None):
     try:
         json.dumps(decision, allow_nan=False)
     except (TypeError, ValueError, OverflowError) as exc:
         raise SchemaInvalid("Expected finite JSON decision values") from exc
-    _shape(decision, decision_schema())
+    _shape(decision, decision_schema(), measurement_branch=measurement_branch)
     ops = decision["ops"]
     if any(not isinstance(op, dict) for op in ops):
         raise SchemaInvalid("Expected a graph operation object")

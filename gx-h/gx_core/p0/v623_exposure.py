@@ -48,7 +48,7 @@ def brief_ack(conn, root, delivery):
     if hashlib.sha256(root["brief"].encode()).hexdigest() != delivery["text_sha256"]:
         return
     packet = v6_native.brief(root)
-    if packet.get("evidence_policy") == endpoints.POLICY:
+    if packet.get("evidence_policy") in v621_policy.LIVE_SCIENCE:
         _save(conn, root, delivery["turn_id"], delivery["event_id"], "brief", _packet(conn, packet))
 
 
@@ -118,7 +118,7 @@ def read_completed(conn, root, turn, item):
     _save(conn, root, turn, item["id"], "artifact_read", proofs)
 
 
-def received(conn, *, run_id, task_id, lease_id, thread_id, turn_id, aliases=None):
+def received(conn, *, run_id, task_id, lease_id, thread_id, turn_id, aliases=None, by_source=False):
     """Resolve only trusted values on this actor's acknowledged native turns up to the requested turn."""
     result, cache = {}, {}
     query = """SELECT e.event_id,e.payload_json FROM events e WHERE e.run_id=? AND e.kind=? AND e.actor=?
@@ -131,20 +131,20 @@ def received(conn, *, run_id, task_id, lease_id, thread_id, turn_id, aliases=Non
         receipt = json.loads(event["payload_json"])
         for proof in receipt.pop("endpoints"):
             source = proof["source_ref"]
+            delivery = {**receipt, "source_ref": source, "event_id": event["event_id"]}
             if external := proof.get("external_endpoint"):
-                result[external["metric_ref"]] = {**receipt, "source_ref":source, "event_id":event["event_id"],
-                                                "external_endpoint":external}
-                continue
-            if aliases is not None:
-                # The decision owner resolved its immutable, visible source set before the writer.
+                ref = external["metric_ref"]
+                delivery["external_endpoint"] = external
+            elif aliases is not None:
+                # The decision owner resolved the visible immutable sources before the writer.
                 ref = proof.get("metric_ref") or aliases.get(source + "#" + proof["row"]["key"])
-                if ref:
-                    result[ref] = {**receipt, "source_ref":source, "event_id":event["event_id"]}
-                continue
-            if source not in cache:
-                metrics = endpoints.registered(conn, run_id, source)
-                cache[source] = {m["metric_ref"]:row for m, row in zip(metrics, endpoints.compact_rows(metrics))}
-            for ref, row in cache[source].items():
-                if ref == proof.get("metric_ref") or row == proof.get("row"):
-                    result[ref] = {**receipt, "source_ref":source, "event_id":event["event_id"]}
+            else:
+                if source not in cache:
+                    metrics = endpoints.registered(conn, run_id, source)
+                    cache[source] = {m["metric_ref"]: row for m, row in zip(metrics, endpoints.compact_rows(metrics))}
+                ref = next((r for r, row in cache[source].items()
+                            if r == proof.get("metric_ref") or row == proof.get("row")), None)
+            if ref:
+                key = (source, ref) if by_source else ref
+                result[key] = delivery
     return result

@@ -449,6 +449,7 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False, timel
     results, gaps, prior_availability = [], [], False
     seen = set()
     original_facts = set()
+    verified_materials = reg.get("material_identity") == "endpoint_verified"
     for eid, item, reason, observed_scope in _published(conn, run, claim["decision_scope"], through):
         if item.get("status") and item["status"] not in ("SUCCEEDED", "REUSED"):
             if _failure_matches(conn, item, data):
@@ -483,7 +484,12 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False, timel
             from . import v622_propositions
             material_pins = v622_propositions.input_materials(fact, item, reading)
             if bindings is not None:
-                keys = sorted({key for p in material_pins for key in bindings.get(p["artifact_ref"], ())})
+                if verified_materials:
+                    from . import v623_chronology
+                    keys = v623_chronology.material_keys(bindings, fact, item, reading)
+                    identity = ids.sha256_of_obj([identity, keys])
+                else:
+                    keys = sorted({key for p in material_pins for key in bindings.get(p["artifact_ref"], ())})
                 matches = sorted({p["sha256"] for p in reg["data"] if p.get("material_key", p["sha256"]) in keys})
             else:
                 matches = sorted(data.intersection(p["sha256"] for p in material_pins))
@@ -525,6 +531,8 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False, timel
             exclusion = "unknown_first_production"
         elif first <= reg["event_id"] or any(reg.get("known_at_registration", {}).get(sha) for sha in (keys if timeline is not None else matches)):
             exclusion = "already_available"
+        elif verified_materials and any(timeline[key].get("material_identity_uncertainty") for key in keys):
+            exclusion = "unknown_first_production"
         elif fact.get("job_id") and (launch is None or launch <= reg["event_id"]):
             exclusion = "unverified_production_order"
         if exclusion:
@@ -764,7 +772,8 @@ def attach(conn, run, claim, prior, data, method_pin, event_id):
         from . import v621_policy, v622_propositions
         if v621_policy.current(conn, run):
             frozen_chronology = v622_propositions.freeze(conn, reg, claim, prior,
-                                                         typed_chronology=v621_policy.live_science(conn, run))
+                                                         typed_chronology=v621_policy.live_science(conn, run),
+                                                         verified_materials=v621_policy.science_execution(conn, run))
     claim["assessment_cursor"] = claim["event_cursor"]
     claim["availability_cursor"] = event_id
     claim["maturity"] = assessment(conn, run, claim, reg, claim["assessment_cursor"], event_id,

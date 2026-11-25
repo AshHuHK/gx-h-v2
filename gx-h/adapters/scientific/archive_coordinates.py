@@ -7,6 +7,8 @@ from urllib.parse import parse_qs, urlsplit
 
 from gx_core.errors import SchemaInvalid
 
+from . import coordinate_equivalence
+
 READER = "gx.pdbx.source-identity/1"
 PDB_ID = r"(?:[0-9][A-Za-z0-9]{3}|pdb_[A-Za-z0-9]{8})"
 CIF_MEDIA = {"chemical/x-mmcif", "chemical/x-cif"}
@@ -101,7 +103,7 @@ def _revision_identity(doc, labels):
     return {"status": status, "claimed": claimed, "observed": observed}
 
 
-def _withholding(parent, child, rule, parent_sha, processing):
+def _withholding(parent, child, rule, parent_sha, processing, *, proof_bytes):
     # The material publisher hashes the versioned JSON file, including its trailing newline.
     rule_sha = sha256((json.dumps(rule, indent=2, sort_keys=True, ensure_ascii=False)+"\n").encode()).hexdigest()
     fields = {"schema", "parent_sha256", "operation", "group", "model", "entity", "chain", "atom",
@@ -124,6 +126,7 @@ def _withholding(parent, child, rule, parent_sha, processing):
     if (len(set(columns)) != len(columns) or not {"id", "label_seq_id", *selectors}.issubset(columns)):
         raise SchemaInvalid("Coordinate transformation requires one tabular atom_site loop")
     removed, produced = [], sha256()
+    affected_positions = set()
     for line in lines:
         if line.startswith((b"ATOM ", b"HETATM ")):
             words = line.decode("utf-8").split()
@@ -137,15 +140,20 @@ def _withholding(parent, child, rule, parent_sha, processing):
                     raise SchemaInvalid("Coordinate transformation requires integer sequence IDs") from exc
                 if residue % modulus in residues:
                     removed.append(row["id"])
+                    if proof_bytes is not None:
+                        affected_positions.add(residue)
                     continue
         produced.update(line)
     if (not removed or sha256("\n".join(removed).encode()).hexdigest() != rule["removed_ids_sha256"]
             or produced.hexdigest() != child):
         raise SchemaInvalid("Replaying the coordinate transformation does not reproduce the child SHA-256")
-    return {"schema": WITHHOLD, "descriptor_sha256": rule_sha, "result_sha256": child}
+    proof = {"schema": WITHHOLD, "descriptor_sha256": rule_sha, "result_sha256": child}
+    if proof_bytes is not None:
+        proof["coverage_masks"] = coordinate_equivalence.withholding_effects(parent, proof_bytes, affected_positions)
+    return proof
 
 
-def verify(media_type, labels, digest, read, parents, processing, transformation, *, verify_revision=False):
+def verify(media_type, labels, digest, read, parents, processing, transformation, *, verify_revision=False, prove_endpoints=False):
     """Return None for another domain. Original, parent and transformed child all use immutable file pins."""
     coordinate_file = media_type.partition(";")[0].lower() in CIF_MEDIA
     accessions, archive_digests = _declarations(labels, coordinate_file=coordinate_file)
@@ -168,6 +176,8 @@ def verify(media_type, labels, digest, read, parents, processing, transformation
               "status": "matched_accession" if accessions else "operator_attested"}
     if verify_revision:
         result.update(reader="gx.pdbx.source-identity/2", revision=_revision_identity(doc, labels))
+    if prove_endpoints:
+        result["reader"] = "gx.pdbx.source-identity/3"
     if not parents:
         if transformation is not None:
             raise SchemaInvalid("A coordinate transformation needs its original parent")
@@ -179,12 +189,31 @@ def verify(media_type, labels, digest, read, parents, processing, transformation
     if _entry_and_dictionary(parent)[0] != entry:
         raise SchemaInvalid("Coordinate derivative and declared parent have different archive accessions")
     if isinstance(transformation, dict) and transformation.get("schema") == WITHHOLD:
-        result["transformation"] = _withholding(parent, digest, transformation, parent_sha, processing)
+        result["transformation"] = _withholding(parent, digest, transformation, parent_sha, processing,
+                                                  proof_bytes=raw if prove_endpoints else None)
     elif transformation is None and processing == ["append-envelope-comment/v1"]:
         suffix = raw[len(parent):]
         if not (raw.startswith(parent) and suffix and all(s.lstrip().startswith(b"#") for s in suffix.splitlines())):
             raise SchemaInvalid("Coordinate comment transformation does not reproduce the supplied bytes")
         result["transformation"] = {"schema": processing[0], "result_sha256": digest}
+        if prove_endpoints:
+            if not parent.endswith((b"\n", b"\r")):
+                raise SchemaInvalid("An appended comment must start on a separate coordinate file line")
+            result["transformation"]["coverage_masks"] = dict.fromkeys(coordinate_equivalence.MASKS, "equivalent")
+    elif prove_endpoints and transformation is None and processing == [coordinate_equivalence.ANNOTATION]:
+        try:
+            unchanged = coordinate_equivalence.same_coordinate_table(parent, raw)
+        except (RuntimeError, IndexError, ValueError, KeyError, UnicodeError):
+            unchanged = False
+        if not unchanged:
+            raise SchemaInvalid("Coordinate annotation must preserve the registered atom_site records")
+        result["transformation"] = {"schema": processing[0], "result_sha256": digest,
+                                    "coverage_masks": dict.fromkeys(coordinate_equivalence.MASKS, "equivalent")}
+    elif (prove_endpoints and len(processing) == 1 and isinstance(processing[0], str)
+          and processing[0] not in ("append-envelope-comment/v1", coordinate_equivalence.ANNOTATION)
+          and not processing[0].startswith("coordinate-record withholding/")):
+        return dict(result, status="unverified_derivation", parent_sha256=parent_sha,
+                    reason="The archived transformation has no verified endpoint equivalence rule")
     else:
         raise SchemaInvalid("Supply the versioned descriptor for a supported coordinate transformation")
     result.update(status="verified_derivation", parent_sha256=parent_sha)

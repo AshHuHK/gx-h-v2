@@ -6,6 +6,7 @@ import json
 from ..artifacts import ArtifactService
 from ..domain import ids
 from ..errors import SchemaInvalid, ScopeDenied
+from . import v621_policy
 
 
 def bindings(conn, run_id, version, cursor=None):
@@ -19,7 +20,7 @@ def bindings(conn, run_id, version, cursor=None):
     return [json.loads(row[0]) for row in conn.execute(sql+" ORDER BY rowid", args)]
 
 
-def _registered_spec(conn, run_id):
+def _registered_spec(conn, run_id, *, include_refs=False):
     data = json.loads(conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)).fetchone()[0])
     files = data.get("files", [])
     for f in files:
@@ -34,8 +35,9 @@ def _registered_spec(conn, run_id):
             continue
         assay = registration["assay"]
         method = {key: assay[key] for key in ("capability","parameters","output_name","metric_id","unit")}
-        sources = [r["sha256"] for r in files if r.get("role")==registration.get("reference_role")]
-        return {"method":method, "material_role":registration["material_role"], "reference_sha256":sources,
+        sources = [r for r in files if r.get("role")==registration.get("reference_role")]
+        return {"method":method, "material_role":registration["material_role"], "reference_sha256":[r["sha256"] for r in sources],
+                **({"reference_refs":[r["artifact_ref"] for r in sources]} if include_refs else {}),
                 "method_card_ref":f["artifact_ref"], "method_card_sha256":f["sha256"]}
     return None
 
@@ -44,14 +46,25 @@ def prepare(conn, task, decision):
     """Read the immutable operator method card once, outside decision adoption."""
     if task["scope"]!="run" or decision.get("comparison_id") or decision.get("disposition"):
         return None
-    if bindings(conn,task["run_id"], task["goal_version"]):
-        return None
-    spec = _registered_spec(conn,task["run_id"])
     proposed = decision.get("comparison_plan")
+    current = v621_policy.science_execution(conn, task["run_id"])
+    existing = bindings(conn, task["run_id"], task["goal_version"])
+    if existing and not (current and proposed):
+        return None
+    if current and not proposed:
+        openings = [op for op in decision["ops"] if op["op"] == "open_branch"]
+        # A default transport branch grants a cheap Job capacity. It is not a scientific plan.
+        if len(openings) != 1 or "hypothesis" not in openings[0]:
+            return None
+    spec = None if existing else _registered_spec(conn, task["run_id"], include_refs=current)
     if not spec and proposed:
         spec = {k:proposed[k] for k in ("method","material_role")}
     if not spec:
         return None
+    if current:
+        spec = _pin_materials(conn, task, decision, spec)
+        if proposed and "prediction" in proposed:
+            spec["prediction"] = proposed["prediction"]
     from . import v622_measurement
     m = spec["method"]
     pin = v622_measurement.pin(conn,task["run_id"],{"observable":"/metrics/"+m["metric_id"],"method":{
@@ -61,6 +74,36 @@ def prepare(conn, task, decision):
         raise SchemaInvalid("The comparison requires the effective parameters of its registered method")
     return {**spec, "measurement_spec_sha256":pin["measurement_spec_sha256"],
             "method_manifest_sha256":pin["manifest_sha256"]}
+
+
+def _pin_materials(conn, task, decision, spec):
+    """Bind the actual ordered input refs at registration, before taking the writer."""
+    from . import v621_assignment
+    from .v624_comparison import problem
+
+    files = json.loads(conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (task["run_id"],)).fetchone()[0])["files"]
+    materials = {r["artifact_ref"]: r["sha256"] for r in files if r.get("role") != "workflow_spec"}
+    materials.update({r["artifact_ref"]:r["sha256"] for r in v621_assignment.for_lead(
+        conn, task["run_id"], task["goal_version"], task["event_cursor"])})
+    visible = set(json.loads(task["visible_refs_json"]))
+    plan = decision.get("comparison_plan") or {}
+    refs = plan.get("reference_refs")
+    if refs is not None:
+        if not refs or any(r not in visible or r not in materials for r in refs) or len(set(refs)) != len(refs):
+            problem("comparison_material_unavailable", "comparison_plan.reference_refs",
+                    "Choose distinct original materials visible to this Goal.", sorted(visible & materials.keys()))
+        if spec.get("reference_refs") and refs != spec["reference_refs"]:
+            problem("comparison_material_mismatch", "comparison_plan.reference_refs",
+                    "Use the reference materials pinned by the registered method card.", spec["reference_refs"])
+    elif "reference_refs" in spec:
+        refs = spec["reference_refs"]
+    else:
+        branch = plan.get("branch")
+        candidates = {tuple(op["inputs"]) for op in decision["ops"] if op["op"] == "add_node"
+                      and op.get("branch") == branch and op["capability"] == spec["method"]["capability"]
+                      and op["inputs"] and all(r in visible and r in materials for r in op["inputs"])}
+        refs = list(candidates.pop()) if len(candidates) == 1 else []
+    return {**spec, "reference_refs":refs, "reference_sha256":[materials[r] for r in refs]}
 
 
 def adopt(conn, request, task, decision_ref, resolved_ops, event_id, *, registered=None):
@@ -81,7 +124,11 @@ def adopt(conn, request, task, decision_ref, resolved_ops, event_id, *, register
             raise SchemaInvalid("A stop requires its specific cause")
         return {"comparison_action":{k:body[k] for k in ("comparison_id","disposition","affected_scope",
                 "metric_refs","stop_reason","rationale","evidence_refs") if k in body}}
-    if bindings(conn,rid,version) or not proposed and conn.execute(
+    current = v621_policy.science_execution(conn, rid)
+    if current:
+        if not registered:
+            return {}
+    elif bindings(conn,rid,version) or not proposed and conn.execute(
             """SELECT 1 FROM v6_decisions WHERE run_id=? AND json_extract(receipt_json,'$.scope')='run'
                AND json_extract(receipt_json,'$.goal_version')=? LIMIT 1""",(rid,version)).fetchone():
         return {}
@@ -91,6 +138,10 @@ def adopt(conn, request, task, decision_ref, resolved_ops, event_id, *, register
                 for op in resolved_ops if op["spec"]["op"]=="open_branch"]
     if proposed:
         branch = next((actual for actual,alias in branches if proposed["branch"] in (actual,alias)),None)
+        if not branch and current and conn.execute(
+                "SELECT 1 FROM v6_branches WHERE run_id=? AND branch_id=? AND status='OPEN'",
+                (rid, proposed["branch"])).fetchone():
+            branch = proposed["branch"]
         if not branch:
             raise SchemaInvalid("The comparison plan must refer to a branch opened by this decision")
         if registered and any(registered[k]!=proposed[k] for k in ("method","material_role")):

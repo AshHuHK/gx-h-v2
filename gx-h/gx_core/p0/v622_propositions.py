@@ -28,7 +28,7 @@ def exposed_materials(prior):
             if pin["qualification"] in ("prospective", "retrospective")}
 
 
-def freeze(conn, registration, claim, prior, *, typed_chronology=False):
+def freeze(conn, registration, claim, prior, *, typed_chronology=False, verified_materials=False):
     from . import v62_maturity
 
     pred = registration["prediction"]
@@ -38,6 +38,8 @@ def freeze(conn, registration, claim, prior, *, typed_chronology=False):
     registration.update(policy=RULE, quantifier=pred.get("quantifier", "all"), measurement_spec_sha256=spec_sha)
     if typed_chronology:
         from . import v623_chronology
+        if verified_materials:
+            registration["material_identity"] = "endpoint_verified"
         spec_sha = ids.sha256_of_obj(v623_chronology.endpoint(pred, registration.get("method_pin")))
         registration.update(policy=v623_chronology.RULE, chronology_scope="same_store", measurement_spec_sha256=spec_sha)
     registration["proposition_sha256"] = ids.sha256_of_obj({
@@ -90,6 +92,8 @@ def with_coverage(reg, results, gaps, timeline=None):
         else:
             status = "unmeasured"
         timing = timeline[sha] if timeline is not None else {}
+        if timing.get("material_identity_uncertainty"):
+            status = "timing_unknown"
         first = timing.get("endpoint_first_available_event_id")
         if first is not None:
             if first <= reg["event_id"]:

@@ -52,6 +52,7 @@ class Prepared:
     module_dependencies: dict
     endpoint_inventory: tuple | None
     comparison_registration: dict | None
+    selected_receipts: dict | None
 
 
 def authority(conn, *, run_id, task_id, lease_id, thread_id, turn_id):
@@ -162,7 +163,6 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         raise RuntimeError("Prepare the instance graph and decision original outside the writer")
     if not all(isinstance(x, str) and x.strip() for x in (run_id, task_id, lease_id, thread_id, turn_id, call_id)):
         raise ScopeDenied("The callback needs a complete native, Run, Task and Lease identity")
-    v6_graph.validate_body(decision)
     identity = dict(run_id=run_id, thread_id=thread_id, turn_id=turn_id, call_id=call_id)
     saved = replay(conn, **identity, decision=decision)
     if saved is not None:
@@ -172,7 +172,30 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
     root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                         thread_id=thread_id, turn_id=turn_id)
     from . import v621_policy, v623_endpoint_use
+    execution = v621_policy.science_execution(conn, run_id)
     science = v621_policy.live_science(conn, run_id)
+    original_decision = decision
+    inventory, selected = None, None
+    if execution:
+        from . import v624_operations, v62_native, v6_native
+        wire = v62_native.evidence_tool(v6_native.DECIDE, v621_policy.VERSION)
+        v6_graph._shape(decision, wire["inputSchema"]["properties"]["decision"])
+        decision, implicit = v624_operations.normalize(conn, task, goal, decision, module=module)
+        if task["scope"] == "run":
+            from . import v624_comparison
+            metrics, received, selected = {}, {}, {}
+            if decision.get("metric_refs") or any(op["op"] == "close_run" for op in decision["ops"]):
+                inventory = v623_endpoint_use.prepare(conn, task, metric_details=metrics)
+                selected = v623_endpoint_use.resolve_delivered(conn, task, root, turn_id, decision, inventory,
+                                                               received_metrics=received)
+            delivered = v6_native.acknowledged_brief(conn, root, turn_id)
+            decision = v624_comparison.normalize(conn, task, decision, metrics, received,
+                                                 packet=delivered[0] if delivered else {})
+        v6_graph.validate_body(decision, measurement_branch=implicit)
+    else:
+        v6_graph.validate_body(decision)
+        if {"prediction", "reference_refs"}.intersection(decision.get("comparison_plan", {})):
+            raise ScopeDenied("These comparison plan fields require the science execution policy")
     declared = any(key in decision for key in v623_endpoint_use.FIELDS)
     if declared and not (science and task["scope"] == "run"):
         raise ScopeDenied("Structured endpoint and comparison decisions require a V6.2.3 Run Lead")
@@ -191,7 +214,10 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
     request = dict(schema_version="gx.v6.decision.1", run_id=run_id, decision_task_id=task_id, lease_id=lease_id,
                    scope=task["scope"], goal_version=task["goal_version"], context_ref=task["context_ref"],
                    base=base, idempotency_key="v6.decision:" + ids.sha256_of_obj([thread_id, call_id]),
-                   draft_sha256=ids.sha256_of_obj(decision), decision=json.loads(ids.canonical_json(decision)))
+                   draft_sha256=ids.sha256_of_obj(original_decision), decision=json.loads(ids.canonical_json(decision)))
+    if execution:
+        request.update(original_decision=json.loads(ids.canonical_json(original_decision)),
+                       normalized_sha256=ids.sha256_of_obj(decision))
     refs = _visible(conn, task, lease_id, thread_id, turn_id, decision)
     if decision.get("resolved_gaps"):
         from . import v621_gaps, v621_policy
@@ -233,14 +259,14 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         version = base["version"] + 1 if base else 1
         graph.update(run_id=run_id, version=version, parent=base, decision_ref=manifest.entries[0]["artifact_ref"])
         result = dict(version=version, sha256=ids.sha256_of_obj(graph))
-    inventory, comparison = None, None
+    comparison = None
     if science and task["scope"] == "run":
         from . import v623_comparison
         comparison = v623_comparison.prepare(conn, task, decision)
-        if declared or any(op["op"] == "close_run" for op in decision["ops"]):
+        if inventory is None and (declared or any(op["op"] == "close_run" for op in decision["ops"])):
             inventory = v623_endpoint_use.prepare(conn, task)
     return Prepared(request, thread_id, turn_id, call_id, manifest, ids.canonical_json(graph), result, ops,
-                    aliases, watches, funding, config_pin, cap_pins, costs, dependencies, inventory, comparison)
+                    aliases, watches, funding, config_pin, cap_pins, costs, dependencies, inventory, comparison, selected)
 
 
 def _revoke(conn, run_id, where, key):
@@ -369,7 +395,7 @@ def commit(conn, plan):
     run_id, task_id, lease_id = request["run_id"], request["decision_task_id"], request["lease_id"]
     with store.transaction(conn, transaction_owner="V6Decision", operation="adopt_revision", run_id=run_id):
         saved = replay(conn, run_id=run_id, thread_id=plan.thread_id, turn_id=plan.turn_id, call_id=plan.call_id,
-                       decision=request["decision"])
+                       decision=request.get("original_decision", request["decision"]))
         if saved is not None:
             return saved
         root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
@@ -380,11 +406,18 @@ def commit(conn, plan):
         from . import v623_endpoint_use
         decision = request["decision"]
         decision_facts = {k: decision[k] for k in v623_endpoint_use.FIELDS if k in decision}
+        if plan.selected_receipts is not None and decision.get("disposition") and close_context is None:
+            from . import v62_rounds
+            late = v62_rounds.late_evidence(conn, run_id, task["event_cursor"])
+            if late:
+                raise StaleRevision("New research evidence arrived after the delivered comparison brief",
+                                    details={"reason": "comparison_context_changed", "event_id": late,
+                                             "field": "comparison_id", "brief_cursor": task["event_cursor"]})
         if decision_facts:
             decision_facts.update(rationale=decision["rationale"], evidence_refs=decision["evidence_refs"])
         if plan.endpoint_inventory is not None:
             endpoint_use = v623_endpoint_use.verify(conn, task, root, plan.turn_id, decision, plan.endpoint_inventory,
-                                                    closing=close_context is not None)
+                                                    closing=close_context is not None, selected=plan.selected_receipts)
             decision_facts["endpoint_use"] = endpoint_use
             if close_context is not None:
                 close_context.update({k: v for k, v in endpoint_use.items() if k != "receipts"})
@@ -427,7 +460,7 @@ def commit(conn, plan):
         if request["decision"].get("approve_nodes"):
             from . import v62_evidence
             v62_evidence.record_approvals(conn, request, decision_ref)
-        submission = accept_product(conn, root, request["draft_sha256"], decision_ref)
+        submission = accept_product(conn, root, request.get("normalized_sha256", request["draft_sha256"]), decision_ref)
         receipt = dict(run_id=run_id, task_id=task_id, lease_id=lease_id, task_status="ACCEPTED",
                        decision_ref=decision_ref, decision_id=decision_ref, scope=task["scope"],
                        goal_version=task["goal_version"], context_ref=task["context_ref"], base=base,
@@ -437,6 +470,8 @@ def commit(conn, plan):
                        dispatches=dispatches, submission_id=submission, claim_revisions=claims,
                        consumed_event_cursor=task["event_cursor"])
         receipt.update(decision_facts)
+        if "normalized_sha256" in request:
+            receipt["normalized_sha256"] = request["normalized_sha256"]
         if "gap_resolutions" in request:
             receipt["gap_resolutions"] = request["gap_resolutions"]
         if close_context is not None:
@@ -477,7 +512,7 @@ def commit(conn, plan):
 def reconsider_module_conflict(conn, identity, error):
     """After rollback retire the authenticated brief that can no longer support this decision."""
     reason = error.details.get("reason")
-    if reason in ("convergence_context_changed", "close_context_changed"):
+    if reason in ("convergence_context_changed", "close_context_changed", "comparison_context_changed"):
         from . import v62_rounds
         return v62_rounds.refresh(conn, identity, error)
     if reason not in ("module_graph_conflict", "unseen_module_report"):

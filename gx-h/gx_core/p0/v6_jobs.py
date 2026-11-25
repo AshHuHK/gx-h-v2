@@ -23,7 +23,7 @@ from ..jobs import cpu_queue
 from ..jobs.service import JobService, PURPOSE_WORKFLOW, TERMINAL
 from ..persistence import store
 from . import manifest as execution
-from . import v6_method_context, v62_evidence
+from . import research_window, v6_method_context, v62_evidence
 from ..plugins import goal as goal_plugins
 
 NODE_TERMINAL = {"SUCCEEDED", "FAILED", "CANCELLED", "REUSED", "BLOCKED"}
@@ -528,12 +528,13 @@ def _active(conn, node, service):
     return "waiting"
 
 
-def _run_node(conn, node, service):
+def _run_node(conn, node, service, window):
     if node["job_id"]:
         return _active(conn, node, service)
     if node["status"] == "CANCEL_REQUESTED":
         return "cancelled" if _finish(conn, node, "CANCELLED") else "waiting"
     _live(node, "PENDING")
+    research_window.require_open(window)
     spec = json.loads(node["spec_json"])
     _module_grant(conn, node, spec)
     from . import v621_policy
@@ -699,12 +700,13 @@ def advance(conn, run_id):
         (run_id,),
     ).fetchall()
     service = JobService(conn)
+    window = research_window.for_run(conn, run_id) if work else None
     for (node_id,) in work:
         node = _node(conn, run_id, node_id)
         if node["status"] in NODE_TERMINAL:
             continue
         try:
-            counts[_run_node(conn, node, service)] += 1
+            counts[_run_node(conn, node, service, window)] += 1
         except (
             BudgetExceeded,
             ResourceDenied,

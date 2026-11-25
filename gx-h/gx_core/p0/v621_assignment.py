@@ -57,7 +57,22 @@ def _bytes(path):
 def assign(conn, run_id, *, after_decision, source, path, sha256, role, metadata_path, actor,
            module_instance=None, media_type="application/octet-stream"):
     """Register bytes, acquisition, and the exact recipient grant in one operator transaction."""
-    from . import v621_policy, v622_sources, v62_catalog, v62b_handoff
+    item = dict(source=source, path=path, sha256=sha256, role=role, metadata_path=metadata_path,
+                module_instance=module_instance, media_type=media_type)
+    prepared = _prepare(conn, run_id, after_decision=after_decision, **item)
+    return _assign(conn, run_id, after_decision=after_decision, actor=actor, **prepared)
+
+
+def assign_group(conn, run_id, *, after_decision, actor, items, comparison_id=None):
+    """Publish an original and its companion inputs at the same operator decision cut."""
+    prepared = [_prepare(conn, run_id, after_decision=after_decision, **item) for item in items]
+    with store.transaction(conn, transaction_owner="ScientificLead", operation="assign_material_group", run_id=run_id):
+        return [_assign(conn, run_id, after_decision=after_decision, actor=actor, comparison_id=comparison_id, **item) for item in prepared]
+
+
+def _prepare(conn, run_id, *, after_decision, source, path, sha256, role, metadata_path,
+             module_instance=None, media_type="application/octet-stream"):
+    from . import v621_policy, v622_sources, v62b_handoff
     if not v621_policy.enabled(conn, run_id):
         raise ScopeDenied("This Goal uses an earlier scientific evidence policy")
     if any(not isinstance(s, str) or not s.strip() for s in (source, role, media_type, after_decision)):
@@ -69,10 +84,19 @@ def assign(conn, run_id, *, after_decision, source, path, sha256, role, metadata
         raise SchemaInvalid("Assigned material differs from the supplied SHA-256")
     metadata = json.loads(_bytes(metadata_path))
     identity = v622_sources.prepare(conn, run_id, source, metadata, sha256, media_type, raw=raw)
-    name = Path(path).name
+    return dict(source=source, name=Path(path).name, sha256=sha256, role=role, module_instance=module_instance,
+                media_type=media_type, raw=raw, metadata=metadata, identity=identity)
+
+
+def _assign(conn, run_id, *, after_decision, actor, source, name, sha256, role, module_instance,
+            media_type, raw, metadata, identity, comparison_id=None):
+    from . import v62_catalog
+
     key = "v621.assign:" + ids.sha256_of_obj([run_id, source])
     request = dict(decision_ref=after_decision, source=source, sha256=sha256, role=role, name=name,
                    acquisition=metadata, module_instance_id=module_instance, media_type=media_type)
+    if comparison_id:
+        request["comparison_id"] = comparison_id
     with store.transaction(conn, transaction_owner="ScientificLead", operation="assign_material", run_id=run_id):
         idem = store.begin_idempotent(conn, key, ASSIGNED, request)
         if idem.replay:
@@ -81,7 +105,16 @@ def assign(conn, run_id, *, after_decision, source, path, sha256, role, metadata
         latest = conn.execute("""SELECT d.decision_ref,t.goal_version FROM v6_decisions d
             JOIN v6_decision_tasks t USING(task_id) WHERE d.run_id=? AND t.scope='run' ORDER BY d.rowid DESC LIMIT 1""",
             (run_id,)).fetchone()
-        if not goal or goal["status"] != "OPEN" or not latest or tuple(latest) != (after_decision, goal["goal_version"]):
+        current = bool(goal and latest and tuple(latest) == (after_decision, goal["goal_version"]))
+        if comparison_id and goal:
+            from . import v621_policy
+            current = v621_policy.science_execution(conn, run_id) and conn.execute("""SELECT 1 FROM v6_decisions d
+                JOIN v6_decision_tasks t USING(task_id,run_id) JOIN v6_branches b ON b.run_id=d.run_id
+                  AND b.branch_id=json_extract(d.receipt_json,'$.comparison.branch')
+                WHERE d.run_id=? AND d.decision_ref=? AND t.goal_version=? AND t.scope='run'
+                  AND json_extract(d.receipt_json,'$.comparison.comparison_id')=? AND b.status='OPEN'""",
+                (run_id, after_decision, goal["goal_version"], comparison_id)).fetchone()
+        if not goal or goal["status"] != "OPEN" or not current:
             raise StaleRevision("This material must follow the current accepted Run Lead decision")
         module = None
         if module_instance is not None:

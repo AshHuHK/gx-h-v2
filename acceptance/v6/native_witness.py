@@ -34,6 +34,24 @@ def documents(value):
                 break
 
 
+def verified_native_decision(decision, arguments):
+    """Bind the model's exact draft and GX's adopted form to their separate hashes."""
+    raw = arguments["decision"]
+    if isinstance(raw, str):
+        raw = parse(raw)
+    request = parse(decision["request_json"])
+    original = request.get("original_decision", request["decision"])
+    need(stable(original) == stable(raw) and digest(raw) == request["draft_sha256"],
+         "adopted payload differs from native tool arguments")
+    receipt = parse(decision["receipt_json"])
+    if "original_decision" in request or "normalized_sha256" in request or "normalized_sha256" in receipt:
+        need("original_decision" in request and digest(request["decision"]) == request.get("normalized_sha256")
+             and receipt.get("draft_sha256") == request["draft_sha256"]
+             and receipt.get("normalized_sha256") == request["normalized_sha256"],
+             "normalized decision differs from its adoption receipt")
+    return raw
+
+
 def rollout(path, decision, source):
     tid, turn, call = (decision[k] for k in ("thread_id", "turn_id", "call_id"))
     root, = [r for r in source["p0_roots"] if r["thread_id"] == tid]
@@ -116,12 +134,7 @@ def rollout(path, decision, source):
     need(session and context and arguments is not None, "missing official session, turn or call")
     need(root["brief"] in user and sha(root["brief"].encode()) in delivered,
          "root brief not confirmed by rollout and acknowledged delivery")
-    native_decision = arguments["decision"]
-    if isinstance(native_decision, str):
-        native_decision = parse(native_decision)
-    recorded = parse(decision["request_json"])
-    need(recorded["decision"] == native_decision and digest(native_decision) == recorded["draft_sha256"],
-         "adopted payload differs from native tool arguments")
+    native_decision = verified_native_decision(decision, arguments)
     callback, = [c for c in source["p0_root_calls"] if (c["thread_id"],c["call_id"]) == (tid,call)]
     need(callback["turn_id"] == turn and callback["request_sha"] == digest(["gx_decide_revision", arguments]),
          "GX callback digest or turn mismatch")

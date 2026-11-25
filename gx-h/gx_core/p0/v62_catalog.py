@@ -70,7 +70,7 @@ def for_start(spec):
     candidates = {}
     for plugin in loaded.plugins.values():
         for key, definition in plugin.contributions.research_modules.items():
-            if definition.get("method_profiles") and version != v621_policy.VERSION:
+            if definition.get("method_profiles") and version not in v621_policy.LIVE_SCIENCE:
                 continue
             reference = "@".join(key)
             if requested is None and defaults.get(key[0], key[1]) != key[1]:

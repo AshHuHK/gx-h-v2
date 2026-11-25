@@ -2,11 +2,13 @@
 from ..errors import SchemaInvalid
 
 
-VERSION = "gx.evidence/6.2.3"
+VERSION = "gx.evidence/6.2.4"
+V623 = "gx.evidence/6.2.3"
 V622 = "gx.evidence/6.2.2"
 PREVIOUS = "gx.evidence/6.2.1"
 LEGACY = "gx.evidence/6.2"
-TYPED = (V622, VERSION)
+LIVE_SCIENCE = (V623, VERSION)
+TYPED = (V622, *LIVE_SCIENCE)
 GOVERNED = (PREVIOUS, *TYPED)
 
 
@@ -42,4 +44,8 @@ def current(conn, run_id):
 
 
 def live_science(conn, run_id):
+    return pinned(conn, run_id) in LIVE_SCIENCE
+
+
+def science_execution(conn, run_id):
     return pinned(conn, run_id) == VERSION

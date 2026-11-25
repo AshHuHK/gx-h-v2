@@ -14,7 +14,7 @@ from ..errors import (BudgetExceeded, HoldActive, IdempotencyConflict, LeaseExpi
                       OutcomeUnknown, SchemaInvalid, ScopeDenied)
 from ..hostobs.app_server_client import AppServerResponseError
 from ..persistence import store
-from . import activity, meter_limits, metering, response_attribution, team_admission, waits
+from . import activity, meter_limits, metering, research_window, response_attribution, team_admission, waits
 from .profiles import CODEX_VERSION
 
 ACTOR = "p0-root"
@@ -208,6 +208,7 @@ class RootDelivery:
         self.roots = roots
         self.conn = roots.conn
         self.run_id = roots.run_id
+        self.window = research_window.for_run(self.conn, self.run_id)
         self.attribution = response_attribution.Attribution(self.conn, self.run_id)
         self._verify_after = {}
         self._live = {}
@@ -552,6 +553,7 @@ class RootDelivery:
                 if row["state"] != "ready":
                     return row, False
             if not interrupt:
+                research_window.require_open(self.window)
                 waits.prepare_delivery(self.conn, thread_id, event_id)
             binding = self._binding(thread_id, interrupt=interrupt, human=human)
             if not interrupt and binding.get("wait_job_id") and event_id != (
@@ -1045,14 +1047,14 @@ class RootDelivery:
             if "not materialized yet" not in exc.message or "before first user message" not in exc.message:
                 raise
 
-    def _refused(self, event_id):
+    def _refused(self, event_id, *, reason="Codex refused the input"):
         with store.transaction(
             self.conn, transaction_owner="RootDelivery", operation="refuse_delivery", run_id=self.run_id,
         ):
             row = self._get(event_id)
             if row["state"] == "sending":
                 if row["reservation_ref"]:
-                    budgets.release(self.conn, row["reservation_ref"], actor=ACTOR, reason="Codex refused the input")
+                    budgets.release(self.conn, row["reservation_ref"], actor=ACTOR, reason=reason)
                 self.conn.execute("UPDATE p0_root_deliveries SET state='ready',reservation_ref=NULL,prior_tokens=NULL,"
                                   "token_budget=NULL WHERE run_id=? AND event_id=?", (self.run_id, event_id))
 
@@ -1084,6 +1086,13 @@ class RootDelivery:
                           "clientUserMessageId": client_id}
                 if active:
                     params["expectedTurnId"] = active
+            if not interrupt and self.window:
+                # A writer or host read can consume the final seconds. No RPC has left GX yet.
+                try:
+                    research_window.require_open(self.window)
+                except HoldActive:
+                    self._refused(event_id, reason="Research admission closed before native send")
+                    raise
             try:
                 response = self.roots._request(method, params)
             except AppServerResponseError as exc:

@@ -19,7 +19,7 @@ from ..orchestration import branches, native_worker, reactor, service
 from ..orchestration.engine import StoreCheckpointer
 from ..persistence import store
 from ..research import records
-from . import idle, intent, intent_budget, waits
+from . import idle, intent, intent_budget, research_window, waits
 from .roots import Roots, thread_for_lease
 
 
@@ -128,6 +128,7 @@ class Driver:
     def __init__(self, conn, directory, rid):
         self.conn, self.directory, self.rid = conn, Path(directory), rid
         self.ctx = context(conn)
+        self.research_window = research_window.for_run(conn, rid)
         self._stack = ExitStack()
         self._native = None
         self._retry_at = {}
@@ -494,6 +495,12 @@ class Driver:
             (self.rid,))}
         closing_threads = {row["thread_id"] for row in terminal_products.pending(self.conn, self.rid)}
         pending.update(closing_threads)
+        if self.research_window:
+            # A host can accept the original request before GX persists its turn ID.
+            # Its stable input ID can still be reconciled after admission has closed.
+            pending.update(row[0] for row in self.conn.execute(
+                "SELECT DISTINCT thread_id FROM p0_root_deliveries WHERE run_id=? AND state='sending'",
+                (self.rid,)))
         # A passive read during Goal closure cannot collect the cumulative snapshot returned by
         # a guarded attach after closure. Revisit that thread when the terminal owner completes.
         reads = {(thread, thread in closing_threads) for thread in pending}
@@ -530,6 +537,10 @@ class Driver:
         from . import metering
         now = time.monotonic()
         due = [deadline, now + self.idle_seconds]
+        if self.research_window:
+            wall = clock.now().timestamp()
+            due.extend(now + self.research_window[key] - wall for key in ("start", "new_work_until", "drain_until")
+                       if self.research_window[key] > wall)
         due.extend(t for t in (*self._dispatch_deadlines, *self._retry_at.values()) if t > started)
         heartbeat = getattr(self._native, "heartbeats", None)
         connection_wait = self._waits.get(("connection", self.rid), {}).get("next_retry_at")
@@ -625,6 +636,9 @@ class Driver:
             admission_retries[key] = (delay, time.monotonic() + delay, watch)
         last_terminal_event = None
         while time.monotonic() < deadline:
+            if research_window.phase(self.research_window) in ("RECONCILE", "ENDED"):
+                # Hand control back to the operator's bounded stop and receipt-only reconciliation.
+                return {**snapshot(self.conn, self.rid), "driver": "research_drain_ended"}
             metering.maintain(self.conn, self.rid)
             self._exhausted.clear()
             pending_messages = self.messages(local_only=True)
@@ -705,6 +719,8 @@ class Driver:
                 for ended in admission_retries.keys() - ready_attempts:
                     del admission_retries[ended]
             for t in tasks:
+                if research_window.phase(self.research_window) != "OPEN":
+                    break
                 if t["waiting_proposal"] or (t["waiting_job"] and not machines.is_terminal("job", t["waiting_job"])):
                     continue
                 key = (t["task_id"], t["attempt"] + (t["status"] == "READY"))

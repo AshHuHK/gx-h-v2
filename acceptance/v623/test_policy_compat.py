@@ -24,8 +24,8 @@ class PinnedEvidencePolicy(unittest.TestCase):
                     self.assertEqual(wire_digest(form), digest)
 
     def test_only_current_research_is_admitted_without_replay_class(self):
-        self.assertEqual(v621_policy.admit({}), "gx.evidence/6.2.3")
-        for version in (v621_policy.LEGACY, v621_policy.PREVIOUS, v621_policy.V622):
+        self.assertEqual(v621_policy.admit({}), v621_policy.VERSION)
+        for version in (v621_policy.LEGACY, v621_policy.PREVIOUS, v621_policy.V622, v621_policy.V623):
             with self.subTest(version=version):
                 with self.assertRaises(SchemaInvalid):
                     v621_policy.admit({"evidence_policy": version})

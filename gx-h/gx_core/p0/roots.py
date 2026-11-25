@@ -558,12 +558,12 @@ class Roots:
                 v62_native.check_workspace(row)
                 params["developerInstructions"] = v62_native.module_instructions(packet)
             else:
-                params["developerInstructions"] = v6_native.INSTRUCTIONS
+                params["developerInstructions"] = (v6_native.COMPACT_INSTRUCTIONS
+                    if packet.get("evidence_policy") == v621_policy.VERSION else v6_native.INSTRUCTIONS)
                 if any(tool["name"] == v62_native.OPEN for tool in tools):
                     params["developerInstructions"] += v62_native.LEAD_INSTRUCTIONS
                 if packet.get("research_evidence_version"):
                     params["developerInstructions"] += v6_native.EVIDENCE_INSTRUCTIONS
-            from . import v621_policy
             if packet.get("evidence_policy") in v621_policy.GOVERNED:
                 params["developerInstructions"] += (
                     " For a numbered finding from a measurement with declared metrics, cite its output and "
@@ -996,7 +996,12 @@ class Roots:
                 # first. Its live authorization was refused. Leave both requests to abort.
                 suppress = True
                 return NO_TOOL_RESPONSE
-            return {"success":False,"contentItems":[{"type":"inputText","text":json.dumps({"error":str(exc)})}]}
+            out = {"error": str(exc)}
+            if (isinstance(exc, GxError) and p.get("tool") == v6_native.DECIDE
+                    and v621_policy.science_execution(self.conn, self.run_id)):
+                status = exc.code
+                out.update(code=exc.code, **{key: exc.details[key] for key in ("reason","field","options") if key in exc.details})
+            return {"success":False,"contentItems":[{"type":"inputText","text":json.dumps(out)}]}
 
         finally:
             try:

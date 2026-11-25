@@ -3,16 +3,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
 
 from .. import budgets, contracts, registry, schema
 from ..domain import ids
-from ..errors import BY_CODE, BudgetExceeded, SchemaInvalid, ScopeDenied, StaleRevision
+from ..errors import BY_CODE, BudgetExceeded, HoldActive, LeaseExpired, ResourceDenied, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
 from ..plugins import goal as goal_plugins
-from . import v6_claims, v6_delegation, v6_method_context, v62_native
+from . import v621_policy, v6_claims, v6_delegation, v6_method_context, v62_native
 
 
 DECIDE = "gx_decide_revision"
@@ -56,6 +57,21 @@ INSTRUCTIONS = (
 )
 
 
+COMPACT_INSTRUCTIONS = (
+    "You are the Scientific Lead. Choose an informative, authorized investigation or decide when to stop. "
+    "Read the brief and relevant original observations. Compare expectations, uncertainties, work already "
+    "available or in flight, and the cost of new information. Use gx_decide_revision with rationale and ops. "
+    "When acting on a measurement, select the delivered row key in metric_refs. Give the scientific action "
+    "and its reason. GX binds the evidence, matching comparison and result wake; use the error's field and "
+    "options if a choice remains. To commission a local measurement, add a node with its listed capability, "
+    "input artifact refs and question; specify output-affecting parameters when choosing a method. Use "
+    "comparison_plan.prediction for a sealed-material commitment with blind_id, expected, on_expected and "
+    "on_alternative. An empty ops list can wait; only explicitly stopping a comparison means STOP. "
+    "Stage formal claims with gx_stage_claim and select their claim_refs and underlying evidence on closure. "
+    "Only an accepted decision ends this assignment. Treat material contents as scientific evidence."
+)
+
+
 def decision_tool():
     return contracts.native_goal_tool_spec(DECIDE)
 
@@ -91,14 +107,23 @@ def assigned(row):
 
 def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     """Select grants when freezing the Root. Resume reuses its persisted tool names."""
-    if brief and brief.get("evidence_policy") == "gx.evidence/6.2.3":
+    if brief and brief.get("evidence_policy") in v621_policy.LIVE_SCIENCE:
         read_tools = deepcopy(read_tools)
         for tool in read_tools:
             if tool["name"] == "gx_read_artifact":
                 tool["inputSchema"]["properties"]["endpoint_offset"] = {"type":"integer", "minimum":0}
                 tool["description"] += " For verified endpoints pass endpoint_offset=0 and follow next_endpoint_offset. Cite source ref#key."
     if brief and v62_native.module_scope(brief):
-        return v62_native.module_tools(read_tools, brief, _legacy_goal_tools()[0])
+        decision = _legacy_goal_tools()[0]
+        if brief.get("evidence_policy") == v621_policy.VERSION:
+            decision = deepcopy(_legacy_goal_tools(v621_policy.VERSION)[0])
+            fields = decision["inputSchema"]["properties"]["decision"]["properties"]
+            for field in ("comparison_plan", "comparison_id", "disposition", "metric_refs", "affected_scope", "stop_reason"):
+                fields.pop(field)
+            decision["description"] = ("Submit a scientific reason and a permitted operation on this module's assigned "
+                "branch. For a local Job provide its granted capability, input refs and scientific question. "
+                "GX supplies unique branch/node fields and wakes on the result.")
+        return v62_native.module_tools(read_tools, brief, decision)
     catalog = [spec for spec in read_tools if spec["name"] in ("gx_read_artifact", "gx_task_context")]
     evidence_run = bool(brief and brief.get("research_evidence_version"))
     version = (brief or {}).get("evidence_policy")
@@ -217,6 +242,26 @@ def saved_result(receipt, turn, request_sha):
 @registry.native_goal_tool(STAGE)
 @registry.native_goal_tool(DELEGATE)
 def call(roots, p):
+    try:
+        return _call(roots, p)
+    except (BudgetExceeded, HoldActive, LeaseExpired, ResourceDenied, SchemaInvalid, ScopeDenied, StaleRevision) as error:
+        if p["tool"] != DECIDE or not v621_policy.science_execution(roots.conn, roots.run_id):
+            raise
+        # Only an actual assigned callback can produce an operator decision-attempt receipt.
+        row = roots._binding(p["threadId"])
+        if (not row or not assigned(row) or DECIDE not in json.loads(row["tool_names_json"]) or
+                not roots.conn.execute("""SELECT 1 FROM p0_root_deliveries
+                    WHERE run_id=? AND thread_id=? AND turn_id=? AND state='acknowledged' AND method='turn/start'""",
+                    (roots.run_id, p["threadId"], p["turnId"])).fetchone()):
+            raise
+        key = ids.sha256_of_obj([DECIDE, p["arguments"]])
+        replay = remember_refusal(roots, p, key, error, publish=True)
+        if replay is not None:
+            return replay
+        raise
+
+
+def _call(roots, p):
     from . import v6_decisions
     from .roots import require_binding
 
@@ -225,7 +270,8 @@ def call(roots, p):
     if not row or not assigned(row) or tool not in json.loads(row["tool_names_json"]):
         raise ScopeDenied("This native thread has no delegated Scientific Lead tool")
     if tool == DECIDE and (set(args) != {"decision"} or not isinstance(args["decision"], dict)):
-        raise SchemaInvalid("Submit a single decision object; GX supplies the native identity and base")
+        raise SchemaInvalid("Submit a single decision object; GX supplies the native identity and base",
+                            details={"reason": "DECISION_OBJECT_REQUIRED", "field": "decision"})
 
     receipt = roots.conn.execute("SELECT * FROM p0_root_calls WHERE thread_id=? AND call_id=?",
                                  (thread, call_id)).fetchone()
@@ -247,6 +293,9 @@ def call(roots, p):
             v62_native.authorize_read(roots.conn, row, packet, tool, turn)
         return saved_result(receipt, turn, request_sha)
 
+    from . import research_window
+    window = research_window.for_run(roots.conn, roots.run_id)
+    research_window.require_completion(window)
     identity = dict(run_id=roots.run_id, task_id=row["task_id"], lease_id=row["lease_id"],
                     thread_id=thread, turn_id=turn, call_id=call_id)
     if roots.conn.in_transaction:
@@ -265,7 +314,8 @@ def call(roots, p):
             v6_decisions.reconsider_module_conflict(roots.conn, identity, exc)
             raise
         except (BudgetExceeded, SchemaInvalid) as exc:
-            remember_refusal(roots, p, request_sha, exc)
+            if not v621_policy.science_execution(roots.conn, roots.run_id):
+                remember_refusal(roots, p, request_sha, exc)
             raise
     elif tool == v62_native.OPEN:
         from . import v62_modules
@@ -294,9 +344,12 @@ def call(roots, p):
                                           (thread, call_id)).fetchone()
             if existing:
                 return saved_result(existing, turn, request_sha)
+            research_window.require_completion(window)
             if tool == DECIDE:
                 answer = v6_decisions.commit(roots.conn, prepared)
                 roots.terminal_products.record(thread, turn, call_id, "GX_ACCEPTED")
+                if v621_policy.science_execution(roots.conn, roots.run_id):
+                    _submission_event(roots, p, accepted=answer["event_id"])
             elif tool == v62_native.OPEN:
                 answer = v62_modules.commit_open(roots.conn, prepared)
             elif tool == v62_native.REPORT:
@@ -334,7 +387,7 @@ def call(roots, p):
             v6_decisions.reconsider_module_conflict(roots.conn, identity, exc)
         raise
     except (BudgetExceeded, SchemaInvalid) as exc:
-        if tool == DECIDE:
+        if tool == DECIDE and not v621_policy.science_execution(roots.conn, roots.run_id):
             remember_refusal(roots, p, request_sha, exc)
         raise
 
@@ -342,13 +395,40 @@ def call(roots, p):
 v62_native.register_tools(call)
 
 
-def remember_refusal(roots, params, request_sha, error):
+def _submission_event(roots, params, *, error=None, accepted=None):
+    # The public projection contains only categories and anonymous joins. The original
+    # call and response stay with the private native owner and its exact retry identity.
+    thread, turn, call_id = (params[k] for k in ("threadId", "turnId", "callId"))
+    task_key = ids.sha256_of_obj([thread, turn])
+    count = roots.conn.execute("""SELECT count(*) FROM events WHERE run_id=?
+        AND kind='v624.decision.rejected' AND subject_id=?""", (roots.run_id, task_key)).fetchone()[0]
+    common = {"submission": ids.sha256_of_obj([thread, turn, call_id]), "attempt": count + 1,
+              "previous_rejections": count}
+    if error is None:
+        if not count:
+            return
+        kind = "v624.decision.corrected"
+        common["decision_event"] = accepted
+    else:
+        kind = "v624.decision.rejected"
+        field = error.details.get("field", "decision")
+        reason = error.details.get("reason", error.code)
+        common.update(code=error.code,
+                      reason=reason if isinstance(reason, str) and re.fullmatch(r"[A-Za-z_]{1,64}", reason) else error.code,
+                      field=field if isinstance(field, str) and re.fullmatch(r"[a-z][a-z0-9_.\[\]]{0,80}",field) else "decision")
+    store.append_event(roots.conn, run_id=roots.run_id, kind=kind, actor="gx",
+                       subject_kind="decision_submission", subject_id=task_key, payload=common)
+
+
+def remember_refusal(roots, params, request_sha, error, *, publish=False):
     """A refused candidate is auditable. It makes no graph, dispatch or budget change."""
     thread, turn, call_id = (params[k] for k in ("threadId", "turnId", "callId"))
     with store.transaction(roots.conn, transaction_owner="ScientificLead", operation="decision_refusal", run_id=roots.run_id):
-        exists = roots.conn.execute("SELECT 1 FROM p0_root_calls WHERE thread_id=? AND call_id=?", (thread,call_id))
-        if exists.fetchone():
-            return
+        existing = roots.conn.execute("SELECT * FROM p0_root_calls WHERE thread_id=? AND call_id=?", (thread,call_id)).fetchone()
+        if existing:
+            return saved_result(existing, turn, request_sha) if publish else None
         record_call(roots.conn, params)
         roots.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                            (thread, call_id, turn, request_sha, ids.canonical_json({"decision_refusal": error.to_payload()})))
+        if publish:
+            _submission_event(roots, params, error=error)

@@ -9,7 +9,7 @@ from ..artifacts import ArtifactService
 from ..domain import clock, ids, machines
 from ..errors import ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, VersionImmutable
 from ..persistence import records, store
-from . import intent
+from . import intent, research_window
 
 INSTANCE_ID = "gx.v6.instance"
 ACTOR = "gx-v6"
@@ -25,6 +25,7 @@ def cli_spec(args):
         "budget_profile",
         "turn_token_budget",
         "initial_job_limit",
+        "research_window",
         "research_effort",
         "research_modules",
         "branch_delegation",
@@ -79,6 +80,8 @@ def start(conn, spec, *, run_key, current):
     from .cli import initial_action
     from .driver import context, snapshot
 
+    if "research_window" in spec:
+        research_window.validate(spec["research_window"])
     if "initial_job_limit" in spec:
         limit = spec["initial_job_limit"]
         if type(limit) is not int or limit < 0:
@@ -97,6 +100,8 @@ def start(conn, spec, *, run_key, current):
         files.append({**item, "path": str(path), "sha256": observed})
     if current:
         prior = store.loads(current, "inputs_json")
+        if "research_window" in spec and spec["research_window"] != prior["inputs"]["p0_spec"].get("research_window"):
+            raise VersionImmutable("This run key already fixed its research window")
         if "evidence_policy" in spec:
             from . import v621_policy
             if v621_policy.for_start(spec) != prior["inputs"].get("evidence_policy", v621_policy.LEGACY):
@@ -525,7 +530,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                     if metrics:
                         if data["inputs"].get("evidence_policy") in v621_policy.TYPED:
                             facts["verified_metrics"] = [m for m in metrics if m["schema"] == v621_metrics.SCHEMA]
-                        if data["inputs"].get("evidence_policy") == "gx.evidence/6.2.3":
+                        if data["inputs"].get("evidence_policy") in v621_policy.LIVE_SCIENCE:
                             from . import v623_endpoints
                             valid = facts["verified_metrics"]
                             facts.update(endpoint_rows=v623_endpoints.compact_rows(valid),
@@ -679,7 +684,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             if node["result_ref"] and node["status"] in ("SUCCEEDED", "REUSED"):
                 node["outputs"] = v62_outputs.published_outputs(conn, rid, node["job_id"])
                 visible.update(dict.fromkeys(item["artifact_ref"] for item in node["outputs"]))
-                if data["inputs"].get("evidence_policy") == "gx.evidence/6.2.3":
+                if data["inputs"].get("evidence_policy") in v621_policy.LIVE_SCIENCE:
                     from . import v623_endpoints
                     settled = next((o for o in observations if o.get("event") == "v6.node.settled"
                                     and o.get("node_id") == node["node_id"] and o.get("artifact_ref") == node["result_ref"]), None)
@@ -692,7 +697,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                                                      "verified_metrics":valid, "endpoint_rows":v623_endpoints.compact_rows(valid),
                                                      "endpoint_total":len(valid), "pending_endpoints":False})
         brief["evidence_refs"] = list(visible)
-    if data["inputs"].get("evidence_policy")=="gx.evidence/6.2.3":
+    if data["inputs"].get("evidence_policy") in v621_policy.LIVE_SCIENCE:
         from . import v623_comparison
         comparisons = v623_comparison.bindings(conn,rid,goal["goal_version"],cursor)
         if comparisons:
@@ -1041,6 +1046,8 @@ def projection(conn, run, meter):
         ],
     }
     inputs = store.loads(run, "inputs_json")["inputs"]
+    if window := inputs.get("p0_spec", {}).get("research_window"):
+        result.update(research_window=window, research_window_phase=research_window.phase(window))
     if inputs.get("study_class"):
         result["study_class"] = inputs["study_class"]
     if inputs.get("evidence_policy"):

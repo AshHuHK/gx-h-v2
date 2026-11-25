@@ -71,7 +71,7 @@ def external_measurement(conn, ref, pred):
 
 
 class _Materials:
-    """Keep custody identities separate; joins require actual parentage or matching acquisition."""
+    """Disjoint material classes for a fixed endpoint and event cursor."""
     def __init__(self):
         self.parent = {}
 
@@ -90,15 +90,8 @@ class _Materials:
             self.parent[a] = b
 
 
-def availability(conn, reg, through, *, bindings=None):
-    """Earliest provable availability of this typed endpoint, for each requested material."""
-    pred = reg["prediction"]
+def _legacy_materials(conn, pubs, through):
     mats = _Materials()
-    pubs = {r["subject_id"]: dict(r) for r in conn.execute("""
-        SELECT e.event_id,e.subject_id,a.sha256,a.media_type,a.rel_path,a.kind,
-               json_extract(e.payload_json,'$.source_role') source_role FROM events e
-        JOIN artifacts a ON a.artifact_ref=e.subject_id WHERE e.kind='artifact.published'
-        AND e.event_id<=? AND a.published=1 AND a.origin='INGEST' ORDER BY e.event_id""", (through,))}
     individual_observations = set()
     by_ref = defaultdict(set)
     first_by_source = {}
@@ -133,6 +126,144 @@ def availability(conn, reg, through, *, bindings=None):
             continue
         identity = (pub["sha256"], next(iter(keys), None))
         mats.join(ref, representations.setdefault(identity, ref))
+    identified = {ref for ref in individual_observations if len(by_ref[ref]) == 1 and None not in by_ref[ref]}
+    return mats, identified
+
+
+def _custody_axes(receipt):
+    deps = receipt.get("dependencies", {})
+    return tuple(tuple(deps.get(k, ())) for k in ("acquisition", "source", "sample"))
+
+
+def _acquisitions(conn, pubs, through):
+    by_ref = defaultdict(dict)
+    for row in conn.execute("""SELECT json_extract(payload_json,'$.acquisition') FROM events
+            WHERE kind='v6.observation.added' AND event_id<=?
+            AND json_type(payload_json,'$.acquisition')='object' ORDER BY event_id""", (through,)):
+        receipt = json.loads(row[0])
+        ref = receipt["artifact_ref"]
+        if ref not in pubs or receipt["sha256"] != pubs[ref]["sha256"]:
+            continue
+        # Scope and source labels on the submission do not change material identity.
+        signature = ids.sha256_of_obj([_custody_axes(receipt), receipt.get("source_identity"),
+                                       receipt.get("derived_from"), receipt["data_refs"]])
+        by_ref[ref][signature] = receipt
+    return by_ref
+
+
+def _verified_materials(conn, reg, pubs, through):
+    """Build equivalence for this endpoint only. A custody edge is not equivalence."""
+    from . import v622_sources
+    mats = _Materials()
+    histories = _acquisitions(conn, pubs, through)
+    receipts = {}
+    uncertain = {}
+    byte_copies = {}
+    derived = {}
+    verified_boundaries = set()
+    for ref, pub in pubs.items():
+        variants = histories.get(ref, {})
+        if len(variants) > 1:
+            uncertain[ref] = "conflicting_acquisition"
+            continue
+        receipt = next(iter(variants.values()), {})
+        if receipt:
+            receipts[ref] = receipt
+        parents = receipt.get("derived_from", [])
+        if parents:
+            if len(parents) != 1:
+                uncertain[ref] = "multiple_transformation_inputs"
+                continue
+            parent = parents[0]
+            parent_ref = parent["artifact_ref"]
+            if pubs.get(parent_ref, {}).get("sha256") != parent["sha256"]:
+                uncertain[ref] = "missing_pinned_parent"
+                continue
+            relation = v622_sources.endpoint_relation(conn, reg.get("method_pin"), receipt.get("source_identity") or {},
+                                                      parent_sha256=parent["sha256"], child_sha256=pub["sha256"])
+            if relation == "equivalent":
+                mats.join(ref, parent_ref)
+            elif relation == "different":
+                verified_boundaries.add(ref)
+            else:
+                uncertain[ref] = "unverified_endpoint_transformation"
+            derived[ref] = parent_ref
+        else:
+            if receipt:
+                verified_boundaries.add(ref)
+            origin = _custody_axes(receipt) if receipt else None
+            # Equal encodings from independent source/sample versions stay distinct.
+            identity = (pub["sha256"], origin)
+            mats.join(ref, byte_copies.setdefault(identity, ref))
+    # An exact reimport of an identified derivative keeps its history even when its
+    # operator labels differ. Iterate only if an alias changed a parent class.
+    changed = bool(derived)
+    while changed:
+        changed = False
+        copies = {}
+        for ref, parent in derived.items():
+            identity = (pubs[ref]["sha256"], mats.key(parent))
+            previous = copies.setdefault(identity, ref)
+            if mats.key(previous) != mats.key(ref):
+                mats.join(ref, previous)
+                changed = True
+    # A new Goal can reimport bytes before adding a receipt. Inherit an unambiguous
+    # prior version. Several independent custody versions leave the origin unresolved.
+    identified_copies = defaultdict(set)
+    for ref in receipts:
+        identified_copies[pubs[ref]["sha256"]].add(mats.key(ref))
+    for ref, pub in pubs.items():
+        if ref in histories:
+            continue
+        candidates = identified_copies[pub["sha256"]]
+        if len(candidates) == 1:
+            mats.join(ref, next(iter(candidates)))
+        elif candidates:
+            uncertain[ref] = "ambiguous_same_bytes_acquisitions"
+
+    certain = {mats.key(ref) for ref in verified_boundaries}
+    reasons = defaultdict(set)
+    for ref, reason in uncertain.items():
+        key = mats.key(ref)
+        if key not in certain:
+            reasons[key].add(reason)
+    return mats, receipts, reasons
+
+
+def _external_inputs(ref, acquisition):
+    # Custody dependencies of a derivative never attribute its value to a parent.
+    if acquisition.get("derived_from"):
+        return [ref]
+    return [pin["artifact_ref"] for pin in acquisition.get("data_refs", ())] or [ref]
+
+
+def material_keys(bindings, fact, observation, reading):
+    """Attribute a scalar to one material class. A pooled or unbound result cannot qualify."""
+    if reading is not None:
+        refs = [pin["artifact_ref"] for pin in reading["material_inputs"]]
+    else:
+        refs = _external_inputs(fact["artifact_ref"], observation.get("acquisition") or {})
+    if not refs:
+        return []
+    first = bindings.get(refs[0], [])
+    if not first or any(bindings.get(ref) != first for ref in refs[1:]):
+        return []
+    return list(first)
+
+
+def availability(conn, reg, through, *, bindings=None):
+    """Earliest provable availability of this typed endpoint, for each requested material."""
+    pred = reg["prediction"]
+    pubs = {r["subject_id"]: dict(r) for r in conn.execute("""
+        SELECT e.event_id,e.subject_id,a.sha256,a.media_type,a.rel_path,a.kind,
+               json_extract(e.payload_json,'$.source_role') source_role FROM events e
+        JOIN artifacts a ON a.artifact_ref=e.subject_id WHERE e.kind='artifact.published'
+        AND e.event_id<=? AND a.published=1 AND a.origin='INGEST' ORDER BY e.event_id""", (through,))}
+    verified = reg.get("material_identity") == "endpoint_verified"
+    if verified:
+        mats, acquisitions, uncertain = _verified_materials(conn, reg, pubs, through)
+    else:
+        mats, identified = _legacy_materials(conn, pubs, through)
     selected = defaultdict(list)
     records = {}
     for pin in reg["data"]:
@@ -142,10 +273,13 @@ def availability(conn, reg, through, *, bindings=None):
         pub = pubs.get(ref)
         records[key] = {"raw_material_received_event_id": pub["event_id"] if pub else None,
                                   "endpoint_first_available_event_id": None}
-    if bindings is not None:
-        for ref in pubs:
-            if keys := selected.get(mats.key(ref)):
-                bindings[ref] = keys
+        if verified and mats.key(ref) in uncertain:
+            records[key]["material_identity_uncertainty"] = sorted(uncertain[mats.key(ref)])
+    if bindings is None:
+        bindings = {}
+    for ref in pubs:
+        if keys := selected.get(mats.key(ref)):
+            bindings[ref] = keys
     def found(ref, event_id):
         for digest in selected.get(mats.key(ref), ()):
             record = records[digest]
@@ -179,7 +313,8 @@ def availability(conn, reg, through, *, bindings=None):
     # A registered original can intrinsically disclose a schema-defined value before
     # registration, even when it never received a separate observation notification.
     intrinsic = {p["artifact_ref"] for p in reg["data"]}
-    identified = {ref for ref in individual_observations if len(by_ref[ref]) == 1 and None not in by_ref[ref]}
+    if verified:
+        return _external_availability(conn, pred, pubs, records, acquisitions, intrinsic, bindings)
     for ref in intrinsic | identified:
         pub = pubs.get(ref)
         if (pub is None or mats.key(ref) not in selected or pub["kind"] in ("test_fixture", "synthetic_observation")
@@ -188,6 +323,55 @@ def availability(conn, reg, through, *, bindings=None):
             continue
         if external_measurement(conn, ref, pred)[0] is not None:
             found(ref, pub["event_id"])
+    return records
+
+
+def _external_availability(conn, pred, pubs, records, acquisitions, intrinsic, bindings):
+    # A reported original can be an endpoint in its own right or a scalar expressly
+    # attributed to a sample. Its attribution never merges those two input artifacts.
+    def is_original_json(ref):
+        pub = pubs.get(ref)
+        if not pub or pub["kind"] in ("test_fixture", "synthetic_observation") or pub["source_role"] in (
+                "fixture", "test_fixture", "synthetic_fixture"):
+            return False
+        media = (pub["media_type"] or "").partition(";")[0].lower().strip()
+        return media in ("application/json", "text/json") or media.endswith("+json") or pub["rel_path"].lower().endswith(".json")
+
+    selected_origins = defaultdict(dict)
+    for ref in intrinsic:
+        receipt = acquisitions.get(ref, {})
+        origin = source_identity(receipt)
+        if (origin and not receipt.get("derived_from") and not receipt.get("data_refs")
+                and ref in bindings and is_original_json(ref)):
+            value, _ = external_measurement(conn, ref, pred)
+            if value is not None:
+                selected_origins[origin].setdefault(value, set()).update(bindings[ref])
+    for ref in intrinsic | acquisitions.keys():
+        if not is_original_json(ref):
+            continue
+        pub = pubs[ref]
+        receipt = acquisitions.get(ref, {})
+        origin = source_identity(receipt)
+        keys = set(bindings.get(ref, ()))
+        if receipt:
+            # Source and acquisition identify a supplied reading. An unsigned or
+            # unattributed reading cannot establish the first time for a different input.
+            deps = receipt["dependencies"]
+            if deps.get("source") and deps.get("acquisition"):
+                keys.update(material_keys(bindings, {"artifact_ref": ref}, {"acquisition": receipt}, None))
+        compare_origin = not receipt.get("data_refs") and not receipt.get("derived_from") and origin in selected_origins
+        if not keys and not compare_origin:
+            continue
+        value, _ = external_measurement(conn, ref, pred)
+        if value is None:
+            continue
+        if compare_origin:
+            keys.update(selected_origins[origin].get(value, ()))
+        for key in keys:
+            record = records[key]
+            previous = record["endpoint_first_available_event_id"]
+            if previous is None or pub["event_id"] < previous:
+                record["endpoint_first_available_event_id"] = pub["event_id"]
     return records
 
 

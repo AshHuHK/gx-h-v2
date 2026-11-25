@@ -1,12 +1,13 @@
 """Verify operator-declared material identity before atomically registering a source."""
 from functools import partial
 
-from adapters.scientific import archive_coordinates
+from adapters.scientific import archive_coordinates, coordinate_equivalence
 
 from ..artifacts import ArtifactService
 from ..errors import SchemaInvalid
 from . import v621_policy
 
+V624_READERS = (partial(archive_coordinates.verify, verify_revision=True, prove_endpoints=True),)
 READERS = (partial(archive_coordinates.verify, verify_revision=True),)
 V622_READERS = (archive_coordinates.verify,)
 
@@ -43,6 +44,8 @@ def prepare(conn, run_id, source, acquisition, digest, media_type, *, raw=None, 
     # Raw ingestion callers have already hashed the buffer; references are read through the artifact owner.
     read = (lambda: raw) if raw is not None else partial(assets.read_bytes, ref, expected_sha256=digest)
     readers = READERS if v621_policy.live_science(conn, run_id) else V622_READERS
+    if v621_policy.science_execution(conn, run_id):
+        readers = V624_READERS
     for reader in readers:
         proof = reader(media_type or "", labels, digest, read, parents, processing, acquisition.get("transformation"))
         if proof is not None:
@@ -50,3 +53,22 @@ def prepare(conn, run_id, source, acquisition, digest, media_type, *, raw=None, 
     if acquisition.get("transformation") is not None or parents:
         raise SchemaInvalid("An acquired derivative requires a reader for its declared transformation")
     return {"schema": "gx.source_identity/1", "status": "operator_attested", "artifact_sha256": digest}
+
+
+def endpoint_relation(conn, method_pin, source_identity, *, parent_sha256, child_sha256):
+    """Read verified acquisition and installed method pins without opening either coordinate file."""
+    identity = source_identity or {}
+    if (identity.get("status") != "verified_derivation" or identity.get("parent_sha256") != parent_sha256
+            or identity.get("artifact_sha256") != child_sha256 or not method_pin
+            or (identity.get("transformation") or {}).get("result_sha256") != child_sha256):
+        return "unknown"
+    spec = method_pin.get("measurement_spec") or {}
+    name, _, version = spec.get("capability", "").rpartition("@")
+    if (not name or not version or not method_pin.get("manifest_sha256")
+            or method_pin.get("capability") != spec["capability"] or method_pin.get("output") != spec.get("output_name")
+            or method_pin["manifest_sha256"] != spec.get("manifest_sha256")):
+        return "unknown"
+    installed = conn.execute("""SELECT json_extract(source_json,'$.installed_package.portable_sha256')
+        FROM assets WHERE kind='TOOL_ADAPTER' AND asset_id=? AND version=? AND content_sha256=?""",
+                             (name, version, method_pin["manifest_sha256"])).fetchone()
+    return coordinate_equivalence.relation(identity, spec, installed[0]) if installed else "unknown"

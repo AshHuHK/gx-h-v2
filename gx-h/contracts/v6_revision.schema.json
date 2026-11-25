@@ -389,6 +389,40 @@
                   "$ref": "#/$defs/text"
                 }
               }
+            },
+            "reference_refs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/text"
+              },
+              "minItems": 1,
+              "uniqueItems": true,
+              "description": "Ordered material references for this comparison, taken from the current Goal."
+            },
+            "prediction": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "blind_id",
+                "expected",
+                "on_expected",
+                "on_alternative"
+              ],
+              "properties": {
+                "blind_id": {
+                  "$ref": "#/$defs/text"
+                },
+                "expected": {
+                  "$ref": "#/$defs/text"
+                },
+                "on_expected": {
+                  "$ref": "#/$defs/text"
+                },
+                "on_alternative": {
+                  "$ref": "#/$defs/text"
+                }
+              },
+              "description": "For sealed material name its blind_id, your expectation, and what each outcome would change in the study."
             }
           }
         },
@@ -507,6 +541,51 @@
     },
     "decision": {
       "$ref": "#/$defs/decision"
+    }
+  },
+  "x-gx-lead-submission": {
+    "description": "Submit the scientific reason and the operation to enact. Select delivered measurements by their exact row keys in metric_refs. GX binds their sources and the matching registered comparison, fills unique branch fields and wakes on Job results. With multiple matches, select from the comparison_id options in the reply. Legacy explicit fields remain valid.",
+    "required": [
+      "rationale",
+      "ops"
+    ],
+    "operation_required": {
+      "open_branch": [
+        "op",
+        "hypothesis",
+        "method_family",
+        "alternative",
+        "discriminating_observation",
+        "stop_condition"
+      ],
+      "add_node": [
+        "op",
+        "capability",
+        "inputs",
+        "question"
+      ]
+    },
+    "metric_refs_description": "Copy the key from each delivered endpoint row, its metric_ref, or source_ref#key. Use the reading that supports the action.",
+    "example": {
+      "decision": {
+        "rationale": "The calibration residual leaves the drift estimate uncertain; measure the second standard.",
+        "metric_refs": [
+          "<delivered row key>"
+        ],
+        "ops": [
+          {
+            "op": "add_node",
+            "capability": "<listed method@version>",
+            "inputs": [
+              "<second calibration standard ref>"
+            ],
+            "parameters": {
+              "channel": "<method-supported channel>"
+            },
+            "question": "Does drift persist on the second standard?"
+          }
+        ]
+      }
     }
   }
 }

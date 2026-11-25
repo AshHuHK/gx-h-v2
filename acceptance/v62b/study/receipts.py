@@ -9,7 +9,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 sys.path[:0] = [str(ROOT / "gx-h"), str(ROOT / "acceptance/v6")]
 from gx_core.p0 import manifest, response_attribution, v6_costs, v62_outputs
-from native_witness import rollout, texts
+from native_witness import rollout, texts, verified_native_decision
 from verify import digest, need, parse, sha
 
 
@@ -304,13 +304,11 @@ def extract(work, run_id, sessions=None):
                     except ValueError:
                         # Code-mode nested dynamic calls are attested by a completed native tool item.
                         name, args, line = calls[d["call_id"]]
-                        req = parse(d["request_json"])
-                        intent = args["decision"] if isinstance(args["decision"], dict) else parse(args["decision"])
+                        verified_native_decision(d, args)
                         callback, = [c for c in source["p0_root_calls"] if (c["thread_id"], c["turn_id"], c["call_id"]) ==
                                      (tid, turn, d["call_id"])]
                         need(name.endswith("gx_decide_revision") and callback["request_sha"] == digest(["gx_decide_revision", args])
-                             and req["decision"] == intent and digest(intent) == req["draft_sha256"] and
-                             (d["task_id"], d["context_ref"], d["lease_id"]) == (task["task_id"], task["context_ref"], root["lease_id"]),
+                             and (d["task_id"], d["context_ref"], d["lease_id"]) == (task["task_id"], task["context_ref"], root["lease_id"]),
                              "Accepted nested call differs from the original host or GX binding")
                     item["decision"] = {**decision_effect(db, run_id, d, jobs), "native_call_line": line,
                                         "commissioned_jobs": [n for m in item["commissions"] for n in m["executed_nodes"]]}

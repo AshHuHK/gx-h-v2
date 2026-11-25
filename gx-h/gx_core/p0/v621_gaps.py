@@ -5,7 +5,7 @@ import re
 
 from ..domain import ids
 from ..errors import GxError, SchemaInvalid, ScopeDenied, StaleRevision
-from . import manifest, v62_maturity, v62_outputs, v621_policy
+from . import manifest, v62_maturity, v62_outputs, v621_policy, v623_chronology
 
 _COMPARISONS = {"eq": operator.eq, "lt": operator.lt, "lte": operator.le, "gt": operator.gt, "gte": operator.ge}
 
@@ -20,6 +20,7 @@ def register(conn, module, payload, sources):
         raise SchemaInvalid("Gap criteria must be a list of declarations")
     available = {s["artifact_ref"]: s["sha256"] for s in sources}
     result = {}
+    verified = v621_policy.science_execution(conn, module["run_id"])
     for entry in declarations:
         required = {"question", "data_ref", "applicability", "measurement_schema", "observable", "nature", "op"}
         optional = {"method", "output_name", "method_parameters", "threshold"}
@@ -69,6 +70,8 @@ def register(conn, module, payload, sources):
             criterion["method_sha256"] = method_pin["manifest_sha256"]
             if current:
                 criterion.update(version=2, method_pin=method_pin)
+        if verified:
+            criterion["material_identity"] = "endpoint_verified"
         result[q] = criterion
     return {"gap_criteria": result}
 
@@ -82,7 +85,30 @@ def declaration(bundle, question, source_hashes, report_ref, report_event):
             "closure": "conditional" if criterion else "awaiting_review"}
 
 
-def _match(conn, fact, criterion, boundary):
+def _endpoint(conn, criterion, through):
+    if criterion.get("material_identity") != "endpoint_verified":
+        return None
+    pin = {"artifact_ref": criterion["data_ref"], "sha256": criterion["data_sha256"]}
+    pred = {"target": "analysis" if criterion["nature"] == "analysis" else "experimental_observation",
+            "measurement_schema": criterion["measurement_schema"], "observable": criterion["observable"]}
+    reg = {"data": [pin], "prediction": pred, "method_pin": criterion.get("method_pin"),
+           "material_identity": criterion["material_identity"]}
+    bindings = {}
+    timeline = v623_chronology.availability(conn, reg, through, bindings=bindings)
+    return pred, timeline[pin["sha256"]], bindings
+
+
+def _acquired_observation(conn, task, ref):
+    # Classification already rejected conflicting or out-of-scope acquisition receipts.
+    row = conn.execute("""SELECT json_extract(payload_json,'$.acquisition') FROM events
+        WHERE run_id=? AND kind='v6.observation.added' AND event_id<=? AND
+        json_extract(payload_json,'$.scope')='run' AND json_extract(payload_json,'$.artifact_ref')=?
+        AND json_type(payload_json,'$.acquisition')='object' ORDER BY event_id LIMIT 1""",
+        (task["run_id"], task["event_cursor"], ref)).fetchone()
+    return {"acquisition": json.loads(row[0])} if row else {}
+
+
+def _match(conn, fact, criterion, boundary, endpoint=None, observation=None):
     if fact["nature"] != criterion["nature"] or fact["record_kind"] not in ("supplied_observation", "job_output"):
         return "source_nature", None
     if "model_prediction" in fact["upstream_natures"] or not fact["original_observations"]:
@@ -90,7 +116,7 @@ def _match(conn, fact, criterion, boundary):
     if criterion["nature"] == "analysis" and not fact.get("original_inputs_grounded"):
         return "missing_original", None
     target = {"artifact_ref": criterion["data_ref"], "sha256": criterion["data_sha256"]}
-    if target not in fact["data_refs"] and target not in fact["original_observations"]:
+    if endpoint is None and target not in fact["data_refs"] and target not in fact["original_observations"]:
         return "different_material", None
     if set(fact["applicability_scopes"]) != {criterion["applicability"]}:
         return "different_scope", None
@@ -107,7 +133,7 @@ def _match(conn, fact, criterion, boundary):
         reason, reading = v622_measurement.match(conn, criterion, fact)
         if reason:
             return reason, None
-        if target not in [{k: i[k] for k in ("artifact_ref", "sha256")} for i in reading["material_inputs"]]:
+        if endpoint is None and target not in [{k: i[k] for k in ("artifact_ref", "sha256")} for i in reading["material_inputs"]]:
             return "different_material", None
     parameters = criterion.get("method_parameters")
     if parameters and reading is None:
@@ -115,15 +141,36 @@ def _match(conn, fact, criterion, boundary):
         if any(k not in admitted or ids.canonical_json(admitted[k]) != ids.canonical_json(v)
                for k, v in parameters.items()):
             return "different_method_parameters", None
-    first = v62_maturity._first_relevant(conn, fact, {"event_id": boundary})
-    if first is None or first <= boundary:
-        return "already_available", None
+    if endpoint is not None:
+        pred, timing, bindings = endpoint
+        keys = v623_chronology.material_keys(bindings, fact, observation or {}, reading)
+        if target["sha256"] not in keys:
+            return "different_material", None
+        if reading is None:
+            # Another receipt for this endpoint cannot supply a missing attribution on this reading.
+            deps = (observation or {}).get("acquisition", {}).get("dependencies", {})
+            if not (deps.get("source") and deps.get("acquisition")):
+                return "unknown_first_production", None
+        if uncertainty := timing.get("material_identity_uncertainty"):
+            return uncertainty[0], None
+        first = timing["endpoint_first_available_event_id"]
+    else:
+        first = v62_maturity._first_relevant(conn, fact, {"event_id": boundary})
+        if first is None or first <= boundary:
+            return "already_available", None
     if reading:
         number, name = reading["value"], reading["metric"]
+    elif endpoint is not None:
+        number, name = v623_chronology.external_measurement(conn, fact["artifact_ref"], pred)
     else:
         number, name = v62_maturity._measurement(conn, fact["artifact_ref"], criterion["observable"])
     if name != criterion["measurement_schema"] or number is None:
         return "missing_observable_or_schema", None
+    if endpoint is not None:
+        if first is None:
+            return "unknown_first_production", None
+        if first <= boundary:
+            return "already_available", None
     if criterion["op"] != "finite":
         from decimal import Decimal
         value = v622_measurement.comparison_value(reading) if reading else number
@@ -134,6 +181,8 @@ def _match(conn, fact, criterion, boundary):
                                          "original_observations", "applicability_scopes")}
     receipt.update(value=number, observable=criterion["observable"], measurement_schema=name,
                    first_production_event=first, output_name=fact.get("output_name"), job_id=fact.get("job_id"))
+    if endpoint is not None:
+        receipt.update(material=target, endpoint_first_available_event_id=first)
     if reading:
         receipt.update(measurement=reading)
     if fact.get("job_id"):
@@ -154,7 +203,7 @@ def prepare(conn, task, decision):
     visible = set(json.loads(task["visible_refs_json"]))
     if not set(decision["evidence_refs"]) <= visible:
         raise ScopeDenied("Use gap evidence released into this Lead brief")
-    facts, results = {}, []
+    facts, observations, results = {}, {}, []
     for key in selected:
         gap = gaps[key]
         criterion = gap.get("criterion")
@@ -166,6 +215,7 @@ def prepare(conn, task, decision):
         elif gap.get("goal_version") != task["goal_version"]:
             raise StaleRevision("A different goal version established this gap")
         else:
+            endpoint = _endpoint(conn, criterion, task["event_cursor"])
             for ref in decision["evidence_refs"]:
                 if ref not in facts:
                     try:
@@ -177,7 +227,10 @@ def prepare(conn, task, decision):
                     row["rejections"].append({"artifact_ref": ref, "reason": "unverified_source",
                                                "code": facts[ref].code})
                     continue
-                reason, match = _match(conn, facts[ref], criterion, gap["registered_event_id"])
+                if endpoint is not None and facts[ref]["record_kind"] == "supplied_observation" and ref not in observations:
+                    observations[ref] = _acquired_observation(conn, task, ref)
+                reason, match = _match(conn, facts[ref], criterion, gap["registered_event_id"], endpoint,
+                                       observations.get(ref))
                 if match is None:
                     row["rejections"].append({"artifact_ref": ref, "reason": reason})
                 else:

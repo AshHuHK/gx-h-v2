@@ -22,11 +22,17 @@ def evidence_tool(name, version):
     """Project current and historical native tool menus from the one contract."""
     from . import v621_policy
 
-    spec = contracts.native_goal_tool_spec(name)
     if version == v621_policy.VERSION:
-        return spec
+        return contracts.native_goal_tool_spec(name, compact_decision=name == "gx_decide_revision")
+    spec = contracts.native_goal_tool_spec(name)
     spec = deepcopy(spec)
     fields = spec["inputSchema"]["properties"]
+    if name == "gx_decide_revision":
+        plan = fields["decision"]["properties"]["comparison_plan"]["properties"]
+        for key in ("reference_refs", "prediction"):
+            plan.pop(key, None)
+    if version == v621_policy.V623:
+        return spec
     if name == "gx_decide_revision":
         decision = fields["decision"]["properties"]
         for key in ("comparison_plan", "comparison_id", "disposition", "metric_refs", "affected_scope", "stop_reason"):

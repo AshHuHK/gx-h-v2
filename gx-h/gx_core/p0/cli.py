@@ -283,9 +283,17 @@ def execute(args):
         from . import v621_assignment
         with closing(existing_db(directory, readonly=False)) as conn:
             run = selected_run(conn)
-            return v621_assignment.assign(conn, run["run_id"], after_decision=args.after_decision, source=args.source,
-                path=args.input, sha256=args.sha256, role=args.role, metadata_path=args.acquisition,
-                module_instance=args.module_instance, media_type=args.media_type, actor=operator.local_context(conn).actor)
+            item = dict(source=args.source, path=args.input, sha256=args.sha256, role=args.role,
+                        metadata_path=args.acquisition, module_instance=args.module_instance, media_type=args.media_type)
+            actor = operator.local_context(conn).actor
+            if args.companion:
+                companions = [json.loads(path.read_bytes()) for path in args.companion]
+                receipts = v621_assignment.assign_group(conn, run["run_id"], after_decision=args.after_decision,
+                                                        actor=actor, items=[item, *companions], comparison_id=args.comparison_id)
+                return {"assignments": receipts}
+            if args.comparison_id:
+                raise ValueError("--comparison-id applies to a committed material group")
+            return v621_assignment.assign(conn, run["run_id"], after_decision=args.after_decision, actor=actor, **item)
     if args.command == "observe":
         from .v62_outputs import ingest_measurement
         with closing(existing_db(directory, readonly=False)) as conn:
@@ -401,6 +409,8 @@ def main(argv=None):
             sub.add_argument("--role", required=True, help="Scientific input role in the recipient grant")
             sub.add_argument("--acquisition", required=True, type=Path, help="Acquisition and source metadata JSON")
             sub.add_argument("--module-instance", help="Also grant this original to this open scoped delegation")
+            sub.add_argument("--comparison-id", help="Bind the group to an active comparison from this Goal version")
+            sub.add_argument("--companion", type=Path, action="append", help="Assign this companion descriptor in the same transaction")
             sub.add_argument("--media-type", default="application/octet-stream")
         if name == "observe":
             sub.add_argument("--source", required=True, help="Stable citation for this original measurement")

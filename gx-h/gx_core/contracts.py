@@ -139,7 +139,7 @@ def native_goal_tool_names() -> list[str]:
 
 
 @functools.lru_cache(maxsize=None)
-def native_goal_tool_spec(name: str) -> dict[str, Any]:
+def native_goal_tool_spec(name: str, *, compact_decision: bool = False) -> dict[str, Any]:
     """Inline the frozen decision schema for the Codex dynamic-tool wire format."""
     entry = mcp_tools()["native_goal_tools"]["tools"][name]
     definitions = _load("v6_revision.schema.json")["$defs"]
@@ -156,7 +156,23 @@ def native_goal_tool_spec(name: str) -> dict[str, Any]:
             return expand(definitions[fragment])
         return {key: expand(item) for key, item in value.items()}
 
-    return {**entry, "inputSchema": expand(entry["inputSchema"])}
+    spec = {**entry, "inputSchema": expand(entry["inputSchema"])}
+    if compact_decision:
+        if name != "gx_decide_revision":
+            raise ValueError("The compact form belongs to gx_decide_revision")
+        form = _load("v6_revision.schema.json")["x-gx-lead-submission"]
+        body = spec["inputSchema"]["properties"]["decision"]
+        body["required"] = form["required"]
+        # An absent mode is inferred only after the model has chosen its operations.
+        body.pop("allOf")
+        for variant in body["properties"]["ops"]["items"]["oneOf"]:
+            kind = variant["properties"]["op"]["const"]
+            if kind in form["operation_required"]:
+                variant["required"] = form["operation_required"][kind]
+        body["properties"]["metric_refs"]["description"] = form["metric_refs_description"]
+        spec["description"] = form["description"] + " Example: " + json.dumps(
+            form["example"], ensure_ascii=False, separators=(",", ":"))
+    return spec
 
 
 def tool_spec(name: str) -> dict[str, Any]:

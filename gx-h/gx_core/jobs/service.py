@@ -535,6 +535,9 @@ class JobService:
         conn = self.conn
         run_id, path_id, task_id = request["run_id"], request["path_id"], request["task_id"]
         purpose = request["purpose"]
+        from ..p0 import research_window
+        window = research_window.for_run(conn, run_id)
+        research_window.require_open(window)
 
         capability, manifest, env, env_view, lease_ref, step_index = self._admission_prerequisites(request)
 
@@ -756,6 +759,7 @@ class JobService:
                              "path_id": path_id, "resources": resources,
                              "reservation_ref": reservation["reservation_ref"]},
                 )
+                research_window.require_open(window)
         except BaseException:
             # The hold was made in the row's own transaction, so nothing of it outlives a refusal.
             executor.remove_tree(job.job_dir)

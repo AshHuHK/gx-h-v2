@@ -103,8 +103,8 @@ def deliver(conn, brief, limit):
                for entry in reversed(report_index) if entry.get("counterevidence")]
     adverse_refs = {entry["report_ref"] for entry in adverse}
     ordinary = [entry for entry in reversed(brief.get("module_reports", [])) if entry["report_ref"] not in adverse_refs]
-    from . import v623_endpoints as endpoints
-    active = brief.get("evidence_policy") == endpoints.POLICY
+    from . import v621_policy, v623_endpoints as endpoints
+    active = brief.get("evidence_policy") in v621_policy.LIVE_SCIENCE
     placed = {}
     if adverse:
         packet["reports_with_counterevidence"] = len(adverse)

@@ -118,6 +118,42 @@ class OauthUsage(unittest.TestCase):
         self.assertIsNone(unknown["total_tokens"])
         self.assertIsNone(unknown["confirmed_tokens"])
 
+    def test_interrupted_after_last_keyed_response_repeated_count_cannot_close_bill(self):
+        actor = self.lead
+        path = self.finish(actor.thread, actor.turn, 19)
+        header, context, _, _, _ = [json.loads(line) for line in path.read_text().splitlines()]
+        header["payload"]["session_id"] = actor.thread
+        def record(sequence, amount, cum):
+            return {"type":"token_usage_record", "payload":{
+                "response_id":f"original-{sequence}", "thread_id":actor.thread, "turn_id":actor.turn,
+                "session_id":actor.thread, "root_turn_id":actor.turn, "usage":{"total_tokens":amount},
+                "turn_token_usage":{"total_tokens":cum}, "thread_token_usage":{"total_tokens":cum}}}
+
+        def count(amount, cum):
+            return {"type":"event_msg", "payload":{"type":"token_count", "info":{
+                "last_token_usage":{"total_tokens":amount}, "total_token_usage":{"total_tokens":cum}}}}
+
+        first = record(1, 11, 11)
+        second = record(2, 8, 19)
+        abort = {"type":"event_msg", "payload":{"type":"turn_aborted","turn_id":actor.turn}}
+        started = {"type":"event_msg","payload":{"type":"task_started","turn_id":actor.turn,"root_turn_id":actor.turn}}
+        covered = [header, started, context, first, count(11, 11), second, count(8, 19)]
+        work = {"type":"response_item","payload":{"type":"reasoning","summary":[]}}
+        # The GX settlement itself is authentic but its terminal amount is stale.
+        path.write_text("".join(json.dumps(x) + "\n" for x in [*covered, work, count(8,19), abort]))
+        pending = self.reconcile()
+        self.assertEqual(pending["status"], "UNKNOWN")
+        self.assertIsNone(pending["total_tokens"])
+        self.assertFalse(pending["can_continue"])
+        self.assertTrue(any("UNCONFIRMED_RESPONSE_TAIL" in u.get("reasons", []) for u in pending["unresolved"]))
+        turn, = pending["turns"]
+        self.assertEqual((turn["covered_response_tokens"],turn["covered_response_count"]), (19, 2))
+        self.assertEqual(self.reconcile()["receipt_sha256"], pending["receipt_sha256"])
+        path.write_text("".join(json.dumps(x) + "\n" for x in [*covered, abort]))
+        exact = self.reconcile()
+        self.assertEqual((exact["status"], exact["total_tokens"]), ("SETTLED", 19))
+        self.assertEqual(exact["turns"][0]["covered_response_count"], 2)
+
     def test_stray_child_and_receipt_conflict_hold_the_original_request(self):
         path = self.finish(self.lead.thread, self.lead.turn, 9)
         extra = rollout(self.slot, "unregistered-child", self.binding, turn="unseen", parent=self.lead.thread,

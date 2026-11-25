@@ -41,7 +41,7 @@ def _rollouts(home, owned):
                 if header.get("type") == "session_meta" and meta.get("id") and spawn.get("parent_thread_id"):
                     possible_children[meta["id"]] = spawn["parent_thread_id"]
                 continue
-            turns, current, thread, provider = {}, None, None, None
+            turns, current, thread, provider, session = {}, None, None, None, None
             errors = set()
             with file.open(encoding="utf-8") as stream:
                 for line in stream:
@@ -59,6 +59,7 @@ def _rollouts(home, owned):
                     kind, event = record.get("type"), p.get("type")
                     if kind == "session_meta":
                         thread, provider = p.get("id"), p.get("model_provider")
+                        session = p.get("session_id")
                         if thread not in owned:
                             break
                     if kind == "turn_context" or (kind == "event_msg" and event == "task_started"):
@@ -70,6 +71,35 @@ def _rollouts(home, owned):
                         for field in ("model", "effort", "root_turn_id"):
                             if p.get(field):
                                 row[field] = p[field]
+                    if current and kind == "response_item":
+                        # A tool reply, user abort marker or rate-limit snapshot is not new model output.
+                        if (event == "message" and p.get("role") == "assistant") or event in (
+                                "reasoning", "function_call", "custom_tool_call", "web_search_call",
+                                "local_shell_call", "image_generation_call"):
+                            turns[current]["unpriced_output"] = True
+                    if current and kind == "token_usage_record":
+                        row = turns[current]
+                        rid = p.get("response_id")
+                        amount = (p.get("usage") or {}).get("total_tokens")
+                        if (not isinstance(rid, str) or not rid or not _count(amount) or
+                            (p.get("thread_id"), p.get("turn_id"), p.get("session_id"), p.get("root_turn_id")) !=
+                            (thread, current, session, row.get("root_turn_id")) or not session or not row.get("root_turn_id")):
+                            row["receipt_conflict"] = True
+                        else:
+                            key = _sha(rid)
+                            receipts = row.setdefault("keyed_responses", {})
+                            if key in receipts:
+                                # Replaying a receipt for an earlier response cannot price a new emission.
+                                if receipts[key] != amount:
+                                    row["receipt_conflict"] = True
+                            else:
+                                receipts[key] = amount
+                                if sum(receipts.values()) != (p.get("turn_token_usage") or {}).get("total_tokens"):
+                                    row["receipt_conflict"] = True
+                                row["unpriced_output"] = False
+                                row["awaiting_token_count"] = True
+                                row["last_response_amount"] = amount
+                                row["last_response_total"] = (p.get("thread_token_usage") or {}).get("total_tokens")
                     if kind != "event_msg":
                         continue
                     if event in ("turn_aborted", "task_complete"):
@@ -80,6 +110,14 @@ def _rollouts(home, owned):
                         n = (p["info"].get("total_token_usage") or {}).get("total_tokens")
                         if _count(n):
                             row = turns.setdefault(current, {})
+                            if row.get("awaiting_token_count"):
+                                if (row["last_response_total"] != n
+                                        or row["last_response_amount"] != (p["info"].get("last_token_usage") or {}).get("total_tokens")):
+                                    row["receipt_conflict"] = True
+                                row["awaiting_token_count"] = False
+                            elif row.get("keyed_responses") or row.get("unpriced_output"):
+                                # No new keyed receipt backs this mirror, even if its cumulative total stayed flat.
+                                row["unpaired_count"] = True
                             if "total" in row and n < row["total"]:
                                 errors.add("NONMONOTONIC_NATIVE_COUNT")
                             row["total"] = n
@@ -88,6 +126,18 @@ def _rollouts(home, owned):
                 if thread in by_thread and by_thread[thread] != projection:
                     projection["issues"].append("CONFLICTING_NATIVE_HISTORY")
                 by_thread[thread] = projection
+    # A provider response ID cannot belong to two roles/turns. Ambiguous receipts
+    # stay out of the observed subtotal as well as the final total.
+    seen = defaultdict(list)
+    for session in by_thread.values():
+        for turn in session["turns"].values():
+            for receipt in turn.get("keyed_responses", {}):
+                seen[receipt].append(turn)
+    for key, owners in seen.items():
+        if len(owners) > 1:
+            for owner in owners:
+                owner["receipt_conflict"] = True
+                del owner["keyed_responses"][key]
     linked = set(owned)
     while discovered := {thread for thread, parent in possible_children.items() if parent in linked} - linked:
         linked.update(discovered)
@@ -111,6 +161,10 @@ def _crosscheck(history, thread, turn, cumulative, *, owner=None, role=None):
     session = history.get(thread, {})
     official = session.get("turns", {}).get(turn, {})
     issues = list(session.get("issues", []))
+    if official.get("unpriced_output") or official.get("unpaired_count"):
+        issues.append("UNCONFIRMED_RESPONSE_TAIL")
+    if official.get("receipt_conflict"):
+        issues.append("CONFLICTING_PROVIDER_RESPONSE")
     if not official.get("end"):
         issues.append("NO_OFFICIAL_TERMINAL_RECEIPT")
     if not _count(cumulative) or official.get("total") != cumulative:
@@ -121,6 +175,12 @@ def _crosscheck(history, thread, turn, cumulative, *, owner=None, role=None):
     if owner and official.get("root_turn_id") != owner:
         issues.append("UNATTRIBUTED_DESCENDANT")
     return issues
+
+
+def _covered(history, thread, turn):
+    receipts = history.get(thread, {}).get("turns", {}).get(turn, {}).get("keyed_responses", {})
+    return {"covered_response_count": len(receipts),
+            "covered_response_tokens": sum(receipts.values()) if receipts else None}
 
 
 def _audit(db, slot, run_id):
@@ -167,6 +227,11 @@ def _audit(db, slot, run_id):
         unsettled = r["budget_status"] == "HELD" and not r["terminal_status"]
         if unsettled:
             pending.append(identity)
+            # GX may have gone down before its terminal notification. The original
+            # official abort still proves a missing final response, while its hold stays intact.
+            official = history.get(thread, {}).get("turns", {}).get(turn, {})
+            if official.get("end") and (official.get("unpriced_output") or official.get("unpaired_count")):
+                issues.append("UNCONFIRMED_RESPONSE_TAIL")
         elif r["confidence"] not in ("PROVIDER_CONFIRMED", "PROVIDER_RECONCILED") or (
                 r["attribution"] != "TURN" or r["budget_status"] not in ("SETTLED", "RELEASED") or not _count(amount)):
             issues.append("UNRESOLVED_OR_ESTIMATED_USAGE")
@@ -186,7 +251,9 @@ def _audit(db, slot, run_id):
                     and c["total_tokens"] - c["prior_tokens"] == c["measured_tokens"]):
                 child_issues.append("INCOMPLETE_CHILD_USAGE")
             issues.extend(child_issues)
-            children.append({"thread": c["child_id"], "turn": c["turn_id"], "tokens": c["measured_tokens"],
+            children.append({"thread": c["child_id"], "turn": c["turn_id"],
+                             "tokens": None if child_issues else c["measured_tokens"],
+                             **_covered(history, c["child_id"], c["turn_id"]),
                              "receipt_sha256": _sha(history.get(c["child_id"], {}).get("turns", {}).get(c["turn_id"], {}))})
             if _count(c["measured_tokens"]):
                 descendant_tokens += c["measured_tokens"]
@@ -198,7 +265,7 @@ def _audit(db, slot, run_id):
         proven = not unsettled and not issues
         if proven:
             confirmed += amount
-        row.update(tokens=amount if proven else None, descendants=children, reserved_tokens=r["token_budget"],
+        row.update(**_covered(history, thread, turn), tokens=amount if proven else None, descendants=children, reserved_tokens=r["token_budget"],
                    receipt_sha256=_sha(history.get(thread, {}).get("turns", {}).get(turn, {})))
         details.append(row)
     if not ledger:
@@ -228,7 +295,10 @@ def reconcile(slot, run_id):
     safe = status == "SETTLED" and account == {"state": "INCLUDED_AVAILABLE", "ready": True}
     proof = {"run_id": run_id, "account": account, "turns": records, "pending_turns": pending,
              "unresolved": unknown}
-    return {**proof, "schema": "gx.v623.oauth-usage/1", "status": status, "usage_status": accounting,
+    responses = [item for row in records for item in [row, *row["descendants"]]]
+    covered = [r["covered_response_tokens"] for r in responses if r["covered_response_tokens"] is not None]
+    return {**proof, "covered_response_count": sum(r["covered_response_count"] for r in responses),
+            "covered_response_tokens": sum(covered) if covered else None, "schema": "gx.v623.oauth-usage/2", "status": status, "usage_status": accounting,
             "total_tokens": exact, "confirmed_tokens": confirmed if any(r["tokens"] is not None for r in records) else None,
             "can_continue": safe, "provider_usd": None, "cost_status": "UNKNOWN",
             "receipt_sha256": _sha(proof)}

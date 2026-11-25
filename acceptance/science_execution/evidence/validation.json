@@ -1,0 +1,180 @@
+{
+  "schema": "gx.science-execution.delivery/1",
+  "candidate": "b60a76c95d45782379e5c4590ee867bd23346cee",
+  "baseline": "f9231023b5c44c5d96ec1a974d639ea9dfe34613",
+  "time_utc": "2026-11-25T23:45:20Z",
+  "raw_validation_directory": "../science-execution-validation",
+  "tests_on_candidate": {
+    "deployed-v624unit.log": {
+      "command": "PYTHONPATH=.:gx-h:gx-h/tests .venv/bin/python -B -m unittest discover -s acceptance/v624",
+      "passed": 29,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "bc4bdce01669f7ffbfe339fe21125a5d67a883afd47e6b03b001ca75c33d5522"
+    },
+    "deployed-old623units.log": {
+      "command": "PYTHONPATH=.:gx-h:gx-h/tests .venv/bin/python -B -m unittest discover -s acceptance/v623",
+      "passed": 80,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "5c1f28907425904f7b9a205d90f5db4615e2cfd37ae2f18e2c2bdcc89390463b"
+    },
+    "deployed-scisuite.log": {
+      "command": "PYTHONPATH=.:gx-h:gx-h/tests .venv/bin/python -B -m unittest discover -s acceptance/science_execution",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "188218601b1eb3b94b42b846cc119e551aa5bc56c1d488b5cc75bbba5c0b177d"
+    },
+    "final-study-tests.log": {
+      "command": "PYTHONPATH=.:gx-h:gx-h/tests .venv/bin/python -B -m unittest -v acceptance.science_execution.study.test_commitment acceptance.science_execution.study.test_mapped_method",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "87644915b5a2370429ff6ab1e6a1480ae78a2bd1a92f5cfc0d7ee82de85d7b94"
+    },
+    "final-diagnostic/controls.log": {
+      "command": "bash acceptance/science_execution/rehearse.sh \"$OUTPUT\" \"$CLASH_BINARY\"",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "log_sha256": "63a1089b18f81ea02189d45c3e01162168dd956224fc70c771d1e1330c961fa5"
+    }
+  },
+  "baseline_replay_on_candidate": {
+    "verify": {
+      "command": ".venv/bin/python -B acceptance/v623/validate.py verify --require-complete",
+      "exit_code": 0,
+      "sha256": "45a50c475558a6dbadfcbf40b6427071830a5b49e9ef505e1020c28059d233e4",
+      "result": {
+        "hard_public_live": "NOT_RUN",
+        "production_hard_entry": "BLOCKED",
+        "public_numeric_method": "PASS",
+        "research_answer": {
+          "observational_analysis": "PASS",
+          "real_model_autonomy_in_this_cpu_run": "NOT_RUN"
+        },
+        "v623_research_correctness": "PASS"
+      }
+    },
+    "public": {
+      "command": ".venv/bin/python -B acceptance/v623/public_replay.py verify --receipts acceptance/v623/evidence/live",
+      "exit_code": 0,
+      "sha256": "77fea703712667b1ddd959b367d8bcb8aac3b5da82d894a13e3d1d6656712e9a",
+      "result": {
+        "status": "PASS",
+        "source_commit": "82ee888158431c9031236b2e3642a50efcdbd1d0",
+        "original_runs": 4,
+        "packets_reproduced": 24,
+        "external_paid_calls": 0
+      }
+    },
+    "archive": {
+      "command": ".venv/bin/python -B acceptance/v623/study/archive.py replay --receipts acceptance/v623/evidence/study",
+      "exit_code": 0,
+      "sha256": "369edef22c7a185c5e19fee55dc3c6e9a95f114da9e700ab5896ac6d9b2bc3f6",
+      "result": {
+        "status": "PASS",
+        "source_commit": "82ee888158431c9031236b2e3642a50efcdbd1d0",
+        "reproduced_native_decisions": 7,
+        "paid_provider_calls": 0,
+        "published_claims": 4,
+        "named_outputs": [
+          {
+            "entry": "2RE9",
+            "mask": "common_backbone",
+            "job_id": "gxj_01m8abxhznzpzhqx19",
+            "material_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+            "output_ref": "gxa_01m8abxkzw037h0rak",
+            "output_sha256": "845e9bbe3a1143e8b10c7039fb23ee50f222c05c5db97e67b5a150daef077b8b",
+            "max_abs_errors": {
+              "fit_angle_deg": 3.126388037344441e-13,
+              "fit_rmsd_A": 2.9976021664879227e-15,
+              "delta_angle_deg": 3.126388037344441e-13,
+              "delta_rmsd_A": 2.9976021664879227e-15
+            }
+          },
+          {
+            "entry": "2RE9",
+            "mask": "common_ca",
+            "job_id": "gxj_01m8abxmsa7ped710c",
+            "material_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+            "output_ref": "gxa_01m8abxnm94kaw3ahx",
+            "output_sha256": "a3aafcc25994caa1d5ab513954dc941882956be0e7304eda55b2260d3edc35c2",
+            "max_abs_errors": {
+              "fit_angle_deg": 3.836930773104541e-13,
+              "fit_rmsd_A": 2.4424906541753444e-15,
+              "delta_angle_deg": 3.836930773104541e-13,
+              "delta_rmsd_A": 2.4424906541753444e-15
+            }
+          },
+          {
+            "entry": "2O0O",
+            "mask": "common_backbone",
+            "job_id": "gxj_01m8abxr3902k4k8cd",
+            "material_sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103",
+            "output_ref": "gxa_01m8abxsgbz3gqeamm",
+            "output_sha256": "4ce82373882d21eca1e52f2a570aeb87938f0e923751a6fb8d6973463b4682d6",
+            "max_abs_errors": {
+              "fit_angle_deg": 2.8421709430404007e-13,
+              "fit_rmsd_A": 2.4424906541753444e-15,
+              "delta_angle_deg": 2.8421709430404007e-13,
+              "delta_rmsd_A": 3.1086244689504383e-15
+            }
+          },
+          {
+            "entry": "2O0O",
+            "mask": "common_ca",
+            "job_id": "gxj_01m8abxtba6rfcahyf",
+            "material_sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103",
+            "output_ref": "gxa_01m8abxv50rj06njk2",
+            "output_sha256": "56e44eb3c00c98d0103e51c2dd8a6f36d116e7be60fcbf0726f0407916e856ff",
+            "max_abs_errors": {
+              "fit_angle_deg": 3.126388037344441e-13,
+              "fit_rmsd_A": 3.4416913763379853e-15,
+              "delta_angle_deg": 2.984279490192421e-13,
+              "delta_rmsd_A": 3.885780586188048e-15
+            }
+          }
+        ]
+      }
+    }
+  },
+  "development_rerun": {
+    "stage": "before pinning candidate",
+    "old_623_tests": 80,
+    "initial_errors": 1,
+    "initial_log_sha256": "d0a1e03f88b05e385aa600d28fe20c0468bb761e38957c0997b17c72373a4abf",
+    "resolution": "Explicit historical_replay on the test starting a 6.2.3 Goal; subsequent full 80/80 passed."
+  },
+  "acceptance": {
+    "successor_offline_demonstrations": 2,
+    "successor_live_first_attempts": 0,
+    "successor_live_accepted": 0,
+    "successor_live_allocations_planned": 2,
+    "successor_live_status": "AWAITING_SUCCESSOR_PI_APPROVAL",
+    "v62_frozen": false,
+    "archived_hard_live": "0/4",
+    "archived_private_unseen": "0/2",
+    "third_eligible_depositions": 0,
+    "actual_third_study": "NOT_ENROLLED",
+    "third_study_model_calls": 0,
+    "new_paid_model_calls": 0,
+    "archived_original_exposure_lower_bound": 578596,
+    "archived_original_total_tokens": null,
+    "additional_currency_authorized_by_old_series": 0
+  },
+  "receipts": {
+    "baseline.json": "ba84a4a2d780a115af14dfad12b81ee21dd6e7e8894c6dde3527f9a2c482c483",
+    "chronology.json": "1552dddd748d8ffd24aced3e45f764d2c1ccb249f2158a805fda75d724a22933",
+    "diagnostic.json": "953bad5c0781a20243a6ffec416e123335300c4d1dd8d8b96b4651b81ac531e5",
+    "history.json": "12aaa74f09a517d50c2c71efda1dc29c418c600fb8b68ddb2cce83874a75453b",
+    "method-summary.json": "f7f570615a65e59dc32a9ce3f62e2907c2c5929db5b2674b12e0d3624821cd23",
+    "official-decision-wire.json": "816efc12e64173bd254aa7e13a4314a58ad40f9c3e3c8a5f2a414b03afc4d276",
+    "product.json": "88e9c51102fb9225d07e4ee2852557bb50e352de4d57a35a41bdafaafd729e8b",
+    "subscription-preflight.json": "86cb71f8a9c543f27ea513f10d07e685e39f064008de8d163486469c734e50b5",
+    "synthetic-study.json": "ca5e0a107d9ddf6b546c078b68e4f94f165d7e8718e18d9b0f269f20eccf29db",
+    "third-study-registration.json": "83577ff743e568b3eaf27ce06921c4ce757640b3d18ceba72cbaa8f399872780",
+    "v623-cold-migration.json": "4b06b1bec6bf4eb225f63eeaa088f825217f68ad2a13e63a84a60f49683c2dc2"
+  }
+}

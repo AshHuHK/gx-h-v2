@@ -112,15 +112,16 @@ def publication(db, work, rid, projected, cursor, jobs):
     for item in body["sources"]:
         origin, _ = artifact(db, work, rid, item["artifact_ref"])
         need(origin["sha256"] == item["sha256"] and item["receipts"], "Report source lacks a matching receipt")
-        traces = []
+        traces = [dict(kind="job", event_id=n["commission_event"], settled_event=n["event_id"],
+                       capability=n["spec"]["capability"], parameters=n["spec"]["parameters"],
+                       input_sha256=n["input_sha256"], job_id=n["job_id"], output=out)
+                  for n in jobs if n["branch_id"] == opened["branch_id"] and n["job_id"] == origin["job_id"]
+                  and n["status"] == "SUCCEEDED" for out in n["outputs"]
+                  if out["artifact_ref"] == item["artifact_ref"] and out["sha256"] == item["sha256"]]
         for proof in item["receipts"]:
             if "job_id" in proof:
-                traces.extend(dict(kind="job", event_id=n["commission_event"], settled_event=n["event_id"],
-                                   capability=n["spec"]["capability"], parameters=n["spec"]["parameters"],
-                                   input_sha256=n["input_sha256"], job_id=n["job_id"], output=out) for n in jobs
-                              if n["branch_id"] == opened["branch_id"] and n["job_id"] == proof["job_id"]
-                              and n["status"] == "SUCCEEDED" for out in n["outputs"]
-                              if out["artifact_ref"] == item["artifact_ref"] and out["sha256"] == proof["output_sha256"] == item["sha256"])
+                need(proof["job_id"] == origin["job_id"] and proof["output_sha256"] == item["sha256"],
+                     "Published source refers to a different actual Job output")
             elif "operation_key" in proof:
                 for op in db.execute("SELECT event_id,payload_json FROM events WHERE run_id=? AND subject_id=? "
                                     "AND kind='v62.module.tool_completed' AND json_extract(payload_json,'$.operation_key')=?",

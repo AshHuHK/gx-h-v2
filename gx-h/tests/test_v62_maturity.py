@@ -5,6 +5,7 @@ from pathlib import Path
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 from gx_core.artifacts import ArtifactService
 from gx_core.domain import ids
@@ -240,6 +241,22 @@ class ProspectiveClaims(unittest.TestCase):
         self.observe(12.2, 0, label="new-name", raw_ref=copy, acquisition={**sample_a, "processing":"SOP-1"})
         self.assertEqual(v62_maturity.reassess(self.db, self.run), [])
 
+    def test_earlier_identical_scalar_on_independently_attested_unrelated_sampling_is_excluded(self):
+        prior_plan = self.put({"transect":"other-season"}, "acquisition_plan")
+        common = {"schema":self.metric, "measurement":{"value":12}}
+        first = self.put(common, "field_observation", alias="old-reader")
+        self.observe(12, 0, plan=prior_plan, raw_ref=first, label="old-site",
+                     acquisition={"applicability":"previous season"})
+        registered = self.adopt(self.stage())
+        self.assertEqual(registered["maturity"]["stage"], "preregistered")
+        new = self.put(common, "field_observation", alias="spring-reader")
+        self.observe(12, 0, raw_ref=new)
+        checked, = v62_maturity.reassess(self.db,self.run)
+        self.assertEqual(checked["maturity"]["stage"], "tested")
+        measurement, = checked["maturity"]["results"]
+        self.assertLess(measurement["first_bytes_event_id"],registered["maturity"]["registration"]["event_id"])
+        self.assertGreater(measurement["first_event_id"],registered["maturity"]["registration"]["event_id"])
+
     def test_textual_review_lends_direction_only_to_its_proposition(self):
         claim = {"statement":"The signal rises", "scope":self.scope, "maturity_lineage":["p@1"]}
         review = {"source_class":"reviewed_source_evidence", "record_nature":"formal_evidence",
@@ -284,6 +301,31 @@ class ComputedPredictions(unittest.TestCase):
         decision = draft({**branch(),"budget_limits":{"job_submissions":1,"cpu_seconds":60}},node)
         adopted = v6_decisions.adopt(db, **call, decision={**decision,"evidence_refs":refs})
         self.assertEqual({r["maturity"]["stage"] for r in adopted["claim_revisions"]}, {"preregistered"})
+        # Freeze a second Lead task before dispatch, then submit its claim after the *actual*
+        # detached launch and before GX has received any output. The scientific value is checked
+        # retrospectively even if its later publication cursor makes it look prospective.
+        v6_goal.record_observation(db, run, raw, source="later-instrument-review")
+        next_task = v6_goal.ensure_task(db, run)
+        second = bind_native_fixture(db, run, tmp, task_id=next_task)
+        second_scope = db.execute("SELECT context_ref,visible_refs_json FROM v6_decision_tasks WHERE task_id=?",
+                                  (second["task_id"],)).fetchone()
+        from gx_core.jobs import executor
+        real_launch = executor.launch
+
+        def register_during_launch(directory):
+            identity = real_launch(directory)
+            pred = {"data_refs":[raw], "observable":"/value", "operator":"gt", "threshold":5,
+                    "target":"analysis", "method":{"capability":METHOD, "output":"mean.json"}}
+            late = dict(statement="after dispatch", scope=SCOPE, criteria="More than five on this named output",
+                        level="open", evidence_refs=[raw], rationale="Concurrent post-launch registration",
+                        limitations="First production is unknown.", prediction=pred)
+            staged = v6_claims.stage(db, **{**second,"call_id":"late"}, context_ref=second_scope["context_ref"],
+                                     allowed_refs=json.loads(second_scope["visible_refs_json"]), payload=late)
+            v6_decisions.adopt(db, **second, decision={**draft(),"evidence_refs":[raw,staged["claim_ref"]]})
+            return identity
+
+        with patch.object(executor, "launch", side_effect=register_during_launch):
+            v6_jobs.advance(db, run)
         deadline = time.monotonic()+25
         while time.monotonic() < deadline:
             v6_jobs.advance(db, run)
@@ -301,6 +343,11 @@ class ComputedPredictions(unittest.TestCase):
         self.assertEqual(actual["observed"]["stage"], "preregistered")
         self.assertFalse(actual["observed"]["results"])
         self.assertIn("nature_mismatch",{g["kind"] for g in actual["observed"]["gaps"]})
+        late = actual["after dispatch"]
+        self.assertEqual((late["stage"], late["direction"]), ("grounded", "opposed"))
+        uncertain, = [g for g in late["gaps"] if g["kind"] == "unverified_production_order"]
+        self.assertLess(uncertain["launch_event_id"],late["registration"]["event_id"])
+        self.assertGreater(uncertain["first_event_id"],late["registration"]["event_id"])
 
 
 if __name__ == "__main__":

@@ -226,6 +226,26 @@ class OutputProvenance(unittest.TestCase):
         with self.assertRaises(SchemaInvalid):
             outputs._binding(admission, {**output, "output_name": "statistics_copy/one.json"})
 
+    def test_changed_submit_intent_cannot_replace_the_admitted_output_collector(self):
+        from tests.test_v6_jobs import DynamicJobs
+        scenario = DynamicJobs()
+        self.addCleanup(scenario.doCleanups)
+        scenario.setUp()
+        scenario.new("changed-pin")
+        v6_jobs.advance(scenario.conn, scenario.run_id)
+        job = scenario.state("changed-pin")["job_id"]
+        original = manifest.read_manifest(scenario.conn, job)["admission_hash"]
+        scenario.conn.execute("UPDATE jobs SET submit_intent_json=json_set(submit_intent_json,"
+                              "'$.manifest_sha256', ?) WHERE job_id=?", ("0" * 64, job))
+        final = JobService(scenario.conn).wait(job, timeout_seconds=15)
+        self.assertEqual(final["status"], "FAILED")
+        self.assertIn("immutable capability pin", final["failure"]["summary"])
+        after = manifest.read_manifest(scenario.conn, job)
+        self.assertEqual(after["admission_hash"], original)
+        self.assertEqual(after["completion"]["outputs"], [])
+        diagnostic = final["recovery_manifest_ref"]
+        self.assertEqual(outputs.classify(scenario.conn, scenario.run_id, diagnostic)["record_kind"], "execution_failure")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -241,9 +241,11 @@ def complete(conn, job_id):
                  (ids.canonical_json(doc), ids.sha256_of_obj(doc), job_id))
 
 
-def read_manifest(conn, job_id):
+def read_manifest(conn, job_id, *, missing_ok=False):
     row = conn.execute("SELECT * FROM p0_execution_manifests WHERE job_id=?", (job_id,)).fetchone()
     if row is None:
+        if missing_ok:
+            return None
         _refuse("missing_manifest", "no prospective execution manifest for this Job", job_id=job_id)
     admission = store.loads(row, "admission_json")
     completion = store.loads(row, "completion_json")

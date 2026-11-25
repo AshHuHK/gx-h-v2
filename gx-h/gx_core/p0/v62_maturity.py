@@ -145,9 +145,12 @@ def qualified_ground(fact, claim):
     scopes = set(fact.get("output_provenance", {}).get("applicability_scopes", ()))
     if scopes and scopes != {claim["scope"]}:
         return False
+    target = claim.get("prediction", {}).get("target")
+    if kind in ("observed", "analysis") and "model_prediction" in fact.get("output_provenance", {}).get("upstream_natures", []):
+        return kind == "analysis" and target == "analysis"
     if kind in ("observed", "analysis"):
         return True
-    return kind == "model_prediction" and claim.get("prediction", {}).get("target") == "model_prediction"
+    return kind == "model_prediction" and target == "model_prediction"
 
 
 def _identity(claim):
@@ -196,6 +199,52 @@ def _applies(fact, claim_scope):
     return not declared or set(declared) == {claim_scope}
 
 
+def _historical_facts(conn, run, ref, through):
+    """Use the original branch's scientific scope for chronology, without releasing its evidence."""
+    from . import v62_outputs
+    scopes = conn.execute("""SELECT DISTINCT json_extract(payload_json,'$.scope') FROM events
+        WHERE run_id=? AND kind='v6.observation.added' AND event_id<=?
+          AND json_extract(payload_json,'$.artifact_ref')=? AND json_type(payload_json,'$.acquisition')='object'
+        UNION SELECT json_extract(m.admission_json,'$.owner.branch_id') FROM artifacts a
+              JOIN p0_execution_manifests m USING(job_id) WHERE a.artifact_ref=?""", (run, through, ref, ref))
+    for scope in {row[0] or "run" for row in scopes} or {"run"}:
+        yield v62_outputs.classify(conn, run, ref, scope=scope, through_event=through)
+
+
+def _disjoint_sampling(prior, current):
+    if not all(f["record_kind"] == "supplied_observation" and f["independence_complete"] for f in (prior, current)):
+        return False
+    left, right = ({p["sha256"] for p in f["data_refs"]} for f in (prior, current))
+    if not left or not right or left & right:
+        return False
+    for axis in ("data", "acquisition", "sample", "source", "publication", "sampling"):
+        both = set(prior["dependencies"][axis]) & set(current["dependencies"][axis])
+        if axis == "data":
+            both.discard("sha256:" + current["sha256"])  # Equal scalar bytes can come from distinct sites.
+        if both:
+            return False
+    return True
+
+
+def _first_relevant(conn, fact, reg):
+    """Keep old unidentified copies. Exclude only samples independently identified before registration."""
+    first = fact.get("first_event_id")
+    boundary = reg["event_id"]
+    if first is None or first > boundary:
+        return first
+    copies = conn.execute("""SELECT e.event_id,e.run_id,e.subject_id FROM events e
+        WHERE kind='artifact.published' AND json_extract(payload_json,'$.sha256')=?
+        AND event_id<=? ORDER BY event_id""", (fact["sha256"], boundary))
+    for row in copies:
+        if not row["run_id"] or row["subject_id"] == fact["artifact_ref"]:
+            return row["event_id"]
+        prior = _historical_facts(conn, row["run_id"], row["subject_id"], boundary)
+        if any(not _disjoint_sampling(old, fact) for old in prior):
+            return row["event_id"]
+    return conn.execute("SELECT min(event_id) FROM events WHERE kind='artifact.published' AND subject_id=?",
+                        (fact["artifact_ref"],)).fetchone()[0]
+
+
 def _known_before(conn, reg, through):
     """Past output anywhere in this store disqualifies the same outcome on the same frozen inputs.
 
@@ -208,15 +257,14 @@ def _known_before(conn, reg, through):
     pins = [p["sha256"] for p in reg["data"]]
     pointer = reg["prediction"]["observable"]
     # A material can itself already contain the value, even without a scientific receipt.
-    from . import v62_outputs
     for pin in reg["data"]:
         ref = pin["artifact_ref"]
         value, metric = _measurement(conn, ref, pointer)
         if value is None:
             continue
         run = conn.execute("SELECT run_id FROM artifacts WHERE artifact_ref=?", (ref,)).fetchone()[0]
-        fact = v62_outputs.classify(conn, run, ref, through_event=through)
-        if _applies(fact, reg["claim_scope"]) and _metric_matches(reg, fact, metric):
+        if any(_applies(fact, reg["claim_scope"]) and _metric_matches(reg, fact, metric)
+               for fact in _historical_facts(conn, run, ref, through)):
             return True
     # Check actual output availability, including a completed Job whose node report is still pending.
     # Qualify data by their digest rather than movable names, run ids, or visibility of an old report.
@@ -248,11 +296,12 @@ def _known_before(conn, reg, through):
                       AND e.kind='artifact.published' AND e.event_id<=?)""",
         (through, json.dumps(pins), through, through, boundary, through))
     for row in candidates:
-        fact = v62_outputs.classify(conn, row["run_id"], row["artifact_ref"], scope="run", through_event=through)
-        if _applies(fact, reg["claim_scope"]) and fact["nature"] in (NATURE[reg["prediction"]["target"]], "unclassified"):
-            value, metric = _measurement(conn, row["artifact_ref"], pointer)
-            if value is not None and _metric_matches(reg, fact, metric):
-                return True
+        for fact in _historical_facts(conn, row["run_id"], row["artifact_ref"], through):
+            if _applies(fact, reg["claim_scope"]) and fact["nature"] in (NATURE[reg["prediction"]["target"]], "unclassified"):
+                value, metric = _measurement(conn, row["artifact_ref"], pointer)
+                first = _first_relevant(conn, fact, reg)
+                if value is not None and first is not None and first <= boundary and _metric_matches(reg, fact, metric):
+                    return True
     return False
 
 
@@ -338,7 +387,11 @@ def _results(conn, run, claim, reg, through):
             gaps.append({"kind": "unmeasured_observable", "event_id": eid, "artifact_ref": ref,
                          "observable": pred["observable"]})
             continue
-        first = fact.get("first_event_id")
+        first = _first_relevant(conn, fact, reg)
+        launch = None
+        if fact.get("job_id"):
+            launch = conn.execute("SELECT min(event_id) FROM events WHERE subject_id=? AND kind='job.transition' "
+                                  "AND new_state='SUBMITTING'", (fact["job_id"],)).fetchone()[0]
         exclusion = None
         if fact.get("record_kind") == "test_fixture":
             exclusion = "test_fixture"
@@ -352,15 +405,19 @@ def _results(conn, run, claim, reg, through):
             exclusion = "unknown_first_production"
         elif first <= reg["event_id"]:
             exclusion = "already_available"
+        elif fact.get("job_id") and (launch is None or launch <= reg["event_id"]):
+            exclusion = "unverified_production_order"
         if exclusion:
             gap = {"kind": exclusion, "artifact_ref": ref, "event_id": eid, "nature": fact["nature"]}
-            if exclusion == "already_available":
-                prior_availability = True
-                gap.update(value=value, first_event_id=first, supports=COMPARISONS[pred["operator"]](value, pred["threshold"]))
+            if exclusion in ("already_available", "unverified_production_order"):
+                prior_availability = prior_availability or exclusion == "already_available"
+                gap.update(value=value, first_event_id=first, first_bytes_event_id=fact.get("first_event_id"),
+                           launch_event_id=launch, supports=COMPARISONS[pred["operator"]](value, pred["threshold"]))
             gaps.append(gap)
             continue
         passed = COMPARISONS[pred["operator"]](value, pred["threshold"])
         results.append({"artifact_ref": ref, "sha256": fact["sha256"], "event_id": eid, "first_event_id": first,
+                        "first_bytes_event_id": fact.get("first_event_id"), "launch_event_id": launch,
                         "nature": fact["nature"], "value": value, "supports": passed, "matched_data_sha256": matches,
                         "measurement_schema": metric, "capability": fact.get("capability"), "output_name": fact.get("output_name"),
                         "original_observations": fact.get("original_observations", []),
@@ -472,6 +529,7 @@ def assessment(conn, run, claim, reg, through, available_through):
             gaps.append({"kind": "engineering_gap" if fact.get("job_status") in ("FAILED", "CANCELLED", "TIMED_OUT")
                          else "execution_record", "artifact_ref": ref, "job_id": fact.get("job_id"),
                          "status": fact.get("job_status")})
+    retrospective = {"already_available", "unverified_production_order"}
     results, pairs, preexisting = [], [], False
     if reg:
         results, test_gaps, old = _results(conn, run, claim, reg, through)
@@ -479,14 +537,14 @@ def assessment(conn, run, claim, reg, through, available_through):
         preexisting = old or _known_before(conn, reg, available_through)
         pairs = _independence(results, claim["scope"])
         grounded.extend(r["artifact_ref"] for r in results)
-        grounded.extend(g["artifact_ref"] for g in test_gaps if g["kind"] == "already_available")
+        grounded.extend(g["artifact_ref"] for g in test_gaps if g["kind"] in retrospective)
         grounded = list(dict.fromkeys(grounded))
     support = [r["review_ref"] for r in reviews if r["review_ref"] in grounded and r["direction"] == "supports"]
     opposing = [r["review_ref"] for r in reviews if r["review_ref"] in grounded and r["direction"] == "opposes"]
     support.extend(r["artifact_ref"] for r in results if r["supports"])
     opposing.extend(r["artifact_ref"] for r in results if not r["supports"])
-    support.extend(g["artifact_ref"] for g in gaps if g["kind"] == "already_available" and g["supports"])
-    opposing.extend(g["artifact_ref"] for g in gaps if g["kind"] == "already_available" and not g["supports"])
+    support.extend(g["artifact_ref"] for g in gaps if g["kind"] in retrospective and g["supports"])
+    opposing.extend(g["artifact_ref"] for g in gaps if g["kind"] in retrospective and not g["supports"])
     if support and opposing:
         direction = "mixed"
     elif opposing:
@@ -500,15 +558,18 @@ def assessment(conn, run, claim, reg, through, available_through):
     if grounded:
         stage = "grounded"
         reasons.append("Applicable reviewed evidence or a classified scientific artifact is cited.")
-    if reg and not preexisting:
+    uncertain_production = any(g["kind"] == "unverified_production_order" for g in gaps)
+    if reg and not preexisting and not uncertain_production:
         stage = "preregistered"
-        reasons.append("The rule, claim scope and input versions were adopted before a matching result was available.")
+        reasons.append("The registered rule, scope and input versions precede the first known applicable result.")
         if results:
             stage = "tested"
             reasons.append("GX compared the original measured value with the registered decision rule.")
         if any(pair["relation"] == "independent_acquisitions" for pair in pairs) and not opposing:
             stage = "replicated"
             reasons.append("Independent acquisitions support the registered claim within the same attested scope.")
+    if uncertain_production:
+        reasons.append("GX cannot establish prospective order for a detached Job launched before registration.")
     if reg and preexisting:
         reasons.append("An applicable result existed by registration; interpretation of this rule is retrospective.")
     if not reasons:

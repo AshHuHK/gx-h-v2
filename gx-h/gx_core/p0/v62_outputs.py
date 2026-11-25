@@ -44,17 +44,11 @@ def _binding(admission, output):
     raise SchemaInvalid("Published output does not match the name and kind of an admitted OutputDecl")
 
 
-def bind_published(conn, job_id, outputs):
+def bind_published(admission, outputs):
     """Called by JobService after publishing the real files/documents, before sealing completion."""
-    row = conn.execute("SELECT admission_json,admission_sha256 FROM p0_execution_manifests WHERE job_id=?",
-                       (job_id,)).fetchone()
-    if row:
-        admission = json.loads(row["admission_json"])
-        if "output_declarations" in admission:
-            if ids.sha256_of_obj(admission) != row["admission_sha256"]:
-                raise SchemaInvalid("Admitted output declarations failed their execution manifest digest")
-            for item in outputs:
-                item.update(_binding(admission, item))
+    if admission and "output_declarations" in admission:
+        for item in outputs:
+            item.update(_binding(admission, item))
 
 
 def _frozen_nature(admission, output):
@@ -84,9 +78,9 @@ def _publication(conn, run_id, ref):
 
 def recorded_outputs(conn, run_id, job_id, *, check_publications=False):
     """Read the terminal scientific publications and logs from the sealed execution receipt."""
-    if not conn.execute("SELECT 1 FROM p0_execution_manifests WHERE job_id=?", (job_id,)).fetchone():
+    record = manifest.read_manifest(conn, job_id, missing_ok=True)
+    if not record:
         return None
-    record = manifest.read_manifest(conn, job_id)
     admission, completed = record["admission"], record["completion"]
     if admission["run_id"] != run_id:
         raise ScopeDenied("Output inventory is outside the selected run")
@@ -294,9 +288,7 @@ def classify(conn, run_id, artifact_ref, *, scope="run", through_event=None):
         result = _base(conn, ref, pub)
         if not pub["job_id"]:
             _observation(conn, run_id, ref, pub, scope, cursor, result, read)
-        elif conn.execute(
-                "SELECT 1 FROM p0_execution_manifests WHERE job_id=?", (pub["job_id"],)).fetchone():
-            record = manifest.read_manifest(conn, pub["job_id"])
+        elif record := manifest.read_manifest(conn, pub["job_id"], missing_ok=True):
             _classify_job(conn, run_id, pub, ref, record, result, read)
         cache[key] = result
         return result

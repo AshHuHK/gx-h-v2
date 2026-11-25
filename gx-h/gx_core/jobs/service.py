@@ -1861,8 +1861,16 @@ class JobService:
         raw_outputs: list[dict[str, Any]] = []
         validated: dict[str, bool] = {}
         adapter_record: dict[str, Any] = {}
+        admission = None
         if to_state == SUCCEEDED:
             try:
+                record = execution_manifest.read_manifest(self.conn, job_id, missing_ok=True)
+                if record:
+                    admission = record["admission"]
+                    pin = admission["capability"]
+                    if (pin["id"], pin["version"], pin["sha256"]) != (
+                            row["capability_id"], row["capability_version"], intent["manifest_sha256"]):
+                        raise SchemaInvalid("Job collection differs from its immutable capability pin")
                 bundle = registry.load_bundle(self.conn, row["capability_id"], row["capability_version"],
                                               expected_sha256=intent["manifest_sha256"])
                 raw_outputs, documents_out, validated, adapter_record = self._collect(
@@ -1950,7 +1958,7 @@ class JobService:
                                       "kind": kind, "sha256": artifact.sha256, "bytes": artifact.bytes,
                                       "validated": validated.get(name, False)})
                 from ..p0.v62_outputs import bind_published
-                bind_published(txn, job_id, published)
+                bind_published(admission, published)
             for name, path in (("stdout", job.stdout), ("stderr", job.stderr)):
                 data = _bounded_log(path)
                 if data is None:

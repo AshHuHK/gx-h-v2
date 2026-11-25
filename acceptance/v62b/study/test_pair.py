@@ -1,6 +1,9 @@
 """Public negative controls for the new-pair review and admission boundaries. No inference."""
+from contextlib import closing
 import json
+import os
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -130,7 +133,8 @@ class TestPair(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             work = Path(tmp)
             pair.save_new(work / "01/score.json", {"passed":True})
-            self.assertEqual(pair.status(work)["passed"], 0)
+            summary = pair.status(work)
+            self.assertEqual((summary["admitted"], summary["passed"], summary["science_status"]), (0, 0, "NOT_RUN"))
             with self.assertRaisesRegex(ValueError, "independent reviewer"):
                 pair.verified_score(work, "01", {}, "registration", "different")
             with self.assertRaises(FileExistsError):
@@ -166,6 +170,22 @@ class TestPair(unittest.TestCase):
             self.assertEqual(a["tools_sha256"], b["tools_sha256"])
             self.assertNotEqual(a["brief_sha256"], b["brief_sha256"])
             self.assertEqual(pair.status(work)["admitted"], 0)
+            from gx_core.p0.profiles import proxy_settings
+            folder = work / "01"
+            env = dict(HOME=str(folder / "seed-home"), PATH=str(Path(sys.executable).parent) + os.pathsep + os.environ["PATH"],
+                       GX_P0_PROFILE=str(folder / "seed-home/profile.json"), GX_CODEX_OFFLINE="1",
+                       PYTHONDONTWRITEBYTECODE="1", **proxy_settings())
+            case = folder / "public-supplement.json"
+            pair.save_new(case, {"kind":"supplement", "text":"Inspect deposited public source A for this demonstration."})
+            mid = pair.message_id("public-test", "01")
+            result = pair.submit_assignment(env, folder, a["run_id"], mid, case)
+            replay = pair.submit_assignment(env, folder, a["run_id"], mid, case)
+            self.assertEqual(result, replay)
+            with closing(pair.database(folder)) as db:
+                observations = db.execute("SELECT payload_json FROM events WHERE run_id=? AND subject_id=? "
+                                          "AND kind='v6.observation.added'", (a["run_id"], result["source_id"])).fetchall()
+                self.assertEqual([pair.parse(r[0])["artifact_ref"] for r in observations], [result["artifact_ref"]])
+                self.assertEqual(pair.opening(db, a["run_id"]), a)
 
 
 if __name__ == "__main__":

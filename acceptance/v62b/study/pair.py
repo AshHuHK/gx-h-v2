@@ -39,6 +39,9 @@ def external(path):
 
 
 def source_pin():
+    base = PROTOCOL["integrated_runtime_base"]
+    need(subprocess.run(["git", "-C", ROOT, "merge-base", "--is-ancestor", base, "HEAD"]).returncode == 0,
+         "Use the registered integrated V6.2B release or a descendant with its own frozen manifest")
     paths = ["bin/gx-p0", "gx-h/gx_core", "gx-h/contracts", "gx-h/config", "gx-h/plugins/installed",
              "gx-h/adapters", "release-assets/lock.json", "acceptance/v6/native_witness.py",
              "acceptance/v6/verify.py", "acceptance/v6/live.py", "acceptance/v61/adaptive/study_score.py",
@@ -233,6 +236,16 @@ def message_id(anchor, slot):
     return str(uuid.uuid5(uuid.NAMESPACE_URL, f"gx-v62b/{anchor}/{slot}"))
 
 
+def submit_assignment(env, folder, rid, mid, science):
+    result = live.invocation(env, ["message", "--state", folder / "state", "--run-id", rid,
+                             "--message-id", mid, "--action", science], 30, folder / "injection.json")
+    receipt = result["stdout"].get("result", {})
+    need(result["exit_code"] == 0 and result["stdout"].get("message_id") == mid and
+         receipt.get("status") == "supplement_registered" and receipt.get("source_id") and receipt.get("artifact_ref"),
+         "Custodian assignment lacks an original GX source receipt")
+    return receipt
+
+
 def execute(work, inputs, slot, anchor, previous_sha=None):
     inputs = external(inputs)
     plan = registration(work, anchor)
@@ -265,20 +278,29 @@ def execute(work, inputs, slot, anchor, previous_sha=None):
         science = folder / "intervention.json"
         save_new(science, case["intervention"])
         timeout = PROTOCOL["deadline_seconds_per_slot"]
+        deadline = time.monotonic() + timeout
+        injected = False
         with ThreadPoolExecutor(max_workers=1) as worker:
             driving = worker.submit(live.invocation, env, ["run", "--state", dbfile.parent, "--run-id", rid,
                                     "--timeout", timeout], timeout + 30, folder / "run.json")
-            while not driving.done():
+            while True:
                 with closing(database(folder)) as db:
                     first = db.execute("SELECT d.decision_ref FROM v6_decisions d JOIN v6_decision_tasks t "
                                        "USING(task_id,run_id) WHERE d.run_id=? AND t.scope='run' LIMIT 1", (rid,)).fetchone()
-                if first:
-                    injected = live.invocation(env, ["message", "--state", dbfile.parent, "--run-id", rid, "--queue-only",
-                                "--message-id", message_id(anchor, slot), "--action", science], 30, folder / "injection.json")
-                    need(injected["exit_code"] == 0, "Custodian assignment could not be queued")
+                    open_goal = db.execute("SELECT status FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0] == "OPEN"
+                if first and open_goal and time.monotonic() < deadline:
+                    submit_assignment(env, folder, rid, message_id(anchor, slot), science)
+                    injected = True
+                    break
+                if driving.done() or not open_goal:
                     break
                 time.sleep(.15)
             final = driving.result()
+        remaining = int(deadline - time.monotonic())
+        if injected and final["exit_code"] == 0 and final["stdout"].get("goal_status") == "OPEN" and remaining > 0:
+            # A waiting driver may have returned just before the assignment arrived.
+            final = live.invocation(env, ["run", "--state", dbfile.parent, "--run-id", rid, "--timeout", remaining],
+                                    remaining + 30, folder / "continue-same-run.json")
         status = ("CLOSED" if final["exit_code"] == 0 and final["stdout"].get("goal_status") == "CLOSED" else
                   "TIMED_OUT" if final["exit_code"] == 75 else "INCOMPLETE")
     finally:
@@ -356,20 +378,31 @@ def status(work=None, anchor=None, retained=None):
     plan = registration(work, anchor) if work and anchor else None
     retained = retained or {}
     result = {}
+    admitted = 0
+    conditions = {name: dict(planned=count, independently_scored=0, opportunities=0, passed=0,
+                             unsupported_stops=0)
+                  for name, count in PROTOCOL["denominators"].items() if name != "total"}
     for slot in SLOTS:
         folder = work / slot if work else None
+        admission = bool(folder and (folder / "admission.json").is_file())
+        admitted += admission
         saved = bool(folder and (folder / "score.json").is_file())
         score = verified_score(work, slot, plan, anchor, retained[slot]) if saved and plan and slot in retained else None
         terminal = read(folder / "terminal.json") if folder and (folder / "terminal.json").is_file() else None
         outcome = "NOT_RUN"
         if terminal:
             outcome = terminal["status"]
-        elif folder and (folder / "admission.json").is_file():
+        elif admission:
             outcome = "ADMITTED_UNRESOLVED"
         if saved and not score:
             outcome = "RECORDED_AWAITING_INDEPENDENT_COMMITMENT"
         if score:
             outcome = "STOP_UNSUPPORTED" if score["stop_unsupported"] else "PASS" if score["passed"] else "FAIL"
+            counts = conditions[score["condition"]]
+            counts["independently_scored"] += 1
+            counts["opportunities"] += score["opportunities"]
+            counts["passed"] += score["passed"]
+            counts["unsupported_stops"] += score["stop_unsupported"]
         safe = ({k:score[k] for k in ("condition", "passed", "opportunities", "stop_unsupported", "assigned_measurement_verified",
                 "strict_cited_work_change", "wake_count", "brief_bytes", "elapsed_seconds", "dossier_sha256",
                 "independent_review_sha256")} if score else None)
@@ -377,7 +410,7 @@ def status(work=None, anchor=None, retained=None):
             safe["windows"] = [{k:r[k] for k in ("window","is_opportunity","disposition","justified","unlisted",
                                     "unsupported_support","strict_cited_work_change")} for r in score["windows"]]
         costs = score["costs"] if score else None
-        if not score and folder and (folder / "admission.json").is_file() and (folder / "initial.json").is_file():
+        if not score and admission and (folder / "initial.json").is_file():
             rid = read(folder / "start.json")["stdout"]["run_id"]
             with closing(database(folder)) as db:
                 scopes = dict(db.execute("SELECT r.thread_id,t.scope FROM p0_roots r JOIN v6_decision_tasks t "
@@ -385,10 +418,10 @@ def status(work=None, anchor=None, retained=None):
                 costs = cost_detail(db, rid, scopes)
         result[slot] = dict(status=outcome, enrollment=terminal, score=safe, costs=costs)
     passed = sum(r["status"] == "PASS" for r in result.values())
-    admitted = sum(r["status"] != "NOT_RUN" for r in result.values())
     return dict(series=PROTOCOL["series"], planned=PROTOCOL["denominators"], admitted=admitted, passed=passed,
                 science_status="NOT_RUN" if not admitted else "PASS" if passed == 2 else "NOT_ESTABLISHED",
-                slots=result, private_registration="FROZEN" if work and (work / "registration.json").is_file()
+                by_condition=conditions, slots=result, private_registration="FROZEN" if plan
+                else "AWAITING_INDEPENDENT_COMMITMENT" if work and (work / "registration.json").is_file()
                 else "PENDING_CUSTODIAN_COMMITMENTS", historic_control_contribution=0, scripted_contribution=0)
 
 

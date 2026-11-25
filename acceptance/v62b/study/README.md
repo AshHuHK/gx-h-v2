@@ -10,7 +10,7 @@ V62B-UNSEEN-PAIR-01 reserves two Goal runs. One tests a change in subsequent wor
 | Public 2RE9 and 2O0O development material | Separate | Reproducible deposited-coordinate regression. [Original study and scorer](../../v61/adaptive/STUDY.md) |
 | Public V6.2B scripted pair | Separate | Official-host engineering rehearsal. [Reproduction command](../engineering/run.py) |
 
-The two private commitments, an independent custody receipt and any approved admission limits must come from the custodian. Their values are absent from this checkout. The public protocol and the two reserved slots can be replayed without a provider, login, or private inputs.
+The two private commitments, an independent custody receipt and any approved admission limits must come from the custodian. Their values are absent from this checkout. The public status records zero admissions and zero independently scored opportunities in each condition. It can be regenerated without a provider, login, or private inputs. [Recorded cohort status](not-run.json)
 
 ```bash
 python -B acceptance/v62b/study/pair.py status
@@ -49,11 +49,11 @@ python -B "$pair" register --work "$COHORT" --inputs "$EXECUTION_INPUTS" \
   --keys "$REVIEW_KEYS" --custody "$CUSTODY_RECEIPT" --funding "$AUTHORIZED_LIMITS"
 ```
 
-Registration starts two fresh Goals through the regular offline CLI. It checks that both stores contain zero native turns, Jobs and decisions, and records each exact opening brief hash, tool-spec hash, common source pins and initial limits. Compare the two normalized opening digests to check that the task, cards and sources match despite run-scoped identifiers. It freezes the product, prompt, scorer and selected extension bytes with the checkout. Use an A-accepted integrated checkout. The runtime eventually produces later frozen briefs from actual reports, and each delivered byte sequence is retained with its native and GX receipts.
+Registration starts two fresh Goals through the regular offline CLI. It checks that both stores contain zero native turns, Jobs and decisions, and records each exact opening brief hash, tool-spec hash, common source pins and initial limits. Compare the two normalized opening digests to check that the task, cards and sources match despite run-scoped identifiers. Registration requires the integrated runtime at `530b1380a1e3bb3cd9ccb5023d436c708512113a` or a descendant, and freezes the actual product, prompt, scorer and extension bytes of the selected checkout. Each later brief carries the native and GX receipts for its actual delivered bytes.
 
 ## Execution and independent review
 
-Only the custodian runs the next command in the funded environment. The runner uses the existing official OAuth setup and a fresh native home per slot. It queues the registered raw assignment after the first committed Lead decision through `gx-p0 message`, then allows the normal Goal driver to continue under its resource owners. Each slot has a single admission and a fixed 480-second observation window. Preserve any incomplete run, ambiguous admission or timeout under its original slot. The second admission requires independent assessment of the first. An unsupported claim of support stops the batch.
+Only the custodian runs the next command in the funded environment. The runner uses the existing official OAuth setup and a fresh native home per slot. It registers the raw assignment after the first committed Lead decision through `gx-p0 message`, verifies its run-local source and artifact receipt, then allows the normal Goal driver to continue under its resource owners. Each slot has a single admission and a fixed 480-second observation window. Preserve any incomplete run, ambiguous admission or timeout under its original slot. The second admission requires independent assessment of the first. An unsupported claim of support stops the batch.
 
 ```bash
 python -B "$pair" run --work "$COHORT" --slot "$FIRST" --inputs "$EXECUTION_INPUTS" \

@@ -295,6 +295,15 @@ class JobService:
     def view(self, row: sqlite3.Row, *, replayed: bool = False, observation: Mapping[str, Any] | None = None) -> dict[str, Any]:
         outcome = store.loads(row, "outcome_json", {}) or {}
         outputs = list(outcome.get("outputs") or [])
+        if row["status"] == SUCCEEDED:
+            from ..p0.v62_outputs import recorded_outputs
+            receipt = recorded_outputs(self.conn, row["run_id"], row["job_id"])
+            if receipt is not None:
+                scientific, logs = receipt
+                outputs = [*scientific, *logs]
+            else:
+                outputs = [item if item["kind"] in ("job_stdout", "job_stderr")
+                           else dict(item, nature="unclassified") for item in outputs]
         view = {
             "job_id": row["job_id"], "run_id": row["run_id"], "path_id": row["path_id"],
             "task_id": row["task_id"],

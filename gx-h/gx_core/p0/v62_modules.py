@@ -17,7 +17,7 @@ from ..errors import (
 )
 from ..orchestration import seams
 from ..persistence import store
-from . import v6_decisions, v6_goal, v6_jobs
+from . import v6_decisions, v6_goal, v6_jobs, v62b_handoff
 
 OWNER = "ResearchModule"
 
@@ -79,13 +79,8 @@ def _assert_sources(conn, run_id, goal_version, grant, snapshot, *, for_projecti
         raise StaleRevision("The research module declaration is no longer in this Run's grant")
     live_inputs = set(json.loads(goal["materials_json"]))
     live_methods = json.loads(goal["capabilities_json"])
-    for m in snapshot["materials"]:
-        ref = m["artifact_ref"]
-        row = conn.execute(
-            "SELECT sha256 FROM artifacts WHERE run_id=? AND artifact_ref=?", (run_id, ref)
-        ).fetchone()
-        if ref not in live_inputs or not row or row[0] != m["sha256"]:
-            raise StaleRevision("A delegated material or its content pin changed")
+    v62b_handoff.require_materials(conn, run_id, live_inputs, snapshot["materials"])
+    v62b_handoff.require_claims(conn, run_id, snapshot.get("target_claims", ()))
     for cap, pin in snapshot["method_pins"].items():
         if live_methods.get(cap) != pin:
             raise StaleRevision("A delegated method pin changed")
@@ -216,12 +211,15 @@ def _brief(conn, row, nodes):
         "expected_delivery": row["expected_delivery"],
         "allowed_tools": grant["tools"],
         "allowed_method_ids": grant["capabilities"],
-        "materials": snapshot["materials"],
+        "materials": [{k: v for k, v in item.items() if k != "publication"} for item in snapshot["materials"]],
+        **({"catalog_access": grant["catalog_access"]} if "catalog_access" in grant else {}),
         "capabilities": snapshot["capabilities"],
         "budget": {k: funds[k] for k in ("limits", "spent", "reserved", "available")},
         "branches": [{"branch_id": row["branch_id"], "status": "OPEN", "budget_limits": funds["limits"]}],
         "nodes": nodes,
-        "claims": [],
+        "claims": [{k: target[k] for k in ("claim_revision_id", "statement", "scope")}
+                   for target in snapshot.get("target_claims", ())],
+        **({"target_claim_refs": grant["target_claim_refs"]} if grant.get("target_claim_refs") else {}),
         "operations": operations,
         "observations": [n for n in nodes if n["result_ref"]],
         "evidence_refs": visible_refs(conn, row),
@@ -288,7 +286,7 @@ def _open_authority(conn, identity, key, digest):
 
 
 def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, payload):
-    from . import v62_catalog
+    from . import v62_catalog, v62_rounds
 
     if conn.in_transaction:
         raise RuntimeError("Prepare module inputs and provider declaration before acquiring the writer")
@@ -306,12 +304,13 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
     if (
         not isinstance(payload, dict)
         or not required <= payload.keys()
-        or payload.keys() - required - {"wake_on", "tools"}
+        or payload.keys() - required - {"wake_on", "tools", "target_claim_refs"}
     ):
         raise SchemaInvalid("Invalid fields for a module delegation")
     _strings(payload, ["module_id", "module_version", "focus", "expected_delivery", "operation_key"])
     refs = _list(payload["input_refs"], "input_refs")
     caps = _list(payload["capabilities"], "capabilities")
+    target_refs = _list(payload.get("target_claim_refs", []), "target_claim_refs")
     watches = _list(payload.get("wake_on", []), "wake_on")
     if set(watches) - {"counterevidence", "gap", "partial"}:
         raise SchemaInvalid("Unknown module early-wake condition")
@@ -323,6 +322,7 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
     prior, task, goal = _open_authority(conn, ident, payload["operation_key"], sha)
     if prior is not None:
         return prior
+    v62_rounds.require_exploration(conn, run_id)
     policy = v62_catalog.policy(conn, run_id)
     if policy["effort"] == "quick" or payload["round"] > policy["max_rounds"]:
         raise ScopeDenied("This research effort does not grant this module round")
@@ -333,15 +333,11 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
     if "gx_submit_module_report" not in tools:
         raise SchemaInvalid("A delegated research worker requires its report submission route")
     frozen = json.loads(task["snapshot_json"])
-    materials = {m["artifact_ref"]: m for m in frozen["materials"]}
-    if set(refs) - set(materials) or set(caps) - set(decl["capabilities"]):
-        raise ScopeDenied("Requested module inputs or methods exceed the parent and declaration grants")
-    for ref in refs:
-        material = materials[ref]
-        if "*" not in decl["input_roles"] and material["role"] not in decl["input_roles"]:
-            raise ScopeDenied("This module is not authorized for a delegated input role")
-        if not ArtifactService(conn).verify(ref)["ok"]:
-            raise StaleRevision("The bytes behind a delegated material changed")
+    if set(caps) - set(decl["capabilities"]):
+        raise ScopeDenied("Requested module methods exceed the parent and declaration grants")
+    materials = v62b_handoff.select_materials(conn, task, frozen, refs, decl["input_roles"],
+                                             published_only=decl.get("published_inputs_only", False))
+    targets = v62b_handoff.select_claims(conn, task, frozen, target_refs)
     from ..plugins import goal as providers
 
     methods = {
@@ -350,16 +346,20 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
     if set(caps) - set(methods):
         raise ScopeDenied("Some delegated methods are absent from the frozen Lead brief")
     grant = dict(
-        input_refs=refs,
+        input_refs=[material["artifact_ref"] for material in materials],
         capabilities=caps,
         tools=tools,
         plugin=decl["plugin"],
         declaration_sha256=decl["declaration_sha256"],
     )
+    if decl.get("catalog_access") == "public_methods" and "gx_query_catalog" in tools:
+        grant["catalog_access"] = "public_methods"
+    if targets:
+        grant["target_claim_refs"] = [target["claim_revision_id"] for target in targets]
     snapshot = dict(
         module_id=payload["module_id"],
         module_version=payload["module_version"],
-        materials=[materials[r] for r in refs],
+        materials=materials,
         capabilities=[methods[c] for c in caps],
         method_pins={k: json.loads(goal["capabilities_json"])[k] for k in caps},
         asset_pins=v6_decisions._capability_pins(conn, caps),
@@ -368,6 +368,8 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
         instructions=decl["instructions"],
         opened_base=frozen["head"],
     )
+    if targets:
+        snapshot["target_claims"] = targets
     return Opening(
         dict(ident, call_id=call_id),
         json.loads(store._j(payload)),
@@ -381,7 +383,7 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
 
 
 def commit_open(conn, plan):
-    from . import v62_budget
+    from . import v62_budget, v62_rounds
 
     if isinstance(plan, dict):
         return plan
@@ -392,6 +394,7 @@ def commit_open(conn, plan):
         prior, parent, goal = _open_authority(tx, ident, p["operation_key"], plan.request_sha)
         if prior is not None:
             return prior
+        v62_rounds.require_exploration(tx, rid)
         if parent["context_ref"] != plan.context_ref:
             raise StaleRevision("The delegating context changed")
         _assert_sources(tx, rid, plan.goal_version, plan.grant, plan.snapshot)

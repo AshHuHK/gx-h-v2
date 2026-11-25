@@ -497,7 +497,8 @@ class ArtifactService:
             payload={"artifact_ref": artifact.artifact_ref, "namespace": artifact.namespace,
                      "rel_path": artifact.rel_path, "kind": artifact.kind, "sha256": artifact.sha256,
                      "bytes": artifact.bytes, "media_type": artifact.media_type, "origin": origin,
-                     "task_id": task_id},
+                     "task_id": task_id, **({"source_role": provenance["role"]} if origin == "INGEST" and
+                                             provenance and provenance.get("role") else {})},
         )
 
     def discard_on_rollback(self, published: PublishedArtifact) -> None:

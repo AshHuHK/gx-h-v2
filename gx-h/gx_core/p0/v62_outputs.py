@@ -76,30 +76,41 @@ def _publication(conn, run_id, ref):
     if not row:
         raise ScopeDenied("Cited artifact has no publication in the selected run")
     published = json.loads(row["payload_json"])
-    if published.get("artifact_ref") != ref or any(published.get(k) != row[k] for k in ("sha256", "kind", "origin", "bytes", "task_id")):
+    fields = ("sha256", "kind", "origin", "bytes", "task_id", "media_type", "rel_path")
+    if published.get("artifact_ref") != ref or any(published.get(k) != row[k] for k in fields):
         raise SchemaInvalid("Artifact record differs from the original publication")
     return row
 
 
-def published_outputs(conn, run_id, job_id):
-    """Short cards for an authorized settled Job. Byte verification occurs on scientific use."""
+def recorded_outputs(conn, run_id, job_id, *, check_publications=False):
+    """Read the terminal scientific publications and logs from the sealed execution receipt."""
     if not conn.execute("SELECT 1 FROM p0_execution_manifests WHERE job_id=?", (job_id,)).fetchone():
-        return []
+        return None
     record = manifest.read_manifest(conn, job_id)
     admission, completed = record["admission"], record["completion"]
     if admission["run_id"] != run_id:
         raise ScopeDenied("Output inventory is outside the selected run")
     if not completed or completed["status"] != "SUCCEEDED":
-        return []
-    inventory = []
+        return None
+    scientific = []
     for output in completed["outputs"]:
-        pub = _publication(conn, run_id, output["artifact_ref"])
-        if (pub["origin"] != "JOB_OUTPUT" or pub["job_id"] != job_id or pub["kind"] != output["kind"]
-                or pub["sha256"] != output["sha256"] or pub["bytes"] != output["bytes"]):
-            raise SchemaInvalid("Published artifact differs from the completed Job output")
-        inventory.append({k: output[k] for k in ("artifact_ref", "sha256", "output_name", "kind")})
-        inventory[-1]["nature"] = _frozen_nature(admission, output)
-    return inventory
+        if check_publications:
+            pub = _publication(conn, run_id, output["artifact_ref"])
+            if (pub["origin"] != "JOB_OUTPUT" or pub["job_id"] != job_id or pub["kind"] != output["kind"]
+                    or pub["sha256"] != output["sha256"] or pub["bytes"] != output["bytes"]):
+                raise SchemaInvalid("Published artifact differs from the completed Job output")
+        entry = dict(output, nature=_frozen_nature(admission, output))
+        if output.get("runner_sha256", output["sha256"]) != output["sha256"]:
+            entry.update(nature="unclassified", reason="Output lacks a matching detached runner file receipt")
+        scientific.append(entry)
+    return scientific, completed["logs"]
+
+
+def published_outputs(conn, run_id, job_id):
+    """Short cards for an authorized settled Job. Byte verification occurs on scientific use."""
+    receipt = recorded_outputs(conn, run_id, job_id, check_publications=True)
+    return [{k: item[k] for k in ("artifact_ref", "sha256", "output_name", "kind", "nature")}
+            for item in receipt[0]] if receipt else []
 
 
 def first_publication(conn, sha256):
@@ -109,10 +120,7 @@ def first_publication(conn, sha256):
 
 
 def _verify(assets, ref, digest):
-    check = assets.verify(ref)
-    if not check["ok"] or check["observed_sha256"] != digest:
-        raise SchemaInvalid("Published artifact bytes differ from their original digest",
-                            details={"reason": "integrity_mismatch", "artifact_ref": ref})
+    manifest.verify_artifact_pin(assets, _pin(ref, digest))
 
 
 def _pin(ref, digest):
@@ -337,8 +345,16 @@ def _classify_job(conn, run_id, pub, ref, record, result, read):
     files = admission["source"]["files"]
     if source := (files.get("method_source") or files.get("entry_script")):
         deps["processing"].add("method_source:" + source)
+    if files.get("parser"):
+        deps["processing"].add("parser:" + files["parser"])
+    deps["processing"].update("weights:" + weight["sha256"] for weight in admission["model"]["weights"])
     roles = {v["role"] for v in original_inputs}
-    deps["processing"].update("input_sha256:" + p["sha256"] for p in admission["inputs"] if p["role"] not in roles)
+    assets = ArtifactService(conn)
+    manifest.verify_artifact_pin(assets, admission["input_manifest"])
+    for processing_input in admission["inputs"]:
+        if processing_input["role"] not in roles:
+            manifest.verify_artifact_pin(assets, processing_input)
+            deps["processing"].add("input_sha256:" + processing_input["sha256"])
     sources = [s for p in parents for s in p["original_observations"]]
     if nature == "observed":
         sources.append(_pin(ref, pub["sha256"]))
@@ -381,11 +397,12 @@ def ingest_measurement(conn, run_id, *, source, scope, path, metadata_path, acto
     raw = supplied(path)
     acquisition = json.loads(supplied(metadata_path))
     digest = hashlib.sha256(raw).hexdigest()
+    original_key = ids.sha256_of_obj([scope.removeprefix("branch:"), source, digest])
     with store.transaction(conn, transaction_owner="GoalObservation", operation="ingest", run_id=run_id):
         assets = ArtifactService(conn)
-        original = assets.publish_bytes(namespace=f"{run_id}/acquisitions", rel_path=f"{digest}.json",
+        original = assets.publish_bytes(namespace=f"{run_id}/acquisitions", rel_path=f"{original_key}.json",
                                         kind="instrument_measurement", run_id=run_id, data=raw,
-                                        media_type="application/json", origin="INGEST", actor=actor)
+                                        expected_sha256=digest, media_type="application/json", origin="INGEST", actor=actor)
         assets.discard_on_rollback(original)
         return v6_goal.record_observation(conn, run_id, original.artifact_ref, source=source,
                                           scope=scope.removeprefix("branch:"), acquisition=acquisition)

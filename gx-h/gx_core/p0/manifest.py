@@ -256,6 +256,13 @@ def read_manifest(conn, job_id):
             "admission_hash": row["admission_sha256"], "manifest_hash": row["completion_sha256"]}
 
 
+def verify_artifact_pin(artifacts, pinned):
+    verified = artifacts.verify(pinned["artifact_ref"])
+    if not verified["ok"] or verified["observed_sha256"] != pinned["sha256"]:
+        _refuse("integrity_mismatch", "artifact bytes differ from their recorded digest",
+                artifact_ref=pinned["artifact_ref"])
+
+
 def validate_evidence(conn, *, run_id, job_id, artifact_ref):
     """Validate the exact scientific output and original inputs against current GX authority."""
     with store.transaction(conn):
@@ -279,10 +286,7 @@ def validate_evidence(conn, *, run_id, job_id, artifact_ref):
             if actual["job_id"] != job_id or actual["run_id"] != run_id or actual["origin"] != "JOB_OUTPUT":
                 _refuse("artifact_mismatch", "artifact ownership differs from the Job receipt")
             for pinned in [admission["input_manifest"], *admission["inputs"], output]:
-                verified = artifacts.verify(pinned["artifact_ref"])
-                if not verified["ok"] or verified["observed_sha256"] != pinned["sha256"]:
-                    _refuse("integrity_mismatch", "artifact bytes differ from the execution manifest",
-                            artifact_ref=pinned["artifact_ref"])
+                verify_artifact_pin(artifacts, pinned)
         except GxError as exc:
             if isinstance(exc, SchemaInvalid):
                 raise

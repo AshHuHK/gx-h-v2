@@ -3,8 +3,10 @@
 from collections import Counter
 from functools import lru_cache
 import json
+from pathlib import Path
 
 from .. import config
+from ..capabilities import manifest, shipped
 from ..domain import ids
 from ..errors import SchemaInvalid, ScopeDenied, VersionImmutable
 from ..plugins import goal, loader
@@ -12,9 +14,10 @@ from ..plugins.selection import _references
 from . import intent
 
 _EFFORT = {"quick": (0, 0), "medium": (4, 3), "deep": (6, 5)}
-_DEFAULTS = {"report_bytes": 4096, "brief_bytes": 65536, "catalog_limit": 15, "catalog_bytes": 8192}
+_DEFAULTS = {"report_bytes": 4096, "brief_bytes": 65536, "catalog_limit": 15, "catalog_bytes": 8192,
+             "no_progress_rounds": 2}
 _MINIMUM = {"report_bytes": 512, "brief_bytes": 4096, "catalog_limit": 1, "catalog_bytes": 256,
-            "max_parallel": 0, "max_rounds": 0}
+            "max_parallel": 0, "max_rounds": 0, "no_progress_rounds": 1}
 _COMMON = ("module_id", "version", "purpose", "output", "cost_class", "focuses")
 _QUICK = {"effort": "quick", **_DEFAULTS, "max_parallel": 0, "max_rounds": 0}
 
@@ -50,6 +53,7 @@ def for_start(spec):
         raise SchemaInvalid("research_modules must list distinct module_id@version references")
     if settings["effort"] == "quick":
         return None
+    from .v62_sources import TOOL_NAMES
     if not isinstance(spec.get("plugins", []), list):
         raise SchemaInvalid("plugins must be a list of exact provider id@version references")
     preferred = set(_references(spec.get("plugins", [])))
@@ -66,17 +70,64 @@ def for_start(spec):
     if missing:
         raise SchemaInvalid(f"Unavailable research module grants for {settings['effort']}: {sorted(missing)}")
     modules = []
+    lead_source_tools = set()
+    survey = False
     for key, owners in sorted(candidates.items()):
         selected = [p for p in owners if (p.pin.id, p.pin.version) in preferred] or owners
         if len(selected) != 1:
             raise SchemaInvalid(f"Select an exact provider in plugins for the research module {'@'.join(key)}")
         plugin = selected[0]
         declaration = _declaration(plugin, key)
+        if settings["effort"] == "deep":
+            lead_source_tools.update(set(declaration["tools"]).intersection(TOOL_NAMES))
+        survey |= declaration.get("catalog_access") == "public_methods"
         pins = goal._load([plugin.pin]).plugins
         modules.append({**{k: declaration[k] for k in _COMMON}, "plugin": goal._document(plugin.pin),
                         "provider_closure": [goal._document(p) for p in pins],
                         "declaration_sha256": ids.sha256_of_obj(declaration)})
-    return {"policy": settings, "modules": modules}
+    return {"policy": settings, "modules": modules,
+            **({"source_tools": sorted(lead_source_tools)} if lead_source_tools else {}),
+            **({"public_methods": _release_method_cards()} if survey else {})}
+
+
+def _release_method_cards():
+    """Read only the operator's shipped public methods, without attaching executables or visiting study data."""
+    cards = []
+    for cap, path in sorted(shipped.MANIFESTS.items()):
+        declaration = config.HARNESS_ROOT / path
+        if not declaration.is_file():
+            continue
+        bundle = json.loads(declaration.read_bytes())
+        for slot in ("entry_script", "parser"):
+            relative = bundle.get(slot)
+            if relative is not None:
+                if Path(relative).is_absolute() or ".." in Path(relative).parts or not manifest.allowed_script_path(relative):
+                    raise VersionImmutable("The public method references a script outside the release")
+                bundle[slot] = {"path": relative, "sha256": ids.sha256_of_file(config.HARNESS_ROOT / relative)}
+        pin = shipped.portable_digest(bundle)
+        method = bundle["manifest"]
+        if shipped.pin(cap) != pin or manifest.capability_version(method) != cap:
+            raise VersionImmutable("The public method metadata differs from the registered release")
+        cards.append(_public_card({"capability_version": cap, "portable_sha256": pin,
+            "method": method["method_card"], "inputs": manifest.input_roles(method), "outputs": method["outputs"],
+            "limitations": method.get("limitations"), "cost_class": "gpu" if method["resources"].get("gpu") else "local_cpu"}))
+    return cards
+
+
+def _public_card(row):
+    """Project only scientific metadata. Provider paths, evaluation payloads, schemas and artifact links stay private."""
+    method = row.get("method")
+    if isinstance(method, dict):
+        method = {key: method[key] for key in ("family", "objective", "mechanism", "estimator", "training_data_lineage")
+                  if isinstance(method.get(key), str)}
+    card = {key: row[key] for key in ("capability_version", "portable_sha256", "family", "cost_class", "limitations")
+            if isinstance(row.get(key), str)}
+    card["method"] = method if isinstance(method, (dict, str)) else {}
+    card["inputs"] = [item for item in row.get("inputs", ()) if isinstance(item, str)]
+    card["outputs"] = [{k: item[k] for k in ("name", "kind", "nature") if isinstance(item.get(k), str)}
+                       if isinstance(item, dict) else {"name": item}
+                       for item in (row.get("output_summary") or row.get("outputs") or ()) if isinstance(item, (str, dict))]
+    return card
 
 
 def _inputs(conn, run_id):
@@ -140,18 +191,11 @@ def _method_summary(row):
             "cost_class": row.get("cost_class", "unspecified"), "outputs": outputs}
 
 
-def project(conn, run_id, brief):
-    """Apply a byte and item threshold to the L2 projection only; keep every entry queryable."""
-    inputs = _inputs(conn, run_id)
-    catalog = inputs.get("research_catalog")
-    if not catalog:
-        return brief
-    settings = catalog["policy"]
-    rows = [_method_summary(row) for row in _methods(conn, run_id, inputs)]
+def _catalog_view(rows, settings, categories_for):
     compact = len(rows) > settings["catalog_limit"] or len(ids.canonical_json(rows).encode()) > settings["catalog_bytes"]
     view = {"mode": "categories" if compact else "summaries", "total": len(rows), "query_tool": "gx_query_catalog"}
     if compact:
-        counts = sorted(Counter(row["category"] for row in rows).items())
+        counts = sorted(Counter(name for row in rows for name in categories_for(row)).items())
         categories = {}
         used_bytes = 2
         for name, count in counts:
@@ -164,8 +208,24 @@ def project(conn, run_id, brief):
         if len(categories) < len(counts):
             view["category_count"] = len(counts)
             view["additional_categories"] = len(counts) - len(categories)
-    return {**brief, "capabilities": [] if compact else rows, "catalog_view": view,
-            "research_effort": settings["effort"], "module_catalog": [_module_summary(r) for r in catalog["modules"]]}
+    return ([] if compact else rows), view
+
+
+def project(conn, run_id, brief):
+    """Project a bounded catalog of methods and modules, keeping all records available by query."""
+    inputs = _inputs(conn, run_id)
+    catalog = inputs.get("research_catalog")
+    if not catalog:
+        return brief
+    settings = catalog["policy"]
+    methods, view = _catalog_view([_method_summary(row) for row in _methods(conn, run_id, inputs)],
+                                  settings, lambda row: [row["category"]])
+    modules, module_view = _catalog_view([_module_summary(r) for r in catalog["modules"]],
+                                         settings, lambda row: row["focuses"])
+    return {**brief, "capabilities": methods, "catalog_view": view, "research_effort": settings["effort"],
+            "module_catalog": modules, "module_catalog_available": bool(catalog["modules"]),
+            **({"module_catalog_view": module_view} if module_view["mode"] == "categories" else {}),
+            **({"source_tools": catalog["source_tools"]} if catalog.get("source_tools") else {})}
 
 
 def query(conn, run_id, brief, args):
@@ -193,7 +253,17 @@ def query(conn, run_id, brief, args):
     reference = args.get("reference")
     if kind == "method":
         rows = _methods(conn, run_id, inputs)
-        if module_scope:
+        if module_scope and brief.get("catalog_access") == "public_methods":
+            from .v62_modules import require_active
+            grant = json.loads(require_active(conn, run_id, scope)["grant_json"])
+            if grant.get("catalog_access") != "public_methods" or "gx_query_catalog" not in grant["tools"]:
+                raise ScopeDenied("Public method discovery is outside the module grant")
+            bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
+            cards = {r["capability_version"]: r for r in catalog.get("public_methods", ())
+                     if not intent.forbidden_capability(*r["capability_version"].rsplit("@", 1), bans)}
+            cards.update({r["capability_version"]: _public_card(r) for r in rows})
+            rows = [cards[k] for k in sorted(cards)]
+        elif module_scope:
             allowed = brief.get("allowed_method_ids", [])
             rows = [row for row in rows if row["capability_version"] in allowed]
         if reference is not None:

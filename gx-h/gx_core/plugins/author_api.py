@@ -234,7 +234,8 @@ class _ResearchModules(_Registrar):
     """Declare research roles independently of package identity and method implementations."""
 
     def register(self, *, module_id, version, purpose, output, cost_class, focuses, instructions,
-                 capabilities, tools, input_roles, efforts=("medium", "deep")):
+                 capabilities, tools, input_roles, efforts=("medium", "deep"), catalog_access="assigned",
+                 published_inputs_only=False):
         if not isinstance(module_id, str) or not re.fullmatch(r"[a-z][a-z0-9_.-]*", module_id):
             raise ValueError("research module_id must be a stable identifier")
         if not isinstance(version, str) or not re.fullmatch(r"[0-9][0-9A-Za-z.-]*", version):
@@ -257,9 +258,17 @@ class _ResearchModules(_Registrar):
             raise ValueError("medium supports data, model, workflow and evaluation inventory")
         for capability in capabilities:
             _parse_capability_version(capability)
+        if catalog_access not in ("assigned", "public_methods"):
+            raise ValueError("catalog_access must be assigned or public_methods")
+        if type(published_inputs_only) is not bool:
+            raise ValueError("published_inputs_only must be a boolean")
+        # Omit the default so declarations already pinned by A keep their original identity.
+        discovery = {"catalog_access": catalog_access} if catalog_access != "assigned" else {}
+        if published_inputs_only:
+            discovery["published_inputs_only"] = True
         self._add((module_id, version), _copy_schema({
             "module_id": module_id, "version": version, "purpose": purpose, "output": output,
-            "cost_class": cost_class, "instructions": instructions, **groups,
+            "cost_class": cost_class, "instructions": instructions, **groups, **discovery,
         }, freeze=True))
 
 

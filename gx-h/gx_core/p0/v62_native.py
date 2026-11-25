@@ -9,6 +9,7 @@ from .. import contracts
 from ..domain import ids
 from ..errors import OutcomeUnknown, SchemaInvalid, ScopeDenied
 from ..persistence import store
+from .v62_sources import TOOL_NAMES as SOURCE_TOOLS
 
 OPEN = "gx_open_module"
 CANCEL = "gx_cancel_module"
@@ -24,7 +25,10 @@ def module_instructions(brief):
     if "gx_read_artifact" in tools:
         instructions.append("Inspect sources through gx_read_artifact. Use operation_key to reuse a completed inspection.")
     if QUERY in tools:
-        instructions.append("Use gx_query_catalog for details of a granted method.")
+        if brief.get("catalog_access") == "public_methods":
+            instructions.append("Use gx_query_catalog to survey public method cards. An exact method query returns a citeable source_ref.")
+        else:
+            instructions.append("Use gx_query_catalog for details of a granted method.")
     if "gx_decide_revision" in tools:
         instructions.append("Use gx_decide_revision to add a bounded Job to your assigned branch using a listed "
                             "capability and authorized inputs. A following decision can use the confirmed output.")
@@ -57,6 +61,7 @@ def module_tools(read_tools, brief, decide):
         if tool["name"] in ("gx_read_artifact", "gx_task_context"):
             available.append(tool)
     available.extend((decide, contracts.native_goal_tool_spec(REPORT), contracts.native_goal_tool_spec(QUERY)))
+    available.extend(contracts.native_goal_tool_spec(name) for name in SOURCE_TOOLS if name in allowed)
     return [tool for tool in available if tool["name"] in allowed]
 
 
@@ -66,7 +71,43 @@ def lead_tools(brief):
     names = [QUERY]
     if brief.get("module_catalog") or brief.get("module_catalog_available"):
         names.extend((OPEN, CANCEL))
+    if brief.get("research_effort") == "deep":
+        names.extend(name for name in SOURCE_TOOLS if name in brief.get("source_tools", ()))
     return [contracts.native_goal_tool_spec(name) for name in names]
+
+
+def register_tools(native_owner):
+    from .. import registry
+    for name in SOURCE_TOOLS:
+        registry.native_goal_tool(name)(native_owner)
+
+
+def authorize_source(roots, row, params):
+    from . import v6_decisions, v6_native
+    packet = v6_native.brief(row)
+    tool, turn = params["tool"], params["turnId"]
+    if module_scope(packet):
+        authorize_read(roots.conn, row, packet, tool, turn)
+        return
+    if packet.get("scope") != "run" or packet.get("research_effort") != "deep" or tool not in packet.get("source_tools", ()):
+        raise ScopeDenied("This decision has no delegated source evidence tool")
+    _, task, _, _ = v6_decisions.authority(roots.conn, run_id=row["run_id"], task_id=row["task_id"],
+                                          lease_id=row["lease_id"], thread_id=params["threadId"], turn_id=turn)
+    if task["scope"] != "run" or tool not in store.loads(task, "snapshot_json").get("source_tools", ()):
+        raise ScopeDenied("The source tool is outside the live Lead grant")
+
+
+def perform_source(roots, row, params):
+    """The evidence owner verifies original versions and independently signed reads in this receipt transaction."""
+    from . import v62_sources
+    if not roots.conn.in_transaction:
+        raise RuntimeError("Source evidence must share the native callback receipt transaction")
+    answer = v62_sources.call_tool(roots.conn, params["tool"], params["arguments"], run_id=row["run_id"],
+                                   task_id=row["task_id"], lease_id=row["lease_id"], thread_id=params["threadId"],
+                                   turn_id=params["turnId"], call_id=params["callId"])
+    if answer.get("artifact_ref"):
+        roots._allow_refs(row["root_key"], answer["artifact_ref"])
+    return answer
 
 
 def check_workspace(row):
@@ -140,10 +181,22 @@ def perform_read(roots, row, params, packet, execute):
         raise OutcomeUnknown("Await reconciliation of the original module tool operation")
     answer = execute(args)
     sources = [ref] if ref else []
+    artifacts = list(sources)
+    pins = {}
+    if (tool == QUERY and args.get("kind") == "method" and args.get("reference")
+            and json.loads(instance["grant_json"]).get("catalog_access") == "public_methods"):
+        from . import science
+        card = answer["spec"]
+        original = science._publish(roots.conn, row["run_id"], "method-cards", "v62_public_method_spec", card)
+        answer = {**answer, "source_ref": original}
+        roots._allow_refs(row["root_key"], original)
+        artifacts.append(original)
+        pins[original] = ids.sha256_of_obj(card)
     receipt = {"module_instance_id": module_id, "scope": packet["scope"], "operation_key": operation,
                "tool": tool, "arguments": args, "task_id": row["task_id"], "lease_id": row["lease_id"],
                "thread_id": params["threadId"], "turn_id": params["turnId"], "call_id": params["callId"],
-               "source_refs": sources, "artifact_refs": sources, "source_sha256": source_sha,
+               "source_refs": sources, "artifact_refs": artifacts, "source_sha256": source_sha,
+               **({"artifact_sha256": pins} if pins else {}),
                "result_sha256": ids.sha256_of_obj(answer)}
     store.append_event(roots.conn, run_id=row["run_id"], kind="v62.module.tool_completed",
                        actor=params["threadId"], subject_kind="module", subject_id=module_id,

@@ -72,7 +72,8 @@ def _module_evidence(conn, module):
     for op in operation_receipts(conn, rid, module["module_instance_id"]):
         for ref in set(op.get("source_refs", ())) | set(op.get("artifact_refs", ())):
             proofs.setdefault(ref, []).append({"tool": op["tool"], "operation_key": op["operation_key"],
-                                             "result_sha256": op["result_sha256"], "source_sha256": op.get("source_sha256")})
+                                             "result_sha256": op["result_sha256"],
+                                             "source_sha256": op.get("artifact_sha256", {}).get(ref, op.get("source_sha256"))})
     jobs = conn.execute(
         "SELECT n.node_id,n.result_ref,n.exec_key,n.job_id FROM v6_nodes n "
         "WHERE n.run_id=? AND n.branch_id=? AND n.status IN ('SUCCEEDED','REUSED') ORDER BY n.node_id",
@@ -340,6 +341,9 @@ def commit_report(conn, plan):
         # Completing the last member releases all remaining reports together, even if this member has a watch.
         wake = release_round(conn, module, publishing=receipt)
         reason = _early_reason(module, plan.bundle)
+        if wake is None and not reason:
+            from . import v62_rounds
+            reason = v62_rounds.early_reason(conn, module, plan.bundle)
         if wake is None and reason and mid not in _released(conn, rid, module["round"]):
             wake = _wake(conn, module, "early:" + mid, reason, [receipt])
         receipt["wake_event_id"] = wake

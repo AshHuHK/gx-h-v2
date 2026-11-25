@@ -12,7 +12,7 @@ from ..artifacts.service import ArtifactService
 from ..domain import clock, ids
 from ..errors import IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
-from . import manifest
+from . import manifest, v62_maturity
 
 
 SCHEMA = 'gx.v6.claim.1'
@@ -31,7 +31,9 @@ def _validate(payload):
     if not isinstance(payload, dict) or not set(REQUIRED) <= payload.keys() or payload.keys() - schema['properties'].keys():
         raise SchemaInvalid('claim needs the documented statement, scope, criteria, limits, rationale, level and grounds')
     for field, value in payload.items():
-        if field in ('evidence_refs', 'chain_pairs'):
+        if field == 'prediction':
+            v62_maturity.validate_prediction(value)
+        elif field in ('evidence_refs', 'chain_pairs'):
             if (not isinstance(value, list) or any(not isinstance(v, str) or not v.strip() for v in value)
                     or len(set(value)) != len(value)):
                 raise SchemaInvalid(f'{field} must contain distinct nonempty strings')
@@ -58,6 +60,11 @@ def _has_number(value):
 
 
 def _ground(conn, run, ref, observations, context):
+    enriched = v62_maturity.enrolled(conn, run)
+    if enriched:
+        formal = v62_maturity.ground(conn, run, ref, context['scope'], context['event_cursor'])
+        if formal:
+            return formal
     # A source alias can be reused by different branches. Require the immutable
     # artifact reference when multiple authorized originals have that name.
     matching = [item for item in observations if ref in (item.get('id'), item.get('subject_ref'), item.get('artifact_ref'))]
@@ -81,8 +88,9 @@ def _ground(conn, run, ref, observations, context):
     if row['job_id']:
         fact.update(job_id=row['job_id'], job_status=row['job_status'], capability=row['capability_id'],
                     version=row['capability_version'], source_class='execution_record')
-        node = conn.execute("SELECT 1 FROM v6_nodes WHERE run_id=? AND job_id=? AND result_ref=? "
-                            "AND status IN ('SUCCEEDED','REUSED')", (run, row['job_id'], row['artifact_ref'])).fetchone()
+        node = conn.execute("SELECT 1 FROM v6_nodes WHERE run_id=? AND job_id=? AND (result_ref=? OR ?) "
+                            "AND status IN ('SUCCEEDED','REUSED')", (run, row['job_id'], row['artifact_ref'],
+                            enriched and row['kind'] not in ('job_stdout', 'job_stderr'))).fetchone()
         if node and row['job_status'] == 'SUCCEEDED' and row['origin'] == 'JOB_OUTPUT':
             record = manifest.read_manifest(conn, row['job_id'])
             result = record['completion'] or {}
@@ -105,7 +113,7 @@ def _ground(conn, run, ref, observations, context):
                     fact[key] = value[key]
     elif observation:
         body = observation.get('observation')
-        if body is None:
+        if body is None and (not enriched or row['media_type'] == 'application/json'):
             body = ArtifactService(conn).read_json(artifact_ref)
         # A timestamp or identifier in an arbitrary operator note does not make it a measurement.
         measurement = (body if row['kind'] == 'synthetic_observation' else
@@ -114,6 +122,8 @@ def _ground(conn, run, ref, observations, context):
         fact['source_event_id'] = observation.get('event_id')
     else:
         fact['source_class'] = 'input'
+    if enriched:
+        return v62_maturity.annotate(conn, run, fact, context['scope'], context['event_cursor'])
     return fact
 
 
@@ -169,16 +179,35 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         raise ScopeDenied('claim cites evidence outside the presented context')
     brief = json.loads(task['snapshot_json'])
     sources = [_ground(conn, run_id, ref, brief.get('observations', []), task) for ref in payload['evidence_refs']]
-    if (payload['level'] in ('limited_support', 'contested', 'mixed', 'refuted')
-            and not any(s['source_class'] in ('computed_result', 'supplied_measurement', 'retrospective_evaluation') for s in sources)):
-        raise SchemaInvalid('this level requires a result or measurement; execution and input records are insufficient')
+    enriched = v62_maturity.enrolled(conn, run_id)
+    pins = method_pin = None
+    if 'prediction' in payload:
+        if not enriched:
+            raise SchemaInvalid('A prospective prediction requires an enrolled research-evidence Goal')
+        pins = v62_maturity.pin_data(conn, run_id, payload['prediction'], visible)
+        method_pin = v62_maturity.pin_method(conn, run_id, payload['prediction'])
     previous = payload.get('previous_claim_ref')
+    prior = None
     if previous:
         prior = read_revision(conn, run_id, previous)
         if previous not in visible or not prior or (task['scope'] != 'run' and prior['decision_scope'] != task['scope']):
             raise ScopeDenied('previous claim is absent or outside the decision scope')
+    if payload['level'] in ('limited_support', 'contested', 'mixed', 'refuted'):
+        if enriched:
+            proposed = {**payload, 'decision_scope': task['scope']}
+            proposed['maturity_lineage'] = v62_maturity.continuing_lineage(proposed, prior)
+            usable = any(v62_maturity.qualified_ground(s, proposed) for s in sources)
+        else:
+            usable = any(s['source_class'] in ('computed_result', 'supplied_measurement', 'retrospective_evaluation')
+                         for s in sources)
+        if not usable:
+            raise SchemaInvalid('this level requires applicable evidence or a classified measurement; execution, '
+                                'fixtures and unspecified inputs cannot establish the proposed direction')
     draft = dict(schema=SCHEMA, **binding, decision_scope=task['scope'], event_cursor=task['event_cursor'],
                  claim=payload, sources=sources)
+    if pins is not None:
+        draft['prediction_data'] = pins
+        draft['prediction_method'] = method_pin
     digest = ids.sha256_of_obj(draft)
     # The artifact is inert until an authenticated staging event references it.
     artifact = ArtifactService(conn).publish_bytes(namespace=f'{run_id}/claims', rel_path=f'{digest}.json',
@@ -251,13 +280,17 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
                        context_ref=draft['context_ref'], event_cursor=draft['event_cursor'],
                        criteria_sha256=ids.sha256_of_obj(claim['criteria']), source_records=draft['sources'],
                        science=science, **claim)
+        event_id = store.append_event(conn, run_id=run_id, kind='v6.claim.adopted', actor=principal, subject_kind='hypothesis',
+                           subject_id=hid, prev_revision=parent, new_revision=revision,
+                           payload={'decision_ref': decision_ref, 'claim_revision_id': receipt['claim_revision_id'],
+                                    'claim_ref': ref, 'evidence_refs': claim['evidence_refs']})
+        if v62_maturity.enrolled(conn, run_id):
+            receipt['science']['level_source'] = 'lead_proposal'
+            v62_maturity.attach(conn, run_id, receipt, previous, draft.get('prediction_data'),
+                                draft.get('prediction_method'), event_id)
         conn.execute('INSERT INTO hypothesis_revisions (hypothesis_id,revision,parent_revision,document_json,sha256,'
                      'author_principal,author_task_id,proposal_id,created_at) VALUES (?,?,?,?,?,?,?,?,?)',
                      (hid, revision, parent, ids.canonical_json(receipt), ids.sha256_of_obj(receipt), principal,
                       task_id, ref, now))
-        store.append_event(conn, run_id=run_id, kind='v6.claim.adopted', actor=principal, subject_kind='hypothesis',
-                           subject_id=hid, prev_revision=parent, new_revision=revision,
-                           payload={'decision_ref': decision_ref, 'claim_revision_id': receipt['claim_revision_id'],
-                                    'claim_ref': ref, 'evidence_refs': claim['evidence_refs']})
         receipts.append(receipt)
     return receipts

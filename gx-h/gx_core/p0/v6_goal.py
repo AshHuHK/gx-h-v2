@@ -323,7 +323,6 @@ def _matches(row, watches, rid):
     kind = row["kind"]
     events = {
         "v6.decision.superseded": set(),
-        "v62.module.wake": set(),
         "v62.module.invalidated": set(),
         "v6.intent.changed": {"goal_changed"},
         "v6.node.settled": {"evidence_added", "job_settled"},
@@ -965,7 +964,11 @@ def projection(conn, run, meter):
             )
         ],
     }
-    if store.loads(run, "inputs_json")["inputs"].get("research_catalog"):
+    inputs = store.loads(run, "inputs_json")["inputs"]
+    if inputs.get("research_evidence_version"):
+        from . import v62_rounds
+        result.update(v62_rounds.brief(conn, rid, None))
+    if inputs.get("research_catalog"):
         result["research_modules"] = [dict(row) for row in conn.execute(
             "SELECT m.module_instance_id,m.module_id,m.module_version,m.scope,m.round,m.status,m.budget_ref,r.report_ref "
             "FROM v62_modules m LEFT JOIN v62_module_reports r USING(module_instance_id) WHERE m.run_id=? ORDER BY m.rowid",

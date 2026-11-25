@@ -1,0 +1,37 @@
+test_registered_endpoint_precedes_newer_direct_job_with_same_name_and_unit (priority_check.EndpointClose.test_registered_endpoint_precedes_newer_direct_job_with_same_name_and_unit) ... FAIL
+test_registered_mask_leads_in_a_tight_real_report (priority_check.EndpointClose.test_registered_mask_leads_in_a_tight_real_report) ... FAIL
+
+======================================================================
+FAIL: test_registered_endpoint_precedes_newer_direct_job_with_same_name_and_unit (priority_check.EndpointClose.test_registered_endpoint_precedes_newer_direct_job_with_same_name_and_unit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-v6.2.3/acceptance/v623/test_close_metrics.py", line 156, in test_registered_endpoint_precedes_newer_direct_job_with_same_name_and_unit
+    self.assertEqual(order,["local:primary","local:later"])
+AssertionError: Lists differ: ['local:later', 'local:primary'] != ['local:primary', 'local:later']
+
+First differing element 0:
+'local:later'
+'local:primary'
+
+- ['local:later', 'local:primary']
++ ['local:primary', 'local:later']
+
+======================================================================
+FAIL: test_registered_mask_leads_in_a_tight_real_report (priority_check.EndpointClose.test_registered_mask_leads_in_a_tight_real_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-v6.2.3/acceptance/v623/test_close_metrics.py", line 125, in test_registered_mask_leads_in_a_tight_real_report
+    self.assertEqual(order[:2], [mask, mask], f"delivered masks {order} from six settled Jobs")
+AssertionError: Lists differ: ['common_backbone', 'ordered_backbone'] != ['common_ca', 'common_ca']
+
+First differing element 0:
+'common_backbone'
+'common_ca'
+
+- ['common_backbone', 'ordered_backbone']
++ ['common_ca', 'common_ca'] : delivered masks ['common_backbone', 'ordered_backbone', 'common_backbone', 'ordered_backbone'] from six settled Jobs
+
+----------------------------------------------------------------------
+Ran 2 tests in 5.749s
+
+FAILED (failures=2)

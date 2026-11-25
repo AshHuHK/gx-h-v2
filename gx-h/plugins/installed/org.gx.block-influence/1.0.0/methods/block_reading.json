@@ -1,0 +1,228 @@
+{
+  "manifest": {
+    "capability_id": "deposited-block-reading",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--table",
+        "{in.table}",
+        "--pair",
+        "{param.pair}",
+        "--block-index",
+        "{param.block_index}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "coordinate_geometry",
+      "mechanism": "Read an existing within-deposition block table without rerunning coordinate fits. Select pair AB, AC or BC and zero-based interval block_index (0 denotes positions 1–20).",
+      "objective": "Quantify within-mask influence on reported chain-pair geometry.",
+      "estimator": "Absolute difference in two unsigned proper-fit rotation angle scalars (degrees) and separately in two fitted RMSD scalars (angstrom). Missing or ambiguous geometry remains unmeasured.",
+      "training_data_lineage": "Deterministic analysis of one deposited asymmetric unit."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.block-influence/1.0.0/methods/block_reading.py",
+      "sha256": "7589d5e36902e00d3dd4fc1b877b0a866877e835d5f9211e6548fdeadb542153"
+    },
+    "licence": "GX release source; the input coordinate deposition retains its licence.",
+    "licence_basis": "Uses released Horn fit; see adapters/scientific/tl1a_geometry/LICENSE.chaperone.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 10
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "cell.json",
+        "kind": "file:block_reading",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "table"
+        ],
+        "metric_specs": {
+          "baseline_angle_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/baseline_angle_deg",
+            "unit": "deg",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "after_angle_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/after_angle_deg",
+            "unit": "deg",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "delta_angle_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/delta_angle_deg",
+            "unit": "deg",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "median_delta_angle_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/median_delta_angle_deg",
+            "unit": "deg",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "control_max_angle_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/control_max_angle_deg",
+            "unit": "deg",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "baseline_rmsd_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/baseline_rmsd_A",
+            "unit": "Å",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "after_rmsd_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/after_rmsd_A",
+            "unit": "Å",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "delta_rmsd_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/delta_rmsd_A",
+            "unit": "Å",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "median_delta_rmsd_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/median_delta_rmsd_A",
+            "unit": "Å",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "control_max_rmsd_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/control_max_rmsd_A",
+            "unit": "Å",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "material_sha256": "/material_sha256",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Descriptive sensitivity on common observed positions only. Fits with insufficient data or non-unique rotations have no numeric value. Geometric sensitivity alone does not establish function, frequency, causation or cross-deposition correspondence."
+  },
+  "entry_script": "methods/block_reading.py"
+}

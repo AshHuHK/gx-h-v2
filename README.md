@@ -1,4 +1,8 @@
-# GX-H V6.2A 自主科研
+# GX-H V6.2B 自主科研
+
+Lead 可以盤點資料與方法、調閱離線文獻、比較可證偽的假設，再根據發布的證據決定改路、維持或收斂。每項主張同時保留證據方向、成熟度與理由。可從同一個 Goal 入口啟動 quick、medium 或 deep 研究。[啟動與續跑](V62B_DEPLOYMENT.md) · [驗收結果與逐案收據](V62B_ACCEPTANCE.md)
+
+## V6.2A 本地研究模組
 
 Scientific Lead 可在 medium 或 deep Goal 中，把本地資料盤點委派給 `data_inventory@1`。模組用自己的任務、租約及子預算執行已授權的 CPU Job，按來源回報；GX 重啟後可以從同一份已完成的量測繼續。預設 quick 使用單層 Lead。[啟動一個公開範例](examples/v62a-data-inventory/README.md) · [插件與 V6.2B 整合介面](V62A_MODULE_HANDOFF.md) · [工程驗收、遷移與回退](V62A_ACCEPTANCE.md)
 

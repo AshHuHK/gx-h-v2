@@ -223,8 +223,9 @@ def project(conn, run_id, brief):
     modules, module_view = _catalog_view([_module_summary(r) for r in catalog["modules"]],
                                          settings, lambda row: row["focuses"])
     return {**brief, "capabilities": methods, "catalog_view": view, "research_effort": settings["effort"],
-            "module_catalog": modules, "module_catalog_available": bool(catalog["modules"]),
-            **({"module_catalog_view": module_view} if module_view["mode"] == "categories" else {}),
+            "module_catalog": modules,
+            **({"module_catalog_view": module_view, "module_catalog_available": True}
+               if module_view["mode"] == "categories" else {}),
             **({"source_tools": catalog["source_tools"]} if catalog.get("source_tools") else {})}
 
 

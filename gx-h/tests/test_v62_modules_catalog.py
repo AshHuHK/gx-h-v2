@@ -2,6 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -97,6 +98,8 @@ class PublicModuleCatalog(unittest.TestCase):
         approved.parent.mkdir()
         approved.write_text('{"plugins": []}')
         install_root = base / "plugins/installed"
+        core = base / "gx_core"
+        shutil.copytree(PRODUCT / "gx-h/gx_core", core, ignore=shutil.ignore_patterns("__pycache__"))
         self.enterContext(patch.object(config, "HARNESS_ROOT", base))
         self.enterContext(patch.object(config, "CONFIG_DIR", approved.parent))
 
@@ -104,7 +107,7 @@ class PublicModuleCatalog(unittest.TestCase):
             return cli._install(source, package_digest(source), install_root, approved)
 
         def core_files():
-            return {p.relative_to(PRODUCT): digest(p) for p in (PRODUCT / "gx-h/gx_core").rglob("*.py")}
+            return {p.relative_to(core): digest(p) for p in core.rglob("*") if p.is_file()}
 
         survey_pin = install(PRODUCT / "gx-h/plugins/installed/org.gx.research-survey/1.0.0")
         before = v62_catalog.for_start({"research_effort": "deep"})

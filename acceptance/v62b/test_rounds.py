@@ -182,6 +182,37 @@ class ResearchRounds(unittest.TestCase):
         expected = self.s.rows("SELECT expected_json FROM research_rounds")[0]
         self.assertEqual(len(json.loads(expected["expected_json"])), 2)
 
+    def test_a_pending_operator_decision_defers_stagnation_until_the_wait_is_settled(self):
+        from gx_core.context import Ctx, Principal
+        from gx_core.governance import approvals
+        from gx_core.p0.driver import context
+        from gx_core.registry import Subject
+
+        self.round(1, "Check the first inventory question")
+        worker = self.open(2, "second-question", "Check a new coverage question")
+        lead = self.decide()
+        original = self.s.conn.execute("SELECT content_sha256 FROM submissions WHERE submission_id=?",
+                                       (lead["submission_id"],)).fetchone()
+        target = Subject(kind="submission", id=lead["submission_id"], sha256=original[0])
+        request = approvals.request(context(self.s.conn), action_kind="model_switch", subject=target,
+                                    run_id=self.s.run_id, request={"reason": "Review the pending follow-up"})
+        self.assertEqual(request["status"], "PENDING")
+        self.report(worker)
+        frozen = v6_goal.ensure_task(self.s.conn, self.s.run_id)
+        latest = self.s.conn.execute("SELECT c.snapshot_json FROM v6_decision_tasks t JOIN research_contexts c "
+                                     "USING(context_ref) WHERE t.task_id=?", (frozen,)).fetchone()
+        waiting = json.loads(latest[0])["research_progress"]
+        self.assertIn({"kind": "operator", "approval_id": request["approval_id"]}, waiting["waiting_for"])
+        self.assertEqual(waiting["consecutive_no_progress"], 1)
+        human = Principal(subject="scripted-operator", scope="operator", source=approvals.INTERACTIVE_SOURCE)
+        approvals.decide(Ctx(self.s.conn, human), approval_id=request["approval_id"], decision="DENIED",
+                         expected_subject_sha256=target.sha256, note="Keep the current settings.")
+        self.assertEqual(self.next()["research_progress"], waiting)
+        self.decide()
+        settled = self.next()["research_progress"]
+        self.assertEqual((settled["phase"], settled["consecutive_no_progress"]), ("convergence_due", 2))
+        self.assertEqual(settled["waiting_for"], [])
+
     def test_new_arrival_retires_stale_convergence_and_resolves_only_visible_grounded_gap(self):
         report, progress = self.round(1, "Identify missing information",
                                       gaps=["The independent series lacks an instrument reading."])

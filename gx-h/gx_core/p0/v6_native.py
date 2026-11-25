@@ -3,14 +3,13 @@ from __future__ import annotations
 
 import hashlib
 import json
-from functools import lru_cache
 from pathlib import Path
 
-from .. import budgets
+from .. import budgets, contracts, registry
 from ..domain import ids
 from ..errors import BY_CODE, BudgetExceeded, SchemaInvalid, ScopeDenied
 from ..persistence import store
-from . import v6_claims, v6_delegation, v6_graph, v6_protein
+from . import v6_claims, v6_delegation, v6_protein
 
 
 DECIDE = "gx_decide_revision"
@@ -46,12 +45,14 @@ INSTRUCTIONS = (
 )
 
 
-@lru_cache(maxsize=1)
 def decision_tool():
-    return {"type": "function", "name": DECIDE,
-            "description": "Submit a scoped scientific decision. GX authenticates this turn and applies its frozen base.",
-            "inputSchema": {"type": "object", "properties": {"decision": v6_graph.decision_schema()},
-                            "required": ["decision"], "additionalProperties": False}}
+    return contracts.native_goal_tool_spec(DECIDE)
+
+
+def callback_for(name):
+    if name == REEVALUATE:
+        return call
+    return registry.native_goal_handler_for(name)
 
 
 def assigned(row):
@@ -143,6 +144,9 @@ def saved_result(receipt, turn, request_sha):
     return result
 
 
+@registry.native_goal_tool(DECIDE)
+@registry.native_goal_tool(STAGE)
+@registry.native_goal_tool(DELEGATE)
 def call(roots, p):
     from . import v6_decisions
     from .roots import require_binding

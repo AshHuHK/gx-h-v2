@@ -21,6 +21,7 @@ CONFIG_DIR = HARNESS_ROOT / "config"
 #: v2 adds the gate table and the bundle schemas; both are part of the frozen contract.
 _CONTRACT_FILES = (
     "states.json", "errors.json", "labels.json", "mcp_tools.json", "gates.json", "bundles.json",
+    "v6_revision.schema.json",
 )
 
 
@@ -124,6 +125,31 @@ def error_codes() -> list[str]:
 
 def failure_classes() -> dict[str, Any]:
     return errors()["failure_taxonomy"]["classes"]
+
+
+def native_goal_tool_names() -> list[str]:
+    return sorted(mcp_tools()["native_goal_tools"]["tools"])
+
+
+@functools.lru_cache(maxsize=None)
+def native_goal_tool_spec(name: str) -> dict[str, Any]:
+    """Inline the frozen decision schema for the Codex dynamic-tool wire format."""
+    entry = mcp_tools()["native_goal_tools"]["tools"][name]
+    definitions = _load("v6_revision.schema.json")["$defs"]
+
+    def expand(value: Any) -> Any:
+        if isinstance(value, list):
+            return [expand(item) for item in value]
+        if not isinstance(value, dict):
+            return value
+        if "$ref" in value:
+            source, fragment = value["$ref"].split("#/$defs/")
+            if source not in ("", "v6_revision.schema.json"):
+                raise ValueError(f"Unexpected native schema reference {source!r}")
+            return expand(definitions[fragment])
+        return {key: expand(item) for key, item in value.items()}
+
+    return {**entry, "inputSchema": expand(entry["inputSchema"])}
 
 
 def tool_spec(name: str) -> dict[str, Any]:

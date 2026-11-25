@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 
+from .. import contracts
 from ..artifacts.service import ArtifactService
 from ..domain import clock, ids
 from ..errors import IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
@@ -16,24 +17,13 @@ from . import manifest
 
 SCHEMA = 'gx.v6.claim.1'
 DRAFT_KIND = 'v6_claim_proposal'
-LEVELS = ('open', 'limited_support', 'contested', 'insufficient', 'mixed', 'refuted')
-REQUIRED = ('statement', 'level', 'scope', 'criteria', 'limitations', 'rationale', 'evidence_refs')
-
 
 def tool_spec():
-    text = {'type': 'string', 'minLength': 1}
-    strings = {'type': 'array', 'items': text, 'uniqueItems': True}
-    properties = {key: text for key in ('statement', 'scope', 'criteria', 'limitations', 'rationale', 'previous_claim_ref')}
-    properties.update(level={'type': 'string', 'enum': list(LEVELS)}, evidence_refs={**strings, 'minItems': 1},
-                      chain_pairs=strings)
-    return {'type': 'function', 'name': 'gx_stage_claim', 'description':
-            'Stage a bounded interpretation with actual visible evidence IDs, criteria and limits. '
-            'Use previous_claim_ref to revise an existing interpretation. For close_run, list the '
-            'resulting claim_ref in claim_refs and its underlying observations in decision.evidence_refs. '
-            'For an intermediate amendment or resolution, cite the staged claim_ref along with its '
-            'original grounds to publish it with that decision.',
-            'inputSchema': {'type': 'object', 'additionalProperties': False, 'required': list(REQUIRED),
-                            'properties': properties}}
+    return contracts.native_goal_tool_spec("gx_stage_claim")
+
+
+LEVELS = tuple(tool_spec()["inputSchema"]["properties"]["level"]["enum"])
+REQUIRED = tuple(tool_spec()["inputSchema"]["required"])
 
 
 def _validate(payload):

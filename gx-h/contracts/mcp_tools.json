@@ -90,6 +90,131 @@
       "input_manifest_ref"
     ]
   },
+  "native_goal_tools": {
+    "transport": "official_codex_app_server",
+    "authority": "The bound Root obtains task, lease, thread, turn and call identifiers from the native callback. Its frozen tool grant and the current run/scope are checked before adoption.",
+    "idempotency": "Callback receipts are keyed by the official thread and call. Replay must match turn and request digest.",
+    "tools": {
+      "gx_decide_revision": {
+        "type": "function",
+        "name": "gx_decide_revision",
+        "description": "Submit a scoped scientific decision. GX authenticates this turn and applies its frozen base.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "decision": {
+              "$ref": "v6_revision.schema.json#/$defs/decision"
+            }
+          },
+          "required": [
+            "decision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_stage_claim": {
+        "type": "function",
+        "name": "gx_stage_claim",
+        "description": "Stage a bounded interpretation with actual visible evidence IDs, criteria and limits. Use previous_claim_ref to revise an existing interpretation. For close_run, list the resulting claim_ref in claim_refs and its underlying observations in decision.evidence_refs. For an intermediate amendment or resolution, cite the staged claim_ref along with its original grounds to publish it with that decision.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "statement",
+            "level",
+            "scope",
+            "criteria",
+            "limitations",
+            "rationale",
+            "evidence_refs"
+          ],
+          "properties": {
+            "statement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scope": {
+              "type": "string",
+              "minLength": 1
+            },
+            "criteria": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limitations": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1
+            },
+            "previous_claim_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "level": {
+              "type": "string",
+              "enum": [
+                "open",
+                "limited_support",
+                "contested",
+                "insufficient",
+                "mixed",
+                "refuted"
+              ]
+            },
+            "evidence_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true,
+              "minItems": 1
+            },
+            "chain_pairs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          }
+        }
+      },
+      "gx_delegate_branch": {
+        "type": "function",
+        "name": "gx_delegate_branch",
+        "description": "Assign one decision on an open branch. Its Jobs use that branch’s fixed resource limits. The Run pays for the worker task and native turn, subject to any further branch ceilings.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "branch_id": {
+              "type": "string",
+              "description": "Durable ID of an open branch in this brief."
+            },
+            "question": {
+              "type": "string",
+              "description": "Scientific question for the branch owner to decide."
+            }
+          },
+          "required": [
+            "branch_id",
+            "question"
+          ]
+        }
+      }
+    },
+    "provider_tools": "Installed provider tools are offered only on runs holding their capability grant. The protein provider supplies gx_reevaluate_geometry for its geometry method.",
+    "claim_direction": "gx.v6.claim.1 level describes evidence direction. A staged claim publishes with its adopted decision. Existing payloads may include the optional chain_pairs field.",
+    "reserved": {
+      "maturity": "M3. Independent from the level of evidential support. No maturity transition, archive or PI signature is emitted by this schema.",
+      "watch_measure": "M3. An explicit predicate on a measured value and its units would require a new event contract. The current reconsider_when list accepts six event kinds and matches their subject references."
+    }
+  },
   "tools": {
     "gx_run_start": {
       "phase": "core",

@@ -977,8 +977,8 @@ class Roots:
             raise ScopeDenied("GX tools require an official dynamic tool request")
         envelope = {"thread_id":tid,"turn_id":turn,"call_id":call_id}
         digest = ids.sha256_of_obj([tool,args])
-        if self._goal_mode and tool in (v6_native.DECIDE, v6_native.STAGE, v6_native.REEVALUATE, v6_native.DELEGATE):
-            return v6_native.call(self, p)
+        if self._goal_mode and (callback := v6_native.callback_for(tool)):
+            return callback(self, p)
         prepared = None
         if self.worker_prepare and tool in self._extension_tools and tool not in self._plugin_tools:
             binding = require_binding(self.conn, self.run_id, tid)

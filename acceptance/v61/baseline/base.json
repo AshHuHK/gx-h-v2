@@ -1,0 +1,837 @@
+{
+  "head": "47fc728d32bc10ba478df6a063529a8d98f98828",
+  "source_changes": [],
+  "contract": {
+    "bundles.json": "456471a624966c843a7786a07c5253c6c79b7888cacb07de9ac88abc30785d27",
+    "db_schema.sql": "456753d35343e1571693a0e69d7921b75dfee0ebe653942d16eb36e842f1c4a8",
+    "errors.json": "58ccef2a0c1ad54b51642cac855713fb6696a9d978bf2c0329e6ab4c8f53c76c",
+    "gates.json": "9e59d9c2fd8492539b60599930e51e11fd3da3bc20c198a4a24b5f4a20e721a1",
+    "labels.json": "2d06362a0fb40c1f6c714b7caf940ca206c269903a1b6dc288ea03d2808d3a18",
+    "mcp_tools.json": "ce41d9e04f748a3b375630069a27c2ca3f486ff6f5a663b8fdf0ac7c22d46211",
+    "states.json": "44bf33622b34363872794f16a1a3c20a65fcf78b9bde5db46a09d2191a15fefc",
+    "__combined__": "afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd"
+  },
+  "registry": {
+    "providers": {
+      "gx_core.orchestration.tools": null,
+      "gx_core.teams.tools": null,
+      "gx_core.teams.manager_tools": null,
+      "gx_core.artifacts.tools": null,
+      "gx_core.governance.tools": null,
+      "gx_core.knowledge.tools": null,
+      "gx_core.jobs.tools": null,
+      "gx_core.capabilities.tools": null,
+      "gx_core.hostobs.projection": null
+    },
+    "published": {
+      "tools": {
+        "gx_approval_grant": "gx_core.governance.tools",
+        "gx_artifact_get": "gx_core.artifacts.tools",
+        "gx_artifact_put": "gx_core.artifacts.tools",
+        "gx_asset_promote": "gx_core.governance.tools",
+        "gx_asset_status": "gx_core.governance.tools",
+        "gx_asset_submit": "gx_core.governance.tools",
+        "gx_bundle_check": "gx_core.teams.tools",
+        "gx_capability_inspect": "gx_core.capabilities.tools",
+        "gx_capability_register": "gx_core.capabilities.tools",
+        "gx_coordinator_claim": "gx_core.orchestration.tools",
+        "gx_job_cancel": "gx_core.jobs.tools",
+        "gx_job_status": "gx_core.jobs.tools",
+        "gx_job_submit": "gx_core.jobs.tools",
+        "gx_job_wait": "gx_core.jobs.tools",
+        "gx_memory_read": "gx_core.knowledge.tools",
+        "gx_memory_search": "gx_core.knowledge.tools",
+        "gx_model_activity": "gx_core.teams.tools",
+        "gx_next_actions": "gx_core.orchestration.tools",
+        "gx_run_control": "gx_core.orchestration.tools",
+        "gx_run_resume": "gx_core.orchestration.tools",
+        "gx_run_start": "gx_core.orchestration.tools",
+        "gx_run_status": "gx_core.orchestration.tools",
+        "gx_shared_board": "gx_core.teams.tools",
+        "gx_task_acquire": "gx_core.teams.tools",
+        "gx_task_bind": "gx_core.teams.tools",
+        "gx_task_claim": "gx_core.teams.tools",
+        "gx_task_finish": "gx_core.teams.tools",
+        "gx_task_submit": "gx_core.teams.tools",
+        "gx_team_manage": "gx_core.teams.manager_tools",
+        "gx_team_message": "gx_core.teams.manager_tools",
+        "gx_team_status": "gx_core.teams.manager_tools"
+      },
+      "bundle_validators": {
+        "asset_review_bundle": "gx_core.governance.tools",
+        "capability_manifest_bundle": "gx_core.capabilities.tools",
+        "execution_bundle": "gx_core.jobs.tools",
+        "role_bundle": "gx_core.hostobs.projection"
+      },
+      "checks": {
+        "byte_binding": "gx_core.governance.tools",
+        "licence_recorded": "gx_core.governance.tools",
+        "manifest_schema": "gx_core.governance.tools",
+        "method_card_present": "gx_core.capabilities.checks",
+        "probe_L0_files": "gx_core.capabilities.checks",
+        "probe_L1_metadata": "gx_core.capabilities.checks",
+        "probe_L2_entrypoint": "gx_core.capabilities.checks",
+        "probe_L3_smoke": "gx_core.capabilities.checks",
+        "probe_L4_known_answer": "gx_core.capabilities.checks",
+        "probe_input_error": "gx_core.capabilities.checks",
+        "scope_scan": "gx_core.governance.tools",
+        "weights_digest": "gx_core.capabilities.checks"
+      },
+      "brief_sections": {
+        "capability_under_review": "gx_core.capabilities.tools",
+        "earlier_jobs": "gx_core.jobs.tools",
+        "prior_knowledge": "gx_core.knowledge.tools",
+        "team_assignment": "gx_core.teams.manager_tools"
+      }
+    },
+    "compatibility_only": {
+      "tools": [
+        "gx_captured_source_intake",
+        "gx_eval_run",
+        "gx_experience_submit",
+        "gx_host_event",
+        "gx_host_observe",
+        "gx_host_pool_adopt_existing",
+        "gx_host_pool_register",
+        "gx_host_pool_reparent",
+        "gx_host_pool_reserve",
+        "gx_host_pool_snapshot",
+        "gx_host_pool_transition",
+        "gx_hypothesis_create",
+        "gx_hypothesis_get",
+        "gx_hypothesis_update_commit",
+        "gx_hypothesis_update_propose",
+        "gx_hypothesis_update_review",
+        "gx_ingest",
+        "gx_literature_search",
+        "gx_plan_submit",
+        "gx_plugin_identity_preview",
+        "gx_plugin_inspect",
+        "gx_plugin_invoke",
+        "gx_plugin_lifecycle",
+        "gx_plugin_register",
+        "gx_pubmed_search",
+        "gx_research_context_create",
+        "gx_research_context_get",
+        "gx_research_provider_list",
+        "gx_research_round_get",
+        "gx_research_round_open",
+        "gx_research_round_rebase",
+        "gx_research_round_seal",
+        "gx_rsi_final_compare",
+        "gx_rsi_propose",
+        "gx_skill_get",
+        "gx_skill_search",
+        "gx_source_acquire",
+        "gx_source_read",
+        "gx_strategy_rollback",
+        "gx_submission_review_request"
+      ],
+      "bundle_validators": [
+        "benchmark_bundle",
+        "conclusion_bundle",
+        "evalspec_bundle",
+        "evidence_bundle",
+        "evidence_review_bundle",
+        "gap_bundle",
+        "path_bundle",
+        "research_bundle",
+        "research_update_bundle",
+        "research_update_review_bundle",
+        "scenario_answers_bundle",
+        "skill_bundle",
+        "strategy_bundle",
+        "workflow_bundle"
+      ],
+      "checks": [
+        "benchmark_frozen",
+        "budget_declared",
+        "cases_declared",
+        "cases_executed",
+        "coverage",
+        "dataset_split_registered",
+        "dry_run",
+        "graph_validation",
+        "locator_resolution",
+        "planted_controls",
+        "projection_parity",
+        "rsi_cycle_verdict",
+        "scenario_execution",
+        "scenario_sensitivity",
+        "source_pinning",
+        "threshold_basis",
+        "trace_completeness"
+      ]
+    }
+  },
+  "registry_counts": {
+    "tools": 40,
+    "bundle_validators": 14,
+    "checks": 17
+  },
+  "tool_owners": {
+    "gx_decide_revision": null,
+    "gx_stage_claim": null,
+    "gx_delegate_branch": null,
+    "gx_reevaluate_geometry": null
+  },
+  "doctor": {
+    "argv": [
+      "gx-h/bin/gx",
+      "doctor"
+    ],
+    "ok": true,
+    "providers_not_loaded": [],
+    "seams": {
+      "seams": {
+        "agent_policy": {
+          "owner": "gx_core.hostobs.policy.agent_policy",
+          "installed": true
+        },
+        "task_requirement": {
+          "owner": "gx_core.hostobs.policy.requirement_of_task",
+          "installed": true
+        },
+        "bind_worker": {
+          "owner": "gx_core.hostobs.policy.bind_worker",
+          "installed": true
+        },
+        "policy_verdict": {
+          "owner": "gx_core.hostobs.policy.verdict_for",
+          "installed": true
+        },
+        "host_record": {
+          "owner": "gx_core.hostobs.detect.host_record",
+          "installed": true
+        },
+        "host_detected": {
+          "owner": "gx_core.hostobs.detect.detected",
+          "installed": true
+        },
+        "compile_brief": {
+          "owner": "gx_core.teams.briefs.compile_brief",
+          "installed": true
+        },
+        "request_approval": {
+          "owner": "gx_core.governance.approvals.request",
+          "installed": true
+        },
+        "approval_view": {
+          "owner": "gx_core.governance.approvals.get",
+          "installed": true
+        },
+        "screen_objective": {
+          "owner": "gx_core.planning.objective.screen",
+          "installed": true
+        },
+        "workflow_admission": {
+          "owner": "gx_core.governance.assets.require_active",
+          "installed": true
+        },
+        "budget_profile": {
+          "owner": "gx_core.budgets.profile",
+          "installed": true
+        },
+        "create_root_budget": {
+          "owner": "gx_core.budgets.create_root",
+          "installed": true
+        },
+        "budget_state": {
+          "owner": "gx_core.budgets.state",
+          "installed": true
+        },
+        "charge": {
+          "owner": "gx_core.budgets.spend",
+          "installed": true
+        },
+        "release_chain": {
+          "owner": "gx_core.budgets.release_chain",
+          "installed": true
+        },
+        "release_reservation": {
+          "owner": "gx_core.budgets.release",
+          "installed": true
+        },
+        "memory_search": {
+          "owner": "gx_core.knowledge.memory.MemoryService",
+          "installed": true
+        },
+        "run_scopes": {
+          "owner": "gx_core.knowledge.scopes.for_run",
+          "installed": true
+        },
+        "cancel_run_jobs": {
+          "owner": "gx_core.jobs.service.JobService",
+          "installed": true
+        },
+        "shipped_strategies": {
+          "owner": "gx_core.knowledge.strategy.shipped_report",
+          "installed": true
+        },
+        "role_intent_pins": {
+          "owner": "gx_core.hostobs.roles.pins",
+          "installed": true
+        },
+        "role_intents": {
+          "owner": "gx_core.hostobs.roles.shipped",
+          "installed": true
+        },
+        "reconcile_jobs": {
+          "owner": "gx_core.jobs.service.JobService",
+          "installed": true
+        },
+        "hold_run_jobs": {
+          "owner": "gx_core.jobs.service.JobService",
+          "installed": true
+        },
+        "exec_need_cleared": {
+          "owner": "gx_core.jobs.needs.cleared",
+          "installed": true
+        },
+        "stopped_holders": {
+          "owner": "gx_core.hostobs.policy.stopped_holders",
+          "installed": true
+        },
+        "holder_stopped": {
+          "owner": "gx_core.hostobs.policy.holder_stopped",
+          "installed": true
+        },
+        "record_verdict_for_lease": {
+          "owner": "gx_core.hostobs.policy.record_verdict_for_lease",
+          "installed": true
+        },
+        "session_capability": {
+          "owner": "gx_core.hostobs.events.session_capability",
+          "installed": true
+        },
+        "reviews_for": {
+          "owner": "gx_core.governance.reviews.reviews_for",
+          "installed": true
+        },
+        "human_task_review": {
+          "owner": "gx_core.governance.reviews.human_task_review",
+          "installed": true
+        },
+        "reserve_task_chain": {
+          "owner": "gx_core.budgets.reserve_chain",
+          "installed": true
+        },
+        "advance_asset": {
+          "owner": "gx_core.governance.assets.advance",
+          "installed": true
+        },
+        "get_asset": {
+          "owner": "gx_core.governance.assets.get",
+          "installed": true
+        },
+        "asset_review_for": {
+          "owner": "gx_core.governance.reviews.request_review_for",
+          "installed": true
+        }
+      },
+      "on_fallback": {}
+    },
+    "shipped": {
+      "workflows": {
+        "module_collaboration@1": {
+          "installed": true,
+          "sha256": "24c2dd42888cf9b39b3e61e636cbac59e87574373651d18567a439266bce9be2",
+          "pinned_sha256": "24c2dd42888cf9b39b3e61e636cbac59e87574373651d18567a439266bce9be2",
+          "matches": true,
+          "sources": {
+            "workflows.module_collaboration.nodes": "1bd3daade45a9766b357b36d52dbed5ae373970fb6debc580f8f2df454407943",
+            "workflows.module_collaboration.products": "9ecc7272fee7edb59e4bf566aab046b6d9f465c81a5f7555d0658ff54e6e3429",
+            "workflows.module_collaboration": "772cc1235e6f52dceb73fbbbc6e06a85d6c76317b054353045f4550d98ad499b"
+          },
+          "admitted_as": "SHIPPED"
+        },
+        "science_grid@1": {
+          "installed": true,
+          "sha256": "30cbe639fd6df6ee9f616412368c800295e63ede94def06f3ff722858df74ad3",
+          "pinned_sha256": "30cbe639fd6df6ee9f616412368c800295e63ede94def06f3ff722858df74ad3",
+          "matches": true,
+          "sources": {
+            "workflows.science_grid.nodes": "1ed6da3d831806bdeb12ce12b8b929e032b8079331567d87efdebc3f9955f741",
+            "gx_core.p0.science": "718b9c5e10baf6fbcd194213ec81d5fcec6488879fc1e9fef58916be68d3f01a",
+            "gx_core.p0.science_refresh": "42149addcdd1aca6176735abb13d9fc9f1847f3922d876a747b444da6c3d0d6a",
+            "workflows.science_grid": "41680887530e20c4e5bcb9c7208ac94de098078ae1271d8da6b36d5314abe1cb"
+          },
+          "admitted_as": "SHIPPED"
+        },
+        "science_grid@2": {
+          "installed": true,
+          "sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467",
+          "pinned_sha256": "4f922e187a641e36c679e2a78879ce81dec0b687342bd14779293c7771b4f467",
+          "matches": true,
+          "sources": {
+            "workflows.science_grid.nodes": "1ed6da3d831806bdeb12ce12b8b929e032b8079331567d87efdebc3f9955f741",
+            "workflows.science_grid_v2.nodes": "098dfe0aa0f2d3e8fdd64d3c1d5f7e845aeaf889c445ba3da94afe07b2ed915e",
+            "gx_core.p0.science": "718b9c5e10baf6fbcd194213ec81d5fcec6488879fc1e9fef58916be68d3f01a",
+            "gx_core.p0.science_inputs": "c5270b23b5941dce80ecf08e0ee09e52e67a09b81a435aed48b70f31571b7470",
+            "gx_core.p0.science_refresh": "42149addcdd1aca6176735abb13d9fc9f1847f3922d876a747b444da6c3d0d6a",
+            "gx_core.p0.science_refresh_v2": "5e14cb4043b85e2dc12f264cd0a935d58fdf1726859384d6ff5111d3afd25c6d",
+            "gx_core.p0.science_v2": "497f5a2f2627c66fa169e467b0fc3b56e55018070252ebdbd669172a553fa1e9",
+            "workflows.science_grid_v2": "4c4f0f0f30e03ca34f88d8e0e166bec28f90d3a9e50c7fc99ab8ba63c92c1350"
+          },
+          "admitted_as": "SHIPPED"
+        },
+        "science_grid@3": {
+          "installed": true,
+          "sha256": "3a5c74ae4d1e44d74f9ddc583179accf2cc5fd6a303dbece86403cb931eb1410",
+          "pinned_sha256": "3a5c74ae4d1e44d74f9ddc583179accf2cc5fd6a303dbece86403cb931eb1410",
+          "matches": true,
+          "sources": {
+            "workflows.science_grid.nodes": "1ed6da3d831806bdeb12ce12b8b929e032b8079331567d87efdebc3f9955f741",
+            "workflows.science_grid_v3.nodes": "9b9e66b05271679f8928e02c731aa1d9a6af1eefe5e80d465ad5956f5a6f58dd",
+            "workflows.science_grid_v2.nodes": "098dfe0aa0f2d3e8fdd64d3c1d5f7e845aeaf889c445ba3da94afe07b2ed915e",
+            "gx_core.p0.science": "718b9c5e10baf6fbcd194213ec81d5fcec6488879fc1e9fef58916be68d3f01a",
+            "gx_core.p0.science_inputs": "c5270b23b5941dce80ecf08e0ee09e52e67a09b81a435aed48b70f31571b7470",
+            "gx_core.p0.science_refresh_v2": "5e14cb4043b85e2dc12f264cd0a935d58fdf1726859384d6ff5111d3afd25c6d",
+            "workflows.compat_v20.grid_dispatch": "279d09347a9c88d8fd3ee753b94c24c5417a3b23f8d8c3652b6df5fa13bc481e",
+            "workflows.science_grid_v3": "18fa3491c6285bcf0119bb15293aed862fc82e4ade55ffaaaed524da2811dae2",
+            "workflows.science_grid_v3.contract": "fe125c2a9128e2df487f12cd8e0b0578bbc4afc916c3bd40ea9cab9df452b984",
+            "workflows.science_grid_v3.products": "35da94815010b73b2bac4764045e07d72fcc6659da01c5e11817088ca4576023",
+            "workflows.science_grid_v3.settlement": "d73044b0c7a1a8bf15be60996fc4f24079328013d9891cb05adf1da860a3d566",
+            "gx_core.orchestration.hooks": "d5024c27e522579a57b3a0525f45331054f80efb0d66f0caa9b61e58b0af7b03",
+            "workflows.compat_v20.grid": "98359ebc58cc692fa4146e6f68cfab8b845534f37ecc19c6555345ca9cb736f1",
+            "workflows.compat_v20.grid_replan": "a847ec0a97479a05b8b6a04ba47048cd49eee4529d05504374bc6c5afc771b69"
+          },
+          "admitted_as": "SHIPPED"
+        },
+        "tl1a_coordinate_quality@1": {
+          "installed": true,
+          "sha256": "ff371a43c6a604da1ffc962e833859985f22b17f5df781dba020f0c59bc296c6",
+          "pinned_sha256": "ff371a43c6a604da1ffc962e833859985f22b17f5df781dba020f0c59bc296c6",
+          "matches": true,
+          "sources": {
+            "workflows.tl1a_coordinate_quality": "ce3189d31cc978c696ba663416aa7ad2ae2711f47534c96ec75d28dd5cbb4dae"
+          },
+          "admitted_as": "SHIPPED"
+        },
+        "tl1a_geometry@1": {
+          "installed": true,
+          "sha256": "bd01ffd53b2f9148c868e7e699fda32149acd0734b60841534fa404e5c47d455",
+          "pinned_sha256": "bd01ffd53b2f9148c868e7e699fda32149acd0734b60841534fa404e5c47d455",
+          "matches": true,
+          "sources": {
+            "workflows.tl1a_geometry.nodes": "1bcfe13e880260fa232ecf51cbafa006f7759eb3f87b3b1ce3eebe53f8a1c03a",
+            "adapters.scientific.tl1a_geometry.review": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705",
+            "adapters.scientific.tl1a_geometry.worker": "f6a589ae44c53725d8066988cda86b1212aad19d26f89660a2e49a3e96f13003",
+            "workflows.tl1a_geometry": "6699fa366569df4e20e6e482feb25c5d774a89c0677208113849998cacc0527f",
+            "workflows.tl1a_geometry.domain": "c6b9ff5c8fa5642feaa569fda8ae4757ebfe35a779ba2b757ef1d58bbdc6541d",
+            "workflows.tl1a_geometry.replan": "1030caffee9d4914691a40ab7050e304e632f061d89750d8a7fcfc5829d47db2",
+            "workflows.tl1a_geometry.review_tools": "a28e5d6a4079b12dd28c7b507c8db764e9b50cb2cfe0237a42e7fc66f069636f"
+          },
+          "admitted_as": "SHIPPED"
+        },
+        "tl1a_geometry@2": {
+          "installed": true,
+          "sha256": "33d7414ce6489dbee3b0dfa2c8136f31653ec1c81fdcfb15b69d533201dcd755",
+          "pinned_sha256": "33d7414ce6489dbee3b0dfa2c8136f31653ec1c81fdcfb15b69d533201dcd755",
+          "matches": true,
+          "sources": {
+            "workflows.tl1a_geometry.nodes": "1bcfe13e880260fa232ecf51cbafa006f7759eb3f87b3b1ce3eebe53f8a1c03a",
+            "workflows.tl1a_geometry_v2": "3158df6c6160d7a2a90e3ae2f5444662ec2015014e8feda0bb1d231df138df82",
+            "adapters.scientific.tl1a_geometry.review": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705",
+            "adapters.scientific.tl1a_geometry.worker": "f6a589ae44c53725d8066988cda86b1212aad19d26f89660a2e49a3e96f13003",
+            "workflows.tl1a_geometry": "6699fa366569df4e20e6e482feb25c5d774a89c0677208113849998cacc0527f",
+            "workflows.tl1a_geometry.domain": "c6b9ff5c8fa5642feaa569fda8ae4757ebfe35a779ba2b757ef1d58bbdc6541d",
+            "workflows.tl1a_geometry.replan": "1030caffee9d4914691a40ab7050e304e632f061d89750d8a7fcfc5829d47db2",
+            "workflows.tl1a_geometry.review_tools": "a28e5d6a4079b12dd28c7b507c8db764e9b50cb2cfe0237a42e7fc66f069636f",
+            "gx_core.p0.science_inputs": "c5270b23b5941dce80ecf08e0ee09e52e67a09b81a435aed48b70f31571b7470",
+            "workflows.tl1a_geometry_v2.briefs": "50bb1f9439dc2787ba0c63be42d2a41527b72dabd4d6a40b2f5175d39efb8797"
+          },
+          "admitted_as": "SHIPPED"
+        },
+        "tl1a_geometry@3": {
+          "installed": true,
+          "sha256": "cd0d819c7876f26d8200b30a9ae703d6ad247cdf03b2de80eb6121072d4c17db",
+          "pinned_sha256": "cd0d819c7876f26d8200b30a9ae703d6ad247cdf03b2de80eb6121072d4c17db",
+          "matches": true,
+          "sources": {
+            "workflows.tl1a_geometry.nodes": "1bcfe13e880260fa232ecf51cbafa006f7759eb3f87b3b1ce3eebe53f8a1c03a",
+            "workflows.tl1a_geometry_v2": "3158df6c6160d7a2a90e3ae2f5444662ec2015014e8feda0bb1d231df138df82",
+            "workflows.tl1a_geometry_v3": "808ebe2629faf605f3585b9e38cbba708283c5ac5ff7e4aaef3608fd9018f549",
+            "adapters.scientific.tl1a_geometry.review": "7d9ca4e78049900243f3a042b8534aebf95745cac8eab31cff3803ac3b9f4705",
+            "adapters.scientific.tl1a_geometry.worker": "f6a589ae44c53725d8066988cda86b1212aad19d26f89660a2e49a3e96f13003",
+            "workflows.tl1a_geometry": "6699fa366569df4e20e6e482feb25c5d774a89c0677208113849998cacc0527f",
+            "workflows.tl1a_geometry.domain": "c6b9ff5c8fa5642feaa569fda8ae4757ebfe35a779ba2b757ef1d58bbdc6541d",
+            "workflows.tl1a_geometry.replan": "1030caffee9d4914691a40ab7050e304e632f061d89750d8a7fcfc5829d47db2",
+            "workflows.tl1a_geometry.review_tools": "a28e5d6a4079b12dd28c7b507c8db764e9b50cb2cfe0237a42e7fc66f069636f",
+            "gx_core.p0.science_inputs": "c5270b23b5941dce80ecf08e0ee09e52e67a09b81a435aed48b70f31571b7470",
+            "workflows.tl1a_geometry_v2.briefs": "50bb1f9439dc2787ba0c63be42d2a41527b72dabd4d6a40b2f5175d39efb8797",
+            "workflows.tl1a_geometry_v3.review_jobs": "924307aeb113eefb7d613440e4eafb69d5e27b51b2f6810e71b1f9f5f1c6749c",
+            "gx_core.orchestration.hooks": "d5024c27e522579a57b3a0525f45331054f80efb0d66f0caa9b61e58b0af7b03",
+            "workflows.compat_v20.geometry": "390d6045d013992e803bcc363a2619cd428e6fd5bac3d42f224b150406aff4da",
+            "workflows.compat_v20.grid": "98359ebc58cc692fa4146e6f68cfab8b845534f37ecc19c6555345ca9cb736f1"
+          },
+          "admitted_as": "SHIPPED"
+        }
+      },
+      "strategies": {
+        "memory_retrieval@word-bigram-routed": {
+          "installed": true,
+          "sha256": "bf8a3e536ec0cf08105ba81bac45b6be55695c1aaf460af16914bc975e74a397",
+          "pinned_sha256": "bf8a3e536ec0cf08105ba81bac45b6be55695c1aaf460af16914bc975e74a397",
+          "matches": true,
+          "admitted_as": "SHIPPED",
+          "sources": {
+            "gx_core/knowledge/strategy.py": "a2c38d94b52beee840d06bbdd9d4740747617a72d7682943a8ff030148d47a95",
+            "gx_core/knowledge/memory.py": "e01491f6bed37708a3af7e3e1ff3062bb33a6014e94478e072bf7b4e1ba93671",
+            "gx_core/knowledge/tokenize.py": "b2948f32845517d711711d68d462ce69412fefc858adf34ba83f6a83e1083669"
+          }
+        }
+      },
+      "role_intents": {
+        "role.adapter_author": {
+          "installed": true,
+          "sha256": "24b1d4b9ca4e0ce8a2b0fa9eb1fb24a9634c5d215d326d9c7ce416fade08fe4c",
+          "pinned_sha256": "24b1d4b9ca4e0ce8a2b0fa9eb1fb24a9634c5d215d326d9c7ce416fade08fe4c",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.coordinator": {
+          "installed": true,
+          "sha256": "2eac6c55b07ef6c2fbdc70781714ab88045786f06fd05b5d13f9266d3980ee9f",
+          "pinned_sha256": "2eac6c55b07ef6c2fbdc70781714ab88045786f06fd05b5d13f9266d3980ee9f",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.evaluation_designer": {
+          "installed": true,
+          "sha256": "00e6904518499003a8ddf7812fa3653000f45acb8ac2b97cacda18227deb9f41",
+          "pinned_sha256": "00e6904518499003a8ddf7812fa3653000f45acb8ac2b97cacda18227deb9f41",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.evidence_reviewer": {
+          "installed": true,
+          "sha256": "204bbbb661eb469fb103d77f4cbc4e2da2b681e67f30d10c4a6a64d392d7b253",
+          "pinned_sha256": "204bbbb661eb469fb103d77f4cbc4e2da2b681e67f30d10c4a6a64d392d7b253",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.executor": {
+          "installed": true,
+          "sha256": "a323de541dc6eb2af80d0900504132267f0935de618433a8c6aa665677e7ec43",
+          "pinned_sha256": "a323de541dc6eb2af80d0900504132267f0935de618433a8c6aa665677e7ec43",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.improver": {
+          "installed": true,
+          "sha256": "1b9c5713c797511deffbf241680f8f2f508b618c77aa0525600887c3d092b52f",
+          "pinned_sha256": "1b9c5713c797511deffbf241680f8f2f508b618c77aa0525600887c3d092b52f",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.planner": {
+          "installed": true,
+          "sha256": "c05d6c8c2cb6d89150bdbe973360112817e231fe8e758c5bd2bbb0679e6da0f9",
+          "pinned_sha256": "c05d6c8c2cb6d89150bdbe973360112817e231fe8e758c5bd2bbb0679e6da0f9",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.researcher": {
+          "installed": true,
+          "sha256": "7b8406a5ee90dcf55ceb8e958e9fdb0e83f489c53b7ed7ba9cfa55f76812b99f",
+          "pinned_sha256": "7b8406a5ee90dcf55ceb8e958e9fdb0e83f489c53b7ed7ba9cfa55f76812b99f",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.skill_author": {
+          "installed": true,
+          "sha256": "98e674c27f7ca2c41d10eaae5b8f31a4a385338c9bdc650517177ee79817f166",
+          "pinned_sha256": "98e674c27f7ca2c41d10eaae5b8f31a4a385338c9bdc650517177ee79817f166",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        },
+        "role.verifier": {
+          "installed": true,
+          "sha256": "c35378985d53577706bad49fcdbe1c146a81953b6738bd5889091a94931f560a",
+          "pinned_sha256": "c35378985d53577706bad49fcdbe1c146a81953b6738bd5889091a94931f560a",
+          "matches": true,
+          "admitted_as": "SHIPPED"
+        }
+      },
+      "packages_not_loaded": {}
+    }
+  },
+  "protein_packages": [
+    {
+      "id": "org.gx.protein",
+      "version": "0.1.0-v6.1",
+      "sha256": "ac5b5d5cf96e942bfc57dc8492aa56b77ad9ecee0716735a3e6338463630fce9",
+      "namespace": "gx_ext_org_gx_protein_0_1_0_v6_1_12571b9ad41732e64130a755ed6255610931b0694c4f9bd9324aa410e00b7e40",
+      "contributions": {
+        "workflows": [],
+        "tools": [],
+        "capabilities": [
+          "tl1a-coordinate-quality@1",
+          "tl1a-geometry@1",
+          "tl1a-review@1"
+        ]
+      }
+    }
+  ],
+  "inventory": {
+    "goal_markers": [
+      {
+        "path": "gx-h/gx_core/orchestration/engine.py",
+        "line": 1113,
+        "source": "if v6_goal.is_goal(run):"
+      },
+      {
+        "path": "gx-h/gx_core/orchestration/engine.py",
+        "line": 1190,
+        "source": "if checkpoint and v6_goal.is_goal(row):"
+      },
+      {
+        "path": "gx-h/gx_core/orchestration/reactor.py",
+        "line": 203,
+        "source": "if v6_goal.is_goal(run):"
+      },
+      {
+        "path": "gx-h/gx_core/orchestration/service.py",
+        "line": 173,
+        "source": "if v6_goal.is_goal(run):"
+      },
+      {
+        "path": "gx-h/gx_core/orchestration/service.py",
+        "line": 211,
+        "source": "if v6_goal.is_goal(run):"
+      },
+      {
+        "path": "gx-h/gx_core/orchestration/service.py",
+        "line": 868,
+        "source": "if v6_goal.is_goal(run):"
+      },
+      {
+        "path": "gx-h/gx_core/orchestration/service.py",
+        "line": 2196,
+        "source": "if v6_goal.is_goal(_run(conn, run_id)):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/cli.py",
+        "line": 212,
+        "source": "if not v6_goal.is_goal(run) and not store.latest_checkpoint(conn, rid):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/coordinator.py",
+        "line": 168,
+        "source": "if not is_goal(run) and not store.latest_checkpoint(conn, rid):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/driver.py",
+        "line": 91,
+        "source": "**(v6_goal.projection(conn, run, meter) if v6_goal.is_goal(run) else {}),"
+      },
+      {
+        "path": "gx-h/gx_core/p0/driver.py",
+        "line": 177,
+        "source": "if v6_goal.is_goal(run):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 109,
+        "source": "self._goal_mode = v6_goal.is_goal(self.run)"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 129,
+        "source": "terminal_delivery = self._goal_mode or terminal_products.enabled(self.run)"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 367,
+        "source": "lead = self._goal_mode and task is not None and task[\"kind\"] == \"decide_revision\""
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 498,
+        "source": "if self._goal_mode and v6_native.assigned(row):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 522,
+        "source": "lead = self._goal_mode and v6_native.assigned(row)"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 598,
+        "source": "if self._goal_mode and v6_native.assigned(row) and settings:"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 738,
+        "source": "if not (self._goal_mode and v6_native.assigned(row)):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 852,
+        "source": "if not row or row[\"task_id\"] is None or self._goal_mode and v6_native.assigned(row):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 931,
+        "source": "if self._goal_mode and p.get(\"tool\") == v6_native.DECIDE:"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 973,
+        "source": "terminal_tool = tool == \"gx_submit_product\" or self._goal_mode and tool == v6_native.DECIDE"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 980,
+        "source": "if self._goal_mode and tool in (v6_native.DECIDE, v6_native.STAGE, v6_native.REEVALUATE, v6_native.DELEGATE):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 1049,
+        "source": "lead = self._goal_mode and v6_native.assigned(row)"
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 1081,
+        "source": "if self._goal_mode and v6_native.assigned(row):"
+      }
+    ],
+    "direct_mode_comparisons": [
+      {
+        "path": "gx-h/gx_core/orchestration/service.py",
+        "line": 523,
+        "source": "goal_mode = prepare_p0 is not None and args.get(\"inputs\", {}).get(\"mode\") == \"goal\""
+      },
+      {
+        "path": "gx-h/gx_core/p0/cli.py",
+        "line": 128,
+        "source": "if spec.get(\"mode\") == \"goal\":"
+      },
+      {
+        "path": "gx-h/gx_core/p0/cli.py",
+        "line": 248,
+        "source": "if getattr(args, \"goal\", None) is not None:"
+      },
+      {
+        "path": "gx-h/gx_core/p0/cli.py",
+        "line": 113,
+        "source": "if spec.get(\"mode\") != \"goal\" and (type(spec.get(\"max_rounds\")) is not int or spec[\"max_rounds\"] < 1):"
+      }
+    ],
+    "grid_equality": [
+      {
+        "path": "gx-h/gx_core/p0/cli.py",
+        "line": 131,
+        "source": "if (workflow, version) == (\"science_grid\", \"3\"):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/driver.py",
+        "line": 77,
+        "source": "if (run[\"workflow_id\"], run[\"workflow_version\"]) == (\"science_grid\", \"3\"):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/driver.py",
+        "line": 84,
+        "source": "if (run[\"workflow_id\"], run[\"workflow_version\"]) == (\"science_grid\", \"3\"):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/grid_brief.py",
+        "line": 21,
+        "source": "return (run[\"workflow_id\"] == \"science_grid\" and run[\"workflow_version\"] == \"3\""
+      },
+      {
+        "path": "gx-h/gx_core/p0/roots.py",
+        "line": 110,
+        "source": "self._role_tools = (self.run[\"workflow_id\"], self.run[\"workflow_version\"]) == (\"science_grid\", \"3\")"
+      },
+      {
+        "path": "gx-h/gx_core/p0/science_refresh_v2.py",
+        "line": 76,
+        "source": "if workflow[\"workflow_id\"] == \"science_grid\" and workflow[\"workflow_version\"] == \"1\":"
+      },
+      {
+        "path": "gx-h/gx_core/p0/terminal_products.py",
+        "line": 33,
+        "source": "return (run[\"workflow_id\"], run[\"workflow_version\"]) == (\"science_grid\", \"3\")"
+      },
+      {
+        "path": "gx-h/gx_core/teams/service.py",
+        "line": 1844,
+        "source": "if (run[\"workflow_id\"], run[\"workflow_version\"]) == (\"science_grid\", \"3\"):"
+      }
+    ],
+    "other_grid_predicates": [
+      {
+        "path": "gx-h/gx_core/p0/science_inputs.py",
+        "line": 147,
+        "source": "if project[\"status\"] != \"ACTIVE\" or project[\"workflow_id\"] not in (\"science_grid\", \"tl1a_geometry\"):"
+      },
+      {
+        "path": "gx-h/gx_core/p0/science_inputs.py",
+        "line": 76,
+        "source": "return conn.execute(\"SELECT 1 FROM runs WHERE run_id=? AND workflow_id='science_grid' \""
+      }
+    ],
+    "protein_imports": [
+      {
+        "path": "gx-h/gx_core/jobs/service.py",
+        "line": 683,
+        "source": "from ..p0 import v6_jobs, v6_protein"
+      },
+      {
+        "path": "gx-h/gx_core/p0/v6_goal.py",
+        "line": 69,
+        "source": "from . import operator, v6_protein, workspace"
+      },
+      {
+        "path": "gx-h/gx_core/p0/v6_goal.py",
+        "line": 345,
+        "source": "from . import v6_claims, v6_protein"
+      },
+      {
+        "path": "gx-h/gx_core/p0/v6_jobs.py",
+        "line": 48,
+        "source": "from . import v6_protein"
+      },
+      {
+        "path": "gx-h/gx_core/p0/v6_jobs.py",
+        "line": 134,
+        "source": "from . import v6_protein"
+      },
+      {
+        "path": "gx-h/gx_core/p0/v6_jobs.py",
+        "line": 468,
+        "source": "from . import v6_protein"
+      },
+      {
+        "path": "gx-h/gx_core/p0/v6_native.py",
+        "line": 13,
+        "source": "from . import v6_claims, v6_delegation, v6_graph, v6_protein"
+      }
+    ]
+  },
+  "inventory_counts": {
+    "goal_markers": 24,
+    "direct_mode_comparisons": 4,
+    "grid_equality": 8,
+    "other_grid_predicates": 2,
+    "protein_imports": 7,
+    "protein_modules": 4
+  },
+  "reviewed_documents_sha256": {
+    "V6_ACCEPTANCE.md": "089df911312fb59e9bce094c5d9ba367d637cab48471106e1d963f7d1dbca8e4",
+    "V6_DEPLOYMENT.md": "34a55603f0d416b3b6f0a179c7e0b85390d13adebd642396385eb67f55ffebaa",
+    "acceptance/v6/engineering/README.md": "ab49c15e21eb6b14efcd7a7b88d2a364ad8bcf4b91827592e0614e1d5b92ca35",
+    "acceptance/v6/m0/baseline-audit.json": "0e3e3e223a6c2502c7db49fb738eb8d516f28c6beb0fd08a9beee1dd8fddfc6e"
+  },
+  "environment": {
+    "python": "3.11.9",
+    "sqlite": "3.45.3",
+    "machine": "x86_64",
+    "node": "v22.17.0",
+    "npm": "10.9.2",
+    "Biopython": "1.88",
+    "numpy": "1.26.4"
+  }
+}

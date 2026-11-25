@@ -1,0 +1,357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GX scoped research decision submission, version 1",
+  "description": "Wire request created by the authenticated GX transport. The model supplies only decision. For a new base use null.",
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "watch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "subject_ref"
+      ],
+      "properties": {
+        "event": {
+          "enum": [
+            "goal_changed",
+            "evidence_added",
+            "claim_changed",
+            "job_settled",
+            "budget_changed",
+            "operator_reopened"
+          ]
+        },
+        "subject_ref": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "head": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "sha256"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "rationale",
+        "evidence_refs",
+        "reconsider_when",
+        "ops"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "amend",
+            "resolve"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/text"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "uniqueItems": true
+        },
+        "reconsider_when": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/watch"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "ops": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "branch",
+                  "hypothesis",
+                  "method_family",
+                  "alternative",
+                  "discriminating_observation",
+                  "budget_limits",
+                  "stop_condition"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "open_branch"
+                  },
+                  "branch": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "hypothesis": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "method_family": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "alternative": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "discriminating_observation": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "budget_limits": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "propertyNames": {
+                      "enum": [
+                        "job_submissions",
+                        "worker_tasks",
+                        "cpu_seconds",
+                        "gpu_jobs",
+                        "gpu_minutes",
+                        "tokens",
+                        "api_calls"
+                      ]
+                    },
+                    "additionalProperties": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  },
+                  "stop_condition": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "branch",
+                  "node",
+                  "capability",
+                  "inputs",
+                  "parameters",
+                  "depends_on",
+                  "question"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "add_node"
+                  },
+                  "branch": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "node": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "capability": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "inputs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "uniqueItems": true
+                  },
+                  "parameters": {
+                    "type": "object"
+                  },
+                  "depends_on": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "uniqueItems": true
+                  },
+                  "question": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "branch",
+                  "reason"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "stop_branch"
+                  },
+                  "branch": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "reason": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "node",
+                  "reason"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "cancel_node"
+                  },
+                  "node": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "reason": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "reason",
+                  "claim_refs",
+                  "unresolved"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "close_run"
+                  },
+                  "reason": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "claim_refs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "uniqueItems": true
+                  },
+                  "unresolved": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "resolve"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ops": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "ops": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "decision_task_id",
+    "lease_id",
+    "scope",
+    "goal_version",
+    "context_ref",
+    "base",
+    "idempotency_key",
+    "draft_sha256",
+    "decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "gx.v6.decision.1"
+    },
+    "run_id": {
+      "$ref": "#/$defs/text"
+    },
+    "decision_task_id": {
+      "$ref": "#/$defs/text"
+    },
+    "lease_id": {
+      "$ref": "#/$defs/text"
+    },
+    "scope": {
+      "$ref": "#/$defs/text"
+    },
+    "goal_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "context_ref": {
+      "$ref": "#/$defs/text"
+    },
+    "base": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/head"
+        }
+      ]
+    },
+    "idempotency_key": {
+      "$ref": "#/$defs/text"
+    },
+    "draft_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "decision": {
+      "$ref": "#/$defs/decision"
+    }
+  }
+}

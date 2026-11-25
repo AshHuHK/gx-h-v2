@@ -208,6 +208,10 @@ def _resync_same_major(conn: sqlite3.Connection, meta: dict[str, str]) -> None:
     with transaction(conn, transaction_owner="Store", operation="resync_schema") as tx:
         if read_meta(tx).get(META_CONTRACT_SHA256) == contracts.contract_digest()["__combined__"]:
             return  # another process brought it up to date while this one waited for the lock
+        # A published P0 install may already own these names. Validate before
+        # any ALTER/CREATE or new stamp could hide a missing or divergent object.
+        from ..p0.schema import verify_promoted
+        verify_promoted(tx, require_all=False)
         for table, clause in additions:
             tx.execute(f"ALTER TABLE {table} ADD COLUMN {clause}")
         added = {(table, clause.split()[0]) for table, clause in additions}

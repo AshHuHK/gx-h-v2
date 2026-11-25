@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 import json
 
+from .. import contracts
 from ..domain import ids
 from ..errors import BudgetExceeded, IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..orchestration import seams
@@ -10,16 +11,7 @@ from ..persistence import store
 from . import v6_decisions, v6_goal
 
 
-TOOL = {
-    "type": "function", "name": "gx_delegate_branch",
-    "description": ("Assign one decision on an open branch. Its Jobs use that branch’s fixed resource limits. "
-                    "The Run pays for the worker task and native turn, subject to any further branch ceilings."),
-    "inputSchema": {"type": "object", "additionalProperties": False,
-        "properties": {
-            "branch_id": {"type": "string", "description": "Durable ID of an open branch in this brief."},
-            "question": {"type": "string", "description": "Scientific question for the branch owner to decide."}},
-        "required": ["branch_id", "question"]},
-}
+TOOL = contracts.native_goal_tool_spec("gx_delegate_branch")
 
 
 @dataclass(frozen=True)

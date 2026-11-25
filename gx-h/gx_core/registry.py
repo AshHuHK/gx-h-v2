@@ -172,12 +172,14 @@ class _SectionEntry:
 # --------------------------------------------------------------------------- tables
 
 TOOLS: dict[str, ToolHandler] = {}
+# Root-authenticated callbacks use native transport context, never a public MCP Ctx.
+NATIVE_GOAL_TOOLS: dict[str, Callable[..., Any]] = {}
 BUNDLE_VALIDATORS: dict[str, BundleValidator] = {}
 CHECKS: dict[str, Check] = {}
 BRIEF_SECTIONS: dict[str, _SectionEntry] = {}
 
 #: name -> module that published it, per table. What :func:`report` prints.
-_OWNERS: dict[str, dict[str, str]] = {"tools": {}, "bundle_validators": {}, "checks": {}, "brief_sections": {}}
+_OWNERS: dict[str, dict[str, str]] = {"tools": {}, "native_goal_tools": {}, "bundle_validators": {}, "checks": {}, "brief_sections": {}}
 
 
 def _same_function(old: Callable[..., Any], new: Callable[..., Any]) -> bool:
@@ -210,6 +212,19 @@ def tool(name: str) -> Callable[[ToolHandler], ToolHandler]:
         return fn
 
     return decorate
+
+
+def native_goal_tool(name: str):
+    """Bind a handler that receives the actual P0 Roots owner and official request."""
+    def decorate(fn):
+        _publish(NATIVE_GOAL_TOOLS, "native_goal_tools", name, fn, contracts.native_goal_tool_names())
+        return fn
+    return decorate
+
+
+def native_goal_handler_for(name: str):
+    load_providers()
+    return NATIVE_GOAL_TOOLS.get(name)
 
 
 def bundle_validator(kind: str) -> Callable[[BundleValidator], BundleValidator]:
@@ -267,7 +282,7 @@ def sections_for(task_kind: str) -> list[_SectionEntry]:
 PROVIDERS: tuple[str, ...] = (
     "gx_core.orchestration.tools", "gx_core.teams.tools", "gx_core.teams.manager_tools",
     "gx_core.artifacts.tools", "gx_core.governance.tools", "gx_core.knowledge.tools",
-    "gx_core.jobs.tools", "gx_core.capabilities.tools", "gx_core.hostobs.projection",
+    "gx_core.jobs.tools", "gx_core.capabilities.tools", "gx_core.hostobs.projection", "gx_core.p0.v6_native",
 )
 
 _LOADED: dict[str, str | None] | None = None
@@ -307,6 +322,7 @@ def compatibility_only() -> dict[str, list[str]]:
     load_providers()
     return {
         "tools": sorted(set(_all_tool_names()) - set(TOOLS)),
+        "native_goal_tools": sorted(set(contracts.native_goal_tool_names()) - set(NATIVE_GOAL_TOOLS)),
         "bundle_validators": sorted(set(contracts.bundle_kinds()) - set(BUNDLE_VALIDATORS)),
         "checks": sorted(set(contracts.check_ids()) - set(CHECKS)),
     }

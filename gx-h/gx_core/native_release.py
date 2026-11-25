@@ -127,9 +127,11 @@ def _verify_database(db: Path, expected_sha: str) -> None:
     after = db.stat()
     if (before.st_dev, before.st_ino) != (after.st_dev, after.st_ino):
         raise ReleaseStateError("native database identity changed during preflight")
-    if meta.get("contract_sha256") == expected_sha:
-        return
     digest = contracts.contract_digest()
+    if (meta.get("contract_sha256") == expected_sha
+            and meta.get("db_schema_sha256") == digest["db_schema.sql"]
+            and meta.get("contract_version") == str(contracts.contract_version())):
+        return
     previous_sha = meta.get("contract_sha256", "")
     migration = json.loads((contracts.CONFIG_DIR / "native_contract_migrations.json").read_text())
     known_schema = any(route.get("contract_sha256") == previous_sha and
@@ -139,8 +141,8 @@ def _verify_database(db: Path, expected_sha: str) -> None:
             or meta.get("contract_version") != str(contracts.contract_version())
             or (meta.get("db_schema_sha256") != digest["db_schema.sql"] and not known_schema)):
         raise ReleaseStateError("native database contract differs incompatibly from this release")
-    # This is an API/procedure update within the same owned release and identical
-    # DDL. store.ensure_schema records its normal old/new contract event at connect.
+    # Same-DDL API updates and explicitly declared additive DDL sources pass
+    # to the existing schema owner. It records the old/new contract at connect.
     # The marker retains its original contract identity; no historical run is edited.
 
 

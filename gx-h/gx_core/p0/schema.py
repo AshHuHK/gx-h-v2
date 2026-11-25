@@ -3,8 +3,10 @@
 from functools import lru_cache
 import hashlib
 from pathlib import Path
+import re
 import sqlite3
 
+from ..errors import StoreUnavailable
 from ..persistence import store
 
 
@@ -25,6 +27,51 @@ def migrations():
     return parts
 
 
+# These exact, released migrations now have a second representation in the
+# formal contract. Their original bytes remain the migration ledger identity.
+_PROMOTED = frozenset(f"p0.migration.{name}" for name in (
+    "v6.sql", "v6_job_indexes.sql", "v6_funding.sql", "v6_native.sql",
+    "zzzzzzzzzz_v6_job_attempts.sql",
+))
+_CREATE = re.compile(r"^CREATE (?:TABLE|INDEX|TRIGGER) (\w+)\b", re.MULTILINE)
+
+
+@lru_cache(maxsize=1)
+def _promoted_objects():
+    objects = {}
+    for key, digest, statements in migrations():
+        if key not in _PROMOTED:
+            continue
+        for statement in statements:
+            create = _CREATE.search(statement)
+            if create is None:
+                raise ValueError(f"Unsupported statement in released migration {key}")
+            # SQLite stores CREATE text from the first keyword, omits the final
+            # semicolon and strips IF NOT EXISTS. This compares the entire FK,
+            # CHECK, UNIQUE, partial-index predicate, or trigger body.
+            sql = statement[create.start():].strip().removesuffix(";")
+            objects[create[1]] = (key, digest, sql)
+    return objects
+
+
+def verify_promoted(conn, *, require_all):
+    meta = store.read_meta(conn)
+    installed = dict(conn.execute(
+        "SELECT lower(name),sql FROM sqlite_schema "
+        "WHERE lower(name) GLOB 'v6_*' OR lower(name)='p0_v6_native_calls'"
+    ))
+    for name, (key, digest, sql) in _promoted_objects().items():
+        if key in meta and meta[key] != digest:
+            raise ValueError(f"Applied P0 migration changed on disk: {key}")
+        if name not in installed and not require_all and key not in meta:
+            continue  # An older store has not reached this migration.
+        if installed.get(name) != sql:
+            raise StoreUnavailable(
+                f"Published V6 schema object {name} differs from {key}",
+                details={"reason": "contract_shape_mismatch", "object": name, "migration": key},
+            )
+
+
 def install(conn):
     applied = store.read_meta(conn)
     pending = []
@@ -37,12 +84,15 @@ def install(conn):
     if not pending:
         return
     with store.transaction(conn, transaction_owner="Store", operation="install_p0_schema") as tx:
+        if any(key in _PROMOTED for key, _, _ in pending):
+            verify_promoted(tx, require_all=True)
         for key, digest, statements in pending:
             row = tx.execute("SELECT value FROM schema_meta WHERE key=?", (key,)).fetchone()
             if row and row[0] == digest:
                 continue
             if row:
                 raise ValueError(f"Incompatible P0 migration: {key}")
-            for statement in statements:
-                tx.execute(statement)
+            if key not in _PROMOTED:
+                for statement in statements:
+                    tx.execute(statement)
             tx.execute("INSERT INTO schema_meta(key,value) VALUES(?,?)", (key, digest))

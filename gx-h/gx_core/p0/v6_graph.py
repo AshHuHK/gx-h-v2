@@ -1,30 +1,15 @@
 """Compile a Lead's operation list against one immutable instance graph, outside the writer."""
 from collections import Counter
-from functools import lru_cache
 from graphlib import CycleError, TopologicalSorter
 import json
-from pathlib import Path
 
-from .. import budgets, schema
+from .. import budgets, contracts, schema
 from ..domain import ids
 from ..errors import BudgetExceeded, SchemaInvalid, ScopeDenied
 
 
-@lru_cache(maxsize=1)
 def decision_schema():
-    """Official tool shape with local schema references inlined for the native host."""
-    definitions = json.loads(Path(__file__).with_name("v6_revision.schema.json").read_text())["$defs"]
-
-    def expand(value):
-        if isinstance(value, list):
-            return [expand(item) for item in value]
-        if not isinstance(value, dict):
-            return value
-        if "$ref" in value:
-            return expand(definitions[value["$ref"].split("/")[-1]])
-        return {key: expand(item) for key, item in value.items()}
-
-    return expand(definitions["decision"])
+    return contracts.native_goal_tool_spec("gx_decide_revision")["inputSchema"]["properties"]["decision"]
 
 
 def _shape(value, spec):

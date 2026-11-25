@@ -1,0 +1,62 @@
+{
+  "commit": "47fc728d32bc10ba478df6a063529a8d98f98828",
+  "kind": "independent fresh baseline execution, release-matched local Python and wheels, public-protocol fixtures, CPU workloads",
+  "environment_source": "base.json",
+  "groups": {
+    "v6": {
+      "command": [
+        "../.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_v6_*.py",
+        "-v"
+      ],
+      "cwd": "gx-h",
+      "PATH_prefix": "../.venv/bin",
+      "exit": 0,
+      "tests": 45,
+      "seconds": 31.074,
+      "log": "45-v6.log",
+      "sha256": "7e0ab3dac8c0ea1505869591a40ae7dbb69400b4db1c3d3133682651c746a6f9",
+      "skips": [],
+      "failures": [],
+      "checked_geometry_cases": []
+    },
+    "inherited": {
+      "command": [
+        "../.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_phase2a_engine",
+        "tests.test_phase2a_resume_policy",
+        "tests.test_p0_wait_leases",
+        "tests.test_native_crash_receipts",
+        "tests.test_p0_roots",
+        "tests.test_p0_root_delivery",
+        "tests.test_v3_plugins",
+        "tests.test_tl1a_geometry"
+      ],
+      "cwd": "gx-h",
+      "PATH_prefix": "../.venv/bin",
+      "exit": 0,
+      "tests": 62,
+      "seconds": 16.634,
+      "log": "62-legacy.log",
+      "sha256": "2c36547782d1d8b86616d3c85e33da56e203d2e58eb4aa8c866e8a3e7e2aa559",
+      "skips": [],
+      "failures": [],
+      "checked_geometry_cases": [
+        "test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project (tests.test_tl1a_geometry.GeometryWorkflow.test_confirmed_changed_objective_reuses_original_job_receipts_in_same_project) ... ok",
+        "test_formal_geometry_criterion_and_changed_criterion_on_original_measurements (tests.test_tl1a_geometry.GeometryWorkflow.test_formal_geometry_criterion_and_changed_criterion_on_original_measurements) ... ok",
+        "test_quality_frozen_plan_real_jobs_independent_review_and_next_investigation (tests.test_tl1a_geometry.GeometryWorkflow.test_quality_frozen_plan_real_jobs_independent_review_and_next_investigation) ... ok"
+      ]
+    }
+  }
+}

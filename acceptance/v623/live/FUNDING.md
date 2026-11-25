@@ -5,7 +5,10 @@
 ```bash
 .venv/bin/python -B acceptance/v623/live/pilot.py preflight --host live
 .venv/bin/python -B -m unittest -v acceptance.v623.test_live_funding
+.venv/bin/python -B -m acceptance.v623.installed_meter_control --work /tmp/gx-new-installed-owner-control
 ```
+
+第三個命令需使用新的外部目錄。它在沒有外網路由的 Linux network namespace 內，以測試管理員和供應商代替真實部署，讓一個正常 GX Goal 真正透過正式宿主路徑、官方 Codex、已安裝計量介接程式走完一筆模擬計費及回執。其所有數字只用於工程驗收。
 
 預檢只會查官方宿主、路由、模型目錄、部署計量契約與授權。當前鎖定的 Codex 0.169.0 原生 OAuth 沒有涵蓋所有計費 token 的請求上界。缺少計量部署時會列出 `HARD_CAP_UNAVAILABLE`。沒有本批授權時另列 `AUTHORIZATION_MISSING`。日後接通經驗證的部署時，`run` 與 `resume` 首次可能付費。
 

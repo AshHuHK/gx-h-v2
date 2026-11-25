@@ -1,11 +1,9 @@
 """Run one installed-owner transport control on the official production host path without an external network."""
 import argparse
 from contextlib import closing, ExitStack
-from datetime import datetime, timedelta, timezone
 import fcntl
 import hashlib
 import json
-import os
 from pathlib import Path
 import socket
 import struct
@@ -40,7 +38,8 @@ class IsolatedProvider:
 
     def __init__(self, directory):
         self.directory = Path(directory)
-        if Path("/proc/net/route").read_text().splitlines()[1:]:
+        v6 = {line.split()[-1] for line in Path("/proc/net/ipv6_route").read_text().splitlines()}
+        if Path("/proc/net/route").read_text().splitlines()[1:] or v6 - {"lo"}:
             raise ValueError("A mock priced owner requires the isolated namespace")
 
     def deployment_receipt(self):
@@ -76,6 +75,9 @@ class IsolatedProvider:
 def run(work):
     network = isolated_network()
     work.mkdir(mode=0o700, parents=True, exist_ok=False)
+    save(work/"control-context.json", {"classification":"ISOLATED_PROVISIONED_OWNER_CONTROL",
+         "scope":"Transport and accounting control with stub PI/provider. All bills and model outputs here are synthetic.",
+         "network":network, "new_real_model_inference":0, "counts_toward_public_four":False})
     site = work / "isolated-site"
     site.mkdir()
     candidate = subprocess.check_output(["git","rev-parse","HEAD"], cwd=deployment.ROOT,text=True).strip()

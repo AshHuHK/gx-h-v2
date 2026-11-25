@@ -48,7 +48,7 @@ def terminal_metadata(wire):
     response = terminal["response"]
     status = terminal["type"].split(".", 1)[1]
     if response.get("status", status) != status:
-        raise FundingBlocked("Provider terminal status conflicts with the original event")
+        status = "CONFLICT"
     return {"id": response.get("id"), "model": response.get("model"), "status": status}
 
 
@@ -180,9 +180,10 @@ class FundedTransport:
     def request(self, *, slot, scope, request_id, body):
         self.reserve(slot=slot, scope=scope, request_id=request_id, body=body)
         with self._db(write=True) as db:
-            if self._totals(db)["breaches"]:
-                raise FundingBlocked("A provider exceeded its quote; new sends suspended")
-            if db.execute("SELECT state FROM requests WHERE request_id=?", (request_id,)).fetchone()[0] == "HELD":
+            state = db.execute("SELECT state FROM requests WHERE request_id=?", (request_id,)).fetchone()[0]
+            if state == "HELD":
+                if self._totals(db)["breaches"]:
+                    raise FundingBlocked("A provider exceeded its quote; new sends suspended")
                 self._require_active()
             send = db.execute("""UPDATE requests SET state='UNKNOWN', sent_intent_utc=?
                                  WHERE request_id=? AND state='HELD'""", (_now(), request_id)).rowcount

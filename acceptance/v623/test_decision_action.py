@@ -15,7 +15,7 @@ def comparison_open():
     return {**draft(branch("route")),
             "comparison_plan": {
                 "branch": "local:route",
-                "material_role": "material",
+                "material_role": "structure",
                 "method": {"capability": "deposited-chain-geometry@2", "parameters": {"mask": "common_ca"},
                            "output_name": "geometry.json", "metric_id": "coverage", "unit": "1"},
             }}
@@ -30,6 +30,11 @@ class AcceptedAction(unittest.TestCase):
         with CloseStudy(work, spec_updates={"plugins": ["org.gx.protein@0.3.0"],
                                             "capabilities": ["deposited-chain-geometry@2"],
                                             "research_modules": []}) as s:
+            forged = comparison_open()
+            forged["comparison_plan"]["method"]["output_name"] = "unregistered-coverage.json"
+            with self.assertRaises((ScopeDenied, SchemaInvalid)):
+                s.call(s.lead, "gx_decide_revision", {"decision": forged}, "unregistered-method")
+            self.assertFalse(s.rows("SELECT 1 FROM events WHERE kind='v6.decision.committed'"))
             first = s.call(s.lead, "gx_decide_revision", {"decision": comparison_open()}, "open")
             binding = first["comparison"]
             self.assertEqual(binding["initial_event"], first["event_id"])

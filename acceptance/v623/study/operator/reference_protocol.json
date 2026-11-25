@@ -1,0 +1,88 @@
+{
+  "series": "GX-GEOMETRY-BLOCK-INFLUENCE-01",
+  "version": 1,
+  "source_protocol_sha256": "5f97c99777ff84bd8e77bd934d530c7098ee8e204b540c1b22d4a91a0fbff8a7",
+  "neutral_goal_sha256": "bdc18a95be6e7512ab2c0dd6cd2afca7675a915b836fe5a99301c9e86e01dc2e",
+  "source_baseline": "e6520f53ca19ef8eae3ec0915af74e9bfc6dcdca",
+  "status": "FROZEN_OPERATOR_REFERENCE",
+  "study_class": "Retrospective quality control of public archive coordinates. New numeric endpoints can be opened under this engineering protocol. A separate production Lead requires its own grant and prospective decision record.",
+  "inputs": [
+    {
+      "entry": "2RE9",
+      "repository_path": "gx-h/adapters/scientific/tl1a_geometry/data/2RE9.cif",
+      "descriptor": "examples/v621-coordinate-analysis/2RE9.json",
+      "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "record": "https://www.rcsb.org/structure/2RE9"
+    },
+    {
+      "entry": "2O0O",
+      "repository_path": "acceptance/v61/adaptive/data/2O0O.cif",
+      "descriptor": "examples/v621-coordinate-analysis/2O0O.json",
+      "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103",
+      "record": "https://www.rcsb.org/structure/2O0O"
+    }
+  ],
+  "order": [
+    "2RE9",
+    "2O0O"
+  ],
+  "model": "1",
+  "label_entity": "1",
+  "label_chains": [
+    "A",
+    "B",
+    "C"
+  ],
+  "chain_pairs": [
+    "AB",
+    "AC",
+    "BC"
+  ],
+  "per_deposit_registration": "Record initial hypotheses before first access. Before opening the next deposit, preserve the chosen prediction, scope, metric, intended interpretation and stage event.",
+  "primary_mask": "common_backbone",
+  "sensitivity_mask": "common_ca",
+  "atom_matching": "Common label position, matched residue identity and atom name in all three chains. Use the pinned geometry method selection, occupancy and alternate location rules. Compare deposits separately.",
+  "block_index": "(label_seq_id - 1) // 20",
+  "block_universe": "Include all intervals from position 1 through the last declared polymer position or observed selected-chain position, whichever is larger.",
+  "minimum_initial_matched": 60,
+  "minimum_coverage_of_observed_union": 0.6,
+  "minimum_matched_in_block": 10,
+  "minimum_remaining_matched": 60,
+  "minimum_remaining_fraction": 0.6,
+  "min_blocks_for_overall_conclusion": 3,
+  "endpoints": {
+    "delta_angle_deg": {
+      "definition": "absolute difference of unsigned rotation angles from proper fits before and after deletion",
+      "report_tolerance": 0.5,
+      "single_fit_absolute_tolerance": 0.01,
+      "delta_absolute_tolerance": 0.02,
+      "unit": "degree"
+    },
+    "delta_rmsd_angstrom": {
+      "definition": "absolute difference of fitted RMSD scalars from proper fits before and after deletion",
+      "report_tolerance": 0.15,
+      "single_fit_absolute_tolerance": 0.001,
+      "delta_absolute_tolerance": 0.002,
+      "unit": "angstrom"
+    }
+  },
+  "comparison": "Unrounded values; strict greater-than. Flag if validation tolerance overlaps the reporting threshold. Missing, insufficient or nonidentifiable fits are NA.",
+  "hidden_exception": "For each endpoint and block independently: absolute difference between the three-pair medians before and after deletion within tolerance and at least one individual pair exceeds tolerance.",
+  "dispersed_reference": {
+    "seed_format": "GX-BLOCK-QC-1|input_sha|mask|block_index|k|label_seq_id",
+    "pool": "All matched positions outside the tested interval; interval eligibility for block deletion does not limit individual control positions.",
+    "sort": "Lexicographic SHA-256 digest bytes of UTF-8, tie by ascending position. ASCII decimal integers, lowercase input digest.",
+    "size": "same number of positions as removed from the target block",
+    "min_distinct_intervals": 3,
+    "unique_sets": 20,
+    "k_first": 0,
+    "k_last": 1023,
+    "interpretation": "Requires 20 distinct qualifying control sets, exceedance of the reporting tolerance and a strictly larger change than every control. Descriptive comparison only."
+  },
+  "hypotheses": {
+    "H1": "All eligible comparisons in the asserted domain stay within the corresponding endpoint tolerance.",
+    "H2": "At least one eligible pair and interval exceeds its endpoint tolerance."
+  },
+  "known_at_registration": "Both deposited input files and earlier whole-chain summaries were public. New block-influence numeric answers had not been computed or viewed by this operator at the time of this protocol.",
+  "independence": "Second deposit is delayed public comparison material. The two deposits share a publication; biological sampling independence is unknown. Independent numerical recomputation reuses the same originals."
+}

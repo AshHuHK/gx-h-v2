@@ -3,6 +3,7 @@
 import argparse
 from contextlib import closing
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -17,6 +18,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 BASELINE = "c4c5b66a55739b38b34684360810d05f18f9a21a"
+QUICK_DRIVER = "acceptance/v6/engineering/official.py"
 RELEASE_FILES = (
     "bin/gx-p0", "gx-h", "codex_adapter", "examples/paired-grid.json", "release-assets/lock.json",
 )
@@ -47,7 +49,7 @@ def db_facts(state):
 def materialize_old(repo, deploy):
     deploy.mkdir()
     with tempfile.TemporaryFile() as stream:
-        subprocess.run(["git", "-C", repo, "archive", BASELINE, *RELEASE_FILES], stdout=stream, check=True)
+        subprocess.run(["git", "-C", repo, "archive", BASELINE, *RELEASE_FILES, QUICK_DRIVER], stdout=stream, check=True)
         stream.seek(0)
         with tarfile.open(fileobj=stream, mode="r:") as contents:
             contents.extractall(deploy, filter="data")
@@ -71,12 +73,18 @@ def quick_compatibility(work):
         sys.path.insert(0, str(engineering))
     # The released verifier imports public_cli by module name. Hook its CLI path to the
     # stable deployment directory, retaining its decision script and transport checks.
-    import official
     import public_cli as official_cli
 
     work.mkdir(parents=True)
     deploy, state = work / "release", work / "state"
     materialize_old(ROOT, deploy)
+    # Create the original Goal with its own revision's fixture. A current fresh-Goal
+    # verifier can require fields which the old CLI correctly rejects.
+    driver_file = deploy / QUICK_DRIVER
+    driver_sha = hashlib.sha256(driver_file.read_bytes()).hexdigest()
+    loader = importlib.util.spec_from_file_location("a7_original_quick_driver", driver_file)
+    official = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(official)
     material = work / "public-2RE9.cif"
     shutil.copy2(official.STRUCTURE, material)
     out = work / "loopback"
@@ -109,6 +117,8 @@ def quick_compatibility(work):
     assert marker == (state / ".gx-native-state.json").read_bytes()
     assert after["run"]["run_id"] == q["run_id"] == rid
     assert before["run"]["inputs_json"] == after["run"]["inputs_json"]
+    original_goal = (work / "goal.json").read_bytes()
+    assert {"historical_replay", "evidence_policy"}.isdisjoint(json.loads(original_goal))
     assert after["tasks"][0]["task_id"] == old_task and {r["scope"] for r in after["tasks"]} == {"run"}
     assert after["run"]["contract_sha256"] == before["run"]["contract_sha256"]
     assert after["jobs"][0]["status"] == "SUCCEEDED" and len(after["jobs"]) == 1
@@ -130,7 +140,9 @@ def quick_compatibility(work):
                           "tool_names": json.loads(root["tool_names_json"]),
                           "tool_summary_count": len(json.loads(root["tool_names_json"]))})
     return {
-        "old_revision": BASELINE, "run_id": rid, "original_task_id": old_task,
+        "old_revision": BASELINE, "original_driver": QUICK_DRIVER, "original_driver_sha256": driver_sha,
+        "original_goal_sha256": hashlib.sha256(original_goal).hexdigest(), "original_goal_fields": sorted(json.loads(original_goal)),
+        "run_id": rid, "original_task_id": old_task,
         "source_marker_sha256": hashlib.sha256(marker).hexdigest(), "initial_contract": before["contract"],
         "candidate_contract": after["contract"], "retained_run_contract": after["run"]["contract_sha256"],
         "turns": turns, "native_requests_to_local_peer": len(turns), "jobs": q["jobs"], "heads": q["versions"], "raw_records_dir": "quick/loopback",

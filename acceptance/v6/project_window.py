@@ -170,16 +170,21 @@ def material_documents(capture):
             pass
 
 
-def packet_view(mode, spec, native, before, decision, arch):
+def packet_view(mode, spec, native, before, decision, arch, registered_packet=None):
     goal_row, = before.rows["v6_goals"]
     brief = v.parse(native["brief"].split("\n", 1)[1])
     v.need(brief["goal"] == goal_row["goal"] and brief["head"] == before.graph(), "goal/base changed before turn")
     grants = brief["evidence_refs"]
     observations, results = [], {}
     if mode == "controls":
-        v.need(spec["packet_id"] in {"p17","p42","p63"}, "unknown control packet")
-        goal, initial, packet = [v.parse((HERE / "inputs" / (stem + ".json")).read_bytes())
-                                 for stem in ("goal","initial",spec["packet_id"])]
+        goal, initial = [v.parse((HERE / "inputs" / (stem + ".json")).read_bytes()) for stem in ("goal", "initial")]
+        if registered_packet is None:
+            v.need(spec["packet_id"] in {"p17","p42","p63"}, "unknown control packet")
+            packet = v.parse((HERE / "inputs" / (spec["packet_id"] + ".json")).read_bytes())
+        else:
+            packet = registered_packet
+            v.need(packet["packet_id"] == spec["packet_id"] and packet["base_digest"] == v.digest(initial),
+                   "registered control differs from the captured case or initial state")
         materials = [d for _,d in material_documents(before)]
         v.need(goal in materials and initial in materials and brief["goal"] == goal["question"],
                "matched prestate/Goal were not registered as actual run materials")
@@ -279,7 +284,7 @@ def stop_events(archive, before, settled, decision, start, ops):
     return refs
 
 
-def resolve_window(archive, mode, path):
+def resolve_window(archive, mode, path, *, registered_packet=None):
     spec = v.parse(path.read_bytes())
     def location(key):
         return path.parent / spec[key]
@@ -301,7 +306,7 @@ def resolve_window(archive, mode, path):
     official = v.parse(call["request_json"])
     v.need(official["arguments"] == v.parse(args["arguments"]) and official["tool"] == "gx_decide_revision",
            "rollout and official callback parameters disagree")
-    goal, initial, packet, presented, results = packet_view(mode, spec, native, before, decision, archive)
+    goal, initial, packet, presented, results = packet_view(mode, spec, native, before, decision, archive, registered_packet)
     claim_ids = {r["hypothesis_id"] for r in receipt.get("claim_revisions", [])}
     if not claim_ids:
         claim_ids = {h["hypothesis_id"] for h in before.rows["hypotheses"]}

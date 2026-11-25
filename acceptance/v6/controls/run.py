@@ -79,38 +79,47 @@ def bootstrap_fixture(db, state, run_id, initial):
         (run_id, tid, call),
     ).fetchone()
     if finished:
-        return json.loads(finished[0])
-    root = roots._claim(task_id)
-    roots._bind(root, {"id": tid, "sessionId": tid, "cwd": root["cwd"], "source": "appServer"})
-    # Public controls start with a synthetic logical head. Seed the acknowledged fixture input
-    # only, with no provider reservation. Its deterministic IDs exclude it from live scoring.
-    with store.transaction(
-        db, transaction_owner="AcceptanceV6", operation="fixture_delivery", run_id=run_id
-    ):
-        db.execute(
-            "INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,human,"
-            "interrupt,state,method,turn_id) VALUES (?,?,?,?,?,0,0,?,?,?)",
-            (
-                run_id,
-                "fixture-initial",
-                tid,
-                "fixture-initial",
-                hashlib.sha256(root["brief"].encode()).hexdigest(),
-                "acknowledged",
-                "turn/start",
-                turn,
-            ),
+        receipt = json.loads(finished[0])
+    else:
+        root = roots._claim(task_id)
+        roots._bind(root, {"id": tid, "sessionId": tid, "cwd": root["cwd"], "source": "appServer"})
+        # Public controls start with a synthetic logical head. Seed the acknowledged fixture input
+        # only, with no provider reservation. Its deterministic IDs exclude it from live scoring.
+        with store.transaction(
+            db, transaction_owner="AcceptanceV6", operation="fixture_delivery", run_id=run_id
+        ):
+            db.execute(
+                "INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,human,"
+                "interrupt,state,method,turn_id) VALUES (?,?,?,?,?,0,0,?,?,?)",
+                (
+                    run_id,
+                    "fixture-initial",
+                    tid,
+                    "fixture-initial",
+                    hashlib.sha256(root["brief"].encode()).hexdigest(),
+                    "acknowledged",
+                    "turn/start",
+                    turn,
+                ),
+            )
+        receipt = v6_decisions.adopt(
+            db,
+            run_id=run_id,
+            task_id=task_id,
+            lease_id=root["lease_id"],
+            thread_id=tid,
+            turn_id=turn,
+            call_id=call,
+            decision=seed_decision(refs, initial),
         )
-    return v6_decisions.adopt(
-        db,
-        run_id=run_id,
-        task_id=task_id,
-        lease_id=root["lease_id"],
-        thread_id=tid,
-        turn_id=turn,
-        call_id=call,
-        decision=seed_decision(refs, initial),
-    )
+    # Release the acknowledged fixture delivery only after its synthetic setup callback
+    # has returned. An open fixture turn would indefinitely occupy a one-slot provider.
+    with store.transaction(db, transaction_owner="AcceptanceV6", operation="finish_fixture_delivery", run_id=run_id):
+        db.execute(
+            "INSERT OR IGNORE INTO p0_root_turn_usage(thread_id,turn_id,terminal_status) VALUES (?,?,'completed')",
+            (tid, turn),
+        )
+    return receipt
 
 
 def inject(db, run_id, packet):

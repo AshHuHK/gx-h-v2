@@ -1,0 +1,722 @@
+[
+  {
+    "call_id": "call-fixture-1",
+    "request_sha256": "a737279ba2038dc51cc5f22cca6bd168ab0bb3c07d1331e3d1592bb6382fe56a",
+    "visible": {
+      "branches": [],
+      "budget": {
+        "available": {
+          "api_calls": 8,
+          "cpu_seconds": 300,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 10,
+          "tokens": 1000000,
+          "wall_hours": 1,
+          "worker_tasks": 24
+        },
+        "initial_job_limit": 5,
+        "limits": {
+          "api_calls": 8,
+          "cpu_seconds": 300,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 10,
+          "tokens": 1000000,
+          "wall_hours": 1,
+          "worker_tasks": 24
+        },
+        "reserved": {},
+        "spent": {}
+      },
+      "capabilities": [
+        {
+          "capability_version": "deposited-chain-geometry@1",
+          "inputs": [
+            "structure"
+          ],
+          "limitations": "Comparisons within the asymmetric unit of two deposited structures from one crystallographic study; the method does not estimate population variance or functional properties.",
+          "manifest_sha256": "76c391b87e066d4b7be4acceb90eccc5c21889ca4f64bbd7df7077919be1332b",
+          "method": {
+            "estimator": "Match label position, residue and atom within model 1/entity 1/A,B,C. Report observed-union coverage, proper Horn least-squares fit, unsigned rotation in degrees and fitted RMSD in angstrom.",
+            "family": "coordinate_geometry",
+            "mechanism": "One archived 2RE9 or 2O0O mmCIF per invocation. mask is common_ca, common_backbone (all four shared atoms), or ordered_backbone (all four shared atoms, full occupancy and B <= 40 across all chains).",
+            "objective": "Describe the effect of atom selection on observed chain-pair geometry.",
+            "training_data_lineage": "Deterministic coordinate analysis."
+          },
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json",
+              "required": true
+            }
+          ],
+          "plugin": {
+            "id": "org.gx.protein",
+            "sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+            "version": "0.2.0"
+          },
+          "portable_sha256": "91840fdb7cac9024e0e8b9374e36afc94b7149e100da3b0bfd4278c08a754249",
+          "provider_closure": [
+            {
+              "id": "org.gx.protein",
+              "sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+              "version": "0.2.0"
+            }
+          ]
+        }
+      ],
+      "claims": [],
+      "evidence_refs": [
+        "gxa_01m88cavbzwtnf25fg",
+        "gxa_01m88cavc4amnz5w2j"
+      ],
+      "goal": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+      "goal_version": 1,
+      "head": null,
+      "intent": {
+        "objective": {
+          "value": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+          "version": 1
+        }
+      },
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m88cavbzwtnf25fg",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m88cavc4amnz5w2j",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        }
+      ],
+      "nodes": [],
+      "observations": [],
+      "previous_decision": null,
+      "run_id": "gxr_01m88cavbgg8q1x7q3",
+      "scope": "run",
+      "trigger": {
+        "changes": [],
+        "since_cursor": 0,
+        "through_cursor": 0
+      }
+    },
+    "catalog": [
+      "gx",
+      "gx_decide_revision",
+      "gx_read_artifact",
+      "gx_stage_claim",
+      "gx_task_context"
+    ],
+    "decision": {
+      "mode": "amend",
+      "rationale": "Test whether the selected subset covers the deposited chains.",
+      "evidence_refs": [],
+      "reconsider_when": [
+        {
+          "event": "job_settled",
+          "subject_ref": "run"
+        }
+      ],
+      "ops": [
+        {
+          "op": "open_branch",
+          "branch": "local:geometry",
+          "hypothesis": "The ordered mask has broad coverage.",
+          "alternative": "Many deposited positions may be outside this mask.",
+          "method_family": "geometry",
+          "discriminating_observation": "Count supported positions.",
+          "stop_condition": "Inspect remaining evidence.",
+          "budget_limits": {
+            "job_submissions": 5,
+            "cpu_seconds": 150
+          }
+        },
+        {
+          "op": "add_node",
+          "node": "local:one",
+          "branch": "local:geometry",
+          "capability": "deposited-chain-geometry@1",
+          "inputs": [
+            "gxa_01m88cavbzwtnf25fg"
+          ],
+          "parameters": {
+            "mask": "ordered_backbone"
+          },
+          "depends_on": [],
+          "question": "How many deposited positions meet this mask?"
+        }
+      ]
+    }
+  },
+  {
+    "call_id": "call-fixture-2",
+    "request_sha256": "a54d3039bd43a77d648dc1096fb5d21307bc25e69c2c6274842594abf0ec0e1d",
+    "visible": {
+      "branches": [
+        {
+          "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "spec": {
+            "alternative": "Many deposited positions may be outside this mask.",
+            "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "budget_limits": {
+              "cpu_seconds": 150,
+              "job_submissions": 5
+            },
+            "discriminating_observation": "Count supported positions.",
+            "hypothesis": "The ordered mask has broad coverage.",
+            "method_family": "geometry",
+            "op": "open_branch",
+            "stop_condition": "Inspect remaining evidence."
+          },
+          "status": "OPEN"
+        }
+      ],
+      "budget": {
+        "available": {
+          "api_calls": 7,
+          "cpu_seconds": 299,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 9,
+          "tokens": 999965,
+          "wall_hours": 1,
+          "worker_tasks": 24
+        },
+        "limits": {
+          "api_calls": 8,
+          "cpu_seconds": 300,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 10,
+          "tokens": 1000000,
+          "wall_hours": 1,
+          "worker_tasks": 24
+        },
+        "reserved": {},
+        "spent": {
+          "api_calls": 1,
+          "cpu_seconds": 1,
+          "job_submissions": 1,
+          "tokens": 35
+        }
+      },
+      "capabilities": [
+        {
+          "capability_version": "deposited-chain-geometry@1",
+          "inputs": [
+            "structure"
+          ],
+          "limitations": "Comparisons within the asymmetric unit of two deposited structures from one crystallographic study; the method does not estimate population variance or functional properties.",
+          "manifest_sha256": "76c391b87e066d4b7be4acceb90eccc5c21889ca4f64bbd7df7077919be1332b",
+          "method": {
+            "estimator": "Match label position, residue and atom within model 1/entity 1/A,B,C. Report observed-union coverage, proper Horn least-squares fit, unsigned rotation in degrees and fitted RMSD in angstrom.",
+            "family": "coordinate_geometry",
+            "mechanism": "One archived 2RE9 or 2O0O mmCIF per invocation. mask is common_ca, common_backbone (all four shared atoms), or ordered_backbone (all four shared atoms, full occupancy and B <= 40 across all chains).",
+            "objective": "Describe the effect of atom selection on observed chain-pair geometry.",
+            "training_data_lineage": "Deterministic coordinate analysis."
+          },
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json",
+              "required": true
+            }
+          ],
+          "plugin": {
+            "id": "org.gx.protein",
+            "sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+            "version": "0.2.0"
+          },
+          "portable_sha256": "91840fdb7cac9024e0e8b9374e36afc94b7149e100da3b0bfd4278c08a754249",
+          "provider_closure": [
+            {
+              "id": "org.gx.protein",
+              "sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+              "version": "0.2.0"
+            }
+          ]
+        }
+      ],
+      "claims": [],
+      "evidence_refs": [
+        "gxa_01m88cavbzwtnf25fg",
+        "gxa_01m88cavc4amnz5w2j",
+        "gxa_01m88cax6vd6pbc7sv"
+      ],
+      "goal": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+      "goal_version": 1,
+      "head": {
+        "sha256": "efcce16be2fdb6beac1eaf5c75a2bd88dd4ec70a90be85babdcc137b2c4258d2",
+        "version": 1
+      },
+      "intent": {
+        "objective": {
+          "value": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+          "version": 1
+        }
+      },
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m88cavbzwtnf25fg",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m88cavc4amnz5w2j",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        }
+      ],
+      "nodes": [
+        {
+          "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "commission": {
+            "capability": "deposited-chain-geometry@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m88cavbzwtnf25fg"
+            ],
+            "parameters": {
+              "mask": "ordered_backbone"
+            },
+            "question": "How many deposited positions meet this mask?"
+          },
+          "exec_key": "b7a0e49a25d3205aa117bf396a351571fa815efad0429c904f00f2cbc4e46bcf",
+          "job_id": "gxj_01m88cawwp68xt3dt4",
+          "node_id": "node_e0e9cd367e0d11938e8d11b7dbc74102",
+          "result_ref": "gxa_01m88cax6vd6pbc7sv",
+          "status": "SUCCEEDED",
+          "version": 1,
+          "wait": null
+        }
+      ],
+      "observations": [
+        {
+          "artifact_ref": "gxa_01m88cax6vd6pbc7sv",
+          "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "event": "v6.node.settled",
+          "event_id": 44,
+          "id": "node_e0e9cd367e0d11938e8d11b7dbc74102",
+          "node_id": "node_e0e9cd367e0d11938e8d11b7dbc74102",
+          "observation": {
+            "chains": [
+              "A",
+              "B",
+              "C"
+            ],
+            "coverage_fraction": 0.29878048780487804,
+            "entry": "2RE9",
+            "input_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+            "label_entity": "1",
+            "mask": "ordered_backbone",
+            "matched_keys_sha256": "e0dea83487c919cb38e486539cd8c1e616e77d21701e770c450ffdf673651512",
+            "method": "deposited-chain-geometry@1",
+            "model": "1",
+            "observed_union_residues": 164,
+            "pairs": [
+              {
+                "fitted_rmsd_angstrom": 0.1236746941729654,
+                "fixed_chain": "A",
+                "moving_chain": "B",
+                "rotation_angle_deg": 120.16825736986071
+              },
+              {
+                "fitted_rmsd_angstrom": 0.12184698327904085,
+                "fixed_chain": "A",
+                "moving_chain": "C",
+                "rotation_angle_deg": 120.11283383478522
+              },
+              {
+                "fitted_rmsd_angstrom": 0.13048718621497052,
+                "fixed_chain": "B",
+                "moving_chain": "C",
+                "rotation_angle_deg": 119.72112595621311
+              }
+            ],
+            "schema": "gx.deposited_chain_geometry/1",
+            "selected_atoms": 196,
+            "selected_residues": 49
+          },
+          "sha256": "d7d7de37690f14bb67abb37efd9ea1adb8a9448efd4ce3d6553961688e503216",
+          "source_job_id": "gxj_01m88cawwp68xt3dt4",
+          "status": "SUCCEEDED",
+          "subject_ref": "node_e0e9cd367e0d11938e8d11b7dbc74102"
+        }
+      ],
+      "previous_decision": {
+        "consumed_cursor": 0,
+        "decision_ref": "gxa_e2340e90894609bdd0322fe3b5981e5a31f47786aa99569c8b9d61bb9507070d",
+        "evidence_refs": [],
+        "head": {
+          "sha256": "efcce16be2fdb6beac1eaf5c75a2bd88dd4ec70a90be85babdcc137b2c4258d2",
+          "version": 1
+        },
+        "outcome": "adopted",
+        "rationale": "Test whether the selected subset covers the deposited chains.",
+        "reconsider_when": [
+          {
+            "event": "job_settled",
+            "subject_ref": "run"
+          }
+        ],
+        "scope": "run"
+      },
+      "run_id": "gxr_01m88cavbgg8q1x7q3",
+      "scope": "run",
+      "trigger": {
+        "changes": [
+          {
+            "event": "v6.node.settled",
+            "event_id": 44,
+            "matched_watches": [
+              {
+                "event": "job_settled",
+                "subject_ref": "run"
+              }
+            ],
+            "scope": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "subject_ref": "node_e0e9cd367e0d11938e8d11b7dbc74102"
+          }
+        ],
+        "since_cursor": 0,
+        "through_cursor": 44
+      }
+    },
+    "catalog": [
+      "gx",
+      "gx_decide_revision",
+      "gx_delegate_branch",
+      "gx_read_artifact",
+      "gx_stage_claim",
+      "gx_task_context"
+    ],
+    "decision": {
+      "mode": "amend",
+      "rationale": "The returned coverage determines the next mask; the second deposition lacks a measurement.",
+      "evidence_refs": [
+        "gxa_01m88cax6vd6pbc7sv"
+      ],
+      "reconsider_when": [
+        {
+          "event": "job_settled",
+          "subject_ref": "run"
+        }
+      ],
+      "ops": [
+        {
+          "op": "add_node",
+          "node": "local:two",
+          "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "capability": "deposited-chain-geometry@1",
+          "inputs": [
+            "gxa_01m88cavc4amnz5w2j"
+          ],
+          "parameters": {
+            "mask": "common_ca"
+          },
+          "depends_on": [],
+          "question": "Measure the second deposited model."
+        }
+      ]
+    }
+  },
+  {
+    "call_id": "call-fixture-3",
+    "request_sha256": "29890183ea98a00d93cbfc5e7fcdf3755a67bda3b0b32131a4a84c4e53fa8440",
+    "visible": {
+      "branches": [
+        {
+          "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "spec": {
+            "alternative": "Many deposited positions may be outside this mask.",
+            "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "budget_limits": {
+              "cpu_seconds": 150,
+              "job_submissions": 5
+            },
+            "discriminating_observation": "Count supported positions.",
+            "hypothesis": "The ordered mask has broad coverage.",
+            "method_family": "geometry",
+            "op": "open_branch",
+            "stop_condition": "Inspect remaining evidence."
+          },
+          "status": "OPEN"
+        }
+      ],
+      "budget": {
+        "available": {
+          "api_calls": 6,
+          "cpu_seconds": 298,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 8,
+          "tokens": 999930,
+          "wall_hours": 1,
+          "worker_tasks": 24
+        },
+        "limits": {
+          "api_calls": 8,
+          "cpu_seconds": 300,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 10,
+          "tokens": 1000000,
+          "wall_hours": 1,
+          "worker_tasks": 24
+        },
+        "reserved": {},
+        "spent": {
+          "api_calls": 2,
+          "cpu_seconds": 2,
+          "job_submissions": 2,
+          "tokens": 70
+        }
+      },
+      "capabilities": [
+        {
+          "capability_version": "deposited-chain-geometry@1",
+          "inputs": [
+            "structure"
+          ],
+          "limitations": "Comparisons within the asymmetric unit of two deposited structures from one crystallographic study; the method does not estimate population variance or functional properties.",
+          "manifest_sha256": "76c391b87e066d4b7be4acceb90eccc5c21889ca4f64bbd7df7077919be1332b",
+          "method": {
+            "estimator": "Match label position, residue and atom within model 1/entity 1/A,B,C. Report observed-union coverage, proper Horn least-squares fit, unsigned rotation in degrees and fitted RMSD in angstrom.",
+            "family": "coordinate_geometry",
+            "mechanism": "One archived 2RE9 or 2O0O mmCIF per invocation. mask is common_ca, common_backbone (all four shared atoms), or ordered_backbone (all four shared atoms, full occupancy and B <= 40 across all chains).",
+            "objective": "Describe the effect of atom selection on observed chain-pair geometry.",
+            "training_data_lineage": "Deterministic coordinate analysis."
+          },
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json",
+              "required": true
+            }
+          ],
+          "plugin": {
+            "id": "org.gx.protein",
+            "sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+            "version": "0.2.0"
+          },
+          "portable_sha256": "91840fdb7cac9024e0e8b9374e36afc94b7149e100da3b0bfd4278c08a754249",
+          "provider_closure": [
+            {
+              "id": "org.gx.protein",
+              "sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+              "version": "0.2.0"
+            }
+          ]
+        }
+      ],
+      "claims": [],
+      "evidence_refs": [
+        "gxa_01m88cavbzwtnf25fg",
+        "gxa_01m88cavc4amnz5w2j",
+        "gxa_01m88cay7r52ac4we6",
+        "gxa_01m88cax6vd6pbc7sv"
+      ],
+      "goal": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+      "goal_version": 1,
+      "head": {
+        "sha256": "7d6163b0ca651ae31f480e0d31034b298535e85a82b7e21e2732a0e58dcedc61",
+        "version": 2
+      },
+      "intent": {
+        "objective": {
+          "value": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+          "version": 1
+        }
+      },
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m88cavbzwtnf25fg",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m88cavc4amnz5w2j",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        }
+      ],
+      "nodes": [
+        {
+          "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "commission": {
+            "capability": "deposited-chain-geometry@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m88cavbzwtnf25fg"
+            ],
+            "parameters": {
+              "mask": "ordered_backbone"
+            },
+            "question": "How many deposited positions meet this mask?"
+          },
+          "exec_key": "b7a0e49a25d3205aa117bf396a351571fa815efad0429c904f00f2cbc4e46bcf",
+          "job_id": "gxj_01m88cawwp68xt3dt4",
+          "node_id": "node_e0e9cd367e0d11938e8d11b7dbc74102",
+          "result_ref": "gxa_01m88cax6vd6pbc7sv",
+          "status": "SUCCEEDED",
+          "version": 1,
+          "wait": null
+        },
+        {
+          "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "commission": {
+            "capability": "deposited-chain-geometry@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m88cavc4amnz5w2j"
+            ],
+            "parameters": {
+              "mask": "common_ca"
+            },
+            "question": "Measure the second deposited model."
+          },
+          "exec_key": "edee28637193af6988db83c4f6a3071df4e52ff80250a61e16296d9997782ece",
+          "job_id": "gxj_01m88caxs3b3cftpvd",
+          "node_id": "node_c4e1105723079e79f3a33f006b188abe",
+          "result_ref": "gxa_01m88cay7r52ac4we6",
+          "status": "SUCCEEDED",
+          "version": 2,
+          "wait": null
+        }
+      ],
+      "observations": [
+        {
+          "artifact_ref": "gxa_01m88cay7r52ac4we6",
+          "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "event": "v6.node.settled",
+          "event_id": 68,
+          "id": "node_c4e1105723079e79f3a33f006b188abe",
+          "node_id": "node_c4e1105723079e79f3a33f006b188abe",
+          "observation": {
+            "chains": [
+              "A",
+              "B",
+              "C"
+            ],
+            "coverage_fraction": 0.9934640522875817,
+            "entry": "2O0O",
+            "input_sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103",
+            "label_entity": "1",
+            "mask": "common_ca",
+            "matched_keys_sha256": "1004ee8e04480fa01c67157a90a098b520684516656748ae2a64619f27cb39e3",
+            "method": "deposited-chain-geometry@1",
+            "model": "1",
+            "observed_union_residues": 153,
+            "pairs": [
+              {
+                "fitted_rmsd_angstrom": 0.8138518140250616,
+                "fixed_chain": "A",
+                "moving_chain": "B",
+                "rotation_angle_deg": 119.40623208692193
+              },
+              {
+                "fitted_rmsd_angstrom": 0.8132924171225488,
+                "fixed_chain": "A",
+                "moving_chain": "C",
+                "rotation_angle_deg": 119.74788155508259
+              },
+              {
+                "fitted_rmsd_angstrom": 1.0803407489371941,
+                "fixed_chain": "B",
+                "moving_chain": "C",
+                "rotation_angle_deg": 120.8135388994745
+              }
+            ],
+            "schema": "gx.deposited_chain_geometry/1",
+            "selected_atoms": 152,
+            "selected_residues": 152
+          },
+          "sha256": "a4049efb2da251e23139095c9ccb9d8f9fb4667e1b87109bf26177fcc3313286",
+          "source_job_id": "gxj_01m88caxs3b3cftpvd",
+          "status": "SUCCEEDED",
+          "subject_ref": "node_c4e1105723079e79f3a33f006b188abe"
+        }
+      ],
+      "previous_decision": {
+        "consumed_cursor": 44,
+        "decision_ref": "gxa_13d50e0f38b8638a225fa496ad4f4886bc27ddc9d341370576d2123d06f7e974",
+        "evidence_refs": [
+          "gxa_01m88cax6vd6pbc7sv"
+        ],
+        "head": {
+          "sha256": "7d6163b0ca651ae31f480e0d31034b298535e85a82b7e21e2732a0e58dcedc61",
+          "version": 2
+        },
+        "outcome": "adopted",
+        "rationale": "The returned coverage determines the next mask; the second deposition lacks a measurement.",
+        "reconsider_when": [
+          {
+            "event": "job_settled",
+            "subject_ref": "run"
+          }
+        ],
+        "scope": "run"
+      },
+      "run_id": "gxr_01m88cavbgg8q1x7q3",
+      "scope": "run",
+      "trigger": {
+        "changes": [
+          {
+            "event": "v6.node.settled",
+            "event_id": 68,
+            "matched_watches": [
+              {
+                "event": "job_settled",
+                "subject_ref": "run"
+              }
+            ],
+            "scope": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "subject_ref": "node_c4e1105723079e79f3a33f006b188abe"
+          }
+        ],
+        "since_cursor": 44,
+        "through_cursor": 68
+      }
+    },
+    "catalog": [
+      "gx",
+      "gx_decide_revision",
+      "gx_delegate_branch",
+      "gx_read_artifact",
+      "gx_stage_claim",
+      "gx_task_context"
+    ],
+    "decision": {
+      "mode": "amend",
+      "rationale": "The scripted protocol exercise obtained the follow-up observation.",
+      "evidence_refs": [
+        "gxa_01m88cay7r52ac4we6"
+      ],
+      "reconsider_when": [
+        {
+          "event": "goal_changed",
+          "subject_ref": "run"
+        }
+      ],
+      "ops": [
+        {
+          "op": "close_run",
+          "reason": "Scripted engineering endpoint reached.",
+          "claim_refs": [],
+          "unresolved": [
+            "This short protocol did not complete the scientific comparison."
+          ]
+        }
+      ]
+    }
+  }
+]

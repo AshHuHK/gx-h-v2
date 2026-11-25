@@ -123,7 +123,7 @@ def setup_source():
     }
 
 
-def prepare(private, reviewer, *, api_calls=1):
+def prepare(private, reviewer, *, api_calls=1, packets=None, run_options=None):
     private, reviewer = private.resolve(), reviewer.resolve()
     if private == reviewer or private in reviewer.parents or reviewer in private.parents:
         raise ValueError("Choose disjoint private-state and reviewer directories")
@@ -131,7 +131,10 @@ def prepare(private, reviewer, *, api_calls=1):
         raise ValueError("Use working directories outside the source tree")
     if private.exists() or reviewer.exists():
         raise FileExistsError("Use new working directories to preserve prior trials")
-    goal, initial, packets = fixture_objects()
+    goal, initial, public = fixture_objects()
+    packets = list(public if packets is None else packets)
+    if not packets or any(p['base_digest'] != digest(initial) for p in packets):
+        raise ValueError('Intervention must match the frozen initial state')
     citations = citation_rows()
     private.mkdir(parents=True, mode=0o700)
     reviewer.mkdir(parents=True, mode=0o700)
@@ -177,6 +180,7 @@ def prepare(private, reviewer, *, api_calls=1):
         save(
             world / "goal-config.json",
             {
+                **(run_options or {}),
                 "project": "v6-matched-controls",
                 "capabilities": CAPABILITIES,
                 "run_budget": {**LIMITS, "api_calls": api_calls},
@@ -185,7 +189,10 @@ def prepare(private, reviewer, *, api_calls=1):
                 "input_files": [{"path": str(path), "role": role} for role, path in inputs.items()],
             },
         )
-        shutil.copyfile(V6 / "inputs" / (packet["packet_id"] + ".json"), review / "intervention.json")
+        if packet in public:
+            shutil.copyfile(V6 / "inputs" / (packet["packet_id"] + ".json"), review / "intervention.json")
+        else:
+            save(review / "intervention.json", packet)
         plan.append(
             {
                 "slot": slot,
@@ -202,7 +209,7 @@ def prepare(private, reviewer, *, api_calls=1):
             "version": 1,
             "goal_digest": digest(goal),
             "initial_digest": digest(initial),
-            "design": "three synthetic matched interventions",
+            "design": f"{len(packets)} synthetic matched interventions",
             "api_calls_per_run": api_calls,
             "source": setup_source(),
             "worlds": plan,

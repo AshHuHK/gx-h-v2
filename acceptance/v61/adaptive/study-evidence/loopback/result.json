@@ -1,0 +1,489 @@
+{
+  "actual_delegations": [],
+  "branches": [
+    "branch_87a4aa2300e865b225c0fd4b2dc14dfc"
+  ],
+  "closed": true,
+  "cold_identity": {
+    "claims": [],
+    "decisions": [
+      "gxa_13d50e0f38b8638a225fa496ad4f4886bc27ddc9d341370576d2123d06f7e974",
+      "gxa_7043b6e5ed705f1fc90010f148922b83594b28fe37b2a38aa2b3db403262e11f",
+      "gxa_e2340e90894609bdd0322fe3b5981e5a31f47786aa99569c8b9d61bb9507070d"
+    ],
+    "graph_versions": [
+      [
+        1,
+        "efcce16be2fdb6beac1eaf5c75a2bd88dd4ec70a90be85babdcc137b2c4258d2"
+      ],
+      [
+        2,
+        "7d6163b0ca651ae31f480e0d31034b298535e85a82b7e21e2732a0e58dcedc61"
+      ],
+      [
+        3,
+        "4f111c733233e82a3cf411ff1f03bc91d5b94c398fb422564361456e3c683844"
+      ]
+    ],
+    "jobs": [
+      "gxj_01m88cawwp68xt3dt4",
+      "gxj_01m88caxs3b3cftpvd"
+    ],
+    "turns": [
+      [
+        "01a210c5-723b-7551-8ace-88bfa5f2da55",
+        "01a210c5-7265-7ff1-8018-2ed01ec4a919"
+      ],
+      [
+        "01a210c5-7615-74a0-aeb5-5f759becdcc6",
+        "01a210c5-7637-7aa3-9c63-91edddb16941"
+      ],
+      [
+        "01a210c5-791f-74b3-9099-53255b20ec0d",
+        "01a210c5-7930-75f1-ab8f-f725cbda9850"
+      ]
+    ]
+  },
+  "costs": {
+    "budget_ref": "gxb_01m88cavbpdqn9wetx",
+    "jobs_recorded": 2,
+    "lines": {
+      "api_calls": {
+        "booked": 3,
+        "limit": 8,
+        "remaining": 5,
+        "reserved": 0,
+        "unit": "calls"
+      },
+      "cpu_seconds": {
+        "booked": 2,
+        "limit": 300,
+        "remaining": 298,
+        "reserved": 0,
+        "unit": "CPU seconds"
+      },
+      "gpu_jobs": {
+        "booked": 0,
+        "limit": 0,
+        "remaining": 0,
+        "reserved": 0,
+        "unit": "GPU jobs"
+      },
+      "gpu_minutes": {
+        "booked": 0,
+        "limit": 0,
+        "remaining": 0,
+        "reserved": 0,
+        "unit": "GPU minutes"
+      },
+      "job_submissions": {
+        "booked": 2,
+        "limit": 10,
+        "remaining": 8,
+        "reserved": 0,
+        "unit": "submissions"
+      },
+      "tokens": {
+        "booked": 105,
+        "limit": 1000000,
+        "remaining": 999895,
+        "reserved": 0,
+        "unit": "tokens"
+      },
+      "wall_hours": {
+        "booked": 0,
+        "limit": 1,
+        "remaining": 1,
+        "reserved": 0,
+        "unit": "wall hours"
+      },
+      "worker_tasks": {
+        "booked": 0,
+        "limit": 24,
+        "remaining": 24,
+        "reserved": 0,
+        "unit": "tasks"
+      }
+    },
+    "measured_cpu": {
+      "observed": 0.169,
+      "observed_jobs": 2,
+      "pending_or_unmeasured_jobs": 0,
+      "unit": "CPU seconds"
+    },
+    "provider_charge": {
+      "amount": null,
+      "source": "provider_money_cost",
+      "unit": "USD"
+    },
+    "tokens": {
+      "possibly_understated": [],
+      "provider_attributed": 105,
+      "provisional_booked": 0,
+      "unattributed_delta": 0,
+      "unit": "tokens",
+      "unresolved": []
+    }
+  },
+  "cross_branch_physical_overlap": [],
+  "decisions": [
+    {
+      "base": null,
+      "brief_sha256": "932de5b4fffdf0067e91dfd86d96ffd285122d46e77dc5fe2077e578af7f36f6",
+      "call": "call-fixture-1",
+      "cited": [],
+      "context": "gxcx_01m88cavchc9f6wggs",
+      "decision": "gxa_e2340e90894609bdd0322fe3b5981e5a31f47786aa99569c8b9d61bb9507070d",
+      "event": 30,
+      "head": {
+        "sha256": "efcce16be2fdb6beac1eaf5c75a2bd88dd4ec70a90be85babdcc137b2c4258d2",
+        "version": 1
+      },
+      "mode": "amend",
+      "native_call_line": 9,
+      "new_jobs": [],
+      "ops": [
+        {
+          "op_digest": "caed9647605301784b592516b6f0e9ea4df089866949601ccf866662016e0f31",
+          "source_index": 0,
+          "spec": {
+            "alternative": "Many deposited positions may be outside this mask.",
+            "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "budget_limits": {
+              "cpu_seconds": 150,
+              "job_submissions": 5
+            },
+            "discriminating_observation": "Count supported positions.",
+            "hypothesis": "The ordered mask has broad coverage.",
+            "method_family": "geometry",
+            "op": "open_branch",
+            "stop_condition": "Inspect remaining evidence."
+          }
+        },
+        {
+          "op_digest": "842e7e7b5d8843852ca63e2952fa438470fd62fb0cb9921660fe03f64c673e18",
+          "source_index": 1,
+          "spec": {
+            "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "capability": "deposited-chain-geometry@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m88cavbzwtnf25fg"
+            ],
+            "node": "node_e0e9cd367e0d11938e8d11b7dbc74102",
+            "op": "add_node",
+            "parameters": {
+              "mask": "ordered_backbone"
+            },
+            "question": "How many deposited positions meet this mask?"
+          }
+        }
+      ],
+      "prospective_conditions": [],
+      "rationale": "Test whether the selected subset covers the deposited chains.",
+      "rollout_sha256": "cc3ee903cff67e2e1c1792e7ef8b0dc2f48677bee58bff2be9c8e72d857ed702",
+      "stopped": [],
+      "thread": "01a210c5-723b-7551-8ace-88bfa5f2da55",
+      "turn": "01a210c5-7265-7ff1-8018-2ed01ec4a919",
+      "verified_graph_effect": false
+    },
+    {
+      "base": {
+        "sha256": "efcce16be2fdb6beac1eaf5c75a2bd88dd4ec70a90be85babdcc137b2c4258d2",
+        "version": 1
+      },
+      "brief_sha256": "19bfeed7eda6910fee194c16dcc76a8b867bd0609685afc7744665de71a00200",
+      "call": "call-fixture-2",
+      "cited": [
+        {
+          "native_saw_value": true,
+          "new_to_lead_scope": true,
+          "origin_job": "gxj_01m88cawwp68xt3dt4",
+          "ref": "gxa_01m88cax6vd6pbc7sv",
+          "settled_event": 44,
+          "sha256": "d7d7de37690f14bb67abb37efd9ea1adb8a9448efd4ce3d6553961688e503216",
+          "value": {
+            "chains": [
+              "A",
+              "B",
+              "C"
+            ],
+            "coverage_fraction": 0.29878048780487804,
+            "entry": "2RE9",
+            "input_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+            "label_entity": "1",
+            "mask": "ordered_backbone",
+            "matched_keys_sha256": "e0dea83487c919cb38e486539cd8c1e616e77d21701e770c450ffdf673651512",
+            "method": "deposited-chain-geometry@1",
+            "model": "1",
+            "observed_union_residues": 164,
+            "pairs": [
+              {
+                "fitted_rmsd_angstrom": 0.1236746941729654,
+                "fixed_chain": "A",
+                "moving_chain": "B",
+                "rotation_angle_deg": 120.16825736986071
+              },
+              {
+                "fitted_rmsd_angstrom": 0.12184698327904085,
+                "fixed_chain": "A",
+                "moving_chain": "C",
+                "rotation_angle_deg": 120.11283383478522
+              },
+              {
+                "fitted_rmsd_angstrom": 0.13048718621497052,
+                "fixed_chain": "B",
+                "moving_chain": "C",
+                "rotation_angle_deg": 119.72112595621311
+              }
+            ],
+            "schema": "gx.deposited_chain_geometry/1",
+            "selected_atoms": 196,
+            "selected_residues": 49
+          }
+        }
+      ],
+      "context": "gxcx_01m88cax7cj8wh91mz",
+      "decision": "gxa_13d50e0f38b8638a225fa496ad4f4886bc27ddc9d341370576d2123d06f7e974",
+      "event": 54,
+      "head": {
+        "sha256": "7d6163b0ca651ae31f480e0d31034b298535e85a82b7e21e2732a0e58dcedc61",
+        "version": 2
+      },
+      "mode": "amend",
+      "native_call_line": 9,
+      "new_jobs": [
+        {
+          "job": "gxj_01m88caxs3b3cftpvd",
+          "node": "node_c4e1105723079e79f3a33f006b188abe",
+          "result": "gxa_01m88cay7r52ac4we6"
+        }
+      ],
+      "ops": [
+        {
+          "op_digest": "c6a8aef3f0e73ae85963e9f6d75348a5dd9c991bc0264553426b36f8597f1b12",
+          "source_index": 0,
+          "spec": {
+            "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "capability": "deposited-chain-geometry@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m88cavc4amnz5w2j"
+            ],
+            "node": "node_c4e1105723079e79f3a33f006b188abe",
+            "op": "add_node",
+            "parameters": {
+              "mask": "common_ca"
+            },
+            "question": "Measure the second deposited model."
+          }
+        }
+      ],
+      "prospective_conditions": [
+        "insufficient_coverage",
+        "uncommissioned_comparison"
+      ],
+      "rationale": "The returned coverage determines the next mask; the second deposition lacks a measurement.",
+      "rollout_sha256": "1fb38ce684f8e59388589bb25311cfe55d80430f9d0cc2e8f18ecc62dabec654",
+      "stopped": [],
+      "thread": "01a210c5-7615-74a0-aeb5-5f759becdcc6",
+      "turn": "01a210c5-7637-7aa3-9c63-91edddb16941",
+      "verified_graph_effect": true
+    },
+    {
+      "base": {
+        "sha256": "7d6163b0ca651ae31f480e0d31034b298535e85a82b7e21e2732a0e58dcedc61",
+        "version": 2
+      },
+      "brief_sha256": "8645885e3e7e7f244d813a55dfcdd5b6a359fd17863bbacf506e9af145be665e",
+      "call": "call-fixture-3",
+      "cited": [
+        {
+          "native_saw_value": true,
+          "new_to_lead_scope": true,
+          "origin_job": "gxj_01m88caxs3b3cftpvd",
+          "ref": "gxa_01m88cay7r52ac4we6",
+          "settled_event": 68,
+          "sha256": "a4049efb2da251e23139095c9ccb9d8f9fb4667e1b87109bf26177fcc3313286",
+          "value": {
+            "chains": [
+              "A",
+              "B",
+              "C"
+            ],
+            "coverage_fraction": 0.9934640522875817,
+            "entry": "2O0O",
+            "input_sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103",
+            "label_entity": "1",
+            "mask": "common_ca",
+            "matched_keys_sha256": "1004ee8e04480fa01c67157a90a098b520684516656748ae2a64619f27cb39e3",
+            "method": "deposited-chain-geometry@1",
+            "model": "1",
+            "observed_union_residues": 153,
+            "pairs": [
+              {
+                "fitted_rmsd_angstrom": 0.8138518140250616,
+                "fixed_chain": "A",
+                "moving_chain": "B",
+                "rotation_angle_deg": 119.40623208692193
+              },
+              {
+                "fitted_rmsd_angstrom": 0.8132924171225488,
+                "fixed_chain": "A",
+                "moving_chain": "C",
+                "rotation_angle_deg": 119.74788155508259
+              },
+              {
+                "fitted_rmsd_angstrom": 1.0803407489371941,
+                "fixed_chain": "B",
+                "moving_chain": "C",
+                "rotation_angle_deg": 120.8135388994745
+              }
+            ],
+            "schema": "gx.deposited_chain_geometry/1",
+            "selected_atoms": 152,
+            "selected_residues": 152
+          }
+        }
+      ],
+      "context": "gxcx_01m88cay8an30tadkr",
+      "decision": "gxa_7043b6e5ed705f1fc90010f148922b83594b28fe37b2a38aa2b3db403262e11f",
+      "event": 79,
+      "head": {
+        "sha256": "4f111c733233e82a3cf411ff1f03bc91d5b94c398fb422564361456e3c683844",
+        "version": 3
+      },
+      "mode": "amend",
+      "native_call_line": 9,
+      "new_jobs": [],
+      "ops": [
+        {
+          "op_digest": "2833b5d08c0bb9a11eff506522f186a4afd423730b7abe7fbc07635db43144f3",
+          "source_index": 0,
+          "spec": {
+            "claim_refs": [],
+            "op": "close_run",
+            "reason": "Scripted engineering endpoint reached.",
+            "unresolved": [
+              "This short protocol did not complete the scientific comparison."
+            ]
+          }
+        }
+      ],
+      "prospective_conditions": [
+        "uncommissioned_comparison"
+      ],
+      "rationale": "The scripted protocol exercise obtained the follow-up observation.",
+      "rollout_sha256": "36332a600fed3b701ca7dfb2f964a6c5cd45f959b9409a47f577b474a598c617",
+      "stopped": [],
+      "thread": "01a210c5-791f-74b3-9099-53255b20ec0d",
+      "turn": "01a210c5-7930-75f1-ab8f-f725cbda9850",
+      "verified_graph_effect": false
+    }
+  ],
+  "first_revision_nodes": 1,
+  "fresh_native_threads": 3,
+  "independent_numeric_checks": [
+    {
+      "entry": "2RE9",
+      "fits": [
+        {
+          "angle_difference": 0.0,
+          "pair": [
+            "A",
+            "B"
+          ],
+          "reference_angle": 120.16825736986071,
+          "reference_rmsd": 0.12367469417296385,
+          "rmsd_difference": 1.5404344466674047e-15
+        },
+        {
+          "angle_difference": 0.0,
+          "pair": [
+            "A",
+            "C"
+          ],
+          "reference_angle": 120.11283383478522,
+          "reference_rmsd": 0.12184698327904052,
+          "rmsd_difference": 3.3306690738754696e-16
+        },
+        {
+          "angle_difference": 8.526512829121202e-14,
+          "pair": [
+            "B",
+            "C"
+          ],
+          "reference_angle": 119.72112595621303,
+          "reference_rmsd": 0.1304871862149713,
+          "rmsd_difference": 7.771561172376096e-16
+        }
+      ],
+      "mask": "ordered_backbone",
+      "selected_positions": 49,
+      "structure_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+    },
+    {
+      "entry": "2O0O",
+      "fits": [
+        {
+          "angle_difference": 5.684341886080802e-14,
+          "pair": [
+            "A",
+            "B"
+          ],
+          "reference_angle": 119.40623208692188,
+          "reference_rmsd": 0.813851814025061,
+          "rmsd_difference": 5.551115123125783e-16
+        },
+        {
+          "angle_difference": 1.4210854715202004e-14,
+          "pair": [
+            "A",
+            "C"
+          ],
+          "reference_angle": 119.74788155508257,
+          "reference_rmsd": 0.8132924171225488,
+          "rmsd_difference": 0.0
+        },
+        {
+          "angle_difference": 1.4210854715202004e-14,
+          "pair": [
+            "B",
+            "C"
+          ],
+          "reference_angle": 120.81353889947451,
+          "reference_rmsd": 1.080340748937194,
+          "rmsd_difference": 2.220446049250313e-16
+        }
+      ],
+      "mask": "common_ca",
+      "selected_positions": 152,
+      "structure_sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+    }
+  ],
+  "interpretation": "This check links source bytes, delivered observation, accepted native call, graph revision and actual changed work. Scientific interpretation of these decisions is reviewed separately.",
+  "jobs": [
+    "gxj_01m88cawwp68xt3dt4",
+    "gxj_01m88caxs3b3cftpvd"
+  ],
+  "observed_evidence_to_graph_effect": true,
+  "rule_condition_seen": true,
+  "run_id": "gxr_01m88cavbgg8q1x7q3",
+  "source_class": "SCRIPTED_OFFICIAL_LOOPBACK",
+  "worker_process_intervals": [
+    {
+      "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+      "finish": "2026-11-25T03:35:05.682Z",
+      "job_id": "gxj_01m88cawwp68xt3dt4",
+      "start": "2026-11-25T03:35:05.462Z",
+      "tool_pid": 450031
+    },
+    {
+      "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+      "finish": "2026-11-25T03:35:06.734Z",
+      "job_id": "gxj_01m88caxs3b3cftpvd",
+      "start": "2026-11-25T03:35:06.512Z",
+      "tool_pid": 450042
+    }
+  ]
+}

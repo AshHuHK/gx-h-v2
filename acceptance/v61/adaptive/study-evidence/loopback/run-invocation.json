@@ -1,0 +1,730 @@
+{
+  "argv": [
+    "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-v6.1/bin/gx-p0",
+    "run",
+    "--state",
+    "/tmp/gx-v61-adaptive-loopback-frozen/state",
+    "--run-id",
+    "gxr_01m88cavbgg8q1x7q3",
+    "--timeout",
+    "45"
+  ],
+  "exit_code": 0,
+  "finished_ns": 1795577707028043682,
+  "pid": 449949,
+  "started_ns": 1795577703910472047,
+  "stderr_bytes": 0,
+  "stdout": {
+    "attempt_waits": [],
+    "capabilities": {
+      "deposited-chain-geometry@1": "91840fdb7cac9024e0e8b9374e36afc94b7149e100da3b0bfd4278c08a754249"
+    },
+    "claims": [],
+    "completed_nodes": [],
+    "decisions": [
+      {
+        "aliases": {
+          "local:geometry": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+          "local:one": "node_e0e9cd367e0d11938e8d11b7dbc74102"
+        },
+        "base": null,
+        "checkpoint_id": "gxc_01m88cawswqf6y1dvx",
+        "claim_revisions": [],
+        "consumed_event_cursor": 0,
+        "context_ref": "gxcx_01m88cavchc9f6wggs",
+        "decision_id": "gxa_e2340e90894609bdd0322fe3b5981e5a31f47786aa99569c8b9d61bb9507070d",
+        "decision_ref": "gxa_e2340e90894609bdd0322fe3b5981e5a31f47786aa99569c8b9d61bb9507070d",
+        "dispatches": [
+          {
+            "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "decision_ref": "gxa_e2340e90894609bdd0322fe3b5981e5a31f47786aa99569c8b9d61bb9507070d",
+            "node_id": "node_e0e9cd367e0d11938e8d11b7dbc74102",
+            "op_digest": "842e7e7b5d8843852ca63e2952fa438470fd62fb0cb9921660fe03f64c673e18",
+            "operation_key": "v6.node:fcc4cf8e4eb4bd6145bb6f111929e7894eb2866866774c24905ff0ea55d8e928",
+            "run_id": "gxr_01m88cavbgg8q1x7q3"
+          }
+        ],
+        "draft_sha256": "446427e2a92a9baec9d23f62810c87d99c844f0fb9b5f53a500bfd96b644fbef",
+        "event_id": 30,
+        "evidence_refs": [],
+        "goal_version": 1,
+        "lease_id": "gxl_01m88cawgwszhgn91m",
+        "outcome": "adopted",
+        "rationale": "Test whether the selected subset covers the deposited chains.",
+        "reconsider_when": [
+          {
+            "event": "job_settled",
+            "subject_ref": "run"
+          }
+        ],
+        "resolved_ops": [
+          {
+            "op_digest": "caed9647605301784b592516b6f0e9ea4df089866949601ccf866662016e0f31",
+            "source_index": 0,
+            "spec": {
+              "alternative": "Many deposited positions may be outside this mask.",
+              "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+              "budget_limits": {
+                "cpu_seconds": 150,
+                "job_submissions": 5
+              },
+              "discriminating_observation": "Count supported positions.",
+              "hypothesis": "The ordered mask has broad coverage.",
+              "method_family": "geometry",
+              "op": "open_branch",
+              "stop_condition": "Inspect remaining evidence."
+            }
+          },
+          {
+            "op_digest": "842e7e7b5d8843852ca63e2952fa438470fd62fb0cb9921660fe03f64c673e18",
+            "source_index": 1,
+            "spec": {
+              "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+              "capability": "deposited-chain-geometry@1",
+              "depends_on": [],
+              "inputs": [
+                "gxa_01m88cavbzwtnf25fg"
+              ],
+              "node": "node_e0e9cd367e0d11938e8d11b7dbc74102",
+              "op": "add_node",
+              "parameters": {
+                "mask": "ordered_backbone"
+              },
+              "question": "How many deposited positions meet this mask?"
+            }
+          }
+        ],
+        "result_head": {
+          "sha256": "efcce16be2fdb6beac1eaf5c75a2bd88dd4ec70a90be85babdcc137b2c4258d2",
+          "version": 1
+        },
+        "run_id": "gxr_01m88cavbgg8q1x7q3",
+        "scope": "run",
+        "submission_id": "gxsb_01m88cawswntg5497s",
+        "task_id": "gxt_01m88cavcj1bhfk72k",
+        "task_status": "ACCEPTED"
+      },
+      {
+        "aliases": {
+          "local:two": "node_c4e1105723079e79f3a33f006b188abe"
+        },
+        "base": {
+          "sha256": "efcce16be2fdb6beac1eaf5c75a2bd88dd4ec70a90be85babdcc137b2c4258d2",
+          "version": 1
+        },
+        "checkpoint_id": "gxc_01m88caxp2qdebscr7",
+        "claim_revisions": [],
+        "consumed_event_cursor": 44,
+        "context_ref": "gxcx_01m88cax7cj8wh91mz",
+        "decision_id": "gxa_13d50e0f38b8638a225fa496ad4f4886bc27ddc9d341370576d2123d06f7e974",
+        "decision_ref": "gxa_13d50e0f38b8638a225fa496ad4f4886bc27ddc9d341370576d2123d06f7e974",
+        "dispatches": [
+          {
+            "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+            "decision_ref": "gxa_13d50e0f38b8638a225fa496ad4f4886bc27ddc9d341370576d2123d06f7e974",
+            "node_id": "node_c4e1105723079e79f3a33f006b188abe",
+            "op_digest": "c6a8aef3f0e73ae85963e9f6d75348a5dd9c991bc0264553426b36f8597f1b12",
+            "operation_key": "v6.node:1391d6e5b202efbcff2b0cdeb9cd7a44e47f86d05927f3f883b73213d1b63ef1",
+            "run_id": "gxr_01m88cavbgg8q1x7q3"
+          }
+        ],
+        "draft_sha256": "2ca056ec3cc5da142a6f64987a4250e7ca64e98bc3321a4dc8d3b6df1fd20c56",
+        "event_id": 54,
+        "evidence_refs": [
+          "gxa_01m88cax6vd6pbc7sv"
+        ],
+        "goal_version": 1,
+        "lease_id": "gxl_01m88cax7n4786m8ce",
+        "outcome": "adopted",
+        "rationale": "The returned coverage determines the next mask; the second deposition lacks a measurement.",
+        "reconsider_when": [
+          {
+            "event": "job_settled",
+            "subject_ref": "run"
+          }
+        ],
+        "resolved_ops": [
+          {
+            "op_digest": "c6a8aef3f0e73ae85963e9f6d75348a5dd9c991bc0264553426b36f8597f1b12",
+            "source_index": 0,
+            "spec": {
+              "branch": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+              "capability": "deposited-chain-geometry@1",
+              "depends_on": [],
+              "inputs": [
+                "gxa_01m88cavc4amnz5w2j"
+              ],
+              "node": "node_c4e1105723079e79f3a33f006b188abe",
+              "op": "add_node",
+              "parameters": {
+                "mask": "common_ca"
+              },
+              "question": "Measure the second deposited model."
+            }
+          }
+        ],
+        "result_head": {
+          "sha256": "7d6163b0ca651ae31f480e0d31034b298535e85a82b7e21e2732a0e58dcedc61",
+          "version": 2
+        },
+        "run_id": "gxr_01m88cavbgg8q1x7q3",
+        "scope": "run",
+        "submission_id": "gxsb_01m88caxp26nke2t2y",
+        "task_id": "gxt_01m88cax7cvc8h882v",
+        "task_status": "ACCEPTED"
+      },
+      {
+        "aliases": {},
+        "base": {
+          "sha256": "7d6163b0ca651ae31f480e0d31034b298535e85a82b7e21e2732a0e58dcedc61",
+          "version": 2
+        },
+        "checkpoint_id": "gxc_01m88caych9nrytfag",
+        "claim_revisions": [],
+        "consumed_event_cursor": 68,
+        "context_ref": "gxcx_01m88cay8an30tadkr",
+        "decision_id": "gxa_7043b6e5ed705f1fc90010f148922b83594b28fe37b2a38aa2b3db403262e11f",
+        "decision_ref": "gxa_7043b6e5ed705f1fc90010f148922b83594b28fe37b2a38aa2b3db403262e11f",
+        "dispatches": [],
+        "draft_sha256": "d73a467387f4da5b4f3d450e6512780aaba0b09fe2a3c9b38105fae97c8c9dac",
+        "event_id": 79,
+        "evidence_refs": [
+          "gxa_01m88cay7r52ac4we6"
+        ],
+        "goal_version": 1,
+        "lease_id": "gxl_01m88cay8jd48erz42",
+        "outcome": "adopted",
+        "rationale": "The scripted protocol exercise obtained the follow-up observation.",
+        "reconsider_when": [
+          {
+            "event": "goal_changed",
+            "subject_ref": "run"
+          }
+        ],
+        "resolved_ops": [
+          {
+            "op_digest": "2833b5d08c0bb9a11eff506522f186a4afd423730b7abe7fbc07635db43144f3",
+            "source_index": 0,
+            "spec": {
+              "claim_refs": [],
+              "op": "close_run",
+              "reason": "Scripted engineering endpoint reached.",
+              "unresolved": [
+                "This short protocol did not complete the scientific comparison."
+              ]
+            }
+          }
+        ],
+        "result_head": {
+          "sha256": "4f111c733233e82a3cf411ff1f03bc91d5b94c398fb422564361456e3c683844",
+          "version": 3
+        },
+        "run_id": "gxr_01m88cavbgg8q1x7q3",
+        "scope": "run",
+        "submission_id": "gxsb_01m88caychaextfa94",
+        "task_id": "gxt_01m88cay8b6y09wm5q",
+        "task_status": "ACCEPTED"
+      }
+    ],
+    "failed_nodes": {},
+    "goal": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+    "goal_status": "CLOSED",
+    "goal_version": 1,
+    "graph_head": {
+      "sha256": "4f111c733233e82a3cf411ff1f03bc91d5b94c398fb422564361456e3c683844",
+      "version": 3
+    },
+    "intent": {
+      "objective": {
+        "change_id": "gxq_01m88cavccc4pey599",
+        "created_at": "2026-11-25T03:35:03.820Z",
+        "item_id": "objective",
+        "item_type": "objective",
+        "run_id": "gxr_01m88cavbgg8q1x7q3",
+        "sha256": "cafff4c0b5eff82cf4450023706e7e5b7d5e1387a6e0238f1e230582b3374d31",
+        "source_message_id": "b3512e8b-c709-5ee1-96b5-423e3a9b416e",
+        "status": "active",
+        "value": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+        "version": 1
+      }
+    },
+    "jobs": [
+      {
+        "job_id": "gxj_01m88cawwp68xt3dt4",
+        "scheduler_ref": "runner:450030:2989716816",
+        "status": "SUCCEEDED"
+      },
+      {
+        "job_id": "gxj_01m88caxs3b3cftpvd",
+        "scheduler_ref": "runner:450040:2989716921",
+        "status": "SUCCEEDED"
+      }
+    ],
+    "materials": [
+      "gxa_01m88cavbzwtnf25fg",
+      "gxa_01m88cavc4amnz5w2j"
+    ],
+    "messages": [
+      {
+        "message_id": "b3512e8b-c709-5ee1-96b5-423e3a9b416e",
+        "rejected": null,
+        "result_json": "{\"change_id\":\"gxq_01m88cavccc4pey599\",\"impact\":[],\"preview\":[{\"item_id\":\"objective\",\"item_type\":\"objective\",\"new_value\":\"在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。\",\"new_version\":1,\"old_value\":null,\"old_version\":0}],\"preview_sha256\":\"4da04b72a356e3376820001e788a818a0255ccacf5fd91c885f9993827b2e136\",\"resource_limits\":[],\"status\":\"committed\"}"
+      }
+    ],
+    "metering": {
+      "adjustments": [],
+      "attributed_response_count": 3,
+      "cost_report": {
+        "ESTIMATED": {
+          "provisional_budget_tokens": 0,
+          "tokens": 0
+        },
+        "PROVIDER_CONFIRMED": {
+          "tokens": 105
+        },
+        "UNATTRIBUTED_DELTA": {
+          "tokens": 0
+        },
+        "UNRESOLVED": {
+          "reservation_refs": [],
+          "tokens": null
+        },
+        "possibly_understated_estimate_refs": [],
+        "threads": [
+          {
+            "root_id": "01a210c5-723b-7551-8ace-88bfa5f2da55",
+            "thread_confirmed_cumulative": 35,
+            "thread_id": "01a210c5-723b-7551-8ace-88bfa5f2da55",
+            "turn_attributed_total": 35,
+            "unattributed_delta": 0
+          },
+          {
+            "root_id": "01a210c5-7615-74a0-aeb5-5f759becdcc6",
+            "thread_confirmed_cumulative": 35,
+            "thread_id": "01a210c5-7615-74a0-aeb5-5f759becdcc6",
+            "turn_attributed_total": 35,
+            "unattributed_delta": 0
+          },
+          {
+            "root_id": "01a210c5-791f-74b3-9099-53255b20ec0d",
+            "thread_confirmed_cumulative": 35,
+            "thread_id": "01a210c5-791f-74b3-9099-53255b20ec0d",
+            "turn_attributed_total": 35,
+            "unattributed_delta": 0
+          }
+        ],
+        "turn_receipts": [
+          {
+            "conflicting_response_count": 0,
+            "disputed": false,
+            "provider_confirmed_tokens": 35,
+            "receipts_with_usage": 1,
+            "response_count": 1,
+            "thread_id": "01a210c5-723b-7551-8ace-88bfa5f2da55",
+            "turn_id": "01a210c5-7265-7ff1-8018-2ed01ec4a919"
+          },
+          {
+            "conflicting_response_count": 0,
+            "disputed": false,
+            "provider_confirmed_tokens": 35,
+            "receipts_with_usage": 1,
+            "response_count": 1,
+            "thread_id": "01a210c5-7615-74a0-aeb5-5f759becdcc6",
+            "turn_id": "01a210c5-7637-7aa3-9c63-91edddb16941"
+          },
+          {
+            "conflicting_response_count": 0,
+            "disputed": false,
+            "provider_confirmed_tokens": 35,
+            "receipts_with_usage": 1,
+            "response_count": 1,
+            "thread_id": "01a210c5-791f-74b3-9099-53255b20ec0d",
+            "turn_id": "01a210c5-7930-75f1-ab8f-f725cbda9850"
+          }
+        ]
+      },
+      "interrupts": [],
+      "provider_money_cost": null,
+      "risk": {
+        "active_root_count": 0,
+        "available_tokens": 999895,
+        "committed_tokens": 105,
+        "hard_tokens": 1000000,
+        "largest_active_turn_grant": 0,
+        "maximum_exposure_note": "A GX grant bounds reserved units. Without an enforced provider response size or throughput bound, notification and interrupt latency have no finite token bound.",
+        "observed_in_flight_tokens": 0,
+        "observed_plus_settled": 105,
+        "provider_maximum_overshoot_tokens": null,
+        "reserved_tokens": 0,
+        "scope": "gxb_01m88cavbpdqn9wetx",
+        "settled_tokens": 105,
+        "unfunded_closed_thread_tokens": 0,
+        "unobserved_reserved_tokens": 0
+      },
+      "threads": [
+        {
+          "anomaly_at": null,
+          "anomaly_total": null,
+          "confidence": "PROVIDER_RECONCILED",
+          "observation_source": "thread/tokenUsage/updated",
+          "observed_at": "2026-11-25T03:35:05.297Z",
+          "observed_total": 35,
+          "reconciled_total": 35,
+          "root_id": "01a210c5-723b-7551-8ace-88bfa5f2da55",
+          "run_id": "gxr_01m88cavbgg8q1x7q3",
+          "thread_id": "01a210c5-723b-7551-8ace-88bfa5f2da55",
+          "turn_attributed_total": 35,
+          "unresolved_delta": 0
+        },
+        {
+          "anomaly_at": null,
+          "anomaly_total": null,
+          "confidence": "PROVIDER_RECONCILED",
+          "observation_source": "thread/tokenUsage/updated",
+          "observed_at": "2026-11-25T03:35:06.196Z",
+          "observed_total": 35,
+          "reconciled_total": 35,
+          "root_id": "01a210c5-7615-74a0-aeb5-5f759becdcc6",
+          "run_id": "gxr_01m88cavbgg8q1x7q3",
+          "thread_id": "01a210c5-7615-74a0-aeb5-5f759becdcc6",
+          "turn_attributed_total": 35,
+          "unresolved_delta": 0
+        },
+        {
+          "anomaly_at": null,
+          "anomaly_total": null,
+          "confidence": "PROVIDER_RECONCILED",
+          "observation_source": "thread/tokenUsage/updated",
+          "observed_at": "2026-11-25T03:35:06.913Z",
+          "observed_total": 35,
+          "reconciled_total": 35,
+          "root_id": "01a210c5-791f-74b3-9099-53255b20ec0d",
+          "run_id": "gxr_01m88cavbgg8q1x7q3",
+          "thread_id": "01a210c5-791f-74b3-9099-53255b20ec0d",
+          "turn_attributed_total": 35,
+          "unresolved_delta": 0
+        }
+      ],
+      "token_unit": "provider totalTokens, including cached input once",
+      "turns": [
+        {
+          "attribution": "TURN",
+          "budget_ref": "gxb_01m88cavbpdqn9wetx",
+          "budget_status": "SETTLED",
+          "children_known": 1,
+          "confidence": "PROVIDER_CONFIRMED",
+          "cost_assessment": {
+            "estimate_policy": null,
+            "evidence_gaps": [],
+            "observed_lower_bound_at_estimate_tokens": null,
+            "original_estimate_tokens": null,
+            "provider_confirmed_total_tokens": 35,
+            "risk": "PROVIDER_CONFIRMED",
+            "scoped_observed_lower_bound_tokens": 35,
+            "turn_grant_tokens": 150000,
+            "unobserved_tokens_upper_bound": 0
+          },
+          "estimate_snapshot": null,
+          "estimated_at": null,
+          "event_id": "start:1995057e-2bc0-4efe-a733-12290f1342e5",
+          "measured_tokens": 35,
+          "metering_reason": null,
+          "observed_lower_bound": 35,
+          "prior_tokens": 0,
+          "reservation_ref": "rsv_01m88cawk0d8t7t49b",
+          "run_id": "gxr_01m88cavbgg8q1x7q3",
+          "sequence": 2,
+          "settled_tokens": 35,
+          "state": "acknowledged",
+          "terminal_at": "2026-11-25T03:35:05.314Z",
+          "terminal_status": "interrupted",
+          "thread_id": "01a210c5-723b-7551-8ace-88bfa5f2da55",
+          "token_budget": 150000,
+          "total_tokens": 35,
+          "turn_id": "01a210c5-7265-7ff1-8018-2ed01ec4a919",
+          "usage_class": "PROVIDER_CONFIRMED"
+        },
+        {
+          "attribution": "TURN",
+          "budget_ref": "gxb_01m88cavbpdqn9wetx",
+          "budget_status": "SETTLED",
+          "children_known": 1,
+          "confidence": "PROVIDER_CONFIRMED",
+          "cost_assessment": {
+            "estimate_policy": null,
+            "evidence_gaps": [],
+            "observed_lower_bound_at_estimate_tokens": null,
+            "original_estimate_tokens": null,
+            "provider_confirmed_total_tokens": 35,
+            "risk": "PROVIDER_CONFIRMED",
+            "scoped_observed_lower_bound_tokens": 35,
+            "turn_grant_tokens": 150000,
+            "unobserved_tokens_upper_bound": 0
+          },
+          "estimate_snapshot": null,
+          "estimated_at": null,
+          "event_id": "start:dcc683c9-b331-4746-b331-c50903238879",
+          "measured_tokens": 35,
+          "metering_reason": null,
+          "observed_lower_bound": 35,
+          "prior_tokens": 0,
+          "reservation_ref": "rsv_01m88caxhjy53sck6x",
+          "run_id": "gxr_01m88cavbgg8q1x7q3",
+          "sequence": 4,
+          "settled_tokens": 35,
+          "state": "acknowledged",
+          "terminal_at": "2026-11-25T03:35:06.214Z",
+          "terminal_status": "interrupted",
+          "thread_id": "01a210c5-7615-74a0-aeb5-5f759becdcc6",
+          "token_budget": 150000,
+          "total_tokens": 35,
+          "turn_id": "01a210c5-7637-7aa3-9c63-91edddb16941",
+          "usage_class": "PROVIDER_CONFIRMED"
+        },
+        {
+          "attribution": "TURN",
+          "budget_ref": "gxb_01m88cavbpdqn9wetx",
+          "budget_status": "SETTLED",
+          "children_known": 1,
+          "confidence": "PROVIDER_CONFIRMED",
+          "cost_assessment": {
+            "estimate_policy": null,
+            "evidence_gaps": [],
+            "observed_lower_bound_at_estimate_tokens": null,
+            "original_estimate_tokens": null,
+            "provider_confirmed_total_tokens": 35,
+            "risk": "PROVIDER_CONFIRMED",
+            "scoped_observed_lower_bound_tokens": 35,
+            "turn_grant_tokens": 150000,
+            "unobserved_tokens_upper_bound": 0
+          },
+          "estimate_snapshot": null,
+          "estimated_at": null,
+          "event_id": "start:d571eddd-3312-4a6b-b503-389b1ce6579b",
+          "measured_tokens": 35,
+          "metering_reason": null,
+          "observed_lower_bound": 35,
+          "prior_tokens": 0,
+          "reservation_ref": "rsv_01m88cay9dmr7re59r",
+          "run_id": "gxr_01m88cavbgg8q1x7q3",
+          "sequence": 6,
+          "settled_tokens": 35,
+          "state": "acknowledged",
+          "terminal_at": "2026-11-25T03:35:06.930Z",
+          "terminal_status": "interrupted",
+          "thread_id": "01a210c5-791f-74b3-9099-53255b20ec0d",
+          "token_budget": 150000,
+          "total_tokens": 35,
+          "turn_id": "01a210c5-7930-75f1-ab8f-f725cbda9850",
+          "usage_class": "PROVIDER_CONFIRMED"
+        }
+      ],
+      "unresolved_alerts": [],
+      "unresolved_cases": []
+    },
+    "mode": "goal",
+    "native_waits": [],
+    "node": "decision",
+    "node_attempts": [
+      {
+        "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+        "exec_key": "b7a0e49a25d3205aa117bf396a351571fa815efad0429c904f00f2cbc4e46bcf",
+        "job_id": "gxj_01m88cawwp68xt3dt4",
+        "node_id": "node_e0e9cd367e0d11938e8d11b7dbc74102",
+        "operation_key": "v6.node:fcc4cf8e4eb4bd6145bb6f111929e7894eb2866866774c24905ff0ea55d8e928",
+        "result_ref": "gxa_01m88cax6vd6pbc7sv",
+        "status": "SUCCEEDED",
+        "version": 1
+      },
+      {
+        "branch_id": "branch_87a4aa2300e865b225c0fd4b2dc14dfc",
+        "exec_key": "edee28637193af6988db83c4f6a3071df4e52ff80250a61e16296d9997782ece",
+        "job_id": "gxj_01m88caxs3b3cftpvd",
+        "node_id": "node_c4e1105723079e79f3a33f006b188abe",
+        "operation_key": "v6.node:1391d6e5b202efbcff2b0cdeb9cd7a44e47f86d05927f3f883b73213d1b63ef1",
+        "result_ref": "gxa_01m88cay7r52ac4we6",
+        "status": "SUCCEEDED",
+        "version": 2
+      }
+    ],
+    "node_waits": {},
+    "pause": null,
+    "pending_deliveries": [],
+    "pending_previews": [],
+    "plugin_binding": {
+      "capabilities": [
+        {
+          "capability_version": "deposited-chain-geometry@1",
+          "content_artifact_ref": "gxa_01m88catv7js9khtr4",
+          "manifest_sha256": "76c391b87e066d4b7be4acceb90eccc5c21889ca4f64bbd7df7077919be1332b",
+          "portable_sha256": "91840fdb7cac9024e0e8b9374e36afc94b7149e100da3b0bfd4278c08a754249"
+        }
+      ],
+      "kind": "goal",
+      "packages": [
+        {
+          "id": "org.gx.protein",
+          "sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+          "version": "0.2.0"
+        }
+      ]
+    },
+    "project": "v61-deposited-chain-geometry",
+    "replies": [],
+    "report_ref": null,
+    "resource_limits": [],
+    "resource_profile": {
+      "cpu": {
+        "cgroup_quota_cpus": 24.0,
+        "logical_cpus": 224,
+        "policy": {
+          "max_pool_workers": 8,
+          "max_quota_fraction": 0.5
+        },
+        "source": "cgroup v2 cpu.max",
+        "threads_allowed": 8
+      },
+      "gpu": {
+        "cuda_visible_devices": null,
+        "devices": [
+          {
+            "index": 0,
+            "memory_free_mib": 69407,
+            "memory_total_mib": 81559,
+            "memory_used_mib": 12152,
+            "utilization_pct": 14
+          }
+        ],
+        "problems": [],
+        "source": "nvidia-smi"
+      },
+      "memory": {
+        "available_mib": 202721,
+        "cgroup_in_use_mib": 27679,
+        "cgroup_limit_mib": 230400,
+        "source": "cgroup v2 memory.max/current and /proc/meminfo"
+      },
+      "mode": "real",
+      "observed_at": "2026-11-25T03:35:03.791Z",
+      "source": "host"
+    },
+    "resources": {
+      "budget_ref": "gxb_01m88cavbpdqn9wetx",
+      "jobs_recorded": 2,
+      "lines": {
+        "api_calls": {
+          "booked": 3,
+          "limit": 8,
+          "remaining": 5,
+          "reserved": 0,
+          "unit": "calls"
+        },
+        "cpu_seconds": {
+          "booked": 2,
+          "limit": 300,
+          "remaining": 298,
+          "reserved": 0,
+          "unit": "CPU seconds"
+        },
+        "gpu_jobs": {
+          "booked": 0,
+          "limit": 0,
+          "remaining": 0,
+          "reserved": 0,
+          "unit": "GPU jobs"
+        },
+        "gpu_minutes": {
+          "booked": 0,
+          "limit": 0,
+          "remaining": 0,
+          "reserved": 0,
+          "unit": "GPU minutes"
+        },
+        "job_submissions": {
+          "booked": 2,
+          "limit": 10,
+          "remaining": 8,
+          "reserved": 0,
+          "unit": "submissions"
+        },
+        "tokens": {
+          "booked": 105,
+          "limit": 1000000,
+          "remaining": 999895,
+          "reserved": 0,
+          "unit": "tokens"
+        },
+        "wall_hours": {
+          "booked": 0,
+          "limit": 1,
+          "remaining": 1,
+          "reserved": 0,
+          "unit": "wall hours"
+        },
+        "worker_tasks": {
+          "booked": 0,
+          "limit": 24,
+          "remaining": 24,
+          "reserved": 0,
+          "unit": "tasks"
+        }
+      },
+      "measured_cpu": {
+        "observed": 0.169,
+        "observed_jobs": 2,
+        "pending_or_unmeasured_jobs": 0,
+        "unit": "CPU seconds"
+      },
+      "provider_charge": {
+        "amount": null,
+        "source": "provider_money_cost",
+        "unit": "USD"
+      },
+      "tokens": {
+        "possibly_understated": [],
+        "provider_attributed": 105,
+        "provisional_booked": 0,
+        "unattributed_delta": 0,
+        "unit": "tokens",
+        "unresolved": []
+      }
+    },
+    "reviews": [],
+    "round": null,
+    "rounds": [],
+    "run_id": "gxr_01m88cavbgg8q1x7q3",
+    "run_key": "v61-comparative-study",
+    "run_objective": "在提供的兩份沉積晶體座標中，以不同的骨架原子選取方式描述三條鏈的相對幾何時，哪一部分結論可由兩份資料共同支持？用實際覆蓋及量測說明結論的範圍和不確定性。題目的範圍是沉積座標。",
+    "status": "STOPPED",
+    "supplements": [],
+    "tasks": [
+      {
+        "attempt": 1,
+        "role": "planner",
+        "stage": null,
+        "status": "ACCEPTED",
+        "task_id": "gxt_01m88cavcj1bhfk72k"
+      },
+      {
+        "attempt": 1,
+        "role": "planner",
+        "stage": null,
+        "status": "ACCEPTED",
+        "task_id": "gxt_01m88cax7cvc8h882v"
+      },
+      {
+        "attempt": 1,
+        "role": "planner",
+        "stage": null,
+        "status": "ACCEPTED",
+        "task_id": "gxt_01m88cay8b6y09wm5q"
+      }
+    ],
+    "unsettled_turns": [],
+    "waiting_for": null,
+    "workflow": {
+      "id": null,
+      "version": null
+    }
+  }
+}

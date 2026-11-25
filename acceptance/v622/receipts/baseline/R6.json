@@ -1,0 +1,92 @@
+{
+  "case": "late_direct_job",
+  "run_id": "gxr_01m89x46dkvexj232f",
+  "model": "local scripted native acknowledgement",
+  "provider_calls": 0,
+  "initial_task": "gxt_01m89x46kepbrwas1t",
+  "initial_turn": "turn-gxl_01m89x46kjx7dk18c3",
+  "initial_brief_sha256": "a1f62b9eeaab80c6d8302267286811a1ff64269b300a5534b537c5678f7fab4e",
+  "initial_cursor": 35,
+  "job_event": {
+    "event_id": 50,
+    "branch_id": "branch_e519fd74e75e00bbb582c17dede4ec36",
+    "decision_ref": "gxa_4db9acce24bacca020a772e3d28983eb6230d62a80da10a283721c2ba63f4e2e",
+    "exec_key": "d3dd57bc92c84f9df66991bc3061f9aa72727d711e6274e0c3cc78d42995db48",
+    "job_id": "gxj_01m89x46mntedy3r9p",
+    "node_id": "node_1318371d8ebdec56628f4f2dd70629dc",
+    "observed_job_status": "SUCCEEDED",
+    "operation_key": "v6.node:c585c99e07bc36aa2a9336c3940322d531de84615c138cb936170d25b5f0cd9e",
+    "result_ref": "gxa_01m89x46zww6scjwk0",
+    "reused_from": null,
+    "status": "SUCCEEDED"
+  },
+  "attempted_close": {
+    "run_id": "gxr_01m89x46dkvexj232f",
+    "task_id": "gxt_01m89x46kepbrwas1t",
+    "lease_id": "gxl_01m89x46kjx7dk18c3",
+    "task_status": "ACCEPTED",
+    "decision_ref": "gxa_e22e19f964dfdf9ca012b61dcbe0098c7d700c70abd6cafd4d395d3fb41c96ab",
+    "decision_id": "gxa_e22e19f964dfdf9ca012b61dcbe0098c7d700c70abd6cafd4d395d3fb41c96ab",
+    "scope": "run",
+    "goal_version": 1,
+    "context_ref": "gxcx_01m89x46kebfrws9ms",
+    "base": {
+      "sha256": "743aec6d5cb5e118a3f9e8a68f91eea6d7d4fcea2c6ea2528b7a7171d4be3439",
+      "version": 1
+    },
+    "result_head": {
+      "version": 2,
+      "sha256": "f2f1404c38471faf123916040148948810c668f6b4ae0aa0d91bf32c762405a5"
+    },
+    "outcome": "adopted",
+    "draft_sha256": "f23e99406ab57d63fc1103b499e9e8b7f9f41a20ce2c4ca24cebb0ad8ce172f7",
+    "resolved_ops": [
+      {
+        "source_index": 0,
+        "op_digest": "cc0e9a3a061969a543f6c09854fab266c321bd83f0b33f16a8f7d98d86e9ab28",
+        "spec": {
+          "claim_refs": [],
+          "op": "close_run",
+          "reason": "Record the known coverage at closure.",
+          "unresolved": [
+            "Sampling independence remains unknown."
+          ]
+        }
+      }
+    ],
+    "aliases": {},
+    "reconsider_when": [
+      {
+        "event": "evidence_added",
+        "subject_ref": "run"
+      }
+    ],
+    "checkpoint_id": "gxc_01m89x470d0z16f4gj",
+    "dispatches": [],
+    "submission_id": "gxsb_01m89x470d3r9vw7h7",
+    "claim_revisions": [],
+    "consumed_event_cursor": 35,
+    "event_id": 57
+  },
+  "refusal": null,
+  "node_head": {
+    "version": 2,
+    "sha256": "f2f1404c38471faf123916040148948810c668f6b4ae0aa0d91bf32c762405a5"
+  },
+  "jobs": [
+    {
+      "job_id": "gxj_01m89x46mntedy3r9p",
+      "status": "SUCCEEDED",
+      "reservation_ref": "rsv_01m89x46njf4w5vpe0",
+      "measured_json": "{\"cpu_seconds\":0.095,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":19.2,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.216}"
+    }
+  ],
+  "charges": [
+    {
+      "reservation_ref": "rsv_01m89x46njf4w5vpe0",
+      "subject_id": "gxj_01m89x46mntedy3r9p",
+      "status": "SETTLED",
+      "amounts_json": "{\"cpu_seconds\":30,\"job_submissions\":1}"
+    }
+  ]
+}

@@ -183,7 +183,7 @@
             },
             "prediction": {
               "type": "object",
-              "description": "Preregister a falsifiable numeric comparison for this statement and scope. Each data reference identifies a pinned acquisition. The JSON Pointer selects the measured value in the original result.",
+              "description": "Preregister a falsifiable numeric comparison for this statement and scope. Each data reference identifies a pinned acquisition. The JSON Pointer selects the measured value in the original result. Pin a method and its named output for computation or a versioned measurement schema for an ingested observation.",
               "additionalProperties": false,
               "required": [
                 "observable",
@@ -227,6 +227,29 @@
                     "analysis",
                     "model_prediction"
                   ]
+                },
+                "method": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "capability",
+                    "output"
+                  ],
+                  "properties": {
+                    "capability": {
+                      "type": "string",
+                      "minLength": 3
+                    },
+                    "output": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "measurement_schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Versioned observable and units contract bound as the result artifact schema_ref."
                 }
               }
             }

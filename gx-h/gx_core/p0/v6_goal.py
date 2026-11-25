@@ -555,9 +555,17 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "budget": budget,
     }
     if data["inputs"].get("research_evidence_version"):
-        from . import v62_rounds
+        from . import v62_outputs, v62_rounds
         brief["research_evidence_version"] = data["inputs"]["research_evidence_version"]
         brief.update(v62_rounds.brief(conn, rid, cursor))
+        # A released node exposes all its named outputs. The primary result
+        # remains the graph dependency, including on cold continuation.
+        visible = dict.fromkeys(brief["evidence_refs"])
+        for node in brief["nodes"]:
+            if node["result_ref"] and node["status"] in ("SUCCEEDED", "REUSED"):
+                node["outputs"] = v62_outputs.published_outputs(conn, rid, node["job_id"])
+                visible.update(dict.fromkeys(item["artifact_ref"] for item in node["outputs"]))
+        brief["evidence_refs"] = list(visible)
     return brief
 
 

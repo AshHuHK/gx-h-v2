@@ -279,10 +279,8 @@ def commit(conn, plan):
         if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
             raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
         decision_ref, = delivery.register_manifest(ArtifactService(conn), plan.manifest, actor=plan.thread_id)
-        convergence = None
-        if "convergence" in request["decision"] or "resolved_gaps" in request["decision"]:
-            from . import v62_rounds
-            convergence = v62_rounds.adopt(conn, request, decision_ref, task)
+        from . import v62_rounds
+        convergence = v62_rounds.adopt(conn, request, decision_ref, task)
         claims = v6_claims.adopt(conn, run_id, task_id, lease_id, request["context_ref"],
                                  decision_ref, request["decision"])
         checkpoint, dispatches = None, []

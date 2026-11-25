@@ -53,7 +53,8 @@ def _branch_brief(conn, task, branch, question):
     parent = store.loads(task, "snapshot_json")
     rid, scope, branch_id = task["run_id"], "branch:" + branch["branch_id"], branch["branch_id"]
     scoped = {key: parent[key] for key in ("run_id", "goal", "goal_version", "head", "intent", "materials", "capabilities")}
-    nodes = [{key: n[key] for key in ("node_id", "branch_id", "version", "status", "job_id", "result_ref")}
+    nodes = [{key: n[key] for key in ("node_id", "branch_id", "version", "status", "job_id", "result_ref", "outputs")
+              if key in n}
              for n in parent["nodes"] if n["branch_id"] == branch_id]
     claims = [c for c in parent["claims"] if c["decision_scope"] == scope]
     # Source aliases are allowed to overlap across scopes. Filter by the original event,
@@ -68,6 +69,7 @@ def _branch_brief(conn, task, branch, question):
                     (o["event"] == "v6.node.settled" and o["branch_id"] == branch_id)]
     refs = {m["artifact_ref"] for m in parent["materials"]}
     refs.update(n["result_ref"] for n in nodes if n["result_ref"])
+    refs.update(item["artifact_ref"] for n in nodes for item in n.get("outputs", ()))
     refs.update(r[key] for r in sources for key in ("subject_id", "ref"))
     refs.update(c[key] for c in claims for key in ("claim_ref", "claim_revision_id"))
     scoped.update(scope=scope, delegation_question=question, native_turn_budget_scope="run_with_explicit_branch_ceilings",

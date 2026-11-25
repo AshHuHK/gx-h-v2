@@ -12,7 +12,7 @@ The historical static `tl1a_geometry@3` was published for 2RE9. The matched stat
 
 ## Run and reproduce
 
-Use the V6.1 release environment, its official Codex binary and a fresh working directory outside the product. The model-shaped requests in a rehearsal terminate in a scripted local Responses server. The measurements, native tool calls, durable decisions and cold reopen use the normal product paths. The operator needs no OAuth login for rehearsal.
+Use the V6.1 release environment, its official Codex binary and a fresh working directory outside the product. Each command resolves symlinks before checking the directory. An existing directory must be accessible only to its owner. This keeps the native session store and the live OAuth login link in the operator's private workspace. The model-shaped requests in a rehearsal terminate in a scripted local Responses server. The measurements, native tool calls, durable decisions and cold reopen use the normal product paths. The operator needs no OAuth login for rehearsal.
 
 ```bash
 source .venv/bin/activate
@@ -34,7 +34,7 @@ python -B "$runner" live --work "$paid_cohort" --arm single --seconds 900
 python -B "$runner" live --work "$paid_cohort" --arm multi --seconds 900
 ```
 
-One enrollment may be run at a time per cohort directory. Commands reject a second enrollment of the same arm. Use the original store and `score` to re-evaluate the same evidence. Live and loopback use separate cohort directories. The standalone adaptive study is a separate enrollment with a distinct prospective denominator.
+One enrollment may be run at a time per cohort directory. Commands reject a second enrollment of the same arm. Use the original store and `score` to re-evaluate the same evidence. The recorded rehearsal pins the launcher at commit `063fdbf8096a037cc8679204b573973696174668`. Use that checkout when rescoring its original private cohort. Fresh enrollments pin the launcher with the external-workspace check. Live and loopback use separate cohort directories. The standalone adaptive study is a separate enrollment with a distinct prospective denominator.
 
 ## Metrics
 

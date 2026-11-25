@@ -148,6 +148,10 @@ def main():
     if args.seconds < 1 or args.seconds > 3600:
         parser.error("Use a positive window within the enrolled one hour per-arm allowance")
     work=args.work.resolve()
+    if work.is_relative_to(ROOT):
+        parser.error("--work must resolve outside the release checkout")
+    if work.exists() and (not work.is_dir() or work.stat().st_mode & 0o077):
+        parser.error("--work must be a private directory accessible only to its owner")
     plan=ensure_plan(work)
     if args.mode=="prepare":
         print(work/"preregistration.json")

@@ -215,7 +215,13 @@ def publish_report(work, plan):
     for block in sorted({r["block"] for r in rows}):
         members = [r for r in rows if r["block"] == block and r["case"] in CASE_IDS[:3]]
         blocks[block] = grouped_verdict(work, block, members) if all(r.get("bundle") for r in members) else {"status":"NOT RUN"}
+    matched = [r for r in identities if r.get("shape_digest")]
+    shapes = sorted({r["shape_digest"] for r in matched})
+    comparable = ("FAIL" if len(shapes) > 1 else "PASS" if len(matched) == len(rows)
+                  else "PARTIAL" if matched else "NOT RUN")
     result = {"protocol": plan["design_digest"], "source": plan["source"]["git_head"],
+              "matched_prestate_and_profile": {"status": comparable, "observed": len(matched), "planned": len(rows),
+                                               "digests": shapes},
               "recorded_utc": live.now(), "seeded": sum(r["seeded"] for r in rows),
               "per_case": {c: tally([r for r in rows if r["case"] == c]) for c in CASE_IDS},
               "held_out": tally([r for r in rows if r["case"] in CASE_IDS[3:]]),

@@ -74,7 +74,8 @@ class QuantitativePublication(unittest.TestCase):
             tmp.mkdir(parents=True, exist_ok=False, mode=0o700)
         else:
             tmp = Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
-        spec = {"research_effort":"deep","research_modules":["data_inventory@2"],
+        spec = {"evidence_policy":"gx.evidence/6.2.1", "historical_replay":True,
+                "research_effort":"deep","research_modules":["data_inventory@2"],
                 "plugins":["org.gx.protein@0.3.0"],"capabilities":[METHOD]}
         s = self.enterContext(Scenario(tmp/"study",spec_updates=spec))
         raw = s.materials[0]
@@ -158,7 +159,8 @@ class QuantitativePublication(unittest.TestCase):
 
     def test_direct_quick_lead_sees_typed_output_and_no_reader_for_raw(self):
         tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
-        s = self.enterContext(Scenario(tmp/"quick", spec_updates={"research_effort":"quick",
+        s = self.enterContext(Scenario(tmp/"quick", spec_updates={"evidence_policy":"gx.evidence/6.2.1",
+                    "historical_replay":True, "research_effort":"quick",
                     "research_modules":[],"capabilities":[METHOD],"plugins":["org.gx.protein@0.3.0"]}))
         b = {**branch("direct"), "budget_limits":{"job_submissions":1,"cpu_seconds":90}}
         op = s.node(s.lead,"coverage",s.materials[0],branch_id="local:direct",capability=METHOD,

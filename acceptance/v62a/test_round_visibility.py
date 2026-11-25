@@ -103,7 +103,8 @@ class RoundVisibility(unittest.TestCase):
         self.assertEqual(index, archived["module_report_index"])
         [contrary] = [r for r in index if r.get("counterevidence")]
         self.assertEqual(adverse_ref, contrary["report_ref"])
-        self.assertEqual([{"text": adverse, "source_refs": [src]}], contrary["counterevidence"])
+        self.assertEqual([{"text": adverse, "source_refs": [src], "evidence_status": "UNVERIFIED"}],
+                         contrary["counterevidence"])
         self.assertIn(adverse_ref, full["evidence_refs"])
         # A Lead should learn the sole contrary observation even when it came in the oldest report.
         with self.subTest(packet="full"):

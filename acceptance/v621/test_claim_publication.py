@@ -148,14 +148,16 @@ class ClaimPublication(unittest.TestCase):
         self.assertEqual(provisional["publication"]["opposing_refs"], [observed])
 
     def test_one_observed_sample_cannot_be_published_as_all_registered_samples(self):
-        self.start(second_material=True)
-        result_ref = self.reading("first-sample", 14)
-        lead, previous, _ = self.delivered_claim()
-        result = self.adopt(lead, "one-of-two", [result_ref], "limited_support",
-                            previous_claim_ref=previous["claim_revision_id"])
-        self.assertEqual(result["publication"]["unmeasured_data_refs"], self.gx.materials[1:])
-        self.assertEqual((result["maturity"]["stage"], result["maturity"]["direction"], result["level"]),
-                         ("tested", "supported", "insufficient"))
+        for policy, expected_direction in (("gx.evidence/6.2.1", "supported"), (None, "undetermined")):
+            with self.subTest(policy=policy):
+                self.start(policy=policy, second_material=True)
+                result_ref = self.reading("first-sample", 14)
+                lead, previous, _ = self.delivered_claim()
+                result = self.adopt(lead, "one-of-two", [result_ref], "limited_support",
+                                    previous_claim_ref=previous["claim_revision_id"])
+                self.assertEqual(result["publication"]["unmeasured_data_refs"], self.gx.materials[1:])
+                self.assertEqual((result["maturity"]["stage"], result["maturity"]["direction"], result["level"]),
+                                 ("tested", expected_direction, "insufficient"))
 
     def test_changed_endpoint_cannot_borrow_old_refutation_and_narrow_revision_survives(self):
         self.start()

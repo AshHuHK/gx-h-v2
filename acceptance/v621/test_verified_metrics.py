@@ -195,3 +195,47 @@ class QuantitativePublication(unittest.TestCase):
         self.assertEqual(note["sha256"],hashlib.sha256(content).hexdigest())
         self.assertIn("bench,7",str(s.call(nxt,"gx_read_artifact",{"ref":raw},"read-bench")))
         self.assertEqual(assets.read_bytes(raw),content)
+
+    def test_frozen_csv_projection_from_an_actual_job_and_missing_field(self):
+        from contextlib import closing
+        import shutil
+        from unittest.mock import patch
+        from tests import test_v62_outputs as instrument
+        from gx_core.native_release import native_state
+        from gx_core.persistence import store
+
+        tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        source = tmp/"csv-instrument"
+        shutil.copytree(instrument.FIXTURE, source)
+        card = source/"series.json"
+        package = json.loads(card.read_bytes())
+        output = package["manifest"]["outputs"][0]
+        output.update(name="mean.csv", metric_specs={"reading":SCALAR,
+                      "unobserved":{**SCALAR,"pointer":"/second_instrument"}})
+        card.write_text(json.dumps(package))
+        entry = source/"measure.py"
+        entry.write_text(entry.read_text().replace('(output_dir / "mean.json").write_text(json.dumps(analysis))',
+                         '(output_dir / "mean.csv").write_text("reading\\n" + str(analysis["value"]) + "\\n")'))
+        state = tmp/"study/state"
+        with native_state(state), closing(store.open_store(state/"gx.db")) as db, patch.object(instrument,"FIXTURE",source):
+            _, raw = instrument.start_series_goal(self, db, tmp, readings={"readings":[0.06439,0.06439]})
+        with Scenario(tmp/"study",reopen=True) as s:
+            lead = s.next_actor("run")
+            op = s.node(lead,"csv",raw,branch_id="local:direct",capability=instrument.METHOD)
+            change = draft({**branch("direct"),"budget_limits":{"job_submissions":1,"cpu_seconds":25}},op,
+                           watches=[{"event":"job_settled","subject_ref":"local:csv"}])
+            opened = s.call(lead,v6_native.DECIDE,{"decision":change},"dispatch-instrument")
+            row = s.settle(opened["aliases"]["local:csv"])
+            packet = v6_native.brief(s.roots._binding(s.next_actor("run").thread))
+            reading, = [o for o in packet["observations"] if o["artifact_ref"] == row["result_ref"]]
+            projections = {m["metric_id"]:m for m in reading["metrics"]}
+            mean = projections["reading"]
+            self.assertEqual((mean["schema"],mean["display"],mean["raw_value"]),(metrics.SCHEMA,"0.064","0.06439"))
+            self.assertEqual((mean["reader"],mean["output_name"],mean["selectors"]["pointer"]),
+                             ("csv-row/1","mean.csv","/reading"))
+            absent = projections["unobserved"]
+            self.assertEqual(absent["schema"],metrics.MISSING)
+            self.assertIn("second_instrument",absent["reason"])
+            original = ArtifactService(s.conn).read_bytes(row["result_ref"])
+            self.assertEqual(original,b"reading\n0.06439\n")
+            self.assertEqual(hashlib.sha256(original).hexdigest(),mean["sha256"])

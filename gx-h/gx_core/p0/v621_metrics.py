@@ -234,12 +234,25 @@ def _cited(conn, rid, refs, cache=None):
     return list(found.values())
 
 
-def _render(text, metrics):
+def _method_identifiers(conn, rid):
+    from .v62_catalog import _inputs
+    inputs = _inputs(conn, rid)
+    cards = [*inputs.get("capability_catalog", ()), *inputs.get("research_catalog", {}).get("public_methods", ())]
+    return {m["capability_version"] for m in cards if m.get("capability_version")}
+
+
+def _render(text, metrics, methods=(), *, protected=()):
     if isinstance(text, list):
-        return [_render(part, metrics) for part in text]
+        return [_render(part, metrics, methods) for part in text]
     if not isinstance(text, str):
         raise SchemaInvalid("Quantitative interpretation must be text")
-    without_tags = TAG.sub("", text)
+    checked = text
+    for start, end in sorted(protected, reverse=True):
+        checked = checked[:start] + " " + checked[end:]
+    without_tags = TAG.sub("", checked)
+    if "@" in without_tags:
+        without_tags = re.sub(r"(?<![\w.-])[A-Za-z][A-Za-z0-9_.-]*@[0-9]+(?:\.[0-9]+)*",
+                              lambda m: "" if m[0] in methods else m[0], without_tags)
     def identifier(match):
         # An accession such as 2E19 is also a valid numeric literal; its use as an identifier needs context.
         if re.fullmatch(r"\d[Ee]\d{2}", match[0]) and not re.search(
@@ -287,7 +300,7 @@ PREDICATES = {"gt": (">", r">(?!=)|above|greater than|exceeds?"),
               "le": ("<=", r"<=|≤|at most"), "eq": ("=", r"==|(?<![<>])=|equals?")}
 
 
-def _criterion(text, prediction, metrics):
+def _criterion(text, prediction, metrics, methods=()):
     # Only a comparator with its prospective numeric RHS can be stated literally.
     symbol, words = PREDICATES[prediction["operator"]]
     cutoff = prediction["threshold"]
@@ -299,7 +312,7 @@ def _criterion(text, prediction, metrics):
         return match["op"] + match["space"] + "{{cutoff}}"
     if "{{cutoff}}" in text:
         raise SchemaInvalid("Use {{criterion}} to cite the registered comparison")
-    text = _render(pattern.sub(substitute, text), metrics)
+    text = _render(pattern.sub(substitute, text), metrics, methods)
     return text.replace("{{cutoff}}", str(cutoff)).replace(
         "{{criterion}}", f"{prediction['observable']} {symbol} {cutoff}")
 
@@ -307,6 +320,7 @@ def _criterion(text, prediction, metrics):
 def render_fields(conn, run_id, evidence_refs, text_fields, *, allowed_context=None, prediction=None):
     """Render already-authorized scientific prose from pinned metrics, retaining their full receipts."""
     metrics = _cited(conn, run_id, evidence_refs)
+    methods = _method_identifiers(conn, run_id) if any("@" in field for field in text_fields.values()) else ()
     # Whole phrases can be independently established by the claim owner's source and scope checks.
     trusted = allowed_context or {}
     result = {}
@@ -315,24 +329,41 @@ def render_fields(conn, run_id, evidence_refs, text_fields, *, allowed_context=N
             result[key] = value
             continue
         if key == "criteria" and prediction:
-            result[key] = _criterion(value, prediction, metrics)
+            result[key] = _criterion(value, prediction, metrics, methods)
         else:
             if "{{criterion}}" in value:
                 raise SchemaInvalid("A criterion citation requires a prospective structured prediction")
-            result[key] = _render(value, metrics)
+            result[key] = _render(value, metrics, methods)
     return result, metrics
 
 
 def render_report(conn, rid, bundle):
     """Only a finding's own citations may supply its numerical statements."""
     cache = {}
+    methods = _method_identifiers(conn, rid)
     fields = {}
-    for finding in bundle["findings"]:
+    quotations = []
+    reads = None
+    for index, finding in enumerate(bundle["findings"]):
         entries = _cited(conn, rid, finding["source_refs"], cache)
-        fields.setdefault("findings", []).append({**finding, "text": _render(finding["text"], entries)})
+        try:
+            text = _render(finding["text"], entries, methods)
+        except SchemaInvalid:
+            # A verified quotation is a source attribution, never an executed measurement.
+            from . import v62_native, v62_sources
+            if reads is None:
+                reads = v62_native.operation_receipts(conn, rid, bundle["module_instance_id"])
+            quote = v62_sources.report_quotation(conn, rid, bundle["scope"], finding, reads)
+            if not quote:
+                raise
+            text = _render(finding["text"], entries, methods, protected=[quote["finding_span"]])
+            quotations.append(dict(finding_index=index, **quote))
+        fields.setdefault("findings", []).append({**finding, "text": text})
+    if quotations:
+        bundle["source_quotations"] = quotations
     metrics = _cited(conn, rid, [s["artifact_ref"] for s in bundle["sources"]], cache)
     bundle.update(schema="gx.v621.module_report_bundle.1", metrics=metrics,
                   interpretation={"findings": bundle["findings"], "gaps": bundle["gaps"], "next_steps": bundle["next_steps"]})
     bundle.update(fields)
     for key in ("gaps", "next_steps"):
-        bundle[key] = _render(bundle[key], metrics)
+        bundle[key] = _render(bundle[key], metrics, methods)

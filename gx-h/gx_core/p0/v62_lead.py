@@ -111,13 +111,14 @@ def deliver(conn, brief, limit):
             summary["counterevidence"] = [{"text": _excerpt(first["text"], 256), "source_refs": first["source_refs"][:1]}]
         if append("module_reports", summary):
             append("evidence_refs", report["report_ref"])
-            if report.get("metrics"):
-                summary["metrics"] = []
-                for metric in report["metrics"]:
-                    if not append("metrics", metric, owner=summary):
-                        break
-                if not summary["metrics"]:
-                    del summary["metrics"]
+            for field in ("metrics", "source_quotations"):
+                if report.get(field):
+                    summary[field] = []
+                    for proof in report[field]:
+                        if not append(field, proof, owner=summary):
+                            break
+                    if not summary[field]:
+                        del summary[field]
     if progress:
         projected = packet["research_progress"]
         for key in ("waiting_for", "open_gaps"):

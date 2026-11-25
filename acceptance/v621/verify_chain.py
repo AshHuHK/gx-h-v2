@@ -234,8 +234,11 @@ def verify_controls(work):
         need(not db.execute("SELECT 1 FROM events WHERE run_id=? AND kind='v6.observation.added' AND subject_id=?",
                             (foreign["target_run_id"],foreign["source_id"])).fetchone(), "rejected acquisition was published")
         rejects = [v for v in transcript["rejected"] if "149/164" in v.get("input", "") or "149/164" in v.get("claim", "")]
-        need(len(rejects) == 2 and all("SCHEMA_INVALID" in v["reason"] for v in rejects) and
-             "149/164" not in json.dumps([receipt["module_report"]["finding"],receipt["public_claim"]["statement"]]), "fabricated ratio entered an output")
+        need({v["callback"]["tool"] for v in rejects} == {"gx_submit_module_report", "gx_stage_claim"} and
+             all("SCHEMA_INVALID" in v["reason"] for v in rejects),
+             "expected both report and claim refusals for the fabricated ratio")
+        need("149/164" not in json.dumps([receipt["module_report"]["finding"],receipt["public_claim"]["statement"]]),
+             "fabricated ratio entered an output")
         for rejection in rejects:
             call = rejection["callback"]
             need(call["error"] == "SCHEMA_INVALID" and call["head_before"] == call["head_after"] and
@@ -303,7 +306,7 @@ def main():
     parser.add_argument("mode",choices=("run","verify","wire"))
     parser.add_argument("work",type=Path)
     parser.add_argument("--controls", type=Path, help="Verified control state to link to an official-wire result")
-    parser.add_argument("--output", type=Path, help="Write the official-wire signoff JSON")
+    parser.add_argument("--output", type=Path, help="Export a reconstructed signoff receipt")
     options = parser.parse_args()
     work = options.work.resolve()
     if options.mode == "wire":
@@ -330,12 +333,16 @@ def main():
             ["git","-C",str(ROOT),"status","--porcelain","--untracked-files=normal"],text=True).splitlines()})
         run_controls(work)
     receipt = verify_controls(work)
+    archived = work / "verified-chain.json"
     if options.mode == "run":
-        save(work/"verified-chain.json",receipt)
-    else:
-        need(receipt == load(work/"verified-chain.json"), "archived source-to-claim receipt differs from readback")
-    print(json.dumps({"status":"PASS","run_id":receipt["run_id"],"verified_receipt":str(work/"verified-chain.json"),
-                      "verified_receipt_sha256":digest((work/"verified-chain.json").read_bytes())}))
+        save(archived, receipt)
+    elif archived.exists() or not options.output:
+        need(receipt == load(archived), "archived source-to-claim receipt differs from readback")
+    if options.output:
+        save(options.output, receipt)
+    output = options.output or archived
+    print(json.dumps({"status":"PASS","run_id":receipt["run_id"],"verified_receipt":str(output),
+                      "verified_receipt_sha256":digest(output.read_bytes())}))
 
 
 if __name__ == "__main__":

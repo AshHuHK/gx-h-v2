@@ -45,6 +45,10 @@ CASES = (
     ("4.gate", "repairs", "An evaluated false gate terminates. Pending, invalid and approved remain distinct.",
      ["gate-trace.json", "gate-trace.review.json"]),
     ("4.contract", "repairs", "Append-only publication and evidence survive reopen and allow cursor advance.", []),
+    ("5.trace", "chain", "Official Lead wire, artifact pins, independent recomputation, public claim and authenticated refusals agree.",
+     ["coordinate-publication.json"]),
+    ("5.legacy-coordinate", "legacy-coordinate", "The installed historical method produces the same bytes and evidence type under both releases.",
+     ["legacy-coordinates/comparison.json", "legacy-coordinates/before.json", "legacy-coordinates/after.json"]),
     ("5.upgrade", "upgrade", "The old Run and plugin pins, decisions, measurements and charges survive upgrade and rollback.",
      ["upgrade/before.json", "upgrade/check.json", "upgrade/restored.json"]),
     ("5.v6", "v6", "Inherited V6 regressions complete under the candidate.", []),
@@ -54,6 +58,8 @@ CASES = (
      ["spend-preflight-probe.json"]),
     ("C.dry", "pilot", "Four scripted cases finish on the frozen candidate with no paid calls.",
      [PILOT+"registration.json", PILOT+"result.json"]),
+    ("C.parity", "pilot", "Both arms in the four official scripted Runs have matching methods and input access; only commissioning differs.",
+     [PILOT+"capability-parity.json", PILOT+"registration.json", PILOT+"result.json"]),
     ("C.score", "rating", "All four engineering outcomes have separate science and delegation scores.",
      [PILOT+"scores.json", PILOT+"registration.json", PILOT+"result.json"]),
 )
@@ -121,6 +127,91 @@ def science_trace(d):
     return f'{metric["display"]}; official level {claim["publication"]["level"]} ({claim["publication"]["direction"]})'
 
 
+def official_publication(trace, source):
+    assert trace["source_version"]["git_head"] == source, "The official wire receipt was produced by another revision"
+    original, job, output, metric = (trace[k] for k in ("original", "job", "output", "metric"))
+    report, delivery, claim = (trace[k] for k in ("module_report", "delivered_lead", "public_claim"))
+    assert original["event_id"] <= metric["provenance_cursor"] < job["admission_event_id"] < report["event_id"] < claim["event_id"]
+    assert all(job["input"][k] == original[k] for k in ("artifact_ref", "sha256"))
+    assert metric["inputs"] == output["source_inputs"] == [job["input"]]
+    assert metric["artifact_ref"] == output["artifact_ref"] and metric["sha256"] == output["runner_sha256"] == output["sha256"]
+    assert metric["output_name"] == output["output_name"] == "geometry.json" and output["nature"] == "analysis"
+    assert all(metric[k] == job[k] for k in ("job_id", "admission_sha256", "manifest_sha256", "method"))
+    check = trace["independent_check"]
+    assert check["source_sha256"] == original["sha256"] and trace["real_cpu_jobs"] == 1
+    assert (metric["numerator"], metric["denominator"]) == (check["numerator"], check["denominator"]) == (49, 164)
+    assert check["integer_difference"] == 0 and check["absolute_ratio_difference"] <= check["fraction_absolute_tolerance"]
+    assert delivery["official_session"]["model_provider"] == "gx_loopback" and delivery["delivery_state"] == "acknowledged"
+    assert delivery["thread_id"] == delivery["official_session"]["id"] and delivery["turn_id"] == delivery["turn_context"]["turn_id"]
+    assert delivery["metric_ref"] == metric["metric_ref"] and delivery["report_ref"] == report["report_ref"]
+    assert delivery["finding"] == report["finding"] and output["artifact_ref"] in report["finding"]["source_refs"]
+    assert metric["display"] == "49/164 (0.299)" and metric["display"] in report["finding"]["text"] and metric["display"] in claim["statement"]
+    assert claim["publication"]["claim_revision_id"] == claim["claim_revision_id"] and claim["publication"]["level"] == "open"
+    calls = delivery["calls"]
+    assert [c["tool"] for c in calls] == ["gx_stage_claim", "gx_decide_revision"]
+    assert calls[0]["official_session_line"] < calls[1]["official_session_line"] and calls[0]["call_id"] != calls[1]["call_id"]
+    assert all(re.fullmatch(r"[0-9a-f]{64}", c[k]) for c in calls for k in ("wire_sha256", "arguments_sha256"))
+    wrong = trace["refusals"]["different_numerator"]
+    assert {r["callback"]["tool"] for r in wrong} == {"gx_submit_module_report", "gx_stage_claim"}
+    for r in wrong:
+        cb = r["callback"]
+        assert "149/164" in (r.get("input") or r.get("claim", "")) and cb["error"] == "SCHEMA_INVALID"
+        assert cb["head_before"] == cb["head_after"] and cb["lease_id"] and cb["task_id"]
+    foreign = trace["refusals"]["foreign_original"]
+    assert trace["control_run_id"] != trace["run_id"] and foreign["target_run_id"] != trace["control_run_id"]
+    assert foreign["own_ref_same_bytes"] != foreign["foreign_ref"] and foreign["returncode"] != 0
+    assert foreign["foreign_ref"] in foreign["argv"] and original["sha256"] in foreign["argv"] and "run-local" in foreign["diagnostic"]
+    return "Official Lead received 49/164 (0.299), staged and adopted open; wrong numerator and cross-Run original refused"
+
+
+def legacy_coordinates(docs, source):
+    comparison, before, after = docs
+    assert comparison["schema"] == "gx.accept.legacy_coordinate_comparison/1"
+    assert before["commit"] == BASE and after["commit"] == source and before["run_id"] != after["run_id"]
+    snapshots = {row["slot"]: row for row in comparison["cases"]}
+    assert set(snapshots) == {"before", "after"}
+    for label, d in (("before", before), ("after", after)):
+        case = snapshots[label]
+        assert all(case[k] == d[k] for k in ("commit", "run_id", "job_id", "output_ref", "acquisition_event",
+                                             "job_created_event", "admission_sha256", "manifest_sha256", "capability_sha256"))
+        assert d["acquisition_event"] < d["job_created_event"] and d["raw_input"]["sha256"] == comparison["input_sha256"]
+        assert d["schema"] == "gx.accept.legacy_coordinates/1" and all(d[k] == v for k,v in comparison["common"].items())
+    assert before["output_sha256"] == after["output_sha256"] and re.fullmatch(r"[0-9a-f]{64}", before["output_sha256"])
+    assert before["nature"] == after["nature"] == "unclassified" and before["output_name"] == after["output_name"] == "geometry.json"
+    assert before["capability"] == after["capability"] == "deposited-chain-geometry@1"
+    assert before["plugin"] == after["plugin"] == "org.gx.protein@0.2.0" and (before["selected"], before["denominator"]) == (49, 164)
+    assert before["real_jobs"] == after["real_jobs"] == 1 and before["paid_calls"] == after["paid_calls"] == 0
+    return "One historical @1 CPU Job on each release; geometry.json SHA-256 and unclassified nature agree"
+
+
+def official_parity(docs, source, registration_sha):
+    parity, reg, result = docs
+    booked = {s["slot"]:s for s in reg["slots"]}
+    assert reg["source_commit"] == source and result["registration_sha256"] == registration_sha
+    assert parity["classification"] == result["classification"] == "SCRIPTED_REHEARSAL"
+    assert set(booked) == set(parity["slots"]) == set(result["cases"]) == SLOTS
+    common = parity["slots"]["01"]["common"]
+    assert common["research_effort"] == "deep" and common["model"] == reg["wire_model"] and common["model_effort"] == reg["wire_effort"]
+    assert {"gx_read_source", "gx_query_catalog", "gx_read_artifact", "gx_decide_revision"} <= set(common["tools"])
+    assert not common["branch_delegation"]
+    pairs = {}
+    for slot, p in parity["slots"].items():
+        measured, booking = result["cases"][slot], booked[slot]
+        arm = p["architecture"]
+        assert arm == measured["architecture"] == booking["architecture"] and p["run_id"] == measured["run_id"]
+        assert p["common"] == common and p["job_count"] == measured["job_count"] == 2
+        assert p["source_sha256"] == measured["assignment"]["sha256"] and measured["paid_model_calls"] == 0
+        extra = {"gx_open_module","gx_cancel_module"} if arm == "delegation_available" else set()
+        assert set(measured["initial_tools"]) == set(common["tools"]) | extra
+        assert p["role_usage"] == measured["role_usage"] and p["live_provider_tokens"] is p["live_provider_usd"] is None
+        pairs.setdefault(booking["code"], {})[arm] = p["source_sha256"]
+    assert pairs.keys() == parity["matched_pairs"].keys() and len(pairs) == 2
+    for code, arms in pairs.items():
+        assert set(arms) == {"single","delegation_available"} and len(set(arms.values())) == 1
+        assert parity["matched_pairs"][code]["cost_ratio_paid"] is None
+    return "Four official openings, two matched specimen pairs, same methods and 2 Jobs/slot; only gx_open_module/gx_cancel_module differ"
+
+
 def outcome(case, docs, source, pins=()):
     """Check substance where a trace is available. A passing command is also required."""
     for d in docs:
@@ -165,6 +256,12 @@ def outcome(case, docs, source, pins=()):
         deny, review = docs
         assert deny["additional_jobs"] == 0 and review["candidate_waits"] and review["review_event"]
         return "Fixed negative launched zero extra Jobs; a different reviewed gate admitted the follow-up"
+    if case == "5.trace":
+        return official_publication(docs[0], source)
+    if case == "5.legacy-coordinate":
+        return legacy_coordinates(docs, source)
+    if case == "C.parity":
+        return official_parity(docs, source, pins[1])
     if case == "5.upgrade":
         before, checked, restored = docs
         assert before["revision"] == checked["baseline"] == restored["baseline"] == BASE

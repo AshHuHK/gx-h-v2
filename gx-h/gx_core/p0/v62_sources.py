@@ -520,6 +520,48 @@ def claim_ground(conn, run_id, ref, decision_scope, event_cursor):
             'evidence_ref':doc.get('evidence_ref', ref), 'review_ref':ref if owned['kind'] == REVIEW_RECORD else None}
 
 
+def report_quotation(conn, run_id, scope, finding, reads):
+    """Recognize exact source text already delivered to this module and cited in this finding."""
+    refs = set(finding['source_refs'])
+    text = finding['text']
+    extracted = refs.intersection(a for read in reads if read['tool'] in (EXTRACT, REVIEW)
+                                 for a in read.get('artifact_refs', ()))
+    for op in reads:
+        if op['tool'] != READ or not op.get('receipt_id') or not refs.intersection(op['source_refs']):
+            continue
+        original = op['source_refs'][0]
+        src = _source(conn, run_id, original)
+        seg = _receipt(conn, src, op['segment_id'], op['receipt_id'], op)
+        base = dict(schema='gx.source_quotation/1', **_pin(src), segment_id=seg['segment_id'],
+                    text_sha256=seg['text_sha256'], receipt_id=op['receipt_id'], record_nature=_nature(src, reviewed=False))
+        if text == seg['text']:
+            return dict(**base, quote_sha256=seg['text_sha256'], source_span=[0,len(text)], finding_span=[0,len(text)])
+        for ref in sorted(extracted):
+            owned = _owned(conn, run_id, ref)
+            if not owned:
+                continue
+            doc = _document(conn, ref, owned)
+            if (doc['anchor_status'] != 'VERBATIM' or doc['source_ref'] != original
+                    or doc['extract_receipt_id'] != op['receipt_id'] or doc['text_sha256'] != seg['text_sha256']):
+                continue
+            start, end, quote = doc['char_start'], doc['char_end'], doc['quote']
+            if seg['text'][start:end] != quote or not quote or _sha(quote) != doc['quote_sha256']:
+                continue
+            idx = text.find(quote)
+            if idx < 0:
+                continue
+            # An inline numeric quote needs explicit attribution. A different literal in its surrounding
+            # interpretation remains subject to the usual metric citation requirement.
+            if text != quote and not (re.search(
+                    r'(?:^|[.!?]\s+)(?:the\s+)?(?:[\w-]+\s+){0,4}'
+                    r'(?:note|source|paper|study|record|article|report)\s+(?:reports?|states?|quotes?)\s+["“]?$',
+                    text[:idx], flags=re.I) and re.match(r'["”]?(?:[.,;:!?]|$)',text[idx+len(quote):])):
+                continue
+            return dict(**base, evidence_ref=ref, evidence_sha256=owned['sha256'], quote_sha256=doc['quote_sha256'],
+                        source_span=[start,end], finding_span=[idx,idx+len(quote)])
+    return None
+
+
 def _published_matches(conn, run_id, scope, cursor, locator, value):
     refs = conn.execute("SELECT subject_id FROM events WHERE run_id=? AND kind='v62.source.reviewed' AND event_id<=? "
         "AND json_extract(payload_json,?)=? ORDER BY event_id", (run_id, cursor, locator, value))

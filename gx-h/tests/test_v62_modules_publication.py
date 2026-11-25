@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from gx_core.domain import ids
-from gx_core.errors import ScopeDenied
+from gx_core.errors import SchemaInvalid, ScopeDenied
 from gx_core.p0 import v6_native
 from tests.test_v62_modules_catalog import HYPOTHESES, LITERATURE, PRODUCT, SURVEY, public_grant
 
@@ -118,6 +118,9 @@ class ModulePublications(unittest.TestCase):
         submission = {"operation_key": "sourced-shortlist", "status": "COMPLETE", "findings": findings,
                       "artifact_refs": [mats["workflow_spec"], mats["model_card"], mats["evaluation_spec"]],
                       "gaps": [card["evaluation_gap"]], "next_steps": ["Obtain coverage on the selected input."]}
+        with self.assertRaises(SchemaInvalid):
+            s.call(survey, "gx_submit_module_report", {**submission,"operation_key":"fake-version",
+                   "findings":[{**findings[0],"text":"Shortlist deposited-chain-geometry@99."}]}, "fake-version")
         receipt = s.call(survey, "gx_submit_module_report", submission, "publish-shortlist")
         self.assertEqual(receipt["status"], "COMPLETE")
         next_lead = s.next_actor("run")
@@ -177,6 +180,14 @@ class ModulePublications(unittest.TestCase):
                 break
         self.assertIsNotNone(excerpt)
         method = {"text": excerpt["text"], "source_refs": [note_ref]}
+        for i, bad in enumerate([
+                {**citation, "text": citation["text"].replace("3.000", "4.000")},
+                {**citation, "text":"GX measured 3.000 angstroms."},
+                {**citation, "text": citation["text"] + " Our measured coverage is 149/164."},
+                {**citation, "source_refs":[note_ref,entry["evidence_ref"]]},
+                {**method, "text":method["text"].replace("at most 40", "at most 400")}]):
+            with self.subTest(bad=bad), self.assertRaises(SchemaInvalid):
+                s.report(reader, xml_ref, "wrong-source-value-" + str(i), findings=[bad])
         reading = s.report(reader, xml_ref, "publish-reading", findings=[citation, counterexample, method],
                            artifact_refs=[entry["evidence_ref"], adverse["evidence_ref"]],
                            gaps=["Refinement resolution alone gives no coverage."])
@@ -189,6 +200,19 @@ class ModulePublications(unittest.TestCase):
             s.call(analyst, "gx_read_artifact", {"ref": xml_ref}, "unassigned-original")
         published = s.call(analyst, "gx_read_artifact", {"ref": reading["report_ref"]}, "read-published")
         self.assertEqual(published["findings"], [citation, counterexample, method])
+        self.assertEqual(published["metrics"], [])
+        proofs = published["source_quotations"]
+        self.assertEqual([q["finding_index"] for q in proofs], [0,1,2])
+        self.assertEqual([q["receipt_id"] for q in proofs],
+                         [passage["receipt_id"], contrast["receipt_id"], excerpt["receipt_id"]])
+        self.assertEqual({q["schema"] for q in proofs},{"gx.source_quotation/1"})
+        self.assertEqual(proofs[0]["evidence_ref"],entry["evidence_ref"])
+        self.assertEqual(proofs[0]["record_nature"],"test_fixture")
+        for q, original in zip(proofs,(passage,contrast,excerpt)):
+            source_text = original["text"][slice(*q["source_span"])]
+            reported = published["findings"][q["finding_index"]]["text"][slice(*q["finding_span"])]
+            self.assertEqual(source_text,reported)
+            self.assertEqual(q["source_sha256"], original["source_sha256"])
         candidates = [
             {"text": "Occupancy and displacement criteria remove some shared residues. On the same 2O0O model, "
                      "deposited-chain-geometry@1 should measure fewer positions under ordered_backbone than "

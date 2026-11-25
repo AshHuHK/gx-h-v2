@@ -194,11 +194,12 @@ class ClaimPublication(unittest.TestCase):
         from tests.test_v62_sources import SourceGoal
         f = SourceGoal()
         self.addCleanup(f.doCleanups)
-        f.setUp()
+        field_note = "The signed west wall survey reported dampness at 7/8 sites."
+        f.setUp(note="Survey scope.\n\n" + field_note + "\n")
         src = f.refs["note.txt"]
         _, worker = f.open(f.lead, [src])
         read = f.paragraph(worker)
-        interpretation = f.interpretation(read)
+        interpretation = f.interpretation(read, claim=field_note)
         found = f.call(worker, sources.EXTRACT, interpretation)
         f.call(f.lead, "gx_decide_revision", {"decision": draft()})
         f.publish(worker, [src, found["evidence_ref"]], "A located observation from the first visit.")
@@ -218,6 +219,9 @@ class ClaimPublication(unittest.TestCase):
                      "limitations": "Western transect only.", "level": "limited_support"}
         with self.assertRaises(SchemaInvalid):
             f.call(lead, "gx_stage_claim", {**candidate, "scope": "All sites"}, "reject-broader-survey")
+        with self.assertRaises(SchemaInvalid):
+            f.call(lead, "gx_stage_claim", {**candidate, "statement": field_note.replace("7/8", "8/8")},
+                   "reject-unreviewed-numeric-rewording")
         proposed = f.call(lead, "gx_stage_claim", candidate)
         result = f.call(lead, "gx_decide_revision", {"decision": draft(evidence=[rr, proposed["claim_ref"]])})
         published, = result["claim_revisions"]

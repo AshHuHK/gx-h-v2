@@ -35,14 +35,14 @@ class OfflineParser(unittest.TestCase):
 
 
 class SourceGoal(unittest.TestCase):
-    def setUp(self):
+    def setUp(self, *, note="North wall.\n\nThe west wall was damp.\n"):
         self.directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
         self.enterContext(native_state(self.directory))
         self.path = self.directory / 'gx.db'
         self.conn = store.open_store(self.path)
         self.addCleanup(lambda: self.conn.close())
         self.enterContext(patch('gx_core.p0.roots.tempfile.gettempdir', return_value=str(self.directory)))
-        materials = [('note.txt', 'literature', 'North wall.\n\nThe west wall was damp.\n'),
+        materials = [('note.txt', 'literature', note),
                      ('manual.md', 'source', '# Survey\n\nOnly the western transect was sampled.\n'),
                      ('article.nxml', 'literature', '<article><body><sec id="results"><p id="contrast">The '
                       '<italic>second</italic> station remained dry.</p></sec></body></article>'),

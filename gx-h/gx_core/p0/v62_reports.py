@@ -449,8 +449,9 @@ def _preview(bundle, index, limit):
     base = _base(bundle, index["report_ref"])
     full = {**base, **{k: bundle[k] for k in ("findings", "gaps", "next_steps", "artifact_refs")},
             "truncated": False}
-    if bundle.get("metrics"):
-        full["metrics"] = bundle["metrics"]
+    for field in ("metrics", "source_quotations"):
+        if bundle.get(field):
+            full[field] = bundle[field]
     if index.get("counterevidence"):
         full["counterevidence"] = index["counterevidence"]
     if _size(full) <= limit:
@@ -464,15 +465,16 @@ def _preview(bundle, index, limit):
         room = limit - _size(preview) + _size(counter)
         if not _fit_string(counter, "text", text, room):
             return None
-    if bundle.get("metrics"):
-        preview["metrics"] = []
-        for metric in bundle["metrics"]:
-            preview["metrics"].append(metric)
-            if _size(preview) > limit:
-                preview["metrics"].pop()
-                break
-        if not preview["metrics"]:
-            del preview["metrics"]
+    for field in ("metrics", "source_quotations"):
+        if bundle.get(field):
+            preview[field] = []
+            for proof in bundle[field]:
+                preview[field].append(proof)
+                if _size(preview) > limit:
+                    preview[field].pop()
+                    break
+            if not preview[field]:
+                del preview[field]
     for key, value in base.items():
         if key not in preview:
             preview[key] = value

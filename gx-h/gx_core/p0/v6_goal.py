@@ -556,6 +556,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     }
     if data["inputs"].get("research_evidence_version"):
         from . import v62_rounds
+        brief["research_evidence_version"] = data["inputs"]["research_evidence_version"]
         brief.update(v62_rounds.brief(conn, rid, cursor))
     return brief
 

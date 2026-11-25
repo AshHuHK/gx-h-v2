@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import deepcopy
+from functools import lru_cache
 from pathlib import Path
 
 from .. import budgets, contracts, registry
@@ -49,6 +51,17 @@ def decision_tool():
     return contracts.native_goal_tool_spec(DECIDE)
 
 
+@lru_cache(maxsize=1)
+def _legacy_goal_tools():
+    """Keep the original, smaller decision vocabulary in quick and pre-B briefs."""
+    decision, claim = deepcopy(decision_tool()), deepcopy(v6_claims.tool_spec())
+    fields = decision["inputSchema"]["properties"]["decision"]["properties"]
+    del fields["convergence"], fields["resolved_gaps"]
+    fields["reconsider_when"]["items"]["properties"]["event"]["enum"].remove("module_report")
+    del claim["inputSchema"]["properties"]["prediction"]
+    return decision, claim
+
+
 def callback_for(name, *, conn=None, run_id=None):
     handler = registry.native_goal_handler_for(name)
     if handler:
@@ -65,7 +78,8 @@ def assigned(row):
 def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     """Select grants when freezing the Root. Resume reuses its persisted tool names."""
     catalog = [spec for spec in read_tools if spec["name"] in ("gx_read_artifact", "gx_task_context")]
-    catalog.extend([decision_tool(), v6_claims.tool_spec()])
+    evidence_run = bool(brief and brief.get("research_evidence_version"))
+    catalog.extend((decision_tool(), v6_claims.tool_spec()) if evidence_run else _legacy_goal_tools())
     if brief is None or (brief.get("scope", "run") == "run" and
                          any(b["status"] == "OPEN" for b in brief.get("branches", []))):
         catalog.append(v6_delegation.TOOL)

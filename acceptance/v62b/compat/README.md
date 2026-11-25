@@ -1,5 +1,11 @@
 # Released-project compatibility and A regression
 
+B runtime `530b1380a1e3bb3cd9ccb5023d436c708512113a` passed A1–A7 and the original A7 upgrade probe. Three V6.1 projects retained five historical Job admissions. B settled the two pending grid Jobs against their existing reservations. The accepted A project retained its two Job manifests, original report and native usage through two B resumes with the operator-supplied files offline. Each project reopened on its original release after rollback. A separate copy of the verifier ran against 328 unpacked B runtime files and 28 indexed evidence files. [Published index](../receipts/compat/index.json) · [Detached replay](../receipts/compat/detached-verification.json)
+
+```bash
+python -B acceptance/v62b/compat/verify.py --revision 530b1380a1e3bb3cd9ccb5023d436c708512113a
+```
+
 The V6.1 inputs are a paired-voltage CSV project and two public synthetic grid projects from the original A7 upgrade probe. The A input is a new instance of the accepted A1 module study on the two deposited coordinate files. The fixtures use a credential-free scripted local peer and real CPU Jobs. Restoring a saved deployment and state at their original physical paths exercises the ordinary native state marker, plugin pins and cold CLI.
 
 `upgrade.py` reads each original admission and completion through the installed manifest reader, checks output bytes against the original artifact records, and runs two independent B CLI resumes. The paused V6.1 grid has two already launched Jobs whose completions await collection. For A, it takes the operator-supplied source files offline and compares the stored inputs, module, report, wake, graph, decision, Job, reservation and turn history across each resume. It restores the supplied files, original checkout bytes, SQLite backup, artifact directory and local loopback home, then reopens the project with the original release.

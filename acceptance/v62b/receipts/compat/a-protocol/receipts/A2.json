@@ -1,0 +1,1490 @@
+{
+  "status": "PASS",
+  "schedules": {
+    "lead_before_read": {
+      "original": null,
+      "change": {
+        "run_id": "gxr_01m897fewy4b1yh6g0",
+        "task_id": "gxt_01m897ff0c9pzqn1rd",
+        "lease_id": "gxl_01m897ff5abqben9tf",
+        "task_status": "ACCEPTED",
+        "decision_ref": "gxa_5ddd60ef0805447d021140a33d994381d68e49b7ef15987ebffa88acd76b1cdc",
+        "decision_id": "gxa_5ddd60ef0805447d021140a33d994381d68e49b7ef15987ebffa88acd76b1cdc",
+        "scope": "run",
+        "goal_version": 1,
+        "context_ref": "gxcx_01m897ff0c0e6jkz12",
+        "base": null,
+        "result_head": {
+          "version": 1,
+          "sha256": "07ad53e93a21d07349860b124854b42c038e75ad0f04e56bb2e70f43b28f7e9d"
+        },
+        "outcome": "adopted",
+        "draft_sha256": "4383662d5c9eb4757c32da2151ec11e45e9902f2c1cf0240b683270456dcfe7d",
+        "resolved_ops": [
+          {
+            "source_index": 0,
+            "op_digest": "15df145afa79dadc805e23598d3757969fccd216d2b089e74e08cff0af1f6cd9",
+            "spec": {
+              "alternative": "Coverage may agree across the files.",
+              "branch": "branch_e944cf39b1dbbe296e307dab1080b959",
+              "budget_limits": {
+                "cpu_seconds": 10,
+                "job_submissions": 1
+              },
+              "discriminating_observation": "Read the source manifest and coordinate counts.",
+              "hypothesis": "The two source files may differ in recorded coverage.",
+              "method_family": "public inventory",
+              "op": "open_branch",
+              "stop_condition": "Stop when the measurement is available."
+            }
+          }
+        ],
+        "aliases": {
+          "local:unrelated-public-branch": "branch_e944cf39b1dbbe296e307dab1080b959"
+        },
+        "reconsider_when": [
+          {
+            "event": "evidence_added",
+            "subject_ref": "run"
+          }
+        ],
+        "checkpoint_id": "gxc_01m897ff91ec2mdvkq",
+        "dispatches": [],
+        "submission_id": "gxsb_01m897ff91p1vkt9rj",
+        "claim_revisions": [],
+        "consumed_event_cursor": 0,
+        "event_id": 42
+      },
+      "report_ref": "gxa_76e313170d9f3eac2d97e9811ec13203964b607660874f54ae1cdb1015edc2ac",
+      "source_event": 43,
+      "tool_answer_sha": "80573fa68f54fbaa4a1b790d45070186191effa8307520715d21d6e3d9bca431",
+      "module": "module_31325a7fcf8fff00d364c6576e9dd011",
+      "history": {
+        "transport": "scripted acknowledgments at the native Roots callback boundary",
+        "run_id": "gxr_01m897fewy4b1yh6g0",
+        "paid_model_calls": 0,
+        "provider_tokens": null,
+        "external_usd": null,
+        "turns": [
+          {
+            "scope": "run",
+            "task_id": "gxt_01m897ff0c9pzqn1rd",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897ff0c0e6jkz12",
+            "lease_id": "gxl_01m897ff5abqben9tf",
+            "thread_id": "script-gxl_01m897ff5abqben9tf",
+            "brief_utf8_bytes": 2603,
+            "brief_sha256": "79bc3d30e3084709a54f30082f2311be2d59dd0c575f5ead351a04ddcd343207",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897ff5abqben9tf",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "inspect-source",
+                "turn_id": "turn-gxl_01m897ff5abqben9tf",
+                "request_sha": "cef011be0e0d30f0e8f35064aa1858f5a2f6756ab1252bef05cdd0d35f3db41e"
+              },
+              {
+                "call_id": "unrelated-public-branch",
+                "turn_id": "turn-gxl_01m897ff5abqben9tf",
+                "request_sha": "c5a8051db395017d1670ca751c7aac49c51609a04052a6319a960cce7467c197"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_stage_claim",
+              "gx_query_catalog",
+              "gx_open_module",
+              "gx_cancel_module"
+            ],
+            "tool_summary_count": 7
+          },
+          {
+            "scope": "module:module_31325a7fcf8fff00d364c6576e9dd011",
+            "task_id": "gxt_01m897ff701a99t6tq",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897ff70azkp8m2m",
+            "lease_id": "gxl_01m897ff76mrss34q5",
+            "thread_id": "script-gxl_01m897ff76mrss34q5",
+            "brief_utf8_bytes": 2807,
+            "brief_sha256": "f5e2d0d14dda23fefabf220e4f0626737a48ec9b4a2c20645bc8a49ec4613db1",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897ff76mrss34q5",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "inspect-source-window",
+                "turn_id": "turn-gxl_01m897ff76mrss34q5",
+                "request_sha": "80c031f930805833357ec9de4271fbb28fa2f01e2368ea64ccd7181752768d3f"
+              },
+              {
+                "call_id": "report",
+                "turn_id": "turn-gxl_01m897ff76mrss34q5",
+                "request_sha": "609dbcc6d97cc7323d27f156666723719bb45820117012f09733e49dbea5ce34"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_submit_module_report",
+              "gx_query_catalog"
+            ],
+            "tool_summary_count": 5
+          }
+        ],
+        "native_requests_to_provider": 0,
+        "scripted_native_turn_count": 2,
+        "persisted_native_tool_call_count": 4,
+        "serial_callback_observations": 4,
+        "decisions_and_tools": [
+          {
+            "key": "inspect-source",
+            "tool": "gx_open_module",
+            "scope": "module:module_31325a7fcf8fff00d364c6576e9dd011",
+            "lease_id": "gxl_01m897ff5abqben9tf",
+            "task_id": "gxt_01m897ff0c9pzqn1rd",
+            "request_sha256": "66f8b393d8d7f24b4518c98c60acd4743b56e7d2d8c324a2dda1349ff759bd6e",
+            "head_before": null,
+            "reply_sha256": "688b4348f26b48e439578e930604508362af435c3f4ae01e28c125cec9750157",
+            "module_instance_id": "module_31325a7fcf8fff00d364c6576e9dd011",
+            "operation_key": "inspect-source",
+            "head_after": null
+          },
+          {
+            "key": "unrelated-public-branch",
+            "tool": "gx_decide_revision",
+            "scope": "run",
+            "lease_id": "gxl_01m897ff5abqben9tf",
+            "task_id": "gxt_01m897ff0c9pzqn1rd",
+            "request_sha256": "70c28d3e52dd7b88867f33b5d673a3cea8e7d13a6215763835a5277cc0172b31",
+            "head_before": null,
+            "reply_sha256": "745b10a043683c8c1383d98afa269d4e436399e092deaf18bb4747582e13d60a",
+            "base": null,
+            "result_head": {
+              "version": 1,
+              "sha256": "07ad53e93a21d07349860b124854b42c038e75ad0f04e56bb2e70f43b28f7e9d"
+            },
+            "decision_ref": "gxa_5ddd60ef0805447d021140a33d994381d68e49b7ef15987ebffa88acd76b1cdc",
+            "head_after": {
+              "version": 1,
+              "sha256": "07ad53e93a21d07349860b124854b42c038e75ad0f04e56bb2e70f43b28f7e9d"
+            }
+          },
+          {
+            "key": "inspect-source-window",
+            "tool": "gx_read_artifact",
+            "scope": "module:module_31325a7fcf8fff00d364c6576e9dd011",
+            "lease_id": "gxl_01m897ff76mrss34q5",
+            "task_id": "gxt_01m897ff701a99t6tq",
+            "request_sha256": "6f5d46e7b12c9b27511311c103494ec57e19a6c767cb466771ead855e723750a",
+            "head_before": {
+              "version": 1,
+              "sha256": "07ad53e93a21d07349860b124854b42c038e75ad0f04e56bb2e70f43b28f7e9d"
+            },
+            "reply_sha256": "80573fa68f54fbaa4a1b790d45070186191effa8307520715d21d6e3d9bca431",
+            "head_after": {
+              "version": 1,
+              "sha256": "07ad53e93a21d07349860b124854b42c038e75ad0f04e56bb2e70f43b28f7e9d"
+            }
+          },
+          {
+            "key": "report",
+            "tool": "gx_submit_module_report",
+            "scope": "module:module_31325a7fcf8fff00d364c6576e9dd011",
+            "lease_id": "gxl_01m897ff76mrss34q5",
+            "task_id": "gxt_01m897ff701a99t6tq",
+            "request_sha256": "1a0953ff01ebc36300f3cb75b681c4740ced03e7c968fa1e44b04a3629038979",
+            "head_before": {
+              "version": 1,
+              "sha256": "07ad53e93a21d07349860b124854b42c038e75ad0f04e56bb2e70f43b28f7e9d"
+            },
+            "reply_sha256": "866762175e70b04504dcede5cf63ab6c480035200f6d68145eead96b7a9b0bed",
+            "module_instance_id": "module_31325a7fcf8fff00d364c6576e9dd011",
+            "base": null,
+            "report_ref": "gxa_76e313170d9f3eac2d97e9811ec13203964b607660874f54ae1cdb1015edc2ac",
+            "artifact_ref": "gxa_76e313170d9f3eac2d97e9811ec13203964b607660874f54ae1cdb1015edc2ac",
+            "operation_key": "report",
+            "head_after": {
+              "version": 1,
+              "sha256": "07ad53e93a21d07349860b124854b42c038e75ad0f04e56bb2e70f43b28f7e9d"
+            }
+          }
+        ],
+        "head": {
+          "version": 1,
+          "sha256": "07ad53e93a21d07349860b124854b42c038e75ad0f04e56bb2e70f43b28f7e9d"
+        },
+        "events": [
+          {
+            "event_id": 35,
+            "kind": "v62.module.opened",
+            "subject_id": "module_31325a7fcf8fff00d364c6576e9dd011",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 42,
+            "kind": "v6.decision.committed",
+            "subject_id": "gxa_5ddd60ef0805447d021140a33d994381d68e49b7ef15987ebffa88acd76b1cdc",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 43,
+            "kind": "v62.module.tool_completed",
+            "subject_id": "module_31325a7fcf8fff00d364c6576e9dd011",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 49,
+            "kind": "v62.module.reported",
+            "subject_id": "module_31325a7fcf8fff00d364c6576e9dd011",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 50,
+            "kind": "v62.module.wake",
+            "subject_id": "gxr_01m897fewy4b1yh6g0",
+            "new_state": null,
+            "reason": null
+          }
+        ],
+        "jobs": [],
+        "nodes": [],
+        "costs": {
+          "budget_ref": "gxb_01m897fex3y52wq8qc",
+          "lines": {
+            "api_calls": {
+              "unit": "calls",
+              "limit": 48,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 48
+            },
+            "cpu_seconds": {
+              "unit": "CPU seconds",
+              "limit": 1200,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 1200
+            },
+            "gpu_jobs": {
+              "unit": "GPU jobs",
+              "limit": 0,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 0
+            },
+            "gpu_minutes": {
+              "unit": "GPU minutes",
+              "limit": 0,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 0
+            },
+            "job_submissions": {
+              "unit": "submissions",
+              "limit": 20,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 20
+            },
+            "tokens": {
+              "unit": "tokens",
+              "limit": 120000,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 120000
+            },
+            "wall_hours": {
+              "unit": "wall hours",
+              "limit": 2,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 2
+            },
+            "worker_tasks": {
+              "unit": "tasks",
+              "limit": 48,
+              "booked": 1,
+              "reserved": 0,
+              "remaining": 47
+            }
+          },
+          "jobs_recorded": 0,
+          "measured_cpu": {
+            "unit": "CPU seconds",
+            "observed": 0,
+            "observed_jobs": 0,
+            "pending_or_unmeasured_jobs": 0
+          },
+          "tokens": {
+            "unit": "tokens",
+            "provider_attributed": 0,
+            "provisional_booked": 0,
+            "unattributed_delta": 0,
+            "unresolved": [],
+            "possibly_understated": []
+          },
+          "provider_charge": {
+            "unit": "USD",
+            "amount": null,
+            "source": "provider_money_cost"
+          }
+        }
+      }
+    },
+    "lead_after_read": {
+      "original": null,
+      "change": {
+        "run_id": "gxr_01m897fg14mh97badd",
+        "task_id": "gxt_01m897fg45fgkx17mv",
+        "lease_id": "gxl_01m897fg95skkg1q5y",
+        "task_status": "ACCEPTED",
+        "decision_ref": "gxa_b7b7de0693c00b761dc09e3a7314eae064cda302fca115ee75c2908ea533878c",
+        "decision_id": "gxa_b7b7de0693c00b761dc09e3a7314eae064cda302fca115ee75c2908ea533878c",
+        "scope": "run",
+        "goal_version": 1,
+        "context_ref": "gxcx_01m897fg45mthggybk",
+        "base": null,
+        "result_head": {
+          "version": 1,
+          "sha256": "e4b987a654ec568839d53aadfbe1d3f04ac9ff06268dd193184cc0d34470e505"
+        },
+        "outcome": "adopted",
+        "draft_sha256": "4383662d5c9eb4757c32da2151ec11e45e9902f2c1cf0240b683270456dcfe7d",
+        "resolved_ops": [
+          {
+            "source_index": 0,
+            "op_digest": "15df145afa79dadc805e23598d3757969fccd216d2b089e74e08cff0af1f6cd9",
+            "spec": {
+              "alternative": "Coverage may agree across the files.",
+              "branch": "branch_f395ba513fa4c65b98f8d88a1cb02ca3",
+              "budget_limits": {
+                "cpu_seconds": 10,
+                "job_submissions": 1
+              },
+              "discriminating_observation": "Read the source manifest and coordinate counts.",
+              "hypothesis": "The two source files may differ in recorded coverage.",
+              "method_family": "public inventory",
+              "op": "open_branch",
+              "stop_condition": "Stop when the measurement is available."
+            }
+          }
+        ],
+        "aliases": {
+          "local:unrelated-public-branch": "branch_f395ba513fa4c65b98f8d88a1cb02ca3"
+        },
+        "reconsider_when": [
+          {
+            "event": "evidence_added",
+            "subject_ref": "run"
+          }
+        ],
+        "checkpoint_id": "gxc_01m897fgbvf3926haf",
+        "dispatches": [],
+        "submission_id": "gxsb_01m897fgbv28dtatwb",
+        "claim_revisions": [],
+        "consumed_event_cursor": 0,
+        "event_id": 43
+      },
+      "report_ref": "gxa_6a37bd1b59948e22749e335a6a5140e8af87c25f71f72eac20cb9e42dbc8f749",
+      "source_event": 37,
+      "tool_answer_sha": "cd669e70f19c3f96c8887cb265b7b39c9058515c3c94e52742fd0b8625621800",
+      "module": "module_28e8e873be093f08507727ac339ee400",
+      "history": {
+        "transport": "scripted acknowledgments at the native Roots callback boundary",
+        "run_id": "gxr_01m897fg14mh97badd",
+        "paid_model_calls": 0,
+        "provider_tokens": null,
+        "external_usd": null,
+        "turns": [
+          {
+            "scope": "run",
+            "task_id": "gxt_01m897fg45fgkx17mv",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897fg45mthggybk",
+            "lease_id": "gxl_01m897fg95skkg1q5y",
+            "thread_id": "script-gxl_01m897fg95skkg1q5y",
+            "brief_utf8_bytes": 2603,
+            "brief_sha256": "76c152c1f55c9c1d8c9a5c5fee0cad3e234fcffdaae29a7b4bd3f582a3965e65",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897fg95skkg1q5y",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "inspect-source",
+                "turn_id": "turn-gxl_01m897fg95skkg1q5y",
+                "request_sha": "035b2a6f8913b14e526269f8daab189fb3fcfe86a345b0e0bd6dc1f71d6b4078"
+              },
+              {
+                "call_id": "unrelated-public-branch",
+                "turn_id": "turn-gxl_01m897fg95skkg1q5y",
+                "request_sha": "c5a8051db395017d1670ca751c7aac49c51609a04052a6319a960cce7467c197"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_stage_claim",
+              "gx_query_catalog",
+              "gx_open_module",
+              "gx_cancel_module"
+            ],
+            "tool_summary_count": 7
+          },
+          {
+            "scope": "module:module_28e8e873be093f08507727ac339ee400",
+            "task_id": "gxt_01m897fga1tewxpyx0",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897fga0d0gtgvx1",
+            "lease_id": "gxl_01m897fga9nnbr9qvb",
+            "thread_id": "script-gxl_01m897fga9nnbr9qvb",
+            "brief_utf8_bytes": 2807,
+            "brief_sha256": "38a73accb4eb50813f93e99700d981bdc3d4ea01d15fbfcfb5a75bf799b174f0",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897fga9nnbr9qvb",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "inspect-source-window",
+                "turn_id": "turn-gxl_01m897fga9nnbr9qvb",
+                "request_sha": "32ae51fe179228af7296abb9ca06b1e2a7e8a190cf4f8254b1921b6d22d854bb"
+              },
+              {
+                "call_id": "report",
+                "turn_id": "turn-gxl_01m897fga9nnbr9qvb",
+                "request_sha": "bb098947e7710daa15aef4b2a6d8a49780fcac48dfa845349abee3cc81437b96"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_submit_module_report",
+              "gx_query_catalog"
+            ],
+            "tool_summary_count": 5
+          }
+        ],
+        "native_requests_to_provider": 0,
+        "scripted_native_turn_count": 2,
+        "persisted_native_tool_call_count": 4,
+        "serial_callback_observations": 4,
+        "decisions_and_tools": [
+          {
+            "key": "inspect-source",
+            "tool": "gx_open_module",
+            "scope": "module:module_28e8e873be093f08507727ac339ee400",
+            "lease_id": "gxl_01m897fg95skkg1q5y",
+            "task_id": "gxt_01m897fg45fgkx17mv",
+            "request_sha256": "2545bd2cb0a8119532e2b3f7006822032c0e954b504b95d1a65d56c71a92500e",
+            "head_before": null,
+            "reply_sha256": "158d72bdfe58fbdd120d2edbd5654b83f62f4f56d55d160483337f30d984cc41",
+            "module_instance_id": "module_28e8e873be093f08507727ac339ee400",
+            "operation_key": "inspect-source",
+            "head_after": null
+          },
+          {
+            "key": "inspect-source-window",
+            "tool": "gx_read_artifact",
+            "scope": "module:module_28e8e873be093f08507727ac339ee400",
+            "lease_id": "gxl_01m897fga9nnbr9qvb",
+            "task_id": "gxt_01m897fga1tewxpyx0",
+            "request_sha256": "67ab57e64cb7966ae7bc8056612574ba478e696bf756d2aa9efa3bb448ae43e7",
+            "head_before": null,
+            "reply_sha256": "cd669e70f19c3f96c8887cb265b7b39c9058515c3c94e52742fd0b8625621800",
+            "head_after": null
+          },
+          {
+            "key": "unrelated-public-branch",
+            "tool": "gx_decide_revision",
+            "scope": "run",
+            "lease_id": "gxl_01m897fg95skkg1q5y",
+            "task_id": "gxt_01m897fg45fgkx17mv",
+            "request_sha256": "70c28d3e52dd7b88867f33b5d673a3cea8e7d13a6215763835a5277cc0172b31",
+            "head_before": null,
+            "reply_sha256": "dfa9864fff2749317f3cb06fa1f3ecdee01e1c1289d871750de5df9e98ef6776",
+            "base": null,
+            "result_head": {
+              "version": 1,
+              "sha256": "e4b987a654ec568839d53aadfbe1d3f04ac9ff06268dd193184cc0d34470e505"
+            },
+            "decision_ref": "gxa_b7b7de0693c00b761dc09e3a7314eae064cda302fca115ee75c2908ea533878c",
+            "head_after": {
+              "version": 1,
+              "sha256": "e4b987a654ec568839d53aadfbe1d3f04ac9ff06268dd193184cc0d34470e505"
+            }
+          },
+          {
+            "key": "report",
+            "tool": "gx_submit_module_report",
+            "scope": "module:module_28e8e873be093f08507727ac339ee400",
+            "lease_id": "gxl_01m897fga9nnbr9qvb",
+            "task_id": "gxt_01m897fga1tewxpyx0",
+            "request_sha256": "eade45c04420f0f0df662b2f8cf0d34c959ec3031d6fa3b18ff22d5ca9a69bd9",
+            "head_before": {
+              "version": 1,
+              "sha256": "e4b987a654ec568839d53aadfbe1d3f04ac9ff06268dd193184cc0d34470e505"
+            },
+            "reply_sha256": "f4b3ef2fb2d1401a7c74987a69c9a620fcac84e1abd86399e69e5d03f2a6a6ff",
+            "module_instance_id": "module_28e8e873be093f08507727ac339ee400",
+            "base": null,
+            "report_ref": "gxa_6a37bd1b59948e22749e335a6a5140e8af87c25f71f72eac20cb9e42dbc8f749",
+            "artifact_ref": "gxa_6a37bd1b59948e22749e335a6a5140e8af87c25f71f72eac20cb9e42dbc8f749",
+            "operation_key": "report",
+            "head_after": {
+              "version": 1,
+              "sha256": "e4b987a654ec568839d53aadfbe1d3f04ac9ff06268dd193184cc0d34470e505"
+            }
+          }
+        ],
+        "head": {
+          "version": 1,
+          "sha256": "e4b987a654ec568839d53aadfbe1d3f04ac9ff06268dd193184cc0d34470e505"
+        },
+        "events": [
+          {
+            "event_id": 35,
+            "kind": "v62.module.opened",
+            "subject_id": "module_28e8e873be093f08507727ac339ee400",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 37,
+            "kind": "v62.module.tool_completed",
+            "subject_id": "module_28e8e873be093f08507727ac339ee400",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 43,
+            "kind": "v6.decision.committed",
+            "subject_id": "gxa_b7b7de0693c00b761dc09e3a7314eae064cda302fca115ee75c2908ea533878c",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 49,
+            "kind": "v62.module.reported",
+            "subject_id": "module_28e8e873be093f08507727ac339ee400",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 50,
+            "kind": "v62.module.wake",
+            "subject_id": "gxr_01m897fg14mh97badd",
+            "new_state": null,
+            "reason": null
+          }
+        ],
+        "jobs": [],
+        "nodes": [],
+        "costs": {
+          "budget_ref": "gxb_01m897fg19drywhpfc",
+          "lines": {
+            "api_calls": {
+              "unit": "calls",
+              "limit": 48,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 48
+            },
+            "cpu_seconds": {
+              "unit": "CPU seconds",
+              "limit": 1200,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 1200
+            },
+            "gpu_jobs": {
+              "unit": "GPU jobs",
+              "limit": 0,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 0
+            },
+            "gpu_minutes": {
+              "unit": "GPU minutes",
+              "limit": 0,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 0
+            },
+            "job_submissions": {
+              "unit": "submissions",
+              "limit": 20,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 20
+            },
+            "tokens": {
+              "unit": "tokens",
+              "limit": 120000,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 120000
+            },
+            "wall_hours": {
+              "unit": "wall hours",
+              "limit": 2,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 2
+            },
+            "worker_tasks": {
+              "unit": "tasks",
+              "limit": 48,
+              "booked": 1,
+              "reserved": 0,
+              "remaining": 47
+            }
+          },
+          "jobs_recorded": 0,
+          "measured_cpu": {
+            "unit": "CPU seconds",
+            "observed": 0,
+            "observed_jobs": 0,
+            "pending_or_unmeasured_jobs": 0
+          },
+          "tokens": {
+            "unit": "tokens",
+            "provider_attributed": 0,
+            "provisional_booked": 0,
+            "unattributed_delta": 0,
+            "unresolved": [],
+            "possibly_understated": []
+          },
+          "provider_charge": {
+            "unit": "USD",
+            "amount": null,
+            "source": "provider_money_cost"
+          }
+        }
+      }
+    },
+    "cancel_after_read": {
+      "cancellation": {
+        "module_instance_id": "module_72ae673a134d018ceac15b7b84fae7a1",
+        "operation_key": "withdraw-assignment",
+        "reason": "This input is no longer assigned.",
+        "scope": "module:module_72ae673a134d018ceac15b7b84fae7a1",
+        "run_id": "gxr_01m897fh361nrsre1z",
+        "status": "CANCELLED",
+        "thread_id": "script-gxl_01m897fhagz6eabc5g",
+        "turn_id": "turn-gxl_01m897fhagz6eabc5g",
+        "call_id": "cancel",
+        "task_id": "gxt_01m897fh683g7rvng8",
+        "lease_id": "gxl_01m897fhagz6eabc5g"
+      },
+      "late_write": {
+        "code": "SCOPE_DENIED",
+        "reason": "this root no longer owns the current task attempt",
+        "details": {}
+      },
+      "retained_source": {
+        "arguments": {
+          "ref": "gxa_01m897fh41513k5mnx"
+        },
+        "artifact_refs": [
+          "gxa_01m897fh41513k5mnx"
+        ],
+        "call_id": "inspect-source-window",
+        "lease_id": "gxl_01m897fhc3f56hdzat",
+        "module_instance_id": "module_72ae673a134d018ceac15b7b84fae7a1",
+        "operation_key": "inspect-source-window",
+        "result_sha256": "fcf944e4d651c6bec75fc789895df45fc8fa40a754453c92b0d50aa610139f76",
+        "scope": "module:module_72ae673a134d018ceac15b7b84fae7a1",
+        "source_refs": [
+          "gxa_01m897fh41513k5mnx"
+        ],
+        "source_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "task_id": "gxt_01m897fhbrkpcz65tp",
+        "thread_id": "script-gxl_01m897fhc3f56hdzat",
+        "tool": "gx_read_artifact",
+        "turn_id": "turn-gxl_01m897fhc3f56hdzat"
+      },
+      "prepared_write": {
+        "code": "SCOPE_DENIED",
+        "reason": "this root no longer owns the current task attempt",
+        "details": {}
+      },
+      "history": {
+        "transport": "scripted acknowledgments at the native Roots callback boundary",
+        "run_id": "gxr_01m897fh361nrsre1z",
+        "paid_model_calls": 0,
+        "provider_tokens": null,
+        "external_usd": null,
+        "turns": [
+          {
+            "scope": "run",
+            "task_id": "gxt_01m897fh683g7rvng8",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897fh68ndnkg52q",
+            "lease_id": "gxl_01m897fhagz6eabc5g",
+            "thread_id": "script-gxl_01m897fhagz6eabc5g",
+            "brief_utf8_bytes": 2603,
+            "brief_sha256": "6de6eef5a8ba6a013c97c1f9dadd87d0449d5e35b1a4906972d00320f665f12e",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897fhagz6eabc5g",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "inspect-source",
+                "turn_id": "turn-gxl_01m897fhagz6eabc5g",
+                "request_sha": "202486d6b360906c0a475d0d0b5811886888658dedb37631f5029cb0c6f52e46"
+              },
+              {
+                "call_id": "cancel",
+                "turn_id": "turn-gxl_01m897fhagz6eabc5g",
+                "request_sha": "8c7eae6f60d448ca4b933700e6c6ecde2c42f14b7d1848eb5f76423e9acd46e1"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_stage_claim",
+              "gx_query_catalog",
+              "gx_open_module",
+              "gx_cancel_module"
+            ],
+            "tool_summary_count": 7
+          },
+          {
+            "scope": "module:module_72ae673a134d018ceac15b7b84fae7a1",
+            "task_id": "gxt_01m897fhbrkpcz65tp",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897fhbr4rbw2t9j",
+            "lease_id": "gxl_01m897fhc3f56hdzat",
+            "thread_id": "script-gxl_01m897fhc3f56hdzat",
+            "brief_utf8_bytes": 2807,
+            "brief_sha256": "b729c2be38c9d849372a97cb718f81796a51415dc4dff2ef2d29eae70a67d6f8",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897fhc3f56hdzat",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "inspect-source-window",
+                "turn_id": "turn-gxl_01m897fhc3f56hdzat",
+                "request_sha": "7259f98897cdca7fcc888df3497e1b7d0bc981e686efa8806e2ff928bc104b36"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_submit_module_report",
+              "gx_query_catalog"
+            ],
+            "tool_summary_count": 5
+          }
+        ],
+        "native_requests_to_provider": 0,
+        "scripted_native_turn_count": 2,
+        "persisted_native_tool_call_count": 3,
+        "serial_callback_observations": 4,
+        "decisions_and_tools": [
+          {
+            "key": "inspect-source",
+            "tool": "gx_open_module",
+            "scope": "module:module_72ae673a134d018ceac15b7b84fae7a1",
+            "lease_id": "gxl_01m897fhagz6eabc5g",
+            "task_id": "gxt_01m897fh683g7rvng8",
+            "request_sha256": "56224591d97cc7da5f91ea9bba2f7572c68293ccb629475956b859c3f8bda7b3",
+            "head_before": null,
+            "reply_sha256": "8b76d410a87d0386859959ed324ebd626d53f5e747c26cbb207d546a8e131436",
+            "module_instance_id": "module_72ae673a134d018ceac15b7b84fae7a1",
+            "operation_key": "inspect-source",
+            "head_after": null
+          },
+          {
+            "key": "inspect-source-window",
+            "tool": "gx_read_artifact",
+            "scope": "module:module_72ae673a134d018ceac15b7b84fae7a1",
+            "lease_id": "gxl_01m897fhc3f56hdzat",
+            "task_id": "gxt_01m897fhbrkpcz65tp",
+            "request_sha256": "dff41409f0e74fd0363dbf8c7e6090e4d75fe3ae3ec367b005b44fca70bad186",
+            "head_before": null,
+            "reply_sha256": "fcf944e4d651c6bec75fc789895df45fc8fa40a754453c92b0d50aa610139f76",
+            "head_after": null
+          },
+          {
+            "key": "cancel",
+            "tool": "gx_cancel_module",
+            "scope": "module:module_72ae673a134d018ceac15b7b84fae7a1",
+            "lease_id": "gxl_01m897fhagz6eabc5g",
+            "task_id": "gxt_01m897fh683g7rvng8",
+            "request_sha256": "de68fa7c02759ac37e4ce604365cde58db532b136defa98148504db6a0698f4f",
+            "head_before": null,
+            "reply_sha256": "e3f9274f1d4567b3e6b8417837e999548359a8d03b0c1ec11a4f5335dadb4450",
+            "module_instance_id": "module_72ae673a134d018ceac15b7b84fae7a1",
+            "operation_key": "withdraw-assignment",
+            "head_after": null
+          },
+          {
+            "key": "measure-late-measurement",
+            "tool": "gx_decide_revision",
+            "scope": "module:module_72ae673a134d018ceac15b7b84fae7a1",
+            "lease_id": "gxl_01m897fhc3f56hdzat",
+            "task_id": "gxt_01m897fhbrkpcz65tp",
+            "request_sha256": "ebb3b372d2ed3be8931ecdcdd8a6c1eb53932ff0dd85095b3e11c4a0355aa375",
+            "head_before": null,
+            "error": "SCOPE_DENIED",
+            "reason": "SCOPE_DENIED: this root no longer owns the current task attempt",
+            "details": {},
+            "head_after": null
+          }
+        ],
+        "head": null,
+        "events": [
+          {
+            "event_id": 35,
+            "kind": "v62.module.opened",
+            "subject_id": "module_72ae673a134d018ceac15b7b84fae7a1",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 37,
+            "kind": "v62.module.tool_completed",
+            "subject_id": "module_72ae673a134d018ceac15b7b84fae7a1",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 39,
+            "kind": "v62.module.cancelled",
+            "subject_id": "module_72ae673a134d018ceac15b7b84fae7a1",
+            "new_state": "CANCELLED",
+            "reason": "This input is no longer assigned."
+          }
+        ],
+        "jobs": [],
+        "nodes": [],
+        "costs": {
+          "budget_ref": "gxb_01m897fh3c60b33jqg",
+          "lines": {
+            "api_calls": {
+              "unit": "calls",
+              "limit": 48,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 48
+            },
+            "cpu_seconds": {
+              "unit": "CPU seconds",
+              "limit": 1200,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 1200
+            },
+            "gpu_jobs": {
+              "unit": "GPU jobs",
+              "limit": 0,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 0
+            },
+            "gpu_minutes": {
+              "unit": "GPU minutes",
+              "limit": 0,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 0
+            },
+            "job_submissions": {
+              "unit": "submissions",
+              "limit": 20,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 20
+            },
+            "tokens": {
+              "unit": "tokens",
+              "limit": 120000,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 120000
+            },
+            "wall_hours": {
+              "unit": "wall hours",
+              "limit": 2,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 2
+            },
+            "worker_tasks": {
+              "unit": "tasks",
+              "limit": 48,
+              "booked": 1,
+              "reserved": 0,
+              "remaining": 47
+            }
+          },
+          "jobs_recorded": 0,
+          "measured_cpu": {
+            "unit": "CPU seconds",
+            "observed": 0,
+            "observed_jobs": 0,
+            "pending_or_unmeasured_jobs": 0
+          },
+          "tokens": {
+            "unit": "tokens",
+            "provider_attributed": 0,
+            "provisional_booked": 0,
+            "unattributed_delta": 0,
+            "unresolved": [],
+            "possibly_understated": []
+          },
+          "provider_charge": {
+            "unit": "USD",
+            "amount": null,
+            "source": "provider_money_cost"
+          }
+        }
+      }
+    },
+    "monitored_counterevidence": {
+      "first_wake": {
+        "module_instance_ids": [
+          "module_da4662814a961c59ecfa5a384d5dea47"
+        ],
+        "reason": "counterevidence",
+        "report_refs": [
+          "gxa_cdaafdf10a7e60c5ea86c171b02352335f4d7b91cc6b336b267c261d12fdfbef"
+        ],
+        "round": 1,
+        "scope": "run",
+        "wake_key": "early:module_da4662814a961c59ecfa5a384d5dea47"
+      },
+      "round_wake": {
+        "module_instance_ids": [
+          "module_f8ba5961f47433d61b19ac7a9689392c"
+        ],
+        "reason": "round_complete",
+        "report_refs": [
+          "gxa_ffdb1fce4f0db4f7b13052d6a8d4ec618588c67861ff0f8bd4c265d134618778"
+        ],
+        "round": 1,
+        "scope": "run",
+        "wake_key": "round:1"
+      },
+      "lead_received": "gxt_01m897fjgbp5b0wj26",
+      "report_refs": [
+        "gxa_01m897fj4xx7exeamc",
+        "gxa_01m897fj5kvf4e0y48",
+        "gxa_01m897fj62nsby3s17",
+        "gxa_cdaafdf10a7e60c5ea86c171b02352335f4d7b91cc6b336b267c261d12fdfbef"
+      ],
+      "history": {
+        "transport": "scripted acknowledgments at the native Roots callback boundary",
+        "run_id": "gxr_01m897fj41jnwn9075",
+        "paid_model_calls": 0,
+        "provider_tokens": null,
+        "external_usd": null,
+        "turns": [
+          {
+            "scope": "run",
+            "task_id": "gxt_01m897fj73v71dv6rn",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897fj73gqkrtx8q",
+            "lease_id": "gxl_01m897fjaq2b3jesej",
+            "thread_id": "script-gxl_01m897fjaq2b3jesej",
+            "brief_utf8_bytes": 2603,
+            "brief_sha256": "ec74d86584f59debb5fe0a23e386494c0d29d52f6bffb0d390fdc934e58db449",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897fjaq2b3jesej",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "watch-this-module",
+                "turn_id": "turn-gxl_01m897fjaq2b3jesej",
+                "request_sha": "01c3be4b2e32e581d1edca314c54e494ac5743d2b608d460ebcbe51a6175370e"
+              },
+              {
+                "call_id": "unaffected-module",
+                "turn_id": "turn-gxl_01m897fjaq2b3jesej",
+                "request_sha": "a99220b752a35dde23b4561ef372c423d054c92e7ad54c5f14f73ac1018a5d1e"
+              },
+              {
+                "call_id": "wait-for-inventory",
+                "turn_id": "turn-gxl_01m897fjaq2b3jesej",
+                "request_sha": "2b9dd07693d9154391775b181ea7dff561c294aa7d45b899f978cb56ab93955f"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_stage_claim",
+              "gx_query_catalog",
+              "gx_open_module",
+              "gx_cancel_module"
+            ],
+            "tool_summary_count": 7
+          },
+          {
+            "scope": "module:module_da4662814a961c59ecfa5a384d5dea47",
+            "task_id": "gxt_01m897fjbm9mg6ncc7",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897fjbk7tjhpha8",
+            "lease_id": "gxl_01m897fjc641k3f192",
+            "thread_id": "script-gxl_01m897fjc641k3f192",
+            "brief_utf8_bytes": 2807,
+            "brief_sha256": "67cc09ba32270983be0ab57c4113f2b98eb4fa02d47d3854512e1353a0f2abe0",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897fjc641k3f192",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "monitored-inspection",
+                "turn_id": "turn-gxl_01m897fjc641k3f192",
+                "request_sha": "35f377468453b448b7508d742183742ab919f783aaaa302ed0758eaa187cac84"
+              },
+              {
+                "call_id": "monitored-report",
+                "turn_id": "turn-gxl_01m897fjc641k3f192",
+                "request_sha": "c05b2481e5504d3a5e9c3a8ad55767c1525725964e983daf8ed9c59418f79dd4"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_submit_module_report",
+              "gx_query_catalog"
+            ],
+            "tool_summary_count": 5
+          },
+          {
+            "scope": "module:module_f8ba5961f47433d61b19ac7a9689392c",
+            "task_id": "gxt_01m897fjc0cjwxjrk5",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897fjc0e784bwba",
+            "lease_id": "gxl_01m897fjcgp94s36zj",
+            "thread_id": "script-gxl_01m897fjcgp94s36zj",
+            "brief_utf8_bytes": 2807,
+            "brief_sha256": "957bac35b00c25f8f9f6964541e37b23dc72b2df0233afc916439ae2ff7304ba",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897fjcgp94s36zj",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [
+              {
+                "call_id": "finish-independent-inspection",
+                "turn_id": "turn-gxl_01m897fjcgp94s36zj",
+                "request_sha": "902f0f543c583c4a159557761b310be622c7784373ec42c59369bbd866796267"
+              },
+              {
+                "call_id": "peer-round-finish",
+                "turn_id": "turn-gxl_01m897fjcgp94s36zj",
+                "request_sha": "0dfce826c202d6fa7c273e4a344a5282ff1eabb597dcef6583a505ee2590c04f"
+              }
+            ],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_submit_module_report",
+              "gx_query_catalog"
+            ],
+            "tool_summary_count": 5
+          },
+          {
+            "scope": "run",
+            "task_id": "gxt_01m897fjgbp5b0wj26",
+            "base_json": "null",
+            "context_ref": "gxcx_01m897fjgbqw5ykdfx",
+            "lease_id": "gxl_01m897fjgr7crrwj1a",
+            "thread_id": "script-gxl_01m897fjgr7crrwj1a",
+            "brief_utf8_bytes": 5362,
+            "brief_sha256": "1bd0ece873d4819ea44da211e400aee367c4cc9611dfe80ad5941c753ec64b6a",
+            "brief_tokens_observed": null,
+            "transport_turns": [
+              {
+                "turn_id": "turn-gxl_01m897fjgr7crrwj1a",
+                "state": "acknowledged",
+                "reservation_ref": null,
+                "token_budget": null,
+                "scripted_total_tokens": null
+              }
+            ],
+            "tool_receipts": [],
+            "token_source": "local scripted transport; paid provider tokens unobserved",
+            "tool_names": [
+              "gx_task_context",
+              "gx_read_artifact",
+              "gx_decide_revision",
+              "gx_stage_claim",
+              "gx_query_catalog",
+              "gx_open_module",
+              "gx_cancel_module"
+            ],
+            "tool_summary_count": 7
+          }
+        ],
+        "native_requests_to_provider": 0,
+        "scripted_native_turn_count": 4,
+        "persisted_native_tool_call_count": 7,
+        "serial_callback_observations": 8,
+        "decisions_and_tools": [
+          {
+            "key": "watch-this-module",
+            "tool": "gx_open_module",
+            "scope": "module:module_da4662814a961c59ecfa5a384d5dea47",
+            "lease_id": "gxl_01m897fjaq2b3jesej",
+            "task_id": "gxt_01m897fj73v71dv6rn",
+            "request_sha256": "4077ad92ddfd590c0a4fe7d3e7663450e52b44dda6af5f7a739c8423a6da8383",
+            "head_before": null,
+            "reply_sha256": "e12055f31f3863f793036f5948d782890bfb0d71b1a7d1e8afb05f675fde3a96",
+            "module_instance_id": "module_da4662814a961c59ecfa5a384d5dea47",
+            "operation_key": "watch-this-module",
+            "head_after": null
+          },
+          {
+            "key": "unaffected-module",
+            "tool": "gx_open_module",
+            "scope": "module:module_f8ba5961f47433d61b19ac7a9689392c",
+            "lease_id": "gxl_01m897fjaq2b3jesej",
+            "task_id": "gxt_01m897fj73v71dv6rn",
+            "request_sha256": "357eb4cbb090360169456c785f15ab974689be3adb1366ad93bf007007f0a1b2",
+            "head_before": null,
+            "reply_sha256": "a0f388101e5a11f73fbc295074d8c1400bc51ab434232c5154ac807ebb7a98f8",
+            "module_instance_id": "module_f8ba5961f47433d61b19ac7a9689392c",
+            "operation_key": "unaffected-module",
+            "head_after": null
+          },
+          {
+            "key": "wait-for-inventory",
+            "tool": "gx_decide_revision",
+            "scope": "run",
+            "lease_id": "gxl_01m897fjaq2b3jesej",
+            "task_id": "gxt_01m897fj73v71dv6rn",
+            "request_sha256": "1a4325545e521287b4e48ebf607e899e3a0c26105cb039edeedce6220b93f77d",
+            "head_before": null,
+            "reply_sha256": "04c2802afd33520c098b0d5642d12bec207dc52d03c16f9670a1afd79f896281",
+            "base": null,
+            "result_head": null,
+            "decision_ref": "gxa_4bf48deadacf9ea65a4e62afff38373177d89e969c6472111a2bd087ff36f77a",
+            "head_after": null
+          },
+          {
+            "key": "monitored-inspection",
+            "tool": "gx_read_artifact",
+            "scope": "module:module_da4662814a961c59ecfa5a384d5dea47",
+            "lease_id": "gxl_01m897fjc641k3f192",
+            "task_id": "gxt_01m897fjbm9mg6ncc7",
+            "request_sha256": "32967424871307343f4eff51326e280ed3878c44670eacf0f2e34ca29f4063ae",
+            "head_before": null,
+            "reply_sha256": "3f8a1615da997a461d53002737af32029f43db446fac9695ebfd061a531bb33f",
+            "head_after": null
+          },
+          {
+            "key": "monitored-report",
+            "tool": "gx_submit_module_report",
+            "scope": "module:module_da4662814a961c59ecfa5a384d5dea47",
+            "lease_id": "gxl_01m897fjc641k3f192",
+            "task_id": "gxt_01m897fjbm9mg6ncc7",
+            "request_sha256": "0bbc367f80fe245b29d41b62a1d06028764b23690dc63a881b98320781ca8454",
+            "head_before": null,
+            "reply_sha256": "1275b84a46245aeecbd5e5b6c95f6d3cdbba24bf5d13c900a0ebaf17fdedea6a",
+            "module_instance_id": "module_da4662814a961c59ecfa5a384d5dea47",
+            "base": null,
+            "report_ref": "gxa_cdaafdf10a7e60c5ea86c171b02352335f4d7b91cc6b336b267c261d12fdfbef",
+            "artifact_ref": "gxa_cdaafdf10a7e60c5ea86c171b02352335f4d7b91cc6b336b267c261d12fdfbef",
+            "operation_key": "monitored-report",
+            "head_after": null
+          },
+          {
+            "key": "monitored-report",
+            "tool": "gx_submit_module_report",
+            "scope": "module:module_da4662814a961c59ecfa5a384d5dea47",
+            "lease_id": "gxl_01m897fjc641k3f192",
+            "task_id": "gxt_01m897fjbm9mg6ncc7",
+            "request_sha256": "0bbc367f80fe245b29d41b62a1d06028764b23690dc63a881b98320781ca8454",
+            "head_before": null,
+            "reply_sha256": "1275b84a46245aeecbd5e5b6c95f6d3cdbba24bf5d13c900a0ebaf17fdedea6a",
+            "module_instance_id": "module_da4662814a961c59ecfa5a384d5dea47",
+            "base": null,
+            "report_ref": "gxa_cdaafdf10a7e60c5ea86c171b02352335f4d7b91cc6b336b267c261d12fdfbef",
+            "artifact_ref": "gxa_cdaafdf10a7e60c5ea86c171b02352335f4d7b91cc6b336b267c261d12fdfbef",
+            "operation_key": "monitored-report",
+            "head_after": null
+          },
+          {
+            "key": "finish-independent-inspection",
+            "tool": "gx_read_artifact",
+            "scope": "module:module_f8ba5961f47433d61b19ac7a9689392c",
+            "lease_id": "gxl_01m897fjcgp94s36zj",
+            "task_id": "gxt_01m897fjc0cjwxjrk5",
+            "request_sha256": "0a3fb81e859e54c573f4d8e50d722290a6145b16cb1358ca16c4fd301cb6d939",
+            "head_before": null,
+            "reply_sha256": "08b01bb054f5b1feb2e4272e73e71961d08b8458c7adff9d48ed1732603547ca",
+            "head_after": null
+          },
+          {
+            "key": "peer-round-finish",
+            "tool": "gx_submit_module_report",
+            "scope": "module:module_f8ba5961f47433d61b19ac7a9689392c",
+            "lease_id": "gxl_01m897fjcgp94s36zj",
+            "task_id": "gxt_01m897fjc0cjwxjrk5",
+            "request_sha256": "558e82df3794362129e19ccfed9aabfd36da25fdb4cf15d11fed6b6d87f97026",
+            "head_before": null,
+            "reply_sha256": "2fe3cbf5be1b9b91c9691c132e11238f9de020803374fe99e1f7d1b49319226f",
+            "module_instance_id": "module_f8ba5961f47433d61b19ac7a9689392c",
+            "base": null,
+            "report_ref": "gxa_ffdb1fce4f0db4f7b13052d6a8d4ec618588c67861ff0f8bd4c265d134618778",
+            "artifact_ref": "gxa_ffdb1fce4f0db4f7b13052d6a8d4ec618588c67861ff0f8bd4c265d134618778",
+            "operation_key": "peer-round-finish",
+            "head_after": null
+          }
+        ],
+        "head": null,
+        "events": [
+          {
+            "event_id": 35,
+            "kind": "v62.module.opened",
+            "subject_id": "module_da4662814a961c59ecfa5a384d5dea47",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 42,
+            "kind": "v62.module.opened",
+            "subject_id": "module_f8ba5961f47433d61b19ac7a9689392c",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 50,
+            "kind": "v6.decision.committed",
+            "subject_id": "gxa_4bf48deadacf9ea65a4e62afff38373177d89e969c6472111a2bd087ff36f77a",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 51,
+            "kind": "v62.module.tool_completed",
+            "subject_id": "module_da4662814a961c59ecfa5a384d5dea47",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 57,
+            "kind": "v62.module.reported",
+            "subject_id": "module_da4662814a961c59ecfa5a384d5dea47",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 58,
+            "kind": "v62.module.wake",
+            "subject_id": "gxr_01m897fj41jnwn9075",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 63,
+            "kind": "v62.module.tool_completed",
+            "subject_id": "module_f8ba5961f47433d61b19ac7a9689392c",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 69,
+            "kind": "v62.module.reported",
+            "subject_id": "module_f8ba5961f47433d61b19ac7a9689392c",
+            "new_state": null,
+            "reason": null
+          },
+          {
+            "event_id": 70,
+            "kind": "v62.module.wake",
+            "subject_id": "gxr_01m897fj41jnwn9075",
+            "new_state": null,
+            "reason": null
+          }
+        ],
+        "jobs": [],
+        "nodes": [],
+        "costs": {
+          "budget_ref": "gxb_01m897fj460nc93dnk",
+          "lines": {
+            "api_calls": {
+              "unit": "calls",
+              "limit": 48,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 48
+            },
+            "cpu_seconds": {
+              "unit": "CPU seconds",
+              "limit": 1200,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 1200
+            },
+            "gpu_jobs": {
+              "unit": "GPU jobs",
+              "limit": 0,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 0
+            },
+            "gpu_minutes": {
+              "unit": "GPU minutes",
+              "limit": 0,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 0
+            },
+            "job_submissions": {
+              "unit": "submissions",
+              "limit": 20,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 20
+            },
+            "tokens": {
+              "unit": "tokens",
+              "limit": 120000,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 120000
+            },
+            "wall_hours": {
+              "unit": "wall hours",
+              "limit": 2,
+              "booked": 0,
+              "reserved": 0,
+              "remaining": 2
+            },
+            "worker_tasks": {
+              "unit": "tasks",
+              "limit": 48,
+              "booked": 2,
+              "reserved": 0,
+              "remaining": 46
+            }
+          },
+          "jobs_recorded": 0,
+          "measured_cpu": {
+            "unit": "CPU seconds",
+            "observed": 0,
+            "observed_jobs": 0,
+            "pending_or_unmeasured_jobs": 0
+          },
+          "tokens": {
+            "unit": "tokens",
+            "provider_attributed": 0,
+            "provisional_booked": 0,
+            "unattributed_delta": 0,
+            "unresolved": [],
+            "possibly_understated": []
+          },
+          "provider_charge": {
+            "unit": "USD",
+            "amount": null,
+            "source": "provider_money_cost"
+          }
+        }
+      }
+    }
+  },
+  "case": "A2",
+  "elapsed_seconds": 4.592,
+  "host_classification": "GX Roots native tool callbacks with a local scripted transport",
+  "paid_model_calls": 0,
+  "provider_tokens": null,
+  "observed_sources": {
+    "commit": "530b1380a1e3bb3cd9ccb5023d436c708512113a",
+    "runtime_file_count": 328,
+    "runtime_sources_sha256": "a8c8d50c8c82f76751e54f8a38093f868a5dc054317ffe57f6c8fcc544540b40",
+    "acceptance_sources_sha256": {
+      "interleavings.py": "8aea8fcd07ea227659d7c095195c5be16c08f94f98d40668165b51cca2de5052",
+      "interleavings_fixture.py": "fd68f4c5b0de5948ae947ffe586d289aae41d788cf8a598b64773a4755d7ac57",
+      "interleavings_isolation.py": "1fcddc18e7ce24c7764a8385f8864f762c241518174c3e11da3ebe1540e543fa",
+      "interleavings_limits.py": "2182b542f6e63c502a55e41316ea25c7cddf4b0a4bfb95bd394fb582519f881d"
+    }
+  }
+}

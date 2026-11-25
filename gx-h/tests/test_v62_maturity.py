@@ -271,12 +271,33 @@ class ProspectiveClaims(unittest.TestCase):
 
 class ComputedPredictions(unittest.TestCase):
     def test_same_pointer_for_real_sibling_outputs_uses_pinned_output_and_distinct_observation_type(self):
+        self._sibling_decisions(historical_replay=True)
+
+    def test_typed_sibling_measurements_keep_unknown_launch_order_separate(self):
+        self._sibling_decisions(historical_replay=False)
+
+    def _sibling_decisions(self, *, historical_replay):
         from gx_core.p0 import v6_decisions
         from tests.test_v6_decisions import bind_native_fixture, branch, draft
         from tests.test_v62_outputs import METHOD, SCOPE, acquired, start_series_goal
         tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
         db = self.enterContext(closing(store.open_store(tmp / "gx.db")))
-        run, raw = start_series_goal(self, db, tmp, effort="medium")
+        if historical_replay:
+            run, raw = start_series_goal(self, db, tmp, effort="medium", historical_replay=True)
+        else:
+            # For a current Goal, the instrument declares its metric before registration.
+            import shutil
+            from tests import test_v62_outputs as instrument
+            fixture = tmp / "measured-series"
+            shutil.copytree(instrument.FIXTURE, fixture)
+            card = fixture / "series.json"
+            package = json.loads(card.read_bytes())
+            for output in package["manifest"]["outputs"][:2]:
+                output["metric_specs"] = {"reading": {"op": "decimal/1", "reader": "json/1",
+                    "pointer": "/value", "unit": "1", "places": 2}}
+            card.write_text(json.dumps(package))
+            with patch.object(instrument, "FIXTURE", fixture):
+                run, raw = start_series_goal(self, db, tmp, effort="medium")
         v6_goal.record_observation(db, run, raw, source="field-sensor", acquisition=acquired("s1"))
         call = bind_native_fixture(db, run, tmp)
         delegation = db.execute("SELECT context_ref,visible_refs_json FROM v6_decision_tasks WHERE task_id=?",
@@ -344,8 +365,10 @@ class ComputedPredictions(unittest.TestCase):
         self.assertFalse(actual["observed"]["results"])
         self.assertIn("nature_mismatch",{g["kind"] for g in actual["observed"]["gaps"]})
         late = actual["after dispatch"]
-        self.assertEqual((late["stage"], late["direction"]), ("grounded", "opposed"))
+        expected = "opposed" if historical_replay else "undetermined"
+        self.assertEqual((late["stage"], late["direction"]), ("grounded", expected))
         uncertain, = [g for g in late["gaps"] if g["kind"] == "unverified_production_order"]
+        self.assertEqual((uncertain["supports"], uncertain["value"]), (False, 3))
         self.assertLess(uncertain["launch_event_id"],late["registration"]["event_id"])
         self.assertGreater(uncertain["first_event_id"],late["registration"]["event_id"])
 

@@ -500,8 +500,9 @@ def brief(conn, rid, cursor):
                                      **({"resolved_gaps": closed} if closed else {}))}
 
 
-def _late_event(conn, rid, cursor):
-    from . import v6_goal, v62_lead
+def late_evidence(conn, rid, cursor):
+    """The normal Lead event view excludes historical Goals, private workers and accounting."""
+    from . import v6_goal, v62_lead, v621_policy
     private = v62_lead.branch_ids(conn, rid)
     for row in v6_goal._events(conn, rid, cursor):
         kind = row["kind"]
@@ -509,6 +510,8 @@ def _late_event(conn, rid, cursor):
                     "v62.source.reviewed", "v6.claim.adopted", "v6.intent.changed"):
             if not v62_lead.internal_event(row, private):
                 return row["event_id"]
+        if kind == "v621.material.assigned" and v621_policy.current(conn, rid):
+            return row["event_id"]
     return None
 
 
@@ -548,8 +551,9 @@ def adopt(conn, request, decision_ref, task):
                               details={"waiting_for": waiting})
     if due and closes and waiting:
         raise ScopeDenied("The closing decision must await outstanding work", details={"waiting_for": waiting})
-    if entered is not None or closes or resolved:
-        late = _late_event(conn, rid, task["event_cursor"])
+    from . import v621_policy
+    if (entered is not None or closes or resolved) and not (closes and v621_policy.current(conn, rid)):
+        late = late_evidence(conn, rid, task["event_cursor"])
         if late:
             raise StaleRevision("New information arrived after the frozen brief; consider it before settling",
                                 details={"reason": "convergence_context_changed", "event_id": late})
@@ -608,13 +612,13 @@ def refresh(conn, identity, error):
     from . import v6_decisions, v6_goal
 
     rid = identity["run_id"]
-    with store.transaction(conn, transaction_owner=OWNER, operation="refresh_convergence", run_id=rid):
+    with store.transaction(conn, transaction_owner=OWNER, operation=error.details["reason"], run_id=rid):
         try:
             native = {k: identity[k] for k in ("run_id", "thread_id", "turn_id", "task_id", "lease_id")}
             _, task, _, _ = v6_decisions.authority(conn, **native)
         except GxError:
             return
-        if task["scope"] != "run" or not _late_event(conn, rid, task["event_cursor"]):
+        if task["scope"] != "run" or not late_evidence(conn, rid, task["event_cursor"]):
             return
         v6_goal.cancel_decision(conn, rid, task["task_id"], reason=error.message)
         store.append_event(conn, run_id=rid, kind="v6.decision.superseded", actor=OWNER,

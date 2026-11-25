@@ -27,7 +27,7 @@ class ScientificLead(unittest.TestCase):
         self.conn = self.enterContext(closing(store.open_store(directory / "gx.db")))
         self.run = cli.start(self.conn, directory, {"project": "isolated-study", "mode": "goal",
             "objective": "Which observations would distinguish these measurements?", "capabilities": [],
-            **({"evidence_policy": evidence_policy} if evidence_policy else {})},
+            **({"evidence_policy": evidence_policy, "historical_replay": True} if evidence_policy else {})},
             run_key="native-regression")["run_id"]
         self.task = self.conn.execute("SELECT task_id FROM v6_decision_tasks WHERE run_id=?", (self.run,)).fetchone()[0]
         self.enterContext(patch("gx_core.p0.roots.tempfile.gettempdir", return_value=temp.name))

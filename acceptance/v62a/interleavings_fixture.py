@@ -117,6 +117,10 @@ class Scenario:
                   "api_calls": 48, "tokens": 120000, "gpu_jobs": 0, "gpu_minutes": 0, "wall_hours": 2}
         spec.update(run_budget=limits, workspace_budget=limits, turn_token_budget=1000)
         spec.update(self.spec_updates)
+        # Explicitly pinned old scenarios are release replays. The production CLI
+        # rejects the same input without this opt-in (tested at its public entry).
+        if spec.get("evidence_policy") in ("gx.evidence/6.2", "gx.evidence/6.2.1"):
+            spec.setdefault("historical_replay", True)
         cfg = self.directory / "grant.json"
         save(cfg, spec)
         argv = [sys.executable, "-B", str(PRODUCT / "bin/gx-p0"), "start", "--state", str(self.state),
@@ -162,7 +166,7 @@ class Scenario:
             with store.transaction(self.conn, transaction_owner="V62AInterleavingFixture", operation="ack_scripted_turn"):
                 self.conn.execute("""INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,
                     human,interrupt,state,method,turn_id) VALUES(?,?,?,?,?,0,0,'acknowledged','turn/start',?)""",
-                                  (self.run_id, turn, thread, task_id, ids.sha256_of_obj(row["brief"]), turn))
+                                  (self.run_id, turn, thread, task_id, sha256(row["brief"].encode()), turn))
         scope = self.conn.execute("SELECT scope FROM v6_decision_tasks WHERE task_id=?", (task_id,)).fetchone()[0]
         actor = Actor(task_id, row["lease_id"], scope, thread, turn)
         self.actors[actor.lease_id] = actor

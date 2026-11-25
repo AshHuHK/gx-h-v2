@@ -57,7 +57,7 @@ def _bytes(path):
 def assign(conn, run_id, *, after_decision, source, path, sha256, role, metadata_path, actor,
            module_instance=None, media_type="application/octet-stream"):
     """Register bytes, acquisition, and the exact recipient grant in one operator transaction."""
-    from . import v621_policy, v62_catalog, v62b_handoff
+    from . import v621_policy, v622_sources, v62_catalog, v62b_handoff
     if not v621_policy.enabled(conn, run_id):
         raise ScopeDenied("This Goal uses an earlier scientific evidence policy")
     if any(not isinstance(s, str) or not s.strip() for s in (source, role, media_type, after_decision)):
@@ -68,6 +68,7 @@ def assign(conn, run_id, *, after_decision, source, path, sha256, role, metadata
     if hashlib.sha256(raw).hexdigest() != sha256:
         raise SchemaInvalid("Assigned material differs from the supplied SHA-256")
     metadata = json.loads(_bytes(metadata_path))
+    identity = v622_sources.prepare(conn, run_id, source, metadata, sha256, media_type, raw=raw)
     name = Path(path).name
     key = "v621.assign:" + ids.sha256_of_obj([run_id, source])
     request = dict(decision_ref=after_decision, source=source, sha256=sha256, role=role, name=name,
@@ -93,7 +94,8 @@ def assign(conn, run_id, *, after_decision, source, path, sha256, role, metadata
             kind=service.INPUT_KIND, data=raw, run_id=run_id, media_type=media_type, expected_sha256=sha256,
             origin="INGEST", actor=actor, provenance={"role": role, "name": name, "source": source})
         assets.discard_on_rollback(original)
-        observation = v6_goal.record_observation(conn, run_id, original.artifact_ref, source=source, acquisition=metadata)
+        observation = v6_goal.record_observation(conn, run_id, original.artifact_ref, source=source,
+                                                  acquisition=metadata, prepared_identity=identity)
         material = dict(artifact_ref=original.artifact_ref, sha256=sha256, name=name, role=role)
         detail = dict(**material, source=source, goal_version=goal["goal_version"], decision_ref=after_decision,
                       acquisition_event_id=observation["event_id"])

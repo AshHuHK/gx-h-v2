@@ -308,7 +308,7 @@ def accept_product(conn, root, content_sha256, product_ref):
     return submission_id
 
 
-def _require_close_context(conn, run_id, task):
+def _require_close_context(conn, run_id, task, root, turn_id):
     # Early watches and sealed rounds are the only ways a module report enters a Run brief.
     # A report may already exist even while its commissioning Lead keeps the round unsealed.
     from . import v621_goal_scope
@@ -326,6 +326,24 @@ def _require_close_context(conn, run_id, task):
     if conn.execute("SELECT 1 FROM v62_modules WHERE run_id=? AND status='OPEN' "
                     "AND (? IS NULL OR goal_version=?) LIMIT 1", (run_id, version, version)).fetchone():
         raise ScopeDenied("Collect pending module reports or explicitly cancel their delegations before closure")
+    from . import v621_policy, v62_rounds, v6_native
+    if v621_policy.current(conn, run_id):
+        delivered = v6_native.acknowledged_brief(conn, root, turn_id)
+        if delivered is None:
+            raise ScopeDenied("Closing requires an acknowledged research brief on the deciding Lead thread")
+        packet, native_receipt = delivered
+        cursor = packet["trigger"]["through_cursor"]
+        if (packet["run_id"], packet["goal_version"], cursor) != (run_id, version, task["event_cursor"]):
+            raise ScopeDenied("The delivered research brief and current Goal decision context disagree")
+        late = v62_rounds.late_evidence(conn, run_id, cursor)
+        if late is not None:
+            raise StaleRevision("New research evidence arrived after the delivered brief; reconsider before closing",
+                                details={"reason": "close_context_changed", "event_id": late, "goal_version": version,
+                                         "brief_cursor": cursor, "context_ref": task["context_ref"]})
+        return {"brief_cursor": cursor, "goal_version": version, "context_ref": task["context_ref"],
+                "brief_sha256": native_receipt["text_sha256"], "brief_delivery": native_receipt["event_id"],
+                "brief_turn": native_receipt["turn_id"], "closing_turn": turn_id}
+    return None
 
 
 def commit(conn, plan):
@@ -342,6 +360,9 @@ def commit(conn, plan):
             return saved
         root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                             thread_id=plan.thread_id, turn_id=plan.turn_id)
+        close_context = None
+        if any(item["spec"]["op"] == "close_run" for item in plan.resolved_ops):
+            close_context = _require_close_context(conn, run_id, task, root, plan.turn_id)
         config = (goal["capabilities_json"], goal["materials_json"])
         if module is not None:
             config = (module["grant_json"], module["snapshot_json"], module["budget_json"])
@@ -363,8 +384,6 @@ def commit(conn, plan):
         _check_bans(conn, run_id, plan.resolved_ops)
         if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
             raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
-        if any(item["spec"]["op"] == "close_run" for item in plan.resolved_ops):
-            _require_close_context(conn, run_id, task)
         decision_ref, = delivery.register_manifest(ArtifactService(conn), plan.manifest, actor=plan.thread_id)
         from . import v62_rounds
         convergence = v62_rounds.adopt(conn, request, decision_ref, task)
@@ -394,6 +413,8 @@ def commit(conn, plan):
                        consumed_event_cursor=task["event_cursor"])
         if "gap_resolutions" in request:
             receipt["gap_resolutions"] = request["gap_resolutions"]
+        if close_context is not None:
+            receipt["close_context"] = close_context
         if convergence is not None:
             receipt["convergence"] = convergence
         if "module_instance_id" in request:
@@ -424,7 +445,7 @@ def commit(conn, plan):
 def reconsider_module_conflict(conn, identity, error):
     """After rollback retire the authenticated brief that can no longer support this decision."""
     reason = error.details.get("reason")
-    if reason == "convergence_context_changed":
+    if reason in ("convergence_context_changed", "close_context_changed"):
         from . import v62_rounds
         return v62_rounds.refresh(conn, identity, error)
     if reason not in ("module_graph_conflict", "unseen_module_report"):

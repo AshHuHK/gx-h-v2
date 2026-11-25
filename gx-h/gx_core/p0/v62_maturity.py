@@ -6,6 +6,7 @@ import json
 import math
 import operator
 import re
+from decimal import Decimal
 
 from .. import contracts, schema
 from ..artifacts.service import ArtifactService
@@ -161,14 +162,26 @@ def _identity(claim):
     return {key: claim.get(key) for key in ("statement", "scope", "criteria", "chain_pairs", "decision_scope")}
 
 
-def _same_proposition(claim, prior):
+def _equivalent_rule(previous, prediction, data, method_pin):
+    if prediction is None or prediction == previous["prediction"]:
+        return True
+    if not (previous.get("policy") and previous.get("method_pin") and method_pin):
+        return False
+    comparable = ("target", "measurement_schema", "operator", "threshold")
+    return (previous["method_pin"]["measurement_spec_sha256"] == method_pin["measurement_spec_sha256"]
+            and previous.get("quantifier", "all") == prediction.get("quantifier", "all")
+            and all(previous["prediction"].get(k) == prediction.get(k) for k in comparable)
+            and {p["sha256"] for p in data} == {p["sha256"] for p in previous["data"]})
+
+
+def _same_proposition(claim, prior, data, method_pin):
     if not prior or _identity(prior) != _identity(claim):
         return False
     if "publication" in prior:
         if prior["limitations"] != claim["limitations"]:
             return False
         prior_rule = prior["maturity"]["registration"]
-        if "prediction" in claim and prior_rule and claim["prediction"] != prior_rule["prediction"]:
+        if prior_rule and not _equivalent_rule(prior_rule, claim.get("prediction"), data, method_pin):
             return False
     return True
 
@@ -176,18 +189,25 @@ def _same_proposition(claim, prior):
 def registration(claim, prior, data, method_pin, event_id):
     """Only adoption registers the rule. A change of proposition, scope, data or rule starts a new clock."""
     previous = (prior or {}).get("maturity", {}).get("registration")
-    same_claim = _same_proposition(claim, prior)
     prediction = claim.get("prediction")
-    if previous and same_claim and (prediction is None or prediction == previous["prediction"]):
+    if (previous and _same_proposition(claim, prior, data, method_pin)
+            and _equivalent_rule(previous, prediction, data, method_pin)):
         return previous
     if prediction is None:
         return None
     parent_result = None
     if previous:
-        same_observable = all(previous["prediction"].get(k) == prediction.get(k)
-                              for k in ("observable", "target", "measurement_schema", "method"))
         dataset = {pin["sha256"] for pin in data}
-        if same_observable and any(dataset & set(r["matched_data_sha256"]) for r in prior["maturity"]["results"]):
+        if previous.get("policy"):
+            from . import v622_propositions
+            posthoc = (v622_propositions.same_endpoint(previous, prediction, method_pin)
+                       and dataset.intersection(v622_propositions.exposed_materials(prior)))
+        else:
+            same_observable = all(previous["prediction"].get(k) == prediction.get(k)
+                                  for k in ("observable", "target", "measurement_schema", "method"))
+            posthoc = same_observable and any(dataset.intersection(r["matched_data_sha256"])
+                                              for r in prior["maturity"]["results"])
+        if posthoc:
             parent_result = prior["claim_revision_id"]
     return {"event_id": event_id, "claim_revision_id": claim["claim_revision_id"], "posthoc_revision_of": parent_result,
             "decision_scope": claim["decision_scope"], "claim_scope": claim["scope"], "prediction": prediction,
@@ -208,6 +228,21 @@ def _metric_matches(reg, fact, metric):
         return (pin["capability"] == f"{capability.get('id')}@{capability.get('version')}"
                 and pin["manifest_sha256"] == capability.get("sha256") and pin["output"] == fact.get("output_name"))
     return True
+
+
+def _reading(conn, reg, fact):
+    """Check identity before admitting a numeric observation or declaring historical exposure."""
+    if reg.get("policy") and reg.get("method_pin"):
+        from . import v622_measurement
+        reason, reading = v622_measurement.match(conn, reg, fact)
+        if reason or not reading:
+            return reason or "unmeasured_observable", None, None, None
+        return None, reading["value"], reading.get("metric"), reading
+    if reg.get("policy") and fact.get("job_id"):
+        return "method_not_registered", None, None, None
+    value, metric = _measurement(conn, fact["artifact_ref"], reg["prediction"]["observable"])
+    reason = None if _metric_matches(reg, fact, metric) else "method_or_measurement_schema_mismatch"
+    return reason, value, metric, None
 
 
 def _applies(fact, claim_scope):
@@ -271,28 +306,43 @@ def _known_before(conn, reg, through):
         return True
     boundary = reg["event_id"]
     pins = [p["sha256"] for p in reg["data"]]
-    pointer = reg["prediction"]["observable"]
     # A material can itself already contain the value, even without a scientific receipt.
     for pin in reg["data"]:
         ref = pin["artifact_ref"]
-        value, metric = _measurement(conn, ref, pointer)
-        if value is None:
-            continue
+        if not reg.get("method_pin") or not reg.get("policy"):
+            value, _ = _measurement(conn, ref, reg["prediction"]["observable"])
+            if value is None:
+                continue
         run = conn.execute("SELECT run_id FROM artifacts WHERE artifact_ref=?", (ref,)).fetchone()[0]
-        if any(_applies(fact, reg["claim_scope"]) and _metric_matches(reg, fact, metric)
-               for fact in _historical_facts(conn, run, ref, through)):
-            return True
+        for fact in _historical_facts(conn, run, ref, through):
+            if _applies(fact, reg["claim_scope"]):
+                reason, value, _, _ = _reading(conn, reg, fact)
+                if not reason and value is not None:
+                    return True
     # Check actual output availability, including a completed Job whose node report is still pending.
     # Qualify data by their digest rather than movable names, run ids, or visibility of an old report.
-    candidates = conn.execute("""
+    # New-policy lineage follows only the original inputs bound to this named output.
+    # In particular, shared worker configuration is not a shared scientific material.
+    job_edges = ("""
+        SELECT json_extract(i.value,'$.sha256'), json_extract(o.value,'$.artifact_ref')
+        FROM p0_execution_manifests m, json_each(m.completion_json,'$.outputs') o,
+             json_each(o.value,'$.source_inputs') i
+    """ if reg.get("policy") else """
+        SELECT json_extract(d.value,'$.sha256'), a.artifact_ref
+        FROM p0_execution_manifests m JOIN artifacts a USING(job_id), json_each(m.admission_json,'$.inputs') d
+        WHERE a.origin='JOB_OUTPUT' AND a.published=1 AND a.kind NOT IN ('job_stdout','job_stderr')
+    """)
+    candidates = conn.execute(f"""
         WITH RECURSIVE edges(input_sha, result_ref) AS (
             SELECT json_extract(d.value,'$.sha256'), json_extract(e.payload_json,'$.artifact_ref')
             FROM events e, json_each(e.payload_json,'$.acquisition.data_refs') d
             WHERE e.kind='v6.observation.added' AND e.event_id<=?
             UNION ALL
-            SELECT json_extract(d.value,'$.sha256'), a.artifact_ref
-            FROM p0_execution_manifests m JOIN artifacts a USING(job_id), json_each(m.admission_json,'$.inputs') d
-            WHERE a.origin='JOB_OUTPUT' AND a.published=1 AND a.kind NOT IN ('job_stdout','job_stderr')
+            {job_edges}
+            UNION ALL
+            SELECT json_extract(d.value,'$.sha256'), json_extract(e.payload_json,'$.artifact_ref')
+            FROM events e, json_each(e.payload_json,'$.acquisition.derived_from') d
+            WHERE ? AND e.kind='v6.observation.added' AND e.event_id<=?
         ), ancestors(sha) AS (
             SELECT value FROM json_each(?)
             UNION SELECT i.input_sha FROM ancestors original JOIN artifacts a ON a.sha256=original.sha
@@ -310,13 +360,25 @@ def _known_before(conn, reg, through):
                       AND json_extract(e.payload_json,'$.sha256')=a.sha256 AND e.event_id<?)
           AND EXISTS (SELECT 1 FROM events e WHERE e.subject_id=a.artifact_ref
                       AND e.kind='artifact.published' AND e.event_id<=?)""",
-        (through, json.dumps(pins), through, through, boundary, through))
+        (through, bool(reg.get("policy")), through, json.dumps(pins), through, through, boundary, through))
     for row in candidates:
         for fact in _historical_facts(conn, row["run_id"], row["artifact_ref"], through):
             if _applies(fact, reg["claim_scope"]) and fact["nature"] in (NATURE[reg["prediction"]["target"]], "unclassified"):
-                value, metric = _measurement(conn, row["artifact_ref"], pointer)
+                reason, value, _, reading = _reading(conn, reg, fact)
+                if reg.get("policy") and value is not None and not reason:
+                    if reading is not None and not reading["material_inputs"]:
+                        continue
+                    if reading is None and len(fact.get("data_refs", ())) > 1:
+                        # Nested provenance may span several generations; only an explicitly
+                        # pooled acquisition lacks per-material attribution.
+                        provenance = conn.execute("""SELECT json_array_length(payload_json,'$.acquisition.data_refs')
+                            FROM events WHERE run_id=? AND kind='v6.observation.added'
+                            AND json_extract(payload_json,'$.artifact_ref')=? AND event_id<=?""",
+                            (row["run_id"], row["artifact_ref"], through)).fetchall()
+                        if any(p[0] and p[0] > 1 for p in provenance):
+                            continue
                 first = _first_relevant(conn, fact, reg)
-                if value is not None and first is not None and first <= boundary and _metric_matches(reg, fact, metric):
+                if not reason and value is not None and first is not None and first <= boundary:
                     return True
     return False
 
@@ -392,17 +454,30 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
         identity = ids.sha256_of_obj([fact["sha256"], fact["nature"], fact.get("capability"), fact.get("output_name"),
                                       fact.get("dependencies"), fact.get("unknown_dependencies"),
                                       fact.get("applicability_scopes"), matches])
-        if identity in original_facts:
-            continue
-        original_facts.add(identity)
-        value, metric = _measurement(conn, ref, pred["observable"])
-        if not _metric_matches(reg, fact, metric):
-            gaps.append({"kind": "method_or_measurement_schema_mismatch", "event_id": eid, "artifact_ref": ref})
+        if not reg.get("policy"):
+            if identity in original_facts:
+                continue
+            original_facts.add(identity)
+        mismatch, value, metric, reading = _reading(conn, reg, fact)
+        if mismatch:
+            gaps.append({"kind": mismatch, "event_id": eid, "artifact_ref": ref})
             continue
         if value is None:
             gaps.append({"kind": "unmeasured_observable", "event_id": eid, "artifact_ref": ref,
                          "observable": pred["observable"]})
             continue
+        if reg.get("policy"):
+            from . import v622_propositions
+            material_pins = v622_propositions.input_materials(fact, item, reading)
+            matches = sorted(data.intersection(p["sha256"] for p in material_pins))
+            if not matches:
+                gaps.append({"kind": "no_individual_material_attribution", "event_id": eid, "artifact_ref": ref})
+                continue
+        if reading:
+            from .v622_measurement import comparison_value
+            passed = COMPARISONS[pred["operator"]](comparison_value(reading), Decimal(str(pred["threshold"])))
+        else:
+            passed = COMPARISONS[pred["operator"]](value, pred["threshold"])
         first = _first_relevant(conn, fact, reg)
         launch = None
         if fact.get("job_id"):
@@ -423,22 +498,32 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
             exclusion = "out_of_scientific_scope"
         elif first is None:
             exclusion = "unknown_first_production"
-        elif first <= reg["event_id"]:
+        elif first <= reg["event_id"] or any(reg.get("known_at_registration", {}).get(sha) for sha in matches):
             exclusion = "already_available"
         elif fact.get("job_id") and (launch is None or launch <= reg["event_id"]):
             exclusion = "unverified_production_order"
         if exclusion:
             gap = {"kind": exclusion, "artifact_ref": ref, "event_id": eid, "nature": fact["nature"]}
+            if reg.get("policy"):
+                gap.update(matched_data_sha256=matches, sha256=fact["sha256"])
+                if reading:
+                    gap["measurement"] = reading
             if exclusion in ("already_available", "unverified_production_order"):
                 prior_availability = prior_availability or exclusion == "already_available"
                 gap.update(value=value, first_event_id=first, first_bytes_event_id=fact.get("first_event_id"),
-                           launch_event_id=launch, supports=COMPARISONS[pred["operator"]](value, pred["threshold"]))
+                           launch_event_id=launch, supports=passed)
             gaps.append(gap)
             continue
-        passed = COMPARISONS[pred["operator"]](value, pred["threshold"])
+        if reg.get("policy"):
+            # Only a qualified result consumes its identity. An incompatible mask or
+            # missing attribution may happen to produce the very same output bytes.
+            if identity in original_facts:
+                continue
+            original_facts.add(identity)
         results.append({"artifact_ref": ref, "sha256": fact["sha256"], "event_id": eid, "first_event_id": first,
                         "first_bytes_event_id": fact.get("first_event_id"), "launch_event_id": launch,
                         "nature": fact["nature"], "value": value, "supports": passed, "matched_data_sha256": matches,
+                        **({"measurement": reading} if reading else {}),
                         "measurement_schema": metric, "capability": fact.get("capability"), "output_name": fact.get("output_name"),
                         "original_observations": fact.get("original_observations", []),
                         "dependencies": fact.get("dependencies", {}), "unknown_dependencies": fact.get("unknown_dependencies", []),
@@ -553,22 +638,33 @@ def assessment(conn, run, claim, reg, through, available_through):
                          else "execution_record", "artifact_ref": ref, "job_id": fact.get("job_id"),
                          "status": fact.get("job_status")})
     retrospective = {"already_available", "unverified_production_order"}
+    current = bool(reg and reg.get("policy"))
+    coverage = []
     results, pairs, preexisting = [], [], False
     if reg:
         results, test_gaps, old = _results(conn, run, claim, reg, through, require_acquisition=require_acquisition)
         gaps.extend(test_gaps)
-        preexisting = old or _known_before(conn, reg, available_through)
+        if current:
+            from . import v622_propositions
+            coverage = v622_propositions.with_coverage(reg, results, test_gaps)
+            preexisting = old or any(r["known_at_registration"] for r in coverage)
+        else:
+            preexisting = old or _known_before(conn, reg, available_through)
         pairs = _independence(results, claim["scope"])
         grounded.extend(r["artifact_ref"] for r in results)
         grounded.extend(g["artifact_ref"] for g in test_gaps if g["kind"] in retrospective)
         grounded = list(dict.fromkeys(grounded))
     support = [r["review_ref"] for r in reviews if r["review_ref"] in grounded and r["direction"] == "supports"]
     opposing = [r["review_ref"] for r in reviews if r["review_ref"] in grounded and r["direction"] == "opposes"]
+    reviewed_support, reviewed_opposition = bool(support), bool(opposing)
     support.extend(r["artifact_ref"] for r in results if r["supports"])
     opposing.extend(r["artifact_ref"] for r in results if not r["supports"])
-    support.extend(g["artifact_ref"] for g in gaps if g["kind"] in retrospective and g["supports"])
-    opposing.extend(g["artifact_ref"] for g in gaps if g["kind"] in retrospective and not g["supports"])
-    if support and opposing:
+    if not current:
+        support.extend(g["artifact_ref"] for g in gaps if g["kind"] in retrospective and g["supports"])
+        opposing.extend(g["artifact_ref"] for g in gaps if g["kind"] in retrospective and not g["supports"])
+    if current:
+        direction = v622_propositions.direction(coverage, reviewed_support, reviewed_opposition)
+    elif support and opposing:
         direction = "mixed"
     elif opposing:
         direction = "opposed"
@@ -582,13 +678,15 @@ def assessment(conn, run, claim, reg, through, available_through):
         stage = "grounded"
         reasons.append("Applicable reviewed evidence or a classified scientific artifact is cited.")
     uncertain_production = any(g["kind"] == "unverified_production_order" for g in gaps)
-    if reg and not preexisting and not uncertain_production:
+    if reg and ((current and results) or (not preexisting and not uncertain_production)):
         stage = "preregistered"
-        reasons.append("The registered rule, scope and input versions precede the first known applicable result.")
+        reasons.append("GX froze the rule before each qualifying prospective result." if current else
+                       "The registered rule, scope and input versions precede the first known applicable result.")
         if results:
             stage = "tested"
             reasons.append("GX compared the original measured value with the registered decision rule.")
-        if any(pair["relation"] == "independent_acquisitions" for pair in pairs) and not opposing:
+        if (any(pair["relation"] == "independent_acquisitions" for pair in pairs) and not opposing
+                and (not current or direction == "supported")):
             stage = "replicated"
             reasons.append("Independent acquisitions support the registered claim within the same attested scope.")
     if uncertain_production:
@@ -603,22 +701,27 @@ def assessment(conn, run, claim, reg, through, available_through):
         reasons.append("Published reviews dispute this extraction. Its interpretation remains unresolved.")
     if opposing:
         reasons.append("Adverse results or independently reviewed opposing evidence are retained.")
-    return {"rule": RULE, "stage": stage, "direction": direction, "reasons": reasons, "registration": reg,
+    return {"rule": v622_propositions.RULE if current else RULE,
+            **({"material_coverage": coverage} if current else {}), "stage": stage, "direction": direction, "reasons": reasons, "registration": reg,
             "preexisting_result": preexisting, "grounds": grounded, "reviewed_evidence": reviews, "disputed_extractions": sorted(disputed),
             "supporting_refs": support, "opposing_refs": opposing, "results": results, "replication": pairs,
             "gaps": gaps}
 
 
-def continuing_lineage(claim, prior):
-    return prior.get("maturity_lineage", []) if _same_proposition(claim, prior) else []
+def continuing_lineage(claim, prior, data, method_pin):
+    return prior.get("maturity_lineage", []) if _same_proposition(claim, prior, data, method_pin) else []
 
 
 def attach(conn, run, claim, prior, data, method_pin, event_id):
-    lineage = continuing_lineage(claim, prior)
+    lineage = continuing_lineage(claim, prior, data, method_pin)
     if lineage:
         claim["continuing_review_refs"] = [r["review_ref"] for r in prior["maturity"]["reviewed_evidence"]]
     claim["maturity_lineage"] = list(dict.fromkeys([*lineage, claim["claim_ref"], claim["claim_revision_id"]]))
     reg = registration(claim, prior, data, method_pin, event_id)
+    if reg and reg["event_id"] == event_id:
+        from . import v621_policy, v622_propositions
+        if v621_policy.current(conn, run):
+            v622_propositions.freeze(conn, reg, claim, prior)
     claim["assessment_cursor"] = claim["event_cursor"]
     claim["availability_cursor"] = event_id
     claim["maturity"] = assessment(conn, run, claim, reg, claim["assessment_cursor"], event_id)

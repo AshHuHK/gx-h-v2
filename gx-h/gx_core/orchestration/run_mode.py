@@ -223,6 +223,8 @@ def specification(args):
     from ..p0 import v6_goal
     if getattr(args, "goal", None) is not None:
         return v6_goal.cli_spec(args)
+    if getattr(args, "historical_replay", False):
+        raise ValueError("--historical-replay requires --goal and an explicit historical policy")
     if any(getattr(args, name, None) for name in ("goal_config", "input", "capability", "research_effort")):
         raise ValueError("--goal-config, --input, --capability and --research-effort require --goal")
     return packages.example(args.example) if args.example else json.loads(args.spec.read_text())

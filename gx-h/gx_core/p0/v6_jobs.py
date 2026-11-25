@@ -64,16 +64,17 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
         meta = assets.describe(ref)
         if meta["run_id"] != run_id or not assets.verify(ref)["ok"]:
             raise SchemaInvalid("Input is not an intact artifact in this Run")
+    parameters = manifest.effective_parameters(method, spec["parameters"])
     provider = goal_plugins.method(conn, run_id, capability)
     if provider and provider.validate:
         ctx = v6_method_context.MethodContext(conn, run_id, spec["inputs"])
-        v6_method_context.invoke(provider.validate, ctx, capability, spec["inputs"], spec["parameters"],
+        v6_method_context.invoke(provider.validate, ctx, capability, spec["inputs"], parameters,
                                  producers=producers)
     else:
         _roles(method, len(spec["inputs"]))
-        if set(spec["parameters"]) != set(manifest.parameter_names(method)):
+        if set(parameters) != set(manifest.parameter_names(method)):
             raise SchemaInvalid(f"{capability} expects parameters {manifest.parameter_names(method)}")
-        for name, value in spec["parameters"].items():
+        for name, value in parameters.items():
             manifest.coerce_parameter(name, value, whole_token=True)
     if limits is not None:
         required = JobService._budget_amounts(manifest.effective_resources(method, {}))
@@ -190,13 +191,14 @@ def _compile(conn, node, refs):
     spec = json.loads(node["spec_json"])
     cap = spec["capability"]
     method = registry.candidate(conn, cap)
+    parameters = manifest.effective_parameters(method["manifest"], spec["parameters"])
     provider = goal_plugins.method(conn, node["run_id"], cap)
     if provider and provider.bind:
         ctx = v6_method_context.MethodContext(conn, node["run_id"], refs, writable=True)
-        inputs, params = v6_method_context.invoke(provider.bind, ctx, cap, refs, spec["parameters"])
+        inputs, params = v6_method_context.invoke(provider.bind, ctx, cap, refs, parameters)
     else:
         inputs = dict(zip(_roles(method["manifest"], len(refs)), refs))
-        params = spec["parameters"]
+        params = parameters
     artifacts = storage.artifact_service(conn)
     entries = [{"role": key, "artifact_ref": ref} for key, ref in inputs.items()]
     inputs_ref = artifacts.make_input_manifest(

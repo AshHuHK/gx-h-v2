@@ -1,6 +1,7 @@
 """V6's native adoption transaction, run on a Goal created by its public service."""
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -40,12 +41,15 @@ def bind_native_fixture(db, run_id, directory, *, task_id=None):
                                   seconds=300, attempt=1)["lease_id"]
         store.transition(db, machine="task", subject_id=task, to_state="CLAIMED", actor=thread,
                          extra_updates={"attempt": 1, "lease_id": lease, "owner": thread}, bump=False)
+        from gx_core.p0.v6_native import PREFIX
+        body = db.execute("SELECT input_json FROM tasks WHERE task_id=?", (task,)).fetchone()[0]
+        brief = PREFIX + ids.canonical_json(json.loads(body)["brief"])
         db.execute("""INSERT INTO p0_roots(root_key,run_id,task_id,attempt,lease_id,thread_id,cwd,role,
-            model,effort,brief,state) VALUES(?,?,?,1,?,?,?,'planner','test','xhigh','frozen','bound')""",
-            ("root-" + task, run_id, task, lease, thread, str(Path(directory)/task)))
+            model,effort,brief,state) VALUES(?,?,?,1,?,?,?,'planner','test','xhigh',?,'bound')""",
+            ("root-" + task, run_id, task, lease, thread, str(Path(directory)/task), brief))
         db.execute("""INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,
             human,interrupt,state,method,turn_id) VALUES(?,?,?,?,?,0,0,'acknowledged','turn/start',?)""",
-            (run_id, "start-" + task, thread, "client-" + task, ids.sha256_of_obj(task), turn))
+            (run_id, "start-" + task, thread, "client-" + task, hashlib.sha256(brief.encode()).hexdigest(), turn))
     return dict(run_id=run_id, task_id=task, lease_id=lease, thread_id=thread, turn_id=turn, call_id="proposal")
 
 

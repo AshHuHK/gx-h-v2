@@ -236,9 +236,10 @@ def _brief(conn, row, nodes, proofs):
     operations = _operations(conn, row)
     # A new decision receives confirmed references and field summaries, never another scope's materials.
     from . import v621_policy
+    policy = v621_policy.pinned(conn, row["run_id"])
     return {
         "run_id": row["run_id"],
-        **({"evidence_policy": v621_policy.VERSION} if v621_policy.enabled(conn, row["run_id"]) else {}),
+        **({"evidence_policy": policy} if policy in v621_policy.GOVERNED else {}),
         "scope": row["scope"],
         "goal": snapshot["goal"],
         "module": module,
@@ -626,7 +627,7 @@ def _progress(conn, row):
             except ScopeDenied:
                 return False
     task = _task(conn, row)
-    reason = v62_budget.exhausted(conn, row)
+    reason = v62_budget.exhausted(conn, row) or v62_reports.exhausted_report_repairs(conn, task)
     if not reason and task and task["status"] in v6_goal.ACTIVE_TASKS:
         return False
     if not reason and any(n["status"] not in v6_jobs.NODE_TERMINAL for n in _nodes(conn, row)):

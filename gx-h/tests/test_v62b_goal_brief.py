@@ -19,7 +19,7 @@ class ResearchBrief(unittest.TestCase):
         spec = {"mode": "goal", "project": "brief-scope", "objective": "Compare two reference readings.",
                 "research_effort": effort, "capabilities": []}
         if effort != "quick":
-            spec.update(research_modules=[], evidence_policy=v621_policy.LEGACY)
+            spec.update(research_modules=[], evidence_policy=v621_policy.LEGACY, historical_replay=True)
         rid = cli.start(conn, state, spec, run_key="capture")["run_id"]
         (frozen,) = conn.execute("SELECT snapshot_json FROM research_contexts WHERE run_id=?", (rid,)).fetchone()
         return conn, json.loads(frozen)

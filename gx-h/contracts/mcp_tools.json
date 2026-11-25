@@ -243,6 +243,22 @@
                     "output": {
                       "type": "string",
                       "minLength": 1
+                    },
+                    "parameters": {
+                      "type": "object",
+                      "maxProperties": 32
+                    },
+                    "metric_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "input_role": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   }
                 },
@@ -250,6 +266,12 @@
                   "type": "string",
                   "minLength": 1,
                   "description": "Versioned observable and units contract in the original result JSON schema field."
+                },
+                "quantifier": {
+                  "type": "string",
+                  "enum": [
+                    "all"
+                  ]
                 }
               }
             }
@@ -533,6 +555,18 @@
                   },
                   "threshold": {
                     "type": "number"
+                  },
+                  "metric_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "input_role": {
+                    "type": "string",
+                    "minLength": 1
                   }
                 },
                 "required": [
@@ -545,6 +579,63 @@
                   "op"
                 ],
                 "additionalProperties": false
+              }
+            },
+            "qualitative_notes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true,
+                    "minItems": 1
+                  },
+                  "kind": {
+                    "enum": [
+                      "support",
+                      "counterevidence",
+                      "observation"
+                    ]
+                  }
+                },
+                "required": [
+                  "text",
+                  "source_refs"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0,
+              "description": "Unverified interpretations with their own scoped references."
+            },
+            "metric_refs": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_ref",
+                  "metric_id"
+                ],
+                "properties": {
+                  "artifact_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "metric_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
               }
             }
           },

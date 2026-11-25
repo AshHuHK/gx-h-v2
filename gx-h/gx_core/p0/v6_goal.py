@@ -29,6 +29,7 @@ def cli_spec(args):
         "research_modules",
         "branch_delegation",
         "evidence_policy",
+        "historical_replay",
         "module_policy",
         "input_files",
         "capabilities",
@@ -39,6 +40,8 @@ def cli_spec(args):
     if not isinstance(raw, dict) or set(raw) - allowed:
         raise SchemaInvalid("Goal config accepts only " + ", ".join(sorted(allowed)))
     spec = {"project": "gx-research", **raw, "mode": "goal", "objective": args.goal}
+    if getattr(args, "historical_replay", False):
+        spec["historical_replay"] = True
     files = raw.get("input_files", [])
     if not isinstance(files, list):
         raise SchemaInvalid("input_files must be an array")
@@ -111,11 +114,14 @@ def start(conn, spec, *, run_key, current):
         raise SchemaInvalid("capabilities must be a list of distinct, versioned methods")
     from . import v62_catalog, v621_policy
 
+    policy = v621_policy.admit(spec)
     research_catalog = v62_catalog.for_start(spec)
     public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []),
                                                  module_catalog=research_catalog)
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
-    inputs["evidence_policy"] = v621_policy.for_start(spec)
+    inputs["evidence_policy"] = policy
+    if spec.get("historical_replay"):
+        inputs["study_class"] = "historical_replay"
     if research_catalog is not None:
         inputs["research_catalog"] = research_catalog
         inputs["research_evidence_version"] = "gx.research.v6.2b.1"
@@ -191,7 +197,7 @@ def _is_json_artifact(meta):
     )
 
 
-def record_observation(conn, run_id, artifact_ref, *, source, scope="run", observation=None, acquisition=None):
+def record_observation(conn, run_id, artifact_ref, *, source, scope="run", observation=None, acquisition=None, prepared_identity=None):
     """Record a citation to verified, run-local material in its original media type."""
     assets = ArtifactService(conn)
     meta = assets.describe(artifact_ref)
@@ -217,7 +223,8 @@ def record_observation(conn, run_id, artifact_ref, *, source, scope="run", obser
     payload = {"source": source, "artifact_ref": artifact_ref, "scope": scope, "sha256": meta["sha256"]}
     if acquisition is not None:
         from . import v62_outputs
-        payload["acquisition"] = v62_outputs.acquisition_receipt(conn, run_id, artifact_ref, acquisition, scope=scope)
+        payload["acquisition"] = v62_outputs.acquisition_receipt(conn, run_id, artifact_ref, acquisition, scope=scope,
+                                                                      source_id=source, prepared_identity=prepared_identity)
 
     def save(tx):
         eid = store.append_event(
@@ -457,7 +464,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         for f in data["files"]
     ]
     from . import v621_assignment, v621_policy
-    current_policy = data["inputs"].get("evidence_policy") == v621_policy.VERSION
+    current_policy = data["inputs"].get("evidence_policy") in v621_policy.GOVERNED
     if current_policy:
         files.extend(v621_assignment.for_lead(conn, rid, goal["goal_version"], cursor))
     observations = []
@@ -516,6 +523,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                 if row["kind"] == "v6.node.settled":
                     metrics = v621_metrics.from_output(conn, rid, ref)
                     if metrics:
+                        if data["inputs"].get("evidence_policy") == v621_policy.VERSION:
+                            facts["verified_metrics"] = [m for m in metrics if m["schema"] == v621_metrics.SCHEMA]
                         facts["metrics"] = metrics
                 elif not _is_json_artifact(meta):
                     facts["metric_availability"] = {"schema": v621_metrics.MISSING,
@@ -638,6 +647,10 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "evidence_refs": list(dict.fromkeys(refs)),
         "budget": budget,
     }
+    if data["inputs"].get("study_class"):
+        brief["study_class"] = data["inputs"]["study_class"]
+    if data["inputs"].get("evidence_policy") == v621_policy.VERSION:
+        brief["evidence_policy"] = v621_policy.VERSION
     if research:
         brief = v62_catalog.project(conn, rid, brief)
         v62_lead.attach_reports(conn, brief, cursor, research["policy"])
@@ -1006,6 +1019,8 @@ def projection(conn, run, meter):
         ],
     }
     inputs = store.loads(run, "inputs_json")["inputs"]
+    if inputs.get("study_class"):
+        result["study_class"] = inputs["study_class"]
     if inputs.get("evidence_policy"):
         result["evidence_policy"] = inputs["evidence_policy"]
     if inputs.get("research_evidence_version"):

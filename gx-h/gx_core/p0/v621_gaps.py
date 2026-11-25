@@ -23,6 +23,9 @@ def register(conn, module, payload, sources):
     for entry in declarations:
         required = {"question", "data_ref", "applicability", "measurement_schema", "observable", "nature", "op"}
         optional = {"method", "output_name", "method_parameters", "threshold"}
+        current = v621_policy.current(conn, module["run_id"])
+        if current:
+            optional.update(("metric_id", "unit", "input_role"))
         if (not isinstance(entry, dict) or not required <= entry.keys() <= required | optional
                 or not all(isinstance(entry[k], str) and entry[k].strip() for k in required)):
             raise SchemaInvalid("Gap criteria must name the question, material, scope, observable and closure test")
@@ -49,13 +52,23 @@ def register(conn, module, payload, sources):
             parameters = entry.get("method_parameters", {})
             if not isinstance(parameters, dict) or not all(isinstance(k, str) and k for k in parameters):
                 raise SchemaInvalid("Gap method parameters must identify named analysis settings")
-            method_pin = v62_maturity.pin_method(conn, module["run_id"],
-                {"method": {"capability": method, "output": entry["output_name"]}})
-        elif entry["nature"] != "observed" or {"method", "output_name", "method_parameters"} & entry.keys():
+            if current:
+                from . import v622_measurement
+                selectors = {k: entry[k] for k in ("metric_id", "unit", "input_role") if k in entry}
+                method_pin = v622_measurement.pin(conn, module["run_id"], {
+                    "method": {"capability": method, "output": entry["output_name"], "parameters": parameters,
+                               **selectors}, "observable": entry["observable"],
+                    "measurement_schema": entry["measurement_schema"]}, applicability=entry["applicability"])
+            else:
+                method_pin = v62_maturity.pin_method(conn, module["run_id"],
+                    {"method": {"capability": method, "output": entry["output_name"]}})
+        elif entry["nature"] != "observed" or {"method", "output_name", "method_parameters", "metric_id", "unit", "input_role"} & entry.keys():
             raise SchemaInvalid("Original observations and named analysis outputs have separate criteria")
         criterion = {**entry, "version": 1, "data_sha256": available[ref]}
         if method_pin:
             criterion["method_sha256"] = method_pin["manifest_sha256"]
+            if current:
+                criterion.update(version=2, method_pin=method_pin)
         result[q] = criterion
     return {"gap_criteria": result}
 
@@ -88,8 +101,16 @@ def _match(conn, fact, criterion, boundary):
         or criterion["output_name"] != fact.get("output_name")
     ):
         return "different_method_or_output", None
+    reading = None
+    if criterion.get("method_pin"):
+        from . import v622_measurement
+        reason, reading = v622_measurement.match(conn, criterion, fact)
+        if reason:
+            return reason, None
+        if target not in [{k: i[k] for k in ("artifact_ref", "sha256")} for i in reading["material_inputs"]]:
+            return "different_material", None
     parameters = criterion.get("method_parameters")
-    if parameters:
+    if parameters and reading is None:
         admitted = manifest.read_manifest(conn, fact["job_id"])["admission"]["parameters"]
         if any(k not in admitted or ids.canonical_json(admitted[k]) != ids.canonical_json(v)
                for k, v in parameters.items()):
@@ -97,15 +118,24 @@ def _match(conn, fact, criterion, boundary):
     first = v62_maturity._first_relevant(conn, fact, {"event_id": boundary})
     if first is None or first <= boundary:
         return "already_available", None
-    number, name = v62_maturity._measurement(conn, fact["artifact_ref"], criterion["observable"])
+    if reading:
+        number, name = reading["value"], reading["metric"]
+    else:
+        number, name = v62_maturity._measurement(conn, fact["artifact_ref"], criterion["observable"])
     if name != criterion["measurement_schema"] or number is None:
         return "missing_observable_or_schema", None
-    if criterion["op"] != "finite" and not _COMPARISONS[criterion["op"]](number, criterion["threshold"]):
-        return "threshold_not_met", None
+    if criterion["op"] != "finite":
+        from decimal import Decimal
+        value = v622_measurement.comparison_value(reading) if reading else number
+        threshold = Decimal(str(criterion["threshold"])) if reading else criterion["threshold"]
+        if not _COMPARISONS[criterion["op"]](value, threshold):
+            return "threshold_not_met", None
     receipt = {key: fact[key] for key in ("artifact_ref", "sha256", "nature", "record_kind",
                                          "original_observations", "applicability_scopes")}
     receipt.update(value=number, observable=criterion["observable"], measurement_schema=name,
                    first_production_event=first, output_name=fact.get("output_name"), job_id=fact.get("job_id"))
+    if reading:
+        receipt.update(measurement=reading)
     if fact.get("job_id"):
         receipt.update(capability=capability, admission_sha256=fact["admission_sha256"],
                        manifest_sha256=fact["completion_sha256"])

@@ -94,7 +94,8 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
         return v62_native.module_tools(read_tools, brief, _legacy_goal_tools()[0])
     catalog = [spec for spec in read_tools if spec["name"] in ("gx_read_artifact", "gx_task_context")]
     evidence_run = bool(brief and brief.get("research_evidence_version"))
-    catalog.extend((decision_tool(), v6_claims.tool_spec()) if evidence_run else _legacy_goal_tools())
+    catalog.extend((decision_tool(), v62_native.evidence_tool(STAGE, brief.get("evidence_policy")))
+                   if evidence_run else _legacy_goal_tools())
     if brief is None or (brief.get("scope", "run") == "run" and brief.get("branch_delegation", True) and
                          any(b["status"] == "OPEN" for b in brief.get("branches", []))):
         catalog.append(v6_delegation.TOOL)
@@ -135,6 +136,24 @@ def brief(row):
     if not row["brief"].startswith(PREFIX):
         raise SchemaInvalid("Missing frozen Scientific Lead brief")
     return json.loads(row["brief"][len(PREFIX):])
+
+
+def acknowledged_brief(conn, root, turn_id):
+    """Return the immutable packet actually acknowledged on this native task thread.
+
+    A resumed turn may receive a continuation message. Its thread still owns the
+    earlier confirmed brief. A delivery intent or an unrelated message is insufficient.
+    """
+    digest = hashlib.sha256(root["brief"].encode("utf-8")).hexdigest()
+    row = conn.execute("""SELECT d.event_id,d.turn_id,d.text_sha256 FROM p0_root_deliveries d
+        WHERE d.run_id=? AND d.thread_id=? AND d.state='acknowledged' AND d.method='turn/start'
+          AND d.text_sha256=? AND d.rowid<=(
+              SELECT MAX(rowid) FROM p0_root_deliveries WHERE run_id=d.run_id AND thread_id=d.thread_id
+              AND turn_id=? AND state='acknowledged' AND method='turn/start')
+        ORDER BY d.rowid DESC LIMIT 1""", (root["run_id"], root["thread_id"], digest, turn_id)).fetchone()
+    if row is not None:
+        return brief(root), dict(row)
+    return None
 
 
 def current_context(conn, row):
@@ -225,9 +244,12 @@ def call(roots, p):
     if roots.conn.in_transaction:
         raise RuntimeError("Prepare scientific decisions outside the GX writer")
     if tool in (v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY):
-        failures = schema.validate(args, contracts.native_goal_tool_spec(tool)["inputSchema"])
+        spec = (v62_native.evidence_tool(tool, brief(row).get("evidence_policy"))
+                if tool == v62_native.REPORT else contracts.native_goal_tool_spec(tool))
+        failures = schema.validate(args, spec["inputSchema"])
         if failures:
-            raise SchemaInvalid("Invalid arguments to " + tool + ": " + ", ".join(failures))
+            details = {"category": "module_report_structure"} if tool == v62_native.REPORT else {}
+            raise SchemaInvalid("Invalid arguments to " + tool + ": " + ", ".join(failures), details=details)
     if tool == DECIDE:
         try:
             prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])

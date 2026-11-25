@@ -79,7 +79,7 @@ def for_start(spec):
         raise SchemaInvalid(f"Unavailable research module grants for {settings['effort']}: {sorted(missing)}")
     modules = []
     deep = settings["effort"] == "deep"
-    independent_science_access = deep and version == v621_policy.VERSION
+    independent_science_access = deep and version in v621_policy.GOVERNED
     lead_source_tools = set(TOOL_NAMES) if independent_science_access else set()
     survey = False
     for key, owners in sorted(candidates.items()):

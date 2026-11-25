@@ -140,9 +140,14 @@ def _known_derivative_or_fixture(conn, digest, cursor):
         "LIMIT 1", (cursor, digest)).fetchone() is not None
 
 
-def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run"):
+def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run", source_id="", prepared_identity=None):
     """The trusted observation ingress binds source-owner metadata to exact ingested bytes."""
-    if not isinstance(acquisition, dict) or acquisition.keys() - {*AXES, "data_refs", "applicability", "derived_from"}:
+    from . import v621_policy, v622_sources
+    governed = v621_policy.current(conn, run_id)
+    allowed = {*AXES, "data_refs", "applicability", "derived_from"}
+    if governed:
+        allowed.update(("sha256", "transformation"))
+    if not isinstance(acquisition, dict) or acquisition.keys() - allowed:
         raise SchemaInvalid("Acquisition describes data, acquisition, sample, source, publication, processing, "
                             "sampling, applicability and data_refs")
     pub = _publication(conn, run_id, artifact_ref)
@@ -223,7 +228,14 @@ def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run")
             raise ScopeDenied("Applicable input was supplied outside the observation's scope")
         _verify(assets, ref, source["sha256"])
         inputs.append(_pin(ref, source["sha256"]))
+    identity = prepared_identity
+    if governed:
+        if identity is None:
+            identity = v622_sources.prepare(conn, run_id, source_id, acquisition, pub["sha256"], pub["media_type"], ref=artifact_ref)
+        elif identity["artifact_sha256"] != pub["sha256"]:
+            raise SchemaInvalid("Source identity proof refers to another artifact")
     return {"schema": "gx.acquisition/1", **_pin(artifact_ref, pub["sha256"]), "dependencies": deps,
+            **({"source_identity": identity} if identity is not None else {}),
             "unknown_dependencies": unknown, "applicability": applicability, "measurement_schema": measurement_schema,
             "data_refs": _unique_pins(inputs),
             **({"schema": "gx.acquisition/2", "derived_from": _unique_pins(pinned_parents)} if derived else {})}
@@ -459,6 +471,8 @@ def ingest_measurement(conn, run_id, *, source, scope, path, metadata_path, acto
     digest = hashlib.sha256(raw).hexdigest()
     if expected_sha256 is not None and expected_sha256 != digest:
         raise SchemaInvalid("Supplied bytes differ from the expected SHA-256")
+    from . import v622_sources
+    identity = v622_sources.prepare(conn, run_id, source, acquisition, digest, media_type, raw=raw)
     original_key = ids.sha256_of_obj([scope.removeprefix("branch:"), source, digest])
     with store.transaction(conn, transaction_owner="GoalObservation", operation="ingest", run_id=run_id):
         assets = ArtifactService(conn)
@@ -467,4 +481,4 @@ def ingest_measurement(conn, run_id, *, source, scope, path, metadata_path, acto
                                         expected_sha256=digest, media_type=media_type, origin="INGEST", actor=actor)
         assets.discard_on_rollback(original)
         return v6_goal.record_observation(conn, run_id, original.artifact_ref, source=source,
-                                          scope=scope.removeprefix("branch:"), acquisition=acquisition)
+                                          scope=scope.removeprefix("branch:"), acquisition=acquisition, prepared_identity=identity)

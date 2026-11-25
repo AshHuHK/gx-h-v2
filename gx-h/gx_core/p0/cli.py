@@ -420,6 +420,8 @@ def main(argv=None):
             selector = sub.add_mutually_exclusive_group(required=True)
             selector.add_argument("--spec", type=Path)
             selector.add_argument("--goal", help="Start from a human scientific question with no selected workflow")
+            sub.add_argument("--historical-replay", action="store_true",
+                             help="Reproduce an explicitly selected older Goal evidence policy")
             sub.add_argument("--goal-config", type=Path, help="JSON project, resource caps, capabilities and input files")
             sub.add_argument("--research-effort", choices=("quick", "medium", "deep"),
                              help="Select the research delegation policy for a Goal")

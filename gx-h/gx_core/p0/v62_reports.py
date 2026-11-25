@@ -21,15 +21,21 @@ def _strings(items):
     return isinstance(items, list) and all(isinstance(v, str) and v.strip() for v in items)
 
 
-def _validate(payload):
-    if not isinstance(payload, dict) or not _FIELDS <= set(payload) <= _FIELDS | {"gap_criteria"}:
+def _validate(payload, *, current=False):
+    extra = {"gap_criteria", "metric_refs", "qualitative_notes"} if current else {"gap_criteria"}
+    if not isinstance(payload, dict) or not _FIELDS <= set(payload) <= _FIELDS | extra:
         raise SchemaInvalid("Supply report content, status, artifact references and an operation key")
     if (not isinstance(payload["operation_key"], str) or not payload["operation_key"].strip()
             or payload["status"] not in ("COMPLETE", "PARTIAL") or not isinstance(payload["findings"], list)):
         raise SchemaInvalid("Invalid module report operation key, status or findings")
     if not all(_strings(payload[k]) for k in ("artifact_refs", "gaps", "next_steps")):
         raise SchemaInvalid("Report references, gaps and next steps must be lists of nonempty strings")
-    for finding in payload["findings"]:
+    selectors, notes = payload.get("metric_refs", []), payload.get("qualitative_notes", [])
+    if not isinstance(notes, list) or not isinstance(selectors, list) or any(
+            not isinstance(item, dict) or set(item) != {"artifact_ref", "metric_id"} or
+            not _strings([item["artifact_ref"], item["metric_id"]]) for item in selectors):
+        raise SchemaInvalid("Supply qualitative notes and pairs of named output reference and metric ID")
+    for finding in [*payload["findings"], *notes]:
         if (not isinstance(finding, dict) or not {"text", "source_refs"} <= finding.keys()
                 or finding.keys() - {"text", "source_refs", "kind"}
                 or not isinstance(finding["text"], str) or not finding["text"].strip()
@@ -38,7 +44,7 @@ def _validate(payload):
             raise SchemaInvalid("Every finding needs its text, cited sources and a supported kind")
     if payload["status"] == "PARTIAL" and not payload["gaps"]:
         raise SchemaInvalid("A partial report must name its unfinished work")
-    if payload["status"] == "COMPLETE" and not (payload["findings"] or payload["gaps"]):
+    if payload["status"] == "COMPLETE" and not (payload["findings"] or payload["gaps"] or notes or selectors):
         raise SchemaInvalid("A completed report needs a sourced finding or a documented gap")
 
 
@@ -127,8 +133,9 @@ def _stage(conn, module, task, identity, payload, evidence, *, attempt):
     binds = {"kind": "MODULE" if identity else "GX", "task_id": task["task_id"],
              "context_ref": task["context_ref"], **(identity or {})}
     sources = set(payload["artifact_refs"])
-    for finding in payload["findings"]:
+    for finding in [*payload["findings"], *payload.get("qualitative_notes", [])]:
         sources.update(finding["source_refs"])
+    sources.update(selector["artifact_ref"] for selector in payload.get("metric_refs", []))
     checked = _sources(conn, module, sources, evidence)
     bundle = {**{k: module[k] for k in ("module_instance_id", "module_id", "module_version", "round",
                                          "run_id", "scope", "goal_version", "parent_context_ref")},
@@ -137,7 +144,9 @@ def _stage(conn, module, task, identity, payload, evidence, *, attempt):
               "gaps": payload["gaps"], "artifact_refs": payload["artifact_refs"], "next_steps": payload["next_steps"]}
     from . import v621_metrics, v621_policy
     if v621_policy.enabled(conn, module["run_id"]):
-        v621_metrics.render_report(conn, module["run_id"], bundle)
+        v621_metrics.render_report(conn, module["run_id"], bundle, current=v621_policy.current(conn, module["run_id"]),
+                                   metric_refs=payload.get("metric_refs", ()),
+                                   qualitative_notes=payload.get("qualitative_notes", ()))
     if "gap_criteria" in payload:
         from . import v621_gaps
         bundle.update(v621_gaps.register(conn, module, payload, checked))
@@ -166,7 +175,12 @@ def _report_authority(conn, identity, module):
 def prepare_report(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, payload):
     if conn.in_transaction:
         raise RuntimeError("Prepare report bytes and verify original evidence outside the write transaction")
-    _validate(payload)
+    from . import v621_policy
+    try:
+        _validate(payload, current=v621_policy.current(conn, run_id))
+    except SchemaInvalid as exc:
+        exc.details["category"] = "module_report_structure"
+        raise
     module = _task_module(conn, run_id, task_id)
     identity = dict(run_id=run_id, task_id=task_id, lease_id=lease_id, thread_id=thread_id, turn_id=turn_id)
     saved = _replay(conn, module["module_instance_id"], payload["operation_key"], ids.sha256_of_obj(payload), identity)
@@ -282,9 +296,22 @@ def _early_reason(module, bundle):
     return None
 
 
+def exhausted_report_repairs(conn, task):
+    if not task or task["status"] != "BLOCKED":
+        return None
+    # Only the last, exhausted lease of this task can turn a blocked module into a handback.
+    failed = conn.execute(
+        """SELECT 1 FROM p0_roots r JOIN p0_root_terminals e USING(thread_id)
+           JOIN p0_product_repairs p USING(thread_id,turn_id,call_id)
+           WHERE r.task_id=? AND r.attempt=? AND e.reason='GX_REPAIR_LIMIT'
+             AND p.category='module_report_structure' AND json_extract(p.response_json,'$.task_status')='BLOCKED'""",
+        (task["task_id"], task["attempt"])).fetchone()
+    return "module report structural repair and task attempts exhausted" if failed else None
+
+
 def _partial_reason(conn, module):
-    from . import v62_budget
-    if reason := v62_budget.exhausted(conn, module):
+    from . import v62_budget, v62_modules
+    if reason := v62_budget.exhausted(conn, module) or exhausted_report_repairs(conn, v62_modules._task(conn, module)):
         return reason
     if conn.execute("SELECT 1 FROM budget_reservations WHERE budget_ref=? AND status='HELD' LIMIT 1",
                     (module["budget_ref"],)).fetchone():
@@ -429,7 +456,9 @@ def _index_entry(bundle, ref):
     # All released counterevidence and its original citation links remain discoverable by
     # the Lead, even when the native packet cannot fit one summary per report.
     entry = {**_base(bundle, ref)}
-    counters = [{"text": _excerpt(finding["text"]), "source_refs": finding["source_refs"]}
+    counters = [{"text": ("A named measurement was flagged for review." if finding.get("metric_refs")
+                          else _excerpt(finding["text"])), "source_refs": finding["source_refs"],
+                 **({"evidence_status": finding["evidence_status"]} if "evidence_status" in finding else {})}
                 for finding in bundle["findings"] if finding.get("kind") == "counterevidence"]
     if counters:
         entry["counterevidence"] = counters
@@ -440,7 +469,7 @@ def _compact(index):
     entry = {k: index[k] for k in ("module_instance_id", "status", "report_ref", "applicability") if k in index}
     if index.get("counterevidence"):
         first = index["counterevidence"][0]
-        entry["counterevidence"] = [{"text": first["text"], "source_refs": first["source_refs"][:1]}]
+        entry["counterevidence"] = [{**first, "source_refs": first["source_refs"][:1]}]
     entry["truncated"] = True
     return entry
 
@@ -449,7 +478,8 @@ def _preview(bundle, index, limit):
     base = _base(bundle, index["report_ref"])
     full = {**base, **{k: bundle[k] for k in ("findings", "gaps", "next_steps", "artifact_refs")},
             "truncated": False}
-    for field in ("metrics", "source_quotations"):
+    proof_fields = ("verified_metrics", "source_quotations") if "verified_metrics" in bundle else ("metrics", "source_quotations")
+    for field in (*proof_fields, "qualitative_notes"):
         if bundle.get(field):
             full[field] = bundle[field]
     if index.get("counterevidence"):
@@ -465,7 +495,7 @@ def _preview(bundle, index, limit):
         room = limit - _size(preview) + _size(counter)
         if not _fit_string(counter, "text", text, room):
             return None
-    for field in ("metrics", "source_quotations"):
+    for field in proof_fields:
         if bundle.get(field):
             preview[field] = []
             for proof in bundle[field]:
@@ -491,6 +521,9 @@ def _preview(bundle, index, limit):
             if field == "findings":
                 if value.get("kind") == "counterevidence":
                     continue  # The priority cue already carries the report link and first citation.
+                if value.get("metric_refs") and not set(value["metric_refs"]) <= {
+                        m["metric_ref"] for m in preview.get("verified_metrics", ())}:
+                    continue  # A clipped or missing proof cannot deliver a verified numerical reading.
                 entry = {**value, "source_refs": value["source_refs"][:1], "text": ""}
                 preview[field].append(entry)
                 room = limit - _size(preview) + _size(entry)
@@ -502,6 +535,11 @@ def _preview(bundle, index, limit):
                 if _size(preview) > limit:
                     preview[field].pop()
                     break
+    notes = bundle.get("qualitative_notes")
+    if notes:
+        preview["qualitative_notes"] = notes
+        if _size(preview) > limit:
+            del preview["qualitative_notes"]
     return preview
 
 

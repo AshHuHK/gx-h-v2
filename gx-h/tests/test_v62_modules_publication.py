@@ -126,7 +126,8 @@ class ModulePublications(unittest.TestCase):
         next_lead = s.next_actor("run")
         self.assertIn(receipt["report_ref"], s.brief(next_lead)["evidence_refs"])
         published = s.call(next_lead, "gx_read_artifact", {"ref": receipt["report_ref"]}, "read-shortlist")
-        self.assertEqual(published["findings"], findings)
+        self.assertEqual(published["findings"], [{**f, "evidence_status": "UNVERIFIED"} for f in findings])
+        self.assertEqual(published["qualitative_notes"]["findings"], findings)
         self.assertFalse(s.rows("SELECT job_id FROM jobs WHERE run_id=?", s.run_id))
 
     def test_deep_reading_supplies_a_published_source_for_competing_hypotheses(self):
@@ -227,6 +228,7 @@ class ModulePublications(unittest.TestCase):
                             gaps=published["gaps"], next_steps=["Measure both masks on the same deposition."])
         last_lead = s.next_actor("run")
         final = s.call(last_lead, "gx_read_artifact", {"ref": proposed["report_ref"]}, "inspect-alternatives")
-        self.assertEqual(final["findings"], candidates)
+        self.assertEqual(final["findings"], [{**f, "evidence_status": "UNVERIFIED"} for f in candidates])
+        self.assertEqual(final["qualitative_notes"]["findings"], candidates)
         self.assertEqual(final["author"]["task_id"], analyst.task_id)
         self.assertEqual(len(s.rows("SELECT report_ref FROM v62_module_reports WHERE run_id=?", s.run_id)), 2)

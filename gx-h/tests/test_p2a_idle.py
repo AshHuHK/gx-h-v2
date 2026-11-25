@@ -137,6 +137,9 @@ conn.close()
                     peer.execute("UPDATE runs SET objective='discarded' WHERE run_id=?", (self.rid,))
                     raise ValueError("rollback")
             self.assertEqual(listener.wait(.025), set())
+        # The committed outer savepoint transaction can advance SQLite data_version
+        # even after its only update was undone. Observe the independent pipe on a fresh baseline.
+        with idle.WorkspaceWait(self.db) as listener:
             with closing(StdioTransport([sys.executable, "-I", "-S", "-c",
                                          "import sys; sys.stdin.readline(); print('ready', flush=True)"],
                                         env=self.child_env)) as transport:

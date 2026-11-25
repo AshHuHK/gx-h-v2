@@ -16,6 +16,7 @@ from .v62_evidence import _fact
 
 SCHEMA = "gx.verified_metric/1"
 MISSING = "gx.metric_unavailable/1"
+REPORT_SCHEMA = "gx.v622.module_report_bundle.1"
 OPERANDS = {"integer/1": ("pointer",), "decimal/1": ("pointer",),
             "ratio/1": ("numerator", "denominator"), "difference/1": ("left", "right")}
 NAME = re.compile(r"[A-Za-z][A-Za-z0-9_.-]{0,63}")
@@ -44,8 +45,12 @@ def definition_errors(specs):
                 type(spec.get("places")) is not int or not 0 <= spec["places"] <= 12):
             errors.append(f"{name}: unsupported formula, reader, unit or display precision")
             continue
-        fields = {"op", "reader", "unit", "places", "scope", "bounds", "source_unit", "scale", *operands}
+        fields = {"op", "reader", "unit", "places", "scope", "bounds", "source_unit", "scale", "result_pointer", *operands}
         scope = spec.get("scope", {})
+        result_pointer = spec.get("result_pointer")
+        if "result_pointer" in spec and (not isinstance(result_pointer, str) or not result_pointer.startswith("/")):
+            errors.append(f"{name}: invalid result field selector")
+            continue
         if (spec.keys() - fields or not isinstance(scope, dict) or
                 any(not isinstance(k, str) or not NAME.fullmatch(k) for k in scope) or
                 any(not isinstance(p, str) or not p.startswith("/") for p in
@@ -226,7 +231,8 @@ def _cited(conn, rid, refs, cache=None):
                 continue
             receipt = json.loads(record[0])
             raw = assets.read_bytes(ref, expected_sha256=receipt["report_sha256"])
-            entries = json.loads(raw).get("metrics", [])
+            doc = json.loads(raw)
+            entries = doc.get("verified_metrics", []) if doc.get("schema") == REPORT_SCHEMA else doc.get("metrics", [])
         else:
             entries = from_output(conn, rid, ref)
         cache[ref] = {e["metric_ref"]: e for e in entries}
@@ -241,9 +247,9 @@ def _method_identifiers(conn, rid):
     return {m["capability_version"] for m in cards if m.get("capability_version")}
 
 
-def _render(text, metrics, methods=(), *, protected=()):
+def _render(text, metrics, methods=(), *, protected=(), used=None):
     if isinstance(text, list):
-        return [_render(part, metrics, methods) for part in text]
+        return [_render(part, metrics, methods, used=used) for part in text]
     if not isinstance(text, str):
         raise SchemaInvalid("Quantitative interpretation must be text")
     checked = text
@@ -270,9 +276,11 @@ def _render(text, metrics, methods=(), *, protected=()):
         key, *checks = match[1].split("|")
         ref, _, name = key.rpartition(":")
         choices = [m for m in metrics if m["metric_id"] == name and (not ref or m["artifact_ref"] == ref)]
-        if len(choices) != 1 or choices[0]["schema"] != SCHEMA:
+        if len(choices) != 1:
             raise SchemaInvalid("Metric template needs one available metric on its cited source")
         item = choices[0]
+        if item["schema"] != SCHEMA:
+            raise SchemaInvalid("The declared metric has no usable reader result", details={"metric": item})
         values = {**item["scope"], **{k: item[k] for k in ("unit", "display", "numerator", "denominator") if k in item}}
         for check in checks:
             attr, eq, expected = check.partition("=")
@@ -288,6 +296,8 @@ def _render(text, metrics, methods=(), *, protected=()):
                     declared = re.findall(r"\b" + re.escape(field) + r"\s*[:=]\s*([\w.-]+)", without_tags, re.I)
                     if any(v.rstrip(".") != actual for v in declared):
                         raise SchemaInvalid("Metric prose declares a different selection scope")
+        if used is not None:
+            used[item["metric_ref"]] = item
         return item["display"]
     rendered = TAG.sub(replace, text)
     if "{{metric:" in rendered:
@@ -300,7 +310,7 @@ PREDICATES = {"gt": (">", r">(?!=)|above|greater than|exceeds?"),
               "le": ("<=", r"<=|≤|at most"), "eq": ("=", r"==|(?<![<>])=|equals?")}
 
 
-def _criterion(text, prediction, metrics, methods=()):
+def _criterion(text, prediction, metrics, methods=(), *, used=None):
     # Only a comparator with its prospective numeric RHS can be stated literally.
     symbol, words = PREDICATES[prediction["operator"]]
     cutoff = prediction["threshold"]
@@ -312,12 +322,12 @@ def _criterion(text, prediction, metrics, methods=()):
         return match["op"] + match["space"] + "{{cutoff}}"
     if "{{cutoff}}" in text:
         raise SchemaInvalid("Use {{criterion}} to cite the registered comparison")
-    text = _render(pattern.sub(substitute, text), metrics, methods)
+    text = _render(pattern.sub(substitute, text), metrics, methods, used=used)
     return text.replace("{{cutoff}}", str(cutoff)).replace(
         "{{criterion}}", f"{prediction['observable']} {symbol} {cutoff}")
 
 
-def render_fields(conn, run_id, evidence_refs, text_fields, *, allowed_context=None, prediction=None):
+def render_fields(conn, run_id, evidence_refs, text_fields, *, allowed_context=None, prediction=None, used=None):
     """Render already-authorized scientific prose from pinned metrics, retaining their full receipts."""
     metrics = _cited(conn, run_id, evidence_refs)
     methods = _method_identifiers(conn, run_id) if any("@" in field for field in text_fields.values()) else ()
@@ -329,41 +339,112 @@ def render_fields(conn, run_id, evidence_refs, text_fields, *, allowed_context=N
             result[key] = value
             continue
         if key == "criteria" and prediction:
-            result[key] = _criterion(value, prediction, metrics, methods)
+            result[key] = _criterion(value, prediction, metrics, methods, used=used)
         else:
             if "{{criterion}}" in value:
                 raise SchemaInvalid("A criterion citation requires a prospective structured prediction")
-            result[key] = _render(value, metrics, methods)
+            result[key] = _render(value, metrics, methods, used=used)
     return result, metrics
 
 
-def render_report(conn, rid, bundle):
+def measured_statement(metrics):
+    """A shareable numerical statement whose entire value and label come from the method."""
+    return "; ".join(m["metric_id"] + " = " + m["display"] for m in metrics) + "."
+
+
+def render_report(conn, rid, bundle, *, current=False, metric_refs=(), qualitative_notes=()):
     """Only a finding's own citations may supply its numerical statements."""
     cache = {}
     methods = _method_identifiers(conn, rid)
     fields = {}
+    selected = {}
     quotations = []
     reads = None
-    for index, finding in enumerate(bundle["findings"]):
+    for finding in bundle["findings"]:
+        quote = None
         entries = _cited(conn, rid, finding["source_refs"], cache)
+        used = {}
         try:
-            text = _render(finding["text"], entries, methods)
-        except SchemaInvalid:
+            text = _render(finding["text"], entries, methods, used=used)
+        except SchemaInvalid as error:
             # A verified quotation is a source attribution, never an executed measurement.
             from . import v62_native, v62_sources
             if reads is None:
                 reads = v62_native.operation_receipts(conn, rid, bundle["module_instance_id"])
             quote = v62_sources.report_quotation(conn, rid, bundle["scope"], finding, reads)
             if not quote:
+                if current and "metric" not in error.details:
+                    error.details["category"] = "module_report_structure"
                 raise
-            text = _render(finding["text"], entries, methods, protected=[quote["finding_span"]])
-            quotations.append(dict(finding_index=index, **quote))
-        fields.setdefault("findings", []).append({**finding, "text": text})
+            try:
+                text = _render(finding["text"], entries, methods, protected=[quote["finding_span"]], used=used)
+            except SchemaInvalid as error:
+                if current and "metric" not in error.details:
+                    error.details["category"] = "module_report_structure"
+                raise
+        if current and any(m["artifact_ref"] not in finding["source_refs"] for m in used.values()):
+            raise ScopeDenied("A module measurement must cite its own authorized named output")
+        selected.update(used)
+        findings = fields.setdefault("findings", [])
+        if not current:
+            if quote:
+                quotations.append(dict(finding_index=len(findings), **quote))
+            findings.append({**finding, "text": text})
+            continue
+        if entries and used:
+            findings.append({**finding, "text": measured_statement(used.values()), "metric_refs": list(used)})
+        if quote:
+            # A missing/omitted metric may already have removed an earlier draft finding.
+            # The locator must point at the published text, including for mixed sources.
+            if entries:
+                start, end = quote["finding_span"]
+                text = finding["text"][start:end]
+                quote = {**quote, "finding_span": [0, len(text)]}
+            quotations.append(dict(finding_index=len(findings), **quote))
+            findings.append({**finding, "text": text})
+        elif not entries:
+            findings.append({**finding, "text": text, "evidence_status": "UNVERIFIED"})
+        elif not used and finding.get("kind") == "counterevidence":
+            findings.append({**finding, "text": "A qualitative note flags this source for review.",
+                             "evidence_status": "UNVERIFIED"})
     if quotations:
         bundle["source_quotations"] = quotations
     metrics = _cited(conn, rid, [s["artifact_ref"] for s in bundle["sources"]], cache)
     bundle.update(schema="gx.v621.module_report_bundle.1", metrics=metrics,
                   interpretation={"findings": bundle["findings"], "gaps": bundle["gaps"], "next_steps": bundle["next_steps"]})
+    if current:
+        for note in qualitative_notes:
+            if note.get("kind") == "counterevidence":
+                fields.setdefault("findings", []).append({**note, "text": "A qualitative note flags this source for review.",
+                                                         "evidence_status": "UNVERIFIED"})
+        presented = set(selected)
+        for selector in metric_refs:
+            ref, name = selector["artifact_ref"], selector["metric_id"]
+            entry = next((m for m in _cited(conn, rid, [ref], cache)
+                          if m["artifact_ref"] == ref and m["metric_id"] == name), None)
+            if entry is None:
+                raise SchemaInvalid("Select a declared metric on the cited named Job output",
+                                    details={"category": "module_report_structure"})
+            if entry["schema"] != SCHEMA:
+                raise SchemaInvalid("The declared metric has no usable reader result", details={"metric": entry})
+            selected[entry["metric_ref"]] = entry
+        for ref, metric in selected.items():
+            if ref not in presented:
+                fields.setdefault("findings", []).append({"text": measured_statement([metric]),
+                    "metric_refs": [ref], "source_refs": [metric["artifact_ref"]]})
+        bundle["schema"] = REPORT_SCHEMA
+        bundle["verified_metrics"] = list(selected.values())
+        bundle["metrics"] = bundle["verified_metrics"]
+        bundle["qualitative_notes"] = {"status": "UNVERIFIED", "findings": [*bundle["findings"], *qualitative_notes],
+                                       "gaps": list(bundle["gaps"]), "next_steps": list(bundle["next_steps"])}
+        # Keep the legacy interpretation shape limited to pre-6.2.2 reports.
+        del bundle["interpretation"]
+        fields.setdefault("findings", [])
     bundle.update(fields)
     for key in ("gaps", "next_steps"):
-        bundle[key] = _render(bundle[key], metrics, methods)
+        try:
+            bundle[key] = _render(bundle[key], metrics, methods)
+        except SchemaInvalid as error:
+            if current and "metric" not in error.details:
+                error.details["category"] = "module_report_structure"
+            raise

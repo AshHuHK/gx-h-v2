@@ -223,6 +223,15 @@ def bundle_problems(bundle: Any) -> list[str]:
         found.append("env_id is empty: a capability with no environment is not callable")
 
     found.extend(_entry_problems(manifest, bundle))
+    for name, default in manifest.get("parameter_defaults", {}).items():
+        if name not in parameter_names(manifest):
+            found.append(f"Default for unknown parameter {name!r}")
+            continue
+        try:
+            whole = "{param." + name + "}" in manifest["entry"]["argv_template"]
+            coerce_parameter(name, default, whole_token=whole)
+        except SchemaInvalid as error:
+            found.append(error.message)
     found.extend(_weights_problems(manifest))
     for index, item in enumerate(manifest["required_data"]):
         found.extend(_rooted_path_problems(item, where=f"required_data[{index}]"))
@@ -510,6 +519,11 @@ def parameter_names(manifest: Mapping[str, Any]) -> list[str]:
                    for name in placeholders(token) if _namespace(name) == "param"})
 
 
+def effective_parameters(manifest: Mapping[str, Any], parameters: Mapping[str, Any]) -> dict[str, Any]:
+    """Resolve only defaults explicitly declared in this immutable method version."""
+    return {**manifest.get("parameter_defaults", {}), **parameters}
+
+
 def is_raw_output(output: Mapping[str, Any]) -> bool:
     kind = output["kind"]
     return kind == RAW_OUTPUT_PREFIX or kind.startswith(RAW_OUTPUT_PREFIX + ":")
@@ -693,7 +707,7 @@ def launch_plan(
     manifest = bundle["manifest"]
     entry = manifest["entry"]
     template = list(argv_template if argv_template is not None else entry["argv_template"])
-    supplied = dict(parameters or {})
+    supplied = effective_parameters(manifest, parameters or {})
     declared = set(parameter_names(manifest))
     undeclared = sorted(set(supplied) - declared)
     if undeclared and argv_template is None:
@@ -736,7 +750,7 @@ def launch_plan(
                 if key not in supplied:
                     raise SchemaInvalid(
                         f"parameter {key!r} is required by {capability_version(manifest)} and "
-                        "was not supplied; there are no defaults, so two runs that differ in "
+                        "was not supplied and has no declared default; two runs that differ in "
                         "a flag differ in what was recorded",
                         details={"parameter": key, "declared": sorted(declared)},
                     )

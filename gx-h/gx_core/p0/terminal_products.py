@@ -115,7 +115,9 @@ class TerminalProducts:
             raise RuntimeError("roll back the product transaction before recording its structural failure")
         thread, turn, call = (params[key] for key in ("threadId", "turnId", "callId"))
         digest = ids.sha256_of_obj([params["tool"], params["arguments"]])
-        with store.transaction(self.conn):
+        category = error.details["category"]
+        with store.transaction(self.conn, transaction_owner="TerminalProducts", operation="record_repair",
+                               run_id=self.roots.run_id):
             prior = self.replayed_failure(thread, turn, call, digest)
             if prior is not None:
                 return prior
@@ -123,22 +125,32 @@ class TerminalProducts:
             if self.roots.active_turns.get(thread) != turn or self.conn.execute(
                     "SELECT 1 FROM p0_root_calls WHERE thread_id=? AND call_id=?", (thread, call)).fetchone():
                 raise ScopeDenied("the failed callback no longer belongs to this active Root Turn")
-            count = 1 + self.conn.execute("SELECT count(*) FROM p0_product_repairs WHERE thread_id=?",
-                                          (thread,)).fetchone()[0]
-            response = {"error": error.message[:1000], "code": error.code, "category": "product_structure",
+            if category == "module_report_structure":
+                from . import v6_decisions
+                v6_decisions.module_authority(self.conn, run_id=self.roots.run_id, task_id=binding["task_id"],
+                                              lease_id=binding["lease_id"], thread_id=thread, turn_id=turn)
+            count = 1 + self.conn.execute("SELECT count(*) FROM p0_product_repairs WHERE thread_id=? AND category=?",
+                                          (thread, category)).fetchone()[0]
+            response = {"error": error.message[:1000], "code": error.code, "category": category,
                         "contract_digest": error.details["contract_digest"],
                         "pointer": str(error.details.get("pointer", ""))[:400],
                         "failure_count": count, "max_failures": self.limit, "terminal": count >= self.limit}
             if response["terminal"]:
-                reason = f"GX product contract reached {self.limit} distinct structural failures in this attempt"
+                product = "module report" if category == "module_report_structure" else "product"
+                reason = f"GX {product} contract reached {self.limit} distinct structural failures in this attempt"
                 response["task_status"] = TeamService(self.conn).recover_failed_attempt(
                     task_id=binding["task_id"], lease_ref=binding["lease_id"], reason=reason)
                 self.record(thread, turn, call, "GX_REPAIR_LIMIT")
+            encoded = ids.canonical_json(response)
+            if category == "module_report_structure":
+                # All native Goal tools share this immutable call-ID registry. A refused report
+                # cannot be replayed as a decision or a source operation with the same ID.
+                self.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)", (thread, call, turn, digest, encoded))
             self.conn.execute(
                 "INSERT INTO p0_product_repairs(thread_id,call_id,turn_id,request_sha,category,contract_digest,"
                 "response_json,recorded_at) VALUES(?,?,?,?,?,?,?,?)",
                 (thread, call, turn, digest, response["category"], response["contract_digest"],
-                 ids.canonical_json(response), clock.now_iso()))
+                 encoded, clock.now_iso()))
             return response
 
     def _rpc(self, method, params):

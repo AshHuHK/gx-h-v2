@@ -71,6 +71,8 @@ def deliver(conn, brief, limit):
                   intent={}, module_reports=[], module_catalog=[])
     if "research_evidence_version" in brief:
         packet["research_evidence_version"] = brief["research_evidence_version"]
+    if "study_class" in brief:
+        packet["study_class"] = brief["study_class"]
     if "evidence_policy" in brief:
         packet["evidence_policy"] = brief["evidence_policy"]
     progress = brief.get("research_progress")
@@ -108,10 +110,14 @@ def deliver(conn, brief, limit):
         contrary = report.get("counterevidence", [])
         if contrary:
             first = contrary[0]
-            summary["counterevidence"] = [{"text": _excerpt(first["text"], 256), "source_refs": first["source_refs"][:1]}]
+            summary["counterevidence"] = [{**first, "text": _excerpt(first["text"], 256), "source_refs": first["source_refs"][:1]}]
         if append("module_reports", summary):
             append("evidence_refs", report["report_ref"])
-            for field in ("metrics", "source_quotations"):
+            if "verified_metrics" in report:
+                proof_fields = ("verified_metrics", "source_quotations")
+            else:
+                proof_fields = ("metrics", "source_quotations")
+            for field in proof_fields:
                 if report.get(field):
                     summary[field] = []
                     for proof in report[field]:

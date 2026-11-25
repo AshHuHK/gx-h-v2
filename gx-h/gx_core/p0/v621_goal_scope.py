@@ -4,8 +4,8 @@ from . import v621_policy
 
 def active(conn, rid):
     goal = conn.execute("""SELECT g.goal_version FROM runs r JOIN v6_goals g USING(run_id)
-        WHERE r.run_id=? AND json_extract(r.inputs_json,'$.inputs.evidence_policy')=?""",
-        (rid, v621_policy.VERSION)).fetchone()
+        WHERE r.run_id=? AND json_extract(r.inputs_json,'$.inputs.evidence_policy') IN (?,?)""",
+        (rid, *v621_policy.GOVERNED)).fetchone()
     return goal[0] if goal else None
 
 

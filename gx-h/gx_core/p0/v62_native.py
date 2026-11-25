@@ -1,6 +1,8 @@
 """Native research module tool grants and recoverable local read receipts."""
 from __future__ import annotations
 
+from copy import deepcopy
+
 import json
 from pathlib import Path
 import stat
@@ -15,6 +17,32 @@ OPEN = "gx_open_module"
 CANCEL = "gx_cancel_module"
 REPORT = "gx_submit_module_report"
 QUERY = "gx_query_catalog"
+
+def evidence_tool(name, version):
+    """Project current and historical native tool menus from the one contract."""
+    from . import v621_policy
+
+    spec = contracts.native_goal_tool_spec(name)
+    if version == v621_policy.VERSION:
+        return spec
+    spec = deepcopy(spec)
+    fields = spec["inputSchema"]["properties"]
+    if name == REPORT:
+        fields.pop("metric_refs", None)
+        fields.pop("qualitative_notes", None)
+        if version not in v621_policy.GOVERNED:
+            fields.pop("gap_criteria", None)
+        else:
+            gap = fields["gap_criteria"]["items"]["properties"]
+            for key in ("metric_id", "unit", "input_role"):
+                gap.pop(key, None)
+    elif name == "gx_stage_claim":
+        prediction = fields["prediction"]["properties"]
+        prediction.pop("quantifier", None)
+        for key in ("parameters", "metric_id", "unit", "input_role"):
+            prediction["method"]["properties"].pop(key, None)
+    return spec
+
 
 def module_instructions(brief):
     tools = set(brief["allowed_tools"])
@@ -34,6 +62,11 @@ def module_instructions(brief):
                             "capability and authorized inputs. A following decision can use the confirmed output.")
     instructions.append("Use gx_submit_module_report with findings, exact source references, gaps and next steps. "
                         "Preserve contrary observations and report PARTIAL when work is incomplete.")
+    from . import v621_policy
+    if brief.get("evidence_policy") == v621_policy.VERSION:
+        instructions.append("Select verified readings with metric_refs containing artifact_ref and metric_id, "
+                            "or cite {{metric:id}} in a finding. Put interpretations, hypotheses and unverified "
+                            "estimates in qualitative_notes with their source_refs.")
     return " ".join(instructions)
 
 
@@ -60,12 +93,7 @@ def module_tools(read_tools, brief, decide):
             tool = {**tool, "inputSchema": {**original, "properties": properties}}
         if tool["name"] in ("gx_read_artifact", "gx_task_context"):
             available.append(tool)
-    from . import v621_policy
-    report = contracts.native_goal_tool_spec(REPORT)
-    if brief.get("evidence_policy") != v621_policy.VERSION:
-        form = report["inputSchema"]
-        properties = {key: value for key, value in form["properties"].items() if key != "gap_criteria"}
-        report = {**report, "inputSchema": {**form, "properties": properties}}
+    report = evidence_tool(REPORT, brief.get("evidence_policy"))
     available.extend((decide, report, contracts.native_goal_tool_spec(QUERY)))
     available.extend(contracts.native_goal_tool_spec(name) for name in SOURCE_TOOLS if name in allowed)
     return [tool for tool in available if tool["name"] in allowed]

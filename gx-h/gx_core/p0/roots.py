@@ -22,7 +22,7 @@ from ..scheduling import dispatch as scheduler, snapshot
 from ..teams import recovery
 from ..teams.service import TeamService, default_lease_seconds
 from . import compute
-from . import profiles, v6_native, v62_native
+from . import profiles, v6_native, v62_native, v621_policy
 from ..orchestration.service import hooks_for_run
 from . import activity, terminal_products, waits
 
@@ -564,7 +564,7 @@ class Roots:
                 if packet.get("research_evidence_version"):
                     params["developerInstructions"] += v6_native.EVIDENCE_INSTRUCTIONS
             from . import v621_policy
-            if packet.get("evidence_policy") == v621_policy.VERSION:
+            if packet.get("evidence_policy") in v621_policy.GOVERNED:
                 params["developerInstructions"] += (
                     " For a numbered finding from a measurement with declared metrics, cite its output and "
                     "insert {{metric:METRIC_ID}} in the interpretation. GX renders the value from that "
@@ -947,22 +947,29 @@ class Roots:
             except SchemaInvalid as exc:
                 if p.get("tool") == "gx_submit_product" and not self.terminal_products:
                     status = "SCHEMA_INVALID"
-                if (not self.terminal_products or p.get("tool") != "gx_submit_product"
-                        or exc.details.get("category") != "product_structure" or not exc.details.get("contract_digest")):
+                if not self.terminal_products:
+                    raise
+                if (p.get("tool") == v62_native.REPORT and exc.details.get("category") == "module_report_structure"
+                        and v621_policy.current(self.conn, self.run_id)):
+                    spec = v62_native.evidence_tool(v62_native.REPORT, v621_policy.VERSION)
+                    exc.details["contract_digest"] = ids.sha256_of_obj(spec["inputSchema"])
+                elif (p.get("tool") != "gx_submit_product" or exc.details.get("category") != "product_structure"
+                      or not exc.details.get("contract_digest")):
                     raise
                 out = self.terminal_products.failed_call(p, exc)
             status = "SUCCESS"
+            if (p.get("tool") in ("gx_submit_product", v62_native.REPORT) and isinstance(out, dict)
+                    and out.get("category") in ("product_structure", "module_report_structure")):
+                status = "SCHEMA_INVALID_LIMIT" if out["terminal"] else "SCHEMA_INVALID"
+                suppress = out["terminal"] or self.terminal_products.is_terminal(p["threadId"], p["turnId"])
+                if suppress:
+                    return NO_TOOL_RESPONSE
+                return {"success": False, "contentItems": [{"type": "inputText", "text": ids.canonical_json(out)}]}
             if p.get("tool") in self.mode.decision_tools:
                 status = "ACCEPTED"
                 suppress = True
                 return NO_TOOL_RESPONSE
             if p.get("tool") == "gx_submit_product" and isinstance(out, dict):
-                if out.get("category") == "product_structure":
-                    status = "SCHEMA_INVALID_LIMIT" if out["terminal"] else "SCHEMA_INVALID"
-                    suppress = out["terminal"] or self.terminal_products.is_terminal(p["threadId"], p["turnId"])
-                    if suppress:
-                        return NO_TOOL_RESPONSE
-                    return {"success": False, "contentItems": [{"type": "inputText", "text": ids.canonical_json(out)}]}
                 if out.get("task_status") in ("ACCEPTED", "REJECTED"):
                     status = "ACCEPTED" if out["task_status"] == "ACCEPTED" else "TERMINAL_REJECTED"
                     if self.terminal_products:

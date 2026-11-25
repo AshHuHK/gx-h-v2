@@ -33,7 +33,8 @@ def acquired(sample, **more):
                 publication=[], processing=[], applicability=SCOPE) | more
 
 
-def start_series_goal(case, conn, tmp, *, effort="quick", run_key="mixed", readings=None):
+def start_series_goal(case, conn, tmp, *, effort="quick", run_key="mixed", readings=None, extra_files=(),
+                      historical_replay=False):
     deployment = tmp / "release"
     installed = deployment / "plugins/installed"
     shutil.copytree(config.CONFIG_DIR, deployment / "config")
@@ -50,7 +51,9 @@ def start_series_goal(case, conn, tmp, *, effort="quick", run_key="mixed", readi
     spec = {"mode": "goal", "project": "output-types", "research_effort": effort,
             "objective": "Summarize the observed series and estimate the next reading",
             "plugins": ["org.example.instrument-series@1.0.0"], "capabilities": [METHOD],
-            "input_files": [{"role": "readings", "path": str(path)}]}
+            "input_files": [{"role": "readings", "path": str(path)}, *extra_files]}
+    if historical_replay:
+        spec.update(evidence_policy="gx.evidence/6.2.1", historical_replay=True)
     run = v6_goal.start(conn, spec, run_key=run_key, current=None)["run_id"]
     raw = json.loads(conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run,)).fetchone()[0])
     return run, raw["files"][0]["artifact_ref"]

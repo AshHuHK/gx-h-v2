@@ -77,18 +77,22 @@ class MeasurementAdmission(unittest.TestCase):
                            previous_claim_ref=prior["claim_revision_id"])
             wrong=apply(actor,"publish-and-obtain-ordered",[first["result_ref"],proposal],
                         [job(actor,"ordered_backbone",register["aliases"]["local:measurements"])],"local:ordered_backbone")
+            def external_status():
+                output = subprocess.check_output(
+                    [sys.executable, "-B", str(PRODUCT / "bin/gx-p0"), "status", "--state", str(s.state),
+                     "--run-id", s.run_id], text=True, env={**os.environ, "GX_CODEX_OFFLINE": "1"})
+                return json.loads(output)["claims"][0]
+            cold_wrong = external_status()
             second=s.settle(wrong["aliases"]["local:ordered_backbone"])
             final_actor=actor_with(second["result_ref"])
             latest,=s.brief(final_actor)["claims"]
             amended=claim(final_actor,"conclude",[second["result_ref"]],"contested",
                           previous_claim_ref=latest["claim_revision_id"])
             result=apply(final_actor,"publish-final",[second["result_ref"],amended])
-            options=dict(env={**os.environ,"GX_CODEX_OFFLINE":"1"},text=True)
-            status=json.loads(subprocess.check_output([sys.executable,"-B",str(PRODUCT/"bin/gx-p0"),
-                "status","--state",str(s.state),"--run-id",s.run_id],**options))
+            status = external_status()
             doc=result["claim_revisions"][0]
             wrong_doc=wrong["claim_revisions"][0]
-            self.assertEqual(status["claims"][0]["claim_revision_id"],doc["claim_revision_id"])
+            self.assertEqual(status["claim_revision_id"],doc["claim_revision_id"])
             self.assertEqual(v6_claims.read_revision(s.conn,s.run_id,wrong_doc["claim_revision_id"]),wrong_doc)
             trace={"case":"R1","run_id":s.run_id,"paid_calls":0,"input_sha256":hashlib.sha256(original).hexdigest(),
                    "acquisition_event":acq["event_id"],"independent":counts,
@@ -96,11 +100,13 @@ class MeasurementAdmission(unittest.TestCase):
                    "jobs":[{k:manifest.read_manifest(s.conn,n["job_id"])[k] for k in
                               ("admission","completion","manifest_hash")} for n in (first,second)],
                    "wrong_mask_publication":wrong_doc,"correct_mask_publication":doc,
-                   "operator_status":status["claims"][0],"next_lead":latest}
+                   "operator_status":status,"next_lead":latest,"cold_wrong_mask":cold_wrong}
             if destination:=os.getenv("GX_R1_RECEIPT"):
                 Path(destination).write_text(json.dumps(trace,indent=2)+"\n")
             self.assertNotEqual(wrong_doc["publication"]["direction"],"supported",
                                 "wrong common_ca mask gave supporting evidence for ordered_backbone")
+            self.assertEqual(cold_wrong["publication"], wrong_doc["publication"])
+            self.assertFalse(wrong_doc["maturity"]["results"])
             self.assertEqual(doc["publication"]["direction"],"opposed")
             self.assertEqual(doc["science"]["level"],"contested")
 

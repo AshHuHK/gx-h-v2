@@ -185,7 +185,11 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         if not enriched:
             raise SchemaInvalid('A prospective prediction requires an enrolled research-evidence Goal')
         pins = v62_maturity.pin_data(conn, run_id, payload['prediction'], visible)
-        method_pin = v62_maturity.pin_method(conn, run_id, payload['prediction'])
+        if v621_policy.current(conn, run_id):
+            from . import v622_measurement
+            method_pin = v622_measurement.pin(conn, run_id, payload['prediction'], applicability=payload['scope'])
+        else:
+            method_pin = v62_maturity.pin_method(conn, run_id, payload['prediction'])
     previous = payload.get('previous_claim_ref')
     prior = None
     if previous:
@@ -209,12 +213,14 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
             if (fact.get('source_class') == 'reviewed_source_evidence' and fact.get('claim') == payload['statement']
                     and v62_maturity.qualified_ground(fact, payload, require_acquisition=True)):
                 trusted.update(statement=fact['claim'], scope=fact['applicability'])
+        selected = {}
         rendered, metrics = v621_metrics.render_fields(conn, run_id, [f['artifact_ref'] for f in sources],
-                        text_fields, allowed_context=trusted, prediction=payload.get('prediction'))
-    if payload['level'] in ('limited_support', 'contested', 'mixed', 'refuted'):
+                        text_fields, allowed_context=trusted, prediction=payload.get('prediction'), used=selected)
+    unassessed = not enriched and v621_policy.current(conn, run_id)
+    if payload['level'] in ('limited_support', 'contested', 'mixed', 'refuted') and not unassessed:
         if enriched:
             proposed = {**payload, **rendered, 'decision_scope': task['scope']}
-            proposed['maturity_lineage'] = v62_maturity.continuing_lineage(proposed, prior)
+            proposed['maturity_lineage'] = v62_maturity.continuing_lineage(proposed, prior, pins, method_pin)
             usable = any(v62_maturity.qualified_ground(s, proposed, require_acquisition=governed)
                          for s in sources)
         else:
@@ -230,6 +236,24 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
     if metrics or any(payload[key] != value for key, value in rendered.items()):
         draft['rendered_claim_fields'] = rendered
         draft['metrics'] = metrics
+    if v621_policy.current(conn, run_id):
+        verified = list(selected.values())
+        registered = 'prediction' in payload or prior and prior.get('maturity', {}).get('registration')
+        draft['qualitative_notes'] = {'status': 'UNVERIFIED', 'statement': payload['statement'],
+                                      'rationale': payload['rationale'], 'limitations': payload['limitations']}
+        draft['verified_metrics'] = verified
+        if metrics:
+            draft['metrics'] = verified
+        if registered:
+            draft['statement_role'] = 'registered_proposition'
+        elif trusted.get('statement') == payload['statement']:
+            draft['statement_role'] = 'reviewed_source'
+        elif metrics:
+            draft['statement_role'] = 'gx_measurement' if verified else 'unverified_interpretation'
+            draft['rendered_claim_fields']['statement'] = (
+                v621_metrics.measured_statement(verified) if verified else 'No named measurement selected.')
+        else:
+            draft['statement_role'] = 'lead_proposition'
     if pins is not None:
         draft['prediction_data'] = pins
         draft['prediction_method'] = method_pin
@@ -279,8 +303,15 @@ def set_publication(claim, *, proposed_level, proposal_ref):
     reg = judgment["registration"]
     measured = {digest for result in judgment["results"] for digest in result["matched_data_sha256"]}
     pending = [pin["artifact_ref"] for pin in reg["data"] if pin["sha256"] not in measured] if reg else []
+    coverage = judgment.get("material_coverage")
+    if coverage is not None:
+        pending = [r["artifact_ref"] for r in coverage if r["qualification"] != "prospective"]
     partial_readings = bool(judgment["results"] and pending)
-    if partial_readings:
+    universal_counterexample = (coverage is not None and direction == "opposed" and
+                                any(r["opposing_refs"] and not r["supporting_refs"] for r in coverage))
+    if universal_counterexample:
+        allowed.extend(["contested", "refuted"])
+    elif partial_readings:
         if direction in ("opposed", "mixed"):
             allowed.append("contested")
     elif direction == "supported":
@@ -295,6 +326,8 @@ def set_publication(claim, *, proposed_level, proposal_ref):
 
     if proposed_level in allowed:
         published = proposed_level
+    elif universal_counterexample:
+        published = "contested"
     elif partial_readings:
         published = "insufficient"
     else:
@@ -310,6 +343,9 @@ def set_publication(claim, *, proposed_level, proposal_ref):
         "registration_event_id": reg["event_id"] if reg else None, "unmeasured_data_refs": pending,
         "reasons": list(judgment["reasons"]),
     }
+    if coverage is not None:
+        publication.update(policy="gx.claim-publication/2", quantifier=reg["quantifier"],
+                           proposition_sha256=reg["proposition_sha256"], material_coverage=coverage)
     if partial_readings:
         publication["reasons"].append("The observed direction covers only a subset of the registered materials.")
     if proposed_level != published:
@@ -332,6 +368,8 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
     cited = set(decision['evidence_refs'])
     requested = cited | {ref for op in decision['ops'] for ref in op.get('claim_refs', ())}
     drafts = _drafts(conn, run_id, task_id, lease_id, context_ref, requested)
+    run_class = conn.execute("SELECT json_extract(inputs_json,'$.inputs.study_class') FROM runs WHERE run_id=?",
+                             (run_id,)).fetchone()[0]
     receipts = []
     for ref, draft in drafts.items():
         claim = {**draft['claim'], **draft.get('rendered_claim_fields', {})}
@@ -364,15 +402,36 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
                            subject_id=hid, prev_revision=parent, new_revision=revision,
                            payload={'decision_ref': decision_ref, 'claim_revision_id': receipt['claim_revision_id'],
                                     'claim_ref': ref, 'evidence_refs': claim['evidence_refs']})
+        if 'verified_metrics' in draft:
+            for field in ('verified_metrics', 'qualitative_notes', 'statement_role'):
+                receipt[field] = draft[field]
         if 'metrics' in draft:
             receipt['metrics'] = draft['metrics']
             science['metric_refs'] = [metric['metric_ref'] for metric in draft['metrics']]
+        if v621_policy.current(conn, run_id):
+            from . import v622_propositions
+            receipt["decision_delivery"] = v622_propositions.lead_delivery(conn, run_id, draft)
         if v62_maturity.enrolled(conn, run_id):
             receipt['science']['level_source'] = 'lead_proposal'
             v62_maturity.attach(conn, run_id, receipt, previous, draft.get('prediction_data'),
                                 draft.get('prediction_method'), event_id)
             if v621_policy.enabled(conn, run_id):
                 set_publication(receipt, proposed_level=claim['level'], proposal_ref=ref)
+        elif v621_policy.current(conn, run_id):
+            proposed = claim["level"]
+            published = proposed if proposed in ("open", "insufficient") else "insufficient"
+            reason = "This direct summary has no prospective assessment. The Lead's interpretation is unverified."
+            receipt["level"] = published
+            receipt["lead_interpretation"] = {"status": "UNVERIFIED", "rationale": claim["rationale"],
+                                             "proposed_level": proposed, "proposal_ref": ref}
+            receipt["rationale"] = reason
+            receipt["publication"] = {"policy": "gx.claim-publication/2", "scope": claim["scope"],
+                "claim_revision_id": receipt["claim_revision_id"], "maturity": "unassessed", "direction": "undetermined",
+                "level": published, "proposed_level": proposed, "proposal_ref": ref, "admissible_levels": ["open", "insufficient"],
+                "supporting_refs": [], "opposing_refs": [], "reasons": [reason]}
+            receipt["science"].update(level=published, level_source="gx.claim-publication/2", direction="undetermined")
+        if run_class:
+            receipt['study_class'] = run_class
         conn.execute('INSERT INTO hypothesis_revisions (hypothesis_id,revision,parent_revision,document_json,sha256,'
                      'author_principal,author_task_id,proposal_id,created_at) VALUES (?,?,?,?,?,?,?,?,?)',
                      (hid, revision, parent, ids.canonical_json(receipt), ids.sha256_of_obj(receipt), principal,

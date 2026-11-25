@@ -1,0 +1,608 @@
+{
+  "external_paid_calls": 0,
+  "policy": "gx.evidence/6.2.2",
+  "original": {
+    "assessment_cursor": 27,
+    "assessment_of": "gxh_01m8abyx1148kxk24j@1",
+    "availability_cursor": 27,
+    "claim_ref": "gxh_01m8abyx1148kxk24j@2",
+    "claim_revision_id": "gxh_01m8abyx1148kxk24j@2",
+    "context_ref": "gxcx_01m8abyws024n2we1q",
+    "criteria": "Temperature in Celsius exceeds ten.",
+    "criteria_sha256": "77d12ab3cee763fddde9256bf4efa43d88b2df82f9ac5b06dabff02ca87c46fa",
+    "decision_delivery": {
+      "brief_sha256": "7aab29bc20c52724d175f60f8fb1fe21c4629a0f054608b3fa735ff2c0119c10",
+      "brief_turn_id": "turn-gxl_01m8abywxsn3gwm326",
+      "context_ref": "gxcx_01m8abyws024n2we1q",
+      "delivery_receipt": "turn-gxl_01m8abywxsn3gwm326",
+      "metric_refs": [],
+      "observations": [],
+      "snapshot_cursor": 0,
+      "state": "acknowledged",
+      "thread_id": "script-gxl_01m8abywxsn3gwm326",
+      "turn_id": "turn-gxl_01m8abywxsn3gwm326"
+    },
+    "decision_id": "gxa_c958ba6a09373dfce2321b663d43e0f53792eb7f863bc97a24683d4ef18dc85a",
+    "decision_scope": "run",
+    "event_cursor": 0,
+    "evidence_refs": [
+      "gxa_01m8abywkc2yxbf9dd"
+    ],
+    "hypothesis_id": "gxh_01m8abyx1148kxk24j",
+    "lead_interpretation": {
+      "proposal_ref": "gxa_01m8abywz9b46jgj5q",
+      "proposed_level": "open",
+      "rationale": "Audit the original proposition against the registered endpoint."
+    },
+    "level": "open",
+    "limitations": "North station mornings only.",
+    "maturity": {
+      "direction": "opposed",
+      "disputed_extractions": [],
+      "gaps": [],
+      "grounds": [
+        "gxa_01m8abyxktebhj98x7"
+      ],
+      "material_coverage": [
+        {
+          "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+          "known_at_registration": false,
+          "measurement_spec_sha256": "e9d3b080cfa369ec7f830d89a79119f7dca83300ce0e8e6c75afb298ca55bb6b",
+          "opposing_refs": [
+            "gxa_01m8abyxktebhj98x7"
+          ],
+          "qualification": "prospective",
+          "registration_event_id": 20,
+          "retrospective_refs": [],
+          "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+          "supporting_refs": [],
+          "uncertain_refs": []
+        }
+      ],
+      "opposing_refs": [
+        "gxa_01m8abyxktebhj98x7"
+      ],
+      "preexisting_result": false,
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited.",
+        "GX froze the rule before each qualifying prospective result.",
+        "GX compared the original measured value with the registered decision rule.",
+        "Adverse results or independently reviewed opposing evidence are retained."
+      ],
+      "registration": {
+        "claim_revision_id": "gxh_01m8abyx1148kxk24j@1",
+        "claim_scope": "Morning samples from the north station",
+        "claim_sha256": "68eb1273fae8b7d9b982b18adbc6ad0235d56bfec8b91dffa4ffd0bf109b8505",
+        "data": [
+          {
+            "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+            "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704"
+          }
+        ],
+        "decision_scope": "run",
+        "event_id": 20,
+        "known_at_registration": {
+          "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704": false
+        },
+        "measurement_spec_sha256": "e9d3b080cfa369ec7f830d89a79119f7dca83300ce0e8e6c75afb298ca55bb6b",
+        "method_pin": null,
+        "policy": "gx.claim-proposition/2",
+        "posthoc_revision_of": null,
+        "prediction": {
+          "data_refs": [
+            "gxa_01m8abywkc2yxbf9dd"
+          ],
+          "measurement_schema": "public.thermometer.celsius/1",
+          "observable": "/measurement/value",
+          "operator": "gt",
+          "target": "experimental_observation",
+          "threshold": 10
+        },
+        "proposition_sha256": "964910c4ee89708025f91651adaa3c6acbf2b8e7110032fbf9ecc04500cb8cec",
+        "quantifier": "all"
+      },
+      "replication": [],
+      "results": [
+        {
+          "applicability_scopes": [
+            "Morning samples from the north station"
+          ],
+          "artifact_ref": "gxa_01m8abyxktebhj98x7",
+          "capability": null,
+          "dependencies": {
+            "acquisition": [
+              "thermometer-log/01"
+            ],
+            "data": [
+              "sha256:61b9b663893c1f48f2af5a541d40a5eba72004f6fcc8eab956aa071483430433",
+              "sha256:c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+              "thermometer-42/visit-01"
+            ],
+            "processing": [
+              "calibrated Kelvin-to-Celsius reader/1"
+            ],
+            "publication": [],
+            "sample": [
+              "morning/01"
+            ],
+            "sampling": [
+              "north-station/visit-01"
+            ],
+            "source": [
+              "north-station/instrument-42"
+            ]
+          },
+          "event_id": 27,
+          "first_bytes_event_id": 26,
+          "first_event_id": 26,
+          "independence_complete": true,
+          "launch_event_id": null,
+          "matched_data_sha256": [
+            "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704"
+          ],
+          "measurement_schema": "public.thermometer.celsius/1",
+          "nature": "observed",
+          "original_observations": [
+            {
+              "artifact_ref": "gxa_01m8abyxktebhj98x7",
+              "sha256": "61b9b663893c1f48f2af5a541d40a5eba72004f6fcc8eab956aa071483430433"
+            }
+          ],
+          "output_name": null,
+          "sha256": "61b9b663893c1f48f2af5a541d40a5eba72004f6fcc8eab956aa071483430433",
+          "supports": false,
+          "unknown_dependencies": [],
+          "upstream_natures": [],
+          "value": 7
+        }
+      ],
+      "reviewed_evidence": [],
+      "rule": "gx.claim-proposition/2",
+      "stage": "tested",
+      "supporting_refs": []
+    },
+    "maturity_lineage": [
+      "gxa_01m8abywz9b46jgj5q",
+      "gxh_01m8abyx1148kxk24j@1",
+      "gxh_01m8abyx1148kxk24j@2"
+    ],
+    "originating_claim_ref": "gxa_01m8abywz9b46jgj5q",
+    "prediction": {
+      "data_refs": [
+        "gxa_01m8abywkc2yxbf9dd"
+      ],
+      "measurement_schema": "public.thermometer.celsius/1",
+      "observable": "/measurement/value",
+      "operator": "gt",
+      "target": "experimental_observation",
+      "threshold": 10
+    },
+    "publication": {
+      "admissible_levels": [
+        "open",
+        "insufficient",
+        "contested",
+        "refuted"
+      ],
+      "assessment_cursor": 27,
+      "claim_revision_id": "gxh_01m8abyx1148kxk24j@2",
+      "direction": "opposed",
+      "level": "open",
+      "material_coverage": [
+        {
+          "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+          "known_at_registration": false,
+          "measurement_spec_sha256": "e9d3b080cfa369ec7f830d89a79119f7dca83300ce0e8e6c75afb298ca55bb6b",
+          "opposing_refs": [
+            "gxa_01m8abyxktebhj98x7"
+          ],
+          "qualification": "prospective",
+          "registration_event_id": 20,
+          "retrospective_refs": [],
+          "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+          "supporting_refs": [],
+          "uncertain_refs": []
+        }
+      ],
+      "maturity": "tested",
+      "opposing_refs": [
+        "gxa_01m8abyxktebhj98x7"
+      ],
+      "policy": "gx.claim-publication/2",
+      "proposal_ref": "gxa_01m8abywz9b46jgj5q",
+      "proposed_level": "open",
+      "proposition_sha256": "964910c4ee89708025f91651adaa3c6acbf2b8e7110032fbf9ecc04500cb8cec",
+      "quantifier": "all",
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited.",
+        "GX froze the rule before each qualifying prospective result.",
+        "GX compared the original measured value with the registered decision rule.",
+        "Adverse results or independently reviewed opposing evidence are retained."
+      ],
+      "registration_event_id": 20,
+      "scope": "Morning samples from the north station",
+      "supporting_refs": [],
+      "unmeasured_data_refs": []
+    },
+    "qualitative_notes": {
+      "limitations": "North station mornings only.",
+      "rationale": "Audit the original proposition against the registered endpoint.",
+      "statement": "The observed morning temperature exceeds ten degrees Celsius.",
+      "status": "UNVERIFIED"
+    },
+    "rationale": "Applicable reviewed evidence or a classified scientific artifact is cited. GX froze the rule before each qualifying prospective result. GX compared the original measured value with the registered decision rule. Adverse results or independently reviewed opposing evidence are retained.",
+    "revision": 2,
+    "revision_author": "GX",
+    "schema": "gx.v6.claim.1",
+    "science": {
+      "claim_revision_id": "gxh_01m8abyx1148kxk24j@2",
+      "direction": "opposed",
+      "level": "open",
+      "level_source": "gx.claim-publication/2"
+    },
+    "scope": "Morning samples from the north station",
+    "source_records": [
+      {
+        "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+        "kind": "run_input",
+        "output_provenance": {
+          "applicability_scopes": [],
+          "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+          "data_refs": [],
+          "dependencies": {
+            "acquisition": [],
+            "data": [],
+            "processing": [],
+            "publication": [],
+            "sample": [],
+            "sampling": [],
+            "source": []
+          },
+          "first_event_id": 5,
+          "independence_complete": false,
+          "job_id": null,
+          "nature": "unclassified",
+          "original_inputs_grounded": false,
+          "original_observations": [],
+          "reason": "No pinned declaration or original acquisition receipt",
+          "record_kind": "unclassified",
+          "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+          "unknown_dependencies": [
+            "data",
+            "acquisition",
+            "sample",
+            "source",
+            "publication",
+            "processing",
+            "sampling"
+          ],
+          "upstream_natures": []
+        },
+        "record_nature": "unclassified",
+        "ref": "gxa_01m8abywkc2yxbf9dd",
+        "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+        "source_class": "input"
+      }
+    ],
+    "statement": "The observed morning temperature exceeds ten degrees Celsius.",
+    "statement_role": "registered_proposition",
+    "study_class": "historical_replay",
+    "verified_metrics": []
+  },
+  "exported": {
+    "assessment_cursor": 44,
+    "availability_cursor": 51,
+    "claim_ref": "gxa_01m8abyzc69y6m019g",
+    "claim_revision_id": "gxh_01m8abyxtzg8emyxyj@3",
+    "context_ref": "gxcx_01m8abyync618pb1dk",
+    "continuing_review_refs": [],
+    "criteria": "Temperature in Celsius exceeds ten.",
+    "criteria_sha256": "77d12ab3cee763fddde9256bf4efa43d88b2df82f9ac5b06dabff02ca87c46fa",
+    "decision_delivery": {
+      "brief_sha256": "dbe253a0a28d6b50532a9d99f95bc33eeef7cde8ba499807576c67750d731bb8",
+      "brief_turn_id": "turn-gxl_01m8abyynq2d89cv2z",
+      "context_ref": "gxcx_01m8abyync618pb1dk",
+      "delivery_receipt": "turn-gxl_01m8abyynq2d89cv2z",
+      "metric_refs": [],
+      "observations": [
+        {
+          "artifact_ref": "gxa_01m8abyyjje58kgxcf",
+          "event_id": 42,
+          "projection_sha256": "2d43ffcfaec34d3f282cce74ec90c3dbdc42eadee2763215ec2ee92eda809eb4",
+          "sha256": "1ac28b6877483ef04b544807b70283f95138e1ffc714f9e08560d96e189e6ed0"
+        }
+      ],
+      "snapshot_cursor": 44,
+      "state": "acknowledged",
+      "thread_id": "script-gxl_01m8abyynq2d89cv2z",
+      "turn_id": "turn-gxl_01m8abyynq2d89cv2z"
+    },
+    "decision_id": "gxa_a9600ba0b096f2769dae681d8805b272fb6b6fa338e80770a2412931ef735658",
+    "decision_scope": "run",
+    "event_cursor": 44,
+    "evidence_refs": [
+      "gxa_01m8abyyjje58kgxcf"
+    ],
+    "hypothesis_id": "gxh_01m8abyxtzg8emyxyj",
+    "lead_interpretation": {
+      "proposal_ref": "gxa_01m8abyzc69y6m019g",
+      "proposed_level": "limited_support",
+      "rationale": "Audit the original proposition against the registered endpoint."
+    },
+    "level": "limited_support",
+    "limitations": "North station mornings only.",
+    "maturity": {
+      "direction": "supported",
+      "disputed_extractions": [],
+      "gaps": [
+        {
+          "artifact_ref": "gxa_01m8abyxktebhj98x7",
+          "event_id": 27,
+          "kind": "out_of_scientific_scope",
+          "matched_data_sha256": [
+            "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704"
+          ],
+          "nature": "observed",
+          "sha256": "61b9b663893c1f48f2af5a541d40a5eba72004f6fcc8eab956aa071483430433"
+        }
+      ],
+      "grounds": [
+        "gxa_01m8abyyjje58kgxcf"
+      ],
+      "material_coverage": [
+        {
+          "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+          "known_at_registration": false,
+          "measurement_spec_sha256": "e9d3b080cfa369ec7f830d89a79119f7dca83300ce0e8e6c75afb298ca55bb6b",
+          "opposing_refs": [],
+          "qualification": "prospective",
+          "registration_event_id": 35,
+          "retrospective_refs": [],
+          "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+          "supporting_refs": [
+            "gxa_01m8abyyjje58kgxcf"
+          ],
+          "uncertain_refs": []
+        }
+      ],
+      "opposing_refs": [],
+      "preexisting_result": false,
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited.",
+        "GX froze the rule before each qualifying prospective result.",
+        "GX compared the original measured value with the registered decision rule.",
+        "Unmeasured outcomes and execution gaps do not establish counterevidence."
+      ],
+      "registration": {
+        "claim_revision_id": "gxh_01m8abyxtzg8emyxyj@1",
+        "claim_scope": "Morning samples from the north station.",
+        "claim_sha256": "a86f3c7d00e68e9ec214b80a5fcc3fdafcb8aca32384d2b9af53d17550e5ca0c",
+        "data": [
+          {
+            "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+            "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704"
+          }
+        ],
+        "decision_scope": "run",
+        "event_id": 35,
+        "known_at_registration": {
+          "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704": false
+        },
+        "measurement_spec_sha256": "e9d3b080cfa369ec7f830d89a79119f7dca83300ce0e8e6c75afb298ca55bb6b",
+        "method_pin": null,
+        "policy": "gx.claim-proposition/2",
+        "posthoc_revision_of": null,
+        "prediction": {
+          "data_refs": [
+            "gxa_01m8abywkc2yxbf9dd"
+          ],
+          "measurement_schema": "public.thermometer.celsius/1",
+          "observable": "/measurement/value",
+          "operator": "gt",
+          "target": "experimental_observation",
+          "threshold": 5
+        },
+        "proposition_sha256": "d5bbc9bf427258777f1a1bdc5b74211f50d3d22b8b307d19ef06985a8719d2ef",
+        "quantifier": "all"
+      },
+      "replication": [],
+      "results": [
+        {
+          "applicability_scopes": [
+            "Morning samples from the north station."
+          ],
+          "artifact_ref": "gxa_01m8abyyjje58kgxcf",
+          "capability": null,
+          "dependencies": {
+            "acquisition": [
+              "thermometer-log/01"
+            ],
+            "data": [
+              "sha256:1ac28b6877483ef04b544807b70283f95138e1ffc714f9e08560d96e189e6ed0",
+              "sha256:c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+              "thermometer-42/visit-01"
+            ],
+            "processing": [
+              "calibrated Kelvin-to-Celsius reader/1"
+            ],
+            "publication": [],
+            "sample": [
+              "morning/01"
+            ],
+            "sampling": [
+              "north-station/visit-01"
+            ],
+            "source": [
+              "north-station/instrument-42"
+            ]
+          },
+          "event_id": 42,
+          "first_bytes_event_id": 41,
+          "first_event_id": 41,
+          "independence_complete": true,
+          "launch_event_id": null,
+          "matched_data_sha256": [
+            "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704"
+          ],
+          "measurement_schema": "public.thermometer.celsius/1",
+          "nature": "observed",
+          "original_observations": [
+            {
+              "artifact_ref": "gxa_01m8abyyjje58kgxcf",
+              "sha256": "1ac28b6877483ef04b544807b70283f95138e1ffc714f9e08560d96e189e6ed0"
+            }
+          ],
+          "output_name": null,
+          "sha256": "1ac28b6877483ef04b544807b70283f95138e1ffc714f9e08560d96e189e6ed0",
+          "supports": true,
+          "unknown_dependencies": [],
+          "upstream_natures": [],
+          "value": 7.0
+        }
+      ],
+      "reviewed_evidence": [],
+      "rule": "gx.claim-proposition/2",
+      "stage": "tested",
+      "supporting_refs": [
+        "gxa_01m8abyyjje58kgxcf"
+      ]
+    },
+    "maturity_lineage": [
+      "gxa_01m8abyxrmzp82287a",
+      "gxh_01m8abyxtzg8emyxyj@1",
+      "gxh_01m8abyxtzg8emyxyj@2",
+      "gxa_01m8abyzc69y6m019g",
+      "gxh_01m8abyxtzg8emyxyj@3"
+    ],
+    "previous_claim_ref": "gxh_01m8abyxtzg8emyxyj@2",
+    "publication": {
+      "admissible_levels": [
+        "open",
+        "insufficient",
+        "limited_support"
+      ],
+      "assessment_cursor": 44,
+      "claim_revision_id": "gxh_01m8abyxtzg8emyxyj@3",
+      "direction": "supported",
+      "level": "limited_support",
+      "material_coverage": [
+        {
+          "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+          "known_at_registration": false,
+          "measurement_spec_sha256": "e9d3b080cfa369ec7f830d89a79119f7dca83300ce0e8e6c75afb298ca55bb6b",
+          "opposing_refs": [],
+          "qualification": "prospective",
+          "registration_event_id": 35,
+          "retrospective_refs": [],
+          "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+          "supporting_refs": [
+            "gxa_01m8abyyjje58kgxcf"
+          ],
+          "uncertain_refs": []
+        }
+      ],
+      "maturity": "tested",
+      "opposing_refs": [],
+      "policy": "gx.claim-publication/2",
+      "proposal_ref": "gxa_01m8abyzc69y6m019g",
+      "proposed_level": "limited_support",
+      "proposition_sha256": "d5bbc9bf427258777f1a1bdc5b74211f50d3d22b8b307d19ef06985a8719d2ef",
+      "quantifier": "all",
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited.",
+        "GX froze the rule before each qualifying prospective result.",
+        "GX compared the original measured value with the registered decision rule.",
+        "Unmeasured outcomes and execution gaps do not establish counterevidence."
+      ],
+      "registration_event_id": 35,
+      "scope": "Morning samples from the north station.",
+      "supporting_refs": [
+        "gxa_01m8abyyjje58kgxcf"
+      ],
+      "unmeasured_data_refs": []
+    },
+    "qualitative_notes": {
+      "limitations": "North station mornings only.",
+      "rationale": "Audit the original proposition against the registered endpoint.",
+      "statement": "The observed morning temperature exceeds five degrees Celsius.",
+      "status": "UNVERIFIED"
+    },
+    "rationale": "Applicable reviewed evidence or a classified scientific artifact is cited. GX froze the rule before each qualifying prospective result. GX compared the original measured value with the registered decision rule. Unmeasured outcomes and execution gaps do not establish counterevidence.",
+    "revision": 3,
+    "schema": "gx.v6.claim.1",
+    "science": {
+      "claim_revision_id": "gxh_01m8abyxtzg8emyxyj@3",
+      "direction": "supported",
+      "level": "limited_support",
+      "level_source": "gx.claim-publication/2"
+    },
+    "scope": "Morning samples from the north station.",
+    "source_records": [
+      {
+        "artifact_ref": "gxa_01m8abyyjje58kgxcf",
+        "kind": "instrument_measurement",
+        "output_provenance": {
+          "applicability_scopes": [
+            "Morning samples from the north station."
+          ],
+          "artifact_ref": "gxa_01m8abyyjje58kgxcf",
+          "data_refs": [
+            {
+              "artifact_ref": "gxa_01m8abywkc2yxbf9dd",
+              "sha256": "c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704"
+            }
+          ],
+          "dependencies": {
+            "acquisition": [
+              "thermometer-log/01"
+            ],
+            "data": [
+              "sha256:1ac28b6877483ef04b544807b70283f95138e1ffc714f9e08560d96e189e6ed0",
+              "sha256:c1123bdffd9354fbaafb42fba7ebd1c0022c2b154a999b70e228708779572704",
+              "thermometer-42/visit-01"
+            ],
+            "processing": [
+              "calibrated Kelvin-to-Celsius reader/1"
+            ],
+            "publication": [],
+            "sample": [
+              "morning/01"
+            ],
+            "sampling": [
+              "north-station/visit-01"
+            ],
+            "source": [
+              "north-station/instrument-42"
+            ]
+          },
+          "first_event_id": 41,
+          "independence_complete": true,
+          "job_id": null,
+          "measurement_schema": "public.thermometer.celsius/1",
+          "nature": "observed",
+          "original_inputs_grounded": true,
+          "original_observations": [
+            {
+              "artifact_ref": "gxa_01m8abyyjje58kgxcf",
+              "sha256": "1ac28b6877483ef04b544807b70283f95138e1ffc714f9e08560d96e189e6ed0"
+            }
+          ],
+          "reason": "Verified operator acquisition receipt on the original ingested bytes",
+          "record_kind": "supplied_observation",
+          "sha256": "1ac28b6877483ef04b544807b70283f95138e1ffc714f9e08560d96e189e6ed0",
+          "unknown_dependencies": [],
+          "upstream_natures": []
+        },
+        "record_nature": "observed",
+        "ref": "gxa_01m8abyyjje58kgxcf",
+        "sha256": "1ac28b6877483ef04b544807b70283f95138e1ffc714f9e08560d96e189e6ed0",
+        "source_class": "supplied_measurement",
+        "source_event_id": 42
+      }
+    ],
+    "statement": "The observed morning temperature exceeds five degrees Celsius.",
+    "statement_role": "registered_proposition",
+    "study_class": "historical_replay",
+    "verified_metrics": []
+  }
+}

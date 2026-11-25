@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v623-validation/final-v4x8yihr/candidate/acceptance/v62a/interleavings_isolation.py", line 275, in <module>
+    result = quick_compatibility(args.quick_worker.resolve())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v623-validation/final-v4x8yihr/candidate/acceptance/v62a/interleavings_isolation.py", line 102, in quick_compatibility
+    q = official.run(work, out, Path(binary).resolve())
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v623-validation/final-v4x8yihr/candidate/acceptance/v6/engineering/official.py", line 135, in run
+    rid = call("start", "--goal", "How many deposited chains have observable coordinates?",
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v623-validation/final-v4x8yihr/candidate/acceptance/v6/engineering/official.py", line 126, in call
+    result = cli(state, env, action, *extra)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v623-validation/final-v4x8yihr/candidate/acceptance/v62a/interleavings_isolation.py", line 88, in call_across_upgrade
+    result = public_call(target, env, action, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v623-validation/final-v4x8yihr/candidate/acceptance/v6/engineering/public_cli.py", line 25, in cli
+    raise AssertionError(f"{action} exited {result.returncode}: {result.stderr[-1500:]} {result.stdout[-1500:]}")
+AssertionError: start exited 1: SchemaInvalid: SCHEMA_INVALID: Goal config accepts only budget_profile, capabilities, initial_job_limit, input_files, intent_items, plugins, project, run_budget, turn_token_budget, workspace, workspace_budget
+ 

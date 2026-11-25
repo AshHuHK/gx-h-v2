@@ -1,0 +1,304 @@
+{
+  "run_id": "gxr_01m8ac092gs0q4kkpe",
+  "job_id": "gxj_01m8ac09qdfzh4q4qw",
+  "output_ref": "gxa_01m8ac0a5nzy1fzr52",
+  "report": "gxa_d9745d08b8aa4103cae92ae26fc29035458f3f8ffdeaec1ae5e0afea0705403a",
+  "actual_delivery": {
+    "task": "gxt_01m8ac0ahbxekqrm9t",
+    "turn": "turn-gxl_01m8ac0ahq0r7tvj83",
+    "text_sha256": "3cd8bb6889c560e1e6ff9e54db6b1db4fe4556567880f855ec41e74b2a9ea5da",
+    "packet": {
+      "branches": [
+        {
+          "branch_id": "branch_d6dd0a21f42977252981dd535de0fd75",
+          "spec": {
+            "module_instance_id": "module_26739a2f9cc5009fbc2264526e5f3533"
+          },
+          "status": "OPEN"
+        }
+      ],
+      "budget": {
+        "available": {
+          "api_calls": 40,
+          "cpu_seconds": 1080,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 18,
+          "tokens": 113980,
+          "wall_hours": 2,
+          "worker_tasks": 42
+        },
+        "limits": {
+          "api_calls": 48,
+          "cpu_seconds": 1200,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 20,
+          "tokens": 120000,
+          "wall_hours": 2,
+          "worker_tasks": 48
+        },
+        "reserved": {
+          "api_calls": 8,
+          "cpu_seconds": 120,
+          "job_submissions": 2,
+          "tokens": 6020,
+          "worker_tasks": 6
+        },
+        "spent": {}
+      },
+      "capabilities": [
+        {
+          "capability_version": "deposited-chain-geometry@2",
+          "category": "coordinate_geometry",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json",
+              "nature": "analysis"
+            }
+          ],
+          "purpose": "Describe the effect of atom selection on observed chain-pair geometry."
+        }
+      ],
+      "claims": [],
+      "evidence_policy": "gx.evidence/6.2.3",
+      "evidence_refs": [
+        "gxa_01m8ac0ah54p8s938w",
+        "gxa_d9745d08b8aa4103cae92ae26fc29035458f3f8ffdeaec1ae5e0afea0705403a"
+      ],
+      "full_brief_ref": "gxa_01m8ac0ah54p8s938w",
+      "goal": "Inventory the supplied public deposited-coordinate records and report their measured coverage.",
+      "goal_version": 1,
+      "head": {
+        "sha256": "d2f95aeb7b44f5cc2747376754f87460bc5acd712828510a87ab1b50174bc5fe",
+        "version": 1
+      },
+      "intent": {},
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m8ac0936qtes9h8e",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m8ac093q6b70eqj4",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        },
+        {
+          "artifact_ref": "gxa_01m8ac0949b7ydv7gd",
+          "name": "public-scope-marker.json",
+          "role": "material",
+          "sha256": "fe92401b86e351c391eb34c220d33b86807de4526afdc8b4f8e0072023a4c4fb"
+        }
+      ],
+      "module_catalog": [
+        {
+          "cost_class": "local_cpu",
+          "focuses": [
+            "data"
+          ],
+          "module_id": "data_inventory",
+          "output": "module_report_bundle",
+          "purpose": "Inventory the assigned local materials, their provenance, coverage and gaps.",
+          "version": "2"
+        }
+      ],
+      "module_catalog_available": true,
+      "module_reports": [
+        {
+          "endpoint_rows": [
+            {
+              "id": "coverage",
+              "key": "6a5a28fe8337",
+              "unit": "1",
+              "value": "49/164 (0.299)"
+            }
+          ],
+          "endpoint_total": 1,
+          "module_instance_id": "module_26739a2f9cc5009fbc2264526e5f3533",
+          "pending_endpoints": false,
+          "report_ref": "gxa_d9745d08b8aa4103cae92ae26fc29035458f3f8ffdeaec1ae5e0afea0705403a",
+          "status": "COMPLETE"
+        }
+      ],
+      "nodes": [
+        {
+          "branch_id": "branch_d6dd0a21f42977252981dd535de0fd75",
+          "job_id": "gxj_01m8ac09qdfzh4q4qw",
+          "node_id": "node_43f8008787be584ada9d6d96841d1796",
+          "result_ref": null,
+          "status": "SUCCEEDED",
+          "version": 1
+        }
+      ],
+      "observations": [
+        {
+          "artifact_ref": null,
+          "branch_id": null,
+          "event": "v62.module.wake",
+          "event_id": 75,
+          "id": "gxr_01m8ac092gs0q4kkpe",
+          "node_id": null,
+          "source_job_id": null,
+          "status": null,
+          "subject_ref": "gxr_01m8ac092gs0q4kkpe"
+        },
+        {
+          "artifact_ref": null,
+          "branch_id": null,
+          "event": "v62.round.settled",
+          "event_id": 76,
+          "id": "round:64bfb1962304af6f4befec4c3752a16a744cfed9218db73c6b7e51e2e7dedb05",
+          "node_id": null,
+          "source_job_id": null,
+          "status": null,
+          "subject_ref": "round:64bfb1962304af6f4befec4c3752a16a744cfed9218db73c6b7e51e2e7dedb05"
+        }
+      ],
+      "previous_decision": {
+        "consumed_cursor": 26,
+        "decision_ref": "gxa_fe78f72bd527df57374a2399d44df7c02ed7d5f1f1eb4b66cde748769f398dda",
+        "evidence_refs": [],
+        "head": {
+          "sha256": "d2f95aeb7b44f5cc2747376754f87460bc5acd712828510a87ab1b50174bc5fe",
+          "version": 1
+        },
+        "outcome": "maintained",
+        "rationale": "Record the next authorized work for the supplied inputs.",
+        "reconsider_when": [
+          {
+            "event": "evidence_added",
+            "subject_ref": "run"
+          }
+        ],
+        "scope": "run"
+      },
+      "read_with": "gx_read_artifact",
+      "research_effort": "deep",
+      "research_evidence_version": "gx.research.v6.2b.1",
+      "research_progress": {
+        "consecutive_no_progress": 0,
+        "decision_options": [
+          "explore",
+          "enter_convergence",
+          "close_run"
+        ],
+        "no_progress_rounds": 2,
+        "open_gap_count": 0,
+        "open_gaps": [],
+        "phase": "exploring",
+        "waiting_count": 0,
+        "waiting_for": []
+      },
+      "run_id": "gxr_01m8ac092gs0q4kkpe",
+      "scope": "run",
+      "source_tools": [
+        "gx_extract_evidence",
+        "gx_read_source",
+        "gx_review_evidence"
+      ],
+      "trigger": {
+        "since_cursor": 26,
+        "through_cursor": 76
+      }
+    }
+  },
+  "used": {
+    "run_id": "gxr_01m8ac092gs0q4kkpe",
+    "task_id": "gxt_01m8ac0ahbxekqrm9t",
+    "lease_id": "gxl_01m8ac0ahq0r7tvj83",
+    "task_status": "ACCEPTED",
+    "decision_ref": "gxa_6bcbb0272927afa70efd80c91e83d3b76c527128013c958a60e4086112419b70",
+    "decision_id": "gxa_6bcbb0272927afa70efd80c91e83d3b76c527128013c958a60e4086112419b70",
+    "scope": "run",
+    "goal_version": 1,
+    "context_ref": "gxcx_01m8ac0ahaw30789zp",
+    "base": {
+      "sha256": "d2f95aeb7b44f5cc2747376754f87460bc5acd712828510a87ab1b50174bc5fe",
+      "version": 1
+    },
+    "result_head": {
+      "version": 2,
+      "sha256": "ab0d4a16a9db81c4b2f61122c6e28822837552ac723763ddc34cf1a28a748372"
+    },
+    "outcome": "adopted",
+    "draft_sha256": "ee79f6ccbd12739396ed2db081c73b28c83c7e04679bf242c8e42d6be9f5ff61",
+    "resolved_ops": [
+      {
+        "source_index": 0,
+        "op_digest": "cc0e9a3a061969a543f6c09854fab266c321bd83f0b33f16a8f7d98d86e9ab28",
+        "spec": {
+          "claim_refs": [],
+          "op": "close_run",
+          "reason": "Record the known coverage at closure.",
+          "unresolved": [
+            "Sampling independence remains unknown."
+          ]
+        }
+      }
+    ],
+    "aliases": {},
+    "reconsider_when": [
+      {
+        "event": "evidence_added",
+        "subject_ref": "run"
+      }
+    ],
+    "checkpoint_id": "gxc_01m8ac0amf530d81v3",
+    "dispatches": [],
+    "submission_id": "gxsb_01m8ac0amfp4byfhwj",
+    "claim_revisions": [],
+    "consumed_event_cursor": 76,
+    "metric_refs": [
+      "metric_6a5a28fe8337a0255dfd61919425484ecccc413c9c2294f99d32d81772a0764f"
+    ],
+    "rationale": "Record the next authorized work for the supplied inputs.",
+    "evidence_refs": [
+      "gxa_d9745d08b8aa4103cae92ae26fc29035458f3f8ffdeaec1ae5e0afea0705403a"
+    ],
+    "endpoint_use": {
+      "received_metric_refs": [
+        "metric_6a5a28fe8337a0255dfd61919425484ecccc413c9c2294f99d32d81772a0764f"
+      ],
+      "used_metric_refs": [
+        "metric_6a5a28fe8337a0255dfd61919425484ecccc413c9c2294f99d32d81772a0764f"
+      ],
+      "unread_metric_refs": [],
+      "receipts": {
+        "metric_6a5a28fe8337a0255dfd61919425484ecccc413c9c2294f99d32d81772a0764f": {
+          "delivery_kind": "brief",
+          "lease_id": "gxl_01m8ac0ahq0r7tvj83",
+          "receipt": "start:45cc6927-932f-4276-b323-55695401f5f1",
+          "task_id": "gxt_01m8ac0ahbxekqrm9t",
+          "thread_id": "script-gxl_01m8ac0ahq0r7tvj83",
+          "turn_id": "turn-gxl_01m8ac0ahq0r7tvj83",
+          "source_ref": "gxa_d9745d08b8aa4103cae92ae26fc29035458f3f8ffdeaec1ae5e0afea0705403a",
+          "event_id": 90
+        }
+      }
+    },
+    "close_context": {
+      "brief_cursor": 76,
+      "goal_version": 1,
+      "context_ref": "gxcx_01m8ac0ahaw30789zp",
+      "brief_sha256": "3cd8bb6889c560e1e6ff9e54db6b1db4fe4556567880f855ec41e74b2a9ea5da",
+      "brief_delivery": "start:45cc6927-932f-4276-b323-55695401f5f1",
+      "brief_turn": "turn-gxl_01m8ac0ahq0r7tvj83",
+      "closing_turn": "turn-gxl_01m8ac0ahq0r7tvj83",
+      "received_metric_refs": [
+        "metric_6a5a28fe8337a0255dfd61919425484ecccc413c9c2294f99d32d81772a0764f"
+      ],
+      "used_metric_refs": [
+        "metric_6a5a28fe8337a0255dfd61919425484ecccc413c9c2294f99d32d81772a0764f"
+      ],
+      "unread_metric_refs": []
+    },
+    "event_id": 97
+  },
+  "external_paid_calls": 0
+}

@@ -1,0 +1,460 @@
+{
+  "run_id": "gxr_01m8ac0br1xbaztfr7",
+  "official_prior_goal_brief": {
+    "task": "gxt_01m8ac0d6fdb3mmrpe",
+    "turn": "turn-gxl_01m8ac0d6ydjzhrtnv",
+    "text_sha256": "ba09e9e7d205b1817417a8a0fefa9f09f31439e2ef9902e401df824edb66423f",
+    "packet": {
+      "branches": [
+        {
+          "branch_id": "branch_7d483b85f0a6583ac19f62039bb78ed2",
+          "spec": {
+            "module_instance_id": "module_9c6d2da35588c9ad286717c34ae020b0"
+          },
+          "status": "OPEN"
+        }
+      ],
+      "budget": {
+        "available": {
+          "api_calls": 40,
+          "cpu_seconds": 1080,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 18,
+          "tokens": 113980,
+          "wall_hours": 2,
+          "worker_tasks": 42
+        },
+        "limits": {
+          "api_calls": 48,
+          "cpu_seconds": 1200,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 20,
+          "tokens": 120000,
+          "wall_hours": 2,
+          "worker_tasks": 48
+        },
+        "reserved": {
+          "api_calls": 8,
+          "cpu_seconds": 120,
+          "job_submissions": 2,
+          "tokens": 6020,
+          "worker_tasks": 6
+        },
+        "spent": {}
+      },
+      "capabilities": [
+        {
+          "capability_version": "deposited-chain-geometry@2",
+          "category": "coordinate_geometry",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json",
+              "nature": "analysis"
+            }
+          ],
+          "purpose": "Describe the effect of atom selection on observed chain-pair geometry."
+        }
+      ],
+      "claims": [],
+      "evidence_policy": "gx.evidence/6.2.3",
+      "evidence_refs": [
+        "gxa_01m8ac0d65xwt964yv",
+        "gxa_32fd4398771d05ad905aabe924bfa3051c386642cdbe3d3fa7970875f27f7069"
+      ],
+      "full_brief_ref": "gxa_01m8ac0d65xwt964yv",
+      "goal": "Inventory the supplied public deposited-coordinate records and report their measured coverage.",
+      "goal_version": 1,
+      "head": {
+        "sha256": "ff07753a5fccccde259a47dbbe4ee2ce8c8cc04534ec11efc42c3ebb4658baad",
+        "version": 1
+      },
+      "intent": {},
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m8ac0brxvbdhazr4",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m8ac0bsfeyr0n533",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        },
+        {
+          "artifact_ref": "gxa_01m8ac0bt3kp20y0ed",
+          "name": "public-scope-marker.json",
+          "role": "material",
+          "sha256": "fe92401b86e351c391eb34c220d33b86807de4526afdc8b4f8e0072023a4c4fb"
+        }
+      ],
+      "module_catalog": [
+        {
+          "cost_class": "local_cpu",
+          "focuses": [
+            "data"
+          ],
+          "module_id": "data_inventory",
+          "output": "module_report_bundle",
+          "purpose": "Inventory the assigned local materials, their provenance, coverage and gaps.",
+          "version": "2"
+        }
+      ],
+      "module_catalog_available": true,
+      "module_reports": [
+        {
+          "endpoint_rows": [
+            {
+              "id": "coverage",
+              "key": "96db812d17b9",
+              "unit": "1",
+              "value": "49/164 (0.299)"
+            }
+          ],
+          "endpoint_total": 1,
+          "module_instance_id": "module_9c6d2da35588c9ad286717c34ae020b0",
+          "pending_endpoints": false,
+          "report_ref": "gxa_32fd4398771d05ad905aabe924bfa3051c386642cdbe3d3fa7970875f27f7069",
+          "status": "COMPLETE"
+        }
+      ],
+      "nodes": [
+        {
+          "branch_id": "branch_7d483b85f0a6583ac19f62039bb78ed2",
+          "job_id": "gxj_01m8ac0cdgppwa948t",
+          "node_id": "node_7966d27199ebfe2d51cabcc59292217f",
+          "result_ref": null,
+          "status": "SUCCEEDED",
+          "version": 1
+        }
+      ],
+      "observations": [
+        {
+          "artifact_ref": null,
+          "branch_id": null,
+          "event": "v62.module.wake",
+          "event_id": 75,
+          "id": "gxr_01m8ac0br1xbaztfr7",
+          "node_id": null,
+          "source_job_id": null,
+          "status": null,
+          "subject_ref": "gxr_01m8ac0br1xbaztfr7"
+        },
+        {
+          "artifact_ref": null,
+          "branch_id": null,
+          "event": "v62.round.settled",
+          "event_id": 76,
+          "id": "round:2301c40b375bfaa7c981e00bf897953811b3e62f5334bb655019b02d51d2f8f1",
+          "node_id": null,
+          "source_job_id": null,
+          "status": null,
+          "subject_ref": "round:2301c40b375bfaa7c981e00bf897953811b3e62f5334bb655019b02d51d2f8f1"
+        }
+      ],
+      "previous_decision": {
+        "consumed_cursor": 26,
+        "decision_ref": "gxa_4ee4581bef0c695102ed8eb459629629c0b12bdc1f8dcd226fca06ee92c97440",
+        "evidence_refs": [],
+        "head": {
+          "sha256": "ff07753a5fccccde259a47dbbe4ee2ce8c8cc04534ec11efc42c3ebb4658baad",
+          "version": 1
+        },
+        "outcome": "maintained",
+        "rationale": "Record the next authorized work for the supplied inputs.",
+        "reconsider_when": [
+          {
+            "event": "evidence_added",
+            "subject_ref": "run"
+          }
+        ],
+        "scope": "run"
+      },
+      "read_with": "gx_read_artifact",
+      "research_effort": "deep",
+      "research_evidence_version": "gx.research.v6.2b.1",
+      "research_progress": {
+        "consecutive_no_progress": 0,
+        "decision_options": [
+          "explore",
+          "enter_convergence",
+          "close_run"
+        ],
+        "no_progress_rounds": 2,
+        "open_gap_count": 0,
+        "open_gaps": [],
+        "phase": "exploring",
+        "waiting_count": 0,
+        "waiting_for": []
+      },
+      "run_id": "gxr_01m8ac0br1xbaztfr7",
+      "scope": "run",
+      "source_tools": [
+        "gx_extract_evidence",
+        "gx_read_source",
+        "gx_review_evidence"
+      ],
+      "trigger": {
+        "since_cursor": 26,
+        "through_cursor": 76
+      }
+    }
+  },
+  "official_new_goal_brief": {
+    "task": "gxt_01m8ac0ed46nc5z7be",
+    "turn": "turn-gxl_01m8ac0edbd54vae0t",
+    "text_sha256": "aa586340928937945c1fe47d4ade30acf8551a690be4cc34f9602fbaf0c5e5c9",
+    "packet": {
+      "branches": [
+        {
+          "branch_id": "branch_7d483b85f0a6583ac19f62039bb78ed2",
+          "spec": {
+            "module_instance_id": "module_9c6d2da35588c9ad286717c34ae020b0"
+          },
+          "status": "OPEN"
+        }
+      ],
+      "budget": {
+        "available": {
+          "api_calls": 39,
+          "cpu_seconds": 1080,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 18,
+          "tokens": 113970,
+          "wall_hours": 2,
+          "worker_tasks": 42
+        },
+        "limits": {
+          "api_calls": 48,
+          "cpu_seconds": 1200,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 20,
+          "tokens": 120000,
+          "wall_hours": 2,
+          "worker_tasks": 48
+        },
+        "reserved": {
+          "api_calls": 9,
+          "cpu_seconds": 120,
+          "job_submissions": 2,
+          "tokens": 6030,
+          "worker_tasks": 6
+        },
+        "spent": {}
+      },
+      "capabilities": [
+        {
+          "capability_version": "deposited-chain-geometry@2",
+          "category": "coordinate_geometry",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json",
+              "nature": "analysis"
+            }
+          ],
+          "purpose": "Describe the effect of atom selection on observed chain-pair geometry."
+        }
+      ],
+      "catalog_view": {
+        "mode": "summaries",
+        "query_tool": "gx_query_catalog",
+        "total": 1
+      },
+      "claims": [],
+      "evidence_policy": "gx.evidence/6.2.3",
+      "evidence_refs": [
+        "gxa_01m8ac0brxvbdhazr4",
+        "gxa_01m8ac0bsfeyr0n533",
+        "gxa_01m8ac0bt3kp20y0ed",
+        "public-archive"
+      ],
+      "goal": "Which recorded sources can support a second independent question?",
+      "goal_version": 2,
+      "head": {
+        "sha256": "ff07753a5fccccde259a47dbbe4ee2ce8c8cc04534ec11efc42c3ebb4658baad",
+        "version": 1
+      },
+      "intent": {
+        "objective": {
+          "value": "Which recorded sources can support a second independent question?",
+          "version": 2
+        }
+      },
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m8ac0brxvbdhazr4",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m8ac0bsfeyr0n533",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        },
+        {
+          "artifact_ref": "gxa_01m8ac0bt3kp20y0ed",
+          "name": "public-scope-marker.json",
+          "role": "material",
+          "sha256": "fe92401b86e351c391eb34c220d33b86807de4526afdc8b4f8e0072023a4c4fb"
+        }
+      ],
+      "module_catalog": [
+        {
+          "cost_class": "local_cpu",
+          "focuses": [
+            "data"
+          ],
+          "module_id": "data_inventory",
+          "output": "module_report_bundle",
+          "purpose": "Inventory the assigned local materials, their provenance, coverage and gaps.",
+          "version": "2"
+        }
+      ],
+      "module_reports": [],
+      "nodes": [
+        {
+          "branch_id": "branch_7d483b85f0a6583ac19f62039bb78ed2",
+          "job_id": "gxj_01m8ac0cdgppwa948t",
+          "node_id": "node_7966d27199ebfe2d51cabcc59292217f",
+          "result_ref": null,
+          "status": "SUCCEEDED",
+          "version": 1
+        }
+      ],
+      "observations": [
+        {
+          "artifact_ref": null,
+          "branch_id": null,
+          "event": "v6.intent.changed",
+          "event_id": 97,
+          "id": "gxr_01m8ac0br1xbaztfr7",
+          "node_id": null,
+          "source_job_id": null,
+          "status": null,
+          "subject_ref": "gxr_01m8ac0br1xbaztfr7"
+        }
+      ],
+      "previous_decision": null,
+      "research_effort": "deep",
+      "research_evidence_version": "gx.research.v6.2b.1",
+      "research_progress": {
+        "consecutive_no_progress": 0,
+        "convergence": null,
+        "decision_options": [
+          "explore",
+          "enter_convergence",
+          "close_run"
+        ],
+        "expected": [],
+        "no_progress_rounds": 2,
+        "open_gaps": [],
+        "phase": "exploring",
+        "rounds": [],
+        "waiting_for": []
+      },
+      "run_id": "gxr_01m8ac0br1xbaztfr7",
+      "scope": "run",
+      "source_tools": [
+        "gx_extract_evidence",
+        "gx_read_source",
+        "gx_review_evidence"
+      ],
+      "trigger": {
+        "changes": [
+          {
+            "event": "v6.intent.changed",
+            "event_id": 97,
+            "matched_watches": [],
+            "scope": "run",
+            "subject_ref": "gxr_01m8ac0br1xbaztfr7"
+          }
+        ],
+        "since_cursor": 26,
+        "through_cursor": 97
+      }
+    }
+  },
+  "closed": {
+    "run_id": "gxr_01m8ac0br1xbaztfr7",
+    "task_id": "gxt_01m8ac0ed46nc5z7be",
+    "lease_id": "gxl_01m8ac0edbd54vae0t",
+    "task_status": "ACCEPTED",
+    "decision_ref": "gxa_ea189c8e267c75c0b48b767d69145ee9cfdb2c2b79ec2942f3dbb0f7de5fb917",
+    "decision_id": "gxa_ea189c8e267c75c0b48b767d69145ee9cfdb2c2b79ec2942f3dbb0f7de5fb917",
+    "scope": "run",
+    "goal_version": 2,
+    "context_ref": "gxcx_01m8ac0ed49y2azhvb",
+    "base": {
+      "sha256": "ff07753a5fccccde259a47dbbe4ee2ce8c8cc04534ec11efc42c3ebb4658baad",
+      "version": 1
+    },
+    "result_head": {
+      "version": 2,
+      "sha256": "bdcc1179ee71d201551a39cc62545f382022d173f3360bcdbc83bce7dcf442b9"
+    },
+    "outcome": "adopted",
+    "draft_sha256": "70cd4e43a5c815b0e5b1cbe0a90f31bc6e88878722b3e98914943265e3ff8e71",
+    "resolved_ops": [
+      {
+        "source_index": 0,
+        "op_digest": "cc0e9a3a061969a543f6c09854fab266c321bd83f0b33f16a8f7d98d86e9ab28",
+        "spec": {
+          "claim_refs": [],
+          "op": "close_run",
+          "reason": "Record the known coverage at closure.",
+          "unresolved": [
+            "Sampling independence remains unknown."
+          ]
+        }
+      }
+    ],
+    "aliases": {},
+    "reconsider_when": [
+      {
+        "event": "evidence_added",
+        "subject_ref": "run"
+      }
+    ],
+    "checkpoint_id": "gxc_01m8ac0eg9ax828wzs",
+    "dispatches": [],
+    "submission_id": "gxsb_01m8ac0ega52empa9r",
+    "claim_revisions": [],
+    "consumed_event_cursor": 97,
+    "stop_reason": "INSUFFICIENT_DATA",
+    "rationale": "Current scope has no reviewed measurement.",
+    "evidence_refs": [],
+    "endpoint_use": {
+      "received_metric_refs": [],
+      "used_metric_refs": [],
+      "unread_metric_refs": [],
+      "receipts": {},
+      "stop_reason": "INSUFFICIENT_DATA"
+    },
+    "close_context": {
+      "brief_cursor": 97,
+      "goal_version": 2,
+      "context_ref": "gxcx_01m8ac0ed49y2azhvb",
+      "brief_sha256": "aa586340928937945c1fe47d4ade30acf8551a690be4cc34f9602fbaf0c5e5c9",
+      "brief_delivery": "start:72a529f5-f919-4800-8073-fffd28e912c8",
+      "brief_turn": "turn-gxl_01m8ac0edbd54vae0t",
+      "closing_turn": "turn-gxl_01m8ac0edbd54vae0t",
+      "received_metric_refs": [],
+      "used_metric_refs": [],
+      "unread_metric_refs": [],
+      "stop_reason": "INSUFFICIENT_DATA"
+    },
+    "event_id": 110
+  },
+  "external_paid_calls": 0
+}

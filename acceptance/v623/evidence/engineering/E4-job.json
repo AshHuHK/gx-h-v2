@@ -1,0 +1,963 @@
+{
+  "run_id": "gxr_01m8abz5hmzwez9f81",
+  "original_registration": {
+    "event_id": 29,
+    "claim_revision_id": "gxh_01m8abz61xganf9wq8@1",
+    "posthoc_revision_of": null,
+    "decision_scope": "run",
+    "claim_scope": "Deposited chains in this coordinate archive",
+    "prediction": {
+      "data_refs": [
+        "gxa_01m8abz5j7pgsnp7yk"
+      ],
+      "measurement_schema": "gx.deposited_chain_geometry/2",
+      "method": {
+        "capability": "deposited-chain-geometry@2",
+        "input_role": "structure",
+        "metric_id": "coverage",
+        "output": "geometry.json",
+        "parameters": {
+          "mask": "ordered_backbone"
+        },
+        "unit": "1"
+      },
+      "observable": "/metrics/coverage",
+      "operator": "gt",
+      "target": "analysis",
+      "threshold": 0.6
+    },
+    "claim_sha256": "8d5d45beb21e282e299fac1ba0f937393dbb372ee49ab7ade515c6c4b4896ed0",
+    "data": [
+      {
+        "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+        "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+      }
+    ],
+    "method_pin": {
+      "capability": "deposited-chain-geometry@2",
+      "manifest_sha256": "f3db782fcde636ab051fc27b6fdd8367e5b351f60228adc12c5e2525fe46b7b8",
+      "measurement_spec": {
+        "applicability": "Deposited chains in this coordinate archive",
+        "capability": "deposited-chain-geometry@2",
+        "input_role": "structure",
+        "manifest_sha256": "f3db782fcde636ab051fc27b6fdd8367e5b351f60228adc12c5e2525fe46b7b8",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "metric_definition": {
+          "bounds": [
+            0,
+            1
+          ],
+          "denominator": "/observed_union_residues",
+          "numerator": "/selected_residues",
+          "op": "ratio/1",
+          "places": 3,
+          "reader": "json/1",
+          "scope": {
+            "chains": "/chains",
+            "entity": "/label_entity",
+            "input_sha256": "/input_sha256",
+            "mask": "/mask",
+            "model": "/model"
+          },
+          "unit": "1"
+        },
+        "metric_id": "coverage",
+        "missing_parameters": [],
+        "observable": "/metrics/coverage",
+        "output": "geometry.json",
+        "output_name": "geometry.json",
+        "parameters": {
+          "mask": "ordered_backbone"
+        },
+        "result_pointer": "/coverage_fraction",
+        "schema": "gx.measurement-spec/2",
+        "source_roles": [
+          "structure"
+        ],
+        "unit": "1"
+      },
+      "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+      "output": "geometry.json"
+    },
+    "policy": "gx.claim-proposition/3",
+    "quantifier": "all",
+    "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+    "chronology_scope": "same_store",
+    "proposition_sha256": "6ae741af9bd70d26d6bb6848d9d1c95ec8e40a6ad1e35d22fdbdb5934fbacb1a",
+    "endpoint_chronology_at_registration": {
+      "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b": {
+        "raw_material_received_event_id": 11,
+        "endpoint_first_available_event_id": null
+      }
+    },
+    "known_at_registration": {
+      "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b": false
+    }
+  },
+  "job": {
+    "node_id": "node_688031142449575af3b2922cf40c51d4",
+    "run_id": "gxr_01m8abz5hmzwez9f81",
+    "branch_id": "branch_d0a138a9a2625e9707d26323736731a5",
+    "version": 1,
+    "decision_ref": "gxa_3cfe130214f7f12c7c0b4d619538b54e200cf263cb1b623d1096ccc1b2c3b2cd",
+    "spec_json": "{\"branch\":\"branch_d0a138a9a2625e9707d26323736731a5\",\"capability\":\"deposited-chain-geometry@2\",\"depends_on\":[],\"inputs\":[\"gxa_01m8abz5j7pgsnp7yk\"],\"node\":\"node_688031142449575af3b2922cf40c51d4\",\"op\":\"add_node\",\"parameters\":{\"mask\":\"ordered_backbone\"},\"question\":\"What coverage is recorded in this source?\"}",
+    "operation_key": "v6.node:2c102a925ffa84948325cdcf8948b0cd54994f92247dc19b7a47a82ace24ed4f",
+    "status": "SUCCEEDED",
+    "job_id": "gxj_01m8abz65zvqpne53x",
+    "result_ref": "gxa_01m8abz6pe6mby3wh6",
+    "exec_key": "fcf9e81434d7a1d02e7f9644dd4603fe93ac05a643edce92db4bd7dc21678627"
+  },
+  "original": {
+    "assessment_cursor": 47,
+    "assessment_of": "gxh_01m8abz61xganf9wq8@2",
+    "availability_cursor": 47,
+    "claim_ref": "gxh_01m8abz61xganf9wq8@3",
+    "claim_revision_id": "gxh_01m8abz61xganf9wq8@3",
+    "context_ref": "gxcx_01m8abz5m99xdvpx08",
+    "criteria": "Temperature in Celsius exceeds ten.",
+    "criteria_sha256": "77d12ab3cee763fddde9256bf4efa43d88b2df82f9ac5b06dabff02ca87c46fa",
+    "decision_delivery": {
+      "brief_sha256": "735ac4b5bac3260de2f6eaf68089ccdd73a8dae348c8f05f6bbe1895774441ec",
+      "brief_turn_id": "turn-gxl_01m8abz5spgn3eg708",
+      "context_ref": "gxcx_01m8abz5m99xdvpx08",
+      "delivery_receipt": "turn-gxl_01m8abz5spgn3eg708",
+      "metric_refs": [],
+      "observations": [],
+      "snapshot_cursor": 0,
+      "state": "acknowledged",
+      "thread_id": "script-gxl_01m8abz5spgn3eg708",
+      "turn_id": "turn-gxl_01m8abz5spgn3eg708"
+    },
+    "decision_id": "gxa_3cfe130214f7f12c7c0b4d619538b54e200cf263cb1b623d1096ccc1b2c3b2cd",
+    "decision_scope": "run",
+    "event_cursor": 0,
+    "evidence_refs": [
+      "gxa_01m8abz5j7pgsnp7yk"
+    ],
+    "hypothesis_id": "gxh_01m8abz61xganf9wq8",
+    "lead_interpretation": {
+      "proposal_ref": "gxa_01m8abz5zgqy52vy68",
+      "proposed_level": "open",
+      "rationale": "Audit the original proposition against the registered endpoint."
+    },
+    "level": "open",
+    "limitations": "North station mornings only.",
+    "maturity": {
+      "direction": "opposed",
+      "disputed_extractions": [],
+      "gaps": [
+        {
+          "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+          "event_id": 25,
+          "kind": "different_method_or_output"
+        }
+      ],
+      "grounds": [
+        "gxa_01m8abz6pe6mby3wh6"
+      ],
+      "material_coverage": [
+        {
+          "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+          "endpoint_first_available_event_id": 45,
+          "known_at_registration": false,
+          "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+          "opposing_refs": [
+            "gxa_01m8abz6pe6mby3wh6"
+          ],
+          "qualification": "prospective",
+          "raw_material_received_event_id": 11,
+          "registration_event_id": 29,
+          "retrospective_refs": [],
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+          "supporting_refs": [],
+          "uncertain_refs": []
+        }
+      ],
+      "opposing_refs": [
+        "gxa_01m8abz6pe6mby3wh6"
+      ],
+      "preexisting_result": false,
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited.",
+        "GX froze the rule before each qualifying prospective result.",
+        "GX compared the original measured value with the registered decision rule.",
+        "Unmeasured outcomes and execution gaps do not establish counterevidence.",
+        "Adverse results or independently reviewed opposing evidence are retained."
+      ],
+      "registration": {
+        "chronology_scope": "same_store",
+        "claim_revision_id": "gxh_01m8abz61xganf9wq8@1",
+        "claim_scope": "Deposited chains in this coordinate archive",
+        "claim_sha256": "8d5d45beb21e282e299fac1ba0f937393dbb372ee49ab7ade515c6c4b4896ed0",
+        "data": [
+          {
+            "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+            "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+          }
+        ],
+        "decision_scope": "run",
+        "endpoint_chronology_at_registration": {
+          "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b": {
+            "endpoint_first_available_event_id": null,
+            "raw_material_received_event_id": 11
+          }
+        },
+        "event_id": 29,
+        "known_at_registration": {
+          "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b": false
+        },
+        "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+        "method_pin": {
+          "capability": "deposited-chain-geometry@2",
+          "manifest_sha256": "f3db782fcde636ab051fc27b6fdd8367e5b351f60228adc12c5e2525fe46b7b8",
+          "measurement_spec": {
+            "applicability": "Deposited chains in this coordinate archive",
+            "capability": "deposited-chain-geometry@2",
+            "input_role": "structure",
+            "manifest_sha256": "f3db782fcde636ab051fc27b6fdd8367e5b351f60228adc12c5e2525fe46b7b8",
+            "measurement_schema": "gx.deposited_chain_geometry/2",
+            "metric_definition": {
+              "bounds": [
+                0,
+                1
+              ],
+              "denominator": "/observed_union_residues",
+              "numerator": "/selected_residues",
+              "op": "ratio/1",
+              "places": 3,
+              "reader": "json/1",
+              "scope": {
+                "chains": "/chains",
+                "entity": "/label_entity",
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model"
+              },
+              "unit": "1"
+            },
+            "metric_id": "coverage",
+            "missing_parameters": [],
+            "observable": "/metrics/coverage",
+            "output": "geometry.json",
+            "output_name": "geometry.json",
+            "parameters": {
+              "mask": "ordered_backbone"
+            },
+            "result_pointer": "/coverage_fraction",
+            "schema": "gx.measurement-spec/2",
+            "source_roles": [
+              "structure"
+            ],
+            "unit": "1"
+          },
+          "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+          "output": "geometry.json"
+        },
+        "policy": "gx.claim-proposition/3",
+        "posthoc_revision_of": null,
+        "prediction": {
+          "data_refs": [
+            "gxa_01m8abz5j7pgsnp7yk"
+          ],
+          "measurement_schema": "gx.deposited_chain_geometry/2",
+          "method": {
+            "capability": "deposited-chain-geometry@2",
+            "input_role": "structure",
+            "metric_id": "coverage",
+            "output": "geometry.json",
+            "parameters": {
+              "mask": "ordered_backbone"
+            },
+            "unit": "1"
+          },
+          "observable": "/metrics/coverage",
+          "operator": "gt",
+          "target": "analysis",
+          "threshold": 0.6
+        },
+        "proposition_sha256": "6ae741af9bd70d26d6bb6848d9d1c95ec8e40a6ad1e35d22fdbdb5934fbacb1a",
+        "quantifier": "all"
+      },
+      "replication": [],
+      "results": [
+        {
+          "applicability_scopes": [
+            "Deposited chains in this coordinate archive"
+          ],
+          "artifact_ref": "gxa_01m8abz6pe6mby3wh6",
+          "capability": {
+            "id": "deposited-chain-geometry",
+            "sha256": "f3db782fcde636ab051fc27b6fdd8367e5b351f60228adc12c5e2525fe46b7b8",
+            "version": "2"
+          },
+          "dependencies": {
+            "acquisition": [],
+            "data": [
+              "https://files.rcsb.org/download/2RE9.cif#sha256=8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+              "sha256:8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+            ],
+            "processing": [
+              "capability:f3db782fcde636ab051fc27b6fdd8367e5b351f60228adc12c5e2525fe46b7b8",
+              "method_source:8ea2b5a1406eb1402a508ea49b1532ddde836b444855eca7d2963fe9de066f97"
+            ],
+            "publication": [
+              "https://doi.org/10.1016/j.bbrc.2007.09.097"
+            ],
+            "sample": [],
+            "sampling": [],
+            "source": [
+              "wwPDB:2RE9/revision/1.4"
+            ]
+          },
+          "event_id": 47,
+          "first_bytes_event_id": 42,
+          "first_event_id": 45,
+          "independence_complete": false,
+          "launch_event_id": 38,
+          "matched_data_sha256": [
+            "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+          ],
+          "matched_material_keys": [
+            "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+          ],
+          "measurement": {
+            "admission_sha256": "6284334ce96bd163999c424ff994fff041974c306094e04e3547d495bf8ffd27",
+            "applicability_scopes": [
+              "Deposited chains in this coordinate archive"
+            ],
+            "comparison_value": "0.29878048780487804878048780487804878048780487804878",
+            "denominator": 164,
+            "lineage": [
+              {
+                "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+                "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+              }
+            ],
+            "manifest_sha256": "2f3cc708e084e87a877e52ff8fb224841d7ae7a854c2db9684187fa62732d93d",
+            "material_inputs": [
+              {
+                "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+                "bytes": 507971,
+                "role": "structure",
+                "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+              }
+            ],
+            "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+            "metric": "gx.deposited_chain_geometry/2",
+            "metric_id": "coverage",
+            "metric_ref": "metric_54c6c8b0af1ac63d32dc5c4a80aed3fa2b0f5a7c51597d9ebd59f0193e29e0c9",
+            "metric_scope": {
+              "chains": [
+                "A",
+                "B",
+                "C"
+              ],
+              "entity": "1",
+              "input_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+              "mask": "ordered_backbone",
+              "model": "1"
+            },
+            "numerator": 49,
+            "raw_value": "0.29878048780487804878048780487804878048780487804878",
+            "sha256": "f0b083e153aa3ae2973f3480e0d28c31465b75c947fff7a91615939cf71e314f",
+            "source_inputs": [
+              {
+                "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+                "bytes": 507971,
+                "role": "structure",
+                "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+              }
+            ],
+            "unit": "1",
+            "value": 0.29878048780487804
+          },
+          "measurement_schema": "gx.deposited_chain_geometry/2",
+          "nature": "analysis",
+          "original_observations": [
+            {
+              "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+              "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+            }
+          ],
+          "output_name": "geometry.json",
+          "sha256": "f0b083e153aa3ae2973f3480e0d28c31465b75c947fff7a91615939cf71e314f",
+          "supports": false,
+          "unknown_dependencies": [
+            "acquisition",
+            "processing",
+            "sample",
+            "sampling",
+            "source"
+          ],
+          "upstream_natures": [
+            "observed"
+          ],
+          "value": 0.29878048780487804
+        }
+      ],
+      "reviewed_evidence": [],
+      "rule": "gx.claim-proposition/3",
+      "stage": "tested",
+      "supporting_refs": []
+    },
+    "maturity_lineage": [
+      "gxa_01m8abz5zgqy52vy68",
+      "gxh_01m8abz61xganf9wq8@1",
+      "gxh_01m8abz61xganf9wq8@2",
+      "gxh_01m8abz61xganf9wq8@3"
+    ],
+    "originating_claim_ref": "gxa_01m8abz5zgqy52vy68",
+    "prediction": {
+      "data_refs": [
+        "gxa_01m8abz5j7pgsnp7yk"
+      ],
+      "measurement_schema": "gx.deposited_chain_geometry/2",
+      "method": {
+        "capability": "deposited-chain-geometry@2",
+        "input_role": "structure",
+        "metric_id": "coverage",
+        "output": "geometry.json",
+        "parameters": {
+          "mask": "ordered_backbone"
+        },
+        "unit": "1"
+      },
+      "observable": "/metrics/coverage",
+      "operator": "gt",
+      "target": "analysis",
+      "threshold": 0.6
+    },
+    "publication": {
+      "admissible_levels": [
+        "open",
+        "insufficient",
+        "contested",
+        "refuted"
+      ],
+      "assessment_cursor": 47,
+      "claim_revision_id": "gxh_01m8abz61xganf9wq8@3",
+      "direction": "opposed",
+      "level": "open",
+      "material_coverage": [
+        {
+          "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+          "endpoint_first_available_event_id": 45,
+          "known_at_registration": false,
+          "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+          "opposing_refs": [
+            "gxa_01m8abz6pe6mby3wh6"
+          ],
+          "qualification": "prospective",
+          "raw_material_received_event_id": 11,
+          "registration_event_id": 29,
+          "retrospective_refs": [],
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+          "supporting_refs": [],
+          "uncertain_refs": []
+        }
+      ],
+      "maturity": "tested",
+      "measured_unqualified_data_refs": [],
+      "missing_prospective_data_refs": [],
+      "opposing_refs": [
+        "gxa_01m8abz6pe6mby3wh6"
+      ],
+      "policy": "gx.claim-publication/3",
+      "proposal_ref": "gxa_01m8abz5zgqy52vy68",
+      "proposed_level": "open",
+      "proposition_sha256": "6ae741af9bd70d26d6bb6848d9d1c95ec8e40a6ad1e35d22fdbdb5934fbacb1a",
+      "prospective_data_refs": [
+        "gxa_01m8abz5j7pgsnp7yk"
+      ],
+      "quantifier": "all",
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited.",
+        "GX froze the rule before each qualifying prospective result.",
+        "GX compared the original measured value with the registered decision rule.",
+        "Unmeasured outcomes and execution gaps do not establish counterevidence.",
+        "Adverse results or independently reviewed opposing evidence are retained."
+      ],
+      "registration_event_id": 29,
+      "retrospective_data_refs": [],
+      "scope": "Deposited chains in this coordinate archive",
+      "supporting_refs": [],
+      "timing_unknown_data_refs": [],
+      "unmeasured_data_refs": []
+    },
+    "qualitative_notes": {
+      "limitations": "North station mornings only.",
+      "rationale": "Audit the original proposition against the registered endpoint.",
+      "statement": "First preregistration",
+      "status": "UNVERIFIED"
+    },
+    "rationale": "Applicable reviewed evidence or a classified scientific artifact is cited. GX froze the rule before each qualifying prospective result. GX compared the original measured value with the registered decision rule. Unmeasured outcomes and execution gaps do not establish counterevidence. Adverse results or independently reviewed opposing evidence are retained.",
+    "revision": 3,
+    "revision_author": "GX",
+    "schema": "gx.v6.claim.1",
+    "science": {
+      "claim_revision_id": "gxh_01m8abz61xganf9wq8@3",
+      "direction": "opposed",
+      "level": "open",
+      "level_source": "gx.claim-publication/3"
+    },
+    "scope": "Deposited chains in this coordinate archive",
+    "source_records": [
+      {
+        "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+        "kind": "run_input",
+        "output_provenance": {
+          "applicability_scopes": [],
+          "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+          "data_refs": [],
+          "dependencies": {
+            "acquisition": [],
+            "data": [],
+            "processing": [],
+            "publication": [],
+            "sample": [],
+            "sampling": [],
+            "source": []
+          },
+          "first_event_id": 11,
+          "independence_complete": false,
+          "job_id": null,
+          "nature": "unclassified",
+          "original_inputs_grounded": false,
+          "original_observations": [],
+          "reason": "No pinned declaration or original acquisition receipt",
+          "record_kind": "unclassified",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+          "unknown_dependencies": [
+            "data",
+            "acquisition",
+            "sample",
+            "source",
+            "publication",
+            "processing",
+            "sampling"
+          ],
+          "upstream_natures": []
+        },
+        "record_nature": "unclassified",
+        "ref": "gxa_01m8abz5j7pgsnp7yk",
+        "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "source_class": "input"
+      }
+    ],
+    "statement": "First preregistration",
+    "statement_role": "registered_proposition",
+    "verified_metrics": []
+  },
+  "changed_scope": {
+    "policy": "gx.claim-publication/3",
+    "proposed_level": "open",
+    "proposal_ref": "gxa_01m8abz6wzezc31s66",
+    "level": "open",
+    "direction": "undetermined",
+    "maturity": "idea",
+    "claim_revision_id": "gxh_01m8abz709fxe1h8e4@1",
+    "scope": "Deposited chains in this coordinate archive.",
+    "assessment_cursor": 48,
+    "admissible_levels": [
+      "open",
+      "insufficient"
+    ],
+    "supporting_refs": [],
+    "opposing_refs": [],
+    "registration_event_id": 57,
+    "unmeasured_data_refs": [],
+    "reasons": [
+      "An applicable result existed by registration; interpretation of this rule is retrospective.",
+      "Unmeasured outcomes and execution gaps do not establish counterevidence."
+    ],
+    "quantifier": "all",
+    "proposition_sha256": "2e8c1bf91c918315b46671140e2729a2475840d61bb840764a26e2149071ad23",
+    "material_coverage": [
+      {
+        "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+        "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "raw_material_received_event_id": 11,
+        "endpoint_first_available_event_id": 45,
+        "qualification": "retrospective",
+        "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+        "known_at_registration": true,
+        "registration_event_id": 57,
+        "supporting_refs": [],
+        "opposing_refs": [],
+        "retrospective_refs": [],
+        "uncertain_refs": []
+      }
+    ],
+    "missing_prospective_data_refs": [
+      "gxa_01m8abz5j7pgsnp7yk"
+    ],
+    "prospective_data_refs": [],
+    "retrospective_data_refs": [
+      "gxa_01m8abz5j7pgsnp7yk"
+    ],
+    "timing_unknown_data_refs": [],
+    "measured_unqualified_data_refs": []
+  },
+  "alternative": {
+    "policy": "gx.claim-publication/3",
+    "proposed_level": "open",
+    "proposal_ref": "gxa_01m8abz6ymxnrvpadb",
+    "level": "open",
+    "direction": "undetermined",
+    "maturity": "preregistered",
+    "claim_revision_id": "gxh_01m8abz7144kwhmn1x@1",
+    "scope": "Deposited chains in this coordinate archive",
+    "assessment_cursor": 48,
+    "admissible_levels": [
+      "open",
+      "insufficient"
+    ],
+    "supporting_refs": [],
+    "opposing_refs": [],
+    "registration_event_id": 58,
+    "unmeasured_data_refs": [
+      "gxa_01m8abz5j7pgsnp7yk"
+    ],
+    "reasons": [
+      "Applicable reviewed evidence or a classified scientific artifact is cited.",
+      "GX froze the rule before each qualifying prospective result.",
+      "Unmeasured outcomes and execution gaps do not establish counterevidence."
+    ],
+    "quantifier": "all",
+    "proposition_sha256": "77935dc08fbe68dc29fa831be668f6c210c5890b22a58ed70d139458d769e7d4",
+    "material_coverage": [
+      {
+        "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+        "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "raw_material_received_event_id": 11,
+        "endpoint_first_available_event_id": null,
+        "qualification": "unmeasured",
+        "measurement_spec_sha256": "b8ef646731a723051c8f4f4c18b4819dfbd0c95824eca6224f9627904b1b9bef",
+        "known_at_registration": false,
+        "registration_event_id": 58,
+        "supporting_refs": [],
+        "opposing_refs": [],
+        "retrospective_refs": [],
+        "uncertain_refs": []
+      }
+    ],
+    "missing_prospective_data_refs": [
+      "gxa_01m8abz5j7pgsnp7yk"
+    ],
+    "prospective_data_refs": [],
+    "retrospective_data_refs": [],
+    "timing_unknown_data_refs": [],
+    "measured_unqualified_data_refs": []
+  },
+  "jobs_after_reconcile": 1,
+  "cold_coverage": [
+    {
+      "artifact_ref": "gxa_01m8abz5j7pgsnp7yk",
+      "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "raw_material_received_event_id": 11,
+      "endpoint_first_available_event_id": 45,
+      "qualification": "prospective",
+      "measurement_spec_sha256": "1d9deedd8b19c1ca38525783b9abd46ffccce4501232faba673dd1213d02551b",
+      "known_at_registration": false,
+      "registration_event_id": 29,
+      "supporting_refs": [],
+      "opposing_refs": [
+        "gxa_01m8abz6pe6mby3wh6"
+      ],
+      "retrospective_refs": [],
+      "uncertain_refs": []
+    }
+  ],
+  "generated_seed": 6230716,
+  "generated_variants": [
+    {
+      "scope": "Deposited chains in this coordinate archive",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "output": "geometry.json",
+          "capability": "deposited-chain-geometry@2",
+          "unit": "1",
+          "parameters": {
+            "mask": "common_ca"
+          },
+          "input_role": "structure",
+          "metric_id": "coverage"
+        },
+        "observable": "/metrics/coverage",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.8,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 29
+    },
+    {
+      "scope": "Deposited chains in this coordinate archive.",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "capability": "deposited-chain-geometry@2",
+          "input_role": "structure",
+          "metric_id": "coverage",
+          "parameters": {
+            "mask": "ordered_backbone"
+          },
+          "output": "geometry.json",
+          "unit": "1"
+        },
+        "observable": "/metrics/coverage",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.8,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 63
+    },
+    {
+      "scope": "Deposited chains in this coordinate archive.",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "metric_id": "coverage",
+          "input_role": "structure",
+          "capability": "deposited-chain-geometry@2",
+          "parameters": {
+            "mask": "common_ca"
+          },
+          "unit": "1",
+          "output": "geometry.json"
+        },
+        "observable": "/metrics/coverage",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.6,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 29
+    },
+    {
+      "scope": "Deposited chains in this coordinate archive",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "unit": "1",
+          "input_role": "structure",
+          "output": "geometry.json",
+          "capability": "deposited-chain-geometry@2",
+          "metric_id": "coverage",
+          "parameters": {
+            "mask": "common_ca"
+          }
+        },
+        "observable": "/coverage_fraction",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.8,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 63
+    },
+    {
+      "scope": "\u516c\u958b\u5ea7\u6a19\u6a94\u5167\u7684\u6c89\u7a4d\u93c8\u3002",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "metric_id": "coverage",
+          "output": "geometry.json",
+          "parameters": {
+            "mask": "common_ca"
+          },
+          "unit": "1",
+          "input_role": "structure",
+          "capability": "deposited-chain-geometry@2"
+        },
+        "observable": "/metrics/coverage",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.3,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 63
+    },
+    {
+      "scope": "Deposited chains in this coordinate archive.",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "input_role": "structure",
+          "parameters": {
+            "mask": "common_ca"
+          },
+          "output": "geometry.json",
+          "metric_id": "coverage",
+          "unit": "1",
+          "capability": "deposited-chain-geometry@2"
+        },
+        "observable": "/metrics/coverage",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.3,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 29
+    },
+    {
+      "scope": "Deposited chains in this coordinate archive.",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "output": "geometry.json",
+          "capability": "deposited-chain-geometry@2",
+          "metric_id": "coverage",
+          "input_role": "structure",
+          "parameters": {
+            "mask": "ordered_backbone"
+          },
+          "unit": "1"
+        },
+        "observable": "/coverage_fraction",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.3,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 29
+    },
+    {
+      "scope": "\u516c\u958b\u5ea7\u6a19\u6a94\u5167\u7684\u6c89\u7a4d\u93c8\u3002",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "metric_id": "coverage",
+          "output": "geometry.json",
+          "unit": "1",
+          "parameters": {
+            "mask": "ordered_backbone"
+          },
+          "input_role": "structure",
+          "capability": "deposited-chain-geometry@2"
+        },
+        "observable": "/coverage_fraction",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.6,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 63
+    },
+    {
+      "scope": "\u516c\u958b\u5ea7\u6a19\u6a94\u5167\u7684\u6c89\u7a4d\u93c8\u3002",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "output": "geometry.json",
+          "metric_id": "coverage",
+          "parameters": {
+            "mask": "common_ca"
+          },
+          "input_role": "structure",
+          "unit": "1",
+          "capability": "deposited-chain-geometry@2"
+        },
+        "observable": "/coverage_fraction",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.3,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 63
+    },
+    {
+      "scope": "\u516c\u958b\u5ea7\u6a19\u6a94\u5167\u7684\u6c89\u7a4d\u93c8\u3002",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "input_role": "structure",
+          "capability": "deposited-chain-geometry@2",
+          "metric_id": "coverage",
+          "output": "geometry.json",
+          "parameters": {
+            "mask": "common_ca"
+          },
+          "unit": "1"
+        },
+        "observable": "/metrics/coverage",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.6,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 45
+    },
+    {
+      "scope": "\u516c\u958b\u5ea7\u6a19\u6a94\u5167\u7684\u6c89\u7a4d\u93c8\u3002",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "unit": "1",
+          "metric_id": "coverage",
+          "output": "geometry.json",
+          "parameters": {
+            "mask": "common_ca"
+          },
+          "capability": "deposited-chain-geometry@2",
+          "input_role": "structure"
+        },
+        "observable": "/coverage_fraction",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.3,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 29
+    },
+    {
+      "scope": "Deposited chains in this coordinate archive.",
+      "prediction": {
+        "target": "analysis",
+        "method": {
+          "output": "geometry.json",
+          "input_role": "structure",
+          "metric_id": "coverage",
+          "capability": "deposited-chain-geometry@2",
+          "parameters": {
+            "mask": "ordered_backbone"
+          },
+          "unit": "1"
+        },
+        "observable": "/metrics/coverage",
+        "measurement_schema": "gx.deposited_chain_geometry/2",
+        "operator": "gt",
+        "threshold": 0.6,
+        "data_refs": [
+          "gxa_01m8abz5j7pgsnp7yk"
+        ]
+      },
+      "as_of": 45
+    }
+  ],
+  "external_paid_calls": 0
+}

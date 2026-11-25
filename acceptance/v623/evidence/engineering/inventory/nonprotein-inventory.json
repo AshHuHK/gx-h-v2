@@ -1,0 +1,202 @@
+{
+  "schema": "gx.acceptance/6.2.3.inventory",
+  "run": "gxr_01m8ac0wb183arrma3",
+  "module": {
+    "id": "org.gx.data-inventory",
+    "sha256": "5ea8a0a4bfc9f77e3ffb9bb1acd0e12412e0070aa0448650d07bb0c3072264d9",
+    "version": "3.0.0"
+  },
+  "run_granted": [
+    "artifact-analysis@1",
+    "deposited-chain-geometry@2",
+    "fixture-grid@1"
+  ],
+  "module_eligible": [
+    "artifact-analysis@1",
+    "deposited-chain-geometry@2"
+  ],
+  "delegated": [
+    "artifact-analysis@1"
+  ],
+  "inputs": [
+    {
+      "ref": "gxa_01m8ac0wbr8s1sa3e2",
+      "sha256": "e38671fe6bbcd3b444e748549f5a987d09161d432ec1ffd1f80f6c3394b2b781"
+    },
+    {
+      "ref": "gxa_01m8ac0wcbyhxxq5jx",
+      "sha256": "6c667b065de03e2ca26ad875c40a152f788eaa4c388a81447f080ba720305812"
+    }
+  ],
+  "actions": [
+    {
+      "key": "policy",
+      "tool": "gx_query_catalog",
+      "scope": "run",
+      "lease_id": "gxl_01m8ac0wkn5dv9dcr6",
+      "task_id": "gxt_01m8ac0we467f8ff5k",
+      "request_sha256": "bc47ce14a73c489ad3e60973702f0280be218ba67f33e8777ff98e16a6d6a619",
+      "head_before": null,
+      "reply_sha256": "9dfbdef5816ee7202b28d292e4b5068225f3d70557394145dd1492b07b3062af",
+      "head_after": null
+    },
+    {
+      "key": "out-of-policy",
+      "tool": "gx_open_module",
+      "scope": "run",
+      "lease_id": "gxl_01m8ac0wkn5dv9dcr6",
+      "task_id": "gxt_01m8ac0we467f8ff5k",
+      "request_sha256": "d61163e698016d919b2ae08b53af2a22682f5731f19a8573aa55bb6fd588ce2d",
+      "head_before": null,
+      "error": "SCOPE_DENIED",
+      "reason": "SCOPE_DENIED: Requested module methods exceed the parent and declaration grants",
+      "details": {},
+      "head_after": null
+    },
+    {
+      "key": "open",
+      "tool": "gx_open_module",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wkn5dv9dcr6",
+      "task_id": "gxt_01m8ac0we467f8ff5k",
+      "request_sha256": "6c6bdc5e84ce42ee46db35456f8e190e7e49fa79ec701796673919ed14451377",
+      "head_before": null,
+      "reply_sha256": "8617c704631d20079d50365fe64e0a838d8aea7d8f827941477525016a868c4f",
+      "module_instance_id": "module_c6201cc88d42d52c1251bd41325a13b9",
+      "operation_key": "data",
+      "head_after": null
+    },
+    {
+      "key": "catalog",
+      "tool": "gx_query_catalog",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "7b51fc3cd4e9295fac02cb6607b7c95c0db22af88f64c68ae40e0505bc66c10b",
+      "head_before": null,
+      "reply_sha256": "f45e9d5ae5298a9b2c8693c84ba31897259cf15a33711bdd5d31a58c3b50d1e0",
+      "head_after": null
+    },
+    {
+      "key": "card",
+      "tool": "gx_query_catalog",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "2cf656083e990a147364371db46207fe80c711aaf62e2245b0878e1d9f0a74c5",
+      "head_before": null,
+      "reply_sha256": "6cb03a307e2ed65b7d91ab143c404ada89eac1796a82256d90c2d9cb311687fd",
+      "head_after": null
+    },
+    {
+      "key": "denied-card-0",
+      "tool": "gx_query_catalog",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "9f2624f053bb07e3b4df26ba7ca955576232b389734c3c1d8200519a33dc4ead",
+      "head_before": null,
+      "error": "SCOPE_DENIED",
+      "reason": "SCOPE_DENIED: Catalog reference is unavailable in this task's grant",
+      "details": {},
+      "head_after": null
+    },
+    {
+      "key": "measure-denied0",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "f289cabe3e67c4135d247d32cc6ebc65473e76b811c687539d35b26acbc5416e",
+      "head_before": null,
+      "error": "SCOPE_DENIED",
+      "reason": "SCOPE_DENIED: Capability is outside the Run's pinned catalog",
+      "details": {},
+      "head_after": null
+    },
+    {
+      "key": "denied-card-1",
+      "tool": "gx_query_catalog",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "32447fd3578a0bc28bf16ad8fc63e6aea8d417f9c51c30eeacdc4ecd3578de06",
+      "head_before": null,
+      "error": "SCOPE_DENIED",
+      "reason": "SCOPE_DENIED: Catalog reference is unavailable in this task's grant",
+      "details": {},
+      "head_after": null
+    },
+    {
+      "key": "measure-denied1",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "bc198d8b57297dbc093eeb932cef87864a81fe6ea97e42cb936d6e819e252303",
+      "head_before": null,
+      "error": "SCOPE_DENIED",
+      "reason": "SCOPE_DENIED: Capability is outside the Run's pinned catalog",
+      "details": {},
+      "head_after": null
+    },
+    {
+      "key": "denied-card-2",
+      "tool": "gx_query_catalog",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "0ef4d09b5578a5072fe09d1c538a689045be7d4f98a54fe1a1da8b015625e191",
+      "head_before": null,
+      "error": "SCOPE_DENIED",
+      "reason": "SCOPE_DENIED: Catalog reference is unavailable in this task's grant",
+      "details": {},
+      "head_after": null
+    },
+    {
+      "key": "measure-denied2",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "d816a7a058eca7bf2c61743e2037f1f202bbcecef821bdeb8b1e5535161f5583",
+      "head_before": null,
+      "error": "SCOPE_DENIED",
+      "reason": "SCOPE_DENIED: Capability is outside the Run's pinned catalog",
+      "details": {},
+      "head_after": null
+    },
+    {
+      "key": "count-readings",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_c6201cc88d42d52c1251bd41325a13b9",
+      "lease_id": "gxl_01m8ac0wnkf03gxdzq",
+      "task_id": "gxt_01m8ac0wn0kazef2k3",
+      "request_sha256": "e3c02f10d6e00f207cba4d6e9dac19ec7188750e9bb1c0a084da8aa64b0fe801",
+      "head_before": null,
+      "reply_sha256": "f249ff584697c78a9e67c0a0f4f5ba765734070e20b1c2854b541234bcdc3faa",
+      "module_instance_id": "module_c6201cc88d42d52c1251bd41325a13b9",
+      "base": null,
+      "result_head": {
+        "version": 1,
+        "sha256": "a72f01a96c309afcd780ebb51d5a7df5177e85637d64e601356ab2e2fd50c6f9"
+      },
+      "decision_ref": "gxa_3d9716b1cd874458ec4609cc018bd906c3dcb702bfadb0fb60a372ded30e2da3",
+      "head_after": {
+        "version": 1,
+        "sha256": "a72f01a96c309afcd780ebb51d5a7df5177e85637d64e601356ab2e2fd50c6f9"
+      }
+    }
+  ],
+  "job": "gxj_01m8ac0ww50ytpf5dt",
+  "node": "node_d3ad72c7bf01011d623882d4e844bf85",
+  "output": {
+    "ref": "gxa_01m8ac0xc7vk2vbch2",
+    "sha256": "a5fb8eb97856970b61d9f466deb64f7659e835ee8ec5497003b78438fe888cad",
+    "value": {
+      "count": 4
+    }
+  },
+  "real_cpu_jobs": 1,
+  "paid_calls": 0
+}

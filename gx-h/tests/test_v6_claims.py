@@ -135,7 +135,7 @@ class EvidenceDuringDecision(unittest.TestCase):
         from gx_core.p0 import v6_goal
         from tests import test_v6_native
         native = test_v6_native.ScientificLead()
-        native.setUp()
+        native.setUp(evidence_policy="gx.evidence/6.2")  # Replay V6 synthetic numerical claim semantics.
         self.addCleanup(native.doCleanups)
         db, run = native.conn, native.run
         native.roots._call(native.params())  # First frozen decision, awaiting evidence.

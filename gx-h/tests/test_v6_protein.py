@@ -39,6 +39,7 @@ class ProteinAdapter(unittest.TestCase):
             data = config.HARNESS_ROOT / "adapters/scientific/tl1a_geometry/data/2RE9.cif"
             pins = [shipped.QUALITY, shipped.GEOMETRY, shipped.REVIEW]
             spec = {"project": "coordinates", "mode": "goal", "objective": "Compare deposited coordinate protocols",
+                    "evidence_policy": "gx.evidence/6.2",  # Retrospective evaluator and original claim wording.
                     "plugins": ["org.gx.protein@0.2.0"], "capabilities": pins,
                     "input_files": [{"path": str(data), "role": "structure"}]}
             run = v6_goal.start(conn, spec, run_key="coordinate-graph", current=None)["run_id"]

@@ -568,7 +568,9 @@ class Roots:
                 params["developerInstructions"] += (
                     " For a numbered finding from a measurement with declared metrics, cite its output and "
                     "insert {{metric:METRIC_ID}} in the interpretation. GX renders the value from that "
-                    "named output. Cite {{metric:ARTIFACT_REF:METRIC_ID}} when references are ambiguous.")
+                    "named output. Cite {{metric:ARTIFACT_REF:METRIC_ID}} when references are ambiguous. "
+                    "Without a declared reader describe the gap qualitatively. Use {{criterion}} in claim "
+                    "criteria to show a registered prospective threshold.")
         if new:
             params["experimentalRawEvents"] = True
             params["environments"] = []

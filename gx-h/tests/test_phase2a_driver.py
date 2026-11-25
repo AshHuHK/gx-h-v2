@@ -10,9 +10,10 @@ import unittest
 from unittest.mock import patch
 
 from gx_core.domain import clock
+from gx_core.errors import LeaseExpired, ScopeDenied
 from gx_core.hostobs.app_server_client import AppServerDisconnected
 from gx_core.orchestration import branches
-from gx_core.p0 import cli, driver, roots
+from gx_core.p0 import cli, driver, roots, v6_goal
 from gx_core.persistence import store
 from gx_core.teams.service import default_lease_seconds
 from tests import test_p0_local_operator, test_p0_roots
@@ -114,6 +115,60 @@ class NativeOutage(unittest.TestCase):
         self.assertEqual(driver.native_waits(f.conn, f.run), [])
         self.assertEqual(f.conn.execute("SELECT count(*) FROM leases WHERE task_id=?", (f.task,)).fetchone()[0], 1)
         self.assertEqual(f.conn.execute("SELECT attempts_consumed FROM tasks WHERE task_id=?", (f.task,)).fetchone()[0], 0)
+
+    def test_retired_dispatch_at_claim_or_between_thread_and_turn(self):
+        for boundary in ("before_claim", "after_thread", "live_error"):
+            with self.subTest(boundary=boundary):
+                f = test_p0_roots.DurableRoots()
+                self.addCleanup(f.doCleanups)
+                f.setUp()
+                f.conn.execute("UPDATE runs SET inputs_json=? WHERE run_id=?", (
+                    json.dumps({"inputs": {"p0": True, "p0_spec": {}}}), f.run))
+                selected = []
+
+                def retire():
+                    with store.transaction(f.conn):
+                        v6_goal.cancel_decision(f.conn, f.run, f.task, reason="Operator assigned a new material")
+
+                def request(method, params):
+                    if method == "thread/start":
+                        response = f.fake(method, params)
+                        retire()
+                        return response
+                    self.assertEqual(method, "thread/read")
+                    return {"thread": {"id": params["threadId"], "status": {"type": "idle"}}}
+
+                def dispatch(task_id):
+                    selected.append(task_id)
+                    if boundary == "before_claim":
+                        retire()
+                    if boundary == "live_error":
+                        raise LeaseExpired("an active attempt still requires recovery")
+                    return f.roots.dispatch(task_id)
+
+                f.roots._request = request
+                peer = SimpleNamespace(dispatch=dispatch, active_turns={}, poll=lambda delay: False)
+                with closing(driver.Driver(f.conn, f.tmp.name, f.run)) as worker, patch.object(
+                        driver.Driver, "native", property(lambda _: peer)):
+                    with closing(worker.passes(time.monotonic()+10, shared=True)) as cycle:
+                        next(cycle)
+                        if boundary == "live_error":
+                            with self.assertRaisesRegex(LeaseExpired, "requires recovery"):
+                                next(cycle)
+                            continue
+                        next(cycle)
+                        next(cycle)
+                self.assertEqual(selected, [f.task])
+                self.assertEqual(tuple(f.conn.execute("SELECT status,attempts_consumed FROM tasks WHERE task_id=?",
+                                                      (f.task,)).fetchone()), ("CANCELLED", 0))
+                self.assertEqual(f.conn.execute("SELECT count(*) FROM p0_root_deliveries").fetchone()[0], 0)
+                self.assertEqual(f.conn.execute("SELECT count(*) FROM budget_reservations "
+                                               "WHERE subject_kind='native_turn'").fetchone()[0], 0)
+                if boundary == "after_thread":
+                    [thread] = f.conn.execute("SELECT thread_id FROM p0_roots WHERE task_id=?", (f.task,)).fetchone()
+                    self.assertTrue(thread)
+                    with self.assertRaises(ScopeDenied):
+                        roots.require_binding(f.conn, f.run, thread)
 
     def test_offline_unkeyed_bootstrap_stays_unauthorized_in_both_cli_run_modes(self):
         with tempfile.TemporaryDirectory() as tmp, patch.dict("os.environ", {driver.OFFLINE: "1"}), patch.object(

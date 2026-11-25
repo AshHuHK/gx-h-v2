@@ -239,7 +239,14 @@ def _render(text, metrics):
         return [_render(part, metrics) for part in text]
     if not isinstance(text, str):
         raise SchemaInvalid("Quantitative interpretation must be text")
-    prose = CALENDAR_YEAR.sub("", IDENTIFIER.sub("", TAG.sub("", text)))
+    without_tags = TAG.sub("", text)
+    def identifier(match):
+        # An accession such as 2E19 is also a valid numeric literal; its use as an identifier needs context.
+        if re.fullmatch(r"\d[Ee]\d{2}", match[0]) and not re.search(
+                r"\b(?:pdb|entry|structure|accession)\s+$", without_tags[:match.start()], flags=re.I):
+            return match[0]
+        return ""
+    prose = CALENDAR_YEAR.sub("", IDENTIFIER.sub(identifier, without_tags))
     for metric in metrics:
         for key, value in metric.get("scope", {}).items():
             if isinstance(value, (str, int)) and str(value).isdecimal():
@@ -258,6 +265,16 @@ def _render(text, metrics):
             attr, eq, expected = check.partition("=")
             if not eq or attr not in values or str(values[attr]) != expected:
                 raise SchemaInvalid("Metric assertion differs from the named output's value, unit or scope")
+        # A physical unit immediately appended to a rendered number is part of the quantitative assertion.
+        suffix = re.match(r"\s*(%|[µμmunpkMGT]?(?:V|A|g|m|s|K|Pa|Hz|L|mol|eV)|Å)(?![\w])", text[match.end():])
+        if suffix and suffix[1] != item["unit"]:
+            raise SchemaInvalid("Metric suffix uses a different unit than the named output")
+        if len(TAG.findall(text)) == 1:
+            for field, actual in item["scope"].items():
+                if isinstance(actual, str):
+                    declared = re.findall(r"\b" + re.escape(field) + r"\s*[:=]\s*([\w.-]+)", without_tags, re.I)
+                    if any(v.rstrip(".") != actual for v in declared):
+                        raise SchemaInvalid("Metric prose declares a different selection scope")
         return item["display"]
     rendered = TAG.sub(replace, text)
     if "{{metric:" in rendered:
@@ -265,13 +282,45 @@ def _render(text, metrics):
     return rendered
 
 
-def render_fields(conn, run_id, evidence_refs, text_fields, *, allowed_context=None):
+PREDICATES = {"gt": (">", r">(?!=)|above|greater than|exceeds?"),
+              "ge": (">=", r">=|≥|at least"), "lt": ("<", r"<(?!=)|below|less than"),
+              "le": ("<=", r"<=|≤|at most"), "eq": ("=", r"==|(?<![<>])=|equals?")}
+
+
+def _criterion(text, prediction, metrics):
+    # Only a comparator with its prospective numeric RHS can be stated literally.
+    symbol, words = PREDICATES[prediction["operator"]]
+    cutoff = prediction["threshold"]
+    pattern = re.compile(r"(?P<op>" + words + r")(?P<space>\s*)(?P<n>[+-]?(?:\d{1,3}(?:,\d{3})+|\d+)"
+                         r"(?:\.\d+)?(?:[eE][+-]?\d+)?)\b", re.I)
+    def substitute(match):
+        if Decimal(match["n"].replace(",", "")) != _number(cutoff):
+            raise SchemaInvalid("Numerical criterion differs from the registered prediction threshold")
+        return match["op"] + match["space"] + "{{cutoff}}"
+    if "{{cutoff}}" in text:
+        raise SchemaInvalid("Use {{criterion}} to cite the registered comparison")
+    text = _render(pattern.sub(substitute, text), metrics)
+    return text.replace("{{cutoff}}", str(cutoff)).replace(
+        "{{criterion}}", f"{prediction['observable']} {symbol} {cutoff}")
+
+
+def render_fields(conn, run_id, evidence_refs, text_fields, *, allowed_context=None, prediction=None):
     """Render already-authorized scientific prose from pinned metrics, retaining their full receipts."""
     metrics = _cited(conn, run_id, evidence_refs)
-    # Whole phrases can be independently established by the claim owner's source/criteria checks.
+    # Whole phrases can be independently established by the claim owner's source and scope checks.
     trusted = allowed_context or {}
-    return {k: value if k in trusted and value == trusted[k] else _render(value, metrics)
-            for k, value in text_fields.items()}, metrics
+    result = {}
+    for key, value in text_fields.items():
+        if key in trusted and trusted[key] == value:
+            result[key] = value
+            continue
+        if key == "criteria" and prediction:
+            result[key] = _criterion(value, prediction, metrics)
+        else:
+            if "{{criterion}}" in value:
+                raise SchemaInvalid("A criterion citation requires a prospective structured prediction")
+            result[key] = _render(value, metrics)
+    return result, metrics
 
 
 def render_report(conn, rid, bundle):

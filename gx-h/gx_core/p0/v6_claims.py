@@ -202,7 +202,15 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
             del text_fields['criteria']
         if prior and prior['scope'] == text_fields['scope']:
             del text_fields['scope']
-        rendered, metrics = v621_metrics.render_fields(conn, run_id, [f['artifact_ref'] for f in sources], text_fields)
+        trusted = {}
+        for fact in sources:
+            if payload['scope'] in fact.get('output_provenance', {}).get('applicability_scopes', ()):
+                trusted['scope'] = payload['scope']
+            if (fact.get('source_class') == 'reviewed_source_evidence' and fact.get('claim') == payload['statement']
+                    and v62_maturity.qualified_ground(fact, payload, require_acquisition=True)):
+                trusted.update(statement=fact['claim'], scope=fact['applicability'])
+        rendered, metrics = v621_metrics.render_fields(conn, run_id, [f['artifact_ref'] for f in sources],
+                        text_fields, allowed_context=trusted, prediction=payload.get('prediction'))
     if payload['level'] in ('limited_support', 'contested', 'mixed', 'refuted'):
         if enriched:
             proposed = {**payload, **rendered, 'decision_scope': task['scope']}
@@ -219,7 +227,7 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
                                          'scope': payload['scope'], 'evidence_refs': payload['evidence_refs']})
     draft = dict(schema=SCHEMA, **binding, decision_scope=task['scope'], event_cursor=task['event_cursor'],
                  claim=payload, sources=sources)
-    if metrics:
+    if metrics or any(payload[key] != value for key, value in rendered.items()):
         draft['rendered_claim_fields'] = rendered
         draft['metrics'] = metrics
     if pins is not None:

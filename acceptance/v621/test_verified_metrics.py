@@ -51,6 +51,19 @@ class DisplayContract(unittest.TestCase):
                                      {"a":0.065,"b":0.001})
         self.assertEqual(converted["display"], "64.000 mV")
 
+    def test_scientific_literals_and_identifiers_have_different_meanings(self):
+        for label in ("Archive 2RE9 from 2007, named record-2.cif.", "The PDB entry 2E19 was deposited in 2007."):
+            self.assertEqual(metrics._render(label, []),label)
+        for unsupported in ("Measured 2E19 residues.", "Coverage from 2007 residues.", "Result: 149/164"):
+            with self.subTest(unsupported=unsupported), self.assertRaises(SchemaInvalid):
+                metrics._render(unsupported,[])
+        pin = {"observable":"/measurement/value","operator":"gt","threshold":1000}
+        self.assertEqual(metrics._criterion("Accept above 1,000 only.",pin,[]), "Accept above 1000 only.")
+        self.assertEqual(metrics._criterion("Pinned {{criterion}}.",pin,[]),"Pinned /measurement/value > 1000.")
+        for unsupported in ("Accept below 1,000.", "Accept above 999.", "149/164, above 1,000."):
+            with self.subTest(unsupported=unsupported), self.assertRaises(SchemaInvalid):
+                metrics._criterion(unsupported,pin,[])
+
 
 class QuantitativePublication(unittest.TestCase):
     def test_original_receipt_real_job_report_and_delivered_numbers(self):
@@ -88,11 +101,19 @@ class QuantitativePublication(unittest.TestCase):
         self.assertEqual(entry["inputs"][0]["sha256"],sha)
         self.assertEqual(entry["scope"]["mask"],"ordered_backbone")
         rejected=[]
+        s.call(worker, "gx_read_artifact", {"ref":raw,"operation_key":"inspect-original"}, "inspect-original")
+        # Both refs are authorized. Only the source actually attached to each finding may supply its metric.
+        for text in ("Observed coverage is 149/164.", "Coverage from 2007 residues.", "Coverage {{metric:coverage}}."):
+            with self.assertRaises(SchemaInvalid) as wrong:
+                s.report(worker, ref, key="wrong-source-"+str(len(rejected)),
+                         findings=[{"text":text,"source_refs":[raw]}], artifact_refs=[raw, ref])
+            rejected.append({"input":text,"source_ref":raw,"reason":str(wrong.exception),"callback":s.actions[-1]})
         for text in ("The measured coverage is 149/164.", "The measured coverage is {{metric:coverage|mask=common_ca}}.",
-                     "Change the unit to {{metric:coverage|unit=mV}}.", "The count is {{metric:coverage|numerator=149}}."):
+                     "Change the unit to {{metric:coverage|unit=mV}}.", "The count is {{metric:coverage|numerator=149}}.",
+                     "Apparent coverage is {{metric:coverage}} mV.", "For mask=common_ca the coverage is {{metric:coverage}}."):
             with self.assertRaises(SchemaInvalid) as exc:
                 s.report(worker, ref, key="rejected-"+str(len(rejected)), text=text)
-            rejected.append({"input":text,"reason":str(exc.exception)})
+            rejected.append({"input":text,"reason":str(exc.exception),"callback":s.actions[-1]})
         tmpl = "Archive 2RE9 from 2007, source record-2.cif: {{metric:coverage|mask=ordered_backbone|unit=1}}."
         accepted = s.report(worker, ref, key="publish",text=tmpl)
         document = service.read_json(accepted["report_ref"])
@@ -117,7 +138,12 @@ class QuantitativePublication(unittest.TestCase):
         for bad in ("The coverage is 149/164.", "The measured ratio is 2007/2024."):
             with self.assertRaises(SchemaInvalid) as exc:
                 s.call(lead,"gx_stage_claim",{**claim,"statement":bad},"wrong-claim-"+str(len(rejected)))
-            rejected.append({"claim":bad,"reason":str(exc.exception)})
+            rejected.append({"claim":bad,"reason":str(exc.exception),"callback":s.actions[-1]})
+        with self.assertRaises(SchemaInvalid) as wrong:
+            s.call(lead, "gx_stage_claim", {**claim,"statement":"Published coverage is 149/164.",
+                                           "evidence_refs":[raw]}, "wrong-claim-source")
+        rejected.append({"claim":"Published coverage is 149/164.","source_ref":raw,
+                         "reason":str(wrong.exception),"callback":s.actions[-1]})
         staged = s.call(lead,"gx_stage_claim",claim,"stage-conclusion")
         conclusion = s.call(lead,"gx_decide_revision",{"decision":draft(evidence=[ref,staged["claim_ref"]])},"publish-claim")
         final, = conclusion["claim_revisions"]
@@ -129,3 +155,43 @@ class QuantitativePublication(unittest.TestCase):
                  "formal_claim":final,"rejected":rejected,"formal_findings":document["findings"],"jobs":len(s.rows("SELECT * FROM jobs"))}
         if path:=os.getenv("GX_V621_METRICS_TRACE"):
             Path(path).write_text(json.dumps(trace,indent=2,ensure_ascii=False)+"\n")
+
+    def test_direct_quick_lead_sees_typed_output_and_no_reader_for_raw(self):
+        tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        s = self.enterContext(Scenario(tmp/"quick", spec_updates={"research_effort":"quick",
+                    "research_modules":[],"capabilities":[METHOD],"plugins":["org.gx.protein@0.3.0"]}))
+        b = {**branch("direct"), "budget_limits":{"job_submissions":1,"cpu_seconds":90}}
+        op = s.node(s.lead,"coverage",s.materials[0],branch_id="local:direct",capability=METHOD,
+                    parameters={"mask":"ordered_backbone"})
+        change = draft(b, op, watches=[{"event":"job_settled","subject_ref":"local:coverage"}])
+        start = s.call(s.lead, v6_native.DECIDE, {"decision":change}, "measure-direct")
+        node = s.settle(start["aliases"]["local:coverage"])
+        lead = s.next_actor("run")
+        packet = v6_native.brief(s.roots._binding(lead.thread))
+        result, = [o for o in packet["observations"] if o["artifact_ref"] == node["result_ref"]]
+        metric, = result["metrics"]
+        self.assertEqual((metric["display"],metric["scope"]["mask"]),("49/164 (0.299)","ordered_backbone"))
+        claim = dict(statement="Coverage is {{metric:coverage}}.",scope=SCOPE,criteria="Inspect shared positions.",
+                     limitations="This selection only.",rationale="Recorded count ratio.",level="open",
+                     evidence_refs=[node["result_ref"]])
+        with self.assertRaises(SchemaInvalid):
+            s.call(lead,"gx_stage_claim",{**claim,"statement":"Coverage is 149/164."},"invented-direct")
+        staged = s.call(lead,"gx_stage_claim",claim,"direct-claim")
+        decision = s.call(lead,v6_native.DECIDE,{"decision":draft(evidence=[node["result_ref"],staged["claim_ref"]])},
+                          "publish-direct")
+        self.assertEqual(decision["claim_revisions"][0]["statement"],"Coverage is 49/164 (0.299).")
+
+        # A small operator-supplied file without a declared reader remains an accessible original.
+        from gx_core.p0 import v6_goal
+        content = b"instrument,reading\nbench,7\n"
+        assets = ArtifactService(s.conn)
+        raw = assets.put(run_id=s.run_id,kind="field_notes",origin="INGEST",media_type="text/csv",
+                         content=content,put_by="public-control").artifact_ref
+        v6_goal.record_observation(s.conn,s.run_id,raw,source="bench-original")
+        nxt = s.next_actor("run")
+        raw_packet = v6_native.brief(s.roots._binding(nxt.thread))
+        note, = [o for o in raw_packet["observations"] if o["artifact_ref"] == raw]
+        self.assertEqual(note["metric_availability"]["schema"],metrics.MISSING)
+        self.assertEqual(note["sha256"],hashlib.sha256(content).hexdigest())
+        self.assertIn("bench,7",str(s.call(nxt,"gx_read_artifact",{"ref":raw},"read-bench")))
+        self.assertEqual(assets.read_bytes(raw),content)

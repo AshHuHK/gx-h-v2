@@ -12,7 +12,7 @@ import uuid
 from .. import metrics
 from ..context import Ctx, Principal
 from ..domain import clock, ids, machines
-from ..errors import ArtifactNotFound, BudgetExceeded, HoldActive, IdempotencyConflict, OutcomeUnknown, PermissionDenied, SchemaInvalid, StaleRevision
+from ..errors import ArtifactNotFound, BudgetExceeded, HoldActive, IdempotencyConflict, IllegalTransition, LeaseExpired, OutcomeUnknown, PermissionDenied, SchemaInvalid, StaleRevision
 from ..hostobs.app_server_client import AppServerDisconnected, AppServerResponseError, AppServerTimeout
 from ..jobs.service import JobService
 from ..orchestration import branches, native_worker, reactor, service
@@ -734,6 +734,14 @@ class Driver:
                                 receipt = self._native_call("task", t["task_id"], lambda n: n.dispatch(t["task_id"]))
                             finally:
                                 metrics.record("p0_dispatch", started=started)
+                    except (IllegalTransition, LeaseExpired):
+                        # The task list predates native I/O. A concurrent Goal edit or new grant can retire
+                        # a decision before claim, or after thread/start but before its first paid turn.
+                        fresh = self.conn.execute("SELECT status,attempt FROM tasks WHERE run_id=? AND task_id=?",
+                                                  (self.rid, t["task_id"])).fetchone()
+                        if fresh and (machines.is_terminal("task", fresh["status"]) or fresh["attempt"] > key[1]):
+                            continue
+                        raise
                     except HoldActive as exc:
                         if t["status"] == "READY":
                             defer_admission(key, getattr(exc, "slot_watch", None))

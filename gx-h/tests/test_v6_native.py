@@ -19,14 +19,15 @@ from gx_core.persistence import store
 
 
 class ScientificLead(unittest.TestCase):
-    def setUp(self):
+    def setUp(self, *, evidence_policy=None):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         directory = Path(temp.name)
         self.enterContext(native_state(directory))
         self.conn = self.enterContext(closing(store.open_store(directory / "gx.db")))
         self.run = cli.start(self.conn, directory, {"project": "isolated-study", "mode": "goal",
-            "objective": "Which observations would distinguish these measurements?", "capabilities": []},
+            "objective": "Which observations would distinguish these measurements?", "capabilities": [],
+            **({"evidence_policy": evidence_policy} if evidence_policy else {})},
             run_key="native-regression")["run_id"]
         self.task = self.conn.execute("SELECT task_id FROM v6_decision_tasks WHERE run_id=?", (self.run,)).fetchone()[0]
         self.enterContext(patch("gx_core.p0.roots.tempfile.gettempdir", return_value=temp.name))

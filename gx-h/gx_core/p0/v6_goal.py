@@ -457,7 +457,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         for f in data["files"]
     ]
     from . import v621_assignment, v621_policy
-    if v621_policy.enabled(conn, rid):
+    current_policy = data["inputs"].get("evidence_policy") == v621_policy.VERSION
+    if current_policy:
         files.extend(v621_assignment.for_lead(conn, rid, goal["goal_version"], cursor))
     observations = []
     refs = [f["artifact_ref"] for f in files]
@@ -504,15 +505,14 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                             content = provider.project(content)
                     facts["observation"] = content
                 except (ArtifactHashMismatch, ArtifactNotFound, OSError, SchemaInvalid) as exc:
-                    from . import v621_policy
-                    if not v621_policy.enabled(conn, rid):
+                    if not current_policy:
                         raise
                     facts["unavailable"] = {"reason": getattr(exc, "code", "IO_ERROR"),
                                             "recovery": "Restore the cited bytes and verify their digest"}
             else:
                 facts.update(read_with="gx_read_artifact", media_type=meta["media_type"], bytes=meta["bytes"])
-            from . import v621_metrics, v621_policy
-            if v621_policy.enabled(conn, rid):
+            from . import v621_metrics
+            if current_policy:
                 if row["kind"] == "v6.node.settled":
                     metrics = v621_metrics.from_output(conn, rid, ref)
                     if metrics:

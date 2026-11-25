@@ -1,0 +1,255 @@
+{
+  "schema": "gx.oauth.interrupted-turn-audit/1",
+  "candidate": "0094e35051410fcd54820362e20b275b56c9b456",
+  "series": "GX-V62C-PUBLIC-COVERAGE-OAUTH-01",
+  "slot": "01",
+  "official_binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+  "model_inference_calls": 0,
+  "live_store_writes": 0,
+  "previous_charge_overwrites": 0,
+  "original_rollout_tail": {
+    "covered_responses": 12,
+    "covered_response_tokens": 333311,
+    "ids_and_usage_sha256": "dd8150616b004970166277165d1a756edba57c1a825e244ff3525212791ca758",
+    "last_response_at": "2026-11-25T22:20:48.481Z",
+    "unmatched_tail": [
+      {
+        "at": "2026-11-25T22:21:00.993Z",
+        "event": "reasoning"
+      },
+      {
+        "at": "2026-11-25T22:21:04.958Z",
+        "event": "unpaired_token_count",
+        "total_tokens": 333311,
+        "repeats_previous": true
+      },
+      {
+        "at": "2026-11-25T22:21:04.975Z",
+        "event": "message"
+      }
+    ],
+    "terminal": {
+      "at": "2026-11-25T22:21:04.990Z",
+      "event": "turn_aborted",
+      "reason": "interrupted"
+    }
+  },
+  "run_id": "gxr_01m8aca38k35b8m45w",
+  "thread_id": "01a214c7-eb06-7611-8fb0-c98d1318bd12",
+  "turn_id": "01a214c7-eb3e-72a2-b642-04c3f0c9c60a",
+  "read_only_ledger_before": [
+    {
+      "thread_id": "01a214c5-1cd6-7003-9b61-3a9833dcf140",
+      "turn_id": "01a214c5-1d0e-7040-9d25-1a56af1057fc",
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "terminal_status": "interrupted",
+      "prior_tokens": 0,
+      "total_tokens": 82502,
+      "measured_tokens": 82502,
+      "estimated_at": null,
+      "reservation_ref": "rsv_01m8aca788dh71af4e"
+    },
+    {
+      "thread_id": "01a214c6-aea8-7e92-b69b-81689db0d506",
+      "turn_id": "01a214c6-aed9-73a2-aa5b-43b4b8d4009c",
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "terminal_status": "completed",
+      "prior_tokens": 0,
+      "total_tokens": 64324,
+      "measured_tokens": 64324,
+      "estimated_at": null,
+      "reservation_ref": "rsv_01m8acdbpm2frwmht5"
+    },
+    {
+      "thread_id": "01a214c6-b39c-79b3-b119-f75b78f628ee",
+      "turn_id": "01a214c6-b3d3-7331-a39e-0029c2eb3dab",
+      "budget_status": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "terminal_status": "interrupted",
+      "prior_tokens": 0,
+      "total_tokens": 98459,
+      "measured_tokens": 98459,
+      "estimated_at": null,
+      "reservation_ref": "rsv_01m8acdcyb98df56v8"
+    },
+    {
+      "thread_id": "01a214c7-eb06-7611-8fb0-c98d1318bd12",
+      "turn_id": "01a214c7-eb3e-72a2-b642-04c3f0c9c60a",
+      "budget_status": "HELD",
+      "confidence": "RESERVED",
+      "terminal_status": null,
+      "prior_tokens": 0,
+      "total_tokens": 333311,
+      "measured_tokens": null,
+      "estimated_at": null,
+      "reservation_ref": "rsv_01m8acftsqq4sskqyh"
+    }
+  ],
+  "gx_provider_response_receipts_equal_original": true,
+  "confirmed_other_turn_tokens": 245285,
+  "acknowledged_response_lower_bound": 578596,
+  "gx_exact_rollout_proof": false,
+  "original_rollout_sha256": "f672d36e40b082e58b2f6e9f77ab0da6dc8bbea23409d56f20deb7a44feecd45",
+  "existing_jobs": 1,
+  "additional_jobs": 0,
+  "additional_debits": 0,
+  "extra_judge_turns": 0,
+  "original_target_status": "PENDING",
+  "exact_slot_usage": null,
+  "invoice_usd": null,
+  "hardened_read_only_reconciliation": {
+    "run_id": "gxr_01m8aca38k35b8m45w",
+    "account": {
+      "state": "INCLUDED_AVAILABLE",
+      "ready": true
+    },
+    "turns": [
+      {
+        "thread": "01a214c5-1cd6-7003-9b61-3a9833dcf140",
+        "turn": "01a214c5-1d0e-7040-9d25-1a56af1057fc",
+        "reservation": "rsv_01m8aca788dh71af4e",
+        "role": "planner",
+        "model": "gpt-6.2-astra",
+        "provider": "openai",
+        "effort": "max",
+        "confidence": "PROVIDER_CONFIRMED",
+        "ledger_state": "SETTLED",
+        "covered_response_count": 5,
+        "covered_response_tokens": 82502,
+        "tokens": 82502,
+        "descendants": [],
+        "reserved_tokens": 32768,
+        "receipt_sha256": "f57337a2483bc20768e84c86dd211b47992e1c8e0155252feb43408792c94e0b"
+      },
+      {
+        "thread": "01a214c6-aea8-7e92-b69b-81689db0d506",
+        "turn": "01a214c6-aed9-73a2-aa5b-43b4b8d4009c",
+        "reservation": "rsv_01m8acdbpm2frwmht5",
+        "role": "planner",
+        "model": "gpt-6.2-astra",
+        "provider": "openai",
+        "effort": "max",
+        "confidence": "PROVIDER_CONFIRMED",
+        "ledger_state": "SETTLED",
+        "covered_response_count": 5,
+        "covered_response_tokens": 64324,
+        "tokens": 64324,
+        "descendants": [],
+        "reserved_tokens": 32768,
+        "receipt_sha256": "96ebd49c6b51718027b121482a063d993c6adae75f08de20220e1ee5e98227a1"
+      },
+      {
+        "thread": "01a214c6-b39c-79b3-b119-f75b78f628ee",
+        "turn": "01a214c6-b3d3-7331-a39e-0029c2eb3dab",
+        "reservation": "rsv_01m8acdcyb98df56v8",
+        "role": "planner",
+        "model": "gpt-6.2-astra",
+        "provider": "openai",
+        "effort": "max",
+        "confidence": "PROVIDER_CONFIRMED",
+        "ledger_state": "SETTLED",
+        "covered_response_count": 5,
+        "covered_response_tokens": 98459,
+        "tokens": 98459,
+        "descendants": [],
+        "reserved_tokens": 32768,
+        "receipt_sha256": "4d7f3e341dccacc286380356f004e94b9ad035858479f0653159e683d7d31c88"
+      },
+      {
+        "thread": "01a214c7-eb06-7611-8fb0-c98d1318bd12",
+        "turn": "01a214c7-eb3e-72a2-b642-04c3f0c9c60a",
+        "reservation": "rsv_01m8acftsqq4sskqyh",
+        "role": "planner",
+        "model": "gpt-6.2-astra",
+        "provider": "openai",
+        "effort": "max",
+        "confidence": "RESERVED",
+        "ledger_state": "HELD",
+        "covered_response_count": 12,
+        "covered_response_tokens": 333311,
+        "tokens": null,
+        "descendants": [],
+        "reserved_tokens": 32768,
+        "receipt_sha256": "5e53fabc12afc6594c84dbf914cac1481a6b7055d79080191723a031b421dbeb"
+      }
+    ],
+    "pending_turns": [
+      {
+        "thread": "01a214c7-eb06-7611-8fb0-c98d1318bd12",
+        "turn": "01a214c7-eb3e-72a2-b642-04c3f0c9c60a",
+        "reservation": "rsv_01m8acftsqq4sskqyh"
+      }
+    ],
+    "unresolved": [
+      {
+        "thread": "01a214c7-eb06-7611-8fb0-c98d1318bd12",
+        "turn": "01a214c7-eb3e-72a2-b642-04c3f0c9c60a",
+        "reservation": "rsv_01m8acftsqq4sskqyh",
+        "reasons": [
+          "UNCONFIRMED_RESPONSE_TAIL"
+        ]
+      }
+    ],
+    "covered_response_count": 27,
+    "covered_response_tokens": 578596,
+    "schema": "gx.v623.oauth-usage/2",
+    "status": "UNKNOWN",
+    "usage_status": "UNKNOWN",
+    "total_tokens": null,
+    "confirmed_tokens": 245285,
+    "can_continue": false,
+    "provider_usd": null,
+    "cost_status": "UNKNOWN",
+    "receipt_sha256": "6f620b14e0cf1b3c7bbc9db6715bc20ee71d7d15376448962260e12524e6ee20"
+  },
+  "signed_off_for_next_slot": false,
+  "audit_checkout_head": "38de91968d725f9207316a8895a978ebc86a8d21",
+  "audit_source_sha256": {
+    "acceptance/v623/oauth/audit_tail.py": "609d698c0f443b55f93fa7dd0f6190bc98600139ca73e22663305a60661deefc",
+    "acceptance/v623/oauth/usage.py": "415be4a0a4bef7cf3ac326ce7155e6866561323f32b43c6a2d51435174c872bc",
+    "gx-h/gx_core/p0/root_delivery.py": "2a20bb3ccb211d07480370a65606cb66ed73b9d28251a1153b70a26203f79a5a",
+    "gx-h/gx_core/p0/metering.py": "cd06ae80996efc6fc08785bf8f27ed6d729b78beb80c9b013b7393fea7f88d63"
+  },
+  "original_accounting_sha256": "809f49a7e2ddfe89e3a7b6a03f31170fd894f5673abeeeba0c684b55dc79f6d4",
+  "official_native_turn_index": {
+    "status": "interrupted",
+    "duration_ms": 289053
+  },
+  "official_thread_usage": {
+    "api": "account/usage/read",
+    "contract": "estimated per thread",
+    "returned_thread_usage": false,
+    "confirmed_invoice": false,
+    "field_names": []
+  },
+  "projected_turns": [
+    {
+      "turn_id": "01a214c7-eb3e-72a2-b642-04c3f0c9c60a",
+      "status": "interrupted"
+    }
+  ],
+  "native_read_rpcs": {
+    "initialize": 1,
+    "config/read": 1,
+    "account/read": 1,
+    "account/usage/read": 1,
+    "thread/read": 1,
+    "thread/turns/list": 1,
+    "thread/items/list": 2
+  },
+  "scratch_owner_result": {
+    "thread_id": "01a214c7-eb06-7611-8fb0-c98d1318bd12",
+    "turn_id": "01a214c7-eb3e-72a2-b642-04c3f0c9c60a",
+    "budget_status": "HELD",
+    "confidence": "RESERVED",
+    "terminal_status": "interrupted",
+    "prior_tokens": 0,
+    "total_tokens": 333311,
+    "measured_tokens": null,
+    "estimated_at": null,
+    "reservation_ref": "rsv_01m8acftsqq4sskqyh"
+  },
+  "original_ledger_unchanged": true
+}

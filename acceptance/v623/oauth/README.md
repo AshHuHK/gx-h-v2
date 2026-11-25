@@ -34,7 +34,7 @@ admission=(--work "$WORK" --approval "$APPROVAL" --approval-sha "$APPROVAL_SHA")
 
 ## 此次登記的結果
 
-四個原格均已登記。01 的 Lead 實際讀取 149/164，時限內沒有提交針對該結果的後續行動。原帳本保留最後一個中斷 turn 的預留。研究中可逐筆核對的供應商回執合計至少 578,596 token；訂閱帳戶查詢沒有最後回應的正式結算。依登記的支出及對帳條件，01 的獨立盲評與 02–04 仍待入場。[四格結果](receipts/first-attempts/index.json) · [第一格原始回執核對](receipts/interrupted-turn.json)
+四個原格均已登記。01 的 Lead 實際讀取 149/164，提出沿用原方法的決策。該請求漏填 `disposition`，GX 回覆需指定已有比較；Lead 核對比較 ID 相符後即達時限，行動未生效。原帳本保留最後一個中斷 turn 的預留。研究中可逐筆核對的供應商回執合計至少 578,596 token；訂閱帳戶查詢沒有最後回應的正式結算。依登記的支出及對帳條件，01 的獨立盲評與 02–04 仍待入場。[四格結果](receipts/first-attempts/index.json) · [第一格原始回執核對](receipts/interrupted-turn.json)
 
 要在原部署確認新的晚到證據，可針對同一格執行下列讀取。腳本複製所需的本機狀態，在暫存副本執行 GX 對帳，並對官方 App Server 做唯讀查詢。正式執行與使用者對話紀錄均保留於原工作目錄及既有宿主。
 

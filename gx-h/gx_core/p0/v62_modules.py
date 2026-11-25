@@ -124,9 +124,21 @@ def _operations(conn, row):
     return operation_receipts(conn, row["run_id"], row["module_instance_id"])
 
 
-def visible_refs(conn, row):
+def visible_refs(conn, row, *, verified_jobs=None):
+    from . import v621_assignment
     refs = list(json.loads(row["grant_json"])["input_refs"])
+    refs.extend(m["artifact_ref"] for m in v621_assignment.for_module(conn, row))
     refs.extend(n["result_ref"] for n in _nodes(conn, row) if n["result_ref"])
+    if verified_jobs is None:
+        # Authority is attached to the collector's frozen task, including after a cold claim.
+        # The grant and the current short task/lease are checked by the native tool owner.
+        context = conn.execute(
+            "SELECT c.snapshot_json FROM v6_decision_tasks d JOIN research_contexts c USING(context_ref) "
+            "WHERE d.run_id=? AND d.scope=? ORDER BY d.rowid DESC LIMIT 1", (row["run_id"], row["scope"])
+        ).fetchone()
+        verified_jobs = json.loads(context[0]).get("verified_jobs", ()) if context else ()
+    for job in verified_jobs:
+        refs.extend(item["artifact_ref"] for item in job.get("outputs", ()))
     for operation in _operations(conn, row):
         refs.extend(operation.get("artifact_refs", []))
     return list(dict.fromkeys(refs))
@@ -136,6 +148,30 @@ def recovery_context(conn, run_id, packet):
     """Rebuild confirmed local tool receipts for a replacement lease without rewriting its original context."""
     module = require_active(conn, run_id, packet["scope"])
     return {**packet, "operations": _operations(conn, module), "evidence_refs": visible_refs(conn, module)}
+
+
+def job_outputs(conn, run_id, node, execution):
+    """Select only the actual, bound scientific publications of this node's sealed Job."""
+    from . import v621_policy, v62_outputs
+
+    if v621_policy.enabled(conn, run_id):
+        actual, _logs = v62_outputs.recorded_outputs(
+            conn, run_id, node["job_id"], record=execution, check_publications=True
+        )
+        if any(item.get("runner_sha256", item["sha256"]) != item["sha256"] for item in actual):
+            raise ArtifactHashMismatch("A published Job output differs from its runner receipt")
+        cards = [{k: item[k] for k in ("output_name", "artifact_ref", "sha256", "kind", "nature")} for item in actual]
+        declarations = {d["name"]: d for d in execution["admission"].get("output_declarations", ())}
+        for item, card in zip(actual, cards):
+            declared = declarations.get(item.get("declaration_name", item["output_name"]), {})
+            if declared.get("metric_specs"):
+                card["metric_ids"] = sorted(declared["metric_specs"])
+    else:
+        cards = [{"artifact_ref": item["artifact_ref"], "sha256": item["sha256"]}
+                 for item in execution["completion"]["outputs"] if item["artifact_ref"] == node["result_ref"]]
+    if not any(item["artifact_ref"] == node["result_ref"] for item in cards):
+        raise StaleRevision("The completed module Job has no bound primary result")
+    return cards
 
 
 def _verified_jobs(conn, module, nodes):
@@ -150,12 +186,12 @@ def _verified_jobs(conn, module, nodes):
         job_id, ref = node["job_id"], node["result_ref"]
         evidence = manifest.read_manifest(conn, job_id)
         identity = v6_jobs.confirmed_result_identity(conn, node["node_id"], evidence, verify_inputs=True)
-        output = next((r for r in evidence["completion"]["outputs"] if r["artifact_ref"] == ref), None)
-        if output is None:
-            raise StaleRevision("The completed module Job has no bound result")
-        checked = artifacts.verify(ref)
-        if not checked["ok"] or checked["observed_sha256"] != output["sha256"]:
-            raise StaleRevision("An artifact in a confirmed module Job changed")
+        outputs = job_outputs(conn, module["run_id"], node, evidence)
+        for output in outputs:
+            checked = artifacts.verify(output["artifact_ref"])
+            if not checked["ok"] or checked["observed_sha256"] != output["sha256"]:
+                raise StaleRevision("An artifact in a confirmed module Job changed")
+        primary = next(item for item in outputs if item["artifact_ref"] == ref)
         manifest.require_current(conn, job_id)
         proofs.append(
             dict(
@@ -163,7 +199,8 @@ def _verified_jobs(conn, module, nodes):
                 job_id=job_id,
                 **identity,
                 artifact_ref=ref,
-                output_sha256=output["sha256"],
+                output_sha256=primary["sha256"],
+                **({"outputs": outputs} if "output_name" in primary else {}),
                 admission_sha256=evidence["admission_hash"],
                 completion_sha256=evidence["manifest_hash"],
             )
@@ -180,7 +217,8 @@ def _task(conn, row):
     ).fetchone()
 
 
-def _brief(conn, row, nodes):
+def _brief(conn, row, nodes, proofs):
+    from . import v621_assignment
     grant, snapshot = (json.loads(row[k]) for k in ("grant_json", "snapshot_json"))
     fields = (
         "module_instance_id",
@@ -213,7 +251,8 @@ def _brief(conn, row, nodes):
         "expected_delivery": row["expected_delivery"],
         "allowed_tools": grant["tools"],
         "allowed_method_ids": grant["capabilities"],
-        "materials": [{k: v for k, v in item.items() if k != "publication"} for item in snapshot["materials"]],
+        "materials": [{k: v for k, v in item.items() if k != "publication"} for item in
+                      [*snapshot["materials"], *v621_assignment.for_module(conn, row)]],
         **({"catalog_access": grant["catalog_access"]} if "catalog_access" in grant else {}),
         "capabilities": snapshot["capabilities"],
         "budget": {k: funds[k] for k in ("limits", "spent", "reserved", "available")},
@@ -224,7 +263,7 @@ def _brief(conn, row, nodes):
         **({"target_claim_refs": grant["target_claim_refs"]} if grant.get("target_claim_refs") else {}),
         "operations": operations,
         "observations": [n for n in nodes if n["result_ref"]],
-        "evidence_refs": visible_refs(conn, row),
+        "evidence_refs": visible_refs(conn, row, verified_jobs=proofs),
     }
 
 
@@ -238,7 +277,7 @@ def _new_task(tx, row, *, previous=None, verified_nodes=None, proofs=()):
         return None
     if verified_nodes is not None and verified_nodes != nodes:
         return None
-    brief = _brief(tx, row, nodes)
+    brief = _brief(tx, row, nodes, proofs)
     brief["verified_jobs"] = list(proofs)
     cursor = tx.execute("SELECT coalesce(max(event_id),0) FROM events WHERE run_id=?", (rid,)).fetchone()[0]
     key = "v62.task:" + ids.sha256_of_obj([row["module_instance_id"], previous])
@@ -385,7 +424,7 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
 
 
 def commit_open(conn, plan):
-    from . import v62_budget, v62_rounds
+    from . import v62_budget, v62_rounds, v621_goal_scope
 
     if isinstance(plan, dict):
         return plan
@@ -400,16 +439,19 @@ def commit_open(conn, plan):
         if parent["context_ref"] != plan.context_ref:
             raise StaleRevision("The delegating context changed")
         _assert_sources(tx, rid, plan.goal_version, plan.grant, plan.snapshot)
+        version = v621_goal_scope.active(tx, rid)
         if (
             tx.execute(
-                "SELECT count(*) FROM v62_modules WHERE run_id=? AND status='OPEN'", (rid,)
+                "SELECT count(*) FROM v62_modules WHERE run_id=? AND status='OPEN' "
+                "AND (? IS NULL OR goal_version=?)", (rid, version, version)
             ).fetchone()[0]
             >= plan.policy["max_parallel"]
         ):
             raise BudgetExceeded("The maximum concurrent module count was reached")
         latest = tx.execute(
-            "SELECT round,parent_task_id FROM v62_modules WHERE run_id=? ORDER BY round DESC LIMIT 1",
-            (rid,),
+            "SELECT round,parent_task_id FROM v62_modules WHERE run_id=? AND (? IS NULL OR goal_version=?) "
+            "ORDER BY round DESC LIMIT 1",
+            (rid, version, version),
         ).fetchone()
         if latest and (p["round"] < latest["round"] or
                        (p["round"] == latest["round"] and ident["task_id"] != latest["parent_task_id"])):
@@ -489,7 +531,7 @@ def open_module(conn, **native):
 
 
 def _end(tx, row, status, reason):
-    from . import v62_budget, v62_reports
+    from . import v62_budget, v62_reports, v621_policy
 
     if row["status"] != "OPEN":
         return False
@@ -518,6 +560,7 @@ def _end(tx, row, status, reason):
             "module_instance_id": instance,
             "scope": "run",
             "module_scope": row["scope"],
+            **({"goal_version": row["goal_version"]} if v621_policy.enabled(tx, rid) else {}),
             "reason": reason,
         },
     )

@@ -193,7 +193,8 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         if previous not in visible or not prior or (task['scope'] != 'run' and prior['decision_scope'] != task['scope']):
             raise ScopeDenied('previous claim is absent or outside the decision scope')
     rendered, metrics = {}, []
-    if enriched and v621_policy.enabled(conn, run_id):
+    governed = v621_policy.enabled(conn, run_id)
+    if governed:
         from . import v621_metrics
         text_fields = {key: payload[key] for key in ('statement', 'scope', 'criteria', 'limitations', 'rationale')}
         # A condition already frozen before this reading is a criterion, not a newly claimed result.
@@ -206,7 +207,8 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         if enriched:
             proposed = {**payload, **rendered, 'decision_scope': task['scope']}
             proposed['maturity_lineage'] = v62_maturity.continuing_lineage(proposed, prior)
-            usable = any(v62_maturity.qualified_ground(s, proposed) for s in sources)
+            usable = any(v62_maturity.qualified_ground(s, proposed, require_acquisition=governed)
+                         for s in sources)
         else:
             usable = any(s['source_class'] in ('computed_result', 'supplied_measurement', 'retrospective_evaluation')
                          for s in sources)
@@ -266,7 +268,14 @@ def set_publication(claim, *, proposed_level, proposal_ref):
     judgment = claim["maturity"]
     direction = judgment["direction"]
     allowed = ["open", "insufficient"]
-    if direction == "supported":
+    reg = judgment["registration"]
+    measured = {digest for result in judgment["results"] for digest in result["matched_data_sha256"]}
+    pending = [pin["artifact_ref"] for pin in reg["data"] if pin["sha256"] not in measured] if reg else []
+    partial_readings = bool(judgment["results"] and pending)
+    if partial_readings:
+        if direction in ("opposed", "mixed"):
+            allowed.append("contested")
+    elif direction == "supported":
         allowed.append("limited_support")
     elif direction == "opposed":
         allowed.append("contested")
@@ -278,10 +287,11 @@ def set_publication(claim, *, proposed_level, proposal_ref):
 
     if proposed_level in allowed:
         published = proposed_level
+    elif partial_readings:
+        published = "insufficient"
     else:
         published = {"undetermined": "insufficient", "opposed": "contested",
                      "mixed": "mixed", "supported": "open"}[direction]
-    reg = judgment["registration"]
     publication = {
         "policy": "gx.claim-publication/1",
         "proposed_level": proposed_level, "proposal_ref": proposal_ref,
@@ -289,9 +299,11 @@ def set_publication(claim, *, proposed_level, proposal_ref):
         "claim_revision_id": claim["claim_revision_id"], "scope": claim["scope"],
         "assessment_cursor": claim["assessment_cursor"], "admissible_levels": allowed,
         "supporting_refs": judgment["supporting_refs"], "opposing_refs": judgment["opposing_refs"],
-        "registration_event_id": reg["event_id"] if reg else None,
+        "registration_event_id": reg["event_id"] if reg else None, "unmeasured_data_refs": pending,
         "reasons": list(judgment["reasons"]),
     }
+    if partial_readings:
+        publication["reasons"].append("The observed direction covers only a subset of the registered materials.")
     if proposed_level != published:
         publication["reasons"].append(
             f"The proposed {proposed_level} exceeds the {direction} evidence for this proposition, "
@@ -303,8 +315,7 @@ def set_publication(claim, *, proposed_level, proposal_ref):
     claim["rationale"] = " ".join(publication["reasons"])
     claim["science"] = {**claim["science"], "level": published, "level_source": publication["policy"],
                         "direction": direction, "claim_revision_id": claim["claim_revision_id"]}
-    if claim.get("metrics"):
-        claim["science"]["metric_refs"] = [metric["metric_ref"] for metric in claim["metrics"]]
+
 
 def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
     """Called in the same CAS transaction as the accepted decision and outbox."""
@@ -345,13 +356,14 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
                            subject_id=hid, prev_revision=parent, new_revision=revision,
                            payload={'decision_ref': decision_ref, 'claim_revision_id': receipt['claim_revision_id'],
                                     'claim_ref': ref, 'evidence_refs': claim['evidence_refs']})
+        if 'metrics' in draft:
+            receipt['metrics'] = draft['metrics']
+            science['metric_refs'] = [metric['metric_ref'] for metric in draft['metrics']]
         if v62_maturity.enrolled(conn, run_id):
             receipt['science']['level_source'] = 'lead_proposal'
             v62_maturity.attach(conn, run_id, receipt, previous, draft.get('prediction_data'),
                                 draft.get('prediction_method'), event_id)
             if v621_policy.enabled(conn, run_id):
-                if 'metrics' in draft:
-                    receipt['metrics'] = draft['metrics']
                 set_publication(receipt, proposed_level=claim['level'], proposal_ref=ref)
         conn.execute('INSERT INTO hypothesis_revisions (hypothesis_id,revision,parent_revision,document_json,sha256,'
                      'author_principal,author_task_id,proposal_id,created_at) VALUES (?,?,?,?,?,?,?,?,?)',

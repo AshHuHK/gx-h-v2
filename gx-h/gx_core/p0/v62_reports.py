@@ -66,6 +66,7 @@ def _replay(conn, mid, key, sha, identity):
 
 def _module_evidence(conn, module):
     """Index confirmed tool reads and Job outputs. A grant by itself is insufficient to cite a source."""
+    from .v62_modules import job_outputs
     from .v62_native import operation_receipts
     rid = module["run_id"]
     proofs = {}
@@ -84,12 +85,12 @@ def _module_evidence(conn, module):
         if not end or end["status"] != "SUCCEEDED":
             continue
         identity = v6_jobs.confirmed_result_identity(conn, row["node_id"], manifest)
-        for output in end["outputs"]:
-            if output["artifact_ref"] == row["result_ref"]:
-                proofs.setdefault(row["result_ref"], []).append(dict(
-                    node_id=row["node_id"], job_id=row["job_id"], **identity,
-                    output_sha256=output["sha256"], admission_sha256=manifest["admission_hash"],
-                    manifest_sha256=manifest["manifest_hash"]))
+        for output in job_outputs(conn, rid, row, manifest):
+            proofs.setdefault(output["artifact_ref"], []).append(dict(
+                node_id=row["node_id"], job_id=row["job_id"], **identity,
+                **{k: output[k] for k in ("output_name", "nature") if k in output},
+                output_sha256=output["sha256"], admission_sha256=manifest["admission_hash"],
+                manifest_sha256=manifest["manifest_hash"]))
     return proofs
 
 
@@ -198,11 +199,13 @@ def _wake(conn, module, key, reason, rows):
     saved = conn.execute("SELECT event_id FROM v62_module_wakes WHERE run_id=? AND wake_key=?", (rid, key)).fetchone()
     if saved:
         return saved[0]
+    from . import v621_policy
+    origin = {"goal_version": module["goal_version"]} if v621_policy.enabled(conn, rid) else {}
     reports = [r["report_ref"] for r in rows]
     mids = [r["module_instance_id"] for r in rows]
     event = store.append_event(conn, run_id=rid, kind="v62.module.wake", actor="GX",
         subject_kind="run", subject_id=rid, evidence_level="EXECUTION_OBSERVED",
-        payload={"scope": "run", "round": number, "wake_key": key, "reason": reason, "report_refs": reports,
+        payload={**origin, "scope": "run", "round": number, "wake_key": key, "reason": reason, "report_refs": reports,
                  "module_instance_ids": mids})
     conn.execute("INSERT INTO v62_module_wakes(run_id,wake_key,round,event_id) VALUES(?,?,?,?)",
                  (rid, key, number, event))
@@ -211,7 +214,7 @@ def _wake(conn, module, key, reason, rows):
 
 def release_parent_rounds(conn, run_id, task_id):
     """Accepting or retiring the opening Lead seals membership in its rounds."""
-    rounds = conn.execute("SELECT DISTINCT run_id,round FROM v62_modules WHERE run_id=? AND parent_task_id=?",
+    rounds = conn.execute("SELECT DISTINCT run_id,goal_version,round FROM v62_modules WHERE run_id=? AND parent_task_id=?",
                           (run_id, task_id)).fetchall()
     for member in rounds:
         release_round(conn, member)
@@ -220,14 +223,18 @@ def release_parent_rounds(conn, run_id, task_id):
 def reconcile_rounds(conn, run_id):
     """Recover unpublished reports when a delegating task terminated by another path."""
     active = ",".join("?" for _ in v6_goal.ACTIVE_TASKS)
-    rounds = conn.execute(f"""SELECT DISTINCT m.run_id,m.round FROM v62_module_reports r
+    from . import v621_policy
+    scoped = v621_policy.enabled(conn, run_id)
+    rounds = conn.execute(f"""SELECT DISTINCT m.run_id,m.goal_version,m.round FROM v62_module_reports r
         JOIN v62_modules m USING(run_id,module_instance_id) JOIN tasks t ON t.task_id=m.parent_task_id
         WHERE m.run_id=? AND t.status NOT IN ({active})
         AND NOT EXISTS(SELECT 1 FROM v62_modules peer
-                        WHERE peer.run_id=m.run_id AND peer.round=m.round AND peer.status='OPEN')
+                        WHERE peer.run_id=m.run_id AND peer.round=m.round AND peer.status='OPEN'
+                          AND (NOT ? OR peer.goal_version=m.goal_version))
         AND NOT EXISTS(SELECT 1 FROM v62_module_wakes w WHERE w.run_id=m.run_id AND
-                       w.wake_key IN ('round:'||m.round,'early:'||m.module_instance_id))""",
-                          (run_id, *v6_goal.ACTIVE_TASKS)).fetchall()
+                       (w.wake_key='early:'||m.module_instance_id OR w.wake_key=
+                        CASE WHEN ? AND m.goal_version>1 THEN 'goal:'||m.goal_version||':round:'||m.round
+                             ELSE 'round:'||m.round END))""", (run_id, *v6_goal.ACTIVE_TASKS, scoped, scoped)).fetchall()
     if not rounds:
         return False
     changed = False
@@ -241,22 +248,27 @@ def release_round(conn, module, *, publishing=None):
     """Called under the publication/cancellation transaction once a member changes status."""
     if not conn.in_transaction:
         raise RuntimeError("Release the round in the member's state-change transaction")
+    from . import v621_policy
     rid, number = module["run_id"], module["round"]
+    version = module["goal_version"] if v621_policy.enabled(conn, rid) else None
     # The Lead may be about to delegate another member of this round. Its durable task
     # yields membership with its decision even across native reconnects or GX restart.
     active = ",".join("?" for _ in v6_goal.ACTIVE_TASKS)
     if conn.execute(f"""SELECT 1 FROM v62_modules m JOIN tasks t ON t.task_id=m.parent_task_id
-                    WHERE m.run_id=? AND m.round=? AND (m.status='OPEN' OR t.status IN ({active})) LIMIT 1""",
-                    (rid, number, *v6_goal.ACTIVE_TASKS)).fetchone():
+                    WHERE m.run_id=? AND m.round=? AND (? IS NULL OR m.goal_version=?)
+                      AND (m.status='OPEN' OR t.status IN ({active})) LIMIT 1""",
+                    (rid, number, version, version, *v6_goal.ACTIVE_TASKS)).fetchone():
         return None
     released = _released(conn, rid, number)
     rows = conn.execute("SELECT r.module_instance_id,r.report_ref FROM v62_module_reports r "
                         "JOIN v62_modules m USING(module_instance_id,run_id) "
-                        "WHERE m.run_id=? AND m.round=? ORDER BY r.rowid", (rid, number))
+                        "WHERE m.run_id=? AND m.round=? AND (? IS NULL OR m.goal_version=?) ORDER BY r.rowid",
+                        (rid, number, version, version))
     undisclosed = [r for r in rows if r["module_instance_id"] not in released]
     if publishing:
         undisclosed.append(publishing)
-    return _wake(conn, module, f"round:{number}", "round_complete", undisclosed)
+    key = f"goal:{version}:round:{number}" if version and version > 1 else f"round:{number}"
+    return _wake(conn, module, key, "round_complete", undisclosed)
 
 
 def _early_reason(module, bundle):
@@ -437,6 +449,8 @@ def _preview(bundle, index, limit):
     base = _base(bundle, index["report_ref"])
     full = {**base, **{k: bundle[k] for k in ("findings", "gaps", "next_steps", "artifact_refs")},
             "truncated": False}
+    if bundle.get("metrics"):
+        full["metrics"] = bundle["metrics"]
     if index.get("counterevidence"):
         full["counterevidence"] = index["counterevidence"]
     if _size(full) <= limit:
@@ -450,6 +464,15 @@ def _preview(bundle, index, limit):
         room = limit - _size(preview) + _size(counter)
         if not _fit_string(counter, "text", text, room):
             return None
+    if bundle.get("metrics"):
+        preview["metrics"] = []
+        for metric in bundle["metrics"]:
+            preview["metrics"].append(metric)
+            if _size(preview) > limit:
+                preview["metrics"].pop()
+                break
+        if not preview["metrics"]:
+            del preview["metrics"]
     for key, value in base.items():
         if key not in preview:
             preview[key] = value
@@ -482,8 +505,11 @@ def _preview(bundle, index, limit):
 
 def _released_rows(conn, rid, through_cursor):
     visible = _released(conn, rid, through_cursor=through_cursor)
-    rows = conn.execute("SELECT module_instance_id,report_ref,receipt_json FROM v62_module_reports WHERE run_id=? ORDER BY rowid",
-                        (rid,))
+    from . import v621_goal_scope
+    version = v621_goal_scope.active(conn, rid)
+    rows = conn.execute("""SELECT r.module_instance_id,r.report_ref,r.receipt_json FROM v62_module_reports r
+        JOIN v62_modules m USING(module_instance_id,run_id) WHERE r.run_id=? AND (? IS NULL OR m.goal_version=?)
+        ORDER BY r.rowid""", (rid, version, version))
     return [row for row in rows if row["module_instance_id"] in visible]
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 
+from .. import contracts
 from ..artifacts import ArtifactService
 from ..capabilities import manifest as capabilities
 from ..domain import ids
@@ -12,6 +13,9 @@ from ..persistence import store
 from . import manifest
 
 
+OUTPUT_NATURES = frozenset(contracts.label_values("output_nature"))
+PREDICTION_TARGET_NATURE = {"experimental_observation": "observed", "analysis": "analysis",
+                            "model_prediction": "model_prediction"}
 AXES = ("data", "acquisition", "sample", "source", "publication", "processing", "sampling")
 FIXTURES = {"synthetic_observation", "test_fixture"}
 UNKNOWN = {"unknown", "unspecified", "n/a", "not available", "not recorded"}
@@ -76,13 +80,14 @@ def _publication(conn, run_id, ref):
     return row
 
 
-def recorded_outputs(conn, run_id, job_id, *, check_publications=False):
+def recorded_outputs(conn, run_id, job_id, *, check_publications=False, record=None):
     """Read the terminal scientific publications and logs from the sealed execution receipt."""
-    record = manifest.read_manifest(conn, job_id, missing_ok=True)
+    if record is None:
+        record = manifest.read_manifest(conn, job_id, missing_ok=True)
     if not record:
         return None
     admission, completed = record["admission"], record["completion"]
-    if admission["run_id"] != run_id:
+    if admission["run_id"] != run_id or record["job_id"] != job_id:
         raise ScopeDenied("Output inventory is outside the selected run")
     if not completed or completed["status"] != "SUCCEEDED":
         return None
@@ -137,7 +142,7 @@ def _known_derivative_or_fixture(conn, digest, cursor):
 
 def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run"):
     """The trusted observation ingress binds source-owner metadata to exact ingested bytes."""
-    if not isinstance(acquisition, dict) or acquisition.keys() - {*AXES, "data_refs", "applicability"}:
+    if not isinstance(acquisition, dict) or acquisition.keys() - {*AXES, "data_refs", "applicability", "derived_from"}:
         raise SchemaInvalid("Acquisition describes data, acquisition, sample, source, publication, processing, "
                             "sampling, applicability and data_refs")
     pub = _publication(conn, run_id, artifact_ref)
@@ -177,6 +182,29 @@ def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run")
     applicability = acquisition.get("applicability")
     if applicability is not None and (not isinstance(applicability, str) or not applicability.strip()):
         raise SchemaInvalid("Acquisition applicability must identify the scientific scope")
+    derived = acquisition.get("derived_from", [])
+    if not isinstance(derived, list) or ("derived_from" in acquisition and not derived):
+        raise SchemaInvalid("derived_from must identify immutable parent data")
+    if derived and not deps["processing"]:
+        raise SchemaInvalid("A derived material requires a processing or transformation identifier")
+    pinned_parents = []
+    for parent in derived:
+        if (not isinstance(parent, dict) or set(parent) != {"artifact_ref", "sha256"}
+                or not isinstance(parent["artifact_ref"], str) or not isinstance(parent["sha256"], str)):
+            raise SchemaInvalid("Each derived parent requires an artifact_ref and SHA-256")
+        parent_info = classify(conn, run_id, parent["artifact_ref"], scope=scope)
+        if (parent_info["sha256"] != parent["sha256"] or parent["sha256"] == pub["sha256"]
+                or parent_info["record_kind"] not in {"supplied_observation", "derived_input"}
+                or not parent_info["original_observations"]):
+            raise SchemaInvalid("A derived parent must identify a distinct acquired input in the same scope")
+        pinned_parents.append(_pin(parent["artifact_ref"], parent["sha256"]))
+    if not derived and conn.execute(
+        "SELECT 1 FROM events WHERE kind='v6.observation.added' AND json_extract(payload_json,'$.sha256')=? "
+        "AND json_type(payload_json,'$.acquisition.derived_from')='array' LIMIT 1", (pub["sha256"],)
+    ).fetchone():
+        raise SchemaInvalid("Previously registered derived bytes cannot become a new original observation")
+    if len(_unique_pins(pinned_parents)) != len(pinned_parents):
+        raise SchemaInvalid("Derived source pins must be distinct")
     refs = acquisition.get("data_refs", [])
     if (not isinstance(refs, list) or not all(isinstance(r, str) and r for r in refs)
             or len(refs) != len(set(refs)) or artifact_ref in refs):
@@ -197,7 +225,8 @@ def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run")
         inputs.append(_pin(ref, source["sha256"]))
     return {"schema": "gx.acquisition/1", **_pin(artifact_ref, pub["sha256"]), "dependencies": deps,
             "unknown_dependencies": unknown, "applicability": applicability, "measurement_schema": measurement_schema,
-            "data_refs": _unique_pins(inputs)}
+            "data_refs": _unique_pins(inputs),
+            **({"schema": "gx.acquisition/2", "derived_from": _unique_pins(pinned_parents)} if derived else {})}
 
 
 def _base(conn, ref, pub):
@@ -223,7 +252,7 @@ def _observation(conn, run, ref, pub, scope, cursor, result, read):
     for row in records:
         event = json.loads(row["payload_json"])
         receipt = event["acquisition"]
-        if (receipt.get("schema") != "gx.acquisition/1" or receipt.get("artifact_ref") != ref
+        if (receipt.get("schema") not in {"gx.acquisition/1", "gx.acquisition/2"} or receipt.get("artifact_ref") != ref
                 or event["sha256"] != pub["sha256"] or receipt.get("sha256") != pub["sha256"]):
             raise SchemaInvalid("Acquisition receipt identifies different measurement bytes")
         versions.setdefault(ids.sha256_of_obj(receipt), (row["event_id"], receipt))
@@ -235,21 +264,27 @@ def _observation(conn, run, ref, pub, scope, cursor, result, read):
     (event_id, receipt), = versions.values()
     deps = {k: set(v) for k, v in receipt["dependencies"].items()}
     deps["data"].add("sha256:" + pub["sha256"])
-    sources = [_pin(ref, pub["sha256"])]
+    derived = receipt.get("derived_from", [])
+    sources = [] if derived else [_pin(ref, pub["sha256"])]
     upstream, scopes = set(), set()
     unknown = set(receipt["unknown_dependencies"])
     complete = not unknown and bool(receipt["applicability"])
     if receipt["applicability"]:
         scopes.add(receipt["applicability"])
-    data_refs = list(receipt["data_refs"])
-    for pin in receipt["data_refs"]:
+    parents = _unique_pins([*receipt["data_refs"], *derived])
+    derived_refs = {pin["artifact_ref"] for pin in derived}
+    originals_grounded = True
+    data_refs = list(parents)
+    for pin in parents:
         # An acquisition can reference an earlier sampled material, e.g. an
         # aliquot of the same specimen. Keep that lineage as recorded at supply.
         source = read(pin["artifact_ref"], event_id - 1)
+        if pin["artifact_ref"] in derived_refs:
+            originals_grounded = originals_grounded and source.get("original_inputs_grounded", False)
         if source["sha256"] != pin["sha256"]:
             raise SchemaInvalid("Applicable data differ from the acquisition receipt")
         deps["data"].add("sha256:" + pin["sha256"])
-        if source["record_kind"] == "supplied_observation":
+        if source["record_kind"] in {"supplied_observation", "derived_input"}:
             for axis in AXES:
                 deps[axis].update(source["dependencies"][axis])
             sources.extend(source["original_observations"])
@@ -261,14 +296,18 @@ def _observation(conn, run, ref, pub, scope, cursor, result, read):
         elif source["record_kind"] in {"test_fixture", "conflicting_acquisition"}:
             complete = False
             unknown.update(AXES)
-    result.update(nature="observed", record_kind="supplied_observation",
+    if "original_inputs_grounded" in result:
+        result["original_inputs_grounded"] = originals_grounded
+    result.update(nature="analysis" if derived else "observed",
+                  record_kind="derived_input" if derived else "supplied_observation",
                   dependencies={k: sorted(v) for k, v in deps.items()},
                   measurement_schema=receipt.get("measurement_schema"),
                   unknown_dependencies=sorted(unknown), data_refs=_unique_pins(data_refs),
                   applicability_scopes=sorted(scopes), upstream_natures=sorted(upstream),
                   original_observations=_unique_pins(sources),
                   independence_complete=complete and len(scopes) == 1,
-                  reason="Verified operator acquisition receipt on the original ingested bytes")
+                  reason=("Versioned transformation of acquired input bytes" if derived else
+                          "Verified operator acquisition receipt on the original ingested bytes"))
 
 
 def classify(conn, run_id, artifact_ref, *, scope="run", through_event=None):
@@ -277,8 +316,11 @@ def classify(conn, run_id, artifact_ref, *, scope="run", through_event=None):
     latest = conn.execute("SELECT COALESCE(MAX(event_id),0) FROM events").fetchone()[0]
     cache = {}
 
-    def read(ref, cursor):
-        key = (ref, cursor)
+    from . import v621_policy
+    frozen_scope = v621_policy.enabled(conn, run_id)
+
+    def read(ref, cursor, source_scope=scope):
+        key = (ref, cursor, source_scope)
         if key in cache:
             return cache[key]
         pub = _publication(conn, run_id, ref)
@@ -286,10 +328,19 @@ def classify(conn, run_id, artifact_ref, *, scope="run", through_event=None):
             raise ScopeDenied("Artifact publication falls after the frozen context")
         _verify(assets, ref, pub["sha256"])
         result = _base(conn, ref, pub)
+        if frozen_scope:
+            result["original_inputs_grounded"] = False
         if not pub["job_id"]:
-            _observation(conn, run_id, ref, pub, scope, cursor, result, read)
+            _observation(conn, run_id, ref, pub, source_scope, cursor, result,
+                         lambda parent, at: read(parent, at, source_scope))
         elif record := manifest.read_manifest(conn, pub["job_id"], missing_ok=True):
-            _classify_job(conn, run_id, pub, ref, record, result, read)
+            # Consumption of a report in another scope cannot add a sibling's acquisition
+            # to the Job. Rebuild its input provenance using its actual admission owner.
+            producer_scope = source_scope
+            if frozen_scope:
+                producer_scope = record["admission"]["owner"].get("branch_id") or "run"
+            _classify_job(conn, run_id, pub, ref, record, result,
+                          lambda parent, at: read(parent, at, producer_scope))
         cache[key] = result
         return result
 
@@ -357,6 +408,12 @@ def _classify_job(conn, run_id, pub, ref, record, result, read):
         unknown.add("source")
     if fixture or any(p["record_kind"] == "test_fixture" for p in parents):
         result["record_kind"] = "test_fixture"
+    if "original_inputs_grounded" in result:
+        result["original_inputs_grounded"] = (
+            bool(parents) and all(p["original_inputs_grounded"] for p in parents)
+            and result["record_kind"] != "test_fixture"
+            and nature in {"analysis", "observed"} and "model_prediction" not in upstream
+        )
     scopes = {s for p in parents for s in p["applicability_scopes"]}
     result.update(dependencies={k: sorted(v) for k, v in deps.items()}, unknown_dependencies=sorted(unknown),
                   original_observations=_unique_pins(sources), upstream_natures=sorted(upstream),
@@ -369,7 +426,8 @@ def _classify_job(conn, run_id, pub, ref, record, result, read):
                   reason="Verified output bytes, prospective OutputDecl and admitted source inputs")
 
 
-def ingest_measurement(conn, run_id, *, source, scope, path, metadata_path, actor):
+def ingest_measurement(conn, run_id, *, source, scope, path, metadata_path, actor, artifact_ref=None,
+                       expected_sha256=None, media_type="application/json"):
     """Local operator ingress used by gx-p0 observe, including after prospective registration."""
     from ..orchestration import service
     from . import v6_goal
@@ -386,15 +444,27 @@ def ingest_measurement(conn, run_id, *, source, scope, path, metadata_path, acto
 
     if not conn.execute("SELECT 1 FROM v6_goals WHERE run_id=? AND status='OPEN'", (run_id,)).fetchone():
         raise SchemaInvalid("Observations require an open research Goal")
-    raw = supplied(path)
     acquisition = json.loads(supplied(metadata_path))
+    scope = scope.removeprefix("branch:")
+    if artifact_ref:
+        if path or not expected_sha256:
+            raise SchemaInvalid("Register existing bytes using their artifact reference and expected SHA-256")
+        if ArtifactService(conn).describe(artifact_ref)["sha256"] != expected_sha256:
+            raise SchemaInvalid("Expected SHA-256 differs from the supplied artifact pin")
+        return v6_goal.record_observation(conn, run_id, artifact_ref, source=source, scope=scope, acquisition=acquisition)
+    media_suffix = {"application/json": "json", "chemical/x-mmcif": "cif", "text/plain": "txt"}
+    if media_type not in media_suffix:
+        raise SchemaInvalid("Unsupported observation media type")
+    raw = supplied(path)
     digest = hashlib.sha256(raw).hexdigest()
+    if expected_sha256 is not None and expected_sha256 != digest:
+        raise SchemaInvalid("Supplied bytes differ from the expected SHA-256")
     original_key = ids.sha256_of_obj([scope.removeprefix("branch:"), source, digest])
     with store.transaction(conn, transaction_owner="GoalObservation", operation="ingest", run_id=run_id):
         assets = ArtifactService(conn)
-        original = assets.publish_bytes(namespace=f"{run_id}/acquisitions", rel_path=f"{original_key}.json",
+        original = assets.publish_bytes(namespace=f"{run_id}/acquisitions", rel_path=f"{original_key}.{media_suffix[media_type]}",
                                         kind="instrument_measurement", run_id=run_id, data=raw,
-                                        expected_sha256=digest, media_type="application/json", origin="INGEST", actor=actor)
+                                        expected_sha256=digest, media_type=media_type, origin="INGEST", actor=actor)
         assets.discard_on_rollback(original)
         return v6_goal.record_observation(conn, run_id, original.artifact_ref, source=source,
                                           scope=scope.removeprefix("branch:"), acquisition=acquisition)

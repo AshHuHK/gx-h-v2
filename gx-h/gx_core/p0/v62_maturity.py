@@ -12,12 +12,13 @@ from ..artifacts.service import ArtifactService
 from ..domain import clock, ids
 from ..errors import SchemaInvalid, ScopeDenied
 from ..persistence import store
+from .v62_outputs import PREDICTION_TARGET_NATURE
 
 
 VERSION = "gx.research.v6.2b.1"
 RULE = "gx.claim-maturity/1"
 COMPARISONS = {"lt": operator.lt, "le": operator.le, "gt": operator.gt, "ge": operator.ge, "eq": operator.eq}
-NATURE = {"experimental_observation": "observed", "analysis": "analysis", "model_prediction": "model_prediction"}
+NATURE = PREDICTION_TARGET_NATURE
 DEPENDENCIES = ("data", "acquisition", "sample", "source", "publication", "processing", "sampling")
 
 
@@ -134,7 +135,7 @@ def annotate(conn, run, fact, scope, cursor):
     return fact
 
 
-def qualified_ground(fact, claim):
+def qualified_ground(fact, claim, *, require_acquisition=False):
     if fact.get("source_class") == "reviewed_source_evidence":
         target = fact.get("target_claim_ref")
         same_proposition = target in claim.get("maturity_lineage", []) if target else fact.get("claim") == claim["statement"]
@@ -142,8 +143,11 @@ def qualified_ground(fact, claim):
                 and fact.get("direction") in ("supports", "opposes")
                 and fact.get("applicability") == claim["scope"])
     kind = fact.get("record_nature")
+    if (require_acquisition and kind in ("observed", "analysis")
+            and not fact.get("output_provenance", {}).get("original_inputs_grounded")):
+        return False
     scopes = set(fact.get("output_provenance", {}).get("applicability_scopes", ()))
-    if scopes and scopes != {claim["scope"]}:
+    if (scopes or require_acquisition and kind in ("observed", "analysis")) and scopes != {claim["scope"]}:
         return False
     target = claim.get("prediction", {}).get("target")
     if kind in ("observed", "analysis") and "model_prediction" in fact.get("output_provenance", {}).get("upstream_natures", []):
@@ -363,7 +367,7 @@ def _failure_matches(conn, item, data):
     return False
 
 
-def _results(conn, run, claim, reg, through):
+def _results(conn, run, claim, reg, through, *, require_acquisition=False):
     from . import v62_outputs
     pred = reg["prediction"]
     data = {p["sha256"] for p in reg["data"]}
@@ -407,11 +411,15 @@ def _results(conn, run, claim, reg, through):
         exclusion = None
         if fact.get("record_kind") == "test_fixture":
             exclusion = "test_fixture"
+        elif (require_acquisition and fact["nature"] in ("observed", "analysis")
+              and not fact.get("original_inputs_grounded")):
+            exclusion = "missing_original_acquisition"
         elif fact["nature"] != NATURE[pred["target"]]:
             exclusion = "nature_mismatch"
         elif fact["nature"] == "observed" and "model_prediction" in fact.get("upstream_natures", []):
             exclusion = "prediction_ancestry"
-        elif not _applies(fact, claim["scope"]):
+        elif ((require_acquisition and fact["nature"] in ("observed", "analysis") and not fact["applicability_scopes"])
+              or not _applies(fact, claim["scope"])):
             exclusion = "out_of_scientific_scope"
         elif first is None:
             exclusion = "unknown_first_production"
@@ -529,7 +537,10 @@ def assessment(conn, run, claim, reg, through, available_through):
     disputed = {fact.get("evidence_ref") for fact in facts.values()
                 if fact.get("source_class") == "reviewed_source_evidence" and fact.get("record_nature") == "formal_evidence"
                 and fact.get("verdict") in ("OVERSTATED", "NOT_SUPPORTED", "CONTRADICTED")}
-    grounded = [ref for ref, fact in facts.items() if qualified_ground(fact, claim) and fact.get("evidence_ref") not in disputed]
+    from . import v621_policy
+    require_acquisition = v621_policy.enabled(conn, run)
+    grounded = [ref for ref, fact in facts.items() if fact.get("evidence_ref") not in disputed
+                and qualified_ground(fact, claim, require_acquisition=require_acquisition)]
     reviews = []
     gaps = []
     for ref, fact in facts.items():
@@ -544,7 +555,7 @@ def assessment(conn, run, claim, reg, through, available_through):
     retrospective = {"already_available", "unverified_production_order"}
     results, pairs, preexisting = [], [], False
     if reg:
-        results, test_gaps, old = _results(conn, run, claim, reg, through)
+        results, test_gaps, old = _results(conn, run, claim, reg, through, require_acquisition=require_acquisition)
         gaps.extend(test_gaps)
         preexisting = old or _known_before(conn, reg, available_through)
         pairs = _independence(results, claim["scope"])

@@ -279,12 +279,22 @@ def execute(args):
             write_native_bytes(target, (json.dumps(output["result"], indent=2, ensure_ascii=False) + "\n").encode())
             return {"message_id": output["message_id"], "run_id": rid, "audit_file": str(args.output)}
         return output
+    if args.command == "assign-material":
+        from . import v621_assignment
+        with closing(existing_db(directory, readonly=False)) as conn:
+            run = selected_run(conn)
+            return v621_assignment.assign(conn, run["run_id"], after_decision=args.after_decision, source=args.source,
+                path=args.input, sha256=args.sha256, role=args.role, metadata_path=args.acquisition,
+                module_instance=args.module_instance, media_type=args.media_type, actor=operator.local_context(conn).actor)
     if args.command == "observe":
         from .v62_outputs import ingest_measurement
         with closing(existing_db(directory, readonly=False)) as conn:
             run = selected_run(conn)
             return ingest_measurement(conn, run["run_id"], source=args.source, scope=args.scope,
                                       path=args.input, metadata_path=args.acquisition,
+                                      artifact_ref=getattr(args, "artifact_ref", None),
+                                      expected_sha256=getattr(args, "sha256", None),
+                                      media_type=getattr(args, "media_type", "application/json"),
                                       actor=operator.local_context(conn).actor)
     if args.command == "team":
         from .team_admission import team_control, team_status
@@ -378,15 +388,29 @@ def main(argv=None):
     add_plugin_commands(commands)
     from .operator import add_commands
     add_commands(commands)
-    for name in ("start", "status", "run", "resume", "stop", "message", "team", "observe"):
+    for name in ("start", "status", "run", "resume", "stop", "message", "team", "observe", "assign-material"):
         sub = commands.add_parser(name)
         sub.add_argument("--state", required=True, type=Path)
         if name != "start":
             sub.add_argument("--run-id", help="Select a run within this workspace")
+        if name == "assign-material":
+            sub.add_argument("--after-decision", required=True, help="Accepted Run Lead decision receiving this assignment")
+            sub.add_argument("--source", required=True, help="Stable operator citation and idempotency key")
+            sub.add_argument("--input", required=True, type=Path, help="Original local material")
+            sub.add_argument("--sha256", required=True, help="Expected SHA-256 of the original bytes")
+            sub.add_argument("--role", required=True, help="Scientific input role in the recipient grant")
+            sub.add_argument("--acquisition", required=True, type=Path, help="Acquisition and source metadata JSON")
+            sub.add_argument("--module-instance", help="Also grant this original to this open scoped delegation")
+            sub.add_argument("--media-type", default="application/octet-stream")
         if name == "observe":
             sub.add_argument("--source", required=True, help="Stable citation for this original measurement")
             sub.add_argument("--scope", default="run", help="Run or branch receiving this observation")
-            sub.add_argument("--input", type=Path, required=True, help="Original JSON measurement")
+            material = sub.add_mutually_exclusive_group(required=True)
+            material.add_argument("--input", type=Path, help="Original local measurement or raw mmCIF")
+            material.add_argument("--artifact-ref", help="Register acquisition of the exact existing run artifact")
+            sub.add_argument("--sha256", help="Expected original digest (required with --artifact-ref)")
+            sub.add_argument("--media-type", choices=("application/json", "chemical/x-mmcif", "text/plain"),
+                             default="application/json", help="Format of a newly supplied --input")
             sub.add_argument("--acquisition", type=Path, required=True, help="JSON acquisition and sample provenance")
         if name == "team":
             sub.add_argument("--team-id")

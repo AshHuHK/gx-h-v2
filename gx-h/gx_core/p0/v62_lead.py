@@ -59,6 +59,8 @@ def deliver(conn, brief, limit):
     ref = artifact.artifact_ref
     full = {**brief, "full_brief_ref": ref, "evidence_refs": list(dict.fromkeys([*brief["evidence_refs"], ref]))}
     packet = {k: brief[k] for k in ("run_id", "scope", "goal_version", "head", "research_effort")}
+    if brief.get("branch_delegation") is False:
+        packet["branch_delegation"] = False
     packet.update(goal=_excerpt(brief["goal"], 512), full_brief_ref=ref, read_with="gx_read_artifact",
                   module_catalog_available=bool(brief.get("module_catalog_available") or brief.get("module_catalog")),
                   **({"source_tools": brief["source_tools"]} if brief.get("source_tools") else {}),
@@ -92,7 +94,9 @@ def deliver(conn, brief, limit):
 
     # Reserve space for adverse results and their durable citations ahead of routine inventory.
     report_index = brief.get("module_report_index", [])
-    adverse = [entry for entry in reversed(report_index) if entry.get("counterevidence")]
+    previews = {entry["report_ref"]: entry for entry in brief.get("module_reports", [])}
+    adverse = [{**previews.get(entry["report_ref"], {}), **entry}
+               for entry in reversed(report_index) if entry.get("counterevidence")]
     adverse_refs = {entry["report_ref"] for entry in adverse}
     ordinary = [entry for entry in reversed(brief.get("module_reports", [])) if entry["report_ref"] not in adverse_refs]
     if adverse:
@@ -107,6 +111,13 @@ def deliver(conn, brief, limit):
             summary["counterevidence"] = [{"text": _excerpt(first["text"], 256), "source_refs": first["source_refs"][:1]}]
         if append("module_reports", summary):
             append("evidence_refs", report["report_ref"])
+            if report.get("metrics"):
+                summary["metrics"] = []
+                for metric in report["metrics"]:
+                    if not append("metrics", metric, owner=summary):
+                        break
+                if not summary["metrics"]:
+                    del summary["metrics"]
     if progress:
         projected = packet["research_progress"]
         for key in ("waiting_for", "open_gaps"):

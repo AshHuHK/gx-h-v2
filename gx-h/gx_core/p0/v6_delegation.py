@@ -99,6 +99,8 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, pay
     if task["scope"] != "run":
         raise ScopeDenied("Only the Run Lead may delegate a branch decision")
     parent = store.loads(task, "snapshot_json")
+    if parent.get("branch_delegation") is False:
+        raise ScopeDenied("This Run's operator grant disables branch delegation")
     branch = next((b for b in parent["branches"] if b["branch_id"] == payload["branch_id"] and b["status"] == "OPEN"), None)
     if branch is None or branch["spec"].get("module_instance_id"):
         raise ScopeDenied("Choose an open branch from this frozen Lead brief")

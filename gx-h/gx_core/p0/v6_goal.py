@@ -7,7 +7,7 @@ import uuid
 from .. import budgets
 from ..artifacts import ArtifactService
 from ..domain import clock, ids, machines
-from ..errors import SchemaInvalid, VersionImmutable
+from ..errors import ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, VersionImmutable
 from ..persistence import records, store
 from . import intent
 
@@ -27,6 +27,7 @@ def cli_spec(args):
         "initial_job_limit",
         "research_effort",
         "research_modules",
+        "branch_delegation",
         "evidence_policy",
         "module_policy",
         "input_files",
@@ -289,7 +290,7 @@ def _events(conn, rid, after, budget_ref=None):
         WHERE event_id>? AND (
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
                                   'v6.claim.adopted','v6.decision.superseded','v62.round.settled',
-                                  'v62.claim.reassessed','v62.module.wake','v62.module.invalidated') OR
+                                  'v62.claim.reassessed','v62.module.wake','v62.module.invalidated','v621.material.assigned') OR
           (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
           OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
@@ -298,11 +299,15 @@ def _events(conn, rid, after, budget_ref=None):
         (budget_ref, rid, after, rid),
     ).fetchall()
 
-    from . import v62_lead
+    from . import v62_lead, v621_goal_scope
 
+    version = v621_goal_scope.active(conn, rid)
+    first = v621_goal_scope.start_cursor(conn, rid, version)
     module_branches = v62_lead.branch_ids(conn, rid) if events else set()
     captured = []
     for row in events:
+        if row["event_id"] < first or not v621_goal_scope.applies(conn, rid, row, store.loads(row, "payload_json"), version):
+            continue
         if module_branches and v62_lead.internal_event(row, module_branches):
             continue
         if row["kind"] == "v6.claim.adopted":
@@ -333,6 +338,7 @@ def _matches(row, watches, rid):
         "v6.intent.changed": {"goal_changed"},
         "v6.node.settled": {"evidence_added", "job_settled"},
         "v6.observation.added": {"evidence_added"},
+        "v621.material.assigned": {"evidence_added"},
         "v6.claim.adopted": {"claim_changed"},
         "v62.claim.reassessed": {"claim_changed"},
         "v62.round.settled": set(),
@@ -413,7 +419,7 @@ def _run_wakes(conn, rid, prior, events):
         payload = store.loads(row, "payload_json")
         if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
             continue
-        if (row["kind"] in {"v6.intent.changed", "v62.module.wake", "v62.module.invalidated"} or _operator_evidence(conn, rid, row)
+        if (row["kind"] in {"v6.intent.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
                 or row["kind"] == "v6.decision.superseded" and payload.get("scope") == "run"
                 or row["kind"] == "v62.round.settled" and payload.get("reconsider")
                 or row["kind"] == "v62.claim.reassessed" and payload.get("critical_counterevidence")
@@ -450,9 +456,14 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         {"name": Path(f["path"]).name, **{k: f.get(k) for k in ("artifact_ref", "sha256", "role")}}
         for f in data["files"]
     ]
+    from . import v621_assignment, v621_policy
+    if v621_policy.enabled(conn, rid):
+        files.extend(v621_assignment.for_lead(conn, rid, goal["goal_version"], cursor))
     observations = []
     refs = [f["artifact_ref"] for f in files]
     for row in events:
+        if row["kind"] == "v621.material.assigned":
+            continue  # The paired acquisition already has an observation entry.
         p = store.loads(row, "payload_json")
         ref = p.get("result_ref") or p.get("artifact_ref")
         facts = {
@@ -466,6 +477,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             "status": p.get("status"),
             "artifact_ref": ref,
         }
+        if p.get("condition") and row["kind"] == "v6.node.settled":
+            facts["condition"] = p["condition"]
         if ref:
             meta = ArtifactService(conn).describe(ref)
             if meta["run_id"] != rid:
@@ -475,22 +488,39 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             if row["kind"] == "v6.observation.added":
                 refs.append(facts["id"])
             if meta["bytes"] <= 32_768 and _is_json_artifact(meta):
-                content = ArtifactService(conn).read_json(ref)
-                job = (
-                    conn.execute(
-                        "SELECT capability_id,capability_version FROM jobs WHERE job_id=? AND run_id=?",
-                        (p.get("job_id"), rid),
-                    ).fetchone()
-                    if row["kind"] == "v6.node.settled"
-                    else None
-                )
-                if job:
-                    provider = goal_plugins.method(conn, rid, f"{job[0]}@{job[1]}")
-                    if provider and provider.project:
-                        content = provider.project(content)
-                facts["observation"] = content
+                try:
+                    content = ArtifactService(conn).read_json(ref)
+                    job = (
+                        conn.execute(
+                            "SELECT capability_id,capability_version FROM jobs WHERE job_id=? AND run_id=?",
+                            (p.get("job_id"), rid),
+                        ).fetchone()
+                        if row["kind"] == "v6.node.settled"
+                        else None
+                    )
+                    if job:
+                        provider = goal_plugins.method(conn, rid, f"{job[0]}@{job[1]}")
+                        if provider and provider.project:
+                            content = provider.project(content)
+                    facts["observation"] = content
+                except (ArtifactHashMismatch, ArtifactNotFound, OSError, SchemaInvalid) as exc:
+                    from . import v621_policy
+                    if not v621_policy.enabled(conn, rid):
+                        raise
+                    facts["unavailable"] = {"reason": getattr(exc, "code", "IO_ERROR"),
+                                            "recovery": "Restore the cited bytes and verify their digest"}
             else:
                 facts.update(read_with="gx_read_artifact", media_type=meta["media_type"], bytes=meta["bytes"])
+            from . import v621_metrics, v621_policy
+            if v621_policy.enabled(conn, rid):
+                if row["kind"] == "v6.node.settled":
+                    metrics = v621_metrics.from_output(conn, rid, ref)
+                    if metrics:
+                        facts["metrics"] = metrics
+                elif not _is_json_artifact(meta):
+                    facts["metric_availability"] = {"schema": v621_metrics.MISSING,
+                        "artifact_ref": ref, "sha256": meta["sha256"],
+                        "reason": "A raw source requires an authorized measurement reader or derived named output"}
         observations.append(facts)
     nodes = [
         dict(r)
@@ -547,7 +577,9 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         refs.extend(x for x in (claim.get("claim_ref"), claim.get("claim_revision_id")) if x)
     previous = None
     watches = []
-    if prior:
+    from . import v621_goal_scope
+    current_version = v621_goal_scope.active(conn, rid)
+    if prior and (current_version is None or store.loads(prior, "receipt_json")["goal_version"] == current_version):
         body = store.loads(prior, "request_json")["decision"]
         receipt = store.loads(prior, "receipt_json")
         watches = receipt["reconsider_when"]
@@ -576,7 +608,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     for change, event in zip(deltas, events):
         if event["kind"] in {"v62.module.wake", "v62.module.invalidated"}:
             payload = store.loads(event, "payload_json")
-            change.update({k: payload[k] for k in ("round", "reason", "module_instance_ids", "module_instance_id", "report_refs") if k in payload})
+            change.update({k: payload[k] for k in ("round", "reason", "module_instance_ids", "module_instance_id", "report_refs", "goal_version") if k in payload})
     budget = {k: account[k] for k in ("limits", "spent", "reserved", "available")}
     grant = data.get("inputs", {}).get("p0_spec", {})
     if head is None and "initial_job_limit" in grant:
@@ -700,7 +732,8 @@ def ensure_task(conn, run_id):
             or v6_decisions.head(tx, run_id) != head
             or _open(tx, run_id)
             or tx.execute(
-                "SELECT 1 FROM events WHERE run_id=? AND kind='v6.intent.changed' AND event_id>? LIMIT 1",
+                "SELECT 1 FROM events WHERE run_id=? "
+                "AND kind IN ('v6.intent.changed','v621.material.assigned') AND event_id>? LIMIT 1",
                 (run_id, cursor),
             ).fetchone()
         ):

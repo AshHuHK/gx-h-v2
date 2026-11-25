@@ -24,7 +24,8 @@ NUMBER = re.compile(r"(?<![a-zA-Z_\d])[+−-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]
 # File names, accessions, calendar years and document labels are not scientific measurements.
 IDENTIFIER = re.compile(r"(?<!\w)(?:[a-zA-Z0-9_.-]+\.(?:cif|pdb|csv|json|txt|pdf|xml)|"
                         r"[0-9][A-Z][A-Z0-9]{2})(?!\w)")
-CALENDAR_YEAR = re.compile(r"\b(?:from|in|published|released|deposited|year)\s+(?:19|20)\d{2}\b(?![./]\d)", re.I)
+CALENDAR_YEAR = re.compile(r"\b(?:from|in|published|released|deposited|year)\s+(?:19|20)\d{2}\b"
+                           r"(?=\s*(?:[,.;:)](?!\d)|$|and\b|with\b|by\b))", re.I)
 METRIC_READER_BYTES = 2_000_000
 
 
@@ -33,7 +34,7 @@ def definition_errors(specs):
         return ["metric_specs must name between one and 32 metrics"]
     errors = []
     for name, spec in specs.items():
-        if not NAME.fullmatch(name) or not isinstance(spec, dict):
+        if not isinstance(name, str) or not NAME.fullmatch(name) or not isinstance(spec, dict):
             errors.append("Invalid metric name or declaration")
             continue
         operands = OPERANDS.get(spec.get("op")) if isinstance(spec.get("op"), str) else None
@@ -46,7 +47,7 @@ def definition_errors(specs):
         fields = {"op", "reader", "unit", "places", "scope", "bounds", "source_unit", "scale", *operands}
         scope = spec.get("scope", {})
         if (spec.keys() - fields or not isinstance(scope, dict) or
-                any(not NAME.fullmatch(k) for k in scope) or
+                any(not isinstance(k, str) or not NAME.fullmatch(k) for k in scope) or
                 any(not isinstance(p, str) or not p.startswith("/") for p in
                     [*(spec.get(k) for k in operands), *scope.values()])):
             errors.append(f"{name}: invalid operand or scope selector")
@@ -71,16 +72,17 @@ def _number(v):
     if type(v) not in (int, float, Decimal):
         raise ValueError("expected a numeric observation")
     n = Decimal(str(v))
-    if not n.is_finite():
-        raise ValueError("nonfinite observation")
+    if not n.is_finite() or abs(n.adjusted()) > 308 or len(n.as_tuple().digits) > 1024:
+        raise ValueError("nonfinite or unsupported numeric observation")
     return n
 
 
 def _read(raw, reader, name, media):
     media = (media or "").split(";")[0].lower()
-    if reader == "json/1" and (media == "application/json" or media.endswith("+json") or name.endswith(".json")):
+    generic = media in ("", "application/octet-stream", "text/plain")
+    if reader == "json/1" and (media == "application/json" or media.endswith("+json") or generic and name.endswith(".json")):
         return json.loads(raw, parse_float=Decimal)
-    if reader == "csv-row/1" and (media == "text/csv" or name.endswith(".csv")):
+    if reader == "csv-row/1" and (media == "text/csv" or generic and name.endswith(".csv")):
         rows = csv.reader(io.StringIO(raw.decode("utf-8"), newline=""), strict=True)
         header, row = next(rows, []), next(rows, [])
         if (not row or len(header) != len(row) or not all(header) or len(set(header)) != len(header)
@@ -106,10 +108,20 @@ def _json_number(value):
     return number
 
 
+def _scope_value(value):
+    if isinstance(value, list):
+        return [_scope_value(v) for v in value]
+    if type(value) in (Decimal, int, float):
+        return _json_number(_number(value))
+    if type(value) in (str, bool):
+        return value
+    raise ValueError("selection scope must be a finite scalar or list")
+
+
 def calculate(spec, document):
     """The only rounding here is the final displayed representation."""
     operands = {k: _fact(document, spec[k]) for k in OPERANDS[spec["op"]]}
-    scope = {k: _fact(document, p) for k, p in spec.get("scope", {}).items()}
+    scope = {k: _scope_value(_fact(document, p)) for k, p in spec.get("scope", {}).items()}
     with localcontext() as ctx:
         ctx.prec = 50
         values = {k: _number(v) for k, v in operands.items()}
@@ -121,7 +133,7 @@ def calculate(spec, document):
         elif spec["op"] == "difference/1":
             raw = values["left"] - values["right"]
         else:
-            if spec["op"] == "integer/1" and type(operands["pointer"]) is not int:
+            if spec["op"] == "integer/1" and (type(operands["pointer"]) is not int or operands["pointer"] < 0):
                 raise ValueError("integer measurement requires an integer field")
             raw = values["pointer"]
         raw *= _number(spec.get("scale", 1))
@@ -168,7 +180,8 @@ def from_output(conn, rid, ref):
         raise SchemaInvalid("Metric publication differs from admitted output binding")
     proof = dict(artifact_ref=ref, sha256=meta["sha256"], job_id=job_id, output_name=name,
                  method=adm["capability"], admission_sha256=sealed["admission_hash"],
-                 manifest_sha256=sealed["manifest_hash"], inputs=binding["source_inputs"])
+                 manifest_sha256=sealed["manifest_hash"], provenance_cursor=adm.get("provenance_cursor"),
+                 inputs=binding["source_inputs"])
     readers = {}
     metrics = []
     for key, spec in specs.items():
@@ -192,10 +205,14 @@ def from_output(conn, rid, ref):
     return metrics
 
 
-def _cited(conn, rid, refs):
+def _cited(conn, rid, refs, cache=None):
     assets = ArtifactService(conn)
     found = {}
+    cache = {} if cache is None else cache
     for ref in dict.fromkeys(refs):
+        if ref in cache:
+            found.update(cache[ref])
+            continue
         # Goal evidence can also cite source-event and prior decision identities.
         row = conn.execute("SELECT kind,run_id FROM artifacts WHERE artifact_ref=?", (ref,)).fetchone()
         if row is None:
@@ -212,8 +229,8 @@ def _cited(conn, rid, refs):
             entries = json.loads(raw).get("metrics", [])
         else:
             entries = from_output(conn, rid, ref)
-        for entry in entries:
-            found[entry["metric_ref"]] = entry
+        cache[ref] = {e["metric_ref"]: e for e in entries}
+        found.update(cache[ref])
     return list(found.values())
 
 
@@ -222,14 +239,13 @@ def _render(text, metrics):
         return [_render(part, metrics) for part in text]
     if not isinstance(text, str):
         raise SchemaInvalid("Quantitative interpretation must be text")
-    if metrics:
-        prose = CALENDAR_YEAR.sub("", IDENTIFIER.sub("", TAG.sub("", text)))
-        for metric in metrics:
-            for key, value in metric.get("scope", {}).items():
-                if isinstance(value, (str, int)) and str(value).isdecimal():
-                    prose = re.sub(r"\b" + re.escape(key) + r"\s+" + re.escape(str(value)) + r"\b", "", prose, flags=re.I)
-        if NUMBER.search(prose):
-            raise SchemaInvalid("Cite a declared metric for scientific numbers, for example {{metric:coverage}}")
+    prose = CALENDAR_YEAR.sub("", IDENTIFIER.sub("", TAG.sub("", text)))
+    for metric in metrics:
+        for key, value in metric.get("scope", {}).items():
+            if isinstance(value, (str, int)) and str(value).isdecimal():
+                prose = re.sub(r"\b" + re.escape(key) + r"\s+" + re.escape(str(value)) + r"\b", "", prose, flags=re.I)
+    if NUMBER.search(prose):
+        raise SchemaInvalid("Cite a declared metric for scientific numbers, for example {{metric:coverage}}")
     def replace(match):
         key, *checks = match[1].split("|")
         ref, _, name = key.rpartition(":")
@@ -249,19 +265,23 @@ def _render(text, metrics):
     return rendered
 
 
-def render_fields(conn, run_id, evidence_refs, text_fields):
+def render_fields(conn, run_id, evidence_refs, text_fields, *, allowed_context=None):
     """Render already-authorized scientific prose from pinned metrics, retaining their full receipts."""
     metrics = _cited(conn, run_id, evidence_refs)
-    return {k: _render(value, metrics) for k, value in text_fields.items()}, metrics
+    # Whole phrases can be independently established by the claim owner's source/criteria checks.
+    trusted = allowed_context or {}
+    return {k: value if k in trusted and value == trusted[k] else _render(value, metrics)
+            for k, value in text_fields.items()}, metrics
 
 
 def render_report(conn, rid, bundle):
     """Only a finding's own citations may supply its numerical statements."""
+    cache = {}
     fields = {}
     for finding in bundle["findings"]:
-        rendered, _ = render_fields(conn, rid, finding["source_refs"], {"text": finding["text"]})
-        fields.setdefault("findings", []).append({**finding, **rendered})
-    metrics = _cited(conn, rid, [s["artifact_ref"] for s in bundle["sources"]])
+        entries = _cited(conn, rid, finding["source_refs"], cache)
+        fields.setdefault("findings", []).append({**finding, "text": _render(finding["text"], entries)})
+    metrics = _cited(conn, rid, [s["artifact_ref"] for s in bundle["sources"]], cache)
     bundle.update(schema="gx.v621.module_report_bundle.1", metrics=metrics,
                   interpretation={"findings": bundle["findings"], "gaps": bundle["gaps"], "next_steps": bundle["next_steps"]})
     bundle.update(fields)

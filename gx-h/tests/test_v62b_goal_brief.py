@@ -7,7 +7,7 @@ import unittest
 
 from gx_core.artifacts import ArtifactService
 from gx_core.native_release import native_state
-from gx_core.p0 import cli, v6_goal, v6_native, v62_lead
+from gx_core.p0 import cli, v6_goal, v6_native, v621_policy, v62_lead
 from gx_core.persistence import store
 
 
@@ -19,7 +19,7 @@ class ResearchBrief(unittest.TestCase):
         spec = {"mode": "goal", "project": "brief-scope", "objective": "Compare two reference readings.",
                 "research_effort": effort, "capabilities": []}
         if effort != "quick":
-            spec["research_modules"] = []
+            spec.update(research_modules=[], evidence_policy=v621_policy.LEGACY)
         rid = cli.start(conn, state, spec, run_key="capture")["run_id"]
         (frozen,) = conn.execute("SELECT snapshot_json FROM research_contexts WHERE run_id=?", (rid,)).fetchone()
         return conn, json.loads(frozen)

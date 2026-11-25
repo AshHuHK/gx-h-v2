@@ -146,6 +146,13 @@ def operation_receipts(conn, run_id, module_instance_id):
         "ORDER BY event_id", (run_id, module_instance_id))]
 
 
+def publish_method_card(roots, row, card):
+    from . import science
+    ref = science._publish(roots.conn, row["run_id"], "method-cards", "v62_public_method_spec", card)
+    roots._allow_refs(row["root_key"], ref)
+    return ref
+
+
 def perform_read(roots, row, params, packet, execute):
     """The completed local operation and its native callback are saved in one transaction."""
     if not roots.conn.in_transaction:
@@ -191,11 +198,9 @@ def perform_read(roots, row, params, packet, execute):
     pins = {}
     if (tool == QUERY and args.get("kind") == "method" and args.get("reference")
             and json.loads(instance["grant_json"]).get("catalog_access") == "public_methods"):
-        from . import science
         card = answer["spec"]
-        original = science._publish(roots.conn, row["run_id"], "method-cards", "v62_public_method_spec", card)
+        original = publish_method_card(roots, row, card)
         answer = {**answer, "source_ref": original}
-        roots._allow_refs(row["root_key"], original)
         artifacts.append(original)
         pins[original] = ids.sha256_of_obj(card)
     receipt = {"module_instance_id": module_id, "scope": packet["scope"], "operation_key": operation,

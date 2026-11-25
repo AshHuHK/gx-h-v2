@@ -34,37 +34,48 @@ def _key(kind, basis):
 
 
 def _waiting(conn, rid):
+    version = v621_goal_scope.active(conn, rid)
     # A private module is represented by its delegated identity, even when it has internal Jobs.
     items = [dict(kind="module", module_instance_id=m[0], round=m[1]) for m in conn.execute(
-        "SELECT module_instance_id,round FROM v62_modules WHERE run_id=? AND status='OPEN' ORDER BY rowid", (rid,)
+        "SELECT module_instance_id,round FROM v62_modules WHERE run_id=? AND status='OPEN' "
+        "AND (? IS NULL OR goal_version=?) ORDER BY rowid", (rid, version, version)
     )]
     from . import v62_reports
     released = v62_reports._released(conn, rid)
     items.extend(dict(kind="report_release", module_instance_id=m[0], round=m[1]) for m in conn.execute(
         """SELECT m.module_instance_id,m.round FROM v62_modules m JOIN v62_module_reports r
-           USING(module_instance_id,run_id) WHERE m.run_id=? ORDER BY m.rowid""", (rid,)
+           USING(module_instance_id,run_id) WHERE m.run_id=? AND (? IS NULL OR m.goal_version=?)
+           ORDER BY m.rowid""", (rid, version, version)
     ) if m[0] not in released)
     items.extend(dict(kind="node", node_id=n[0], status=n[1]) for n in conn.execute(
         """SELECT n.node_id,n.status FROM v6_nodes n WHERE n.run_id=?
            AND n.status IN ('PENDING','RUNNING','CANCEL_REQUESTED')
            AND NOT EXISTS (SELECT 1 FROM v62_modules m WHERE m.branch_id=n.branch_id)
-           ORDER BY n.rowid""", (rid,)
+           AND (? IS NULL OR EXISTS(SELECT 1 FROM v6_decisions d JOIN v6_decision_tasks t USING(task_id)
+               WHERE d.decision_ref=n.decision_ref AND t.goal_version=?))
+           ORDER BY n.rowid""", (rid, version, version)
     ))
     items.extend(dict(kind="operator", approval_id=a[0]) for a in conn.execute(
-        "SELECT approval_id FROM approvals WHERE run_id=? AND status='PENDING' ORDER BY rowid", (rid,)
+        """SELECT a.approval_id FROM approvals a WHERE a.run_id=? AND a.status='PENDING'
+           AND NOT EXISTS(SELECT 1 FROM submissions s JOIN v6_decision_tasks t USING(task_id)
+               WHERE a.subject_kind='submission' AND a.subject_id=s.submission_id AND t.goal_version!=?)
+           ORDER BY a.rowid""", (rid, version)
     ))
     return items
 
 
 def _members(conn, rid):
+    version = v621_goal_scope.active(conn, rid)
     rows = conn.execute(
         """SELECT m.round,m.module_instance_id,m.module_id,m.module_version,m.focus,m.expected_delivery,
                   m.parent_context_ref,m.status,m.snapshot_json,m.grant_json,r.report_ref,t.status AS parent_status
            FROM v62_modules m JOIN tasks t ON t.task_id=m.parent_task_id
            LEFT JOIN v62_module_reports r ON r.run_id=m.run_id AND r.module_instance_id=m.module_instance_id
-           WHERE m.run_id=? AND NOT EXISTS
-           (SELECT 1 FROM research_rounds rr WHERE rr.run_id=m.run_id AND rr.round_index=m.round
-            AND rr.created_by=?) ORDER BY m.round,m.rowid""", (rid, OWNER)
+           WHERE m.run_id=? AND (? IS NULL OR m.goal_version=?) AND NOT EXISTS
+           (SELECT 1 FROM research_rounds rr WHERE rr.run_id=m.run_id AND rr.created_by=?
+            AND json_extract(rr.sealed_json,'$.round')=m.round AND
+            (? IS NULL OR json_extract(rr.sealed_json,'$.goal_version')=m.goal_version))
+           ORDER BY m.round,m.rowid""", (rid, version, version, OWNER, version)
     )
     grouped = defaultdict(list)
     for row in rows:
@@ -72,12 +83,14 @@ def _members(conn, rid):
     return grouped
 
 
-def _history(conn, rid, cursor=None):
+def _history(conn, rid, cursor=None, *, goal_version=None):
+    version = v621_goal_scope.active(conn, rid) if goal_version is None else goal_version
     return [json.loads(row[0]) for row in conn.execute(
         """SELECT r.sealed_json FROM research_rounds r JOIN events e
            ON e.run_id=r.run_id AND e.kind='v62.round.settled' AND e.subject_id=r.round_id
-           WHERE r.run_id=? AND r.created_by=? AND (? IS NULL OR e.event_id<=?) ORDER BY r.round_index""",
-        (rid, OWNER, cursor, cursor),
+           WHERE r.run_id=? AND r.created_by=? AND (? IS NULL OR e.event_id<=?)
+           AND (? IS NULL OR json_extract(r.sealed_json,'$.goal_version')=?) ORDER BY r.round_index""",
+        (rid, OWNER, cursor, cursor, version, version),
     )]
 
 
@@ -130,10 +143,12 @@ def early_reason(conn, module, bundle):
     rid = module["run_id"]
     if not _policy(conn, rid):
         return None
+    version = v621_goal_scope.active(conn, rid)
     subjects = {"run", rid, module["scope"], module["module_instance_id"], module["branch_id"]}
     prior = conn.execute(
         """SELECT d.receipt_json FROM v6_decisions d JOIN v6_decision_tasks t USING(task_id)
-           WHERE d.run_id=? AND t.scope='run' ORDER BY d.rowid DESC LIMIT 1""", (rid,)
+           WHERE d.run_id=? AND t.scope='run' AND (? IS NULL OR t.goal_version=?)
+           ORDER BY d.rowid DESC LIMIT 1""", (rid, version, version)
     ).fetchone()
     watches = json.loads(prior[0])["reconsider_when"] if prior else []
     if any(w["event"] == "module_report" and w["subject_ref"] in subjects for w in watches):
@@ -225,17 +240,31 @@ def _event_facts(conn, rid, after, through):
 
     facts, failures = {}, []
     private = v62_lead.branch_ids(conn, rid)
+    version = v621_goal_scope.active(conn, rid)
+    after = max(after, v621_goal_scope.start_cursor(conn, rid, version) - 1)
     for row in conn.execute(
         """SELECT event_id,kind,subject_id,reason,payload_json FROM events WHERE run_id=? AND event_id>? AND event_id<=?
            AND kind IN ('v6.node.settled','v6.observation.added','v6.claim.adopted','v62.claim.reassessed',
                         'v6.branch.stop_requested','v62.gap.resolved','v62.source.reviewed') ORDER BY event_id""", (rid, after, through)
     ):
         p = store.loads(row, "payload_json")
+        if not v621_goal_scope.applies(conn, rid, row, p, version):
+            continue
         if v62_lead.internal_event(row, private) or str(p.get("scope", "")).startswith("module:"):
             continue
         kind, ref = row["kind"], None
         value = None
         if kind == "v6.node.settled":
+            condition = p.get("condition", {})
+            if condition.get("reason") == "evidence_condition_false":
+                gate = condition["gate"]
+                key = _key("candidate_excluded", [condition["source_sha256"], condition["result_sha256"],
+                                                  gate["pointer"], gate["equals"]])
+                facts[key] = dict(kind="candidate_excluded", reference=condition["result_ref"],
+                                  node_id=row["subject_id"], event_id=row["event_id"])
+                continue
+            if p.get("dependency", {}).get("reason") == "evidence_route_blocked":
+                continue
             if p.get("status") in ("FAILED", "BLOCKED", "CANCELLED"):
                 failures.append(dict(node_id=row["subject_id"], event_id=row["event_id"], status=p["status"],
                                      job_id=p.get("job_id"), reason=row["reason"]))
@@ -283,6 +312,7 @@ def _present(member):
 
 
 def _calculate(conn, rid, rounds, threshold, cursor):
+    version = v621_goal_scope.active(conn, rid)
     history = _history(conn, rid)
     seen = {key for entry in history for key in (*entry["new_facts"], *entry.get("initial_known_facts", []))}
     inquiries = {k for entry in history for k in entry["inquiries"]}
@@ -303,8 +333,9 @@ def _calculate(conn, rid, rounds, threshold, cursor):
         # round's own release; the last includes any observation we were waiting for.
         through = cursor
         if index + 1 < len(indexes):
-            released = conn.execute("SELECT max(event_id) FROM v62_module_wakes WHERE run_id=? AND round=?",
-                                    (rid, number)).fetchone()[0]
+            released = conn.execute("""SELECT max(w.event_id) FROM v62_module_wakes w JOIN events e USING(event_id)
+                WHERE w.run_id=? AND w.round=? AND (? IS NULL OR json_extract(e.payload_json,'$.goal_version')=?)""",
+                (rid, number, version, version)).fetchone()[0]
             through = max(after, released or after)
         facts, failures = _event_facts(conn, rid, after, through)
         gaps, asked, deliveries = {}, set(), []
@@ -328,6 +359,8 @@ def _calculate(conn, rid, rounds, threshold, cursor):
         result = dict(round=number, through_cursor=through, outcomes=deliveries, outcome=outcome,
                       new_facts=novel, inquiries=fresh, execution_failures=failures, consecutive_no_progress=streak,
                       no_progress_rounds=threshold, reconsider=previous < threshold <= streak)
+        if version is not None:
+            result["goal_version"] = version
         if index == 0 and initial:
             result["initial_known_facts"] = sorted(initial)
         plans.append((members[0]["parent_context_ref"], [_present(m) for m in members], result, gaps))
@@ -364,13 +397,21 @@ def reconcile(conn, rid):
             return
         for context, expected, result, gaps in plans:
             number = result["round"]
-            key = _key("round", [rid, number])
+            physical = number
+            identity = [rid, number]
+            if "goal_version" in result:
+                identity = [rid, result["goal_version"], number]
+                # The shared history uses a Run-wide sequence; its signed content
+                # records the per-objective number shown to the researcher.
+                physical = conn.execute("SELECT coalesce(max(round_index),0)+1 FROM research_rounds WHERE run_id=?",
+                                        (rid,)).fetchone()[0]
+            key = _key("round", identity)
             now = clock.now_iso()
             conn.execute(
                 """INSERT INTO research_rounds(round_id,run_id,round_index,context_ref,expected_json,
                    expected_sha256,status,sealed_json,sealed_sha256,created_by,created_at,sealed_at,closed_at)
                    VALUES(?,?,?,?,?,?,'COMMITTED',?,?,?,?,?,?)""",
-                (key, rid, number, context, store._j(expected), ids.sha256_of_obj(expected), store._j(result),
+                (key, rid, physical, context, store._j(expected), ids.sha256_of_obj(expected), store._j(result),
                  ids.sha256_of_obj(result), OWNER, now, now, now),
             )
             for gap in gaps.values():
@@ -383,21 +424,25 @@ def reconcile(conn, rid):
             store.append_event(conn, kind="v62.round.settled", run_id=rid, actor=OWNER,
                                subject_kind="round", subject_id=key, payload={
                                    k: result[k] for k in ("round", "through_cursor", "outcome",
-                                                          "consecutive_no_progress", "reconsider")})
+                                                          "consecutive_no_progress", "reconsider", "goal_version") if k in result})
 
 
 def _convergence(conn, rid, cursor=None):
+    version = v621_goal_scope.active(conn, rid)
     row = conn.execute(
         """SELECT payload_json FROM events WHERE run_id=? AND kind='v62.convergence.entered'
-           AND (? IS NULL OR event_id<=?) ORDER BY event_id LIMIT 1""", (rid, cursor, cursor)
+           AND (? IS NULL OR event_id<=?) AND (? IS NULL OR json_extract(payload_json,'$.goal_version')=?)
+           ORDER BY event_id LIMIT 1""", (rid, cursor, cursor, version, version)
     ).fetchone()
     return json.loads(row[0]) if row else None
 
 
 def _streak(conn, rid, threshold):
+    version = v621_goal_scope.active(conn, rid)
     entry = conn.execute(
         """SELECT json_extract(sealed_json,'$.consecutive_no_progress') FROM research_rounds
-           WHERE run_id=? AND created_by=? ORDER BY round_index DESC LIMIT 1""", (rid, OWNER)
+           WHERE run_id=? AND created_by=? AND (? IS NULL OR json_extract(sealed_json,'$.goal_version')=?)
+           ORDER BY round_index DESC LIMIT 1""", (rid, OWNER, version, version)
     ).fetchone()
     return bool(entry and entry[0] >= threshold)
 

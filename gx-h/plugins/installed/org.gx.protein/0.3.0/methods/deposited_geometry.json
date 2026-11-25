@@ -1,0 +1,79 @@
+{
+  "manifest": {
+    "capability_id": "deposited-chain-geometry",
+    "version": "2",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--structure",
+        "{in.structure}",
+        "--fitter",
+        "{data.0}",
+        "--mask",
+        "{param.mask}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "coordinate_geometry",
+      "mechanism": "Read one mmCIF with a single entry, coordinates for model 1, entity 1 and label chains A/B/C. Accept common_ca, common_backbone (all four backbone atoms shared), or ordered_backbone (all four shared, full occupancy and B ≤ 40 in each chain). Input profile uses an ASCII-style tabular atom_site loop with one whitespace-delimited atom row per line.",
+      "objective": "Describe the effect of atom selection on observed chain-pair geometry.",
+      "estimator": "Match label position, residue and atom within model 1/entity 1/A,B,C. Report observed-union coverage, proper Horn least-squares fit, unsigned rotation in degrees and fitted RMSD in angstrom.",
+      "training_data_lineage": "Deterministic coordinate analysis."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.protein/0.3.0/methods/deposited_geometry.py",
+      "sha256": "8ea2b5a1406eb1402a508ea49b1532ddde836b444855eca7d2963fe9de066f97"
+    },
+    "licence": "GX release source; coordinate data CC0.",
+    "licence_basis": "Original data licence in adapters/scientific/tl1a_geometry/data/LICENSE.cc0 and original geometric metric attribution in LICENSE.chaperone.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/adapters/scientific/tl1a_geometry/worker.py"
+    ],
+    "outputs": [
+      {
+        "name": "geometry.json",
+        "kind": "file:deposited_chain_geometry",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "coverage": {
+            "reader": "json/1",
+            "op": "ratio/1",
+            "numerator": "/selected_residues",
+            "denominator": "/observed_union_residues",
+            "unit": "1",
+            "places": 3,
+            "bounds": [
+              0,
+              1
+            ],
+            "scope": {
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "chains": "/chains",
+              "input_sha256": "/input_sha256"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "One asymmetric unit per measurement. Alternate locations and ambiguous backbone assignments are unsupported. Absence of a selected position is a coverage limitation. The measurement does not establish sampling independence or population-level properties."
+  },
+  "entry_script": "methods/deposited_geometry.py"
+}

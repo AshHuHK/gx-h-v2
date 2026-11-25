@@ -13,7 +13,7 @@ from unittest.mock import patch
 from gx_core import config
 from gx_core.errors import SchemaInvalid, ScopeDenied, VersionImmutable
 from gx_core.plugins.catalog import package_digest
-from gx_core.p0 import v62_catalog as catalog
+from gx_core.p0 import v62_catalog as catalog, v621_policy
 
 
 class ModuleCatalog(unittest.TestCase):
@@ -85,6 +85,32 @@ class ModuleCatalog(unittest.TestCase):
         with self.assertRaises(ScopeDenied):
             catalog.query(conn, run, {**frozen, "scope": "branch:another"}, {"kind": "module"})
         self.assertEqual(catalog.resolve(conn, run, "data_inventory", "1")["plugin"], module["plugin"])
+
+    def test_inventory_default_is_pinned_by_evidence_policy(self):
+        settings = {"research_effort": "deep"}
+        for policy, expected in ((v621_policy.LEGACY, "1"), (v621_policy.VERSION, "2")):
+            with self.subTest(policy=policy):
+                auto = catalog.for_start({**settings, "evidence_policy": policy})
+                versions = [m["version"] for m in auto["modules"] if m["module_id"] == "data_inventory"]
+                self.assertEqual(versions, [expected])
+        explicit = catalog.for_start({**settings, "research_modules": ["data_inventory@1"]})
+        self.assertEqual([m["version"] for m in explicit["modules"]], ["1"])
+        self.assertNotIn("branch_delegation", explicit)
+        self.assertIsNone(catalog.for_start({"research_effort": "quick"}))
+
+    def test_disabled_branch_delegation_grant_is_immutable(self):
+        settings = {"research_modules": [], "branch_delegation": False}
+        conn, rid, packet = self.start("deep", settings)
+        self.assertFalse(packet["branch_delegation"])
+        grant = self.work / "deep.json"
+        grant.write_text(json.dumps({**settings, "branch_delegation": True}))
+        outcome = subprocess.run([sys.executable, "-B", self.cli, "start", "--state", self.work / "deep",
+                "--run-key", "one", "--goal", "Describe the coverage of these local sources.",
+                "--goal-config", grant, "--research-effort", "deep"], capture_output=True, text=True)
+        self.assertNotEqual(outcome.returncode, 0)
+        self.assertIn("different project specification", outcome.stdout + outcome.stderr)
+        frozen = json.loads(conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (rid,)).fetchone()[0])
+        self.assertIs(frozen["inputs"]["research_catalog"]["branch_delegation"], False)
 
     def test_byte_limit_and_paginated_search_do_not_hide_last_method(self):
         # Freeze a real medium Run and exercise its persisted catalogue with many test methods.

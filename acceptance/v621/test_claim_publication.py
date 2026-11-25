@@ -23,17 +23,21 @@ BASE = dict(statement="The observed morning temperature exceeds ten degrees Cels
 
 
 class ClaimPublication(unittest.TestCase):
-    def start(self, policy=None):
+    def start(self, policy=None, *, second_material=False):
         self.folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
         plan = self.folder / "station.json"
         plan.write_text('{"survey":"north-morning"}')
         config = {"research_effort": "deep", "research_modules": [], "capabilities": [], "plugins": [],
                   "input_files": [{"role": "material", "path": str(plan)}]}
+        if second_material:
+            secondary = self.folder / "second-station-sample.json"
+            secondary.write_text('{"survey":"north-morning","visit":"second"}')
+            config["input_files"].append({"role": "material", "path": str(secondary)})
         if policy is not None:
             config["evidence_policy"] = policy
         self.gx = self.enterContext(Scenario(self.folder / "goal", spec_updates=config))
         raw = self.gx.materials[0]
-        self.rule = {"data_refs": [raw], "observable": "/measurement/value", "operator": "gt", "threshold": 10,
+        self.rule = {"data_refs": self.gx.materials, "observable": "/measurement/value", "operator": "gt", "threshold": 10,
                      "target": "experimental_observation", "measurement_schema": METRIC}
         self.initial = self.adopt(self.gx.lead, "initial", [raw], "open", prediction=self.rule)
 
@@ -101,6 +105,12 @@ class ClaimPublication(unittest.TestCase):
         self.observe("schedule", {"schedule": "second review"}, data=[])
         _, delivered, brief_sha = self.delivered_claim()
         self.assertEqual(published["publication"], delivered["publication"])
+        from acceptance.v6.export import capture
+        from acceptance.v6.project_window import Capture
+        out = self.folder / "export"
+        capture(self.gx.state / "gx.db", self.gx.run_id, out)
+        exported = Capture(out).claim(published["hypothesis_id"])
+        self.assertEqual((exported["publication"], exported["science"]), (published["publication"], published["science"]))
         self.trace("opposed", published, brief_sha)
 
     def test_new_mixed_reading_withdraws_support_without_overwriting_original_receipt(self):
@@ -119,6 +129,33 @@ class ClaimPublication(unittest.TestCase):
         self.assertEqual(revised["publication"], self.cli("status")["claims"][0]["publication"])
         self.assertEqual(supported, v6_claims.read_revision(self.gx.conn, self.gx.run_id, supported["claim_revision_id"]))
         self.trace("mixed", revised, brief_sha)
+
+    def test_scoped_refutation_and_insufficient_are_admissible_for_same_adverse_reading(self):
+        self.start()
+        observed = self.reading("adverse", 7)
+        lead, previous, _ = self.delivered_claim()
+        claimed = self.adopt(lead, "accept-scoped-refutation", [observed], "refuted",
+                             previous_claim_ref=previous["claim_revision_id"])
+        self.assertEqual((claimed["level"], claimed["publication"]["direction"], claimed["scope"]),
+                         ("refuted", "opposed", SCOPE))
+        self.assertEqual(set(claimed["publication"]["admissible_levels"]),
+                         {"open", "insufficient", "contested", "refuted"})
+        self.observe("second-look", {"calendar": "second look"}, data=[])
+        lead, previous, _ = self.delivered_claim()
+        provisional = self.adopt(lead, "reserve-judgment", [observed], "insufficient",
+                                 previous_claim_ref=previous["claim_revision_id"])
+        self.assertEqual(provisional["level"], "insufficient")
+        self.assertEqual(provisional["publication"]["opposing_refs"], [observed])
+
+    def test_one_observed_sample_cannot_be_published_as_all_registered_samples(self):
+        self.start(second_material=True)
+        result_ref = self.reading("first-sample", 14)
+        lead, previous, _ = self.delivered_claim()
+        result = self.adopt(lead, "one-of-two", [result_ref], "limited_support",
+                            previous_claim_ref=previous["claim_revision_id"])
+        self.assertEqual(result["publication"]["unmeasured_data_refs"], self.gx.materials[1:])
+        self.assertEqual((result["maturity"]["stage"], result["maturity"]["direction"], result["level"]),
+                         ("tested", "supported", "insufficient"))
 
     def test_changed_endpoint_cannot_borrow_old_refutation_and_narrow_revision_survives(self):
         self.start()

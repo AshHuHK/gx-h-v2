@@ -95,7 +95,7 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     catalog = [spec for spec in read_tools if spec["name"] in ("gx_read_artifact", "gx_task_context")]
     evidence_run = bool(brief and brief.get("research_evidence_version"))
     catalog.extend((decision_tool(), v6_claims.tool_spec()) if evidence_run else _legacy_goal_tools())
-    if brief is None or (brief.get("scope", "run") == "run" and
+    if brief is None or (brief.get("scope", "run") == "run" and brief.get("branch_delegation", True) and
                          any(b["status"] == "OPEN" for b in brief.get("branches", []))):
         catalog.append(v6_delegation.TOOL)
     if conn is not None:
@@ -283,6 +283,9 @@ def call(roots, p):
                     return v62_catalog.query(roots.conn, roots.run_id, packet, arguments)
                 answer = (v62_native.perform_read(roots, row, p, packet, query)
                           if v62_native.module_scope(packet) else query(args))
+                if "execution_granted" in answer and args.get("reference"):
+                    card = v62_catalog._public_card(answer["spec"], metric_contract=True)
+                    answer["source_ref"] = v62_native.publish_method_card(roots, row, card)
             elif tool in v62_native.SOURCE_TOOLS:
                 answer = v62_native.perform_source(roots, row, p)
             elif tool == DELEGATE:

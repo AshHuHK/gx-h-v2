@@ -333,8 +333,14 @@ def _scope_grants(conn, run_id, scope, ref, cursor):
     if scope == 'run':
         return True
     if scope.startswith('module:'):
-        return conn.execute("""SELECT 1 FROM v62_modules m JOIN json_each(m.grant_json,'$.input_refs') i
-            WHERE m.run_id=? AND m.scope=? AND i.value=?""", (run_id, scope, ref)).fetchone() is not None
+        row = conn.execute("SELECT module_instance_id,grant_json,run_id FROM v62_modules WHERE run_id=? AND scope=?",
+                           (run_id, scope)).fetchone()
+        if row is None:
+            return False
+        if ref in store.loads(row, 'grant_json')['input_refs']:
+            return True
+        from . import v621_assignment
+        return any(m["artifact_ref"] == ref for m in v621_assignment.for_module(conn, row, cursor=cursor))
     return conn.execute("""SELECT 1 FROM (
         SELECT d.visible_refs_json FROM v6_decision_tasks d JOIN research_contexts c USING(context_ref)
         WHERE d.run_id=? AND d.scope=? AND c.event_cursor<=? ORDER BY c.event_cursor DESC,d.rowid DESC LIMIT 1
@@ -425,7 +431,7 @@ def call_tool(conn, tool, payload, *, run_id, task_id, lease_id, thread_id, turn
             grant = json.loads(module['grant_json'])
             if tool not in grant['tools'] or tool not in packet['allowed_tools']:
                 raise ScopeDenied('This tool is outside the active module grant')
-            visible &= set(grant['input_refs'])
+            visible &= {m['artifact_ref'] for m in packet['materials']}
             permitted_targets = set(grant.get('target_claim_refs', ()))
         elif scope != 'run' or packet.get('research_effort') != 'deep' or tool not in packet.get('source_tools', ()):
             raise ScopeDenied('This decision has no delegated source evidence tool')

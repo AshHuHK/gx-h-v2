@@ -187,6 +187,11 @@ def require_materials(conn, run_id, original_refs, materials):
         if not meta or meta[0] != material["sha256"]:
             raise StaleRevision("A delegated material or its content pin changed")
         pin = material.get("publication")
+        if pin is None and material.get("assignment_event_id") is not None:
+            from . import v621_assignment
+            if not v621_assignment.matches(conn, run_id, material):
+                raise StaleRevision("The assigned original belongs to another material or Goal version")
+            continue
         if material.get("original_input") and ref not in original_refs:
             raise StaleRevision("A published original is no longer an input of this Goal")
         if pin is None:

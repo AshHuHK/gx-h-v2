@@ -11,7 +11,7 @@ from ..domain import ids
 from ..errors import SchemaInvalid, ScopeDenied, VersionImmutable
 from ..plugins import goal, loader
 from ..plugins.selection import _references
-from . import intent
+from . import intent, v621_policy
 
 _EFFORT = {"quick": (0, 0), "medium": (4, 3), "deep": (6, 5)}
 _DEFAULTS = {"report_bytes": 4096, "brief_bytes": 65536, "catalog_limit": 15, "catalog_bytes": 8192,
@@ -46,6 +46,9 @@ def _declaration(plugin, key):
 def for_start(spec):
     """Freeze the discovered declaration and its exact installation closure before opening a Run."""
     settings = _policy(spec)
+    branch_delegation = spec.get("branch_delegation", True)
+    if type(branch_delegation) is not bool or (not branch_delegation and settings["effort"] == "quick"):
+        raise SchemaInvalid("branch_delegation must be boolean; a restricted delegation grant needs medium or deep effort")
     requested = spec.get("research_modules")
     if requested is not None and (not isinstance(requested, list)
             or any(not isinstance(k, str) or k.count("@") != 1 for k in requested)
@@ -58,19 +61,26 @@ def for_start(spec):
         raise SchemaInvalid("plugins must be a list of exact provider id@version references")
     preferred = set(_references(spec.get("plugins", [])))
     path = config.CONFIG_DIR / "workflow_packages.json"
-    roots = [tuple(row["path"].split("/")) for row in json.loads(path.read_text())["plugins"]]
+    release = json.loads(path.read_text())
+    roots = [tuple(row["path"].split("/")) for row in release["plugins"]]
+    version = v621_policy.for_start(spec)
+    defaults = release.get("default_research_module_versions", {}).get(version, {})
     loaded = loader.bootstrap(selected=roots)
     candidates = {}
     for plugin in loaded.plugins.values():
         for key, definition in plugin.contributions.research_modules.items():
             reference = "@".join(key)
+            if requested is None and defaults.get(key[0], key[1]) != key[1]:
+                continue
             if (requested is None or reference in requested) and settings["effort"] in definition["efforts"]:
                 candidates.setdefault(key, []).append(plugin)
     missing = set(requested or ()) - {"@".join(key) for key in candidates}
     if missing:
         raise SchemaInvalid(f"Unavailable research module grants for {settings['effort']}: {sorted(missing)}")
     modules = []
-    lead_source_tools = set()
+    deep = settings["effort"] == "deep"
+    independent_science_access = deep and version == v621_policy.VERSION
+    lead_source_tools = set(TOOL_NAMES) if independent_science_access else set()
     survey = False
     for key, owners in sorted(candidates.items()):
         selected = [p for p in owners if (p.pin.id, p.pin.version) in preferred] or owners
@@ -78,7 +88,7 @@ def for_start(spec):
             raise SchemaInvalid(f"Select an exact provider in plugins for the research module {'@'.join(key)}")
         plugin = selected[0]
         declaration = _declaration(plugin, key)
-        if settings["effort"] == "deep":
+        if deep and not independent_science_access:
             lead_source_tools.update(set(declaration["tools"]).intersection(TOOL_NAMES))
         survey |= declaration.get("catalog_access") == "public_methods"
         pins = goal._load([plugin.pin]).plugins
@@ -86,8 +96,10 @@ def for_start(spec):
                         "provider_closure": [goal._document(p) for p in pins],
                         "declaration_sha256": ids.sha256_of_obj(declaration)})
     return {"policy": settings, "modules": modules,
+            **({"branch_delegation": False} if not branch_delegation else {}),
             **({"source_tools": sorted(lead_source_tools)} if lead_source_tools else {}),
-            **({"public_methods": _release_method_cards()} if survey else {})}
+            **({"lead_method_cards": True} if independent_science_access else {}),
+            **({"public_methods": _release_method_cards()} if independent_science_access or survey else {})}
 
 
 def _release_method_cards():
@@ -114,7 +126,7 @@ def _release_method_cards():
     return cards
 
 
-def _public_card(row):
+def _public_card(row, *, metric_contract=False):
     """Project only scientific metadata. Provider paths, evaluation payloads, schemas and artifact links stay private."""
     method = row.get("method")
     if isinstance(method, dict):
@@ -127,6 +139,12 @@ def _public_card(row):
     card["outputs"] = [{k: item[k] for k in ("name", "kind", "nature") if isinstance(item.get(k), str)}
                        if isinstance(item, dict) else {"name": item}
                        for item in (row.get("output_summary") or row.get("outputs") or ()) if isinstance(item, (str, dict))]
+    if metric_contract:
+        definitions = {item["name"]: item for item in row.get("outputs", ()) if isinstance(item, dict)}
+        for output in card["outputs"]:
+            declared = definitions.get(output["name"], {})
+            if declared.get("metric_specs"):
+                output.update(metric_specs=declared["metric_specs"], source_roles=declared["source_roles"])
     return card
 
 
@@ -224,6 +242,7 @@ def project(conn, run_id, brief):
                                          settings, lambda row: row["focuses"])
     return {**brief, "capabilities": methods, "catalog_view": view, "research_effort": settings["effort"],
             "module_catalog": modules,
+            **({"branch_delegation": False} if catalog.get("branch_delegation") is False else {}),
             **({"module_catalog_view": module_view, "module_catalog_available": True}
                if module_view["mode"] == "categories" else {}),
             **({"source_tools": catalog["source_tools"]} if catalog.get("source_tools") else {})}
@@ -254,15 +273,19 @@ def query(conn, run_id, brief, args):
     reference = args.get("reference")
     if kind == "method":
         rows = _methods(conn, run_id, inputs)
-        if module_scope and brief.get("catalog_access") == "public_methods":
+        survey = module_scope and brief.get("catalog_access") == "public_methods"
+        public_lead = scope == "run" and catalog.get("lead_method_cards")
+        if survey:
             from .v62_modules import require_active
             grant = json.loads(require_active(conn, run_id, scope)["grant_json"])
             if grant.get("catalog_access") != "public_methods" or "gx_query_catalog" not in grant["tools"]:
                 raise ScopeDenied("Public method discovery is outside the module grant")
+        if survey or public_lead:
             bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
             cards = {r["capability_version"]: r for r in catalog.get("public_methods", ())
                      if not intent.forbidden_capability(*r["capability_version"].rsplit("@", 1), bans)}
-            cards.update({r["capability_version"]: _public_card(r) for r in rows})
+            granted = {r["capability_version"] for r in rows}
+            cards.update({r["capability_version"]: r if public_lead else _public_card(r) for r in rows})
             rows = [cards[k] for k in sorted(cards)]
         elif module_scope:
             allowed = brief.get("allowed_method_ids", [])
@@ -271,8 +294,12 @@ def query(conn, run_id, brief, args):
             for row in rows:
                 if row["capability_version"] == reference:
                     return {"kind": kind, "reference": reference, "spec": {k: v for k, v in row.items()
-                                              if k not in ("content_artifact_ref", "provider_closure")}}
+                                              if k not in ("content_artifact_ref", "provider_closure")},
+                            **({"execution_granted": reference in granted} if public_lead else {})}
         entries = [_method_summary(row) for row in rows]
+        if public_lead:
+            for item in entries:
+                item["execution_granted"] = item["capability_version"] in granted
     else:
         rows = catalog["modules"]
         if module_scope:

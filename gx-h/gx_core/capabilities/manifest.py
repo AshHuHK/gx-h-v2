@@ -381,6 +381,11 @@ def _outputs_problems(manifest: Mapping[str, Any]) -> list[str]:
         if name in seen:
             found.append(f"outputs[{index}].name {name!r} is declared twice")
         seen.add(name)
+        if "metric_specs" in output:
+            from ..p0.v621_metrics import definition_errors
+            if not output.get("nature") or not output.get("source_roles"):
+                found.append(f"outputs[{index}].metric_specs requires a classified output and scientific input roles")
+            found.extend(f"outputs[{index}]: {err}" for err in definition_errors(output["metric_specs"]))
         origins = output.get("source_roles")
         if origins is not None and (not output.get("nature") or not origins or len(origins) != len(set(origins))
                 or any(role not in roles and not (grouped and GROUPED_ROLE.fullmatch(role)) for role in origins)):

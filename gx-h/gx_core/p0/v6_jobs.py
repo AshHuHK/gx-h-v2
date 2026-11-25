@@ -23,7 +23,7 @@ from ..jobs import cpu_queue
 from ..jobs.service import JobService, PURPOSE_WORKFLOW, TERMINAL
 from ..persistence import store
 from . import manifest as execution
-from . import v6_method_context
+from . import v6_method_context, v62_evidence
 from ..plugins import goal as goal_plugins
 
 NODE_TERMINAL = {"SUCCEEDED", "FAILED", "CANCELLED", "REUSED", "BLOCKED"}
@@ -159,21 +159,31 @@ def confirmed_result_identity(conn, node_id, proof, *, verify_inputs=False):
             "environment_sha256": ids.sha256_of_obj(environment)}
 
 
-def _dependencies(conn, node, spec):
+def _dependencies(conn, node, spec, *, check_all=False):
     resolved = {}
+    waiting = False
     for ref in dict.fromkeys([*spec["depends_on"], *spec["inputs"]]):
         dep = conn.execute(
             "SELECT status,result_ref FROM v6_nodes WHERE run_id=? AND node_id=?", (node["run_id"], ref)
         ).fetchone()
         if dep:
             if dep["status"] in {"FAILED", "CANCELLED", "BLOCKED"}:
-                raise DependencyUnmet(
-                    "A declared dependency ended without a usable result", details={"node": ref}
-                )
+                details = {"node": ref}
+                if check_all and dep["status"] == "BLOCKED":
+                    excluded = conn.execute("""SELECT event_id FROM events WHERE run_id=? AND kind='v6.node.settled'
+                        AND subject_id=? AND (json_extract(payload_json,'$.condition.reason')='evidence_condition_false'
+                        OR json_extract(payload_json,'$.dependency.reason')='evidence_route_blocked') LIMIT 1""",
+                        (node["run_id"], ref)).fetchone()
+                    if excluded:
+                        details.update(reason="evidence_route_blocked", settlement_event=excluded[0])
+                raise DependencyUnmet("A declared dependency ended without a usable result", details=details)
             if dep["status"] not in {"REUSED", "SUCCEEDED"}:
-                return None
+                if not check_all:
+                    return None
+                waiting = True
+                continue
             resolved[ref] = dep["result_ref"]
-    return [resolved.get(ref, ref) for ref in spec["inputs"]]
+    return None if waiting else [resolved.get(ref, ref) for ref in spec["inputs"]]
 
 
 def _compile(conn, node, refs):
@@ -377,19 +387,22 @@ def _consume(conn, node):
     cpu_queue.admitted(conn, f"job:{node['run_id']}:{node['operation_key']}")
 
 
-def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_status=None, reason=None, evidence=None):
+def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_status=None, reason=None, evidence=None, condition=None, dependency=None):
     with _tx(conn, node["run_id"], "settle_node") as tx:
         current = _node(tx, node["run_id"], node["node_id"])
         if current["status"] in NODE_TERMINAL:
             return False
         if current["job_id"] and current["job_id"] != job_id:
             return False
+        if condition and current["status"] != "CANCEL_REQUESTED":
+            _live(current, "PENDING")
+            _module_grant(tx, current, json.loads(current["spec_json"]))
+            v62_evidence.fence_negative(tx, current, condition)
         if source:
             _live(current, "PENDING")
             spec = json.loads(current["spec_json"])
             _module_grant(tx, current, spec)
             if spec.get("evidence_gate"):
-                from . import v62_evidence
                 v62_evidence.fence(tx, current, evidence)
             execution.require_current(tx, job_id)
         if current["status"] == "CANCEL_REQUESTED":
@@ -421,6 +434,8 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
                 "result_ref": result,
                 "exec_key": current["exec_key"],
                 "reused_from": source,
+                **({"condition": condition} if condition and status == "BLOCKED" else {}),
+                **({"dependency": dependency} if dependency and status == "BLOCKED" else {}),
             },
         )
         return True
@@ -431,6 +446,10 @@ def _record_wait(conn, node, error):
     # Keep volatile queue sampling out of the durable deduplication identity.
     wait = {k: reason[k] for k in ("code", "message")}
     details = reason["details"]
+    if details.get("reason") in {"evidence_pending", "evidence_invalid"}:
+        from . import v621_policy
+        if v621_policy.enabled(conn, node["run_id"]):
+            wait = reason
     if details.get("rule") == "cpu.threads_free":
         wait = {"code": error.code, "rule": "cpu.threads_free", "needed": details["needed"]}
     encoded = ids.canonical_json(wait)
@@ -515,11 +534,19 @@ def _run_node(conn, node, service):
     _live(node, "PENDING")
     spec = json.loads(node["spec_json"])
     _module_grant(conn, node, spec)
+    from . import v621_policy
+    fixed_conditions = v621_policy.enabled(conn, node["run_id"])
+    if fixed_conditions:
+        refs = _dependencies(conn, node, spec, check_all=True)
     evidence = None
     if spec.get("evidence_gate"):
-        from . import v62_evidence
-        evidence = v62_evidence.require_ready(conn, node, spec)
-    refs = _dependencies(conn, node, spec)
+        try:
+            evidence = v62_evidence.require_ready(conn, node, spec)
+        except v62_evidence.ConditionFalse as error:
+            settled = _finish(conn, node, "BLOCKED", condition=error.details, reason=error.details["reason"])
+            return "settled" if settled else "waiting"
+    if not fixed_conditions:
+        refs = _dependencies(conn, node, spec)
     if refs is None:
         return "waiting"
     attempt = conn.execute("SELECT * FROM v6_job_attempts WHERE node_id=?", (node["node_id"],)).fetchone()
@@ -695,7 +722,8 @@ def advance(conn, run_id):
                 counts["waiting"] += 1
                 continue
             status = "BLOCKED" if isinstance(error, DependencyUnmet) else "FAILED"
-            if _finish(conn, node, status, reason=f"{error.code}: {error.message}"):
+            dependency = error.details if error.details.get("reason") == "evidence_route_blocked" else None
+            if _finish(conn, node, status, reason=f"{error.code}: {error.message}", dependency=dependency):
                 counts["settled"] += 1
     _finalize(conn, run_id)
     return counts

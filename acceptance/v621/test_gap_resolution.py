@@ -160,3 +160,79 @@ class GapResolution(unittest.TestCase):
         with self.assertRaises(ScopeDenied):
             self.decide("other-gap", evidence_refs=[ref], resolved_gaps=["gap:other-study"])
         self.assertEqual(self.s.rows("SELECT event_id FROM events WHERE kind='v62.gap.resolved'"), [])
+
+
+class CoordinateAnalysisGap(unittest.TestCase):
+    def test_acquired_original_and_named_output_resolve_only_registered_mask(self):
+        from acceptance.v62a.interleavings_fixture import PRODUCT
+        from gx_core.p0 import manifest
+
+        method = "deposited-chain-geometry@2"
+        work = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        s = self.enterContext(Scenario(work / "study", spec_updates={
+            "research_effort": "deep", "research_modules": ["data_inventory@2"],
+            "plugins": ["org.gx.protein@0.3.0"], "capabilities": [method]}))
+        raw = s.materials[0]
+        sha = ArtifactService(s.conn).describe(raw)["sha256"]
+        acquisition = json.loads((PRODUCT / "examples/v621-coordinate-analysis/2RE9.json").read_bytes())
+
+        def commission(name, caps, round_number):
+            args = s.open_args(name, inputs=[raw], caps=caps, round=round_number)
+            args["module_version"] = "2"
+            return s.call(s.lead, "gx_open_module", args, name)
+
+        report_task = commission("questions", [], 1)
+        worker = s.bind(report_task["task_id"])
+        s.call(s.lead, "gx_decide_revision", {"decision": draft()}, "wait-for-questions")
+        s.call(worker, "gx_read_artifact", {"ref": raw, "operation_key": "inspect"}, "inspect-input")
+        criteria = []
+        for mask in ("ordered_backbone", "common_ca"):
+            criteria.append({"question": f"What coverage is recorded under {mask}?",
+                "data_ref": raw, "applicability": acquisition["applicability"], "nature": "analysis",
+                "method": method, "method_parameters": {"mask":mask}, "output_name": "geometry.json",
+                "measurement_schema": "gx.deposited_chain_geometry/2", "observable": "/coverage_fraction",
+                "op": "finite"})
+        registered = s.report(worker, raw, gaps=[g["question"] for g in criteria], gap_criteria=criteria)
+        s.next_actor("run")
+        gaps = {g["criterion"]["method_parameters"]["mask"]: g["gap_ref"]
+                for g in s.brief(s.lead)["research_progress"]["open_gaps"]}
+        assignment = commission("measurement", [method], 2)
+        operator = v6_goal.record_observation(s.conn, s.run_id, raw, source="public-deposition",
+                                              acquisition=acquisition)
+        s.call(s.lead, "gx_decide_revision", {"decision": draft()}, "wait-for-analysis")
+        node_decision = s.submit_node(s.bind(assignment["task_id"]), "readout", raw,
+                                      capability=method, parameters={"mask": "ordered_backbone"})
+        node = s.settle(node_decision["aliases"]["local:readout"])
+        output = node["result_ref"]
+        sealed = manifest.read_manifest(s.conn, node["job_id"])
+        self.assertIn({"artifact_ref":raw, "sha256":sha},
+                      [{k: i[k] for k in ("artifact_ref","sha256")} for i in sealed["admission"]["inputs"]])
+        self.assertLessEqual(operator["event_id"], sealed["admission"]["provenance_cursor"])
+        module = s.next_actor(assignment["scope"])
+        report = s.report(module, output, text="Measured coverage is {{metric:coverage}}.")
+        lead = s.next_actor("run")
+        if output not in s.brief(lead)["evidence_refs"]:
+            s.call(lead, "gx_decide_revision", {"decision":draft()}, "await-released-report")
+            lead = s.next_actor("run")
+        self.assertIn(output, s.brief(lead)["evidence_refs"])
+        decision = {**draft(evidence=[output]), "resolved_gaps": list(gaps.values())}
+        with self.assertRaises(SchemaInvalid) as exc:
+            s.call(lead, "gx_decide_revision", {"decision":decision}, "try-both-masks")
+        results = {r["gap_ref"]:r for r in exc.exception.details["gap_results"]}
+        self.assertEqual(results[gaps["common_ca"]]["rejections"][0]["reason"], "different_method_parameters")
+        decision["resolved_gaps"] = [gaps["ordered_backbone"]]
+        receipt = s.call(lead, "gx_decide_revision", {"decision":decision}, "resolve-ordered-backbone")
+        match, = receipt["gap_resolutions"][0]["matches"]
+        self.assertEqual((match["nature"], match["output_name"],match["job_id"]),
+                         ("analysis","geometry.json",node["job_id"]))
+        self.assertEqual(match["original_observations"], [{"artifact_ref":raw,"sha256":sha}])
+        self.assertAlmostEqual(match["value"],49/164)
+        states = {g["gap_id"]:g["status"] for g in s.rows("SELECT gap_id,status FROM gaps")}
+        self.assertEqual(states,{gaps["ordered_backbone"]:"RESOLVED", gaps["common_ca"]:"OPEN"})
+        if path := os.getenv("GX_V621_ANALYSIS_GAP_RECEIPT"):
+            Path(path).write_text(json.dumps({"run_id":s.run_id, "acquisition":operator,
+                "report_registering_criteria":registered, "job_id":node["job_id"],
+                "admitted_parameters":sealed["admission"]["parameters"],"job_inputs":sealed["admission"]["inputs"],
+                "job_admission_sha256":sealed["admission_hash"],"result_report":report,
+                "rejected_batch":results, "accepted_decision":receipt,"states":states,
+                "paid_model_calls":0, "provider_tokens":None,"real_cpu_jobs":1}, indent=2)+"\n")

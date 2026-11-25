@@ -563,6 +563,12 @@ class Roots:
                     params["developerInstructions"] += v62_native.LEAD_INSTRUCTIONS
                 if packet.get("research_evidence_version"):
                     params["developerInstructions"] += v6_native.EVIDENCE_INSTRUCTIONS
+            from . import v621_policy
+            if packet.get("evidence_policy") == v621_policy.VERSION:
+                params["developerInstructions"] += (
+                    " For a numbered finding from a measurement with declared metrics, cite its output and "
+                    "insert {{metric:METRIC_ID}} in the interpretation. GX renders the value from that "
+                    "named output. Cite {{metric:ARTIFACT_REF:METRIC_ID}} when references are ambiguous.")
         if new:
             params["experimentalRawEvents"] = True
             params["environments"] = []

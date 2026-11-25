@@ -311,18 +311,20 @@ def accept_product(conn, root, content_sha256, product_ref):
 def _require_close_context(conn, run_id, task):
     # Early watches and sealed rounds are the only ways a module report enters a Run brief.
     # A report may already exist even while its commissioning Lead keeps the round unsealed.
+    from . import v621_goal_scope
+    version = v621_goal_scope.active(conn, run_id)
     unseen = conn.execute("""
         SELECT m.module_instance_id FROM v62_modules m JOIN v62_module_reports r USING(module_instance_id)
-        WHERE m.run_id=? AND NOT EXISTS (
-            SELECT 1 FROM v62_module_wakes w WHERE w.run_id=m.run_id AND w.event_id<=?
-            AND w.wake_key IN ('early:' || m.module_instance_id, 'round:' || m.round)
-        ) LIMIT 1""", (run_id, task["event_cursor"])).fetchone()
+        WHERE m.run_id=? AND (? IS NULL OR m.goal_version=?) AND NOT EXISTS (
+            SELECT 1 FROM v62_module_wakes w JOIN events e USING(event_id), json_each(e.payload_json,'$.module_instance_ids') member
+            WHERE w.run_id=m.run_id AND w.round=m.round AND w.event_id<=? AND member.value=m.module_instance_id
+        ) LIMIT 1""", (run_id, version, version, task["event_cursor"])).fetchone()
     if unseen:
         raise StaleRevision("A completed module report needs a fresh Lead decision before closure",
                             details={"reason": "unseen_module_report", "module_instance_id": unseen[0],
                                      "brief_cursor": task["event_cursor"]})
-    if conn.execute("SELECT 1 FROM v62_modules WHERE run_id=? AND status='OPEN' LIMIT 1",
-                    (run_id,)).fetchone():
+    if conn.execute("SELECT 1 FROM v62_modules WHERE run_id=? AND status='OPEN' "
+                    "AND (? IS NULL OR goal_version=?) LIMIT 1", (run_id, version, version)).fetchone():
         raise ScopeDenied("Collect pending module reports or explicitly cancel their delegations before closure")
 
 
@@ -390,10 +392,10 @@ def commit(conn, plan):
                        aliases=plan.aliases, reconsider_when=plan.watches, checkpoint_id=checkpoint,
                        dispatches=dispatches, submission_id=submission, claim_revisions=claims,
                        consumed_event_cursor=task["event_cursor"])
-        if convergence is not None:
-            receipt["convergence"] = convergence
         if "gap_resolutions" in request:
             receipt["gap_resolutions"] = request["gap_resolutions"]
+        if convergence is not None:
+            receipt["convergence"] = convergence
         if "module_instance_id" in request:
             receipt.update(module_instance_id=request["module_instance_id"],
                            original_base=request["original_base"], adopted_base=base)

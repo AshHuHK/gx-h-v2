@@ -5,28 +5,32 @@ import re
 
 from ..domain import ids
 from ..errors import GxError, SchemaInvalid, ScopeDenied, StaleRevision
-from . import v62_maturity, v62_outputs, v621_policy
+from . import manifest, v62_maturity, v62_outputs, v621_policy
 
 _COMPARISONS = {"eq": operator.eq, "lt": operator.lt, "lte": operator.le, "gt": operator.gt, "gte": operator.ge}
 
 
 def register(conn, module, payload, sources):
-    declarations = payload.get("gap_criteria")
-    if declarations is None:
+    if "gap_criteria" not in payload:
         return {}
     if not v621_policy.enabled(conn, module["run_id"]):
         raise SchemaInvalid("Gap criteria require the current research evidence policy")
+    declarations = payload["gap_criteria"]
+    if not isinstance(declarations, list):
+        raise SchemaInvalid("Gap criteria must be a list of declarations")
     available = {s["artifact_ref"]: s["sha256"] for s in sources}
     result = {}
     for entry in declarations:
+        required = {"question", "data_ref", "applicability", "measurement_schema", "observable", "nature", "op"}
+        optional = {"method", "output_name", "method_parameters", "threshold"}
+        if (not isinstance(entry, dict) or not required <= entry.keys() <= required | optional
+                or not all(isinstance(entry[k], str) and entry[k].strip() for k in required)):
+            raise SchemaInvalid("Gap criteria must name the question, material, scope, observable and closure test")
         q, ref = entry["question"], entry["data_ref"]
         if q not in payload["gaps"] or q in result or payload["gaps"].count(q) != 1:
             raise SchemaInvalid("Each gap criterion must identify a single reported question")
         if ref not in available:
             raise ScopeDenied("A gap must cite the material it concerns")
-        for field in ("question", "applicability", "measurement_schema", "observable"):
-            if not entry[field].strip():
-                raise SchemaInvalid(f"A gap criterion requires {field}")
         pointer = entry["observable"]
         if not pointer.startswith("/") or len(pointer) < 2 or re.search(r"~(?![01])", pointer):
             raise SchemaInvalid("A gap observable must name a numeric field using a JSON Pointer")
@@ -39,11 +43,15 @@ def register(conn, module, payload, sources):
         method_pin = None
         if entry["nature"] == "analysis":
             method = entry.get("method", "")
-            if method.count("@") != 1 or not entry.get("output_name", "").strip():
+            if (not isinstance(method, str) or method.count("@") != 1
+                    or not isinstance(entry.get("output_name"), str) or not entry["output_name"].strip()):
                 raise SchemaInvalid("An analysis criterion requires the method version and named output")
+            parameters = entry.get("method_parameters", {})
+            if not isinstance(parameters, dict) or not all(isinstance(k, str) and k for k in parameters):
+                raise SchemaInvalid("Gap method parameters must identify named analysis settings")
             method_pin = v62_maturity.pin_method(conn, module["run_id"],
                 {"method": {"capability": method, "output": entry["output_name"]}})
-        elif entry["nature"] != "observed" or "method" in entry or "output_name" in entry:
+        elif entry["nature"] != "observed" or {"method", "output_name", "method_parameters"} & entry.keys():
             raise SchemaInvalid("Original observations and named analysis outputs have separate criteria")
         criterion = {**entry, "version": 1, "data_sha256": available[ref]}
         if method_pin:
@@ -66,6 +74,8 @@ def _match(conn, fact, criterion, boundary):
         return "source_nature", None
     if "model_prediction" in fact["upstream_natures"] or not fact["original_observations"]:
         return "missing_original", None
+    if criterion["nature"] == "analysis" and not fact.get("original_inputs_grounded"):
+        return "missing_original", None
     target = {"artifact_ref": criterion["data_ref"], "sha256": criterion["data_sha256"]}
     if target not in fact["data_refs"] and target not in fact["original_observations"]:
         return "different_material", None
@@ -78,6 +88,12 @@ def _match(conn, fact, criterion, boundary):
         or criterion["output_name"] != fact.get("output_name")
     ):
         return "different_method_or_output", None
+    parameters = criterion.get("method_parameters")
+    if parameters:
+        admitted = manifest.read_manifest(conn, fact["job_id"])["admission"]["parameters"]
+        if any(k not in admitted or ids.canonical_json(admitted[k]) != ids.canonical_json(v)
+               for k, v in parameters.items()):
+            return "different_method_parameters", None
     first = v62_maturity._first_relevant(conn, fact, {"event_id": boundary})
     if first is None or first <= boundary:
         return "already_available", None

@@ -7,6 +7,7 @@ from ..artifacts import ArtifactService
 from ..domain import clock, ids
 from ..errors import GxError, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
+from . import v621_goal_scope
 
 VERSION = "gx.research.v6.2b.1"
 OWNER = "v62.rounds"
@@ -192,9 +193,20 @@ def _report(conn, rid, member, cursor):
             facts[key] = dict(kind=kind, reference=source)
     gaps = {}
     if bundle["author"]["kind"] == "MODULE" and source_hashes and (bundle["status"] == "COMPLETE" or bundle["findings"]):
+        from . import v621_gaps, v621_policy
+        current = v621_policy.enabled(conn, rid)
+        report_event = None
+        if current and bundle["gaps"]:
+            report_event = conn.execute("SELECT json_extract(receipt_json,'$.event_id') FROM v62_module_reports "
+                                        "WHERE run_id=? AND report_ref=?", (rid, ref)).fetchone()[0]
         for question in bundle["gaps"]:
-            key = _key("gap", [rid, _normalize(question), source_hashes])
-            gaps[key] = dict(gap_ref=key, question=question, report_ref=ref, source_refs=sorted(sources))
+            if current:
+                gap = v621_gaps.declaration(bundle, question, source_hashes, ref, report_event)
+                key = gap["gap_ref"]
+            else:
+                key = _key("gap", [rid, _normalize(question), source_hashes])
+                gap = dict(gap_ref=key, question=question, report_ref=ref)
+            gaps[key] = {**gap, "source_refs": sorted(sources)}
             facts[key] = dict(kind="new_gap", reference=key, **gaps[key])
     # A new, completed inquiry can confirm an existing answer. The inquiry and its
     # underlying source versions are stable across new module IDs, prose and report refs.
@@ -410,10 +422,14 @@ def brief(conn, rid, cursor):
         phase, options = "convergence_due", ["wait"] if waiting else ["enter_convergence", "close_run"]
     else:
         phase, options = "exploring", ["explore", "enter_convergence", "close_run"]
-    resolved = {r[0] for r in conn.execute(
-        """SELECT subject_id FROM events WHERE run_id=? AND kind='v62.gap.resolved'
-           AND (? IS NULL OR event_id<=?)""", (rid, cursor, cursor))}
-    gaps = [{k: fact[k] for k in ("gap_ref", "question", "report_ref")}
+    resolution_events = conn.execute(
+        """SELECT subject_id,event_id,payload_json FROM events WHERE run_id=? AND kind='v62.gap.resolved'
+           AND (? IS NULL OR event_id<=?) ORDER BY event_id""", (rid, cursor, cursor))
+    resolved = {r["subject_id"]: {**json.loads(r["payload_json"]), "event_id": r["event_id"]} for r in resolution_events}
+    active_goal = v621_goal_scope.active(conn, rid)
+    closed = [r for r in resolved.values() if active_goal is not None and r.get("goal_version") == active_goal]
+    gaps = [{k: fact[k] for k in ("gap_ref", "question", "report_ref", "goal_version", "criterion",
+                                   "registered_event_id", "closure") if k in fact}
             for entry in history for fact in entry["new_facts"].values()
             if fact["kind"] == "new_gap" and fact["gap_ref"] not in resolved]
     rounds = [{k: entry[k] for k in ("round", "outcome", "outcomes", "execution_failures",
@@ -435,7 +451,8 @@ def brief(conn, rid, cursor):
             pending.append(item)
     return {"research_progress": dict(phase=phase, no_progress_rounds=threshold, consecutive_no_progress=streak,
                                      decision_options=options, rounds=rounds, expected=pending, waiting_for=waiting,
-                                     open_gaps=gaps, convergence=entered)}
+                                     open_gaps=gaps, convergence=entered,
+                                     **({"resolved_gaps": closed} if closed else {}))}
 
 
 def _late_event(conn, rid, cursor):
@@ -491,7 +508,19 @@ def adopt(conn, request, decision_ref, task):
         if late:
             raise StaleRevision("New information arrived after the frozen brief; consider it before settling",
                                 details={"reason": "convergence_context_changed", "event_id": late})
-    if resolved:
+    if resolved and "gap_resolutions" in request:
+        for result in request["gap_resolutions"]:
+            key = result["gap_ref"]
+            changed = conn.execute("UPDATE gaps SET status='RESOLVED',updated_at=? WHERE run_id=? AND gap_id=? "
+                                   "AND status='OPEN'", (clock.now_iso(), rid, key)).rowcount
+            if changed != 1:
+                raise StaleRevision("The gap has already been resolved")
+            store.append_event(conn, run_id=rid, kind="v62.gap.resolved", actor=OWNER,
+                               subject_kind="gap", subject_id=key,
+                               payload={**result, "scope": "run", "decision_ref": decision_ref,
+                                        "evidence_refs": [m["artifact_ref"] for m in result["matches"]],
+                                        "rationale": decision["rationale"]})
+    elif resolved:
         visible = {g["gap_ref"]: g for g in frozen.get("research_progress", {}).get("open_gaps", [])}
         if not set(resolved) <= set(visible):
             raise ScopeDenied("A resolved gap must be open in this frozen Lead brief")

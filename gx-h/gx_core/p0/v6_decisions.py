@@ -186,6 +186,10 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
                    base=base, idempotency_key="v6.decision:" + ids.sha256_of_obj([thread_id, call_id]),
                    draft_sha256=ids.sha256_of_obj(decision), decision=json.loads(ids.canonical_json(decision)))
     refs = _visible(conn, task, lease_id, thread_id, turn_id, decision)
+    if decision.get("resolved_gaps"):
+        from . import v621_gaps, v621_policy
+        if v621_policy.enabled(conn, run_id):
+            request["gap_resolutions"] = v621_gaps.prepare(conn, task, decision)
     previous = v62_graph.graph_at(conn, run_id, base)
     allowed = json.loads(goal["capabilities_json"])
     config_pin = (goal["capabilities_json"], goal["materials_json"])
@@ -388,6 +392,8 @@ def commit(conn, plan):
                        consumed_event_cursor=task["event_cursor"])
         if convergence is not None:
             receipt["convergence"] = convergence
+        if "gap_resolutions" in request:
+            receipt["gap_resolutions"] = request["gap_resolutions"]
         if "module_instance_id" in request:
             receipt.update(module_instance_id=request["module_instance_id"],
                            original_base=request["original_base"], adopted_base=base)

@@ -12,7 +12,7 @@ from ..artifacts.service import ArtifactService
 from ..domain import clock, ids
 from ..errors import IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
-from . import manifest, v62_maturity
+from . import manifest, v62_maturity, v621_policy
 
 
 SCHEMA = 'gx.v6.claim.1'
@@ -192,9 +192,19 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         prior = read_revision(conn, run_id, previous)
         if previous not in visible or not prior or (task['scope'] != 'run' and prior['decision_scope'] != task['scope']):
             raise ScopeDenied('previous claim is absent or outside the decision scope')
+    rendered, metrics = {}, []
+    if enriched and v621_policy.enabled(conn, run_id):
+        from . import v621_metrics
+        text_fields = {key: payload[key] for key in ('statement', 'scope', 'criteria', 'limitations', 'rationale')}
+        # A condition already frozen before this reading is a criterion, not a newly claimed result.
+        if prior and prior['criteria'] == text_fields['criteria']:
+            del text_fields['criteria']
+        if prior and prior['scope'] == text_fields['scope']:
+            del text_fields['scope']
+        rendered, metrics = v621_metrics.render_fields(conn, run_id, [f['artifact_ref'] for f in sources], text_fields)
     if payload['level'] in ('limited_support', 'contested', 'mixed', 'refuted'):
         if enriched:
-            proposed = {**payload, 'decision_scope': task['scope']}
+            proposed = {**payload, **rendered, 'decision_scope': task['scope']}
             proposed['maturity_lineage'] = v62_maturity.continuing_lineage(proposed, prior)
             usable = any(v62_maturity.qualified_ground(s, proposed) for s in sources)
         else:
@@ -202,9 +212,14 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
                          for s in sources)
         if not usable:
             raise SchemaInvalid('this level requires applicable evidence or a classified measurement; execution, '
-                                'fixtures and unspecified inputs cannot establish the proposed direction')
+                                'fixtures and unspecified inputs cannot establish the proposed direction',
+                                details={'proposed_level': payload['level'], 'admissible_levels': ['open', 'insufficient'],
+                                         'scope': payload['scope'], 'evidence_refs': payload['evidence_refs']})
     draft = dict(schema=SCHEMA, **binding, decision_scope=task['scope'], event_cursor=task['event_cursor'],
                  claim=payload, sources=sources)
+    if metrics:
+        draft['rendered_claim_fields'] = rendered
+        draft['metrics'] = metrics
     if pins is not None:
         draft['prediction_data'] = pins
         draft['prediction_method'] = method_pin
@@ -245,6 +260,52 @@ def staged_refs(conn, run_id, task_id, lease_id, context_ref, refs):
     return list(_drafts(conn, run_id, task_id, lease_id, context_ref, refs))
 
 
+
+def set_publication(claim, *, proposed_level, proposal_ref):
+    """Freeze the same scoped conclusion in the adoption receipt, status, brief and export."""
+    judgment = claim["maturity"]
+    direction = judgment["direction"]
+    allowed = ["open", "insufficient"]
+    if direction == "supported":
+        allowed.append("limited_support")
+    elif direction == "opposed":
+        allowed.append("contested")
+        if judgment["stage"] == "tested" and judgment["registration"] and judgment["results"]:
+            # A refutation is confined to the exact registered endpoint and collection.
+            allowed.append("refuted")
+    elif direction == "mixed":
+        allowed.extend(["contested", "mixed"])
+
+    if proposed_level in allowed:
+        published = proposed_level
+    else:
+        published = {"undetermined": "insufficient", "opposed": "contested",
+                     "mixed": "mixed", "supported": "open"}[direction]
+    reg = judgment["registration"]
+    publication = {
+        "policy": "gx.claim-publication/1",
+        "proposed_level": proposed_level, "proposal_ref": proposal_ref,
+        "level": published, "direction": direction, "maturity": judgment["stage"],
+        "claim_revision_id": claim["claim_revision_id"], "scope": claim["scope"],
+        "assessment_cursor": claim["assessment_cursor"], "admissible_levels": allowed,
+        "supporting_refs": judgment["supporting_refs"], "opposing_refs": judgment["opposing_refs"],
+        "registration_event_id": reg["event_id"] if reg else None,
+        "reasons": list(judgment["reasons"]),
+    }
+    if proposed_level != published:
+        publication["reasons"].append(
+            f"The proposed {proposed_level} exceeds the {direction} evidence for this proposition, "
+            "endpoint and population. The Lead may request review or stage a narrower proposition.")
+    claim.setdefault("lead_interpretation", {"rationale": claim["rationale"], "proposed_level": proposed_level,
+                                             "proposal_ref": proposal_ref})
+    claim["publication"] = publication
+    claim["level"] = published
+    claim["rationale"] = " ".join(publication["reasons"])
+    claim["science"] = {**claim["science"], "level": published, "level_source": publication["policy"],
+                        "direction": direction, "claim_revision_id": claim["claim_revision_id"]}
+    if claim.get("metrics"):
+        claim["science"]["metric_refs"] = [metric["metric_ref"] for metric in claim["metrics"]]
+
 def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
     """Called in the same CAS transaction as the accepted decision and outbox."""
     if not conn.in_transaction:
@@ -254,7 +315,7 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
     drafts = _drafts(conn, run_id, task_id, lease_id, context_ref, requested)
     receipts = []
     for ref, draft in drafts.items():
-        claim = draft['claim']
+        claim = {**draft['claim'], **draft.get('rendered_claim_fields', {})}
         if not set(claim['evidence_refs']) <= cited:
             raise SchemaInvalid('an adopted claim must cite its original evidence in this decision')
         previous = read_revision(conn, run_id, claim['previous_claim_ref']) if 'previous_claim_ref' in claim else None
@@ -288,6 +349,10 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
             receipt['science']['level_source'] = 'lead_proposal'
             v62_maturity.attach(conn, run_id, receipt, previous, draft.get('prediction_data'),
                                 draft.get('prediction_method'), event_id)
+            if v621_policy.enabled(conn, run_id):
+                if 'metrics' in draft:
+                    receipt['metrics'] = draft['metrics']
+                set_publication(receipt, proposed_level=claim['level'], proposal_ref=ref)
         conn.execute('INSERT INTO hypothesis_revisions (hypothesis_id,revision,parent_revision,document_json,sha256,'
                      'author_principal,author_task_id,proposal_id,created_at) VALUES (?,?,?,?,?,?,?,?,?)',
                      (hid, revision, parent, ids.canonical_json(receipt), ids.sha256_of_obj(receipt), principal,

@@ -476,6 +476,72 @@
             "operation_key": {
               "type": "string",
               "minLength": 1
+            },
+            "gap_criteria": {
+              "type": "array",
+              "description": "Optional future closure tests for individual questions in gaps. Bind the cited study material and scientific scope; omit a criterion to leave a narrative gap for review.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "data_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "applicability": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "measurement_schema": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "observable": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "method": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "output_name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "nature": {
+                    "enum": [
+                      "observed",
+                      "analysis"
+                    ]
+                  },
+                  "op": {
+                    "enum": [
+                      "finite",
+                      "eq",
+                      "lt",
+                      "lte",
+                      "gt",
+                      "gte"
+                    ]
+                  },
+                  "threshold": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "question",
+                  "data_ref",
+                  "applicability",
+                  "nature",
+                  "measurement_schema",
+                  "observable",
+                  "op"
+                ],
+                "additionalProperties": false
+              }
             }
           },
           "required": [

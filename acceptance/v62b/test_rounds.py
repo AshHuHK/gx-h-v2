@@ -14,6 +14,7 @@ class ResearchRounds(unittest.TestCase):
     def setUp(self):
         self.directory = Path(self.enterContext(tempfile.TemporaryDirectory())) / "study"
         self.s = self.enterContext(Scenario(self.directory, spec_updates={
+            "evidence_policy": "gx.evidence/6.2",  # Exercise the published B round and gap semantics.
             "module_policy": {"max_rounds": 5, "no_progress_rounds": 2},
         }))
         self.ref = self.s.materials[0]

@@ -69,6 +69,8 @@ def deliver(conn, brief, limit):
                   intent={}, module_reports=[], module_catalog=[])
     if "research_evidence_version" in brief:
         packet["research_evidence_version"] = brief["research_evidence_version"]
+    if "evidence_policy" in brief:
+        packet["evidence_policy"] = brief["evidence_policy"]
     progress = brief.get("research_progress")
     if progress:
         packet["research_progress"] = {k: progress[k] for k in (

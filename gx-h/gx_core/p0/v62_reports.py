@@ -22,7 +22,7 @@ def _strings(items):
 
 
 def _validate(payload):
-    if not isinstance(payload, dict) or set(payload) != _FIELDS:
+    if not isinstance(payload, dict) or not _FIELDS <= set(payload) <= _FIELDS | {"gap_criteria"}:
         raise SchemaInvalid("Supply report content, status, artifact references and an operation key")
     if (not isinstance(payload["operation_key"], str) or not payload["operation_key"].strip()
             or payload["status"] not in ("COMPLETE", "PARTIAL") or not isinstance(payload["findings"], list)):
@@ -134,6 +134,12 @@ def _stage(conn, module, task, identity, payload, evidence, *, attempt):
               "schema": SCHEMA, "version": 1, "author": binds, "base": json.loads(task["base_json"]),
               "status": payload["status"], "findings": payload["findings"], "sources": checked,
               "gaps": payload["gaps"], "artifact_refs": payload["artifact_refs"], "next_steps": payload["next_steps"]}
+    from . import v621_metrics, v621_policy
+    if v621_policy.enabled(conn, module["run_id"]):
+        v621_metrics.render_report(conn, module["run_id"], bundle)
+    if "gap_criteria" in payload:
+        from . import v621_gaps
+        bundle.update(v621_gaps.register(conn, module, payload, checked))
     service = ArtifactService(conn)
     params = {"run_id": module["run_id"], "task_id": task["task_id"], "attempt": max(1, attempt)}
     with NamedTemporaryFile(mode="w", encoding="utf-8", dir=service.inbox_dir(module["run_id"])) as source:

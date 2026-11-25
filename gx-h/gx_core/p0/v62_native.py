@@ -60,7 +60,13 @@ def module_tools(read_tools, brief, decide):
             tool = {**tool, "inputSchema": {**original, "properties": properties}}
         if tool["name"] in ("gx_read_artifact", "gx_task_context"):
             available.append(tool)
-    available.extend((decide, contracts.native_goal_tool_spec(REPORT), contracts.native_goal_tool_spec(QUERY)))
+    from . import v621_policy
+    report = contracts.native_goal_tool_spec(REPORT)
+    if brief.get("evidence_policy") != v621_policy.VERSION:
+        form = report["inputSchema"]
+        properties = {key: value for key, value in form["properties"].items() if key != "gap_criteria"}
+        report = {**report, "inputSchema": {**form, "properties": properties}}
+    available.extend((decide, report, contracts.native_goal_tool_spec(QUERY)))
     available.extend(contracts.native_goal_tool_spec(name) for name in SOURCE_TOOLS if name in allowed)
     return [tool for tool in available if tool["name"] in allowed]
 

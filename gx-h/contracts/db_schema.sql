@@ -1606,3 +1606,28 @@ CREATE TABLE IF NOT EXISTS v62_module_wakes (
     event_id INTEGER NOT NULL UNIQUE REFERENCES events(event_id),
     PRIMARY KEY(run_id,wake_key)
 );
+
+-- The released v62_maturity.sql already created this cursor in Goal stores.
+CREATE TABLE IF NOT EXISTS v62_maturity_cursors (
+    run_id TEXT PRIMARY KEY REFERENCES v6_goals(run_id),
+    event_cursor INTEGER NOT NULL
+);
+
+-- Delivery progress is tracked by wakes and cursors. Published evidence is append-only.
+CREATE TRIGGER IF NOT EXISTS v621_report_no_update BEFORE UPDATE ON v62_module_reports
+BEGIN SELECT RAISE(ABORT, 'Published module report is immutable'); END;
+CREATE TRIGGER IF NOT EXISTS v621_report_no_delete BEFORE DELETE ON v62_module_reports
+BEGIN SELECT RAISE(ABORT, 'Published module report is immutable'); END;
+CREATE TRIGGER IF NOT EXISTS v621_report_no_replace BEFORE INSERT ON v62_module_reports
+WHEN EXISTS (SELECT 1 FROM v62_module_reports WHERE module_instance_id=NEW.module_instance_id OR report_ref=NEW.report_ref)
+BEGIN SELECT RAISE(ABORT, 'Module report already published'); END;
+CREATE TRIGGER IF NOT EXISTS v621_evidence_no_update BEFORE UPDATE ON events
+WHEN OLD.kind IN ('v62.module.reported','v62.module.tool_completed')
+BEGIN SELECT RAISE(ABORT, 'Published module evidence receipt is immutable'); END;
+CREATE TRIGGER IF NOT EXISTS v621_evidence_no_delete BEFORE DELETE ON events
+WHEN OLD.kind IN ('v62.module.reported','v62.module.tool_completed')
+BEGIN SELECT RAISE(ABORT, 'Published module evidence receipt is immutable'); END;
+CREATE TRIGGER IF NOT EXISTS v621_evidence_no_replace BEFORE INSERT ON events
+WHEN NEW.event_id > 0 AND EXISTS (SELECT 1 FROM events WHERE event_id=NEW.event_id
+    AND kind IN ('v62.module.reported','v62.module.tool_completed'))
+BEGIN SELECT RAISE(ABORT, 'Published module evidence receipt already exists'); END;

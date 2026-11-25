@@ -27,6 +27,7 @@ def cli_spec(args):
         "initial_job_limit",
         "research_effort",
         "research_modules",
+        "evidence_policy",
         "module_policy",
         "input_files",
         "capabilities",
@@ -92,6 +93,10 @@ def start(conn, spec, *, run_key, current):
         files.append({**item, "path": str(path), "sha256": observed})
     if current:
         prior = store.loads(current, "inputs_json")
+        if "evidence_policy" in spec:
+            from . import v621_policy
+            if v621_policy.for_start(spec) != prior["inputs"].get("evidence_policy", v621_policy.LEGACY):
+                raise VersionImmutable("This run key already fixed its evidence policy")
         if any(a["sha256"] != b["sha256"] for a, b in zip(files, prior["files"])):
             raise VersionImmutable("This run key granted different material bytes; supply a new run key")
         return snapshot(conn, current["run_id"])
@@ -103,12 +108,13 @@ def start(conn, spec, *, run_key, current):
         or len(requested) != len(set(requested))
     ):
         raise SchemaInvalid("capabilities must be a list of distinct, versioned methods")
-    from . import v62_catalog
+    from . import v62_catalog, v621_policy
 
     research_catalog = v62_catalog.for_start(spec)
     public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []),
                                                  module_catalog=research_catalog)
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
+    inputs["evidence_policy"] = v621_policy.for_start(spec)
     if research_catalog is not None:
         inputs["research_catalog"] = research_catalog
         inputs["research_evidence_version"] = "gx.research.v6.2b.1"
@@ -606,6 +612,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     if data["inputs"].get("research_evidence_version"):
         from . import v62_outputs, v62_rounds
         brief["research_evidence_version"] = data["inputs"]["research_evidence_version"]
+        if data["inputs"].get("evidence_policy"):
+            brief["evidence_policy"] = data["inputs"]["evidence_policy"]
         brief.update(v62_rounds.brief(conn, rid, cursor))
         # A released node exposes all its named outputs. The primary result
         # remains the graph dependency, including on cold continuation.
@@ -965,6 +973,8 @@ def projection(conn, run, meter):
         ],
     }
     inputs = store.loads(run, "inputs_json")["inputs"]
+    if inputs.get("evidence_policy"):
+        result["evidence_policy"] = inputs["evidence_policy"]
     if inputs.get("research_evidence_version"):
         from . import v62_rounds
         result.update(v62_rounds.brief(conn, rid, None))

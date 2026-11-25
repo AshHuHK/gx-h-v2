@@ -157,10 +157,22 @@ def _identity(claim):
     return {key: claim.get(key) for key in ("statement", "scope", "criteria", "chain_pairs", "decision_scope")}
 
 
+def _same_proposition(claim, prior):
+    if not prior or _identity(prior) != _identity(claim):
+        return False
+    if "publication" in prior:
+        if prior["limitations"] != claim["limitations"]:
+            return False
+        prior_rule = prior["maturity"]["registration"]
+        if "prediction" in claim and prior_rule and claim["prediction"] != prior_rule["prediction"]:
+            return False
+    return True
+
+
 def registration(claim, prior, data, method_pin, event_id):
     """Only adoption registers the rule. A change of proposition, scope, data or rule starts a new clock."""
     previous = (prior or {}).get("maturity", {}).get("registration")
-    same_claim = bool(prior and _identity(prior) == _identity(claim))
+    same_claim = _same_proposition(claim, prior)
     prediction = claim.get("prediction")
     if previous and same_claim and (prediction is None or prediction == previous["prediction"]):
         return previous
@@ -587,7 +599,7 @@ def assessment(conn, run, claim, reg, through, available_through):
 
 
 def continuing_lineage(claim, prior):
-    return prior.get("maturity_lineage", []) if prior and _identity(prior) == _identity(claim) else []
+    return prior.get("maturity_lineage", []) if _same_proposition(claim, prior) else []
 
 
 def attach(conn, run, claim, prior, data, method_pin, event_id):
@@ -648,6 +660,10 @@ def reassess(conn, run_id):
                        "assessment_cursor": through, "availability_cursor": available,
                        "assessment_of": old["claim_revision_id"], "revision_author": "GX", "maturity": new,
                        "maturity_lineage": [*old["maturity_lineage"], revision_id]}
+            if "publication" in old:
+                published = old["publication"]
+                v6_claims.set_publication(receipt, proposed_level=published["proposed_level"],
+                                          proposal_ref=published["proposal_ref"])
             conn.execute("INSERT INTO hypothesis_revisions(hypothesis_id,revision,parent_revision,document_json,sha256,"
                          "author_principal,created_at) VALUES(?,?,?,?,?,'GX',?)",
                          (hid, version, parent, ids.canonical_json(receipt), ids.sha256_of_obj(receipt), clock.now_iso()))

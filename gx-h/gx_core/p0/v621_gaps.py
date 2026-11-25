@@ -1,0 +1,144 @@
+"""Bind a research gap to an observable on a specific acquired material."""
+import json
+import operator
+import re
+
+from ..domain import ids
+from ..errors import GxError, SchemaInvalid, ScopeDenied, StaleRevision
+from . import v62_maturity, v62_outputs, v621_policy
+
+_COMPARISONS = {"eq": operator.eq, "lt": operator.lt, "lte": operator.le, "gt": operator.gt, "gte": operator.ge}
+
+
+def register(conn, module, payload, sources):
+    declarations = payload.get("gap_criteria")
+    if declarations is None:
+        return {}
+    if not v621_policy.enabled(conn, module["run_id"]):
+        raise SchemaInvalid("Gap criteria require the current research evidence policy")
+    available = {s["artifact_ref"]: s["sha256"] for s in sources}
+    result = {}
+    for entry in declarations:
+        q, ref = entry["question"], entry["data_ref"]
+        if q not in payload["gaps"] or q in result or payload["gaps"].count(q) != 1:
+            raise SchemaInvalid("Each gap criterion must identify a single reported question")
+        if ref not in available:
+            raise ScopeDenied("A gap must cite the material it concerns")
+        for field in ("question", "applicability", "measurement_schema", "observable"):
+            if not entry[field].strip():
+                raise SchemaInvalid(f"A gap criterion requires {field}")
+        pointer = entry["observable"]
+        if not pointer.startswith("/") or len(pointer) < 2 or re.search(r"~(?![01])", pointer):
+            raise SchemaInvalid("A gap observable must name a numeric field using a JSON Pointer")
+        op = entry["op"]
+        if op == "finite":
+            if "threshold" in entry:
+                raise SchemaInvalid("A finite reading criterion has no threshold")
+        elif op not in _COMPARISONS or not v62_maturity._finite(entry.get("threshold")):
+            raise SchemaInvalid("A threshold criterion requires a finite value and supported comparison")
+        method_pin = None
+        if entry["nature"] == "analysis":
+            method = entry.get("method", "")
+            if method.count("@") != 1 or not entry.get("output_name", "").strip():
+                raise SchemaInvalid("An analysis criterion requires the method version and named output")
+            method_pin = v62_maturity.pin_method(conn, module["run_id"],
+                {"method": {"capability": method, "output": entry["output_name"]}})
+        elif entry["nature"] != "observed" or "method" in entry or "output_name" in entry:
+            raise SchemaInvalid("Original observations and named analysis outputs have separate criteria")
+        criterion = {**entry, "version": 1, "data_sha256": available[ref]}
+        if method_pin:
+            criterion["method_sha256"] = method_pin["manifest_sha256"]
+        result[q] = criterion
+    return {"gap_criteria": result}
+
+
+def declaration(bundle, question, source_hashes, report_ref, report_event):
+    criterion = bundle.get("gap_criteria", {}).get(question)
+    goal = bundle["goal_version"]
+    key = "gap:" + ids.sha256_of_obj([bundle["run_id"], goal, question.casefold().split(), source_hashes, criterion])
+    return {"gap_ref": key, "question": question, "report_ref": report_ref, "goal_version": goal,
+            "registered_event_id": report_event, "criterion": criterion,
+            "closure": "conditional" if criterion else "awaiting_review"}
+
+
+def _match(conn, fact, criterion, boundary):
+    if fact["nature"] != criterion["nature"] or fact["record_kind"] not in ("supplied_observation", "job_output"):
+        return "source_nature", None
+    if "model_prediction" in fact["upstream_natures"] or not fact["original_observations"]:
+        return "missing_original", None
+    target = {"artifact_ref": criterion["data_ref"], "sha256": criterion["data_sha256"]}
+    if target not in fact["data_refs"] and target not in fact["original_observations"]:
+        return "different_material", None
+    if set(fact["applicability_scopes"]) != {criterion["applicability"]}:
+        return "different_scope", None
+    capability = fact.get("capability", {})
+    if criterion["nature"] == "analysis" and (
+        criterion["method"] != f"{capability.get('id')}@{capability.get('version')}"
+        or criterion["method_sha256"] != capability.get("sha256")
+        or criterion["output_name"] != fact.get("output_name")
+    ):
+        return "different_method_or_output", None
+    first = v62_maturity._first_relevant(conn, fact, {"event_id": boundary})
+    if first is None or first <= boundary:
+        return "already_available", None
+    number, name = v62_maturity._measurement(conn, fact["artifact_ref"], criterion["observable"])
+    if name != criterion["measurement_schema"] or number is None:
+        return "missing_observable_or_schema", None
+    if criterion["op"] != "finite" and not _COMPARISONS[criterion["op"]](number, criterion["threshold"]):
+        return "threshold_not_met", None
+    receipt = {key: fact[key] for key in ("artifact_ref", "sha256", "nature", "record_kind",
+                                         "original_observations", "applicability_scopes")}
+    receipt.update(value=number, observable=criterion["observable"], measurement_schema=name,
+                   first_production_event=first, output_name=fact.get("output_name"), job_id=fact.get("job_id"))
+    if fact.get("job_id"):
+        receipt.update(capability=capability, admission_sha256=fact["admission_sha256"],
+                       manifest_sha256=fact["completion_sha256"])
+    return "matched", receipt
+
+
+def prepare(conn, task, decision):
+    """Classify visible source bytes and perform numerical comparisons before the writer is acquired."""
+    selected = decision["resolved_gaps"]
+    if task["scope"] != "run":
+        raise ScopeDenied("Only the Run Lead can resolve research gaps")
+    brief = json.loads(task["snapshot_json"])
+    gaps = {g["gap_ref"]: g for g in brief.get("research_progress", {}).get("open_gaps", [])}
+    if any(g not in gaps for g in selected):
+        raise ScopeDenied("The requested gap must be open in this frozen Lead brief")
+    visible = set(json.loads(task["visible_refs_json"]))
+    if not set(decision["evidence_refs"]) <= visible:
+        raise ScopeDenied("Use gap evidence released into this Lead brief")
+    facts, results = {}, []
+    for key in selected:
+        gap = gaps[key]
+        criterion = gap.get("criterion")
+        row = {"gap_ref": key, "goal_version": task["goal_version"], "criterion": criterion,
+               "report_ref": gap["report_ref"], "through_cursor": task["event_cursor"],
+               "matches": [], "rejections": []}
+        if criterion is None:
+            row["reason"] = "awaiting_review"
+        elif gap.get("goal_version") != task["goal_version"]:
+            raise StaleRevision("A different goal version established this gap")
+        else:
+            for ref in decision["evidence_refs"]:
+                if ref not in facts:
+                    try:
+                        facts[ref] = v62_outputs.classify(conn, task["run_id"], ref, scope="run",
+                                                          through_event=task["event_cursor"])
+                    except GxError as exc:
+                        facts[ref] = exc
+                if isinstance(facts[ref], GxError):
+                    row["rejections"].append({"artifact_ref": ref, "reason": "unverified_source",
+                                               "code": facts[ref].code})
+                    continue
+                reason, match = _match(conn, facts[ref], criterion, gap["registered_event_id"])
+                if match is None:
+                    row["rejections"].append({"artifact_ref": ref, "reason": reason})
+                else:
+                    row["matches"].append(match)
+            row["reason"] = "matched" if row["matches"] else "no_matching_evidence"
+        results.append(row)
+    if any(row["reason"] != "matched" for row in results):
+        raise SchemaInvalid("The batch includes unresolved research gaps; submit matching gaps separately",
+                            details={"gap_results": results})
+    return results

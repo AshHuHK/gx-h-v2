@@ -197,8 +197,10 @@ def _brief(conn, row, nodes):
     funds = budgets.state(conn, row["budget_ref"])
     operations = _operations(conn, row)
     # A new decision receives confirmed references and field summaries, never another scope's materials.
+    from . import v621_policy
     return {
         "run_id": row["run_id"],
+        **({"evidence_policy": v621_policy.VERSION} if v621_policy.enabled(conn, row["run_id"]) else {}),
         "scope": row["scope"],
         "goal": snapshot["goal"],
         "module": module,

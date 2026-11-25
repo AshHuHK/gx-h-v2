@@ -31,7 +31,7 @@ def migrations():
 # formal contract. Their original bytes remain the migration ledger identity.
 _PROMOTED = frozenset(f"p0.migration.{name}" for name in (
     "v6.sql", "v6_job_indexes.sql", "v6_funding.sql", "v6_native.sql",
-    "zzzzzzzzzz_v6_job_attempts.sql",
+    "zzzzzzzzzz_v6_job_attempts.sql", "v62_maturity.sql",
 ))
 _CREATE = re.compile(r"^CREATE (?:TABLE|INDEX|TRIGGER) (\w+)\b", re.MULTILINE)
 
@@ -58,11 +58,13 @@ def verify_promoted(conn, *, require_all):
     """Check objects already installed and identify DDL still owed by each unreceipted migration."""
     missing = {}
     meta = store.read_meta(conn)
+    objects = _promoted_objects()
+    placeholders = ",".join("?" for _ in objects)
     installed = dict(conn.execute(
-        "SELECT lower(name),sql FROM sqlite_schema "
-        "WHERE lower(name) GLOB 'v6_*' OR lower(name)='p0_v6_native_calls'"
+        f"SELECT lower(name),sql FROM sqlite_schema WHERE lower(name) IN ({placeholders})",
+        tuple(objects),
     ))
-    for name, (key, digest, sql) in _promoted_objects().items():
+    for name, (key, digest, sql) in objects.items():
         if key in meta and meta[key] != digest:
             raise ValueError(f"Applied P0 migration changed on disk: {key}")
         if name not in installed and not require_all and key not in meta:

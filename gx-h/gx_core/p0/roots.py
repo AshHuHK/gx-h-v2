@@ -951,7 +951,7 @@ class Roots:
                     raise
                 if (p.get("tool") == v62_native.REPORT and exc.details.get("category") == "module_report_structure"
                         and v621_policy.current(self.conn, self.run_id)):
-                    spec = v62_native.evidence_tool(v62_native.REPORT, v621_policy.VERSION)
+                    spec = v62_native.evidence_tool(v62_native.REPORT, v621_policy.pinned(self.conn, self.run_id))
                     exc.details["contract_digest"] = ids.sha256_of_obj(spec["inputSchema"])
                 elif (p.get("tool") != "gx_submit_product" or exc.details.get("category") != "product_structure"
                       or not exc.details.get("contract_digest")):
@@ -1147,6 +1147,12 @@ class Roots:
 
     def _read_artifact(self, binding, args):
         ref, offset = args.get("ref"), args.get("offset")
+        if "endpoint_offset" in args:
+            if set(args) != {"ref", "endpoint_offset"} or not isinstance(ref, str) or not v621_policy.live_science(self.conn, self.run_id):
+                raise SchemaInvalid("An endpoint page requires a scoped ref and endpoint_offset")
+            self._artifact_access(binding, ref)
+            from . import v623_endpoints
+            return v623_endpoints.page(self.conn, self.run_id, ref, args["endpoint_offset"])
         if not isinstance(ref, str) or args.keys() - {"ref", "offset"} or (
                 "offset" in args and (type(offset) is not int or offset < 0)):
             raise SchemaInvalid("gx_read_artifact requires a reference and accepts a nonnegative byte offset")

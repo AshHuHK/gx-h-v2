@@ -7,7 +7,8 @@ from ..artifacts import ArtifactService
 from ..errors import SchemaInvalid
 from . import v621_policy
 
-READERS = (archive_coordinates.verify,)
+READERS = (partial(archive_coordinates.verify, verify_revision=True),)
+V622_READERS = (archive_coordinates.verify,)
 
 
 def prepare(conn, run_id, source, acquisition, digest, media_type, *, raw=None, ref=None):
@@ -41,7 +42,8 @@ def prepare(conn, run_id, source, acquisition, digest, media_type, *, raw=None, 
         parents.append((pin["sha256"], partial(assets.read_bytes, pin["artifact_ref"], expected_sha256=pin["sha256"])))
     # Raw ingestion callers have already hashed the buffer; references are read through the artifact owner.
     read = (lambda: raw) if raw is not None else partial(assets.read_bytes, ref, expected_sha256=digest)
-    for reader in READERS:
+    readers = READERS if v621_policy.live_science(conn, run_id) else V622_READERS
+    for reader in readers:
         proof = reader(media_type or "", labels, digest, read, parents, processing, acquisition.get("transformation"))
         if proof is not None:
             return dict(schema="gx.source_identity/1", artifact_sha256=digest, **proof)

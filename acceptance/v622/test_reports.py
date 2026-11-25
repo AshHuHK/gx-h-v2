@@ -97,7 +97,8 @@ class ReportEvidence(unittest.TestCase):
 
     def test_index_only_requires_explicit_read_and_scoped_metric_selector(self):
         directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
-        s, assets, origin, node, output, worker = self.measured_output(directory, module_policy={"report_bytes":512})
+        s, assets, origin, node, output, worker = self.measured_output(directory, module_policy={"report_bytes":512},
+                historical_replay=True, evidence_policy="gx.evidence/6.2.2")
         notes = [{"text": "三聚體及第一個結構域。 IL-2 and pH 7.2. The analyst estimates ninety percent.",
                   "source_refs": [output]}]
         selector = {"artifact_ref": output, "metric_id": "coverage"}

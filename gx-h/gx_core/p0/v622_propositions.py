@@ -9,6 +9,8 @@ RULE = "gx.claim-proposition/2"
 
 def same_endpoint(previous, prediction, method_pin):
     old = previous["prediction"]
+    if previous.get("chronology_scope") and old.get("external_endpoint") != prediction.get("external_endpoint"):
+        return False
     if any(old.get(k) != prediction.get(k) for k in ("target", "measurement_schema")):
         return False
     old_method = previous.get("method_pin")
@@ -26,7 +28,7 @@ def exposed_materials(prior):
             if pin["qualification"] in ("prospective", "retrospective")}
 
 
-def freeze(conn, registration, claim, prior):
+def freeze(conn, registration, claim, prior, *, typed_chronology=False):
     from . import v62_maturity
 
     pred = registration["prediction"]
@@ -34,14 +36,25 @@ def freeze(conn, registration, claim, prior):
         "measurement_schema": pred["measurement_schema"], "observable": pred["observable"], "target": pred["target"]}
     spec_sha = specification.get("measurement_spec_sha256") or ids.sha256_of_obj(specification)
     registration.update(policy=RULE, quantifier=pred.get("quantifier", "all"), measurement_spec_sha256=spec_sha)
+    if typed_chronology:
+        from . import v623_chronology
+        spec_sha = ids.sha256_of_obj(v623_chronology.endpoint(pred, registration.get("method_pin")))
+        registration.update(policy=v623_chronology.RULE, chronology_scope="same_store", measurement_spec_sha256=spec_sha)
     registration["proposition_sha256"] = ids.sha256_of_obj({
         "claim": registration["claim_sha256"], "limitations": claim["limitations"], "scope": claim["scope"],
         "measurement": spec_sha,
-        "materials": sorted(p["sha256"] for p in registration["data"]), "quantifier": registration["quantifier"],
+        "materials": sorted(p.get("material_key", p["sha256"]) for p in registration["data"]), "quantifier": registration["quantifier"],
         "comparison": pred["operator"], "threshold": pred["threshold"], "target": pred["target"],
         "observable": None if registration.get("method_pin") else pred["observable"]})
     # Narrowing the text of a previously tested claim cannot hide the original
     # reading. Preserve its material binding without tainting unmeasured siblings.
+    if typed_chronology:
+        bindings = {}
+        timeline = v623_chronology.availability(conn, registration, registration["event_id"], bindings=bindings)
+        registration["endpoint_chronology_at_registration"] = timeline
+        registration["known_at_registration"] = {k: t["endpoint_first_available_event_id"] is not None
+                                                 for k, t in timeline.items()}
+        return timeline, bindings
     previously_tested = exposed_materials(prior) if registration["posthoc_revision_of"] else set()
     registration["known_at_registration"] = {}
     for pin in registration["data"]:
@@ -60,12 +73,12 @@ def input_materials(fact, observation, reading):
     return direct if len(direct) == 1 else []
 
 
-def with_coverage(reg, results, gaps):
+def with_coverage(reg, results, gaps, timeline=None):
     by_material = []
     for pin in reg["data"]:
-        sha = pin["sha256"]
-        eligible = [r for r in results if sha in r["matched_data_sha256"]]
-        excluded = [g for g in gaps if sha in g.get("matched_data_sha256", ())]
+        sha = pin.get("material_key", pin["sha256"])
+        eligible = [r for r in results if sha in r.get("matched_material_keys", r["matched_data_sha256"])]
+        excluded = [g for g in gaps if sha in g.get("matched_material_keys", g.get("matched_data_sha256", ()))]
         confirmed = [r["artifact_ref"] for r in eligible if r["supports"]]
         adverse = [r["artifact_ref"] for r in eligible if not r["supports"]]
         if eligible:
@@ -76,7 +89,14 @@ def with_coverage(reg, results, gaps):
             status = "timing_unknown"
         else:
             status = "unmeasured"
-        by_material.append({**pin, "qualification": status,
+        timing = timeline[sha] if timeline is not None else {}
+        first = timing.get("endpoint_first_available_event_id")
+        if first is not None:
+            if first <= reg["event_id"]:
+                status = "retrospective"
+            elif status == "unmeasured":
+                status = "measured_unqualified"
+        by_material.append({**pin, **timing, "qualification": status,
                             "measurement_spec_sha256": reg["measurement_spec_sha256"],
                             "known_at_registration": reg["known_at_registration"][sha],
                             "registration_event_id": reg["event_id"],

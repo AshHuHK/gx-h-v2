@@ -71,7 +71,10 @@ def pin_data(conn, run, prediction, visible):
             raise SchemaInvalid("A prediction data reference must identify an immutable artifact version")
         pins.append(dict(row))
     if len({pin["sha256"] for pin in pins}) != len(pins):
-        raise SchemaInvalid("Several aliases of one data version cannot register distinct acquisitions")
+        from . import v621_policy, v623_chronology
+        if not v621_policy.live_science(conn, run):
+            raise SchemaInvalid("Several aliases of one data version cannot register distinct acquisitions")
+        v623_chronology.distinguish_samples(conn, run, pins)
     return pins
 
 
@@ -95,6 +98,10 @@ def _measurement(conn, ref, pointer):
         value = asset.read_json(ref)
     except SchemaInvalid:  # Non-JSON data have no numeric JSON Pointer.
         return None, None
+    return _scalar_at(value, pointer)
+
+
+def _scalar_at(value, pointer):
     metric = value.get("schema") if isinstance(value, dict) else None
     for part in pointer[1:].split("/"):
         key = part.replace("~1", "/").replace("~0", "~")
@@ -168,6 +175,8 @@ def _equivalent_rule(previous, prediction, data, method_pin):
     if not (previous.get("policy") and previous.get("method_pin") and method_pin):
         return False
     comparable = ("target", "measurement_schema", "operator", "threshold")
+    if previous.get("chronology_scope") and {p["artifact_ref"] for p in data} != {p["artifact_ref"] for p in previous["data"]}:
+        return False
     return (previous["method_pin"]["measurement_spec_sha256"] == method_pin["measurement_spec_sha256"]
             and previous.get("quantifier", "all") == prediction.get("quantifier", "all")
             and all(previous["prediction"].get(k) == prediction.get(k) for k in comparable)
@@ -240,7 +249,11 @@ def _reading(conn, reg, fact):
         return None, reading["value"], reading.get("metric"), reading
     if reg.get("policy") and fact.get("job_id"):
         return "method_not_registered", None, None, None
-    value, metric = _measurement(conn, fact["artifact_ref"], reg["prediction"]["observable"])
+    if reg.get("chronology_scope"):
+        from . import v623_chronology
+        value, metric = v623_chronology.external_measurement(conn, fact["artifact_ref"], reg["prediction"])
+    else:
+        value, metric = _measurement(conn, fact["artifact_ref"], reg["prediction"]["observable"])
     reason = None if _metric_matches(reg, fact, metric) else "method_or_measurement_schema_mismatch"
     return reason, value, metric, None
 
@@ -429,7 +442,7 @@ def _failure_matches(conn, item, data):
     return False
 
 
-def _results(conn, run, claim, reg, through, *, require_acquisition=False):
+def _results(conn, run, claim, reg, through, *, require_acquisition=False, timeline=None, bindings=None):
     from . import v62_outputs
     pred = reg["prediction"]
     data = {p["sha256"] for p in reg["data"]}
@@ -449,7 +462,7 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
         fact = v62_outputs.classify(conn, run, ref, scope=observed_scope, through_event=through)
         pins = {p["sha256"] for p in fact.get("data_refs", [])} | {fact["sha256"]}
         matches = sorted(data & pins)
-        if not matches:
+        if not matches and (bindings is None or not any(p["artifact_ref"] in bindings for p in [fact, *fact.get("data_refs", ())])):
             continue
         identity = ids.sha256_of_obj([fact["sha256"], fact["nature"], fact.get("capability"), fact.get("output_name"),
                                       fact.get("dependencies"), fact.get("unknown_dependencies"),
@@ -469,7 +482,11 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
         if reg.get("policy"):
             from . import v622_propositions
             material_pins = v622_propositions.input_materials(fact, item, reading)
-            matches = sorted(data.intersection(p["sha256"] for p in material_pins))
+            if bindings is not None:
+                keys = sorted({key for p in material_pins for key in bindings.get(p["artifact_ref"], ())})
+                matches = sorted({p["sha256"] for p in reg["data"] if p.get("material_key", p["sha256"]) in keys})
+            else:
+                matches = sorted(data.intersection(p["sha256"] for p in material_pins))
             if not matches:
                 gaps.append({"kind": "no_individual_material_attribution", "event_id": eid, "artifact_ref": ref})
                 continue
@@ -478,7 +495,12 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
             passed = COMPARISONS[pred["operator"]](comparison_value(reading), Decimal(str(pred["threshold"])))
         else:
             passed = COMPARISONS[pred["operator"]](value, pred["threshold"])
-        first = _first_relevant(conn, fact, reg)
+        if timeline is None:
+            first = _first_relevant(conn, fact, reg)
+        else:
+            from . import v623_chronology
+            first = min((timeline[sha]["endpoint_first_available_event_id"] for sha in keys
+                         if timeline[sha]["endpoint_first_available_event_id"] is not None), default=None)
         launch = None
         if fact.get("job_id"):
             launch = conn.execute("SELECT min(event_id) FROM events WHERE subject_id=? AND kind='job.transition' "
@@ -486,6 +508,9 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
         exclusion = None
         if fact.get("record_kind") == "test_fixture":
             exclusion = "test_fixture"
+        elif (timeline is not None and not fact.get("job_id") and pred["target"] == "experimental_observation" and
+              (not v623_chronology.sample_identified(item) or fact.get("record_kind") == "conflicting_acquisition")):
+            exclusion = "unknown_first_production"
         elif (require_acquisition and fact["nature"] in ("observed", "analysis")
               and not fact.get("original_inputs_grounded")):
             exclusion = "missing_original_acquisition"
@@ -498,7 +523,7 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
             exclusion = "out_of_scientific_scope"
         elif first is None:
             exclusion = "unknown_first_production"
-        elif first <= reg["event_id"] or any(reg.get("known_at_registration", {}).get(sha) for sha in matches):
+        elif first <= reg["event_id"] or any(reg.get("known_at_registration", {}).get(sha) for sha in (keys if timeline is not None else matches)):
             exclusion = "already_available"
         elif fact.get("job_id") and (launch is None or launch <= reg["event_id"]):
             exclusion = "unverified_production_order"
@@ -506,6 +531,8 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
             gap = {"kind": exclusion, "artifact_ref": ref, "event_id": eid, "nature": fact["nature"]}
             if reg.get("policy"):
                 gap.update(matched_data_sha256=matches, sha256=fact["sha256"])
+                if timeline is not None:
+                    gap["matched_material_keys"] = keys
                 if reading:
                     gap["measurement"] = reading
             if exclusion in ("already_available", "unverified_production_order"):
@@ -523,6 +550,7 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False):
         results.append({"artifact_ref": ref, "sha256": fact["sha256"], "event_id": eid, "first_event_id": first,
                         "first_bytes_event_id": fact.get("first_event_id"), "launch_event_id": launch,
                         "nature": fact["nature"], "value": value, "supports": passed, "matched_data_sha256": matches,
+                        **({"matched_material_keys": keys} if timeline is not None else {}),
                         **({"measurement": reading} if reading else {}),
                         "measurement_schema": metric, "capability": fact.get("capability"), "output_name": fact.get("output_name"),
                         "original_observations": fact.get("original_observations", []),
@@ -616,7 +644,7 @@ def _grounds(conn, run, claim, through):
     return facts
 
 
-def assessment(conn, run, claim, reg, through, available_through):
+def assessment(conn, run, claim, reg, through, available_through, *, frozen_chronology=None):
     """Reproducible for the two recorded cursors, including a frozen brief older than adoption."""
     facts = _grounds(conn, run, claim, through)
     disputed = {fact.get("evidence_ref") for fact in facts.values()
@@ -642,12 +670,25 @@ def assessment(conn, run, claim, reg, through, available_through):
     coverage = []
     results, pairs, preexisting = [], [], False
     if reg:
-        results, test_gaps, old = _results(conn, run, claim, reg, through, require_acquisition=require_acquisition)
+        timeline = bindings = None
+        if reg.get("chronology_scope"):
+            from . import v623_chronology
+            cursor = max(available_through, through)
+            if frozen_chronology is not None and cursor == reg["event_id"]:
+                timeline, bindings = frozen_chronology
+            else:
+                bindings = {}
+                timeline = v623_chronology.availability(conn, reg, cursor, bindings=bindings)
+        results, test_gaps, old = _results(conn, run, claim, reg, through, require_acquisition=require_acquisition,
+                                           timeline=timeline, bindings=bindings)
         gaps.extend(test_gaps)
         if current:
             from . import v622_propositions
-            coverage = v622_propositions.with_coverage(reg, results, test_gaps)
-            preexisting = old or any(r["known_at_registration"] for r in coverage)
+            coverage = v622_propositions.with_coverage(reg, results, test_gaps, timeline)
+            if timeline is not None:
+                preexisting = old or any(r["qualification"] == "retrospective" for r in coverage)
+            else:
+                preexisting = old or any(r["known_at_registration"] for r in coverage)
         else:
             preexisting = old or _known_before(conn, reg, available_through)
         pairs = _independence(results, claim["scope"])
@@ -701,7 +742,7 @@ def assessment(conn, run, claim, reg, through, available_through):
         reasons.append("Published reviews dispute this extraction. Its interpretation remains unresolved.")
     if opposing:
         reasons.append("Adverse results or independently reviewed opposing evidence are retained.")
-    return {"rule": v622_propositions.RULE if current else RULE,
+    return {"rule": reg["policy"] if current else RULE,
             **({"material_coverage": coverage} if current else {}), "stage": stage, "direction": direction, "reasons": reasons, "registration": reg,
             "preexisting_result": preexisting, "grounds": grounded, "reviewed_evidence": reviews, "disputed_extractions": sorted(disputed),
             "supporting_refs": support, "opposing_refs": opposing, "results": results, "replication": pairs,
@@ -718,13 +759,16 @@ def attach(conn, run, claim, prior, data, method_pin, event_id):
         claim["continuing_review_refs"] = [r["review_ref"] for r in prior["maturity"]["reviewed_evidence"]]
     claim["maturity_lineage"] = list(dict.fromkeys([*lineage, claim["claim_ref"], claim["claim_revision_id"]]))
     reg = registration(claim, prior, data, method_pin, event_id)
+    frozen_chronology = None
     if reg and reg["event_id"] == event_id:
         from . import v621_policy, v622_propositions
         if v621_policy.current(conn, run):
-            v622_propositions.freeze(conn, reg, claim, prior)
+            frozen_chronology = v622_propositions.freeze(conn, reg, claim, prior,
+                                                         typed_chronology=v621_policy.live_science(conn, run))
     claim["assessment_cursor"] = claim["event_cursor"]
     claim["availability_cursor"] = event_id
-    claim["maturity"] = assessment(conn, run, claim, reg, claim["assessment_cursor"], event_id)
+    claim["maturity"] = assessment(conn, run, claim, reg, claim["assessment_cursor"], event_id,
+                                   frozen_chronology=frozen_chronology)
 
 
 def recompute(conn, run, revision):

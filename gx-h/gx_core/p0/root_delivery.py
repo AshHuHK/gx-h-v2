@@ -290,7 +290,8 @@ class RootDelivery:
             "(SELECT 1 FROM p0_usage_releases x WHERE x.reservation_ref=r.reservation_ref AND x.confirmation_event_id IS NULL)) OR (mt.confidence='ESTIMATED' AND EXISTS "
             "(SELECT 1 FROM p0_root_terminals e WHERE e.thread_id=d.thread_id AND e.turn_id=d.turn_id)))",
             (thread_id,)).fetchall()
-        targets = {row["turn_id"] for row in pending}
+        from . import v623_exposure
+        targets = {row["turn_id"] for row in pending} | v623_exposure.pending_reads(self.conn,self.run_id,thread_id)
         with store.transaction(
             self.conn, transaction_owner="RootDelivery", operation="attach_thread", run_id=self.run_id,
         ):
@@ -597,6 +598,8 @@ class RootDelivery:
         row = self._get(event_id)
         if row["turn_id"] != turn_id:
             raise OutcomeUnknown("Codex returned inconsistent turn receipts")
+        from . import v623_exposure
+        v623_exposure.brief_ack(self.conn, self.roots._binding(row["thread_id"]), row)
         self._settle(row["thread_id"], turn_id)
 
     def _settle(self, thread_id, turn_id):
@@ -709,6 +712,9 @@ class RootDelivery:
                 and item.get('tool') in response_attribution.FINAL_TOOLS and item.get('status') == 'failed'
                 and item.get('success') is False and item.get('contentItems') == []):
             self._cancelled_products[thread_id, turn_id] = item.get('id')
+        if item.get("type") == "dynamicToolCall" and item.get("tool") == "gx_read_artifact":
+            from . import v623_exposure
+            v623_exposure.read_completed(self.conn, self.roots._binding(thread_id), turn_id, item)
         if item.get("type") != "userMessage" or not isinstance(item.get("clientId"), str):
             return
         content = item.get("content")
@@ -994,18 +1000,21 @@ class RootDelivery:
             "AND (d.state='sending' OR r.status='HELD' OR (mt.confidence='ESTIMATED' AND EXISTS "
             "(SELECT 1 FROM p0_root_terminals e WHERE e.thread_id=d.thread_id AND e.turn_id=d.turn_id)))",
             (self.run_id, thread_id)).fetchall()
-        if not rows:
+        from . import v623_exposure
+        read_turns = v623_exposure.pending_reads(self.conn,self.run_id,thread_id)
+        if not rows and not read_turns:
             return
         pending = {row["event_id"]: row["target_turn"] for row in rows if row["state"] == "sending"
                    and not row["interrupt"]}
         targets = {row["turn_id"] or row["target_turn"] for row in rows} - {None}
+        targets |= read_turns
         turns = self._pages("thread/turns/list", {"threadId": thread_id, "sortDirection": "desc",
                                                  "itemsView": "notLoaded", "limit": 64})
         try:
             for turn in turns:
                 tid = turn["id"]
                 terminal = turn["status"] in TERMINAL
-                inspect_items = tid in pending.values() or None in pending.values()
+                inspect_items = tid in read_turns or tid in pending.values() or None in pending.values()
                 if terminal and tid in targets:
                     inventory = self.conn.execute("SELECT children_known FROM p0_root_turn_usage "
                                                   "WHERE thread_id=? AND turn_id=?", (thread_id, tid)).fetchone()

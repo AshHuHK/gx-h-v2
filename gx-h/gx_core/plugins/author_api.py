@@ -235,7 +235,7 @@ class _ResearchModules(_Registrar):
 
     def register(self, *, module_id, version, purpose, output, cost_class, focuses, instructions,
                  capabilities, tools, input_roles, efforts=("medium", "deep"), catalog_access="assigned",
-                 published_inputs_only=False):
+                 published_inputs_only=False, method_profiles=()):
         if not isinstance(module_id, str) or not re.fullmatch(r"[a-z][a-z0-9_.-]*", module_id):
             raise ValueError("research module_id must be a stable identifier")
         if not isinstance(version, str) or not re.fullmatch(r"[0-9][0-9A-Za-z.-]*", version):
@@ -264,6 +264,17 @@ class _ResearchModules(_Registrar):
             raise ValueError("published_inputs_only must be a boolean")
         # Omit the default so declarations already pinned by A keep their original identity.
         discovery = {"catalog_access": catalog_access} if catalog_access != "assigned" else {}
+        if method_profiles:
+            if capabilities or catalog_access != "assigned" or not isinstance(method_profiles, (tuple, list)):
+                raise ValueError("Use method profiles with an assigned catalog and no static method list")
+            for profile in method_profiles:
+                if not isinstance(profile, dict) or set(profile) not in (
+                    {"output_nature"}, {"method_family", "input_role", "output_kind"}
+                ):
+                    raise ValueError("A method profile needs a sourced output nature or family and typed roles")
+                for key, value in profile.items():
+                    _name(value, key)
+            discovery["method_profiles"] = method_profiles
         if published_inputs_only:
             discovery["published_inputs_only"] = True
         self._add((module_id, version), _copy_schema({

@@ -54,7 +54,7 @@ class NamedModuleOutputs(unittest.TestCase):
         source = module_fixture(tmp)
         with native_state(state), closing(store.open_store(state / "gx.db")) as conn:
             with patch.object(series, "FIXTURE", source):
-                run, raw = series.start_series_goal(self, conn, tmp, effort="deep")
+                run, raw = series.start_series_goal(self, conn, tmp, effort="deep", historical_replay=True)
 
         def open_worker(world, key):
             args = world.open_args(key, caps=[series.METHOD], inputs=[raw],

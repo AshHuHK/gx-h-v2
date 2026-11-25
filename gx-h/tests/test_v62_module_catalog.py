@@ -51,7 +51,8 @@ class ModuleCatalog(unittest.TestCase):
 
     def test_normal_goal_preserves_exact_module_grant_and_summarizes_all_methods(self):
         caps = ["deposited-chain-geometry@1", "tl1a-coordinate-quality@1"]
-        conn, run, frozen = self.start("medium", {"research_modules": ["data_inventory@1"], "capabilities": caps,
+        conn, run, frozen = self.start("medium", {"evidence_policy": v621_policy.V622, "historical_replay": True,
+                                      "research_modules": ["data_inventory@1"], "capabilities": caps,
                                       "plugins": ["org.gx.protein@0.2.0", "org.gx.data-inventory@1.0.0"],
                                       "module_policy": {"catalog_limit": 1}})
         self.assertEqual(frozen["research_effort"], "medium")
@@ -88,7 +89,8 @@ class ModuleCatalog(unittest.TestCase):
 
     def test_inventory_default_is_pinned_by_evidence_policy(self):
         settings = {"research_effort": "deep"}
-        for policy, expected in ((v621_policy.LEGACY, "1"), (v621_policy.VERSION, "2")):
+        for policy, expected in ((v621_policy.LEGACY, "1"), (v621_policy.PREVIOUS, "2"),
+                                 (v621_policy.V622, "2"), (v621_policy.VERSION, "3")):
             with self.subTest(policy=policy):
                 auto = catalog.for_start({**settings, "evidence_policy": policy})
                 versions = [m["version"] for m in auto["modules"] if m["module_id"] == "data_inventory"]

@@ -346,6 +346,82 @@
           "items": {
             "$ref": "#/$defs/text"
           }
+        },
+        "comparison_plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "branch",
+            "material_role",
+            "method"
+          ],
+          "properties": {
+            "branch": {
+              "$ref": "#/$defs/text"
+            },
+            "material_role": {
+              "$ref": "#/$defs/text"
+            },
+            "method": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "capability",
+                "parameters",
+                "output_name",
+                "metric_id",
+                "unit"
+              ],
+              "properties": {
+                "capability": {
+                  "$ref": "#/$defs/text"
+                },
+                "parameters": {
+                  "type": "object"
+                },
+                "output_name": {
+                  "$ref": "#/$defs/text"
+                },
+                "metric_id": {
+                  "$ref": "#/$defs/text"
+                },
+                "unit": {
+                  "$ref": "#/$defs/text"
+                }
+              }
+            }
+          }
+        },
+        "comparison_id": {
+          "$ref": "#/$defs/text"
+        },
+        "disposition": {
+          "enum": [
+            "CHANGE",
+            "MAINTAIN",
+            "STOP"
+          ]
+        },
+        "metric_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "description": "Concrete received metric references adopted in this decision, using metric_ref or source_ref#key."
+        },
+        "affected_scope": {
+          "$ref": "#/$defs/text"
+        },
+        "stop_reason": {
+          "enum": [
+            "INSUFFICIENT_DATA",
+            "UNREAD_EVIDENCE",
+            "BUDGET",
+            "TIME_LIMIT",
+            "OPERATOR",
+            "SCIENTIFIC_COMPLETION"
+          ]
         }
       },
       "allOf": [

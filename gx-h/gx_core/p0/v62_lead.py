@@ -97,13 +97,56 @@ def deliver(conn, brief, limit):
     # Reserve space for adverse results and their durable citations ahead of routine inventory.
     report_index = brief.get("module_report_index", [])
     previews = {entry["report_ref"]: entry for entry in brief.get("module_reports", [])}
-    adverse = [{**previews.get(entry["report_ref"], {}), **entry}
+    adverse = [{**previews.get(entry["report_ref"], {}), **entry,
+                **({"pending_endpoints": previews[entry["report_ref"]].get("pending_endpoints", True)}
+                   if "endpoint_total" in entry and entry["report_ref"] in previews else {})}
                for entry in reversed(report_index) if entry.get("counterevidence")]
     adverse_refs = {entry["report_ref"] for entry in adverse}
     ordinary = [entry for entry in reversed(brief.get("module_reports", [])) if entry["report_ref"] not in adverse_refs]
+    from . import v623_endpoints as endpoints
+    active = brief.get("evidence_policy") == endpoints.POLICY
+    placed = {}
     if adverse:
         packet["reports_with_counterevidence"] = len(adverse)
+    if active:
+        if brief.get("comparisons"):
+            packet["comparisons"] = []
+            for item in reversed(brief["comparisons"]):
+                if not append("comparisons", {k:item[k] for k in ("comparison_id", "branch") if k in item}):
+                    break
+        # Allocate compact verified values before report prose, catalogs or large proofs.
+        # Every value is bound to its own parent reference, including colliding metric names.
+        items = [("module_reports", item, "report_ref") for item in [*adverse, *ordinary]]
+        items.extend(("observations", item, "artifact_ref") for item in reversed(brief.get("observations", ())))
+        wanted = {(c["method"]["metric_id"], c["method"]["unit"]) for c in brief.get("comparisons", ())
+                  if c.get("method", {}).get("metric_id") and c["method"].get("unit")}
+        if wanted:
+            items.sort(key=lambda item: not any((r["id"],r["unit"]) in wanted for r in item[1].get("endpoint_rows", ())))
+        for group, original, key in items:
+            if not original.get("endpoint_total"):
+                continue
+            ref = original[key]
+            summary = {key:ref, "endpoint_total":original["endpoint_total"], "pending_endpoints":True}
+            if not append(group, summary):
+                packet["endpoints_available_in_full_brief"] = True
+                if _size(packet) > room:
+                    packet.pop("endpoints_available_in_full_brief")
+                continue
+            rows = sorted(original.get("endpoint_rows", ()), key=lambda r: (r["id"],r["unit"]) not in wanted)
+            endpoints.fit(summary, rows, original["endpoint_total"], lambda: _size(packet) <= room)
+            placed[ref] = summary
+        for group, original, key in items:
+            if (summary := placed.get(original.get(key))) is None:
+                continue
+            append("evidence_refs", original[key])
+            for name in ("status","module_instance_id","event_id","node_id","source_job_id","applicability","counterevidence"):
+                if name in original and name not in summary:
+                    summary[name] = original[name]
+                    if _size(packet) > room:
+                        del summary[name]
     for report in [*adverse, *ordinary]:
+        if report["report_ref"] in placed:
+            continue
         summary = {k: report[k] for k in ("module_instance_id", "status", "report_ref") if k in report}
         if report.get("applicability"):
             summary["applicability"] = report["applicability"]
@@ -136,6 +179,8 @@ def deliver(conn, brief, limit):
                     break
     for key in ("module_catalog", "materials", "capabilities", "branches", "nodes", "claims", "observations"):
         for item in brief.get(key, []):
+            if key == "observations" and item.get("artifact_ref") in placed:
+                continue
             if not append(key, item):
                 break
     for key in ("previous_decision", "catalog_view", "module_catalog_view", "research_progress", "intent", "trigger"):

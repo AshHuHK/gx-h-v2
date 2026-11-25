@@ -50,6 +50,8 @@ class Prepared:
     capability_pins: dict
     module_demand: dict
     module_dependencies: dict
+    endpoint_inventory: tuple | None
+    comparison_registration: dict | None
 
 
 def authority(conn, *, run_id, task_id, lease_id, thread_id, turn_id):
@@ -169,6 +171,11 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         return saved
     root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                         thread_id=thread_id, turn_id=turn_id)
+    from . import v621_policy, v623_endpoint_use
+    science = v621_policy.live_science(conn, run_id)
+    declared = any(key in decision for key in v623_endpoint_use.FIELDS)
+    if declared and not (science and task["scope"] == "run"):
+        raise ScopeDenied("Structured endpoint and comparison decisions require a V6.2.3 Run Lead")
     original = base
     if module is not None:
         base = head(conn, run_id)
@@ -201,7 +208,8 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         grant = json.loads(module["grant_json"])
         if "gx_decide_revision" not in grant["tools"]:
             raise ScopeDenied("This module's grant excludes graph decisions")
-        allowed = set(allowed) & set(grant["capabilities"])
+        from .v62_catalog import effective_methods
+        allowed = set(allowed) & effective_methods(conn, run_id, grant)
         config_pin = (module["grant_json"], module["snapshot_json"], module["budget_json"])
     caps = {op["capability"] for op in decision["ops"] if op["op"] == "add_node"}
     if any("@" not in cap for cap in caps):
@@ -225,8 +233,14 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         version = base["version"] + 1 if base else 1
         graph.update(run_id=run_id, version=version, parent=base, decision_ref=manifest.entries[0]["artifact_ref"])
         result = dict(version=version, sha256=ids.sha256_of_obj(graph))
+    inventory, comparison = None, None
+    if science and task["scope"] == "run":
+        from . import v623_comparison
+        comparison = v623_comparison.prepare(conn, task, decision)
+        if declared or any(op["op"] == "close_run" for op in decision["ops"]):
+            inventory = v623_endpoint_use.prepare(conn, task)
     return Prepared(request, thread_id, turn_id, call_id, manifest, ids.canonical_json(graph), result, ops,
-                    aliases, watches, funding, config_pin, cap_pins, costs, dependencies)
+                    aliases, watches, funding, config_pin, cap_pins, costs, dependencies, inventory, comparison)
 
 
 def _revoke(conn, run_id, where, key):
@@ -235,7 +249,7 @@ def _revoke(conn, run_id, where, key):
                  "AND status IN ('PENDING','RUNNING')", (run_id, key))
 
 
-def _apply_ops(conn, plan, decision_ref, module):
+def _apply_ops(conn, plan, decision_ref, module, decision_facts):
     run_id = plan.request["run_id"]
     dispatches = []
     if module is not None and any(item["spec"]["op"] == "add_node" for item in plan.resolved_ops):
@@ -282,7 +296,7 @@ def _apply_ops(conn, plan, decision_ref, module):
                          (decision_ref, digest, run_id))
             store.append_event(conn, run_id=run_id, kind="v6.run.close_requested", actor=plan.thread_id,
                 subject_kind="run", subject_id=run_id, prev_state="OPEN", new_state="CLOSING",
-                payload=dict(decision_id=decision_ref, op_digest=digest))
+                payload=dict(decision_id=decision_ref, op_digest=digest, **decision_facts))
             _revoke(conn, run_id, "run_id", run_id)
     return dispatches
 
@@ -363,6 +377,17 @@ def commit(conn, plan):
         close_context = None
         if any(item["spec"]["op"] == "close_run" for item in plan.resolved_ops):
             close_context = _require_close_context(conn, run_id, task, root, plan.turn_id)
+        from . import v623_endpoint_use
+        decision = request["decision"]
+        decision_facts = {k: decision[k] for k in v623_endpoint_use.FIELDS if k in decision}
+        if decision_facts:
+            decision_facts.update(rationale=decision["rationale"], evidence_refs=decision["evidence_refs"])
+        if plan.endpoint_inventory is not None:
+            endpoint_use = v623_endpoint_use.verify(conn, task, root, plan.turn_id, decision, plan.endpoint_inventory,
+                                                    closing=close_context is not None)
+            decision_facts["endpoint_use"] = endpoint_use
+            if close_context is not None:
+                close_context.update({k: v for k, v in endpoint_use.items() if k != "receipts"})
         config = (goal["capabilities_json"], goal["materials_json"])
         if module is not None:
             config = (module["grant_json"], module["snapshot_json"], module["budget_json"])
@@ -396,7 +421,7 @@ def commit(conn, plan):
                 graph_json,decision_ref) VALUES(?,?,?,?,?,?)""",
                 (run_id, result["version"], result["sha256"], base["sha256"] if base else None,
                  plan.graph_json, decision_ref))
-            dispatches = _apply_ops(conn, plan, decision_ref, module)
+            dispatches = _apply_ops(conn, plan, decision_ref, module, decision_facts)
             checkpoint = store.save_checkpoint(conn, run_id=run_id, workflow_id=INSTANCE,
                 workflow_version=str(result["version"]), node="decision", state=dict(head=result, decision_ref=decision_ref))
         if request["decision"].get("approve_nodes"):
@@ -411,6 +436,7 @@ def commit(conn, plan):
                        aliases=plan.aliases, reconsider_when=plan.watches, checkpoint_id=checkpoint,
                        dispatches=dispatches, submission_id=submission, claim_revisions=claims,
                        consumed_event_cursor=task["event_cursor"])
+        receipt.update(decision_facts)
         if "gap_resolutions" in request:
             receipt["gap_resolutions"] = request["gap_resolutions"]
         if close_context is not None:
@@ -423,7 +449,13 @@ def commit(conn, plan):
         receipt["event_id"] = store.append_event(conn, run_id=run_id, kind="v6.decision.committed",
             actor=plan.thread_id, subject_kind="decision", subject_id=decision_ref,
             payload=dict(decision_id=decision_ref, result_head=plan.result_head, task_id=task_id,
-                         turn_id=plan.turn_id, call_id=plan.call_id, draft_sha256=request["draft_sha256"]))
+                         turn_id=plan.turn_id, call_id=plan.call_id, draft_sha256=request["draft_sha256"],
+                         **decision_facts))
+        from . import v621_policy
+        if task["scope"] == "run" and v621_policy.live_science(conn, run_id):
+            from . import v623_comparison
+            receipt.update(v623_comparison.adopt(conn, request, task, decision_ref, plan.resolved_ops,
+                                                 receipt["event_id"], registered=plan.comparison_registration))
         conn.execute("""INSERT INTO v6_decisions(decision_ref,run_id,task_id,context_ref,lease_id,thread_id,
             turn_id,call_id,request_json,receipt_json) VALUES(?,?,?,?,?,?,?,?,?,?)""",
             (decision_ref, run_id, task_id, task["context_ref"], lease_id, plan.thread_id, plan.turn_id,

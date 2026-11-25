@@ -274,6 +274,10 @@ def _observation(conn, run, ref, pub, scope, cursor, result, read):
                           reason="Conflicting acquisition receipts for the same original publication")
         return
     (event_id, receipt), = versions.values()
+    identity = receipt.get("source_identity") or {}
+    if "revision" in identity:
+        # Preserve the distinction between matching bytes, the accession and the archive revision.
+        result["source_identity"] = identity
     deps = {k: set(v) for k, v in receipt["dependencies"].items()}
     deps["data"].add("sha256:" + pub["sha256"])
     derived = receipt.get("derived_from", [])

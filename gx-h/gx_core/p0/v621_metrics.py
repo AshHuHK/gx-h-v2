@@ -232,7 +232,7 @@ def _cited(conn, rid, refs, cache=None):
             receipt = json.loads(record[0])
             raw = assets.read_bytes(ref, expected_sha256=receipt["report_sha256"])
             doc = json.loads(raw)
-            entries = doc.get("verified_metrics", []) if doc.get("schema") == REPORT_SCHEMA else doc.get("metrics", [])
+            entries = doc.get("verified_metrics", []) if doc.get("schema") in (REPORT_SCHEMA, "gx.v623.module_report_bundle.1") else doc.get("metrics", [])
         else:
             entries = from_output(conn, rid, ref)
         cache[ref] = {e["metric_ref"]: e for e in entries}
@@ -352,7 +352,7 @@ def measured_statement(metrics):
     return "; ".join(m["metric_id"] + " = " + m["display"] for m in metrics) + "."
 
 
-def render_report(conn, rid, bundle, *, current=False, metric_refs=(), qualitative_notes=()):
+def render_report(conn, rid, bundle, *, current=False, auto_endpoints=False, metric_refs=(), qualitative_notes=()):
     """Only a finding's own citations may supply its numerical statements."""
     cache = {}
     methods = _method_identifiers(conn, rid)
@@ -372,13 +372,18 @@ def render_report(conn, rid, bundle, *, current=False, metric_refs=(), qualitati
             if reads is None:
                 reads = v62_native.operation_receipts(conn, rid, bundle["module_instance_id"])
             quote = v62_sources.report_quotation(conn, rid, bundle["scope"], finding, reads)
-            if not quote:
-                if current and "metric" not in error.details:
-                    error.details["category"] = "module_report_structure"
-                raise
-            try:
-                text = _render(finding["text"], entries, methods, protected=[quote["finding_span"]], used=used)
-            except SchemaInvalid as error:
+            if quote:
+                try:
+                    text = _render(finding["text"], entries, methods, protected=[quote["finding_span"]], used=used)
+                except SchemaInvalid as error:
+                    if current and "metric" not in error.details:
+                        error.details["category"] = "module_report_structure"
+                    raise
+            elif auto_endpoints and entries and "{{metric:" not in finding["text"]:
+                # Free observations, including an incorrect literal, stay available as notes.
+                # Their formatting need not consume another model attempt.
+                text = finding["text"]
+            else:
                 if current and "metric" not in error.details:
                     error.details["category"] = "module_report_structure"
                 raise
@@ -428,12 +433,22 @@ def render_report(conn, rid, bundle, *, current=False, metric_refs=(), qualitati
             if entry["schema"] != SCHEMA:
                 raise SchemaInvalid("The declared metric has no usable reader result", details={"metric": entry})
             selected[entry["metric_ref"]] = entry
+        if auto_endpoints:
+            # A released module may only publish evidence it owns. An inherited report is
+            # useful context but cannot stand in for a separately authorized named output.
+            originals = {source["artifact_ref"] for source in bundle["sources"]}
+            for m in metrics:
+                if m["schema"] == SCHEMA and m["artifact_ref"] in originals:
+                    selected.setdefault(m["metric_ref"], m)
         for ref, metric in selected.items():
             if ref not in presented:
                 fields.setdefault("findings", []).append({"text": measured_statement([metric]),
                     "metric_refs": [ref], "source_refs": [metric["artifact_ref"]]})
-        bundle["schema"] = REPORT_SCHEMA
+        bundle["schema"] = "gx.v623.module_report_bundle.1" if auto_endpoints else REPORT_SCHEMA
         bundle["verified_metrics"] = list(selected.values())
+        if auto_endpoints:
+            bundle["endpoint_total"] = len(selected)
+            bundle["endpoint_state"] = "AVAILABLE" if selected else "NO_VERIFIED_ENDPOINTS"
         bundle["metrics"] = bundle["verified_metrics"]
         bundle["qualitative_notes"] = {"status": "UNVERIFIED", "findings": [*bundle["findings"], *qualitative_notes],
                                        "gaps": list(bundle["gaps"]), "next_steps": list(bundle["next_steps"])}

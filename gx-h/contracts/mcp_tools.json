@@ -272,6 +272,25 @@
                   "enum": [
                     "all"
                   ]
+                },
+                "external_endpoint": {
+                  "type": "object",
+                  "description": "Typed dimensions of the supplied versioned endpoint. Use the actual acquisition and instrument definition.",
+                  "properties": {
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "instrument": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "selection": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
                 }
               }
             }

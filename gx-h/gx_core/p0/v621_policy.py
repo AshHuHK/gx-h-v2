@@ -2,10 +2,12 @@
 from ..errors import SchemaInvalid
 
 
-VERSION = "gx.evidence/6.2.2"
+VERSION = "gx.evidence/6.2.3"
+V622 = "gx.evidence/6.2.2"
 PREVIOUS = "gx.evidence/6.2.1"
 LEGACY = "gx.evidence/6.2"
-GOVERNED = (PREVIOUS, VERSION)
+TYPED = (V622, VERSION)
+GOVERNED = (PREVIOUS, *TYPED)
 
 
 def for_start(spec):
@@ -35,4 +37,9 @@ def enabled(conn, run_id):
 
 
 def current(conn, run_id):
+    """Run supports the typed evidence contract introduced in V6.2.2."""
+    return pinned(conn, run_id) in TYPED
+
+
+def live_science(conn, run_id):
     return pinned(conn, run_id) == VERSION

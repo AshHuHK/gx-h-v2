@@ -39,7 +39,7 @@ def _declarations(labels, *, coordinate_file):
     return accessions, hashes
 
 
-def _entry(raw):
+def _entry_and_dictionary(raw):
     from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 
     try:
@@ -55,7 +55,50 @@ def _entry(raw):
     block = doc.get("data_", "")
     if not isinstance(block, str) or (re.fullmatch(PDB_ID, block, re.I) and _accession(block) != entry):
         raise SchemaInvalid("Coordinate data block and internal archive accession disagree")
-    return entry
+    return entry, doc
+
+
+def _coordinate_revision(doc):
+    """Latest Structure model ordinal in this file, independent of loop row order."""
+    prefix = "_pdbx_audit_revision_history."
+    columns = {key.casefold()[len(prefix):]: values for key, values in doc.items()
+               if key.casefold().startswith(prefix)}
+    required = ("data_content_type", "ordinal", "major_revision", "minor_revision")
+    if any(key not in columns for key in required) or len({len(columns[key]) for key in required}) != 1:
+        return None
+    rows = [(ordinal, major, minor) for kind, ordinal, major, minor in zip(*(columns[key] for key in required))
+            if kind.casefold() == "structure model"]
+    if not rows or any(not re.fullmatch(r"[1-9][0-9]*", ordinal) for ordinal, _, _ in rows):
+        return None
+    latest = max(int(ordinal) for ordinal, _, _ in rows)
+    versions = {(major, minor) for ordinal, major, minor in rows if int(ordinal) == latest}
+    if len(versions) != 1:
+        return None
+    major, minor = versions.pop()
+    if not re.fullmatch(r"[0-9]+", major) or not re.fullmatch(r"[0-9]+", minor):
+        return None
+    return f"{int(major)}.{int(minor)}"
+
+
+def _revision_identity(doc, labels):
+    # These are the archive source IDs used by the released acquisition descriptors.
+    syntax = re.compile(r"(?:wwPDB|PDB):" + PDB_ID + r"(?:/revision/|:revision-)([^/?#:]+)(?=[/?#:]|$)", re.I)
+    claims = {m[1] for label in labels if (m := syntax.match(label))}
+    if len(claims) > 1:
+        raise SchemaInvalid("Conflicting archive revisions in the acquisition descriptor",
+                            details={"claimed": sorted(claims)})
+    claimed = next(iter(claims), None)
+    observed = _coordinate_revision(doc)
+    status = "observed" if observed is not None else "unknown"
+    if claimed is not None:
+        status = "operator_attested"
+        if observed is not None and re.fullmatch(r"[0-9]+\.[0-9]+", claimed):
+            canonical = ".".join(str(int(n)) for n in claimed.split("."))
+            if canonical != observed:
+                raise SchemaInvalid("Declared archive revision differs from the current coordinate file",
+                                    details={"claimed": claimed, "observed": observed})
+            status = "verified"
+    return {"status": status, "claimed": claimed, "observed": observed}
 
 
 def _withholding(parent, child, rule, parent_sha, processing):
@@ -102,7 +145,7 @@ def _withholding(parent, child, rule, parent_sha, processing):
     return {"schema": WITHHOLD, "descriptor_sha256": rule_sha, "result_sha256": child}
 
 
-def verify(media_type, labels, digest, read, parents, processing, transformation):
+def verify(media_type, labels, digest, read, parents, processing, transformation, *, verify_revision=False):
     """Return None for another domain. Original, parent and transformed child all use immutable file pins."""
     coordinate_file = media_type.partition(";")[0].lower() in CIF_MEDIA
     accessions, archive_digests = _declarations(labels, coordinate_file=coordinate_file)
@@ -110,7 +153,7 @@ def verify(media_type, labels, digest, read, parents, processing, transformation
         return None
     raw = read()
     try:
-        entry = _entry(raw)
+        entry, doc = _entry_and_dictionary(raw)
     except SchemaInvalid:
         if accessions:
             raise
@@ -123,6 +166,8 @@ def verify(media_type, labels, digest, read, parents, processing, transformation
         raise SchemaInvalid("Archive descriptor SHA-256 differs from the original coordinate bytes; identify the parent and transformation for derived bytes")
     result = {"reader": READER, "entry_id": entry,
               "status": "matched_accession" if accessions else "operator_attested"}
+    if verify_revision:
+        result.update(reader="gx.pdbx.source-identity/2", revision=_revision_identity(doc, labels))
     if not parents:
         if transformation is not None:
             raise SchemaInvalid("A coordinate transformation needs its original parent")
@@ -131,7 +176,7 @@ def verify(media_type, labels, digest, read, parents, processing, transformation
         raise SchemaInvalid("The registered coordinate transformations require one acquired parent")
     parent_sha, get_parent = parents[0]
     parent = get_parent()
-    if _entry(parent) != entry:
+    if _entry_and_dictionary(parent)[0] != entry:
         raise SchemaInvalid("Coordinate derivative and declared parent have different archive accessions")
     if isinstance(transformation, dict) and transformation.get("schema") == WITHHOLD:
         result["transformation"] = _withholding(parent, digest, transformation, parent_sha, processing)

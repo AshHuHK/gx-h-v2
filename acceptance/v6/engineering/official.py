@@ -130,6 +130,7 @@ def run(work, out, binary):
 
         config = work / "goal.json"
         archive.save(config, {"project": "v6-engineering", "turn_token_budget": 1024,
+                              "historical_replay": True, "evidence_policy": "gx.evidence/6.2.2",
                               "capabilities": [QUALITY], "input_files": [{"path": str(STRUCTURE), "role": "structure"}]})
         rid = call("start", "--goal", "How many deposited chains have observable coordinates?",
                    "--goal-config", config, "--run-key", "inventory")["run_id"]

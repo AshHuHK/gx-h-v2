@@ -65,10 +65,16 @@ def pin(conn, run_id, prediction, *, applicability=None):
                 "source_roles": roles, "input_role": role, "observable": "/metrics/" + name if decl else selector,
                 "result_pointer": result_pointer,
                 "measurement_schema": prediction.get("measurement_schema"), "applicability": applicability}
-    return {**base, "measurement_spec": endpoint, "measurement_spec_sha256": ids.sha256_of_obj(endpoint)}
+    from . import v621_policy
+    if v621_policy.live_science(conn, run_id):
+        endpoint["schema"] = "gx.measurement-spec/2"
+        definition = {k: v for k, v in endpoint.items() if k != "applicability"}
+    else:
+        definition = endpoint
+    return {**base, "measurement_spec": endpoint, "measurement_spec_sha256": ids.sha256_of_obj(definition)}
 
 
-def match(conn, registration, fact):
+def match(conn, registration, fact, *, chronology_only=False):
     """Read a prospective or retrospective fact with the same fully pinned measurement definition.
 
     A grouped scalar has input provenance, but no one-to-one material observations.
@@ -83,7 +89,7 @@ def match(conn, registration, fact):
     if spec["missing_parameters"]:
         return "unregistered_method_parameters", None
     scopes = fact.get("applicability_scopes", [])
-    if spec.get("applicability") and scopes and set(scopes) != {spec["applicability"]}:
+    if not chronology_only and spec.get("applicability") and scopes and set(scopes) != {spec["applicability"]}:
         return "out_of_scientific_scope", None
     sealed = manifest.read_manifest(conn, fact["job_id"])
     adm = sealed["admission"]

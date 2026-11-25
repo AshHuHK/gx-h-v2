@@ -182,6 +182,11 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
     enriched = v62_maturity.enrolled(conn, run_id)
     pins = method_pin = None
     if 'prediction' in payload:
+        if 'external_endpoint' in payload['prediction']:
+            if not v621_policy.live_science(conn, run_id) or payload['prediction'].get('method'):
+                raise SchemaInvalid('External endpoint qualifiers require a current supplied-observation prediction')
+            if payload['prediction']['target'] != 'experimental_observation':
+                raise SchemaInvalid('External endpoint qualifiers apply to a supplied observation')
         if not enriched:
             raise SchemaInvalid('A prospective prediction requires an enrolled research-evidence Goal')
         pins = v62_maturity.pin_data(conn, run_id, payload['prediction'], visible)
@@ -346,6 +351,10 @@ def set_publication(claim, *, proposed_level, proposal_ref):
     if coverage is not None:
         publication.update(policy="gx.claim-publication/2", quantifier=reg["quantifier"],
                            proposition_sha256=reg["proposition_sha256"], material_coverage=coverage)
+    if reg and reg.get("chronology_scope"):
+        publication.update(policy="gx.claim-publication/3", missing_prospective_data_refs=pending)
+        for state in ("prospective", "retrospective", "timing_unknown", "measured_unqualified", "unmeasured"):
+            publication[state + "_data_refs"] = [row["artifact_ref"] for row in coverage if row["qualification"] == state]
     if partial_readings:
         publication["reasons"].append("The observed direction covers only a subset of the registered materials.")
     if proposed_level != published:

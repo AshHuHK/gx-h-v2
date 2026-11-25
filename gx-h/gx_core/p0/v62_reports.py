@@ -136,6 +136,11 @@ def _stage(conn, module, task, identity, payload, evidence, *, attempt):
     for finding in [*payload["findings"], *payload.get("qualitative_notes", [])]:
         sources.update(finding["source_refs"])
     sources.update(selector["artifact_ref"] for selector in payload.get("metric_refs", []))
+    from . import v621_policy
+    auto_endpoints = v621_policy.live_science(conn, module["run_id"])
+    if auto_endpoints:
+        sources.update(ref for ref, proofs in evidence.items() if any(
+            proof.get("job_id") and proof.get("output_name") for proof in proofs))
     checked = _sources(conn, module, sources, evidence)
     bundle = {**{k: module[k] for k in ("module_instance_id", "module_id", "module_version", "round",
                                          "run_id", "scope", "goal_version", "parent_context_ref")},
@@ -145,7 +150,7 @@ def _stage(conn, module, task, identity, payload, evidence, *, attempt):
     from . import v621_metrics, v621_policy
     if v621_policy.enabled(conn, module["run_id"]):
         v621_metrics.render_report(conn, module["run_id"], bundle, current=v621_policy.current(conn, module["run_id"]),
-                                   metric_refs=payload.get("metric_refs", ()),
+                                   auto_endpoints=auto_endpoints, metric_refs=payload.get("metric_refs", ()),
                                    qualitative_notes=payload.get("qualitative_notes", ()))
     if "gap_criteria" in payload:
         from . import v621_gaps
@@ -460,6 +465,12 @@ def _index_entry(bundle, ref):
                           else _excerpt(finding["text"])), "source_refs": finding["source_refs"],
                  **({"evidence_status": finding["evidence_status"]} if "evidence_status" in finding else {})}
                 for finding in bundle["findings"] if finding.get("kind") == "counterevidence"]
+    if bundle.get("schema") == "gx.v623.module_report_bundle.1":
+        entry.update(endpoint_total=len(bundle["verified_metrics"]), pending_endpoints=bool(bundle["verified_metrics"]))
+    if entry.get("pending_endpoints"):
+        for counter in counters:
+            if counter.get("evidence_status") == "UNVERIFIED":
+                counter["text"] = "A qualitative note flags this source for review."
     if counters:
         entry["counterevidence"] = counters
     return entry
@@ -474,10 +485,15 @@ def _compact(index):
     return entry
 
 
-def _preview(bundle, index, limit):
+def _preview(bundle, index, limit, comparisons=()):
     base = _base(bundle, index["report_ref"])
     full = {**base, **{k: bundle[k] for k in ("findings", "gaps", "next_steps", "artifact_refs")},
             "truncated": False}
+    from . import v623_endpoints as endpoints
+    automatic = bundle.get("schema") == endpoints.REPORT
+    if automatic:
+        rows = endpoints.compact_rows(endpoints.priority(bundle["verified_metrics"], comparisons))
+        full.update(endpoint_total=len(rows), endpoint_rows=rows, pending_endpoints=False)
     proof_fields = ("verified_metrics", "source_quotations") if "verified_metrics" in bundle else ("metrics", "source_quotations")
     for field in (*proof_fields, "qualitative_notes"):
         if bundle.get(field):
@@ -487,6 +503,17 @@ def _preview(bundle, index, limit):
     if _size(full) <= limit:
         return full
     preview = _compact(index)
+    if automatic and rows:
+        # Even a short packet carries either a verified value or a durable pending reference.
+        preview = {"report_ref": index["report_ref"], "truncated": True}
+        endpoints.fit(preview, rows, len(rows), lambda: _size(preview) <= limit)
+        if _size(preview) > limit:
+            return None
+        for key, value in _compact(index).items():
+            if key not in preview:
+                preview[key] = value
+                if _size(preview) > limit:
+                    del preview[key]
     if _size(preview) > limit:
         if "counterevidence" not in preview:
             return None
@@ -511,7 +538,7 @@ def _preview(bundle, index, limit):
             if _size(preview) > limit:
                 del preview[key]
     for field in ("findings", "gaps", "next_steps", "artifact_refs"):
-        if not bundle[field]:
+        if not bundle[field] or (preview.get("pending_endpoints") and field in ("gaps","next_steps")):
             continue
         preview[field] = []
         if _size(preview) > limit:
@@ -519,6 +546,8 @@ def _preview(bundle, index, limit):
             continue
         for value in bundle[field]:
             if field == "findings":
+                if preview.get("pending_endpoints") and value.get("evidence_status") == "UNVERIFIED":
+                    continue
                 if value.get("kind") == "counterevidence":
                     continue  # The priority cue already carries the report link and first citation.
                 if value.get("metric_refs") and not set(value["metric_refs"]) <= {
@@ -536,7 +565,7 @@ def _preview(bundle, index, limit):
                     preview[field].pop()
                     break
     notes = bundle.get("qualitative_notes")
-    if notes:
+    if notes and not preview.get("pending_endpoints"):
         preview["qualitative_notes"] = notes
         if _size(preview) > limit:
             del preview["qualitative_notes"]
@@ -569,6 +598,10 @@ def report_views(conn, run_id, *, per_report_bytes=4096, total_bytes=16384, thro
     """A bounded projection plus a complete, source-linked index for the archived Lead context."""
     from .v62_modules import _assert_sources
     service = ArtifactService(conn)
+    from . import v621_goal_scope, v621_policy, v623_comparison
+    comparisons = ()
+    if v621_policy.live_science(conn, run_id):
+        comparisons = v623_comparison.bindings(conn, run_id, v621_goal_scope.active(conn, run_id), through_cursor)
     released = []
     for row in _released_rows(conn, run_id, through_cursor):
         ref = row["report_ref"]
@@ -592,7 +625,7 @@ def report_views(conn, run_id, *, per_report_bytes=4096, total_bytes=16384, thro
         available = remaining - bool(previews)
         share = available // (len(order) - position)
         limit = min(per_report_bytes, available, max(share, _size(_compact(index))))
-        preview = _preview(bundle, index, limit)
+        preview = _preview(bundle, index, limit, comparisons)
         if preview is not None:
             previews[i] = preview
             remaining = available - _size(preview)

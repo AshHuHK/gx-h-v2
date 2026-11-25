@@ -60,10 +60,11 @@ def decision_tool():
     return contracts.native_goal_tool_spec(DECIDE)
 
 
-@lru_cache(maxsize=1)
-def _legacy_goal_tools():
+@lru_cache(maxsize=None)
+def _legacy_goal_tools(version=None):
     """Keep the original, smaller decision vocabulary in quick and pre-B briefs."""
-    decision, claim = deepcopy(decision_tool()), deepcopy(v6_claims.tool_spec())
+    decision = deepcopy(v62_native.evidence_tool(DECIDE, version))
+    claim = deepcopy(v6_claims.tool_spec())
     fields = decision["inputSchema"]["properties"]["decision"]["properties"]
     del fields["convergence"], fields["resolved_gaps"]
     fields["reconsider_when"]["items"]["properties"]["event"]["enum"].remove("module_report")
@@ -90,12 +91,19 @@ def assigned(row):
 
 def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     """Select grants when freezing the Root. Resume reuses its persisted tool names."""
+    if brief and brief.get("evidence_policy") == "gx.evidence/6.2.3":
+        read_tools = deepcopy(read_tools)
+        for tool in read_tools:
+            if tool["name"] == "gx_read_artifact":
+                tool["inputSchema"]["properties"]["endpoint_offset"] = {"type":"integer", "minimum":0}
+                tool["description"] += " For verified endpoints pass endpoint_offset=0 and follow next_endpoint_offset. Cite source ref#key."
     if brief and v62_native.module_scope(brief):
         return v62_native.module_tools(read_tools, brief, _legacy_goal_tools()[0])
     catalog = [spec for spec in read_tools if spec["name"] in ("gx_read_artifact", "gx_task_context")]
     evidence_run = bool(brief and brief.get("research_evidence_version"))
-    catalog.extend((decision_tool(), v62_native.evidence_tool(STAGE, brief.get("evidence_policy")))
-                   if evidence_run else _legacy_goal_tools())
+    version = (brief or {}).get("evidence_policy")
+    catalog.extend((v62_native.evidence_tool(DECIDE, version), v62_native.evidence_tool(STAGE, version))
+                   if evidence_run else _legacy_goal_tools(version))
     if brief is None or (brief.get("scope", "run") == "run" and brief.get("branch_delegation", True) and
                          any(b["status"] == "OPEN" for b in brief.get("branches", []))):
         catalog.append(v6_delegation.TOOL)

@@ -10,6 +10,7 @@ from ..capabilities import manifest, shipped
 from ..domain import ids
 from ..errors import SchemaInvalid, ScopeDenied, VersionImmutable
 from ..plugins import goal, loader
+from ..plugins.author_api import _copy_schema
 from ..plugins.selection import _references
 from . import intent, v621_policy
 
@@ -40,7 +41,7 @@ def _policy(spec):
 
 def _declaration(plugin, key):
     registered = plugin.contributions.research_modules[key]
-    return {k: list(v) if isinstance(v, tuple) else v for k, v in registered.items()}
+    return _copy_schema(registered, freeze=False)
 
 
 def for_start(spec):
@@ -69,6 +70,8 @@ def for_start(spec):
     candidates = {}
     for plugin in loaded.plugins.values():
         for key, definition in plugin.contributions.research_modules.items():
+            if definition.get("method_profiles") and version != v621_policy.VERSION:
+                continue
             reference = "@".join(key)
             if requested is None and defaults.get(key[0], key[1]) != key[1]:
                 continue
@@ -174,6 +177,27 @@ def _methods(conn, run_id, inputs):
             and not intent.forbidden_capability(*row["capability_version"].rsplit("@", 1), bans)]
 
 
+def _fits_profile(method, profiles):
+    inputs = set(method.get("inputs", ()))
+    card = method.get("method")
+    family = method.get("family") or (card.get("family") if isinstance(card, dict) else None)
+    for output in method.get("outputs", ()):
+        if not isinstance(output, dict):
+            continue
+        for profile in profiles:
+            if "output_nature" in profile:
+                # A classified measurement is eligible only with a named scientific output
+                # whose declared data dependencies belong to this exact method.
+                sources = output.get("source_roles")
+                if (output.get("nature") == profile["output_nature"] and output.get("name") and output.get("kind")
+                        and sources and set(sources) <= inputs):
+                    return True
+            elif (family == profile["method_family"] and profile["input_role"] in inputs
+                  and output.get("kind") == profile["output_kind"]):
+                return True
+    return False
+
+
 def resolve(conn, run_id, module_id, version):
     """A module's effective methods are intersected again with the individual delegation by its owner."""
     inputs = _inputs(conn, run_id)
@@ -187,9 +211,27 @@ def resolve(conn, run_id, module_id, version):
         declaration = _declaration(plugin, (module_id, version))
         if ids.sha256_of_obj(declaration) != row["declaration_sha256"]:
             raise VersionImmutable("The granted research declaration changed")
-        granted = {method["capability_version"] for method in _methods(conn, run_id, inputs)}
-        return {**row, **declaration, "capabilities": [c for c in declaration["capabilities"] if c in granted]}
+        methods = _methods(conn, run_id, inputs)
+        if declaration.get("method_profiles"):
+            allowed = [method["capability_version"] for method in methods
+                       if _fits_profile(method, declaration["method_profiles"])]
+        else:
+            granted = {method["capability_version"] for method in methods}
+            allowed = [c for c in declaration["capabilities"] if c in granted]
+        return {**row, **declaration, "capabilities": allowed}
     raise ScopeDenied(f"Research module {module_id}@{version} is outside this Run's effort or grant")
+
+
+def effective_methods(conn, run_id, grant, *, methods=None):
+    """Intersect this delegation with the live Run pins, immutable module policy and active bans."""
+    assigned = set(grant["capabilities"])
+    profiles = grant.get("method_profiles")
+    if not profiles:
+        return assigned
+    if methods is None:
+        methods = _methods(conn, run_id, _inputs(conn, run_id))
+    return {m["capability_version"] for m in methods
+            if m["capability_version"] in assigned and _fits_profile(m, profiles)}
 
 
 def _module_summary(row):
@@ -289,6 +331,10 @@ def query(conn, run_id, brief, args):
             rows = [cards[k] for k in sorted(cards)]
         elif module_scope:
             allowed = brief.get("allowed_method_ids", [])
+            if v621_policy.live_science(conn, run_id):
+                from .v62_modules import _module
+                module = _module(conn, run_id, scope)
+                allowed = effective_methods(conn, run_id, json.loads(module["grant_json"]), methods=rows)
             rows = [row for row in rows if row["capability_version"] in allowed]
         if reference is not None:
             for row in rows:

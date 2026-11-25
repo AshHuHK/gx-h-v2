@@ -27,6 +27,14 @@ def evidence_tool(name, version):
         return spec
     spec = deepcopy(spec)
     fields = spec["inputSchema"]["properties"]
+    if name == "gx_decide_revision":
+        decision = fields["decision"]["properties"]
+        for key in ("comparison_plan", "comparison_id", "disposition", "metric_refs", "affected_scope", "stop_reason"):
+            decision.pop(key, None)
+    elif name == "gx_stage_claim":
+        fields["prediction"]["properties"].pop("external_endpoint", None)
+    if version == v621_policy.V622:
+        return spec
     if name == REPORT:
         fields.pop("metric_refs", None)
         fields.pop("qualitative_notes", None)
@@ -63,7 +71,7 @@ def module_instructions(brief):
     instructions.append("Use gx_submit_module_report with findings, exact source references, gaps and next steps. "
                         "Preserve contrary observations and report PARTIAL when work is incomplete.")
     from . import v621_policy
-    if brief.get("evidence_policy") == v621_policy.VERSION:
+    if brief.get("evidence_policy") in v621_policy.TYPED:
         instructions.append("Select verified readings with metric_refs containing artifact_ref and metric_id, "
                             "or cite {{metric:id}} in a finding. Put interpretations, hypotheses and unverified "
                             "estimates in qualitative_notes with their source_refs.")

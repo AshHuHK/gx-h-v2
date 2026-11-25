@@ -523,8 +523,13 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                 if row["kind"] == "v6.node.settled":
                     metrics = v621_metrics.from_output(conn, rid, ref)
                     if metrics:
-                        if data["inputs"].get("evidence_policy") == v621_policy.VERSION:
+                        if data["inputs"].get("evidence_policy") in v621_policy.TYPED:
                             facts["verified_metrics"] = [m for m in metrics if m["schema"] == v621_metrics.SCHEMA]
+                        if data["inputs"].get("evidence_policy") == "gx.evidence/6.2.3":
+                            from . import v623_endpoints
+                            valid = facts["verified_metrics"]
+                            facts.update(endpoint_rows=v623_endpoints.compact_rows(valid),
+                                         endpoint_total=len(valid), pending_endpoints=False)
                         facts["metrics"] = metrics
                 elif not _is_json_artifact(meta):
                     facts["metric_availability"] = {"schema": v621_metrics.MISSING,
@@ -649,8 +654,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     }
     if data["inputs"].get("study_class"):
         brief["study_class"] = data["inputs"]["study_class"]
-    if data["inputs"].get("evidence_policy") == v621_policy.VERSION:
-        brief["evidence_policy"] = v621_policy.VERSION
+    if data["inputs"].get("evidence_policy") in v621_policy.TYPED:
+        brief["evidence_policy"] = data["inputs"]["evidence_policy"]
     if research:
         brief = v62_catalog.project(conn, rid, brief)
         v62_lead.attach_reports(conn, brief, cursor, research["policy"])
@@ -674,7 +679,24 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             if node["result_ref"] and node["status"] in ("SUCCEEDED", "REUSED"):
                 node["outputs"] = v62_outputs.published_outputs(conn, rid, node["job_id"])
                 visible.update(dict.fromkeys(item["artifact_ref"] for item in node["outputs"]))
+                if data["inputs"].get("evidence_policy") == "gx.evidence/6.2.3":
+                    from . import v623_endpoints
+                    settled = next((o for o in observations if o.get("event") == "v6.node.settled"
+                                    and o.get("node_id") == node["node_id"] and o.get("artifact_ref") == node["result_ref"]), None)
+                    if settled:
+                        for output in node["outputs"]:
+                            extra = output["artifact_ref"]
+                            if extra != node["result_ref"] and (valid := v623_endpoints.registered(conn,rid,extra)):
+                                observations.append({**{k:settled[k] for k in ("event","event_id","node_id","source_job_id","branch_id","status")},
+                                                     "artifact_ref":extra, "sha256":valid[0]["sha256"], "output_name":valid[0]["output_name"],
+                                                     "verified_metrics":valid, "endpoint_rows":v623_endpoints.compact_rows(valid),
+                                                     "endpoint_total":len(valid), "pending_endpoints":False})
         brief["evidence_refs"] = list(visible)
+    if data["inputs"].get("evidence_policy")=="gx.evidence/6.2.3":
+        from . import v623_comparison
+        comparisons = v623_comparison.bindings(conn,rid,goal["goal_version"],cursor)
+        if comparisons:
+            brief["comparisons"] = comparisons
     return brief
 
 

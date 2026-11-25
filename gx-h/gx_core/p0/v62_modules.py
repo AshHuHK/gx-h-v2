@@ -394,6 +394,8 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
         plugin=decl["plugin"],
         declaration_sha256=decl["declaration_sha256"],
     )
+    if decl.get("method_profiles"):
+        grant["method_profiles"] = decl["method_profiles"]
     if decl.get("catalog_access") == "public_methods" and "gx_query_catalog" in tools:
         grant["catalog_access"] = "public_methods"
     if targets:

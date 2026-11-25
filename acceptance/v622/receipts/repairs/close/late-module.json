@@ -1,0 +1,497 @@
+{
+  "run_id": "gxr_01m8a4eakgxqn6x8aw",
+  "original_brief": {
+    "task": "gxt_01m8a4ean0z1wgeck5",
+    "turn": "turn-gxl_01m8a4eaqcsgx96thj",
+    "text_sha256": "fe704ac71e5770af69a3732072e67620a3e71f7a4016804fc090ac9f14f0a28e",
+    "packet": {
+      "branches": [],
+      "budget": {
+        "available": {
+          "api_calls": 48,
+          "cpu_seconds": 1200,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 20,
+          "tokens": 120000,
+          "wall_hours": 2,
+          "worker_tasks": 48
+        },
+        "initial_job_limit": 5,
+        "limits": {
+          "api_calls": 48,
+          "cpu_seconds": 1200,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 20,
+          "tokens": 120000,
+          "wall_hours": 2,
+          "worker_tasks": 48
+        },
+        "reserved": {},
+        "spent": {}
+      },
+      "capabilities": [
+        {
+          "capability_version": "tl1a-coordinate-quality@1",
+          "category": "coordinate_completeness",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:coordinate_inventory",
+              "name": "quality.json"
+            }
+          ],
+          "purpose": "Count observed atoms, residues and selection coverage."
+        },
+        {
+          "capability_version": "deposited-chain-geometry@1",
+          "category": "coordinate_geometry",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json"
+            }
+          ],
+          "purpose": "Describe the effect of atom selection on observed chain-pair geometry."
+        }
+      ],
+      "catalog_view": {
+        "mode": "summaries",
+        "query_tool": "gx_query_catalog",
+        "total": 2
+      },
+      "claims": [],
+      "evidence_policy": "gx.evidence/6.2.2",
+      "evidence_refs": [
+        "gxa_01m8a4eaknkmbwbn2v",
+        "gxa_01m8a4eakqvw99gjft",
+        "gxa_01m8a4eaks01029wtz"
+      ],
+      "goal": "Inventory the supplied public deposited-coordinate records and report their measured coverage.",
+      "goal_version": 1,
+      "head": null,
+      "intent": {
+        "objective": {
+          "value": "Inventory the supplied public deposited-coordinate records and report their measured coverage.",
+          "version": 1
+        }
+      },
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m8a4eaknkmbwbn2v",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m8a4eakqvw99gjft",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        },
+        {
+          "artifact_ref": "gxa_01m8a4eaks01029wtz",
+          "name": "public-scope-marker.json",
+          "role": "material",
+          "sha256": "fe92401b86e351c391eb34c220d33b86807de4526afdc8b4f8e0072023a4c4fb"
+        }
+      ],
+      "module_catalog": [
+        {
+          "cost_class": "local_cpu",
+          "focuses": [
+            "data"
+          ],
+          "module_id": "data_inventory",
+          "output": "module_report_bundle",
+          "purpose": "Inventory the assigned local materials, their provenance, coverage and gaps.",
+          "version": "1"
+        }
+      ],
+      "module_reports": [],
+      "nodes": [],
+      "observations": [],
+      "previous_decision": null,
+      "research_effort": "medium",
+      "research_evidence_version": "gx.research.v6.2b.1",
+      "research_progress": {
+        "consecutive_no_progress": 0,
+        "convergence": null,
+        "decision_options": [
+          "explore",
+          "enter_convergence",
+          "close_run"
+        ],
+        "expected": [],
+        "no_progress_rounds": 2,
+        "open_gaps": [],
+        "phase": "exploring",
+        "rounds": [],
+        "waiting_for": []
+      },
+      "run_id": "gxr_01m8a4eakgxqn6x8aw",
+      "scope": "run",
+      "trigger": {
+        "changes": [],
+        "since_cursor": 0,
+        "through_cursor": 0
+      }
+    }
+  },
+  "refreshed_brief": {
+    "task": "gxt_01m8a4eas443618znq",
+    "turn": "turn-gxl_01m8a4eas76fddqe6n",
+    "text_sha256": "11cca80b9780bf24580466fee5e050325265274d3d99ec34b343706d8b2570fb",
+    "packet": {
+      "branches": [],
+      "budget": {
+        "available": {
+          "api_calls": 41,
+          "cpu_seconds": 1080,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 18,
+          "tokens": 113990,
+          "wall_hours": 2,
+          "worker_tasks": 42
+        },
+        "initial_job_limit": 5,
+        "limits": {
+          "api_calls": 48,
+          "cpu_seconds": 1200,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 20,
+          "tokens": 120000,
+          "wall_hours": 2,
+          "worker_tasks": 48
+        },
+        "reserved": {
+          "api_calls": 7,
+          "cpu_seconds": 120,
+          "job_submissions": 2,
+          "tokens": 6010,
+          "worker_tasks": 6
+        },
+        "spent": {}
+      },
+      "capabilities": [
+        {
+          "capability_version": "tl1a-coordinate-quality@1",
+          "category": "coordinate_completeness",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:coordinate_inventory",
+              "name": "quality.json"
+            }
+          ],
+          "purpose": "Count observed atoms, residues and selection coverage."
+        },
+        {
+          "capability_version": "deposited-chain-geometry@1",
+          "category": "coordinate_geometry",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json"
+            }
+          ],
+          "purpose": "Describe the effect of atom selection on observed chain-pair geometry."
+        }
+      ],
+      "catalog_view": {
+        "mode": "summaries",
+        "query_tool": "gx_query_catalog",
+        "total": 2
+      },
+      "claims": [],
+      "evidence_policy": "gx.evidence/6.2.2",
+      "evidence_refs": [
+        "gxa_01m8a4eaknkmbwbn2v",
+        "gxa_01m8a4eakqvw99gjft",
+        "gxa_01m8a4eaks01029wtz",
+        "gxa_ceeae3479a1de0ba4f938df470d2c7206a6f810c8590b739fd3d3881053ce822"
+      ],
+      "goal": "Inventory the supplied public deposited-coordinate records and report their measured coverage.",
+      "goal_version": 1,
+      "head": null,
+      "intent": {
+        "objective": {
+          "value": "Inventory the supplied public deposited-coordinate records and report their measured coverage.",
+          "version": 1
+        }
+      },
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m8a4eaknkmbwbn2v",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m8a4eakqvw99gjft",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        },
+        {
+          "artifact_ref": "gxa_01m8a4eaks01029wtz",
+          "name": "public-scope-marker.json",
+          "role": "material",
+          "sha256": "fe92401b86e351c391eb34c220d33b86807de4526afdc8b4f8e0072023a4c4fb"
+        }
+      ],
+      "module_catalog": [
+        {
+          "cost_class": "local_cpu",
+          "focuses": [
+            "data"
+          ],
+          "module_id": "data_inventory",
+          "output": "module_report_bundle",
+          "purpose": "Inventory the assigned local materials, their provenance, coverage and gaps.",
+          "version": "1"
+        }
+      ],
+      "module_report_index": [
+        {
+          "goal_version": 1,
+          "module_id": "data_inventory",
+          "module_instance_id": "module_5e8b416b78da169faa3b39adf6b69dbf",
+          "module_version": "1",
+          "report_ref": "gxa_ceeae3479a1de0ba4f938df470d2c7206a6f810c8590b739fd3d3881053ce822",
+          "round": 1,
+          "status": "COMPLETE",
+          "version": 1
+        }
+      ],
+      "module_reports": [
+        {
+          "artifact_refs": [
+            "gxa_01m8a4eaks01029wtz"
+          ],
+          "findings": [
+            {
+              "evidence_status": "UNVERIFIED",
+              "source_refs": [
+                "gxa_01m8a4eaks01029wtz"
+              ],
+              "text": "The inventoried input was read."
+            }
+          ],
+          "gaps": [],
+          "goal_version": 1,
+          "module_id": "data_inventory",
+          "module_instance_id": "module_5e8b416b78da169faa3b39adf6b69dbf",
+          "module_version": "1",
+          "next_steps": [],
+          "qualitative_notes": {
+            "findings": [
+              {
+                "source_refs": [
+                  "gxa_01m8a4eaks01029wtz"
+                ],
+                "text": "The inventoried input was read."
+              }
+            ],
+            "gaps": [],
+            "next_steps": [],
+            "status": "UNVERIFIED"
+          },
+          "report_ref": "gxa_ceeae3479a1de0ba4f938df470d2c7206a6f810c8590b739fd3d3881053ce822",
+          "round": 1,
+          "status": "COMPLETE",
+          "truncated": false,
+          "version": 1
+        }
+      ],
+      "nodes": [],
+      "observations": [
+        {
+          "artifact_ref": null,
+          "branch_id": null,
+          "event": "v62.module.wake",
+          "event_id": 47,
+          "id": "gxr_01m8a4eakgxqn6x8aw",
+          "node_id": null,
+          "source_job_id": null,
+          "status": null,
+          "subject_ref": "gxr_01m8a4eakgxqn6x8aw"
+        },
+        {
+          "artifact_ref": null,
+          "branch_id": null,
+          "event": "v62.round.settled",
+          "event_id": 49,
+          "id": "round:3c7702376212f4ceee51ec72b673945cd8d03a02514d2efbc24602bca2cf2808",
+          "node_id": null,
+          "source_job_id": null,
+          "status": null,
+          "subject_ref": "round:3c7702376212f4ceee51ec72b673945cd8d03a02514d2efbc24602bca2cf2808"
+        }
+      ],
+      "previous_decision": null,
+      "research_effort": "medium",
+      "research_evidence_version": "gx.research.v6.2b.1",
+      "research_progress": {
+        "consecutive_no_progress": 1,
+        "convergence": null,
+        "decision_options": [
+          "explore",
+          "enter_convergence",
+          "close_run"
+        ],
+        "expected": [],
+        "no_progress_rounds": 2,
+        "open_gaps": [],
+        "phase": "exploring",
+        "rounds": [
+          {
+            "consecutive_no_progress": 1,
+            "execution_failures": [],
+            "outcome": "no_progress",
+            "outcomes": [
+              {
+                "module_instance_id": "module_5e8b416b78da169faa3b39adf6b69dbf",
+                "report_ref": "gxa_ceeae3479a1de0ba4f938df470d2c7206a6f810c8590b739fd3d3881053ce822",
+                "status": "COMPLETE"
+              }
+            ],
+            "round": 1,
+            "through_cursor": 48
+          }
+        ],
+        "waiting_for": []
+      },
+      "run_id": "gxr_01m8a4eakgxqn6x8aw",
+      "scope": "run",
+      "trigger": {
+        "changes": [
+          {
+            "event": "v62.module.wake",
+            "event_id": 47,
+            "goal_version": 1,
+            "matched_watches": [],
+            "module_instance_ids": [
+              "module_5e8b416b78da169faa3b39adf6b69dbf"
+            ],
+            "reason": "round_complete",
+            "report_refs": [
+              "gxa_ceeae3479a1de0ba4f938df470d2c7206a6f810c8590b739fd3d3881053ce822"
+            ],
+            "round": 1,
+            "scope": "run",
+            "subject_ref": "gxr_01m8a4eakgxqn6x8aw"
+          },
+          {
+            "event": "v62.round.settled",
+            "event_id": 49,
+            "matched_watches": [],
+            "scope": "run",
+            "subject_ref": "round:3c7702376212f4ceee51ec72b673945cd8d03a02514d2efbc24602bca2cf2808"
+          }
+        ],
+        "since_cursor": 0,
+        "through_cursor": 49
+      }
+    }
+  },
+  "result": {
+    "module_instance_id": "module_5e8b416b78da169faa3b39adf6b69dbf",
+    "module_id": "data_inventory",
+    "module_version": "1",
+    "run_id": "gxr_01m8a4eakgxqn6x8aw",
+    "scope": "module:module_5e8b416b78da169faa3b39adf6b69dbf",
+    "round": 1,
+    "version": 1,
+    "goal_version": 1,
+    "status": "COMPLETE",
+    "author": {
+      "kind": "MODULE",
+      "task_id": "gxt_01m8a4eaqr3vt20agq",
+      "context_ref": "gxcx_01m8a4eaqrj9ezf8km",
+      "run_id": "gxr_01m8a4eakgxqn6x8aw",
+      "lease_id": "gxl_01m8a4eaqxem0d5vz4",
+      "thread_id": "script-gxl_01m8a4eaqxem0d5vz4",
+      "turn_id": "turn-gxl_01m8a4eaqxem0d5vz4",
+      "call_id": "report"
+    },
+    "base": null,
+    "operation_key": "report",
+    "report_ref": "gxa_ceeae3479a1de0ba4f938df470d2c7206a6f810c8590b739fd3d3881053ce822",
+    "artifact_ref": "gxa_ceeae3479a1de0ba4f938df470d2c7206a6f810c8590b739fd3d3881053ce822",
+    "report_sha256": "90d881fb52e848a101db6ac659583115e1dbfa205d40dc7dc1b56f6d01bf8aa5",
+    "source_refs": [
+      "gxa_01m8a4eaks01029wtz"
+    ],
+    "event_id": 45,
+    "wake_event_id": null
+  },
+  "rejected": {
+    "reason": "unseen_module_report",
+    "module_instance_id": "module_5e8b416b78da169faa3b39adf6b69dbf",
+    "brief_cursor": 0
+  },
+  "close": {
+    "run_id": "gxr_01m8a4eakgxqn6x8aw",
+    "task_id": "gxt_01m8a4eas443618znq",
+    "lease_id": "gxl_01m8a4eas76fddqe6n",
+    "task_status": "ACCEPTED",
+    "decision_ref": "gxa_51591d7c5c3fe760f089ad7624ddc06b76540a0d0bc155b38a074095be6df712",
+    "decision_id": "gxa_51591d7c5c3fe760f089ad7624ddc06b76540a0d0bc155b38a074095be6df712",
+    "scope": "run",
+    "goal_version": 1,
+    "context_ref": "gxcx_01m8a4eas3gekqtk9b",
+    "base": null,
+    "result_head": {
+      "version": 1,
+      "sha256": "186b3bb7dac6b0561141c791142ee40934918b0fabfbe6774b5876c58b6c76d1"
+    },
+    "outcome": "adopted",
+    "draft_sha256": "7fa9bc9669c6243ddc034c98e54dd70dfb4f64f468b05019f18af612f0ffa910",
+    "resolved_ops": [
+      {
+        "source_index": 0,
+        "op_digest": "cc0e9a3a061969a543f6c09854fab266c321bd83f0b33f16a8f7d98d86e9ab28",
+        "spec": {
+          "claim_refs": [],
+          "op": "close_run",
+          "reason": "Record the known coverage at closure.",
+          "unresolved": [
+            "Sampling independence remains unknown."
+          ]
+        }
+      }
+    ],
+    "aliases": {},
+    "reconsider_when": [
+      {
+        "event": "evidence_added",
+        "subject_ref": "run"
+      }
+    ],
+    "checkpoint_id": "gxc_01m8a4easm2v2q11p3",
+    "dispatches": [],
+    "submission_id": "gxsb_01m8a4easmx8xn9v57",
+    "claim_revisions": [],
+    "consumed_event_cursor": 49,
+    "close_context": {
+      "brief_cursor": 49,
+      "goal_version": 1,
+      "context_ref": "gxcx_01m8a4eas3gekqtk9b",
+      "brief_sha256": "11cca80b9780bf24580466fee5e050325265274d3d99ec34b343706d8b2570fb",
+      "brief_delivery": "start:2cac286a-1198-4451-8281-4ca9c4c4ac4b",
+      "brief_turn": "turn-gxl_01m8a4eas76fddqe6n",
+      "closing_turn": "turn-gxl_01m8a4eas76fddqe6n"
+    },
+    "event_id": 60
+  },
+  "wakes": 1,
+  "replay_identical": true,
+  "jobs": 0,
+  "job_charges": 0
+}

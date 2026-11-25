@@ -1,0 +1,65 @@
+{
+  "case": "R5",
+  "run_id": "gxr_01m8a4fkjta0pmgpdz",
+  "registered_decision": "gxa_5e22f7be01c90241a02105b46b8322544991ffa87665961295baa321bd6b1834",
+  "operations": [
+    {
+      "command": "observe",
+      "source": "wrong-descriptor-hash",
+      "expected_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "descriptor": {
+        "source": "wwPDB:2RE9/revision/1.4",
+        "data": "https://files.rcsb.org/download/2RE9.cif#sha256=8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "acquisition": null,
+        "sample": null,
+        "publication": "https://doi.org/10.1016/j.bbrc.2007.09.097",
+        "processing": null,
+        "sampling": null,
+        "applicability": "model 1, entity 1, label chains A/B/C in the deposited asymmetric unit",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "exit_code": 1,
+      "result": {},
+      "error": "SchemaInvalid: SCHEMA_INVALID: Descriptor SHA-256 differs from the supplied artifact"
+    },
+    {
+      "command": "observe",
+      "source": "wrong-archive-hash",
+      "expected_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "descriptor": {
+        "source": "wwPDB:2RE9/revision/1.4",
+        "data": "https://files.rcsb.org/download/2RE9.cif#sha256=0000000000000000000000000000000000000000000000000000000000000000",
+        "acquisition": null,
+        "sample": null,
+        "publication": "https://doi.org/10.1016/j.bbrc.2007.09.097",
+        "processing": null,
+        "sampling": null,
+        "applicability": "model 1, entity 1, label chains A/B/C in the deposited asymmetric unit"
+      },
+      "exit_code": 1,
+      "result": {},
+      "error": "SchemaInvalid: SCHEMA_INVALID: Archive descriptor SHA-256 differs from the original coordinate bytes; identify the parent and transformation for derived bytes"
+    },
+    {
+      "command": "observe",
+      "source": "conflicting-accessions",
+      "expected_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "descriptor": {
+        "source": "wwPDB:2RE9/revision/1.4",
+        "data": "https://files.rcsb.org/download/2RE9.cif#sha256=8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "acquisition": "wwPDB:2O0O:revision-1",
+        "sample": null,
+        "publication": "https://doi.org/10.1016/j.bbrc.2007.09.097",
+        "processing": null,
+        "sampling": null,
+        "applicability": "model 1, entity 1, label chains A/B/C in the deposited asymmetric unit"
+      },
+      "exit_code": 1,
+      "result": {},
+      "error": "SchemaInvalid: SCHEMA_INVALID: Declared archive accession differs from the coordinate _entry.id"
+    }
+  ],
+  "observations": [],
+  "real_cpu_jobs": 0,
+  "paid_model_calls": 0
+}

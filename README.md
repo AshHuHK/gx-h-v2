@@ -1,4 +1,8 @@
-# GX-H V6.2.1 自主科研
+# GX-H V6.2.2 自主科研
+
+新版將預先登記的命題逐一對應到合格材料、具名量測與 Lead 實際收到的證據。研究者改門檻或收窄範圍後，報告保留哪些讀數已經看過。公開離線試點分別驗證直接取數、委派、改路與有據早停，並保存可獨立重評的原始 Run。[版本簽收與重播](V622_ACCEPTANCE.md) · [離線啟動與恢復](acceptance/v622/public/README.md) · [逐項回執](acceptance/v622/receipts/index.json)
+
+## V6.2.1 自主科研
 
 本版把原始材料、具名量測、Lead 實際收到的數字和正式主張連在一起。新 Goal 可採用同一套 deep 研究政策單層執行或委派。舊 Run 延用啟動時的證據政策及插件版本。[V6.2.1 驗收與回放](V621_ACCEPTANCE.md) · [座標材料取得與版本](examples/v621-coordinate-analysis/README.md) · [逐項機讀收據](acceptance/v621/receipts/index.json)
 

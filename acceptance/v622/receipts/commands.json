@@ -1,0 +1,101 @@
+{
+  "source_commit": "a0d167cc34a51b2c687e038510372c84971616a0",
+  "groups": {
+    "repairs": {
+      "source_commit": "a0d167cc34a51b2c687e038510372c84971616a0",
+      "exit_code": 0,
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/candidate/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "acceptance/v622",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "log": "repairs/repairs.log"
+    },
+    "funding": {
+      "source_commit": "a0d167cc34a51b2c687e038510372c84971616a0",
+      "exit_code": 0,
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/candidate/.venv/bin/python",
+        "-B",
+        "acceptance/phase2a/regression/loopback.py",
+        "--clash",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/clash/clash.new",
+        "--receipt",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/funding/bounded-network.json",
+        "--",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/candidate/.venv/bin/python",
+        "-B",
+        "-m",
+        "acceptance.v622.public.funding_probe",
+        "--work",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/funding/run"
+      ],
+      "log": "funding/command.log"
+    },
+    "compat": {
+      "source_commit": "a0d167cc34a51b2c687e038510372c84971616a0",
+      "exit_code": 0,
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/compat-suite-final-leoj8dqm/source/.venv/bin/python",
+        "-B",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/compat-suite-final-leoj8dqm/source/acceptance/v622/compat/regression.py",
+        "--work",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/compat-suite-final-leoj8dqm/out/a0d167cc34a51b2c687e038510372c84971616a0",
+        "--clash",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/clash/clash.new"
+      ],
+      "log": "compat/aggregate.log"
+    },
+    "standard": {
+      "source_commit": "a0d167cc34a51b2c687e038510372c84971616a0",
+      "exit_code": 0,
+      "argv": [
+        "bash",
+        "acceptance/v622/public/run-public.sh",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/cohorts/standard",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/clash/clash.new",
+        "standard"
+      ],
+      "log": "standard/batch.log"
+    },
+    "formal": {
+      "source_commit": "a0d167cc34a51b2c687e038510372c84971616a0",
+      "exit_code": 0,
+      "argv": [
+        "bash",
+        "acceptance/v622/public/run-public.sh",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/cohorts/controls",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/clash/clash.new",
+        "controls"
+      ],
+      "log": "formal/batch.log"
+    },
+    "crash": {
+      "source_commit": "a0d167cc34a51b2c687e038510372c84971616a0",
+      "exit_code": 0,
+      "argv": [
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/candidate/.venv/bin/python",
+        "-B",
+        "acceptance/phase2a/regression/loopback.py",
+        "--clash",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/clash/clash.new",
+        "--receipt",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/crash/network.json",
+        "--",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/candidate/.venv/bin/python",
+        "-B",
+        "acceptance/v622/batch_recovery.py",
+        "--work",
+        "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/v622-validation/final-42kon5sl/crash/probe"
+      ],
+      "log": "crash/output.log"
+    }
+  }
+}

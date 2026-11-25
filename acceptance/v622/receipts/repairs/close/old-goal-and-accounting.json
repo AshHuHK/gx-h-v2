@@ -1,0 +1,261 @@
+{
+  "run_id": "gxr_01m8a4e5ka9vf6p9a2",
+  "new_goal_brief": {
+    "task": "gxt_01m8a4e76g94hw3j54",
+    "turn": "turn-gxl_01m8a4e76v2krkwbjq",
+    "text_sha256": "fb23c3a94b8ce4cbbc601077364e97a3236505cbff3ff79e5ac9341ebaccdb8f",
+    "packet": {
+      "branches": [],
+      "budget": {
+        "available": {
+          "api_calls": 35,
+          "cpu_seconds": 960,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 16,
+          "tokens": 107990,
+          "wall_hours": 2,
+          "worker_tasks": 36
+        },
+        "initial_job_limit": 5,
+        "limits": {
+          "api_calls": 48,
+          "cpu_seconds": 1200,
+          "gpu_jobs": 0,
+          "gpu_minutes": 0,
+          "job_submissions": 20,
+          "tokens": 120000,
+          "wall_hours": 2,
+          "worker_tasks": 48
+        },
+        "reserved": {
+          "api_calls": 13,
+          "cpu_seconds": 240,
+          "job_submissions": 4,
+          "tokens": 12010,
+          "worker_tasks": 12
+        },
+        "spent": {}
+      },
+      "capabilities": [
+        {
+          "capability_version": "tl1a-coordinate-quality@1",
+          "category": "coordinate_completeness",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:coordinate_inventory",
+              "name": "quality.json"
+            }
+          ],
+          "purpose": "Count observed atoms, residues and selection coverage."
+        },
+        {
+          "capability_version": "deposited-chain-geometry@1",
+          "category": "coordinate_geometry",
+          "cost_class": "local_cpu",
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json"
+            }
+          ],
+          "purpose": "Describe the effect of atom selection on observed chain-pair geometry."
+        }
+      ],
+      "catalog_view": {
+        "mode": "summaries",
+        "query_tool": "gx_query_catalog",
+        "total": 2
+      },
+      "claims": [],
+      "evidence_policy": "gx.evidence/6.2.2",
+      "evidence_refs": [
+        "gxa_01m8a4e5kfyd1gq772",
+        "gxa_01m8a4e5khhf46w1cb",
+        "gxa_01m8a4e5kkv7kp0wvz"
+      ],
+      "goal": "Which recorded sources can support a second independent question?",
+      "goal_version": 2,
+      "head": null,
+      "intent": {
+        "objective": {
+          "value": "Which recorded sources can support a second independent question?",
+          "version": 2
+        }
+      },
+      "materials": [
+        {
+          "artifact_ref": "gxa_01m8a4e5kfyd1gq772",
+          "name": "2RE9.cif",
+          "role": "structure_2RE9",
+          "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b"
+        },
+        {
+          "artifact_ref": "gxa_01m8a4e5khhf46w1cb",
+          "name": "2O0O.cif",
+          "role": "structure_2O0O",
+          "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103"
+        },
+        {
+          "artifact_ref": "gxa_01m8a4e5kkv7kp0wvz",
+          "name": "public-scope-marker.json",
+          "role": "material",
+          "sha256": "fe92401b86e351c391eb34c220d33b86807de4526afdc8b4f8e0072023a4c4fb"
+        }
+      ],
+      "module_catalog": [
+        {
+          "cost_class": "local_cpu",
+          "focuses": [
+            "data"
+          ],
+          "module_id": "data_inventory",
+          "output": "module_report_bundle",
+          "purpose": "Inventory the assigned local materials, their provenance, coverage and gaps.",
+          "version": "1"
+        }
+      ],
+      "module_reports": [],
+      "nodes": [],
+      "observations": [
+        {
+          "artifact_ref": null,
+          "branch_id": null,
+          "event": "v6.intent.changed",
+          "event_id": 62,
+          "id": "gxr_01m8a4e5ka9vf6p9a2",
+          "node_id": null,
+          "source_job_id": null,
+          "status": null,
+          "subject_ref": "gxr_01m8a4e5ka9vf6p9a2"
+        }
+      ],
+      "previous_decision": null,
+      "research_effort": "medium",
+      "research_evidence_version": "gx.research.v6.2b.1",
+      "research_progress": {
+        "consecutive_no_progress": 0,
+        "convergence": null,
+        "decision_options": [
+          "explore",
+          "enter_convergence",
+          "close_run"
+        ],
+        "expected": [],
+        "no_progress_rounds": 2,
+        "open_gaps": [],
+        "phase": "exploring",
+        "rounds": [],
+        "waiting_for": []
+      },
+      "run_id": "gxr_01m8a4e5ka9vf6p9a2",
+      "scope": "run",
+      "trigger": {
+        "changes": [
+          {
+            "event": "v6.intent.changed",
+            "event_id": 62,
+            "matched_watches": [],
+            "scope": "run",
+            "subject_ref": "gxr_01m8a4e5ka9vf6p9a2"
+          }
+        ],
+        "since_cursor": 0,
+        "through_cursor": 62
+      }
+    }
+  },
+  "historical_report": {
+    "module_instance_id": "module_96d103e1d8713f197c884de207af2c2a",
+    "module_id": "data_inventory",
+    "module_version": "1",
+    "run_id": "gxr_01m8a4e5ka9vf6p9a2",
+    "scope": "module:module_96d103e1d8713f197c884de207af2c2a",
+    "round": 1,
+    "version": 1,
+    "goal_version": 1,
+    "status": "COMPLETE",
+    "author": {
+      "kind": "MODULE",
+      "task_id": "gxt_01m8a4e5qz314t3hw3",
+      "context_ref": "gxcx_01m8a4e5qzky3k4207",
+      "run_id": "gxr_01m8a4e5ka9vf6p9a2",
+      "lease_id": "gxl_01m8a4e5r4vpvt9m1a",
+      "thread_id": "script-gxl_01m8a4e5r4vpvt9m1a",
+      "turn_id": "turn-gxl_01m8a4e5r4vpvt9m1a",
+      "call_id": "report"
+    },
+    "base": null,
+    "operation_key": "report",
+    "report_ref": "gxa_de095225ac631aa998f694a8a8d145521d18e8c4bccbe4229122619709138e18",
+    "artifact_ref": "gxa_de095225ac631aa998f694a8a8d145521d18e8c4bccbe4229122619709138e18",
+    "report_sha256": "61edebffc235e1bbcce91d39968e6ea66e79c02e01b3fd49795b86d9f926d0c5",
+    "source_refs": [
+      "gxa_01m8a4e5kkv7kp0wvz"
+    ],
+    "event_id": 55,
+    "wake_event_id": null
+  },
+  "historical_report_released": 70,
+  "budget_event": {
+    "kind": "budget.allotment_changed",
+    "event_id": 71
+  },
+  "closed": {
+    "run_id": "gxr_01m8a4e5ka9vf6p9a2",
+    "task_id": "gxt_01m8a4e76g94hw3j54",
+    "lease_id": "gxl_01m8a4e76v2krkwbjq",
+    "task_status": "ACCEPTED",
+    "decision_ref": "gxa_22d361a79e7a8502cec8ff96f7942b7900bb4bba8025a263266f7fce0730a954",
+    "decision_id": "gxa_22d361a79e7a8502cec8ff96f7942b7900bb4bba8025a263266f7fce0730a954",
+    "scope": "run",
+    "goal_version": 2,
+    "context_ref": "gxcx_01m8a4e76fq9dqbz54",
+    "base": null,
+    "result_head": {
+      "version": 1,
+      "sha256": "e7bf3512aa45cf389eebe57a18c206b7947d98b607f4a3d35b28560c92a29ff9"
+    },
+    "outcome": "adopted",
+    "draft_sha256": "f23e99406ab57d63fc1103b499e9e8b7f9f41a20ce2c4ca24cebb0ad8ce172f7",
+    "resolved_ops": [
+      {
+        "source_index": 0,
+        "op_digest": "cc0e9a3a061969a543f6c09854fab266c321bd83f0b33f16a8f7d98d86e9ab28",
+        "spec": {
+          "claim_refs": [],
+          "op": "close_run",
+          "reason": "Record the known coverage at closure.",
+          "unresolved": [
+            "Sampling independence remains unknown."
+          ]
+        }
+      }
+    ],
+    "aliases": {},
+    "reconsider_when": [
+      {
+        "event": "evidence_added",
+        "subject_ref": "run"
+      }
+    ],
+    "checkpoint_id": "gxc_01m8a4e77n7f9dzjed",
+    "dispatches": [],
+    "submission_id": "gxsb_01m8a4e77nas8gc295",
+    "claim_revisions": [],
+    "consumed_event_cursor": 62,
+    "close_context": {
+      "brief_cursor": 62,
+      "goal_version": 2,
+      "context_ref": "gxcx_01m8a4e76fq9dqbz54",
+      "brief_sha256": "fb23c3a94b8ce4cbbc601077364e97a3236505cbff3ff79e5ac9341ebaccdb8f",
+      "brief_delivery": "start:f45583c0-98fc-4aec-8bd2-4ef1b0ae31fe",
+      "brief_turn": "turn-gxl_01m8a4e76v2krkwbjq",
+      "closing_turn": "turn-gxl_01m8a4e76v2krkwbjq"
+    },
+    "event_id": 78
+  },
+  "jobs": 0,
+  "job_charges": 0
+}

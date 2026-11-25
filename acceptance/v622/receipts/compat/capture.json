@@ -1,0 +1,508 @@
+{
+  "source_commit": "e5b7ee977ec33854362bc2440d8f9249464aed20",
+  "run_id": "gxr_01m8a4dbpnamx6jmqp",
+  "evidence_policy": "gx.evidence/6.2.1",
+  "original_packages": {
+    "org.gx.data-inventory@2.0.0": "5b5ab3984fbb74951614916adc6c1557499d41c102b15b537c9388d7bb82a665",
+    "org.gx.protein@0.3.0": "f5f2c9169d1a6ff82d39fc260a491f8c4053f54f98a543c2ea4b7e42f390a6ad"
+  },
+  "scientific_state_sha256": "eb45106572ddf0479212e8651cc3fe6d1b871951b65d864c31967d2ca611db47",
+  "business": {
+    "run": {
+      "run_id": "gxr_01m8a4dbpnamx6jmqp",
+      "status": "STOPPED",
+      "contract_sha256": "321a0d3e7af19534d30dd35f482d9bbdcf0ec80a7da5b5ccd0a12af928275873",
+      "workflow_id": null,
+      "workflow_version": null,
+      "workflow_sha256": null,
+      "agent_policy_sha256": "794b5366df2e1353debdf73208c10e42fb116ac8e3480b4f97a60f6a10662217",
+      "capability_pins": [
+        {
+          "capability_version": "deposited-chain-geometry@2",
+          "content_artifact_ref": "gxa_01m8a4dbfffd259qaj",
+          "cost_class": "local_cpu",
+          "family": "coordinate_geometry",
+          "inputs": [
+            "structure"
+          ],
+          "limitations": "One asymmetric unit per measurement. Alternate locations and ambiguous backbone assignments are unsupported. Absence of a selected position is a coverage limitation. The measurement does not establish sampling independence or population-level properties.",
+          "manifest_sha256": "ebe71b323d3ff7ee4249d9fa5b1b314e52d7012c08114d6c930344d3f7580941",
+          "method": {
+            "estimator": "Match label position, residue and atom within model 1/entity 1/A,B,C. Report observed-union coverage, proper Horn least-squares fit, unsigned rotation in degrees and fitted RMSD in angstrom.",
+            "family": "coordinate_geometry",
+            "mechanism": "Read one mmCIF with a single entry, coordinates for model 1, entity 1 and label chains A/B/C. Accept common_ca, common_backbone (all four backbone atoms shared), or ordered_backbone (all four shared, full occupancy and B ≤ 40 in each chain). Input profile uses an ASCII-style tabular atom_site loop with one whitespace-delimited atom row per line.",
+            "objective": "Describe the effect of atom selection on observed chain-pair geometry.",
+            "training_data_lineage": "Deterministic coordinate analysis."
+          },
+          "output_summary": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "name": "geometry.json",
+              "nature": "analysis"
+            }
+          ],
+          "outputs": [
+            {
+              "kind": "file:deposited_chain_geometry",
+              "metric_specs": {
+                "coverage": {
+                  "bounds": [
+                    0,
+                    1
+                  ],
+                  "denominator": "/observed_union_residues",
+                  "numerator": "/selected_residues",
+                  "op": "ratio/1",
+                  "places": 3,
+                  "reader": "json/1",
+                  "scope": {
+                    "chains": "/chains",
+                    "entity": "/label_entity",
+                    "input_sha256": "/input_sha256",
+                    "mask": "/mask",
+                    "model": "/model"
+                  },
+                  "unit": "1"
+                }
+              },
+              "name": "geometry.json",
+              "nature": "analysis",
+              "required": true,
+              "source_roles": [
+                "structure"
+              ]
+            }
+          ],
+          "plugin": {
+            "id": "org.gx.protein",
+            "sha256": "f5f2c9169d1a6ff82d39fc260a491f8c4053f54f98a543c2ea4b7e42f390a6ad",
+            "version": "0.3.0"
+          },
+          "portable_sha256": "741e860f87822bb1b1b204cd18e6cb3035b5da35c7bded3f5cb1e97ada23ee1f",
+          "provider_closure": [
+            {
+              "id": "org.gx.protein",
+              "sha256": "f5f2c9169d1a6ff82d39fc260a491f8c4053f54f98a543c2ea4b7e42f390a6ad",
+              "version": "0.3.0"
+            }
+          ]
+        }
+      ]
+    },
+    "run_input_sha256": "25a5bad9a567f3be505ed2634426828b0ea468121063663dfa16790fa4ed276d",
+    "research_evidence_version": "gx.research.v6.2b.1",
+    "package_pins": [
+      {
+        "id": "org.gx.data-inventory",
+        "sha256": "5b5ab3984fbb74951614916adc6c1557499d41c102b15b537c9388d7bb82a665",
+        "version": "2.0.0"
+      },
+      {
+        "id": "org.gx.protein",
+        "sha256": "f5f2c9169d1a6ff82d39fc260a491f8c4053f54f98a543c2ea4b7e42f390a6ad",
+        "version": "0.3.0"
+      }
+    ],
+    "native_models": [
+      {
+        "thread_id": "01a21446-b8f2-7132-ad07-4d9a30f9f8f2",
+        "model": "gpt-6.2-astra",
+        "effort": "max",
+        "provider": "gx_loopback"
+      },
+      {
+        "thread_id": "01a21446-bcee-74d0-b938-51d52cd1f619",
+        "model": "gpt-6.2-astra",
+        "effort": "max",
+        "provider": "gx_loopback"
+      },
+      {
+        "thread_id": "01a21446-be14-7d23-a47d-b95d6d837618",
+        "model": "gpt-6.2-astra",
+        "effort": "max",
+        "provider": "gx_loopback"
+      },
+      {
+        "thread_id": "01a21446-bf2c-7531-aa91-091a06b1589c",
+        "model": "gpt-6.2-astra",
+        "effort": "max",
+        "provider": "gx_loopback"
+      },
+      {
+        "thread_id": "01a21446-c231-7ce3-989e-0159424784b9",
+        "model": "gpt-6.2-astra",
+        "effort": "max",
+        "provider": "gx_loopback"
+      },
+      {
+        "thread_id": "01a21446-c48c-7553-a5dd-f041eb8f38e3",
+        "model": "gpt-6.2-astra",
+        "effort": "max",
+        "provider": "gx_loopback"
+      },
+      {
+        "thread_id": "01a21446-c728-76d2-a746-32d4b1bf3f21",
+        "model": "gpt-6.2-astra",
+        "effort": "max",
+        "provider": "gx_loopback"
+      },
+      {
+        "thread_id": "01a21446-cc0b-7d11-9da6-a4adc485b956",
+        "model": "gpt-6.2-astra",
+        "effort": "max",
+        "provider": "gx_loopback"
+      }
+    ],
+    "report": {
+      "module_instance_id": "module_8c2f54e77126ce82d22a75efa9fa21e1",
+      "operation_key": "report-measurement",
+      "report_ref": "gxa_2b3dc2ec5d5567638d0147e57c394d00d5fab9a55e7d4d33d5d45c21ffac3d34",
+      "report_sha256": "a5c579ddda3fd508bde4c258ab7c828540c57b6aaad0fc1a07f40e234b1e6af6",
+      "event_id": 119,
+      "wake_event_id": 120,
+      "source_refs": [
+        "gxa_01m8a4dgsc27gy432a"
+      ]
+    },
+    "original_receipt_sha256": "e2d0e983b3accf2e425af1f2fae1d834d0cbffc873c31fe01b4d1fd1fa914fac",
+    "claims": [
+      {
+        "revision": 1,
+        "sha256": "4518a723139edc130d0ee1f44ee89d62537afc7d6f7a52e61f0bc9683d60b239",
+        "claim_revision_id": "gxh_01m8a4dj9jwtnb4zwd@1",
+        "statement": "Assigned specimen completeness for the registered atom selection is 54/164 (0.329).",
+        "level": "open",
+        "evidence_refs": [
+          "gxa_2b3dc2ec5d5567638d0147e57c394d00d5fab9a55e7d4d33d5d45c21ffac3d34"
+        ],
+        "maturity": {
+          "direction": "undetermined",
+          "disputed_extractions": [],
+          "gaps": [],
+          "grounds": [],
+          "opposing_refs": [],
+          "preexisting_result": false,
+          "reasons": [
+            "No applicable independently reviewed evidence or classified scientific result is cited."
+          ],
+          "registration": null,
+          "replication": [],
+          "results": [],
+          "reviewed_evidence": [],
+          "rule": "gx.claim-maturity/1",
+          "stage": "idea",
+          "supporting_refs": []
+        }
+      },
+      {
+        "revision": 1,
+        "sha256": "3b2068dff12cdad451dcfae23e650c8942c976a1742935188dd9ce7f931991de",
+        "claim_revision_id": "gxh_01m8a4dkxqe4r3d3hb@1",
+        "statement": "Reference file completeness for the registered atom selection is 164/164 (1.000).",
+        "level": "open",
+        "evidence_refs": [
+          "gxa_01m8a4djwjng5kbszn"
+        ],
+        "maturity": {
+          "direction": "undetermined",
+          "disputed_extractions": [],
+          "gaps": [],
+          "grounds": [],
+          "opposing_refs": [],
+          "preexisting_result": false,
+          "reasons": [
+            "No applicable independently reviewed evidence or classified scientific result is cited."
+          ],
+          "registration": null,
+          "replication": [],
+          "results": [],
+          "reviewed_evidence": [],
+          "rule": "gx.claim-maturity/1",
+          "stage": "idea",
+          "supporting_refs": []
+        }
+      }
+    ],
+    "graph": [
+      {
+        "version": 1,
+        "sha256": "dfdede4eec32deb42b9e68caadff98ec8442ce88fd1114f060f3faceff982dc4",
+        "decision_ref": "gxa_14fe41c2d390e3d1abc969f82ec6457398b957a7c257576e6726d73f4014752c"
+      },
+      {
+        "version": 2,
+        "sha256": "87577e6629b2d9a76c620695dcb330c45516d33ac802cc7ba2b10a41e38a9796",
+        "decision_ref": "gxa_4c28446736420989d4c61933faa73e5c37454142a5a0ff980ca2447c697f85f4"
+      },
+      {
+        "version": 3,
+        "sha256": "b7327cd6b53074862f50806ab71385b3e8b97095103be96ff68f3e86998050c5",
+        "decision_ref": "gxa_e5636ce73e7d8d05c81daa895e3be05e2fb0522c4ec44a1dc01fa7317dca3a60"
+      },
+      {
+        "version": 4,
+        "sha256": "7569815eba512d1acc38ea6f3f2d708d0e987de3570ac2635b2835c1fa043883",
+        "decision_ref": "gxa_2a6586390f5acb3dddba3210bc3e36f74f3213971a2eaaba70a773e9da18bd97"
+      }
+    ],
+    "jobs": [
+      {
+        "job_id": "gxj_01m8a4dgbqg6adq7sr",
+        "capability_id": "deposited-chain-geometry",
+        "idempotency_key": "job:gxr_01m8a4dbpnamx6jmqp:v6.node:806ec12217ead6572a76149bfc42c3c06022788b94eb4b75e3c013071937719a",
+        "reservation_ref": "rsv_01m8a4dgdpfcfrw1ps",
+        "status": "SUCCEEDED",
+        "measured_json": "{\"cpu_seconds\":0.087,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":20.2,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.215}"
+      },
+      {
+        "job_id": "gxj_01m8a4djf64c52b6kr",
+        "capability_id": "deposited-chain-geometry",
+        "idempotency_key": "job:gxr_01m8a4dbpnamx6jmqp:v6.node:52eef1fe221f3c6263d8df0bc429a2f9afded37c4a17245de7dd8c154a02558b",
+        "reservation_ref": "rsv_01m8a4djgrfwhrwqqx",
+        "status": "SUCCEEDED",
+        "measured_json": "{\"cpu_seconds\":0.093,\"limit_memory_mib\":null,\"limit_wall_seconds\":30,\"max_rss_mib\":19.9,\"memory_check\":\"no memory_mib is declared for this job: nothing to check against\",\"memory_within_limit\":null,\"result\":\"exited\",\"started\":true,\"wall_seconds\":0.229}"
+      }
+    ],
+    "execution_manifests": [
+      {
+        "job_id": "gxj_01m8a4dgbqg6adq7sr",
+        "admission_sha256": "bb9194960679d34ecfd47fd5395d5ab2bd1b1fc3c2f342dbd9119fce9f121b14",
+        "completion_sha256": "29cab9960dc7693ebb672c6f7021b3f90fbd0358cd92b433fa2fc63c874165da"
+      },
+      {
+        "job_id": "gxj_01m8a4djf64c52b6kr",
+        "admission_sha256": "c2e66e308b2b9e49b24ef0117975198bc4cdb4c2b03070a9f81c508f2542c35e",
+        "completion_sha256": "44fa56ed6fafd1241c08efc5520cf56e060c2f5e96fc79eb5bbdd2cbd272897c"
+      }
+    ],
+    "artifact_pins": [
+      {
+        "ref": "gxa_01m8a4dbe42meejasr",
+        "sha256": "8ea2b5a1406eb1402a508ea49b1532ddde836b444855eca7d2963fe9de066f97",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4dbfffd259qaj",
+        "sha256": "ebe71b323d3ff7ee4249d9fa5b1b314e52d7012c08114d6c930344d3f7580941",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4dbqerds55r72",
+        "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4dbqw5d4abpqz",
+        "sha256": "0cdb0a9a62b951232469547fa506023046c880d1d1841951e123f7b5b9910ffa",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4dej99raabsaw",
+        "sha256": "c2c26cda6cb1ccc1c08d2e7b5e3c1df9889da5ddf668c799a38b4f768a52fe67",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4dfk90zvyje7a",
+        "sha256": "9626b37bfb39c8c1afc42aa848d4351e8929018b802d49537a734f7e78d8c686",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4dg9v3h981aft",
+        "sha256": "5a56308eece937d4e2e2ecc6d05482b1f8c8ba10fc4dcbd420b965f70f86f5e7",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4dgsc27gy432a",
+        "sha256": "c1f564fa4f04e3f9091d4eb36594df7ead086656e9a64c6a46ee337b84d0466b",
+        "job_id": "gxj_01m8a4dgbqg6adq7sr"
+      },
+      {
+        "ref": "gxa_01m8a4dgstk58mk63y",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "job_id": "gxj_01m8a4dgbqg6adq7sr"
+      },
+      {
+        "ref": "gxa_01m8a4dgt6h49g8xwb",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "job_id": "gxj_01m8a4dgbqg6adq7sr"
+      },
+      {
+        "ref": "gxa_01m8a4dj3m10t8stgd",
+        "sha256": "ea38a659730ccb06df52a9bf925cca77d3034e9ff2160f2ff23ee4029cd00164",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4djdt02e5ehs8",
+        "sha256": "ad9a80ae847cc8b05075a8802c2ab07a492dcac554edcf3324512be676b0c20d",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_01m8a4djwjng5kbszn",
+        "sha256": "2d8e1ae5402cb3b44db7e182eb8fb1103d663dd62f5d08a033b54534d7538841",
+        "job_id": "gxj_01m8a4djf64c52b6kr"
+      },
+      {
+        "ref": "gxa_01m8a4djwybpa2mmvs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "job_id": "gxj_01m8a4djf64c52b6kr"
+      },
+      {
+        "ref": "gxa_01m8a4djx96wx6cjmd",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "job_id": "gxj_01m8a4djf64c52b6kr"
+      },
+      {
+        "ref": "gxa_01m8a4dkmhm4tepgpe",
+        "sha256": "e9e40c0059a927ef47c18f2358c94887ffb159d28b6fbb80f1ab3e4d59478037",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_14fe41c2d390e3d1abc969f82ec6457398b957a7c257576e6726d73f4014752c",
+        "sha256": "48a2a264ed98251f4267e901c2009120e576ea5372b536ba8d8c88988b94668e",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_2a6586390f5acb3dddba3210bc3e36f74f3213971a2eaaba70a773e9da18bd97",
+        "sha256": "d0994fd3c730f89ce059df9980ea38cf9372ff6d6b1901925853a70fb789390a",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_2b3dc2ec5d5567638d0147e57c394d00d5fab9a55e7d4d33d5d45c21ffac3d34",
+        "sha256": "a5c579ddda3fd508bde4c258ab7c828540c57b6aaad0fc1a07f40e234b1e6af6",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_4c28446736420989d4c61933faa73e5c37454142a5a0ff980ca2447c697f85f4",
+        "sha256": "feea0065bdce9d8f1718957737eb22d6262eb984229eaa6a63f65688751b1f59",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_7c3a4527a2a909b9a3ac8cff4bdb7b5efa05dd4d1734e094a3b2d4587302e632",
+        "sha256": "0a94a3d666931800a74b9d90e3fcd44de6158541449160ac7d25cdb87640e06f",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_c8ead227aeebe48623d2d71dc3a773b0183f5093b7d615a80c20fe8045163b65",
+        "sha256": "f1a19fcb0d663049f5946616d6e58613ed7e5e6307e51a563688187e24c9c501",
+        "job_id": null
+      },
+      {
+        "ref": "gxa_e5636ce73e7d8d05c81daa895e3be05e2fb0522c4ec44a1dc01fa7317dca3a60",
+        "sha256": "232cdabced194c33261ed9cee642b80b5cc802bdeb153a65e23db11ef894757d",
+        "job_id": null
+      }
+    ],
+    "native_turns": [
+      {
+        "thread_id": "01a21446-b8f2-7132-ad07-4d9a30f9f8f2",
+        "turn_id": "01a21446-b92d-74c3-9fa5-f8c51ec4562c",
+        "settled_tokens": 175,
+        "confidence": "PROVIDER_CONFIRMED",
+        "budget_status": "SETTLED"
+      },
+      {
+        "thread_id": "01a21446-bcee-74d0-b938-51d52cd1f619",
+        "turn_id": "01a21446-bd0a-7f61-9be1-4ad010549411",
+        "settled_tokens": 35,
+        "confidence": "PROVIDER_CONFIRMED",
+        "budget_status": "SETTLED"
+      },
+      {
+        "thread_id": "01a21446-be14-7d23-a47d-b95d6d837618",
+        "turn_id": "01a21446-be3e-79e2-90dd-40edb60bc561",
+        "settled_tokens": 35,
+        "confidence": "PROVIDER_CONFIRMED",
+        "budget_status": "SETTLED"
+      },
+      {
+        "thread_id": "01a21446-bf2c-7531-aa91-091a06b1589c",
+        "turn_id": "01a21446-bf57-7ac3-af64-faf7a9b2339a",
+        "settled_tokens": 70,
+        "confidence": "PROVIDER_CONFIRMED",
+        "budget_status": "SETTLED"
+      },
+      {
+        "thread_id": "01a21446-c231-7ce3-989e-0159424784b9",
+        "turn_id": "01a21446-c255-7db3-9eff-80cdd548d697",
+        "settled_tokens": 70,
+        "confidence": "PROVIDER_CONFIRMED",
+        "budget_status": "SETTLED"
+      },
+      {
+        "thread_id": "01a21446-c48c-7553-a5dd-f041eb8f38e3",
+        "turn_id": "01a21446-c4ad-76e2-bdb8-bc9ae0d1d9b7",
+        "settled_tokens": 105,
+        "confidence": "PROVIDER_CONFIRMED",
+        "budget_status": "SETTLED"
+      },
+      {
+        "thread_id": "01a21446-c728-76d2-a746-32d4b1bf3f21",
+        "turn_id": "01a21446-c750-7730-9d9b-a4b444ce90bd",
+        "settled_tokens": 105,
+        "confidence": "PROVIDER_CONFIRMED",
+        "budget_status": "SETTLED"
+      },
+      {
+        "thread_id": "01a21446-cc0b-7d11-9da6-a4adc485b956",
+        "turn_id": "01a21446-cc38-7653-a51f-193855943182",
+        "settled_tokens": 105,
+        "confidence": "PROVIDER_CONFIRMED",
+        "budget_status": "SETTLED"
+      }
+    ],
+    "budgets": [
+      {
+        "budget_ref": "gxb_01m8a4dbpp1zfs3mw1",
+        "spent_json": "{\"api_calls\":8,\"cpu_seconds\":2,\"job_submissions\":2,\"tokens\":700,\"worker_tasks\":4}",
+        "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":0,\"gpu_jobs\":0,\"gpu_minutes\":0,\"job_submissions\":0,\"tokens\":0,\"wall_hours\":0,\"worker_tasks\":0}"
+      },
+      {
+        "budget_ref": "gxb_01m8a4dbpsm94xt59r",
+        "spent_json": "{\"api_calls\":8,\"cpu_seconds\":2,\"job_submissions\":2,\"tokens\":700,\"worker_tasks\":4}",
+        "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":0,\"job_submissions\":0,\"tokens\":0,\"worker_tasks\":0}"
+      },
+      {
+        "budget_ref": "gxb_01m8a4devyszrvjvj2",
+        "spent_json": "{\"api_calls\":3,\"cpu_seconds\":1,\"job_submissions\":1,\"tokens\":210,\"worker_tasks\":4}",
+        "reserved_json": "{\"api_calls\":0,\"cpu_seconds\":0,\"job_submissions\":0,\"tokens\":0,\"worker_tasks\":0}"
+      }
+    ],
+    "history": {
+      "v6_decisions": {
+        "count": 6,
+        "sha256": "c2c1726bcf59f256a7d6fb972fe30f2ddad21118a1c0d97c0b05625ab031db35"
+      },
+      "v6_nodes": {
+        "count": 2,
+        "sha256": "0dd6550f8d16e0f9de62dfee4e752acd12fb9ca2bfc3f322cb1b64e23f8042b7"
+      },
+      "v62_module_wakes": {
+        "count": 1,
+        "sha256": "2c04362fe9b7beda8c8960152af051de67c716263c1c7fc63990b2d81b612f6e"
+      },
+      "research_contexts": {
+        "count": 10,
+        "sha256": "e67bf9ca0c17e287e1a71094a68068e6292cdc1729b0b809bdce87bbbd0f44d8"
+      },
+      "p0_root_calls": {
+        "count": 19,
+        "sha256": "b68850b8ebf3adf7a816ddca74a77ef650760b80875538a27e59918720853810"
+      }
+    },
+    "state_marker_sha256": "54c44123d5708153f07e51183601e00b30bbf2320eaeba91b6231cbb55be2320"
+  },
+  "previous_schema": {
+    "contract_sha256": "321a0d3e7af19534d30dd35f482d9bbdcf0ec80a7da5b5ccd0a12af928275873",
+    "db_schema_sha256": "303e1ccd6438d045b280254647157aabb212e800fa4dca3c532acf20335ddd97"
+  },
+  "old_source_hashes": {
+    "protocol.json": "fda25db527b22e75da525a5f0919e7062cddd5323b94fd91aa8a67ef539f5783",
+    "rate.py": "840b7b81b86ac84011ec38886dcd91b451b4fbf2176bed9efe50af69c725f8d4",
+    "scoring.py": "8174b82425bfd27d1c74469178556c5787be5261f5724e5aa7de2c51c8d2a1b9",
+    "witness.py": "b66ef533dde9d50fe9085e95df750a7b563519227866e5cc21f5cf96e9222a68",
+    "receipts/scores.json": "612db0cd7d9416c6bf9f7c1c0d96c3637dd0719b5e42ba8f1114cac3b1938aa0"
+  },
+  "original_score_sha256": "03890eb068c8e2f67fdacb7f86c2db7df51500599aee9d2a8fc1ec4574a58407",
+  "status": "PASS",
+  "paid_provider_calls": 0
+}

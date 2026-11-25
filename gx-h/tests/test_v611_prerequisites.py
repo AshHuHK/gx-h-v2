@@ -1,10 +1,16 @@
 """Public V6.1.1 decision wake and scoped observation regressions (zero model inference)."""
 from contextlib import closing
 import json
+import os
+from pathlib import Path
+import time
 import unittest
+from unittest.mock import patch
 
 from gx_core.artifacts import ArtifactService
-from gx_core.p0 import intent, v6_goal, v6_native
+from gx_core.errors import BudgetExceeded
+from gx_core.jobs.service import JobService
+from gx_core.p0 import intent, v6_goal, v6_jobs, v6_native
 from gx_core.persistence import store
 from tests import test_v6_delegation, test_v6_goal
 from tests.test_v6_decisions import draft
@@ -44,6 +50,8 @@ class GoalPrerequisites(unittest.TestCase):
             self.assertEqual(triggers[0]["decision_ref"], own["decision_ref"])
             self.assertIn(ref, packet["evidence_refs"])
             self.assertIn(own["decision_ref"], packet["evidence_refs"])
+            self.assertEqual(v6_goal.record_observation(cold, f.run, ref, source="branch-late-result",
+                                                       scope=f.left)["event_id"], packet["trigger"]["through_cursor"])
             self.assertIsNone(v6_goal.ensure_task(cold, f.run))
         f.call(f.bind(tid), v6_native.DECIDE, {"decision": global_hold}, "branch-wake-ack")
         self.assertIsNone(v6_goal.ensure_task(f.conn, f.run))
@@ -96,5 +104,39 @@ class GoalPrerequisites(unittest.TestCase):
             from gx_core.p0 import v6_decisions
             v6_decisions.adopt(conn, **call, decision=fixture.decision(fixture.branch("local:counts"), inventory))
         with closing(store.open_store(r.db_path)) as cold:
-            self.assertEqual(v6_goal.waiting_for(cold, r.run_id)["kind"], "nodes")
+            waiting = v6_goal.waiting_for(cold, r.run_id)
+            self.assertEqual((waiting["kind"], waiting["nodes"][0]["status"]), ("nodes", "PENDING"))
+            # Deterministically hold the first admissible submission at the JobService boundary.
+            with patch.object(JobService, "submit", side_effect=BudgetExceeded("wait for science CPU")):
+                v6_jobs.advance(cold, r.run_id)
+        with closing(store.open_store(r.db_path)) as cold:
+            waiting = v6_goal.waiting_for(cold, r.run_id)
+            node, = waiting["nodes"]
+            self.assertEqual(node["wait"], {"code": "BUDGET_EXCEEDED", "message": "wait for science CPU"})
+            self.assertIsNone(node["job_id"])
             self.assertIsNone(v6_goal.ensure_task(cold, r.run_id))
+            v6_jobs.advance(cold, r.run_id)
+        with closing(store.open_store(r.db_path)) as cold:
+            running = v6_goal.waiting_for(cold, r.run_id)
+            node, = running["nodes"]
+            self.assertEqual(node["status"], "RUNNING")
+            self.assertTrue(node["job_id"])
+            self.assertNotIn("wait", node)
+            self.assertEqual(cold.execute("SELECT count(*) FROM jobs").fetchone()[0], 1)
+            self.assertIsNone(v6_goal.ensure_task(cold, r.run_id))
+            # Wait for the real CPU process and collect it via the original Job owner.
+            timeout = time.monotonic() + 15
+            while time.monotonic() < timeout:
+                v6_jobs.advance(cold, r.run_id)
+                if cold.execute("SELECT status FROM v6_nodes").fetchone()[0] == "SUCCEEDED":
+                    break
+                time.sleep(.02)
+            settled = dict(cold.execute("SELECT node_id,job_id,exec_key,status,result_ref FROM v6_nodes").fetchone())
+            self.assertEqual(settled["status"], "SUCCEEDED")
+            if directory := os.environ.get("GX_V611_PREREQUISITE_EVIDENCE"):
+                destination = Path(directory)
+                destination.mkdir(exist_ok=True, parents=True)
+                receipt = {"run_id": r.run_id, "admission_wait": waiting, "admitted": running, "settled": settled,
+                           "job_count": cold.execute("SELECT count(*) FROM jobs").fetchone()[0],
+                           "paid_model_calls": 0, "provider_tokens": None}
+                (destination / "pending-to-settled.json").write_text(json.dumps(receipt, indent=2) + "\n")

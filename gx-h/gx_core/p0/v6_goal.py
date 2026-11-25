@@ -819,12 +819,17 @@ def waiting_for(conn, rid):
     nodes = [
         dict(row)
         for row in conn.execute(
-            "SELECT node_id,branch_id,status,job_id FROM v6_nodes WHERE run_id=? "
-            "AND status IN ('PENDING','RUNNING','CANCEL_REQUESTED') ORDER BY rowid",
+            "SELECT n.node_id,n.branch_id,n.status,n.job_id,w.wait_json "
+            "FROM v6_nodes n LEFT JOIN v6_node_waits w USING(node_id) WHERE n.run_id=? "
+            "AND n.status IN ('PENDING','RUNNING','CANCEL_REQUESTED') ORDER BY n.rowid",
             (rid,),
         )
     ]
     if nodes:
+        for node in nodes:
+            reason = node.pop("wait_json")
+            if reason:
+                node["wait"] = json.loads(reason)
         return {"kind": "nodes", "nodes": nodes, "continue_with": "gx-p0 run"}
     prior = _latest(conn, rid)
     if prior:

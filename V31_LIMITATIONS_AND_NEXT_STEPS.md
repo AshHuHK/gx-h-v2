@@ -18,7 +18,7 @@
 
 首次 B1 实测在五个原生 turn 的上限内没有产生最后的 planner 决策。该项目实际花费 420,896 token，完成 3 个 Job。两条路线推荐的坐标分别为 2.125 和 1.8125，实测为 −1/64 和 −9/256，相差 +5/256。旧 planner 先把独立审阅引用填入限定为一手证据的字段，再把下一轮网格提交为裸数组，两次拒绝耗用了可用 turn。该次结果保留为未闭环。[B1 独立验收](acceptance/v31/quality/independent-review-b1.json)
 
-后续修复将一手证据、独立审阅和补充来源的字段用途写入 planner 实际收到的工具合同，并在发布 Artifact 前校验下一轮网格形状。网格结构错误可在同一 Attempt 修复。该合同随新领的多轮或有补充来源的任务冻结；单轮无补充来源的效率样例沿用原先的线格式。[planner 实现](gx-h/gx_core/p0/grid_planner.py)
+后续修复将一手证据、独立审阅和补充来源的字段用途写入 planner 实际收到的工具合同，并在发布 Artifact 前校验下一轮网格形状。网格结构错误可在同一 Attempt 修复。该合同随新领的多轮或有补充来源的任务冻结；单轮无补充来源的效率样例沿用原先的线格式。[planner 实现](https://github.com/AshHuHK/gx-h-v2/blob/47fc728d32bc10ba478df6a063529a8d98f98828/gx-h/gx_core/p0/grid_planner.py)
 
 在修复后的产品 `9cd6655` 上，用相同的 case、冻结 grader 和五个 turn 上限新建项目。4 个原生 turn 的首次提交均被接受，3 项 CPU Job 成功，4 笔 provider 回执共 293,439 token，无估算。两项资料都在初始 Job 运行期间进入项目。第二轮的实测确认二次插值选点优于线性插值选点，差值为 +5/256。最终决策同时记录了反例、剩余两个未测坐标及连续最优值的不确定性。19 项预定检查均通过。B1 的未完成记录仍可逐项对照。此结论限于一项合成数值研究，两种方法使用同一组初始观测。[科研结果及模型产物](acceptance/v31/quality/final-live/evidence.json) · [原始准则逐项验收](acceptance/v31/quality/final-live/grade.json) · [修复过程线路对照](acceptance/v31/quality/planner-transport-proof.json)
 

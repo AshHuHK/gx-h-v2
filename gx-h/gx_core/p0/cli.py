@@ -15,9 +15,9 @@ from ..domain import ids, machines
 from ..hostobs.app_server_client import AppServerDisconnected, AppServerTimeout
 from ..errors import OutcomeUnknown
 from ..native_release import native_state, ReleaseStateError
-from ..orchestration import packages, service
+from ..orchestration import native_worker, packages, run_mode, service
 from ..persistence import store
-from . import deployment, intent, v6_goal
+from . import deployment, intent
 from .driver import Driver, context, enqueue, native_waits, project, snapshot
 from .idle import WorkspaceWait
 
@@ -110,8 +110,6 @@ def existing_db(directory, *, readonly):
 
 def start(conn, directory, spec, *, run_key=None, run_id=None):
     from . import workspace
-    if spec.get("mode") != "goal" and (type(spec.get("max_rounds")) is not int or spec["max_rounds"] < 1):
-        raise ValueError("Supply a positive max_rounds")
     if not isinstance(spec.get("objective"), str) or not spec["objective"].strip():
         raise ValueError("Supply an objective")
     allocation = spec.get("turn_token_budget", 65536)
@@ -125,12 +123,15 @@ def start(conn, directory, spec, *, run_key=None, run_id=None):
         if store.loads(current, "inputs_json")["inputs"]["p0_spec"] != spec:
             raise ValueError("This state already belongs to a different project specification")
         run_key = current["run_key"]
-    if spec.get("mode") == "goal":
-        return v6_goal.start(conn, spec, run_key=run_key, current=current)
+    mode = run_mode.for_run(current) if current is not None else run_mode.for_start(spec)
+    return mode.start_project(conn, directory, spec, run_key, current)
+
+
+def start_workflow(conn, directory, spec, run_key, current):
+    from . import workspace
+    budget_profile = spec.get("budget_profile", "p0")
     workflow, version = packages.research_ref(spec, current)
-    if (workflow, version) == ("science_grid", "3"):
-        from .terminal_products import repair_limit
-        repair_limit(spec)
+    native_worker.for_workflow(workflow, version).check_start(spec)
     flow = service.default_registry(conn, workflow_id=workflow, version=version).get(workflow, version)
     service.seams.workflow_admission(conn, workflow_id=workflow, version=version,
                                     sha256=flow.digest(), sources_complete=flow.sources_complete())
@@ -209,7 +210,7 @@ def _run_until_stopped(conn, directory, rid, timeout, listener):
         driver = None
         try:
             run = project(conn, rid)
-            if not v6_goal.is_goal(run) and not store.latest_checkpoint(conn, rid):
+            if run_mode.for_run(run).needs_bootstrap(conn, rid):
                 start(conn, directory, store.loads(run, "inputs_json")["inputs"]["p0_spec"], run_id=rid)
             driver = Driver(conn, directory, rid)
             result = driver.drive(deadline - time.monotonic(), waiter=listener)
@@ -245,11 +246,7 @@ def _run_until_stopped(conn, directory, rid, timeout, listener):
 
 
 def start_specification(args):
-    if getattr(args, "goal", None) is not None:
-        return v6_goal.cli_spec(args)
-    if any(getattr(args, name, None) for name in ("goal_config", "input", "capability")):
-        raise ValueError("--goal-config, --input and --capability require --goal")
-    return packages.example(args.example) if args.example else json.loads(args.spec.read_text())
+    return run_mode.specification(args)
 
 
 def execute(args):

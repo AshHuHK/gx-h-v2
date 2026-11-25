@@ -13,7 +13,8 @@ from gx_core.artifacts import ArtifactService
 from gx_core.domain import ids
 from gx_core.errors import BudgetExceeded, GxError
 from gx_core.orchestration import reactor
-from gx_core.p0 import v6_decisions, v6_goal, v6_protein
+from gx_core.p0 import v6_decisions, v6_goal
+from gx_core.capabilities import shipped
 from gx_core.p0.driver import Driver, context
 from gx_core.p0.roots import Roots
 from gx_core.persistence import store
@@ -63,7 +64,7 @@ class OperatorRecovery(unittest.TestCase):
         self.decoy = self.directory / 'notes.json'
         self.decoy.write_text('{"kind":"operator_note","contents":"instrument log"}')
         config = self.directory / 'config.json'
-        config.write_text(json.dumps({'run_budget': {'job_submissions': 5, 'cpu_seconds': 300}, 'input_files': [
+        config.write_text(json.dumps({'capabilities': [shipped.QUALITY, shipped.GEOMETRY, shipped.REVIEW], 'plugins': ['org.gx.protein@0.2.0'], 'run_budget': {'job_submissions': 5, 'cpu_seconds': 300}, 'input_files': [
             {'role': 'coordinates', 'path': str(COORDINATES)}, {'role': 'note', 'path': str(self.decoy)}]}))
         start = self.cli('start', '--run-key', 'audit', '--goal', 'Is the coordinate measurement reproducible?',
                          '--goal-config', str(config))
@@ -185,9 +186,9 @@ class OperatorRecovery(unittest.TestCase):
             self.assertEqual(conn.execute('SELECT count(*) FROM v6_branches WHERE run_id=?',(self.run_id,)).fetchone()[0],1)
 
     def test_invalid_ordered_inputs_reject_the_entire_first_draft(self):
-        inventory = node('local:inventory', v6_protein.QUALITY, [self.structure])
-        wrong_input = node('local:wrong', v6_protein.QUALITY, [self.note])
-        wrong_source = node('local:review', v6_protein.REVIEW, [self.structure, 'local:inventory'], ['local:inventory'])
+        inventory = node('local:inventory', shipped.QUALITY, [self.structure])
+        wrong_input = node('local:wrong', shipped.QUALITY, [self.note])
+        wrong_source = node('local:review', shipped.REVIEW, [self.structure, 'local:inventory'], ['local:inventory'])
         with closing(store.open_store(self.db_path)) as conn:
             first = self.claim(conn)
             for bad in (wrong_input, wrong_source):
@@ -203,7 +204,7 @@ class OperatorRecovery(unittest.TestCase):
         with closing(store.open_store(self.db_path)) as conn:
             first = self.claim(conn)
             initial = v6_decisions.adopt(conn, **first, decision=decision(branch('local:counts', jobs=3),
-                node('local:inventory', v6_protein.QUALITY, [self.structure])))
+                node('local:inventory', shipped.QUALITY, [self.structure])))
         replacement = 'Which uncertainties should we measure in the next dataset?'
         change = {'kind': 'change', 'items': [{'item_id': 'objective', 'item_type': 'objective',
                   'expected_version': 1, 'value': replacement}]}
@@ -214,7 +215,7 @@ class OperatorRecovery(unittest.TestCase):
         with closing(store.open_store(self.db_path)) as conn:
             # Freeze a new Lead brief after the packet arrives, before the Job consumer gets the scheduler.
             self.assertIsNotNone(v6_goal.ensure_task(conn, self.run_id))
-            later = node('local:second', v6_protein.QUALITY, [self.structure])
+            later = node('local:second', shipped.QUALITY, [self.structure])
             later['branch'] = initial['aliases']['local:counts']
             second = v6_decisions.adopt(conn, **self.claim(conn), decision=decision(later, refs=[receipt['source_id']]))
         confirmation = {'kind': 'confirm', 'change_id': preview['change_id'], 'preview_sha256': preview['preview_sha256'],
@@ -243,7 +244,7 @@ class OperatorRecovery(unittest.TestCase):
             self.assertEqual(conn.execute('SELECT count(*) FROM jobs WHERE run_id=?', (self.run_id,)).fetchone()[0], 0)
 
     def test_granted_material_and_method_pin_drift_are_rejected(self):
-        draft = decision(branch('local:counts'), node('local:inventory', v6_protein.QUALITY, [self.structure]))
+        draft = decision(branch('local:counts'), node('local:inventory', shipped.QUALITY, [self.structure]))
         with closing(store.open_store(self.db_path)) as conn:
             first = self.claim(conn)
             assets = ArtifactService(conn)
@@ -261,7 +262,7 @@ class OperatorRecovery(unittest.TestCase):
                 preserved.replace(path)
             self.assertTrue(assets.verify(self.structure)['ok'])
             pins = conn.execute('SELECT capabilities_json FROM v6_goals WHERE run_id=?', (self.run_id,)).fetchone()[0]
-            altered = {**json.loads(pins), v6_protein.QUALITY: '0' * 64}
+            altered = {**json.loads(pins), shipped.QUALITY: '0' * 64}
             conn.execute('UPDATE v6_goals SET capabilities_json=? WHERE run_id=?', (json.dumps(altered), self.run_id))
             with self.assertRaises(GxError):
                 v6_decisions.adopt(conn, **first, decision=draft)

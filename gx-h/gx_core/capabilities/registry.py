@@ -377,7 +377,7 @@ def candidate(conn: sqlite3.Connection, capability_version: str) -> dict[str, An
     return view
 
 
-def resolve(conn: sqlite3.Connection, capability_version: str) -> dict[str, Any]:
+def resolve(conn: sqlite3.Connection, capability_version: str, *, run_id=None) -> dict[str, Any]:
     """An ACTIVE capability version, or ``CAPABILITY_NOT_APPROVED`` saying why not.
 
     ACTIVE is read from the asset row, for the sha256 this version was registered with.
@@ -385,22 +385,32 @@ def resolve(conn: sqlite3.Connection, capability_version: str) -> dict[str, Any]
     anything but ACTIVE are the same answer to a caller who wants to run or plan with it;
     ``details.reason`` says which, and ``details.missing`` what its next gate lacks.
     """
-    return active_view(conn, candidate(conn, capability_version))
+    return active_view(conn, candidate(conn, capability_version), run_id=run_id)
 
 
-def active_view(conn: sqlite3.Connection, view: dict[str, Any]) -> dict[str, Any]:
+def active_view(conn: sqlite3.Connection, view: dict[str, Any], *, run_id=None) -> dict[str, Any]:
     """The second half of :func:`resolve`, for a caller that already holds the
     :func:`candidate` view and had something to ask of it first (job admission asks the
     operator's switches before it says anything about a version's state): the view with its
     environment's readiness, or ``CAPABILITY_NOT_APPROVED`` when the version is not ACTIVE."""
     capability_version = view["capability_version"]
     shipped = False
-    from .shipped import admitted
+    from .shipped import admitted, participates
+    package_admitted = False
     if view["status"] == "DRAFT":
         source = _governance_assets().get(conn, view["capability_id"], view["version"], kind=ASSET_KIND)["source"]
         shipped = admitted(view, source)
+        # An operator-installed package can be run on its verified, explicitly
+        # composed Goal. Its workspace-wide governance state stays unchanged.
+        if run_id and source.get("installed_package"):
+            from ..plugins.runtime import recorded
+            run = conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)).fetchone()
+            package_admitted = bool(run and (recorded(run) or {}).get("kind") == "goal"
+                                    and participates(conn, run_id, capability_version))
     if shipped:
         view["admission"] = "SHIPPED"
+    elif package_admitted:
+        view["admission"] = "GOAL_PACKAGE"
     elif view["status"] != ACTIVE:
         missing: Any = None
         try:

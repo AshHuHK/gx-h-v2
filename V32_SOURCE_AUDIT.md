@@ -29,7 +29,7 @@
 | 03 | Intent 版本、历史批准、额度与在途预留、冻结评估和 evidence。 | **conflict** 领域阈值可来自 proposal，初始化与既有预算批准路径不能授予插件或模型 PI 权限。**missing** 两层 Goal、producer 变更授权和结果绑定的科学签署。[原阈值来源](gx-h/gx_core/p0/science.py#L134) |
 | 04 | 工作流源码 pin、checkpoint、任务重试和幂等。 | **conflict** 全 Run repin/回卷与部分冻结，旧路径键与 seed 语义。**missing** Run 实例图、节点级语义键及活决策租约下的 CAS。 |
 | 05 | 接受与终局拒绝同事务保存裁决和回执；取消未答工具，查询原 turn；结构错回滚后另事务去重，同一 Attempt 修复。固定版启动校验和累计用量对账已有。[协议](gx-h/gx_core/p0/terminal_products.py#L75) · [修复表](gx-h/gx_core/p0/zz_v31_terminal_products.sql#L14) · [直接调用用量](gx-h/gx_core/p0/metering.py#L89) | **missing** 面向两类 Session 的版本化适配边界。**conflict** 现行优化按 grid@3 与直接提交工具识别；插件工具可转交 _submit，但该入口没有相同的直接调用身份。**deferred** 未验证的 Codex 版本。[版本校验](gx-h/gx_core/p0/roots.py#L149) · [插件结果转交](gx-h/gx_core/plugins/runtime_context.py#L165) |
-| 06 | 角色目录、主循环核验 native child 来源，回调内重验租约及可读引用，16 KiB 单项/总量的不可变简报预载及延迟读取；已有结构化恢复历史。[角色](gx-h/gx_core/p0/profiles.py#L162) · [child](gx-h/gx_core/p0/root_delivery.py#L874) · [简报](gx-h/gx_core/p0/grid_brief.py#L74) · [历史](gx-h/gx_core/teams/recovery.py#L203) | **missing** 将授权与新两类 Session、分支和 Graph head 绑定，通用只读上下文和重读契约。原简报及工具策略的一部分是 grid@3 特化。 |
+| 06 | 角色目录、主循环核验 native child 来源，回调内重验租约及可读引用，16 KiB 单项/总量的不可变简报预载及延迟读取；已有结构化恢复历史。[角色](gx-h/gx_core/p0/profiles.py#L162) · [child](gx-h/gx_core/p0/root_delivery.py#L874) · [简报](https://github.com/AshHuHK/gx-h-v2/blob/47fc728d32bc10ba478df6a063529a8d98f98828/gx-h/gx_core/p0/grid_brief.py#L74) · [历史](gx-h/gx_core/teams/recovery.py#L203) | **missing** 将授权与新两类 Session、分支和 Graph head 绑定，通用只读上下文和重读契约。原简报及工具策略的一部分是 grid@3 特化。 |
 
 ## 证据适用范围和信任边界
 

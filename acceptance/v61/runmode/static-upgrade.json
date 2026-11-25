@@ -1,0 +1,96 @@
+{
+  "baseline": "47fc728d32bc10ba478df6a063529a8d98f98828",
+  "archive_sha256": "f45efd56d86fe0368a3bbfa4d420daf39df03a0ceacc8c29029bc93ca7161c29",
+  "before": {
+    "run": {
+      "run_id": "gxr_01m88cqb3sp5kgwqaj",
+      "status": "PAUSED",
+      "workflow_id": "science_grid",
+      "workflow_version": "3",
+      "contract_sha256": "afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd",
+      "workflow_sha256": "3a5c74ae4d1e44d74f9ddc583179accf2cc5fd6a303dbece86403cb931eb1410",
+      "agent_policy_sha256": "1f0624776be94d3d4ef80f78e69c868f5fac2765716b4fa5d8cff4c122f5ed71"
+    },
+    "schema": "afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd",
+    "jobs": [
+      {
+        "job_id": "gxj_01m88cqb5z29ynd6dd",
+        "idempotency_key": "job:gxr_01m88cqb3sp5kgwqaj:grid:science:r0:fcd1a2180242edca3803eb5cbaa7674de2d37a7a0fbcdbb95551a67d7df6e746",
+        "reservation_ref": "rsv_01m88cqb90zdcrpspc",
+        "status": "SUBMITTED"
+      },
+      {
+        "job_id": "gxj_01m88cqbb595c0rzjr",
+        "idempotency_key": "job:gxr_01m88cqb3sp5kgwqaj:grid:science:r0:642d1a27e1a28dea975708731063c9523ec28c66dd0c27e1d04f039088de93a9",
+        "reservation_ref": "rsv_01m88cqbd71b0297ny",
+        "status": "SUBMITTED"
+      }
+    ],
+    "budget": [
+      {
+        "spent_json": "{}",
+        "reserved_json": "{\"cpu_seconds\":60,\"job_submissions\":2}"
+      }
+    ],
+    "tasks": []
+  },
+  "after": {
+    "run": {
+      "run_id": "gxr_01m88cqb3sp5kgwqaj",
+      "status": "WAITING_CLIENT",
+      "workflow_id": "science_grid",
+      "workflow_version": "3",
+      "contract_sha256": "afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd",
+      "workflow_sha256": "3a5c74ae4d1e44d74f9ddc583179accf2cc5fd6a303dbece86403cb931eb1410",
+      "agent_policy_sha256": "1f0624776be94d3d4ef80f78e69c868f5fac2765716b4fa5d8cff4c122f5ed71"
+    },
+    "schema": "69d033774654803f4854f956ae3e2516bfd845a250d95bc3d6fdafb283df0dd7",
+    "jobs": [
+      {
+        "job_id": "gxj_01m88cqb5z29ynd6dd",
+        "idempotency_key": "job:gxr_01m88cqb3sp5kgwqaj:grid:science:r0:fcd1a2180242edca3803eb5cbaa7674de2d37a7a0fbcdbb95551a67d7df6e746",
+        "reservation_ref": "rsv_01m88cqb90zdcrpspc",
+        "status": "SUCCEEDED"
+      },
+      {
+        "job_id": "gxj_01m88cqbb595c0rzjr",
+        "idempotency_key": "job:gxr_01m88cqb3sp5kgwqaj:grid:science:r0:642d1a27e1a28dea975708731063c9523ec28c66dd0c27e1d04f039088de93a9",
+        "reservation_ref": "rsv_01m88cqbd71b0297ny",
+        "status": "SUCCEEDED"
+      }
+    ],
+    "budget": [
+      {
+        "spent_json": "{\"cpu_seconds\":2,\"job_submissions\":2,\"worker_tasks\":1}",
+        "reserved_json": "{\"cpu_seconds\":0,\"job_submissions\":0,\"worker_tasks\":0}"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "gxt_01m88cqdvxver2rcwm",
+        "kind": "research_round",
+        "status": "READY"
+      }
+    ]
+  },
+  "cold_repeat_unchanged": true,
+  "resume_status": "WAITING_CLIENT",
+  "migration_receipts": [
+    {
+      "added_columns": [],
+      "from_db_schema_sha256": "456753d35343e1571693a0e69d7921b75dfee0ebe653942d16eb36e842f1c4a8",
+      "from_sha256": "afe0646bcec1a57c36160b38a1011822258bd6cf921b26b6e5b50f18c11ff8dd",
+      "to_db_schema_sha256": "39ef2566a4155d9d395d806ea556bde12a785606cddb2f6866ac528577b6bbd2",
+      "to_sha256": "69d033774654803f4854f956ae3e2516bfd845a250d95bc3d6fdafb283df0dd7"
+    }
+  ],
+  "team_id": "gxtm_43deb7e4b142bc3fc1ad082142709625",
+  "team_replay": true,
+  "wrong_pins": {
+    "contract_sha256": "CONTENT_HASH_MISMATCH",
+    "workflow_sha256": "VERSION_IMMUTABLE",
+    "agent_policy_sha256": "CONTENT_HASH_MISMATCH"
+  },
+  "missing_receipt_rejected": true,
+  "wrong_source_ddl_rejected": true
+}

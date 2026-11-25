@@ -22,7 +22,7 @@ from ..errors import (
 )
 from ..persistence import store
 from ..teams import recovery
-from . import expansion, reactions, seams
+from . import expansion, reactions, run_mode, seams
 
 LOGGER = logging.getLogger("gx.reactor")
 
@@ -135,7 +135,7 @@ def _pins_refusal(conn: sqlite3.Connection, run: sqlite3.Row) -> dict[str, Any] 
                 "message": f"workflow {run['workflow_id']}@{run['workflow_version']} is pinned by run "
                            f"{run['run_id']} and is not installed"}
     try:
-        runs.require_pins(run, workflow)
+        runs.require_pins(run, workflow, conn=conn)
     except (VersionImmutable, ContentHashMismatch) as exc:
         return {"code": exc.code, "what": exc.details.get("what"), "pinned_sha256": exc.details.get("pinned_sha256"),
                 "installed_sha256": exc.details.get("installed_sha256"), "message": exc.message}
@@ -190,7 +190,6 @@ def on_submission_recorded(ctx: Ctx, run_id: str, row: sqlite3.Row, payload: Map
 
 def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
     """Advance a ready science checkpoint using GX, including after a lost notification."""
-    from . import service
     from ..teams.service import backend_ctx
 
     conn = ctx.conn
@@ -198,10 +197,13 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
     run = _run(conn, run_id)
     if run["status"] not in {"ACTIVE", *machines.waiting_states("run")}:
         return None
+    return run_mode.for_run(run).react(ctx, run, backend)
+
+
+def _drive_workflow(ctx, run, backend):
+    from . import service
+    conn, run_id = ctx.conn, run["run_id"]
     if not run["workflow_id"]:
-        from ..p0 import v6_goal
-        if v6_goal.is_goal(run):
-            return service._engine(backend, run_id).advance(run_id=run_id, actor=backend.actor)
         return None
     hooks = service.hooks_for_run(conn, run_id)
     if not hooks.auto_advance:
@@ -224,7 +226,7 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
     if not ready_refs and not engine.idle(run_id, retry_failed=False):
         return None
     workflow = service._pinned_workflow(conn, run)
-    verified = service.require_pins(run, workflow)
+    verified = service.require_pins(run, workflow, conn=conn)
     begun = None
     with store.transaction(conn, transaction_owner="Reactor", operation="drive_science", run_id=run_id) as tx:
         run = _run(tx, run_id)
@@ -232,7 +234,7 @@ def drive_science(ctx: Ctx, run_id: str) -> dict[str, Any] | None:
             return None
         if (workflow.workflow_id, workflow.version) != (run["workflow_id"], run["workflow_version"]):
             return None
-        service._check_pins(run, verified)
+        service._check_pins(run, verified, conn=tx)
         for wait in engine.waits(run_id, conn=tx).values():
             ref = wait["interrupt_ref"]
             if ref not in ready_refs or not engine.standing(run_id, conn=tx, interrupt_ref=ref, cpu_sample=cpu_sample).complete:

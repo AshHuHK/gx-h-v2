@@ -1839,15 +1839,15 @@ class TeamService:
             kind = store.loads(task, "input_json", {}).get("output_kind")
             if not kind or store.loads(task, "acceptance_json", {}).get("validate_workflow_product") is not True:
                 raise SchemaInvalid("this task has no pinned workflow product validator")
-            workflow = None
+            workflow = self._product_workflow(conn, run)
             refusal = None
-            if (run["workflow_id"], run["workflow_version"]) == ("science_grid", "3"):
-                workflow = self._product_workflow(conn, run)
+            prepare_native = getattr(workflow, "prepare_native_product", None)
+            if prepare_native is not None:
                 assigned = task_mapping(conn, task)
                 try:
                     # The versioned workflow validates model fields before any Artifact
                     # exists, then binds its frozen evidence and evaluator-owned values.
-                    product = workflow.prepare_native_product(conn, assigned, product)
+                    product = prepare_native(conn, assigned, product)
                 except SchemaInvalid as exc:
                     if exc.details.get("category") != "product_semantic":
                         raise
@@ -1858,7 +1858,7 @@ class TeamService:
                 run_id=run_id, task_id=task_id, kind=kind, media_type="application/json",
                 content=ids.canonical_json(product), origin="HOST_PUT", put_by=callback["thread_id"],
             )
-            if workflow is not None:
+            if prepare_native is not None:
                 self.artifacts.discard_on_rollback(published)
             ref = published.artifact_ref
             bundle_ref = self._bundle_ref(task, [self.artifacts.describe(ref)])
@@ -1878,7 +1878,7 @@ class TeamService:
                 "policy_verdict": None, "bundle_kind": task["bundle_kind"], "artifact_refs": [ref],
             }
             result = self._conclude(conn, task, lease_ref, submission, verdict, {},
-                                    discard_on_rollback=workflow is not None)
+                                    discard_on_rollback=prepare_native is not None)
             return {**result, "artifact_ref": ref}
 
     def submit(self, *, task_id: str, lease_ref: str, artifact_refs: Sequence[str],

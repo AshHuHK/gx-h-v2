@@ -16,14 +16,6 @@ ACTOR = "gx-v6"
 ACTIVE_TASKS = ("PENDING", "READY", "CLAIMED", "RUNNING", "BLOCKED", "RETRYABLE", "SUBMITTED", "VALIDATING")
 
 
-def is_goal(run):
-    return bool(
-        run
-        and not run["workflow_id"]
-        and store.loads(run, "inputs_json", {}).get("inputs", {}).get("mode") == "goal"
-    )
-
-
 def cli_spec(args):
     raw = json.loads(args.goal_config.read_text()) if args.goal_config else {}
     allowed = {
@@ -32,8 +24,10 @@ def cli_spec(args):
         "workspace_budget",
         "budget_profile",
         "turn_token_budget",
+        "initial_job_limit",
         "input_files",
         "capabilities",
+        "plugins",
         "workspace",
         "intent_items",
     }
@@ -63,14 +57,20 @@ def cli_spec(args):
 
 
 def start(conn, spec, *, run_key, current):
-    from ..capabilities import manifest, registry, shipped
+    from ..capabilities import registry
+    from ..plugins import goal as goal_plugins
+    from ..plugins.runtime import Bound
     from ..orchestration import service
-    from ..orchestration.hooks import basic_research_start
-    from . import operator, v6_protein, workspace
+    from ..orchestration.hooks import DEFAULT_HOOKS, basic_research_start
+    from . import operator, workspace
     from .cli import initial_action
     from .driver import context, snapshot
 
-    if any(k in spec for k in ("workflow", "plugins")):
+    if "initial_job_limit" in spec:
+        limit = spec["initial_job_limit"]
+        if type(limit) is not int or limit < 0:
+            raise SchemaInvalid("initial_job_limit must be a nonnegative integer")
+    if "workflow" in spec:
         raise SchemaInvalid("A goal-only run selects capabilities; its scientific recipe starts empty")
     ctx = context(conn)
     files = []
@@ -95,24 +95,7 @@ def start(conn, spec, *, run_key, current):
         or len(requested) != len(set(requested))
     ):
         raise SchemaInvalid("capabilities must be a list of distinct, versioned methods")
-    catalog = (
-        v6_protein.catalog(ctx)
-        if requested is None or any(v6_protein.supported(x) for x in requested)
-        else []
-    )
-    by_id = {row["capability_version"]: row for row in catalog}
-    for pin in requested or ():
-        if pin not in by_id:
-            receipt = shipped.attach(ctx, pin)
-            method = registry.resolve(conn, pin)["manifest"]
-            by_id[pin] = {
-                **receipt,
-                "method": method.get("method_card"),
-                "inputs": manifest.input_roles(method),
-                "outputs": method["outputs"],
-                "limitations": method.get("limitations"),
-            }
-    public = [by_id[k] for k in requested] if requested is not None else catalog
+    public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []))
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
     action = initial_action(spec, basic_research_start(spec))
 
@@ -127,8 +110,9 @@ def start(conn, spec, *, run_key, current):
         from .manifest import check_capability
 
         for entry in public:
-            if entry["capability_version"] not in shipped.MANIFESTS:
-                check_capability(conn, rid, entry["capability_version"])
+            cap = entry["capability_version"]
+            check_capability(conn, rid, cap)
+            registry.resolve(conn, cap, run_id=rid)
         run = conn.execute("SELECT * FROM runs WHERE run_id=?", (rid,)).fetchone()
         objective = intent.read_item(conn, rid, "objective")
         if objective["value"] != spec["objective"]:
@@ -172,6 +156,7 @@ def start(conn, spec, *, run_key, current):
             "idempotency_key": workspace.start_key(spec["project"], run_key),
         },
         prepare_p0=bootstrap,
+        plugin_binding=Bound(DEFAULT_HOOKS, composition),
         workspace_key=run_key,
     )
     return snapshot(conn, outcome["run_id"])
@@ -342,7 +327,8 @@ def _latest(conn, rid):
 
 
 def _brief(conn, run, goal, head, events, cursor, prior):
-    from . import v6_claims, v6_protein
+    from ..plugins import goal as goal_plugins
+    from . import v6_claims
 
     rid = run["run_id"]
     data = store.loads(run, "inputs_json")
@@ -384,8 +370,10 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                     if row["kind"] == "v6.node.settled"
                     else None
                 )
-                if job and f"{job[0]}@{job[1]}" == v6_protein.QUALITY:
-                    content = v6_protein.observation_view(content)
+                if job:
+                    provider = goal_plugins.method(conn, rid, f"{job[0]}@{job[1]}")
+                    if provider and provider.project:
+                        content = provider.project(content)
                 facts["observation"] = content
             else:
                 facts["read_with"] = "gx_read_artifact"
@@ -456,6 +444,10 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         }
         for row in events
     ]
+    budget = {k: account[k] for k in ("limits", "spent", "reserved", "available")}
+    grant = data.get("inputs", {}).get("p0_spec", {})
+    if head is None and "initial_job_limit" in grant:
+        budget["initial_job_limit"] = grant["initial_job_limit"]
     return {
         "run_id": rid,
         "scope": "run",
@@ -479,7 +471,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "claims": claims,
         "observations": observations,
         "evidence_refs": list(dict.fromkeys(refs)),
-        "budget": {k: account[k] for k in ("limits", "spent", "reserved", "available")},
+        "budget": budget,
     }
 
 
@@ -665,9 +657,6 @@ def cancel_decision(conn, rid, tid, *, reason):
 
 def impact(conn, rid, edits, *, commit):
     """Fence the previous brief and unaccepted delegations in the PI's Intent transaction."""
-    run = conn.execute("SELECT * FROM runs WHERE run_id=?", (rid,)).fetchone()
-    if not is_goal(run):
-        return []
     goal = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (rid,)).fetchone()
     if goal is None:  # initial operator bootstrap inside run creation
         return []

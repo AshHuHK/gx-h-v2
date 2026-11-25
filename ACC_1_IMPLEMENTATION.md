@@ -24,8 +24,8 @@
 
 ## 第二批 · 需求、来源、任务执行与审查
 
-- **BUG-04、BUG-06**。新任务书绑定实际适用的条目；通知携带不可变的条目值、版本和删除语义。当前 Worker 可以读取作用域内的最新任务上下文。已发送的旧通知用原正文对账。当前版本的输出偏好、选择优先级及优化目标有消费或明确的适用范围。[变更处置](gx-h/gx_core/p0/impact.py) · [任务上下文和提交检查](gx-h/gx_core/p0/science_inputs.py)
-- **BUG-05**。在旧审查交卷时从 CLI 补充“先前对照可能受污染”，留下原审查、一次后继独立审查和一次决策。这是纯计算样本，后继审查与决策均能引用原文并解释为什么维持数值判断。两份原 CPU Job 得到复用。状态的 `reviews` 与 `supplements` 可分别追查实际审阅集合与处置。对冻结的旧 `science_grid@1`，缺少消费证明的补充保持待审。[官方 App Server 加脚本模型的全链实测](acceptance/runs/acc-1-source-official/summary.json) · [事务顺序与恢复](acceptance/runs/acc-1-source-judgments/) · [执行代码](gx-h/gx_core/p0/science_inputs.py)
+- **BUG-04、BUG-06**。新任务书绑定实际适用的条目；通知携带不可变的条目值、版本和删除语义。当前 Worker 可以读取作用域内的最新任务上下文。已发送的旧通知用原正文对账。当前版本的输出偏好、选择优先级及优化目标有消费或明确的适用范围。[变更处置](gx-h/gx_core/p0/impact.py) · [任务上下文和提交检查](https://github.com/AshHuHK/gx-h-v2/blob/47fc728d32bc10ba478df6a063529a8d98f98828/gx-h/gx_core/p0/science_inputs.py)
+- **BUG-05**。在旧审查交卷时从 CLI 补充“先前对照可能受污染”，留下原审查、一次后继独立审查和一次决策。这是纯计算样本，后继审查与决策均能引用原文并解释为什么维持数值判断。两份原 CPU Job 得到复用。状态的 `reviews` 与 `supplements` 可分别追查实际审阅集合与处置。对冻结的旧 `science_grid@1`，缺少消费证明的补充保持待审。[官方 App Server 加脚本模型的全链实测](acceptance/runs/acc-1-source-official/summary.json) · [事务顺序与恢复](acceptance/runs/acc-1-source-judgments/) · [执行代码](https://github.com/AshHuHK/gx-h-v2/blob/47fc728d32bc10ba478df6a063529a8d98f98828/gx-h/gx_core/p0/science_inputs.py)
 - **GAP-01**。自然文本经真人回执后逐项核对具体授权。夹带的其他编辑留作提案。需要确认的候选绑定用户已看到的版本、内容和后果。降限影响未来准入，历史实耗不改，取消在途 Job 有单独的后果预览和确认。[公开 CLI 对话](acceptance/runs/acc-1-natural-input/summary.json) · [三个额度区间](acceptance/runs/acc-1-natural-input/budget-ranges.json)
 - **GAP-04**。主循环在工具回调与事务外核验官方父子关系。child 的每次读取重新检查父任务、Attempt、租约和产物范围。原工作线程可以在初次验证前或冷恢复后收到可重试结果，验证成功后读取原文。跨项目、普通 fork、旧租约及写操作分别测试。[官方 child 实测](acceptance/runs/acc-1-child-access/official.json)
 

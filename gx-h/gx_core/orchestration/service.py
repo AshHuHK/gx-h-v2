@@ -63,7 +63,7 @@ from ..errors import (
 from ..persistence import records, store
 from ..teams import recovery
 from ..teams.service import TeamService
-from . import packages, seams
+from . import packages, run_mode, seams
 from .hooks import DEFAULT_HOOKS
 from .engine import Engine, InterruptRequest, Workflow
 from .registry import WorkflowRegistry
@@ -168,12 +168,11 @@ def set_registry(registry: WorkflowRegistry | None) -> None:
 
 def _engine(ctx: Ctx, run_id: str | None = None) -> Engine:
     run = _run(ctx.conn, run_id) if run_id is not None else None
-    if run is not None and not run["workflow_id"]:
-        from ..p0 import v6_goal
-        if v6_goal.is_goal(run):
-            # Goal instances resolve from the Run's immutable graph rows. A third-party
-            # static recipe should not be loaded merely to drive or inspect that Run.
-            return Engine(ctx.conn, WorkflowRegistry(), teams=TeamService(ctx.conn, ctx=ctx), ctx=ctx)
+    registry = run_mode.for_run(run).registry(ctx, run)
+    return Engine(ctx.conn, registry, teams=TeamService(ctx.conn, ctx=ctx), ctx=ctx)
+
+
+def _workflow_registry(ctx, run):
     registry = default_registry()
     if run is not None:
         if run["workflow_id"]:
@@ -187,7 +186,7 @@ def _engine(ctx: Ctx, run_id: str | None = None) -> Engine:
                 warning = f"workflow {run['workflow_id']}@{run['workflow_version']} is unavailable: {exc.code}: {exc.message}"
                 if warning not in ctx.warnings:
                     ctx.warn(warning)
-    return Engine(ctx.conn, registry, teams=TeamService(ctx.conn, ctx=ctx), ctx=ctx)
+    return registry
 
 
 def _pinned_workflow(conn: sqlite3.Connection, run: sqlite3.Row) -> Workflow:
@@ -206,11 +205,11 @@ def _pinned_workflow(conn: sqlite3.Connection, run: sqlite3.Row) -> Workflow:
 def hooks_for_run(conn, run_id):
     """Resolve the exact saved binding before invoking any workflow behavior."""
     run = _run(conn, run_id)
+    return run_mode.for_run(run).hooks(conn, run)
+
+
+def _workflow_hooks(conn, run):
     if not run["workflow_id"]:
-        from ..p0 import v6_goal
-        if v6_goal.is_goal(run):
-            from dataclasses import replace
-            return replace(DEFAULT_HOOKS, register_supplement=v6_goal.supplement)
         return DEFAULT_HOOKS
     flow = _pinned_workflow(conn, run)
     if run["workflow_sha256"] and flow.digest() != run["workflow_sha256"]:
@@ -335,7 +334,7 @@ def pins_view(run: sqlite3.Row) -> dict[str, Any]:
                      "understated": bool(host.get("understated"))}}
 
 
-def require_pins(run: sqlite3.Row, workflow: Workflow) -> dict[str, Any]:
+def require_pins(run: sqlite3.Row, workflow: Workflow | None, *, conn=None) -> dict[str, Any]:
     """Refuse unless what is installed now is what the run started under.
 
     A workflow definition that changed under an unchanged version is
@@ -344,11 +343,11 @@ def require_pins(run: sqlite3.Row, workflow: Workflow) -> dict[str, Any]:
     (a run created below the tool surface) is not compared.
     """
     now = installed_pins(workflow, run=run)
-    _check_pins(run, now)
+    _check_pins(run, now, conn=conn)
     return now
 
 
-def _check_pins(run: sqlite3.Row, now: Mapping[str, Any]) -> None:
+def _check_pins(run: sqlite3.Row, now: Mapping[str, Any], *, conn=None) -> None:
     pinned = run_pins(run)
     if pinned["workflow_sha256"] and pinned["workflow_sha256"] != now["workflow_sha256"]:
         raise VersionImmutable(
@@ -361,6 +360,8 @@ def _check_pins(run: sqlite3.Row, now: Mapping[str, Any]) -> None:
         )
     for what, key in (("contract", "contract_sha256"), ("agent_policy", "agent_policy_sha256")):
         if pinned[key] and pinned[key] != now[key]:
+            if what == "contract" and store.contract_pin_matches(conn, pinned[key], now[key]):
+                continue
             raise ContentHashMismatch(
                 f"the {what.replace('_', ' ')} has changed since run {run['run_id']} pinned it: "
                 f"pinned {pinned[key]}, installed {now[key]}",
@@ -511,6 +512,25 @@ def _require_capable_session(conn: sqlite3.Connection, host: Mapping[str, Any]) 
     )
 
 
+def _admit_workflow(conn, spec):
+    workflow_id, version = _workflow_ref(spec)
+    try:
+        workflow = default_registry(conn, workflow_id=workflow_id, version=version).get(workflow_id, version)
+    except ArtifactNotFound as exc:
+        failed = load_errors()
+        raise SchemaInvalid(
+            f"no workflow {workflow_id}@{version} is installed"
+            + (f"; the package workflows/{workflow_id} could not be loaded: {failed[workflow_id]}"
+               if workflow_id in failed else ""),
+            details={"workflow_id": workflow_id, "version": version, **(exc.details or {}),
+                     **({"load_error": failed[workflow_id]} if workflow_id in failed else {})},
+        ) from exc
+    admission = seams.workflow_admission(conn, workflow_id=workflow_id, version=version,
+                                         sha256=workflow.digest(),
+                                         sources_complete=workflow.sources_complete())
+    return workflow_id, version, workflow, admission
+
+
 def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_key=None, plugin_binding=None) -> dict[str, Any]:
     """Create a run with its pins, objective, budget and coordinator lease, then run the
     workflow to its first interrupt. Returns as soon as outside work is needed."""
@@ -520,25 +540,8 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     text = _objective_text(objective)
     project_ref = args["project_ref"]
     profile = seams.budget_profile(args["budget_profile"])
-    goal_mode = prepare_p0 is not None and args.get("inputs", {}).get("mode") == "goal"
-    workflow_id = version = workflow = None
-    admission = {}
-    if not goal_mode:
-        workflow_id, version = _workflow_ref(args.get("workflow"))
-        try:
-            workflow = default_registry(conn, workflow_id=workflow_id, version=version).get(workflow_id, version)
-        except ArtifactNotFound as exc:
-            failed = load_errors()
-            raise SchemaInvalid(
-                f"no workflow {workflow_id}@{version} is installed"
-                + (f"; the package workflows/{workflow_id} could not be loaded: {failed[workflow_id]}"
-                   if workflow_id in failed else ""),
-                details={"workflow_id": workflow_id, "version": version, **(exc.details or {}),
-                         **({"load_error": failed[workflow_id]} if workflow_id in failed else {})},
-            ) from exc
-        admission = seams.workflow_admission(conn, workflow_id=workflow_id, version=version,
-                                             sha256=workflow.digest(),
-                                             sources_complete=workflow.sources_complete())
+    mode = run_mode.for_start(args.get("inputs") or {}) if prepare_p0 is not None else run_mode.STATIC
+    workflow_id, version, workflow, admission = mode.admit_workflow(conn, args.get("workflow"))
     host = _host_record(ctx, args.get("host"))
     from ..hostobs import host_policy
     if prepare_p0 is not None:
@@ -674,10 +677,7 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
             tx, run_id=run_id, host=str(host.get("kind") or "unknown"), owner=ctx.principal.subject,
             seconds=_coordinator_seconds(None), session_ref=host.get("session_ref"), actor=ctx.actor,
         )
-        if goal_mode:
-            # Goal, its immutable inputs, the first decision and all their authorizations
-            # are either visible together to another GX process or rolled back together.
-            prepare_p0(run_id)
+        mode.bootstrap_transaction(prepare_p0, run_id)
         return {"run_id": run_id, "budget_ref": budget_ref, "objective_id": objective_id,
                 "coordinator_lease_ref": lease["lease_id"], "admission": admission}
 
@@ -703,27 +703,8 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     # call may have died between creating the run and starting it), or waits a bounded
     # time for the call that is starting it, and settles one itself only after that. (A key
     # that already has its answer is found by that wait at once.)
-    engine = None if goal_mode else _engine(ctx, run_id)
     warnings: list[str] = []
-    wait = False
-    if inputs.get("p0") is True and not goal_mode:
-        # The first native human turn authorizes the initial Intent before any node can submit a Job.
-        prepare_p0(run_id)
-    # The first Goal checkpoint belongs to a graph the Lead actually proposed.
-    if not goal_mode and engine.state(run_id)["checkpoint_seq"] == 0:
-        try:
-            started = engine.start(
-                run_id=run_id, workflow_id=workflow_id, workflow_version=version,
-                inputs={**inputs, "objective": text, "objective_id": created["objective_id"]},
-                actor=ctx.actor,
-            )
-            warnings.extend(started.get("warnings") or [])
-        except (SchemaInvalid, IllegalTransition):
-            if engine.state(run_id)["checkpoint_seq"] == 0:
-                raise
-            wait = True                      # another call with this key started it first
-    elif not goal_mode:
-        wait = True
+    wait = mode.start_after_commit(ctx, run_id, inputs, created, prepare_p0, warnings)
     if wait:
         answer = _await_answer(conn, key, seconds=START_ANSWER_WAIT_SECONDS)
         if answer is not None:
@@ -861,12 +842,14 @@ def proves_reconciled_start(conn: sqlite3.Connection, *, project_ref: str, run_i
 def _waiting_for(conn: sqlite3.Connection, run: sqlite3.Row, engine_state: Mapping[str, Any],
                  *, idle: bool = False) -> dict[str, Any] | None:
     """What a run that is not moving is waiting for, and how it continues."""
+
+    return run_mode.for_run(run).waiting_for(conn, run, engine_state, idle)
+
+
+def _workflow_waiting_for(conn, run, engine_state, *, idle):
+
     status = run["status"]
     pending = engine_state.get("pending_interrupt")
-    if status == "ACTIVE" and not run["workflow_id"]:
-        from ..p0 import v6_goal
-        if v6_goal.is_goal(run):
-            return v6_goal.waiting_for(conn, run["run_id"])
     if status == "ACTIVE" and idle:
         # Nothing pending and nobody advancing it: after a pause is lifted, a node that
         # raised, or a process that died between two nodes. Only `continue` moves it.
@@ -1478,7 +1461,7 @@ def run_resume(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
     if workflow is None:
         raise SchemaInvalid(f"run {run_id} was never started on a workflow", details={"run_id": run_id})
     require_coordinator(ctx,conn,run_id,args.get("coordinator_lease_ref"),renew=False)
-    verified_pins = require_pins(run, workflow)
+    verified_pins = require_pins(run, workflow, conn=conn)
     # The caller's view is checked against the run as it was asked about; what time and
     # decisions have settled is then settled, and stands on its own.
     store.check_revision(conn, run_id, args.get("expected_revision"))
@@ -1495,7 +1478,7 @@ def run_resume(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
 
     def resume(tx: sqlite3.Connection) -> dict[str, Any]:
         require_coordinator(ctx, tx, run_id, args.get("coordinator_lease_ref"))
-        _check_pins(_run(tx, run_id), verified_pins)
+        _check_pins(_run(tx, run_id), verified_pins, conn=tx)
         pending = engine.pending_for(run_id, args["interrupt_ref"], conn=tx)
         _require_no_held_submission(tx, run_id, pending=pending)
         _require_workers_on_policy(tx, run_id, pending)
@@ -1772,7 +1755,7 @@ def _no_hold(conn: sqlite3.Connection, run: sqlite3.Row, need: Mapping[str, Any]
 
 def _pins_hold(conn: sqlite3.Connection, run: sqlite3.Row, need: Mapping[str, Any]) -> bool:
     try:
-        require_pins(run, _pinned_workflow(conn, run))
+        require_pins(run, _pinned_workflow(conn, run), conn=conn)
     except GxError:
         return False
     return True
@@ -2030,7 +2013,7 @@ def run_control(ctx: Ctx, args: Mapping[str, Any], *, defer_advance: bool = Fals
             except VersionImmutable as exc:
                 raise DependencyUnmet("the run's exact approved workflow binding must be restored before continue",
                                       details=exc.details) from exc
-            require_pins(run,workflow)
+            require_pins(run, workflow, conn=conn)
     # Predicates that read the device or the filesystem are asked here, before the write lock.
     asked_outside = _needs_asked_outside(conn, _run(conn, run_id)) if action == "continue" else {}
 
@@ -2192,30 +2175,31 @@ def run_control(ctx: Ctx, args: Mapping[str, Any], *, defer_advance: bool = Fals
                 f"{finished['released_holds']} unused hold(s) released, "
                 f"{finished['expired_worker_refusals']} obsolete worker refusal(s) withdrawn"]
     if action == "continue" and not defer_advance:
-        from ..p0 import v6_goal
-        if v6_goal.is_goal(_run(conn, run_id)):
-            _engine(ctx, run_id).advance(run_id=run_id, actor=ctx.actor)
-            return response
-        # A run that came back to ACTIVE with nothing pending has no interrupt for anyone to
-        # resume: it is driven on here, after the state change has committed, so a node never
-        # runs inside the control call's transaction. A replay finds the run already moved on,
-        # or still idle if the first call died here, and then finishes the job.
-        engine = _engine(ctx, run_id)
-        with store.transaction(conn) as tx:
-            begun = None
-            if engine.idle(run_id):
-                require_coordinator(ctx, tx, run_id, args.get("coordinator_lease_ref"), operator_may=True, renew=False)
-                _require_no_held_submission(tx, run_id)
-                begun = engine.begin_advance(tx, run_id=run_id, actor=ctx.actor)
-        if begun:
-            try:
-                advanced = engine.advance_resumed(begun)
-            except Exception as exc:  # noqa: BLE001 - the continue is on record; see _after_commit
-                # gx_run_control declares no waiting_for, so the state is in the warning only.
-                advanced = _after_commit(ctx, run_id, exc, acted="continue", with_waiting=False)
-            response.update(status=advanced["status"], revision=advanced["revision"],
-                            interrupt_ref=advanced["interrupt_ref"], warnings=advanced["warnings"])
+        run_mode.for_run(_run(conn, run_id)).after_continue(ctx, run_id, args, response)
     return response
+
+
+def _continue_workflow(ctx, run_id, args, response):
+    conn = ctx.conn
+    # A run that came back to ACTIVE with nothing pending has no interrupt for anyone to
+    # resume: it is driven on here, after the state change has committed, so a node never
+    # runs inside the control call's transaction. A replay finds the run already moved on,
+    # or still idle if the first call died here, and then finishes the job.
+    engine = _engine(ctx, run_id)
+    with store.transaction(conn) as tx:
+        begun = None
+        if engine.idle(run_id):
+            require_coordinator(ctx, tx, run_id, args.get("coordinator_lease_ref"), operator_may=True, renew=False)
+            _require_no_held_submission(tx, run_id)
+            begun = engine.begin_advance(tx, run_id=run_id, actor=ctx.actor)
+    if begun:
+        try:
+            advanced = engine.advance_resumed(begun)
+        except Exception as exc:  # noqa: BLE001 - the continue is on record; see _after_commit
+            # gx_run_control declares no waiting_for, so the state is in the warning only.
+            advanced = _after_commit(ctx, run_id, exc, acted="continue", with_waiting=False)
+        response.update(status=advanced["status"], revision=advanced["revision"],
+                        interrupt_ref=advanced["interrupt_ref"], warnings=advanced["warnings"])
 
 
 __all__ = [

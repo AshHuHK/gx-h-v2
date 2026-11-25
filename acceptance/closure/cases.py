@@ -25,8 +25,11 @@ V6 = ROOT / "acceptance/v6"
 V6_ENGINEERING = ("V6-GOAL", "V6-MIGRATION", "V6-STATIC", "V6-DECISION", "V6-DISPATCH", "V6-NATIVE",
                   "V6-LOOPBACK", "V6-PROTEIN", "V6-CLAIMS", "V6-COSTS", "V6-EXPORT-NEGATIVES", "U04", "U08")
 V6_EXPORTS = ("V6-OBSERVED-EXPORT", "V6-CONTROLS-EXPORT")
+V61 = ROOT / "acceptance/v61"
+V61_ENGINEERING = ("V61-CONTRACT", "V61-UPGRADE", "V61-MODES", "V61-PROVIDERS", "V61-PROTEIN", "V61-OPENING-LIMIT")
 SUITES = {"phase2a": (*MATRIX, "OFFICIAL-USAGE"), "all": (*MATRIX, *SUPPLEMENTAL),
           "hardening": HARDENING, "v6-engineering": V6_ENGINEERING, "v6-exports": V6_EXPORTS,
+          "v61-engineering": V61_ENGINEERING,
           "v6": (*V6_ENGINEERING, *V6_EXPORTS)}
 SCRIPT = ("SCRIPTED",)
 OFFICIAL = ("SCRIPTED", "OFFICIAL_HOST_LOOPBACK")
@@ -148,6 +151,21 @@ def plan(args, selected, raw, revision):
         "--binary", args.binary], "evidence/result.json", kind="hardening", classes=(*OFFICIAL, "REAL_COMPUTE"),
         requires=(args.binary,), namespace=True, artifacts=("evidence/requests.jsonl", "evidence/gx.db.gz",
                                                              "evidence/commands.json", "evidence/observation.json"))
+    for case, modules in (
+        ("V61-CONTRACT", ("test_v61_native_contract", "test_v61_schema")),
+        ("V61-PROVIDERS", ("test_v61_goal_providers",)),
+        ("V61-OPENING-LIMIT", ("test_v61_opening_budget",)),
+    ):
+        add(case.lower(), (case,), [*py, "-m", "unittest", "-v", *("tests." + m for m in modules)],
+            "console.log", kind="unittest", cwd=ROOT / "gx-h")
+    add("v61-protein", ("V61-PROTEIN",), [*py, "-m", "unittest", "-v", "tests.test_v61_protein_provider"],
+        "console.log", kind="unittest", cwd=ROOT / "gx-h", classes=(*SCRIPT, "REAL_COMPUTE"))
+    baseline = getattr(args, "upgrade_baseline", None)
+    add("v61-upgrade", ("V61-UPGRADE",), [*py, V61 / "migration.py", "--out", out("v61-upgrade"),
+        *(("--baseline", baseline) if baseline else ())], "evidence/result.json", kind="hardening",
+        requires=(baseline,) if baseline else (), classes=(*SCRIPT, "REAL_COMPUTE"))
+    add("v61-modes", ("V61-MODES",), [*py, V61 / "modes.py", "--out", out("v61-modes")],
+        "evidence/result.json", kind="hardening")
     for mode in ("observed", "controls"):
         case = "V6-" + mode.upper() + "-EXPORT"
         dataset, anchor = getattr(args, mode + "_export", None), getattr(args, mode + "_anchor", None)
@@ -229,7 +247,7 @@ def observed(step, directory, returncode):
         import re
         output = source.read_text()
         ok = returncode == 0 and re.search(r"^Ran [1-9]\d* tests? in ", output, re.M)
-        if step.name in {"fifo", "timeout", "T03-intake"} or step.name.startswith("v6-"):
+        if step.name in {"fifo", "timeout", "T03-intake"} or step.name.startswith(("v6-", "v61-")):
             ok = ok and re.search(r"^OK$", output, re.M)
         return {case: row("PASS" if ok else "FAIL", evidence) for case in step.ids}
     data = read(source)

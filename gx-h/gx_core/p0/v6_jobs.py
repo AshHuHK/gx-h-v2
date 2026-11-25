@@ -23,6 +23,8 @@ from ..jobs import cpu_queue
 from ..jobs.service import JobService, PURPOSE_WORKFLOW, TERMINAL
 from ..persistence import store
 from . import manifest as execution
+from . import v6_method_context
+from ..plugins import goal as goal_plugins
 
 NODE_TERMINAL = {"SUCCEEDED", "FAILED", "CANCELLED", "REUSED", "BLOCKED"}
 
@@ -45,8 +47,6 @@ def _roles(method, count):
 
 def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
     """Check the declared call before adoption. The decision owner checks reference visibility."""
-    from . import v6_protein
-
     capability = spec["capability"]
     execution.check_capability(conn, run_id, capability)
     view = registry.candidate(conn, capability)
@@ -55,7 +55,7 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
     catalog = json.loads(goal[0]) if goal else {}
     if not isinstance(catalog, dict) or catalog.get(capability) != shipped.portable_digest(view["bundle"]):
         raise SchemaInvalid("Capability differs from this Goal's granted content pin")
-    registry.active_view(conn, view)
+    registry.active_view(conn, view, run_id=run_id)
     producers = dict(node_ids)
     assets = storage.artifact_service(conn)
     for ref in spec["inputs"]:
@@ -64,9 +64,11 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
         meta = assets.describe(ref)
         if meta["run_id"] != run_id or not assets.verify(ref)["ok"]:
             raise SchemaInvalid("Input is not an intact artifact in this Run")
-    if v6_protein.supported(capability):
-        v6_protein.validate(capability, spec["inputs"], spec["parameters"])
-        v6_protein.validate_inputs(conn, run_id, capability, spec["inputs"], producers=producers)
+    provider = goal_plugins.method(conn, run_id, capability)
+    if provider and provider.validate:
+        ctx = v6_method_context.MethodContext(conn, run_id, spec["inputs"])
+        v6_method_context.invoke(provider.validate, ctx, capability, spec["inputs"], spec["parameters"],
+                                 producers=producers)
     else:
         _roles(method, len(spec["inputs"]))
         if set(spec["parameters"]) != set(manifest.parameter_names(method)):
@@ -131,13 +133,13 @@ def _dependencies(conn, node, spec):
 
 
 def _compile(conn, node, refs):
-    from . import v6_protein
-
     spec = json.loads(node["spec_json"])
     cap = spec["capability"]
     method = registry.candidate(conn, cap)
-    if v6_protein.supported(cap):
-        inputs, params = v6_protein.prepare_inputs(conn, node["run_id"], cap, refs, spec["parameters"])
+    provider = goal_plugins.method(conn, node["run_id"], cap)
+    if provider and provider.bind:
+        ctx = v6_method_context.MethodContext(conn, node["run_id"], refs, writable=True)
+        inputs, params = v6_method_context.invoke(provider.bind, ctx, cap, refs, spec["parameters"])
     else:
         inputs = dict(zip(_roles(method["manifest"], len(refs)), refs))
         params = spec["parameters"]
@@ -157,7 +159,7 @@ def _compile(conn, node, refs):
         "roles": [[entry["role"], entry["sha256"]] for entry in entries],
         "parameters": params,
         "runtime": env,
-        "method_dependencies": v6_protein.runtime_dependencies(cap, runtime["python_executable"]),
+        "method_dependencies": v6_method_context.dependencies(conn, node["run_id"], cap, runtime["python_executable"]),
     }
     exec_key = ids.sha256_of_obj(identity)
     plan_key = ids.sha256_of_obj(
@@ -465,8 +467,6 @@ def _run_node(conn, node, service):
         (node["run_id"], node["node_id"], attempt["exec_key"]),
     ).fetchone()
     if source:
-        from . import v6_protein
-
         # A previously parked attempt may resume under a changed interpreter or SVD distribution.
         identity = json.loads(attempt["identity_json"])
         method = registry.candidate(conn, spec["capability"])
@@ -476,7 +476,7 @@ def _run_node(conn, node, service):
             identity["manifest_sha256"] != method["manifest_sha256"]
             or identity["runtime"] != current
             or identity.get("method_dependencies", {})
-            != v6_protein.runtime_dependencies(spec["capability"], active["python_executable"])
+            != v6_method_context.dependencies(conn, node["run_id"], spec["capability"], active["python_executable"])
         ):
             raise SchemaInvalid("Compiled attempt is incompatible with the currently installed method")
         # Hash the original bytes outside a write transaction; adoption retains the original Job identity.

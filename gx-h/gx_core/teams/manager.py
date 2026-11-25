@@ -92,18 +92,12 @@ def _run(ctx: Ctx, run_id: str) -> sqlite3.Row:
 
 
 def _require_pins(ctx: Ctx, run: sqlite3.Row) -> None:
-    from ..orchestration import seams, service
+    from ..orchestration import service
 
     if run["status"] in machines.terminal_states("run") or run["status"] == "PAUSED":
         raise PhaseDenied("a stopped or paused run cannot change its team")
-    if run["workflow_id"]:
-        workflow = service._pinned_workflow(ctx.conn, run)
-        service.require_pins(run, workflow)
-        return
-    if run["contract_sha256"] and run["contract_sha256"] != contracts.contract_digest()["__combined__"]:
-        raise ContentHashMismatch("the run contract differs from its installed contract")
-    if run["agent_policy_sha256"] and run["agent_policy_sha256"] != seams.agent_policy_for_run(run)[1]:
-        raise ContentHashMismatch("the run's pinned agent policy changed")
+    workflow = service._pinned_workflow(ctx.conn, run) if run["workflow_id"] else None
+    service.require_pins(run, workflow, conn=ctx.conn)
 
 
 def _team(conn: sqlite3.Connection, run_id: str, team_id: str) -> sqlite3.Row:

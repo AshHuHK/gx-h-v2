@@ -1,0 +1,28 @@
+{
+  "schema": "gx.tl1a.criteria/1",
+  "domain": "TL1A 2RE9 deposited coordinate geometry",
+  "method": "tl1a-geometry@1",
+  "source_sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+  "scope": "One deposited experimental model. Compare unsigned pair rotations and fitted Cartesian atom RMSDs after proper rigid superposition.",
+  "mapping": {
+    "model_id": "1",
+    "label_entity_id": "1",
+    "chains": ["A", "B", "C"],
+    "keys": ["label_seq_id", "label_comp_id", "label_atom_id"],
+    "pairs_fixed_moving": [["A", "B"], ["A", "C"], ["B", "C"]]
+  },
+  "protocols": {
+    "common_backbone": "Positive-occupancy N/CA/C/O atom identities observed in all three chains.",
+    "common_ca": "Positive-occupancy alpha-carbon identities observed in all three chains.",
+    "ordered_backbone": "Retain a complete N/CA/C/O residue only when all four atoms on all three chains have occupancy 1 and B_iso_or_equiv <= 40 angstrom^2."
+  },
+  "coverage": {"min_residues": 60, "min_fraction": 0.6, "denominator": "observed_union_residues"},
+  "comparison": {"max_angle_delta_deg": 0.5, "max_rmsd_delta_angstrom": 0.15},
+  "reproduction": {"angle_abs_tol_deg": 0.01, "rmsd_abs_tol_angstrom": 0.001},
+  "interpretation": {
+    "stable": "Every prespecified chain pair across every admissible measured protocol differs by at most both comparison bounds.",
+    "sensitive": "At least one measured chain pair exceeds either comparison bound. Report all pairwise differences.",
+    "insufficient": "A requested protocol lacks the frozen residue coverage, its fit is underdetermined, or fewer than two distinct comparable protocols were measured. Preserve the observable measurements and each individual comparison.",
+    "limits": "Thresholds define this coordinate sensitivity screen. Chain pairs share atoms and are dependent, and B factors mix disorder and refinement effects. A single asymmetric unit cannot establish a common symmetry axis, solution assembly, binding, or activity."
+  }
+}

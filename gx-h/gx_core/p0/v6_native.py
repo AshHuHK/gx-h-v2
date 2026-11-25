@@ -9,13 +9,13 @@ from .. import budgets, contracts, registry
 from ..domain import ids
 from ..errors import BY_CODE, BudgetExceeded, SchemaInvalid, ScopeDenied
 from ..persistence import store
-from . import v6_claims, v6_delegation, v6_protein
+from ..plugins import goal as goal_plugins
+from . import v6_claims, v6_delegation, v6_method_context
 
 
 DECIDE = "gx_decide_revision"
 STAGE = "gx_stage_claim"
 DELEGATE = "gx_delegate_branch"
-REEVALUATE = "gx_reevaluate_geometry"
 PREFIX = "GX research brief\n"
 INSTRUCTIONS = (
     "You are the Scientific Lead. Read the research brief and its authorized original observations. "
@@ -49,26 +49,31 @@ def decision_tool():
     return contracts.native_goal_tool_spec(DECIDE)
 
 
-def callback_for(name):
-    if name == REEVALUATE:
+def callback_for(name, *, conn=None, run_id=None):
+    handler = registry.native_goal_handler_for(name)
+    if handler:
+        return handler
+    if conn is not None and name in goal_plugins.tools(conn, run_id):
         return call
-    return registry.native_goal_handler_for(name)
+    return None
 
 
 def assigned(row):
     return bool(row.get("tool_names_json") and DECIDE in json.loads(row["tool_names_json"]))
 
 
-def tool_specs(read_tools, brief=None):
+def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     """Select grants when freezing the Root. Resume reuses its persisted tool names."""
     catalog = [spec for spec in read_tools if spec["name"] in ("gx_read_artifact", "gx_task_context")]
     catalog.extend([decision_tool(), v6_claims.tool_spec()])
     if brief is None or (brief.get("scope", "run") == "run" and
                          any(b["status"] == "OPEN" for b in brief.get("branches", []))):
         catalog.append(v6_delegation.TOOL)
-    if brief is None or any(cap.get("capability_version") == v6_protein.GEOMETRY
-                            for cap in brief.get("capabilities", [])):
-        catalog.append(v6_protein.REEVALUATE_TOOL)
+    if conn is not None:
+        extras = goal_plugins.tools(conn, run_id)
+    else:
+        extras = goal_plugins.tools_for_catalog((brief or {}).get("capabilities", []))
+    catalog.extend(tool.as_spec() for tool in extras.values())
     return catalog
 
 
@@ -185,16 +190,9 @@ def call(roots, p):
         task = roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?", (row["task_id"],)).fetchone()
         answer = v6_claims.stage(roots.conn, **identity, context_ref=task[0], payload=args,
                                  allowed_refs=task_refs(roots.conn, row))
-    elif tool == REEVALUATE:
-        if set(args) != {"measurement_refs", "criteria"} or not isinstance(args["measurement_refs"], list):
-            raise SchemaInvalid("Provide the measurement_refs and revised criteria")
-        for ref in args["measurement_refs"]:
-            roots._artifact_access(row, ref)
-        task = roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?", (row["task_id"],)).fetchone()
-        answer = v6_protein.reevaluate(roots.conn, measurement_refs=args["measurement_refs"], criteria=args["criteria"],
-                                       **identity, context_ref=task[0])
     else:
-        raise ScopeDenied("Unknown research action")
+        task = roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?", (row["task_id"],)).fetchone()
+        answer = v6_method_context.call_tool(roots.conn, tool, args, context_ref=task[0], **identity)
 
     try:
         with store.transaction(roots.conn, transaction_owner="ScientificLead", operation="native_receipt", run_id=roots.run_id):
@@ -208,8 +206,11 @@ def call(roots, p):
                 roots.terminal_products.record(thread, turn, call_id, "GX_ACCEPTED")
             elif tool == DELEGATE:
                 answer = v6_delegation.commit(roots.conn, prepared)
-            elif tool == REEVALUATE:
-                roots._allow_refs(row["root_key"], answer["evaluation_ref"])
+            elif tool != STAGE and isinstance(answer, dict) and "evaluation_ref" in answer:
+                refs = v6_claims.evaluation_refs(roots.conn, row["run_id"], row["task_id"],
+                                                 row["lease_id"], thread, turn)
+                if answer["evaluation_ref"] in refs:
+                    roots._allow_refs(row["root_key"], answer["evaluation_ref"])
             record_call(roots.conn, p)
             roots.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                                (thread, call_id, turn, request_sha, ids.canonical_json(answer)))

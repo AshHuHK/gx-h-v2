@@ -11,40 +11,56 @@ from gx_core.artifacts import ArtifactService
 from gx_core.capabilities import shipped
 from gx_core.domain import ids
 from gx_core.errors import IdempotencyConflict, SchemaInvalid, ScopeDenied
-from gx_core.p0 import manifest, v6_claims, v6_decisions, v6_goal, v6_jobs, v6_protein as protein
-from gx_core.p0.driver import context
+from gx_core import config
+from gx_core.p0 import manifest, v6_claims, v6_decisions, v6_goal, v6_jobs, v6_method_context
+from gx_core.plugins import goal, selection
 from gx_core.persistence import store
 from tests.test_v6_decisions import bind_native_fixture, branch, draft
 
 
 class ProteinAdapter(unittest.TestCase):
     def test_exact_order_and_parameter_contract(self):
+        package, = selection.select(["org.gx.protein@0.2.0"], "gx.goal","1").plugins
         for cap, roles, params in [
-            (protein.GEOMETRY, ["structure"], {"protocol": "common_ca", "chain_pairs": ["A/C"]}),
-            (protein.GEOMETRY, ["structure"] * 2, {"protocol": "common_ca"}),
-            (protein.GEOMETRY, ["structure"], {"protocol": "none"}),
-            (protein.GEOMETRY, ["structure"], {"protocol": "common_ca", "criteria": {"mapping": {}}}),
-            (protein.GEOMETRY, ["structure"], {"protocol": "common_ca", "criteria": {"coverage": {"min_fraction": 0}}}),
-            (protein.QUALITY, ["structure"], {"selection": "common_ca"}),
-            (protein.REVIEW, ["structure"], {}),
+            (shipped.GEOMETRY, ["structure"], {"protocol": "common_ca", "chain_pairs": ["A/C"]}),
+            (shipped.GEOMETRY, ["structure"] * 2, {"protocol": "common_ca"}),
+            (shipped.GEOMETRY, ["structure"], {"protocol": "none"}),
+            (shipped.GEOMETRY, ["structure"], {"protocol": "common_ca", "criteria": {"mapping": {}}}),
+            (shipped.GEOMETRY, ["structure"], {"protocol": "common_ca", "criteria": {"coverage": {"min_fraction": 0}}}),
+            (shipped.QUALITY, ["structure"], {"selection": "common_ca"}),
+            (shipped.REVIEW, ["structure"], {}),
         ]:
             with self.subTest(cap=cap, roles=roles, params=params), self.assertRaises(SchemaInvalid):
-                protein.validate(cap, roles, params)
+                provider = package.contributions.goal_methods[cap]
+                v6_method_context.invoke(provider.validate, None, cap, roles, params, producers={})
 
     def test_real_methods_independent_fits_and_threshold_only_reading(self):
         with tempfile.TemporaryDirectory() as tmp, closing(store.open_store(Path(tmp) / "gx.db")) as conn:
-            methods = protein.catalog(context(conn))
-            self.assertEqual({row["capability_version"]: row["portable_sha256"] for row in methods},
-                             {cap: shipped.pin(cap) for cap in (protein.QUALITY, protein.GEOMETRY, protein.REVIEW)})
-            data = protein.CRITERIA_PATH.parent / "2RE9.cif"
+            data = config.HARNESS_ROOT / "adapters/scientific/tl1a_geometry/data/2RE9.cif"
+            pins = [shipped.QUALITY, shipped.GEOMETRY, shipped.REVIEW]
             spec = {"project": "coordinates", "mode": "goal", "objective": "Compare deposited coordinate protocols",
+                    "plugins": ["org.gx.protein@0.2.0"], "capabilities": pins,
                     "input_files": [{"path": str(data), "role": "structure"}]}
             run = v6_goal.start(conn, spec, run_key="coordinate-graph", current=None)["run_id"]
             record = conn.execute("SELECT budget_ref,inputs_json FROM runs WHERE run_id=?", (run,)).fetchone()
             budget, structure = record["budget_ref"], json.loads(record["inputs_json"])["files"][0]["artifact_ref"]
+            methods = json.loads(record["inputs_json"])["inputs"]["capability_catalog"]
+            self.assertEqual({row["capability_version"]: row["portable_sha256"] for row in methods},
+                             {cap: shipped.pin(cap) for cap in pins})
+            self.assertEqual({row["plugin"]["version"] for row in methods}, {"0.2.0"})
             assets = ArtifactService(conn)
+
+            def bind(assigned_run, cap, refs, params):
+                ctx = v6_method_context.MethodContext(conn, assigned_run, refs, writable=True)
+                return v6_method_context.invoke(goal.method(conn, run, cap).bind, ctx, cap, refs, params)
+
+            def evaluate(refs, criteria, **call):
+                return v6_method_context.call_tool(conn, "gx_reevaluate_geometry",
+                                                   {"measurement_refs": refs, "criteria": criteria},
+                                                   run_id=run, **call)
+
             with self.assertRaises(SchemaInvalid):
-                protein.prepare_inputs(conn, "other-run", protein.QUALITY, [structure], {})
+                bind("other-run", shipped.QUALITY, [structure], {})
 
             def node(name, cap, deps, params):
                 return dict(op="add_node", branch="local:sample", node="local:" + name, capability=cap,
@@ -52,10 +68,10 @@ class ProteinAdapter(unittest.TestCase):
                             question="Measure or check the selected coordinate protocol")
 
             proposal = draft({**branch(), "budget_limits": {"job_submissions": 4, "cpu_seconds": 120}},
-                             node("inventory", protein.QUALITY, [], {}),
-                             node("ca", protein.GEOMETRY, ["local:inventory"], {"protocol": "common_ca"}),
-                             node("backbone", protein.GEOMETRY, [], {"protocol": "common_backbone"}),
-                             node("review", protein.REVIEW, ["local:ca", "local:backbone"], {}))
+                             node("inventory", shipped.QUALITY, [], {}),
+                             node("ca", shipped.GEOMETRY, ["local:inventory"], {"protocol": "common_ca"}),
+                             node("backbone", shipped.GEOMETRY, [], {"protocol": "common_backbone"}),
+                             node("review", shipped.REVIEW, ["local:ca", "local:backbone"], {}))
             proposal["reconsider_when"] = [{"event": "job_settled", "subject_ref": "local:review"}]
             call = bind_native_fixture(conn, run, Path(tmp))
             receipt = v6_decisions.adopt(conn, **call, decision=proposal)
@@ -74,7 +90,7 @@ class ProteinAdapter(unittest.TestCase):
             inventory, ca, backbone, checked = [outputs[receipt["aliases"]["local:" + name]]
                                                 for name in ("inventory", "ca", "backbone", "review")]
             full_inventory = assets.read_json(inventory)
-            brief = protein.observation_view(full_inventory)
+            brief = goal.method(conn, run, shipped.QUALITY).project(full_inventory)
             self.assertEqual(brief["mapping"], full_inventory["mapping"])
             self.assertLess(len(ids.canonical_json(brief)), len(ids.canonical_json(full_inventory)) // 5)
             for name, mask in brief["protocol_masks"].items():
@@ -88,7 +104,7 @@ class ProteinAdapter(unittest.TestCase):
                 self.assertTrue(all(p["within_reproduction_tolerance"] for p in result["differences"]))
                 self.assertEqual(result["observations_ref"], ca if protocol == "common_ca" else backbone)
             with self.assertRaises(SchemaInvalid):
-                protein.prepare_inputs(conn, run, protein.REVIEW, [structure, inventory], {})
+                bind(run, shipped.REVIEW, [structure, inventory], {})
 
             self.assertIsNotNone(v6_goal.ensure_task(conn, run))
             identity = bind_native_fixture(conn, run, Path(tmp))
@@ -97,15 +113,15 @@ class ProteinAdapter(unittest.TestCase):
                                                     (identity["task_id"],)).fetchone()[0]
             original = {ref: ids.sha256_of_obj(assets.read_json(ref)) for ref in (ca, backbone)}
             before = store.budget_state(conn, budget)
-            original_read = protein.reevaluate(conn, run, [ca, backbone], {}, **identity)
+            original_read = evaluate([ca, backbone], {}, **identity)
             revised_call = {**identity, "call_id": "new-threshold"}
             change = {"coverage": {"min_residues": 10000}}
-            updated = protein.reevaluate(conn, run, [ca, backbone], change, **revised_call)
-            self.assertEqual(updated, protein.reevaluate(conn, run, [ca, backbone], change, **revised_call))
+            updated = evaluate([ca, backbone], change, **revised_call)
+            self.assertEqual(updated, evaluate([ca, backbone], change, **revised_call))
             with self.assertRaises(IdempotencyConflict):
-                protein.reevaluate(conn, run, [ca, backbone], {}, **revised_call)
+                evaluate([ca, backbone], {}, **revised_call)
             with self.assertRaises(ScopeDenied):
-                protein.reevaluate(conn, run, ["gxa_outside"], {}, **{**identity, "call_id": "different-source"})
+                evaluate(["gxa_outside"], {}, **{**identity, "call_id": "different-source"})
             self.assertNotEqual(original_read["evaluation_ref"], updated["evaluation_ref"])
             self.assertEqual(updated["evaluation"]["comparison"]["status"], "insufficient")
             self.assertEqual([s["artifact_ref"] for s in updated["evaluation"]["measurements"]], [ca, backbone])
@@ -113,7 +129,7 @@ class ProteinAdapter(unittest.TestCase):
             self.assertEqual(original, {ref: ids.sha256_of_obj(assets.read_json(ref)) for ref in (ca, backbone)})
             self.assertEqual(store.budget_state(conn, budget), before)
             self.assertEqual(conn.execute("SELECT COUNT(*) FROM jobs WHERE run_id=?", (run,)).fetchone()[0], 4)
-            self.assertEqual(conn.execute("SELECT COUNT(*) FROM events WHERE kind='v6.geometry.reevaluated' "
+            self.assertEqual(conn.execute("SELECT COUNT(*) FROM events WHERE kind='v6.evaluation.recorded' "
                                           "AND run_id=?", (run,)).fetchone()[0], 2)
 
             refs = [ca, backbone, updated["evaluation_ref"]]

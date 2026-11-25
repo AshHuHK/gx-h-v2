@@ -684,13 +684,8 @@ class HostPoolService:
     def _require_run(self, run_id: str) -> sqlite3.Row:
         run = self._scope_run(run_id)
         from ..orchestration import service as runs
-        if run["workflow_id"]:
-            runs.require_pins(run, runs.default_registry().get(run["workflow_id"], run["workflow_version"]))
-        else:
-            if run["contract_sha256"] and run["contract_sha256"] != contracts.contract_digest()["__combined__"]:
-                raise ContentHashMismatch("the run's contract pin differs from the installed contract")
-            if run["agent_policy_sha256"] and run["agent_policy_sha256"] != runs.seams.agent_policy_for_run(run)[1]:
-                raise ContentHashMismatch("the run's agent policy pin differs from the installed policy")
+        flow = runs.default_registry().get(run["workflow_id"], run["workflow_version"]) if run["workflow_id"] else None
+        runs.require_pins(run, flow, conn=self.conn)
         return run
 
     def _pool(self, pool_id: str) -> dict[str, Any]:
@@ -1086,7 +1081,7 @@ class HostPoolService:
             # historical contract digest. No stored source field is changed.
             ordinary = {**dict(run), "contract_sha256": destination["contract_sha256"]}
             workflow = runs.default_registry().get(run["workflow_id"], run["workflow_version"])
-            runs.require_pins(ordinary, workflow)
+            runs.require_pins(ordinary, workflow, conn=self.conn)
             host = store.loads(run, "host_json", {})
             selected = host.get("policy_selection", {})
             if (host.get("kind") != pool["host"] or host.get("session_ref") != pool["session_ref"]

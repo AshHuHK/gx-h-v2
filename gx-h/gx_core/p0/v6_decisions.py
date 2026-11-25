@@ -6,7 +6,7 @@ from tempfile import NamedTemporaryFile
 
 from ..artifacts import ArtifactService, delivery
 from ..domain import clock, ids
-from ..errors import IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
+from ..errors import BudgetExceeded, IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
 from . import intent, v6_graph
 
@@ -150,6 +150,10 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         return saved
     root, task, goal, base = authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                         thread_id=thread_id, turn_id=turn_id)
+    if base is None:
+        limit = json.loads(task["snapshot_json"]).get("budget", {}).get("initial_job_limit")
+        if limit is not None and sum(op["op"] == "add_node" for op in decision["ops"]) > limit:
+            raise BudgetExceeded(f"The first graph may commission at most {limit} Jobs")
     request = dict(schema_version="gx.v6.decision.1", run_id=run_id, decision_task_id=task_id, lease_id=lease_id,
                    scope=task["scope"], goal_version=task["goal_version"], context_ref=task["context_ref"],
                    base=base, idempotency_key="v6.decision:" + ids.sha256_of_obj([thread_id, call_id]),

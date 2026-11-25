@@ -29,10 +29,6 @@ def direct_tool_config(effective):
     return config
 
 
-def enabled(run):
-    return (run["workflow_id"], run["workflow_version"]) == ("science_grid", "3")
-
-
 def repair_limit(spec):
     value = spec.get("max_product_structural_failures", 2)
     if type(value) is not int or value < 1:

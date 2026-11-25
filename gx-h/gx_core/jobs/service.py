@@ -484,7 +484,7 @@ class JobService:
 
             ladder.require_reviewed(conn, capability)
         else:
-            capability = registry.active_view(conn, capability)
+            capability = registry.active_view(conn, capability, run_id=run_id)
         if purpose == PURPOSE_PATH:
             self._bind_to_plan(conn, request, capability, step_index)
         env = environments.require_ready(conn, capability["env_id"], actor=self.actor,
@@ -680,8 +680,9 @@ class JobService:
             prepared = execution_manifest.prepare_runtime(intent, capability["bundle"], env, resources, preflight)
             v6_node = (request.get("binding") or {}).get("v6_node_id")
             if v6_node:
-                from ..p0 import v6_jobs, v6_protein
-                method_dependencies = v6_protein.runtime_dependencies(request["capability_version"], env["python_executable"])
+                from ..p0 import v6_jobs, v6_method_context
+                method_dependencies = v6_method_context.dependencies(
+                    conn, run_id, request["capability_version"], env["python_executable"])
             sample = capacity.sample_admission(conn)
             with store.transaction(conn, transaction_owner="JobService", operation="admit", run_id=run_id) as txn:
                 if reserved_job_id is not None:

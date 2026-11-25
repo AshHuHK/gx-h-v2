@@ -4,7 +4,7 @@
 
 ## Existing · 沿用的所有者
 
-Intent 已保存人的原始输入、版本、预览摘要和后续确认。Budget 保存额度、预留和实际结算。Artifact 可重算文件摘要，Job manifest 可核对原始输入、成功的 Job 和输出归属。沿用 `eval_specs`、`evaluations`、`evidence` 和原始审阅记录。旧 grid 对有限样本产生过支持和反驳两个方向的结果。旧 `science_decisions` 保存每轮科研任务的决定，Codex thread goal 控制工作线程生命周期。[Intent 记录](../../gx-h/gx_core/p0/intent.sql#L6) · [评估表](../../gx-h/contracts/db_schema.sql#L455) · [Job 证据校验](../../gx-h/gx_core/p0/manifest.py#L231) · [grid 回执](../../acceptance/v31/final-public-deterministic.json#L145) · [科研决定](../../gx-h/gx_core/p0/science_inputs.py#L120) · [线程 goal](../../gx-h/gx_core/p0/roots.py#L815)
+Intent 已保存人的原始输入、版本、预览摘要和后续确认。Budget 保存额度、预留和实际结算。Artifact 可重算文件摘要，Job manifest 可核对原始输入、成功的 Job 和输出归属。沿用 `eval_specs`、`evaluations`、`evidence` 和原始审阅记录。旧 grid 对有限样本产生过支持和反驳两个方向的结果。旧 `science_decisions` 保存每轮科研任务的决定，Codex thread goal 控制工作线程生命周期。[Intent 记录](../../gx-h/gx_core/p0/intent.sql#L6) · [评估表](../../gx-h/contracts/db_schema.sql#L455) · [Job 证据校验](../../gx-h/gx_core/p0/manifest.py#L231) · [grid 回执](../../acceptance/v31/final-public-deterministic.json#L145) · [科研决定](https://github.com/AshHuHK/gx-h-v2/blob/47fc728d32bc10ba478df6a063529a8d98f98828/gx-h/gx_core/p0/science_inputs.py#L120) · [线程 goal](../../gx-h/gx_core/p0/roots.py#L815)
 
 ## Extend · Goal 与预算授权
 

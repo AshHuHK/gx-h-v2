@@ -15,7 +15,7 @@ from ..domain import clock, ids, machines
 from ..errors import ArtifactNotFound, BudgetExceeded, HoldActive, IdempotencyConflict, OutcomeUnknown, PermissionDenied, SchemaInvalid, StaleRevision
 from ..hostobs.app_server_client import AppServerDisconnected, AppServerResponseError, AppServerTimeout
 from ..jobs.service import JobService
-from ..orchestration import branches, reactor, service
+from ..orchestration import branches, native_worker, reactor, service
 from ..orchestration.engine import StoreCheckpointer
 from ..persistence import store
 from ..research import records
@@ -73,22 +73,12 @@ def snapshot(conn, run_id=None):
             entry["metering_reason"] = ("awaiting delivery receipt" if not entry["turn_id"] else
                                         "awaiting terminal turn" if not entry["terminal_status"] else
                                         "awaiting attributable usage")
-    grid_evidence = {}
-    if (run["workflow_id"], run["workflow_version"]) == ("science_grid", "3"):
-        from workflows.science_grid_v3.settlement import current_evidence
-        grid_evidence["current_evidence"] = [
-            {key: row[key] for key in ("path_id", "job_id", "eval_id", "evidence_id", "assessment_ref", "direction")}
-            for row in current_evidence(conn, rid, verify_bytes=False)]
+    workflow_projection = native_worker.for_run(run).snapshot(conn, rid)
     binding = store.loads(run, "inputs_json").get("plugin_binding") if '"plugin_binding"' in (run["inputs_json"] or "") else None
-    close = {}
-    if (run["workflow_id"], run["workflow_version"]) == ("science_grid", "3"):
-        from .terminal_products import pending
-        if pending_turns := pending(conn, rid):
-            close["pending_terminal_turns"] = [dict(row) for row in pending_turns]
-    from . import v6_goal
+    from ..orchestration import run_mode
     meter = metering.inspect(conn, rid)
     return {
-        **(v6_goal.projection(conn, run, meter) if v6_goal.is_goal(run) else {}),
+        **run_mode.for_run(run).snapshot(conn, run, meter),
         "project": run["project_ref"], "run_id": rid, "run_key": run["run_key"], "status": run["status"],
         "run_objective": run["objective"],
         "resource_profile": (store.loads(run, "host_json") or {}).get("resource_profile"),
@@ -101,7 +91,7 @@ def snapshot(conn, run_id=None):
         "metering": meter,
         "supplements": records.source_status(conn, rid),
         "reviews": records.review_history(conn, rid),
-        **grid_evidence,
+        **workflow_projection,
         "node": checkpoint.node if checkpoint else None, "round": state.get("round"),
         "completed_nodes": state.get("completed", []),
         "node_waits": node_waits, "failed_nodes": state.get("failed_nodes", {}),
@@ -111,7 +101,6 @@ def snapshot(conn, run_id=None):
         "jobs": rows("SELECT job_id,status,scheduler_ref FROM jobs WHERE run_id=? ORDER BY rowid"),
         "tasks": rows("SELECT task_id,role,stage,status,attempt FROM tasks WHERE run_id=? ORDER BY rowid"),
         "unsettled_turns": unsettled,
-        **close,
         "pending_deliveries": rows("SELECT outbox_id,topic,attempts,last_error FROM outbox "
                                    "WHERE run_id=? AND topic LIKE 'p0.%' AND consumed_at IS NULL"),
         "replies": rows("SELECT m.message_id,r.turn_id,r.status,r.response FROM p0_main_replies r "
@@ -162,22 +151,12 @@ class Driver:
             raise SchemaInvalid("gx_project_state reads the bound project and takes no arguments")
         conn = self.conn
         run = project(conn, self.rid)
-        latest = conn.execute("SELECT round_index,actions_json,reason,stop_reason,decision_ref "
-                              "FROM science_decisions WHERE run_id=? ORDER BY round_index DESC LIMIT 1",
-                              (self.rid,)).fetchone()
         action = conn.execute("SELECT result_json FROM p0_human_inputs WHERE run_id=? AND receipt_turn_id=? "
                               "AND result_json IS NOT NULL ORDER BY rowid DESC LIMIT 1",
                               (self.rid, envelope["turn_id"])).fetchone()
         supplements = records.source_status(conn, self.rid)
-        decision = dict(latest) if latest else None
-        if decision is not None:
-            decision["pending_source_ids"] = [source["source_id"] for source in supplements
-                                              if source["disposition"] == "pending"]
-        from . import v6_goal
-        if v6_goal.is_goal(run):
-            latest = conn.execute("SELECT receipt_json FROM v6_decisions WHERE run_id=? ORDER BY rowid DESC LIMIT 1",
-                                  (self.rid,)).fetchone()
-            decision = store.loads(latest, "receipt_json") if latest else None
+        from ..orchestration import run_mode
+        decision = run_mode.for_run(run).latest_decision(conn, self.rid, supplements)
         return {"run_id":self.rid, "status":run["status"],
                 "current_items":intent.active_items(conn, self.rid),
                 "supplements":supplements,
@@ -513,9 +492,7 @@ class Driver:
             "(budget_status='HELD' OR (confidence='ESTIMATED' AND EXISTS (SELECT 1 FROM p0_root_terminals e "
             "WHERE e.thread_id=p0_meter_native_turns.thread_id AND e.turn_id=p0_meter_native_turns.turn_id)))",
             (self.rid,))}
-        run = project(self.conn, self.rid)
-        closing_threads = ({row["thread_id"] for row in terminal_products.pending(self.conn, self.rid)}
-                           if run and terminal_products.enabled(run) else set())
+        closing_threads = {row["thread_id"] for row in terminal_products.pending(self.conn, self.rid)}
         pending.update(closing_threads)
         # A passive read during Goal closure cannot collect the cumulative snapshot returned by
         # a guarded attach after closure. Revisit that thread when the terminal owner completes.

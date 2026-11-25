@@ -15,15 +15,16 @@ from ..domain import clock, ids, machines
 from ..errors import GxError, HoldActive, IllegalTransition, OutcomeUnknown, ScopeDenied, SchemaInvalid
 from ..hostobs import host_policy
 from ..hostobs.app_server_client import AppServerClient, AppServerResponseError, NO_TOOL_RESPONSE
+from ..orchestration import native_worker, run_mode
 from ..orchestration.dispatch_preparation import DispatchPreparation
 from ..persistence import records, store
 from ..scheduling import dispatch as scheduler, snapshot
 from ..teams import recovery
 from ..teams.service import TeamService, default_lease_seconds
-from . import compute, grid_brief
-from . import profiles, v6_goal, v6_native
+from . import compute
+from . import profiles, v6_native
 from ..orchestration.service import hooks_for_run
-from . import activity, grid_planner, terminal_products, waits
+from . import activity, terminal_products, waits
 
 
 def _tool(name, description, key, schema):
@@ -106,8 +107,9 @@ class Roots:
         self.run = conn.execute("SELECT * FROM runs WHERE run_id=?",(run_id,)).fetchone()
         if not self.run:
             raise ScopeDenied("unknown GX run")
-        self._goal_mode = v6_goal.is_goal(self.run)
-        self._role_tools = (self.run["workflow_id"], self.run["workflow_version"]) == ("science_grid", "3")
+        self.mode = run_mode.for_run(self.run)
+        self.worker = native_worker.for_run(self.run)
+        self._role_tools = self.worker.role_tools
         self.cwd, self.argv, self.env = Path(cwd).resolve(), argv, env
         self.token_budget = token_budget
         self.worker_tools = [*WORKER_TOOLS, *worker_tools]
@@ -126,7 +128,7 @@ class Roots:
         self._ordinary_forks = set()
         self._goal_queue = set()
         self.delivery = RootDelivery(self)
-        terminal_delivery = self._goal_mode or terminal_products.enabled(self.run)
+        terminal_delivery = self.mode.decision_tools or self._role_tools
         self.terminal_products = terminal_products.TerminalProducts(self) if terminal_delivery else None
         self._product_tool_config = terminal_products.direct_tool_config({}) if self.terminal_products else {}
         self.heartbeats = activity.Heartbeats(self)
@@ -364,10 +366,10 @@ class Roots:
         role = task["role"] if task is not None else "main"
         profile = host_policy.p0_role_for_run(self.run, role)
         provider = profile.get("provider") or host_policy.p0_provider_for_run(self.run)
-        lead = self._goal_mode and task is not None and task["kind"] == "decide_revision"
+        lead = self.mode.decision_task(task)
         if lead:
             frozen = store.loads(task, "input_json")["brief"]
-            tool_names = [tool["name"] for tool in v6_native.tool_specs(WORKER_TOOLS, frozen)]
+            tool_names = [tool["name"] for tool in v6_native.tool_specs(WORKER_TOOLS, frozen, conn=self.conn, run_id=self.run_id)]
         else:
             available = self.main_tools if task is None else self.worker_tools
             tool_names = [tool["name"] for tool in profiles.available_for_role(
@@ -382,8 +384,7 @@ class Roots:
             view = TeamService(self.conn).task(task_id)
             packet = {k: view[k] for k in ("task_id", "role", "kind", "input", "acceptance",
                                            "required_artifacts", "previous_attempts", "dependencies")}
-            if self.terminal_products:
-                grid_planner.bind(packet)
+            render = self.worker.assign(self.run, packet)
             current = hooks_for_run(self.conn, self.run_id).build_task_context(self.conn, self.run_id, task_id, attempt)
             packet.update(attempt=attempt, run_objective=self.run["objective"],
                           intent=current["intent"], supplement_sources=current["supplement_sources"],
@@ -392,10 +393,9 @@ class Roots:
             extra = {name: value for name, value in current.items() if name not in ("task_id", "intent", "supplement_sources")}
             if extra:
                 packet["workflow_context"] = extra
-            preload = grid_brief.applies(self.run, packet["input"])
             # Reference grants belong to the new root. Fill its packet after
             # those grants, in this same claim transaction.
-            brief = "" if preload else grid_brief.PREFIX + json.dumps(packet, ensure_ascii=False)
+            brief = "" if render else native_worker.PREFIX + json.dumps(packet, ensure_ascii=False)
         self.conn.execute("INSERT INTO p0_roots(root_key,run_id,task_id,attempt,lease_id,cwd,role,model,"
                           "effort,brief,provider,tool_names_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (key,self.run_id,
                           task["task_id"] if task is not None else None, attempt, lease,
@@ -405,9 +405,9 @@ class Roots:
             self._allow_refs(key, v6_native.task_refs(self.conn, task))
         elif task is not None:
             self._allow_refs(key, [packet["input"], getattr(current, "citations", current)])
-            if preload:
+            if render:
                 self.conn.execute("UPDATE p0_roots SET brief=? WHERE root_key=?",
-                                  (grid_brief.render(self, key, packet), key))
+                                  (render(self, key, packet), key))
         return self._row(key)
 
     def _allow_refs(self, root_key, value):
@@ -495,14 +495,15 @@ class Roots:
     def _tools_for(self, row):
         available = self.main_tools if row["task_id"] is None else self.worker_tools
         names = json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None else None
-        if self._goal_mode and v6_native.assigned(row):
-            available = v6_native.tool_specs(WORKER_TOOLS)
+        if self.mode.decision_root(row):
+            frozen = v6_native.brief(row)
+            available = v6_native.tool_specs(WORKER_TOOLS, frozen, conn=self.conn, run_id=self.run_id)
         return profiles.selected_tools(available, names)
 
     def _product_tools(self, row, tools):
         task = self.conn.execute("SELECT input_json FROM tasks WHERE task_id=? AND run_id=?",
                                  (row["task_id"], self.run_id)).fetchone()
-        contract = grid_planner.assigned(row) or store.loads(task, "input_json", {}).get("product_contract")
+        contract = self.worker.assigned(row) or store.loads(task, "input_json", {}).get("product_contract")
         if not contract:
             return tools
         paging = ""
@@ -519,7 +520,7 @@ class Roots:
     def _settings(self, row, *, new):
         main = row["task_id"] is None
         tools = self._tools_for(row) if new or self.terminal_products else []
-        lead = self._goal_mode and v6_native.assigned(row)
+        lead = self.mode.decision_root(row)
         direct_product = self.terminal_products and not main and any(tool["name"] == "gx_submit_product" for tool in tools)
         profile = host_policy.p0_role_for_run(self.run, row["role"])
         delegate = profile.get("multi_agent", False if self._role_tools else None)
@@ -543,7 +544,7 @@ class Roots:
             names = (json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None
                      else [tool["name"] for tool in self.worker_tools])
             instructions = profiles.worker_instructions(names, delegate=delegate)
-        worker_context = grid_brief.GUIDANCE if grid_brief.includes_artifacts(row["brief"]) else row["brief"]
+        worker_context = self.worker.guidance(row["brief"])
         params = {"modelProvider":row["provider"] or host_policy.p0_provider_for_run(self.run),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
                   "config":config, "developerInstructions":row["brief"] if main else
                   instructions+"\n"+worker_context}
@@ -595,7 +596,7 @@ class Roots:
         policy = response.get("sandbox") or {}
         observed = {"provider": response.get("modelProvider"), "model": response.get("model"),
                     "effort": response.get("reasoningEffort")}
-        if self._goal_mode and v6_native.assigned(row) and settings:
+        if self.mode.decision_root(row) and settings:
             if (response.get("thread") or {}).get("environments") != []:
                 raise ScopeDenied("Official Scientific Lead thread must have zero attached execution environments")
             observed["research_access"] = v6_native.record_access(settings, self._tools_for(row), response)
@@ -735,7 +736,7 @@ class Roots:
                 # Only a verified, already closed Goal can be attached for this one receipt.
                 goal = self._request("thread/goal/get", {"threadId": thread_id}).get("goal")
                 if goal is None:
-                    if not (self._goal_mode and v6_native.assigned(row)):
+                    if not (self.mode.decision_root(row)):
                         return
                 elif goal.get("threadId") != thread_id or goal.get("status") not in ("complete", "budgetLimited"):
                     return
@@ -834,9 +835,8 @@ class Roots:
                 (prior["terminal_status"] and waits.deferred_turn(self.conn, row["root_key"], prior["turn_id"]))):
             event_id = "resume:"+prior["turn_id"]
         text = row["brief"]
-        if event_id.startswith("resume:") and grid_brief.includes_artifacts(text):
-            text = ("Resume your assigned task. Use gx_task_context for current Intent and supplemental "
-                    "sources, then continue with the frozen Artifacts in your original brief.")
+        if event_id.startswith("resume:"):
+            text = self.worker.resume_text(text)
         receipt = self.deliver(tid, text, event_id=event_id)
         return {**self._binding(tid), "turn_id":receipt["turn_id"]}
 
@@ -849,7 +849,7 @@ class Roots:
 
     def _goal_for_budget(self, thread_id, hold_tokens):
         row = self._binding(thread_id)
-        if not row or row["task_id"] is None or self._goal_mode and v6_native.assigned(row):
+        if not row or row["task_id"] is None or self.mode.decision_root(row):
             # One frozen Lead task receives one GX-granted turn. Native automatic Goals can
             # initiate another inference without a new decision event or GX reservation.
             return
@@ -928,7 +928,7 @@ class Roots:
                     raise
                 out = self.terminal_products.failed_call(p, exc)
             status = "SUCCESS"
-            if self._goal_mode and p.get("tool") == v6_native.DECIDE:
+            if p.get("tool") in self.mode.decision_tools:
                 status = "ACCEPTED"
                 suppress = True
                 return NO_TOOL_RESPONSE
@@ -970,14 +970,14 @@ class Roots:
 
     def _call(self,p):
         tid,turn,call_id,tool,args = (p[k] for k in ("threadId","turnId","callId","tool","arguments"))
-        terminal_tool = tool == "gx_submit_product" or self._goal_mode and tool == v6_native.DECIDE
+        terminal_tool = tool == "gx_submit_product" or tool in self.mode.decision_tools
         namespace = terminal_products.NAMESPACE if self.terminal_products and terminal_tool else None
         if ((p.get("namespace") or None) != namespace or not all(isinstance(v,str) and v for v in (tid,turn,call_id,tool))
                 or not isinstance(args,dict)):
             raise ScopeDenied("GX tools require an official dynamic tool request")
         envelope = {"thread_id":tid,"turn_id":turn,"call_id":call_id}
         digest = ids.sha256_of_obj([tool,args])
-        if self._goal_mode and (callback := v6_native.callback_for(tool)):
+        if callback := self.mode.callback(self.conn, self.run_id, tool):
             return callback(self, p)
         prepared = None
         if self.worker_prepare and tool in self._extension_tools and tool not in self._plugin_tools:
@@ -1046,7 +1046,7 @@ class Roots:
                         self._artifact_access(row, args["ref"])
                     return json.loads(receipt["result_json"])
                 self.heartbeats.observed(tid, turn)
-                lead = self._goal_mode and v6_native.assigned(row)
+                lead = self.mode.decision_root(row)
                 if lead and tool == "gx_task_context" and not args:
                     answer = v6_native.current_context(self.conn, row)
                 elif tool == "gx_task_context" and not args:
@@ -1065,7 +1065,7 @@ class Roots:
                     answer = self._submit(row,args["product"],envelope)
                 elif tool == "gx_submit_product" and self.terminal_products:
                     task = self.conn.execute("SELECT input_json FROM tasks WHERE task_id=?", (row["task_id"],)).fetchone()
-                    contract = grid_planner.assigned(row) or store.loads(task, "input_json").get("product_contract") or {}
+                    contract = self.worker.assigned(row) or store.loads(task, "input_json").get("product_contract") or {}
                     raise SchemaInvalid("submit exactly one product object", details={"category": "product_structure",
                         "contract_digest": contract.get("digest") or ids.sha256_of_obj(next(
                             spec["inputSchema"] for spec in tools if spec["name"] == tool)), "pointer": "/product"})
@@ -1078,7 +1078,7 @@ class Roots:
                         answer = self.worker_call(row,tool,args,envelope)
                 else:
                     raise SchemaInvalid("invalid arguments to the assigned GX tool")
-            if self._goal_mode and v6_native.assigned(row):
+            if self.mode.decision_root(row):
                 v6_native.record_call(self.conn, p)
             self.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                               (tid,call_id,turn,digest,ids.canonical_json(answer)))
@@ -1112,15 +1112,13 @@ class Roots:
             not media and Path(allowed["rel_path"]).suffix.lower() == ".json")
         if is_json and offset is None:
             return assets.read_json(ref)
-        if self.terminal_products and offset is not None and allowed["kind"] == "grid_product_schema":
+        if self.terminal_products and offset is not None and allowed["kind"] == self.worker.schema_page_kind:
             # Codex truncates large dynamic tool outputs a second time after GX returns them.
             return assets.get(ref, offset=offset, max_bytes=4096, max_encoded_bytes=4096)
         return assets.get(ref, offset=offset)
 
     def _submit(self, binding, product, envelope):
-        transport = grid_planner.assigned(binding) if self.terminal_products else None
-        if transport:
-            grid_planner.validate_grids(product, transport)
+        transport = self.worker.validate_submission(binding, product)
         try:
             answer = TeamService(self.conn).submit_workflow_product(
                 run_id=self.run_id, task_id=binding["task_id"], lease_ref=binding["lease_id"],

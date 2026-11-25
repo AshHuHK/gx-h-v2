@@ -1,0 +1,131 @@
+{
+  "test": "V6.1 opens new Goal explicitly selecting the historical V6 plugin",
+  "run_id": "gxr_01m88cawc86a7x2mck",
+  "selected_provider": {
+    "id": "org.gx.protein",
+    "sha256": "ac5b5d5cf96e942bfc57dc8492aa56b77ad9ecee0716735a3e6338463630fce9",
+    "version": "0.1.0-v6.1"
+  },
+  "decision_receipt": {
+    "run_id": "gxr_01m88cawc86a7x2mck",
+    "task_id": "gxt_01m88cawd4ay87fmrx",
+    "lease_id": "gxl_01m88cawddsrxghva8",
+    "task_status": "ACCEPTED",
+    "decision_ref": "gxa_6864748bdf38043294fd66b83a9f25e65b1efb8dfd71a7d52396e8fb4523de48",
+    "decision_id": "gxa_6864748bdf38043294fd66b83a9f25e65b1efb8dfd71a7d52396e8fb4523de48",
+    "scope": "run",
+    "goal_version": 1,
+    "context_ref": "gxcx_01m88cawd4wahtd0t0",
+    "base": null,
+    "result_head": {
+      "version": 1,
+      "sha256": "5534993260cce8fd205bd757e8b1f53eaa880b826129a11fb811c94ea0f4de6a"
+    },
+    "outcome": "adopted",
+    "draft_sha256": "7665560749dc0d9efc95bd284433f2b7b348912e3e28bf711243066b32894498",
+    "resolved_ops": [
+      {
+        "source_index": 0,
+        "op_digest": "b86a6025bc2cf4cf015054852cb6488ccf5498695f7ae10110a92579b7150db2",
+        "spec": {
+          "alternative": "coverage agrees",
+          "branch": "branch_150cdbfcefb4ffb0a0fdd0f2914522a1",
+          "budget_limits": {
+            "cpu_seconds": 60,
+            "job_submissions": 1
+          },
+          "discriminating_observation": "per-chain coordinate count",
+          "hypothesis": "coverage differs",
+          "method_family": "inspection",
+          "op": "open_branch",
+          "stop_condition": "after comparing counts"
+        }
+      },
+      {
+        "source_index": 1,
+        "op_digest": "044e30109cb3bed9b5ea8e4337f268aa8098ef7ee6748b721f2e1b928868dfe3",
+        "spec": {
+          "branch": "branch_150cdbfcefb4ffb0a0fdd0f2914522a1",
+          "capability": "tl1a-coordinate-quality@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m88cawctzsv49tem"
+          ],
+          "node": "node_c88527fcbc2e7c2c00afa91309bcedb3",
+          "op": "add_node",
+          "parameters": {},
+          "question": "How many coordinates are shared?"
+        }
+      }
+    ],
+    "aliases": {
+      "local:sample": "branch_150cdbfcefb4ffb0a0fdd0f2914522a1",
+      "local:inventory": "node_c88527fcbc2e7c2c00afa91309bcedb3"
+    },
+    "reconsider_when": [
+      {
+        "event": "evidence_added",
+        "subject_ref": "run"
+      }
+    ],
+    "checkpoint_id": "gxc_01m88cawdpgmr6d9y6",
+    "dispatches": [
+      {
+        "run_id": "gxr_01m88cawc86a7x2mck",
+        "node_id": "node_c88527fcbc2e7c2c00afa91309bcedb3",
+        "branch": "branch_150cdbfcefb4ffb0a0fdd0f2914522a1",
+        "operation_key": "v6.node:8cdd0e986ded3bafd5396a819a95135da852f3a9d1d4e03cafe5a4c1e3618a7a",
+        "decision_ref": "gxa_6864748bdf38043294fd66b83a9f25e65b1efb8dfd71a7d52396e8fb4523de48",
+        "op_digest": "044e30109cb3bed9b5ea8e4337f268aa8098ef7ee6748b721f2e1b928868dfe3"
+      }
+    ],
+    "submission_id": "gxsb_01m88cawdp34msxa2a",
+    "claim_revisions": [],
+    "consumed_event_cursor": 0,
+    "event_id": 28
+  },
+  "pending_jobs_at_first_shutdown": 0,
+  "settled_job": "gxj_01m88cawftxwhex1xd",
+  "cold_job": "gxj_01m88cawftxwhex1xd",
+  "node_id": "node_c88527fcbc2e7c2c00afa91309bcedb3",
+  "outcome": "SUCCEEDED",
+  "artifact": {
+    "artifact_ref": "gxa_01m88cawtwxpy51t78",
+    "run_id": "gxr_01m88cawc86a7x2mck",
+    "path_id": null,
+    "task_id": null,
+    "job_id": "gxj_01m88cawftxwhex1xd",
+    "kind": "coordinate_inventory",
+    "namespace": "gxr_01m88cawc86a7x2mck/jobs/gxj_01m88cawftxwhex1xd",
+    "rel_path": "files/quality.json",
+    "media_type": null,
+    "bytes": 17450,
+    "sha256": "92a55bf4a268d1810c579245d5c950022999e26149b7b357597f84974e5e59c5",
+    "origin": "JOB_OUTPUT",
+    "put_by": "backend",
+    "created_at": "2026-11-25T03:35:05.308Z"
+  },
+  "account": {
+    "budget_ref": "gxb_01m88cawcfpcxzrdf3",
+    "parent_ref": "gxb_01m88cawcckk3nwtzh",
+    "limits": {
+      "api_calls": 64,
+      "cpu_seconds": 7200,
+      "gpu_jobs": 1,
+      "gpu_minutes": 20,
+      "job_submissions": 100,
+      "tokens": 500000,
+      "wall_hours": 12,
+      "worker_tasks": 60
+    },
+    "spent": {
+      "cpu_seconds": 1,
+      "job_submissions": 1
+    },
+    "reserved": {
+      "cpu_seconds": 0,
+      "job_submissions": 0
+    }
+  },
+  "model_calls": 0
+}

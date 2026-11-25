@@ -77,7 +77,7 @@ from ..errors import (
 )
 from ..persistence import store
 from ..teams import recovery
-from . import branches, seams
+from . import branches, run_mode, seams
 
 RUN = "run"
 
@@ -1108,30 +1108,10 @@ class Engine:
         The idle check and the taking of the advance lease are one transaction, so two
         callers that both found the run idle cannot both drive it.
         """
-        from ..p0 import v6_goal
         run = self._run_row(run_id)
-        if v6_goal.is_goal(run):
-            from ..errors import VersionImmutable
-            from ..p0 import v6_decisions, v6_jobs
-            config.check_holds(self.hold_scope)
-            result = {}
-            if run["status"] in {"ACTIVE", *machines.waiting_states(RUN)}:
-                self.conn.execute("SAVEPOINT v6_execution_head")
-                try:
-                    checkpoint = self.checkpointer.latest(self.conn, run_id)
-                    bound = checkpoint.state.get("head") if checkpoint else None
-                    if bound != v6_decisions.head(self.conn, run_id):
-                        raise VersionImmutable("The current checkpoint and adopted graph head differ")
-                    if checkpoint:
-                        v6_goal.instance(self.conn, run_id, checkpoint)
-                finally:
-                    self.conn.execute("RELEASE v6_execution_head")
-                if checkpoint:
-                    result = v6_jobs.advance(self.conn, run_id)
-                task = v6_goal.ensure_task(self.conn, run_id)
-                if task:
-                    result["decision_task_id"] = task
-            return {**self.state(run_id), "work":result, "warnings":[]}
+        return run_mode.for_run(run).advance(self, run, actor, retry_failed)
+
+    def _advance_workflow(self, run_id, actor, retry_failed):
         with store.transaction(
             self.conn, transaction_owner="Engine", operation="begin_advance", run_id=run_id,
         ) as conn:
@@ -1185,22 +1165,7 @@ class Engine:
         if checkpoint is not None and checkpoint.state.get("pending_interrupt"):
             pending = dict(checkpoint.state["pending_interrupt"])
         waits = branches.waits(checkpoint)
-        positions = {}
-        from ..p0 import v6_goal
-        if checkpoint and v6_goal.is_goal(row):
-            graph = v6_goal.instance(self.conn, run_id, checkpoint)
-            states = {r[0]:r[1] for r in self.conn.execute(
-                "SELECT node_id,status FROM v6_nodes WHERE run_id=?", (run_id,))}
-            positions = {n: states[n] for n in graph["nodes"]}
-        elif checkpoint and self.registry.has(checkpoint.workflow_id, checkpoint.workflow_version):
-            workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
-            positions = branches.node_states(workflow, {**checkpoint.state, "node_waits": waits})
-            if row["status"] == "ACTIVE" and _advance_live(checkpoint.state):
-                ready = [n for n, status in positions.items() if status == "READY"]
-                selected = next((n for n in ready if n in checkpoint.state.get("resumptions", {})),
-                                next(iter(ready), None))
-                if selected:
-                    positions[selected] = "RUNNING"
+        positions = run_mode.for_run(row).node_states(self, row, checkpoint, waits) if checkpoint else {}
         return {
             "run_id": run_id,
             "status": row["status"],
@@ -1216,6 +1181,19 @@ class Engine:
             "failed_nodes": dict(checkpoint.state.get("failed_nodes", {})) if checkpoint else {},
             "completed_nodes": list(checkpoint.state.get("completed", [])) if checkpoint else [],
         }
+
+    def _workflow_node_states(self, row, checkpoint, waits):
+        positions = {}
+        if self.registry.has(checkpoint.workflow_id, checkpoint.workflow_version):
+            workflow = self.registry.get(checkpoint.workflow_id, checkpoint.workflow_version)
+            positions = branches.node_states(workflow, {**checkpoint.state, "node_waits": waits})
+            if row["status"] == "ACTIVE" and _advance_live(checkpoint.state):
+                ready = [n for n, status in positions.items() if status == "READY"]
+                selected = next((n for n in ready if n in checkpoint.state.get("resumptions", {})),
+                                next(iter(ready), None))
+                if selected:
+                    positions[selected] = "RUNNING"
+        return positions
 
     # ------------------------------------------------------------------- internals
     @staticmethod

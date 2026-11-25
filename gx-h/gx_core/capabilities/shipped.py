@@ -173,19 +173,52 @@ def attach(ctx: Ctx, reference: str, *, package=None) -> dict:
 
 def participates(conn, run_id, capability):
     """A package-owned method is available to Runs holding its exact workspace receipt."""
-    if capability in MANIFESTS:
+    row = conn.execute(
+        "SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)
+    ).fetchone()
+    if not row:
+        return False
+    from ..plugins.runtime import recorded
+    binding = recorded(row)
+    data = json.loads(row["inputs_json"] or "{}")
+    inputs = data.get("inputs", {})
+    recorded_goal = binding is not None and binding.get("kind") == "goal"
+    catalog = inputs.get("capability_catalog") if recorded_goal else None
+    if binding is None and inputs.get("p0") is True and "capability_catalog" in inputs:
+        if conn.execute("SELECT 1 FROM v6_goals WHERE run_id=?", (run_id,)).fetchone():
+            catalog = inputs["capability_catalog"]
+    # Goal grants include the exact workspace manifest and artifact. Historical
+    # Goals saved this catalog before compositions became a first-class receipt.
+    grant = None
+    if catalog is not None:
+        grant = next((entry for entry in catalog if entry["capability_version"] == capability), None)
+        if grant is None:
+            return False
+    if capability in MANIFESTS and grant is None:
         return True
     name, version = manifest.parse_capability_version(capability)
-    method = conn.execute(
-        "SELECT a.content_sha256,a.content_artifact_ref,"
-        " json_extract(a.source_json,'$.installed_package.portable_sha256') AS portable,"
-        " (SELECT inputs_json FROM runs WHERE run_id=?) AS inputs_json FROM assets a"
-        " WHERE a.asset_id=? AND a.version=? AND a.kind='TOOL_ADAPTER'"
-        " AND json_type(a.source_json,'$.installed_package')='object'", (run_id, name, version)).fetchone()
-    if method is None:
-        return True  # Built-in and independently governed workspace capabilities keep their existing admission.
-    from ..plugins.runtime import recorded
-    binding = recorded(method)
-    receipt = {"capability_version": capability, "portable_sha256": method["portable"],
-               "manifest_sha256": method["content_sha256"], "content_artifact_ref": method["content_artifact_ref"]}
+    asset = conn.execute(
+        "SELECT content_sha256,content_artifact_ref,source_json FROM assets"
+        " WHERE asset_id=? AND version=? AND kind='TOOL_ADAPTER'", (name, version)).fetchone()
+    if not asset:
+        return False
+    pkg = json.loads(asset["source_json"] or "{}").get("installed_package")
+    if grant is not None:
+        if (grant.get("content_artifact_ref") != asset["content_artifact_ref"] or
+                grant.get("manifest_sha256") != asset["content_sha256"]):
+            return False
+        if recorded_goal:
+            fields = ("capability_version", "portable_sha256", "manifest_sha256", "content_artifact_ref")
+            receipt = {field: grant.get(field) for field in fields}
+            if receipt not in binding["capabilities"] or (grant.get("plugin") and grant["plugin"] not in binding["packages"]):
+                return False
+        if pkg:
+            owner = {key: pkg.get(key) for key in ("id", "version", "sha256")}
+            if grant.get("plugin") != owner or pkg.get("portable_sha256") != grant.get("portable_sha256"):
+                return False
+        return True
+    if not pkg:
+        return True
+    receipt = {"capability_version": capability, "portable_sha256": pkg["portable_sha256"],
+               "manifest_sha256": asset["content_sha256"], "content_artifact_ref": asset["content_artifact_ref"]}
     return binding is not None and receipt in binding["capabilities"]

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import json
 import sys
 import threading
 from dataclasses import dataclass
@@ -56,12 +57,28 @@ _lock = threading.RLock()
 def _check_contributions(package: Package, contributions: Contributions) -> None:
     declared = {extension.contract for extension in package.manifest.extensions}
     actual = {kind for kind, entries in (("workflow", contributions.workflows), ("tool", contributions.tools),
-                                         ("capability", contributions.capabilities)) if entries}
+                                         ("capability", contributions.capabilities), ("goal_method", contributions.goal_methods),
+                                         ("goal_tool", contributions.goal_tools)) if entries}
     if declared != actual:
         raise ValueError(f"declared extensions {sorted(declared)} differ from registered contracts {sorted(actual)}")
     for ref in contributions.capabilities:
         if ("@" not in ref or "/" in ref) and ref not in package.files:
             raise ValueError(f"capability bundle {ref!r} is absent from the verified package")
+
+
+def capability_references(package, contributions):
+    """Resolve a portable capability ID without admitting its bundle into any workspace."""
+    refs = {}
+    for ref in contributions.capabilities:
+        if "@" in ref and "/" not in ref:
+            name = ref
+        else:
+            method = json.loads(package.files[ref] if isinstance(package, Package) else package.read_file(ref))["manifest"]
+            name = method["capability_id"] + "@" + method["version"]
+        if name in refs:
+            raise ValueError(f"duplicate capability {name} in one plugin")
+        refs[name] = ref
+    return refs
 
 
 def _register(package: Package, sources: dict[str, Source]) -> LoadedPlugin:
@@ -80,7 +97,7 @@ def _register(package: Package, sources: dict[str, Source]) -> LoadedPlugin:
             module, name = package.manifest.entrypoint.split(":")
             entry = importlib.import_module(f"{namespace}.{module}")
             register = getattr(entry, name)
-            ctx = RegistrationContext()
+            ctx = RegistrationContext(package.files)
             result = register(ctx)
             if result is not None:
                 if inspect.iscoroutine(result):
@@ -88,6 +105,10 @@ def _register(package: Package, sources: dict[str, Source]) -> LoadedPlugin:
                 raise ValueError("register(ctx) must complete synchronously and return None")
             contributions = ctx.freeze()
             _check_contributions(package, contributions)
+            methods = capability_references(package, contributions)
+            hooks = set(contributions.goal_methods) | {tool.capability for tool in contributions.goal_tools.values()}
+            if hooks - methods.keys():
+                raise ValueError(f"Goal extensions require a declared capability: {sorted(hooks - methods.keys())}")
             loaded = LoadedPlugin(pin, package.manifest, namespace, contributions, package.files)
             _registered[pin] = loaded
             return loaded

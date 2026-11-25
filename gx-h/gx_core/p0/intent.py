@@ -404,8 +404,9 @@ def _impact(conn, run_id, change_id, diffs, *, commit, cancel_jobs):
     report = []
     for target, edits in intent_targets(conn, run_id, diffs):
         effects = apply_impact(conn, target, change_id, edits, commit=commit)
-        from . import v6_goal
-        effects.extend(v6_goal.impact(conn, target, edits, commit=commit))
+        from ..orchestration import run_mode
+        run = conn.execute("SELECT * FROM runs WHERE run_id=?", (target,)).fetchone()
+        effects.extend(run_mode.for_run(run).intent_impact(conn, target, edits, commit=commit))
         if target != run_id:
             for effect in effects:
                 effect["run_id"] = target

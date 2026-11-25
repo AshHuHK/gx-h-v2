@@ -56,8 +56,8 @@ def run_interpreter(args):
 
 def configure(args):
     default_cache = ROOT if (ROOT / "vendor/codex-runtime").is_dir() else ROOT.parent / "gx-h-v-3"
-    for name in V6_EXPORT_INPUTS:
-        value = getattr(args, name)
+    for name in (*V6_EXPORT_INPUTS, "upgrade_baseline"):
+        value = getattr(args, name, None)
         if value is not None:
             setattr(args, name, value.resolve())
     args.cache = (args.cache or default_cache).resolve()
@@ -94,7 +94,8 @@ def environment(args):
         "platform": platform.platform(), "machine": platform.machine(),
         "launcher": {"executable": sys.executable, "python": platform.python_version(), "sqlite": sqlite3.sqlite_version},
         "paths": {key: str(getattr(args, key)) if getattr(args, key) else None for key in
-                  ("cache", "python", "node", "binary", "clash", "source_db", "historical_briefs", "catalog", *V6_EXPORT_INPUTS)},
+                  ("cache", "python", "node", "binary", "clash", "source_db", "historical_briefs", "catalog",
+                   "upgrade_baseline", *V6_EXPORT_INPUTS)},
         "original_failures": str(args.original_failures) if args.original_failures else None,
         "invocation": sys.argv, "invocation_cwd": os.getcwd(),
         "classes": ["SCRIPTED", "OFFICIAL_HOST_LOOPBACK", "LIVE_MODEL", "REAL_COMPUTE", "INDEPENDENT_REVIEW"],
@@ -412,6 +413,7 @@ def main(argv=None):
     for name in V6_EXPORT_INPUTS:
         execute.add_argument("--" + name.replace("_", "-"), type=Path,
                              help="V6 export directory or independently held reviewer anchor")
+    execute.add_argument("--upgrade-baseline", type=Path, help="Frozen V6 checkout for same-path upgrade and rollback")
     report = subs.add_parser("report", help="read the verified result of a run")
     report.add_argument("run_id")
     report.add_argument("--json", action="store_true")

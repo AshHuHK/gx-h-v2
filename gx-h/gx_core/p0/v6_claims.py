@@ -92,13 +92,17 @@ def _ground(conn, run, ref, observations, context):
                 raise SchemaInvalid('result provenance does not match its native execution manifest')
             fact.update(source_class='computed_result', admission_sha256=record['admission_hash'],
                         completion_sha256=record['manifest_hash'], inputs=record['admission']['inputs'])
-    elif row['kind'] == 'geometry_reevaluation' and row['origin'] == 'BACKEND':
-        value = ArtifactService(conn).read_json(row['artifact_ref'])
-        if value.get('schema') != 'gx.v6.geometry_reevaluation/1':
-            raise SchemaInvalid('unexpected retrospective evaluation schema')
-        fact.update(source_class='retrospective_evaluation', criteria_ref=value['criteria_ref'],
-                    criteria_sha256=value['criteria_sha256'], evaluator_sha256=value['evaluator_sha256'],
-                    measurements=value['measurements'])
+    elif (evaluation := conn.execute(
+            "SELECT payload_json FROM events WHERE run_id=? AND kind IN "
+            "('v6.evaluation.recorded','v6.geometry.reevaluated') "
+            "AND json_extract(payload_json,'$.evaluation_ref')=? LIMIT 1", (run, artifact_ref)).fetchone()):
+        receipt = store.loads(evaluation, 'payload_json')
+        fact.update(source_class='retrospective_evaluation', source_refs=receipt['source_refs'])
+        value = ArtifactService(conn).read_json(artifact_ref)
+        if isinstance(value, dict):
+            for key in ('criteria_ref', 'criteria_sha256', 'evaluator_sha256', 'measurements'):
+                if key in value:
+                    fact[key] = value[key]
     elif observation:
         body = observation.get('observation')
         if body is None:
@@ -141,7 +145,7 @@ def lookup_replay(conn, key, request):
 
 def evaluation_refs(conn, run, task, lease, thread, turn):
     rows = conn.execute("SELECT json_extract(payload_json,'$.evaluation_ref') FROM events "
-                        "WHERE run_id=? AND kind='v6.geometry.reevaluated' AND subject_id=? "
+                        "WHERE run_id=? AND kind IN ('v6.geometry.reevaluated','v6.evaluation.recorded') AND subject_id=? "
                         "AND json_extract(payload_json,'$.lease_id')=? AND json_extract(payload_json,'$.thread_id')=? "
                         "AND json_extract(payload_json,'$.turn_id')=?", (run, task, lease, thread, turn))
     return {row[0] for row in rows}
@@ -239,7 +243,9 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
             conn.execute('INSERT INTO hypotheses (hypothesis_id,run_id,head_revision,created_by,created_at) '
                          'VALUES(?,?,1,?,?)', (hid, run_id, principal, now))
         revision = (parent or 0) + 1
-        science = {'level': claim['level'], 'chain_pairs': claim.get('chain_pairs', [])}
+        science = {'level': claim['level']}
+        if 'chain_pairs' in claim:  # Preserve the published optional V6 claim dimension.
+            science['chain_pairs'] = claim['chain_pairs']
         receipt = dict(schema=SCHEMA, hypothesis_id=hid, revision=revision, claim_revision_id=f'{hid}@{revision}',
                        claim_ref=ref, decision_id=decision_ref, decision_scope=draft['decision_scope'],
                        context_ref=draft['context_ref'], event_cursor=draft['event_cursor'],

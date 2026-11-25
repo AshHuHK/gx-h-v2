@@ -62,6 +62,13 @@ def db_schema_sql() -> str:
 
 # --------------------------------------------------------------------------- freeze
 
+@functools.lru_cache(maxsize=1)
+def additive_schema_sources():
+    """Release-declared old contract/DDL pairs supported by additive migration."""
+    manifest = json.loads((CONFIG_DIR / "native_contract_migrations.json").read_text())
+    return {r["contract_sha256"]: r["db_schema_sha256"] for r in manifest["additive_schema_sources"]}
+
+
 def contract_digest() -> dict[str, str]:
     """Per-file and combined sha256 over the frozen contract files plus the DDL.
 

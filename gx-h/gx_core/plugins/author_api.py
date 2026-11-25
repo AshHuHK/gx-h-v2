@@ -87,10 +87,26 @@ class ToolContribution:
 
 
 @dataclass(frozen=True, slots=True)
+class GoalMethod:
+    describe: Callable | None = None
+    validate: Callable | None = None
+    bind: Callable | None = None
+    project: Callable | None = None
+    dependencies: Callable | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class GoalToolContribution(ToolContribution):
+    capability: str
+
+
+@dataclass(frozen=True, slots=True)
 class Contributions:
     workflows: Mapping[tuple[str, str], WorkflowContribution]
     tools: Mapping[str, ToolContribution]
     capabilities: tuple[str, ...]
+    goal_methods: Mapping[str, GoalMethod]
+    goal_tools: Mapping[str, GoalToolContribution]
 
 
 _Key = TypeVar("_Key")
@@ -193,16 +209,42 @@ class _CapabilityRegistrar(_Registrar[str, str]):
         self._add(ref, ref)
 
 
+class _GoalMethods(_Registrar[str, GoalMethod]):
+    def register(self, capability, *, describe=None, validate=None, bind=None, project=None, dependencies=None):
+        _parse_capability_version(capability)
+        method = GoalMethod(describe, validate, bind, project, dependencies)
+        if any(hook is not None and not callable(hook) for hook in
+               (describe, validate, bind, project, dependencies)):
+            raise TypeError("Goal method callbacks must be callable")
+        self._add(capability, method)
+
+
+class _GoalTools(_Registrar[str, GoalToolContribution]):
+    def register(self, *, name, capability, schema, handler, description=""):
+        _parse_capability_version(capability)
+        _name(name, "Goal tool name")
+        if not callable(handler) or not isinstance(description, str) or not isinstance(schema, Mapping) or schema.get("type") != "object":
+            raise ValueError("A Goal tool needs a handler, description and object input schema")
+        self._add(name, GoalToolContribution(name, _copy_schema(schema, freeze=True), handler, description, capability))
+
+
 class RegistrationContext:
     """The declarations for one call to a package entrypoint."""
 
-    __slots__ = ("workflows", "tools", "capabilities", "_snapshot")
+    __slots__ = ("workflows", "tools", "capabilities", "goal_methods", "goal_tools", "_snapshot", "_files")
 
-    def __init__(self):
+    def __init__(self, files=None):
+        self._files = files if files is not None else {}
         self.workflows = _WorkflowRegistrar()
         self.tools = _ToolRegistrar()
         self.capabilities = _CapabilityRegistrar()
+        self.goal_methods = _GoalMethods()
+        self.goal_tools = _GoalTools()
         self._snapshot: Contributions | None = None
+
+    def read_file(self, path: str) -> bytes:
+        """Read an immutable member of the package verified for this registration."""
+        return self._files[path]
 
     def freeze(self) -> Contributions:
         if self._snapshot is None:
@@ -210,5 +252,7 @@ class RegistrationContext:
                 workflows=self.workflows._seal(),
                 tools=self.tools._seal(),
                 capabilities=tuple(self.capabilities._seal()),
+                goal_methods=self.goal_methods._seal(),
+                goal_tools=self.goal_tools._seal(),
             )
         return self._snapshot

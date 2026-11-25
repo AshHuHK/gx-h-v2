@@ -133,10 +133,8 @@ def _verify_database(db: Path, expected_sha: str) -> None:
             and meta.get("contract_version") == str(contracts.contract_version())):
         return
     previous_sha = meta.get("contract_sha256", "")
-    migration = json.loads((contracts.CONFIG_DIR / "native_contract_migrations.json").read_text())
-    known_schema = any(route.get("contract_sha256") == previous_sha and
-                       route.get("db_schema_sha256") == meta.get("db_schema_sha256")
-                       for route in migration.get("additive_schema_sources", []))
+    known_schema = (previous_sha in contracts.additive_schema_sources()
+                    and contracts.additive_schema_sources()[previous_sha] == meta.get("db_schema_sha256"))
     if (re.fullmatch(r"[a-f0-9]{64}", previous_sha) is None
             or meta.get("contract_version") != str(contracts.contract_version())
             or (meta.get("db_schema_sha256") != digest["db_schema.sql"] and not known_schema)):

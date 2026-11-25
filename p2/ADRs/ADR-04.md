@@ -6,7 +6,7 @@
 |---|---|
 | existing | 保留 Run 的安装版本与 Plugin 组合回执，复用 Engine、SQLite 写事务、checkpoint、Artifact、Job、Lease、预算和 outbox。[Run pins](../../gx-h/contracts/db_schema.sql#L25) · [组合恢复](../../gx-h/gx_core/plugins/runtime.py#L101) · [checkpoint](../../gx-h/gx_core/persistence/store.py#L1445) |
 | extend | 2A 扫描全部剩余节点，等待仅阻塞该分支及其后继。所有分支均已终止或在等待且没有就绪工作时，Run 才能整体停车。后续由同一 Engine 读取实例图并核验在途结果归属。[2A 源码路径](../../PHASE_2A_SOURCE_MAP.md) |
-| new | 后续动态图与执行身份可用下列两种关系存储。DecisionRecord 沿用 Artifact，采纳与复用关系沿用 checkpoint 和事件。旧科研轮次决策仍按原语义引用。[轮次决策](../../gx-h/gx_core/p0/science_inputs.py#L120) |
+| new | 后续动态图与执行身份可用下列两种关系存储。DecisionRecord 沿用 Artifact，采纳与复用关系沿用 checkpoint 和事件。旧科研轮次决策仍按原语义引用。[轮次决策](https://github.com/AshHuHK/gx-h-v2/blob/47fc728d32bc10ba478df6a063529a8d98f98828/gx-h/gx_core/p0/science_inputs.py#L120) |
 | deferred | 跨 Run 结果缓存、生产 Slurm 调度与 checkpoint 互操作留待后续验证。P2 在同一 Run 内验证复用和有故障注入的本地调度对账。 |
 
 ## 后续图版本与执行身份

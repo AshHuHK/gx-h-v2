@@ -234,8 +234,37 @@ def _resync_same_major(conn: sqlite3.Connection, meta: dict[str, str]) -> None:
             evidence_level="EXECUTION_OBSERVED",
             payload={"from_sha256": previous,
                      "to_sha256": contracts.contract_digest()["__combined__"],
+                     "from_db_schema_sha256": meta.get(SCHEMA_META_KEY),
+                     "to_db_schema_sha256": contracts.contract_digest()["db_schema.sql"],
                      "added_columns": [f"{table}: {clause}" for table, clause in additions]},
         )
+
+
+def contract_pin_matches(conn, pinned, installed):
+    """A historical Run keeps its pin after a declared additive migration of this store."""
+    if pinned == installed:
+        return True
+    if conn is None or not pinned:
+        return False
+    digest = contracts.contract_digest()
+    if installed != digest["__combined__"]:
+        return False
+    # Current stamps alone cannot authorize a historical Run. Use the receipt
+    # from the same transaction that verified/promoted the objects and stamped it.
+    old_ddl = contracts.additive_schema_sources().get(pinned)
+    if not old_ddl:
+        return False
+    stamp = read_meta(conn)
+    if (stamp.get(META_CONTRACT_SHA256), stamp.get(SCHEMA_META_KEY)) != (installed, digest["db_schema.sql"]):
+        return False
+    return conn.execute(
+        "SELECT 1 FROM events WHERE kind='store.contract_resynced' AND actor='backend' "
+        "AND subject_kind='store' AND json_extract(payload_json,'$.from_sha256')=? "
+        "AND json_extract(payload_json,'$.from_db_schema_sha256')=? "
+        "AND json_extract(payload_json,'$.to_sha256')=? "
+        "AND json_extract(payload_json,'$.to_db_schema_sha256')=? LIMIT 1",
+        (pinned, old_ddl, installed, digest["db_schema.sql"]),
+    ).fetchone() is not None
 
 
 def ensure_schema(conn: sqlite3.Connection) -> str:

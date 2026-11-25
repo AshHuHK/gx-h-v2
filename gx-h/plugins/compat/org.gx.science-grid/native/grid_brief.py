@@ -18,8 +18,7 @@ GUIDANCE = (
 
 
 def applies(run, task_input):
-    return (run["workflow_id"] == "science_grid" and run["workflow_version"] == "3"
-            and task_input.get("output_kind") in ("science_assessment", "science_decision"))
+    return task_input.get("output_kind") in ("science_assessment", "science_decision")
 
 
 def includes_artifacts(brief):

@@ -123,7 +123,7 @@ def ensure(ctx: Ctx, run: Any, workflow: Any, *, reason: str | None = None) -> A
 
     old, new = service.run_pins(run), service.installed_pins(workflow, run=run)
     if old == new:
-        service.require_pins(run, workflow)
+        service.require_pins(run, workflow, conn=ctx.conn)
         return run
     require_quiescent(ctx.conn, run)
     generation = _generation(ctx.conn, run["run_id"])

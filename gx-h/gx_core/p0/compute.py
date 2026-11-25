@@ -77,7 +77,7 @@ def _registered(conn, run_id, cap):
     if not shipped.participates(conn, run_id, cap):
         raise ScopeDenied(f"{cap} is outside the Run composition")
     try:
-        registry.resolve(conn, cap)
+        registry.resolve(conn, cap, run_id=run_id)
     except CapabilityNotApproved as exc:
         raise ScopeDenied("this capability version is outside the registered catalog") from exc
 

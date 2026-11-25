@@ -47,7 +47,7 @@ def _contract(conn: sqlite3.Connection, run_id: str, task_id: str, subject: str)
                        " ON r.run_id=t.run_id WHERE t.task_id=?", (task_id,)).fetchone()
     if row is None or row["run_id"] != run_id or not isinstance(subject, str) or not subject.strip():
         return None
-    if row["contract_sha256"] != contracts.contract_digest()["__combined__"]:
+    if not store.contract_pin_matches(conn, row["contract_sha256"], contracts.contract_digest()["__combined__"]):
         return None
     assignment = conn.execute("SELECT subject,assignment_generation FROM task_assignments WHERE task_id=?",
                               (task_id,)).fetchone()

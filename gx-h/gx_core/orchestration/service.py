@@ -33,6 +33,8 @@ import secrets
 import sqlite3
 import string
 import time
+from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -334,7 +336,25 @@ def pins_view(run: sqlite3.Row) -> dict[str, Any]:
                      "understated": bool(host.get("understated"))}}
 
 
-def require_pins(run: sqlite3.Row, workflow: Workflow | None, *, conn=None) -> dict[str, Any]:
+_pin_store = ContextVar("gx_pin_store", default=None)
+
+
+@contextmanager
+def pin_store(conn):
+    """Supply this call's migration receipts to released two-argument pin callbacks."""
+    token = _pin_store.set(conn)
+    try:
+        yield
+    finally:
+        _pin_store.reset(token)
+
+
+def require_store_pins(conn, run, workflow):
+    with pin_store(conn):
+        return require_pins(run, workflow)
+
+
+def require_pins(run: sqlite3.Row, workflow: Workflow | None) -> dict[str, Any]:
     """Refuse unless what is installed now is what the run started under.
 
     A workflow definition that changed under an unchanged version is
@@ -343,7 +363,7 @@ def require_pins(run: sqlite3.Row, workflow: Workflow | None, *, conn=None) -> d
     (a run created below the tool surface) is not compared.
     """
     now = installed_pins(workflow, run=run)
-    _check_pins(run, now, conn=conn)
+    _check_pins(run, now, conn=_pin_store.get())
     return now
 
 
@@ -1461,7 +1481,7 @@ def run_resume(ctx: Ctx, args: Mapping[str, Any]) -> dict[str, Any]:
     if workflow is None:
         raise SchemaInvalid(f"run {run_id} was never started on a workflow", details={"run_id": run_id})
     require_coordinator(ctx,conn,run_id,args.get("coordinator_lease_ref"),renew=False)
-    verified_pins = require_pins(run, workflow, conn=conn)
+    verified_pins = require_store_pins(conn, run, workflow)
     # The caller's view is checked against the run as it was asked about; what time and
     # decisions have settled is then settled, and stands on its own.
     store.check_revision(conn, run_id, args.get("expected_revision"))
@@ -1755,7 +1775,7 @@ def _no_hold(conn: sqlite3.Connection, run: sqlite3.Row, need: Mapping[str, Any]
 
 def _pins_hold(conn: sqlite3.Connection, run: sqlite3.Row, need: Mapping[str, Any]) -> bool:
     try:
-        require_pins(run, _pinned_workflow(conn, run), conn=conn)
+        require_store_pins(conn, run, _pinned_workflow(conn, run))
     except GxError:
         return False
     return True
@@ -2013,7 +2033,7 @@ def run_control(ctx: Ctx, args: Mapping[str, Any], *, defer_advance: bool = Fals
             except VersionImmutable as exc:
                 raise DependencyUnmet("the run's exact approved workflow binding must be restored before continue",
                                       details=exc.details) from exc
-            require_pins(run, workflow, conn=conn)
+            require_store_pins(conn, run, workflow)
     # Predicates that read the device or the filesystem are asked here, before the write lock.
     asked_outside = _needs_asked_outside(conn, _run(conn, run_id)) if action == "continue" else {}
 

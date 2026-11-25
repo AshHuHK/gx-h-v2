@@ -97,7 +97,7 @@ def _require_pins(ctx: Ctx, run: sqlite3.Row) -> None:
     if run["status"] in machines.terminal_states("run") or run["status"] == "PAUSED":
         raise PhaseDenied("a stopped or paused run cannot change its team")
     workflow = service._pinned_workflow(ctx.conn, run) if run["workflow_id"] else None
-    service.require_pins(run, workflow, conn=ctx.conn)
+    service.require_store_pins(ctx.conn, run, workflow)
 
 
 def _team(conn: sqlite3.Connection, run_id: str, team_id: str) -> sqlite3.Row:

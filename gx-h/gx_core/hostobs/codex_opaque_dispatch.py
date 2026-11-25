@@ -245,7 +245,7 @@ def _state(conn: sqlite3.Connection, *, run_id: str, task_id: str, subject: str,
         workflow = orchestration._pinned_workflow(conn, run)
         if workflow is None:
             _deny("the exact authorized workflow is not installed")
-        orchestration.require_pins(run, workflow, conn=conn)
+        orchestration.require_store_pins(conn, run, workflow)
     contract = legacy._contract(conn, run_id, task_id, subject)
     if contract is None or (not issued and (run["status"] == "PAUSED" or machines.is_terminal("run", run["status"]))):
         _deny("the target run is not currently pinned and admitting work")

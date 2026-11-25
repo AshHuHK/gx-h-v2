@@ -122,8 +122,9 @@ def ensure(ctx: Ctx, run: Any, workflow: Any, *, reason: str | None = None) -> A
     from . import service, seams
 
     old, new = service.run_pins(run), service.installed_pins(workflow, run=run)
-    if old == new:
-        service.require_pins(run, workflow, conn=ctx.conn)
+    if ({**old, "contract_sha256": new["contract_sha256"]} == new
+            and store.contract_pin_matches(ctx.conn, old["contract_sha256"], new["contract_sha256"])):
+        # A receipted additive store migration leaves the Run's original pins in force.
         return run
     require_quiescent(ctx.conn, run)
     generation = _generation(ctx.conn, run["run_id"])

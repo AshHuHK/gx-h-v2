@@ -685,7 +685,7 @@ class HostPoolService:
         run = self._scope_run(run_id)
         from ..orchestration import service as runs
         flow = runs.default_registry().get(run["workflow_id"], run["workflow_version"]) if run["workflow_id"] else None
-        runs.require_pins(run, flow, conn=self.conn)
+        runs.require_store_pins(self.conn, run, flow)
         return run
 
     def _pool(self, pool_id: str) -> dict[str, Any]:
@@ -1081,7 +1081,7 @@ class HostPoolService:
             # historical contract digest. No stored source field is changed.
             ordinary = {**dict(run), "contract_sha256": destination["contract_sha256"]}
             workflow = runs.default_registry().get(run["workflow_id"], run["workflow_version"])
-            runs.require_pins(ordinary, workflow, conn=self.conn)
+            runs.require_store_pins(self.conn, ordinary, workflow)
             host = store.loads(run, "host_json", {})
             selected = host.get("policy_selection", {})
             if (host.get("kind") != pool["host"] or host.get("session_ref") != pool["session_ref"]

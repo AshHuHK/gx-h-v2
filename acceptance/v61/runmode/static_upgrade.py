@@ -15,7 +15,7 @@ sys.path[:0] = [str(ROOT / 'gx-h'),str(ROOT / 'acceptance/v61')]
 from migration import install, published
 from gx_core import contracts
 from gx_core.errors import ContentHashMismatch, VersionImmutable
-from gx_core.orchestration import service
+from gx_core.orchestration import repin, service
 from gx_core.p0.driver import context
 from gx_core.persistence import store
 from gx_core.teams.manager import TeamManager
@@ -111,11 +111,15 @@ def exercise(work, out, repo=ROOT):
         team = TeamManager(ctx).manage(**args)
         assert TeamManager(ctx).manage(**args)['replayed'] and team['team']['run_id'] == rid
         flow = service._pinned_workflow(conn, run)
+        assert repin.ensure(ctx, run, flow)["contract_sha256"] == before["run"]["contract_sha256"]
+        assert not conn.execute("SELECT 1 FROM approvals WHERE action_kind='run_repin' AND run_id=?", (rid,)).fetchone()
+        with service.pin_store(conn):
+            service.require_pins(run, flow)
         denied = {}
         for field, error in [('contract_sha256',ContentHashMismatch),('workflow_sha256',VersionImmutable),
                              ('agent_policy_sha256',ContentHashMismatch)]:
             try:
-                service.require_pins({**dict(run),field:'f'*64}, flow, conn=conn)
+                service.require_store_pins(conn, {**dict(run),field:'f'*64}, flow)
             except error as exc:
                 denied[field] = exc.code
             else:
@@ -132,7 +136,7 @@ def exercise(work, out, repo=ROOT):
             assert not store.contract_pin_matches(fresh,before['schema'],after['schema'])
     return {'baseline':BASE,'archive_sha256':fixture['sha256'],'before':before,'after':after,'cold_repeat_unchanged':True,
             'resume_status':resumed['status'],'migration_receipts':resync,'team_id':team['team']['team_id'],
-            'team_replay':True,'wrong_pins':denied,'missing_receipt_rejected':True,'wrong_source_ddl_rejected':True}
+            'team_replay':True,'repin_approvals':0,'wrong_pins':denied,'missing_receipt_rejected':True,'wrong_source_ddl_rejected':True}
 
 
 if __name__ == '__main__':

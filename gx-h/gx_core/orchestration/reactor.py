@@ -135,7 +135,7 @@ def _pins_refusal(conn: sqlite3.Connection, run: sqlite3.Row) -> dict[str, Any] 
                 "message": f"workflow {run['workflow_id']}@{run['workflow_version']} is pinned by run "
                            f"{run['run_id']} and is not installed"}
     try:
-        runs.require_pins(run, workflow, conn=conn)
+        runs.require_store_pins(conn, run, workflow)
     except (VersionImmutable, ContentHashMismatch) as exc:
         return {"code": exc.code, "what": exc.details.get("what"), "pinned_sha256": exc.details.get("pinned_sha256"),
                 "installed_sha256": exc.details.get("installed_sha256"), "message": exc.message}
@@ -208,7 +208,8 @@ def _drive_workflow(ctx, run, backend):
     hooks = service.hooks_for_run(conn, run_id)
     if not hooks.auto_advance:
         return None
-    hooks.replan(conn, run_id)
+    with service.pin_store(conn):
+        hooks.replan(conn, run_id)
     engine = service._engine(backend, run_id)
     # An unchanged parked run needs no write transaction. The selected wait
     # and its authority are checked again under the lock that consumes it.
@@ -226,7 +227,7 @@ def _drive_workflow(ctx, run, backend):
     if not ready_refs and not engine.idle(run_id, retry_failed=False):
         return None
     workflow = service._pinned_workflow(conn, run)
-    verified = service.require_pins(run, workflow, conn=conn)
+    verified = service.require_store_pins(conn, run, workflow)
     begun = None
     with store.transaction(conn, transaction_owner="Reactor", operation="drive_science", run_id=run_id) as tx:
         run = _run(tx, run_id)

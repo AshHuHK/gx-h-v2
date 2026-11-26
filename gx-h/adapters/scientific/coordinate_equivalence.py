@@ -96,3 +96,57 @@ def relation(identity, spec, bundle_sha):
         return "unknown"
     effects = proof.get("coverage_masks") or {}
     return effects.get(params["mask"], "unknown")
+
+
+# The released count screen and these readers use the same model, entity, chains
+# and atom selection. The signed eligibility denominator is independent of e, z,
+# k and fitted endpoint. Evaluable intervals and misses require actual fits.
+_INFLUENCE = "0e88a493cfa80d50b6b6fe1a9ceaeb6b8eafc4ba95b7aa2a32d802903bb436d7"
+_SIGNED = "0ad355138c40104db552a5344e80a6ae5cdb5c1b0d1fc412d43d12a4e34341f7"
+_COUNT = "eligible_20_position_blocks_by_count"
+_COVERAGE = "common_fraction_of_observed_union"
+SCREEN_ENDPOINTS = {
+    (GEOMETRY_BUNDLE, "geometry.json", "coverage"): ("gx.deposited_chain_geometry/2", _COVERAGE),
+    (_INFLUENCE, "block-influence.json", "coverage"): ("gx.block-influence/1", _COVERAGE),
+    (_INFLUENCE, "block-influence.json", "eligible_blocks"): ("gx.block-influence/1", _COUNT),
+    (_SIGNED, "signed-summary.json", "blocks_eligible"): ("gx.signed-summary/1", _COUNT),
+}
+
+
+def screen_column(spec, bundle_sha):
+    entry = SCREEN_ENDPOINTS.get((bundle_sha, spec.get("output_name"), spec.get("metric_id")))
+    if (entry and spec.get("measurement_schema") in (None, entry[0])
+            and spec.get("input_role") == "structure" and not spec.get("missing_parameters")
+            and spec.get("parameters", {}).get("mask") in ("common_ca", "common_backbone")):
+        return entry[1]
+    return None
+
+
+def screened_originals(document, mask, column):
+    """Yield coordinate digests with an actual published count or ratio for this selection."""
+    if not isinstance(document, dict) or not isinstance(document.get("materials"), list):
+        return
+    if document.get("kind") == "count-only material screening, known before the study":
+        digest_key, entity_key = "coordinate_sha256", "label_entity"
+    elif document.get("title") == "Human PCNA coordinate material qualification":
+        digest_key, entity_key = "sha256", "entity"
+    else:
+        return
+    for item in document["materials"]:
+        if not isinstance(item, dict) or item.get("model") != "1" or item.get(entity_key) != "1":
+            continue
+        chains = item.get("observed_positions_per_chain")
+        if not isinstance(chains, dict) or set(chains) != {"A", "B", "C"}:
+            continue
+        masks = item.get("masks")
+        row = masks.get(mask) if isinstance(masks, dict) else None
+        if not isinstance(row, dict) or not isinstance(item.get(digest_key), str):
+            continue
+        if column == _COUNT:
+            count = row.get(column)
+            known = type(count) is int and count >= 0
+        else:
+            n, d = row.get("common_positions"), row.get("observed_union_positions")
+            known = type(n) is int and type(d) is int and d > 0 and 0 <= n <= d
+        if known:
+            yield item[digest_key]

@@ -62,13 +62,42 @@ def endpoint_relation(conn, method_pin, source_identity, *, parent_sha256, child
             or identity.get("artifact_sha256") != child_sha256 or not method_pin
             or (identity.get("transformation") or {}).get("result_sha256") != child_sha256):
         return "unknown"
+    return coordinate_equivalence.relation(identity, method_pin.get("measurement_spec") or {}, _portable_method(conn, method_pin))
+
+
+def _portable_method(conn, method_pin):
     spec = method_pin.get("measurement_spec") or {}
     name, _, version = spec.get("capability", "").rpartition("@")
     if (not name or not version or not method_pin.get("manifest_sha256")
             or method_pin.get("capability") != spec["capability"] or method_pin.get("output") != spec.get("output_name")
             or method_pin["manifest_sha256"] != spec.get("manifest_sha256")):
-        return "unknown"
+        return None
     installed = conn.execute("""SELECT json_extract(source_json,'$.installed_package.portable_sha256')
         FROM assets WHERE kind='TOOL_ADAPTER' AND asset_id=? AND version=? AND content_sha256=?""",
                              (name, version, method_pin["manifest_sha256"])).fetchone()
-    return coordinate_equivalence.relation(identity, spec, installed[0]) if installed else "unknown"
+    return installed[0] if installed else None
+
+
+def screening_availability(conn, method_pin, publications, bindings):
+    """Match a supplied qualifier to its own Run's original, using existing material identity bindings."""
+    spec = method_pin.get("measurement_spec") or {}
+    if not spec or not any(pub["source_role"] == "material_metadata" for pub in publications.values()):
+        return
+    column = coordinate_equivalence.screen_column(spec, _portable_method(conn, method_pin))
+    if not column:
+        return
+    originals = {}
+    for ref in bindings:
+        pub = publications[ref]
+        originals.setdefault(pub["run_id"], []).append((ref, pub["sha256"]))
+    for ref, pub in publications.items():
+        if pub["source_role"] != "material_metadata" or pub["run_id"] not in originals:
+            continue
+        try:
+            document = ArtifactService(conn).read_json(ref)
+        except SchemaInvalid:
+            continue
+        known = set(coordinate_equivalence.screened_originals(document, spec["parameters"]["mask"], column))
+        for target, digest in originals[pub["run_id"]]:
+            if digest in known:
+                yield target, pub["event_id"]

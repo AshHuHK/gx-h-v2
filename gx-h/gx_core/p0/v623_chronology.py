@@ -254,10 +254,14 @@ def material_keys(bindings, fact, observation, reading):
 
 def _original_publications(conn, through):
     return {r["subject_id"]: dict(r) for r in conn.execute("""
-        SELECT e.event_id,e.subject_id,a.sha256,a.media_type,a.rel_path,a.kind,
+        SELECT e.event_id,e.subject_id,e.run_id,a.sha256,a.media_type,a.rel_path,a.kind,
                json_extract(e.payload_json,'$.source_role') source_role FROM events e
         JOIN artifacts a ON a.artifact_ref=e.subject_id WHERE e.kind='artifact.published'
-        AND e.event_id<=? AND a.published=1 AND a.origin='INGEST' ORDER BY e.event_id""", (through,))}
+        AND e.event_id<=? AND a.published=1 AND (a.origin='INGEST' OR EXISTS (
+            SELECT 1 FROM events obs WHERE obs.run_id=a.run_id AND obs.kind='v6.observation.added'
+            AND obs.event_id<=? AND json_extract(obs.payload_json,'$.artifact_ref')=a.artifact_ref
+            AND json_extract(obs.payload_json,'$.acquisition.archive_job.job_id')=a.job_id))
+        ORDER BY e.event_id""", (through, through))}
 
 
 def materials_overlap(conn, candidates, originals, method_pin=None):
@@ -309,6 +313,10 @@ def availability(conn, reg, through, *, bindings=None):
                     record["sufficient_job_launch_event_id"] = started
 
     if reg.get("method_pin"):
+        if verified and pred["target"] == "analysis":
+            from . import v622_sources
+            for original, event_id in v622_sources.screening_availability(conn, reg["method_pin"], pubs, bindings):
+                found(original, event_id)
         sql = """SELECT m.job_id,json_extract(m.admission_json,'$.run_id') run_id,
             e.subject_id ref,max(e.event_id,j.event_id) available,json_extract(o.value,'$.source_inputs') source_inputs,
             json_extract(m.admission_json,'$.parameters') parameters

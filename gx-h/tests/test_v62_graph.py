@@ -73,12 +73,17 @@ class ModuleGraph(unittest.TestCase):
         self.assertEqual(delegated["base"], child["result_head"])
         self.assertFalse(plan.brief["nodes"])
         private_node = child["aliases"]["local:measure"]
-        with self.assertRaises(StaleRevision):
+        with self.assertRaises(StaleRevision) as refusal:
             v6_decisions.adopt(self.db, **parent, decision=dict(draft(), reconsider_when=[
                 {"event": "job_settled", "subject_ref": private_node}]))
+        self.assertEqual(refusal.exception.details["reason"], "lead_graph_conflict")
         actor = bind_native_fixture(self.db, self.run, self.directory, task_id=delegated["task_id"])
         self.assertEqual("maintained", v6_decisions.adopt(self.db, **actor, decision=draft())["outcome"])
-        amended = v6_decisions.adopt(self.db, **parent, decision=draft(branch("independent")))
+        fresh_task = v6_goal.ensure_task(self.db, self.run)
+        self.assertIsNotNone(fresh_task)
+        self.assertNotEqual(fresh_task, parent["task_id"])
+        fresh = bind_native_fixture(self.db, self.run, self.directory, task_id=fresh_task)
+        amended = v6_decisions.adopt(self.db, **fresh, decision=draft(branch("independent")))
         self.assertEqual(child["result_head"], amended["base"])
         self.assertEqual(1, self.db.execute("SELECT count(*) FROM v6_nodes WHERE node_id=?",
                                             (private_node,)).fetchone()[0])

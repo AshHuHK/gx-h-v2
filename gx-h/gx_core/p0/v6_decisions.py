@@ -548,7 +548,7 @@ def reconsider_module_conflict(conn, identity, error):
     if reason in ("convergence_context_changed", "close_context_changed", "comparison_context_changed"):
         from . import v62_rounds
         return v62_rounds.refresh(conn, identity, error)
-    if reason not in ("module_graph_conflict", "unseen_module_report"):
+    if reason not in ("module_graph_conflict", "lead_graph_conflict", "unseen_module_report"):
         return
     from . import v6_goal
     from ..errors import GxError
@@ -559,12 +559,16 @@ def reconsider_module_conflict(conn, identity, error):
                 ("run_id", "thread_id", "turn_id", "task_id", "lease_id")})
         except GxError:
             return  # A competing decision, revocation or prior conflict already retired the lease.
-        if reason == "unseen_module_report" and task["scope"] == "run":
+        if reason in ("lead_graph_conflict", "unseen_module_report") and task["scope"] == "run":
             from . import v62_reports
             v6_goal.cancel_decision(conn, run_id, task["task_id"], reason=error.message)
             v62_reports.release_parent_rounds(conn, run_id, task["task_id"])
-            store.append_event(conn, run_id=run_id, kind="v62.module.close_deferred", actor=identity["thread_id"],
-                               subject_kind="task", subject_id=task["task_id"], payload=error.details)
+            if reason == "lead_graph_conflict":
+                kind, payload = "v6.decision.superseded", {"scope": "run"}
+            else:
+                kind, payload = "v62.module.close_deferred", error.details
+            store.append_event(conn, run_id=run_id, kind=kind, actor=identity["thread_id"],
+                               subject_kind="task", subject_id=task["task_id"], payload=payload)
             return
         if reason != "module_graph_conflict" or not task["scope"].startswith("module:"):
             return

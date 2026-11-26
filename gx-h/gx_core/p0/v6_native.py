@@ -311,7 +311,13 @@ def _call(roots, p):
         try:
             prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
         except StaleRevision as exc:
-            v6_decisions.reconsider_module_conflict(roots.conn, identity, exc)
+            if exc.details.get("reason") == "lead_graph_conflict":
+                replay = remember_refusal(roots, p, request_sha, exc, conflicted_lead=identity,
+                                          publish=v621_policy.science_execution(roots.conn, roots.run_id))
+                if replay is not None:
+                    return replay
+            else:
+                v6_decisions.reconsider_module_conflict(roots.conn, identity, exc)
             raise
         except (BudgetExceeded, SchemaInvalid) as exc:
             if not v621_policy.science_execution(roots.conn, roots.run_id):
@@ -420,15 +426,19 @@ def _submission_event(roots, params, *, error=None, accepted=None):
                        subject_kind="decision_submission", subject_id=task_key, payload=common)
 
 
-def remember_refusal(roots, params, request_sha, error, *, publish=False):
+def remember_refusal(roots, params, request_sha, error, *, publish=False, conflicted_lead=None):
     """A refused candidate is auditable. It makes no graph, dispatch or budget change."""
     thread, turn, call_id = (params[k] for k in ("threadId", "turnId", "callId"))
     with store.transaction(roots.conn, transaction_owner="ScientificLead", operation="decision_refusal", run_id=roots.run_id):
         existing = roots.conn.execute("SELECT * FROM p0_root_calls WHERE thread_id=? AND call_id=?", (thread,call_id)).fetchone()
         if existing:
-            return saved_result(existing, turn, request_sha) if publish else None
+            return saved_result(existing, turn, request_sha) if publish or conflicted_lead is not None else None
         record_call(roots.conn, params)
         roots.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                            (thread, call_id, turn, request_sha, ids.canonical_json({"decision_refusal": error.to_payload()})))
         if publish:
             _submission_event(roots, params, error=error)
+        if conflicted_lead is not None:
+            # Keep the original refusal replayable once this brief loses its lease.
+            from . import v6_decisions
+            v6_decisions.reconsider_module_conflict(roots.conn, conflicted_lead, error)

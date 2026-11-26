@@ -366,11 +366,16 @@ class Driver:
         self._end_native_wait(key)
         return result
 
-    def messages(self, *, local_only=False, pending=None):
+    def messages(self, *, local_only=False, pending=None, through_message=None):
         from . import operator
-        rows = pending if pending is not None else self.conn.execute(
-            "SELECT * FROM p0_operator_messages WHERE run_id=? AND result_json IS NULL AND rejected IS NULL "
-            "ORDER BY rowid", (self.rid,)).fetchall()
+        rows = pending
+        if rows is None:
+            query = "SELECT * FROM p0_operator_messages WHERE run_id=? AND result_json IS NULL AND rejected IS NULL "
+            args = [self.rid]
+            if through_message:
+                query += "AND rowid<=(SELECT rowid FROM p0_operator_messages WHERE run_id=? AND message_id=?) "
+                args.extend([self.rid, through_message])
+            rows = self.conn.execute(query + "ORDER BY rowid", args).fetchall()
         native_rows = []
         native_blocked = False
         for row in rows:

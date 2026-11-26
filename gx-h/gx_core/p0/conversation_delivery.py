@@ -67,11 +67,12 @@ def _drain(driver, target):
         if result["status"] not in ("main_received","received"):
             return result
         metering.maintain(db, rid)
-        driver.messages()
+        driver.messages(through_message=target)
         turns = db.execute("SELECT m.message_id,d.thread_id FROM p0_operator_messages m "
             "JOIN p0_root_deliveries d ON d.run_id=m.run_id AND d.event_id='human:'||m.message_id "
             "LEFT JOIN p0_main_replies r USING(message_id) WHERE m.run_id=? AND r.message_id IS NULL "
-            "AND d.turn_id IS NOT NULL AND m.rejected IS NULL ORDER BY m.rowid", (rid,)).fetchall()
+            "AND m.rowid<=(SELECT rowid FROM p0_operator_messages WHERE message_id=?) "
+            "AND d.turn_id IS NOT NULL AND m.rejected IS NULL ORDER BY m.rowid", (rid, target)).fetchall()
         for turn in turns:
             tid = turn["thread_id"]
             if tid not in attached and not driver.offline:
@@ -82,7 +83,9 @@ def _drain(driver, target):
         if result["status"] not in ("main_received","received"):
             return result
         waits = native_waits(db, rid)
-        if driver.offline or driver._exhausted or any(w["owner"] in ("message","reply","connection") for w in waits):
+        if driver._exhausted:
+            return {**result, "wait_reason":"budget", "detail":str(next(iter(driver._exhausted.values())))}
+        if driver.offline or any(w["owner"] in ("message","reply","connection") for w in waits):
             return {**result, "waits":waits}
         # A genuinely busy turn keeps its owning App Server until it drains. An
         # existing cost hold with no native work can be picked up on the next wake.

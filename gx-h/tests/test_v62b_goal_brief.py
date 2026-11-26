@@ -34,6 +34,18 @@ class ResearchBrief(unittest.TestCase):
         self.assertNotIn("prediction", tools["gx_stage_claim"])
         self.assertNotIn("convergence", tools["gx_decide_revision"]["decision"]["properties"])
 
+    def test_recent_scoped_job_failure_survives_a_compact_lead_delivery(self):
+        conn, brief = self.brief("deep")
+        detail = {"kind": "archive_exclusion", "entry_id": "5E0U", "reason_code": "pcna_assembly_mismatch",
+                  "summary": "The three observed PCNA chains do not share a deposited assembly operation."}
+        failed = {"node_id": "node_f", "job_id": "job_f", "branch_id": "lead", "status": "FAILED",
+                  "failure": detail}
+        brief["nodes"] = [{"node_id": "earlier", "commission": {"question": "x" * 10000}}, failed]
+        brief["observations"] = [{"node_id": "node_f", "event": "v6.node.settled", "status": "FAILED"}]
+        _, delivery = v62_lead.deliver(conn, brief, 4096)
+        self.assertIn("full_brief_ref", delivery)
+        self.assertEqual(delivery["nodes"], [failed])
+
     def test_small_deep_brief_delivers_the_actual_decision_options_and_full_original(self):
         conn, brief = self.brief("deep")
         self.assertEqual(brief["research_evidence_version"], "gx.research.v6.2b.1")

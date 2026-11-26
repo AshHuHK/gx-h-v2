@@ -97,6 +97,13 @@ def deliver(conn, brief, limit):
         return False
 
     # Reserve space for adverse results and their durable citations ahead of routine inventory.
+    recent_failures = {item.get("node_id") for item in brief.get("observations", ())
+                       if item.get("event") == "v6.node.settled" and item.get("status") == "FAILED"}
+    shown_failures = set()
+    for node in reversed(brief.get("nodes", ())):
+        if node.get("failure") and node["node_id"] in recent_failures:
+            if append("nodes", {k: node[k] for k in ("node_id", "job_id", "branch_id", "status", "failure")}):
+                shown_failures.add(node["node_id"])
     report_index = brief.get("module_report_index", [])
     previews = {entry["report_ref"]: entry for entry in brief.get("module_reports", [])}
     adverse = [{**previews.get(entry["report_ref"], {}), **entry,
@@ -184,6 +191,8 @@ def deliver(conn, brief, limit):
                     break
     for key in ("module_catalog", "materials", "capabilities", "branches", "nodes", "claims", "observations"):
         for item in brief.get(key, []):
+            if key == "nodes" and item.get("node_id") in shown_failures:
+                continue
             if key == "observations" and item.get("artifact_ref") in placed:
                 continue
             if not append(key, item):

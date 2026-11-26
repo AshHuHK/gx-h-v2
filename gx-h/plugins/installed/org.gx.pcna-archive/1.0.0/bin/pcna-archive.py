@@ -20,7 +20,10 @@ if args.action == "search":
 else:
     sys.path.insert(0, str(args.identity_reader.resolve().parents[2]))
     from adapters.scientific import archive_coordinates
-    original, acquisition, context = method["fetch"](json.loads(raw), args.entry_id, archive_coordinates)
+    try:
+        original, acquisition, context = method["fetch"](json.loads(raw), args.entry_id, archive_coordinates)
+    except method["ChainExclusion"] as exc:
+        parser.exit(1, f"GX_PCNA_EXCLUSION {exc.code}\n")
     (args.out / "structure.cif").write_bytes(original)
     documents = {"acquisition.json": acquisition, "structure-context.json": context}
 for name, document in documents.items():

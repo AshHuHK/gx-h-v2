@@ -14,9 +14,7 @@ def declared(record):
 
 def prepare(conn, node, job_id):
     # Ordinary measurement Jobs do not require a second manifest or any file reads.
-    exists = conn.execute("""SELECT 1 FROM p0_execution_manifests m,json_each(m.admission_json,'$.output_declarations') d
-        WHERE m.job_id=? AND json_type(d.value,'$.acquired_material')='object' LIMIT 1""", (job_id,)).fetchone()
-    if not exists:
+    if not manifest.acquires_material(conn, job_id):
         return None
     record = manifest.read_manifest(conn, job_id)
     decl = declared(record)

@@ -23,6 +23,7 @@ from ..errors import (
     ScopeDenied,
 )
 from ..jobs import cpu_queue
+from ..jobs import diagnostics
 from ..jobs.service import JobService, PURPOSE_WORKFLOW, TERMINAL
 from ..persistence import store
 from . import manifest as execution
@@ -411,6 +412,7 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
                 result = acquisition["artifact_ref"]
         except (ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, ScopeDenied, ValueError, KeyError) as exc:
             status, result, reason = "FAILED", None, f"Archive acquisition could not be verified: {exc}"
+    failure = diagnostics.preserved(conn, node["run_id"], job_id) if job_status == "FAILED" and job_id else None
     with _tx(conn, node["run_id"], "settle_node") as tx:
         current = _node(tx, node["run_id"], node["node_id"])
         if current["status"] in NODE_TERMINAL:
@@ -449,7 +451,7 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
             subject_id=node["node_id"],
             prev_state=current["status"],
             new_state=status,
-            reason=reason,
+            reason=reason or (failure["summary"] if failure and status == "FAILED" else None),
             payload={
                 "node_id": node["node_id"],
                 "branch_id": node["branch_id"],
@@ -461,6 +463,7 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
                 "result_ref": result,
                 "exec_key": current["exec_key"],
                 "reused_from": source,
+                **({"failure": failure} if failure and status == "FAILED" else {}),
                 **({"condition": condition} if condition and status == "BLOCKED" else {}),
                 **({"dependency": dependency} if dependency and status == "BLOCKED" else {}),
             },

@@ -218,7 +218,11 @@ def _task(conn, row):
 
 
 def _brief(conn, row, nodes, proofs):
+    from ..jobs import diagnostics
     from . import v621_assignment
+    nodes = [dict(n) for n in nodes]
+    for node in nodes:
+        diagnostics.attach_to_node(conn, row["run_id"], node)
     grant, snapshot = (json.loads(row[k]) for k in ("grant_json", "snapshot_json"))
     fields = (
         "module_instance_id",

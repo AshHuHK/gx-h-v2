@@ -84,6 +84,7 @@ from ..persistence import store
 from ..p0 import manifest as execution_manifest
 from ..registry import Subject
 from . import adapter as adapter_mod
+from . import diagnostics
 from . import documents, executor, leases, resource_guard, retained
 from . import limits as limits_mod
 from . import runner as runner_mod
@@ -1977,6 +1978,10 @@ class JobService:
                 bind_published(admission, published)
             for name, path in (("stdout", job.stdout), ("stderr", job.stderr)):
                 data = _bounded_log(path)
+                if name == "stderr" and to_state == FAILED and failure:
+                    detail = diagnostics.at_settlement(self.conn, job_id, intent, failure.get("observed"), exit_code, data or b"")
+                    if detail:
+                        failure["decision_detail"] = detail
                 if data is None:
                     continue
                 artifact = self.artifacts.publish_bytes(

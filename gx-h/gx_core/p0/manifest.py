@@ -198,6 +198,11 @@ def require_current(conn, job_id):
         _refuse("current_intent", "current Intent excludes this Job's execution", job_id=job_id)
 
 
+def acquires_material(conn, job_id):
+    return conn.execute("""SELECT 1 FROM p0_execution_manifests m,json_each(m.admission_json,'$.output_declarations') d
+        WHERE m.job_id=? AND json_type(d.value,'$.acquired_material')='object' LIMIT 1""", (job_id,)).fetchone() is not None
+
+
 def check_launch(conn, job_id):
     require_current(conn, job_id)
     saved = conn.execute("SELECT admission_json FROM p0_execution_manifests WHERE job_id=?",

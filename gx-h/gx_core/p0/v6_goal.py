@@ -496,6 +496,7 @@ def _latest(conn, rid):
 
 
 def _brief(conn, run, goal, head, events, cursor, prior):
+    from ..jobs import diagnostics
     from ..plugins import goal as goal_plugins
     from . import v6_claims
 
@@ -529,6 +530,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         }
         if p.get("condition") and row["kind"] == "v6.node.settled":
             facts["condition"] = p["condition"]
+        if p.get("failure") and row["kind"] == "v6.node.settled":
+            facts["failure"] = p["failure"]
         if ref:
             meta = ArtifactService(conn).describe(ref)
             if meta["run_id"] != rid:
@@ -602,6 +605,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             node["commission"] = {
                 k: spec[k] for k in ("capability", "inputs", "depends_on", "parameters", "question") if k in spec
             }
+            diagnostics.attach_to_node(conn, rid, node)
             if node["result_ref"]:
                 refs.append(node["result_ref"])
     branches = [

@@ -13,6 +13,12 @@ UNIPROT = "https://rest.uniprot.org/uniprotkb/P12004.json"
 ENTRY_ID = re.compile(r"(?:[0-9][A-Z0-9]{3}|PDB_[A-Z0-9]{8})", re.I | re.ASCII)
 
 
+class ChainExclusion(ValueError):
+    def __init__(self, message, code):
+        super().__init__(message)
+        self.code = code
+
+
 def accession(value):
     if not isinstance(value, str) or ENTRY_ID.fullmatch(value) is None:
         raise ValueError("Expected a PDB entry_id")
@@ -141,18 +147,22 @@ def pcna_chains(doc):
         raise ValueError("The P12004 entity must be a deposited human L-polypeptide")
     declared = [ch for ch, ent in rows(doc, "_struct_asym.id", "_struct_asym.entity_id") if ent == entity]
     if len(declared) != 3 or len(set(declared)) != 3:
-        raise ValueError("The P12004 entity must have exactly three distinct asymmetric-unit label chains")
+        if len(declared) != len(set(declared)):
+            raise ValueError("The P12004 entity must have exactly three distinct asymmetric-unit label chains")
+        raise ChainExclusion("The P12004 entity must have exactly three distinct asymmetric-unit label chains",
+                             f"declared {len(declared)}")
     observed = {ch for group, model, ch, ent in rows(doc, "_atom_site.group_PDB", "_atom_site.pdbx_PDB_model_num",
                 "_atom_site.label_asym_id", "_atom_site.label_entity_id")
                 if group == "ATOM" and model == "1" and ent == entity and ch in declared}
     if len(observed) != 3:
-        raise ValueError(f"Expected three deposited model-1 human P12004 polypeptide chains, observed {len(observed)}")
+        raise ChainExclusion(f"Expected three deposited model-1 human P12004 polypeptide chains, observed {len(observed)}",
+                             f"observed {len(observed)}")
     assemblies = {}
     for assembly, operation, asym in rows(doc, "_pdbx_struct_assembly_gen.assembly_id",
             "_pdbx_struct_assembly_gen.oper_expression", "_pdbx_struct_assembly_gen.asym_id_list"):
         assemblies.setdefault((assembly, operation), set()).update(ch.strip() for ch in asym.split(","))
     if not any(observed <= together for together in assemblies.values()):
-        raise ValueError("The three observed PCNA chains do not share a deposited assembly operation")
+        raise ChainExclusion("The three observed PCNA chains do not share a deposited assembly operation", "assembly")
     return sorted(observed), [entity]
 
 

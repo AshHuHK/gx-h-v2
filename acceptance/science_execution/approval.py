@@ -31,13 +31,22 @@ TERMS = {"provider":"openai","authentication":"chatgpt","additional_currency_aut
 
 def user_choice(conversation):
     result = None
+    original_requests = set()
     with original._source(conversation).open(encoding="utf-8") as rows:
         for line in rows:
-            if not any(choice in line for choice in CHOICES):
+            if "request_user_input_async" not in line:
                 continue
             event = json.loads(line)
             msg = event.get("payload", {})
-            if event.get("type") != "response_item" or (msg.get("type"),msg.get("role")) != ("message","user"):
+            if event.get("type") != "response_item":
+                continue
+            if msg.get("type") == "function_call" and msg.get("name") == "request_user_input_async":
+                questions = json.loads(msg["arguments"]).get("questions", [])
+                for index, question in enumerate(questions):
+                    if question.get("title") == QUESTION and set(question.get("options", ())) == set(CHOICES):
+                        original_requests.add((msg["call_id"], index))
+                continue
+            if (msg.get("type"),msg.get("role")) != ("message","user"):
                 continue
             for item in msg.get("content", []):
                 body = item.get("text", "")
@@ -46,10 +55,21 @@ def user_choice(conversation):
                     continue
                 for answer in json.loads(matched[1]):
                     ident = json.loads(answer["questionItemId"])
-                    if (ident[:1] == ["request_user_input_async"] and answer.get("question") == QUESTION
-                            and answer.get("answer") in CHOICES):
-                        result = {"choice":answer["answer"],"utc":event["timestamp"],
+                    if len(ident) != 3 or ident[0] != "request_user_input_async":
+                        continue
+                    shown, choice = answer.get("question", ""), answer.get("answer", "")
+                    # The client echoes up to 512 UTF-8 bytes. Recover the full terms
+                    # only from the original request bound to this user's reply.
+                    matched_call = (ident[1], ident[2]) in original_requests
+                    client_echo = QUESTION.encode("utf-8")[:512].decode("utf-8", errors="ignore")
+                    paired = matched_call and shown in (QUESTION, client_echo)
+                    if paired and re.fullmatch(r"(?:授权所有|授權所有)[，,]\s*不[设設]\s*token\s*(?:上限|上线|上線)", choice, re.I):
+                        choice = CHOICES[0]
+                    if (shown == QUESTION or paired) and choice in CHOICES:
+                        result = {"choice":choice,"utc":event["timestamp"],
                                   "message_sha256":sha256(body.encode()).hexdigest()}
+                    elif paired:
+                        result = None
     if result is None or result["choice"] == CHOICES[2]:
         raise ValueError("No affirmative PI approval covering the new diagnostic and original exposure")
     return result

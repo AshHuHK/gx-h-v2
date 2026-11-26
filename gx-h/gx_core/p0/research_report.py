@@ -1,4 +1,5 @@
 """Export the current Goal conclusion and the evidence the deciding Lead actually received."""
+from functools import partial
 import json
 
 def completed_close(db, rid):
@@ -39,12 +40,8 @@ def completed_close(db, rid):
     return closure
 
 
-def closing_decision(conn, rid, close):
+def decision_readings(conn, rid, d, adopted):
     from . import v623_endpoints
-    d = conn.execute("SELECT * FROM v6_decisions WHERE run_id=? AND decision_ref=?",
-                     (rid, close["decision_ref"])).fetchone()
-    adopted = json.loads(d["receipt_json"])
-    proposal = json.loads(d["request_json"])["decision"]
     used = adopted.get("endpoint_use", {})
     readings = []
     registered = {}
@@ -53,11 +50,11 @@ def closing_decision(conn, rid, close):
         source = proof.get("source_ref")
         row = conn.execute("""SELECT payload_json FROM events WHERE run_id=? AND event_id=?
               AND kind='v623.endpoints.received' AND actor=? AND event_id<?""",
-              (rid, proof.get("event_id"), d["thread_id"], close["committed_event"])).fetchone()
+              (rid, proof.get("event_id"), d["thread_id"], adopted["event_id"])).fetchone()
         delivery = json.loads(row[0]) if row else {}
         if (delivery.get("task_id") != d["task_id"] or delivery.get("lease_id") != d["lease_id"]
                 or delivery.get("turn_id") != proof.get("turn_id") or delivery.get("receipt") != proof.get("receipt")):
-            raise ValueError("Closing decision is missing the Lead delivery for "+metric_ref)
+            raise ValueError("Decision is missing its recorded endpoint delivery for "+metric_ref)
         if source not in registered:
             metrics = v623_endpoints.registered(conn, rid, source)
             registered[source] = {m["metric_ref"]: (m, r) for m,r in zip(metrics,v623_endpoints.compact_rows(metrics))}
@@ -73,13 +70,36 @@ def closing_decision(conn, rid, close):
                 found = metric
                 break
         if found is None:
-            raise ValueError("Closing decision lacks its cited delivered endpoint "+metric_ref)
+            raise ValueError("Decision lacks its cited delivered endpoint "+metric_ref)
         readings.append({"metric_ref":metric_ref, "source_ref":source, "event_id":proof["event_id"], "reading":found})
+    return readings
+
+
+def closing_decision(conn, rid, close):
+    d = conn.execute("SELECT * FROM v6_decisions WHERE run_id=? AND decision_ref=?",
+                     (rid, close["decision_ref"])).fetchone()
+    adopted = json.loads(d["receipt_json"])
+    proposal = json.loads(d["request_json"])["decision"]
+    readings = decision_readings(conn, rid, d, adopted)
     return {"decision_ref":d["decision_ref"], "task_id":d["task_id"], "thread_id":d["thread_id"],
             "turn_id":d["turn_id"], "rationale":proposal["rationale"], "reason":close["operation"]["reason"],
             "unresolved":close["operation"].get("unresolved", []), "claim_refs":close["operation"].get("claim_refs", []),
             "evidence_refs":adopted.get("evidence_refs", proposal.get("evidence_refs", [])),
             "stop_reason":adopted.get("stop_reason"), "used_endpoints":readings}
+
+
+def render_decision(conn, rid, cache, ref, text):
+    """Use only immutable measurement rows acknowledged and selected by this decision."""
+    from . import v621_metrics
+    if "{{metric:" not in text:
+        return text
+    if ref not in cache:
+        row = conn.execute("SELECT * FROM v6_decisions WHERE run_id=? AND decision_ref=?", (rid, ref)).fetchone()
+        if row is None:
+            raise ValueError("Missing adopted decision for the report: "+ref)
+        cache[ref] = decision_readings(conn, rid, row, json.loads(row["receipt_json"]))
+    measured = [entry["reading"] for entry in cache[ref] if entry["reading"].get("schema") == v621_metrics.SCHEMA]
+    return v621_metrics.render_accepted_text(text, measured)
 
 
 def export(conn, rid, directory, invocation):
@@ -93,16 +113,21 @@ def export(conn, rid, directory, invocation):
         goal = conn.execute("SELECT goal FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]
         science = evidence(conn, rid)
         work = routes(conn, rid, directory)
+        display = partial(render_decision, conn, rid, {final["decision_ref"]: final["used_endpoints"]})
+        final_text = {key:display(final["decision_ref"], final[key]) for key in ("rationale","reason")}
+        final_text["unresolved"] = [display(final["decision_ref"], item) for item in final["unresolved"]]
+        final["rendered"] = final_text
+        route_text = route_lines(work, display)
     finally:
         conn.execute("RELEASE research_report")
     result = {"schema":"gx.research-result/1", "run_id":rid, "goal":goal, "goal_status":"CLOSED",
               "goal_version":close["goal_version"], "closure":close, "final_decision":final,
               **science, "routes":work, "invocation":invocation}
-    lines = ["# Research report", "", final["rationale"], ""]
-    if final["reason"] != final["rationale"]:
-        lines.extend([final["reason"], ""])
-    if final["unresolved"]:
-        lines.extend(["## Scope and limitations", "", *("- "+item for item in final["unresolved"]), ""])
+    lines = ["# Research report", "", final_text["rationale"], ""]
+    if final_text["reason"] != final_text["rationale"]:
+        lines.extend([final_text["reason"], ""])
+    if final_text["unresolved"]:
+        lines.extend(["## Scope and limitations", "", *("- "+item for item in final_text["unresolved"]), ""])
     lines.extend(["## Evidence used at closure", ""])
     for item in final["used_endpoints"]:
         reading = item["reading"]
@@ -111,7 +136,7 @@ def export(conn, rid, directory, invocation):
                      f"(delivery {item['event_id']}, {item['metric_ref']})")
     if not final["used_endpoints"]:
         lines.append("No quantitative endpoint was cited in the accepted closing decision.")
-    lines.extend(["", *evidence_lines(science), "", *route_lines(work), "", "## Run and recovery", "",
+    lines.extend(["", *evidence_lines(science), "", *route_text, "", "## Run and recovery", "",
                   f"Run {rid}, Goal version {close['goal_version']}. Decision {close['decision_ref']} "
                   f"committed at event {close['committed_event']}; closed at event {close['closed_event']}.",
                   f"Invocation {invocation['action']} added {invocation['added']['host_turns']} acknowledged host turns "

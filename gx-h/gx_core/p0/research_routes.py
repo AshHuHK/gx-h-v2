@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from ..artifacts import ArtifactService
-from . import v6_native
+from . import v6_native, v621_metrics
 
 
 def _instant(value):
@@ -287,7 +287,13 @@ def routes(conn, rid, directory):
     return dict(modules=modules,real_turn_overlaps=overlaps,job_turn_overlaps=job_overlaps,handoffs=_handoffs(conn,rid,modules,roots,decisions,turn_lookup,directory))
 
 
-def route_lines(data):
+def route_lines(data, render_decision=None):
+    def rationale(decision):
+        text = decision['rationale']
+        if render_decision is None:
+            return v621_metrics.render_accepted_text(text, [])
+        return render_decision(decision['decision_ref'], text)
+
     lines = ['## Research routes', '']
     if not data['modules']:
         return lines + ['The Lead worked directly in this Goal version.', '']
@@ -302,7 +308,7 @@ def route_lines(data):
         for delivery in m['deliveries']:
             lines.append(f"- Delivery event {delivery['event_id']} · {len(delivery['endpoints'])} endpoints · `{delivery['turn_id']}`")
         for decision in m['decisions']:
-            lines.append(f"- Accepted decision {decision['event_id']} · {decision['rationale']}")
+            lines.append(f"- Accepted decision {decision['event_id']} · {rationale(decision)}")
         lines.append('')
     lines.extend([f"Observed overlaps between real module turns: {len(data['real_turn_overlaps'])}.", ''])
     for overlap in data['real_turn_overlaps']:
@@ -311,7 +317,7 @@ def route_lines(data):
         lines.append(f"- Job `{overlap['job_id']}` and another module's turn `{overlap['turn_id']}` · {overlap['seconds']} s")
     for item in data['handoffs']:
         lines.append(f"- {item['publisher']} → {item['receiver_scope'] or 'awaiting receipt'} · `{item['report_ref']}` · {item['status']} · source {item['publisher_classification']} / receiver {item.get('receiver_classification','unknown')}"
-                     + (f" · `{item['decision_ref']}` · {item['rationale']}" if item['decision_ref'] else ''))
+                     + (f" · `{item['decision_ref']}` · {rationale(item)}" if item['decision_ref'] else ''))
         for effect in item['effects']:
             identity = effect.get('job_id') or effect.get('report_ref') or effect.get('subject')
             lines.append(f"  - {effect['kind']} · `{identity}`")

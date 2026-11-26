@@ -272,6 +272,12 @@ def _render(text, metrics, methods=(), *, protected=(), used=None):
                 prose = re.sub(r"\b" + re.escape(key) + r"\s+" + re.escape(str(value)) + r"\b", "", prose, flags=re.I)
     if NUMBER.search(prose):
         raise SchemaInvalid("Cite a declared metric for scientific numbers, for example {{metric:coverage}}")
+    return _substitute_tags(text, metrics, without_tags, used=used)
+
+
+def _substitute_tags(text, metrics, without_tags, *, used=None, report=False):
+    single = len(TAG.findall(text)) == 1
+
     def replace(match):
         key, *checks = match[1].split("|")
         ref, _, name = key.rpartition(":")
@@ -290,7 +296,7 @@ def _render(text, metrics, methods=(), *, protected=(), used=None):
         suffix = re.match(r"\s*(%|[µμmunpkMGT]?(?:V|A|g|m|s|K|Pa|Hz|L|mol|eV)|Å)(?![\w])", text[match.end():])
         if suffix and suffix[1] != item["unit"]:
             raise SchemaInvalid("Metric suffix uses a different unit than the named output")
-        if len(TAG.findall(text)) == 1:
+        if single:
             for field, actual in item["scope"].items():
                 if isinstance(actual, str):
                     declared = re.findall(r"\b" + re.escape(field) + r"\s*[:=]\s*([\w.-]+)", without_tags, re.I)
@@ -299,10 +305,25 @@ def _render(text, metrics, methods=(), *, protected=(), used=None):
         if used is not None:
             used[item["metric_ref"]] = item
         return item["display"]
-    rendered = TAG.sub(replace, text)
+    def project(match):
+        try:
+            return replace(match)
+        except SchemaInvalid as exc:
+            return f"[Unresolved metric {match[1]}: {exc.message}]"
+
+    rendered = TAG.sub(project if report else replace, text)
+    if report:
+        return rendered.replace("{{metric:", "[Malformed metric citation] ")
     if "{{metric:" in rendered:
         raise SchemaInvalid("Malformed scientific metric citation")
     return rendered
+
+
+def render_accepted_text(text, metrics):
+    """Project citations in already accepted prose while preserving its wording and identifiers."""
+    if "{{metric:" not in text:
+        return text
+    return _substitute_tags(text, metrics, TAG.sub("", text), report=True)
 
 
 PREDICATES = {"gt": (">", r">(?!=)|above|greater than|exceeds?"),

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from acceptance.v62a.interleavings_fixture import Scenario, draft
-from gx_core.p0.research_routes import _history_turns, _interval, routes
+from gx_core.p0.research_routes import _history_turns, _interval, route_lines, routes
 
 
 class ResearchRoutes(unittest.TestCase):
@@ -60,6 +60,27 @@ class ResearchRoutes(unittest.TestCase):
         self.assertEqual(h['effects'][0]['findings'],['The reported count supports retaining this scope.'])
         self.assertFalse(h['real_model_handoff'])
         self.assertEqual(proven['real_turn_overlaps'],[])
+
+    def test_rendered_rationales_keep_each_decisions_used_reading_and_preserve_raw_data(self):
+        raw = 'The reported angle was {{metric:angle}}.'
+        module = dict(module_id='measurement',scope='module:a',focus='Measure',round=1,status='COMPLETE',
+                      threads=[],nodes=[],deliveries=[],decisions=[dict(decision_ref='decision-a',event_id=12,rationale=raw)])
+        handoff = dict(publisher='module:a',receiver_scope='run',report_ref='report',status='CITED',
+                       publisher_classification='SCRIPTED',receiver_classification='SCRIPTED',decision_ref='decision-b',
+                       rationale=raw,effects=[])
+        data = dict(modules=[module],handoffs=[handoff],real_turn_overlaps=[],job_turn_overlaps=[])
+        encoded = json.dumps(data)
+        used = {'decision-a':'0.25°', 'decision-b':'0.75°'}
+        def render(ref, text):
+            return text.replace('{{metric:angle}}', used[ref])
+        lines = route_lines(data,render)
+        self.assertIn('- Accepted decision 12 · The reported angle was 0.25°', '\n'.join(lines))
+        self.assertIn('`decision-b` · The reported angle was 0.75°', '\n'.join(lines))
+        self.assertNotIn('{{metric:', '\n'.join(lines))
+        self.assertEqual(json.dumps(data), encoded)
+        fallback = '\n'.join(route_lines(data))
+        self.assertIn('Unresolved metric', fallback)
+        self.assertNotIn('{{metric:', fallback)
 
     def test_native_boundaries_do_not_infer_queue_time_or_missing_end(self):
         directory = Path(self.enterContext(tempfile.TemporaryDirectory()))

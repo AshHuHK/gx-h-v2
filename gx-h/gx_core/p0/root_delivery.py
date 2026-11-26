@@ -473,7 +473,8 @@ class RootDelivery:
             if v6_native.assigned(binding):
                 ref = v62_budget.native_funding(self.conn, self.run_id, binding["task_id"], ref)
         risk_available = meter_limits.allowance(self.conn,self.run_id,ref,binding)
-        available = int(budgets.state(self.conn, ref)["available"].get("tokens", 0))
+        # A module can draw native tokens from its Run without a local token ceiling.
+        available = int(budgets.state(self.conn, ref)["available"].get("tokens", risk_available or 0))
         if risk_available is not None:
             available = min(available,risk_available)
         from . import v6_branch_budget

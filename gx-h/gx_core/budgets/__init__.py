@@ -124,6 +124,29 @@ def _write(conn: sqlite3.Connection, budget_ref: str, *, spent: Mapping[str, Any
             params.append(ids.canonical_json(dict(value)))
     params.append(budget_ref)
     conn.execute(f"UPDATE budgets SET {', '.join(sets)} WHERE budget_ref=?", params)
+    if "tokens" in (spent or {}) or "tokens" in (reserved or {}):
+        funding = _shared_module_tokens(conn, budget_ref)
+        if funding is not None:
+            # An implicit token line borrows exactly the child's current spending and
+            # outstanding holds. Settlement, release and later corrections all write here.
+            amount = funding["committed"]
+            delta = amount - funding["funded"]
+            if delta:
+                conn.execute("UPDATE budgets SET reserved_json=json_set(reserved_json,'$.tokens',"
+                             "coalesce(json_extract(reserved_json,'$.tokens'),0)+?),updated_at=? WHERE budget_ref=?",
+                             (delta, clock.now_iso(), funding["parent_ref"]))
+                conn.execute("UPDATE budget_reservations SET amounts_json=json_set(amounts_json,'$.tokens',?) "
+                             "WHERE reservation_ref=?", (amount, funding["reservation_ref"]))
+
+
+def _shared_module_tokens(conn, budget_ref):
+    """A module without a local token ceiling draws on its open Run funding hold."""
+    return conn.execute("""SELECT c.parent_ref,f.reservation_ref,
+        coalesce(json_extract(f.amounts_json,'$.tokens'),0) AS funded,
+        coalesce(json_extract(c.spent_json,'$.tokens'),0) + coalesce(json_extract(c.reserved_json,'$.tokens'),0) AS committed
+        FROM budgets c JOIN budget_reservations f ON f.reservation_ref=? || c.budget_ref
+        WHERE c.budget_ref=? AND f.subject_kind='research_module' AND f.status='HELD'
+          AND json_type(c.limits_json,'$.tokens') IS NULL""", (FUND_PREFIX, budget_ref)).fetchone()
 
 
 def _clean(value: float) -> float | int:
@@ -521,7 +544,20 @@ def _reserve(conn: sqlite3.Connection, budget: sqlite3.Row, *, reservation_ref: 
     spent = store.loads(budget, "spent_json", {})
     reserved = store.loads(budget, "reserved_json", {})
     shortfalls: list[dict[str, Any]] = []
+    native = subject_kind == "native_turn" and reservation_ref is None
+    shared = _shared_module_tokens(conn, budget_ref) if native and "tokens" in amounts and "tokens" not in limits else None
     for key, requested in amounts.items():
+        if key == "tokens" and shared is not None:
+            parent = _row(conn, shared["parent_ref"])
+            line = store.loads(parent, "limits_json", {}).get(key)
+            used = store.loads(parent, "spent_json", {}).get(key, 0)
+            held = store.loads(parent, "reserved_json", {}).get(key, 0)
+            available = max(0, (line or 0) - used - held)
+            if requested > available:
+                shortfalls.append({"key": key, "requested": requested, "limit": line,
+                                   "spent": used, "reserved": held, "available": available,
+                                   "why": "the Run cannot fund the module's native token hold"})
+            continue
         if key not in limits:
             shortfalls.append({"key": key, "requested": requested, "limit": None,
                                "why": "the budget has no line for this resource"})
@@ -531,7 +567,6 @@ def _reserve(conn: sqlite3.Connection, budget: sqlite3.Row, *, reservation_ref: 
             shortfalls.append({"key": key, "requested": requested, "limit": limits[key],
                                "spent": spent.get(key, 0), "reserved": reserved.get(key, 0),
                                "available": _clean(left), "why": "not enough left"})
-    native = subject_kind == "native_turn" and reservation_ref is None
     if native:
         # A run's token hold can coincide with an exhausted project call cap.
         # The driver needs both facts to choose between waiting and pausing.
@@ -807,9 +842,10 @@ def _settle(conn: sqlite3.Connection, row: sqlite3.Row, used: Mapping[str, Any],
     reserved = store.loads(budget, "reserved_json", {})
     for key, amount in held.items():
         reserved[key] = _clean(reserved.get(key, 0) - amount)
-    unbudgeted = {key: value for key, value in used.items() if key not in limits}
+    funded_keys = limits.keys() | held.keys()
+    unbudgeted = {key: value for key, value in used.items() if key not in funded_keys}
     for key, value in used.items():
-        if key in limits:
+        if key in funded_keys:
             spent[key] = _clean(spent.get(key, 0) + value)
     _write(conn, budget["budget_ref"], spent=spent, reserved=reserved)
     now = clock.now_iso()
@@ -874,8 +910,9 @@ def record_released_native_usage(conn, reservation_ref, *, actual, previous, key
                 raise IdempotencyConflict("the released native usage receipt already has a different amount")
             return seen["event_id"]
         budget = _row(tx, row["budget_ref"])
+        funded_keys = store.loads(budget,"limits_json",{}).keys() | store.loads(row,"amounts_json",{}).keys()
         deltas = {k:actual.get(k,0)-previous.get(k,0) for k in actual.keys() | previous.keys()
-                  if k in store.loads(budget,"limits_json",{})}
+                  if k in funded_keys}
         while True:
             spent = store.loads(budget,"spent_json",{})
             for name, delta in deltas.items():
@@ -895,15 +932,16 @@ def _settle_result(conn: sqlite3.Connection, row: sqlite3.Row, used: Mapping[str
     budget = _row(conn, row["budget_ref"])
     limits = store.loads(budget, "limits_json", {})
     spent = store.loads(budget, "spent_json", {})
+    funded_keys = limits.keys() | held.keys()
     overrun = {key: _clean(value - held.get(key, 0)) for key, value in used.items()
-               if key in limits and value > held.get(key, 0)}
+               if key in funded_keys and value > held.get(key, 0)}
     over_limit = {key: _clean(spent[key] - limits[key]) for key in limits
                   if spent.get(key, 0) > limits[key]}
     return {
         "reservation_ref": row["reservation_ref"], "budget_ref": row["budget_ref"],
         "status": SETTLED, "held": dict(held), "actual": dict(used), "overrun": overrun,
         "over_limit": over_limit,
-        "unbudgeted": {key: value for key, value in used.items() if key not in limits},
+        "unbudgeted": {key: value for key, value in used.items() if key not in funded_keys},
         "reused": reused,
     }
 

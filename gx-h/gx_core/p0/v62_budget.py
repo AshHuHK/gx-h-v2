@@ -25,16 +25,7 @@ def open_child(conn, run_id, instance_id, limits, actor):
     """Called in the module-opening transaction, before a module can receive a task."""
     allocation = budgets.check_amounts(limits, what="module allowance")
     parent = budgets.budget_for(conn, run_id=run_id)
-    # Older Goal branches carry a ceiling on the parent's ledger. Module allocations
-    # have real child accounts whose entire caps are already reserved in the parent.
-    from . import v6_branch_budget
-    promises = Counter()
-    for branch in conn.execute("""SELECT b.branch_id,b.spec_json FROM v6_branches b
-            WHERE b.run_id=? AND b.status='OPEN' AND NOT EXISTS
-            (SELECT 1 FROM v62_modules m WHERE m.run_id=b.run_id AND m.branch_id=b.branch_id)""", (run_id,)):
-        used = v6_branch_budget.exposure(conn, branch["branch_id"])
-        ceilings = json.loads(branch["spec_json"])["budget_limits"]
-        promises.update({key: max(0, limit - used[key]) for key, limit in ceilings.items()})
+    promises = _branch_promises(conn, run_id)
     room, earmarked = _unallocated(conn, run_id, parent, allocation)
     for key, amount in allocation.items():
         if amount and amount + promises[key] > room.get(key, 0):
@@ -46,6 +37,20 @@ def open_child(conn, run_id, instance_id, limits, actor):
         raise error
     return budgets.open_child(conn, parent_ref=parent, subject_kind="research_module",
                               subject_id=instance_id, limits=allocation, actor=actor)["budget_ref"]
+
+
+def _branch_promises(conn, run_id):
+    # Older Goal branches carry a ceiling on the parent's ledger. Module allocations
+    # have real child accounts whose entire caps are already reserved in the parent.
+    from . import v6_branch_budget
+    promises = Counter()
+    for branch in conn.execute("""SELECT b.branch_id,b.spec_json FROM v6_branches b
+            WHERE b.run_id=? AND b.status='OPEN' AND NOT EXISTS
+            (SELECT 1 FROM v62_modules m WHERE m.run_id=b.run_id AND m.branch_id=b.branch_id)""", (run_id,)):
+        used = v6_branch_budget.exposure(conn, branch["branch_id"])
+        ceilings = json.loads(branch["spec_json"])["budget_limits"]
+        promises.update({key: max(0, limit - used[key]) for key, limit in ceilings.items()})
+    return promises
 
 
 def _unallocated(conn, run_id, parent, allocation):
@@ -117,6 +122,9 @@ def view_for_scope(conn, run_id, scope):
     module = _for_scope(conn, run_id, scope)
     account = budgets.state(conn, module["budget_ref"])
     account["native_exposure"] = next(meter_limits.scopes(conn, run_id, module["budget_ref"]))
+    if "tokens" not in account["limits"]:
+        account["token_funding"] = "shared_run"
+        account["available"]["tokens"] = _shared_token_room(conn, run_id)
     return account
 
 
@@ -141,9 +149,17 @@ def job_funding(conn, request, fallback):
     return _open_ref(module) if module else fallback
 
 
+def _shared_token_room(conn, run_id):
+    parent = budgets.budget_for(conn, run_id=run_id)
+    unallocated, _ = _unallocated(conn, run_id, parent, {"tokens": 1})
+    return max(0, unallocated.get("tokens", 0) - _branch_promises(conn, run_id)["tokens"])
+
+
 def available_tokens(conn, run_id, scope, available):
     ref = _open_ref(_for_scope(conn, run_id, scope))
     room = remaining(conn, ref)
+    if "tokens" not in room:
+        room["tokens"] = _shared_token_room(conn, run_id)
     for key in ("tokens", "api_calls"):
         if room.get(key, 0) < 1:
             raise HoldActive("Module cannot fund another native decision",
@@ -164,6 +180,8 @@ def exhausted(conn, module):
         return None
     room = remaining(conn, ref)
     for key in ("api_calls", "tokens"):
+        if key == "tokens" and key not in room:
+            continue
         if room.get(key, 0) < 1:
             return f"module {key} allowance exhausted"
     for line in meter_limits.scopes(conn, rid, ref):

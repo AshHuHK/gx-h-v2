@@ -27,7 +27,7 @@ def commission(brief, i):
         "module_id": "investigation", "module_version": "1", "round": 1,
         "focus": ROUTES[i], "expected_delivery": "Measured coverage, with its source and limit.",
         "capabilities": [science.METHOD], "input_refs": [material(brief, ("2RE9.cif", "2O0O.cif")[i])],
-        "sub_budget": {"job_submissions": 2, "api_calls": 6, "cpu_seconds": 90, "tokens": 250000, "worker_tasks": 6},
+        "sub_budget": {"job_submissions": 2, "api_calls": 6, "cpu_seconds": 90, "worker_tasks": 6},
         "operation_key": ("ordered-measurement", "shared-measurement")[i],
         "wake_on": ["counterevidence"] if i == 0 else [],
     }
@@ -115,14 +115,45 @@ class Pair:
         return original(*args, **kwargs)
 
 
+def verify_funding(db, rid):
+    """Each child's settled balance rolls up through exactly one funding reservation."""
+    edges = list(db.execute("""SELECT m.budget_ref,b.parent_ref,f.reservation_ref,f.status,
+        json_extract(f.amounts_json,'$.tokens'),json_extract(b.spent_json,'$.tokens')
+        FROM v62_modules m JOIN budgets b USING(budget_ref)
+        JOIN budget_reservations f ON f.subject_id=m.module_instance_id AND f.subject_kind='research_module'
+        WHERE m.run_id=? ORDER BY m.rowid""", (rid,)))
+    assert len(edges) == 2 and len({e[0] for e in edges}) == 2
+    tokens = {r[0]: r[1] for r in db.execute("""SELECT budget_ref,sum(settled_tokens)
+        FROM p0_meter_native_turns WHERE run_id=? AND budget_status='SETTLED' GROUP BY budget_ref""", (rid,))}
+    for ref, _, reservation, status, funded, spent in edges:
+        assert reservation == "fund:" + ref and status == "SETTLED" and funded == spent == tokens[ref] > 0
+    parent, = {row[1] for row in edges}
+    expected = sum(tokens.values())
+    balances = {}
+    for owner in ("run", "workspace"):
+        parent, limit, spent, held = db.execute("""SELECT parent_ref,json_extract(limits_json,'$.tokens'),
+            json_extract(spent_json,'$.tokens'),json_extract(reserved_json,'$.tokens')
+            FROM budgets WHERE budget_ref=?""", (parent,)).fetchone()
+        assert spent == expected and held == 0
+        balances[owner] = {"limit":limit,"spent":spent,"reserved":held,"remaining":limit-spent-held}
+    confidence = [dict(row) for row in db.execute("""SELECT confidence,count(*) AS turns,
+        sum(settled_tokens) AS settled_tokens,sum(observed_lower_bound) AS observed_lower_bound
+        FROM p0_meter_native_turns WHERE run_id=? AND budget_status='SETTLED' GROUP BY confidence""", (rid,))]
+    return {"settled_tokens_by_account":tokens,"turn_confidence":confidence,
+            "settled_module_funding_edges":len(edges),"balances":balances}
+
+
 def verify(work, rid, reopened):
     exported = json.loads(Path(reopened["result"]).read_text())
     with closing(batch.old.db_open(work)) as db:
         def rows(query, params=()):
             return [dict(r) for r in db.execute(query, params)]
-        modules = rows("SELECT module_instance_id,scope,branch_id,round,status,parent_task_id FROM v62_modules WHERE run_id=? ORDER BY rowid", (rid,))
+        modules = rows("SELECT module_instance_id,scope,branch_id,round,status,parent_task_id,budget_json FROM v62_modules WHERE run_id=? ORDER BY rowid", (rid,))
         assert len(modules) == 2 and {(m["round"], m["parent_task_id"]) for m in modules} == {(1, modules[0]["parent_task_id"])}
         assert all(m["status"] == "COMPLETE" for m in modules)
+        for module in modules:
+            module["requested_budget"] = json.loads(module.pop("budget_json"))
+            assert "tokens" not in module["requested_budget"]
         turns = rows("""SELECT t.scope,r.thread_id,u.turn_id FROM p0_roots r JOIN v6_decision_tasks t USING(task_id)
                         JOIN p0_root_turn_usage u USING(thread_id) WHERE r.run_id=? AND t.scope LIKE 'module:%'""", (rid,))
         idx = {}
@@ -164,7 +195,7 @@ def verify(work, rid, reopened):
         endpoints = exported["final_decision"]["used_endpoints"]
         assert {r["source_ref"] for r in endpoints} == {followup["result_ref"], *(r["report_ref"] for r in reports)}
         return {"run_id":rid,"paid_model_calls":0,"transport":"official host and scripted localhost Responses",
-                          "modules":modules,"turns":turns,"maximum_turn_overlap_seconds":max(overlaps),"nodes":nodes,
+                          "funding":verify_funding(db,rid),"modules":modules,"turns":turns,"maximum_turn_overlap_seconds":max(overlaps),"nodes":nodes,
                           "reports":reports,"wake":wakes,"followup_decision_event":receipt["event_id"],
                           "closing_readings":[{"source_ref":r["source_ref"],"display":r["reading"]["display"]} for r in endpoints],
                           "reopened":reopened["invocation"]["added"]}

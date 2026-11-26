@@ -1,0 +1,105 @@
+{
+  "run_id": "gxr_01m8cfq9q0pez4xrx4",
+  "original": {
+    "run_id": "gxr_01m8cfq9q0pez4xrx4",
+    "pid": 3232818,
+    "command": "run",
+    "exit_code": -9,
+    "nodes": [
+      {
+        "node_id": "node_916353cf77dc427560c4e6a003e4e763",
+        "status": "SUCCEEDED",
+        "job_id": "gxj_01m8cfqbhyd8crdppy",
+        "result_ref": "gxa_01m8cfqch2v8cxvek7"
+      },
+      {
+        "node_id": "node_b79ee8b58b487828096ce454764314e5",
+        "status": "RUNNING",
+        "job_id": "gxj_01m8cfqbprtpppwqdf",
+        "result_ref": null
+      }
+    ],
+    "capacity": {
+      "allowed": 2,
+      "held": 0,
+      "free": 2,
+      "rule": "min(cpu.max_pool_workers=8, cpu.max_quota_fraction=0.5 x 24.0 CPUs, affinity=2)",
+      "holders": []
+    }
+  },
+  "pid": 3232878,
+  "command": "resume",
+  "jobs": [
+    {
+      "job_id": "gxj_01m8cfqbhyd8crdppy",
+      "runner_pid": 3232850,
+      "job_attempt": 1,
+      "assigned_cpus": [
+        2
+      ]
+    },
+    {
+      "job_id": "gxj_01m8cfqbprtpppwqdf",
+      "runner_pid": 3232865,
+      "job_attempt": 1,
+      "assigned_cpus": [
+        4
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "node_916353cf77dc427560c4e6a003e4e763",
+      "status": "SUCCEEDED",
+      "job_id": "gxj_01m8cfqbhyd8crdppy",
+      "result_ref": "gxa_01m8cfqch2v8cxvek7"
+    },
+    {
+      "node_id": "node_b79ee8b58b487828096ce454764314e5",
+      "status": "SUCCEEDED",
+      "job_id": "gxj_01m8cfqbprtpppwqdf",
+      "result_ref": "gxa_01m8cfqdqwfafhm3vb"
+    }
+  ],
+  "attempts": [
+    {
+      "node_id": "node_916353cf77dc427560c4e6a003e4e763",
+      "operation_key": "v6.node:aada33875157e42f8aae0b5a12e8ee536eb969cca96458ab0efeb79f9c71b43d"
+    },
+    {
+      "node_id": "node_b79ee8b58b487828096ce454764314e5",
+      "operation_key": "v6.node:4cd48573774fd24d69db44cc9e2708ecd87379e9620c6d3e83cb3c6409d939b1"
+    }
+  ],
+  "workers": [
+    {
+      "side": "left",
+      "pid": 3232851,
+      "entered_ns": 30034939987175950,
+      "affinity": [
+        2
+      ],
+      "compute_start_ns": 30034940120093440,
+      "cpu_ns": 351606399,
+      "compute_end_ns": 30034940544211404,
+      "checksum": 3955060480500
+    },
+    {
+      "side": "right",
+      "pid": 3232866,
+      "entered_ns": 30034940111475105,
+      "affinity": [
+        4
+      ],
+      "compute_start_ns": 30034940112897358,
+      "cpu_ns": 352719320,
+      "compute_end_ns": 30034940564215032,
+      "checksum": 3994002000000
+    }
+  ],
+  "real_model_calls": 0,
+  "compute_overlap_ns": 424117964,
+  "concurrent_cpu_lower_bound_ns": 253008045,
+  "successful_job_reused": true,
+  "extra_job_attempts": 0
+}

@@ -232,7 +232,8 @@ def attach_run(conn, run_id, *, project_ref, run_key, profile_name, spec, actor)
     conn.execute("INSERT INTO p0_workspace_runs(run_id,run_key,workspace_id) VALUES(?,?,?)",
                  (run_id, run_key, project_ref))
     if run_id != anchor_id:
-        _inherit_intent(conn, anchor_id, run_id, spec)
+        inherit_from = predecessor["parent_run_id"] if predecessor else anchor_id
+        _inherit_intent(conn, inherit_from, run_id, spec)
     return child["budget_ref"]
 
 

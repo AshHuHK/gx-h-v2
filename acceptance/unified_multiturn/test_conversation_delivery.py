@@ -9,9 +9,11 @@ import unittest
 from unittest.mock import patch
 
 from acceptance.v622.test_close import CloseStudy, close_decision
+from gx_core import budgets
+from gx_core.errors import IdempotencyConflict
 from gx_core.native_release import native_state
 from gx_core.p0 import cli, conversation, workspace
-from gx_core.p0.driver import Driver
+from gx_core.p0.driver import Driver, enqueue
 from gx_core.p0.root_delivery import RootDelivery
 from tests.test_p0_root_delivery import Peer
 
@@ -47,8 +49,13 @@ class MainPeer(Peer):
         for turn in self.turns:
             if turn["status"] == "inProgress":
                 mid = turn["items"][0]["clientId"]
-                turn["items"].append({"type":"agentMessage","text":"Reply from the controlled host to "+mid})
+                turn["items"].append({"type":"agentMessage","phase":"commentary","text":"Looking into it"})
+                turn["items"].append({"type":"agentMessage","phase":"final_answer",
+                                      "text":"Reply from the controlled host to "+mid})
                 turn["status"] = "completed"
+                self.delivery.observe("turn/started",{"threadId":"root","turn":{"id":turn["id"]}})
+                self.delivery.observe("rawResponse/completed",{"threadId":"root","turnId":turn["id"],
+                    "responseId":"response-"+turn["id"],"usage":{"totalTokens":10}})
                 self.delivery.observe("thread/tokenUsage/updated", {"threadId":"root","turnId":turn["id"],
                                     "tokenUsage":{"total":{"totalTokens":10*len(self.turns)}}})
                 self.delivery.observe("turn/completed", {"threadId":"root","turn":turn})
@@ -96,6 +103,7 @@ class ConversationDelivery(unittest.TestCase):
         self.assertEqual(view["conversation_id"],a["conversation_id"])
         self.assertEqual([m["reply"]["turn_id"] for m in view["messages"]],["turn-1","turn-2"])
         self.assertEqual(view["messages"][1]["reply_to"],"first")
+        self.assertEqual(view["messages"][1]["reply"]["text"], "Reply from the controlled host to later")
         self.cmd("message","--run-id",rid,"--message-id","first","--text","What did we observe?")
         self.assertEqual(len(self.calls),2)
         with closing(cli.existing_db(self.state,readonly=True)) as db:
@@ -109,7 +117,18 @@ class ConversationDelivery(unittest.TestCase):
             rid = study.run_id
             study.call(study.lead,"gx_decide_revision",{"decision":close_decision()},"close")
             study.advance()
+            tid, turn = study.lead.thread, study.lead.turn
+            study.roots.delivery.observe("turn/started",{"threadId":tid,"turn":{"id":turn}})
+            study.roots.delivery.observe("rawResponse/completed",{"threadId":tid,"turnId":turn,
+                "responseId":"lead-response","usage":{"totalTokens":12}})
+            study.roots.delivery.observe("thread/tokenUsage/updated",{"threadId":tid,"turnId":turn,
+                "tokenUsage":{"total":{"totalTokens":12}}})
+            study.roots.delivery.observe("turn/completed",{"threadId":tid,"turn":{"id":turn,"status":"completed"}})
             workspace.release_finished(study.conn)
+            run_budget = budgets.budget_for(study.conn,run_id=rid)
+            budget = budgets.state(study.conn,run_budget)
+            self.assertFalse(budget["open"], (budget,study.conn.execute("SELECT status FROM runs WHERE run_id=?",(rid,)).fetchone()[0]))
+            shared = budget["parent_ref"]
             self.state = self.state.parent/"closed"/"state"
         with closing(cli.existing_db(self.state,readonly=True)) as db:
             before = db.execute("SELECT count(*) FROM jobs").fetchone()[0]
@@ -118,3 +137,24 @@ class ConversationDelivery(unittest.TestCase):
         with closing(cli.existing_db(self.state,readonly=True)) as db:
             self.assertEqual(db.execute("SELECT count(*) FROM jobs").fetchone()[0],before)
             self.assertEqual(db.execute("SELECT status FROM v6_goals WHERE run_id=?",(rid,)).fetchone()[0],"CLOSED")
+
+            self.assertEqual(db.execute("SELECT budget_ref FROM p0_meter_native_turns WHERE event_id='human:explain'").fetchone()[0],shared)
+            self.assertFalse(budgets.state(db,run_budget)["open"])
+
+    def test_preupgrade_original_keeps_run_and_anchors_on_replay(self):
+        first = self.cmd("start","--goal","Compare stable heat maps.","--run-key","one")["run_id"]
+        second = self.cmd("start","--goal","Compare stable heat maps.","--run-key","two")["run_id"]
+        with closing(cli.existing_db(self.state, readonly=False)) as db:
+            original = "Why keep the initial condition?"
+            enqueue(db,first,{"kind":"proposal","text":original},original,"legacy")
+            conversation.send(db,first,original,"legacy")
+            with self.assertRaises(IdempotencyConflict):
+                conversation.send(db,second,original,"legacy")
+            with self.assertRaises(IdempotencyConflict):
+                conversation.send(db,first,original,"legacy",goal_version=1)
+            follow = conversation.send(db,second,"Can we compare these?", "follow", reply_to="legacy")
+            self.assertEqual(conversation.timeline(db,first)["conversation_id"],follow["conversation_id"])
+            earlier = conversation.reply_anchor(db, workspace.find_run(db,run_id=second),"legacy")
+            self.assertEqual((earlier["run_id"],earlier["text"]), (first, original))
+            self.assertEqual(conversation.pending(db,first),["legacy"])
+            self.assertEqual(conversation.pending(db,second),["follow"])

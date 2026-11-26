@@ -88,6 +88,12 @@ def thread_for_lease(conn, run_id, task_id, lease_id):
     return row["thread_id"] if row else None
 
 
+def _missing_thread(error, thread):
+    return error.code == -32600 and error.message in (
+        f"thread not found: {thread}", f"no rollout found for thread id {thread}",
+        f"no rollout found for conversation id {thread}")
+
+
 def _artifact_refs(value):
     if isinstance(value, str) and ids.kind_of(value) == "artifact":
         yield value
@@ -738,9 +744,7 @@ class Roots:
             try:
                 self._resume(tid)
             except AppServerResponseError as exc:
-                missing = {f"thread not found: {tid}", f"no rollout found for thread id {tid}",
-                           f"no rollout found for conversation id {tid}"}
-                if exc.code != -32600 or exc.message not in missing:
+                if not _missing_thread(exc, tid):
                     raise
                 if row["task_id"] is None and self.conn.execute(
                         "SELECT 1 FROM p0_root_deliveries WHERE thread_id=? UNION ALL "
@@ -883,11 +887,11 @@ class Roots:
             self._goal_queue.add(thread_id)
 
     def reconcile_meter(self, thread_id):
-        if self.conn.execute("SELECT 1 FROM p0_roots WHERE thread_id=? AND run_id=? AND state='archived_main'",
-                             (thread_id, self.run_id)).fetchone():
-            return  # Settled archived Main turns retain their original usage record.
+        archived = self.conn.execute("SELECT 1 FROM p0_roots WHERE thread_id=? AND run_id=? AND state='archived_main'",
+                                     (thread_id, self.run_id)).fetchone()
         try:
-            if thread_id in self.loaded:
+            if archived or thread_id in self.loaded:
+                # A retired Main still has readable accounting history; never resume it for work.
                 self.delivery.reconcile(thread_id)
             else:
                 self._resume(thread_id, meter_only=True)
@@ -916,8 +920,16 @@ class Roots:
         message_id = message_id or str(uuid.uuid4())
         if before_start:
             before_start(thread, message_id)
-        receipt = self.delivery.deliver(thread,text,event_id="human:"+message_id,
-                                        human=True,message_id=message_id)
+        try:
+            receipt = self.delivery.deliver(thread, text, event_id="human:"+message_id,
+                                            human=True, message_id=message_id)
+        except AppServerResponseError as exc:
+            if _missing_thread(exc, thread):
+                # The host can lose a Main after resume and before read/send. The next
+                # Driver attempt reconciles the original durable delivery before rotating.
+                self.loaded.discard(thread)
+                self.active_turns.pop(thread, None)
+            raise
         turn = receipt["turn_id"]
         if on_started:
             on_started(thread,turn,message_id)

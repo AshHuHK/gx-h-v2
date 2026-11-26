@@ -176,6 +176,12 @@ class Driver:
         if history and mid == history[-1]["message_id"]:
             if history[-1]["goal_version"] is not None:
                 scope.setdefault("goal_version", history[-1]["goal_version"])
+            if ref := history[-1]["reply_to"]:
+                anchor = conversation.reply_anchor(conn, run, ref)
+                result["reply_anchor"] = anchor
+                if anchor["kind"] != "message":
+                    scope.update({k:anchor[k] for k in ("goal_version","decision_ref","branch_id")
+                                  if k in anchor and k not in args})
         result["science"] = conversation_science.project(conn, self.rid, **scope)
         result["questions"] = research_dialogue.questions(conn, self.rid)
         result["feedback"] = research_dialogue.feedback_status(conn, self.rid)
@@ -369,22 +375,22 @@ class Driver:
         native_blocked = False
         for row in rows:
             mid = row["message_id"]
-            successor = self.conn.execute("SELECT successor_json FROM p0_conversation_messages WHERE message_id=? "
-                                          "AND successor_json IS NOT NULL", (mid,)).fetchone()
-            if successor:
-                from .conversation_delivery import start_successor
-                start_successor(self.conn, self.directory, self.rid, mid, row["message_text"], json.loads(successor[0]),
-                                native_owner=True)
-                continue
-            if pending is None and operator.consume_queued(self.ctx, self.rid, row):
-                self._end_native_wait(("message", mid))
-                continue
-            if local_only:
-                native_rows.append(row)
-                continue
-            if native_blocked:
-                continue
             try:
+                successor = self.conn.execute("SELECT successor_json FROM p0_conversation_messages WHERE message_id=? "
+                                              "AND successor_json IS NOT NULL", (mid,)).fetchone()
+                if successor:
+                    from .conversation_delivery import start_successor
+                    start_successor(self.conn, self.directory, self.rid, mid, row["message_text"],
+                                    json.loads(successor[0]), native_owner=True)
+                    continue
+                if pending is None and operator.consume_queued(self.ctx, self.rid, row):
+                    self._end_native_wait(("message", mid))
+                    continue
+                if local_only:
+                    native_rows.append(row)
+                    continue
+                if native_blocked:
+                    continue
                 outcome = self._native_call("message", mid, lambda native: self._human_turn(native, row))
                 native_blocked = outcome is _DEFERRED
             except HoldActive:
@@ -393,7 +399,7 @@ class Driver:
             except BudgetExceeded as exc:
                 self._exhausted["message:"+mid] = exc
                 native_blocked = True
-            except (ArtifactNotFound, IdempotencyConflict, PermissionDenied, SchemaInvalid, StaleRevision) as exc:
+            except (ArtifactNotFound, IdempotencyConflict, PermissionDenied, SchemaInvalid, StaleRevision, ValueError) as exc:
                 # Transport and uncertain native outcomes remain durable and can be reconciled.
                 with store.transaction(
                     self.conn, transaction_owner="Driver", operation="reject_message", run_id=self.rid,
@@ -460,9 +466,12 @@ class Driver:
                     "sortDirection":"desc", "itemsView":"full", "limit":8})
             return next((item for item in turns if item["id"] == row["turn_id"]), None)
         turn = self._native_call("reply", mid, read_turn)
-        if turn is not None and turn is not _DEFERRED:
-            reply = "\n".join(item["text"] for item in turn.get("items", [])
-                               if item.get("type") == "agentMessage")
+        if turn is not None and turn is not _DEFERRED and turn["status"] in ("completed","failed","interrupted"):
+            messages = [item for item in turn.get("items", []) if item.get("type") == "agentMessage"]
+            final = [item for item in messages if item.get("phase") == "final_answer"]
+            if not final and turn["status"] == "completed":
+                final = [item for item in messages if item.get("phase") is None]
+            reply = "\n".join(item["text"] for item in final)
             with store.transaction(db, transaction_owner="Driver", operation="save_reply", run_id=self.rid) as tx:
                 inserted = tx.execute("INSERT OR IGNORE INTO p0_main_replies VALUES(?,?,?,?)",
                            (mid, row["turn_id"], turn["status"], reply))

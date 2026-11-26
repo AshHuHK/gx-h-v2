@@ -30,6 +30,30 @@ def _public_input(row):
     return action.get("kind") in ("text", "proposal", "supplement") and action.get("text") == row["message_text"]
 
 
+def reply_anchor(conn, run, ref):
+    """Resolve a public message or a released research reference, including older turns."""
+    anchored = conn.execute("""
+        SELECT m.*,a.response FROM p0_operator_messages m JOIN runs r USING(run_id)
+        LEFT JOIN p0_main_replies a USING(message_id) WHERE m.message_id=? AND r.project_ref=?
+        """, (ref,run["project_ref"])).fetchone()
+    if anchored and _public_input(anchored):
+        return {"kind":"message", "run_id":anchored["run_id"], "message_id":ref,
+                "text":anchored["message_text"], "reply":anchored["response"]}
+    decision = conn.execute("SELECT t.goal_version FROM v6_decisions d JOIN v6_decision_tasks t "
+                            "USING(run_id,task_id) WHERE d.decision_ref=? AND d.run_id=? AND t.scope='run'",
+                            (ref,run["run_id"])).fetchone()
+    if decision:
+        return {"kind":"decision","decision_ref":ref,"goal_version":decision[0]}
+    released = conn.execute("""
+        SELECT m.branch_id,m.goal_version FROM v62_module_reports r JOIN v62_modules m USING(run_id,module_instance_id)
+        JOIN v62_module_wakes w ON w.run_id=m.run_id JOIN events e ON e.event_id=w.event_id
+        JOIN json_each(e.payload_json,'$.module_instance_ids') member ON member.value=m.module_instance_id
+        WHERE r.run_id=? AND r.report_ref=? LIMIT 1""",(run["run_id"],ref)).fetchone()
+    if released:
+        return {"kind":"report","report_ref":ref,"branch_id":released[0],"goal_version":released[1]}
+    raise ValueError("Unknown conversation message or published research reference on this Run")
+
+
 def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, question_id=None,
          conversation_id=None, goal_version=None, attachments=None, successor=None):
     """Persist verbatim PI input before attempting any native or scientific action."""
@@ -52,6 +76,11 @@ def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, 
         raise ValueError("Conversation does not belong to this project")
     digest = ids.sha256_of_obj([run_id, text, reply_to, branch_id, question_id, attachments or [], successor])
     answer = None
+    pinned = successor
+    if successor and successor.get("input_files") and not conn.execute(
+            "SELECT 1 FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone():
+        from .successor import freeze_files
+        pinned = freeze_files(store.data_root(conn), successor)
     with store.transaction(conn, transaction_owner="Conversation", operation="receive", run_id=run_id) as tx:
         existing = tx.execute("SELECT * FROM p0_operator_messages WHERE message_id=?", (mid,)).fetchone()
         metadata = tx.execute("SELECT * FROM p0_conversation_messages WHERE message_id=?", (mid,)).fetchone()
@@ -71,10 +100,7 @@ def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, 
             if goal_version is not None and (current is None or goal_version > current):
                 raise ValueError("Unknown Goal version on this Run")
             if reply_to:
-                anchor = tx.execute("SELECT m.* FROM p0_operator_messages m JOIN runs r USING(run_id) "
-                                    "WHERE m.message_id=? AND r.project_ref=?", (reply_to, run["project_ref"])).fetchone()
-                if anchor is None or not _public_input(anchor):
-                    raise ValueError("Unknown conversation message to reply to")
+                reply_anchor(tx, run, reply_to)
             if branch_id:
                 from . import research_dialogue
                 _, canonical_branch, _ = research_dialogue._target(tx, run_id, branch_id)
@@ -86,7 +112,7 @@ def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, 
             enqueue(tx, run_id, {"kind": "text", "text": text}, text, mid)
             tx.execute("INSERT INTO p0_conversation_messages VALUES(?,?,?,?,?,?,?,NULL,?)",
                        (mid, cid, version, reply_to, branch_id, question_id, digest,
-                        ids.canonical_json(successor) if successor is not None else None))
+                        ids.canonical_json(pinned) if pinned is not None else None))
             if attachments:
                 from . import pi_materials
                 pi_materials.register(tx, run_id, mid, branch_id=branch_id, attachments=attachments)

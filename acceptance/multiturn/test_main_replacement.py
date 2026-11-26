@@ -16,9 +16,12 @@ class NativeMain:
         self.threads = {}
         self.sent = []
         self.missing = set()
+        self.disappear_on_send = set()
 
     def request(self, method, args):
         thread = args.get("threadId")
+        if method == "turn/start" and thread in self.disappear_on_send:
+            self.missing.add(thread)
         if thread in self.missing:
             raise AppServerResponseError(ReceivedMessage(1, {"id": 42, "error": {
                 "code": -32600, "message": f"thread not found: {thread}"}}))
@@ -55,8 +58,14 @@ class NativeMain:
         s.roots._request = self.request
         return driver
 
-    def complete(self, s, driver, thread, mid, response):
+    def complete(self, s, driver, thread, mid, response, *, meter=False):
         turn = {"id":"turn-"+mid, "status":"completed", "items":[{"type":"agentMessage", "text":response}]}
+        if meter:
+            receipt = {"threadId":thread, "turnId":turn["id"]}
+            s.roots.delivery.observe("turn/started", {"threadId":thread, "turn":{"id":turn["id"]}})
+            s.roots.delivery.observe("rawResponse/completed", {**receipt, "responseId":"response-"+mid,
+                                                               "usage":{"totalTokens":3}})
+            s.roots.delivery.observe("thread/tokenUsage/updated", {**receipt, "tokenUsage":{"total":{"totalTokens":3}}})
         self.threads[thread]["turns"].append(turn)
         s.roots.delivery.observe("turn/completed", {"threadId":thread, "turn":turn})
         driver.finish_main(mid, wait=0)
@@ -106,6 +115,41 @@ class MainReplacement(unittest.TestCase):
                     with self.assertRaises(ScopeDenied):
                         cold.roots._call({"threadId":old,"turnId":"turn-earlier","tool":"gx_project_state",
                                           "callId":"late-write","arguments":{}})
+
+    def test_live_host_loses_loaded_main_before_read_or_before_start(self):
+        for failure in ("read", "send", "uncertain"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temp:
+                host = NativeMain()
+                with Scenario(Path(temp), spec_updates={"input_files":[], "capabilities":[], "plugins":[]}) as s:
+                    driver = host.attach(s)
+                    conversation.send(s.conn, s.run_id, "Which question is still open?", "first")
+                    driver.messages()
+                    old, = host.threads
+                    host.complete(s, driver, old, "first", "The comparison remains open.", meter=True)
+                    conversation.send(s.conn, s.run_id, "Please explain that comparison.", "followup", reply_to="first")
+                    row, = s.rows("SELECT * FROM p0_operator_messages WHERE message_id='followup'")
+                    if failure == "uncertain":
+                        intent.stage_input(s.conn, s.run_id, "followup",
+                                           {"kind":"text","text":row["message_text"]})
+                        s.roots.delivery._prepare(old, row["message_text"], "human:followup", True, False,
+                                                  "followup", None)
+                    if failure == "send":
+                        host.disappear_on_send.add(old)
+                    else:
+                        host.missing.add(old)
+                    with self.assertRaises(AppServerResponseError):
+                        driver._human_turn(s.roots, row)
+                    self.assertNotIn(old, s.roots.loaded)
+                    if failure == "uncertain":
+                        with self.assertRaises(OutcomeUnknown):
+                            driver._human_turn(s.roots, row)
+                        self.assertEqual(host.sent, [(old,"first")])
+                    else:
+                        self.assertEqual(driver._human_turn(s.roots, row), "turn-followup")
+                        new, = [t for t in host.threads if t != old]
+                        self.assertEqual(host.sent, [(old,"first"), (new,"followup")])
+                        self.assertEqual(s.rows("SELECT thread_id FROM p0_root_deliveries WHERE event_id='human:followup'"),
+                                         [{"thread_id":new}])
 
     def test_lost_thread_with_unresolved_send_holds_and_ack_crash_is_consumed_once(self):
         with tempfile.TemporaryDirectory() as temp:

@@ -37,6 +37,35 @@ def _pin(directory, name, raw):
     return {"path": str(target), "sha256": digest}
 
 
+def freeze_files(directory, options):
+    """Pin local operator inputs outside the inbox write lock, before acknowledging delivery."""
+    local = options.get("input_files", [])
+    if not isinstance(local, list):
+        raise SchemaInvalid("Successor input_files must be a list")
+    if not local:
+        return options
+    stage = directory / "successor-inputs"
+    prepared = []
+    for item in local:
+        if (not isinstance(item, dict) or set(item) - {"path", "role", "sha256", "acquisition"}
+                or not isinstance(item.get("path"), str) or not Path(item["path"]).is_absolute()):
+            raise SchemaInvalid("A new material requires an absolute local path and optional role, sha256, acquisition")
+        source = Path(item["path"])
+        entry = _pin(stage, source.name, v621_assignment._bytes(source))
+        if "sha256" in item and item["sha256"] != entry["sha256"]:
+            raise SchemaInvalid("New successor material differs from the selected SHA-256")
+        if "acquisition" in item:
+            if not isinstance(item["acquisition"], str) or not Path(item["acquisition"]).is_absolute():
+                raise SchemaInvalid("A successor acquisition requires a local descriptor path")
+            entry["acquisition"] = _pin(stage, "acquisition.json",
+                v621_assignment._bytes(item["acquisition"]))["path"]
+        role = item.get("role", "material")
+        if not isinstance(role, str) or not role.strip():
+            raise SchemaInvalid("The selected material role must be text")
+        prepared.append({**entry, "role": role})
+    return {**options, "input_files": prepared}
+
+
 def _attachments(conn, rid, message_id):
     from . import pi_materials
     return [item for item in pi_materials.for_message(conn, rid, message_id) if not item.get("branch_id")]
@@ -104,24 +133,18 @@ def _spec(conn, directory, parent, close, mid, text, options):
         files.append({**entry, "role": item.get("role") or "material"})
         sources.append({"parent_artifact_ref": ref, "sha256": entry["sha256"], "name": item["name"],
                         "role": files[-1]["role"]})
+    # Early conversation journals stored the original local options. An already queued
+    # start keeps its frozen specification; an inbox-only request pins its inputs once here.
+    # Its request_digest below still binds the unchanged, originally recorded envelope.
+    if local and not all(isinstance(item, dict) and {"path","role","sha256"} <= item.keys()
+                         and Path(item["path"]).parent == stage / item["sha256"] for item in local):
+        local = freeze_files(directory, options)["input_files"]
     for item in local:
-        if (not isinstance(item, dict) or set(item) - {"path", "role", "sha256", "acquisition"}
-                or not isinstance(item.get("path"), str) or not Path(item["path"]).is_absolute()):
-            raise SchemaInvalid("A new material requires an absolute local path and optional role, sha256, acquisition")
-        source = Path(item["path"])
-        entry = _pin(stage, source.name, v621_assignment._bytes(source))
-        if "sha256" in item and item["sha256"] != entry["sha256"]:
-            raise SchemaInvalid("New successor material differs from the selected SHA-256")
+        material = {key: item[key] for key in ("path","role","sha256")}
         if "acquisition" in item:
-            if not isinstance(item["acquisition"], str) or not Path(item["acquisition"]).is_absolute():
-                raise SchemaInvalid("A successor acquisition requires a local descriptor path")
-            acquisitions[str(len(files))] = _pin(stage, "acquisition.json",
-                v621_assignment._bytes(item["acquisition"]))["path"]
-        role = item.get("role", "material")
-        if not isinstance(role, str) or not role.strip():
-            raise SchemaInvalid("The selected material role must be text")
-        files.append({**entry, "role": role})
-        sources.append({"name": source.name, "role": role, "sha256": entry["sha256"]})
+            acquisitions[str(len(files))] = item["acquisition"]
+        files.append(material)
+        sources.append({"name": Path(material["path"]).name, "role": material["role"], "sha256": material["sha256"]})
     decision = research_report.closing_decision(conn, rid, close)
     predecessor = {"parent_run_id": rid, "parent_decision_ref": close["decision_ref"],
                    "parent_goal_version": close["goal_version"], "closed_event": close["closed_event"],

@@ -237,7 +237,8 @@ def _consequences(conn, rid, feedback, disposition):
         row = conn.execute("SELECT p.report_ref,p.receipt_json FROM v62_module_reports p "
                            "JOIN v62_modules m USING(module_instance_id,run_id) WHERE m.run_id=? AND m.scope=?",
                            (rid, feedback["scope"])).fetchone()
-        if row and (row["report_ref"] == ref or set(store.loads(row, "receipt_json")["source_refs"]) & sources):
+        if row and (row["report_ref"] == ref or row["report_ref"] in disposition["evidence_refs"]
+                    or set(store.loads(row, "receipt_json")["source_refs"]) & sources):
             report = row["report_ref"]
             sources.add(report)
     lead = []
@@ -263,7 +264,8 @@ def dispose(conn, rid, root, turn, task, items, *, product_ref, product_kind, ev
     accepted = []
     for item in items:
         if (not isinstance(item, dict) or set(item) != {"feedback_id", "outcome", "reason"}
-                or item.get("outcome") not in {"adopt", "maintain", "measure", "defer"}
+                or not isinstance(item.get("feedback_id"), str)
+                or item.get("outcome") not in ("adopt", "maintain", "measure", "defer")
                 or not isinstance(item.get("reason"), str) or not item["reason"].strip()):
             raise SchemaInvalid("A feedback disposition requires its feedback_id, outcome and scientific reason")
         key = item["feedback_id"]

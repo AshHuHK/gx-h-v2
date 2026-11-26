@@ -5,7 +5,7 @@ import time
 from ..domain import ids
 from ..native_release import native_state, ReleaseStateError
 from ..persistence import store
-from . import conversation, metering
+from . import metering
 from .driver import Driver, native_waits
 
 
@@ -87,6 +87,13 @@ def _drain(driver, target):
         # A genuinely busy turn keeps its owning App Server until it drains. An
         # existing cost hold with no native work can be picked up on the next wake.
         if not turns and (driver._native is None or not driver._native.active_turns):
-            return result
+            previous = db.execute("""SELECT 1 FROM p0_meter_native_turns n JOIN p0_root_deliveries d
+                USING(run_id,event_id) WHERE n.run_id=? AND d.human=1 AND n.budget_status='HELD'
+                  AND n.terminal_status IS NOT NULL AND n.confidence<>'UNRESOLVED' LIMIT 1""", (rid,)).fetchone()
+            delay = metering.next_deadline_seconds(db, rid) if previous else None
+            if delay is None:
+                return result
+            time.sleep(max(.02, min(.25, delay)))
+            continue
         if not driver._poll(0.15):
             time.sleep(0.03)

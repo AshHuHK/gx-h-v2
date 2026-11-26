@@ -200,6 +200,12 @@ def export(conn, rid, directory, invocation):
     result = {"schema":"gx.research-result/1", "run_id":rid, "goal":goal, "goal_status":"CLOSED",
               "goal_version":close["goal_version"], "closure":close, "final_decision":final,
               **science, "routes":work, "post_read_actions":actions, "rejected_decisions":rejected, "invocation":invocation}
+    predecessor = conn.execute("SELECT json_extract(inputs_json,'$.inputs.p0_spec.predecessor') "
+                               "FROM runs WHERE run_id=?", (rid,)).fetchone()[0]
+    if predecessor:
+        prior = json.loads(predecessor)
+        result["prior_study"] = {k:prior[k] for k in (
+            "parent_run_id", "parent_decision_ref", "parent_goal_version", "request_message_id", "selected_materials")}
     out = directory/"research"/rid
     out.mkdir(parents=True, exist_ok=True)
     for name, data in (("REPORT.md", page(result)),

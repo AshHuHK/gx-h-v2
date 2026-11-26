@@ -17,7 +17,7 @@ from gx_core.artifacts import ArtifactService
 from gx_core.domain import ids
 from gx_core.errors import GxError, StaleRevision
 from gx_core.hostobs.app_server_client import ReceivedMessage
-from gx_core.p0 import v6_decisions, v6_goal, v6_jobs, v6_native
+from gx_core.p0 import v6_decisions, v6_goal, v6_jobs, v6_native, v623_endpoint_use
 
 
 def trace(name, receipt):
@@ -194,7 +194,7 @@ class EndpointClose(unittest.TestCase):
         outputs = {n["result_ref"] for n in nodes}
         missing = sorted(outputs - {covered["artifact_ref"]}, reverse=True)[:2]
         self.assertEqual(len(missing), 2)
-        decision = close_decision([s.materials[0], report_ref, *missing])
+        decision = close_decision([s.materials[0], report_ref, missing[0], covered["artifact_ref"], missing[1]])
         decision["metric_refs"] = [report_ref + "#" + chosen]
         params = {"tool": v6_native.DECIDE, "namespace": "gx", "callId": "quant-citation-index",
                   "threadId": lead.thread, "turnId": lead.turn, "arguments": {"decision": decision}}
@@ -212,6 +212,54 @@ class EndpointClose(unittest.TestCase):
             self.assertNotIn(reference, response["contentItems"][0]["text"])
         self.assertEqual(message.get("field"), "evidence_refs[2]")
         self.assertEqual(details.get("field"), message["field"])
+
+        self.assertEqual(message.get("missing_fields"), ["evidence_refs[2]", "evidence_refs[4]"])
+        self.assertNotIn("more_missing_fields", message)
+        self.assertEqual(set(message), {"error", "code", "reason", "field", "missing_fields"})
+        for metric in metrics:
+            self.assertNotIn(metric["display"], message["error"])
+        self.assertEqual(s.rows("SELECT status FROM v6_goals"), [{"status": "OPEN"}])
+
+        remaining = [ref for index, ref in enumerate(decision["evidence_refs"])
+                     if f"evidence_refs[{index}]" not in message["missing_fields"]]
+        corrected = {**decision, "evidence_refs": remaining}
+        closed = s.call(lead, v6_native.DECIDE, {"decision": corrected}, "remove-unused-sources")
+        self.assertEqual(closed["close_context"]["used_metric_refs"], [covered["metric_ref"]])
+        s.advance()
+        self.assertEqual(s.rows("SELECT status FROM v6_goals"), [{"status": "CLOSED"}])
+
+    def test_native_missing_citation_field_list_is_bounded_at_sixteen(self):
+        directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        s = self.enterContext(CloseStudy(directory / "run"))
+        lead = s.lead
+        root = {"run_id": s.run_id, "thread_id": lead.thread, "lease_id": lead.lease_id}
+        for count in (16, 18):
+            with self.subTest(count=count):
+                # Exercise the real citation check and callback formatting with a large synthetic inventory.
+                sources = [f"private-source-{index:02d}" for index in reversed(range(count))]
+                registered = {ref: {"private-metric-" + ref} for ref in sources}
+                decision = close_decision(["qualitative-ground", *sources])
+                params = {"tool": v6_native.DECIDE, "namespace": "gx", "callId": f"bounded-{count}",
+                          "threadId": lead.thread, "turnId": lead.turn, "arguments": {"decision": decision}}
+
+                def verify(call):
+                    return v623_endpoint_use.verify(s.conn, {"task_id": lead.task_id}, root, lead.turn,
+                        call["arguments"]["decision"], (registered, {}), closing=True)
+
+                with patch.object(s.roots, "_call", side_effect=verify):
+                    response = s.roots._callback(ReceivedMessage(1, {"method": "item/tool/call", "params": params}))
+                self.assertFalse(response["success"])
+                text = response["contentItems"][0]["text"]
+                wire = json.loads(text)
+                self.assertEqual(wire["reason"], "endpoint_use_unspecified")
+                self.assertEqual(wire["field"], "evidence_refs[1]")
+                self.assertEqual(wire.get("missing_fields"), [f"evidence_refs[{i}]" for i in range(1, 17)])
+                if count == 16:
+                    self.assertNotIn("more_missing_fields", wire)
+                else:
+                    self.assertEqual(wire["more_missing_fields"], count - 16)
+                self.assertNotIn("private-source-", text)
+                self.assertNotIn("private-metric-", text)
 
     def test_single_display_is_received_before_a_cited_close(self):
         directory, (s, assets, _, node, output, worker) = self.measured()

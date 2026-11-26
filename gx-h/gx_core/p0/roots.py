@@ -1001,6 +1001,9 @@ class Roots:
                     and v621_policy.science_execution(self.conn, self.run_id)):
                 status = exc.code
                 out.update(code=exc.code, **{key: exc.details[key] for key in ("reason","field","options") if key in exc.details})
+                if out.get("reason") == "endpoint_use_unspecified":
+                    out.update({key: exc.details[key] for key in ("missing_fields", "more_missing_fields")
+                                if key in exc.details})
             return {"success":False,"contentItems":[{"type":"inputText","text":json.dumps(out)}]}
 
         finally:

@@ -4,6 +4,7 @@ from ..errors import SchemaInvalid, ScopeDenied
 
 FIELDS = ("comparison_plan", "comparison_id", "disposition", "metric_refs", "affected_scope", "stop_reason")
 INCOMPLETE_STOPS = {"UNREAD_EVIDENCE", "INSUFFICIENT_DATA", "BUDGET", "TIME_LIMIT", "OPERATOR"}
+MAX_MISSING_FIELDS = 16
 
 
 def prepare(conn, task, *, metric_details=None):
@@ -117,13 +118,17 @@ def verify(conn, task, root, turn, decision, inventory, *, closing, selected=Non
         raise SchemaInvalid("A stop reason belongs to a decision that closes the Run")
     unread = all_refs - received
     cited_sources = by_source.keys() & set(decision["evidence_refs"])
-    missing = sorted(ref for ref in cited_sources if not used.intersection(by_source[ref]))
+    missing = {ref for ref in cited_sources if not used.intersection(by_source[ref])}
     if closing and missing and stop_reason not in INCOMPLETE_STOPS:
-        index = next(i for i, ref in enumerate(decision["evidence_refs"]) if ref in missing)
-        raise SchemaInvalid("A cited quantitative source requires a concrete received endpoint, "
-                            "or an explicit reason for stopping without using it",
-                            details={"reason": "endpoint_use_unspecified", "source_refs": missing,
-                                     "field": f"evidence_refs[{index}]"})
+        positions = [i for i, ref in enumerate(decision["evidence_refs"]) if ref in missing]
+        fields = [f"evidence_refs[{i}]" for i in positions[:MAX_MISSING_FIELDS]]
+        details = {"reason": "endpoint_use_unspecified", "source_refs": sorted(missing),
+                   "field": fields[0], "missing_fields": fields}
+        if len(positions) > len(fields):
+            details["more_missing_fields"] = len(positions) - len(fields)
+        raise SchemaInvalid("For each listed source you used, keep it in evidence_refs and add a received "
+                            "endpoint (source#row) from it to metric_refs. Drop unused sources from evidence_refs. "
+                            "For an incomplete close, give the applicable stop_reason.", details=details)
     if closing and stop_reason == "UNREAD_EVIDENCE" and not unread:
         raise SchemaInvalid("An unread-evidence stop requires a published endpoint this Lead has not received")
     return {"received_metric_refs": sorted(received), "used_metric_refs": sorted(used),

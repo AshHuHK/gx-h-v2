@@ -9,7 +9,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / "gx-h")]
-from acceptance.science_execution import approval, diagnostic
+from acceptance.science_execution import action_effect, approval, diagnostic
 from acceptance.v622.public.enrollment import digest, read
 from acceptance.v623.live import action_witness
 from acceptance.v623.oauth import export_results, usage
@@ -101,15 +101,17 @@ def evaluate(work,number):
         raise ValueError("Inconsistent original allocation")
     trace = action_witness.trace_slot(work,number,reg,True)
     reader,opening = action_witness.reader_packet(trace)
-    outcome,facts = action_witness.outcome_packet(trace,reg,opening)
     win,cues,_ = action_witness.first_window(trace)
     delivery = min((win["delivery_receipts"][c["metric"]["metric_ref"]]["event_id"] for c in cues), default=None)
     account,actors = accounting(slot,reg,rid)
-    action = facts["decision_event"]
-    effect = facts["effect"] or {}
     with closing(receipts.database(slot)) as db:
+        outcome,facts = action_effect.outcome_packet(db,trace,reg,opening)
+        action = facts["decision_event"]
+        effect = facts["effect"] or {}
         times = {"delivery":_event(db,rid,delivery),"decision":_event(db,rid,action),"effect":None}
-        if effect.get("kind")=="completed_job":
+        if effect.get("event_id"):
+            times["effect"] = _event(db,rid,effect["event_id"])
+        elif effect.get("kind")=="completed_job":
             done = db.execute("""SELECT event_id FROM events WHERE run_id=? AND subject_id=?
                AND kind='job.transition' AND new_state='SUCCEEDED' ORDER BY event_id LIMIT 1""",(rid,effect["job_id"])).fetchone()
             if done:

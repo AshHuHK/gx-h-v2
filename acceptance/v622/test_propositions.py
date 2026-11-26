@@ -176,43 +176,93 @@ class QuickPublication(unittest.TestCase):
 
 
 class DerivedMaterialChronology(unittest.TestCase):
-    def test_previously_observed_endpoint_on_source_cannot_validate_again_on_its_derivative(self):
+    endpoint = "public.archive.instrument/1"
+
+    def start(self, **policy):
         from acceptance.v62c import materials
-        from acceptance.v622.test_source_identity import MaterialSource
-        fixture = MaterialSource()
-        self.addCleanup(fixture.doCleanups)
-        fixture.setUp()
-        f = original.ClaimPublication()
-        f.gx, f.folder = fixture.state, fixture.work
-        parent = f.gx.materials[0]
-        metadata = materials.parent_acquisition()
-        code, acquired = fixture.command("observe", "archive-original", fixture.src, metadata, existing_ref=parent)
-        self.assertEqual(code, 0, fixture.out[-1]["error"])
-        endpoint = "public.archive.instrument/1"
-        scope = metadata["applicability"]
-        prior = f.observe("instrument-before", {"schema": endpoint, "measurement": {"value": 7}},
-                          data=[parent], scope=scope)
-        custody = fixture.work / "custody"
-        slot = materials.prepare(custody)["P4"]
-        child = custody / "P4"
-        descriptor = {**metadata, "derived_from": [{k: acquired[k] for k in ("artifact_ref", "sha256")}],
+        from acceptance.v623.test_source_revisions import RevisionIdentity
+        from gx_core.p0 import v621_policy
+
+        self.fixture = RevisionIdentity()
+        self.addCleanup(self.fixture.doCleanups)
+        self.fixture.setUp()
+        self.fixture.start(**policy)
+        self.flow = original.ClaimPublication()
+        self.flow.gx, self.flow.folder = self.fixture.state, self.fixture.work
+        self.assertEqual(v621_policy.pinned(self.flow.gx.conn, self.flow.gx.run_id),
+                         policy.get("evidence_policy", v621_policy.VERSION))
+        self.parent, self.independent = self.flow.gx.materials
+        self.metadata = materials.parent_acquisition()
+        self.scope = self.metadata["applicability"]
+        code, receipt = self.fixture.command("observe", "archive-original", self.fixture.src,
+                                             self.metadata, existing_ref=self.parent)
+        self.assertEqual(code, 0, self.fixture.out[-1]["error"])
+        self.parent_pin = {k: receipt[k] for k in ("artifact_ref", "sha256")}
+        self.prior = self.reading("instrument-before", 7, self.parent)
+        self.custody = self.fixture.work / "custody"
+        self.slots = materials.prepare(self.custody)
+
+    def reading(self, label, value, material):
+        return self.flow.observe(label, {"schema": self.endpoint, "measurement": {"value": value}},
+                                 data=[material], scope=self.scope)
+
+    def assign(self, code):
+        slot = self.slots[code]
+        child = self.custody / code
+        descriptor = {**self.metadata, "derived_from": [self.parent_pin],
                       "processing": ["coordinate-record withholding/" + slot["transform_sha256"]],
                       "transformation": json.loads((child / "transform.json").read_bytes()), "sha256": slot["sha256"]}
-        code, assigned = fixture.command("assign-material", "source-derivative", child / "specimen.cif", descriptor)
-        self.assertEqual(code, 0, fixture.out[-1]["error"])
-        derivative = assigned["artifact_ref"]
-        actor = f.gx.next_actor("run")
-        prediction = {"data_refs": [derivative], "observable": "/measurement/value", "operator": "gt",
-                      "threshold": 5, "measurement_schema": endpoint, "target": "experimental_observation"}
-        registration = f.adopt(actor, "register-on-renamed-source", [prior], "open", scope=scope,
-                               prediction=prediction, statement="The instrument reading exceeds five.")
+        rc, assigned = self.fixture.command("assign-material", "source-derivative-" + code, child / "specimen.cif", descriptor)
+        self.assertEqual(rc, 0, self.fixture.out[-1]["error"])
+        return assigned["artifact_ref"]
+
+    def register(self, inputs):
+        prediction = {"data_refs": inputs, "observable": "/measurement/value", "operator": "gt",
+                      "threshold": 5, "measurement_schema": self.endpoint, "target": "experimental_observation"}
+        return self.flow.adopt(self.flow.gx.next_actor("run"), "register-on-renamed-source", [self.prior], "open",
+                               scope=self.scope, prediction=prediction, statement="The instrument reading exceeds five.")
+
+    def interpret(self, refs):
+        actor, current, _ = self.flow.delivered_claim()
+        return self.flow.adopt(actor, "interpret-child", refs, "limited_support", scope=self.scope,
+                               statement=current["statement"], previous_claim_ref=current["claim_revision_id"])
+
+    def test_previously_observed_endpoint_on_source_cannot_validate_again_on_its_derivative(self):
+        self.start(evidence_policy="gx.evidence/6.2.2", historical_replay=True)
+        derivative = self.assign("P4")
+        registration = self.register([derivative])
         item, = registration["maturity"]["material_coverage"]
         self.assertTrue(item["known_at_registration"])
         self.assertEqual(item["qualification"], "retrospective")
-        later = f.observe("instrument-after", {"schema": endpoint, "measurement": {"value": 8}},
-                          data=[derivative], scope=scope)
-        actor, current, _ = f.delivered_claim()
-        retried = f.adopt(actor, "interpret-child", [later], "limited_support", scope=scope,
-                          statement=registration["statement"], previous_claim_ref=current["claim_revision_id"])
+        later = self.reading("instrument-after", 8, derivative)
+        retried = self.interpret([later])
         self.assertEqual(retried["level"], "insufficient")
         self.assertIn(later, retried["maturity"]["material_coverage"][0]["retrospective_refs"])
+
+    def test_external_instrument_requires_its_own_endpoint_equivalence(self):
+        self.start()
+        derivative, sibling = self.assign("P4"), self.assign("K7")
+        registered = self.register([self.parent, derivative, sibling, self.independent])
+        rows = registered["publication"]["material_coverage"]
+        self.assertEqual([r["qualification"] for r in rows],
+                         ["retrospective", "timing_unknown", "timing_unknown", "unmeasured"])
+        self.assertEqual([r["known_at_registration"] for r in rows], [True, False, False, False])
+        for item in rows[1:3]:
+            self.assertIsNone(item["endpoint_first_available_event_id"])
+            self.assertEqual(item["material_identity_uncertainty"], ["unverified_endpoint_transformation"])
+        # A reading on one child gives that child an availability time. Its relation to
+        # the parent's instrument value is still unknown, and its sibling has no reading.
+        later = self.reading("instrument-after", 8, derivative)
+        fresh = self.reading("separate-deposition", 9, self.independent)
+        result = self.interpret([later, fresh])
+        self.assertEqual((result["level"], result["publication"]["direction"]), ("insufficient", "undetermined"))
+        parent, child, adjacent, independent = result["publication"]["material_coverage"]
+        self.assertEqual(parent["qualification"], "retrospective")
+        self.assertEqual(child["qualification"], "timing_unknown")
+        self.assertLess(child["registration_event_id"], child["endpoint_first_available_event_id"])
+        self.assertEqual(child["uncertain_refs"], [later])
+        self.assertEqual(adjacent["qualification"], "timing_unknown")
+        self.assertIsNone(adjacent["endpoint_first_available_event_id"])
+        self.assertFalse(adjacent["uncertain_refs"])
+        self.assertFalse(child["supporting_refs"] or adjacent["supporting_refs"])
+        self.assertEqual((independent["qualification"], independent["supporting_refs"]), ("prospective", [fresh]))

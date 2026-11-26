@@ -8,6 +8,7 @@ import time
 import unittest
 from unittest.mock import patch
 
+from gx_core.jobs import executor
 from gx_core.p0 import v6_claims, v6_decisions, v6_goal, v6_jobs, v62_maturity
 from gx_core.persistence import store
 from tests import test_v62_outputs as instrument
@@ -280,3 +281,54 @@ class ProspectiveJobs(unittest.TestCase):
         available, = claims[count]['maturity']['material_coverage']
         self.assertEqual(available['qualification'], 'retrospective')
         self.assertLess(available['endpoint_first_available_event_id'], available['registration_event_id'])
+
+    def test_sufficient_table_launched_before_registration_keeps_later_direct_readout_timing_unknown(self):
+        self.start(declare_table=True)
+        self.plan(('table', TABLE, self.raw, 'all'))
+        self.next_lead()
+        launch = executor.launch
+
+        def register_after_table_launch(directory):
+            identity = launch(directory)
+            claim = self.stage()
+            direct = dict(op='add_node', node='local:direct', branch='local:readout', capability=METHOD,
+                          inputs=[self.raw], parameters={'selection': 'all'}, depends_on=[],
+                          question='What is the mean of these samples?')
+            decision = draft(dict(branch('readout'), budget_limits={'job_submissions': 1, 'cpu_seconds': 120}), direct)
+            adopted = v6_decisions.adopt(self.db, **self.actor, decision={**decision, 'evidence_refs': [self.raw, claim]})
+            self.nodes['direct'] = adopted['aliases']['local:direct']
+            return identity
+
+        with patch.object(executor, 'launch', side_effect=register_after_table_launch) as intercepted:
+            v6_jobs.advance(self.db, self.run)
+        intercepted.assert_called_once()
+        table = self.settle('table')
+        direct = self.settle('direct')
+        self.assertNotEqual(table, direct)
+        v6_goal.ensure_task(self.db, self.run)
+        claim, = v6_claims.current(self.db, self.run)
+        maturity = claim['maturity']
+        registered = maturity['registration']['event_id']
+
+        def event(job, state):
+            return self.db.execute("SELECT event_id FROM events WHERE subject_id=? AND kind='job.transition' "
+                                   "AND new_state=?", (job, state)).fetchone()[0]
+
+        self.assertLess(event(table, 'SUBMITTING'), registered)
+        self.assertLess(registered, event(table, 'SUCCEEDED'))
+        self.assertLess(registered, event(direct, 'SUBMITTING'))
+        self.assertLess(event(direct, 'SUBMITTING'), event(direct, 'SUCCEEDED'))
+        with closing(store.open_store(self.directory / 'gx.db')) as cold:
+            v6_jobs.advance(cold, self.run)
+            actual_jobs = [r[0] for r in cold.execute('SELECT job_id FROM jobs WHERE run_id=?', (self.run,))]
+            self.assertCountEqual(actual_jobs, [table, direct])
+            replay = v62_maturity.recompute(cold, self.run, claim['claim_revision_id'])
+        coverage, = maturity['material_coverage']
+        self.assertEqual(coverage['qualification'], 'timing_unknown')
+        self.assertEqual(coverage['sufficient_job_launch_event_id'], event(table, 'SUBMITTING'))
+        reading, = [g for g in maturity['gaps'] if g['kind'] == 'unverified_production_order']
+        self.assertEqual((reading['value'], reading['supports']), (3, True))
+        origin = self.db.execute('SELECT job_id FROM artifacts WHERE artifact_ref=?', (reading['artifact_ref'],)).fetchone()
+        self.assertEqual(origin['job_id'], direct)
+        self.assertEqual((maturity['direction'], maturity['results']), ('undetermined', []))
+        self.assertEqual(replay['material_coverage'], [coverage])

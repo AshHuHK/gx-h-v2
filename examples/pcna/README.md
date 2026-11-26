@@ -6,7 +6,7 @@
 |---|---|---|
 | 旧材料彩排 | 2RE9、2O0O，已有参考计算 | [双路线问题卡](rehearsal.md) · [配置](rehearsal.json) |
 | 正式首航 | 1VYM、9VGW，只用覆盖筛查入组。[原件与资格](data/qualification.json) | [首航问题卡](first-flight.md) · [配置](goal.json) |
-| 自主选路 | 3JA9、3TBL，另批入组的原件。[原件与资格](open-data/qualification.json) | [开放问题卡](open-question.md) · [配置](open.json) |
+| 自主选路 | 3JA9、3TBL，另批入组的原件。[选择经过](open-data/selection.json) · [覆盖与资格](open-data/qualification.json) | [开放问题卡](open-question.md) · [配置](open.json) |
 
 ```bash
 ./bin/gx-p0 research --state ./runs/rehearsal --run-key pcna-rehearsal-01 \

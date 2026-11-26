@@ -69,3 +69,9 @@ GX_CODEX_OFFLINE=1 PYTHONPATH=gx-h:. .venv/bin/python -B -m unittest -v \
   acceptance.science_execution.test_research_metric_text \
   acceptance.science_execution.test_research_routes
 ```
+
+## 真首航暴露的两个边界
+
+首轮两个模块在模型启动前收到 GX 部分报告。模型选了 CPU、Job、调用次数并省略 token 上限，旧代码把省略当成零。修复后，两位同题研究者可从 Run 剩余量取得本回合的额度。脚本化宿主的普通入口复验有两个完成模块、3 个实际 CPU Job；已结 Run 重开新增 0 个 Job 和 0 个回合。[首次失败与复验](module-tokens-summary.json)
+
+原 Lead 在事件 72 和 73 登记了两个有明确原件、方法和阈值的预测。中文范围说明与原件取得记录中的英文范围未能逐字匹配。两个原始正式裁决均保留为未决。新登记可以省略材料范围，GX 从登记时可见且唯一的原件适用范围绑定；若 Lead 明示另一个范围，数值不得进入该范围的正式裁决。两处修复与原始 Lead、端点和报告回归合跑 30 项，全部通过。[原始判定与字段核对](first-scope-audit.json) · [范围回归](../../test_prediction_scope.py) · [额度回归](../../test_module_tokens.py)

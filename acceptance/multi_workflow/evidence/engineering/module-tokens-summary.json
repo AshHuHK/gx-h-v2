@@ -1,0 +1,211 @@
+{
+  "original_run_id": "gxr_01m8cgr15h0txt5abp",
+  "first_red_localhost_run": "gxr_01m8ch2cxwpy94bvsh",
+  "first_red": "module-tokens-first-red.json",
+  "unit_red": "module-tokens-unit-red4.log",
+  "unit_verified": "module-tokens-view.log",
+  "unit_count": 8,
+  "bounds": [
+    "Missing module tokens: simultaneous native holds funded from the Run, explicit per-turn and remaining Run caps respected.",
+    "Explicit zero: no native reservation and the budget PARTIAL is retained.",
+    "Explicit 3: allowed reservation is 3 with a host request of 10. Explicit exhaustion stops future work.",
+    "Admission/settlement/replay of two implicit children: underrun by 1 and overrun by 2 classified under funded resources; repeated settlement and two closes charge the parent exactly once."
+  ],
+  "local_public_cli": {
+    "run_id": "gxr_01m8ch953kqyps0m7s",
+    "transport": "official host and scripted localhost Responses",
+    "paid_model_calls": 0,
+    "scripted_requests": 18,
+    "modules": [
+      {
+        "scope": "module:module_869b6e5e5c4e77562e9ade5917766480",
+        "status": "COMPLETE",
+        "requested_budget": {
+          "api_calls": 6,
+          "cpu_seconds": 90,
+          "job_submissions": 2,
+          "worker_tasks": 6
+        }
+      },
+      {
+        "scope": "module:module_0ea01c17d3602640a71efb2d21fed7b3",
+        "status": "COMPLETE",
+        "requested_budget": {
+          "api_calls": 6,
+          "cpu_seconds": 90,
+          "job_submissions": 2,
+          "worker_tasks": 6
+        }
+      }
+    ],
+    "module_turns": 4,
+    "module_overlap_seconds": 0.722,
+    "jobs": 3,
+    "funding": {
+      "settled_tokens_by_account": {
+        "gxb_01m8ch953rkx2an134": 280,
+        "gxb_01m8ch96b85n2peznm": 175,
+        "gxb_01m8ch96fr2nz4zvr2": 175
+      },
+      "turn_confidence": [
+        {
+          "confidence": "PROVIDER_CONFIRMED",
+          "turns": 8,
+          "settled_tokens": 630,
+          "observed_lower_bound": 630
+        }
+      ],
+      "settled_module_funding_edges": 2,
+      "balances": {
+        "run": {
+          "limit": 1000000,
+          "spent": 630,
+          "reserved": 0,
+          "remaining": 999370
+        },
+        "workspace": {
+          "limit": 1000000,
+          "spent": 630,
+          "reserved": 0,
+          "remaining": 999370
+        }
+      }
+    },
+    "reopen_increment": {
+      "host_turns": 0,
+      "jobs": 0
+    },
+    "source": "module-tokens-native-fixed/native-pair.json"
+  },
+  "repeat_local_public_cli": {
+    "run_id": "gxr_01m8chb9m2npwazsx1",
+    "transport": "official host and scripted localhost Responses",
+    "paid_model_calls": 0,
+    "scripted_requests": 18,
+    "modules": [
+      {
+        "scope": "module:module_1681857d270d1191629242eba124ff23",
+        "status": "COMPLETE",
+        "requested_budget": {
+          "api_calls": 6,
+          "cpu_seconds": 90,
+          "job_submissions": 2,
+          "worker_tasks": 6
+        }
+      },
+      {
+        "scope": "module:module_4b5fafbc7a3bff79d366755e3087dd34",
+        "status": "COMPLETE",
+        "requested_budget": {
+          "api_calls": 6,
+          "cpu_seconds": 90,
+          "job_submissions": 2,
+          "worker_tasks": 6
+        }
+      }
+    ],
+    "module_turns": 4,
+    "module_overlap_seconds": 0.698,
+    "jobs": 3,
+    "funding": {
+      "settled_tokens_by_account": {
+        "gxb_01m8chb9m73wxdjt80": 65746,
+        "gxb_01m8chbaxv5zkz1m3j": 175,
+        "gxb_01m8chbb2j8k3tceqd": 175
+      },
+      "turn_confidence": [
+        {
+          "confidence": "ESTIMATED",
+          "turns": 1,
+          "settled_tokens": 65536,
+          "observed_lower_bound": 70
+        },
+        {
+          "confidence": "PROVIDER_CONFIRMED",
+          "turns": 7,
+          "settled_tokens": 560,
+          "observed_lower_bound": 560
+        }
+      ],
+      "settled_module_funding_edges": 2,
+      "balances": {
+        "run": {
+          "limit": 1000000,
+          "spent": 66096,
+          "reserved": 0,
+          "remaining": 933904
+        },
+        "workspace": {
+          "limit": 1000000,
+          "spent": 66096,
+          "reserved": 0,
+          "remaining": 933904
+        }
+      }
+    },
+    "reopen_increment": {
+      "host_turns": 0,
+      "jobs": 0
+    },
+    "source": "module-tokens-native-final/native-pair.json"
+  },
+  "reproduce": "PYTHONDONTWRITEBYTECODE=1 python -B acceptance/multi_workflow/native_pair.py --work /tmp/gx-module-tokens-NEW",
+  "final_product_entry": {
+    "run_id": "gxr_01m8chfzv7p6jydp28",
+    "receipt": "module-tokens-integrated-final/native-pair.json",
+    "module_turn_overlap_s": 0.641,
+    "jobs": 3,
+    "module_reports": 2,
+    "added_on_reopen": {
+      "host_turns": 0,
+      "jobs": 0
+    },
+    "funding": {
+      "balances": {
+        "run": {
+          "limit": 1000000,
+          "remaining": 999370,
+          "reserved": 0,
+          "spent": 630
+        },
+        "workspace": {
+          "limit": 1000000,
+          "remaining": 999370,
+          "reserved": 0,
+          "spent": 630
+        }
+      },
+      "settled_module_funding_edges": 2,
+      "settled_tokens_by_account": {
+        "gxb_01m8chfzv91dznyxbq": 280,
+        "gxb_01m8chg11re934srfy": 175,
+        "gxb_01m8chg163zw3nmt86": 175
+      },
+      "turn_confidence": [
+        {
+          "confidence": "PROVIDER_CONFIRMED",
+          "observed_lower_bound": 630,
+          "settled_tokens": 630,
+          "turns": 8
+        }
+      ]
+    },
+    "paid_model_calls": 0
+  },
+  "regressions": {
+    "module_native_worker_and_workspace": {
+      "tests": 35,
+      "log": "inherited-token-funding-regressions.log"
+    },
+    "metering_and_usage": {
+      "tests": 43,
+      "log": "inherited-token-meter-regressions-final.log"
+    }
+  },
+  "current_budget_view": {
+    "grant_tokens_omitted": true,
+    "parent_tokens_available": 3,
+    "visible_available_tokens": 3,
+    "token_funding": "shared_run"
+  }
+}

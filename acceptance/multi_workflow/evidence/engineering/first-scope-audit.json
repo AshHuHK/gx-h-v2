@@ -1,0 +1,140 @@
+{
+  "run_id": "gxr_01m8cgr15h0txt5abp",
+  "decision_event": 78,
+  "decision_ref": "gxa_521305ca8e19382aef3209ec5d9eb2e470140478913a80150b0f7c5a9276ffdd",
+  "raw_formal_history": [
+    {
+      "hypothesis_id": "gxh_01m8cgyj3p5e2fvaee",
+      "statement": "在 9VGW 的共同 Cα 坐标上，逐段剔除后，三链对中位数会漏报至少一个达到报告阈值的链对拟合角变化。",
+      "scope": "仅限固定修订版的 9VGW 沉积坐标、方法卡指定的 PCNA 实体及 A/B/C 链，共同 Cα，拟合角端点。",
+      "criteria": "按登记的区段宽度、角度阈值及最小可评分母，检验 /metrics/missed_present = 1。中位数接近零、衰减或与达阈值链对反向均计漏报。全部合格区段可评且无漏报即反驳预测。",
+      "source": {
+        "source": "wwPDB:9VGW/revision/1.1",
+        "event_id": 36,
+        "applicability": "Deposited asymmetric unit, model 1, human PCNA entity 1, label chains A/B/C.",
+        "sha256": "df8fc2854bae2a8b047ed9f09d6e1c436b116ba13a0b19959544dfeb783ee8dd"
+      },
+      "prediction": {
+        "data_refs": [
+          "gxa_01m8cgr176rr0yxvpd"
+        ],
+        "method": {
+          "capability": "deposited-block-signed@1",
+          "input_role": "structure",
+          "metric_id": "missed_present",
+          "output": "signed-summary.json",
+          "parameters": {
+            "effect_minimum": 0.1,
+            "endpoint": "angle_deg",
+            "mask": "common_ca",
+            "minimum_evaluable": 10,
+            "zero_limit": 0.02
+          },
+          "unit": "1"
+        },
+        "observable": "/metrics/missed_present",
+        "operator": "eq",
+        "target": "analysis",
+        "threshold": 1
+      },
+      "measurement_spec_applicability": "仅限固定修订版的 9VGW 沉积坐标、方法卡指定的 PCNA 实体及 A/B/C 链，共同 Cα，拟合角端点。",
+      "registered_event": 72,
+      "known_at_registration": {
+        "df8fc2854bae2a8b047ed9f09d6e1c436b116ba13a0b19959544dfeb783ee8dd": false
+      },
+      "assessment_revision": 2,
+      "official_direction": "undetermined",
+      "official_coverage": [
+        {
+          "artifact_ref": "gxa_01m8cgr176rr0yxvpd",
+          "endpoint_first_available_event_id": 101,
+          "known_at_registration": false,
+          "measurement_spec_sha256": "7d1606718c2cbaffb04397b1be2db8596fdddc916bcb223cd7bcd646e63a5932",
+          "opposing_refs": [],
+          "qualification": "measured_unqualified",
+          "raw_material_received_event_id": 24,
+          "registration_event_id": 72,
+          "retrospective_refs": [],
+          "sha256": "df8fc2854bae2a8b047ed9f09d6e1c436b116ba13a0b19959544dfeb783ee8dd",
+          "supporting_refs": [],
+          "uncertain_refs": []
+        }
+      ],
+      "formal_scope_gaps": [
+        {
+          "artifact_ref": "gxa_01m8cgykgkb1ekzd2e",
+          "event_id": 104,
+          "kind": "out_of_scientific_scope"
+        }
+      ]
+    },
+    {
+      "hypothesis_id": "gxh_01m8cgyj4b6nr0zr1z",
+      "statement": "在 1VYM 的共同 Cα 坐标上，三链对中位数足以标记逐段剔除时达到报告阈值的 RMSD 变化，预期没有漏报区段。",
+      "scope": "仅限固定修订版的 1VYM 沉积坐标、方法卡指定的 PCNA 实体及 A/B/C 链，共同 Cα，端点为叠合后 RMSD。",
+      "criteria": "按登记的 RMSD 阈值及最小可评分母检验 /metrics/missed_present = 0。须全数测完合格区段且无漏报才支持。任何达阈值链对被中位数掩盖或反向表示都能反驳预测，分母规则见方法卡。",
+      "source": {
+        "source": "wwPDB:1VYM/revision/1.4",
+        "event_id": 35,
+        "applicability": "Deposited asymmetric unit, model 1, human PCNA entity 1, label chains A/B/C.",
+        "sha256": "22b94186ce87e4d0b4a8e48c47ed129cea5b9900d5f6b4f9820833e879490b02"
+      },
+      "prediction": {
+        "data_refs": [
+          "gxa_01m8cgr16fwbrh4ter"
+        ],
+        "method": {
+          "capability": "deposited-block-signed@1",
+          "input_role": "structure",
+          "metric_id": "missed_present",
+          "output": "signed-summary.json",
+          "parameters": {
+            "effect_minimum": 0.05,
+            "endpoint": "rmsd_A",
+            "mask": "common_ca",
+            "minimum_evaluable": 10,
+            "zero_limit": 0.01
+          },
+          "unit": "1"
+        },
+        "observable": "/metrics/missed_present",
+        "operator": "eq",
+        "target": "analysis",
+        "threshold": 0
+      },
+      "measurement_spec_applicability": "仅限固定修订版的 1VYM 沉积坐标、方法卡指定的 PCNA 实体及 A/B/C 链，共同 Cα，端点为叠合后 RMSD。",
+      "registered_event": 73,
+      "known_at_registration": {
+        "22b94186ce87e4d0b4a8e48c47ed129cea5b9900d5f6b4f9820833e879490b02": false
+      },
+      "assessment_revision": 2,
+      "official_direction": "undetermined",
+      "official_coverage": [
+        {
+          "artifact_ref": "gxa_01m8cgr16fwbrh4ter",
+          "endpoint_first_available_event_id": 110,
+          "known_at_registration": false,
+          "measurement_spec_sha256": "a04005a639fbbddb55535cf4f79383b9e813953c84995cb827547192502342dd",
+          "opposing_refs": [],
+          "qualification": "measured_unqualified",
+          "raw_material_received_event_id": 23,
+          "registration_event_id": 73,
+          "retrospective_refs": [],
+          "sha256": "22b94186ce87e4d0b4a8e48c47ed129cea5b9900d5f6b4f9820833e879490b02",
+          "supporting_refs": [],
+          "uncertain_refs": []
+        }
+      ],
+      "formal_scope_gaps": [
+        {
+          "artifact_ref": "gxa_01m8cgykxfbdpv152n",
+          "event_id": 113,
+          "kind": "out_of_scientific_scope"
+        }
+      ]
+    }
+  ],
+  "finding": "The selected original, endpoint, mask and thresholds match their Jobs. The formal reader requires literal equality of the two applicability strings. Neither signed claim made that binding.",
+  "remedy": "At staging, current typed predictions may bind the verified common applicability of their selected originals; separately retain narrative and structured method choices. Explicit populations remain exactly matched.",
+  "historical_action": "Read-only audit. Original registrations and official verdicts are preserved. A later interpretation is distinct from the original formal verdict."
+}

@@ -37,6 +37,8 @@ def load_measured(state, snapshot, entry):
     db.row_factory = sqlite3.Row
     raw = None
     for job in jobs:
+        if job["method"] == SIGNED:
+            require(job["evidence"].get("discrepancies")==[], "Discrepant signed Job cannot support a cross-material comparison")
         sealed = db.execute("""SELECT j.status,j.capability_id,j.capability_version,m.admission_json,m.completion_json
                              FROM jobs j JOIN p0_execution_manifests m USING(job_id)
                              WHERE j.run_id=? AND j.job_id=?""", (rid, job["job_id"])).fetchone()
@@ -52,6 +54,14 @@ def load_measured(state, snapshot, entry):
             output = json.loads(read_artifact(db,state,rid,item))
             require(output["entry"] == entry and output["input_sha256"] == pin["sha256"]
                     and output["mask"] == job["parameters"]["mask"], "Published selection mismatch")
+            if item["output_name"] == "signed-summary.json":
+                require(all(output[k] == job["evidence"][k] for k in
+                            ("missed_present","blocks_evaluable","blocks_missed_observed","unavailable_reason")),
+                        "Independent summary differs from its published signed Job")
+            if item["output_name"] == "signed-blocks.json":
+                original = {r["block_index"]:r["classification"] for r in output["blocks"]}
+                independent = {r["index"]:r["classification"] for r in job["evidence"]["blocks"]}
+                require(original == independent, "Independent classes differ from their published signed Job")
         data = read_artifact(db,state,rid,pin)
         require(raw is None or raw == data, "Multiple original revisions for one material")
         raw = data
@@ -73,7 +83,7 @@ def load_measured(state, snapshot, entry):
     cif = MMCIF2Dict(StringIO(raw.decode("utf-8")))
     public = {"entry":entry, "run_id":rid, "sha256":digest,
               "metadata":{k:cif[k] for k in METADATA if k in cif}, "GX_registered_scope":selected,
-              "completed_jobs":[{k:j[k] for k in ("job_id","method","parameters","completed_event")} for j in jobs]}
+              "completed_jobs":[{k:j[k] for k in ("job_id","method","parameters","completed_event","outputs")} for j in jobs]}
     return public, raw, jobs
 
 
@@ -216,6 +226,8 @@ def main(args):
                if j["method"]==SIGNED and i["parameters"] == j["parameters"]]
     out={"schema":"gx.independent-template-comparison/1","template":a,"target":b,"coordinate_comparison":geometry,
          "measured_signed_endpoints":endpoints,
+         "comparison_code_sha256":{p.name:sha256(p.read_bytes()).hexdigest() for p in
+                                   (Path(__file__),Path(__file__).with_name("template_geometry.py"))},
          "scope":"Only observed combinations in both Runs. Delta comparisons follow deposited chain labels. GX first availability refers to the corresponding immutable target SHA in that Run."}
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(out,indent=2,ensure_ascii=False,allow_nan=False)+"\n")

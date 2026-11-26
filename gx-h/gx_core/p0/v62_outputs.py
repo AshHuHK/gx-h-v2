@@ -461,6 +461,10 @@ def ingest_measurement(conn, run_id, *, source, scope, path, metadata_path, acto
     if not conn.execute("SELECT 1 FROM v6_goals WHERE run_id=? AND status='OPEN'", (run_id,)).fetchone():
         raise SchemaInvalid("Observations require an open research Goal")
     acquisition = json.loads(supplied(metadata_path))
+    if source is None:
+        source = acquisition.get("source") if isinstance(acquisition, dict) else None
+        if not isinstance(source, str) or not source.strip():
+            raise SchemaInvalid("The acquisition descriptor requires a source identifier")
     scope = scope.removeprefix("branch:")
     if artifact_ref:
         if path or not expected_sha256:

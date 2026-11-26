@@ -23,7 +23,7 @@ from ..jobs import cpu_queue
 from ..jobs.service import JobService, PURPOSE_WORKFLOW, TERMINAL
 from ..persistence import store
 from . import manifest as execution
-from . import research_window, v6_method_context, v62_evidence
+from . import research_window, v6_method_context, v6_prospective, v62_evidence
 from ..plugins import goal as goal_plugins
 
 NODE_TERMINAL = {"SUCCEEDED", "FAILED", "CANCELLED", "REUSED", "BLOCKED"}
@@ -309,6 +309,7 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
     binding = request.get("binding") or {}
     node = _node(conn, request["run_id"], binding.get("v6_node_id"))
     _live(node, "PENDING")
+    _prospective(conn, request)
     _module_grant(conn, node, json.loads(node["spec_json"]))
     run_status = conn.execute("SELECT status FROM runs WHERE run_id=?", (request["run_id"],)).fetchone()[0]
     if run_status not in machines.machine("run")["executable"]:
@@ -371,6 +372,14 @@ def _module_grant(conn, node, spec):
             raise ScopeDenied("This module Job lost its capability grant")
 
 
+def _prospective(conn, request):
+    def input_refs():
+        bound = storage.artifact_service(conn).read_input_manifest(request["input_manifest_ref"])
+        return {item["role"]: item["artifact_ref"] for item in bound["entries"]}
+    v6_prospective.require_registration(conn, request["run_id"], request["capability_version"],
+                                        request["parameters"], input_refs)
+
+
 def fence_launch(conn, request, job_id):
     node = _node(conn, request["run_id"], request["binding"]["v6_node_id"])
     _live(node, "RUNNING")
@@ -402,6 +411,8 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
             v62_evidence.fence_negative(tx, current, condition)
         if source:
             _live(current, "PENDING")
+            attempt = tx.execute("SELECT request_json FROM v6_job_attempts WHERE node_id=?", (node["node_id"],)).fetchone()
+            _prospective(tx, json.loads(attempt[0]))
             spec = json.loads(current["spec_json"])
             _module_grant(tx, current, spec)
             if spec.get("evidence_gate"):
@@ -478,6 +489,13 @@ def _record_wait(conn, node, error):
             subject_id=node["node_id"],
             payload=reason,
         )
+        if details.get("reason") == "prospective_opening":
+            version, = tx.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (node["run_id"],)).fetchone()
+            prior = tx.execute("SELECT 1 FROM events WHERE run_id=? AND kind='v6.prospective.opening_wait' "
+                               "AND json_extract(payload_json,'$.goal_version')=?", (node["run_id"], version)).fetchone()
+            if not prior:
+                store.append_event(tx, kind="v6.prospective.opening_wait", actor="gx", run_id=node["run_id"],
+                                   subject_kind="run", subject_id=node["run_id"], payload={"goal_version": version})
         if details.get("rule") == "cpu.threads_free" and details.get("job_key"):
             cpu_queue.park(
                 tx,
@@ -556,6 +574,9 @@ def _run_node(conn, node, service, window):
     if not attempt:
         _compile(conn, node, refs)
         attempt = conn.execute("SELECT * FROM v6_job_attempts WHERE node_id=?", (node["node_id"],)).fetchone()
+    request = json.loads(attempt["request_json"])
+    # A parked node should not restage a Job workspace while its Lead is still deciding.
+    _prospective(conn, request)
     source = conn.execute(
         "SELECT * FROM v6_nodes WHERE run_id=? AND node_id<>? AND exec_key=? AND "
         "status='SUCCEEDED' AND result_ref IS NOT NULL ORDER BY rowid LIMIT 1",
@@ -605,7 +626,7 @@ def _run_node(conn, node, service, window):
             )
             else "waiting"
         )
-    result = service.submit(**json.loads(attempt["request_json"]), idempotency_key=node["operation_key"])
+    result = service.submit(**request, idempotency_key=node["operation_key"])
     return "waiting" if result["replayed"] else "dispatched"
 
 

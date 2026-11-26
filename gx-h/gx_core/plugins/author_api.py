@@ -94,6 +94,7 @@ class GoalMethod:
     bind: Callable | None = None
     project: Callable | None = None
     dependencies: Callable | None = None
+    sufficient_metric: Callable | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -212,11 +213,12 @@ class _CapabilityRegistrar(_Registrar[str, str]):
 
 
 class _GoalMethods(_Registrar[str, GoalMethod]):
-    def register(self, capability, *, describe=None, validate=None, bind=None, project=None, dependencies=None):
+    def register(self, capability, *, describe=None, validate=None, bind=None, project=None, dependencies=None,
+                 sufficient_metric=None):
         _parse_capability_version(capability)
-        method = GoalMethod(describe, validate, bind, project, dependencies)
+        method = GoalMethod(describe, validate, bind, project, dependencies, sufficient_metric)
         if any(hook is not None and not callable(hook) for hook in
-               (describe, validate, bind, project, dependencies)):
+               (describe, validate, bind, project, dependencies, sufficient_metric)):
             raise TypeError("Goal method callbacks must be callable")
         self._add(capability, method)
 

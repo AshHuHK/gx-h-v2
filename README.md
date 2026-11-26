@@ -2,6 +2,18 @@
 
 GX 追蹤每項量測何時首次可得、哪位研究者實際收到，以及哪些數值進入正式結論。本版用兩份公開 mmCIF 原件檢查局部區段對幾何摘要的影響，並提供經官方 Codex 宿主執行的公開研究試點。[版本簽收](V623_ACCEPTANCE.md) · [真資料研究報告](acceptance/v623/V623_SCIENCE_REPORT.md) · [公開四格操作](acceptance/v623/oauth/README.md)
 
+## 啟動或繼續一項研究
+
+```bash
+bin/gx-p0 research --state ./runs/pcna --run-key pcna-first-01 \
+  --goal-file ./examples/pcna/first-flight.md \
+  --goal-config ./examples/pcna/goal.json --research-effort medium
+```
+
+`--goal-file` 讀入整份 UTF-8 問題卡，也可以用 `--goal` 直接提供題目。配置中的 `input_files` 可為每份原件提供 `path`、`role`、`sha256` 及 `acquisition`。原件與來源描述的相對路徑以配置檔所在目錄為準。GX 在首份 Lead 簡報前綁定來源描述中的 `source` 與實際原件。
+
+中斷後重送相同命令會繼續原 Run。`--timeout` 限定這次驅動的秒數，退出碼 75 時原進度仍可繼續。結題後命令傳回 `REPORT.md` 和 `result.json` 的路徑，兩者位於狀態目錄的 `research/<run_id>/`。機器可讀回執含正式關閉事件、已用讀數、原始預測與評估、工作分支及這次呼叫新增的 Job 和宿主回合。
+
 ## V6.2.2 自主科研
 
 新版將預先登記的命題逐一對應到合格材料、具名量測與 Lead 實際收到的證據。研究者改門檻或收窄範圍後，報告保留哪些讀數已經看過。公開離線試點分別驗證直接取數、委派、改路與有據早停，並保存可獨立重評的原始 Run。[版本簽收與重播](V622_ACCEPTANCE.md) · [離線啟動與恢復](acceptance/v622/public/README.md) · [逐項回執](acceptance/v622/receipts/index.json)

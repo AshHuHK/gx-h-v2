@@ -58,6 +58,31 @@ class ModuleGraph(unittest.TestCase):
         self.assertEqual(1, self.db.execute("SELECT count(*) FROM outbox WHERE topic='v6.node'").fetchone()[0])
         self.assertEqual(result, v6_decisions.adopt(self.db, **actor, decision=draft(self.node(grant))))
 
+    def test_lead_can_still_delegate_and_amend_a_public_branch_after_a_private_write(self):
+        self.start()
+        grant, worker = self.module("private-inventory")
+        opening = v6_decisions.adopt(self.db, **self.lead, decision=draft(branch("public")))
+        source = ArtifactService(self.db).put(run_id=self.run, content='{"question":"followup"}',
+            kind="observation", media_type="application/json", put_by="test", origin="INGEST").artifact_ref
+        v6_goal.record_observation(self.db, self.run, source, source="followup")
+        parent = bind_native_fixture(self.db, self.run, self.directory, task_id=v6_goal.ensure_task(self.db, self.run))
+        plan = v6_delegation.prepare(self.db, **parent, payload={"branch_id": opening["aliases"]["local:public"],
+                                                                "question": "Reassess the shared observation."})
+        child = v6_decisions.adopt(self.db, **worker, decision=draft(self.node(grant)))
+        delegated = v6_delegation.commit(self.db, plan)
+        self.assertEqual(delegated["base"], child["result_head"])
+        self.assertFalse(plan.brief["nodes"])
+        private_node = child["aliases"]["local:measure"]
+        with self.assertRaises(StaleRevision):
+            v6_decisions.adopt(self.db, **parent, decision=dict(draft(), reconsider_when=[
+                {"event": "job_settled", "subject_ref": private_node}]))
+        actor = bind_native_fixture(self.db, self.run, self.directory, task_id=delegated["task_id"])
+        self.assertEqual("maintained", v6_decisions.adopt(self.db, **actor, decision=draft())["outcome"])
+        amended = v6_decisions.adopt(self.db, **parent, decision=draft(branch("independent")))
+        self.assertEqual(child["result_head"], amended["base"])
+        self.assertEqual(1, self.db.execute("SELECT count(*) FROM v6_nodes WHERE node_id=?",
+                                            (private_node,)).fetchone()[0])
+
     def test_reserved_branch_cannot_be_used_by_a_peer_and_open_instance_fences_closure(self):
         self.start()
         grant, actor = self.module("left")

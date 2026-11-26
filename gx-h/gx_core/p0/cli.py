@@ -267,6 +267,9 @@ def execute(args):
         for run in workspace.list_runs(conn):
             operator.authorize_project(ctx, run["project_ref"])
 
+    if args.command == "research":
+        from . import research
+        return research.execute(args, directory)
     if args.command == "operator":
         with closing(existing_db(directory, readonly=False)) as conn:
             rid = selected_run(conn)["run_id"]
@@ -391,6 +394,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, epilog=
         "Set GX_CODEX_OFFLINE=1 to drive saved work with Codex and App Server stopped.")
     commands = parser.add_subparsers(dest="command", required=True)
+    from . import research
+    research.add_command(commands)
     deployment.add_commands(commands)
     from ..plugins.cli import add_commands as add_plugin_commands
     add_plugin_commands(commands)

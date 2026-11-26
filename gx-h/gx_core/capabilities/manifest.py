@@ -395,6 +395,15 @@ def _outputs_problems(manifest: Mapping[str, Any]) -> list[str]:
             if not output.get("nature") or not output.get("source_roles"):
                 found.append(f"outputs[{index}].metric_specs requires a classified output and scientific input roles")
             found.extend(f"outputs[{index}]: {err}" for err in definition_errors(output["metric_specs"]))
+        for table in output.get("sufficient_outputs", []):
+            capability, _, version = table["capability"].rpartition("@")
+            axes = table["match_parameters"]
+            if (not output.get("metric_specs") or not CAPABILITY_ID.fullmatch(capability)
+                    or not VERSION.fullmatch(version) or not OUTPUT_NAME.fullmatch(table["output"])
+                    or not table["input_role"].strip() or len(set(axes)) != len(axes)
+                    or not set(axes) <= set(parameter_names(manifest))):
+                found.append(f"outputs[{index}].sufficient_outputs needs a versioned producer, "
+                             "named output, material role and distinct shared method parameters")
         origins = output.get("source_roles")
         if origins is not None and (not output.get("nature") or not origins or len(origins) != len(set(origins))
                 or any(role not in roles and not (grouped and GROUPED_ROLE.fullmatch(role)) for role in origins)):

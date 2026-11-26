@@ -22,6 +22,7 @@ class RoundVisibility(unittest.TestCase):
         opened = s.open("first")
         s.open("peer")
         actor = s.bind(opened["task_id"])
+        s.call(s.lead, v6_native.DECIDE, {"decision": draft()}, "finish-opening")
         marker = "PUBLIC-UNRELEASED-OBSERVATION"
         op = s.node(actor, "measurement")
         op["question"] = f"The inventory produced {marker}. Does it recur?"

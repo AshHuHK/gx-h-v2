@@ -98,6 +98,8 @@ def with_coverage(reg, results, gaps, timeline=None):
         if first is not None:
             if first <= reg["event_id"]:
                 status = "retrospective"
+            elif timing.get("sufficient_production_order_uncertain"):
+                status = "timing_unknown"
             elif status == "unmeasured":
                 status = "measured_unqualified"
         by_material.append({**pin, **timing, "qualification": status,

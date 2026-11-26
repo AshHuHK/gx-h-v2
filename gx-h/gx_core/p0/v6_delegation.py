@@ -119,9 +119,13 @@ def commit(conn, plan):
         replay = _replay(conn, run_id, plan.key, plan.request_sha)
         if replay:
             return replay
-        _, parent, goal, head = v6_decisions.authority(conn, **identity)
-        if parent["scope"] != "run" or parent["context_ref"] != plan.context_ref or head != scoped["head"]:
+        _, parent, goal, frozen = v6_decisions.authority(conn, **identity)
+        if parent["scope"] != "run" or parent["context_ref"] != plan.context_ref or frozen != scoped["head"]:
             raise StaleRevision("The delegating Lead's scope or frozen premises changed")
+        # A compatible module revision only touched its own private branch. The delegated
+        # public branch keeps its original evidence and starts on a usable graph revision.
+        head = v6_decisions.head(conn, run_id)
+        scoped = {**scoped, "head": head}
         branch = conn.execute("SELECT status FROM v6_branches WHERE run_id=? AND branch_id=?", (run_id, branch_id)).fetchone()
         if not branch or branch[0] != "OPEN":
             raise StaleRevision("The requested branch has ceased accepting decisions")
@@ -157,10 +161,12 @@ def retire_stale(conn, run_id, *, cause_scope="run"):
         raise RuntimeError("Supersede old briefs in the graph adoption transaction")
     head = v6_decisions.head(conn, run_id)
     marks = ",".join("?" for _ in v6_goal.ACTIVE_TASKS)
-    rows = conn.execute("SELECT d.task_id,d.scope FROM v6_decision_tasks d JOIN tasks t USING(task_id) "
+    rows = conn.execute("SELECT d.task_id,d.scope,d.goal_version,d.base_json FROM v6_decision_tasks d JOIN tasks t USING(task_id) "
                         f"WHERE d.run_id=? AND d.scope NOT LIKE 'module:%' AND d.base_json IS NOT ? AND t.status IN ({marks})",
                         (run_id, store._j(head), *v6_goal.ACTIVE_TASKS)).fetchall()
     for row in rows:
+        if v6_decisions.compatible_head(conn, run_id, row, head):
+            continue
         v6_goal.cancel_decision(conn, run_id, row["task_id"], reason="A new graph head superseded this frozen decision")
         kind = "v6.decision.superseded" if row["scope"] == "run" else "v6.branch.delegation_ended"
         store.append_event(conn, run_id=run_id, actor=v6_goal.ACTOR, kind=kind, subject_kind="task", subject_id=row["task_id"],

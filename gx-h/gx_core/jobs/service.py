@@ -724,7 +724,9 @@ class JobService:
                 budget_ref = v62_budget.job_funding(txn, request, budget_ref)
                 from ..p0.meter_limits import check_soft
                 check_soft(txn,run_id,task_id)
-                self._threads_or_refuse(txn, resources, key=key, sample=sample)
+                room = self._threads_or_refuse(txn, resources, key=key, sample=sample)
+                if resources.get("gpu") is None:
+                    intent["cpu_affinity"] = room["unclaimed_cpus"][:resources["cpu_threads"]]
                 reservation = budgets.reserve(txn, budget_ref=budget_ref, subject_kind="job",
                                               subject_id=job_id, amounts=amounts, actor=self.actor)
                 txn.execute(
@@ -768,7 +770,7 @@ class JobService:
         return self._row(job_id)
 
     @staticmethod
-    def _threads_or_refuse(conn: sqlite3.Connection, resources: Mapping[str, Any], *, key=None, sample=None) -> None:
+    def _threads_or_refuse(conn: sqlite3.Connection, resources: Mapping[str, Any], *, key=None, sample=None) -> dict:
         """Audit J8 (the lead's ruling, 2026-11-12T21:57Z): a job is admitted only while the
         threads it needs are free, by the count ``capacity.fits`` reads (``capacity.cpu_room``)
         and in its words (``limits.cpu_threads_finding``), so that what fits says and what
@@ -782,6 +784,7 @@ class JobService:
         refusal = cpu_queue.refusal(conn, room, resources["cpu_threads"], key)
         if refusal is not None:
             raise refusal
+        return room
 
     @staticmethod
     def _bind_to_plan(conn: sqlite3.Connection, request: Mapping[str, Any], capability: Mapping[str, Any],
@@ -1107,6 +1110,15 @@ class JobService:
             self._fail_unstarted(row, exc.message, failure_class="input_or_format", because=reason)
             raise self._named(exc, job_id) from None
         try:
+            if assigned := intent.get("cpu_affinity"):
+                # Placement was reserved with the Job row. Only the submission winner
+                # writes it to the detached runner, outside the SQLite writer.
+                try:
+                    spec = json.loads(job.spec.read_bytes())
+                    spec["cpu_affinity"] = assigned
+                    executor.write_spec(job, spec)
+                except (OSError, ValueError) as exc:
+                    raise executor.RunnerLaunchFailed(f"cannot prepare CPU placement: {exc}") from exc
             identity = executor.launch(job.job_dir)
         except executor.LaunchReceiptUnknown as exc:
             self._mark_unknown(row, {"reason": str(exc), "observed_at": clock.now_iso()})

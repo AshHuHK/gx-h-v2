@@ -1,0 +1,75 @@
+{
+  "project": "pcna-first-flight",
+  "research_effort": "medium",
+  "research_modules": [
+    "investigation@1"
+  ],
+  "plugins": [
+    "org.gx.investigation@1.0.0",
+    "org.gx.block-signed@1.0.0",
+    "org.gx.block-influence@1.0.0",
+    "org.gx.protein@0.3.0"
+  ],
+  "capabilities": [
+    "deposited-block-signed@1",
+    "deposited-block-influence@1",
+    "deposited-block-reading@1",
+    "deposited-chain-geometry@2"
+  ],
+  "input_files": [
+    {
+      "path": "data/1VYM.cif",
+      "role": "structure",
+      "sha256": "22b94186ce87e4d0b4a8e48c47ed129cea5b9900d5f6b4f9820833e879490b02",
+      "acquisition": "data/1VYM.json"
+    },
+    {
+      "path": "data/9VGW.cif",
+      "role": "structure",
+      "sha256": "df8fc2854bae2a8b047ed9f09d6e1c436b116ba13a0b19959544dfeb783ee8dd",
+      "acquisition": "data/9VGW.json"
+    },
+    {
+      "path": "methods.json",
+      "role": "workflow_spec",
+      "sha256": "5ab0d291f75abda6fefb1ce49f5476ab7c4234a755202e37f45f9238f0ba7167"
+    },
+    {
+      "path": "data/qualification.json",
+      "role": "material_metadata",
+      "sha256": "f08b899324f91ab34f600e8a6a8b1275a502c7dcbc55a960bf891465caf34669"
+    }
+  ],
+  "budget_profile": "oauth_research",
+  "run_budget": {
+    "worker_tasks": 120,
+    "job_submissions": 80,
+    "cpu_seconds": 14400,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "api_calls": 128,
+    "tokens": 9007199254740991,
+    "wall_hours": 24
+  },
+  "workspace_budget": {
+    "worker_tasks": 120,
+    "job_submissions": 80,
+    "cpu_seconds": 14400,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "api_calls": 128,
+    "tokens": 9007199254740991,
+    "wall_hours": 24
+  },
+  "prospective_opening": {
+    "capabilities": [
+      "deposited-block-signed@1"
+    ],
+    "material_roles": [
+      "structure"
+    ],
+    "metric_ids": [
+      "missed_present"
+    ]
+  }
+}

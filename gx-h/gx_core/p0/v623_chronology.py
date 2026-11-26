@@ -9,8 +9,9 @@ import json
 from collections import defaultdict
 
 from ..artifacts import ArtifactService
-from ..errors import SchemaInvalid
+from ..errors import GxError, SchemaInvalid
 from ..domain import ids
+from ..plugins import goal as goal_plugins
 from . import v62_maturity, v622_measurement
 
 
@@ -251,14 +252,29 @@ def material_keys(bindings, fact, observation, reading):
     return list(first)
 
 
-def availability(conn, reg, through, *, bindings=None):
-    """Earliest provable availability of this typed endpoint, for each requested material."""
-    pred = reg["prediction"]
-    pubs = {r["subject_id"]: dict(r) for r in conn.execute("""
+def _original_publications(conn, through):
+    return {r["subject_id"]: dict(r) for r in conn.execute("""
         SELECT e.event_id,e.subject_id,a.sha256,a.media_type,a.rel_path,a.kind,
                json_extract(e.payload_json,'$.source_role') source_role FROM events e
         JOIN artifacts a ON a.artifact_ref=e.subject_id WHERE e.kind='artifact.published'
         AND e.event_id<=? AND a.published=1 AND a.origin='INGEST' ORDER BY e.event_id""", (through,))}
+
+
+def materials_overlap(conn, candidates, originals, method_pin=None):
+    if originals.intersection(candidates):
+        return True
+    if not candidates or not originals:
+        return False
+    through, = conn.execute("SELECT coalesce(max(event_id),0) FROM events").fetchone()
+    publications = _original_publications(conn, through)
+    materials, _, _ = _verified_materials(conn, {"method_pin": method_pin}, publications, through)
+    return not {materials.key(ref) for ref in originals}.isdisjoint(materials.key(ref) for ref in candidates)
+
+
+def availability(conn, reg, through, *, bindings=None):
+    """Earliest provable availability of this typed endpoint, for each requested material."""
+    pred = reg["prediction"]
+    pubs = _original_publications(conn, through)
     verified = reg.get("material_identity") == "endpoint_verified"
     if verified:
         mats, acquisitions, uncertain = _verified_materials(conn, reg, pubs, through)
@@ -280,16 +296,22 @@ def availability(conn, reg, through, *, bindings=None):
     for ref in pubs:
         if keys := selected.get(mats.key(ref)):
             bindings[ref] = keys
-    def found(ref, event_id):
+    def found(ref, event_id, *, uncertain_launch=False, started=None):
         for digest in selected.get(mats.key(ref), ()):
             record = records[digest]
             prior = record["endpoint_first_available_event_id"]
             if prior is None or event_id < prior:
                 record["endpoint_first_available_event_id"] = event_id
+            if uncertain_launch:
+                record["sufficient_production_order_uncertain"] = True
+                prior_start = record.get("sufficient_job_launch_event_id")
+                if prior_start is None or started is not None and started < prior_start:
+                    record["sufficient_job_launch_event_id"] = started
 
     if reg.get("method_pin"):
         sql = """SELECT m.job_id,json_extract(m.admission_json,'$.run_id') run_id,
-            e.subject_id ref,max(e.event_id,j.event_id) available,json_extract(o.value,'$.source_inputs') source_inputs
+            e.subject_id ref,max(e.event_id,j.event_id) available,json_extract(o.value,'$.source_inputs') source_inputs,
+            json_extract(m.admission_json,'$.parameters') parameters
             FROM p0_execution_manifests m, json_each(m.completion_json,'$.outputs') o
             JOIN events e ON e.subject_id=json_extract(o.value,'$.artifact_ref') AND e.kind='artifact.published'
             JOIN events j ON j.subject_id=m.job_id AND j.kind='job.transition' AND j.new_state='SUCCEEDED'
@@ -306,6 +328,38 @@ def availability(conn, reg, through, *, bindings=None):
                 if not reason and reading:
                     for pin in reading["material_inputs"]:
                         found(pin["artifact_ref"], row["available"])
+        # A complete producer table can determine the registered scalar before the
+        # scalar reader runs or any report is delivered. Its bytes stay in their scope.
+        spec = reg["method_pin"].get("measurement_spec", {})
+        from .v6_prospective import match_parameters
+        if not spec.get("sufficient_outputs"):
+            return records
+        owner = conn.execute("SELECT run_id FROM events WHERE event_id=?", (reg["event_id"],)).fetchone()
+        provider = goal_plugins.method(conn, owner[0], spec["capability"]) if owner else None
+        if not provider or not provider.sufficient_metric:
+            return records
+        for table in spec.get("sufficient_outputs", ()):
+            args = (table["output"], through, through, table["manifest_sha256"])
+            for row in conn.execute(sql, args):
+                if not match_parameters(spec["parameters"], json.loads(row["parameters"]), table["match_parameters"]):
+                    continue
+                refs = [p["artifact_ref"] for p in json.loads(row["source_inputs"] or "[]")
+                        if p["role"] == table["input_role"] and mats.key(p["artifact_ref"]) in selected]
+                if not refs or not any(f["record_kind"] == "job_output" and f.get("job_id") == row["job_id"]
+                                       for f in v62_maturity._historical_facts(conn, row["run_id"], row["ref"], through)):
+                    continue
+                try:
+                    document = ArtifactService(conn).read_json(row["ref"])
+                    known = provider.sufficient_metric(spec["parameters"], spec["metric_id"], table["capability"],
+                                                       table["output"], document)
+                except (GxError, ValueError, KeyError, IndexError, TypeError):
+                    continue
+                if known is True:
+                    started, = conn.execute("SELECT min(event_id) FROM events WHERE subject_id=? AND kind='job.transition' "
+                                            "AND new_state='SUBMITTING'", (row["job_id"],)).fetchone()
+                    crossed = (row["available"] > reg["event_id"] and (started is None or started <= reg["event_id"]))
+                    for ref in refs:
+                        found(ref, row["available"], uncertain_launch=crossed, started=started)
         return records
 
     if pred["target"] != "experimental_observation":

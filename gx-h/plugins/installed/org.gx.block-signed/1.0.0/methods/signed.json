@@ -1,0 +1,212 @@
+{
+  "manifest": {
+    "capability_id": "deposited-block-signed",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--structure",
+        "{in.structure}",
+        "--engine",
+        "{data.0}",
+        "--fitter",
+        "{data.1}",
+        "--mask",
+        "{param.mask}",
+        "--endpoint",
+        "{param.endpoint}",
+        "--effect-minimum",
+        "{param.effect_minimum}",
+        "--zero-limit",
+        "{param.zero_limit}",
+        "--minimum-evaluable",
+        "{param.minimum_evaluable}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "coordinate_geometry",
+      "objective": "Does the three-pair median miss a local chain-pair change in this deposition, mask, and physical endpoint?",
+      "mechanism": "Fit original asymmetric-unit model 1, entity 1, label chains A/B/C. Select mask common_ca (one Cα) or common_backbone (N, Cα, C, O), and endpoint angle_deg (degree) or rmsd_A (ångström). Refit AB, AC, BC after omitting each eligible 20-position label interval. The signed difference is after minus before. Compute the median separately before and after.",
+      "estimator": "Set effect_minimum e > zero_limit z > 0 in endpoint units and integer minimum_evaluable k >= 1 before reading the endpoint. If all pair changes have |Δ| < e the interval is quiet. Otherwise |Δmedian| < z is near_zero, z <= |Δmedian| < e is attenuated, and |Δmedian| >= e is opposed if a pair with |Δ| >= e has the opposite sign, else represented. missed_present = 1 when >=k intervals are evaluable and any is near_zero, attenuated or opposed; 0 when >=k are evaluable, every eligible interval is measured and none is missed; otherwise null with a reason. The summary has denominators; signed-blocks.json has all interval classifications, pair and median fits, signs, and omitted positions.",
+      "training_data_lineage": "Deterministic calculation from one original deposited mmCIF."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.block-signed/1.0.0/methods/signed.py",
+      "sha256": "53adf866c15a31121f2154ed4429fb0af7db7ce0e1c90cda48fef3e2421aecdf"
+    },
+    "licence": "GX release source; coordinate data retain their original licence.",
+    "licence_basis": "Uses the released block-influence engine and Horn fitter; see adapters/scientific/tl1a_geometry/LICENSE.chaperone.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 120
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.block-influence/1.0.0/methods/block_influence.py",
+      "{harness}/adapters/scientific/tl1a_geometry/worker.py"
+    ],
+    "outputs": [
+      {
+        "name": "signed-summary.json",
+        "kind": "file:signed_summary",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "missed_present": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/missed_present",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "model": "/model",
+              "label_entity": "/label_entity",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            },
+            "bounds": [
+              0,
+              1
+            ]
+          },
+          "blocks_total": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_total",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "model": "/model",
+              "label_entity": "/label_entity",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          },
+          "blocks_eligible": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_eligible",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "model": "/model",
+              "label_entity": "/label_entity",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          },
+          "blocks_evaluable": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_evaluable",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "model": "/model",
+              "label_entity": "/label_entity",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          },
+          "blocks_unmeasured": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_unmeasured",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "model": "/model",
+              "label_entity": "/label_entity",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          },
+          "blocks_missed_observed": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_missed_observed",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "model": "/model",
+              "label_entity": "/label_entity",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          }
+        },
+        "sufficient_outputs": [
+          {
+            "capability": "deposited-block-influence@1",
+            "output": "block-influence.json",
+            "input_role": "structure",
+            "match_parameters": [
+              "mask"
+            ]
+          },
+          {
+            "capability": "deposited-block-signed@1",
+            "output": "signed-blocks.json",
+            "input_role": "structure",
+            "match_parameters": [
+              "mask",
+              "endpoint"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "signed-blocks.json",
+        "kind": "file:signed_blocks",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ]
+      }
+    ],
+    "limitations": "Static geometry of observed coordinates only. Three chain pairs share chains. Rotation differences describe the unsigned fitted angle scalar. Pair and median differences refer to the same deposition, interval, endpoint and atom selection. Eligibility and missing fits limit negative conclusions.",
+    "parameter_defaults": {}
+  },
+  "entry_script": "methods/signed.py"
+}

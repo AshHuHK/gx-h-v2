@@ -71,6 +71,8 @@ def deliver(conn, brief, limit):
                   intent={}, module_reports=[], module_catalog=[])
     if "research_evidence_version" in brief:
         packet["research_evidence_version"] = brief["research_evidence_version"]
+    if "prospective_opening" in brief:
+        packet["prospective_opening"] = brief["prospective_opening"]
     if "study_class" in brief:
         packet["study_class"] = brief["study_class"]
     if "evidence_policy" in brief:

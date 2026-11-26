@@ -24,25 +24,34 @@ def graph_at(conn, run_id, head):
                         (run_id, head["version"], head["sha256"])).fetchone()[0]
 
 
-def require_compatible(original, latest, branch, ops):
+def require_compatible(original, latest, branch, decision):
     """Compare only read/write graph subjects used by this draft, before taking the writer."""
     old = json.loads(original) if original else {"branches": {}, "nodes": {}, "closed": False}
     current = json.loads(latest) if latest else {"branches": {}, "nodes": {}, "closed": False}
-    changed = []
-    if current["closed"] or old["branches"].get(branch) != current["branches"].get(branch):
-        changed.append(branch)
+    changed = set()
+    ops = decision["ops"]
+    watches = {w["subject_ref"] for w in decision["reconsider_when"]}
+    branches = watches | ({branch} if branch is not None else {op["branch"] for op in ops if "branch" in op})
+    nodes = watches | set(decision.get("approve_nodes", ()))
+    if current["closed"]:
+        changed.add("run")
     for op in ops:
-        dependencies = set(op.get("depends_on", []))
+        nodes.update(op.get("depends_on", ()))
         if op["op"] == "cancel_node":
-            dependencies.add(op["node"])
-        for key in sorted(dependencies):
-            if key.startswith("local:"):
-                continue
-            if old["nodes"].get(key) != current["nodes"].get(key):
-                changed.append(key)
+            nodes.add(op["node"])
+        elif op["op"] == "stop_branch":
+            # Stopping a branch also withdraws work added to it since the Lead's snapshot.
+            prior = {n: s for n, s in old["nodes"].items() if s["branch"] == op["branch"]}
+            latest = {n: s for n, s in current["nodes"].items() if s["branch"] == op["branch"]}
+            if prior != latest:
+                changed.add(op["branch"])
+    for kind, subjects in (("branches", branches), ("nodes", nodes)):
+        changed.update(key for key in subjects if not key.startswith("local:")
+                       and old[kind].get(key) != current[kind].get(key))
     if changed:
-        raise StaleRevision("A graph premise used by the module has changed; read a fresh decision brief",
-                            details={"reason": "module_graph_conflict", "changed_subjects": sorted(set(changed))})
+        reason = "module_graph_conflict" if branch is not None else "lead_graph_conflict"
+        raise StaleRevision("A graph subject used by this decision changed after its frozen brief",
+                            details={"reason": reason, "changed_subjects": sorted(changed)})
 
 
 def job_demand(conn, run_id, jobs):

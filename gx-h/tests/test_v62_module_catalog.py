@@ -87,6 +87,26 @@ class ModuleCatalog(unittest.TestCase):
             catalog.query(conn, run, {**frozen, "scope": "branch:another"}, {"kind": "module"})
         self.assertEqual(catalog.resolve(conn, run, "data_inventory", "1")["plugin"], module["plugin"])
 
+    def test_investigation_can_delegate_granted_measurements_at_medium_and_deep_effort(self):
+        method = "deposited-block-influence@2"
+        settings = {
+            "research_modules": ["investigation@1"],
+            "plugins": ["org.gx.investigation@1.0.0", "org.gx.block-influence@2.0.0"],
+            "capabilities": [method],
+        }
+        for effort in ("medium", "deep"):
+            with self.subTest(effort=effort):
+                conn, run, brief = self.start(effort, settings)
+                role = catalog.query(conn, run, brief, {"kind": "module", "reference": "investigation@1"})["spec"]
+                self.assertEqual(role["capabilities"], [method])
+                self.assertEqual(role["input_roles"], ["*"])
+                self.assertIn("gx_decide_revision", role["tools"])
+                self.assertIn("gx_submit_module_report", role["tools"])
+                self.assertEqual(catalog.query(conn, run, brief, {"kind": "method", "reference": method})
+                                 ["spec"]["capability_version"], method)
+        with self.assertRaises(SchemaInvalid):
+            catalog.for_start({**settings, "research_effort": "quick"})
+
     def test_inventory_default_is_pinned_by_evidence_policy(self):
         settings = {"research_effort": "deep"}
         for policy, expected in ((v621_policy.LEGACY, "1"), (v621_policy.PREVIOUS, "2"),

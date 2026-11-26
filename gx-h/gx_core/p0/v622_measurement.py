@@ -65,6 +65,21 @@ def pin(conn, run_id, prediction, *, applicability=None):
                 "source_roles": roles, "input_role": role, "observable": "/metrics/" + name if decl else selector,
                 "result_pointer": result_pointer,
                 "measurement_schema": prediction.get("measurement_schema"), "applicability": applicability}
+    if output.get("sufficient_outputs"):
+        tables = []
+        for table in output["sufficient_outputs"]:
+            name, version = capabilities.parse_capability_version(table["capability"])
+            producer = conn.execute("SELECT manifest_sha256,outputs_json FROM capabilities "
+                                    "WHERE capability_id=? AND version=?", (name, version)).fetchone()
+            # An optional producer never installed in this store has no local Job history.
+            if producer is None:
+                continue
+            declared = next((item for item in json.loads(producer["outputs_json"]) if item["name"] == table["output"]), None)
+            if (not declared or table["input_role"] not in declared.get("source_roles", ())
+                    or not set(table["match_parameters"]) <= expected):
+                raise SchemaInvalid("Sufficient output does not bind the declared material role and shared parameters")
+            tables.append({**table, "manifest_sha256": producer["manifest_sha256"]})
+        endpoint["sufficient_outputs"] = tables
     from . import v621_policy
     if v621_policy.live_science(conn, run_id):
         endpoint["schema"] = "gx.measurement-spec/2"

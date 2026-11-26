@@ -20,6 +20,22 @@ def head(conn, run_id):
     return dict(row) if row else None
 
 
+def compatible_head(conn, run_id, task, current):
+    """An immutable Lead brief can survive graph revisions owned solely by private modules of its Goal."""
+    base = json.loads(task["base_json"] or "null")
+    if base == current:
+        return True
+    first = base["version"] if base else 0
+    if task["scope"] != "run" or not current or current["version"] <= first:
+        return False
+    return not conn.execute("""SELECT 1 FROM v6_graph_versions g
+        LEFT JOIN v6_decisions d ON d.run_id=g.run_id AND d.decision_ref=g.decision_ref
+        LEFT JOIN v6_decision_tasks t ON t.task_id=d.task_id
+        WHERE g.run_id=? AND g.version>? AND g.version<=?
+          AND (t.scope IS NULL OR t.scope NOT LIKE 'module:%' OR t.goal_version<>?) LIMIT 1""",
+        (run_id, first, current["version"], task["goal_version"])).fetchone()
+
+
 def replay(conn, *, run_id, thread_id, turn_id, call_id, decision):
     """Read a committed receipt after disconnect, lease retirement, or Run closure."""
     row = conn.execute("SELECT run_id,turn_id,request_json,receipt_json FROM v6_decisions "
@@ -104,7 +120,7 @@ def _authority(conn, *, run_id, task_id, lease_id, thread_id, turn_id):
             raise ScopeDenied("This decision branch is no longer open")
     base = json.loads(task["base_json"]) if task["base_json"] else None
     current = head(conn, run_id)
-    if base != current and not task["scope"].startswith("module:"):
+    if module is None and not compatible_head(conn, run_id, task, current):
         raise StaleRevision("The scoped brief is based on an older graph", details={"current_head": current})
     return root, task, goal, base, module
 
@@ -200,8 +216,9 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
     if declared and not (science and task["scope"] == "run"):
         raise ScopeDenied("Structured endpoint and comparison decisions require a V6.2.3 Run Lead")
     original = base
-    if module is not None:
+    if task["scope"] == "run" or module is not None:
         base = head(conn, run_id)
+    if module is not None:
         v62_graph.require_operations(decision["ops"])
     if base is None:
         if module is None:
@@ -226,11 +243,12 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
     previous = v62_graph.graph_at(conn, run_id, base)
     allowed = json.loads(goal["capabilities_json"])
     config_pin = (goal["capabilities_json"], goal["materials_json"])
+    if base != original:
+        request["original_base"] = original
+        v62_graph.require_compatible(v62_graph.graph_at(conn, run_id, original), previous,
+                                     module["branch_id"] if module is not None else None, decision)
     if module is not None:
         request.update(original_base=original, module_instance_id=module["module_instance_id"])
-        if base != original:
-            v62_graph.require_compatible(v62_graph.graph_at(conn, run_id, original), previous,
-                                        module["branch_id"], decision["ops"])
         grant = json.loads(module["grant_json"])
         if "gx_decide_revision" not in grant["tools"]:
             raise ScopeDenied("This module's grant excludes graph decisions")
@@ -422,6 +440,10 @@ def commit(conn, plan):
             if close_context is not None:
                 close_context.update({k: v for k, v in endpoint_use.items() if k != "receipts"})
         config = (goal["capabilities_json"], goal["materials_json"])
+        if task["scope"] == "run":
+            base = head(conn, run_id)
+            if base != request["base"]:
+                raise StaleRevision("The graph moved during preparation; retry the decision on the current graph")
         if module is not None:
             config = (module["grant_json"], module["snapshot_json"], module["budget_json"])
             actual = head(conn, run_id)

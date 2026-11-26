@@ -62,9 +62,10 @@ def _read(path: Path) -> str | None:
 def cpu_state() -> dict[str, Any]:
     """The CPU this process is allowed, from the cgroup, and how pressed it is."""
     if config.deterministic_test_resources():
-        return {"logical_cpus": 2, "cgroup_quota_cpus": 2.0,
+        return {"logical_cpus": 2, "affinity_cpus": min(2, len(os.sched_getaffinity(0))), "cgroup_quota_cpus": 2.0,
                 "source": "deterministic test profile", "load_average": None}
-    state: dict[str, Any] = {"logical_cpus": os.cpu_count(), "cgroup_quota_cpus": None,
+    state: dict[str, Any] = {"logical_cpus": os.cpu_count(), "affinity_cpus": len(os.sched_getaffinity(0)),
+                             "cgroup_quota_cpus": None,
                              "source": "cgroup v2 cpu.max"}
     raw = _read(CGROUP / "cpu.max")
     if raw:
@@ -253,7 +254,7 @@ def cpu_room(conn: sqlite3.Connection, *, limits: Mapping[str, Any] | None = Non
     of our jobs' files, and writes nothing; what has been read already can be handed in.
 
     ``allowed`` is the smaller of ``cpu.max_pool_workers`` and ``cpu.max_quota_fraction`` of
-    the CPUs the cgroup gives this process, and at least 1. ``held`` is ``jobs_state``'s
+    the CPUs the cgroup gives this process, capped by its affinity and at least 1. ``held`` is ``jobs_state``'s
     ``cpu_threads_held``, and ``holders`` the jobs that hold them.
     """
     document = config.limits() if limits is None else limits
@@ -262,12 +263,13 @@ def cpu_room(conn: sqlite3.Connection, *, limits: Mapping[str, Any] | None = Non
     cpu_limits = document["cpu"]
     quota = cpu["cgroup_quota_cpus"] or cpu["logical_cpus"] or 1
     by_fraction = int(quota * float(cpu_limits["max_quota_fraction"]))
-    allowed = max(1, min(int(cpu_limits["max_pool_workers"]), by_fraction))
+    affinity = cpu.get("affinity_cpus", cpu["logical_cpus"]) or 1
+    allowed = max(1, min(int(cpu_limits["max_pool_workers"]), by_fraction, affinity))
     held = int(jobs["cpu_threads_held"])
     return {
         "allowed": allowed, "held": held, "free": max(0, allowed - held),
         "rule": (f"min(cpu.max_pool_workers={cpu_limits['max_pool_workers']}, "
-                 f"cpu.max_quota_fraction={cpu_limits['max_quota_fraction']} x {quota} CPUs)"),
+                 f"cpu.max_quota_fraction={cpu_limits['max_quota_fraction']} x {quota} CPUs, affinity={affinity})"),
         "holders": [job["job_id"] for job in jobs["jobs"] if job["holding_cpu_threads"]],
     }
 
@@ -286,7 +288,12 @@ def admission_room(conn, sample):
     allowed, start_deadline, observed = sample
     statuses = (CREATED, *IN_FLIGHT)
     marks = ",".join("?" for _ in statuses)
-    rows = conn.execute(f"SELECT job_id,status,created_at,resources_json FROM jobs WHERE status IN ({marks})", statuses)
+    rows = conn.execute(f"""SELECT job_id,status,created_at,resources_json,
+                            json_extract(submit_intent_json, '$.cpu_affinity') AS cpu_affinity
+                            FROM jobs WHERE status IN ({marks})""", statuses)
+    available = sorted(os.sched_getaffinity(0))
+    allowed = min(allowed, len(available))
+    claimed = set()
     holders = []
     held = 0
     for row in rows:
@@ -300,7 +307,11 @@ def admission_room(conn, sample):
         if holding:
             holders.append(row["job_id"])
             held += resources["cpu_threads"]
-    return {"allowed": allowed, "held": held, "free": max(0, allowed - held), "holders": holders}
+            # Older jobs and GPU jobs use the guard's original prefix of the inherited mask.
+            allocated = store.loads(row, "cpu_affinity") or available[:resources["cpu_threads"]]
+            claimed.update(allocated)
+    return {"allowed": allowed, "held": held, "free": max(0, allowed - held), "holders": holders,
+            "unclaimed_cpus": [cpu for cpu in available if cpu not in claimed]}
 
 
 # ------------------------------------------------------------------------------ snapshot

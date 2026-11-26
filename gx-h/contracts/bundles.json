@@ -575,7 +575,14 @@
       "required": "bool",
       "nature": "enum:output_nature?",
       "source_roles": "array<str>?",
-      "metric_specs": "object?"
+      "metric_specs": "object?",
+      "sufficient_outputs": "array<SufficientOutput>?"
+    },
+    "SufficientOutput": {
+      "capability": "str",
+      "output": "str",
+      "input_role": "str",
+      "match_parameters": "array<str>"
     },
     "SourceRef": {
       "path": "str",

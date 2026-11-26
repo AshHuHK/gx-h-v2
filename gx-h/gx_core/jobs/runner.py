@@ -722,6 +722,13 @@ class Runner:
         if guard_policy and gpu_record is not None and not guard_policy.get("instrument_selftest"):
             child_env["CUDA_VISIBLE_DEVICES"] = gpu_record["physical_identity"]["uuid"]
         try:
+            if assigned := spec.get("cpu_affinity"):
+                # A resumed coordinator may inherit a different cpuset. Fill any lost
+                # positions inside the current mask; the child guard enforces its original limit.
+                allowed = os.sched_getaffinity(0)
+                selected = set(assigned) & allowed
+                selected.update(sorted(allowed - selected)[:len(assigned) - len(selected)])
+                os.sched_setaffinity(0, selected)
             process = subprocess.Popen(  # noqa: S603 - an argv array from the manifest, no shell
                 list(spec["argv"]), cwd=spec["cwd"], env=child_env,
                 stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, shell=False,

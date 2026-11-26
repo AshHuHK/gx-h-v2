@@ -28,10 +28,12 @@ def cli_spec(args):
         "research_window",
         "research_effort",
         "research_modules",
+        "prospective_opening",
         "branch_delegation",
         "evidence_policy",
         "historical_replay",
         "module_policy",
+        "max_parallel_roots",
         "input_files",
         "capabilities",
         "plugins",
@@ -48,14 +50,23 @@ def cli_spec(args):
         raise SchemaInvalid("input_files must be an array")
     base = args.goal_config.resolve().parent if args.goal_config else Path.cwd()
     prepared = []
+    acquisition_files = {}
     for entry in files:
         if (
             not isinstance(entry, dict)
             or not isinstance(entry.get("path"), str)
-            or set(entry) - {"path", "role", "sha256"}
+            or set(entry) - {"path", "role", "sha256", "acquisition"}
         ):
-            raise SchemaInvalid("A material is {path, role?, sha256?}")
-        prepared.append({**entry, "path": str((base / entry["path"]).resolve())})
+            raise SchemaInvalid("A material is {path, role?, sha256?, acquisition?}")
+        material = dict(entry)
+        if "acquisition" in material:
+            descriptor = material.pop("acquisition")
+            if getattr(args, "command", None) != "research" or not isinstance(descriptor, str) or not descriptor:
+                raise SchemaInvalid("Supply an acquisition descriptor path to research")
+            acquisition_files[str(len(prepared))] = str((base / descriptor).resolve())
+        prepared.append({**material, "path": str((base / entry["path"]).resolve())})
+    if acquisition_files:
+        spec["material_acquisitions"] = acquisition_files
     prepared.extend({"path": str(p.resolve())} for p in args.input or ())
     spec["input_files"] = prepared
     effort = getattr(args, "research_effort", None)
@@ -100,6 +111,8 @@ def start(conn, spec, *, run_key, current):
         files.append({**item, "path": str(path), "sha256": observed})
     if current:
         prior = store.loads(current, "inputs_json")
+        if "prospective_opening" in spec and spec["prospective_opening"] != prior["inputs"]["p0_spec"].get("prospective_opening"):
+            raise VersionImmutable("This run key already fixed its prospective opening")
         if "research_window" in spec and spec["research_window"] != prior["inputs"]["p0_spec"].get("research_window"):
             raise VersionImmutable("This run key already fixed its research window")
         if "evidence_policy" in spec:
@@ -123,6 +136,9 @@ def start(conn, spec, *, run_key, current):
     research_catalog = v62_catalog.for_start(spec)
     public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []),
                                                  module_catalog=research_catalog)
+    if "prospective_opening" in spec:
+        from . import v6_prospective
+        v6_prospective.validate_opening(spec, public)
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
     inputs["evidence_policy"] = policy
     if spec.get("historical_replay"):
@@ -176,6 +192,15 @@ def start(conn, spec, *, run_key, current):
                 reason="Human Goal authorized; a Lead decision is required",
                 evidence_level="EXECUTION_OBSERVED",
             )
+        # The opening Lead brief must already contain each granted original's source.
+        if spec.get("material_acquisitions"):
+            from .v62_outputs import ingest_measurement
+            materials = store.loads(run, "inputs_json")["files"]
+            for index, descriptor in spec["material_acquisitions"].items():
+                material = materials[int(index)]
+                ingest_measurement(conn, rid, source=None, scope="run", path=None, metadata_path=Path(descriptor),
+                                   actor=operator.local_context(conn).actor, artifact_ref=material["artifact_ref"],
+                                   expected_sha256=material["sha256"])
         ensure_task(conn, rid)
 
     outcome = service.run_start(
@@ -301,7 +326,7 @@ def _events(conn, rid, after, budget_ref=None):
         SELECT event_id,kind,subject_id,payload_json FROM events
         WHERE event_id>? AND (
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
-                                  'v6.claim.adopted','v6.decision.superseded','v62.round.settled',
+                                  'v6.claim.adopted','v6.decision.superseded','v6.prospective.opening_wait','v62.round.settled',
                                   'v62.claim.reassessed','v62.module.wake','v62.module.invalidated','v621.material.assigned') OR
           (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
@@ -346,6 +371,7 @@ def _matches(row, watches, rid):
     kind = row["kind"]
     events = {
         "v6.decision.superseded": set(),
+        "v6.prospective.opening_wait": set(),
         "v62.module.invalidated": set(),
         "v6.intent.changed": {"goal_changed"},
         "v6.node.settled": {"evidence_added", "job_settled"},
@@ -428,6 +454,11 @@ def _operator_evidence(conn, rid, row):
 def _run_wakes(conn, rid, prior, events):
     watches = store.loads(prior, "receipt_json")["reconsider_when"]
     for row in events:
+        if row["kind"] == "v6.prospective.opening_wait":
+            from . import v6_prospective
+            if v6_prospective.opening_pending(conn, rid):
+                return True
+            continue
         payload = store.loads(row, "payload_json")
         if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
             continue
@@ -443,7 +474,7 @@ def _run_wakes(conn, rid, prior, events):
 def _open(conn, rid):
     marks = ",".join("?" for _ in ACTIVE_TASKS)
     return conn.execute(
-        "SELECT t.task_id,d.base_json FROM v6_decision_tasks d JOIN tasks t USING(task_id) "
+        "SELECT t.task_id,d.scope,d.goal_version,d.base_json FROM v6_decision_tasks d JOIN tasks t USING(task_id) "
         f"WHERE d.run_id=? AND d.scope='run' AND t.status IN ({marks}) LIMIT 1",
         (rid, *ACTIVE_TASKS),
     ).fetchone()
@@ -475,8 +506,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     observations = []
     refs = [f["artifact_ref"] for f in files]
     for row in events:
-        if row["kind"] == "v621.material.assigned":
-            continue  # The paired acquisition already has an observation entry.
+        if row["kind"] in {"v621.material.assigned", "v6.prospective.opening_wait"}:
+            continue  # Assignment already has an acquisition. An opening wait supplies no evidence.
         p = store.loads(row, "payload_json")
         ref = p.get("result_ref") or p.get("artifact_ref")
         facts = {
@@ -657,6 +688,15 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "evidence_refs": list(dict.fromkeys(refs)),
         "budget": budget,
     }
+    if "prospective_opening" in grant:
+        from . import v6_prospective
+        if v6_prospective.opening_pending(conn, rid):
+            brief["prospective_opening"] = {
+                **grant["prospective_opening"],
+                "instructions": ("Before measuring an eligible endpoint or a table from which it can be computed, "
+                                 "stage your chosen prediction and cite its claim_ref in an adopted decision. "
+                                 "Other investigations can proceed independently."),
+            }
     if data["inputs"].get("study_class"):
         brief["study_class"] = data["inputs"]["study_class"]
     if data["inputs"].get("evidence_policy") in v621_policy.TYPED:
@@ -719,13 +759,13 @@ def ensure_task(conn, run_id):
         v62_rounds.reconcile(conn, run_id)
     open_task = _open(conn, run_id)
     if open_task:
-        if json.loads(open_task["base_json"] or "null") == v6_decisions.head(conn, run_id):
+        if v6_decisions.compatible_head(conn, run_id, open_task, v6_decisions.head(conn, run_id)):
             return None
         with store.transaction(
             conn, transaction_owner="ScientificLead", operation="supersede_base", run_id=run_id
         ):
             task = _open(conn, run_id)
-            if task and json.loads(task["base_json"] or "null") != v6_decisions.head(conn, run_id):
+            if task and not v6_decisions.compatible_head(conn, run_id, task, v6_decisions.head(conn, run_id)):
                 cancel_decision(
                     conn, run_id, task["task_id"], reason="Another scope committed a new graph head"
                 )

@@ -533,6 +533,8 @@ def _results(conn, run, claim, reg, through, *, require_acquisition=False, timel
             exclusion = "already_available"
         elif verified_materials and any(timeline[key].get("material_identity_uncertainty") for key in keys):
             exclusion = "unknown_first_production"
+        elif timeline is not None and any(timeline[k].get("sufficient_production_order_uncertain") for k in keys):
+            exclusion = "unverified_production_order"
         elif fact.get("job_id") and (launch is None or launch <= reg["event_id"]):
             exclusion = "unverified_production_order"
         if exclusion:

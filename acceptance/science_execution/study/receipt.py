@@ -7,6 +7,7 @@ from acceptance.v62b.study import receipts as native
 from acceptance.v62c import rehearse
 from acceptance.v623.oauth import host
 from gx_core.p0 import manifest
+from gx_core.p0.research_report import completed_close
 from . import independent, protocol
 
 
@@ -32,44 +33,6 @@ def thread_items(path):
                     continue
                 result[key] = {**calls[key],"value":value,"output_line":line_no,"utc":event["timestamp"]}
     return calls,result
-
-
-def completed_close(db, rid):
-    """Resolve the Goal owner's closing operation to its commit and completion events."""
-    row = db.execute("""
-        SELECT g.goal_version, d.decision_ref, g.stop_op_digest AS op_digest,
-               op.value AS resolved_op, requested.event_id AS requested_event,
-               committed.event_id AS committed_event, closed.event_id AS closed_event,
-               closed.ts AS closed_utc
-        FROM v6_goals g
-        JOIN v6_decisions d ON d.run_id=g.run_id AND d.decision_ref=g.stop_decision_ref
-        JOIN v6_decision_tasks t ON t.task_id=d.task_id AND t.run_id=g.run_id
-            AND t.scope='run' AND t.goal_version=g.goal_version
-        JOIN json_each(d.receipt_json,'$.resolved_ops') op
-            ON json_extract(op.value,'$.spec.op')='close_run'
-            AND json_extract(op.value,'$.op_digest')=g.stop_op_digest
-        JOIN events requested ON requested.run_id=g.run_id AND requested.subject_id=g.run_id
-            AND requested.kind='v6.run.close_requested'
-            AND json_extract(requested.payload_json,'$.decision_id')=d.decision_ref
-            AND json_extract(requested.payload_json,'$.op_digest')=g.stop_op_digest
-        JOIN events committed ON committed.run_id=g.run_id AND committed.subject_id=d.decision_ref
-            AND committed.kind='v6.decision.committed'
-            AND committed.event_id=json_extract(d.receipt_json,'$.event_id')
-        JOIN events closed ON closed.run_id=g.run_id AND closed.subject_id=g.run_id
-            AND closed.kind='v6.run.closed'
-            AND json_extract(closed.payload_json,'$.decision_id')=d.decision_ref
-            AND json_extract(closed.payload_json,'$.op_digest')=g.stop_op_digest
-        WHERE g.run_id=? AND g.status='CLOSED'
-            AND json_extract(d.receipt_json,'$.goal_version')=g.goal_version
-            AND json_extract(d.receipt_json,'$.outcome')='adopted'
-            AND requested.event_id < committed.event_id AND committed.event_id < closed.event_id
-        ORDER BY closed.event_id DESC LIMIT 1
-        """,(rid,)).fetchone()
-    if row is None:
-        raise ValueError("Missing enacted close for the current Goal version")
-    closure = dict(row)
-    closure["operation"] = json.loads(closure.pop("resolved_op"))["spec"]
-    return closure
 
 
 def report_lines(outcome):

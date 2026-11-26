@@ -36,3 +36,14 @@ PYTHONPATH=gx-h:. "$py" -B -m unittest \
 ```
 
 此路徑使用官方 Codex 二進位與本地確定性 Responses。輸出的 `study-receipt.json` 標示 `SCRIPTED_SYNTHETIC`，包含原決策與 turn、原件與映射摘要、Job manifest、完整表格實收回執、四個變化量、獨立複算與實際生效的後續動作。失敗和部分進展記入 `study-progress.json`，保留原始資料庫與 rollout。PI 可讀的表格位於 `report.md`。只讀同一張表會沿用已完成的 CPU 計算。
+
+## 從已結題的原 Run 重新導出
+
+```bash
+"$py" -B acceptance/science_execution/study/operate.py export \
+  --work "$w" --output "${w}.review"
+```
+
+`--output` 指定原研究目錄外的新目錄。`study-receipt.json` 和 `report.md` 使用原 Run 目前 Goal 版本的關閉事件、採納決策、實收表格與 Job 產物。曾要求追加量測時，報告保留首次讀數、復核的依據，以及復核後真正生效的結論。缺少關閉事件或最後一筆量測的實收引用時，導出會報錯。
+
+此命令可在新版 checkout 導出舊版研究，只讀研究記錄，無須啟動模型或派發 Job。對已有舊回執的研究執行 `operate` 時，修正後的報告會另存於同層的 `${w}.final-report`。命令輸出的 `report_directory` 指向可交付的版本。同一閉環後續再次執行會沿用該份報告。

@@ -3,12 +3,15 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from datetime import datetime, timezone
+import errno
 import fcntl
 import json
 from pathlib import Path
 import shutil
+import sqlite3
 import subprocess
 import sys
+from tempfile import TemporaryDirectory
 from threading import Event
 import time
 
@@ -152,10 +155,68 @@ def account_original(slot, rid, window, *, wait=False):
         time.sleep(min(2,max(0,until-time.time())))
 
 
+def export_archived(work, destination):
+    """Publish a fresh report from the original GX state and native transcripts."""
+    from acceptance.science_execution.study import receipt
+    work, destination = work.resolve(), destination.resolve()
+    if destination.is_relative_to(work):
+        raise ValueError("Choose a report directory outside the original study")
+    if destination.exists():
+        raise FileExistsError(errno.EEXIST, "Choose a new report directory", str(destination))
+    reg = read(work/"seal.json")
+    slot = work/"lead"
+    first = read(slot/"first-attempt.json")
+    rid = read(work/"custody/opening.json")["run_id"]
+    if first.get("series", reg["series"]) != reg["series"] or first.get("run_id", rid) != rid:
+        raise ValueError("Opening and first attempt refer to different research")
+    state_hash = rehearse.state_hash(slot, rid)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(dir=destination.parent) as temp:
+        stage = Path(temp)/"report"
+        stage.mkdir()
+        ledger = None
+        if reg["synthetic"]:
+            # The fixture funding owner initializes its tables. Give it a private SQLite snapshot.
+            stored = (work/"custody/account.sqlite").as_uri() + "?mode=ro"
+            snapshot = Path(temp)/"account.sqlite"
+            with closing(sqlite3.connect(stored, uri=True)) as source, closing(sqlite3.connect(snapshot)) as copy:
+                source.backup(copy)
+            ledger = funding.BatchFunding(snapshot, series=reg["series"], slots=["lead"], batch_cap=1_000_000)
+        result = receipt.export(work, rid, reg, state_hash, ledger, destination=stage)
+        stage.rename(destination)
+    return {**result, "report_directory": str(destination)}
+
+
+def reuse_report(work):
+    from acceptance.science_execution.study import receipt
+    slot = work/"lead"
+    original = read(work/"study-receipt.json")
+    directory = work if original.get("closure") else work.with_name(work.name + ".final-report")
+    if not directory.exists():
+        try:
+            return export_archived(work, directory)
+        except OSError as error:
+            if error.errno not in (errno.EEXIST, errno.ENOTEMPTY) or not directory.is_dir():
+                raise
+            # Another reader published first. Validate its report against the same closed Goal.
+    report = original if directory == work else read(directory/"study-receipt.json")
+    rid = read(work/"custody/opening.json")["run_id"]
+    with closing(rehearse.db_open(slot)) as db:
+        closure = receipt.completed_close(db, rid)
+    if (report["run_id"] != rid or report["cold_state_sha256"] != rehearse.state_hash(slot, rid)
+            or report["registration_sha256"] != digest(work/"seal.json") or report.get("closure") != closure
+            or report.get("final_decision", {}).get("decision_ref") != closure["decision_ref"]):
+        raise ValueError("Stored report and current Goal closure disagree")
+    return {**report, "report_directory": str(directory)}
+
+
 def run(work, binary, approval, diagnostics, *, reconcile_only=False):
     reg = read(work/"seal.json")
     if reg["status"]=="NOT_ENROLLED":
         return reg
+    cached = work/"study-receipt.json"
+    if cached.is_file() and not reconcile_only:
+        return reuse_report(work)
     if (reg["candidate"]!=pilot.candidate() or digest(binary)!=reg["host_sha256"] or
             any(digest(work/k)!=v for k,v in reg["sealed_files"].items())):
         raise ValueError("Candidate or sealed materials changed")
@@ -170,11 +231,8 @@ def run(work, binary, approval, diagnostics, *, reconcile_only=False):
             account = account_original(slot,prior,window,wait=reconcile_only)
             if not pilot.settled(account):
                 return partial(work,prior,reg,"HELD","ORIGINAL_USAGE_UNSETTLED",accounting=account["status"])
-        if (work/"study-receipt.json").exists():
-            old = read(work/"study-receipt.json")
-            if prior!=old["run_id"] or old["cold_state_sha256"]!=rehearse.state_hash(slot,prior):
-                raise ValueError("Stored original and closed cold replay disagree")
-            return old
+        if cached.is_file():
+            return reuse_report(work)
         if reconcile_only:
             return partial(work,prior,reg,"RECONCILED" if prior else "NOT_STARTED","READ_ONLY")
         ledger = None
@@ -269,14 +327,25 @@ def run(work, binary, approval, diagnostics, *, reconcile_only=False):
 
 if __name__=="__main__":
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("cmd",choices=("seal","operate","reconcile"))
+    p.add_argument("cmd",choices=("seal","operate","reconcile","export"))
     p.add_argument("--work",type=Path,required=True)
     p.add_argument("--binary",type=Path,default=rehearse.BINARY)
+    p.add_argument("--output",type=Path,help="New report directory for export")
     p.add_argument("--custody",type=Path)
     p.add_argument("--synthetic",action="store_true")
     p.add_argument("--approval",type=Path)
     p.add_argument("--diagnostics",type=Path)
     a=p.parse_args()
     w,b=a.work.resolve(),a.binary.resolve()
-    result=seal(w,b,custody=a.custody,fixture_only=a.synthetic) if a.cmd=="seal" else run(w,b,a.approval,a.diagnostics,reconcile_only=a.cmd=="reconcile")
-    print(json.dumps({k:result.get(k) for k in ("series","status","run_id","qualification","classification")},ensure_ascii=False))
+    if (a.cmd == "export") != (a.output is not None):
+        p.error("export requires --output; --output is only used by export")
+    if a.cmd == "export":
+        result = export_archived(w, a.output)
+    elif a.cmd == "seal":
+        result = seal(w, b, custody=a.custody, fixture_only=a.synthetic)
+    else:
+        result = run(w, b, a.approval, a.diagnostics, reconcile_only=a.cmd == "reconcile")
+    summary = {k:result.get(k) for k in ("series","status","run_id","qualification","classification")}
+    if result["status"] == "CLOSED":
+        summary["report_directory"] = result.get("report_directory", str(w))
+    print(json.dumps(summary,ensure_ascii=False))

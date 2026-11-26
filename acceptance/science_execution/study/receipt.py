@@ -34,17 +34,109 @@ def thread_items(path):
     return calls,result
 
 
-def export(work, rid, reg, cold_hash, ledger):
+def completed_close(db, rid):
+    """Resolve the Goal owner's closing operation to its commit and completion events."""
+    row = db.execute("""
+        SELECT g.goal_version, d.decision_ref, g.stop_op_digest AS op_digest,
+               op.value AS resolved_op, requested.event_id AS requested_event,
+               committed.event_id AS committed_event, closed.event_id AS closed_event,
+               closed.ts AS closed_utc
+        FROM v6_goals g
+        JOIN v6_decisions d ON d.run_id=g.run_id AND d.decision_ref=g.stop_decision_ref
+        JOIN v6_decision_tasks t ON t.task_id=d.task_id AND t.run_id=g.run_id
+            AND t.scope='run' AND t.goal_version=g.goal_version
+        JOIN json_each(d.receipt_json,'$.resolved_ops') op
+            ON json_extract(op.value,'$.spec.op')='close_run'
+            AND json_extract(op.value,'$.op_digest')=g.stop_op_digest
+        JOIN events requested ON requested.run_id=g.run_id AND requested.subject_id=g.run_id
+            AND requested.kind='v6.run.close_requested'
+            AND json_extract(requested.payload_json,'$.decision_id')=d.decision_ref
+            AND json_extract(requested.payload_json,'$.op_digest')=g.stop_op_digest
+        JOIN events committed ON committed.run_id=g.run_id AND committed.subject_id=d.decision_ref
+            AND committed.kind='v6.decision.committed'
+            AND committed.event_id=json_extract(d.receipt_json,'$.event_id')
+        JOIN events closed ON closed.run_id=g.run_id AND closed.subject_id=g.run_id
+            AND closed.kind='v6.run.closed'
+            AND json_extract(closed.payload_json,'$.decision_id')=d.decision_ref
+            AND json_extract(closed.payload_json,'$.op_digest')=g.stop_op_digest
+        WHERE g.run_id=? AND g.status='CLOSED'
+            AND json_extract(d.receipt_json,'$.goal_version')=g.goal_version
+            AND json_extract(d.receipt_json,'$.outcome')='adopted'
+            AND requested.event_id < committed.event_id AND committed.event_id < closed.event_id
+        ORDER BY closed.event_id DESC LIMIT 1
+        """,(rid,)).fetchone()
+    if row is None:
+        raise ValueError("Missing enacted close for the current Goal version")
+    closure = dict(row)
+    closure["operation"] = json.loads(closure.pop("resolved_op"))["spec"]
+    return closure
+
+
+def report_lines(outcome):
+    final, close = outcome["final_decision"], outcome["closure"]
+    lines = ["# "+outcome["classification"], "", outcome["qc_recommendation"], "",
+             f"Goal version {close['goal_version']} closed at event {close['closed_event']} "
+             f"by decision {final['decision_ref']}.", ""]
+    operation = close["operation"]
+    if operation["reason"] != final["rationale"]:
+        lines.extend([operation["reason"], ""])
+    if operation["unresolved"]:
+        lines.extend(["Unresolved at closure", ""])
+        lines.extend("- "+limit for limit in operation["unresolved"])
+    lines.extend(["", "Evidence cited in the closing decision", ""])
+    lines.extend("- "+ref for ref in final["evidence_refs"])
+    decisions = {d["decision_ref"]:d for d in outcome["decisions"]}
+    for index, job in enumerate(outcome["jobs"]):
+        heading = "Primary measurement" if index == 0 else "Follow-up measurement"
+        lines.extend(["", "## "+heading, "", f"Job {job['job_id']}.", ""])
+        if "table" not in job:
+            lines.append(job["status"])
+            continue
+        table = job["table"]
+        lines.extend([f"{outcome['opening']['commitment']['prediction']['blind_id']}, "
+                      f"{table['interval']}, {table['mask']}, {table['endpoint']} ({table['unit']}). "
+                      "Shared chains are dependent observations.", "",
+                      "| Pair | Before | After | Absolute change |", "|---|---:|---:|---:|"])
+        for key in ("pair12","pair13","pair23","median"):
+            row = table["rows"][key]
+            values = row[table["endpoint"]]
+            cells = [key+" ("+",".join(row["chains"])+")"] + [
+                "NA" if values[k] is None else str(values[k]) for k in ("before","after","delta")]
+            lines.append("| "+" | ".join(cells)+" |")
+        lines.extend(["", f"Matched {table['selected_residues']}, omitted {table['omitted_residues']}, "
+                          f"retained {table['retained_residues']}.",
+                      f"Independent maximum delta difference {job['independent']['max_delta_difference']} "
+                      f"{table['unit']}, tolerance {table['tolerance']} {table['unit']}.", "",
+                      f"Output {job['output']['artifact_ref']}. Original SHA-256 {table['input_sha256']}. "
+                      f"Frozen mapping SHA-256 {table['mapping_sha256']}.",
+                      f"Capability {table['method']}. Job manifest {job['manifest_sha256']}."])
+        for ref in job["followup_refs"]:
+            if ref == final["decision_ref"]:
+                lines.extend(["", f"Cited by the closing decision at event {final['event_id']}."])
+            else:
+                lines.extend(["", f"Decision {ref} (event {decisions[ref]['event_id']})", "", decisions[ref]["rationale"]])
+    return lines
+
+
+def export(work, rid, reg, cold_hash, ledger, *, destination=None):
     slot = work/"lead"
     op = read(work/"custody/opening.json")
+    if op["run_id"] != rid:
+        raise ValueError("Opening belongs to another Run")
     primary = op["commitment"]
     sessions = native.native_session(slot/"codex/sessions")
     history = {t:thread_items(path) for t,path in sessions.items()}
     decisions, readings, refused, jobs = [], [], [], []
     with closing(rehearse.db_open(slot)) as db:
+        db.execute("BEGIN")
+        closure = completed_close(db, rid)
+        if primary["goal_version"] != closure["goal_version"]:
+            raise ValueError("Primary commitment belongs to another Goal version")
         for d in protocol.accepted(db,rid):
             thread,turn,cid=d["thread_id"],d["turn_id"],d["call_id"]
             root = db.execute("SELECT brief FROM p0_roots WHERE run_id=? AND thread_id=?", (rid,thread)).fetchone()
+            if not root or thread not in sessions:
+                raise ValueError("Missing original Lead transcript or brief for "+d["decision_ref"])
             session,ctx,when,calls,_ = native.delivered(sessions[thread],turn,root[0])
             if (session["model_provider"] != ("gx_loopback" if reg["synthetic"] else "openai")
                     or (ctx["model"],ctx["effort"]) != (reg["model"],reg["effort"]) or cid not in calls):
@@ -99,19 +191,22 @@ def export(work, rid, reg, cold_hash, ledger):
                     max(a["event_id"] for a in op["assignments"]) < submitted[0] < published[0]):
                 raise ValueError("Primary, opening and Job chronology disagree")
             checked = independent.verify((work/"custody/coordinates.cif").read_bytes(),(work/"custody/mapping.json").read_bytes(),table)
-            received = [r for r in readings if r["ref"]==out["artifact_ref"] and r["complete_segment"]]
+            received = [r for r in readings if r["ref"]==out["artifact_ref"] and r["complete_segment"]
+                        and history[r["thread_id"]][1][r["turn_id"],r["call_id"]]["value"] == table]
             followups = [d for d in decisions if d["event_id"]>published[0] and out["artifact_ref"] in d["evidence_refs"]
                          and any(r["thread_id"]==d["thread_id"] and r["turn_id"]==d["turn_id"] and r["output_line"]<d["native_line"]
                                  for r in received)]
             job.update(table=table, output=out,admitted=dict(submitted),published=dict(published),
                        independent=checked, received=received,followup_refs=[d["decision_ref"] for d in followups])
-    primaries = [j for j in jobs if j["parameters"]==primary["method"]["parameters"] and "table" in j]
-    if len(primaries)!=1 or jobs[0]!=primaries[0] or not primaries[0]["followup_refs"]:
+    if not jobs or jobs[0]["parameters"] != primary["method"]["parameters"] or not jobs[0].get("followup_refs"):
         raise ValueError("No complete, source-bound primary table was received and cited in an enacted action")
-    final = next(d for d in decisions if d["decision_ref"]==primaries[0]["followup_refs"][0])
     for later in jobs[1:]:
-        if later["commission"] not in primaries[0]["followup_refs"]:
+        if later["commission"] not in jobs[0]["followup_refs"]:
             raise ValueError("Additional measurement lacks a new decision after receipt of the primary result")
+    final = next(d for d in decisions if d["decision_ref"] == closure["decision_ref"])
+    last_measurement = max((j for j in jobs if "table" in j), key=lambda j: j["published"]["event_id"])
+    if final["decision_ref"] not in last_measurement["followup_refs"]:
+        raise ValueError("Final decision lacks receipt and citation of the last measurement")
     if ledger:
         costs = funding.check_slot_receipts(ledger,slot.name,[json.loads(l) for l in (slot/"raw/requests.jsonl").read_text().splitlines()])
         account = {"fixture_costs":costs,"real_model_requests":0,"provider_usd":None}
@@ -122,21 +217,11 @@ def export(work, rid, reg, cold_hash, ledger):
                "classification":classification,"status":"CLOSED","registration_sha256":digest(work/"seal.json"),
                "research_window":read(slot/"first-attempt.json")["research_window"],
                "opening":op,"decisions":decisions,"reads":readings,"jobs":jobs,"qc_recommendation":final["rationale"],
+               "closure":closure,"final_decision":final,
                "readback":{"physical_jobs":len(jobs),"artifact_reads":len(readings),"read_induced_jobs":0},
                "cost":account,"field_retries":refused,"cold_state_sha256":cold_hash}
-    save(work/"study-receipt.json",outcome)
-    table = primaries[0]["table"]
-    lines = ["# "+classification,"",final["rationale"],"",f"Scope: {reg['blind_id']}, {table['interval']}, {table['mask']}, "
-             f"{table['endpoint']} ({table['unit']}). Shared chains are dependent observations.","",
-             "| Pair | Before | After | Absolute change |","|---|---:|---:|---:|"]
-    for key in ("pair12","pair13","pair23","median"):
-        row = table["rows"][key]
-        vals = row[table["endpoint"]]
-        lines.append("| "+" | ".join([key+" ("+",".join(row["chains"])+")",*[str(vals[a]) if vals[a] is not None else "NA" for a in ("before","after","delta")]])+" |")
-    lines += ["",f"Matched {table['selected_residues']}, omitted {table['omitted_residues']}, retained {table['retained_residues']}.",
-              f"Independent maximum delta difference {primaries[0]['independent']['max_delta_difference']} {table['unit']}, "
-              f"tolerance {primary['operating_limits']['tolerance']} {table['unit']}.","",
-              f"Original SHA-256 {table['input_sha256']}. Frozen mapping SHA-256 {table['mapping_sha256']}.",
-              f"Capability {primary['method']['capability']}. Manifest {primary['method_manifest_sha256']}."]
-    (work/"report.md").write_text("\n".join(lines)+"\n")
+    dest = destination if destination is not None else work
+    lines = report_lines(outcome)
+    (dest/"report.md").write_text("\n".join(lines)+"\n")
+    save(dest/"study-receipt.json",outcome)
     return outcome

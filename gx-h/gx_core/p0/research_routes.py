@@ -308,26 +308,30 @@ def _handoffs(conn, rid, modules, roots, decisions, turns, directory):
     return result
 
 
-def routes(conn, rid, directory):
-    """Return stable read-only records of the routes on the current Goal version."""
+def routes(conn, rid, directory, *, goal_version=None):
+    """Return the routes for the requested Goal version, defaulting to current work."""
+    if goal_version is None:
+        goal = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (rid,)).fetchone()
+        goal_version = goal[0] if goal else None
     modules = []
     decisions = {}
-    if not conn.execute('SELECT 1 FROM v62_modules m JOIN v6_goals g USING(run_id,goal_version) WHERE m.run_id=? LIMIT 1',(rid,)).fetchone():
+    if not conn.execute('SELECT 1 FROM v62_modules WHERE run_id=? AND goal_version=? LIMIT 1',(rid, goal_version)).fetchone():
         return dict(modules=[],real_turn_overlaps=[],job_turn_overlaps=[],handoffs=[])
     roots = conn.execute('''SELECT r.*,t.scope FROM p0_roots r JOIN v6_decision_tasks t USING(run_id,task_id)
-            JOIN v6_goals g USING(run_id,goal_version) WHERE r.run_id=? ORDER BY r.rowid''',(rid,)).fetchall()
+            WHERE r.run_id=? AND t.goal_version=? ORDER BY r.rowid''',(rid, goal_version)).fetchall()
     by_thread = {root['thread_id']:_turns(conn,rid,directory,root) for root in roots}
     turn_lookup = {(t['thread_id'],t['turn_id']):t for records in by_thread.values() for t in records}
     for r in conn.execute('''SELECT d.*,t.scope FROM v6_decisions d JOIN v6_decision_tasks t USING(run_id,task_id)
-            JOIN v6_goals g USING(run_id,goal_version) WHERE d.run_id=? ORDER BY d.rowid''',(rid,)):
+            WHERE d.run_id=? AND t.goal_version=? ORDER BY d.rowid''',(rid, goal_version)):
         receipt = json.loads(r['receipt_json'])
         spec = json.loads(r['request_json'])['decision']
         decisions[(r['thread_id'],r['turn_id'])] = dict(decision_ref=r['decision_ref'],scope=r['scope'],event_id=receipt['event_id'],
                 thread_id=r['thread_id'],turn_id=r['turn_id'],call_id=r['call_id'],rationale=spec['rationale'],evidence_refs=spec.get('evidence_refs',[]),
                 used_metric_refs=receipt.get('endpoint_use', {}).get('used_metric_refs', []),
                 outcome=receipt.get('outcome'),operations=[item['spec']['op'] for item in receipt.get('resolved_ops',[])])
-    for r in conn.execute('''SELECT m.*,p.receipt_json AS report_json FROM v62_modules m JOIN v6_goals g USING(run_id,goal_version)
-            LEFT JOIN v62_module_reports p USING(run_id,module_instance_id) WHERE m.run_id=? ORDER BY m.round,m.rowid''',(rid,)):
+    for r in conn.execute('''SELECT m.*,p.receipt_json AS report_json FROM v62_modules m
+            LEFT JOIN v62_module_reports p USING(run_id,module_instance_id) WHERE m.run_id=? AND m.goal_version=?
+            ORDER BY m.round,m.rowid''',(rid, goal_version)):
         module = {k:r[k] for k in ('module_instance_id','scope','branch_id','focus','module_id','module_version','round','parent_task_id','goal_version','status')}
         report = json.loads(r['report_json']) if r['report_json'] else None
         if report:

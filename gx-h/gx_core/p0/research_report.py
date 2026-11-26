@@ -3,16 +3,16 @@ import json
 import re
 
 def completed_close(db, rid):
-    """Resolve the Goal owner's closing operation to its commit and completion events."""
+    """Read the decision that actually closed this Run, including older misaligned Goal headers."""
     row = db.execute("""
-        SELECT g.goal_version, d.decision_ref, g.stop_op_digest AS op_digest,
+        SELECT t.goal_version, d.decision_ref, g.stop_op_digest AS op_digest,
                op.value AS resolved_op, requested.event_id AS requested_event,
                committed.event_id AS committed_event, closed.event_id AS closed_event,
                closed.ts AS closed_utc
         FROM v6_goals g
         JOIN v6_decisions d ON d.run_id=g.run_id AND d.decision_ref=g.stop_decision_ref
         JOIN v6_decision_tasks t ON t.task_id=d.task_id AND t.run_id=g.run_id
-            AND t.scope='run' AND t.goal_version=g.goal_version
+            AND t.scope='run' AND t.goal_version<=g.goal_version
         JOIN json_each(d.receipt_json,'$.resolved_ops') op
             ON json_extract(op.value,'$.spec.op')='close_run'
             AND json_extract(op.value,'$.op_digest')=g.stop_op_digest
@@ -28,13 +28,13 @@ def completed_close(db, rid):
             AND json_extract(closed.payload_json,'$.decision_id')=d.decision_ref
             AND json_extract(closed.payload_json,'$.op_digest')=g.stop_op_digest
         WHERE g.run_id=? AND g.status='CLOSED'
-            AND json_extract(d.receipt_json,'$.goal_version')=g.goal_version
+            AND json_extract(d.receipt_json,'$.goal_version')=t.goal_version
             AND json_extract(d.receipt_json,'$.outcome')='adopted'
             AND requested.event_id < committed.event_id AND committed.event_id < closed.event_id
         ORDER BY closed.event_id DESC LIMIT 1
         """,(rid,)).fetchone()
     if row is None:
-        raise ValueError("Missing enacted close for the current Goal version")
+        raise ValueError("Missing enacted close for the sealed Goal")
     closure = dict(row)
     closure["operation"] = json.loads(closure.pop("resolved_op"))["spec"]
     return closure
@@ -168,6 +168,7 @@ def _rejections(conn, rid, closed_event):
 
 def export(conn, rid, directory, invocation):
     from ..native_release import write_native_bytes
+    from .intent import read_item
     from .research_evidence import evidence
     from .research_page import page
     from .research_routes import routes
@@ -175,9 +176,9 @@ def export(conn, rid, directory, invocation):
     try:
         close = completed_close(conn, rid)
         final = closing_decision(conn, rid, close)
-        goal = conn.execute("SELECT goal FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]
-        science = evidence(conn, rid)
-        work = routes(conn, rid, directory)
+        goal = read_item(conn, rid, "objective", close["goal_version"])["value"]
+        science = evidence(conn, rid, through_event=close["closed_event"])
+        work = routes(conn, rid, directory, goal_version=close["goal_version"])
         cache = {final["decision_ref"]: final["used_endpoints"]}
         actions = _decisions_after_reading(conn, rid, close, work, cache)
         texts = [final["rationale"], final["reason"], *final["unresolved"]]

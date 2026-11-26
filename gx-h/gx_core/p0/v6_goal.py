@@ -7,9 +7,9 @@ import uuid
 from .. import budgets
 from ..artifacts import ArtifactService
 from ..domain import clock, ids, machines
-from ..errors import ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, VersionImmutable
+from ..errors import ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, StaleRevision, VersionImmutable
 from ..persistence import records, store
-from . import intent, research_window
+from . import intent, research_dialogue, research_window
 
 INSTANCE_ID = "gx.v6.instance"
 ACTOR = "gx-v6"
@@ -123,6 +123,9 @@ def start(conn, spec, *, run_key, current):
             raise VersionImmutable("This run key granted different material bytes; supply a new run key")
         return snapshot(conn, current["run_id"])
 
+    if spec.get("predecessor"):
+        from . import successor
+        successor.verify_admission(conn, run_key, spec)
     requested = spec.get("capabilities")
     if requested is not None and (
         not isinstance(requested, list)
@@ -182,6 +185,8 @@ def start(conn, spec, *, run_key, current):
                 store._j(limits),
             ),
         )
+        if spec.get("predecessor"):
+            successor.record_transfer(conn, rid, spec["predecessor"], store.loads(run, "inputs_json")["files"])
         for state in ("PLANNING", "ACTIVE"):
             store.transition(
                 conn,
@@ -333,7 +338,8 @@ def _events(conn, rid, after, budget_ref=None):
         WHERE event_id>? AND (
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
                                   'v6.claim.adopted','v6.decision.superseded','v6.prospective.opening_wait','v62.round.settled',
-                                  'v62.claim.reassessed','v62.module.wake','v62.module.invalidated','v621.material.assigned') OR
+                                  'v62.claim.reassessed','v62.module.wake','v62.module.invalidated','v621.material.assigned',
+                                  'research.pi.feedback','research.pi.answered') OR
           (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
           OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
@@ -351,6 +357,10 @@ def _events(conn, rid, after, budget_ref=None):
     for row in events:
         if row["event_id"] < first or not v621_goal_scope.applies(conn, rid, row, store.loads(row, "payload_json"), version):
             continue
+        if row["kind"] in (research_dialogue.FEEDBACK, research_dialogue.ANSWER):
+            item = store.loads(row, "payload_json")
+            if item["scope"].startswith("module:") and item.get("asking_scope") != "run":
+                continue
         if module_branches and v62_lead.internal_event(row, module_branches):
             continue
         if row["kind"] == "v6.claim.adopted":
@@ -376,6 +386,8 @@ def _matches(row, watches, rid):
     payload = store.loads(row, "payload_json")
     kind = row["kind"]
     events = {
+        research_dialogue.ANSWER: set(),
+        research_dialogue.FEEDBACK: set(),
         "v6.decision.superseded": set(),
         "v6.prospective.opening_wait": set(),
         "v62.module.invalidated": set(),
@@ -468,7 +480,7 @@ def _run_wakes(conn, rid, prior, events):
         payload = store.loads(row, "payload_json")
         if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
             continue
-        if (row["kind"] in {"v6.intent.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
+        if (row["kind"] in {research_dialogue.FEEDBACK, research_dialogue.ANSWER, "v6.intent.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
                 or row["kind"] == "v6.decision.superseded" and payload.get("scope") == "run"
                 or row["kind"] == "v62.round.settled" and payload.get("reconsider")
                 or row["kind"] == "v62.claim.reassessed" and payload.get("critical_counterevidence")
@@ -513,7 +525,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     observations = []
     refs = [f["artifact_ref"] for f in files]
     for row in events:
-        if row["kind"] in {"v621.material.assigned", "v6.prospective.opening_wait"}:
+        if row["kind"] in {research_dialogue.ANSWER, research_dialogue.FEEDBACK, "v621.material.assigned", "v6.prospective.opening_wait"}:
             continue  # Assignment already has an acquisition. An opening wait supplies no evidence.
         p = store.loads(row, "payload_json")
         ref = p.get("result_ref") or p.get("artifact_ref")
@@ -698,6 +710,12 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "evidence_refs": list(dict.fromkeys(refs)),
         "budget": budget,
     }
+    if grant.get("predecessor"):
+        predecessor = grant["predecessor"]
+        brief["prior_research"] = {k: predecessor[k] for k in (
+            "parent_run_id", "parent_decision_ref", "parent_goal_version", "closed_event",
+            "request_message_id", "selected_materials", "prior_conclusion")}
+        brief["prior_research"]["evidence_status"] = "Previously known at entry. Use as historical context."
     if "prospective_opening" in grant:
         from . import v6_prospective
         if v6_prospective.opening_pending(conn, rid):
@@ -752,6 +770,9 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         comparisons = v623_comparison.bindings(conn,rid,goal["goal_version"],cursor)
         if comparisons:
             brief["comparisons"] = comparisons
+    dialogue = research_dialogue.packet(conn, rid, "run", goal["goal_version"], through=cursor)
+    if dialogue:
+        brief["pi_dialogue"] = dialogue
     return brief
 
 
@@ -762,6 +783,8 @@ def ensure_task(conn, run_id):
     run = conn.execute("SELECT * FROM runs WHERE run_id=?", (run_id,)).fetchone()
     goal = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
     if not goal or goal["status"] != "OPEN" or run["status"] != "ACTIVE":
+        return None
+    if research_dialogue.blocked(conn, run_id, scope="run"):
         return None
     if store.loads(run, "inputs_json")["inputs"].get("research_evidence_version"):
         from . import v62_maturity, v62_rounds
@@ -821,6 +844,7 @@ def ensure_task(conn, run_id):
             or current["run_status"] != "ACTIVE"
             or v6_decisions.head(tx, run_id) != head
             or _open(tx, run_id)
+            or research_dialogue.blocked(tx, run_id, scope="run")
             or tx.execute(
                 "SELECT 1 FROM events WHERE run_id=? "
                 "AND kind IN ('v6.intent.changed','v621.material.assigned') AND event_id>? LIMIT 1",
@@ -946,6 +970,11 @@ def impact(conn, rid, edits, *, commit):
     goal = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (rid,)).fetchone()
     if goal is None:  # initial operator bootstrap inside run creation
         return []
+    if edits and goal["status"] in ("CLOSING", "CLOSED"):
+        raise StaleRevision(f"Goal {rid} is {goal['status']}. Its scientific Intent is sealed. "
+                            "Start a successor study for a new question.")
+    if all(edit["item_type"] == "soft_preference" for edit in edits):
+        return []
     objective = next((e for e in edits if e["item_id"] == "objective"), None)
     nodes = []
     if objective:
@@ -1017,8 +1046,10 @@ def waiting_for(conn, rid):
             (rid, *ACTIVE_TASKS),
         )
     ]
+    pending = [q for q in research_dialogue.questions(conn, rid) if q["blocking"] and q["status"] == "OPEN"]
+    visible = {"pi_questions": pending} if pending else {}
     if open_tasks:
-        return {"kind": "decision", "tasks": open_tasks, "continue_with": "gx-p0 run"}
+        return {**visible, "kind": "decision", "tasks": open_tasks, "continue_with": "gx-p0 run"}
     nodes = [
         dict(row)
         for row in conn.execute(
@@ -1033,12 +1064,15 @@ def waiting_for(conn, rid):
             reason = node.pop("wait_json")
             if reason:
                 node["wait"] = json.loads(reason)
-        return {"kind": "nodes", "nodes": nodes, "continue_with": "gx-p0 run"}
+        return {**visible, "kind": "nodes", "nodes": nodes, "continue_with": "gx-p0 run"}
     modules = [dict(row) for row in conn.execute(
         "SELECT module_instance_id,round,scope FROM v62_modules WHERE run_id=? AND status='OPEN' ORDER BY rowid", (rid,)
     )]
+    blocked_scopes = {q["scope"] for q in pending}
+    if pending and all(module["scope"] in blocked_scopes for module in modules):
+        return {**visible, "kind": "pi_answer", "continue_with": "gx-p0 message --question-id ID --text ANSWER"}
     if modules:
-        return {"kind": "module_reports", "modules": modules, "continue_with": "gx-p0 run"}
+        return {**visible, "kind": "module_reports", "modules": modules, "continue_with": "gx-p0 run"}
     prior = _latest(conn, rid)
     if prior:
         version = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]

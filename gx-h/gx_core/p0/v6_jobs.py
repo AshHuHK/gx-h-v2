@@ -313,6 +313,9 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
     binding = request.get("binding") or {}
     node = _node(conn, request["run_id"], binding.get("v6_node_id"))
     _live(node, "PENDING")
+    from . import research_dialogue
+    if research_dialogue.blocked(conn, node["run_id"], branch_id=node["branch_id"]):
+        raise HoldActive("This branch is waiting for a PI answer")
     _prospective(conn, request)
     _module_grant(conn, node, json.loads(node["spec_json"]))
     run_status = conn.execute("SELECT status FROM runs WHERE run_id=?", (request["run_id"],)).fetchone()[0]
@@ -569,6 +572,9 @@ def _run_node(conn, node, service, window):
     if node["status"] == "CANCEL_REQUESTED":
         return "cancelled" if _finish(conn, node, "CANCELLED") else "waiting"
     _live(node, "PENDING")
+    from . import research_dialogue
+    if research_dialogue.blocked(conn, node["run_id"], branch_id=node["branch_id"]):
+        return "waiting"
     research_window.require_open(window)
     spec = json.loads(node["spec_json"])
     _module_grant(conn, node, spec)

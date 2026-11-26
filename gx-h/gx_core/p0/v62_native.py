@@ -38,7 +38,11 @@ def evidence_tool(name, version):
     spec = contracts.native_goal_tool_spec(name)
     spec = deepcopy(spec)
     fields = spec["inputSchema"]["properties"]
+    if name == REPORT:
+        fields.pop("pi_dispositions")
     if name == "gx_decide_revision":
+        for key in ("pi_questions", "pi_dispositions"):
+            fields["decision"]["properties"].pop(key)
         plan = fields["decision"]["properties"]["comparison_plan"]["properties"]
         for key in ("reference_refs", "prediction"):
             plan.pop(key, None)
@@ -88,6 +92,10 @@ def module_instructions(brief):
     instructions.append("Use gx_submit_module_report with findings, exact source references, gaps and next steps. "
                         "Preserve contrary observations and report PARTIAL when work is incomplete.")
     from . import v621_policy
+    if brief.get("evidence_policy") == v621_policy.VERSION:
+        instructions.append("You may ask the PI a specific scientific question in a decision's pi_questions. "
+                            "Explain your disposition of delivered PI suggestions in the decision or final report "
+                            "using pi_dispositions with feedback_id, outcome and reason.")
     if brief.get("evidence_policy") in v621_policy.TYPED:
         instructions.append("Select verified readings with metric_refs containing artifact_ref and metric_id, "
                             "or cite {{metric:id}} in a finding. Put interpretations, hypotheses and unverified "

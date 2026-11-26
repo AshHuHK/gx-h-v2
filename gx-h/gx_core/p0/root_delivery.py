@@ -433,6 +433,40 @@ class RootDelivery:
             raise LeaseExpired("the root no longer holds the task attempt")
         return binding
 
+    def _conversation_funding(self, run_ref, event_id):
+        """A sealed Run has returned its allotment. PI readback can use its unused share."""
+        sealed = self.conn.execute("""
+            SELECT b.parent_ref,b.limits_json,b.spent_json FROM budgets b
+            JOIN p0_workspace w ON w.budget_ref=b.parent_ref
+            JOIN p0_workspace_runs member ON member.run_id=?
+            JOIN budget_reservations f ON f.reservation_ref=?||b.budget_ref
+            JOIN v6_goals g ON g.run_id=member.run_id
+            JOIN p0_operator_messages m ON m.run_id=g.run_id AND ('human:'||m.message_id)=?
+            WHERE b.budget_ref=? AND g.status='CLOSED' AND f.status<>?
+              AND json_extract(m.action_json,'$.kind') IN ('text','proposal')
+            """, (self.run_id, budgets.FUND_PREFIX, event_id, run_ref, budgets.HELD)).fetchone()
+        if not sealed:
+            return run_ref, None
+        parent = sealed["parent_ref"]
+        limits, spent = store.loads(sealed,"limits_json"), store.loads(sealed,"spent_json")
+        # Prior conversation turns paid from the shared balance still count against the original Run.
+        calls, tokens = self.conn.execute("""
+            SELECT count(*),coalesce(sum(max(coalesce(d.observed_lower_bound,0),
+                coalesce(d.settled_tokens,d.token_budget,0)
+                + coalesce((SELECT sum(a.delta) FROM p0_meter_adjustments a
+                             WHERE a.through_reservation=d.reservation_ref),0)
+                + coalesce((SELECT sum(a.delta) FROM p0_meter_receipt_adjustments a
+                             WHERE a.reservation_ref=d.reservation_ref),0))),0)
+            FROM p0_meter_native_turns d WHERE d.run_id=? AND d.budget_ref=?
+            """, (self.run_id, parent)).fetchone()
+        remainder = {k: limits.get(k,0) - spent.get(k,0) - used
+                     for k, used in (("tokens",tokens), ("api_calls",calls))}
+        for key, available in remainder.items():
+            if available < 1:
+                raise BudgetExceeded("Archived Run has exhausted its conversation allowance",
+                                     details={"key":key,"available":available,"reason":"budget_exhausted"})
+        return parent, int(remainder["tokens"])
+
     def _reserve(self, thread_id, event_id, binding):
         # A retry gets a new thread as soon as its predecessor submits. That
         # predecessor can still be spending inside the already admitted turn.
@@ -472,11 +506,16 @@ class RootDelivery:
             from . import v6_native, v62_budget
             if v6_native.assigned(binding):
                 ref = v62_budget.native_funding(self.conn, self.run_id, binding["task_id"], ref)
+        conversation_tokens = None
+        if not binding.get("task_id") and event_id.startswith("human:"):
+            ref, conversation_tokens = self._conversation_funding(ref, event_id)
         risk_available = meter_limits.allowance(self.conn,self.run_id,ref,binding)
         # A module can draw native tokens from its Run without a local token ceiling.
         available = int(budgets.state(self.conn, ref)["available"].get("tokens", risk_available or 0))
         if risk_available is not None:
             available = min(available,risk_available)
+        if conversation_tokens is not None:
+            available = min(available,conversation_tokens)
         from . import v6_branch_budget
         available = v6_branch_budget.available_tokens(self.conn, self.run_id, binding, available)
         ceiling = self.roots.token_budget

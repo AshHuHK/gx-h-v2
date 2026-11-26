@@ -75,11 +75,20 @@ def _branch_brief(conn, task, branch, question):
     scoped.update(scope=scope, delegation_question=question, native_turn_budget_scope="run_with_explicit_branch_ceilings",
                   branches=[branch], nodes=nodes, claims=claims,
                   observations=observations, evidence_refs=[r for r in parent["evidence_refs"] if r in refs])
+    from . import pi_materials
+    private = pi_materials.for_branch(conn, rid, task["goal_version"], branch_id)
+    if private:
+        scoped["materials"] = [*scoped["materials"], *private]
+        scoped["evidence_refs"].extend(m["artifact_ref"] for m in private)
     limits = branch["spec"]["budget_limits"]
     from .v6_branch_budget import exposure
     used = exposure(conn, branch_id)
     scoped["budget"] = {"limits": limits, "held_or_spent": {k: used[k] for k in limits},
                         "available": {k: max(0, cap - used[k]) for k, cap in limits.items()}}
+    from . import research_dialogue
+    dialogue = research_dialogue.packet(conn, rid, scope, task["goal_version"], through=task["event_cursor"])
+    if dialogue:
+        scoped["pi_dialogue"] = dialogue
     return scoped
 
 
@@ -133,6 +142,9 @@ def commit(conn, plan):
         if conn.execute("SELECT 1 FROM v6_decision_tasks JOIN tasks USING(task_id) WHERE v6_decision_tasks.run_id=? "
                         f"AND scope=? AND status IN ({marks})", (run_id, scoped["scope"], *v6_goal.ACTIVE_TASKS)).fetchone():
             raise ScopeDenied("This branch already has an active decision task")
+        from . import research_dialogue
+        if research_dialogue.blocked(conn, run_id, scope=scoped["scope"]):
+            raise ScopeDenied("This branch is waiting for a PI answer")
         limits = scoped["budget"]["limits"]
         if "worker_tasks" in limits:
             from .v6_branch_budget import exposure

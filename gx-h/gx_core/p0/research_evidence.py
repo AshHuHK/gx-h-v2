@@ -9,12 +9,13 @@ def _fields(record, names):
     return {k: record[k] for k in names.split() if k in record}
 
 
-def _materials(conn, rid):
+def _materials(conn, rid, through_event):
     row = conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (rid,)).fetchone()
     materials = {i["artifact_ref"]: _fields(i, "artifact_ref sha256 bytes role")
                  for i in json.loads(row[0]).get("files", []) if i.get("artifact_ref")}
     for row in conn.execute("""SELECT event_id,ts,kind,payload_json FROM events WHERE run_id=?
-            AND kind IN ('v6.observation.added','v621.material.assigned') ORDER BY event_id""", (rid,)):
+            AND kind IN ('v6.observation.added','v621.material.assigned') AND (? IS NULL OR event_id<=?)
+            ORDER BY event_id""", (rid, through_event, through_event)):
         body = json.loads(row["payload_json"])
         item = materials.setdefault(body["artifact_ref"], _fields(body, "artifact_ref sha256"))
         item.update(_fields(body, "role name"))
@@ -130,14 +131,15 @@ def _jobs(conn, rid):
     return jobs, metrics_by_source
 
 
-def _deliveries(conn, rid, metrics_by_source):
+def _deliveries(conn, rid, metrics_by_source, through_event):
     events, lead_events, module_events = [], {}, {}
     # The transport can deliver either the Job artifact or a module report carrying
     # exactly the same metric. Resolve compact source-local keys with the owner's codec.
     keys = {}
     for event in conn.execute("""SELECT e.event_id,e.ts,e.payload_json,t.scope FROM events e
             LEFT JOIN v6_decision_tasks t ON t.run_id=e.run_id AND t.task_id=json_extract(e.payload_json,'$.task_id')
-            WHERE e.run_id=? AND e.kind=? ORDER BY e.event_id""", (rid, v623_exposure.EVENT)):
+            WHERE e.run_id=? AND e.kind=? AND (? IS NULL OR e.event_id<=?)
+            ORDER BY e.event_id""", (rid, v623_exposure.EVENT, through_event, through_event)):
         body = json.loads(event["payload_json"])
         endpoints = []
         for proof in body["endpoints"]:
@@ -163,10 +165,10 @@ def _deliveries(conn, rid, metrics_by_source):
     return events, lead_events, module_events
 
 
-def evidence(conn, rid):
+def evidence(conn, rid, *, through_event=None):
     predictions, exploratory = _claims(conn, rid)
     jobs, metrics = _jobs(conn, rid)
-    deliveries, lead, modules = _deliveries(conn, rid, metrics)
+    deliveries, lead, modules = _deliveries(conn, rid, metrics, through_event)
     for job in jobs:
         for output in job["outputs"]:
             received = set()
@@ -199,7 +201,7 @@ def evidence(conn, rid):
                     out = published.get(gap.get("artifact_ref"), {})
                     gap["denominators"] = out.get("denominators", {})
                     gap["unavailable_reason"] = out.get("summary", {}).get("unavailable_reason")
-    return {"materials": _materials(conn, rid), "predictions": list(hypotheses.values()), "exploratory_claims": exploratory,
+    return {"materials": _materials(conn, rid, through_event), "predictions": list(hypotheses.values()), "exploratory_claims": exploratory,
             "comparison_plans": _comparisons(conn, rid), "jobs": jobs, "deliveries": deliveries}
 
 

@@ -10,8 +10,8 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 from .. import contracts
-from ..errors import GxError
-from . import projects
+from ..errors import GxError, IdempotencyConflict
+from . import projects, research
 
 BASE = "/api/science/conversations"
 STATIC = {"index.html": "text/html", "app.js": "text/javascript", "site.css": "text/css"}
@@ -42,12 +42,14 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError("Expected a JSON object")
         return obj
 
-    def stream(self, after):
+    def stream(self, after, run_id=None):
         if not 0 <= after <= 2**63 - 1:
             raise ValueError("Invalid event cursor")
         app = self.server
         # Query before sending the HTTP status so store errors get a real error response.
-        rows = projects.milestones(app.state, app.project, after)
+        read = (lambda cursor: research.events(app.state, app.project, run_id, cursor)) if app.run_id else (
+            lambda cursor: projects.milestones(app.state, app.project, cursor))
+        rows = read(after)
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-cache, no-transform")
@@ -69,7 +71,7 @@ class Handler(BaseHTTPRequestHandler):
             if len(rows) < 200:
                 time.sleep(1)
             try:
-                rows = projects.milestones(app.state, app.project, after)
+                rows = read(after)
             except sqlite3.Error:
                 return  # Browser retries with its last delivered event ID.
 
@@ -90,18 +92,30 @@ class Handler(BaseHTTPRequestHandler):
         if self.command == "GET" and path in ("", "/index.html", "/site.css", "/app.js"):
             name = path.lstrip("/") or "index.html"
             return self.send_bytes(200, (contracts.HARNESS_ROOT / "web" / name).read_bytes(), STATIC[name])
+        query = parse_qs(addr.query)
+        run_id = query.get("run_id", [app.run_id])[0]
         if self.command == "GET" and path == BASE:
-            return self.send_json(200, {"items": [{"id": app.project}], "can_launch": bool(app.prompt)})
+            return self.send_json(200, {"items": [{"id": app.project}], "can_launch": bool(app.prompt) and not app.run_id,
+                                        "backend": "p0" if app.run_id else "native", "run_id": app.run_id})
         route = BASE + "/" + app.project
         if self.command == "GET" and path == route:
+            if app.run_id:
+                return self.send_json(200, research.snapshot(app.state, app.project, run_id))
             return self.send_json(200, projects.snapshot(app.state, app.project))
+        if self.command == "GET" and app.run_id and path == route + "/basis":
+            return self.send_json(200, research.basis(app.state, app.project, run_id, query))
         if self.command == "GET" and path == route + "/events":
             cursor = self.headers.get("Last-Event-ID") or parse_qs(addr.query).get("after", ["0"])[0]
-            return self.stream(int(cursor))
+            return self.stream(int(cursor), run_id)
         if self.command == "POST" and path == route + "/messages":
             body = self.body()
             kind = body.get("kind", "feedback")
-            if kind == "feedback":
+            if app.run_id:
+                if kind != "feedback":
+                    raise ValueError("Send feedback or a follow-up in the selected research conversation")
+                receipt = research.send(app.state, app.project, body)
+                app.delivery.wake(body["run_id"], receipt["message_id"])
+            elif kind == "feedback":
                 receipt = projects.feedback(app.state, app.project, body.get("client_message_id"), body.get("text"))
             elif kind == "launch":
                 if app.prompt is None:
@@ -120,7 +134,7 @@ class Handler(BaseHTTPRequestHandler):
             self.dispatch()
         except (BrokenPipeError, ConnectionResetError):
             pass
-        except projects.Conflict as exc:
+        except (projects.Conflict, IdempotencyConflict) as exc:
             self.send_json(409, {"error": str(exc)})
         except (ValueError, GxError) as exc:
             self.send_json(400, {"error": str(exc)})
@@ -130,13 +144,31 @@ class Handler(BaseHTTPRequestHandler):
     do_POST = do_GET
 
 
-def make_server(state, project, port, *, prompt=None, settings=None):
+class Server(ThreadingHTTPServer):
+    delivery = None
+
+    def server_close(self):
+        if self.delivery:
+            self.delivery.close()
+        super().server_close()
+
+
+def make_server(state, project, port, *, prompt=None, settings=None, run_id=None):
     if not re.fullmatch(r"[a-zA-Z0-9_-][a-zA-Z0-9._-]{0,127}", project):
         raise ValueError("Use a project name containing letters, digits, dots, hyphens or underscores")
     if prompt is not None and not Path(prompt).is_file():
         raise ValueError("The selected prompt file does not exist")
-    server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    server.state, server.project = Path(state).resolve(), project
+    state = Path(state).resolve()
+    selected = research.selected_run(state, project, run_id)
+    server = Server(("127.0.0.1", port), Handler)
+    server.state, server.project, server.run_id = state, project, selected
+    if selected:
+        try:
+            server.delivery = research.Delivery(state, project)
+            server.delivery.start()
+        except BaseException:
+            server.server_close()
+            raise
     server.prompt = Path(prompt).resolve() if prompt else None
     server.settings = settings or {}
     return server
@@ -146,6 +178,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", required=True, type=Path)
     parser.add_argument("--project", required=True)
+    parser.add_argument("--run-id", help="Attach to this existing P0 research Run")
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--prompt-file", type=Path, help="Enable starting this Markdown commission from the page")
     parser.add_argument("--model")
@@ -156,7 +189,7 @@ def main(argv=None):
     settings = {k: v for k, v in vars(args).items() if k in
                 ("model", "collaboration", "max_sessions", "max_wall_seconds") and v is not None}
     try:
-        with make_server(args.state_dir, args.project, args.port, prompt=args.prompt_file, settings=settings) as server:
+        with make_server(args.state_dir, args.project, args.port, prompt=args.prompt_file, settings=settings, run_id=args.run_id) as server:
             print(f"GX project {args.project}: http://127.0.0.1:{server.server_port}/", flush=True)
             server.serve_forever()
     except KeyboardInterrupt:

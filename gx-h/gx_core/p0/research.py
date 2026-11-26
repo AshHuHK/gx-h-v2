@@ -14,8 +14,10 @@ from . import operator, workspace
 def add_command(commands):
     parser = commands.add_parser("research", help="Run or resume a scientific Goal and export its findings")
     parser.add_argument("--state", required=True, type=Path)
-    parser.add_argument("--run-key", required=True, help="Persistent name for this study")
-    question = parser.add_mutually_exclusive_group(required=True)
+    labelled = parser.add_mutually_exclusive_group(required=True)
+    labelled.add_argument("--run-key", help="Persistent name for this study")
+    labelled.add_argument("--run-id", help="Drive or export a previously admitted study, using its saved Goal")
+    question = parser.add_mutually_exclusive_group()
     question.add_argument("--goal")
     question.add_argument("--goal-file", type=Path, help="Read the complete UTF-8 scientific question")
     parser.add_argument("--goal-config", type=Path, help="Resource bounds, allowed research methods and materials")
@@ -34,10 +36,14 @@ def counts(conn, rid):
 
 
 def command(args, directory):
-    parts = [str(Path(sys.argv[0]).resolve()), "research", "--state", str(directory), "--run-key", args.run_key]
+    parts = [str(Path(sys.argv[0]).resolve()), "research", "--state", str(directory)]
+    if getattr(args, "run_id", None):
+        parts.extend(["--run-id", args.run_id])
+    else:
+        parts.extend(["--run-key", args.run_key])
     if args.goal_file:
         parts.extend(["--goal-file", str(args.goal_file.resolve())])
-    else:
+    elif args.goal:
         parts.extend(["--goal", args.goal])
     if args.goal_config:
         parts.extend(["--goal-config", str(args.goal_config.resolve())])
@@ -52,12 +58,19 @@ def execute(args, directory):
     from . import cli, research_report
     if args.goal_file:
         args.goal = args.goal_file.read_text(encoding="utf-8")
-    spec = cli.start_specification(args)
+    rid = getattr(args, "run_id", None)
+    if rid and any((args.goal, args.goal_config, args.research_effort)):
+        raise ValueError("Use --run-id alone to resume the saved study")
+    if not rid and not args.goal:
+        raise ValueError("Supply --goal or --goal-file for a named study")
+    spec = None if rid else cli.start_specification(args)
     resume_command = command(args, directory)
     try:
         with native_state(directory), closing(store.open_store(directory/"gx.db")) as conn:
+            previous = workspace.find_run(conn, run_key=args.run_key, run_id=rid)
+            if rid:
+                spec = store.loads(previous, "inputs_json")["inputs"]["p0_spec"]
             operator.authorize_project(operator.local_context(conn), spec["project"])
-            previous = workspace.find_run(conn, run_key=args.run_key)
             before = counts(conn, previous["run_id"]) if previous else {"jobs": 0, "host_turns": 0}
             if previous:
                 saved = store.loads(previous, "inputs_json")["inputs"]["p0_spec"]
@@ -89,8 +102,10 @@ def execute(args, directory):
         if "another native client" not in str(error) or not (directory/"gx.db").exists():
             raise
         with closing(cli.existing_db(directory, readonly=True)) as conn:
+            run = workspace.find_run(conn, run_key=args.run_key, run_id=getattr(args, "run_id", None))
+            if getattr(args, "run_id", None):
+                spec = store.loads(run, "inputs_json")["inputs"]["p0_spec"]
             operator.authorize_project(operator.local_context(conn), spec["project"])
-            run = workspace.find_run(conn, run_key=args.run_key)
             if not run or store.loads(run, "inputs_json")["inputs"]["p0_spec"] != spec:
                 raise error
             return {**cli.snapshot(conn, run["run_id"]), "driver":"another_native_client",

@@ -196,6 +196,16 @@ def _verified_materials(conn, reg, pubs, through):
             # Equal encodings from independent source/sample versions stay distinct.
             identity = (pub["sha256"], origin)
             mats.join(ref, byte_copies.setdefault(identity, ref))
+    # A successor copying a named, hash-verified original carries its existing endpoint history,
+    # including when its original receipt has run-scoped dependency references.
+    transfers = conn.execute("""SELECT pin.value FROM events e,
+        json_each(e.payload_json,'$.material_transfers') pin
+        WHERE e.kind='v6.research.successor_opened' AND e.event_id<=?""", (through,))
+    for row in transfers:
+        pin = json.loads(row[0])
+        parent, child = pin["parent_artifact_ref"], pin["artifact_ref"]
+        if pubs.get(parent, {}).get("sha256") == pin["sha256"] == pubs.get(child, {}).get("sha256"):
+            mats.join(parent, child)
     # An exact reimport of an identified derivative keeps its history even when its
     # operator labels differ. Iterate only if an alias changed a parent class.
     changed = bool(derived)

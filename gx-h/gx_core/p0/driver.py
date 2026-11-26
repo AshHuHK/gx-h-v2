@@ -148,21 +148,40 @@ class Driver:
         if tool == "gx_propose_intent" and set(args) == {"candidate"}:
             return intent.process_text(self.conn, self.rid, envelope["thread_id"], envelope["turn_id"],
                                        candidate=args["candidate"])
-        if tool != "gx_project_state" or args:
-            raise SchemaInvalid("gx_project_state reads the bound project and takes no arguments")
         conn = self.conn
+        goal = conn.execute("SELECT 1 FROM v6_goals WHERE run_id=?", (self.rid,)).fetchone()
+        if goal and tool == "gx_route_pi_message" and set(args) == {"clauses"}:
+            from . import pi_clauses
+            return pi_clauses.process(conn, self.rid, envelope["thread_id"], envelope["turn_id"], args["clauses"])
+        if tool != "gx_project_state" or set(args) - {"goal_version","branch_id","decision_ref","before_event"}:
+            raise SchemaInvalid("Unknown project state request")
         run = project(conn, self.rid)
-        action = conn.execute("SELECT result_json FROM p0_human_inputs WHERE run_id=? AND receipt_turn_id=? "
-                              "AND result_json IS NOT NULL ORDER BY rowid DESC LIMIT 1",
-                              (self.rid, envelope["turn_id"])).fetchone()
+        action = conn.execute("SELECT message_id,result_json FROM p0_human_inputs WHERE run_id=? AND receipt_turn_id=? "
+                              "ORDER BY rowid DESC LIMIT 1", (self.rid, envelope["turn_id"])).fetchone()
         supplements = records.source_status(conn, self.rid)
-        from ..orchestration import run_mode
-        decision = run_mode.for_run(run).latest_decision(conn, self.rid, supplements)
-        return {"run_id":self.rid, "status":run["status"],
-                "current_items":intent.active_items(conn, self.rid),
-                "supplements":supplements,
-                "input_result":json.loads(action[0]) if action else None,
-                "latest_decision":decision}
+        result = {"run_id":self.rid, "status":run["status"], "current_items":intent.active_items(conn, self.rid),
+                  "supplements":supplements, "input_result":json.loads(action["result_json"])
+                  if action and action["result_json"] else None}
+        if not goal:
+            from ..orchestration import run_mode
+            return {**result, "latest_decision":run_mode.for_run(run).latest_decision(conn, self.rid, supplements)}
+        from . import conversation, conversation_science, pi_clauses, research_dialogue
+        mid = action["message_id"] if action else None
+        history = conversation._entries(conn, run, through=mid, limit=8)
+        # Conversation history belongs to the PI/Main. Workers receive only their frozen scope.
+        result["recent_conversation"] = [{"message_id":m["message_id"], "text":m["text"][:1800],
+            "main_reply":m["reply"]["text"][:2000] if m["reply"] else None, "branch_id":m["branch_id"],
+            "goal_version":m["goal_version"], "reply_to":m["reply_to"]} for m in history]
+        scope = dict(args)
+        if history and mid == history[-1]["message_id"]:
+            if history[-1]["goal_version"] is not None:
+                scope.setdefault("goal_version", history[-1]["goal_version"])
+        result["science"] = conversation_science.project(conn, self.rid, **scope)
+        result["questions"] = research_dialogue.questions(conn, self.rid)
+        result["feedback"] = research_dialogue.feedback_status(conn, self.rid)
+        if mid:
+            result["pi_message"] = pi_clauses.main_context(conn, self.rid, mid)
+        return result
 
     @property
     def native(self):
@@ -181,7 +200,15 @@ class Driver:
                              "inputSchema":{"type":"object","properties":{"candidate":{"type":"object"}},
                                             "required":["candidate"],"additionalProperties":False}}
             tools = service.hooks_for_run(self.conn, self.rid).build_worker_tools(self.conn, self.rid)
-            roots = Roots(self.conn, run_id=self.rid, cwd=thread_dir, main_tools=(main_tool,proposal_tool),
+            main_tools = [main_tool, proposal_tool]
+            if self.conn.execute("SELECT 1 FROM v6_goals WHERE run_id=?", (self.rid,)).fetchone():
+                from . import pi_clauses
+                main_tool["description"] = ("Read this PI conversation, published research decisions, branches, "
+                                            "questions and actual feedback dispositions. Use optional scope for history.")
+                main_tool["inputSchema"]["properties"] = {"goal_version":{"type":"integer"},
+                    "branch_id":{"type":"string"}, "decision_ref":{"type":"string"}, "before_event":{"type":"integer"}}
+                main_tools.append(pi_clauses.TOOL)
+            roots = Roots(self.conn, run_id=self.rid, cwd=thread_dir, main_tools=main_tools,
                           main_call=self.main_read, worker_tools=tools.specs, worker_call=tools.call,
                           worker_prepare=tools.prepare, token_budget=spec.get("turn_token_budget", 65536))
             try:
@@ -342,6 +369,13 @@ class Driver:
         native_blocked = False
         for row in rows:
             mid = row["message_id"]
+            successor = self.conn.execute("SELECT successor_json FROM p0_conversation_messages WHERE message_id=? "
+                                          "AND successor_json IS NOT NULL", (mid,)).fetchone()
+            if successor:
+                from .conversation_delivery import start_successor
+                start_successor(self.conn, self.directory, self.rid, mid, row["message_text"], json.loads(successor[0]),
+                                native_owner=True)
+                continue
             if pending is None and operator.consume_queued(self.ctx, self.rid, row):
                 self._end_native_wait(("message", mid))
                 continue
@@ -371,8 +405,6 @@ class Driver:
 
     def _human_turn(self, native, row):
         mid = row["message_id"]
-        thread = native.ensure_main()
-        intent.bind_main(self.conn, self.rid, thread)
         def stage(thread_id, message_id):
             if (thread_id, message_id) != (thread, mid):
                 raise ValueError("Human message binding changed")
@@ -386,6 +418,17 @@ class Driver:
                 result = intent.accept_input(tx, self.rid, thread_id, turn_id, message_id)
                 tx.execute("UPDATE p0_operator_messages SET result_json=? WHERE message_id=?",
                            (ids.canonical_json(result), mid))
+        # A crash can separate the official acknowledgement from local Intent acceptance.
+        # Consume the original receipt before looking for a new physical Main.
+        prior = self.conn.execute("SELECT thread_id,turn_id FROM p0_root_deliveries WHERE run_id=? AND event_id=? "
+                                  "AND human=1 AND state='acknowledged' AND turn_id IS NOT NULL",
+                                  (self.rid, "human:"+mid)).fetchone()
+        if prior:
+            thread = prior["thread_id"]
+            accepted(thread, prior["turn_id"], mid)
+            return prior["turn_id"]
+        thread = native.ensure_main()
+        intent.bind_main(self.conn, self.rid, thread)
         return native.human_turn(row["message_text"], before_start=stage, on_started=accepted, message_id=mid)
 
     def finish_main(self, mid, *, wait=30, local_only=False):
@@ -421,8 +464,12 @@ class Driver:
             reply = "\n".join(item["text"] for item in turn.get("items", [])
                                if item.get("type") == "agentMessage")
             with store.transaction(db, transaction_owner="Driver", operation="save_reply", run_id=self.rid) as tx:
-                tx.execute("INSERT OR IGNORE INTO p0_main_replies VALUES(?,?,?,?)",
+                inserted = tx.execute("INSERT OR IGNORE INTO p0_main_replies VALUES(?,?,?,?)",
                            (mid, row["turn_id"], turn["status"], reply))
+                if inserted.rowcount:
+                    store.append_event(tx, kind="p0.conversation.replied", run_id=self.rid, actor="codex-main",
+                        subject_kind="message", subject_id=mid, payload={"message_id":mid,"turn_id":row["turn_id"],
+                                                                       "has_text":bool(reply),"status":turn["status"]})
 
     def deliveries(self, topics=_LOCAL_TOPICS + _NATIVE_TOPICS):
         marks = ",".join("?" for _ in topics)

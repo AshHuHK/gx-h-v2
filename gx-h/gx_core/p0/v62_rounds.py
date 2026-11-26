@@ -2,6 +2,7 @@
 
 import json
 from collections import defaultdict
+from typing import NamedTuple
 
 from ..artifacts import ArtifactService
 from ..domain import clock, ids
@@ -13,15 +14,21 @@ VERSION = "gx.research.v6.2b.1"
 OWNER = "v62.rounds"
 
 
+class _RoundPolicy(NamedTuple):
+    threshold: int
+    advisory: bool
+
+
 def _policy(conn, rid):
     row = conn.execute(
         """SELECT json_extract(inputs_json,'$.inputs.research_evidence_version'),
                   json_extract(inputs_json,'$.inputs.research_catalog.policy.effort'),
-                  json_extract(inputs_json,'$.inputs.research_catalog.policy.no_progress_rounds')
+                  json_extract(inputs_json,'$.inputs.research_catalog.policy.no_progress_rounds'),
+                  json_extract(inputs_json,'$.inputs.research_catalog.policy.stagnation_policy')
            FROM runs WHERE run_id=?""", (rid,)
     ).fetchone()
     if row and row[0] == VERSION and row[1] in ("medium", "deep"):
-        return row[2] or 2
+        return _RoundPolicy(row[2] or 2, row[3] == "advisory")
     return None
 
 
@@ -311,7 +318,7 @@ def _present(member):
     return {k: member[k] for k in ("module_instance_id", "module_id", "focus", "expected_delivery")}
 
 
-def _calculate(conn, rid, rounds, threshold, cursor):
+def _calculate(conn, rid, rounds, policy, cursor):
     version = v621_goal_scope.active(conn, rid)
     history = _history(conn, rid)
     seen = {key for entry in history for key in (*entry["new_facts"], *entry.get("initial_known_facts", []))}
@@ -358,7 +365,10 @@ def _calculate(conn, rid, rounds, threshold, cursor):
             streak += 1
         result = dict(round=number, through_cursor=through, outcomes=deliveries, outcome=outcome,
                       new_facts=novel, inquiries=fresh, execution_failures=failures, consecutive_no_progress=streak,
-                      no_progress_rounds=threshold, reconsider=previous < threshold <= streak)
+                      no_progress_rounds=policy.threshold, reconsider=previous < policy.threshold <= streak)
+        if policy.advisory:
+            result["repeated_measurement_refs"] = sorted({fact["reference"] for key, fact in facts.items()
+                if key in seen and fact["kind"] in ("analysis", "observed")})
         if version is not None:
             result["goal_version"] = version
         if index == 0 and initial:
@@ -372,8 +382,8 @@ def _calculate(conn, rid, rounds, threshold, cursor):
 
 def reconcile(conn, rid):
     """Seal once the expected work has drained. Prepare original reads outside the writer."""
-    threshold = _policy(conn, rid)
-    if not threshold:
+    policy = _policy(conn, rid)
+    if not policy:
         return
     rounds = _members(conn, rid)
     if not rounds or _waiting(conn, rid):
@@ -389,7 +399,7 @@ def reconcile(conn, rid):
         # after an early release or withdrawal of all the existing members.
         if any(m["parent_status"] in v6_goal.ACTIVE_TASKS for group in rounds.values() for m in group):
             return
-        plans = _calculate(conn, rid, rounds, threshold, cutoff)
+        plans = _calculate(conn, rid, rounds, policy, cutoff)
     finally:
         conn.execute("RELEASE v62_round_capture")
     with store.transaction(conn, transaction_owner=OWNER, operation="settle", run_id=rid):
@@ -449,21 +459,25 @@ def _streak(conn, rid, threshold):
 
 def require_exploration(conn, rid):
     """The ordinary module admission owner calls this after its duplicate-operation lookup."""
-    threshold = _policy(conn, rid)
-    if threshold and (_convergence(conn, rid) or _streak(conn, rid, threshold)):
+    policy = _policy(conn, rid)
+    if policy and (_convergence(conn, rid) or (not policy.advisory and _streak(conn, rid, policy.threshold))):
         raise ScopeDenied("Exploration is closed to new modules; use the Lead's convergence or closing decision")
 
 
 def brief(conn, rid, cursor):
-    threshold = _policy(conn, rid)
-    if not threshold:
+    policy = _policy(conn, rid)
+    if not policy:
         return {}
     history = _history(conn, rid, cursor)
     streak = history[-1]["consecutive_no_progress"] if history else 0
     entered, waiting = _convergence(conn, rid, cursor), _waiting(conn, rid)
     if entered:
         phase, options = "converging", ["assess_candidates", "close_run"]
-    elif streak >= threshold:
+    elif streak >= policy.threshold and policy.advisory:
+        phase, options = "reconsider", ["explore", "wait"]
+        if not waiting:
+            options.extend(["enter_convergence", "close_run"])
+    elif streak >= policy.threshold:
         phase, options = "convergence_due", ["wait"] if waiting else ["enter_convergence", "close_run"]
     else:
         phase, options = "exploring", ["explore", "enter_convergence", "close_run"]
@@ -478,7 +492,7 @@ def brief(conn, rid, cursor):
             for entry in history for fact in entry["new_facts"].values()
             if fact["kind"] == "new_gap" and fact["gap_ref"] not in resolved]
     rounds = [{k: entry[k] for k in ("round", "outcome", "outcomes", "execution_failures",
-                                     "consecutive_no_progress", "through_cursor")}
+                                     "consecutive_no_progress", "through_cursor", "repeated_measurement_refs") if k in entry}
               for entry in history]
     # Unreleased work contributes only its assignment to the Lead's brief.
     from . import v62_reports
@@ -494,9 +508,15 @@ def brief(conn, rid, cursor):
             else:
                 item["status"] = "AWAITING_REPORT"
             pending.append(item)
-    return {"research_progress": dict(phase=phase, no_progress_rounds=threshold, consecutive_no_progress=streak,
+    advice = {}
+    if phase == "reconsider":
+        advice["last_round_repeated_measurements"] = len(rounds[-1].get("repeated_measurement_refs", []))
+        advice["guidance"] = ("Use known evidence, repeated measurements, outstanding work and remaining resources "
+                              "to decide whether to wait, converge, or explore. For another measurement, explain "
+                              "which competing explanations it separates and what result would change your action.")
+    return {"research_progress": dict(phase=phase, no_progress_rounds=policy.threshold, consecutive_no_progress=streak,
                                      decision_options=options, rounds=rounds, expected=pending, waiting_for=waiting,
-                                     open_gaps=gaps, convergence=entered,
+                                     open_gaps=gaps, convergence=entered, **advice,
                                      **({"resolved_gaps": closed} if closed else {}))}
 
 
@@ -519,24 +539,27 @@ def adopt(conn, request, decision_ref, task):
     """Validate and persist the choice in the ordinary decision owner's write transaction."""
     decision, rid = request["decision"], request["run_id"]
     entered, resolved = decision.get("convergence"), decision.get("resolved_gaps", [])
-    threshold = _policy(conn, rid)
-    if not threshold or task["scope"] != "run":
+    policy = _policy(conn, rid)
+    if not policy or task["scope"] != "run":
         if entered is not None or resolved:
             raise ScopeDenied("Research convergence and gap decisions require this version's Run Lead")
         return None
     if not conn.in_transaction:
         raise RuntimeError("Record research choices in the adopting decision's transaction")
-    due = _streak(conn, rid, threshold) and not _convergence(conn, rid)
+    converged = _convergence(conn, rid)
+    if policy.advisory and converged and any(op["op"] == "open_branch" for op in decision["ops"]):
+        raise ScopeDenied("This Run has entered convergence; assess its selected candidates or close")
+    due = not converged and _streak(conn, rid, policy.threshold)
     closes = any(op["op"] == "close_run" for op in decision["ops"])
     if not (due or entered is not None or resolved):
         return None
     frozen = json.loads(task["snapshot_json"])
     # A task already underway can finish a plain wait if the threshold has just been
     # crossed. The successor will actually receive the evidence and the available choices.
-    due = due and frozen.get("research_progress", {}).get("phase") == "convergence_due"
+    due = due and frozen.get("research_progress", {}).get("phase") in ("convergence_due", "reconsider")
     waiting = _waiting(conn, rid)
     if entered is not None:
-        if _convergence(conn, rid):
+        if converged:
             raise ScopeDenied("This Run already has its immutable convergence decision")
         if decision["ops"] and not closes:
             raise SchemaInvalid("Entering convergence requires resolve or a closing decision")
@@ -545,7 +568,7 @@ def adopt(conn, request, decision_ref, task):
         if waiting:
             raise ScopeDenied("Wait for the outstanding commissioned work before entering convergence",
                               details={"waiting_for": waiting})
-    if due and entered is None and not closes:
+    if due and not policy.advisory and entered is None and not closes:
         if not waiting or decision["ops"]:
             raise ScopeDenied("The no-progress limit calls for convergence or closure",
                               details={"waiting_for": waiting})

@@ -123,7 +123,7 @@ def _inherit_intent(conn, anchor_id, run_id, spec):
         if previous and intent._changes(conn, anchor_id, [{**edit, "expected_version": previous}]):
             raise SchemaInvalid(f"Initial item {edit['item_id']!r} conflicts with current project Intent. "
                                 "Submit a project Intent change to update it.")
-    types = sorted(PROJECT_INTENT_TYPES)
+    types = sorted(PROJECT_INTENT_TYPES - {"objective"} if spec.get("predecessor") else PROJECT_INTENT_TYPES)
     marks = ",".join("?" for _ in types)
     conn.execute(
         "INSERT INTO p0_intent_versions "
@@ -193,11 +193,29 @@ def attach_run(conn, run_id, *, project_ref, run_key, profile_name, spec, actor)
     if "max_parallel_roots" in spec.get("workspace", {}) and cap != _root_cap(spec):
         raise SchemaInvalid("The supplied workspace.max_parallel_roots differs from this project's existing limit")
     release_finished(conn, actor=actor)
+    if predecessor := spec.get("predecessor"):
+        # A closed study may still have an unsettled turn. Its hold stays intact,
+        # but unused allotment can fund a follow-up under the same workspace cap.
+        from ..budgets.allotment import set_run_limit
+        previous = find_run(conn, run_id=predecessor["parent_run_id"])
+        previous_ref = previous["budget_ref"]
+        inherited_caps = budgets.state(conn, previous_ref)["limits"]
+        funding = conn.execute("SELECT status,amounts_json FROM budget_reservations WHERE reservation_ref=?",
+                               (budgets.FUND_PREFIX + previous_ref,)).fetchone()
+        if funding and funding["status"] == budgets.HELD:
+            parent_state = budgets.state(conn, root)
+            previous_state = budgets.state(conn, previous_ref)
+            for key, held in store.loads(funding, "amounts_json").items():
+                free = previous_state["available"].get(key, 0)
+                if free > 0 and parent_state["available"].get(key, 0) <= 0:
+                    transfer = math.ceil(free / 2) if isinstance(free, int) else free / 2
+                    set_run_limit(conn, previous["run_id"], previous_ref, key=key,
+                                  limit=held-transfer, actor=actor)
     parent = budgets.state(conn, root)
     if any(parent["limits"].get(key) != value for key, value in root_limits.items()):
         raise SchemaInvalid("The supplied workspace_budget differs from the existing project budget")
     available = {key: max(0, value) for key, value in parent["available"].items()}
-    if run_key is not None:
+    if run_key is not None and not predecessor:
         # Leave the remainder available for more runs. An explicit line takes precedence.
         available = {key: math.ceil(value / 2) if isinstance(value, int) else value / 2
                      for key, value in available.items()}
@@ -206,6 +224,8 @@ def attach_run(conn, run_id, *, project_ref, run_key, profile_name, spec, actor)
     if any(key not in profile or value > profile[key] for key, value in run_limits.items()):
         raise SchemaInvalid("run_budget must fit within this run's budget profile")
     allotment = {key: min(value, profile[key]) for key, value in available.items() if key in profile}
+    if predecessor:
+        allotment = {k: min(v, inherited_caps[k]) for k, v in allotment.items() if k in inherited_caps}
     child = budgets.open_child(conn, parent_ref=root, subject_kind="run", subject_id=run_id,
                                limits={**allotment, **run_limits}, actor=actor)
     conn.execute("UPDATE budgets SET run_id=? WHERE budget_ref=?", (run_id, child["budget_ref"]))
@@ -231,7 +251,9 @@ def bootstrap_action(conn, run_id, action):
     inherited = {row["item_id"] for row in conn.execute("SELECT DISTINCT item_id FROM p0_intent_versions WHERE "
                  "run_id=? AND item_type IN (" + ",".join("?" for _ in PROJECT_INTENT_TYPES) + ")",
                  (run_id, *PROJECT_INTENT_TYPES))}
-    if "objective" not in inherited:
+    run = find_run(conn, run_id=run_id)
+    successor = store.loads(run, "inputs_json")["inputs"]["p0_spec"].get("predecessor")
+    if "objective" not in inherited and not successor:
         raise ValueError("The first run's initial project Intent is pending. Resume its start before this run.")
     return {**action, "items": [edit for edit in action["items"]
                                 if edit["item_type"] not in PROJECT_INTENT_TYPES or edit["item_id"] not in inherited]}
@@ -243,8 +265,19 @@ def intent_targets(conn, run_id, diffs):
     shared = [diff for diff in diffs if diff["item_type"] in PROJECT_INTENT_TYPES]
     if not shared or not _has_workspace_schema(conn):
         return
-    siblings = conn.execute("SELECT other.run_id FROM p0_workspace_runs member JOIN p0_workspace_runs other "
-                            "USING(workspace_id) WHERE member.run_id=? AND other.run_id<>member.run_id "
+    if not conn.execute("SELECT 1 FROM p0_workspace_runs WHERE run_id=?", (run_id,)).fetchone():
+        return
+    origin = find_run(conn, run_id=run_id)
+    successor = store.loads(origin, "inputs_json")["inputs"]["p0_spec"].get("predecessor")
+    siblings = conn.execute("SELECT other.run_id, r.inputs_json, g.status goal_status FROM p0_workspace_runs member JOIN p0_workspace_runs other "
+                            "USING(workspace_id) JOIN runs r ON r.run_id=other.run_id "
+                            "LEFT JOIN v6_goals g ON g.run_id=other.run_id "
+                            "WHERE member.run_id=? AND other.run_id<>member.run_id "
                             "ORDER BY other.rowid", (run_id,))
     for other in siblings:
-        yield other["run_id"], shared
+        if other["goal_status"] in {"CLOSING", "CLOSED"}:
+            continue
+        distinct_goal = successor or store.loads(other, "inputs_json")["inputs"].get("p0_spec", {}).get("predecessor")
+        edits = [d for d in shared if not distinct_goal or d["item_type"] != "objective"]
+        if edits:
+            yield other["run_id"], edits

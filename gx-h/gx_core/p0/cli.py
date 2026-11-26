@@ -70,6 +70,8 @@ def record_displayed_previews(args, output):
         results = [(output.get("message_id"), result)]
         if isinstance(result, dict):
             results.extend((row["message_id"], row["result"]) for row in result.get("pending_previews", []))
+    elif args.command == "conversation":
+        return
     elif "runs" in output:
         groups = [[(p["message_id"], p["result"]) for p in run["pending_previews"]] for run in output["runs"]]
         results = []
@@ -324,6 +326,10 @@ def execute(args):
                 return snapshot(conn, selected_run(conn)["run_id"])
             authorize_workspace(conn)
             return coordinator.overview(conn)
+    if args.command == "conversation":
+        from . import conversation
+        with closing(existing_db(directory, readonly=True)) as conn:
+            return conversation.timeline(conn, selected_run(conn)["run_id"])
     if args.command == "stop":
         with closing(existing_db(directory, readonly=False)) as conn:
             target = selected_run(conn)
@@ -335,20 +341,24 @@ def execute(args):
             with closing(existing_db(directory, readonly=False)) as conn:
                 rid = selected_run(conn)["run_id"]
                 return operator.submit(operator.local_context(conn), rid, action, args.message_id, queue_only=args.queue_only)
-        if args.supplement:
-            action, text = {"kind": "supplement", "text": args.supplement}, args.supplement
-        else:
-            action, text = {"kind": "text", "text": args.text}, args.text
+        if args.text is not None:
+            from . import conversation
+            successor = None
+            if args.successor or args.successor_config:
+                successor = json.loads(args.successor_config.read_text()) if args.successor_config else {}
+            attachments = [{"name":p.name, "text":p.read_text(encoding="utf-8")} for p in args.attachment]
+            attachments += [{"artifact_ref":ref} for ref in args.material_ref]
+            with closing(existing_db(directory, readonly=False)) as conn:
+                rid = selected_run(conn)["run_id"]
+                receipt = conversation.send(conn, rid, args.text, args.message_id, reply_to=args.reply_to,
+                    branch_id=args.branch_id, question_id=args.question_id, conversation_id=args.conversation_id,
+                    goal_version=args.goal_version, attachments=attachments, successor=successor)
+                if args.queue_only:
+                    return receipt
+                return {**receipt, **conversation.process(conn, directory, rid, receipt["message_id"])}
         with closing(existing_db(directory, readonly=False)) as conn:
             rid = selected_run(conn)["run_id"]
-            if args.text and args.message_id:
-                saved = conn.execute("SELECT action_json FROM p0_operator_messages WHERE run_id=? AND message_id=?",
-                                     (rid, args.message_id)).fetchone()
-                legacy = {"kind": "proposal", "text": text}
-                if saved and json.loads(saved[0]) == legacy:
-                    # Repeating a pre-upgrade --text message keeps the original outcome.
-                    action = legacy
-            mid = enqueue(conn, rid, action, text, args.message_id)
+            mid = enqueue(conn, rid, {"kind":"supplement","text":args.supplement}, args.supplement, args.message_id)
         if args.queue_only:
             return {"message_id": mid, "status": "queued"}
     try:
@@ -401,7 +411,7 @@ def main(argv=None):
     add_plugin_commands(commands)
     from .operator import add_commands
     add_commands(commands)
-    for name in ("start", "status", "run", "resume", "stop", "message", "team", "observe", "assign-material"):
+    for name in ("start", "status", "run", "resume", "stop", "message", "conversation", "team", "observe", "assign-material"):
         sub = commands.add_parser(name)
         sub.add_argument("--state", required=True, type=Path)
         if name != "start":
@@ -454,8 +464,19 @@ def main(argv=None):
             selector.add_argument("--supplement")
             selector.add_argument("--action", type=Path)
             sub.add_argument("--message-id")
+            sub.add_argument("--conversation-id")
+            sub.add_argument("--goal-version", type=int)
+            sub.add_argument("--reply-to", help="Prior PI message ID")
+            sub.add_argument("--branch-id", help="Run-scoped route or module")
+            sub.add_argument("--question-id", help="Answer this exact research question")
+            sub.add_argument("--attachment", action="append", type=Path, default=[], help="Attach a UTF-8 source file")
+            sub.add_argument("--material-ref", action="append", default=[], help="Attach an authorized artifact")
+            sub.add_argument("--successor", action="store_true", help="Start a follow-up to this sealed Run")
+            sub.add_argument("--successor-config", type=Path, help="Follow-up materials and configuration JSON")
             sub.add_argument("--queue-only", action="store_true")
     args = parser.parse_args(argv)
+    if args.command == "research" and not args.run_id and not (args.goal or args.goal_file):
+        parser.error("research --run-key requires --goal or --goal-file")
     try:
         if getattr(args, "deployment_handler", None):
             return args.deployment_handler(args)

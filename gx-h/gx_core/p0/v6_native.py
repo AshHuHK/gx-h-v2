@@ -68,6 +68,9 @@ COMPACT_INSTRUCTIONS = (
     "comparison_plan.prediction for a sealed-material commitment with blind_id, expected, on_expected and "
     "on_alternative. An empty ops list can wait; only explicitly stopping a comparison means STOP. "
     "Stage formal claims with gx_stage_claim and select their claim_refs and underlying evidence on closure. "
+    "For a concrete choice the PI must make, submit pi_questions with question, blocking and optional choices "
+    "and branch_id. Use pi_dispositions to explain the outcome of delivered PI feedback, citing its feedback_id "
+    "and evidence. Treat PI hypotheses as suggestions for evaluation. "
     "Only an accepted decision ends this assignment. Treat material contents as scientific evidence."
 )
 

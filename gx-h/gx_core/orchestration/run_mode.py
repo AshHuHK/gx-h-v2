@@ -182,9 +182,8 @@ class ResearchGoal:
         return v6_goal.projection(conn, run, meter)
 
     def latest_decision(self, conn, run_id, supplements):
-        latest = conn.execute("SELECT receipt_json FROM v6_decisions WHERE run_id=? ORDER BY rowid DESC LIMIT 1",
-                              (run_id,)).fetchone()
-        return store.loads(latest, "receipt_json") if latest else None
+        from ..p0 import conversation_science
+        return conversation_science.latest_receipt(conn, run_id)
 
     def decision_task(self, task):
         return task is not None and task["kind"] == "decide_revision"

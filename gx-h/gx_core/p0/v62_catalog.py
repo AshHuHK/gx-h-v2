@@ -57,6 +57,8 @@ def for_start(spec):
         raise SchemaInvalid("research_modules must list distinct module_id@version references")
     if settings["effort"] == "quick":
         return None
+    if not spec.get("historical_replay"):
+        settings["stagnation_policy"] = "advisory"
     from .v62_sources import TOOL_NAMES
     if not isinstance(spec.get("plugins", []), list):
         raise SchemaInvalid("plugins must be a list of exact provider id@version references")

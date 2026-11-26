@@ -519,7 +519,14 @@ def commit(conn, plan):
             payload=dict(decision_id=decision_ref, result_head=plan.result_head, task_id=task_id,
                          turn_id=plan.turn_id, call_id=plan.call_id, draft_sha256=request["draft_sha256"],
                          **decision_facts))
-        from . import v621_policy
+        from . import research_dialogue, v621_policy
+        if decision.get("pi_questions"):
+            receipt["pi_questions"] = research_dialogue.ask(conn, run_id, task, root, receipt, decision["pi_questions"])
+        if decision.get("pi_dispositions"):
+            receipt["pi_dispositions"] = research_dialogue.dispose(conn, run_id, root, plan.turn_id, task,
+                decision["pi_dispositions"], product_ref=decision_ref, product_kind="decision",
+                event_id=receipt["event_id"], evidence_refs=decision["evidence_refs"],
+                effects=[op["spec"] for op in plan.resolved_ops])
         if task["scope"] == "run" and v621_policy.live_science(conn, run_id):
             from . import v623_comparison
             receipt.update(v623_comparison.adopt(conn, request, task, decision_ref, plan.resolved_ops,

@@ -17,7 +17,7 @@ from ..errors import (
 )
 from ..orchestration import seams
 from ..persistence import store
-from . import v6_decisions, v6_goal, v6_jobs, v62b_handoff
+from . import research_dialogue, v6_decisions, v6_goal, v6_jobs, v62b_handoff
 
 OWNER = "ResearchModule"
 
@@ -241,7 +241,9 @@ def _brief(conn, row, nodes, proofs):
     # A new decision receives confirmed references and field summaries, never another scope's materials.
     from . import v621_policy
     policy = v621_policy.pinned(conn, row["run_id"])
+    dialogue = research_dialogue.packet(conn, row["run_id"], row["scope"], row["goal_version"])
     return {
+        **({"pi_dialogue": dialogue} if dialogue else {}),
         "run_id": row["run_id"],
         **({"evidence_policy": policy} if policy in v621_policy.GOVERNED else {}),
         "scope": row["scope"],
@@ -274,6 +276,8 @@ def _brief(conn, row, nodes, proofs):
 
 def _new_task(tx, row, *, previous=None, verified_nodes=None, proofs=()):
     rid, scope = row["run_id"], row["scope"]
+    if research_dialogue.blocked(tx, rid, scope=scope):
+        return None
     current = _task(tx, row)
     if current and (current["status"] in v6_goal.ACTIVE_TASKS or current["task_id"] != previous):
         return None
@@ -632,6 +636,8 @@ def _progress(conn, row):
                 return _end(tx, _module(tx, rid, scope), "STALE", str(confirmed))
             except ScopeDenied:
                 return False
+    if research_dialogue.blocked(conn, rid, scope=scope):
+        return False
     task = _task(conn, row)
     reason = v62_budget.exhausted(conn, row) or v62_reports.exhausted_report_repairs(conn, task)
     if not reason and task and task["status"] in v6_goal.ACTIVE_TASKS:

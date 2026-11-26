@@ -71,6 +71,10 @@ def deliver(conn, brief, limit):
                   intent={}, module_reports=[], module_catalog=[])
     if "research_evidence_version" in brief:
         packet["research_evidence_version"] = brief["research_evidence_version"]
+    if "prior_research" in brief:
+        prior = brief["prior_research"]
+        packet["prior_research"] = {k: prior[k] for k in (
+            "parent_run_id", "parent_decision_ref", "parent_goal_version", "evidence_status")}
     if "prospective_opening" in brief:
         packet["prospective_opening"] = brief["prospective_opening"]
     if "study_class" in brief:
@@ -81,6 +85,9 @@ def deliver(conn, brief, limit):
     if progress:
         packet["research_progress"] = {k: progress[k] for k in (
             "phase", "no_progress_rounds", "consecutive_no_progress", "decision_options")}
+        for key in ("guidance", "last_round_repeated_measurements"):
+            if key in progress:
+                packet["research_progress"][key] = progress[key]
         packet["research_progress"].update(open_gaps=[], open_gap_count=len(progress["open_gaps"]),
                                           waiting_for=[], waiting_count=len(progress["waiting_for"]))
     if _size(packet) > room:
@@ -96,6 +103,11 @@ def deliver(conn, brief, limit):
         owner[key].pop()
         return False
 
+    if brief.get("pi_dialogue"):
+        packet["pi_dialogue"] = []
+        for item in reversed(brief["pi_dialogue"]):
+            if not append("pi_dialogue", item):
+                break
     # Reserve space for adverse results and their durable citations ahead of routine inventory.
     recent_failures = {item.get("node_id") for item in brief.get("observations", ())
                        if item.get("event") == "v6.node.settled" and item.get("status") == "FAILED"}

@@ -456,6 +456,39 @@
             "OPERATOR",
             "SCIENTIFIC_COMPLETION"
           ]
+        },
+        "pi_questions": {
+          "type": "array",
+          "description": "Ask the PI about a scientific choice. Set blocking only for work that depends on the answer. Use an active branch_id to target a branch.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "question",
+              "blocking"
+            ],
+            "properties": {
+              "question": {
+                "$ref": "#/$defs/text"
+              },
+              "choices": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/text"
+                },
+                "uniqueItems": true
+              },
+              "branch_id": {
+                "$ref": "#/$defs/text"
+              },
+              "blocking": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "pi_dispositions": {
+          "$ref": "#/$defs/pi_dispositions"
         }
       },
       "allOf": [
@@ -483,6 +516,34 @@
           }
         }
       ]
+    },
+    "pi_dispositions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "feedback_id",
+          "outcome",
+          "reason"
+        ],
+        "properties": {
+          "feedback_id": {
+            "$ref": "#/$defs/text"
+          },
+          "outcome": {
+            "enum": [
+              "adopt",
+              "maintain",
+              "measure",
+              "defer"
+            ]
+          },
+          "reason": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
     }
   },
   "type": "object",

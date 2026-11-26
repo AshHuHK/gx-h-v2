@@ -168,8 +168,10 @@ def _resource_action(conn, run_id, text):
 
 def prepare(conn, run_id, message_id, original):
     """Use the entire trusted input. A matching substring of a quotation cannot authorize an edit."""
+    goal_conversation = conn.execute("SELECT 1 FROM v6_goals WHERE run_id=?", (run_id,)).fetchone() is not None
+    conversation = {"status": "conversation", "handler": "Codex Main"}
     if re.match(r"^\s*(?:补充(?:资料|证据|说明)?|supplement(?:ary (?:note|evidence))?|additional (?:evidence|context))\s*[:：]\s*\S", original, re.I):
-        return {"kind": "supplement", "text": original}
+        return conversation if goal_conversation else {"kind": "supplement", "text": original}
     stripped = original.strip().rstrip(".。!！").strip()
     stripped = re.sub(r"^(?:please\s+|请\s*)", "", stripped, count=1, flags=re.I)
     text = unicodedata.normalize("NFKC", stripped).replace("’", "'")
@@ -223,9 +225,11 @@ def prepare(conn, run_id, message_id, original):
             match = re.fullmatch(pattern, stripped, re.I)
             if match:
                 value = next(v for v in match.groups() if v is not None).strip()
+                if goal_conversation and kind == "soft_preference":
+                    return conversation
                 return _single_edit(conn, run_id, kind, value, kind)
         if re.fullmatch(r"(?:用)?中文解释每(?:一)?项结果|(?:explain|describe) (?:each|every) result in Chinese|cite (?:a source for )?(?:each|every) result", stripped, re.I):
-            return _single_edit(conn, run_id, "soft_preference", stripped, "soft_preference")
+            return conversation if goal_conversation else _single_edit(conn, run_id, "soft_preference", stripped, "soft_preference")
         method = re.fullmatch(r"(ban|forbid|unban|allow) (?:the )?(?:method|capability)\s+([\w.@-]+)|(禁用|禁止|解禁|允许)(?:方法|能力)\s*([\w.@-]+)", stripped, re.I)
         if method:
             verb, capability = (v for v in method.groups() if v is not None)
@@ -242,4 +246,6 @@ def prepare(conn, run_id, message_id, original):
                     bans.discard(capability)
                 edit["value"] = {"forbidden_capabilities": sorted(bans)}
                 return action
+    if goal_conversation:
+        return conversation
     return clarify("Specify the item and exact value you want to change, or identify the information as a supplement.")

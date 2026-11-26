@@ -9,13 +9,28 @@
 </head>
 <body>
 <main>
-<header><div><p>GX Harness</p><h1 id="project">Project</h1></div>
+<header><h1 id="project">GX Harness</h1>
 <button type="button" id="launch" hidden>Start or resume</button></header>
 <section aria-labelledby="status-title"><h2 id="status-title">Project status</h2>
+<div id="run-controls" hidden><label for="run-select">Research run</label>
+<select id="run-select"></select><p id="goal"></p></div>
 <p id="status" role="status">Connecting…</p><pre id="reply" hidden></pre></section>
+<section id="discussion" hidden aria-labelledby="discussion-title"><h2 id="discussion-title">Conversation</h2>
+<a id="research-basis" target="_blank" rel="noopener">Open published decisions and evidence</a>
+<ol id="messages"></ol></section>
 <section aria-labelledby="feedback-title"><h2 id="feedback-title">Message the project</h2>
-<form id="form"><label for="text">Additional instructions for the project Root</label>
-<textarea id="text" rows="3" required></textarea><button id="send">Send feedback</button></form>
+<form id="form"><label for="text" id="text-label">Additional instructions for the project Root</label>
+<textarea id="text" rows="3" required></textarea>
+<details id="target-controls" hidden><summary>Reply, route or material</summary>
+<label for="reply-to">Reply to message (optional)</label><input id="reply-to" list="reply-options"><datalist id="reply-options"></datalist>
+<label for="branch-id">Research route (optional)</label><input id="branch-id" list="branch-options"><datalist id="branch-options"></datalist>
+<label for="question-id">Researcher’s question (optional)</label><input id="question-id" list="question-options"><datalist id="question-options"></datalist>
+<label for="material-ref">Existing original (optional)</label><input id="material-ref" list="material-options"><datalist id="material-options"></datalist>
+<label for="attachment">Attach a UTF-8 text file</label><input type="file" id="attachment">
+<div id="follow-controls" hidden><label><input type="checkbox" id="follow"> Start a follow-up study</label>
+<fieldset id="parent-materials" hidden><legend>Originals to carry into the follow-up</legend></fieldset></div>
+</details>
+<button id="send">Send feedback</button></form>
 <p id="receipt" role="status"></p></section>
 <section aria-labelledby="history-title"><h2 id="history-title">Milestones</h2>
 <p id="connection" role="status">Waiting for events…</p><ol id="timeline"></ol></section>

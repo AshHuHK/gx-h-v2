@@ -464,6 +464,11 @@ def _commit(conn, run_id, change, message_id, diffs, cancel_jobs):
             "preview": diffs, "impact": impact, "resource_limits": _cap_balances(conn, run_id, diffs)}
 
 
+def _goal_version(conn, run_id):
+    row = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
+    return row[0] if row else None
+
+
 def _change(conn, run_id, message_id, action, *, force_preview=False):
     from ..orchestration.service import hooks_for_run
     edits = action.get("items", [])
@@ -484,6 +489,9 @@ def _change(conn, run_id, message_id, action, *, force_preview=False):
               if confirm or check_composite else [])
     consequences = [row for row in impact if "consequence" in row]
     exact = {"run_id": run_id, "message_id": message_id, "changes": diffs}
+    goal_version = _goal_version(conn, run_id) if confirm or consequences else None
+    if goal_version is not None:
+        exact["goal_version"] = goal_version
     if consequences:
         exact["consequences"] = consequences
     digest = ids.sha256_of_obj(exact)
@@ -495,6 +503,8 @@ def _change(conn, run_id, message_id, action, *, force_preview=False):
     if confirm or consequences:
         result = {"status": "awaiting_confirmation", "change_id": change_id, "preview_sha256": digest,
                   "preview": diffs, "impact": impact, "resource_limits": _cap_balances(conn, run_id, diffs)}
+        if goal_version is not None:
+            result["goal_version"] = goal_version
         if ack := _required_ack(impact):
             result["required_confirmation"] = {"acknowledge_consequences": ack,
                 "text": ("确认取消预览中列出的作业" if ack == CANCEL_ACK else "确认执行并接受预览中列出的后果"),
@@ -507,7 +517,7 @@ def _change(conn, run_id, message_id, action, *, force_preview=False):
 def _confirm(conn, run_id, turn_id, message_id, action):
     from .intent_text import was_displayed
     change = _preview_for_confirmation(conn, run_id, action)
-    origin = conn.execute("SELECT receipt_turn_id FROM p0_human_inputs WHERE message_id=?",
+    origin = conn.execute("SELECT receipt_turn_id,result_json FROM p0_human_inputs WHERE message_id=?",
                           (change["source_message_id"],)).fetchone()
     if change["source_message_id"] == message_id or (turn_id and origin["receipt_turn_id"] == turn_id):
         raise PermissionDenied("This change needs confirmation in a later human main-thread turn")
@@ -515,6 +525,10 @@ def _confirm(conn, run_id, turn_id, message_id, action):
         raise PermissionDenied("Display this exact preview before confirming it in a later local action.")
     if change["status"] == "committed":
         raise PermissionDenied("This change has already been committed")
+    # Older previews still carry the exact per-item versions checked by _commit.
+    preview_version = json.loads(origin["result_json"] or "{}").get("goal_version")
+    if preview_version is not None and preview_version != _goal_version(conn, run_id):
+        raise StaleRevision("The scientific objective changed. Request and inspect a fresh preview.")
     diffs = json.loads(change["preview_json"])
     original = json.loads(change["impact_json"])
     cancelled = [r["object_id"] for r in original if r["action"] == "request_cancel"]
@@ -591,7 +605,7 @@ def _apply_local(conn, run_id, message_id, action, *, force_preview=False):
             return json.loads(row["result_json"])
         if action["kind"] == "text":
             action = prepare(conn, run_id, message_id, action["text"])
-        if action.get("status") == "needs_clarification":
+        if "status" in action:
             result = action
         elif force_preview:
             result = _change(conn, run_id, message_id, action, force_preview=True)
@@ -663,9 +677,17 @@ def process_text(conn, run_id, thread_id, turn_id, *, candidate=None):
         if row["consumed_at"]:
             return receipt
         authorized = receipt["interpretation"]
-        remainder = None
+        remainder = receipt.get("unapplied_proposal")
         if candidate is not None:
             _check_candidate(candidate)
+            if authorized.get("status") == "conversation":
+                # A speculative edit cannot consume the PI turn before Main routes its actual clauses.
+                receipt = {**receipt, "unapplied_proposal": candidate}
+                encoded = ids.canonical_json(receipt)
+                conn.execute("UPDATE p0_human_inputs SET result_json=? WHERE message_id=?", (encoded, row["message_id"]))
+                conn.execute("UPDATE p0_operator_messages SET result_json=? WHERE run_id=? AND message_id=?",
+                             (encoded, run_id, row["message_id"]))
+                return receipt
             if candidate != authorized and candidate.get("kind") != "proposal":
                 if candidate["kind"] == authorized.get("kind") == "change":
                     grounded = {ids.canonical_json(edit) for edit in authorized["items"]}

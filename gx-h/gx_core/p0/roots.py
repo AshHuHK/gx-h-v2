@@ -203,7 +203,7 @@ class Roots:
         return self.client.request(method, params)
 
     def _binding(self, thread_id):
-        row = self.conn.execute("SELECT * FROM p0_roots WHERE thread_id=? AND run_id=?",
+        row = self.conn.execute("SELECT * FROM p0_roots WHERE thread_id=? AND run_id=? AND state<>'archived_main'",
                                 (thread_id, self.run_id)).fetchone()
         return dict(row) if row else None
 
@@ -380,6 +380,13 @@ class Roots:
         rootdir.mkdir(mode=0o700, parents=True, exist_ok=False)
         if task is None:
             brief = MAIN_INSTRUCTIONS
+            if "gx_route_pi_message" in tool_names:
+                brief += (" For every PI text, first read gx_project_state for the bound Run, Goal version, "
+                          "published Lead decisions, pending questions, and actual effects. Route the verbatim "
+                          "clauses through gx_route_pi_message, including mixed questions, scoped research suggestions "
+                          "and presentation preferences. Answer questions in your own words, with published references. "
+                          "Treat quoted hypotheses as PI input. Leave scientific adoption or rejection to the researchers. "
+                          "Use gx_propose_intent only for explicit formal edits. Preserve unrelated work.")
         elif lead:
             brief = v6_native.PREFIX + ids.canonical_json(frozen)
         else:
@@ -403,7 +410,7 @@ class Roots:
                           "effort,brief,provider,tool_names_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (key,self.run_id,
                           task["task_id"] if task is not None else None, attempt, lease,
                           str(rootdir), role, profile["model"], profile["effort"], brief, provider,
-                          ids.canonical_json(tool_names) if lead or self._role_tools or "provider" in profile else None))
+                          ids.canonical_json(tool_names) if task is None or lead or self._role_tools or "provider" in profile else None))
         if lead:
             refs = frozen["evidence_refs"] if v62_native.module_scope(frozen) else v6_native.task_refs(self.conn, task)
             self._allow_refs(key, refs)
@@ -603,7 +610,7 @@ class Roots:
         tid = thread["id"]
         with store.transaction(self.conn):
             current = self._row(row["root_key"])
-            if current["cwd"] != row["cwd"]:
+            if current["cwd"] != row["cwd"] or current["state"] == "archived_main":
                 raise ScopeDenied("this thread creation was superseded before a turn was sent")
             if current["thread_id"] not in (None, tid):
                 raise OutcomeUnknown("multiple Codex roots match this creation intent")
@@ -611,6 +618,12 @@ class Roots:
                               (tid,row["root_key"]))
             self.conn.execute("UPDATE p0_root_creations SET outcome='bound',thread_id=? WHERE cwd=?",
                               (tid,row["cwd"]))
+            if row["task_id"] is None:
+                # The delivery owner uses 'ready' only before send or after confirmed refusal.
+                self.conn.execute("""UPDATE p0_root_deliveries SET thread_id=? WHERE run_id=? AND state='ready'
+                    AND reservation_ref IS NULL AND thread_id IN
+                    (SELECT thread_id FROM p0_roots WHERE run_id=? AND state='archived_main')""",
+                                  (tid, self.run_id, self.run_id))
             if row["lease_id"]:
                 self.conn.execute("UPDATE leases SET principal=? WHERE lease_id=? AND released_at IS NULL",
                                   (tid,row["lease_id"]))
@@ -667,6 +680,58 @@ class Roots:
                               (str(next_dir),row["root_key"]))
             return self._row(row["root_key"])
 
+    def _current_main(self):
+        return self.conn.execute("SELECT * FROM p0_roots WHERE run_id=? AND task_id IS NULL "
+                                 "AND state<>'archived_main'", (self.run_id,)).fetchone()
+
+    def _main_needs_new_tools(self, row):
+        tool = "gx_route_pi_message"
+        pinned = json.loads(row["tool_names_json"]) if row["tool_names_json"] is not None else None
+        if tool in (pinned or ()) or (pinned is None and tool in row["brief"]):
+            return False
+        profile = host_policy.p0_role_for_run(self.run, "main")
+        return any(t["name"] == tool for t in profiles.available_for_role(
+            self.main_tools, "main", profile, scoped=self._role_tools))
+
+    def _replace_settled_main(self, row, reason):
+        old = row["thread_id"]
+        with store.transaction(self.conn, transaction_owner="NativeRoot", operation="replace_main",
+                               run_id=self.run_id):
+            current = self._current_main()
+            if current["root_key"] != row["root_key"]:
+                return dict(current)
+            # The accounting total can be unknown. A pending transport send or unfinished
+            # turn, however, can still execute a scientific or operator action.
+            outstanding = self.conn.execute("""SELECT d.event_id FROM p0_root_deliveries d
+                LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id)
+                LEFT JOIN p0_operator_messages m ON m.run_id=d.run_id AND d.event_id='human:'||m.message_id
+                LEFT JOIN p0_main_replies r ON r.message_id=m.message_id AND r.turn_id=d.turn_id
+                WHERE d.thread_id=? AND (d.state='sending' OR (d.state='ready' AND d.reservation_ref IS NOT NULL)
+                OR (d.state='acknowledged' AND (m.message_id IS NOT NULL AND m.result_json IS NULL
+                   OR d.method='turn/start' AND u.terminal_status IS NULL AND r.status IS NULL))) LIMIT 1""",
+                                            (old,)).fetchone()
+            if outstanding or old in self.active_turns:
+                raise OutcomeUnknown("The original Main turn still needs its delivery or completion receipt",
+                                     details={"thread_id":old, "event_id":outstanding[0] if outstanding else None})
+            binding = self.conn.execute("SELECT thread_id FROM p0_intent_main WHERE run_id=?", (self.run_id,)).fetchone()
+            if binding and binding[0] not in ("", old):
+                raise OutcomeUnknown("Main intent receipt belongs to a different current thread")
+            self.conn.execute("UPDATE p0_roots SET state='archived_main' WHERE root_key=?", (row["root_key"],))
+            self.conn.execute("UPDATE p0_intent_main SET thread_id='' WHERE run_id=? AND thread_id=?", (self.run_id,old))
+            fresh = self._new_row()
+            store.append_event(self.conn, kind="p0.conversation.main_replaced", actor="gx-native",
+                run_id=self.run_id, subject_kind="root", subject_id=fresh["root_key"],
+                reason=reason, payload={"previous_thread_id":old, "previous_root_key":row["root_key"]})
+            # The next message's gx_project_state reads the journal through its own message
+            # cursor. Never replay human input or insert untrusted text into system instructions.
+            if "gx_project_state" in {t["name"] for t in self._tools_for(fresh)}:
+                brief = (fresh["brief"] + " This is a replacement Main in the same GX project conversation. "
+                         "Call gx_project_state on the current PI message to recover its public conversation, "
+                         "published decisions, original evidence references and outstanding questions. "
+                         "Earlier messages are history. Continue only from the current request.")
+                self.conn.execute("UPDATE p0_roots SET brief=? WHERE root_key=?", (brief,fresh["root_key"]))
+            return self._row(fresh["root_key"])
+
     def _materialize(self, row):
         if row["thread_id"]:
             tid = row["thread_id"]
@@ -677,7 +742,13 @@ class Roots:
                            f"no rollout found for conversation id {tid}"}
                 if exc.code != -32600 or exc.message not in missing:
                     raise
+                if row["task_id"] is None and self.conn.execute(
+                        "SELECT 1 FROM p0_root_deliveries WHERE thread_id=? UNION ALL "
+                        "SELECT 1 FROM p0_human_inputs WHERE run_id=? LIMIT 1", (tid,self.run_id)).fetchone():
+                    return self._materialize(self._replace_settled_main(row, "official Main history missing"))
                 return self._materialize(self._replace_empty_creation(row))
+            if row["task_id"] is None and self._main_needs_new_tools(row) and tid not in self.active_turns:
+                return self._materialize(self._replace_settled_main(row, "refresh installed Main tools"))
             return tid
         if row["state"] == "creating":
             matches = []
@@ -812,6 +883,9 @@ class Roots:
             self._goal_queue.add(thread_id)
 
     def reconcile_meter(self, thread_id):
+        if self.conn.execute("SELECT 1 FROM p0_roots WHERE thread_id=? AND run_id=? AND state='archived_main'",
+                             (thread_id, self.run_id)).fetchone():
+            return  # Settled archived Main turns retain their original usage record.
         try:
             if thread_id in self.loaded:
                 self.delivery.reconcile(thread_id)
@@ -833,8 +907,7 @@ class Roots:
 
     def ensure_main(self):
         with store.transaction(self.conn):
-            prior = self.conn.execute("SELECT * FROM p0_roots WHERE run_id=? AND task_id IS NULL",
-                                      (self.run_id,)).fetchone()
+            prior = self._current_main()
             row = dict(prior) if prior else self._new_row()
         return self._materialize(row)
 
@@ -1158,11 +1231,18 @@ class Roots:
 
     def _artifact_access(self, binding, ref, *, metadata=False):
         columns = "media_type,rel_path,kind,bytes,sha256" if metadata else "media_type,rel_path,kind"
-        allowed = self.conn.execute(f"SELECT {columns} FROM p0_root_artifact_reads JOIN artifacts USING(artifact_ref) "
+        allowed = self.conn.execute(f"SELECT {columns},json_extract(provenance_json,'$.pi_private_branch') AS private_branch "
+                                    "FROM p0_root_artifact_reads JOIN artifacts USING(artifact_ref) "
                                     "WHERE root_key=? AND artifact_ref=? AND (run_id=? OR run_id IS NULL)",
                                     (binding["root_key"], ref, self.run_id)).fetchone()
         if not allowed:
             raise ScopeDenied("this artifact has not been cited in the task inputs")
+        private = allowed["private_branch"]
+        if private and not self.conn.execute("""SELECT 1 FROM v6_decision_tasks d
+            LEFT JOIN v62_modules m USING(run_id,scope) WHERE d.run_id=? AND d.task_id=?
+            AND (d.scope='branch:' || ? OR m.branch_id=?)""",
+            (self.run_id, binding["task_id"], private, private)).fetchone():
+            raise ScopeDenied("The PI assigned this original to a different research route")
         return allowed
 
     def _read_artifact(self, binding, args):

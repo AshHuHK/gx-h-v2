@@ -23,6 +23,7 @@ def _strings(items):
 
 def _validate(payload, *, current=False):
     extra = {"gap_criteria", "metric_refs", "qualitative_notes"} if current else {"gap_criteria"}
+    extra.add("pi_dispositions")
     if not isinstance(payload, dict) or not _FIELDS <= set(payload) <= _FIELDS | extra:
         raise SchemaInvalid("Supply report content, status, artifact references and an operation key")
     if (not isinstance(payload["operation_key"], str) or not payload["operation_key"].strip()
@@ -30,6 +31,8 @@ def _validate(payload, *, current=False):
         raise SchemaInvalid("Invalid module report operation key, status or findings")
     if not all(_strings(payload[k]) for k in ("artifact_refs", "gaps", "next_steps")):
         raise SchemaInvalid("Report references, gaps and next steps must be lists of nonempty strings")
+    if "pi_dispositions" in payload and not isinstance(payload["pi_dispositions"], list):
+        raise SchemaInvalid("Supply PI dispositions as a list")
     selectors, notes = payload.get("metric_refs", []), payload.get("qualitative_notes", [])
     if not isinstance(notes, list) or not isinstance(selectors, list) or any(
             not isinstance(item, dict) or set(item) != {"artifact_ref", "metric_id"} or
@@ -75,9 +78,16 @@ def _module_evidence(conn, module):
     from .v62_modules import job_outputs
     from .v62_native import operation_receipts
     rid = module["run_id"]
-    proofs = {}
+    from . import pi_materials
+    proofs, private = {}, pi_materials.private_originals(conn, rid)
     for op in operation_receipts(conn, rid, module["module_instance_id"]):
-        for ref in set(op.get("source_refs", ())) | set(op.get("artifact_refs", ())):
+        refs = set(op.get("source_refs", ())) | set(op.get("artifact_refs", ()))
+        # Released reports grant their cited sources to peers. Do not release a private
+        # PI original or its extracted quotation through that otherwise public path.
+        if private.intersection(refs):
+            private.update(op.get("artifact_refs", ()))
+            continue
+        for ref in refs:
             proofs.setdefault(ref, []).append({"tool": op["tool"], "operation_key": op["operation_key"],
                                              "result_sha256": op["result_sha256"],
                                              "source_sha256": op.get("artifact_sha256", {}).get(ref, op.get("source_sha256"))})
@@ -152,6 +162,8 @@ def _stage(conn, module, task, identity, payload, evidence, *, attempt):
         v621_metrics.render_report(conn, module["run_id"], bundle, current=v621_policy.current(conn, module["run_id"]),
                                    auto_endpoints=auto_endpoints, metric_refs=payload.get("metric_refs", ()),
                                    qualitative_notes=payload.get("qualitative_notes", ()))
+    if payload.get("pi_dispositions"):
+        bundle["pi_dispositions"] = payload["pi_dispositions"]
     if "gap_criteria" in payload:
         from . import v621_gaps
         bundle.update(v621_gaps.register(conn, module, payload, checked))
@@ -388,6 +400,11 @@ def commit_report(conn, plan):
         receipt["event_id"] = store.append_event(conn, run_id=rid, kind="v62.module.reported", actor=(
             identity["thread_id"] if identity else "GX"), subject_kind="module", subject_id=mid,
             payload=receipt, evidence_level="EXECUTION_OBSERVED")
+        if identity and payload.get("pi_dispositions"):
+            from . import research_dialogue
+            receipt["pi_dispositions"] = research_dialogue.dispose(conn, rid, root, identity["turn_id"], task,
+                payload["pi_dispositions"], product_ref=ref, product_kind="report", event_id=receipt["event_id"],
+                evidence_refs=receipt["source_refs"], effects=[])
         # Completing the last member releases all remaining reports together, even if this member has a watch.
         wake = release_round(conn, module, publishing=receipt)
         reason = _early_reason(module, plan.bundle)

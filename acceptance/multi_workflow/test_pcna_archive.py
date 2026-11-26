@@ -2,11 +2,15 @@
 import hashlib
 import importlib.util
 import json
+from io import StringIO
 from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch
 
+from Bio.PDB import MMCIFIO
+from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from adapters.scientific import archive_coordinates
+from acceptance.multi_workflow.test_pcna_geometry import selection
 
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = ROOT / "gx-h/plugins/installed/org.gx.pcna-archive/1.0.0"
@@ -22,6 +26,20 @@ def record():
             "uniProtKBCrossReferences":[{"database":"PDB","id":"1VYM","properties":[{"key":"Method","value":"X-ray"}]},
                                          {"database":"PDB","id":"3JA9","properties":[]},
                                          {"database":"GO","id":"GO:0000000","properties":[]}]}
+
+
+def cif_bytes(document):
+    stream = StringIO()
+    writer = MMCIFIO()
+    writer.set_dict(document)
+    writer.save(stream)
+    return stream.getvalue().encode("utf-8")
+
+
+def duplicate_row(document, category, original, **changes):
+    for key, column in document.items():
+        if key.startswith(category + "."):
+            column.append(changes.get(key.split(".", 1)[1], column[original]))
 
 
 class ArchiveMethods(unittest.TestCase):
@@ -60,6 +78,60 @@ class ArchiveMethods(unittest.TestCase):
                                                   lambda: observed, [], [], None, verify_revision=True)
                 self.assertEqual(proof["entry_id"], "1VYM")
 
+    def test_linked_only_accession_qualifies_and_stamps_the_downloaded_original(self):
+        original_descriptor = json.loads(ENTRY.with_suffix(".json").read_bytes())
+        for primary in ("?", None):
+            with self.subTest(primary=primary):
+                doc = MMCIF2Dict(str(ENTRY))
+                self.assertEqual(set(doc["_struct_ref_seq.pdbx_db_accession"]), {"P12004"})
+                if primary is None:
+                    del doc["_struct_ref.pdbx_db_accession"]
+                else:
+                    doc["_struct_ref.pdbx_db_accession"] = [primary]
+                doc["_struct_ref.db_name"] = ["UNIPROTKB"]
+                raw = cif_bytes(doc)
+                expected = selection.select(raw)
+                observed, meta, context = archive.fetch(REQUEST, "1VYM", archive_coordinates, Mock(return_value=raw))
+                self.assertEqual((expected.entity, expected.chains), ("1", ("A", "B", "C")))
+                self.assertEqual(observed, raw)
+                self.assertEqual(meta["source"], original_descriptor["source"])
+                self.assertEqual(meta["applicability"], original_descriptor["applicability"])
+                self.assertEqual(meta["sha256"], hashlib.sha256(raw).hexdigest())
+                self.assertEqual(context["structure_sha256"], meta["sha256"])
+                entity, = context["pcna"]["entities"]
+                self.assertEqual((entity["entity_id"], tuple(entity["label_chains"])), (expected.entity, expected.chains))
+
+    def assert_ineligible(self, document):
+        raw = cif_bytes(document)
+        with self.assertRaises(ValueError):
+            selection.select(raw)
+        with self.assertRaises(ValueError):
+            archive.fetch(REQUEST, "1VYM", archive_coordinates, Mock(return_value=raw))
+
+    def test_conflicting_linked_accession_is_ineligible(self):
+        doc = MMCIF2Dict(str(ENTRY))
+        doc["_struct_ref_seq.pdbx_db_accession"][0] = "P99999"
+        self.assert_ineligible(doc)
+
+    def test_chains_from_two_human_pcna_entities_cannot_form_one_qualified_trimer(self):
+        doc = MMCIF2Dict(str(ENTRY))
+        duplicate_row(doc, "_entity", 0, id="77")
+        duplicate_row(doc, "_entity_poly", 0, entity_id="77")
+        duplicate_row(doc, "_struct_ref", 0, id="77", entity_id="77")
+        duplicate_row(doc, "_entity_src_gen", 0, entity_id="77")
+        for chains, entities in (("_struct_asym.id", "_struct_asym.entity_id"),
+                                 ("_atom_site.label_asym_id", "_atom_site.label_entity_id")):
+            for i, chain in enumerate(doc[chains]):
+                if chain == "C":
+                    doc[entities][i] = "77"
+        self.assert_ineligible(doc)
+
+    def test_four_declared_chains_remain_ineligible_when_only_three_have_coordinates(self):
+        doc = MMCIF2Dict(str(ENTRY))
+        duplicate_row(doc, "_struct_asym", 0, id="UNOBSERVED")
+        self.assertNotIn("UNOBSERVED", doc["_atom_site.label_asym_id"])
+        self.assert_ineligible(doc)
+
     def test_partner_and_experimental_metadata_are_deposition_specific(self):
         raw = (ROOT / "examples/pcna/data/9VGW.cif").read_bytes()
         _, _, context = archive.fetch(REQUEST, "9VGW", archive_coordinates, Mock(return_value=raw))
@@ -81,7 +153,7 @@ class ArchiveMethods(unittest.TestCase):
             archive.fetch(REQUEST, "1VYM", archive_coordinates, Mock(return_value=b"data_1VYM\n_entry.id 1VYM\n"))
 
     def test_qualifies_real_entities_and_chain_mappings_without_assuming_labels(self):
-        doc = {"_struct_ref.db_name":["UNP"], "_struct_ref.entity_id":["8"], "_struct_ref.pdbx_db_accession":["P12004"],
+        doc = {"_struct_ref.id":["1"], "_struct_ref.db_name":["UNP"], "_struct_ref.entity_id":["8"], "_struct_ref.pdbx_db_accession":["P12004"],
                "_entity_src_gen.entity_id":["8"], "_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id":["9606"],
                "_entity_poly.entity_id":["8"], "_entity_poly.type":["polypeptide(L)"],
                "_struct_asym.id":list("LMN"), "_struct_asym.entity_id":["8"]*3, "_atom_site.group_PDB":["ATOM"]*3,

@@ -105,9 +105,31 @@ def rows(doc, *keys):
     return zip(*(doc.get(k, ()) for k in keys), strict=True)
 
 
+def pcna_entity(doc):
+    references = doc.get("_struct_ref.id", ())
+    aligned = {}
+    if "_struct_ref_seq.pdbx_db_accession" in doc:
+        for ref, acc in rows(doc, "_struct_ref_seq.ref_id", "_struct_ref_seq.pdbx_db_accession"):
+            if acc not in ("?", "."):
+                aligned.setdefault(ref, set()).add(acc)
+    mapped = set()
+    primary = doc.get("_struct_ref.pdbx_db_accession", ["?"] * len(references))
+    for ref, db, entity, acc in zip(references, doc.get("_struct_ref.db_name", ()),
+                                    doc.get("_struct_ref.entity_id", ()), primary, strict=True):
+        if db.upper() not in ("UNP", "UNIPROT", "UNIPROTKB"):
+            continue
+        accessions = aligned.get(ref, set()) | ({acc} if acc not in ("?", ".") else set())
+        if ACCESSION in accessions:
+            if accessions != {ACCESSION}:
+                raise ValueError("Conflicting UniProt accession on the same deposited reference")
+            mapped.add(entity)
+    if len(mapped) != 1:
+        raise ValueError("Need exactly one deposited protein entity cross-referenced to UniProt P12004")
+    return mapped.pop()
+
+
 def pcna_chains(doc):
-    mapped = {e for db, e, ac in rows(doc, "_struct_ref.db_name", "_struct_ref.entity_id",
-                                      "_struct_ref.pdbx_db_accession") if db.upper() in ("UNP", "UNIPROT") and ac == ACCESSION}
+    entity = pcna_entity(doc)
     human = set()
     for category, taxid in (("_entity_src_gen", "pdbx_gene_src_ncbi_taxonomy_id"),
                             ("_entity_src_nat", "pdbx_ncbi_taxonomy_id"),
@@ -115,10 +137,14 @@ def pcna_chains(doc):
         if category + "." + taxid in doc:
             human.update(e for e, tax in rows(doc, category + ".entity_id", category + "." + taxid) if tax == "9606")
     polymers = {e for e, kind in rows(doc, "_entity_poly.entity_id", "_entity_poly.type") if kind.lower() == "polypeptide(l)"}
-    qualified = mapped & human & polymers
-    declared = {ch: ent for ch, ent in rows(doc, "_struct_asym.id", "_struct_asym.entity_id") if ent in qualified}
+    if entity not in human or entity not in polymers:
+        raise ValueError("The P12004 entity must be a deposited human L-polypeptide")
+    declared = [ch for ch, ent in rows(doc, "_struct_asym.id", "_struct_asym.entity_id") if ent == entity]
+    if len(declared) != 3 or len(set(declared)) != 3:
+        raise ValueError("The P12004 entity must have exactly three distinct asymmetric-unit label chains")
     observed = {ch for group, model, ch, ent in rows(doc, "_atom_site.group_PDB", "_atom_site.pdbx_PDB_model_num",
-                "_atom_site.label_asym_id", "_atom_site.label_entity_id") if group == "ATOM" and model == "1" and declared.get(ch) == ent}
+                "_atom_site.label_asym_id", "_atom_site.label_entity_id")
+                if group == "ATOM" and model == "1" and ent == entity and ch in declared}
     if len(observed) != 3:
         raise ValueError(f"Expected three deposited model-1 human P12004 polypeptide chains, observed {len(observed)}")
     assemblies = {}
@@ -127,7 +153,7 @@ def pcna_chains(doc):
         assemblies.setdefault((assembly, operation), set()).update(ch.strip() for ch in asym.split(","))
     if not any(observed <= together for together in assemblies.values()):
         raise ValueError("The three observed PCNA chains do not share a deposited assembly operation")
-    return sorted(observed), sorted({declared[ch] for ch in observed})
+    return sorted(observed), [entity]
 
 
 def structure_context(entry, digest, doc, pcna_entities):

@@ -61,7 +61,8 @@ def _opened(conn, run_id, opening, materials):
         JOIN v6_goals g ON g.run_id=h.run_id AND g.goal_version=t.goal_version
         WHERE h.run_id=? AND t.scope='run' AND json_type(r.document_json,'$.prediction.method')='object'""", (run_id,))
     for (raw,) in rows:
-        maturity = json.loads(raw).get('maturity', {})
+        document = json.loads(raw)
+        maturity = document.get('maturity', {})
         registration = maturity.get('registration') or {}
         method = (registration.get('method_pin') or {}).get('measurement_spec', {})
         if (method.get('capability') not in opening['capabilities'] or not valid_endpoint(method)
@@ -70,6 +71,8 @@ def _opened(conn, run_id, opening, materials):
             continue
         selected = {pin['artifact_ref'] for pin in maturity.get('material_coverage', [])
                     if not pin['known_at_registration'] and pin['qualification'] in ('unmeasured', 'prospective')}
+        if 'scope_feedback' in document:
+            selected.intersection_update(document['scope_feedback']['matching_refs'])
         if v623_chronology.materials_overlap(conn, selected, materials, registration['method_pin']):
             return True
     return False

@@ -23,7 +23,18 @@ def evidence_tool(name, version):
     from . import v621_policy
 
     if version == v621_policy.VERSION:
-        return contracts.native_goal_tool_spec(name, compact_decision=name == "gx_decide_revision")
+        spec = contracts.native_goal_tool_spec(name, compact_decision=name == "gx_decide_revision")
+        if name == "gx_stage_claim":
+            spec = deepcopy(spec)
+            schema = spec["inputSchema"]
+            schema["required"].remove("scope")
+            schema["properties"]["scope"]["description"] = (
+                "With a predicted method, omit scope or use {{material_scope}} to bind the common verified "
+                "acquisition applicability of the originals in prediction.data_refs. Method settings and data "
+                "references separately bind the measurement. Preserve scientific descriptions in statement and "
+                "limitations. Supply scope for a different population, additional eligibility requirements, "
+                "or a claim without a predicted method.")
+        return spec
     spec = contracts.native_goal_tool_spec(name)
     spec = deepcopy(spec)
     fields = spec["inputSchema"]["properties"]

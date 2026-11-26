@@ -17,6 +17,7 @@ from . import manifest, v62_maturity, v621_policy
 
 SCHEMA = 'gx.v6.claim.1'
 DRAFT_KIND = 'v6_claim_proposal'
+MATERIAL_SCOPE = '{{material_scope}}'
 
 def tool_spec():
     return contracts.native_goal_tool_spec("gx_stage_claim")
@@ -161,14 +162,54 @@ def evaluation_refs(conn, run, task, lease, thread, turn):
     return {row[0] for row in rows}
 
 
+def _material_scope(conn, task, observations, sources, pins, requested):
+    """Bind the material population from the same visible acquisitions used by the measurement reader."""
+    by_ref = {s['artifact_ref']: s for s in sources}
+    scopes = {}
+    for pin in pins:
+        ref = pin['artifact_ref']
+        source = by_ref.get(ref) or _ground(conn, task['run_id'], ref, observations, task)
+        fact = source.get('output_provenance', {})
+        values = fact.get('applicability_scopes', []) if fact.get('record_kind') == 'supplied_observation' else []
+        scopes[ref] = values[0] if len(values) == 1 else None
+    available = sorted({s for s in scopes.values() if s is not None})
+    if requested == MATERIAL_SCOPE:
+        if len(available) != 1 or None in scopes.values():
+            raise SchemaInvalid('The selected original materials have no single verified applicability. '
+                                'Choose the applicable originals or state an explicit scientific scope.',
+                                details={'field': 'scope', 'available_scopes': available})
+        requested = available[0]
+    matching = [ref for ref, scope in scopes.items() if scope == requested]
+    feedback = {'field': 'scope', 'scope': requested, 'matching_refs': matching}
+    if len(matching) != len(scopes):
+        feedback.update(status='out_of_scientific_scope' if None not in scopes.values() and not matching else 'incomplete_scope',
+                        available_scopes=available,
+                        guidance='Only matching acquisitions can qualify this prediction. Keep explicit extra '
+                                 'eligibility conditions and await matching evidence. If the selected originals '
+                                 'and method fully define the scope, omit scope or use {{material_scope}} and '
+                                 'describe the analysis in statement or limitations.')
+    else:
+        feedback['status'] = 'bound'
+    return feedback
+
+
 def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs, thread_id, turn_id, call_id):
+    submitted = payload
+    prediction = payload.get('prediction') if isinstance(payload, dict) else None
+    bind_scope = (isinstance(prediction, dict) and prediction.get('method') is not None
+                  and v621_policy.science_execution(conn, run_id))
+    if bind_scope and 'scope' not in payload:
+        payload = {**payload, 'scope': MATERIAL_SCOPE}
     _validate(payload)
+    if payload['scope'] == MATERIAL_SCOPE and not bind_scope and v621_policy.science_execution(conn, run_id):
+        raise SchemaInvalid('The material scope placeholder requires a predicted method and original data_refs.',
+                            details={'field': 'scope'})
     binding = dict(run_id=run_id, task_id=task_id, lease_id=lease_id, context_ref=context_ref,
                    thread_id=thread_id, turn_id=turn_id, call_id=call_id)
     if any(not isinstance(v, str) or not v for v in binding.values()):
         raise ScopeDenied('missing native claim call identity')
     key = 'v6-claim:' + ids.sha256_of_obj([thread_id, call_id])
-    request = dict(binding=binding, claim=payload)
+    request = dict(binding=binding, claim=submitted)
     replay = lookup_replay(conn, key, request)
     if replay:
         return replay
@@ -180,7 +221,7 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
     brief = json.loads(task['snapshot_json'])
     sources = [_ground(conn, run_id, ref, brief.get('observations', []), task) for ref in payload['evidence_refs']]
     enriched = v62_maturity.enrolled(conn, run_id)
-    pins = method_pin = None
+    pins = method_pin = scope_feedback = None
     if 'prediction' in payload:
         if 'external_endpoint' in payload['prediction']:
             if not v621_policy.live_science(conn, run_id) or payload['prediction'].get('method'):
@@ -190,6 +231,9 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         if not enriched:
             raise SchemaInvalid('A prospective prediction requires an enrolled research-evidence Goal')
         pins = v62_maturity.pin_data(conn, run_id, payload['prediction'], visible)
+        if bind_scope:
+            scope_feedback = _material_scope(conn, task, brief.get('observations', []), sources, pins, payload['scope'])
+            payload = {**payload, 'scope': scope_feedback['scope']}
         if v621_policy.current(conn, run_id):
             from . import v622_measurement
             method_pin = v622_measurement.pin(conn, run_id, payload['prediction'], applicability=payload['scope'])
@@ -212,6 +256,8 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         if prior and prior['scope'] == text_fields['scope']:
             del text_fields['scope']
         trusted = {}
+        if scope_feedback and scope_feedback['status'] == 'bound':
+            trusted['scope'] = payload['scope']
         for fact in sources:
             if payload['scope'] in fact.get('output_provenance', {}).get('applicability_scopes', ()):
                 trusted['scope'] = payload['scope']
@@ -262,6 +308,8 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
     if pins is not None:
         draft['prediction_data'] = pins
         draft['prediction_method'] = method_pin
+    if scope_feedback:
+        draft['scope_feedback'] = scope_feedback
     digest = ids.sha256_of_obj(draft)
     # The artifact is inert until an authenticated staging event references it.
     artifact = ArtifactService(conn).publish_bytes(namespace=f'{run_id}/claims', rel_path=f'{digest}.json',
@@ -275,6 +323,8 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         store.append_event(conn, run_id=run_id, kind='v6.claim.staged', actor=thread_id, subject_kind='artifact',
                            subject_id=artifact.artifact_ref, payload=draft)
         answer = {'status': 'PROPOSED', 'claim_ref': artifact.artifact_ref, 'sha256': digest}
+        if scope_feedback:
+            answer['scope_feedback'] = scope_feedback
         store.complete_idempotent(conn, key, answer)
     return answer
 
@@ -407,6 +457,8 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
                        context_ref=draft['context_ref'], event_cursor=draft['event_cursor'],
                        criteria_sha256=ids.sha256_of_obj(claim['criteria']), source_records=draft['sources'],
                        science=science, **claim)
+        if 'scope_feedback' in draft:
+            receipt['scope_feedback'] = draft['scope_feedback']
         event_id = store.append_event(conn, run_id=run_id, kind='v6.claim.adopted', actor=principal, subject_kind='hypothesis',
                            subject_id=hid, prev_revision=parent, new_revision=revision,
                            payload={'decision_ref': decision_ref, 'claim_revision_id': receipt['claim_revision_id'],

@@ -4,6 +4,7 @@ from ..domain import clock
 from ..errors import SchemaInvalid
 from ..persistence import store
 from . import waits
+from .response_attribution import FINAL_TOOLS
 
 ACTOR = "p0-native-meter"
 
@@ -162,12 +163,13 @@ def recover_late_response_cost(conn, thread, turn, *, child=False, attached=Fals
 
 
 def _terminal_response(conn, thread, turn, call):
-    return conn.execute(
-        "SELECT a.response_id,a.request_ordinal,a.conflicting FROM p0_response_tools m "
+    row = conn.execute(
+        "SELECT a.response_id,a.request_ordinal,a.conflicting,m.tool FROM p0_response_tools m "
         "JOIN p0_response_attribution a USING(thread_id,turn_id,response_id) "
         "JOIN p0_root_terminals e ON e.thread_id=m.thread_id AND e.turn_id=m.turn_id AND e.call_id=m.call_id "
         "WHERE m.thread_id=? AND m.turn_id=? AND m.source='MODEL' AND m.call_id=? "
-        "AND m.namespace='gx' AND m.tool='gx_submit_product'", (thread, turn, call)).fetchone()
+        "AND m.namespace='gx'", (thread, turn, call)).fetchone()
+    return row if row and row["tool"] in FINAL_TOOLS else None
 
 
 def terminal_response_observed(conn, thread, turn, call):

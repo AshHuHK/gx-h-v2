@@ -81,13 +81,18 @@ class TerminalProducts:
 
         store.on_transaction_end(self.conn, on_commit=committed)
 
-    def await_live_response(self, params):
+    def await_live_response(self, params, *, accepted):
         thread, turn, call = (params[name] for name in ("threadId", "turnId", "callId"))
         key = (thread, turn)
         if (key in self.fresh and self.fresh[key] is None
                 and self.roots.delivery.attribution.pending_direct_product(thread, turn, call)
                 and self.is_terminal(thread, turn, call)):
-            self.fresh[key] = (call, time.monotonic() + self.response_grace_seconds)
+            grace = self.response_grace_seconds
+            if accepted:
+                # The unanswered call holds the host on this response while its usage arrives.
+                grace = min(metering.policy(self.conn, self.roots.run_id)["grace_seconds"],
+                            self.roots.client.default_timeout)
+            self.fresh[key] = (call, time.monotonic() + grace)
 
     def for_thread(self, thread):
         return self.conn.execute("SELECT e.turn_id,e.call_id FROM p0_root_terminals e "
@@ -221,9 +226,9 @@ class TerminalProducts:
 
     def _deliver(self, thread, turn, live, stream):
         state = self.conn.execute(
-            "SELECT e.goal_checked_at,u.terminal_status FROM p0_root_terminals e "
-            "LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) WHERE e.thread_id=? AND e.turn_id=?",
-            (thread, turn)).fetchone()
+            "SELECT e.goal_checked_at,u.terminal_status,r.status AS run_status FROM p0_root_terminals e "
+            "LEFT JOIN p0_root_turn_usage u USING(thread_id,turn_id) JOIN runs r ON r.run_id=? "
+            "WHERE e.thread_id=? AND e.turn_id=?", (self.roots.run_id, thread, turn)).fetchone()
         goal_done = bool(state["goal_checked_at"])
         if not goal_done:
             try:
@@ -236,7 +241,7 @@ class TerminalProducts:
         if state["terminal_status"]:
             self._turn_closed(thread, turn)
             return goal_done
-        if stream and self.roots.active_turns.get(thread) == turn:
+        if stream and state["run_status"] not in ("PAUSED", "CANCELLED") and self.roots.active_turns.get(thread) == turn:
             call, deadline = stream
             now = time.monotonic()
             if now < deadline:

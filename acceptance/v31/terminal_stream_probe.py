@@ -11,7 +11,6 @@ from unittest.mock import patch
 
 from terminal_code_mode_probe import MODE_SOURCES, MODEL, Model, _proxy_preflight, identity, trial
 from native_probe_peer import Handler
-from gx_core.p0.terminal_products import TerminalProducts
 
 
 class Stream(Handler):
@@ -50,10 +49,9 @@ def run(directory, binary, entry, case, expected):
     model = Model(case, mode)
     model.RequestHandlerClass = Stream
     missing = case in ("never_completes", "without_grace")
-    grace = 0 if case == "without_grace" else TerminalProducts.response_grace_seconds
-    with patch.object(TerminalProducts, "response_grace_seconds", grace):
-        rec = trial(directory, binary, entry, case, mode, expected,
-                    model=model, post_commit_delay=0, missing_final=missing)
+    grace = 0 if case == "without_grace" else 1
+    rec = trial(directory, binary, entry, case, mode, expected, model=model, post_commit_delay=0,
+                missing_final=missing, metering_grace=grace)
     interrupt, = rec["interrupt_writes"]
     end = rec["requests"][-1]
     committed = rec["committed_at"]

@@ -1006,7 +1006,7 @@ class Roots:
         finally:
             try:
                 if suppress and p.get("namespace") == terminal_products.NAMESPACE and p.get("tool") in terminal_products.FINAL_TOOLS:
-                    self.terminal_products.await_live_response(p)
+                    self.terminal_products.await_live_response(p, accepted=status == "ACCEPTED")
                 self.delivery.attribution.outcome(p, status)
                 metrics.record("p0_callback", started=started, run_id=self.run_id,
                                thread_id=p.get("threadId"), turn_id=p.get("turnId"), tool=p.get("tool"))

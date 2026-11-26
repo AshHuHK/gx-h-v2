@@ -86,13 +86,14 @@ class Model(Peer):
         return self.message(row["id"], "A later request reached the local provider")
 
 
-def v3_store(conn, url, probe, expected):
+def v3_store(conn, url, probe, expected, metering_grace=None):
     schema.install(conn)
     workflow = default_registry().get("science_grid", "3")
     with store.transaction(conn):
         budget = budgets.create_root(conn, run_id=None, actor="protocol-fixture", profile_name="p0")
         run = records.create_run(conn, objective="Check one failed synthetic measurement", project_ref="direct-product",
             actor="fixture", budget_ref=budget, workflow_id="science_grid", workflow_version="3",
+            inputs=None if metering_grace is None else {"inputs": {"p0_spec": {"metering": {"grace_seconds": metering_grace}}}},
             pins={"workflow_sha256": workflow.digest()}, host={"policy_selection": {
                 "test_mode": True, "model_provider": probe.provider, "test_base_url": url}})
         for state in ("AUDITING", "PLANNING", "ACTIVE"):
@@ -122,7 +123,8 @@ def v3_store(conn, url, probe, expected):
     return run, inputs, product
 
 
-def trial(directory, binary, entry, case, mode, expected, *, model=None, post_commit_delay=0.25, missing_final=False):
+def trial(directory, binary, entry, case, mode, expected, *, model=None, post_commit_delay=0.25, missing_final=False,
+          metering_grace=None):
     legacy = case == "legacy_yield_control"
     model = model or Model(case, mode)
     with ExitStack() as stack:
@@ -151,7 +153,7 @@ def trial(directory, binary, entry, case, mode, expected, *, model=None, post_co
             model.product = {"proposal_ref": proposal, "evidence_refs": [evidence], "findings": [{"path_id": "sample",
                              "reason": "The sample failed.", "evaluation_ref": None, "supported": None}]}
         else:
-            run, inputs, model.product = v3_store(conn, url, probe, expected)
+            run, inputs, model.product = v3_store(conn, url, probe, expected, metering_grace)
         knobs = {"GX_P0_TEST": "1", "GX_P0_TEST_PROVIDER": probe.provider,
                  "GX_P0_MODEL": MODEL, "GX_P0_CODEX": str(binary), "CODEX_HOME": str(probe.home)}
         stack.enter_context(patch.dict(os.environ, knobs))

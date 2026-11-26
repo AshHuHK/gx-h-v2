@@ -16,7 +16,7 @@ from gx_core.domain import ids
 from gx_core.p0 import v621_policy
 
 
-def run(work):
+def run(work, *, before_run=None):
     if work.is_relative_to(ROOT):
         raise ValueError("Select a fresh workspace outside the product")
     work.mkdir(parents=True, exist_ok=False)
@@ -76,6 +76,8 @@ def run(work):
         cli = batch.native_cli(work, env, lock.fileno())
         rid = cli("start", "--goal", "Inspect the decision tool contract on the official host.",
                   "--run-key", "wire-retry", "--goal-config", work / "grant.json")["run_id"]
+        if before_run is not None:
+            before_run(work, rid)
         final = cli("run", "--run-id", rid, "--timeout", 28, timeout=47)
         faults = [row["error"] for row in peer.rows if "error" in row]
     with closing(batch.old.db_open(work)) as conn:

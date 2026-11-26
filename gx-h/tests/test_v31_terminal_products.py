@@ -193,6 +193,33 @@ class TerminalProductTests(unittest.TestCase):
         self.assertFalse(self.table("science_settlements"))
         self.assertFalse(self.table("p0_product_repairs"))
 
+    def test_operator_pause_interrupts_the_accepted_call_while_its_receipt_is_pending(self):
+        self.roots.client = SimpleNamespace(default_timeout=3)
+        attribution = self.roots.delivery.attribution
+        attribution.start("reviewer", "turn")
+        attribution.item("reviewer", "turn", {"type": "function_call", "namespace": "gx",
+                                               "name": "gx_submit_product", "call_id": "submit"})
+        calls = []
+
+        def rpc(method, params, **kwargs):
+            calls.append((method, params))
+            return {"goal": {"status": "complete"}} if method == "thread/goal/get" else {}
+
+        self.roots._request = rpc
+        with patch("gx_core.p0.terminal_products.time.monotonic", return_value=10) as now:
+            self.assertIs(self.submit(self.good), NO_TOOL_RESPONSE)
+            owner = self.roots.terminal_products
+            self.assertEqual(owner.fresh["reviewer", "turn"], ("submit", 13))
+            owner.flush()
+            now.return_value = 11.25
+            owner.flush()
+            self.assertEqual([m for m, _ in calls], ["thread/goal/get"])
+            self.conn.execute("UPDATE runs SET status='PAUSED' WHERE run_id=?", (self.run,))
+            now.return_value = 11.3
+            owner.flush()
+        self.assertEqual(calls[-1], ("turn/interrupt", {"threadId": "reviewer", "turnId": "turn"}))
+        self.assertEqual(len(calls), 2)
+
     def test_goal_timeout_still_interrupts_and_reconciles_only_original_turn(self):
         self.assertIs(self.submit(self.good), NO_TOOL_RESPONSE)
         calls = []

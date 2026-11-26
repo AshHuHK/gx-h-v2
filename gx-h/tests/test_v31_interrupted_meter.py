@@ -129,6 +129,17 @@ class ColdTerminalProducts(unittest.TestCase):
         self.assertFalse(self.cold.needs_terminal_snapshot('root', self.turn))
         self.assertEqual(self.ticket()['budget_status'], 'HELD')
 
+    def test_only_the_exact_direct_final_tool_response_can_end_the_wait(self):
+        self.f.raw(self.turn, 'r2', 14)
+        for name, namespace, expected in (
+                ('gx_decide_revision', 'gx', True), ('gx_submit_module_report', 'gx', True),
+                ('gx_task_context', 'gx', False), ('gx_decide_revision', 'other', False)):
+            with self.subTest(name=name, namespace=namespace):
+                self.db.execute("UPDATE p0_response_tools SET tool=?,namespace=? WHERE source='MODEL' AND call_id='submit'",
+                                (name, namespace))
+                self.assertEqual(metering.terminal_response_observed(self.db, 'root', self.turn, 'submit'), expected)
+                self.assertFalse(metering.terminal_response_observed(self.db, 'root', self.turn, 'different'))
+
     def test_conflicting_id_or_wrong_native_cancel_cannot_close(self):
         self.f.raw(self.turn, 'r2', 14)
         self.f.sample(self.turn, 35)

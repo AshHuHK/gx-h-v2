@@ -17,6 +17,7 @@ _SENTENCE = re.compile(r"(?<=[。！？])|(?<=[.!?])\s+")
 _RECOMMEND = re.compile(r"须|应当|应单列|应分|优先|分别报告|建议|recommend|should|report separately", re.I)
 _CONTRAST = re.compile(r"反例|反驳|推翻|衰减|仅在|无法|反向|contradict|counterexample|only when|opposite", re.I)
 _MEASURE = re.compile(r"\d+\.\d+|\d+/\d+|\d+\s*(?:Å|°|deg|%)")
+_NARROWED = re.compile(r"依预登记收窄|撤回|推翻|counterexample|we (?:narrowed|withdrew|rejected)", re.I)
 _ACTION = re.compile(r"因此|故在|据此|这使|重新安排|另行登记|补读|追加|改用|转而|停止|收窄|委派|"
                      r"therefore|we (?:will|chose|selected|stopped|narrowed)|follow.up", re.I)
 
@@ -35,7 +36,8 @@ def _finding(text, limit):
             passage = re.sub(r"(?<=[。！？]) +", "", " ".join(sentences[start:i+1]))
             advice = bool(_RECOMMEND.search(sentence))
             measured = bool(_MEASURE.search(passage))
-            passages.append(((advice and measured, advice, bool(_CONTRAST.search(sentence)) and measured, measured), passage))
+            revised = bool(_NARROWED.search(sentence)) and start < i
+            passages.append(((revised, advice and measured, advice, bool(_CONTRAST.search(sentence)) and measured, measured), passage))
     return _excerpt(max(passages, key=lambda p:p[0])[1], limit) if passages else ""
 
 
@@ -54,7 +56,26 @@ def _target(item, zh):
             rule = f"{target} " + ("段遗漏" if zh else "blocks missed")
         atom_selection = parameters.get("mask", "")
         return " ".join(filter(None, [mask.get(atom_selection, atom_selection), endpoint.get(parameters["endpoint"], parameters["endpoint"]), rule]))
-    statement = _excerpt(item["statement"], 50 if zh else 105)
+    statement = item["statement"]
+    if metric in ("pair_delta_A", "median_delta_A", "pair_delta_deg", "median_delta_deg", "n_contact_residue_pairs") and "block_index" in parameters:
+        interval = re.search(r"[A-Z][a-z]{2}\d+[–—-][A-Z][a-z]{2}\d+", statement)
+        window = interval[0] if interval else ("窗索引 " if zh else "block index ") + str(parameters["block_index"])
+        if metric.startswith("median_"):
+            pair = ""
+        else:
+            labels = set(re.findall(r"(?<![A-Za-z0-9])([A-Z0-9]/[A-Z0-9])(?![A-Za-z0-9])", statement))
+            pair = next(iter(labels)) if len(labels) == 1 else ("链对 " if zh else "pair ") + str(parameters.get("pair", ""))
+        if metric == "n_contact_residue_pairs":
+            quantity = "接触残基对数" if zh else "contacting residue pairs"
+        else:
+            mask = {"common_ca":"Cα","common_backbone":("共同主链" if zh else "common backbone")}.get(parameters.get("mask"), "")
+            endpoint = ("角度" if zh else "angle") if metric.endswith("_deg") else "RMSD"
+            if metric.startswith("median_"):
+                endpoint = (f"(链对 {endpoint} 中位数)" if zh else f"(median pair {endpoint})")
+            quantity = f"{mask} Δ{endpoint}".strip()
+        statement = f"{window} · " + " ".join(filter(None, (pair, quantity)))
+    else:
+        statement = _excerpt(statement, 50 if zh else 105)
     op = {"eq":"=", "ge":"≥", "gt":">", "le":"≤", "lt":"<"}.get(p.get("operator"), p.get("operator"))
     if op is not None and "threshold" in p:
         unit = method.get("unit")
@@ -74,6 +95,19 @@ def _action_rank(action, metric_methods):
 
 def _action_text(action, limit):
     sentences = [s.strip() for s in _SENTENCE.split(action["rendered_rationale"]) if s.strip()]
+    if action["objectives"] and any(j["job_id"] for j in action["jobs"]):
+        commissioned = re.compile(r"另行登记|补读|各测一次|we commissioned", re.I)
+        choice = next((s for s in sentences if commissioned.search(s) and len(s) <= limit and
+                       not re.search(r"若|如果|\bif\b", s, re.I)), None)
+        if choice:
+            return choice
+        question = _SENTENCE.split(action["objectives"][0])[0].strip()
+        if len(question) > limit and "是否" in question and "，" in question:
+            head, ask = question.split("是否", 1)
+            clause = ask.split("，", 1)[0]
+            if clause and len(head + clause) + 3 <= limit:
+                return head + "是否" + clause.rstrip("？?") + "？"
+        return _excerpt(question, limit)
     choice = next((s for s in reversed(sentences) if _ACTION.search(s) and len(s) <= limit), None)
     return choice or _excerpt(next(iter(action["objectives"]), action["rendered_rationale"]), limit)
 
@@ -115,6 +149,8 @@ def _observations(prediction, assessment, output_labels, materials, zh):
             short = format(item["value"], ".6g")
             if float(short) != prediction.get("threshold") or item["value"] == prediction.get("threshold"):
                 value = short
+            if metric in ("pair_delta_A", "median_delta_A", "pair_delta_deg", "median_delta_deg") and item["value"] > 0:
+                value = "+" + value
         if item.get("unit") and item["unit"] != "1":
             value += " " + item["unit"]
         counts = item.get("denominators") or {}
@@ -169,7 +205,13 @@ def page(result):
                       tr("| Prediction | Verdict | Observed |", "| 登记预测 | 原判决 | 实测 |"), "|---|---|---|"])
         # When many hypotheses compete for space, keep counterexamples and unresolved predictions visible.
         priority = {"opposed":0, "mixed":1, "undetermined":2, "supported":3}
-        selected = sorted(predictions, key=lambda p: priority.get(p["assessments"][-1].get("direction"), 2))[:6]
+        def metric(p):
+            return (p["prediction"].get("method") or p["prediction"].get("external_endpoint") or {}).get("metric_id")
+        opposed = {metric(p) for p in predictions if p["assessments"][-1].get("direction") == "opposed"}
+        # Include a directly comparable positive outcome alongside counterexamples when space permits.
+        selected = sorted(predictions, key=lambda p: (
+            priority.get(p["assessments"][-1].get("direction"), 2),
+            p["assessments"][-1].get("direction") == "supported" and metric(p) not in opposed))[:6]
         for p in sorted(selected, key=lambda item: item["registration"]["event_id"]):
             assessment = p["assessments"][-1]
             verdict = titles.get(assessment.get("direction"), tr("Undetermined", "未定"))
@@ -212,7 +254,7 @@ def page(result):
             sources = tr(f"cited reports {reports}", f"引用报告 {reports}") if reports else tr("used readings", "引用量测")
             used_methods = sorted({metric_methods[m] for m in action["metric_refs"] if m in metric_methods})
             if len(used_methods) > 1:
-                sources += " · " + " + ".join(used_methods[:2])
+                sources += tr(" · read ", " · 已读 ") + " + ".join(used_methods[:2])
             effect = _action_text(action, 92 if zh else 160)
             n = sum(bool(j["job_id"]) for j in action["jobs"])
             commissioned = tr(f", {n} Jobs launched", f"，启动 {n} 项作业") if n else ""

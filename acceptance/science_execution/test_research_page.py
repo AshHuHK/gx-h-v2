@@ -7,6 +7,16 @@ from gx_core.p0 import research_page, research_report
 
 
 class ResearchPage(unittest.TestCase):
+    def test_scoped_prediction_and_commission_stay_readable(self):
+        prediction = {"statement":"与其他蛋白共沉积的模型中，预测天然 Leu118–Val137 的 G/E 链对将发生变化。",
+                      "prediction":{"method":{"metric_id":"pair_delta_A","unit":"Å",
+                                               "parameters":{"block_index":6,"mask":"common_ca","pair":"31"}},
+                                    "operator":"le","threshold":-0.042}}
+        self.assertEqual(research_page._target(prediction,True), "Leu118–Val137 · G/E Cα ΔRMSD (≤ -0.042 Å)")
+        action = {"jobs":[{"job_id":"executed"}], "rendered_rationale":"若各组相似，则将研究收窄。",
+                  "objectives":["完整主链复核中，E/F 的 RMSD 差是否 ≤ −0.25 Å，且降幅超过相同分散对照的最大变化？"]}
+        self.assertEqual(research_page._action_text(action,40),"完整主链复核中，E/F 的 RMSD 差是否 ≤ −0.25 Å？")
+
     def test_short_close_keeps_a_numeric_recommendation_and_enacted_multimethod_work(self):
         def decision(event, ops, methods, reports):
             return {"event_id":event, "operations":[{"op":op} for op in ops],

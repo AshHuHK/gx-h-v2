@@ -1,12 +1,13 @@
 """Project module measurements, host turn intervals and published evidence used by another route."""
 from datetime import datetime
+from functools import cache
 from itertools import combinations
 import hashlib
 import json
 from pathlib import Path
 
 from ..artifacts import ArtifactService
-from . import v6_native, v621_metrics
+from . import v6_native, v621_metrics, v62_outputs
 
 
 def _instant(value):
@@ -21,10 +22,17 @@ def _instant(value):
 
 def _history_turns(path, root):
     """Use only the official root's own turns. Delivery, reservations and queue time are separate."""
+    def record(line):
+        try:
+            value = json.loads(line)
+        except (ValueError, RecursionError):
+            return {}
+        return value if isinstance(value, dict) and isinstance(value.get('payload'), dict) else {}
+
     turns = {}
     try:
-        with path.open(encoding='utf-8') as stream:
-            header = json.loads(next(stream, '{}'))
+        with path.open('rb') as stream:
+            header = record(next(stream, b''))
             meta = header.get('payload', {})
             thread = root['thread_id']
             if (header.get('type') != 'session_meta' or meta.get('id') != thread
@@ -32,46 +40,61 @@ def _history_turns(path, root):
                 return turns
             active = None
             for line_number, line in enumerate(stream, 2):
-                row = json.loads(line)
-                p = row.get('payload') or {}
+                row = record(line)
+                p = row.get('payload', {})
                 kind, sub = row.get('type'), p.get('type')
                 tid = p.get('turn_id')
+                if tid is not None and not isinstance(tid, str):
+                    continue
+                timestamp = row.get('timestamp')
+                if not isinstance(timestamp, str):
+                    timestamp = None
                 if kind == 'event_msg' and sub in ('task_started', 'turn_started') and tid:
                     active = tid
-                    turns[tid] = dict(start=row.get('timestamp'), end=None, model=None, response=False, report_reads={}, calls={})
+                    turns[tid] = dict(start=timestamp, end=None, model=None, response=False, report_reads={}, calls={})
                 current = turns.get(tid or active)
                 if current is None:
                     continue
                 if kind == 'turn_context' and tid == active:
                     current['model'] = p.get('model')
-                elif kind == 'token_usage_record' and tid == active and p.get('thread_id') == thread and p.get('response_id'):
+                elif (kind == 'token_usage_record' and tid == active and p.get('thread_id') == thread
+                      and isinstance(p.get('response_id'), str) and p['response_id']):
                     current['response'] = True
                 elif kind == 'event_msg' and sub == 'item_completed' and tid == active:
-                    item = p.get('item') or {}
-                    if p.get('thread_id') == thread and item.get('type') == 'DynamicToolCall':
-                        current['calls'].setdefault(item.get('id'), line_number)
-                        if item.get('tool') == 'gx_read_artifact' and item.get('success') is True:
-                            parts = item.get('content_items', [])
-                            if len(parts) == 1 and parts[0].get('type') == 'inputText':
-                                try:
-                                    body = json.loads(parts[0]['text'])
-                                except (KeyError, ValueError, TypeError):
-                                    continue
-                                if isinstance(body, dict) and body.get('findings'):
-                                    ref = item.get('arguments', {}).get('ref')
-                                    digest = hashlib.sha256(parts[0]['text'].encode()).hexdigest()
-                                    current['report_reads'].setdefault(ref, (item.get('id'), line_number, digest))
+                    item = p.get('item')
+                    if (p.get('thread_id') != thread or not isinstance(item, dict)
+                            or item.get('type') != 'DynamicToolCall' or not isinstance(item.get('id'), str) or not item['id']):
+                        continue
+                    current['calls'].setdefault(item['id'], line_number)
+                    if item.get('tool') != 'gx_read_artifact' or item.get('success') is not True:
+                        continue
+                    parts = item.get('content_items')
+                    args = item.get('arguments')
+                    if (not isinstance(parts, list) or len(parts) != 1 or not isinstance(parts[0], dict)
+                            or parts[0].get('type') != 'inputText' or not isinstance(parts[0].get('text'), str)
+                            or not isinstance(args, dict) or not isinstance(args.get('ref'), str) or not args['ref']):
+                        continue
+                    try:
+                        raw = parts[0]['text'].encode('utf-8')
+                        body = json.loads(raw)
+                    except (ValueError, RecursionError):
+                        continue
+                    if isinstance(body, dict) and body.get('findings'):
+                        digest = hashlib.sha256(raw).hexdigest()
+                        current['report_reads'].setdefault(args['ref'], (item['id'], line_number, digest))
                 elif kind == 'response_item' and active and sub == 'function_call':
-                    current['calls'][p.get('call_id')] = line_number
+                    if not isinstance(p.get('call_id'), str) or not p['call_id']:
+                        continue
+                    current['calls'][p['call_id']] = line_number
                     current['response'] = True
                 elif kind == 'response_item' and active and (sub in ('reasoning','custom_tool_call')
                         or sub == 'message' and p.get('role') == 'assistant'):
                     current['response'] = True
                 elif kind == 'event_msg' and sub in ('task_complete','turn_complete','turn_aborted') and tid == active:
-                    current['end'] = row.get('timestamp')
+                    current['end'] = timestamp
                     active = None
-    except (OSError, UnicodeError, ValueError):
-        # The last record of a still-open rollout may be incomplete. Keep observed boundaries only.
+    except OSError:
+        # Preserve observations already read when the host file becomes unavailable.
         pass
     return turns
 
@@ -136,19 +159,59 @@ def _jobs(conn, rid, branch):
     return result
 
 
-def _effects(conn, rid, decision, cited):
-    """A proposed operation or a closed Run alone cannot establish influence on scientific work."""
+def _comparison_pair(conn, rid, output, selected, later_decisions):
+    """Find an adopted comparison of this Job's measured endpoint and the report's reading."""
+    if not selected or not later_decisions:
+        return None
+    for reading in v621_metrics.from_output(conn, rid, output):
+        if reading['schema'] != v621_metrics.SCHEMA:
+            continue
+        for source in selected:
+            if all(reading[key] == source[key] for key in ('method', 'metric_id', 'unit')):
+                pair = {source['metric_ref'], reading['metric_ref']}
+                for later in later_decisions:
+                    if pair.issubset(later['used_metric_refs']):
+                        return dict(compared_metric_refs=sorted(pair), comparison_decision_ref=later['decision_ref'])
+    return None
+
+
+def _finding_sources(report):
+    refs = {source for finding in report.get('findings', []) for source in finding.get('source_refs', [])}
+    refs.update(metric['artifact_ref'] for metric in report.get('verified_metrics', []))
+    return refs
+
+
+def _effects(conn, rid, decision, cited, report, publisher_branch, lineage, uses):
     ref = decision['decision_ref']
+    metrics = report.get('verified_metrics', [])
+    grounds = {source for finding in _finding_sources(report) for source in lineage(finding)}
+    selected = [m for m in metrics if m['metric_ref'] in decision['used_metric_refs']]
+    later = [d for d in uses if d['event_id'] > decision['event_id'] and d['used_metric_refs']]
     effects = []
     for row in conn.execute('''SELECT n.node_id,n.branch_id,n.job_id,n.result_ref FROM v6_nodes n
             JOIN jobs j USING(run_id,job_id) WHERE n.run_id=? AND n.decision_ref=? AND n.status='SUCCEEDED'
             AND j.status='SUCCEEDED' AND n.result_ref IS NOT NULL ORDER BY n.rowid''',(rid,ref)):
-        effects.append(dict(kind='MEASUREMENT_COMPLETED',**dict(row)))
+        matched = sorted(grounds.intersection(lineage(row['result_ref'])))
+        if matched:
+            effects.append(dict(kind='MEASUREMENT_COMPLETED', **dict(row), matched_source_refs=matched))
+            continue
+        comparison = _comparison_pair(conn, rid, row['result_ref'], selected, later)
+        if comparison:
+            effects.append(dict(kind='MEASUREMENT_COMPLETED', **dict(row), **comparison))
     for row in conn.execute("""SELECT event_id,kind,subject_id,payload_json FROM events WHERE run_id=? AND
             ((kind IN ('v6.claim.adopted','v62.claim.reassessed') AND json_extract(payload_json,'$.decision_ref')=?) OR
              (kind='v6.branch.stopped' AND json_extract(payload_json,'$.decision_id')=?)) ORDER BY event_id""",(rid,ref,ref)):
         data = json.loads(row['payload_json'])
-        if row['kind'] == 'v6.branch.stopped' or cited.intersection(data.get('evidence_refs', [])):
+        if row['kind'] == 'v6.branch.stopped':
+            branch = row['subject_id']
+            inputs = conn.execute("""SELECT a.artifact_ref FROM v6_nodes n, json_each(n.spec_json,'$.inputs') i
+                        LEFT JOIN v6_nodes dep ON dep.run_id=n.run_id AND dep.node_id=i.value
+                        JOIN artifacts a ON a.run_id=n.run_id AND a.artifact_ref=coalesce(dep.result_ref,i.value)
+                        WHERE n.run_id=? AND n.branch_id=?""", (rid, branch))
+            linked = branch == publisher_branch or any(grounds.intersection(lineage(item)) for (item,) in inputs)
+        else:
+            linked = cited.intersection(data.get('evidence_refs', []))
+        if linked:
             effects.append(dict(kind=row['kind'],event_id=row['event_id'],subject=row['subject_id'],claim_revision_id=data.get('claim_revision_id')))
     return effects
 
@@ -156,6 +219,14 @@ def _effects(conn, rid, decision, cited):
 def _handoffs(conn, rid, modules, roots, decisions, turns, directory):
     result = []
     scopes = {m['scope']:m for m in modules}
+    assets = ArtifactService(conn, Path(directory)/'artifacts')
+
+    @cache
+    def lineage(ref):
+        data = v62_outputs.classify(conn, rid, ref)['data_refs']
+        return {ref, *(pin['artifact_ref'] for pin in data)}
+
+    read_report = cache(assets.read_json)
     for m in modules:
         pub = m['report']
         if not pub:
@@ -207,19 +278,21 @@ def _handoffs(conn, rid, modules, roots, decisions, turns, directory):
                         observed_before = any(event < d['event_id'] for event in read)
                         decision_line = turn.get('tool_call_lines',{}).get(d['call_id'])
                         read_before = bool(read_call and decision_line and read_call[1] < decision_line)
-                        # An explicitly delegated report handle can support a commissioned follow-up.
-                        # Preserve whether its actual text/endpoint was also observed in this turn.
-                        handed_ref = scope != 'run' and ref in materials and ref in d['evidence_refs']
-                        if handed_ref or read_before or observed_before or any(x.get('findings') or x.get('endpoint_rows') for x in summaries):
-                            effects = _effects(conn,rid,d,cites)
+                        if read_before or observed_before or any(x.get('findings') or x.get('endpoint_rows') for x in summaries):
+                            report = read_report(ref)
+                            cited_findings = {ref} | cites.intersection(_finding_sources(report))
+                            effects = (_effects(conn,rid,d,cited_findings,report,m['branch_id'],lineage,decisions.values())
+                                       if cited_findings.intersection(d['evidence_refs']) else [])
                             if effects:
                                 entry.update(status='ENACTED',effects=effects)
                     receiver_report = scopes.get(scope,{}).get('report') or {}
                     writer = receiver_report.get('author',{})
                     if (writer.get('thread_id'),writer.get('turn_id')) == (thread,tid) and cites.intersection(receiver_report['source_refs']):
                         # Only findings that use the source qualify; listing the handle in the appendix does not.
-                        bundle = ArtifactService(conn,Path(directory)/'artifacts').read_json(receiver_report['report_ref'])
-                        findings = [f['text'] for f in bundle.get('findings',[]) if cites.intersection(f.get('source_refs',[]))]
+                        followup = read_report(receiver_report['report_ref'])
+                        cited_findings = {ref} | cites.intersection(_finding_sources(read_report(ref)))
+                        findings = [f['text'] for f in followup.get('findings',[])
+                                    if cited_findings.intersection(f.get('source_refs',[]))]
                         report_line = turn.get('tool_call_lines',{}).get(writer.get('call_id'))
                         if findings and (any(n < receiver_report['event_id'] for n in read) or
                                          read_call and report_line and read_call[1] < report_line):
@@ -251,6 +324,7 @@ def routes(conn, rid, directory):
         spec = json.loads(r['request_json'])['decision']
         decisions[(r['thread_id'],r['turn_id'])] = dict(decision_ref=r['decision_ref'],scope=r['scope'],event_id=receipt['event_id'],
                 thread_id=r['thread_id'],turn_id=r['turn_id'],call_id=r['call_id'],rationale=spec['rationale'],evidence_refs=spec.get('evidence_refs',[]),
+                used_metric_refs=receipt.get('endpoint_use', {}).get('used_metric_refs', []),
                 outcome=receipt.get('outcome'),operations=[item['spec']['op'] for item in receipt.get('resolved_ops',[])])
     for r in conn.execute('''SELECT m.*,p.receipt_json AS report_json FROM v62_modules m JOIN v6_goals g USING(run_id,goal_version)
             LEFT JOIN v62_module_reports p USING(run_id,module_instance_id) WHERE m.run_id=? ORDER BY m.round,m.rowid''',(rid,)):

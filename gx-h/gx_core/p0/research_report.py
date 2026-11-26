@@ -1,6 +1,6 @@
 """Export the current Goal conclusion and the evidence the deciding Lead actually received."""
-from functools import partial
 import json
+import re
 
 def completed_close(db, rid):
     """Resolve the Goal owner's closing operation to its commit and completion events."""
@@ -102,10 +102,72 @@ def render_decision(conn, rid, cache, ref, text):
     return v621_metrics.render_accepted_text(text, measured)
 
 
+def _gap_questions(conn, rid, decision_ref, texts):
+    refs = set(re.findall(r"gap:[0-9a-f]{64}", "\n".join(texts)))
+    if not refs:
+        return {}
+    questions = {r["gap_id"]: r["question"] for r in conn.execute(
+        "SELECT gap_id,question FROM gaps WHERE run_id=? AND namespace=?", (rid, rid)) if r["gap_id"] in refs}
+    for r in conn.execute("""SELECT json_extract(g.value,'$.gap_ref'),json_extract(g.value,'$.question')
+            FROM v6_decisions d JOIN research_contexts c USING(run_id,context_ref),
+            json_each(c.snapshot_json,'$.research_progress.open_gaps') g
+            WHERE d.run_id=? AND d.decision_ref=?""", (rid, decision_ref)):
+        if r[0] in refs and r[1]:
+            questions[r[0]] = r[1]
+    return questions
+
+
+def _decisions_after_reading(conn, rid, close, work, cache):
+    reports = {}
+    for handoff in work["handoffs"]:
+        if handoff.get("decision_ref") and handoff.get("received_content"):
+            reports.setdefault(handoff["decision_ref"], {})[handoff["published_event"]] = handoff["status"]
+    actions = []
+    for row in conn.execute("""SELECT d.*,t.scope FROM v6_decisions d
+            JOIN v6_decision_tasks t USING(run_id,task_id) WHERE d.run_id=? AND t.goal_version=?
+            ORDER BY json_extract(d.receipt_json,'$.event_id')""", (rid, close["goal_version"])):
+        ref = row["decision_ref"]
+        receipt = json.loads(row["receipt_json"])
+        if receipt["event_id"] >= close["committed_event"]:
+            continue
+        metrics = (receipt.get("endpoint_use") or {}).get("used_metric_refs", [])
+        if not metrics and ref not in reports:
+            continue
+        proposal = json.loads(row["request_json"])["decision"]
+        nodes = [dict(n) for n in conn.execute("""SELECT n.node_id,n.job_id,j.capability_id,j.status
+                 FROM v6_nodes n LEFT JOIN jobs j ON n.job_id=j.job_id WHERE n.run_id=? AND n.decision_ref=?
+                 ORDER BY n.rowid""", (rid, ref))]
+        operations = [op["spec"] for op in receipt.get("resolved_ops", [])]
+        objectives = [op.get("question") or op.get("reason") for op in operations]
+        actions.append({"decision_ref":ref, "event_id":receipt["event_id"], "scope":row["scope"],
+                        "outcome":receipt.get("outcome"), "metric_refs":metrics, "report_events":sorted(reports.get(ref, ())),
+                        "report_statuses":reports.get(ref, {}),
+                        "operations":operations, "jobs":nodes,
+                        "objectives":[render_decision(conn, rid, cache, ref, s) for s in objectives if s],
+                        "claim_revisions":receipt.get("claim_revisions", []), "rationale":proposal["rationale"],
+                        "rendered_rationale":render_decision(conn, rid, cache, ref, proposal["rationale"])})
+    return actions
+
+
+def _rejections(conn, rid, closed_event):
+    corrected, rejected = {}, []
+    for row in conn.execute("""SELECT event_id,kind,subject_id,payload_json FROM events WHERE run_id=?
+            AND kind IN ('v624.decision.rejected','v624.decision.corrected') AND event_id<=?
+            ORDER BY event_id DESC""", (rid, closed_event)):
+        body = json.loads(row["payload_json"])
+        if row["kind"] == "v624.decision.corrected":
+            corrected[row["subject_id"]] = body.get("decision_event")
+        else:
+            rejected.append({**body, "event_id":row["event_id"],
+                             "corrected_decision_event":corrected.get(row["subject_id"])})
+    return list(reversed(rejected))
+
+
 def export(conn, rid, directory, invocation):
     from ..native_release import write_native_bytes
-    from .research_evidence import evidence, evidence_lines
-    from .research_routes import routes, route_lines
+    from .research_evidence import evidence
+    from .research_page import page
+    from .research_routes import routes
     conn.execute("SAVEPOINT research_report")
     try:
         close = completed_close(conn, rid)
@@ -113,37 +175,30 @@ def export(conn, rid, directory, invocation):
         goal = conn.execute("SELECT goal FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]
         science = evidence(conn, rid)
         work = routes(conn, rid, directory)
-        display = partial(render_decision, conn, rid, {final["decision_ref"]: final["used_endpoints"]})
-        final_text = {key:display(final["decision_ref"], final[key]) for key in ("rationale","reason")}
-        final_text["unresolved"] = [display(final["decision_ref"], item) for item in final["unresolved"]]
+        cache = {final["decision_ref"]: final["used_endpoints"]}
+        actions = _decisions_after_reading(conn, rid, close, work, cache)
+        texts = [final["rationale"], final["reason"], *final["unresolved"]]
+        for item in actions:
+            texts.extend([item["rendered_rationale"], *item["objectives"]])
+        questions = _gap_questions(conn, rid, final["decision_ref"], texts)
+        final["gap_questions"] = questions
+        def display(text):
+            rendered = render_decision(conn, rid, cache, final["decision_ref"], text)
+            for ref, question in questions.items():
+                rendered = rendered.replace(ref, question)
+            return rendered
+        final_text = {key:display(final[key]) for key in ("rationale","reason")}
+        final_text["unresolved"] = [display(item) for item in final["unresolved"]]
         final["rendered"] = final_text
-        route_text = route_lines(work, display)
+        rejected = _rejections(conn, rid, close["closed_event"])
     finally:
         conn.execute("RELEASE research_report")
     result = {"schema":"gx.research-result/1", "run_id":rid, "goal":goal, "goal_status":"CLOSED",
               "goal_version":close["goal_version"], "closure":close, "final_decision":final,
-              **science, "routes":work, "invocation":invocation}
-    lines = ["# Research report", "", final_text["rationale"], ""]
-    if final_text["reason"] != final_text["rationale"]:
-        lines.extend([final_text["reason"], ""])
-    if final_text["unresolved"]:
-        lines.extend(["## Scope and limitations", "", *("- "+item for item in final_text["unresolved"]), ""])
-    lines.extend(["## Evidence used at closure", ""])
-    for item in final["used_endpoints"]:
-        reading = item["reading"]
-        value = reading.get("display") or str(reading.get("value"))
-        lines.append(f"- {reading.get('metric_id', item['metric_ref'])} · {value} · {item['source_ref']} "
-                     f"(delivery {item['event_id']}, {item['metric_ref']})")
-    if not final["used_endpoints"]:
-        lines.append("No quantitative endpoint was cited in the accepted closing decision.")
-    lines.extend(["", *evidence_lines(science), "", *route_text, "", "## Run and recovery", "",
-                  f"Run {rid}, Goal version {close['goal_version']}. Decision {close['decision_ref']} "
-                  f"committed at event {close['committed_event']}; closed at event {close['closed_event']}.",
-                  f"Invocation {invocation['action']} added {invocation['added']['host_turns']} acknowledged host turns "
-                  f"and {invocation['added']['jobs']} Jobs.", "", "```sh", invocation["command"], "```"])
+              **science, "routes":work, "post_read_actions":actions, "rejected_decisions":rejected, "invocation":invocation}
     out = directory/"research"/rid
     out.mkdir(parents=True, exist_ok=True)
-    for name, data in (("REPORT.md", "\n".join(lines)+"\n"),
+    for name, data in (("REPORT.md", page(result)),
                        ("result.json", json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False)+"\n")):
         target = out/name
         encoded = data.encode()

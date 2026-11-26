@@ -24,8 +24,7 @@ def _materials(conn, rid):
 
 
 def _claims(conn, rid):
-    # Every adoption and automated reassessment is an immutable revision. Group by
-    # its original registration, so a change of question or threshold gets a new row.
+    # Collect each registration's assessments before ordering the versions of a hypothesis.
     rows = conn.execute("""SELECT r.document_json,r.created_at,r.author_principal,e.kind,e.event_id,e.ts,
                   t.goal_version FROM hypotheses h JOIN hypothesis_revisions r USING(hypothesis_id)
             LEFT JOIN events e ON e.run_id=h.run_id AND e.subject_id=h.hypothesis_id
@@ -179,7 +178,14 @@ def evidence(conn, rid):
     published = {o["artifact_ref"]: o for j in jobs for o in j["outputs"]}
     external = {(m["artifact_ref"], m["measurement_spec_sha256"]): m for d in deliveries
                 for proof in d["endpoints"] if (m := proof.get("external_endpoint"))}
-    for prediction in predictions:
+    hypotheses = {}
+    for prediction in sorted(predictions, key=lambda p: p["registration"]["event_id"]):
+        hid = prediction["hypothesis_id"]
+        if hid in hypotheses:
+            hypotheses[hid]["revisions"].append(prediction)
+        else:
+            prediction["revisions"] = []
+            hypotheses[hid] = prediction
         for assessment in prediction["assessments"]:
             for result in assessment.get("results", []):
                 observed = result.get("measurement") or external.get((
@@ -193,7 +199,7 @@ def evidence(conn, rid):
                     out = published.get(gap.get("artifact_ref"), {})
                     gap["denominators"] = out.get("denominators", {})
                     gap["unavailable_reason"] = out.get("summary", {}).get("unavailable_reason")
-    return {"materials": _materials(conn, rid), "predictions": predictions, "exploratory_claims": exploratory,
+    return {"materials": _materials(conn, rid), "predictions": list(hypotheses.values()), "exploratory_claims": exploratory,
             "comparison_plans": _comparisons(conn, rid), "jobs": jobs, "deliveries": deliveries}
 
 
@@ -215,42 +221,51 @@ def _denominators(summary):
     return counts
 
 
+def _registration_lines(p):
+    lines = []
+    reg, pred = p["registration"], p["prediction"]
+    method = pred.get("method") or pred.get("external_endpoint") or pred.get("measurement_schema")
+    lines.extend([p["scope"], "",
+                  f"Registered at event {reg['event_id']}, {reg['utc']} ({reg['claim_revision_id']}). "
+                  f"GX assessment {p['classification']}.",
+                  p["criteria"], f"Registered rule · {pred['observable']} {pred['operator']} {pred['threshold']}.",
+                  f"Method {_json(method)}. Materials {_json(reg['data'])}.", ""])
+    seen = set()
+    for a in p["assessments"]:
+        lines.append(f"- {a['claim_revision_id']} at event {a['event_id']} ({a['utc']}) "
+                     f"— {a['stage']}, {a['direction']}.")
+        for result in a.get("results", []):
+            ref = result["artifact_ref"]
+            if ref in seen:
+                continue
+            seen.add(ref)
+            unit = result["unit"] or "unit unrecorded"
+            counts = _json(result["denominators"]) if result["denominators"] else "not reported"
+            delivered = ", ".join(map(str, result["lead_delivery_event_ids"])) or "none recorded"
+            lines.append(f"  - {result['value']} {unit} ({'supports' if result['supports'] else 'opposes'}). "
+                         f"Source {ref}. Denominators {counts}. Lead delivery events {delivered}.")
+        for gap in a.get("gaps", []):
+            key = (gap["kind"], gap.get("artifact_ref"), gap.get("event_id"))
+            if key not in seen:
+                seen.add(key)
+                value = f" ({gap['value']})" if "value" in gap else ""
+                lines.append(f"  - {gap['kind']}{value} · {gap.get('artifact_ref', '')}")
+                if gap.get("denominators") or gap.get("unavailable_reason"):
+                    lines.append(f"    - Published counts {_json(gap.get('denominators', {}))}. "
+                                 f"{gap.get('unavailable_reason') or ''}")
+    lines.append("")
+    return lines
+
+
 def evidence_lines(data):
     lines = ["## Predictions and assessments", ""]
     if not data["predictions"]:
         lines.append("GX recorded no adopted claim with a registered prediction.")
     for p in data["predictions"]:
-        reg, pred = p["registration"], p["prediction"]
-        method = pred.get("method") or pred.get("external_endpoint") or pred.get("measurement_schema")
-        lines.extend([f"### {p['statement']}", "", p["scope"], "",
-                      f"Registered at event {reg['event_id']}, {reg['utc']} ({reg['claim_revision_id']}). "
-                      f"GX assessment {p['classification']}.",
-                      p["criteria"], f"Registered rule · {pred['observable']} {pred['operator']} {pred['threshold']}.",
-                      f"Method {_json(method)}. Materials {_json(reg['data'])}.", ""])
-        seen = set()
-        for a in p["assessments"]:
-            lines.append(f"- {a['claim_revision_id']} at event {a['event_id']} ({a['utc']}) "
-                         f"— {a['stage']}, {a['direction']}.")
-            for result in a.get("results", []):
-                ref = result["artifact_ref"]
-                if ref in seen:
-                    continue
-                seen.add(ref)
-                unit = result["unit"] or "unit unrecorded"
-                counts = _json(result["denominators"]) if result["denominators"] else "not reported"
-                delivered = ", ".join(map(str, result["lead_delivery_event_ids"])) or "none recorded"
-                lines.append(f"  - {result['value']} {unit} ({'supports' if result['supports'] else 'opposes'}). "
-                             f"Source {ref}. Denominators {counts}. Lead delivery events {delivered}.")
-            for gap in a.get("gaps", []):
-                key = (gap["kind"], gap.get("artifact_ref"), gap.get("event_id"))
-                if key not in seen:
-                    seen.add(key)
-                    value = f" ({gap['value']})" if "value" in gap else ""
-                    lines.append(f"  - {gap['kind']}{value} · {gap.get('artifact_ref', '')}")
-                    if gap.get("denominators") or gap.get("unavailable_reason"):
-                        lines.append(f"    - Published counts {_json(gap.get('denominators', {}))}. "
-                                     f"{gap.get('unavailable_reason') or ''}")
-        lines.append("")
+        lines.extend([f"### {p['statement']}", "", *_registration_lines(p)])
+        for revision in p.get("revisions", []):
+            lines.extend([f"#### Revised registration at event {revision['registration']['event_id']}",
+                          "", revision["statement"], "", *_registration_lines(revision)])
     if data["exploratory_claims"]:
         lines.extend(["### Interpretations without a registered prediction", ""])
         for item in data["exploratory_claims"]:

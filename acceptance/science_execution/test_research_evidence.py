@@ -51,6 +51,47 @@ class ResearchEvidence(unittest.TestCase):
         self.assertEqual(gap["artifact_ref"], known["artifact_ref"])
         self.assertEqual(assessment["results"], [])
 
+    def test_one_hypothesis_retains_each_registration_and_its_own_assessments(self):
+        f = maturity_fixture.ProspectiveClaims()
+        f.setUp()
+        self.addCleanup(f.doCleanups)
+        original = f.adopt(f.stage(prediction={**f.prediction, "data_refs": f.plans[:1]}))
+        first_reading = f.observe(12, 0)
+        first, = v62_maturity.reassess(f.db, f.run)
+        f.allow(first["claim_revision_id"])
+        rule = {**f.prediction, "data_refs": f.plans[1:2], "threshold": 15}
+        revised = f.adopt(f.stage(key="change-transect", previous_claim_ref=first["claim_revision_id"],
+                                  statement="The temperature at the second transect exceeds fifteen degrees.",
+                                  criteria="Temperature above 15 Celsius at the second transect.", prediction=rule))
+        second_reading = f.observe(14, 1)
+        second, = v62_maturity.reassess(f.db, f.run)
+        f.allow(second["claim_revision_id"])
+        posthoc = f.adopt(f.stage(key="change-after-reading", previous_claim_ref=second["claim_revision_id"],
+                                  prediction={**rule, "threshold": 13}))
+
+        data = research_evidence.evidence(f.db, f.run)
+        item, = data["predictions"]
+        revision, late = item["revisions"]
+        self.assertEqual([v["registration"]["claim_revision_id"] for v in (item, revision, late)],
+                         [c["claim_revision_id"] for c in (original, revised, posthoc)])
+        self.assertEqual([v["prediction"]["threshold"] for v in (item, revision, late)], [10, 15, 13])
+        self.assertEqual([v["classification"] for v in (item, revision, late)],
+                         ["prospectively_tested", "prospectively_tested", "contains_retrospective_evidence"])
+        for version, assessment, observation, direction in ((item, first, first_reading, "supported"),
+                                                            (revision, second, second_reading, "opposed")):
+            self.assertEqual([a["direction"] for a in version["assessments"]], ["undetermined", direction])
+            self.assertEqual(version["assessments"][-1]["claim_revision_id"], assessment["claim_revision_id"])
+            result, = version["assessments"][-1]["results"]
+            self.assertEqual(result["artifact_ref"], observation["artifact_ref"])
+            self.assertEqual(result["lead_delivery_event_ids"], [])
+            self.assertEqual(result["denominators"], {})
+            self.assertIn("unit", result)
+        self.assertTrue(late["assessments"][0]["preexisting_result"])
+        report = "\n".join(research_evidence.evidence_lines(data))
+        self.assertEqual(report.count("\n### "), 1)
+        self.assertEqual(report.count("\n#### Revised registration"), 2)
+        self.assertIn(second_reading["artifact_ref"], report)
+
     def test_named_output_has_original_sha_parameters_readings_and_delivery_status(self):
         work = Path(self.enterContext(tempfile.TemporaryDirectory()))
         raw, mapping = mapped.example()

@@ -79,3 +79,26 @@ gx_check_dir=$(mktemp -d)
 随包的真实旧材料彩排 `gxr_01m8cftps3hcwzxvz3` 提供了可直接阅读的研究报告、逐回合和逐 Job 证据，以及独立的同 key 重开收据。[彩排报告](evidence/rehearsal/REPORT.md) · [路线与采纳动作](evidence/rehearsal/result.json) · [恢复增量](evidence/rehearsal/warm-reopen.json) · [本地工程对照](evidence/engineering/README.md)
 
 本次工作区另存验证索引于仓库相邻的 `../gx-science/validation/`。其中 `A/index.json` 收录原合同与预测时序，`B/barrier-summary.json` 收录双 CPU 及重开，`C/e2e/` 收录 signed 的合成原件对照。其他部署可用上述命令在自己的验证目录重新生成证据。
+
+## 本次三项真实研究
+
+三次从独立 run key 和新模型线程进入同一产品入口，均有正式关闭决定。科学产物附原始输出摘要、发布件和已关闭状态的重开记录，普通 OAuth 用量在后台记录。
+
+| 研究 | 真实 Run | 官方模型回合 | 成功 CPU Job | 首次结题事件 | 同 Run 重开 |
+|---|---|---:|---:|---:|---|
+| [旧材料彩排](evidence/rehearsal/REPORT.md) | gxr_01m8cftps3hcwzxvz3 | 8 | 11 | 406 | +0 回合、+0 Job |
+| [新材料双路线首航](evidence/first-flight/SCIENCE.md) | gxr_01m8cgr15h0txt5abp | 13 | 14 | 641 | +0 回合、+0 Job |
+| [开放题自选路线](evidence/open-question/SCIENCE.md) | gxr_01m8ck7s94gn2qcw5q | 9 | 21 | 664 | +0 回合、+0 Job |
+
+首航第二轮同一父任务的两个研究者各自产出测量，四段官方回合重叠中最长 225.292 秒。第三轮收到两份报告后做了四次共同主链复测，最终决定使用了 19 个已送达端点。首轮两个无模型回合的部分报告，以及两个因材料范围未匹配而未决的原预测，保存在同一个 Run。[首航原始报告](evidence/first-flight/REPORT.md) · [逐项登记与实测](evidence/first-flight/predictions.md) · [独立复算](evidence/first-flight/independent/READINGS.md)
+
+开放题 Lead 自行决定由一个研究者检查全链覆盖，主线做删段测量，再按读数追加分散删点对照和逐链查表。共同 Cα 的 RMSD 出现了有分母的反例。3JA9 的 22 Å EM 模型使用 1VYM 刚体拟合，独立复核另列模板依赖、坐标精度及阈值附近的分类变化。[开放题原始报告](evidence/open-question/REPORT.md) · [独立复算](evidence/open-question/independent/READINGS.md) · [跨沉积模板比较](evidence/open-question/independent/TEMPLATE.md)
+
+从仓库根目录可离线核对三个压缩包中的原始 Job 输出、报告、关闭决定、回合重叠和重开增量。独立数值实现使用锁定环境的 NumPy 与 Biopython，从原件重新拟合。[独立数值复验命令](independent/README.md)
+
+```bash
+for study in rehearsal first-flight open-question; do
+  python3.11 -B acceptance/multi_workflow/verify_published.py \
+    "acceptance/multi_workflow/evidence/$study" || exit 1
+done
+```

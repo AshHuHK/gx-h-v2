@@ -160,6 +160,32 @@ def read_artifact(db, state, rid, item):
     return data
 
 
+def closing_readout(job, metric_id):
+    """Resolve native metric IDs to the independently reconstructed numerical quantity and tolerance."""
+    if not job or "evidence" not in job:
+        return None
+    method, ev = job["method"], job["evidence"]
+    if method == "deposited-block-signed@1" and metric_id in ev:
+        return ev[metric_id], 0.0
+    if method == "deposited-chain-geometry@2" and metric_id == "coverage":
+        return ev["coverage_fraction"], 0.0
+    if method == "deposited-block-influence@1":
+        if metric_id == "coverage":
+            return ev["matched_positions"] / ev["union_positions"], 0.0
+        if metric_id == "eligible_blocks":
+            return len(ev["eligible_blocks"]), 0.0
+        for endpoint, tol in FIT_TOL.items():
+            if metric_id == "max_"+endpoint:
+                peak = ev["largest_absolute_changes"][endpoint]
+                return (peak["delta"] if peak else None), 2*tol
+    if method == "deposited-block-reading@1":
+        for endpoint, tol in FIT_TOL.items():
+            for kind, value in ev["recomputed"][endpoint].items():
+                if metric_id == kind+"_"+endpoint:
+                    return value, tol if kind in ("after","baseline") else 2*tol
+    return None
+
+
 def report(record):
     run = record["run"]
     lines = ["# 独立坐标复核", "", f"Run `{run['run_id']}`，Goal 状态 `{run['goal_status']}`。"
@@ -240,7 +266,9 @@ def report(record):
                                      f"{obs['mask']} | {cells} | {obs.get('classification','仅有原变化量')} |")
                 lines.extend(["", "表中每行对应一个实际 Job。各 Job 的阈值、分母及对应关系见 JSON 的 matched_masks。", ""])
         lines.extend(["## 正式结题", "", f"事件 {c['committed_event']} 采纳决定，事件 {c['closed_event']} 关闭 Goal。"
-                      f"该决定显式引用 {len(c['citations'])} 项已交付指标，引用到的原 Job、原值和单位保留在 JSON。", ""])
+                      f"该决定显式引用 {len(c['citations'])} 项已交付指标，"
+                      f"{sum(v.get('matches') is True for v in c['citations'])} 项与独立复算相符。"
+                      "原 Job、原值、单位及复算差值保留在 JSON。", ""])
     lines.extend(["[完整参数、输出摘要与逐区段读数](results.json)"])
     return "\n".join(lines)+"\n"
 
@@ -328,15 +356,22 @@ def verify_run(state, out, run_id=None):
         tab=json.loads(read_artifact(db,state,rid,pin))
         block=next((r for r in tab["blocks"] if r["index"]==index), {})
         pair_row=block.get("pairs",{}).get(pair,{})
-        values={}
+        independent = parent["evidence"]
+        independently_omitted = next((b for b in independent["blocks"] if b["index"]==index), {})
+        values, recomputed = {}, {}
         for ep in FIT_TOL:
             readings={"baseline":tab["baseline"][pair][ep],"after":pair_row.get(ep),"delta":pair_row.get("delta_"+ep),
                 "median_delta":block.get("median",{}).get(ep,{}).get("delta"),
                 "control_max":pair_row.get(ep+"_assessment",{}).get("control_max")}
             for f,v in readings.items(): require(v==cell[f+"_"+ep], "cell projection differs")
             values[ep]=readings
+            mapped = independently_omitted.get("metrics",{}).get(ep,{})
+            p = mapped.get("pairs",{}).get(pair,{})
+            recomputed[ep] = {"baseline":independent["baseline"][pair][ep], "after":p.get("after"),
+                              "delta":p.get("absolute_change"), "median_delta":mapped.get("median",{}).get("absolute_change"),
+                              "control_max":p.get("control_max")}
         items.append({**job,"evidence":{"entry":cell["entry"],"mask":cell["mask"],"pair":pair,"block_index":index,
-                    "source_table_job":parent["job_id"],"values":values}})
+                    "source_table_job":parent["job_id"],"values":values,"recomputed":recomputed}})
     out.mkdir(parents=True, exist_ok=True)
     record={"run":dict(run),"reader":"Bio.PDB.MMCIF2Dict "+Bio.__version__,"solver":"NumPy SVD "+np.__version__,"reference_code_sha256":hashes,"jobs":items}
     if run["goal_status"]=="CLOSED":
@@ -351,13 +386,12 @@ def verify_run(state, out, run_id=None):
             m = item["reading"]
             cite = {k:item[k] for k in ("metric_ref","event_id","source_ref")}
             cite.update({k:m.get(k) for k in ("job_id","artifact_ref","metric_id","unit","value","display","scope") if k in m})
-            job = checked.get(m.get("job_id"))
-            if job and job["method"]=="deposited-block-signed@1":
-                ref = job["evidence"]
-                name = m["metric_id"]
-                if name in ref:
-                    cite["recomputed"] = ref[name]
-                    require(ref[name] == m.get("value"), "closing signed endpoint differs from independent result")
+            observation = closing_readout(checked.get(m.get("job_id")), m["metric_id"])
+            if observation is not None:
+                value, tolerance = observation
+                errors = []
+                gap = numeric(value, m.get("value"), tolerance, m["metric_id"], errors)
+                cite.update(recomputed=value, absolute_difference=gap, tolerance=tolerance, matches=not errors)
             citations.append(cite)
         record["closed"]["citations"]=citations
     db.close()

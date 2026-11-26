@@ -133,8 +133,19 @@ def _visible(conn, task, lease_id, thread_id, turn_id, decision):
     claim_refs = {ref for op in decision["ops"] for ref in op.get("claim_refs", [])}
     cited = set(decision["evidence_refs"]) | claim_refs
     staged = set(v6_claims.staged_refs(conn, rid, tid, lease_id, context, cited))
-    if cited - refs - staged:
-        raise ScopeDenied("The decision cites evidence outside its frozen context and scoped tool receipts")
+    denied = cited - refs - staged
+    if denied:
+        for index, ref in enumerate(decision["evidence_refs"]):
+            if ref in denied:
+                raise ScopeDenied("The decision cites evidence outside its frozen context and scoped tool receipts. "
+                                  "Use an evidence reference here. A delivered source#row key belongs in metric_refs.",
+                                  details={"field": f"evidence_refs[{index}]"})
+        for op_index, op in enumerate(decision["ops"]):
+            for index, ref in enumerate(op.get("claim_refs", [])):
+                if ref in denied:
+                    raise ScopeDenied("The decision cites evidence outside its frozen context and scoped tool receipts. "
+                                      "Use a visible claim revision or a claim staged by this task.",
+                                      details={"field": f"ops[{op_index}].claim_refs[{index}]"})
     for ref in claim_refs - staged:
         if not v6_claims.read_revision(conn, rid, ref):
             raise SchemaInvalid("A close_run claim reference must identify an adopted or staged claim")

@@ -36,6 +36,39 @@ class LeadGraphIsolation(unittest.TestCase):
         saved, = s.rows("SELECT request_json FROM v6_decisions WHERE task_id=? AND turn_id=?", lead.task_id, lead.turn)
         self.assertEqual([source], json.loads(saved["request_json"])["decision"]["evidence_refs"])
 
+    def test_scope_refusal_reports_only_the_first_argument_path(self):
+        s = self.scenario()
+        lead, source = s.lead, s.materials[0]
+        worker = s.bind(s.open("private", inputs=[source])["task_id"])
+        child = s.submit_node(worker, "private-measurement")
+        private = child["decision_ref"]
+        frozen = s.brief(lead)
+        self.assertNotIn(private, frozen["evidence_refs"])
+        self.assertTrue(s.rows("SELECT decision_ref FROM v6_decisions WHERE decision_ref=?", private))
+        invented = "caller-only fictional reference"
+        secret = "PRIVATE-SENTINEL 未發布的研究筆記"
+        never_echo = {*frozen["evidence_refs"], *s.brief(worker)["evidence_refs"], private, invented, secret,
+                      child["aliases"]["local:private-measurement"]}
+        for field in ("evidence_refs[1]", "ops[0].claim_refs[0]"):
+            with self.subTest(field=field):
+                errors = []
+                for i, invalid in enumerate(([private, secret], [secret, private], [invented, secret])):
+                    close = {"op": "close_run", "reason": "Conclude after reviewing the evidence.",
+                             "claim_refs": list(invalid), "unresolved": []}
+                    evidence = [source, *invalid] if field.startswith("evidence_refs") else [source]
+                    with self.assertRaises(ScopeDenied) as refused:
+                        s.call(lead, "gx_decide_revision", {"decision": draft(close, evidence=evidence)},
+                               f"refusal-{field}-{i}")
+                    payload = refused.exception.to_payload()
+                    self.assertEqual({"field": field}, payload.get("details"))
+                    for value in never_echo:
+                        self.assertNotIn(value, json.dumps(payload, ensure_ascii=False))
+                    errors.append(payload)
+                self.assertEqual(errors[0], errors[1])
+                self.assertEqual(errors[0], errors[2])
+        self.assertEqual(frozen, s.brief(lead))
+        self.assertEqual([], s.rows("SELECT decision_ref FROM v6_decisions WHERE task_id=?", lead.task_id))
+
     def test_unseen_child_node_cannot_be_cancelled_from_a_stale_lead_brief(self):
         s = self.scenario()
         lead = s.lead

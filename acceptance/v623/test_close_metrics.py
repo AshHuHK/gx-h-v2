@@ -16,6 +16,7 @@ from acceptance.v622 import test_reports as report_fixture
 from gx_core.artifacts import ArtifactService
 from gx_core.domain import ids
 from gx_core.errors import GxError, StaleRevision
+from gx_core.hostobs.app_server_client import ReceivedMessage
 from gx_core.p0 import v6_decisions, v6_goal, v6_jobs, v6_native
 
 
@@ -183,6 +184,34 @@ class EndpointClose(unittest.TestCase):
         self.assertIsNone(reply, "A bare report reference was accepted as the declared basis for closure.")
         self.assertEqual(s.rows("SELECT status FROM v6_goals"), [{"status": "OPEN"}])
         self.assertEqual(s.rows("SELECT job_id FROM jobs"), [{"job_id": node["job_id"]}])
+
+    def test_native_missing_quantitative_citation_identifies_first_caller_slot_on_replay(self):
+        _, s, _, lead, nodes, report_ref, report = self.measured_multiple()
+        page = self.read_page(s, lead, report_ref, 0, "choose-report-reading")
+        chosen = page["endpoint_rows"][0]["key"]
+        metrics = report["verified_metrics"]
+        covered, = [m for m in metrics if m["metric_ref"].removeprefix("metric_").startswith(chosen)]
+        outputs = {n["result_ref"] for n in nodes}
+        missing = sorted(outputs - {covered["artifact_ref"]}, reverse=True)[:2]
+        self.assertEqual(len(missing), 2)
+        decision = close_decision([s.materials[0], report_ref, *missing])
+        decision["metric_refs"] = [report_ref + "#" + chosen]
+        params = {"tool": v6_native.DECIDE, "namespace": "gx", "callId": "quant-citation-index",
+                  "threadId": lead.thread, "turnId": lead.turn, "arguments": {"decision": decision}}
+        frame = ReceivedMessage(1, {"method": "item/tool/call", "params": params})
+        response = s.roots._callback(frame)
+        self.assertFalse(response["success"])
+        self.assertEqual(s.roots._callback(frame), response)
+        message = json.loads(response["contentItems"][0]["text"])
+        self.assertEqual(message["reason"], "endpoint_use_unspecified")
+        saved, = s.conn.execute("SELECT result_json FROM p0_root_calls WHERE thread_id=? AND call_id=?",
+                                (lead.thread, params["callId"])).fetchone()
+        details = json.loads(saved)["decision_refusal"]["details"]
+        self.assertEqual(set(details["source_refs"]), set(missing))
+        for reference in outputs | set(s.materials) | {report_ref} | {m["metric_ref"] for m in metrics}:
+            self.assertNotIn(reference, response["contentItems"][0]["text"])
+        self.assertEqual(message.get("field"), "evidence_refs[2]")
+        self.assertEqual(details.get("field"), message["field"])
 
     def test_single_display_is_received_before_a_cited_close(self):
         directory, (s, assets, _, node, output, worker) = self.measured()

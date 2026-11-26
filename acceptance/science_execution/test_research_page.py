@@ -7,6 +7,33 @@ from gx_core.p0 import research_page, research_report
 
 
 class ResearchPage(unittest.TestCase):
+    def test_short_close_keeps_a_numeric_recommendation_and_enacted_multimethod_work(self):
+        def decision(event, ops, methods, reports):
+            return {"event_id":event, "operations":[{"op":op} for op in ops],
+                    "metric_refs":methods, "report_events":list(reports), "report_statuses":reports,
+                    "jobs":[{"job_id":"new"}] if "add_node" in ops else [], "objectives":["Read the affected pair."],
+                    "rendered_rationale":"We selected two measurements to distinguish the alternatives."}
+        methods = [{"method":{"id":name}, "outputs":[{"artifact_ref":name, "metrics":[{"metric_ref":name}]}]}
+                   for name in ("geometry","interface")]
+        close_reason = "One cohort supports a narrower conclusion."
+        finding = "The contrast was 0.24 Å. The two groups should be reported separately."
+        result = {"goal":"How do these groups compare?", "closure":{"committed_event":80,"closed_event":82},
+                  "final_decision":{"rendered":{"reason":close_reason,"rationale":"An early observation. "*80+"\n\n"+finding,
+                                               "unresolved":["Missing coverage."]}}, "predictions":[], "jobs":methods,
+                  "materials":[], "rejected_decisions":[],
+                  "post_read_actions":[decision(10,[],["geometry"],{}),decision(20,["stop_branch"],["geometry"],{}),
+                                       decision(40,["add_node"],[],{25:"ENACTED"}),
+                                       decision(70,["stop_branch","add_node"],["geometry","interface"],{35:"ENACTED"})]}
+        page = research_page.page(result)
+        self.assertTrue(page.startswith("# Research findings\n\n"+close_reason))
+        self.assertIn(finding,page)
+        self.assertIn("geometry + interface",page)
+        self.assertIn("- 40 ",page)
+        self.assertIn("- 70 ",page)
+        self.assertNotIn("- 10 ",page)
+        self.assertNotIn("- 20 ",page)
+        self.assertLess(len(page),1200)
+
     def test_original_counterexample_remains_visible_after_a_retrospective_rewrite(self):
         reading = {"artifact_ref":"output", "value":0, "unit":"1",
                    "denominators":{"blocks_missed_observed":0, "blocks_evaluable":13}}

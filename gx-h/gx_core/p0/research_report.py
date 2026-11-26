@@ -138,7 +138,10 @@ def _decisions_after_reading(conn, rid, close, work, cache):
                  FROM v6_nodes n LEFT JOIN jobs j ON n.job_id=j.job_id WHERE n.run_id=? AND n.decision_ref=?
                  ORDER BY n.rowid""", (rid, ref))]
         operations = [op["spec"] for op in receipt.get("resolved_ops", [])]
-        objectives = [op.get("question") or op.get("reason") for op in operations]
+        launched = {n["node_id"] for n in nodes if n["job_id"]}
+        objectives = [op.get("question") for op in operations if op.get("node") in launched]
+        if not any(objectives):
+            objectives = [op.get("question") or op.get("reason") for op in operations]
         actions.append({"decision_ref":ref, "event_id":receipt["event_id"], "scope":row["scope"],
                         "outcome":receipt.get("outcome"), "metric_refs":metrics, "report_events":sorted(reports.get(ref, ())),
                         "report_statuses":reports.get(ref, {}),

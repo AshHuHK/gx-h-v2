@@ -1,17 +1,20 @@
 """Register original-bound PCNA endpoints and run the installed Jobs on frozen calibrations."""
 
+import contextlib
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from acceptance.v62a.interleavings_fixture import PRODUCT, draft
 from acceptance.v622.test_close import CloseStudy
 from acceptance.v623 import test_close_metrics
 from gx_core.artifacts import ArtifactService
-from gx_core.p0 import manifest, v6_goal, v621_metrics
+from gx_core.p0 import cli, manifest, v621_metrics
 
 
 PLUGIN = "org.gx.pcna-structure@1.0.0"
@@ -28,10 +31,9 @@ GEOMETRY_PARAMETERS = {"mask": "common_ca", "endpoint": "angle_deg", "effect_min
 def prediction(source, entry, capability, output, metric, unit, parameters):
     pair = {"12": "first and second", "23": "second and third"}[parameters["pair"]]
     region = "whole chains" if parameters["block_index"] == -1 else "first label window"
-    scope = f"{entry} deposited PCNA trimer, {pair} subunits, {region}."
-    return {"statement": f"The measured {metric} is positive in {scope}",
+    return {"statement": f"The measured {metric} is positive for the {pair} subunits of {entry} in the {region}.",
             "rationale": "Test the value on the specified deposited coordinates.",
-            "criteria": "Apply {{criterion}} to the declared output.", "scope": scope,
+            "criteria": "Apply {{criterion}} to the declared output.",
             "limitations": "A measurement on one deposited asymmetric unit.",
             "evidence_refs": [source], "level": "open",
             "prediction": {"target": "analysis", "data_refs": [source], "observable": "/metrics/" + metric,
@@ -45,18 +47,31 @@ class NativePCNA(unittest.TestCase):
         subdir, digest = MATERIALS[entry]
         path = PRODUCT / "examples" / "pcna" / subdir / (entry + ".cif")
         self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
-        settings = {"research_effort": "deep", "research_modules": [], "plugins": [PLUGIN],
-                    "capabilities": [capability], "input_files": [{"role": "structure", "path": str(path)}]}
+        descriptor = path.with_suffix(".json")
+        applicability = json.loads(descriptor.read_bytes())["applicability"]
+        settings = {"project": "pcna-native-calibration", "research_effort": "deep", "plugins": [PLUGIN],
+                    "capabilities": [capability], "input_files": [{"role": "structure", "path": str(path),
+                    "acquisition": str(descriptor), "sha256": digest}]}
         parameters = {"pair": "12", "block_index": -1}
         if capability == GEOMETRY:
             parameters.update(GEOMETRY_PARAMETERS)
             output, table, metric, unit = "geometry.json", "geometry-table.json", "baseline_pair_deg", "deg"
         else:
             output, table, metric, unit = "interface.json", "interface-table.json", "n_contact_residue_pairs", "pairs"
-        with tempfile.TemporaryDirectory() as tmp, CloseStudy(Path(tmp) / "goal", spec_updates=settings) as s:
+        with contextlib.ExitStack() as stack:
+            work = Path(stack.enter_context(tempfile.TemporaryDirectory()))
+            grant = work / "grant.json"
+            grant.write_text(json.dumps(settings))
+            # Admit via ordinary research with its acquisition descriptors; supply scripted transport
+            # after admission so the original frozen Lead brief contains the original applicability.
+            with patch.object(cli, "run_until_stopped", side_effect=lambda conn, args, rid, timeout: cli.snapshot(conn, rid)), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(cli.main(["research", "--state", str(work / "state"), "--run-key", "known-calibration",
+                                           "--goal", "Measure the registered endpoint on deposited human PCNA.",
+                                           "--goal-config", str(grant)]), 0)
+            s = stack.enter_context(CloseStudy(work, reopen=True))
+            s.next_actor("run")
             source, = s.materials
-            v6_goal.record_observation(s.conn, s.run_id, source, source=entry,
-                                       acquisition=json.loads(path.with_suffix(".json").read_bytes()))
             claim = prediction(source, entry, capability, output, metric, unit, parameters)
             first = s.call(s.lead, "gx_stage_claim", claim, "register")["claim_ref"]
             branch = {"op": "open_branch", "branch": "local:pcna", "hypothesis": claim["statement"],
@@ -72,6 +87,7 @@ class NativePCNA(unittest.TestCase):
             revision, = adopted["claim_revisions"]
             reg = revision["maturity"]["registration"]
             pin = reg["method_pin"]["measurement_spec"]
+            self.assertEqual(pin["applicability"], applicability)
             self.assertEqual((pin["capability"], pin["input_role"], pin["parameters"], pin["output_name"],
                               pin["metric_id"], pin["unit"]), (capability, "structure", parameters, output, metric, unit))
             self.assertEqual([d["artifact_ref"] for d in reg["data"]], [source])
@@ -129,7 +145,7 @@ class NativePCNA(unittest.TestCase):
             latest, = s.brief(actor)["claims"]
             coverage, = latest["maturity"]["material_coverage"]
             available = coverage["endpoint_first_available_event_id"]
-            self.assertEqual(coverage["qualification"], "prospective")
+            self.assertEqual(coverage["qualification"], "prospective", latest["maturity"]["gaps"])
             self.assertLess(submitted["event_id"], available)
             self.assertEqual(latest["maturity"]["direction"], "supported" if summary[metric] > 0 else "opposed")
             start = 0

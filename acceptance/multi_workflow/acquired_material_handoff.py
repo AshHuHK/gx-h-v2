@@ -7,12 +7,13 @@ from pathlib import Path
 import subprocess
 import sys
 
-from acceptance.v621.test_verified_metrics import METHOD
 from acceptance.v622.test_close import CloseStudy, actual_packet, close_decision
 from acceptance.v62a.interleavings_fixture import PRODUCT, draft, save
 from gx_core.artifacts import ArtifactService
+from gx_core.domain import ids
 from gx_core.p0 import manifest, v62_outputs
 
+METHOD = "deposited-chain-geometry@2"
 SEARCH = "pcna-archive-search@1"
 FETCH = "pcna-archive-fetch@1"
 ENTRY = "1VYM"
@@ -169,20 +170,35 @@ def check(directory, control):
         assert downstream["common_ca"]["selected"] > downstream["ordered_backbone"]["selected"]
         reports = [item["report"] for item in downstream.values()]
         reviewer = receive_reports(study, reports)
+        conclusion = close_decision(reports)
+        conclusion["metric_refs"] = []
+        conclusion["rationale"] = "The common alpha-carbon mask covers more deposited residues than the ordered-backbone mask."
         for ref in reports:
-            view = study.call(reviewer, "gx_read_artifact", {"ref": ref}, "read-" + ref)
-            assert any(m["metric_id"] == "coverage" for m in view["metrics"])
-        close = study.call(reviewer, "gx_decide_revision", {"decision": close_decision(reports)}, "close-control")
+            request = {"ref": ref, "endpoint_offset": 0}
+            call = "read-" + ref
+            page = study.call(reviewer, "gx_read_artifact", request, call)
+            study.roots.delivery.observe("item/completed", {"threadId": reviewer.thread, "turnId": reviewer.turn,
+                "item": {"type": "dynamicToolCall", "tool": "gx_read_artifact", "id": call, "arguments": request,
+                         "status": "completed", "success": True, "contentItems": [
+                             {"type": "inputText", "text": ids.canonical_json(page)}]}})
+            row, = [r for r in page["endpoint_rows"] if r["id"] == "coverage"]
+            conclusion["metric_refs"].append(ref + "#" + row["key"])
+        close = study.call(reviewer, "gx_decide_revision", {"decision": conclusion}, "close-control")
+        assert len(close["endpoint_use"]["used_metric_refs"]) == 2
         study.advance()
         assert study.rows("SELECT status FROM v6_goals WHERE run_id=?", run_id) == [{"status": "CLOSED"}]
-        jobs = study.rows("SELECT job_id,status FROM jobs WHERE run_id=? ORDER BY rowid", run_id)
+        jobs = study.rows("SELECT job_id,capability_id,capability_version,status,submitted_at,finished_at "
+                          "FROM jobs WHERE run_id=? ORDER BY rowid", run_id)
+        binding, = study.conn.execute("SELECT json_extract(inputs_json,'$.plugin_binding') FROM runs "
+                                      "WHERE run_id=?", (run_id,)).fetchone()
         assert len(jobs) == 4 and all(job["status"] == "SUCCEEDED" for job in jobs), jobs
         copies = study.rows("SELECT artifact_ref FROM artifacts WHERE run_id=? AND sha256=? AND published=1", run_id, digest)
         assert copies == [{"artifact_ref": original}], copies
         result = {"run_id": run_id, "entry": ENTRY, "transport": "real archive Jobs using Clash HTTP CONNECT "
                   "127.0.0.1:7890; native actor replies scripted", "model_calls": 0, "initial_materials": initial,
                   "archive": transfer, "descriptor": metadata, "original_classification": fact, "lead": lead_brief,
-                  "downstream": downstream, "closure": close["decision_ref"], "jobs": jobs}
+                  "downstream": downstream, "closure": close["decision_ref"],
+                  "used_endpoints": close["endpoint_use"]["used_metric_refs"], "admitted_plugins": json.loads(binding)["packages"], "jobs": jobs}
     replay = list(argv)
     replay[3] = "research"
     done = subprocess.run(replay, env={**os.environ, "GX_CODEX_OFFLINE": "1"}, capture_output=True, text=True,

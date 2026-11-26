@@ -41,9 +41,21 @@ bin/gx-p0 research --state ./runs/pcna --run-key pcna-first-01 \
 
 中断后重发原命令，沿用原状态目录、run key、问题卡、grant 和宿主会话。`--timeout` 接受正秒数，只限制本次驱动；退出码 75 时保留当前进度。`bin/gx-p0 status --state ./runs/pcna` 可查看等待的工作。结题后重发原命令会从已采纳的关闭决定导出 `./runs/pcna/research/<run_id>/REPORT.md` 与 `result.json`。比较两次输出中的 `run_id`，结题重开的 `invocation.action` 应为 `export_closed`，`invocation.added.jobs` 与 `invocation.added.host_turns` 均应为 0。
 
+## 自主选材的 PCNA 调查
+
+从一个人 PCNA 的 UniProt accession 和方法卡开始，Lead 自己选择材料、分工及复核。归档检索和获取各作为普通 Job 运行。取得的 mmCIF、采集摘要和下游原件引用保存在同一研究目录；分散删点对照、界面接触和溶剂可及面积各有具名输出。估计结合伙伴与不对称的联系时，应保留伙伴未知、模板依赖和残基映射的不确定性。[科学问题与方法卡](../../examples/pcna-survey/methods.md)
+
+```bash
+bin/gx-p0 research --state ./runs/pcna-survey --run-key pcna-survey-01 \
+  --goal-file examples/pcna-survey/question.md \
+  --goal-config examples/pcna-survey/goal.json --research-effort medium
+```
+
+同一题中断后重发原命令。两个题目并行时分别指定状态目录；每个目录独立计算资源准入，部署者须给两次运行留出总容量。结题使用 GX 自动生成的 `REPORT.md` 阅读结论，用同目录的 `result.json` 查询逐次判决、采集记录和读数后的行动。
+
 ## 本地聚焦复验
 
-以下命令在已激活的虚拟环境中运行。输出写入新的临时验证目录，离线模式只在子 shell 中生效。CPU 并发验证需要进程实际获配至少两个可用逻辑 CPU。
+以下命令在已激活的虚拟环境中运行。输出写入新的临时验证目录，离线模式只在子 shell 中生效。双 CPU 验证需要 GX 能同时准入两个线程。默认额度比例为 0.5，此时 cgroup 至少须有 4 CPU 的配额（未设配额时取逻辑 CPU 数），进程亲和范围和 worker pool 也都至少为 2。
 
 ```bash
 gx_check_dir=$(mktemp -d)

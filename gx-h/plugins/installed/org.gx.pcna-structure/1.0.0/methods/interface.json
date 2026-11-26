@@ -1,0 +1,116 @@
+{
+  "manifest": {
+    "capability_id": "pcna-interface",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--structure",
+        "{in.structure}",
+        "--selection",
+        "{data.0}",
+        "--pair",
+        "{param.pair}",
+        "--block-index={param.block_index}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "interface_contacts_and_burial",
+      "objective": "Compare the three PCNA subunit interfaces, locate local contacts and solvent-accessible area buried in the deposited coordinates.",
+      "mechanism": "Use model 1 and the unique three-chain human P12004 entity, in sorted label chain order. Pair 12, 23 or 31 follows that order. Count a unique residue pair once if any observed non-hydrogen atom pair lies within 4.0 Å. Use Biopython ShrakeRupley with a 1.4 Å probe and 100 points per atom. Sum the SASA losses of both isolated chains upon forming the binary complex. Partner molecules and the third PCNA chain are excluded from this calculation.",
+      "estimator": "block_index=-1 gives the whole interface; 0 denotes label_seq_id 1–20. A contact belongs to a window when either residue lies there. Local buried area sums losses on atoms in that window. Report the two observed residue counts. A window missing a chain is not measurable. interface-table.json includes all three pairs and all windows from one Job. For a verified scalar in a different scope request its pair and window explicitly; all previously published table cells are existing evidence.",
+      "training_data_lineage": "Deterministic analysis of a single wwPDB deposition, without a trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.pcna-structure/1.0.0/job-scripts/interfaces.py",
+      "sha256": "f01e99343b580eb99ecd8aab6bbace0c999c016bcf72c3cb319fc3a4c4c31c01"
+    },
+    "licence": "GX release source; public depositions retain their own terms.",
+    "licence_basis": "Uses Bio.PDB from the locked Biopython distribution.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 180
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.pcna-structure/1.0.0/job-scripts/pcna_selection.py"
+    ],
+    "outputs": [
+      {
+        "name": "interface.json",
+        "kind": "file:pcna_interface",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "n_contact_residue_pairs": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/n_contact_residue_pairs",
+            "unit": "pairs",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "entity": "/label_entity",
+              "model": "/model",
+              "pair": "/pair",
+              "left": "/chain_left",
+              "right": "/chain_right",
+              "block_index": "/block_index"
+            }
+          },
+          "buried_area_A2": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/buried_area_A2",
+            "unit": "Å²",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "entity": "/label_entity",
+              "model": "/model",
+              "pair": "/pair",
+              "left": "/chain_left",
+              "right": "/chain_right",
+              "block_index": "/block_index"
+            }
+          }
+        },
+        "sufficient_outputs": [
+          {
+            "capability": "pcna-interface@1",
+            "output": "interface-table.json",
+            "input_role": "structure",
+            "match_parameters": []
+          }
+        ]
+      },
+      {
+        "name": "interface-table.json",
+        "kind": "file:pcna_interface_table",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ]
+      }
+    ],
+    "limitations": "Observed asymmetric-unit contacts and pairwise surface burial depend on model completeness and selected conformers. Small SASA differences depend on sphere discretization. Contact entries in distinct windows may overlap. These measurements do not estimate binding energy or establish a causal effect of a partner.",
+    "parameter_defaults": {
+      "pair": "12",
+      "block_index": -1
+    }
+  },
+  "entry_script": "job-scripts/interfaces.py"
+}

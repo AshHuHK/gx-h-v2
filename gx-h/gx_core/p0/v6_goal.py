@@ -227,7 +227,7 @@ def _is_json_artifact(meta):
     )
 
 
-def record_observation(conn, run_id, artifact_ref, *, source, scope="run", observation=None, acquisition=None, prepared_identity=None):
+def record_observation(conn, run_id, artifact_ref, *, source, scope="run", observation=None, acquisition=None, prepared_identity=None, acquired_receipt=None):
     """Record a citation to verified, run-local material in its original media type."""
     assets = ArtifactService(conn)
     meta = assets.describe(artifact_ref)
@@ -251,7 +251,13 @@ def record_observation(conn, run_id, artifact_ref, *, source, scope="run", obser
         if not verified["ok"]:
             raise SchemaInvalid("Observation bytes differ from the registered artifact", details=verified)
     payload = {"source": source, "artifact_ref": artifact_ref, "scope": scope, "sha256": meta["sha256"]}
-    if acquisition is not None:
+    if acquired_receipt is not None:
+        provenance = acquired_receipt.get("archive_job") or {}
+        if (meta["job_id"] != provenance.get("job_id") or acquired_receipt.get("artifact_ref") != artifact_ref
+                or acquired_receipt.get("sha256") != meta["sha256"]):
+            raise SchemaInvalid("The acquisition receipt belongs to a different Job output")
+        payload["acquisition"] = acquired_receipt
+    elif acquisition is not None:
         from . import v62_outputs
         payload["acquisition"] = v62_outputs.acquisition_receipt(conn, run_id, artifact_ref, acquisition, scope=scope,
                                                                       source_id=source, prepared_identity=prepared_identity)

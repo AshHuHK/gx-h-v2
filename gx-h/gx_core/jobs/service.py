@@ -1956,7 +1956,7 @@ class JobService:
                 runner_hashes = {f["path"]: f.get("sha256") for f in outcome.get("files", ()) if "path" in f}
                 for item in raw_outputs:
                     artifact = self._publish_copy(namespace, item["rel_path"], item["artifact_kind"],
-                                                  Path(item["path"]), common, item["name"])
+                                                  Path(item["path"]), {**common, "media_type": item.get("media_type")}, item["name"])
                     published.append({"output_name": item["name"], "artifact_ref": artifact.artifact_ref,
                                       "kind": item["artifact_kind"], "sha256": artifact.sha256,
                                       "bytes": artifact.bytes, "validated": False,
@@ -2143,7 +2143,7 @@ class JobService:
                 continue
             kind = output["kind"].split(":", 1)[1] if ":" in output["kind"] else "job_output_file"
             raw.append({"name": output["name"], "path": str(path), "rel_path": f"files/{output['name']}",
-                        "artifact_kind": kind})
+                        "artifact_kind": kind, "media_type": output.get("media_type")})
 
         documents_out: dict[str, Any] = {}
         validated: dict[str, bool] = {}

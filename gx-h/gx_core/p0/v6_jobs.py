@@ -9,6 +9,8 @@ from ..capabilities import environments, manifest, registry, shipped, storage
 from ..domain import clock, ids, machines
 from ..errors import (
     ApprovalRequired,
+    ArtifactHashMismatch,
+    ArtifactNotFound,
     BudgetExceeded,
     DependencyUnmet,
     EnvNotReady,
@@ -18,6 +20,7 @@ from ..errors import (
     PhaseDenied,
     ResourceDenied,
     SchemaInvalid,
+    ScopeDenied,
 )
 from ..jobs import cpu_queue
 from ..jobs.service import JobService, PURPOSE_WORKFLOW, TERMINAL
@@ -399,6 +402,15 @@ def _consume(conn, node):
 
 
 def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_status=None, reason=None, evidence=None, condition=None, dependency=None):
+    from . import acquired_material
+    acquisition = None
+    if status in ("SUCCEEDED", "REUSED") and job_id and node["status"] != "CANCEL_REQUESTED":
+        try:
+            acquisition = acquired_material.prepare(conn, node, job_id)
+            if acquisition:
+                result = acquisition["artifact_ref"]
+        except (ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, ScopeDenied, ValueError, KeyError) as exc:
+            status, result, reason = "FAILED", None, f"Archive acquisition could not be verified: {exc}"
     with _tx(conn, node["run_id"], "settle_node") as tx:
         current = _node(tx, node["run_id"], node["node_id"])
         if current["status"] in NODE_TERMINAL:
@@ -426,6 +438,8 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
         )
         tx.execute("UPDATE v6_job_attempts SET reused_from=? WHERE node_id=?", (source, node["node_id"]))
         _consume(tx, node)
+        if acquisition and status in ("SUCCEEDED", "REUSED"):
+            acquired_material.attach(tx, current, acquisition)
         store.append_event(
             tx,
             kind="v6.node.settled",

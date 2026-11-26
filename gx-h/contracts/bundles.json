@@ -574,9 +574,15 @@
       "kind": "str",
       "required": "bool",
       "nature": "enum:output_nature?",
+      "media_type": "str?",
       "source_roles": "array<str>?",
       "metric_specs": "object?",
-      "sufficient_outputs": "array<SufficientOutput>?"
+      "sufficient_outputs": "array<SufficientOutput>?",
+      "acquired_material": "AcquiredMaterial?"
+    },
+    "AcquiredMaterial": {
+      "role": "str",
+      "metadata_output": "str"
     },
     "SufficientOutput": {
       "capability": "str",

@@ -140,7 +140,7 @@ def _known_derivative_or_fixture(conn, digest, cursor):
         "LIMIT 1", (cursor, digest)).fetchone() is not None
 
 
-def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run", source_id="", prepared_identity=None):
+def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run", source_id="", prepared_identity=None, acquired_job=None):
     """The trusted observation ingress binds source-owner metadata to exact ingested bytes."""
     from . import v621_policy, v622_sources
     governed = v621_policy.current(conn, run_id)
@@ -151,9 +151,13 @@ def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run",
         raise SchemaInvalid("Acquisition describes data, acquisition, sample, source, publication, processing, "
                             "sampling, applicability and data_refs")
     pub = _publication(conn, run_id, artifact_ref)
-    if pub["origin"] != "INGEST" or pub["job_id"] or pub["task_id"] or pub["kind"] in FIXTURES:
+    if acquired_job is not None:
+        if (pub["origin"] != "JOB_OUTPUT" or pub["job_id"] != acquired_job["job_id"] or
+                artifact_ref != acquired_job["artifact_ref"] or pub["sha256"] != acquired_job["sha256"]):
+            raise SchemaInvalid("The original must be the verified coordinate output of its acquisition Job")
+    elif pub["origin"] != "INGEST" or pub["job_id"] or pub["task_id"] or pub["kind"] in FIXTURES:
         raise SchemaInvalid("Only original ingested measurements may receive an acquisition receipt")
-    if _known_derivative_or_fixture(conn, pub["sha256"], pub["event_id"]):
+    elif _known_derivative_or_fixture(conn, pub["sha256"], pub["event_id"]):
         raise SchemaInvalid("The same bytes were already published as a Job, host output or fixture; cite that original")
     assets = ArtifactService(conn)
     from .v6_goal import _is_json_artifact
@@ -235,6 +239,8 @@ def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run",
         elif identity["artifact_sha256"] != pub["sha256"]:
             raise SchemaInvalid("Source identity proof refers to another artifact")
     return {"schema": "gx.acquisition/1", **_pin(artifact_ref, pub["sha256"]), "dependencies": deps,
+            **({"archive_job": {k: acquired_job[k] for k in ("job_id", "descriptor_ref", "completion_sha256")}}
+               if acquired_job is not None else {}),
             **({"source_identity": identity} if identity is not None else {}),
             "unknown_dependencies": unknown, "applicability": applicability, "measurement_schema": measurement_schema,
             "data_refs": _unique_pins(inputs),
@@ -249,11 +255,11 @@ def _base(conn, ref, pub):
             "independence_complete": False, "reason": "No pinned declaration or original acquisition receipt"}
 
 
-def _observation(conn, run, ref, pub, scope, cursor, result, read):
+def _observation(conn, run, ref, pub, scope, cursor, result, read, *, archive_job=None):
     if pub["kind"] in FIXTURES or pub["source_role"] in {"fixture", "test_fixture", "synthetic_fixture"}:
         result.update(record_kind="test_fixture", reason="Original publication identifies a test fixture")
         return
-    if pub["origin"] != "INGEST" or pub["task_id"]:
+    if archive_job is None and (pub["origin"] != "INGEST" or pub["task_id"]):
         return
     records = conn.execute(
         "SELECT event_id,payload_json FROM events WHERE run_id=? AND kind='v6.observation.added' AND event_id<=? "
@@ -267,6 +273,8 @@ def _observation(conn, run, ref, pub, scope, cursor, result, read):
         if (receipt.get("schema") not in {"gx.acquisition/1", "gx.acquisition/2"} or receipt.get("artifact_ref") != ref
                 or event["sha256"] != pub["sha256"] or receipt.get("sha256") != pub["sha256"]):
             raise SchemaInvalid("Acquisition receipt identifies different measurement bytes")
+        if archive_job is not None and (receipt.get("archive_job") or {}).get("completion_sha256") != archive_job:
+            continue
         versions.setdefault(ids.sha256_of_obj(receipt), (row["event_id"], receipt))
     if len(versions) != 1:
         if versions:
@@ -323,6 +331,7 @@ def _observation(conn, run, ref, pub, scope, cursor, result, read):
                   original_observations=_unique_pins(sources),
                   independence_complete=complete and len(scopes) == 1,
                   reason=("Versioned transformation of acquired input bytes" if derived else
+                          "Verified archive Job and acquisition receipt on the original bytes" if archive_job else
                           "Verified operator acquisition receipt on the original ingested bytes"))
 
 
@@ -355,8 +364,14 @@ def classify(conn, run_id, artifact_ref, *, scope="run", through_event=None):
             producer_scope = source_scope
             if frozen_scope:
                 producer_scope = record["admission"]["owner"].get("branch_id") or "run"
-            _classify_job(conn, run_id, pub, ref, record, result,
-                          lambda parent, at: read(parent, at, producer_scope))
+            def read_input(parent, at):
+                return read(parent, at, producer_scope)
+            _classify_job(conn, run_id, pub, ref, record, result, read_input)
+            from . import acquired_material
+            declaration = acquired_material.declared(record)
+            if declaration and result.get("output_name") == declaration["name"]:
+                _observation(conn, run_id, ref, pub, source_scope, cursor, result, read_input,
+                             archive_job=record["manifest_hash"])
         cache[key] = result
         return result
 

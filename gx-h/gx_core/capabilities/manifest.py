@@ -404,6 +404,14 @@ def _outputs_problems(manifest: Mapping[str, Any]) -> list[str]:
                     or not set(axes) <= set(parameter_names(manifest))):
                 found.append(f"outputs[{index}].sufficient_outputs needs a versioned producer, "
                              "named output, material role and distinct shared method parameters")
+        if acquired := output.get("acquired_material"):
+            others = [candidate for candidate in outputs if candidate["name"] == acquired["metadata_output"]
+                      and candidate["name"] != name and candidate["required"]]
+            if (not output["required"] or output.get("nature") != "observed" or not is_raw_output(output)
+                    or not acquired["role"].strip() or len(others) != 1
+                    or sum("acquired_material" in candidate for candidate in outputs) != 1):
+                found.append(f"outputs[{index}].acquired_material requires one observed raw original, "
+                             "a material role and a separate required metadata output")
         origins = output.get("source_roles")
         if origins is not None and (not output.get("nature") or not origins or len(origins) != len(set(origins))
                 or any(role not in roles and not (grouped and GROUPED_ROLE.fullmatch(role)) for role in origins)):

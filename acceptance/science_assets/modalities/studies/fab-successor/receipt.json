@@ -1,0 +1,471 @@
+{
+  "run_id": "gxr_01m8fe32rdt8mqrbaf",
+  "goal": "CLOSED",
+  "materials": [
+    {
+      "role": "structure",
+      "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+      "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+    },
+    {
+      "role": "numbering",
+      "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+      "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+    }
+  ],
+  "jobs": [
+    {
+      "node_id": "node_9d588107527ebbcb5464a103c03c0752",
+      "job_id": "gxj_01m8fe748m25bw7qaq",
+      "status": "SUCCEEDED",
+      "method": "archival-fab-coverage@1",
+      "depends_on": [],
+      "recipe_decision": {
+        "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b",
+        "recipe": "paired-fab-imgt-ca-coverage@1",
+        "step": "cdr_coverage"
+      },
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+          "bytes": 2560,
+          "role": "numbering",
+          "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+        },
+        {
+          "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+          "bytes": 104105,
+          "role": "structure",
+          "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+        }
+      ],
+      "manifest_hash": "87a03cf1c973a017dae16d2f971644fd67bfc5a24c21e5ffabc057586030397a",
+      "outputs": [
+        {
+          "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "sha256": "84cf172ea91d0b66d7b97fcda9d855c5b92176b648b42318dee070f79da89d91",
+          "output_name": "fab_coverage.json",
+          "kind": "archival_fab_coverage",
+          "nature": "analysis"
+        }
+      ],
+      "adopted_by": "gxa_70eadeb8795bd1a0799fb9941fa5a2493c02762ee79dc8e4f8ca73dcee38458c",
+      "selected_inputs": [
+        "gxa_01m8fe32t22ec6dfjs",
+        "gxa_01m8fe32sf8v42h2fd"
+      ],
+      "parameters": {},
+      "measurements": [
+        {
+          "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "summary": {
+            "entry": "1MCP",
+            "model": 1,
+            "input_sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+            "numbering_sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+            "mapped_regions": 6,
+            "mapped_positions": 55,
+            "matched_positions": 55,
+            "numbering_method": "ANARCI",
+            "numbering_version": "2026.2.13.2",
+            "scheme": "IMGT",
+            "chains": {
+              "VH": {
+                "cdr": {
+                  "CDR1": {
+                    "mapped_positions": 8,
+                    "matched_positions": 8
+                  },
+                  "CDR2": {
+                    "mapped_positions": 10,
+                    "matched_positions": 10
+                  },
+                  "CDR3": {
+                    "mapped_positions": 13,
+                    "matched_positions": 13
+                  }
+                },
+                "chain_type": "H",
+                "label_asym_id": "B"
+              },
+              "VL": {
+                "cdr": {
+                  "CDR1": {
+                    "mapped_positions": 12,
+                    "matched_positions": 12
+                  },
+                  "CDR2": {
+                    "mapped_positions": 3,
+                    "matched_positions": 3
+                  },
+                  "CDR3": {
+                    "mapped_positions": 9,
+                    "matched_positions": 9
+                  }
+                },
+                "chain_type": "K",
+                "label_asym_id": "A"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "release_events": [
+    {
+      "event_id": 189,
+      "node": "node_9d588107527ebbcb5464a103c03c0752",
+      "type": "v6.node.settled"
+    }
+  ],
+  "recipe_expansions": [
+    {
+      "thread_id": "01a21ee1-92fe-7ce0-981a-dc6faf29e4ec",
+      "turn_id": "01a21ee1-9337-7461-b607-7d55731f15b7",
+      "call_id": "exec-a973061c-293f-4489-bd48-4b40b8fedeaf",
+      "recipe": "paired-fab-imgt-ca-coverage@1",
+      "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b",
+      "ops": [
+        {
+          "branch": "1mcp-coverage",
+          "capability": "archival-fab-coverage@1",
+          "depends_on": [],
+          "independent_repeat": true,
+          "inputs": [
+            "gxa_01m8fe32t22ec6dfjs",
+            "gxa_01m8fe32sf8v42h2fd"
+          ],
+          "node": "local:1mcp-cdr_coverage",
+          "op": "add_node",
+          "parameters": {},
+          "question": "Apply archival-fab-coverage@1 to the named inputs of this Goal.",
+          "recipe_decision": {
+            "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b",
+            "recipe": "paired-fab-imgt-ca-coverage@1",
+            "step": "cdr_coverage"
+          }
+        }
+      ]
+    }
+  ],
+  "lead_points": [
+    {
+      "task_id": "gxt_01m8fe8877ap55jm57",
+      "points": [
+        {
+          "actions": [
+            "Use all assigned sites in a fully covered loop, intersecting the IMGT identifiers with the comparison structure.",
+            "For a partial loop, establish the identities of observed sites before comparing the shared subset."
+          ],
+          "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b",
+          "event": "job_settled",
+          "evidence": {
+            "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+            "kind": "archival_fab_coverage",
+            "nature": "analysis",
+            "output_name": "fab_coverage.json",
+            "sha256": "84cf172ea91d0b66d7b97fcda9d855c5b92176b648b42318dee070f79da89d91"
+          },
+          "job_id": "gxj_01m8fe748m25bw7qaq",
+          "node_id": "node_9d588107527ebbcb5464a103c03c0752",
+          "output": "fab_coverage.json",
+          "question": "Which assigned sites are eligible for a Cα comparison after checking the counts for each chain and CDR?",
+          "recipe": "paired-fab-imgt-ca-coverage@1",
+          "role": "run_lead",
+          "state": "read_and_decide",
+          "step": "cdr_coverage",
+          "stop_condition": "Stop when the Cα comparison scope is documented for each CDR or when a source, pairing or site ambiguity prevents it."
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "decision_ref": "gxa_70eadeb8795bd1a0799fb9941fa5a2493c02762ee79dc8e4f8ca73dcee38458c",
+      "turn_id": "01a21ee1-9337-7461-b607-7d55731f15b7",
+      "rationale": "Run the archived paired-Fab procedure on the 1MCP originals to test complete Cα coverage. Comparing matched and assigned counts within each IMGT CDR will show which loops can enter a comparison across their shared sites.",
+      "evidence_refs": [
+        "gxa_01m8fe32t22ec6dfjs",
+        "gxa_01m8fe32sf8v42h2fd",
+        "gxa_01m8fe569zmc91serr"
+      ],
+      "ops": [
+        "open_branch",
+        "add_node"
+      ],
+      "outcome": "adopted"
+    },
+    {
+      "decision_ref": "gxa_3851d582da520d381a8720329c5a177862879dbf438b17c619f0760a2cc09346",
+      "turn_id": "01a21ee3-921a-7881-a110-9f9c1be88608",
+      "rationale": "The 1MCP annotation assigns 8, 10 and 13 IMGT positions to VH CDR1–3 and 12, 3 and 9 to VL CDR1–3. The commissioned job applies the archived paired-Fab procedure to this annotation and its source structure. Await its per-loop matched counts to identify any loop that requires a residue-level mask before comparison.",
+      "evidence_refs": [
+        "gxa_01m8fe32t22ec6dfjs",
+        "gxa_01m8fe32sf8v42h2fd",
+        "gxa_01m8fe569zmc91serr"
+      ],
+      "ops": [],
+      "outcome": "maintained"
+    },
+    {
+      "decision_ref": "gxa_565110d2df016a7921790d648c6c5f939fe8c796752728628e06ad0bef813001",
+      "turn_id": "01a21ee4-2149-74c0-a5ae-36849454854f",
+      "rationale": "The archived paired-fab-imgt-ca-coverage@1 procedure validated the supplied ANARCI IMGT map against 1MCP assembly 1 and counted positive-occupancy Cα sites in model 1. The map assigns 8, 10 and 13 positions to CDR1–3 of heavy label chain B and 12, 3 and 9 to CDR1–3 of κ light label chain A. In fab_coverage.json the matched count equals the assigned count within each of those loops, giving {{metric:matched_positions}} observed Cα sites among {{metric:mapped_positions}} assignments. Retain every loop and compare positions that share a domain, IMGT number and insertion label and have a Cα in both deposits. Repeating the same procedure would add no information about other backbone atoms.",
+      "evidence_refs": [
+        "gxa_01m8fe74x1xfrgk7r1",
+        "gxa_01m8fe32t22ec6dfjs",
+        "gxa_01m8fe32sf8v42h2fd"
+      ],
+      "ops": [
+        "close_run"
+      ],
+      "outcome": "adopted"
+    }
+  ],
+  "lead_turns": [
+    {
+      "thread_id": "01a21ee1-92fe-7ce0-981a-dc6faf29e4ec",
+      "turn_id": "01a21ee1-9337-7461-b607-7d55731f15b7",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21ee3-91e1-7bf3-bb5e-01cc9f3dd210",
+      "turn_id": "01a21ee3-921a-7881-a110-9f9c1be88608",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21ee4-2116-7800-9910-03568dc27180",
+      "turn_id": "01a21ee4-2149-74c0-a5ae-36849454854f",
+      "state": "acknowledged"
+    }
+  ],
+  "endpoint_deliveries": [
+    {
+      "event_id": 204,
+      "task_id": "gxt_01m8fe8877ap55jm57",
+      "thread_id": "01a21ee4-2116-7800-9910-03568dc27180",
+      "delivery_kind": "brief",
+      "sources": [
+        "gxa_01m8fe74x1xfrgk7r1"
+      ]
+    },
+    {
+      "event_id": 206,
+      "task_id": "gxt_01m8fe8877ap55jm57",
+      "thread_id": "01a21ee4-2116-7800-9910-03568dc27180",
+      "delivery_kind": "artifact_read",
+      "sources": [
+        "gxa_01m8fe74x1xfrgk7r1"
+      ]
+    }
+  ],
+  "catalog": [
+    {
+      "event_id": 154,
+      "kind": "all",
+      "query": "paired Fab IMGT variable domains CDR mapped positions positive occupancy C-alpha coverage archived recipe",
+      "total": 133,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-fab-coverage@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "recipe",
+          "reference": "paired-fab-imgt-ca-coverage@1",
+          "status": "requires_method"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-fold-calibration@1.0.0",
+          "reference": "mapped-structure-agreement@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-peptide-coverage@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-backbone-qc@1",
+          "status": "catalog_only"
+        }
+      ]
+    },
+    {
+      "event_id": 191,
+      "kind": "all",
+      "query": "paired Fab IMGT CDR Cα coordinate coverage using deposited mmCIF and numbering map to count matched and assigned positions per loop",
+      "total": 146,
+      "first_candidates": [
+        {
+          "kind": "recipe",
+          "reference": "paired-fab-imgt-ca-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-fab-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-fold-calibration@1.0.0",
+          "reference": "mapped-structure-agreement@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-peptide-coverage@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.1.0-v6.1",
+          "reference": "tl1a-review@1",
+          "status": "catalog_only"
+        }
+      ]
+    },
+    {
+      "event_id": 205,
+      "kind": "all",
+      "query": "paired Fab heavy and light chain IMGT CDR C-alpha coordinate coverage archived procedure shared positions",
+      "total": 140,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-fab-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "recipe",
+          "reference": "paired-fab-imgt-ca-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-backbone-qc@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-fold-calibration@1.0.0",
+          "reference": "mapped-structure-agreement@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "recipe",
+          "provider": null,
+          "reference": "fab-coverage-history@legacy",
+          "status": "reference_only"
+        }
+      ]
+    }
+  ],
+  "closure_event": 217,
+  "adopted_decision_events": [
+    {
+      "event_id": 170,
+      "subject_id": "gxa_70eadeb8795bd1a0799fb9941fa5a2493c02762ee79dc8e4f8ca73dcee38458c"
+    },
+    {
+      "event_id": 198,
+      "subject_id": "gxa_3851d582da520d381a8720329c5a177862879dbf438b17c619f0760a2cc09346"
+    },
+    {
+      "event_id": 216,
+      "subject_id": "gxa_565110d2df016a7921790d648c6c5f939fe8c796752728628e06ad0bef813001"
+    }
+  ],
+  "host": "Existing official Codex OAuth through Clash; admitted native turn IDs, including modules.",
+  "native_turns": [
+    {
+      "thread_id": "01a21ee1-92fe-7ce0-981a-dc6faf29e4ec",
+      "turn_id": "01a21ee1-9337-7461-b607-7d55731f15b7",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21ee3-91e1-7bf3-bb5e-01cc9f3dd210",
+      "turn_id": "01a21ee3-921a-7881-a110-9f9c1be88608",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21ee4-2116-7800-9910-03568dc27180",
+      "turn_id": "01a21ee4-2149-74c0-a5ae-36849454854f",
+      "scope": "run"
+    }
+  ],
+  "recipes_published_from_run": [],
+  "native_recipe_calls": [
+    {
+      "thread_id": "01a21ee1-92fe-7ce0-981a-dc6faf29e4ec",
+      "call_id": "exec-a973061c-293f-4489-bd48-4b40b8fedeaf",
+      "turn_id": "01a21ee1-9337-7461-b607-7d55731f15b7",
+      "request": {
+        "arguments": {
+          "branch": "1mcp-coverage",
+          "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b",
+          "independent_repeat": true,
+          "inputs": {
+            "numbering": "gxa_01m8fe32t22ec6dfjs",
+            "structure": "gxa_01m8fe32sf8v42h2fd"
+          },
+          "prefix": "1mcp",
+          "recipe": "paired-fab-imgt-ca-coverage@1"
+        },
+        "callId": "exec-a973061c-293f-4489-bd48-4b40b8fedeaf",
+        "threadId": "01a21ee1-92fe-7ce0-981a-dc6faf29e4ec",
+        "tool": "gx_instantiate_recipe",
+        "turnId": "01a21ee1-9337-7461-b607-7d55731f15b7"
+      },
+      "result": {
+        "decision_point": {
+          "actions": [
+            "Use all assigned sites in a fully covered loop, intersecting the IMGT identifiers with the comparison structure.",
+            "For a partial loop, establish the identities of observed sites before comparing the shared subset."
+          ],
+          "event": "job_settled",
+          "output": "fab_coverage.json",
+          "question": "Which assigned sites are eligible for a Cα comparison after checking the counts for each chain and CDR?",
+          "role": "run_lead",
+          "step": "cdr_coverage",
+          "stop_condition": "Stop when the Cα comparison scope is documented for each CDR or when a source, pairing or site ambiguity prevents it."
+        },
+        "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b",
+        "ops": [
+          {
+            "branch": "1mcp-coverage",
+            "capability": "archival-fab-coverage@1",
+            "depends_on": [],
+            "independent_repeat": true,
+            "inputs": [
+              "gxa_01m8fe32t22ec6dfjs",
+              "gxa_01m8fe32sf8v42h2fd"
+            ],
+            "node": "local:1mcp-cdr_coverage",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply archival-fab-coverage@1 to the named inputs of this Goal.",
+            "recipe_decision": {
+              "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b",
+              "recipe": "paired-fab-imgt-ca-coverage@1",
+              "step": "cdr_coverage"
+            }
+          }
+        ],
+        "recipe": "paired-fab-imgt-ca-coverage@1"
+      }
+    }
+  ]
+}

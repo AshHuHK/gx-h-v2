@@ -1,9 +1,11 @@
 """Verify PDBx/mmCIF archive identity and declared coordinate-record transformations."""
+from gzip import GzipFile
 from hashlib import sha256
-from io import StringIO
+from io import BytesIO, StringIO
 import json
 import re
 from urllib.parse import parse_qs, urlsplit
+from zlib import error as DeflateError
 
 from gx_core.errors import SchemaInvalid
 
@@ -160,6 +162,17 @@ def verify(media_type, labels, digest, read, parents, processing, transformation
     if not coordinate_file and not accessions:
         return None
     raw = read()
+    # Archive downloads may contain the original CIF in a gzip envelope. Only its
+    # identity is read from the expanded bytes. The receipt pins the supplied file.
+    if not parents and raw.startswith(b"\x1f\x8b"):
+        from gx_core.orchestration.service import MAX_COPIED_INPUT_BYTES
+        try:
+            with GzipFile(fileobj=BytesIO(raw), mode="rb") as compressed:
+                raw = compressed.read(MAX_COPIED_INPUT_BYTES + 1)
+        except (OSError, EOFError, DeflateError) as exc:
+            raise SchemaInvalid("Invalid gzip coordinate archive") from exc
+        if len(raw) > MAX_COPIED_INPUT_BYTES:
+            raise SchemaInvalid("Expanded coordinate archive exceeds the Goal input size bound")
     try:
         entry, doc = _entry_and_dictionary(raw)
     except SchemaInvalid:

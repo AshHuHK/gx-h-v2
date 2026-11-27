@@ -1,0 +1,3053 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8fdbhka9m2tahwb",
+  "goal": "A structural archive has supplied two representations of one published peptide. Can we use them interchangeably when counting explicitly recorded cyclic topology? Compare the original records and their coordinate coverage. State what changing the representation changes about the scientific conclusion and whether these materials constitute independent observations. Give the measured counts and supporting evidence.\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_a1aa1c3d7864b7dd4d4c8cdc2f838813c47e4d512ee7d7885d4af91d6be0f63a",
+    "op_digest": "245a028fa47fbf4621209f9b2f1ed7ff518da2502b84bc243c65acfc55c2b308",
+    "requested_event": 158,
+    "committed_event": 163,
+    "closed_event": 164,
+    "closed_utc": "2026-11-27T21:16:19.989Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8fdstfcytnfzr37",
+        "gxa_01m8fdtafkdd5ex6v9"
+      ],
+      "op": "close_run",
+      "reason": "The full file comparison identifies the deleted terminal connection, and the paired measurements establish the effect on closure counts, coordinate coverage and geometry. The provenance identifies a single deposition.",
+      "unresolved": []
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_a1aa1c3d7864b7dd4d4c8cdc2f838813c47e4d512ee7d7885d4af91d6be0f63a",
+    "task_id": "gxt_01m8fdmsqsm3snnsdd",
+    "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+    "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+    "rationale": "Use the deposited _struct_conn record for the explicit topology count. In chain A, covale2 links the GLN 8 carbonyl C to the DAR 1 backbone N. The original closure count is {{metric:gxa_01m8fdh986x2mj3jat:declared_closure}} and the derivative count is {{metric:gxa_01m8fdh99j68cpt4bc:declared_closure}}. Removing that single row reproduces the derivative byte for byte, including its entire _atom_site table. The terminal atoms map in {{metric:gxa_01m8fdh986x2mj3jat:mapped_models}}/{{metric:gxa_01m8fdh986x2mj3jat:model_count}} original models and {{metric:gxa_01m8fdh99j68cpt4bc:mapped_models}}/{{metric:gxa_01m8fdh99j68cpt4bc:model_count}} derivative models. The first-model C–N distances are {{metric:gxa_01m8fdh986x2mj3jat:model_1_distance_A}} and {{metric:gxa_01m8fdh99j68cpt4bc:model_1_distance_A}}, respectively. First-model residue coverage is {{metric:gxa_01m8fdh9ccpmq5kprr:coordinate_coverage}} and {{metric:gxa_01m8fdh9hx98fkvf5q:coordinate_coverage}}, with {{metric:gxa_01m8fdh9ccpmq5kprr:ca_count}} and {{metric:gxa_01m8fdh9hx98fkvf5q:ca_count}} Cα sites and {{metric:gxa_01m8fdh9ccpmq5kprr:complete_backbones}} and {{metric:gxa_01m8fdh9hx98fkvf5q:complete_backbones}} complete backbones. Substituting the derivative would miss the explicitly recorded closure. The files describe one published solution NMR ensemble. The deletion supplies no evidence of ring opening.",
+    "reason": "The full file comparison identifies the deleted terminal connection, and the paired measurements establish the effect on closure counts, coordinate coverage and geometry. The provenance identifies a single deposition.",
+    "unresolved": [],
+    "claim_refs": [
+      "gxa_01m8fdstfcytnfzr37",
+      "gxa_01m8fdtafkdd5ex6v9"
+    ],
+    "evidence_refs": [
+      "gxa_01m8fdbhmakbwwwe0c",
+      "gxa_01m8fdbhn2jacc87v1",
+      "gxa_01m8fdh986x2mj3jat",
+      "gxa_01m8fdh99j68cpt4bc",
+      "gxa_01m8fdh9ccpmq5kprr",
+      "gxa_01m8fdh9hx98fkvf5q"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_15d4e37d02b23ffbfddc1146a2fb1c26e4e2e0cfe6f8bf0ba4276220be76e46e",
+        "source_ref": "gxa_01m8fdh986x2mj3jat",
+        "event_id": 146,
+        "reading": {
+          "metric_id": "model_1_distance_A",
+          "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+          "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+          "job_id": "gxj_01m8fdh8bw8s4svfgr",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-macrocycle-qc",
+            "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+            "version": "1"
+          },
+          "admission_sha256": "873ecf3b9e276e6cb869de7d11e3e23574333a41fc1e8d328be529f9cd9eedb2",
+          "manifest_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+          "provenance_cursor": 72,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "angstrom",
+          "places": 3,
+          "selectors": {
+            "pointer": "/model_1_distance_A"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+          },
+          "value": 1.3351404420509458,
+          "raw_value": "1.3351404420509458",
+          "display": "1.335 angstrom",
+          "metric_ref": "metric_15d4e37d02b23ffbfddc1146a2fb1c26e4e2e0cfe6f8bf0ba4276220be76e46e"
+        }
+      },
+      {
+        "metric_ref": "metric_30fefd603384c0a9e98473bf7c8ea55deeecf2eff6966c9f1d0c33318dd900ee",
+        "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+        "event_id": 149,
+        "reading": {
+          "metric_id": "coordinate_coverage",
+          "artifact_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "sha256": "3f53fa9b01173c9ea0a1679e7fc73f832a0b5d7a4b0588a9cbf8a979bedfb633",
+          "job_id": "gxj_01m8fdh8ymrfaxa35b",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+            "version": "1"
+          },
+          "admission_sha256": "cd59d644e3f3e8d240b1faf8ce320b0bb81920a63a19a820ee50e567816015b4",
+          "manifest_sha256": "be4e2e270de18a20131d92788e96b3f399fa0c71fdd7a0ec53636930a66ea1db",
+          "provenance_cursor": 85,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "ratio/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 4,
+          "selectors": {
+            "numerator": "/observed_residues",
+            "denominator": "/declared_residues"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+            "model": 1
+          },
+          "value": 1,
+          "raw_value": "1",
+          "display": "8/8 (1.0000)",
+          "numerator": 8,
+          "denominator": 8,
+          "metric_ref": "metric_30fefd603384c0a9e98473bf7c8ea55deeecf2eff6966c9f1d0c33318dd900ee"
+        }
+      },
+      {
+        "metric_ref": "metric_35f7040582ac0364afff4358d191076f759bfae484a17758b28dcd27eb34a7e3",
+        "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+        "event_id": 147,
+        "reading": {
+          "metric_id": "coordinate_coverage",
+          "artifact_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "sha256": "c48807bead61b6bad3da91f95f38c8ede0885a376b30a2de0bf14637f32f348f",
+          "job_id": "gxj_01m8fdh8rephz89cke",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+            "version": "1"
+          },
+          "admission_sha256": "3c301d242f7de821a9807fe996dca75c5eb8c9dcf8a44bc76160e7267539a8a7",
+          "manifest_sha256": "2650a9bff06c8333f375de3fd4e84c1603cb12485aabc0cdb9c67b0895e14d7d",
+          "provenance_cursor": 81,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "ratio/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 4,
+          "selectors": {
+            "numerator": "/observed_residues",
+            "denominator": "/declared_residues"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+            "model": 1
+          },
+          "value": 1,
+          "raw_value": "1",
+          "display": "8/8 (1.0000)",
+          "numerator": 8,
+          "denominator": 8,
+          "metric_ref": "metric_35f7040582ac0364afff4358d191076f759bfae484a17758b28dcd27eb34a7e3"
+        }
+      },
+      {
+        "metric_ref": "metric_604e1a3bebc79030372d8ca9c4cd6f4feeab2df8bd4c5c7674161b0347b65bf9",
+        "source_ref": "gxa_01m8fdh986x2mj3jat",
+        "event_id": 146,
+        "reading": {
+          "metric_id": "model_count",
+          "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+          "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+          "job_id": "gxj_01m8fdh8bw8s4svfgr",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-macrocycle-qc",
+            "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+            "version": "1"
+          },
+          "admission_sha256": "873ecf3b9e276e6cb869de7d11e3e23574333a41fc1e8d328be529f9cd9eedb2",
+          "manifest_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+          "provenance_cursor": 72,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/model_count"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+          },
+          "value": 20,
+          "raw_value": "20",
+          "display": "20",
+          "metric_ref": "metric_604e1a3bebc79030372d8ca9c4cd6f4feeab2df8bd4c5c7674161b0347b65bf9"
+        }
+      },
+      {
+        "metric_ref": "metric_64176e7e69a4e79e7bd3514cfa02c888b2c6fc9287e16e7317d6572dfeacc0d0",
+        "source_ref": "gxa_01m8fdh986x2mj3jat",
+        "event_id": 143,
+        "reading": {
+          "metric_id": "declared_closure",
+          "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+          "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+          "job_id": "gxj_01m8fdh8bw8s4svfgr",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-macrocycle-qc",
+            "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+            "version": "1"
+          },
+          "admission_sha256": "873ecf3b9e276e6cb869de7d11e3e23574333a41fc1e8d328be529f9cd9eedb2",
+          "manifest_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+          "provenance_cursor": 72,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_closure"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+          },
+          "value": 1,
+          "raw_value": "1",
+          "display": "1",
+          "metric_ref": "metric_64176e7e69a4e79e7bd3514cfa02c888b2c6fc9287e16e7317d6572dfeacc0d0"
+        }
+      },
+      {
+        "metric_ref": "metric_72269f70283964bb6ba2b0c99cc9ddc18c43febceb3865a295c14ebc4406be70",
+        "source_ref": "gxa_01m8fdh986x2mj3jat",
+        "event_id": 143,
+        "reading": {
+          "metric_id": "mapped_models",
+          "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+          "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+          "job_id": "gxj_01m8fdh8bw8s4svfgr",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-macrocycle-qc",
+            "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+            "version": "1"
+          },
+          "admission_sha256": "873ecf3b9e276e6cb869de7d11e3e23574333a41fc1e8d328be529f9cd9eedb2",
+          "manifest_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+          "provenance_cursor": 72,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/mapped_models"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+          },
+          "value": 20,
+          "raw_value": "20",
+          "display": "20",
+          "metric_ref": "metric_72269f70283964bb6ba2b0c99cc9ddc18c43febceb3865a295c14ebc4406be70"
+        }
+      },
+      {
+        "metric_ref": "metric_759d488a070f355cc46917fce0909283b17ceafbc5c563787fd6236a578dee5a",
+        "source_ref": "gxa_01m8fdh99j68cpt4bc",
+        "event_id": 145,
+        "reading": {
+          "metric_id": "declared_closure",
+          "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+          "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+          "job_id": "gxj_01m8fdh8j3dxcessga",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-macrocycle-qc",
+            "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+            "version": "1"
+          },
+          "admission_sha256": "dd8c1703a8501ccb069e284d9780d711503ce589047f27938885e0b38fd8a212",
+          "manifest_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+          "provenance_cursor": 77,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_closure"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+          },
+          "value": 0,
+          "raw_value": "0",
+          "display": "0",
+          "metric_ref": "metric_759d488a070f355cc46917fce0909283b17ceafbc5c563787fd6236a578dee5a"
+        }
+      },
+      {
+        "metric_ref": "metric_9b079e516978120757963bdc268f779adcfb0d9c233347465d6e925555482124",
+        "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+        "event_id": 142,
+        "reading": {
+          "metric_id": "complete_backbones",
+          "artifact_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "sha256": "c48807bead61b6bad3da91f95f38c8ede0885a376b30a2de0bf14637f32f348f",
+          "job_id": "gxj_01m8fdh8rephz89cke",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+            "version": "1"
+          },
+          "admission_sha256": "3c301d242f7de821a9807fe996dca75c5eb8c9dcf8a44bc76160e7267539a8a7",
+          "manifest_sha256": "2650a9bff06c8333f375de3fd4e84c1603cb12485aabc0cdb9c67b0895e14d7d",
+          "provenance_cursor": 81,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/complete_backbones"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+          },
+          "value": 8,
+          "raw_value": "8",
+          "display": "8",
+          "metric_ref": "metric_9b079e516978120757963bdc268f779adcfb0d9c233347465d6e925555482124"
+        }
+      },
+      {
+        "metric_ref": "metric_a6f7374034ed60b207103561c534cae7e91f8ce2f82df9b915edabd8552e91c7",
+        "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+        "event_id": 144,
+        "reading": {
+          "metric_id": "complete_backbones",
+          "artifact_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "sha256": "3f53fa9b01173c9ea0a1679e7fc73f832a0b5d7a4b0588a9cbf8a979bedfb633",
+          "job_id": "gxj_01m8fdh8ymrfaxa35b",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+            "version": "1"
+          },
+          "admission_sha256": "cd59d644e3f3e8d240b1faf8ce320b0bb81920a63a19a820ee50e567816015b4",
+          "manifest_sha256": "be4e2e270de18a20131d92788e96b3f399fa0c71fdd7a0ec53636930a66ea1db",
+          "provenance_cursor": 85,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/complete_backbones"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+          },
+          "value": 8,
+          "raw_value": "8",
+          "display": "8",
+          "metric_ref": "metric_a6f7374034ed60b207103561c534cae7e91f8ce2f82df9b915edabd8552e91c7"
+        }
+      },
+      {
+        "metric_ref": "metric_c647d154b18680baebce9427b21ef82a20346dedf26293517c7e4af8503df451",
+        "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+        "event_id": 144,
+        "reading": {
+          "metric_id": "ca_count",
+          "artifact_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "sha256": "3f53fa9b01173c9ea0a1679e7fc73f832a0b5d7a4b0588a9cbf8a979bedfb633",
+          "job_id": "gxj_01m8fdh8ymrfaxa35b",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+            "version": "1"
+          },
+          "admission_sha256": "cd59d644e3f3e8d240b1faf8ce320b0bb81920a63a19a820ee50e567816015b4",
+          "manifest_sha256": "be4e2e270de18a20131d92788e96b3f399fa0c71fdd7a0ec53636930a66ea1db",
+          "provenance_cursor": 85,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/ca_count"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+          },
+          "value": 8,
+          "raw_value": "8",
+          "display": "8",
+          "metric_ref": "metric_c647d154b18680baebce9427b21ef82a20346dedf26293517c7e4af8503df451"
+        }
+      },
+      {
+        "metric_ref": "metric_cc753231d481f2b3c587b5092056e43eeeb60d6833789e4261f909b245d644df",
+        "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+        "event_id": 142,
+        "reading": {
+          "metric_id": "ca_count",
+          "artifact_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "sha256": "c48807bead61b6bad3da91f95f38c8ede0885a376b30a2de0bf14637f32f348f",
+          "job_id": "gxj_01m8fdh8rephz89cke",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+            "version": "1"
+          },
+          "admission_sha256": "3c301d242f7de821a9807fe996dca75c5eb8c9dcf8a44bc76160e7267539a8a7",
+          "manifest_sha256": "2650a9bff06c8333f375de3fd4e84c1603cb12485aabc0cdb9c67b0895e14d7d",
+          "provenance_cursor": 81,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/ca_count"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+          },
+          "value": 8,
+          "raw_value": "8",
+          "display": "8",
+          "metric_ref": "metric_cc753231d481f2b3c587b5092056e43eeeb60d6833789e4261f909b245d644df"
+        }
+      },
+      {
+        "metric_ref": "metric_d24bdf80106a1ee0a835eb9f3b26860205378d44848b138aefc0aac7f0d9d4ac",
+        "source_ref": "gxa_01m8fdh99j68cpt4bc",
+        "event_id": 145,
+        "reading": {
+          "metric_id": "mapped_models",
+          "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+          "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+          "job_id": "gxj_01m8fdh8j3dxcessga",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-macrocycle-qc",
+            "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+            "version": "1"
+          },
+          "admission_sha256": "dd8c1703a8501ccb069e284d9780d711503ce589047f27938885e0b38fd8a212",
+          "manifest_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+          "provenance_cursor": 77,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/mapped_models"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+          },
+          "value": 20,
+          "raw_value": "20",
+          "display": "20",
+          "metric_ref": "metric_d24bdf80106a1ee0a835eb9f3b26860205378d44848b138aefc0aac7f0d9d4ac"
+        }
+      },
+      {
+        "metric_ref": "metric_d9f362bd6c47cd95c949b758e246acc319fc25a67b388f455d0ab950e4a8315b",
+        "source_ref": "gxa_01m8fdh99j68cpt4bc",
+        "event_id": 148,
+        "reading": {
+          "metric_id": "model_1_distance_A",
+          "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+          "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+          "job_id": "gxj_01m8fdh8j3dxcessga",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-macrocycle-qc",
+            "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+            "version": "1"
+          },
+          "admission_sha256": "dd8c1703a8501ccb069e284d9780d711503ce589047f27938885e0b38fd8a212",
+          "manifest_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+          "provenance_cursor": 77,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "angstrom",
+          "places": 3,
+          "selectors": {
+            "pointer": "/model_1_distance_A"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+          },
+          "value": 1.3351404420509458,
+          "raw_value": "1.3351404420509458",
+          "display": "1.335 angstrom",
+          "metric_ref": "metric_d9f362bd6c47cd95c949b758e246acc319fc25a67b388f455d0ab950e4a8315b"
+        }
+      },
+      {
+        "metric_ref": "metric_e1c353188bbc8cb456c5acec8722b10b59b4a52580469eb3a9585b40a0a37902",
+        "source_ref": "gxa_01m8fdh99j68cpt4bc",
+        "event_id": 148,
+        "reading": {
+          "metric_id": "model_count",
+          "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+          "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+          "job_id": "gxj_01m8fdh8j3dxcessga",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-macrocycle-qc",
+            "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+            "version": "1"
+          },
+          "admission_sha256": "dd8c1703a8501ccb069e284d9780d711503ce589047f27938885e0b38fd8a212",
+          "manifest_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+          "provenance_cursor": 77,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/model_count"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "6BEN",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+          },
+          "value": 20,
+          "raw_value": "20",
+          "display": "20",
+          "metric_ref": "metric_e1c353188bbc8cb456c5acec8722b10b59b4a52580469eb3a9585b40a0a37902"
+        }
+      }
+    ],
+    "rendered": {
+      "reason": "The full file comparison identifies the deleted terminal connection, and the paired measurements establish the effect on closure counts, coordinate coverage and geometry. The provenance identifies a single deposition.",
+      "rationale": "Use the deposited _struct_conn record for the explicit topology count. In chain A, covale2 links the GLN 8 carbonyl C to the DAR 1 backbone N. The original closure count is 1 and the derivative count is 0. Removing that single row reproduces the derivative byte for byte, including its entire _atom_site table. The terminal atoms map in 20/20 original models and 20/20 derivative models. The first-model C–N distances are 1.335 angstrom and 1.335 angstrom, respectively. First-model residue coverage is 8/8 (1.0000) and 8/8 (1.0000), with 8 and 8 Cα sites and 8 and 8 complete backbones. Substituting the derivative would miss the explicitly recorded closure. The files describe one published solution NMR ensemble. The deletion supplies no evidence of ring opening.",
+      "unresolved": []
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+      "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+      "bytes": 272904,
+      "role": "original"
+    },
+    {
+      "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+      "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+      "bytes": 272799,
+      "role": "derived_representation"
+    }
+  ],
+  "predictions": [],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8fdvh1f7hz4r0sn",
+      "statement": "declared_closure = 1; declared_closure = 0.",
+      "scope": "The supplied chain A deposition and its derivative.",
+      "criteria": "Count a covalent _struct_conn row joining the last carbonyl C and first backbone N on the same chain in either partner order.",
+      "decision_scope": "run",
+      "limitations": "This is a file-level comparison. Both files represent the same solution NMR ensemble and share a PDB accession and primary citation. The deletion supplies no experimental evidence of ring opening.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fdstfcytnfzr37",
+        "proposed_level": "open",
+        "rationale": "The deposited row covale2 links the C-terminal glutamine carbonyl C and N-terminal D-arginine N. Deleting exactly that row reproduces the derivative byte for byte."
+      },
+      "evidence_refs": [
+        "gxa_01m8fdbhmakbwwwe0c",
+        "gxa_01m8fdbhn2jacc87v1",
+        "gxa_01m8fdh986x2mj3jat",
+        "gxa_01m8fdh99j68cpt4bc"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "0820ad2aed3fd7417283ea6a7f01be592edcce81d8de805b89d2ec6928dfab1d",
+        "brief_turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+        "context_ref": "gxcx_01m8fdmsqq84rkn5xa",
+        "delivery_receipt": "start:b91d7493-33a4-4077-af9a-b87846ead03d",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 127,
+        "state": "acknowledged",
+        "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+        "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdbhmakbwwwe0c",
+          "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 6,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdbhn2jacc87v1",
+          "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+          "source_class": "input"
+        },
+        {
+          "admission_sha256": "873ecf3b9e276e6cb869de7d11e3e23574333a41fc1e8d328be529f9cd9eedb2",
+          "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+          "capability": "deposited-macrocycle-qc",
+          "completion_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "job_id": "gxj_01m8fdh8bw8s4svfgr",
+          "job_status": "SUCCEEDED",
+          "kind": "deposited_macrocycle_qc",
+          "output_provenance": {
+            "admission_sha256": "873ecf3b9e276e6cb869de7d11e3e23574333a41fc1e8d328be529f9cd9eedb2",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+            "capability": {
+              "id": "deposited-macrocycle-qc",
+              "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+              "version": "1"
+            },
+            "completion_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+                "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              }
+            ],
+            "declaration_name": "qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              ],
+              "processing": [
+                "capability:312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+                "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 94,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdh8bw8s4svfgr",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdh986x2mj3jat",
+          "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "dd8c1703a8501ccb069e284d9780d711503ce589047f27938885e0b38fd8a212",
+          "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+          "capability": "deposited-macrocycle-qc",
+          "completion_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "job_id": "gxj_01m8fdh8j3dxcessga",
+          "job_status": "SUCCEEDED",
+          "kind": "deposited_macrocycle_qc",
+          "output_provenance": {
+            "admission_sha256": "dd8c1703a8501ccb069e284d9780d711503ce589047f27938885e0b38fd8a212",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+            "capability": {
+              "id": "deposited-macrocycle-qc",
+              "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+              "version": "1"
+            },
+            "completion_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+                "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              }
+            ],
+            "declaration_name": "qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              ],
+              "processing": [
+                "capability:312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+                "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 99,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdh8j3dxcessga",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdh99j68cpt4bc",
+          "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+          "source_class": "computed_result",
+          "version": "1"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fdvh1f7hz4r0sn@1",
+      "decision_id": "gxa_a1aa1c3d7864b7dd4d4c8cdc2f838813c47e4d512ee7d7885d4af91d6be0f63a",
+      "assessment_cursor": 127,
+      "availability_cursor": 156,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:16:19.887Z",
+      "event_id": 156,
+      "event": "v6.claim.adopted",
+      "author": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    },
+    {
+      "hypothesis_id": "gxh_01m8fdvh1hkeqgjtjk",
+      "statement": "mapped_models = 20; model_count = 20; mapped_models = 20; model_count = 20; model_1_distance_A = 1.335 angstrom; model_1_distance_A = 1.335 angstrom; coordinate_coverage = 8/8 (1.0000); coordinate_coverage = 8/8 (1.0000); ca_count = 8; ca_count = 8; complete_backbones = 8; complete_backbones = 8.",
+      "scope": "Chain A of the deposited structure and its minus-closure derivative. Terminal mapping covers the ensemble. Backbone counts and the reported terminal distance refer to the first model.",
+      "criteria": "Compare the full _atom_site tables, the number of models with mapped terminal atoms relative to all deposited models, the first-model terminal C–N distance and coverage over declared polymer positions. A complete backbone requires N, Cα, C and O.",
+      "decision_scope": "run",
+      "limitations": "These coordinate measurements describe the deposited conformers. A bond-length terminal distance is compatible with closure, while an explicit topology count requires a connection record.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fdtafkdd5ex6v9",
+        "proposed_level": "open",
+        "rationale": "In the original and derivative, respectively, the terminal atoms map in 20/20 and 20/20 models. The terminal C–N distances in the first model are 1.335 angstrom and 1.335 angstrom. Observed/declared residue coverage is 8/8 (1.0000) and 8/8 (1.0000). Cα counts are 8 and 8, and complete backbone counts are 8 and 8."
+      },
+      "evidence_refs": [
+        "gxa_01m8fdbhmakbwwwe0c",
+        "gxa_01m8fdbhn2jacc87v1",
+        "gxa_01m8fdh986x2mj3jat",
+        "gxa_01m8fdh99j68cpt4bc",
+        "gxa_01m8fdh9ccpmq5kprr",
+        "gxa_01m8fdh9hx98fkvf5q"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "0820ad2aed3fd7417283ea6a7f01be592edcce81d8de805b89d2ec6928dfab1d",
+        "brief_turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+        "context_ref": "gxcx_01m8fdmsqq84rkn5xa",
+        "delivery_receipt": "start:b91d7493-33a4-4077-af9a-b87846ead03d",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 127,
+        "state": "acknowledged",
+        "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+        "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdbhmakbwwwe0c",
+          "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 6,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdbhn2jacc87v1",
+          "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+          "source_class": "input"
+        },
+        {
+          "admission_sha256": "873ecf3b9e276e6cb869de7d11e3e23574333a41fc1e8d328be529f9cd9eedb2",
+          "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+          "capability": "deposited-macrocycle-qc",
+          "completion_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "job_id": "gxj_01m8fdh8bw8s4svfgr",
+          "job_status": "SUCCEEDED",
+          "kind": "deposited_macrocycle_qc",
+          "output_provenance": {
+            "admission_sha256": "873ecf3b9e276e6cb869de7d11e3e23574333a41fc1e8d328be529f9cd9eedb2",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+            "capability": {
+              "id": "deposited-macrocycle-qc",
+              "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+              "version": "1"
+            },
+            "completion_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+                "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              }
+            ],
+            "declaration_name": "qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              ],
+              "processing": [
+                "capability:312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+                "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 94,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdh8bw8s4svfgr",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdh986x2mj3jat",
+          "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "dd8c1703a8501ccb069e284d9780d711503ce589047f27938885e0b38fd8a212",
+          "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+          "capability": "deposited-macrocycle-qc",
+          "completion_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "job_id": "gxj_01m8fdh8j3dxcessga",
+          "job_status": "SUCCEEDED",
+          "kind": "deposited_macrocycle_qc",
+          "output_provenance": {
+            "admission_sha256": "dd8c1703a8501ccb069e284d9780d711503ce589047f27938885e0b38fd8a212",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+            "capability": {
+              "id": "deposited-macrocycle-qc",
+              "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+              "version": "1"
+            },
+            "completion_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+                "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              }
+            ],
+            "declaration_name": "qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              ],
+              "processing": [
+                "capability:312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+                "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 99,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdh8j3dxcessga",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdh99j68cpt4bc",
+          "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "3c301d242f7de821a9807fe996dca75c5eb8c9dcf8a44bc76160e7267539a8a7",
+          "artifact_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "capability": "deposited-backbone-qc",
+          "completion_sha256": "2650a9bff06c8333f375de3fd4e84c1603cb12485aabc0cdb9c67b0895e14d7d",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "job_id": "gxj_01m8fdh8rephz89cke",
+          "job_status": "SUCCEEDED",
+          "kind": "deposited_backbone_qc",
+          "output_provenance": {
+            "admission_sha256": "3c301d242f7de821a9807fe996dca75c5eb8c9dcf8a44bc76160e7267539a8a7",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdh9ccpmq5kprr",
+            "capability": {
+              "id": "deposited-backbone-qc",
+              "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+              "version": "1"
+            },
+            "completion_sha256": "2650a9bff06c8333f375de3fd4e84c1603cb12485aabc0cdb9c67b0895e14d7d",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+                "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              }
+            ],
+            "declaration_name": "qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              ],
+              "processing": [
+                "capability:a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+                "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 110,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdh8rephz89cke",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "c48807bead61b6bad3da91f95f38c8ede0885a376b30a2de0bf14637f32f348f",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdh9ccpmq5kprr",
+          "sha256": "c48807bead61b6bad3da91f95f38c8ede0885a376b30a2de0bf14637f32f348f",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "cd59d644e3f3e8d240b1faf8ce320b0bb81920a63a19a820ee50e567816015b4",
+          "artifact_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "capability": "deposited-backbone-qc",
+          "completion_sha256": "be4e2e270de18a20131d92788e96b3f399fa0c71fdd7a0ec53636930a66ea1db",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "job_id": "gxj_01m8fdh8ymrfaxa35b",
+          "job_status": "SUCCEEDED",
+          "kind": "deposited_backbone_qc",
+          "output_provenance": {
+            "admission_sha256": "cd59d644e3f3e8d240b1faf8ce320b0bb81920a63a19a820ee50e567816015b4",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdh9hx98fkvf5q",
+            "capability": {
+              "id": "deposited-backbone-qc",
+              "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+              "version": "1"
+            },
+            "completion_sha256": "be4e2e270de18a20131d92788e96b3f399fa0c71fdd7a0ec53636930a66ea1db",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+                "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              }
+            ],
+            "declaration_name": "qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              ],
+              "processing": [
+                "capability:a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+                "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 117,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdh8ymrfaxa35b",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "3f53fa9b01173c9ea0a1679e7fc73f832a0b5d7a4b0588a9cbf8a979bedfb633",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdh9hx98fkvf5q",
+          "sha256": "3f53fa9b01173c9ea0a1679e7fc73f832a0b5d7a4b0588a9cbf8a979bedfb633",
+          "source_class": "computed_result",
+          "version": "1"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fdvh1hkeqgjtjk@1",
+      "decision_id": "gxa_a1aa1c3d7864b7dd4d4c8cdc2f838813c47e4d512ee7d7885d4af91d6be0f63a",
+      "assessment_cursor": 127,
+      "availability_cursor": 157,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:16:19.889Z",
+      "event_id": 157,
+      "event": "v6.claim.adopted",
+      "author": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8fdh8bw8s4svfgr",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "deposited-macrocycle-qc",
+        "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+          "bytes": 272904,
+          "role": "structure",
+          "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:a21f6511055b72cacb31940bad132dc8816d93f35539859f1475e55387072779",
+        "branch_id": "branch_8ac3cc5271c74db12abfe21c231ed5e3",
+        "decision_ref": "gxa_a34306707bc117b60a45cb04479c5f48c9e24f05139561b75516f09dc9749d5e",
+        "exec_key": "7f4399272ec3dca1862f813d4e42650493a31e4557f969181c9d08b30e1669ca",
+        "kind": "graph_node",
+        "node_id": "node_b3bba6fc93b2a4bec0476129e5835a36",
+        "operation_key": "v6.node:a21f6511055b72cacb31940bad132dc8816d93f35539859f1475e55387072779",
+        "plan_key": "5550203ca40defaa8e9d88555a5b2b71036393b4b1076e6984da3b6c017f218f",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "5882c5020f870c0fff353721161d615f30d5856442694eae7d2cbda03386215d",
+      "outputs": [
+        {
+          "output_name": "qc.json",
+          "artifact_ref": "gxa_01m8fdh986x2mj3jat",
+          "sha256": "b0e70ea4cf4e926c62324db85e04222c0990a35bb62c0c33fce8eab37ed6d944",
+          "bytes": 7757,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdbhka9m2tahwb/jobs/gxj_01m8fdh8bw8s4svfgr",
+            "rel_path": "files/qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_closure",
+              "metric_ref": "metric_64176e7e69a4e79e7bd3514cfa02c888b2c6fc9287e16e7317d6572dfeacc0d0",
+              "value": 1,
+              "raw_value": "1",
+              "display": "1",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                143
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_997c00254e8c03c67591d20425c48858d07ded88ae295c2163f192870394c717",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                143
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "mapped_models",
+              "metric_ref": "metric_72269f70283964bb6ba2b0c99cc9ddc18c43febceb3865a295c14ebc4406be70",
+              "value": 20,
+              "raw_value": "20",
+              "display": "20",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                143
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "model_1_distance_A",
+              "metric_ref": "metric_15d4e37d02b23ffbfddc1146a2fb1c26e4e2e0cfe6f8bf0ba4276220be76e46e",
+              "value": 1.3351404420509458,
+              "raw_value": "1.3351404420509458",
+              "display": "1.335 angstrom",
+              "unit": "angstrom",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                146
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "model_count",
+              "metric_ref": "metric_604e1a3bebc79030372d8ca9c4cd6f4feeab2df8bd4c5c7674161b0347b65bf9",
+              "value": 20,
+              "raw_value": "20",
+              "display": "20",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                146
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.deposited-macrocycle-qc/1",
+            "entry": "6BEN",
+            "chain": "A",
+            "entity": "1",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+            "declared_residues": 8,
+            "model_count": 20,
+            "declared_closure": 1,
+            "closure_link_ids": [
+              "covale2"
+            ],
+            "topology": "declared_head_to_tail",
+            "mapped_models": 20,
+            "model_1_distance_A": 1.3351404420509458
+          },
+          "denominators": {
+            "model_count": 20
+          },
+          "lead_delivery_event_ids": [
+            140,
+            143,
+            146
+          ]
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8fdh8j3dxcessga",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "deposited-macrocycle-qc",
+        "sha256": "312c55be8ac54f80e4c6a94f930e9fa15410aadeaf038f6cf54d37f4c68afd8c",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+          "bytes": 272799,
+          "role": "structure",
+          "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:245105e15a9ca2d4e9b09c555e54267f60607dff833d8c25b00b075e15ac9c9b",
+        "branch_id": "branch_8ac3cc5271c74db12abfe21c231ed5e3",
+        "decision_ref": "gxa_a34306707bc117b60a45cb04479c5f48c9e24f05139561b75516f09dc9749d5e",
+        "exec_key": "fd72ef038a1bb514118109e71f7def31c08f40e8a3902e19271797ed723a9ddb",
+        "kind": "graph_node",
+        "node_id": "node_9d31dc8cdabc6cbfbe6aec889ebb129f",
+        "operation_key": "v6.node:245105e15a9ca2d4e9b09c555e54267f60607dff833d8c25b00b075e15ac9c9b",
+        "plan_key": "27598111d4c97600c507da8e5b0749a3f87149b2b5c1f9974687fd8eebc2577c",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "8958643e07b4e101f17c7b2adcc122151949afb8c7fc73a2635d3e28fc4b6ed9",
+      "outputs": [
+        {
+          "output_name": "qc.json",
+          "artifact_ref": "gxa_01m8fdh99j68cpt4bc",
+          "sha256": "f3f066d8646354f9fcd8d96fa27505dd9610b7e0fd350ac98c9ce1418c36b3f9",
+          "bytes": 7751,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdbhka9m2tahwb/jobs/gxj_01m8fdh8j3dxcessga",
+            "rel_path": "files/qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_closure",
+              "metric_ref": "metric_759d488a070f355cc46917fce0909283b17ceafbc5c563787fd6236a578dee5a",
+              "value": 0,
+              "raw_value": "0",
+              "display": "0",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                145
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_e37dcf362dc57c28328908ae495aa873c12a7d3fce53b208f09114feb2939223",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                145
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "mapped_models",
+              "metric_ref": "metric_d24bdf80106a1ee0a835eb9f3b26860205378d44848b138aefc0aac7f0d9d4ac",
+              "value": 20,
+              "raw_value": "20",
+              "display": "20",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                145
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "model_1_distance_A",
+              "metric_ref": "metric_d9f362bd6c47cd95c949b758e246acc319fc25a67b388f455d0ab950e4a8315b",
+              "value": 1.3351404420509458,
+              "raw_value": "1.3351404420509458",
+              "display": "1.335 angstrom",
+              "unit": "angstrom",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                148
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "model_count",
+              "metric_ref": "metric_e1c353188bbc8cb456c5acec8722b10b59b4a52580469eb3a9585b40a0a37902",
+              "value": 20,
+              "raw_value": "20",
+              "display": "20",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                148
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.deposited-macrocycle-qc/1",
+            "entry": "6BEN",
+            "chain": "A",
+            "entity": "1",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+            "declared_residues": 8,
+            "model_count": 20,
+            "declared_closure": 0,
+            "closure_link_ids": [],
+            "topology": "missing_head_to_tail_declaration",
+            "mapped_models": 20,
+            "model_1_distance_A": 1.3351404420509458
+          },
+          "denominators": {
+            "model_count": 20
+          },
+          "lead_delivery_event_ids": [
+            140,
+            145,
+            148
+          ]
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8fdh8rephz89cke",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "deposited-backbone-qc",
+        "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+          "bytes": 272904,
+          "role": "structure",
+          "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:292a6ac258476aa3d44e35cff7f9da631c7beced2a5fdf61d8100be7342fae6a",
+        "branch_id": "branch_8ac3cc5271c74db12abfe21c231ed5e3",
+        "decision_ref": "gxa_a34306707bc117b60a45cb04479c5f48c9e24f05139561b75516f09dc9749d5e",
+        "exec_key": "51d39a4a609a63bb63e0a4b6dc01eea7b9bb2e5886d7650c5363ae902e8ce704",
+        "kind": "graph_node",
+        "node_id": "node_72c6210a0146e9a3c07ca2b6f2cd9fd8",
+        "operation_key": "v6.node:292a6ac258476aa3d44e35cff7f9da631c7beced2a5fdf61d8100be7342fae6a",
+        "plan_key": "f7fc679074dbf21a58e118794b0f2c9552918a570e2cf5d79cee932d2549f561",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "2650a9bff06c8333f375de3fd4e84c1603cb12485aabc0cdb9c67b0895e14d7d",
+      "outputs": [
+        {
+          "output_name": "qc.json",
+          "artifact_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "sha256": "c48807bead61b6bad3da91f95f38c8ede0885a376b30a2de0bf14637f32f348f",
+          "bytes": 394,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhmakbwwwe0c",
+              "bytes": 272904,
+              "role": "structure",
+              "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdbhka9m2tahwb/jobs/gxj_01m8fdh8rephz89cke",
+            "rel_path": "files/qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_count",
+              "metric_ref": "metric_cc753231d481f2b3c587b5092056e43eeeb60d6833789e4261f909b245d644df",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                142
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_4352d81b50cd85ea4647e25eea24b45654f97ec9ed7c92abfff33a7a0e8168aa",
+              "value": 4.04123704761302,
+              "raw_value": "4.04123704761302",
+              "display": "4.041 angstrom",
+              "unit": "angstrom",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                142
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_9b079e516978120757963bdc268f779adcfb0d9c233347465d6e925555482124",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                142
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "coordinate_coverage",
+              "metric_ref": "metric_35f7040582ac0364afff4358d191076f759bfae484a17758b28dcd27eb34a7e3",
+              "value": 1,
+              "raw_value": "1",
+              "display": "8/8 (1.0000)",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+                "model": 1
+              },
+              "numerator": 8,
+              "denominator": 8,
+              "lead_delivery_event_ids": [
+                140,
+                147
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_3e6af82c76cded0ea3b0e30924925bd3fdd3f7ef671cf6455f9d091b99a91dd0",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                147
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "observed_residues",
+              "metric_ref": "metric_24370ce354cc01fdb01bca6e0876e54d9b3bb8f6493a1c696b4c718dc8f45b34",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                147
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.deposited-backbone-qc/1",
+            "entry": "6BEN",
+            "chain": "A",
+            "entity": "1",
+            "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+            "declared_residues": 8,
+            "model_count": 20,
+            "model": 1,
+            "observed_residues": 8,
+            "ca_count": 8,
+            "complete_backbones": 8,
+            "missing_label_positions": [],
+            "ca_radius_of_gyration_A": 4.04123704761302
+          },
+          "denominators": {
+            "model_count": 20,
+            "ca_count": 8
+          },
+          "lead_delivery_event_ids": [
+            140,
+            142,
+            147
+          ]
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8fdh8ymrfaxa35b",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "deposited-backbone-qc",
+        "sha256": "a718b11affba78aa1091dffae2f7a307bcbfd3c1acfc7c647553e59703670c9a",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+          "bytes": 272799,
+          "role": "structure",
+          "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:f5e60881678a98f184bf8ef8ca86d0d8c64ca8ed429f25dd4a1aef0da3651032",
+        "branch_id": "branch_8ac3cc5271c74db12abfe21c231ed5e3",
+        "decision_ref": "gxa_a34306707bc117b60a45cb04479c5f48c9e24f05139561b75516f09dc9749d5e",
+        "exec_key": "084b2569ed18a0ab7d6e7860600026de41b5c32930f4f934ac58a4d4441191c3",
+        "kind": "graph_node",
+        "node_id": "node_a28ccbf6af616b3043e3c8e7a439d925",
+        "operation_key": "v6.node:f5e60881678a98f184bf8ef8ca86d0d8c64ca8ed429f25dd4a1aef0da3651032",
+        "plan_key": "09423356827fe7abadf31bf10cf3f5a70d392d3af7c012e9c8e01447ede601c9",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "be4e2e270de18a20131d92788e96b3f399fa0c71fdd7a0ec53636930a66ea1db",
+      "outputs": [
+        {
+          "output_name": "qc.json",
+          "artifact_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "sha256": "3f53fa9b01173c9ea0a1679e7fc73f832a0b5d7a4b0588a9cbf8a979bedfb633",
+          "bytes": 394,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdbhn2jacc87v1",
+              "bytes": 272799,
+              "role": "structure",
+              "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdbhka9m2tahwb/jobs/gxj_01m8fdh8ymrfaxa35b",
+            "rel_path": "files/qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_count",
+              "metric_ref": "metric_c647d154b18680baebce9427b21ef82a20346dedf26293517c7e4af8503df451",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                144
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_cace273bedba6381d24adfd7451e86dd506a09ac41f66caf68fe4227ae46ab63",
+              "value": 4.04123704761302,
+              "raw_value": "4.04123704761302",
+              "display": "4.041 angstrom",
+              "unit": "angstrom",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                144
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_a6f7374034ed60b207103561c534cae7e91f8ce2f82df9b915edabd8552e91c7",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                144
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "coordinate_coverage",
+              "metric_ref": "metric_30fefd603384c0a9e98473bf7c8ea55deeecf2eff6966c9f1d0c33318dd900ee",
+              "value": 1,
+              "raw_value": "1",
+              "display": "8/8 (1.0000)",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+                "model": 1
+              },
+              "numerator": 8,
+              "denominator": 8,
+              "lead_delivery_event_ids": [
+                140,
+                149
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_61cf9ebe78e1594b6e49270bfbad341f85fcadc33e920a8b4d8019804f2d4d58",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                149
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "observed_residues",
+              "metric_ref": "metric_1d4e19985d489781374131a800f04a453c7f6e60b9d1f1a62f1c46306282a4da",
+              "value": 8,
+              "raw_value": "8",
+              "display": "8",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "6BEN",
+                "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031"
+              },
+              "lead_delivery_event_ids": [
+                140,
+                149
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.deposited-backbone-qc/1",
+            "entry": "6BEN",
+            "chain": "A",
+            "entity": "1",
+            "input_sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+            "declared_residues": 8,
+            "model_count": 20,
+            "model": 1,
+            "observed_residues": 8,
+            "ca_count": 8,
+            "complete_backbones": 8,
+            "missing_label_positions": [],
+            "ca_radius_of_gyration_A": 4.04123704761302
+          },
+          "denominators": {
+            "model_count": 20,
+            "ca_count": 8
+          },
+          "lead_delivery_event_ids": [
+            140,
+            144,
+            149
+          ]
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "c647d154b186",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_c647d154b18680baebce9427b21ef82a20346dedf26293517c7e4af8503df451"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "cace273bedba",
+            "unit": "angstrom",
+            "value": "4.041 angstrom"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_cace273bedba6381d24adfd7451e86dd506a09ac41f66caf68fe4227ae46ab63"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "a6f7374034ed",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_a6f7374034ed60b207103561c534cae7e91f8ce2f82df9b915edabd8552e91c7"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "30fefd603384",
+            "unit": "1",
+            "value": "8/8 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_30fefd603384c0a9e98473bf7c8ea55deeecf2eff6966c9f1d0c33318dd900ee"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "61cf9ebe78e1",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_61cf9ebe78e1594b6e49270bfbad341f85fcadc33e920a8b4d8019804f2d4d58"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "1d4e19985d48",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_1d4e19985d489781374131a800f04a453c7f6e60b9d1f1a62f1c46306282a4da"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "cc753231d481",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_cc753231d481f2b3c587b5092056e43eeeb60d6833789e4261f909b245d644df"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "4352d81b50cd",
+            "unit": "angstrom",
+            "value": "4.041 angstrom"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_4352d81b50cd85ea4647e25eea24b45654f97ec9ed7c92abfff33a7a0e8168aa"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "9b079e516978",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_9b079e516978120757963bdc268f779adcfb0d9c233347465d6e925555482124"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "35f7040582ac",
+            "unit": "1",
+            "value": "8/8 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_35f7040582ac0364afff4358d191076f759bfae484a17758b28dcd27eb34a7e3"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "3e6af82c76cd",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_3e6af82c76cded0ea3b0e30924925bd3fdd3f7ef671cf6455f9d091b99a91dd0"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "24370ce354cc",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_24370ce354cc01fdb01bca6e0876e54d9b3bb8f6493a1c696b4c718dc8f45b34"
+        },
+        {
+          "row": {
+            "id": "declared_closure",
+            "key": "759d488a070f",
+            "unit": "1",
+            "value": "0"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_759d488a070f355cc46917fce0909283b17ceafbc5c563787fd6236a578dee5a"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "e37dcf362dc5",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_e37dcf362dc57c28328908ae495aa873c12a7d3fce53b208f09114feb2939223"
+        },
+        {
+          "row": {
+            "id": "mapped_models",
+            "key": "d24bdf80106a",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_d24bdf80106a1ee0a835eb9f3b26860205378d44848b138aefc0aac7f0d9d4ac"
+        },
+        {
+          "row": {
+            "id": "model_1_distance_A",
+            "key": "d9f362bd6c47",
+            "unit": "angstrom",
+            "value": "1.335 angstrom"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_d9f362bd6c47cd95c949b758e246acc319fc25a67b388f455d0ab950e4a8315b"
+        },
+        {
+          "row": {
+            "id": "model_count",
+            "key": "e1c353188bbc",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_e1c353188bbc8cb456c5acec8722b10b59b4a52580469eb3a9585b40a0a37902"
+        },
+        {
+          "row": {
+            "id": "declared_closure",
+            "key": "64176e7e69a4",
+            "unit": "1",
+            "value": "1"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_64176e7e69a4e79e7bd3514cfa02c888b2c6fc9287e16e7317d6572dfeacc0d0"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "997c00254e8c",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_997c00254e8c03c67591d20425c48858d07ded88ae295c2163f192870394c717"
+        },
+        {
+          "row": {
+            "id": "mapped_models",
+            "key": "72269f702839",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_72269f70283964bb6ba2b0c99cc9ddc18c43febceb3865a295c14ebc4406be70"
+        },
+        {
+          "row": {
+            "id": "model_1_distance_A",
+            "key": "15d4e37d02b2",
+            "unit": "angstrom",
+            "value": "1.335 angstrom"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_15d4e37d02b23ffbfddc1146a2fb1c26e4e2e0cfe6f8bf0ba4276220be76e46e"
+        },
+        {
+          "row": {
+            "id": "model_count",
+            "key": "604e1a3bebc7",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_604e1a3bebc79030372d8ca9c4cd6f4feeab2df8bd4c5c7674161b0347b65bf9"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "start:b91d7493-33a4-4077-af9a-b87846ead03d",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 140,
+      "utc": "2026-11-27T21:12:39.530Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_cc753231d481f2b3c587b5092056e43eeeb60d6833789e4261f909b245d644df",
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr"
+        },
+        {
+          "metric_ref": "metric_4352d81b50cd85ea4647e25eea24b45654f97ec9ed7c92abfff33a7a0e8168aa",
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr"
+        },
+        {
+          "metric_ref": "metric_9b079e516978120757963bdc268f779adcfb0d9c233347465d6e925555482124",
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "cc753231d481",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_cc753231d481f2b3c587b5092056e43eeeb60d6833789e4261f909b245d644df"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "4352d81b50cd",
+            "unit": "angstrom",
+            "value": "4.041 angstrom"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_4352d81b50cd85ea4647e25eea24b45654f97ec9ed7c92abfff33a7a0e8168aa"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "9b079e516978",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_9b079e516978120757963bdc268f779adcfb0d9c233347465d6e925555482124"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "exec-55d19fcb-c0eb-4e60-b72a-8d0c1ee94752",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 142,
+      "utc": "2026-11-27T21:12:51.230Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_64176e7e69a4e79e7bd3514cfa02c888b2c6fc9287e16e7317d6572dfeacc0d0",
+          "source_ref": "gxa_01m8fdh986x2mj3jat"
+        },
+        {
+          "metric_ref": "metric_997c00254e8c03c67591d20425c48858d07ded88ae295c2163f192870394c717",
+          "source_ref": "gxa_01m8fdh986x2mj3jat"
+        },
+        {
+          "metric_ref": "metric_72269f70283964bb6ba2b0c99cc9ddc18c43febceb3865a295c14ebc4406be70",
+          "source_ref": "gxa_01m8fdh986x2mj3jat"
+        },
+        {
+          "row": {
+            "id": "declared_closure",
+            "key": "64176e7e69a4",
+            "unit": "1",
+            "value": "1"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_64176e7e69a4e79e7bd3514cfa02c888b2c6fc9287e16e7317d6572dfeacc0d0"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "997c00254e8c",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_997c00254e8c03c67591d20425c48858d07ded88ae295c2163f192870394c717"
+        },
+        {
+          "row": {
+            "id": "mapped_models",
+            "key": "72269f702839",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_72269f70283964bb6ba2b0c99cc9ddc18c43febceb3865a295c14ebc4406be70"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "exec-dea2caab-da4c-40d3-af88-3d25d23e0a40",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 143,
+      "utc": "2026-11-27T21:12:51.245Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_c647d154b18680baebce9427b21ef82a20346dedf26293517c7e4af8503df451",
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q"
+        },
+        {
+          "metric_ref": "metric_cace273bedba6381d24adfd7451e86dd506a09ac41f66caf68fe4227ae46ab63",
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q"
+        },
+        {
+          "metric_ref": "metric_a6f7374034ed60b207103561c534cae7e91f8ce2f82df9b915edabd8552e91c7",
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "c647d154b186",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_c647d154b18680baebce9427b21ef82a20346dedf26293517c7e4af8503df451"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "cace273bedba",
+            "unit": "angstrom",
+            "value": "4.041 angstrom"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_cace273bedba6381d24adfd7451e86dd506a09ac41f66caf68fe4227ae46ab63"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "a6f7374034ed",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_a6f7374034ed60b207103561c534cae7e91f8ce2f82df9b915edabd8552e91c7"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "exec-0087759a-6002-489d-8e3f-43c838cc1c40",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 144,
+      "utc": "2026-11-27T21:12:51.250Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_759d488a070f355cc46917fce0909283b17ceafbc5c563787fd6236a578dee5a",
+          "source_ref": "gxa_01m8fdh99j68cpt4bc"
+        },
+        {
+          "metric_ref": "metric_e37dcf362dc57c28328908ae495aa873c12a7d3fce53b208f09114feb2939223",
+          "source_ref": "gxa_01m8fdh99j68cpt4bc"
+        },
+        {
+          "metric_ref": "metric_d24bdf80106a1ee0a835eb9f3b26860205378d44848b138aefc0aac7f0d9d4ac",
+          "source_ref": "gxa_01m8fdh99j68cpt4bc"
+        },
+        {
+          "row": {
+            "id": "declared_closure",
+            "key": "759d488a070f",
+            "unit": "1",
+            "value": "0"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_759d488a070f355cc46917fce0909283b17ceafbc5c563787fd6236a578dee5a"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "e37dcf362dc5",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_e37dcf362dc57c28328908ae495aa873c12a7d3fce53b208f09114feb2939223"
+        },
+        {
+          "row": {
+            "id": "mapped_models",
+            "key": "d24bdf80106a",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_d24bdf80106a1ee0a835eb9f3b26860205378d44848b138aefc0aac7f0d9d4ac"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "exec-bae2cfc5-9bd3-4009-8e32-899f9bd57faa",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 145,
+      "utc": "2026-11-27T21:12:51.255Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_15d4e37d02b23ffbfddc1146a2fb1c26e4e2e0cfe6f8bf0ba4276220be76e46e",
+          "source_ref": "gxa_01m8fdh986x2mj3jat"
+        },
+        {
+          "metric_ref": "metric_604e1a3bebc79030372d8ca9c4cd6f4feeab2df8bd4c5c7674161b0347b65bf9",
+          "source_ref": "gxa_01m8fdh986x2mj3jat"
+        },
+        {
+          "row": {
+            "id": "model_1_distance_A",
+            "key": "15d4e37d02b2",
+            "unit": "angstrom",
+            "value": "1.335 angstrom"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_15d4e37d02b23ffbfddc1146a2fb1c26e4e2e0cfe6f8bf0ba4276220be76e46e"
+        },
+        {
+          "row": {
+            "id": "model_count",
+            "key": "604e1a3bebc7",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdh986x2mj3jat",
+          "metric_ref": "metric_604e1a3bebc79030372d8ca9c4cd6f4feeab2df8bd4c5c7674161b0347b65bf9"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "exec-0a8a052d-27cd-4caa-8085-48cc5a2bda33",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 146,
+      "utc": "2026-11-27T21:13:02.619Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_35f7040582ac0364afff4358d191076f759bfae484a17758b28dcd27eb34a7e3",
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr"
+        },
+        {
+          "metric_ref": "metric_3e6af82c76cded0ea3b0e30924925bd3fdd3f7ef671cf6455f9d091b99a91dd0",
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr"
+        },
+        {
+          "metric_ref": "metric_24370ce354cc01fdb01bca6e0876e54d9b3bb8f6493a1c696b4c718dc8f45b34",
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "35f7040582ac",
+            "unit": "1",
+            "value": "8/8 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_35f7040582ac0364afff4358d191076f759bfae484a17758b28dcd27eb34a7e3"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "3e6af82c76cd",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_3e6af82c76cded0ea3b0e30924925bd3fdd3f7ef671cf6455f9d091b99a91dd0"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "24370ce354cc",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9ccpmq5kprr",
+          "metric_ref": "metric_24370ce354cc01fdb01bca6e0876e54d9b3bb8f6493a1c696b4c718dc8f45b34"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "exec-be676eff-da68-4ba2-8c26-6ca6ee36bc50",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 147,
+      "utc": "2026-11-27T21:13:02.638Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_d9f362bd6c47cd95c949b758e246acc319fc25a67b388f455d0ab950e4a8315b",
+          "source_ref": "gxa_01m8fdh99j68cpt4bc"
+        },
+        {
+          "metric_ref": "metric_e1c353188bbc8cb456c5acec8722b10b59b4a52580469eb3a9585b40a0a37902",
+          "source_ref": "gxa_01m8fdh99j68cpt4bc"
+        },
+        {
+          "row": {
+            "id": "model_1_distance_A",
+            "key": "d9f362bd6c47",
+            "unit": "angstrom",
+            "value": "1.335 angstrom"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_d9f362bd6c47cd95c949b758e246acc319fc25a67b388f455d0ab950e4a8315b"
+        },
+        {
+          "row": {
+            "id": "model_count",
+            "key": "e1c353188bbc",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdh99j68cpt4bc",
+          "metric_ref": "metric_e1c353188bbc8cb456c5acec8722b10b59b4a52580469eb3a9585b40a0a37902"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "exec-399d9883-dbde-4ab9-b153-2acdbddb205e",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 148,
+      "utc": "2026-11-27T21:13:02.655Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_30fefd603384c0a9e98473bf7c8ea55deeecf2eff6966c9f1d0c33318dd900ee",
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q"
+        },
+        {
+          "metric_ref": "metric_61cf9ebe78e1594b6e49270bfbad341f85fcadc33e920a8b4d8019804f2d4d58",
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q"
+        },
+        {
+          "metric_ref": "metric_1d4e19985d489781374131a800f04a453c7f6e60b9d1f1a62f1c46306282a4da",
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "30fefd603384",
+            "unit": "1",
+            "value": "8/8 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_30fefd603384c0a9e98473bf7c8ea55deeecf2eff6966c9f1d0c33318dd900ee"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "61cf9ebe78e1",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_61cf9ebe78e1594b6e49270bfbad341f85fcadc33e920a8b4d8019804f2d4d58"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "1d4e19985d48",
+            "unit": "1",
+            "value": "8"
+          },
+          "source_ref": "gxa_01m8fdh9hx98fkvf5q",
+          "metric_ref": "metric_1d4e19985d489781374131a800f04a453c7f6e60b9d1f1a62f1c46306282a4da"
+        }
+      ],
+      "lease_id": "gxl_01m8fdmsrqz8gnfkv4",
+      "receipt": "exec-9c429bc5-9e22-4b2e-9336-d25c580cc50e",
+      "task_id": "gxt_01m8fdmsqsm3snnsdd",
+      "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+      "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+      "scope": "run",
+      "event_id": 149,
+      "utc": "2026-11-27T21:13:02.662Z"
+    }
+  ],
+  "routes": {
+    "modules": [
+      {
+        "module_instance_id": "module_af25d5fee69f511c7f44a7aa164af0d0",
+        "scope": "module:module_af25d5fee69f511c7f44a7aa164af0d0",
+        "branch_id": "branch_e8d4d8703a00fe3ccf0450c7e3eafd71",
+        "focus": "data",
+        "module_id": "data_inventory",
+        "module_version": "3",
+        "round": 1,
+        "parent_task_id": "gxt_01m8fdbhp5c522gz31",
+        "goal_version": 1,
+        "status": "PARTIAL",
+        "threads": [
+          {
+            "thread_id": "01a21ed7-2340-7ad3-9b3e-73831a2a6beb",
+            "task_id": "gxt_01m8fde8q3qndsa29v",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21ed7-2368-7531-afa4-19b7a79e3f88",
+                "thread_id": "01a21ed7-2340-7ad3-9b3e-73831a2a6beb",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:09:05.519Z",
+                "end": "2026-11-27T21:09:35.234Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {},
+        "nodes": [],
+        "report": {
+          "artifact_ref": "gxa_b9b04e79c234fdd337b5e75aff0779ed5c831156af59d894c83ae9e19fc7b8d6",
+          "author": {
+            "context_ref": "gxcx_01m8fde8q3s5msc1px",
+            "kind": "GX",
+            "task_id": "gxt_01m8fde8q3qndsa29v"
+          },
+          "base": null,
+          "event_id": 56,
+          "goal_version": 1,
+          "module_id": "data_inventory",
+          "module_instance_id": "module_af25d5fee69f511c7f44a7aa164af0d0",
+          "module_version": "3",
+          "operation_key": "gx.partial:module_af25d5fee69f511c7f44a7aa164af0d0",
+          "report_ref": "gxa_b9b04e79c234fdd337b5e75aff0779ed5c831156af59d894c83ae9e19fc7b8d6",
+          "report_sha256": "40ed034c2a90fbb04e0851a22e30ce4c1ae8066c76d3fd7f381fa158039b7e15",
+          "round": 1,
+          "run_id": "gxr_01m8fdbhka9m2tahwb",
+          "scope": "module:module_af25d5fee69f511c7f44a7aa164af0d0",
+          "source_refs": [
+            "gxa_01m8fdbhmakbwwwe0c",
+            "gxa_01m8fdbhn2jacc87v1"
+          ],
+          "status": "PARTIAL",
+          "version": 1,
+          "wake_event_id": null,
+          "released_event": 69
+        },
+        "delegated_reports": [],
+        "decisions": []
+      }
+    ],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": [
+      {
+        "publisher": "module:module_af25d5fee69f511c7f44a7aa164af0d0",
+        "report_ref": "gxa_b9b04e79c234fdd337b5e75aff0779ed5c831156af59d894c83ae9e19fc7b8d6",
+        "published_event": 56,
+        "released_event": 69,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ed8-a4a2-77e0-9bea-627f2101c33c",
+        "turn_id": "01a21ed8-a4c9-76c3-a21d-9c593b72a7f7",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:a8e1cc04-9644-4164-a81e-85e45aa4b6c7",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_5c13c5d0d91f65a96dd7eb75e2a96036df270653a9ee3fda89e28fe5c9cc0ff9",
+        "effects": [],
+        "decision_event": 133,
+        "rationale": "Deleting the deposited _struct_conn row covale2 reproduces the complete derivative byte for byte. The row links chain A GLN 8 C to DAR 1 N. Both files have the same _atom_site table, PDB accession and primary citation. The inventory module exhausted its allowance and reported no findings. Keep the paired macrocycle and backbone measurements already commissioned. Their outputs will provide the explicit closure count, mapped model count, model-one terminal distance and backbone coverage for each representation of this single NMR deposition."
+      },
+      {
+        "publisher": "module:module_af25d5fee69f511c7f44a7aa164af0d0",
+        "report_ref": "gxa_b9b04e79c234fdd337b5e75aff0779ed5c831156af59d894c83ae9e19fc7b8d6",
+        "published_event": 56,
+        "released_event": 69,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21eda-6732-7a02-ab5b-234adcb45895",
+        "turn_id": "01a21eda-6764-74e0-9dd4-32315059a640",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:b91d7493-33a4-4077-af9a-b87846ead03d",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      }
+    ]
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[].branch",
+      "previous_rejections": 0,
+      "reason": "branch_selection_required",
+      "submission": "521993c5b2888102c0e17f8cc5084b2769a3830be4292ba8142929a4bdae7397",
+      "event_id": 50,
+      "corrected_decision_event": 68
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "f9072e7d1e33a941c7dc249f693cddf09c816777858c957cecb5e7448856d1eb",
+      "event_id": 58,
+      "corrected_decision_event": 68
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 2,
+      "reason": "SCHEMA_INVALID",
+      "submission": "b9a22aaa988158dda993ff1f07726bdc766167c2ce2f61bd96a401bc979b668b",
+      "event_id": 60,
+      "corrected_decision_event": 68
+    },
+    {
+      "attempt": 4,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 3,
+      "reason": "SCHEMA_INVALID",
+      "submission": "14227d7ac7213b5a7b690002d1f532e226692c07bbd579d17504f8601e11b136",
+      "event_id": 61,
+      "corrected_decision_event": 68
+    },
+    {
+      "attempt": 5,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 4,
+      "reason": "SCHEMA_INVALID",
+      "submission": "bf38bf846d399795dc31de14e47066fca4d223b6fbf64cf1c3f5f71dc7523f7a",
+      "event_id": 62,
+      "corrected_decision_event": 68
+    }
+  ],
+  "invocation": {
+    "action": "start",
+    "before": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "after": {
+      "jobs": 4,
+      "host_turns": 4
+    },
+    "added": {
+      "jobs": 4,
+      "host_turns": 4
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/science-assets-live/modalities/macrocycle/state --run-key macrocycle-controls-v1 --goal-file /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/modalities/studies/macrocycle/question.md --goal-config /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/modalities/studies/macrocycle/goal.json --timeout 1080.0"
+  }
+}

@@ -1,0 +1,1067 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8fe32rdt8mqrbaf",
+  "goal": "A second Fab and its annotation have arrived in the archive. Reuse a suitable archived procedure when applicable, obtaining fresh counts for this deposit. Which paired variable-domain measurements can a curator use, and should any regions be held back from comparison?",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_565110d2df016a7921790d648c6c5f939fe8c796752728628e06ad0bef813001",
+    "op_digest": "691f5ec3a59d224abe76b858aaa9a4d434243ba6410ac85b43e4d0cf880c66f4",
+    "requested_event": 211,
+    "committed_event": 216,
+    "closed_event": 217,
+    "closed_utc": "2026-11-27T21:25:50.103Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8fec9b5gjgcfp58"
+      ],
+      "op": "close_run",
+      "reason": "The fresh paired result establishes Cα comparison eligibility for every assigned site in each 1MCP CDR. All six loops meet the archived procedure’s retention criterion.",
+      "unresolved": [
+        "The exact intersection with 4FAB requires its residue-level IMGT map. The present counts describe 1MCP.",
+        "Full-backbone comparisons require site-level coverage of N, C and O in addition to Cα.",
+        "GX attributes the measured counts jointly to the coordinates and numbering map. Its individual-input assessment of the registered prediction remains open."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_565110d2df016a7921790d648c6c5f939fe8c796752728628e06ad0bef813001",
+    "task_id": "gxt_01m8fe8877ap55jm57",
+    "thread_id": "01a21ee4-2116-7800-9910-03568dc27180",
+    "turn_id": "01a21ee4-2149-74c0-a5ae-36849454854f",
+    "rationale": "The archived paired-fab-imgt-ca-coverage@1 procedure validated the supplied ANARCI IMGT map against 1MCP assembly 1 and counted positive-occupancy Cα sites in model 1. The map assigns 8, 10 and 13 positions to CDR1–3 of heavy label chain B and 12, 3 and 9 to CDR1–3 of κ light label chain A. In fab_coverage.json the matched count equals the assigned count within each of those loops, giving {{metric:matched_positions}} observed Cα sites among {{metric:mapped_positions}} assignments. Retain every loop and compare positions that share a domain, IMGT number and insertion label and have a Cα in both deposits. Repeating the same procedure would add no information about other backbone atoms.",
+    "reason": "The fresh paired result establishes Cα comparison eligibility for every assigned site in each 1MCP CDR. All six loops meet the archived procedure’s retention criterion.",
+    "unresolved": [
+      "The exact intersection with 4FAB requires its residue-level IMGT map. The present counts describe 1MCP.",
+      "Full-backbone comparisons require site-level coverage of N, C and O in addition to Cα.",
+      "GX attributes the measured counts jointly to the coordinates and numbering map. Its individual-input assessment of the registered prediction remains open."
+    ],
+    "claim_refs": [
+      "gxa_01m8fec9b5gjgcfp58"
+    ],
+    "evidence_refs": [
+      "gxa_01m8fe74x1xfrgk7r1",
+      "gxa_01m8fe32t22ec6dfjs",
+      "gxa_01m8fe32sf8v42h2fd"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_6d979233bad60ba10364add1dcc4741158f634f6c57c5b2e0f0deae024e4fcb0",
+        "source_ref": "gxa_01m8fe74x1xfrgk7r1",
+        "event_id": 206,
+        "reading": {
+          "metric_id": "matched_positions",
+          "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "sha256": "84cf172ea91d0b66d7b97fcda9d855c5b92176b648b42318dee070f79da89d91",
+          "job_id": "gxj_01m8fe748m25bw7qaq",
+          "output_name": "fab_coverage.json",
+          "method": {
+            "id": "archival-fab-coverage",
+            "sha256": "a6bcf71293c3180b441b3d74f7d372871278ede107748a50a7bf398a2293a591",
+            "version": "1"
+          },
+          "admission_sha256": "687ba253c97a05e65eb3bd00cd7ee9eb1f09afaf11f0623eb8aed6aeb91af0c0",
+          "manifest_sha256": "87a03cf1c973a017dae16d2f971644fd67bfc5a24c21e5ffabc057586030397a",
+          "provenance_cursor": 174,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+              "bytes": 2560,
+              "role": "numbering",
+              "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+            },
+            {
+              "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+              "bytes": 104105,
+              "role": "structure",
+              "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/matched_positions"
+          },
+          "scope": {
+            "entry": "1MCP",
+            "input_sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+            "numbering_sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+          },
+          "value": 55,
+          "raw_value": "55",
+          "display": "55",
+          "metric_ref": "metric_6d979233bad60ba10364add1dcc4741158f634f6c57c5b2e0f0deae024e4fcb0"
+        }
+      },
+      {
+        "metric_ref": "metric_79527e4d52a6ab9f44d798e4ff3b99c2ffcf8e373d3c161bd47ba9fe34b0b22f",
+        "source_ref": "gxa_01m8fe74x1xfrgk7r1",
+        "event_id": 206,
+        "reading": {
+          "metric_id": "mapped_positions",
+          "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "sha256": "84cf172ea91d0b66d7b97fcda9d855c5b92176b648b42318dee070f79da89d91",
+          "job_id": "gxj_01m8fe748m25bw7qaq",
+          "output_name": "fab_coverage.json",
+          "method": {
+            "id": "archival-fab-coverage",
+            "sha256": "a6bcf71293c3180b441b3d74f7d372871278ede107748a50a7bf398a2293a591",
+            "version": "1"
+          },
+          "admission_sha256": "687ba253c97a05e65eb3bd00cd7ee9eb1f09afaf11f0623eb8aed6aeb91af0c0",
+          "manifest_sha256": "87a03cf1c973a017dae16d2f971644fd67bfc5a24c21e5ffabc057586030397a",
+          "provenance_cursor": 174,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+              "bytes": 2560,
+              "role": "numbering",
+              "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+            },
+            {
+              "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+              "bytes": 104105,
+              "role": "structure",
+              "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/mapped_positions"
+          },
+          "scope": {
+            "entry": "1MCP",
+            "input_sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+            "numbering_sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+          },
+          "value": 55,
+          "raw_value": "55",
+          "display": "55",
+          "metric_ref": "metric_79527e4d52a6ab9f44d798e4ff3b99c2ffcf8e373d3c161bd47ba9fe34b0b22f"
+        }
+      }
+    ],
+    "rendered": {
+      "reason": "The fresh paired result establishes Cα comparison eligibility for every assigned site in each 1MCP CDR. All six loops meet the archived procedure’s retention criterion.",
+      "rationale": "The archived paired-fab-imgt-ca-coverage@1 procedure validated the supplied ANARCI IMGT map against 1MCP assembly 1 and counted positive-occupancy Cα sites in model 1. The map assigns 8, 10 and 13 positions to CDR1–3 of heavy label chain B and 12, 3 and 9 to CDR1–3 of κ light label chain A. In fab_coverage.json the matched count equals the assigned count within each of those loops, giving 55 observed Cα sites among 55 assignments. Retain every loop and compare positions that share a domain, IMGT number and insertion label and have a Cα in both deposits. Repeating the same procedure would add no information about other backbone atoms.",
+      "unresolved": [
+        "The exact intersection with 4FAB requires its residue-level IMGT map. The present counts describe 1MCP.",
+        "Full-backbone comparisons require site-level coverage of N, C and O in addition to Cα.",
+        "GX attributes the measured counts jointly to the coordinates and numbering map. Its individual-input assessment of the registered prediction remains open."
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+      "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+      "bytes": 104105,
+      "role": "structure"
+    },
+    {
+      "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+      "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+      "bytes": 2560,
+      "role": "numbering"
+    }
+  ],
+  "predictions": [
+    {
+      "hypothesis_id": "gxh_01m8fe742fbyc0kash",
+      "statement": "Every assigned IMGT CDR position in the supplied Fab pair has a positive-occupancy Cα coordinate in the selected model.",
+      "scope": "The first model of the declared biological assembly in the supplied 1MCP deposit, heavy label chain B and κ light label chain A, restricted to CDR positions assigned by its supplied IMGT annotation.",
+      "criteria": "Full coverage requires /matched_positions = 55 and equality of matched and assigned counts within every CDR. A deficit places that loop on hold for whole-loop comparison.",
+      "decision_scope": "run",
+      "limitations": "The criterion applies to the deposited Cα trace of the annotated pair. A partial count requires an observed-site mask for a residue-level comparison.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fe569zmc91serr",
+        "proposed_level": "open",
+        "rationale": "Counting the ordered IMGT assignments within the archived CDR windows fixes the complete-coverage expectation before examining the coordinates."
+      },
+      "evidence_refs": [
+        "gxa_01m8fe32t22ec6dfjs",
+        "gxa_01m8fe32sf8v42h2fd"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "f5a9fb6447ab2eff711a9378533c3162a8c033c8d94c3553077f7a60f4777e8f",
+        "brief_turn_id": "01a21ee1-9337-7461-b607-7d55731f15b7",
+        "context_ref": "gxcx_01m8fe32tkb649d5zz",
+        "delivery_receipt": "start:8a0bfaac-d828-4d59-b832-f5e6fc74316e",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 148,
+        "state": "acknowledged",
+        "thread_id": "01a21ee1-92fe-7ce0-981a-dc6faf29e4ec",
+        "turn_id": "01a21ee1-9337-7461-b607-7d55731f15b7"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 138,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fe32t22ec6dfjs",
+          "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 137,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fe32sf8v42h2fd",
+          "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+          "source_class": "input"
+        }
+      ],
+      "goal_version": 1,
+      "prediction": {
+        "data_refs": [
+          "gxa_01m8fe32sf8v42h2fd",
+          "gxa_01m8fe32t22ec6dfjs"
+        ],
+        "method": {
+          "capability": "archival-fab-coverage@1",
+          "metric_id": "matched_positions",
+          "output": "fab_coverage.json",
+          "parameters": {},
+          "unit": "1"
+        },
+        "observable": "/matched_positions",
+        "operator": "eq",
+        "target": "analysis",
+        "threshold": 55
+      },
+      "registration": {
+        "chronology_scope": "same_store",
+        "claim_revision_id": "gxh_01m8fe742fbyc0kash@1",
+        "claim_scope": "The first model of the declared biological assembly in the supplied 1MCP deposit, heavy label chain B and κ light label chain A, restricted to CDR positions assigned by its supplied IMGT annotation.",
+        "claim_sha256": "e768e03133220ddb8513430acb702a52c53b98f1d07eeae13ec9cb0e0f21fed5",
+        "data": [
+          {
+            "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+            "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+          },
+          {
+            "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+            "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+          }
+        ],
+        "decision_scope": "run",
+        "endpoint_chronology_at_registration": {
+          "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8": {
+            "endpoint_first_available_event_id": null,
+            "raw_material_received_event_id": 138
+          },
+          "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e": {
+            "endpoint_first_available_event_id": null,
+            "raw_material_received_event_id": 137
+          }
+        },
+        "event_id": 165,
+        "known_at_registration": {
+          "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8": false,
+          "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e": false
+        },
+        "material_identity": "endpoint_verified",
+        "measurement_spec_sha256": "d30209222b67b2e55c4fcbdf0324be37b397d339c5af53d2dd61a501b8f4b476",
+        "method_pin": {
+          "capability": "archival-fab-coverage@1",
+          "manifest_sha256": "a6bcf71293c3180b441b3d74f7d372871278ede107748a50a7bf398a2293a591",
+          "measurement_spec": {
+            "applicability": "The first model of the declared biological assembly in the supplied 1MCP deposit, heavy label chain B and κ light label chain A, restricted to CDR positions assigned by its supplied IMGT annotation.",
+            "capability": "archival-fab-coverage@1",
+            "input_role": null,
+            "manifest_sha256": "a6bcf71293c3180b441b3d74f7d372871278ede107748a50a7bf398a2293a591",
+            "measurement_schema": null,
+            "metric_definition": {
+              "op": "integer/1",
+              "places": 0,
+              "pointer": "/matched_positions",
+              "reader": "json/1",
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256",
+                "numbering_sha256": "/numbering_sha256"
+              },
+              "unit": "1"
+            },
+            "metric_id": "matched_positions",
+            "missing_parameters": [],
+            "observable": "/metrics/matched_positions",
+            "output": "fab_coverage.json",
+            "output_name": "fab_coverage.json",
+            "parameters": {},
+            "result_pointer": null,
+            "schema": "gx.measurement-spec/2",
+            "source_roles": [
+              "numbering",
+              "structure"
+            ],
+            "unit": "1"
+          },
+          "measurement_spec_sha256": "d30209222b67b2e55c4fcbdf0324be37b397d339c5af53d2dd61a501b8f4b476",
+          "output": "fab_coverage.json"
+        },
+        "policy": "gx.claim-proposition/3",
+        "posthoc_revision_of": null,
+        "prediction": {
+          "data_refs": [
+            "gxa_01m8fe32sf8v42h2fd",
+            "gxa_01m8fe32t22ec6dfjs"
+          ],
+          "method": {
+            "capability": "archival-fab-coverage@1",
+            "metric_id": "matched_positions",
+            "output": "fab_coverage.json",
+            "parameters": {},
+            "unit": "1"
+          },
+          "observable": "/matched_positions",
+          "operator": "eq",
+          "target": "analysis",
+          "threshold": 55
+        },
+        "proposition_sha256": "5f55ac5169aab138d28ddbfd0e2f7479a292d576c7bf9e375d96fb78a82bf12a",
+        "quantifier": "all",
+        "utc": "2026-11-27T21:22:39.823Z",
+        "decision_ref": "gxa_70eadeb8795bd1a0799fb9941fa5a2493c02762ee79dc8e4f8ca73dcee38458c"
+      },
+      "assessments": [
+        {
+          "claim_revision_id": "gxh_01m8fe742fbyc0kash@1",
+          "decision_id": "gxa_70eadeb8795bd1a0799fb9941fa5a2493c02762ee79dc8e4f8ca73dcee38458c",
+          "assessment_cursor": 148,
+          "availability_cursor": 165,
+          "level": "open",
+          "stage": "preregistered",
+          "direction": "undetermined",
+          "results": [],
+          "gaps": [],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "d30209222b67b2e55c4fcbdf0324be37b397d339c5af53d2dd61a501b8f4b476",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 137,
+              "registration_event_id": 165,
+              "retrospective_refs": [],
+              "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            },
+            {
+              "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "d30209222b67b2e55c4fcbdf0324be37b397d339c5af53d2dd61a501b8f4b476",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 138,
+              "registration_event_id": 165,
+              "retrospective_refs": [],
+              "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "GX froze the rule before each qualifying prospective result."
+          ],
+          "utc": "2026-11-27T21:22:39.823Z",
+          "event_id": 165,
+          "event": "v6.claim.adopted",
+          "author": "01a21ee1-92fe-7ce0-981a-dc6faf29e4ec"
+        },
+        {
+          "claim_revision_id": "gxh_01m8fe742fbyc0kash@2",
+          "decision_id": "gxa_70eadeb8795bd1a0799fb9941fa5a2493c02762ee79dc8e4f8ca73dcee38458c",
+          "assessment_cursor": 189,
+          "availability_cursor": 189,
+          "level": "open",
+          "stage": "preregistered",
+          "direction": "undetermined",
+          "results": [],
+          "gaps": [
+            {
+              "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+              "event_id": 189,
+              "kind": "no_individual_material_attribution"
+            }
+          ],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "d30209222b67b2e55c4fcbdf0324be37b397d339c5af53d2dd61a501b8f4b476",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 137,
+              "registration_event_id": 165,
+              "retrospective_refs": [],
+              "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            },
+            {
+              "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "d30209222b67b2e55c4fcbdf0324be37b397d339c5af53d2dd61a501b8f4b476",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 138,
+              "registration_event_id": 165,
+              "retrospective_refs": [],
+              "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "GX froze the rule before each qualifying prospective result.",
+            "Unmeasured outcomes and execution gaps do not establish counterevidence."
+          ],
+          "utc": "2026-11-27T21:22:40.795Z",
+          "event_id": 190,
+          "event": "v62.claim.reassessed",
+          "author": "GX"
+        }
+      ],
+      "classification": "registered_without_qualifying_result",
+      "revisions": []
+    }
+  ],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8fecxsqza5vasv2",
+      "statement": "matched_positions = 55; mapped_positions = 55.",
+      "scope": "The first deposited model of the supplied isolated Fab assembly, heavy variable domain on label chain B and κ light variable domain on label chain A.",
+      "criteria": "Retain a loop when the source and chain map pass validation and its positive assigned count equals its matched count. Across deposits, match the domain, IMGT number and insertion label and require a Cα in both.",
+      "decision_scope": "run",
+      "limitations": "This is a descriptive result for the deposited pair. Full-backbone comparison requires an additional check for N, C and O. A cross-deposit residue set also requires the partner annotation and observed coordinates.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fec9b5gjgcfp58",
+        "proposed_level": "open",
+        "rationale": "The paired output reports equality within every loop. Its two verified totals are attributable jointly to the deposited coordinates and the supplied numbering map. GX leaves the registered prediction open at the individual-input level."
+      },
+      "evidence_refs": [
+        "gxa_01m8fe74x1xfrgk7r1",
+        "gxa_01m8fe32t22ec6dfjs",
+        "gxa_01m8fe32sf8v42h2fd"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "244f77ca64dad8d185c9b22270396796ece197afcdf047f5e705adb9d53bb269",
+        "brief_turn_id": "01a21ee4-2149-74c0-a5ae-36849454854f",
+        "context_ref": "gxcx_01m8fe887672my9zhp",
+        "delivery_receipt": "start:9066ab3a-21b8-4180-87c0-fcbf4855e603",
+        "metric_refs": [
+          "metric_6d979233bad60ba10364add1dcc4741158f634f6c57c5b2e0f0deae024e4fcb0",
+          "metric_79527e4d52a6ab9f44d798e4ff3b99c2ffcf8e373d3c161bd47ba9fe34b0b22f"
+        ],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+            "event_id": 189,
+            "projection_sha256": "47dbd92204077bc3c4cd163a192a0e45b17cdeb389c576d35a9c5ebee104f0a9",
+            "sha256": "84cf172ea91d0b66d7b97fcda9d855c5b92176b648b42318dee070f79da89d91"
+          }
+        ],
+        "snapshot_cursor": 190,
+        "state": "acknowledged",
+        "thread_id": "01a21ee4-2116-7800-9910-03568dc27180",
+        "turn_id": "01a21ee4-2149-74c0-a5ae-36849454854f"
+      },
+      "source_records": [
+        {
+          "admission_sha256": "687ba253c97a05e65eb3bd00cd7ee9eb1f09afaf11f0623eb8aed6aeb91af0c0",
+          "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "capability": "archival-fab-coverage",
+          "completion_sha256": "87a03cf1c973a017dae16d2f971644fd67bfc5a24c21e5ffabc057586030397a",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+              "bytes": 2560,
+              "role": "numbering",
+              "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+            },
+            {
+              "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+              "bytes": 104105,
+              "role": "structure",
+              "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+            }
+          ],
+          "job_id": "gxj_01m8fe748m25bw7qaq",
+          "job_status": "SUCCEEDED",
+          "kind": "archival_fab_coverage",
+          "output_provenance": {
+            "admission_sha256": "687ba253c97a05e65eb3bd00cd7ee9eb1f09afaf11f0623eb8aed6aeb91af0c0",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+            "capability": {
+              "id": "archival-fab-coverage",
+              "sha256": "a6bcf71293c3180b441b3d74f7d372871278ede107748a50a7bf398a2293a591",
+              "version": "1"
+            },
+            "completion_sha256": "87a03cf1c973a017dae16d2f971644fd67bfc5a24c21e5ffabc057586030397a",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+                "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+              },
+              {
+                "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+                "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+              }
+            ],
+            "declaration_name": "fab_coverage.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+                "sha256:cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+              ],
+              "processing": [
+                "capability:a6bcf71293c3180b441b3d74f7d372871278ede107748a50a7bf398a2293a591",
+                "method_source:385ef5e54e22cd25a0a328d0c2e88539137d164b1917c828b9df45cc4cac8c01"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 183,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fe748m25bw7qaq",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "fab_coverage.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "84cf172ea91d0b66d7b97fcda9d855c5b92176b648b42318dee070f79da89d91",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fe74x1xfrgk7r1",
+          "sha256": "84cf172ea91d0b66d7b97fcda9d855c5b92176b648b42318dee070f79da89d91",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 138,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fe32t22ec6dfjs",
+          "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 137,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fe32sf8v42h2fd",
+          "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+          "source_class": "input"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fecxsqza5vasv2@1",
+      "decision_id": "gxa_565110d2df016a7921790d648c6c5f939fe8c796752728628e06ad0bef813001",
+      "assessment_cursor": 190,
+      "availability_cursor": 210,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:25:50.007Z",
+      "event_id": 210,
+      "event": "v6.claim.adopted",
+      "author": "01a21ee4-2116-7800-9910-03568dc27180",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8fe748m25bw7qaq",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "archival-fab-coverage",
+        "sha256": "a6bcf71293c3180b441b3d74f7d372871278ede107748a50a7bf398a2293a591",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+          "bytes": 2560,
+          "role": "numbering",
+          "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+        },
+        {
+          "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+          "bytes": 104105,
+          "role": "structure",
+          "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:5457c6a694c1d22697cfd5b2e8c7da31b7b559837dccf189995aff9bc82d870a",
+        "branch_id": "branch_3757b485272d3e240393a13c0c24cbfd",
+        "decision_ref": "gxa_70eadeb8795bd1a0799fb9941fa5a2493c02762ee79dc8e4f8ca73dcee38458c",
+        "exec_key": "e032811dad1234c4d5b7a9b669f588bd52c824f69e6d4708b6422a9bd8c95c30",
+        "kind": "graph_node",
+        "node_id": "node_9d588107527ebbcb5464a103c03c0752",
+        "operation_key": "v6.node:5457c6a694c1d22697cfd5b2e8c7da31b7b559837dccf189995aff9bc82d870a",
+        "plan_key": "94650ca9c2a52737c38fdea4e11d9843bba088afd8e63e5538cf254ded5c88e2",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "87a03cf1c973a017dae16d2f971644fd67bfc5a24c21e5ffabc057586030397a",
+      "outputs": [
+        {
+          "output_name": "fab_coverage.json",
+          "artifact_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "sha256": "84cf172ea91d0b66d7b97fcda9d855c5b92176b648b42318dee070f79da89d91",
+          "bytes": 1065,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fe32t22ec6dfjs",
+              "bytes": 2560,
+              "role": "numbering",
+              "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+            },
+            {
+              "artifact_ref": "gxa_01m8fe32sf8v42h2fd",
+              "bytes": 104105,
+              "role": "structure",
+              "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fe32rdt8mqrbaf/jobs/gxj_01m8fe748m25bw7qaq",
+            "rel_path": "files/fab_coverage.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "mapped_positions",
+              "metric_ref": "metric_79527e4d52a6ab9f44d798e4ff3b99c2ffcf8e373d3c161bd47ba9fe34b0b22f",
+              "value": 55,
+              "raw_value": "55",
+              "display": "55",
+              "unit": "1",
+              "scope": {
+                "entry": "1MCP",
+                "input_sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+                "numbering_sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+              },
+              "lead_delivery_event_ids": [
+                204,
+                206
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "matched_positions",
+              "metric_ref": "metric_6d979233bad60ba10364add1dcc4741158f634f6c57c5b2e0f0deae024e4fcb0",
+              "value": 55,
+              "raw_value": "55",
+              "display": "55",
+              "unit": "1",
+              "scope": {
+                "entry": "1MCP",
+                "input_sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+                "numbering_sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+              },
+              "lead_delivery_event_ids": [
+                204,
+                206
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "assembly_id": "1",
+            "condition": "One annotated isolated Fab assembly; inference is limited to deposited coordinate coverage.",
+            "entry": "1MCP",
+            "input_sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+            "mapped_positions": 55,
+            "mapped_regions": 6,
+            "matched_positions": 55,
+            "measure": "model-1 positive-occupancy C-alpha coverage of assigned polymer positions in six IMGT CDRs",
+            "model": 1,
+            "numbering_method": "ANARCI",
+            "numbering_sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+            "numbering_version": "2026.2.13.2",
+            "scheme": "IMGT"
+          },
+          "denominators": {},
+          "lead_delivery_event_ids": [
+            204,
+            206
+          ]
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_79527e4d52a6ab9f44d798e4ff3b99c2ffcf8e373d3c161bd47ba9fe34b0b22f",
+          "source_ref": "gxa_01m8fe74x1xfrgk7r1"
+        },
+        {
+          "metric_ref": "metric_6d979233bad60ba10364add1dcc4741158f634f6c57c5b2e0f0deae024e4fcb0",
+          "source_ref": "gxa_01m8fe74x1xfrgk7r1"
+        },
+        {
+          "row": {
+            "id": "mapped_positions",
+            "key": "79527e4d52a6",
+            "unit": "1",
+            "value": "55"
+          },
+          "source_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "metric_ref": "metric_79527e4d52a6ab9f44d798e4ff3b99c2ffcf8e373d3c161bd47ba9fe34b0b22f"
+        },
+        {
+          "row": {
+            "id": "matched_positions",
+            "key": "6d979233bad6",
+            "unit": "1",
+            "value": "55"
+          },
+          "source_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "metric_ref": "metric_6d979233bad60ba10364add1dcc4741158f634f6c57c5b2e0f0deae024e4fcb0"
+        }
+      ],
+      "lease_id": "gxl_01m8fe887t2zgt780t",
+      "receipt": "start:9066ab3a-21b8-4180-87c0-fcbf4855e603",
+      "task_id": "gxt_01m8fe8877ap55jm57",
+      "thread_id": "01a21ee4-2116-7800-9910-03568dc27180",
+      "turn_id": "01a21ee4-2149-74c0-a5ae-36849454854f",
+      "scope": "run",
+      "event_id": 204,
+      "utc": "2026-11-27T21:23:16.939Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_79527e4d52a6ab9f44d798e4ff3b99c2ffcf8e373d3c161bd47ba9fe34b0b22f",
+          "source_ref": "gxa_01m8fe74x1xfrgk7r1"
+        },
+        {
+          "metric_ref": "metric_6d979233bad60ba10364add1dcc4741158f634f6c57c5b2e0f0deae024e4fcb0",
+          "source_ref": "gxa_01m8fe74x1xfrgk7r1"
+        },
+        {
+          "row": {
+            "id": "mapped_positions",
+            "key": "79527e4d52a6",
+            "unit": "1",
+            "value": "55"
+          },
+          "source_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "metric_ref": "metric_79527e4d52a6ab9f44d798e4ff3b99c2ffcf8e373d3c161bd47ba9fe34b0b22f"
+        },
+        {
+          "row": {
+            "id": "matched_positions",
+            "key": "6d979233bad6",
+            "unit": "1",
+            "value": "55"
+          },
+          "source_ref": "gxa_01m8fe74x1xfrgk7r1",
+          "metric_ref": "metric_6d979233bad60ba10364add1dcc4741158f634f6c57c5b2e0f0deae024e4fcb0"
+        }
+      ],
+      "lease_id": "gxl_01m8fe887t2zgt780t",
+      "receipt": "exec-3c9bb24f-17dd-4e0a-ade7-e1e49f23f782",
+      "task_id": "gxt_01m8fe8877ap55jm57",
+      "thread_id": "01a21ee4-2116-7800-9910-03568dc27180",
+      "turn_id": "01a21ee4-2149-74c0-a5ae-36849454854f",
+      "scope": "run",
+      "event_id": 206,
+      "utc": "2026-11-27T21:23:24.945Z"
+    }
+  ],
+  "routes": {
+    "modules": [],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": []
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "a083c20c1381d199b9ce918ea6a967df52360b329aa6f0e4f5d7b614c1ffdab4",
+      "event_id": 159,
+      "corrected_decision_event": 170
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "0ba48c1d92df0b6d98df6b3c71a41abd42631829279d8b9b28464a2a9e04d5f5",
+      "event_id": 160,
+      "corrected_decision_event": 170
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 2,
+      "reason": "SCHEMA_INVALID",
+      "submission": "42c377fc92341b3dbc57d20c76a57e0fc8383f4a6b6274953fb1b9a64d4517de",
+      "event_id": 161,
+      "corrected_decision_event": 170
+    },
+    {
+      "attempt": 4,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 3,
+      "reason": "SCHEMA_INVALID",
+      "submission": "3cc0b16e3f47053f6f5ba5c5d1e8bf7f91f9fc690dce11b02ccd6a19e8281775",
+      "event_id": 162,
+      "corrected_decision_event": 170
+    },
+    {
+      "attempt": 5,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 4,
+      "reason": "SCHEMA_INVALID",
+      "submission": "0e07692a0e3b7b7f8909476cdb3cde7f9c483786cf6632f81111313800785594",
+      "event_id": 163,
+      "corrected_decision_event": 170
+    }
+  ],
+  "invocation": {
+    "action": "resume",
+    "before": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "after": {
+      "jobs": 1,
+      "host_turns": 3
+    },
+    "added": {
+      "jobs": 1,
+      "host_turns": 3
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/science-assets-live/modalities/fab-first/state --run-id gxr_01m8fe32rdt8mqrbaf --timeout 1080.0"
+  },
+  "prior_study": {
+    "parent_run_id": "gxr_01m8fdh3yjvwr7ph5s",
+    "parent_decision_ref": "gxa_d11c81720548c19e7fd3f56bcb14d8d30dfdcaea955371ff9a0bd55b594be2e2",
+    "parent_goal_version": 1,
+    "request_message_id": "second-archival-fab-deposition-v1",
+    "selected_materials": [
+      {
+        "name": "1mcp.cif.gz",
+        "role": "structure",
+        "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e"
+      },
+      {
+        "name": "1mcp.imgt.json",
+        "role": "numbering",
+        "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8"
+      }
+    ]
+  }
+}

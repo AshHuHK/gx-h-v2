@@ -21,3 +21,5 @@
 ```
 
 五項定向回歸涵蓋兩個正例、化學資料未知、不同替代構象、修飾的鏈範圍，以及原有環肽顯式連接對照。[首次缺口](baseline.log) · [修後測試](tests.log) · [普通 Goal 題面](../studies/linear-peptides/question.md)
+
+首次普通 Goal 的設定逐位元保存在[線性肽首案](../studies/linear-peptides/first-goal.json)與[環肽首案](../studies/macrocycle/first-goal.json)。新題的 [線性肽設定](../studies/linear-peptides/goal.json)及[環肽設定](../studies/macrocycle/goal.json)對三份實驗 mmCIF 隨材料登記來源、修訂 1.3、原文 DOI 與檔案 SHA-256，採樣獨立性保留未知。6BEN 刪除閉環聲明的檔案保留衍生對照身份。這項補登僅適用於新建 Run，首次決策與原始收據仍按當時入場條件解讀。

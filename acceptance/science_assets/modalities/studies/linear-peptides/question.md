@@ -1,0 +1,1 @@
+A peptide archive wants to compare coordinate completeness across the two attached deposits. What denominator should a curator use for each? Measure the coverage of the deposited chains, explain how end groups and residue annotations affect the comparison, and identify anything the observations cannot establish.

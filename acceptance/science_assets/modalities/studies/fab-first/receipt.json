@@ -1,0 +1,556 @@
+{
+  "run_id": "gxr_01m8fdh3yjvwr7ph5s",
+  "goal": "CLOSED",
+  "materials": [
+    {
+      "role": "structure",
+      "artifact_ref": "gxa_01m8fdh3zjegxybq5z",
+      "sha256": "197b8da21af9f573230efdc28b9821ef60db4354cd18476a0040e8f42d9c0c6c"
+    },
+    {
+      "role": "numbering",
+      "artifact_ref": "gxa_01m8fdh409cnqk4c72",
+      "sha256": "17de85a6c309c21258a2f40a4ead8f6d8b3da949f261622f7d0a0bf458f59def"
+    }
+  ],
+  "jobs": [
+    {
+      "node_id": "node_c9fdef0d8c8e86a5d499a141486f4e83",
+      "job_id": "gxj_01m8fdpcsnrk62sedj",
+      "status": "FAILED",
+      "method": "deposited-backbone-qc@1",
+      "depends_on": [],
+      "recipe_decision": null,
+      "adopted_by": "gxa_49cb0a0ad683822392c92de08a829cbfd192a734b88e3805e11e3aa7e93bf11e",
+      "selected_inputs": [
+        "gxa_01m8fdh3zjegxybq5z"
+      ],
+      "parameters": {},
+      "measurements": []
+    },
+    {
+      "node_id": "node_1f9c0d1fd468a991e3bc79d3d60951de",
+      "job_id": "gxj_01m8fdt5txksns88fc",
+      "status": "SUCCEEDED",
+      "method": "archival-fab-coverage@1",
+      "depends_on": [],
+      "recipe_decision": null,
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdh409cnqk4c72",
+          "bytes": 2516,
+          "role": "numbering",
+          "sha256": "17de85a6c309c21258a2f40a4ead8f6d8b3da949f261622f7d0a0bf458f59def"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdh3zjegxybq5z",
+          "bytes": 101044,
+          "role": "structure",
+          "sha256": "197b8da21af9f573230efdc28b9821ef60db4354cd18476a0040e8f42d9c0c6c"
+        }
+      ],
+      "manifest_hash": "8fbbbf6e3b59be7d5ddf65f0ef365a828e27fe5df0b57cc0319a0095d3b53da8",
+      "outputs": [
+        {
+          "artifact_ref": "gxa_01m8fdt6eg6y2eqwzc",
+          "sha256": "45390e75f3e03c5b9f21708b32d04ff4e2f76ad79bed9ca63ada20006ef7bd41",
+          "output_name": "fab_coverage.json",
+          "kind": "archival_fab_coverage",
+          "nature": "analysis"
+        }
+      ],
+      "adopted_by": "gxa_2d7da5af0f2a0e125f898fe0be1d28f0b83b4f786c228a4a593a4a827986fd16",
+      "selected_inputs": [
+        "gxa_01m8fdh409cnqk4c72",
+        "gxa_01m8fdh3zjegxybq5z"
+      ],
+      "parameters": {},
+      "measurements": [
+        {
+          "artifact_ref": "gxa_01m8fdt6eg6y2eqwzc",
+          "summary": {
+            "entry": "4FAB",
+            "model": 1,
+            "input_sha256": "197b8da21af9f573230efdc28b9821ef60db4354cd18476a0040e8f42d9c0c6c",
+            "numbering_sha256": "17de85a6c309c21258a2f40a4ead8f6d8b3da949f261622f7d0a0bf458f59def",
+            "mapped_regions": 6,
+            "mapped_positions": 50,
+            "matched_positions": 50,
+            "numbering_method": "ANARCI",
+            "numbering_version": "2026.2.13.2",
+            "scheme": "IMGT",
+            "chains": {
+              "VH": {
+                "cdr": {
+                  "CDR1": {
+                    "mapped_positions": 8,
+                    "matched_positions": 8
+                  },
+                  "CDR2": {
+                    "mapped_positions": 10,
+                    "matched_positions": 10
+                  },
+                  "CDR3": {
+                    "mapped_positions": 9,
+                    "matched_positions": 9
+                  }
+                },
+                "chain_type": "H",
+                "label_asym_id": "B"
+              },
+              "VL": {
+                "cdr": {
+                  "CDR1": {
+                    "mapped_positions": 11,
+                    "matched_positions": 11
+                  },
+                  "CDR2": {
+                    "mapped_positions": 3,
+                    "matched_positions": 3
+                  },
+                  "CDR3": {
+                    "mapped_positions": 9,
+                    "matched_positions": 9
+                  }
+                },
+                "chain_type": "K",
+                "label_asym_id": "A"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "release_events": [
+    {
+      "event_id": 64,
+      "node": "node_c9fdef0d8c8e86a5d499a141486f4e83",
+      "type": "v6.node.settled"
+    },
+    {
+      "event_id": 99,
+      "node": "node_1f9c0d1fd468a991e3bc79d3d60951de",
+      "type": "v6.node.settled"
+    }
+  ],
+  "recipe_expansions": [],
+  "lead_points": [],
+  "decisions": [
+    {
+      "decision_ref": "gxa_49cb0a0ad683822392c92de08a829cbfd192a734b88e3805e11e3aa7e93bf11e",
+      "turn_id": "01a21ed8-96cb-7ea2-afc4-05b6753ddb52",
+      "rationale": "The numbering names both candidate label chains and gives per-position IMGT assignments. The historical Fab recipe leaves paired-chain validation open. The installed backbone reader can independently identify the deposited chain it covers and quantify its model-1 representation in one inexpensive pass. If it reports a deficit, its location relative to the six annotated loops is still needed. The result will determine whether this reader can contribute to a reusable measurement of the pair.",
+      "evidence_refs": [
+        "gxa_01m8fdh3zjegxybq5z",
+        "gxa_01m8fdh409cnqk4c72",
+        "gxa_01m8fdhy12tc27nmqf"
+      ],
+      "ops": [
+        "open_branch",
+        "add_node"
+      ],
+      "outcome": "adopted"
+    },
+    {
+      "decision_ref": "gxa_2d7da5af0f2a0e125f898fe0be1d28f0b83b4f786c228a4a593a4a827986fd16",
+      "turn_id": "01a21edb-3415-7602-b891-6eed1f654d1e",
+      "rationale": "The IMGT map identifies both chains and fixes each CDR denominator independently of the coordinates. The single-chain method recorded an execution failure. The paired reader can check deposition and polymer identity and localize coverage in one local job. Its output should distinguish numbering gaps from unobserved assigned sites and establish which coordinate comparisons the archive supports.",
+      "evidence_refs": [
+        "gxa_01m8fdh409cnqk4c72",
+        "gxa_01m8fdh3zjegxybq5z",
+        "gxa_01m8fdptctj2h919s3",
+        "gxa_01m8fdptfngart5992",
+        "gxa_01m8fds04c6hxv10kv"
+      ],
+      "ops": [
+        "open_branch",
+        "add_node"
+      ],
+      "outcome": "adopted"
+    },
+    {
+      "decision_ref": "gxa_cf8200f1d28c541206f7aeeda56d1ed28aa8cc49fdd62e3b10c558c3d647b58c",
+      "turn_id": "01a21edd-1858-7390-943b-3bedb74e07b2",
+      "rationale": "The supplied IMGT map assigns 8, 10 and 9 residues to VH CDR1–3 and 11, 3 and 9 to VL CDR1–3. The commissioned paired reader checks those assignments against the deposited polymers and coordinates. Its job has succeeded according to the catalogue, and the result is awaiting delivery. Reading its six loop masks and atom rule will resolve the curator’s question without a duplicate job and provide a tested node for the reusable workflow.",
+      "evidence_refs": [
+        "gxa_01m8fdh409cnqk4c72",
+        "gxa_01m8fdh3zjegxybq5z",
+        "gxa_01m8fdptctj2h919s3"
+      ],
+      "ops": [],
+      "outcome": "maintained"
+    },
+    {
+      "decision_ref": "gxa_d11c81720548c19e7fd3f56bcb14d8d30dfdcaea955371ff9a0bd55b594be2e2",
+      "turn_id": "01a21edd-ef27-7b23-9db1-63661bfbae4d",
+      "rationale": "The paired reader accepted the map for 4FAB assembly 1 and recovered the annotated heavy chain B (entity 2) and κ light chain A (entity 1). The map assigns 8, 10 and 9 positions to VH CDR1–3 and 11, 3 and 9 to VL CDR1–3. In fab_coverage.json each loop's matched count equals its assigned count, giving {{metric:matched_positions}} positive-occupancy model-1 Cα sites across {{metric:mapped_positions}} assignments. This supports Cα trace comparisons at shared IMGT positions. Repeating this measurement would add no evidence about the other backbone atoms. The tested workflow is available as paired-fab-imgt-ca-coverage@1.",
+      "evidence_refs": [
+        "gxa_01m8fdt6eg6y2eqwzc",
+        "gxa_01m8fdh409cnqk4c72",
+        "gxa_01m8fdh3zjegxybq5z"
+      ],
+      "ops": [
+        "close_run"
+      ],
+      "outcome": "adopted"
+    }
+  ],
+  "lead_turns": [
+    {
+      "thread_id": "01a21ed8-96a1-7e40-9934-1874437bc0d2",
+      "turn_id": "01a21ed8-96cb-7ea2-afc4-05b6753ddb52",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21edb-33dc-76d1-873d-ff85c1e43978",
+      "turn_id": "01a21edb-3415-7602-b891-6eed1f654d1e",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21edd-1833-7f92-beb3-4507d40a4494",
+      "turn_id": "01a21edd-1858-7390-943b-3bedb74e07b2",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21edd-eef2-7891-8b91-cfb731b64933",
+      "turn_id": "01a21edd-ef27-7b23-9db1-63661bfbae4d",
+      "state": "acknowledged"
+    }
+  ],
+  "endpoint_deliveries": [
+    {
+      "event_id": 113,
+      "task_id": "gxt_01m8fdvvpc6xkfjfzt",
+      "thread_id": "01a21edd-eef2-7891-8b91-cfb731b64933",
+      "delivery_kind": "brief",
+      "sources": [
+        "gxa_01m8fdt6eg6y2eqwzc"
+      ]
+    },
+    {
+      "event_id": 115,
+      "task_id": "gxt_01m8fdvvpc6xkfjfzt",
+      "thread_id": "01a21edd-eef2-7891-8b91-cfb731b64933",
+      "delivery_kind": "artifact_read",
+      "sources": [
+        "gxa_01m8fdt6eg6y2eqwzc"
+      ]
+    }
+  ],
+  "catalog": [
+    {
+      "event_id": 20,
+      "kind": "all",
+      "query": "Fab paired variable domains IMGT annotation sequence concordance CDR observed coordinates coverage reusable workflow",
+      "total": 54,
+      "first_candidates": [
+        {
+          "kind": "recipe",
+          "provider": null,
+          "reference": "fab-coverage-history@legacy",
+          "status": "reference_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.3.0",
+          "reference": "deposited-chain-geometry@2",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-backbone-qc@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.pcna-structure@1.0.0",
+          "reference": "pcna-local-geometry@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.published-kinetics@1.0.0",
+          "reference": "bglb-retrospective@1",
+          "status": "catalog_only"
+        }
+      ]
+    },
+    {
+      "event_id": 66,
+      "kind": "all",
+      "query": "paired Fab IMGT annotation sequence entity agreement six CDR backbone coordinate observability reusable workflow",
+      "total": 45,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-fab-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-peptide-coverage@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "skill",
+          "provider": null,
+          "reference": "interpret-coordinate-coverage@1",
+          "status": "reference_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.pcna-structure@1.0.0",
+          "reference": "pcna-local-geometry@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.1.0-v6.1",
+          "reference": "tl1a-coordinate-quality@1",
+          "status": "catalog_only"
+        }
+      ]
+    },
+    {
+      "event_id": 101,
+      "kind": "all",
+      "query": "Fab deposition paired IMGT annotation coordinate observability of six heavy and light chain CDRs, model and backbone atom selection, reusable coverage workflow",
+      "total": 66,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-fab-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-backbone-qc@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.3.0",
+          "reference": "deposited-chain-geometry@2",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.block-signed@1.0.0",
+          "reference": "deposited-block-signed@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.2.0",
+          "reference": "deposited-chain-geometry@1",
+          "status": "catalog_only"
+        }
+      ]
+    },
+    {
+      "event_id": 114,
+      "kind": "all",
+      "query": "Validate paired Fab mmCIF identities against IMGT numbering, count model-1 C-alpha and complete backbone coordinates in each CDR, save reusable coordinate coverage workflow",
+      "total": 48,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-fab-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-backbone-qc@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.3.0",
+          "reference": "deposited-chain-geometry@2",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-fold-calibration@1.0.0",
+          "reference": "mapped-structure-agreement@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-peptide-coverage@1",
+          "status": "catalog_only"
+        }
+      ]
+    }
+  ],
+  "closure_event": 129,
+  "adopted_decision_events": [
+    {
+      "event_id": 46,
+      "subject_id": "gxa_49cb0a0ad683822392c92de08a829cbfd192a734b88e3805e11e3aa7e93bf11e"
+    },
+    {
+      "event_id": 79,
+      "subject_id": "gxa_2d7da5af0f2a0e125f898fe0be1d28f0b83b4f786c228a4a593a4a827986fd16"
+    },
+    {
+      "event_id": 107,
+      "subject_id": "gxa_cf8200f1d28c541206f7aeeda56d1ed28aa8cc49fdd62e3b10c558c3d647b58c"
+    },
+    {
+      "event_id": 128,
+      "subject_id": "gxa_d11c81720548c19e7fd3f56bcb14d8d30dfdcaea955371ff9a0bd55b594be2e2"
+    }
+  ],
+  "host": "Existing official Codex OAuth through Clash; admitted native turn IDs, including modules.",
+  "native_turns": [
+    {
+      "thread_id": "01a21ed8-96a1-7e40-9934-1874437bc0d2",
+      "turn_id": "01a21ed8-96cb-7ea2-afc4-05b6753ddb52",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21edb-33dc-76d1-873d-ff85c1e43978",
+      "turn_id": "01a21edb-3415-7602-b891-6eed1f654d1e",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21edd-1833-7f92-beb3-4507d40a4494",
+      "turn_id": "01a21edd-1858-7390-943b-3bedb74e07b2",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21edd-eef2-7891-8b91-cfb731b64933",
+      "turn_id": "01a21edd-ef27-7b23-9db1-63661bfbae4d",
+      "scope": "run"
+    }
+  ],
+  "recipes_published_from_run": [
+    {
+      "reference": "paired-fab-imgt-ca-coverage@1",
+      "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b"
+    }
+  ],
+  "native_recipe_calls": [
+    {
+      "thread_id": "01a21edd-eef2-7891-8b91-cfb731b64933",
+      "call_id": "exec-e2ce59d2-c974-437c-8df8-2a395a976dc5",
+      "turn_id": "01a21edd-ef27-7b23-9db1-63661bfbae4d",
+      "request": {
+        "arguments": {
+          "decision_point": {
+            "actions": [
+              "Use all assigned sites in a fully covered loop, intersecting the IMGT identifiers with the comparison structure.",
+              "For a partial loop, establish the identities of observed sites before comparing the shared subset."
+            ],
+            "output": "fab_coverage.json",
+            "question": "Which assigned sites are eligible for a Cα comparison after checking the counts for each chain and CDR?",
+            "step": "cdr_coverage",
+            "stop_condition": "Stop when the Cα comparison scope is documented for each CDR or when a source, pairing or site ambiguity prevents it."
+          },
+          "id_alignment": "Supply the deposit-specific IMGT map first and its source mmCIF second. Check the source mmCIF digest on the uncompressed bytes, entry and assembly. Resolve each annotated VH or VL by label_asym_id, entity_id and polymer sequence digest. Map each ordered IMGT number and insertion label to its deposited label_seq_id starting at first_label_seq_id. Keep chain roles distinct. Use the inclusive IMGT windows 27–38, 56–65 and 105–117.",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdh409cnqk4c72",
+              "name": "numbering"
+            },
+            {
+              "artifact_ref": "gxa_01m8fdh3zjegxybq5z",
+              "name": "structure"
+            }
+          ],
+          "missing_values": "Keep an assigned site with an absent or zero-occupancy Cα in the denominator and exclude it from the numerator. Skip unassigned IMGT numbers. Leave coverage undefined for an empty denominator. Treat an incompatible source or chain map as a validation failure. For a partial loop, obtain the residue-level mask before comparing individual sites.",
+          "nodes": [
+            {
+              "node_id": "node_1f9c0d1fd468a991e3bc79d3d60951de",
+              "slot": "cdr_coverage"
+            }
+          ],
+          "recipe_id": "paired-fab-imgt-ca-coverage",
+          "title": "Model-1 Cα coverage of paired Fab IMGT CDRs",
+          "units": "Integer counts of distinct assigned polymer positions per chain and CDR. The numerator counts positions with a model-1 Cα of positive occupancy. The denominator counts all positions assigned to that CDR. Their ratio is dimensionless.",
+          "version": "1"
+        },
+        "callId": "exec-e2ce59d2-c974-437c-8df8-2a395a976dc5",
+        "threadId": "01a21edd-eef2-7891-8b91-cfb731b64933",
+        "tool": "gx_save_recipe",
+        "turnId": "01a21edd-ef27-7b23-9db1-63661bfbae4d"
+      },
+      "result": {
+        "decision_point": {
+          "actions": [
+            "Use all assigned sites in a fully covered loop, intersecting the IMGT identifiers with the comparison structure.",
+            "For a partial loop, establish the identities of observed sites before comparing the shared subset."
+          ],
+          "event": "job_settled",
+          "output": "fab_coverage.json",
+          "question": "Which assigned sites are eligible for a Cα comparison after checking the counts for each chain and CDR?",
+          "role": "run_lead",
+          "step": "cdr_coverage",
+          "stop_condition": "Stop when the Cα comparison scope is documented for each CDR or when a source, pairing or site ambiguity prevents it."
+        },
+        "digest": "f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b",
+        "id_alignment": "Supply the deposit-specific IMGT map first and its source mmCIF second. Check the source mmCIF digest on the uncompressed bytes, entry and assembly. Resolve each annotated VH or VL by label_asym_id, entity_id and polymer sequence digest. Map each ordered IMGT number and insertion label to its deposited label_seq_id starting at first_label_seq_id. Keep chain roles distinct. Use the inclusive IMGT windows 27–38, 56–65 and 105–117.",
+        "inputs": {
+          "numbering": {
+            "kind": "run_input",
+            "media_type": null
+          },
+          "structure": {
+            "kind": "run_input",
+            "media_type": null
+          }
+        },
+        "kind": "recipe",
+        "method_pins": {
+          "archival-fab-coverage@1": "8e1487c13c151ef95283923a5e61f182cda0fec8973b9aef14be1d99fc8916e4"
+        },
+        "methods": {
+          "cdr_coverage": "archival-fab-coverage@1"
+        },
+        "missing_values": "Keep an assigned site with an absent or zero-occupancy Cα in the denominator and exclude it from the numerator. Skip unassigned IMGT numbers. Leave coverage undefined for an empty denominator. Treat an incompatible source or chain map as a validation failure. For a partial loop, obtain the residue-level mask before comparing individual sites.",
+        "outputs": {
+          "cdr_coverage": [
+            {
+              "kind": "archival_fab_coverage",
+              "name": "fab_coverage.json",
+              "nature": "analysis",
+              "source_roles": [
+                "numbering",
+                "structure"
+              ]
+            }
+          ]
+        },
+        "provider_pins": {
+          "archival-fab-coverage@1": {
+            "closure": [
+              {
+                "id": "org.gx.archival-molecule-qc",
+                "sha256": "fa885b80ccec69fd928a2223f9b809648367d925d6547a146163c41d0aeeb1b8",
+                "version": "1.0.0"
+              }
+            ],
+            "plugin": {
+              "id": "org.gx.archival-molecule-qc",
+              "sha256": "fa885b80ccec69fd928a2223f9b809648367d925d6547a146163c41d0aeeb1b8",
+              "version": "1.0.0"
+            }
+          }
+        },
+        "reference": "paired-fab-imgt-ca-coverage@1",
+        "title": "Model-1 Cα coverage of paired Fab IMGT CDRs",
+        "units": "Integer counts of distinct assigned polymer positions per chain and CDR. The numerator counts positions with a model-1 Cα of positive occupancy. The denominator counts all positions assigned to that CDR. Their ratio is dimensionless."
+      }
+    }
+  ]
+}

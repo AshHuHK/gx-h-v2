@@ -1,0 +1,1 @@
+A second Fab and its annotation have arrived in the archive. Reuse a suitable archived procedure when applicable, obtaining fresh counts for this deposit. Which paired variable-domain measurements can a curator use, and should any regions be held back from comparison?

@@ -168,8 +168,13 @@ class EndpointClose(unittest.TestCase):
                     if case == "number-in-step":
                         text += " Coverage is 149/164."
                     payload["next_steps"] = [text]
-                with self.assertRaises(GxError):
+                pointer = ("/findings/0/text" if payload["findings"] else
+                           "/gaps/0" if payload["gaps"] else "/next_steps/0")
+                # A complete report needs a substantive item independently of its next step.
+                payload["metric_refs"] = [{"artifact_ref": output, "metric_id": "coverage"}]
+                with self.assertRaises(GxError) as rejection:
                     s.report(worker, output, key="invalid-" + case, **payload)
+                self.assertEqual(rejection.exception.details.get("pointer"), pointer)
                 self.assertFalse(s.rows("SELECT 1 FROM v62_module_reports WHERE run_id=?", s.run_id))
 
     def test_registered_mask_leads_in_a_tight_real_report(self):

@@ -1,5 +1,7 @@
 # PI 使用手册：在网页和 CLI 中继续同一项研究
 
+各组实际 Run、原始失败、修后签收和科学结果见[联合验收报告](ACCEPTANCE.md)。
+
 下面的示例从空状态目录开始。课题使用公开的 1VYM 和 9VGW 坐标，研究人 PCNA 三聚体界面的报告方式。PI 可以在两条路线运行时给其中一条补充线索，并查看研究者后来怎样处理这条意见。父题封存后，3TBL 可作为后继题的新材料。[首航问题](../../examples/pcna-conversation/question.md) · [配置与原件](../../examples/pcna-conversation/goal.json) · [后继问题](../../examples/pcna-conversation/successor.md)
 
 ## 1. 从空目录启动并打开网页

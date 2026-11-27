@@ -1,7 +1,12 @@
-"""Use a second installed release to read the original PI anchor, then warmly export both studies."""
+"""Use the upgraded original installation to revisit a sealed PI message and export both studies.
+
+Use the original deployment's absolute source directory for --release. Native states
+retain that source root across in-place version upgrades.
+"""
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -40,23 +45,32 @@ def main():
         scope = list(conn.execute("SELECT scope,p.report_ref FROM v62_modules m JOIN v62_module_reports p "
                                   "USING(run_id,module_instance_id) WHERE m.run_id=?", (parent,)))
         decision_refs = [x[0] for x in conn.execute("SELECT decision_ref FROM v6_decisions WHERE run_id=?", (parent,))]
+        old_events = [dict(x) for x in conn.execute("""SELECT event_id,kind,subject_id FROM events
+            WHERE run_id=? AND kind IN ('research.pi.disposition','v62.module.reported',
+            'v6.decision.committed','v6.run.closed','v62.module.opened')""",(parent,))]
     exports = {}
     for rid in (parent,child):
         _, res = run_gx(env,"research","--state",work/"state","--run-id",rid)
         exports[rid] = res["invocation"]
     answer = item["reply"]["text"] if item["reply"] else ""
+    event_groups = re.findall(r"(?:事件|events?)\s*[#＃]?\s*(\d+(?:\s*[、,，和及]\s*\d+)*)",answer,flags=re.I)
+    event_ids = {int(i) for group in event_groups for i in re.findall(r"\d+",group)}
     receipt = {"build":build, "parent":parent, "child":child, "message_id":mid,
                "reply_to":challenge,"text":text,"response":item["reply"],"native_status":reply["status"],
+               "cited_evidence_events":[e for e in old_events if e["event_id"] in event_ids],
                "cited_reports":[ref for _,ref in scope if ref in answer],
                "cited_decisions":[ref for ref in decision_refs if ref in answer],
                "before":before, "after":after,"warm_exports":exports}
     write(work/"release-readback.json",receipt)
     if not answer or item["reply_to"]!=challenge or before["jobs"]!=after["jobs"]:
         raise ValueError("The sealed anchored reply is missing or started an unexpected Job")
+    if not any(receipt[k] for k in ("cited_evidence_events","cited_decisions","cited_reports")):
+        raise ValueError("The sealed response lacks an identifiable historical evidence or decision citation")
     if any(v["action"]!="export_closed" or v["added"]!={"host_turns":0,"jobs":0} for v in exports.values()):
         raise ValueError("A warm export stepped a scientific Run")
     print(json.dumps({"build":build,"parent":parent,"child":child,"anchor":challenge,"turn_id":item["reply"]["turn_id"],
                       "cited_reports":receipt["cited_reports"],"cited_decisions":receipt["cited_decisions"],
+                      "cited_evidence_events":receipt["cited_evidence_events"],
                       "warm_added":[v["added"] for v in exports.values()]},ensure_ascii=False))
 
 

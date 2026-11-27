@@ -1,0 +1,348 @@
+{
+  "run_id": "gxr_01m8d5edt69rah4ndn",
+  "job_id": "gxj_01m8d5kv34knbdsjaf",
+  "study_build": "9b3685894c51c427deeac40f1c5af75e0670ecd7",
+  "criterion_event": 275,
+  "job_created_event": 279,
+  "scientist_decision_ref": "gxa_24ff1f6efd9e5f68c0d5429ff25f8587341bcee95c19dd4ec87ea86e4adbbb25",
+  "submitted_at": "2026-11-27T00:13:50.702Z",
+  "finished_at": "2026-11-27T00:13:54.524Z",
+  "method": "pcna-interface@1",
+  "pinned_capability_sha256": "aa9d3831593dd600d9a9b8392ff0b5d63ebc0e4b6d2772074d6536640dc4b9e4",
+  "parameters": {
+    "block_index": 9,
+    "pair": "23"
+  },
+  "entry": "3TBL",
+  "input": {
+    "artifact_ref": "gxa_01m8d5edw3fc3t2dnm",
+    "sha256": "05a1488d313d9926f556f495ad155e3ebf7859b2fa3014bc68ae55465acdb776"
+  },
+  "named": {
+    "artifact_ref": "gxa_01m8d5kyx1edn9cq9q",
+    "sha256": "82e6dfff373cb2900033eb47e32339d04b4d3e1828074d30ff8a69530e308916",
+    "pair": "23",
+    "block_index": 9,
+    "label_interval": [
+      181,
+      200
+    ],
+    "value": 5,
+    "delta": 0
+  },
+  "table": {
+    "artifact_ref": "gxa_01m8d5kyxpnnnmanr1",
+    "sha256": "7e466c53895b3db7c23da43e27c552ddba412bb2392e38d369ad34ae8ca3ca44"
+  },
+  "prior": {
+    "run_id": "gxr_01m8d4w4vdg5r77603",
+    "job_id": "gxj_01m8d51cvfdw9n96f8",
+    "earlier_table_ref": "gxa_01m8d51h94vh9f2233",
+    "earlier_table_sha256": "4df064d9eab5c6e0187210e58ab7d551b19a2aeff6c5015ce31cf3bb09cdf275",
+    "prior_table_pairs_canonical_sha256": "91f354f1b8046283c6f818aee32fa23d9a7be4df411be8e9e85afa74300568f1",
+    "new_table_pairs_canonical_sha256": "91f354f1b8046283c6f818aee32fa23d9a7be4df411be8e9e85afa74300568f1",
+    "equal_tables_excluding_request_header": true
+  },
+  "independent_recalculation": {
+    "12": {
+      "chains": [
+        "A",
+        "B"
+      ],
+      "whole_count": 25,
+      "whole_coverage": [
+        250,
+        251
+      ],
+      "window_count": 4,
+      "window_coverage": [
+        14,
+        15
+      ],
+      "window_label_seq_id_pairs": [
+        [
+          109,
+          181
+        ],
+        [
+          109,
+          183
+        ],
+        [
+          110,
+          181
+        ],
+        [
+          111,
+          181
+        ]
+      ]
+    },
+    "23": {
+      "chains": [
+        "B",
+        "C"
+      ],
+      "whole_count": 24,
+      "whole_coverage": [
+        251,
+        252
+      ],
+      "window_count": 5,
+      "window_coverage": [
+        15,
+        14
+      ],
+      "window_label_seq_id_pairs": [
+        [
+          109,
+          182
+        ],
+        [
+          109,
+          183
+        ],
+        [
+          110,
+          181
+        ],
+        [
+          110,
+          182
+        ],
+        [
+          111,
+          181
+        ]
+      ]
+    },
+    "31": {
+      "chains": [
+        "C",
+        "A"
+      ],
+      "whole_count": 24,
+      "whole_coverage": [
+        252,
+        250
+      ],
+      "window_count": 4,
+      "window_coverage": [
+        14,
+        14
+      ],
+      "window_label_seq_id_pairs": [
+        [
+          109,
+          182
+        ],
+        [
+          110,
+          181
+        ],
+        [
+          110,
+          182
+        ],
+        [
+          111,
+          181
+        ]
+      ]
+    }
+  },
+  "scientific_checks": {
+    "window": "Count each oriented cross-chain label_seq_id pair once when either end lies in inclusive [181,200].",
+    "whole_criteria": "Lead committed range/arithmetic mean and 10% criterion before Job creation.",
+    "range_over_mean": "3/73",
+    "percent": 4.109589041095891,
+    "arithmetic_mean": "73/3",
+    "threshold": "1/10",
+    "meets_threshold": true,
+    "whole_contact_profiles": {
+      "mapping": "Cycle-aligned ordered label_seq_id pairs AB, BC, CA; chain letters dropped only for this same-sequence comparison.",
+      "intersection_all": 15,
+      "union": 34,
+      "intersection_counts_by_number_of_interfaces": {
+        "1": 10,
+        "3": 15,
+        "2": 9
+      },
+      "pairwise_shared": {
+        "12/23": 16,
+        "12/31": 17,
+        "23/31": 21
+      },
+      "unique_to_interface": {
+        "12": [
+          [
+            80,
+            146
+          ],
+          [
+            81,
+            146
+          ],
+          [
+            82,
+            146
+          ],
+          [
+            83,
+            146
+          ],
+          [
+            109,
+            181
+          ],
+          [
+            110,
+            146
+          ],
+          [
+            110,
+            180
+          ]
+        ],
+        "23": [
+          [
+            78,
+            175
+          ],
+          [
+            114,
+            151
+          ]
+        ],
+        "31": [
+          [
+            78,
+            154
+          ]
+        ]
+      }
+    },
+    "coverage": {
+      "declared_per_chain": 261,
+      "window_missing_labels": {
+        "A": [
+          187,
+          188,
+          189,
+          190,
+          191,
+          192
+        ],
+        "B": [
+          187,
+          188,
+          189,
+          190,
+          191
+        ],
+        "C": [
+          186,
+          187,
+          188,
+          189,
+          190,
+          191
+        ]
+      },
+      "whole_missing_labels": {
+        "A": [
+          187,
+          188,
+          189,
+          190,
+          191,
+          192,
+          257,
+          258,
+          259,
+          260,
+          261
+        ],
+        "B": [
+          187,
+          188,
+          189,
+          190,
+          191,
+          257,
+          258,
+          259,
+          260,
+          261
+        ],
+        "C": [
+          186,
+          187,
+          188,
+          189,
+          190,
+          191,
+          259,
+          260,
+          261
+        ]
+      }
+    }
+  },
+  "tolerances": {
+    "count_coverage_residue_ids": 0,
+    "internal_coordinate_unit": "0.001 Å; exact squared distance at inclusive 4.000 Å.",
+    "printed_percent": "±0.005 percentage points for two decimal places."
+  },
+  "independent_SASA": false,
+  "formal_close": {
+    "utc": "2026-11-27T00:19:12.738Z",
+    "decision_ref": "gxa_8b6a3296242469f3a48e431ac48b58e73e5cf118bfb4402677bfd7b5d36ea13c",
+    "full_result_sha256": "81183687e49a4460c254fa96aa918d91b1bf688d00bfd5df1420b452c847000d",
+    "report_sha256": "b73f56d57cc1383d93b4fbef4165e36a54841cc47d7028783ebd6a9baea7ae88",
+    "rationale": "3TBL 全界面表的链名和去重残基对清单与原始模型 1 坐标逐对相符。按 A–B、B–C、C–A 的顺序，全界面各有 25、24、24 对，均值为 73/3 对，极差为 1 对，相对极差为 4.11%，在预定的 10% 报告容差内。B–C 和 C–A 总数相等。沿环向取前链 Glu109 和后链 Ser183，这两个位置在三链均有坐标，A–B 与 B–C 达到 4.0 Å 接触标准，C–A 超出该距离。B–C 在 label_seq_id 181–200 区间的读数为 {{metric:n_contact_residue_pairs}}，达到预登记标准。计数和接触身份据 gxa_01m8d5kyxpnnnmanr1#/pairs，区间标量据 gxa_01m8d5kyx1edn9cq9q#/n_contact_residue_pairs，覆盖与构象据 gxa_01m8d5edw3fc3t2dnm#_atom_site。本次作业和原始坐标已回答报告格式问题。",
+    "rendered_rationale": "3TBL 全界面表的链名和去重残基对清单与原始模型 1 坐标逐对相符。按 A–B、B–C、C–A 的顺序，全界面各有 25、24、24 对，均值为 73/3 对，极差为 1 对，相对极差为 4.11%，在预定的 10% 报告容差内。B–C 和 C–A 总数相等。沿环向取前链 Glu109 和后链 Ser183，这两个位置在三链均有坐标，A–B 与 B–C 达到 4.0 Å 接触标准，C–A 超出该距离。B–C 在 label_seq_id 181–200 区间的读数为 5 pairs，达到预登记标准。计数和接触身份据 gxa_01m8d5kyxpnnnmanr1#/pairs，区间标量据 gxa_01m8d5kyx1edn9cq9q#/n_contact_residue_pairs，覆盖与构象据 gxa_01m8d5edw3fc3t2dnm#_atom_site。本次作业和原始坐标已回答报告格式问题。",
+    "cited_refs": [
+      "gxa_01m8d5edw3fc3t2dnm",
+      "gxa_01m8d5kyx1edn9cq9q",
+      "gxa_01m8d5kyxpnnnmanr1"
+    ],
+    "numeric_review": {
+      "displayed_percent": "4.11%",
+      "reported_named_count": 5,
+      "missing_labels_match": true,
+      "GLU109_SER183_distances": {
+        "12": {
+          "chains": [
+            "A",
+            "B"
+          ],
+          "minimum_distance_A": 3.9225727526713894,
+          "squared_distance_milli_A2": 15386577,
+          "contact": true
+        },
+        "23": {
+          "chains": [
+            "B",
+            "C"
+          ],
+          "minimum_distance_A": 3.440434856235473,
+          "squared_distance_milli_A2": 11836592,
+          "contact": true
+        },
+        "31": {
+          "chains": [
+            "C",
+            "A"
+          ],
+          "minimum_distance_A": 4.2774786966155665,
+          "squared_distance_milli_A2": 18296824,
+          "contact": false
+        }
+      },
+      "registered_predicate": ">= 1 pair",
+      "registered_scope": "same_store",
+      "prior_workspace_full_table_already_contained_this_window": true
+    }
+  }
+}

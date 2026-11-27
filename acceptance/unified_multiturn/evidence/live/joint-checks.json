@@ -1,0 +1,566 @@
+{
+  "tested_build": "9b3685894c51c427deeac40f1c5af75e0670ecd7",
+  "checks": {
+    "driver_restarted_same_run": true,
+    "browser_to_cli_exactly_once": true,
+    "cli_to_refreshed_browser": true,
+    "both_routes_visible_at_send": true,
+    "real_turns_active_at_ingress": true,
+    "actual_parent_coordinate_tables": true,
+    "main_answered_compound_and_trace": true,
+    "a_scientific_disposition": true,
+    "b_continued_original_work": true,
+    "lead_used_published_evidence": true,
+    "sealed_explanation": true,
+    "child_same_conversation_and_parent": true,
+    "child_new_coordinate_measurement": true,
+    "sealed_reexport": true
+  },
+  "credential_route": "official Codex ChatGPT OAuth via local Clash",
+  "project": "conversation:pcna-multiturn",
+  "parent": {
+    "run_id": "gxr_01m8d4v7h6x27e09s6",
+    "close": "gxa_06541f8ce264ed421082c90b43fffa385693efd5e40ebab2c13a1896b3c7b7a0",
+    "closed_event": 235,
+    "conclusion": {
+      "rationale": "两份报告均已交付。按各自 interface-table.json 的 /pairs/{12,23,31}/chains 核对 A–B、B–C、C–A，再读取对应的 whole/n_contact_residue_pairs。1VYM 修订版 1.4 的三个界面分别为 33、30、36 对，极差 6 对，均值 33 对，相对极差 18.18%。9VGW 修订版 1.1 分别为 24、27、28 对，极差 4 对，均值 79/3 对，相对极差 15.19%。两个 A–B 标量分别与各自全表一致，六个计数也均与各自的唯一接触残基对清单相符。两份模型都超过用均值概括所容许的 10% 相对极差，各次单独量测已足以回答此次质控问题。",
+      "reason": "复用这两份坐标时，应逐链对列出人 PCNA 实体 1 在模型 1 中的全界面计数，并记录结构修订、链的 label_asym_id、各链覆盖及构象选择。pcna-interface@1 以跨链任一对已建模非氢原子相距不超过 4.0 Å 为接触，每个 label_seq_id 残基对计一次。1VYM 三链覆盖相同，Lys117–Gly176 仅在 C–A 达标。9VGW 中 B 链缺少 Thr185 坐标，A–B 的相应接触无法判定。三个界面共享亚基，结论限于各自沉积构象的几何接触。",
+      "unresolved": []
+    },
+    "jobs": [
+      {
+        "job_id": "gxj_01m8d4xeagp3w3ryvx",
+        "method": "pcna-interface",
+        "status": "SUCCEEDED",
+        "inputs": [
+          "22b94186ce87e4d0b4a8e48c47ed129cea5b9900d5f6b4f9820833e879490b02"
+        ],
+        "branch_id": "branch_5d5c12e682eeefb8e526ceef1a0374d5",
+        "outputs": [
+          {
+            "ref": "gxa_01m8d4xj3zq2whtqpr",
+            "lead_deliveries": [
+              183,
+              185,
+              222,
+              223
+            ]
+          },
+          {
+            "ref": "gxa_01m8d4xj4mxvn4r4bg",
+            "lead_deliveries": []
+          }
+        ]
+      },
+      {
+        "job_id": "gxj_01m8d4xwq913yt1ms8",
+        "method": "pcna-interface",
+        "status": "SUCCEEDED",
+        "inputs": [
+          "df8fc2854bae2a8b047ed9f09d6e1c436b116ba13a0b19959544dfeb783ee8dd"
+        ],
+        "branch_id": "branch_905183844914cd94435eecfb9d09f740",
+        "outputs": [
+          {
+            "ref": "gxa_01m8d4y03yv04j7r67",
+            "lead_deliveries": [
+              222,
+              224
+            ]
+          },
+          {
+            "ref": "gxa_01m8d4y04gycd086pb",
+            "lead_deliveries": []
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "decision_ref": "gxa_c5b4ddc0e5f7cd4354e64932c240fe55f15570180556d1c15defffb17105265e",
+        "event_id": 215,
+        "scope": "run",
+        "report_events": [
+          174
+        ],
+        "operations": [],
+        "rendered_rationale": "1VYM 全表的 /pairs/{12,23,31}/whole/n_contact_residue_pairs 给出 A–B 33 对、B–C 30 对、C–A 36 对。极差 6 对除以均值 33 对得 18.18%，超过事先选定的 10% 容差，支持第一份报告逐链对给出读数的结论。这是共享亚基的同一沉积模型内的比较。9VGW 的单次量测已成功，待第二份报告交付后即可比较两份全表。"
+      }
+    ]
+  },
+  "child": {
+    "run_id": "gxr_01m8d5edt69rah4ndn",
+    "close": "gxa_8b6a3296242469f3a48e431ac48b58e73e5cf118bfb4402677bfd7b5d36ea13c",
+    "closed_event": 311,
+    "conclusion": {
+      "rationale": "3TBL 全界面表的链名和去重残基对清单与原始模型 1 坐标逐对相符。按 A–B、B–C、C–A 的顺序，全界面各有 25、24、24 对，均值为 73/3 对，极差为 1 对，相对极差为 4.11%，在预定的 10% 报告容差内。B–C 和 C–A 总数相等。沿环向取前链 Glu109 和后链 Ser183，这两个位置在三链均有坐标，A–B 与 B–C 达到 4.0 Å 接触标准，C–A 超出该距离。B–C 在 label_seq_id 181–200 区间的读数为 5 pairs，达到预登记标准。计数和接触身份据 gxa_01m8d5kyxpnnnmanr1#/pairs，区间标量据 gxa_01m8d5kyx1edn9cq9q#/n_contact_residue_pairs，覆盖与构象据 gxa_01m8d5edw3fc3t2dnm#_atom_site。本次作业和原始坐标已回答报告格式问题。",
+      "reason": "沿用父题逐界面记录链身份、全界面计数、残基对清单和逐链覆盖的做法。3TBL 可在摘要中附列均值。注明沉积修订 1.4、非对称单元模型 1、PCNA 实体 1、环向 label_asym_id 次序和 label_seq_id 编号。本次所用 PCNA 原子均无替代构象标签。已建模跨链非氢原子间距不超过 4.0 Å 即记接触，每个残基对计一次，任一侧落入所选区间即纳入区间计数。A 链缺 187–192 和 257–261，B 链缺 187–191 和 257–261，C 链缺 186–191 和 259–261。涉及缺失位置的接触标为无法判定。三个界面共享亚基，结论限于本次沉积构象。",
+      "unresolved": []
+    },
+    "jobs": [
+      {
+        "job_id": "gxj_01m8d5kv34knbdsjaf",
+        "method": "pcna-interface",
+        "status": "SUCCEEDED",
+        "inputs": [
+          "05a1488d313d9926f556f495ad155e3ebf7859b2fa3014bc68ae55465acdb776"
+        ],
+        "branch_id": "branch_2ea2336662834595c2b8120ae254486d",
+        "outputs": [
+          {
+            "ref": "gxa_01m8d5kyx1edn9cq9q",
+            "lead_deliveries": [
+              297
+            ]
+          },
+          {
+            "ref": "gxa_01m8d5kyxpnnnmanr1",
+            "lead_deliveries": []
+          }
+        ]
+      }
+    ],
+    "actions": []
+  },
+  "tables": {
+    "gxr_01m8d4v7h6x27e09s6": [
+      {
+        "entry": "1VYM",
+        "model": "1",
+        "job_id": "gxj_01m8d4xeagp3w3ryvx",
+        "table_ref": "gxa_01m8d4xj4mxvn4r4bg",
+        "branch_id": "branch_5d5c12e682eeefb8e526ceef1a0374d5",
+        "cutoff_A": 4.0,
+        "sha256": "22b94186ce87e4d0b4a8e48c47ed129cea5b9900d5f6b4f9820833e879490b02",
+        "pairs": [
+          {
+            "chains": [
+              "A",
+              "B"
+            ],
+            "contacts": 33
+          },
+          {
+            "chains": [
+              "B",
+              "C"
+            ],
+            "contacts": 30
+          },
+          {
+            "chains": [
+              "C",
+              "A"
+            ],
+            "contacts": 36
+          }
+        ]
+      },
+      {
+        "entry": "9VGW",
+        "model": "1",
+        "job_id": "gxj_01m8d4xwq913yt1ms8",
+        "table_ref": "gxa_01m8d4y04gycd086pb",
+        "branch_id": "branch_905183844914cd94435eecfb9d09f740",
+        "cutoff_A": 4.0,
+        "sha256": "df8fc2854bae2a8b047ed9f09d6e1c436b116ba13a0b19959544dfeb783ee8dd",
+        "pairs": [
+          {
+            "chains": [
+              "A",
+              "B"
+            ],
+            "contacts": 24
+          },
+          {
+            "chains": [
+              "B",
+              "C"
+            ],
+            "contacts": 27
+          },
+          {
+            "chains": [
+              "C",
+              "A"
+            ],
+            "contacts": 28
+          }
+        ]
+      }
+    ],
+    "gxr_01m8d5edt69rah4ndn": [
+      {
+        "entry": "3TBL",
+        "model": "1",
+        "job_id": "gxj_01m8d5kv34knbdsjaf",
+        "table_ref": "gxa_01m8d5kyxpnnnmanr1",
+        "branch_id": "branch_2ea2336662834595c2b8120ae254486d",
+        "cutoff_A": 4.0,
+        "sha256": "05a1488d313d9926f556f495ad155e3ebf7859b2fa3014bc68ae55465acdb776",
+        "pairs": [
+          {
+            "chains": [
+              "A",
+              "B"
+            ],
+            "contacts": 25
+          },
+          {
+            "chains": [
+              "B",
+              "C"
+            ],
+            "contacts": 24
+          },
+          {
+            "chains": [
+              "C",
+              "A"
+            ],
+            "contacts": 24
+          }
+        ]
+      }
+    ]
+  },
+  "intake": {
+    "message_id": "4c223587-ca45-4905-875e-48adfa9cdc7d",
+    "text": "补充：为什么保留路线 branch_905183844914cd94435eecfb9d09f740？我怀疑路线 branch_5d5c12e682eeefb8e526ceef1a0374d5 的对照不够独立，请核对这些链对是否共享同一个结构模型，再决定原判断应保留还是收窄。路线 branch_905183844914cd94435eecfb9d09f740 继续原任务。报告用中文。",
+    "created_at": "2026-11-27T00:01:04.825Z",
+    "branch_id": "branch_5d5c12e682eeefb8e526ceef1a0374d5",
+    "clauses": [
+      {
+        "clause_id": "clause_ba9102c11abc6bc387076c29b0fa3763",
+        "goal_version": 1,
+        "kind": "question",
+        "quote": "为什么保留路线 branch_905183844914cd94435eecfb9d09f740？",
+        "source_message_id": "4c223587-ca45-4905-875e-48adfa9cdc7d",
+        "status": "for_main_reply"
+      },
+      {
+        "artifact_refs": [],
+        "branch_id": "branch_5d5c12e682eeefb8e526ceef1a0374d5",
+        "clause_id": "clause_da7c713eac23a015c6c47ec7d342c127",
+        "feedback_id": "pif_bb6ce7beae1153fd7d018dfb9bbdab2a",
+        "goal_version": 1,
+        "kind": "feedback",
+        "quote": "我怀疑路线 branch_5d5c12e682eeefb8e526ceef1a0374d5 的对照不够独立，请核对这些链对是否共享同一个结构模型，再决定原判断应保留还是收窄。",
+        "source_kind": "hypothesis",
+        "source_message_id": "4c223587-ca45-4905-875e-48adfa9cdc7d",
+        "status": "routed"
+      },
+      {
+        "clause_id": "clause_dcade31e7e3134d6a1fa43b108d82b88",
+        "goal_version": 1,
+        "kind": "discussion",
+        "quote": "路线 branch_905183844914cd94435eecfb9d09f740 继续原任务。",
+        "source_message_id": "4c223587-ca45-4905-875e-48adfa9cdc7d",
+        "status": "for_main_reply"
+      },
+      {
+        "clause_id": "clause_78b2c3254d8de1ac9ee46ab14010ba78",
+        "goal_version": 1,
+        "kind": "preference",
+        "persistence": "turn",
+        "quote": "报告用中文。",
+        "source_message_id": "4c223587-ca45-4905-875e-48adfa9cdc7d",
+        "status": "recorded"
+      }
+    ],
+    "feedback": [
+      {
+        "artifact_refs": [],
+        "branch_id": "branch_5d5c12e682eeefb8e526ceef1a0374d5",
+        "feedback_id": "pif_bb6ce7beae1153fd7d018dfb9bbdab2a",
+        "goal_version": 1,
+        "scope": "module:module_5780fc8cc645218ae40740c39fe5701f",
+        "source_kind": "hypothesis",
+        "source_message_id": "4c223587-ca45-4905-875e-48adfa9cdc7d",
+        "text": "我怀疑路线 branch_5d5c12e682eeefb8e526ceef1a0374d5 的对照不够独立，请核对这些链对是否共享同一个结构模型，再决定原判断应保留还是收窄。",
+        "event_id": 71,
+        "disclosed_at": "2026-11-27T00:01:22.481Z",
+        "deliveries": [
+          {
+            "task_id": "gxt_01m8d4xj916ff34jwd",
+            "thread_id": "01a21a4e-c9a0-7f33-b1fe-ae93c8b5491a",
+            "scope": "module:module_5780fc8cc645218ae40740c39fe5701f",
+            "turn_id": "01a21a4e-c9d1-78f3-b748-f90fbb8f6d9a",
+            "delivery_event_id": "start:3af766c8-a6ca-4aa3-a677-73fc1f80772a"
+          }
+        ],
+        "disposition": {
+          "delivery_event_id": "start:3af766c8-a6ca-4aa3-a677-73fc1f80772a",
+          "delivery_turn_id": "01a21a4e-c9d1-78f3-b748-f90fbb8f6d9a",
+          "effects": [],
+          "evidence_refs": [
+            "gxa_01m8d4v7ja39v2svj2",
+            "gxa_01m8d4xj3zq2whtqpr",
+            "gxa_01m8d4xj4mxvn4r4bg"
+          ],
+          "feedback_id": "pif_bb6ce7beae1153fd7d018dfb9bbdab2a",
+          "goal_version": 1,
+          "outcome": "adopt",
+          "product_event_id": 174,
+          "product_ref": "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02",
+          "reason": "A、B、C 的原子记录均属于 1VYM 模型 1，任意两个界面还共享一条链。保留逐链对报告的判断，将其适用范围限定为该沉积模型的内部描述。独立结构之间的变异和生物学机制需要独立证据。",
+          "report_ref": "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02",
+          "scope": "module:module_5780fc8cc645218ae40740c39fe5701f",
+          "task_id": "gxt_01m8d4xj916ff34jwd",
+          "thread_id": "01a21a4e-c9a0-7f33-b1fe-ae93c8b5491a",
+          "turn_id": "01a21a4e-c9d1-78f3-b748-f90fbb8f6d9a",
+          "event_id": 175
+        },
+        "status": "DISPOSED",
+        "follow_up_nodes": [],
+        "module_report_ref": "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02",
+        "lead_decisions": [
+          {
+            "decision_ref": "gxa_c5b4ddc0e5f7cd4354e64932c240fe55f15570180556d1c15defffb17105265e",
+            "event_id": 215,
+            "rationale": "1VYM 全表的 /pairs/{12,23,31}/whole/n_contact_residue_pairs 给出 A–B 33 对、B–C 30 对、C–A 36 对。极差 6 对除以均值 33 对得 18.18%，超过事先选定的 10% 容差，支持第一份报告逐链对给出读数的结论。这是共享亚基的同一沉积模型内的比较。9VGW 的单次量测已成功，待第二份报告交付后即可比较两份全表。",
+            "cited_refs": [
+              "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02"
+            ],
+            "effects": []
+          },
+          {
+            "decision_ref": "gxa_06541f8ce264ed421082c90b43fffa385693efd5e40ebab2c13a1896b3c7b7a0",
+            "event_id": 234,
+            "rationale": "两份报告均已交付。按各自 interface-table.json 的 /pairs/{12,23,31}/chains 核对 A–B、B–C、C–A，再读取对应的 whole/n_contact_residue_pairs。1VYM 修订版 1.4 的三个界面分别为 33、30、36 对，极差 6 对，均值 33 对，相对极差 18.18%。9VGW 修订版 1.1 分别为 24、27、28 对，极差 4 对，均值 79/3 对，相对极差 15.19%。两个 A–B 标量分别与各自全表一致，六个计数也均与各自的唯一接触残基对清单相符。两份模型都超过用均值概括所容许的 10% 相对极差，各次单独量测已足以回答此次质控问题。",
+            "cited_refs": [
+              "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02"
+            ],
+            "effects": [
+              {
+                "op_digest": "203a2bfdb42103d3b005a0a96450b7892d28445d51ff820253321d98512ea083",
+                "source_index": 0,
+                "spec": {
+                  "claim_refs": [
+                    "gxa_01m8d55zamtwebjtyh",
+                    "gxa_01m8d5b911qmep4pnq"
+                  ],
+                  "op": "close_run",
+                  "reason": "复用这两份坐标时，应逐链对列出人 PCNA 实体 1 在模型 1 中的全界面计数，并记录结构修订、链的 label_asym_id、各链覆盖及构象选择。pcna-interface@1 以跨链任一对已建模非氢原子相距不超过 4.0 Å 为接触，每个 label_seq_id 残基对计一次。1VYM 三链覆盖相同，Lys117–Gly176 仅在 C–A 达标。9VGW 中 B 链缺少 Thr185 坐标，A–B 的相应接触无法判定。三个界面共享亚基，结论限于各自沉积构象的几何接触。",
+                  "unresolved": []
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "native": [
+    {
+      "module_instance_id": "module_5780fc8cc645218ae40740c39fe5701f",
+      "branch_id": "branch_5d5c12e682eeefb8e526ceef1a0374d5",
+      "scope": "module:module_5780fc8cc645218ae40740c39fe5701f",
+      "task_id": "gxt_01m8d4wef0dtz9m2kk",
+      "expected_delivery": "一份简短中文报告，列出 1VYM 的结构版本、实体、模型、三个具名链对的全界面读数、单位、均值、极差及相对极差、判定。给出完整表引用和各读数可核对的键或行，另附所选标量的来源与可用 metric row key。说明 4.0 Å 非氢原子距离与残基对去重、坐标覆盖或构象带来的解释限度，以及结构复用时应记录什么。",
+      "module_status": "COMPLETE",
+      "task_status": "ACCEPTED",
+      "thread_id": "01a21a4e-3a88-7733-9583-0710a2a32b9a",
+      "turn_id": "01a21a4e-3ac0-7701-b7db-be716e8096c4",
+      "start": "2026-11-27T00:01:04.198Z",
+      "end": "2026-11-27T00:01:36.421Z",
+      "classification": "NATIVE_MODEL"
+    },
+    {
+      "module_instance_id": "module_cc4ba99d559700bf14f4b34b569f73cc",
+      "branch_id": "branch_905183844914cd94435eecfb9d09f740",
+      "scope": "module:module_cc4ba99d559700bf14f4b34b569f73cc",
+      "task_id": "gxt_01m8d4weftx95trkg5",
+      "expected_delivery": "一份简短中文报告，列出 9VGW 的结构版本、实体、模型、三个具名链对的全界面读数、单位、均值、极差及相对极差、判定。给出完整表引用和各读数可核对的键或行，另附所选标量的来源与可用 metric row key。说明 4.0 Å 非氢原子距离与残基对去重、坐标覆盖或构象带来的解释限度，以及结构复用时应记录什么。",
+      "module_status": "COMPLETE",
+      "task_status": "ACCEPTED",
+      "thread_id": "01a21a4e-3ade-7b80-afa5-3c19e694ed0b",
+      "turn_id": "01a21a4e-3afb-7931-b767-36b26fd3f0e4",
+      "start": "2026-11-27T00:01:04.257Z",
+      "end": "2026-11-27T00:01:51.196Z",
+      "classification": "NATIVE_MODEL"
+    }
+  ],
+  "overlap": [
+    {
+      "left_scope": "module:module_5780fc8cc645218ae40740c39fe5701f",
+      "right_scope": "module:module_cc4ba99d559700bf14f4b34b569f73cc",
+      "left_turn": "01a21a4e-3ac0-7701-b7db-be716e8096c4",
+      "right_turn": "01a21a4e-3afb-7931-b767-36b26fd3f0e4",
+      "left_thread": "01a21a4e-3a88-7733-9583-0710a2a32b9a",
+      "right_thread": "01a21a4e-3ade-7b80-afa5-3c19e694ed0b",
+      "seconds": 32.164
+    }
+  ],
+  "modules": [
+    {
+      "scope": "module:module_5780fc8cc645218ae40740c39fe5701f",
+      "branch_id": "branch_5d5c12e682eeefb8e526ceef1a0374d5",
+      "focus": "独立检查 1VYM 的原始 mmCIF，核实模型、人 PCNA（P12004）实体和 label_asym_id。只在这份材料上运行一次 pcna-interface@1。选择全界面 block_index=-1，标量选有序链对 12（第一链与第二链），同一次作业会产出 interface-table.json。直接从全表的全界面项读出 12、23、31 的实际左右链名和 n_contact_residue_pairs，不累加序列窗口。Lead 预先选定的描述性判据为：同一沉积内三个读数的极差除以其算术平均数 ≤ 10% 时，可用均值作简写；否则要逐链对描述。按此计算、说明哪一对最高和最低（含并列）及局限。",
+      "status": "COMPLETE",
+      "report": {
+        "artifact_ref": "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02",
+        "author": {
+          "call_id": "call_cfe2837cf22441d1a445b41091aff855",
+          "context_ref": "gxcx_01m8d4xj90yeddsgk1",
+          "kind": "MODULE",
+          "lease_id": "gxl_01m8d4xjc338cvvkp1",
+          "run_id": "gxr_01m8d4v7h6x27e09s6",
+          "task_id": "gxt_01m8d4xj916ff34jwd",
+          "thread_id": "01a21a4e-c9a0-7f33-b1fe-ae93c8b5491a",
+          "turn_id": "01a21a4e-c9d1-78f3-b748-f90fbb8f6d9a"
+        },
+        "base": {
+          "sha256": "82a84226c0b37a977085e1edde7e70a3b22eb1818ccdbf7213eada1bdb6d5599",
+          "version": 1
+        },
+        "event_id": 174,
+        "goal_version": 1,
+        "module_id": "investigation",
+        "module_instance_id": "module_5780fc8cc645218ae40740c39fe5701f",
+        "module_version": "1",
+        "operation_key": "1vym-whole-interfaces-model1-report",
+        "pi_dispositions": [
+          {
+            "delivery_event_id": "start:3af766c8-a6ca-4aa3-a677-73fc1f80772a",
+            "delivery_turn_id": "01a21a4e-c9d1-78f3-b748-f90fbb8f6d9a",
+            "effects": [],
+            "event_id": 175,
+            "evidence_refs": [
+              "gxa_01m8d4v7ja39v2svj2",
+              "gxa_01m8d4xj3zq2whtqpr",
+              "gxa_01m8d4xj4mxvn4r4bg"
+            ],
+            "feedback_id": "pif_bb6ce7beae1153fd7d018dfb9bbdab2a",
+            "goal_version": 1,
+            "outcome": "adopt",
+            "product_event_id": 174,
+            "product_ref": "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02",
+            "reason": "A、B、C 的原子记录均属于 1VYM 模型 1，任意两个界面还共享一条链。保留逐链对报告的判断，将其适用范围限定为该沉积模型的内部描述。独立结构之间的变异和生物学机制需要独立证据。",
+            "report_ref": "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02",
+            "scope": "module:module_5780fc8cc645218ae40740c39fe5701f",
+            "task_id": "gxt_01m8d4xj916ff34jwd",
+            "thread_id": "01a21a4e-c9a0-7f33-b1fe-ae93c8b5491a",
+            "turn_id": "01a21a4e-c9d1-78f3-b748-f90fbb8f6d9a"
+          }
+        ],
+        "report_ref": "gxa_49d4b525aa6d5107e1f4d1820de72560e899faf875c9a7730e8cf73c73f7da02",
+        "report_sha256": "2d6679549ef9784bf13752ac34a45774fa9903391f6f12d72aa24fcb6a361914",
+        "round": 1,
+        "run_id": "gxr_01m8d4v7h6x27e09s6",
+        "scope": "module:module_5780fc8cc645218ae40740c39fe5701f",
+        "source_refs": [
+          "gxa_01m8d4v7ja39v2svj2",
+          "gxa_01m8d4xj3zq2whtqpr",
+          "gxa_01m8d4xj4mxvn4r4bg"
+        ],
+        "status": "COMPLETE",
+        "version": 1,
+        "wake_event_id": 176,
+        "released_event": 176
+      }
+    },
+    {
+      "scope": "module:module_cc4ba99d559700bf14f4b34b569f73cc",
+      "branch_id": "branch_905183844914cd94435eecfb9d09f740",
+      "focus": "独立检查 9VGW 的原始 mmCIF，核实模型、人 PCNA（P12004）实体和 label_asym_id。只在这份材料上运行一次 pcna-interface@1。选择全界面 block_index=-1，标量选有序链对 12（第一链与第二链），同一次作业会产出 interface-table.json。直接从全表的全界面项读出 12、23、31 的实际左右链名和 n_contact_residue_pairs，不累加序列窗口。Lead 预先选定的描述性判据为：同一沉积内三个读数的极差除以其算术平均数 ≤ 10% 时，可用均值作简写；否则要逐链对描述。按此计算、说明哪一对最高和最低（含并列）及局限。",
+      "status": "COMPLETE",
+      "report": {
+        "artifact_ref": "gxa_eeff17f4f14c84adf083192f6962b0237be3e0c239aecc07fd79591a8c8d5be5",
+        "author": {
+          "call_id": "call_c36291725159404a89e576b67b0a1bd0",
+          "context_ref": "gxcx_01m8d4y07hn9z4mfn5",
+          "kind": "MODULE",
+          "lease_id": "gxl_01m8d4y08snsarwkje",
+          "run_id": "gxr_01m8d4v7h6x27e09s6",
+          "task_id": "gxt_01m8d4y07jja5v209f",
+          "thread_id": "01a21a4f-012d-7fa2-a2a8-0c272800f981",
+          "turn_id": "01a21a4f-015f-7e43-9020-1a2fd3a6e09a"
+        },
+        "base": {
+          "sha256": "075d5c51981e931cd393ab1e807effb147cda501976076d85ab72e742470da22",
+          "version": 2
+        },
+        "event_id": 199,
+        "goal_version": 1,
+        "module_id": "investigation",
+        "module_instance_id": "module_cc4ba99d559700bf14f4b34b569f73cc",
+        "module_version": "1",
+        "operation_key": "report-9vgw-whole-interfaces-final",
+        "report_ref": "gxa_eeff17f4f14c84adf083192f6962b0237be3e0c239aecc07fd79591a8c8d5be5",
+        "report_sha256": "6ee2c9a24a384e2058452f66b5ce2471b15e094da09575075051996a84e642c6",
+        "round": 1,
+        "run_id": "gxr_01m8d4v7h6x27e09s6",
+        "scope": "module:module_cc4ba99d559700bf14f4b34b569f73cc",
+        "source_refs": [
+          "gxa_01m8d4v7k9dpm41b2c",
+          "gxa_01m8d4y03yv04j7r67",
+          "gxa_01m8d4y04gycd086pb"
+        ],
+        "status": "COMPLETE",
+        "version": 1,
+        "wake_event_id": 200,
+        "released_event": 200
+      }
+    }
+  ],
+  "replies": [
+    {
+      "message_id": "4c223587-ca45-4905-875e-48adfa9cdc7d",
+      "text": "补充：为什么保留路线 branch_905183844914cd94435eecfb9d09f740？我怀疑路线 branch_5d5c12e682eeefb8e526ceef1a0374d5 的对照不够独立，请核对这些链对是否共享同一个结构模型，再决定原判断应保留还是收窄。路线 branch_905183844914cd94435eecfb9d09f740 继续原任务。报告用中文。",
+      "reply": {
+        "text": "**9VGW 路线继续原任务。** 课题要分别判断两份沉积结构的三个界面能否用均值概括。对 9VGW，必须用它自己的三个链对读数检验预设判据：接触残基对数的极差除以均值不超过 10%，才可用均值简写。（GX 委派记录 49、负责人决定 69）\n\n**1VYM 已完成复核。** 原始 mmCIF 显示，A–B、B–C、C–A 都来自模型 1，任意两个界面还共用一条链。研究者采纳了复核建议，保留逐链对报告的判断，并将结论收窄到 **1VYM 模型 1 内部的界面差异**。在该模型中，接触残基对数从高到低依次为 C–A、A–B、B–C。（GX 研究报告 174、采纳记录 175）",
+        "turn_id": "01a21a4e-3d89-7461-b3b2-164b862139bd",
+        "thread_id": "01a21a4d-ac8f-7bc1-bdff-1a880ffdf94e",
+        "status": "completed"
+      },
+      "status": "answered"
+    },
+    {
+      "message_id": "pcna-multiturn-9b36858-02-trace",
+      "text": "我刚才关于对照的那句话改变了哪一条判断？请区分已收到、已读和已经生效的科学决定，给出依据。",
+      "reply": {
+        "text": "你的意见收窄了 **1VYM 三个链对读数的解释范围**。研究者保留逐链对报告的判断，并明确这些读数只描述模型 1 内部的界面差异。要推断独立结构之间的变异或生物学机制，还需要独立证据。\n\n| 状态 | 可核查的依据 |\n|---|---|\n| 已收到 | GX 在事件 71 将你的原话登记为待核对的假设，并指定由 1VYM 路线处理。 |\n| 已读 | 投递记录显示反馈已进入该研究者的任务。已读的依据是同一轮的书面回应：研究者逐行核对原始 mmCIF 的模型编号，确认 A–B、B–C、C–A 均来自模型 1，任意两个界面还共用一条链。（GX 报告 174、处理记录 175） |\n| 已生效 | 事件 175 将这条反馈明确记为“采纳”，并关联到报告 174。该报告在事件 176 正式发布，因此收窄后的判断已在 **1VYM 分支报告**中生效。 |\n\n项目层面用于判断能否用均值概括三个界面的 10% 判据，来自反馈之前的负责人决定（GX 事件 69）。",
+        "turn_id": "01a21a52-3f58-7d23-b68a-daf01bd4f424",
+        "thread_id": "01a21a4d-ac8f-7bc1-bdff-1a880ffdf94e",
+        "status": "completed"
+      },
+      "status": "answered"
+    },
+    {
+      "message_id": "2e3705e5-76d4-42b6-97fb-a5e03e53060c",
+      "text": "只解释封存的父题，不做新计算。先前为何保留另一条路线？请引用当时负责人的决定和这份结题报告。",
+      "reply": {
+        "text": "保留 **9VGW 路线**，是因为父题要分别判断两份结构的三个 PCNA 界面能否用均值概括。1VYM 的三个界面共享亚基，其读数只能说明该模型内部的差异。负责人预先规定，每份结构各测一次，三个读数的极差除以均值不超过 10% 时才可用均值简写。审阅 1VYM 报告时，负责人写道：“9VGW 的单次量测已成功，待第二份报告交付后即可比较两份全表。”（GX 负责人决定 69、215）\n\n父题结题记录汇总了两份报告。按 A–B、B–C、C–A 的顺序，1VYM 的接触残基对数为 **33、30、36 对**，相对极差为 **18.18%**。9VGW 为 **24、27、28 对**，相对极差为 **15.19%**。结题记录指出，两份模型都“超过用均值概括所容许的 10% 相对极差”，因此复用这两份坐标时都应逐链对报告读数。（GX 1VYM 报告 174、9VGW 报告 199，父题结题决定 234）",
+        "turn_id": "01a21a56-1ed2-77a2-a70a-2a9d424d8dc9",
+        "thread_id": "01a21a4d-ac8f-7bc1-bdff-1a880ffdf94e",
+        "status": "completed"
+      },
+      "status": "answered"
+    }
+  ],
+  "successor": {
+    "goal_version": 1,
+    "parent_decision_ref": "gxa_06541f8ce264ed421082c90b43fffa385693efd5e40ebab2c13a1896b3c7b7a0",
+    "parent_run_id": "gxr_01m8d4v7h6x27e09s6",
+    "request_message_id": "pcna-multiturn-9b36858-02-new-material",
+    "run_id": "gxr_01m8d5edt69rah4ndn",
+    "run_key": "successor-c3bc9c084dd59c8f081fffa8b05fd89f3b3567e9e9b13e5fb425dd6d37618986",
+    "status": "successor_started"
+  },
+  "reopen": {
+    "action": "export_closed",
+    "before": {
+      "jobs": 2,
+      "host_turns": 12
+    },
+    "after": {
+      "jobs": 2,
+      "host_turns": 12
+    },
+    "added": {
+      "jobs": 0,
+      "host_turns": 0
+    }
+  }
+}

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import Counter
 import json
 
-from ..capabilities import environments, manifest, registry, shipped, storage
+from ..capabilities import environments, input_domain, manifest, registry, shipped, storage
 from ..domain import clock, ids, machines
 from ..errors import (
     ApprovalRequired,
@@ -104,6 +104,18 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
             raise SchemaInvalid(f"{capability} expects parameters {manifest.parameter_names(method)}")
         for name, value in parameters.items():
             manifest.coerce_parameter(name, value, whole_token=True)
+    domains = input_domain.declarations(method["method_card"].get("applicable_domain"), method.get("applicable_domain"))
+    if domains:
+        if not (provider and provider.bind):
+            bindings = dict(zip(_roles(method, len(spec["inputs"])), spec["inputs"], strict=True))
+            available = {role: ref for role, ref in bindings.items() if ref not in producers}
+            input_domain.require(domains, available, input_domain.InputFacts(assets, run_id), resolved=len(available) == len(bindings))
+        elif not any(ref in producers for ref in spec["inputs"]):
+            try:
+                bind_inputs(conn, run_id, capability, view, spec["inputs"], parameters, writable=False)
+            except ScopeDenied as error:
+                if error.details.get("reason") != "binding_needs_materialization":
+                    raise
     if limits is not None:
         required = JobService._budget_amounts(manifest.effective_resources(method, {}))
         short = {key: value for key, value in required.items() if value > limits.get(key, 0)}
@@ -295,8 +307,14 @@ def bind_inputs(conn, run_id, cap, method, refs, parameters, *, writable):
     provider = goal_plugins.method(conn, run_id, cap)
     if provider and provider.bind:
         ctx = v6_method_context.MethodContext(conn, run_id, refs, writable=writable)
-        return v6_method_context.invoke(provider.bind, ctx, cap, refs, params)
-    return dict(zip(_roles(method["manifest"], len(refs)), refs, strict=True)), params
+        bound, params = v6_method_context.invoke(provider.bind, ctx, cap, refs, params)
+    else:
+        bound = dict(zip(_roles(method["manifest"], len(refs)), refs, strict=True))
+    declared = method["manifest"]
+    domains = input_domain.declarations(declared["method_card"].get("applicable_domain"), declared.get("applicable_domain"))
+    if domains:
+        input_domain.require(domains, bound, input_domain.InputFacts(storage.artifact_service(conn), run_id), resolved=True)
+    return bound, params
 
 
 def _compile(conn, node, refs):

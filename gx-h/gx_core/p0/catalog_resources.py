@@ -1,5 +1,6 @@
 """Cards for installed analytical databases, source readers, research skills and runnable recipes."""
 from functools import lru_cache
+import hashlib
 import json
 
 from .. import config, contracts
@@ -22,27 +23,86 @@ def _method_kinds(row):
     return kind
 
 
-@lru_cache(maxsize=4)
-def _reference_index(path, modified_ns):
-    return json.loads(path.read_bytes())["cards"]
+REFERENCE_FILES = ("research_asset_cards.json", "science_asset_inventory.json")
+_REFERENCE_KINDS = {"method", "research", "database", "skill", "recipe"}
 
 
-def _references(kind, occupied):
-    path = config.CONFIG_DIR / "research_asset_cards.json"
-    if not path.is_file():
-        return []
-    result = []
-    for card in _reference_index(path, path.stat().st_mtime_ns):
-        if card["kind"] != kind or card["reference"] in occupied:
+@lru_cache(maxsize=8)
+def _reference_index(path, revision):
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return "unreadable", (), (path.name,)
+    digest = hashlib.sha256(raw).hexdigest()
+    try:
+        data = json.loads(raw)
+    except ValueError:
+        data = None
+    if not isinstance(data, dict) or not isinstance(data.get("cards"), list):
+        return digest, (), (path.name,)
+    cards = []
+    problems = []
+    for position, card in enumerate(data["cards"]):
+        if not _usable_reference(card):
+            problems.append(f"{path.name}#cards[{position}]")
             continue
-        # These are source locations and descriptions. Their presence cannot
-        # choose a Job provider or turn an old workflow description into a recipe.
-        result.append({**card, "status":"reference_only", "execution_granted":False})
-        occupied.add(card["reference"])
-    return result
+        cards.append(card)
+    return digest, tuple(cards), tuple(problems)
 
 
-def rows_for_kind(conn, run_id, brief, kind, methods, choices, *, current_reading=False):
+def _usable_reference(card):
+    if not isinstance(card, dict):
+        return False
+    required = ("kind", "reference", "category", "purpose", "digest")
+    if any(not isinstance(card.get(k), str) or not card[k].strip() for k in required):
+        return False
+    if card["kind"] not in _REFERENCE_KINDS:
+        return False
+    for key in ("inputs", "aliases", "focuses"):
+        values = card.get(key, [])
+        if not isinstance(values, list) or not all(isinstance(v, str) for v in values):
+            return False
+    outputs = card.get("outputs", [])
+    if not isinstance(outputs, list):
+        return False
+    return all(isinstance(port, str) or (isinstance(port, dict) and isinstance(port.get("name"), str)
+               and isinstance(port.get("kind", ""), str) and isinstance(port.get("metric_specs", {}), dict))
+               for port in outputs)
+
+
+def reference_index(name):
+    path = config.CONFIG_DIR / name
+    try:
+        stat = path.stat()
+    except FileNotFoundError:
+        return None, (), ()
+    except OSError:
+        return "unreadable", (), (name,)
+    return _reference_index(path, (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns))
+
+
+def reference_rows(kind, occupied, *, files=REFERENCE_FILES):
+    result = []
+    problems = []
+    for name in files:
+        _, cards, unavailable = reference_index(name)
+        problems.extend(unavailable)
+        for card in cards:
+            key = (card["kind"], card["reference"])
+            if kind not in ("all", card["kind"]) or key in occupied:
+                continue
+            occupied.add(key)
+            # An archived binding explains the historical operation. Only the installed catalog
+            # and the Goal grant can name a current provider or create a Job.
+            row = {k: v for k, v in card.items() if not k.startswith("_")}
+            row.update(provider=None, status="reference_only", execution_granted=False)
+            if row["kind"] == "method":
+                row["installation_status"] = "unbound"
+            result.append(row)
+    return result, problems
+
+
+def rows_for_kind(conn, run_id, brief, kind, methods, choices, *, current_reading=False, include_references=True):
     from . import v62_catalog, v6_recipes
     from ..plugins import development
     module = brief["scope"].startswith("module:")
@@ -113,8 +173,10 @@ def rows_for_kind(conn, run_id, brief, kind, methods, choices, *, current_readin
                 rows.append({"reference":tool+"@1", "kind":kind, "category":"source_reading", "status":"available",
                              "purpose":spec["description"], "handler":tool, "inputs":spec["inputSchema"],
                              "digest":ids.sha256_of_obj(spec), "outputs":["source or evidence receipt"]})
-    if not module:
-        rows.extend(_references(kind, {row["reference"] for row in rows}))
+    if not module and include_references:
+        occupied = {(kind, row["reference"]) for row in rows}
+        references, _ = reference_rows(kind, occupied, files=REFERENCE_FILES[:1])
+        rows.extend(references)
     return rows
 
 

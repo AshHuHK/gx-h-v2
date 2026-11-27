@@ -303,6 +303,7 @@ def perform_read(roots, row, params, packet, execute):
     artifacts = list(sources)
     pins = {}
     if (tool == QUERY and answer.get("kind") == "method" and args.get("reference")
+            and answer.get("status") != "reference_only"
             and json.loads(instance["grant_json"]).get("catalog_access") == "public_methods"):
         card = answer["spec"]
         original = publish_method_card(roots, row, card)

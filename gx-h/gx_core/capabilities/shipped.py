@@ -112,6 +112,10 @@ def _package_bundle(package, reference):
             content = member(relative)
             path = f"plugins/installed/{package.pin.id}/{package.pin.version}/{relative}"
             bundle[key] = {"path": path, "sha256": hashlib.sha256(content).hexdigest()}
+    if not isinstance(method.get("method_card"), dict):
+        raise SchemaInvalid("A package capability requires a method card")
+    if found := manifest.domain_problems(method):
+        raise SchemaInvalid("; ".join(found))
     return bundle
 
 

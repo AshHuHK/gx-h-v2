@@ -1,0 +1,45 @@
+test_fixed_provider_refuses_wrong_bytes_before_job (acceptance.science_assets.contracts.test_domain.MethodDomain.test_fixed_provider_refuses_wrong_bytes_before_job) ... ERROR
+test_missing_required_fact_stays_unknown (acceptance.science_assets.contracts.test_domain.MethodDomain.test_missing_required_fact_stays_unknown) ... ERROR
+test_old_undeclared_method_still_accepts_inputs (acceptance.science_assets.contracts.test_domain.MethodDomain.test_old_undeclared_method_still_accepts_inputs) ... ERROR
+test_supported_properties_match_both_paths (acceptance.science_assets.contracts.test_domain.MethodDomain.test_supported_properties_match_both_paths) ... ERROR
+
+======================================================================
+ERROR: test_fixed_provider_refuses_wrong_bytes_before_job (acceptance.science_assets.contracts.test_domain.MethodDomain.test_fixed_provider_refuses_wrong_bytes_before_job)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/contracts/test_domain.py", line 79, in test_fixed_provider_refuses_wrong_bytes_before_job
+    self.assertEqual(card["input_coverage"]["domain"]["status"], "unsupported")
+                     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+KeyError: 'domain'
+
+======================================================================
+ERROR: test_missing_required_fact_stays_unknown (acceptance.science_assets.contracts.test_domain.MethodDomain.test_missing_required_fact_stays_unknown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/contracts/test_domain.py", line 101, in test_missing_required_fact_stays_unknown
+    self.assertEqual(answer["input_coverage"]["domain"]["status"], "unknown")
+                     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+KeyError: 'domain'
+
+======================================================================
+ERROR: test_old_undeclared_method_still_accepts_inputs (acceptance.science_assets.contracts.test_domain.MethodDomain.test_old_undeclared_method_still_accepts_inputs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/contracts/test_domain.py", line 107, in test_old_undeclared_method_still_accepts_inputs
+    self.assertEqual(card["input_coverage"]["domain"]["status"], "unknown")
+                     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+KeyError: 'domain'
+
+======================================================================
+ERROR: test_supported_properties_match_both_paths (acceptance.science_assets.contracts.test_domain.MethodDomain.test_supported_properties_match_both_paths)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/contracts/test_domain.py", line 92, in test_supported_properties_match_both_paths
+    self.assertEqual(card["input_coverage"]["domain"]["status"], "supported")
+                     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+KeyError: 'domain'
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.454s
+
+FAILED (errors=4)

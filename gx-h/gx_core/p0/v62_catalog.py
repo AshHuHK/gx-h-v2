@@ -124,9 +124,11 @@ def _release_method_card(cap, declaration):
             bundle[slot] = {"path": relative, "sha256": ids.sha256_of_file(config.HARNESS_ROOT / relative)}
     pin = shipped.portable_digest(bundle)
     method = bundle["manifest"]
+    if found := manifest.domain_problems(method):
+        raise SchemaInvalid("; ".join(found))
     if shipped.pin(cap) != pin or manifest.capability_version(method) != cap:
         raise VersionImmutable("The public method metadata differs from the registered release")
-    return _public_card({"capability_version": cap, "portable_sha256": pin,
+    return _public_card({"capability_version": cap, "portable_sha256": pin, "applicable_domain": method.get("applicable_domain"),
         "method": method["method_card"], "inputs": manifest.input_roles(method), "outputs": method["outputs"],
         "limitations": method.get("limitations"), "cost_class": "gpu" if method["resources"].get("gpu") else "local_cpu"})
 
@@ -165,7 +167,7 @@ def _choice_cards(loaded, options):
                 continue
             method = bundle["manifest"]
             cards[cap] = _public_card({
-                "capability_version":cap, "portable_sha256":digest, "method":method["method_card"],
+                "capability_version":cap, "portable_sha256":digest, "method":method["method_card"], "applicable_domain":method.get("applicable_domain"),
                 "inputs":manifest.input_roles(method), "outputs":method["outputs"], "limitations":method.get("limitations"),
                 "cost_class":"gpu" if method["resources"].get("gpu") else "local_cpu"})
     return [dict(card, status="selectable") for cap, card in sorted(cards.items())
@@ -174,13 +176,20 @@ def _choice_cards(loaded, options):
 
 def _public_card(row, *, metric_contract=False):
     """Project only scientific metadata. Provider paths, evaluation payloads, schemas and artifact links stay private."""
+    from ..capabilities import input_domain
     method = row.get("method")
+    domains = input_domain.declarations(method.get("applicable_domain") if isinstance(method, dict) else None,
+                                        row.get("applicable_domain"))
     if isinstance(method, dict):
         method = {key: method[key] for key in ("family", "objective", "mechanism", "estimator", "training_data_lineage")
                   if isinstance(method.get(key), str)}
     card = {key: row[key] for key in ("capability_version", "portable_sha256", "family", "cost_class", "limitations")
             if isinstance(row.get(key), str)}
     card["method"] = method if isinstance(method, (dict, str)) else {}
+    if "method" in domains:
+        card["method"]["applicable_domain"] = domains["method"]
+    if "provider" in domains:
+        card["applicable_domain"] = domains["provider"]
     card["inputs"] = [item for item in row.get("inputs", ()) if isinstance(item, str)]
     card["outputs"] = [{k: item[k] for k in ("name", "kind", "nature") if isinstance(item.get(k), str)}
                        if isinstance(item, dict) else {"name": item}

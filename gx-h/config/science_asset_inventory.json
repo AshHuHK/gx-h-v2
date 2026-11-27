@@ -1,0 +1,586 @@
+{
+  "cards": [
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "PMC",
+        "JATS"
+      ],
+      "canonical_method_id": "publication-retrieval",
+      "category": "research",
+      "digest": "7986456ea7690a1e548df50a4eb00384656ee47bc3c94d4c737ef260aa375a8d",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query or PMCID"
+      ],
+      "kind": "research",
+      "limitations": "The historical route includes metadata-only hits. Full-text coverage is article-specific.",
+      "outputs": [
+        "bibliographic record",
+        "available article text"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-europe-pmc-route",
+        "revision": null
+      },
+      "purpose": "Find a publication and inspect available full text.",
+      "reference": "europe-pmc-research-route@legacy",
+      "source": {
+        "line": 5,
+        "path": "research.tsv",
+        "sha256": "51b1bbe0023a290284e043da3d3d3eb9866142fd4f903b3ae1d6012cb67f90f2",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Europe PMC / PMC literature records"
+    },
+    {
+      "aliases": [
+        "坐標質控",
+        "结构质量",
+        "PDB quality"
+      ],
+      "canonical_method_id": "pdb-entry-quality",
+      "category": "method",
+      "digest": "532bd22c1915d28ee7f8d83d23f9f05bc54dff7a8b1b793366f640bca08f7edd",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "PDB accession"
+      ],
+      "kind": "method",
+      "limitations": "Schema checked. Historical service status is not operation-level execution evidence.",
+      "outputs": [
+        "entry quality metadata"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-pdb-mcp.get_structure_quality",
+        "revision": null
+      },
+      "purpose": "Look up publicly deposited entry quality metadata.",
+      "reference": "pdb-quality-operation@legacy",
+      "source": {
+        "line": 757,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "20b2dced7b1f22a3e1cfb7cca9dbc3b45269acf78deb1ba03f830ba586f131f2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PDB deposited structure quality"
+    },
+    {
+      "aliases": [
+        "环肽质控",
+        "環肽質控",
+        "環化連接",
+        "topology QC"
+      ],
+      "canonical_method_id": "archived-peptide-topology-qc",
+      "category": "recipe",
+      "digest": "349b066107f631ea2336baffb4d93ebf0534e954065ac722b04edf8665d3b9eb",
+      "domain": [
+        "cyclic-peptide"
+      ],
+      "inputs": [
+        "deposited connectivity record"
+      ],
+      "kind": "recipe",
+      "limitations": "The historical control failed its closure-distance criterion. It does not establish prediction or experimental validity.",
+      "outputs": [
+        "historical control verdict"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-topology-scenario",
+        "revision": null
+      },
+      "purpose": "Inspect the first documented failure of the deposited connectivity control.",
+      "reference": "cyclic-closure-qc-control@legacy",
+      "source": {
+        "line": 118,
+        "path": "workflows.tsv",
+        "primary_sha256": "b1aa181dd69b1c878350fe1a714e5c2bcdd0ba2ed7d86a46f9b1c549fe1ae5b9",
+        "sha256": "6d9fe50589c16c522af9cc6f44f3865160c6ee6be242d2a7babac5b333521a26",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Cyclic peptide archived closure control"
+    },
+    {
+      "aliases": [
+        "Fab",
+        "抗體",
+        "抗体",
+        "VH/VL",
+        "重輕鏈配對"
+      ],
+      "canonical_method_id": "fab-deposit-coverage",
+      "category": "recipe",
+      "digest": "a4fc3c91a0057a8bff42b220d6f896a7d7f89c4ee24cf21f530d6ff94ca1e582",
+      "domain": [
+        "antibody"
+      ],
+      "inputs": [
+        "paired Fab deposit"
+      ],
+      "kind": "recipe",
+      "limitations": "Recorded as deferred. Evidence from VHH does not establish a paired Fab result.",
+      "outputs": [
+        "prior coverage assessment"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-fab-case",
+        "revision": null
+      },
+      "purpose": "Find the recorded gap in paired heavy/light chain validation.",
+      "reference": "fab-coverage-history@legacy",
+      "source": {
+        "line": 146,
+        "path": "workflows.tsv",
+        "primary_sha256": "24fbb858384baea5f4b1a519829668db48f6f4bf29672a3fa385c44355c17e8a",
+        "sha256": "6d9fe50589c16c522af9cc6f44f3865160c6ee6be242d2a7babac5b333521a26",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Fab historical coverage gap"
+    },
+    {
+      "aliases": [
+        "糖水解酶",
+        "既有酶實驗",
+        "反应条件",
+        "archived assay"
+      ],
+      "canonical_method_id": "archived-enzyme-assays",
+      "category": "method",
+      "digest": "f8085f5dad2d04a58738efe5bee9e60bb22e1247cfc8e36690698f88f00efe00",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "enzyme class",
+        "substrate"
+      ],
+      "kind": "method",
+      "limitations": "Limited to fourteen carbohydrate hydrolase EC classes. No transfer of activity across proteins.",
+      "outputs": [
+        "assays.jsonl",
+        "report"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "science-native-v2.enzyme-kinetics",
+        "revision": "1"
+      },
+      "purpose": "Read previously measured assay records with the reported material and conditions.",
+      "reference": "native-assay-reading@legacy",
+      "source": {
+        "line": 32,
+        "path": "methods.tsv",
+        "primary_sha256": "fe618ef61543da7d265240215bf5225a35394554fa90b516218a5ab47f14b972",
+        "sha256": "68f92f1a30db2eab3eb8b9f69158fc1e92987405a08e76663e15e83fb6cbe196",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Historical carbohydrate hydrolase assay lookup"
+    },
+    {
+      "aliases": [
+        "RNA 模型",
+        "RNA secondary structure"
+      ],
+      "canonical_method_id": "rna-secondary-structure",
+      "category": "method",
+      "digest": "8e16780a593193cc89c9d8617ebe7a5da9161fdf15f75f7979ce394d1b56a56b",
+      "domain": [
+        "rna"
+      ],
+      "inputs": [
+        "RNA record"
+      ],
+      "kind": "method",
+      "limitations": "Indexed for the deferred RNA workstream.",
+      "outputs": [
+        "historical model record"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "native-eternafold-manifest",
+        "revision": "13d2487-gx1"
+      },
+      "purpose": "Locate the identity of an archived RNA secondary-structure model.",
+      "reference": "rna-structure-archive@legacy",
+      "source": {
+        "line": 77,
+        "path": "methods.tsv",
+        "primary_sha256": "1b6d3f052b838df5cfff62f62e160580b3cc65420e678ac9ba0460c1f04f38c5",
+        "sha256": "68f92f1a30db2eab3eb8b9f69158fc1e92987405a08e76663e15e83fb6cbe196",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "EternaFold historical RNA model"
+    },
+    {
+      "aliases": [
+        "骨架讀數",
+        "骨架读数",
+        "鏈幾何",
+        "链几何",
+        "structure geometry"
+      ],
+      "canonical_method_id": "deposited-coordinate-geometry",
+      "category": "method",
+      "digest": "1fdfd64ff964afd21a1f741c30a9b5f0afbf5b807a96bfce600139bdb446a59c",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "deposited mmCIF",
+        "three explicit chains"
+      ],
+      "kind": "method",
+      "limitations": "Single coordinate state. Coverage describes observed coordinates only.",
+      "outputs": [
+        "chain comparison report"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "science-native-v2.structure-geometry",
+        "revision": "1.0.0"
+      },
+      "purpose": "Compare observed backbone positions across three chains of one entity.",
+      "reference": "native-coordinate-comparison@legacy",
+      "source": {
+        "line": 102,
+        "path": "methods.tsv",
+        "primary_sha256": "713ebfdb4484d18cac6956b5c884ad9f04ae0d1b504c367f55e0f6dd998b3860",
+        "sha256": "68f92f1a30db2eab3eb8b9f69158fc1e92987405a08e76663e15e83fb6cbe196",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Deposited three-chain geometry"
+    },
+    {
+      "aliases": [
+        "結構模型",
+        "结构模型",
+        "蛋白模型",
+        "Protenix"
+      ],
+      "canonical_method_id": "protein-structure-prediction",
+      "category": "method",
+      "digest": "49be8c40e3b3a8a54ef77a359faf9539ccbe8fe4b50ade8c867a2c5bfbaff8df",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "model identity"
+      ],
+      "kind": "method",
+      "limitations": "The historical model declaration has no current Job binding.",
+      "outputs": [
+        "historical model description"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "historical-gx-model-register",
+        "revision": "85767b811c40ed46e73a9b39519cf6bfca8701ba"
+      },
+      "purpose": "Inspect the archived identity of a structure prediction model.",
+      "reference": "protenix-model@legacy",
+      "source": {
+        "line": 110,
+        "path": "methods.tsv",
+        "primary_sha256": "e04ae7da5f03a3faf59ea043a4884587d8d5107b0ec8199c746f64213b6365f7",
+        "sha256": "68f92f1a30db2eab3eb8b9f69158fc1e92987405a08e76663e15e83fb6cbe196",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protenix v2 model registration"
+    },
+    {
+      "aliases": [
+        "PDB",
+        "公開結構",
+        "公共结构"
+      ],
+      "canonical_method_id": "pdb-archive",
+      "category": "database",
+      "digest": "419b4aaafb7122d0fbf3cfed09bca6d52e078cece1b0683541da0bf068655603",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "PDB accession"
+      ],
+      "kind": "database",
+      "limitations": "PDB is also exposed through a historical web route. Two representations of the same entry share one scientific source.",
+      "outputs": [
+        "deposition metadata"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-pdb-mcp",
+        "revision": "6bb2b9600e1846800d0ba222613241031c58a1ae"
+      },
+      "purpose": "Locate archived macromolecular structures by accession.",
+      "reference": "pdb-entry-mcp@legacy",
+      "source": {
+        "line": 10,
+        "path": "data.tsv",
+        "primary_sha256": "8ba7cc3d6439cbcda6fa206314a687fd2c147227d90da0f7a727dfd5747540f0",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein Data Bank via MCP"
+    },
+    {
+      "aliases": [
+        "PDB",
+        "結構資料庫",
+        "结构数据库"
+      ],
+      "canonical_method_id": "pdb-archive",
+      "category": "database",
+      "digest": "437e49ef8293aca0487db2a4067d24519ec21896a4e692c1fed27d9da3365181",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "PDB accession"
+      ],
+      "kind": "database",
+      "limitations": "Known archive route. Deployment and per-operation evidence are independent of the MCP provider.",
+      "outputs": [
+        "deposition metadata"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-rcsb-web",
+        "revision": null
+      },
+      "purpose": "Find structural records on the same archive through the RCSB route.",
+      "reference": "pdb-entry-web-route@legacy",
+      "source": {
+        "line": 21,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein Data Bank via RCSB"
+    },
+    {
+      "aliases": [
+        "CCD",
+        "線性多肽",
+        "线性多肽",
+        "殘基註釋"
+      ],
+      "canonical_method_id": "pdb-chemical-components",
+      "category": "database",
+      "digest": "46fc74889f115e2cd8310b4c33d0d70555addf4f109a52987f8e982e6f76d3c8",
+      "domain": [
+        "peptide",
+        "cyclic-peptide",
+        "protein"
+      ],
+      "inputs": [
+        "component ID"
+      ],
+      "kind": "database",
+      "limitations": "The source row identifies a directory; content release and modification coverage remain unverified.",
+      "outputs": [
+        "component definition"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "historical-ccd-directory",
+        "revision": null
+      },
+      "purpose": "Resolve component identifiers when checking deposited peptide records.",
+      "reference": "pdb-chemical-dictionary@legacy",
+      "source": {
+        "line": 69,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PDB Chemical Component Dictionary"
+    },
+    {
+      "aliases": [
+        "Rhea",
+        "反應別名",
+        "反应名称"
+      ],
+      "canonical_method_id": "reaction-name-history",
+      "category": "database",
+      "digest": "81186d41eb44ebad824bbc1a585652be0de29196d6f2357f873c4f98ce7b48fe",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "reaction ID or alias"
+      ],
+      "kind": "database",
+      "limitations": "The snapshot covers releases 139–142.",
+      "outputs": [
+        "release and direction record"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "native-rhea-name-snapshot",
+        "revision": "139–142"
+      },
+      "purpose": "Resolve a public reaction identifier across the indexed releases.",
+      "reference": "rhea-reaction-names@legacy",
+      "source": {
+        "line": 88,
+        "path": "data.tsv",
+        "primary_sha256": "46efa03be146239b68bb7b2f3c1e5ec73c129c9e263e0658112de532eb7b429e",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Rhea reaction identifiers and names"
+    },
+    {
+      "aliases": [
+        "Rhea",
+        "Swiss-Prot",
+        "酿酒酵母",
+        "酵母",
+        "天然酶注釋"
+      ],
+      "canonical_method_id": "reaction-protein-annotation",
+      "category": "database",
+      "digest": "613ed6f6abf1558e483ce7a20967f03fdbc0a27a2d1e4a1b75762d78a88d698a",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "reaction accession",
+        "taxon"
+      ],
+      "kind": "database",
+      "limitations": "A curated association with unspecified direction or no direct measurement remains qualified.",
+      "outputs": [
+        "reaction/protein annotation"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "native-rhea-swissprot-snapshot",
+        "revision": "Rhea 142 / Swiss-Prot 2026_03"
+      },
+      "purpose": "Read recorded links between a reaction, taxon and curated natural protein.",
+      "reference": "rhea-sprot-index@legacy",
+      "source": {
+        "line": 89,
+        "path": "data.tsv",
+        "primary_sha256": "76c4649d394422d7b168c74728c4c9cdefaa14fc3f8557014d144c8419d50eab",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Rhea / reviewed Swiss-Prot annotation snapshot"
+    },
+    {
+      "aliases": [
+        "酶动学",
+        "酶動力學",
+        "BRENDA",
+        "SABIO-RK"
+      ],
+      "canonical_method_id": "archived-enzyme-assays",
+      "category": "database",
+      "digest": "99f22193406bc50506798689b1e463f0132352eb20e8977f1b5011ee5cdac9be",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "enzyme annotation",
+        "substrate"
+      ],
+      "kind": "database",
+      "license_basis": "The native assay manifest records BRENDA CC BY 4.0 and academic use for this SABIO-RK export.",
+      "limitations": "Evidence and conditions belong to individual assays. Filter missing identifiers and units explicitly.",
+      "outputs": [
+        "assay records"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "native-brenda-sabio-snapshot",
+        "revision": "BRENDA 2026.1 / SABIO-RK 2026-09-20 v1"
+      },
+      "purpose": "Find archival measurements with experiment, unit and substrate context.",
+      "reference": "kinetics-assay-snapshot@legacy",
+      "source": {
+        "line": 90,
+        "path": "data.tsv",
+        "primary_sha256": "1cac1d6d47925f227959a6c05274252b09f121801d73f931173c4b4be1c2aec3",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "BRENDA and SABIO-RK assay records"
+    },
+    {
+      "aliases": [
+        "PDB 精讀",
+        "PDB 原件",
+        "結構閱讀",
+        "structure reading"
+      ],
+      "canonical_method_id": "structure-record-reading",
+      "category": "skill",
+      "digest": "5588ba4d0d3c340de295df276936773d4f92bf725c814ee9939aba3e42e5eca9",
+      "domain": [
+        "protein",
+        "antibody",
+        "peptide"
+      ],
+      "inputs": [
+        "structure accession"
+      ],
+      "kind": "skill",
+      "limitations": "Guide only. Record-specific evidence needs the original deposit.",
+      "outputs": [
+        "reading guidance"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "shared-pdb-reading-guide",
+        "revision": null
+      },
+      "purpose": "Find the original archival record and qualify deposition-level evidence.",
+      "reference": "pdb-source-reading@legacy",
+      "source": {
+        "line": 472,
+        "path": "skills.tsv",
+        "primary_sha256": "d90908a9d49de46b41293195e93814cd2594387374fdacbb33e69402446fb47b",
+        "sha256": "94881337de66e904073e007f6aacb3cf1d04c4fd4b85cfd91663e6323c73dd4f",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Public structural record reading guide"
+    }
+  ]
+}

@@ -101,6 +101,8 @@ def for_start(ctx, requested, references, *, module_catalog=None, required_provi
         method = view["manifest"]
         descriptor = {"method": method.get("method_card"), "inputs": manifest.input_roles(method),
                       "outputs": method["outputs"], "limitations": method.get("limitations")}
+        if method.get("applicable_domain"):
+            descriptor["applicable_domain"] = method["applicable_domain"]
         if module_catalog:
             descriptor["cost_class"] = "gpu" if method["resources"].get("gpu") else "local_cpu"
             descriptor["family"] = method["method_card"]["family"]

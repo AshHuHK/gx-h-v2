@@ -496,8 +496,8 @@ def main(argv=None):
             sub.add_argument("--successor-config", type=Path, help="Follow-up materials and configuration JSON")
             sub.add_argument("--queue-only", action="store_true")
     args = parser.parse_args(argv)
-    if args.command == "research" and not args.run_id and not (args.goal or args.goal_file):
-        parser.error("research --run-key requires --goal or --goal-file")
+    if args.command == "research" and not args.run_id and not (args.goal or args.goal_file or args.task_card):
+        parser.error("research --run-key requires --goal, --goal-file or --task-card")
     try:
         if getattr(args, "deployment_handler", None):
             return args.deployment_handler(args)

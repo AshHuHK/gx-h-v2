@@ -44,3 +44,5 @@ bin/gx-p0 research --state "$study" --run-id "$RUN_ID"
 切回部署時，將啟動位置和虛擬環境切回先前工作樹，並使用它相配的舊 state。新版進行中的題目保留原 state、插件版本與執行樹，需續題時用原 Run ID。原 `688ab0e` 工作樹、舊狀態庫、既有插件與原始快照均保留。完整研發可在獨立 worktree 比對 `595649e`。這次沒有要求覆蓋遠端分支。
 
 兩個候選共有 51 個本輪更動過的產品路徑，其中 49 個位元相同；差異為精簡部署原有的 CLI profile 註冊和一個額外已安裝的書目插件。官方 Codex 二進位 SHA 與既有發行鎖相符。最終候選另外通過 10 項壓縮原件、具名埠和普通 Goal 配方回歸。[逐檔 SHA、Python 與 Node](release-comparison.json) · [最終候選回歸](slim-field-fixes.log)
+
+整合候選另以普通 `--task-card` 啟動麥芽糖研究 `gxr_01m8fekb5gbjkvze1w`。凍結後的分項與任務卡相符。真 Lead 在三個回合中選法、派出新 CPU Job `gxj_01m8femjkrqb8xkr8q`、實讀 `parent-records.json`，於事件 80 引用該結果、81 結題。兩個命中的 S288C accession 中，直接反應指派 0/2，較寬 EC 類別 2/2。重開新增 0 個 Job、0 個回合。[任務卡、材料、實讀呼叫與決定](yeast/task-to-action.json) · [Lead 的完整結論](yeast/DECISION.md) · [恢復記錄](yeast/warm-recovery.json)

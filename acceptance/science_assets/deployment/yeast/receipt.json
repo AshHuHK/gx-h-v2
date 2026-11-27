@@ -1,0 +1,266 @@
+{
+  "run_id": "gxr_01m8fekb5gbjkvze1w",
+  "goal": "CLOSED",
+  "materials": [
+    {
+      "role": "query",
+      "artifact_ref": "gxa_01m8fekb6ckcznxmpy",
+      "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+    }
+  ],
+  "jobs": [
+    {
+      "node_id": "node_dee5d54a837808cb1f07c30cd178cdae",
+      "job_id": "gxj_01m8femjkrqb8xkr8q",
+      "status": "SUCCEEDED",
+      "method": "yeast-archive-lookup@1",
+      "depends_on": [],
+      "recipe_decision": null,
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fekb6ckcznxmpy",
+          "bytes": 75,
+          "role": "query",
+          "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+        }
+      ],
+      "manifest_hash": "9cdcf71ef9f27c60cfd6c1349a447639b1a4fc4b29914d809b01da76b7093e7c",
+      "outputs": [
+        {
+          "artifact_ref": "gxa_01m8femk7tzx2rbvq0",
+          "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+          "output_name": "parent-records.json",
+          "kind": "yeast_archive_records",
+          "nature": "analysis"
+        }
+      ],
+      "adopted_by": "gxa_ef594433e87d038ff7402479f3e2cb3ab3b18b4e523c169f1ae47cf00bf4062d",
+      "selected_inputs": [
+        "gxa_01m8fekb6ckcznxmpy"
+      ],
+      "parameters": {},
+      "measurements": [
+        {
+          "artifact_ref": "gxa_01m8femk7tzx2rbvq0",
+          "summary": {}
+        }
+      ]
+    }
+  ],
+  "release_events": [
+    {
+      "event_id": 53,
+      "node": "node_dee5d54a837808cb1f07c30cd178cdae",
+      "type": "v6.node.settled"
+    }
+  ],
+  "recipe_expansions": [],
+  "lead_points": [],
+  "decisions": [
+    {
+      "decision_ref": "gxa_ef594433e87d038ff7402479f3e2cb3ab3b18b4e523c169f1ae47cf00bf4062d",
+      "turn_id": "01a21ee9-b447-70b0-8cc0-61e6da2f9693",
+      "rationale": "查詢指定 S. cerevisiae S288C（taxid 559292）與麥芽糖。一次歷史快照查詢即可取得同一範圍內的反應指派、EC 類別註釋與測定紀錄，供逐一核對 accession、底物和測定歸屬。",
+      "evidence_refs": [
+        "gxa_01m8fekb6ckcznxmpy"
+      ],
+      "ops": [
+        "open_branch",
+        "add_node"
+      ],
+      "outcome": "adopted"
+    },
+    {
+      "decision_ref": "gxa_8b0c4fdbdb18c24285fadc47c075659578c1d8dbce1a0f729c80a9d62fc54bd9",
+      "turn_id": "01a21eea-4b5c-7b51-b546-85dff35d00c8",
+      "rationale": "現有查詢已使用題目指定的 S288C（taxid 559292）及麥芽糖。目錄顯示作業執行成功，本次簡報尚未附上 parent-records.json。待結果送達後，即可核對反應與 EC 類別各自的 accession 清單，以及測定的底物和蛋白歸屬。重跑相同查詢不會增加資訊。",
+      "evidence_refs": [
+        "gxa_01m8fekb6ckcznxmpy"
+      ],
+      "ops": [],
+      "outcome": "maintained"
+    },
+    {
+      "decision_ref": "gxa_4e02ef3ce4b9aeb62fa30444a06c6f89c504c12fda6623daf058ea0b46152c86",
+      "turn_id": "01a21eea-985a-7cd3-a6f8-9efbc1311b68",
+      "rationale": "本題的 parent-records.json 已列出指定菌株的完整命中清單，且可逐筆核對測定底物。兩種註釋的覆蓋與麥芽糖活性的證據界限均可直接從本次查詢回答，重查相同快照不會增加資訊。",
+      "evidence_refs": [
+        "gxa_01m8fekb6ckcznxmpy",
+        "gxa_01m8femk7tzx2rbvq0"
+      ],
+      "ops": [
+        "close_run"
+      ],
+      "outcome": "adopted"
+    }
+  ],
+  "lead_turns": [
+    {
+      "thread_id": "01a21ee9-b41a-7480-b147-cf3ef837f006",
+      "turn_id": "01a21ee9-b447-70b0-8cc0-61e6da2f9693",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21eea-4b2a-77a0-96c1-5e607f1eb101",
+      "turn_id": "01a21eea-4b5c-7b51-b546-85dff35d00c8",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21eea-9834-7192-add7-8e71e5aa39bc",
+      "turn_id": "01a21eea-985a-7cd3-a6f8-9efbc1311b68",
+      "state": "acknowledged"
+    }
+  ],
+  "endpoint_deliveries": [],
+  "catalog": [
+    {
+      "event_id": 19,
+      "kind": "all",
+      "query": null,
+      "total": 162,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+          "reference": "yeast-archive-compare@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+          "reference": "yeast-archive-lookup@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "database",
+          "provider": null,
+          "reference": "augmented-nature-uniprot-mcp-server-get-protein-info@legacy",
+          "status": "reference_only"
+        },
+        {
+          "kind": "skill",
+          "provider": null,
+          "reference": "interpret-enzyme-annotation@1",
+          "status": "reference_only"
+        },
+        {
+          "kind": "database",
+          "provider": null,
+          "reference": "augmented-nature-uniprot-mcp-server-get-external-references@legacy",
+          "status": "reference_only"
+        }
+      ]
+    },
+    {
+      "event_id": 54,
+      "kind": "all",
+      "query": "S. cerevisiae S288C maltose historical archive exact reaction assignments EC class distinct protein accession counts and substrate-specific single versus grouped assay attribution",
+      "total": 162,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+          "reference": "yeast-archive-lookup@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+          "reference": "yeast-archive-compare@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": null,
+          "reference": "native-assay-reading@legacy",
+          "status": "reference_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+          "reference": "yeast-reaction-index@2",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+          "reference": "yeast-reaction-index@1",
+          "status": "catalog_only"
+        }
+      ]
+    },
+    {
+      "event_id": 66,
+      "kind": "all",
+      "query": "S288C maltose archive exact Rhea reaction and broader EC accession coverage and substrate-specific assay evidence named results",
+      "total": 162,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+          "reference": "yeast-archive-compare@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+          "reference": "yeast-archive-lookup@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+          "reference": "yeast-reaction-index@2",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+          "reference": "yeast-reaction-index@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+          "reference": "yeast-uniprot-record@2",
+          "status": "selectable"
+        }
+      ]
+    }
+  ],
+  "closure_event": 81,
+  "adopted_decision_events": [
+    {
+      "event_id": 34,
+      "subject_id": "gxa_ef594433e87d038ff7402479f3e2cb3ab3b18b4e523c169f1ae47cf00bf4062d"
+    },
+    {
+      "event_id": 60,
+      "subject_id": "gxa_8b0c4fdbdb18c24285fadc47c075659578c1d8dbce1a0f729c80a9d62fc54bd9"
+    },
+    {
+      "event_id": 80,
+      "subject_id": "gxa_4e02ef3ce4b9aeb62fa30444a06c6f89c504c12fda6623daf058ea0b46152c86"
+    }
+  ],
+  "host": "Existing official Codex OAuth through Clash; admitted native turn IDs, including modules.",
+  "native_turns": [
+    {
+      "thread_id": "01a21ee9-b41a-7480-b147-cf3ef837f006",
+      "turn_id": "01a21ee9-b447-70b0-8cc0-61e6da2f9693",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21eea-4b2a-77a0-96c1-5e607f1eb101",
+      "turn_id": "01a21eea-4b5c-7b51-b546-85dff35d00c8",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21eea-9834-7192-add7-8e71e5aa39bc",
+      "turn_id": "01a21eea-985a-7cd3-a6f8-9efbc1311b68",
+      "scope": "run"
+    }
+  ],
+  "recipes_published_from_run": [],
+  "native_recipe_calls": []
+}

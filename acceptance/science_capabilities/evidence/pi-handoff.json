@@ -1,0 +1,246 @@
+{
+  "candidate": "9c9ea9a51835e2b9c0d386bb8f5439cd9d926cfc",
+  "study_type": "Two observations in different scientific studies. No latency threshold or reliability estimate.",
+  "original": {
+    "run_id": "gxr_01m8d9q2sexhdhq33k",
+    "message_id": "sugar-original-assay-question",
+    "source_text": "请在文献路线核对，最关键的原文实际测量了哪种底物、材料和反应，能否区分直接功能与间接表型？其它路线继续。",
+    "ingress_at": "2026-11-27T01:26:24.332Z",
+    "main": {
+      "thread_id": "01a21a9c-5b85-75f1-9d13-3169c4523460",
+      "turn_id": "01a21a9c-a211-7373-9438-025bcdbe6792",
+      "provider": "openai",
+      "model": "gpt-6.2-astra",
+      "effort": "max",
+      "native_start": "2026-11-27T01:26:42.456Z",
+      "native_completion": "2026-11-27T01:57:41.159Z",
+      "native_elapsed_seconds": 1858.703,
+      "route_return_to_completion_seconds": 1829.904,
+      "status": "completed",
+      "rollout": "rollout-2026-11-27T01-26-24-01a21a9c-5b85-75f1-9d13-3169c4523460.jsonl",
+      "turn_start_line": 2,
+      "turn_completion_line": 435,
+      "route_return": {
+        "call_id": "call_9b5af61a747a44b9a2c34936b55f6939",
+        "requested_at": "2026-11-27T01:27:11.029Z",
+        "request_line": 25,
+        "returned_at": "2026-11-27T01:27:11.255Z",
+        "return_line": 28,
+        "status": "routed",
+        "main_action": null,
+        "feedback_ids": [
+          "pif_47749320a53821f87892dcaf700a5ea9"
+        ]
+      },
+      "explicit_sleep_calls": 27,
+      "requested_sleep_ms": {
+        "30000": 2,
+        "35000": 2,
+        "45000": 2,
+        "50000": 3,
+        "55000": 18
+      },
+      "requested_sleep_seconds": 1360.0
+    },
+    "gx_events": [
+      {
+        "event_id": 201,
+        "ts": "2026-11-27T01:27:11.230Z",
+        "kind": "research.pi.feedback",
+        "subject_id": "pif_47749320a53821f87892dcaf700a5ea9"
+      },
+      {
+        "event_id": 202,
+        "ts": "2026-11-27T01:27:11.231Z",
+        "kind": "pi.message.routed",
+        "subject_id": "sugar-original-assay-question"
+      },
+      {
+        "event_id": 652,
+        "ts": "2026-11-27T01:31:48.271Z",
+        "kind": "research.pi.disposition",
+        "subject_id": "pif_47749320a53821f87892dcaf700a5ea9"
+      },
+      {
+        "event_id": 1098,
+        "ts": "2026-11-27T01:57:41.347Z",
+        "kind": "p0.conversation.replied",
+        "subject_id": "sugar-original-assay-question"
+      }
+    ]
+  },
+  "candidate_run": {
+    "run_id": "gxr_01m8dbxfnk6ae4gm61",
+    "message_id": "pi-metadata-source-check",
+    "source_text": "请在元数据阅读路线核对：比较这两份记录时，哪些字段能直接说明采样来源，哪些地方还需要原件才能确定？",
+    "ingress_at": "2026-11-27T02:04:31.562Z",
+    "main": {
+      "thread_id": "01a21abf-4201-7f20-a6e4-08c22dbb24ec",
+      "turn_id": "01a21abf-423b-7eb2-8fcb-bc467f62f652",
+      "provider": "openai",
+      "model": "gpt-6.2-astra",
+      "effort": "max",
+      "native_start": "2026-11-27T02:04:31.681Z",
+      "native_completion": "2026-11-27T02:05:35.905Z",
+      "native_elapsed_seconds": 64.224,
+      "route_return_to_completion_seconds": 46.067,
+      "status": "completed",
+      "rollout": "rollout-2026-11-27T02-04-31-01a21abf-4201-7f20-a6e4-08c22dbb24ec.jsonl",
+      "turn_start_line": 2,
+      "turn_completion_line": 43,
+      "route_return": {
+        "call_id": "call_69082788e83c4b6296acef24e29b2a52",
+        "requested_at": "2026-11-27T02:04:49.755Z",
+        "request_line": 21,
+        "returned_at": "2026-11-27T02:04:49.838Z",
+        "return_line": 24,
+        "status": "routed",
+        "main_action": "reply_now",
+        "feedback_ids": [
+          "pif_dc3347a8403ebe820b90ae7432f5209b"
+        ]
+      },
+      "explicit_sleep_calls": 0,
+      "requested_sleep_ms": {},
+      "requested_sleep_seconds": 0.0,
+      "reply": "已将问题转给元数据阅读路线的独立研究者。两份记录各自写明了哪些来源信息，仍待逐份核对并标出字段出处。\n\n**来源物种**字段若标为“人”，可直接说明 PCNA 的物种归属。要进一步确认样品取自哪种组织或细胞，需要标题或样品描述明确写出取材对象。\n\n模型链标识用于定位比较对象，wwPDB 版本、坐标链接和 SHA-256 用于定位并校验坐标文件，论文 DOI 用于找到原文。**卡片未写明的取材细节**，需要回查原始沉积记录或论文的方法部分。",
+      "project_state_calls": [
+        "2026-11-27T02:04:38.092Z",
+        "2026-11-27T02:04:59.509Z"
+      ],
+      "project_state_calls_after_route": 1
+    },
+    "gx_events": [
+      {
+        "event_id": 35,
+        "ts": "2026-11-27T02:04:49.802Z",
+        "kind": "research.pi.feedback",
+        "subject_id": "pif_dc3347a8403ebe820b90ae7432f5209b"
+      },
+      {
+        "event_id": 36,
+        "ts": "2026-11-27T02:04:49.803Z",
+        "kind": "pi.message.routed",
+        "subject_id": "pi-metadata-source-check"
+      },
+      {
+        "event_id": 45,
+        "ts": "2026-11-27T02:05:36.004Z",
+        "kind": "p0.conversation.replied",
+        "subject_id": "pi-metadata-source-check"
+      }
+    ],
+    "authorized_host": {
+      "model_provider": "openai",
+      "forced_login_method": "chatgpt",
+      "model": "gpt-6.2-astra",
+      "model_reasoning_effort": "max"
+    },
+    "actual_question_observation": {
+      "observed_at": "2026-11-27T02:04:30.979429+00:00",
+      "active": {
+        "run_id": "gxr_01m8dbxfnk6ae4gm61",
+        "module_id": "investigation",
+        "branch_id": "branch_0c22255b77d4ec71a7ea6b962fb4d585",
+        "scope": "module:module_713c7595d16b12fbac58c02b5d6b721d",
+        "thread_id": "01a21abf-3eda-7813-8d80-ef58ccfefdbb",
+        "turn_id": "01a21abf-3f05-7f90-a2e6-9b3a1f3d542d",
+        "task_id": "gxt_01m8dbyfkndf4cmes5",
+        "through_event": 28
+      },
+      "message_id": "pi-metadata-source-check",
+      "text": "请在元数据阅读路线核对：比较这两份记录时，哪些字段能直接说明采样来源，哪些地方还需要原件才能确定？",
+      "acknowledged_at": "2026-11-27T02:04:31.599031+00:00",
+      "ingress": {
+        "message_id": "pi-metadata-source-check",
+        "run_id": "gxr_01m8dbxfnk6ae4gm61",
+        "conversation_id": "conversation:pi-handoff-public-records",
+        "goal_version": 1,
+        "status": "received"
+      }
+    },
+    "research_disposition": [
+      {
+        "artifact_refs": [],
+        "branch_id": "branch_0c22255b77d4ec71a7ea6b962fb4d585",
+        "feedback_id": "pif_dc3347a8403ebe820b90ae7432f5209b",
+        "goal_version": 1,
+        "scope": "module:module_713c7595d16b12fbac58c02b5d6b721d",
+        "source_kind": "hypothesis",
+        "source_message_id": "pi-metadata-source-check",
+        "text": "请在元数据阅读路线核对：比较这两份记录时，哪些字段能直接说明采样来源，哪些地方还需要原件才能确定？",
+        "event_id": 35,
+        "disclosed_at": "2026-11-27T02:04:49.802Z",
+        "deliveries": [],
+        "disposition": null,
+        "status": "PENDING"
+      }
+    ],
+    "jobs": [],
+    "modules": [
+      {
+        "module_id": "investigation",
+        "scope": "module:module_713c7595d16b12fbac58c02b5d6b721d",
+        "branch_id": "branch_0c22255b77d4ec71a7ea6b962fb4d585",
+        "status": "OPEN",
+        "report_ref": null,
+        "report_event_id": null,
+        "report_time": null
+      }
+    ],
+    "official_turns": [
+      {
+        "role": "planner",
+        "scope": "run",
+        "thread_id": "01a21abe-cf79-7f52-947d-4abb7759e9cc",
+        "turn_id": "01a21abe-cfb2-7a92-9788-5242b427848d",
+        "task_id": "gxt_01m8dbxfsfh6j7f4rx",
+        "terminal_status": "interrupted"
+      },
+      {
+        "role": "planner",
+        "scope": "module:module_713c7595d16b12fbac58c02b5d6b721d",
+        "thread_id": "01a21abf-3eda-7813-8d80-ef58ccfefdbb",
+        "turn_id": "01a21abf-3f05-7f90-a2e6-9b3a1f3d542d",
+        "task_id": "gxt_01m8dbyfkndf4cmes5",
+        "terminal_status": "failed"
+      },
+      {
+        "role": "main",
+        "scope": null,
+        "thread_id": "01a21abf-4201-7f20-a6e4-08c22dbb24ec",
+        "turn_id": "01a21abf-423b-7eb2-8fcb-bc467f62f652",
+        "task_id": null,
+        "terminal_status": "completed"
+      }
+    ],
+    "snapshot": {
+      "goal_status": "OPEN",
+      "through_event": 48,
+      "last_event_at": "2026-11-27T02:10:39.960Z"
+    },
+    "last_provider_window": {
+      "observed_at": "2026-11-27T02:10:09.594Z",
+      "used_percent": 100,
+      "reported_reset_utc": "2026-12-02T01:41:19+00:00"
+    },
+    "cold_export": {
+      "status": "PENDING"
+    },
+    "metadata": [
+      {
+        "file": "1VYM.json",
+        "sha256": "ea5355a9629db647141b851cb6f8489f529a6905d0e6146c16d4fd232d43a08c"
+      },
+      {
+        "file": "9VGW.json",
+        "sha256": "414476d1b4f2be59c47e0c792f1049f2596dab115034055e8c42437074ca1e48"
+      },
+      {
+        "file": "qualification.json",
+        "sha256": "f08b899324f91ab34f600e8a6a8b1275a502c7dcbc55a960bf891465caf34669"
+      }
+    ],
+    "goal": "两份随包的天然人源 PCNA 沉积记录，对选择结构比较原件提供了哪些可核对的来源依据？请委派一名独立阅读研究者逐份核对随附的元数据，标明记录出处，再由 Lead 根据其报告做一个简短结论。范围为这几份已经提供的记录。"
+  }
+}

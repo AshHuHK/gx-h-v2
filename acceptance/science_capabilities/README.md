@@ -34,6 +34,8 @@ Lead 用 gx_query_catalog 按需检索 research、database、method、skill、mo
 
 研究员可以从 Europe PMC 和 Crossref 查找同一问题的候选，从获选记录取得出版方 JATS；也能通过 arXiv 获取指定版本的 PDF。阅读回执指向实际段落、表或物理页。库记录可按 JSON Pointer 核查。工具作者当前支持从引用材料与字段选择派生记录关联和证据覆盖方法，校准覆盖重复键、空值、零值和空分母。[JATS 跨研究员冷恢复](evidence/scholarly-cold-reader.json) · [arXiv 原件](evidence/arxiv-handoff.json) · [PDF 页覆盖](evidence/pdf-source-reading.json)
 
+要在另一台机器上使用本次 Lead 生成的证据覆盖工具，可直接安装随包的五文件插件。新工作区也可用自己的输入重建已执行的两步配方。独立空库实算得到蔗糖 0/1，重新发布的配方与父题原件逐字节一致。[插件、配方与安装命令](portable_method/README.md)
+
 ## 复验
 
 从仓库根目录执行以下命令。它复跑基线三组、受影响的发布与恢复契约以及新增科研用例，写入逐组日志和 JSON。真实模型研究和独立复算分别见验收报告。

@@ -1,0 +1,41 @@
+{
+  "scope": "standalone fixed native reference GPU calibration; separated from GX Goal Jobs",
+  "code_commit": "a66cc5226d5fbcf7b08af4495af6fd7262178e38",
+  "runner_sha256": "f8aba1ff09cc34dc986a2a4533c79680d688c710c22da6b3ec727549c8cdb526",
+  "runner": "code/alphafold3/run_alphafold.py",
+  "shared_interpreter": "conda/envs/auox8-af3-v14/bin/python",
+  "model_weights": "code/alphafold3_weights/af3.bin.zst",
+  "gpu": "NVIDIA H800",
+  "samples": 1,
+  "recycles": 10,
+  "seed": 1,
+  "buckets": [
+    128
+  ],
+  "run_data_pipeline": false,
+  "model_input_written_utc": "2026-11-27T01:20:54.610802+00:00",
+  "model_coordinate_written_utc": "2026-11-27T01:22:41.558396+00:00",
+  "original_log_sha256": "bd6a2d5b394224ce8ff15d2d3b9042a0f50d9ac0489912c51a53e84d047cd8ef",
+  "log_excerpt": [
+    "Found local GPU devices: [CudaDevice(id=0)], using device 0: cuda:0",
+    "Checking that model parameters can be loaded...",
+    "Running fold job published_top7_1qys...",
+    "Skipping data pipeline...",
+    "Writing model input JSON to /tmp/gx-top7-native-af3-run-v1/published_top7_1qys/published_top7_1qys_data.json",
+    "I1127 01:21:01.178812 140583167588160 pipeline.py:185] Processing published_top7_1qys, random_seed=1",
+    "I1127 01:21:01.240617 140583167588160 pipeline.py:265] Calculating bucket size for input with 92 tokens.",
+    "I1127 01:21:01.240993 140583167588160 pipeline.py:271] Got bucket size 128 for input with 92 tokens, resulting in 36 padded tokens.",
+    "Running model inference with seed 1 took 97.29 seconds.",
+    "Running model inference and extracting output structures with 1 seed(s) took 97.47 seconds.",
+    "Fold job published_top7_1qys done, output written to /tmp/gx-top7-native-af3-run-v1/published_top7_1qys",
+    "Done running 1 fold jobs."
+  ],
+  "files": {
+    "TERMS_OF_USE.md": "7ab1c4ef16a8fe88db3ccef813a5e28dec63b1e2d336876e5ae60b6d6b4686b8",
+    "input.json": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf",
+    "published_top7_1qys_data.json": "bd929fc52606a2193643a3de58e235c0083d12d9452579977cb6f21aa8911ab6",
+    "published_top7_1qys_model.cif": "4a58d000840ba6e3a1fb46260677feb23379ca7badb1a8a2fd586403497ee448",
+    "published_top7_1qys_ranking_scores.csv": "eb4728d5f583e7ffeda1d444855914eca4ffd0f5316b12c28da83c577ad6e5aa",
+    "published_top7_1qys_summary_confidences.json": "dcd06674bb6fdaec1970bcd02212603694686f4fcb3014e9af5cfa282cd9af2a"
+  }
+}

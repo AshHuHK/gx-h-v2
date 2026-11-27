@@ -1,0 +1,116 @@
+{
+  "run_id": "gxr_01m8d9pq1zw8stdq7q",
+  "job_id": "gxj_01m8d9pq6kbyz4ck6w",
+  "started_at": "2026-11-27T01:25:19.302Z",
+  "finished_at": "2026-11-27T01:25:19.527Z",
+  "exit_code": 0,
+  "status": "SUCCEEDED",
+  "original_inputs": [
+    {
+      "artifact_ref": "gxa_01m8d9pq2a1fbkh8qv",
+      "role": "kinetics",
+      "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+    },
+    {
+      "artifact_ref": "gxa_01m8d9pq2eq2391mhb",
+      "role": "conservation",
+      "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+    }
+  ],
+  "outputs": [
+    {
+      "artifact_ref": "gxa_01m8d9pqj86g5y9gvr",
+      "output_name": "summary.json",
+      "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+      "source_inputs": [
+        {
+          "artifact_ref": "gxa_01m8d9pq2a1fbkh8qv",
+          "bytes": 115867,
+          "role": "kinetics",
+          "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+        },
+        {
+          "artifact_ref": "gxa_01m8d9pq2eq2391mhb",
+          "bytes": 66435,
+          "role": "conservation",
+          "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+        }
+      ]
+    },
+    {
+      "artifact_ref": "gxa_01m8d9pqjcy87maw5b",
+      "output_name": "records.json",
+      "sha256": "6a493c8f80f5987ebd23fdf821be042aea9bbb0d6a47e9ed079d05e3f8ed3e62",
+      "source_inputs": [
+        {
+          "artifact_ref": "gxa_01m8d9pq2a1fbkh8qv",
+          "bytes": 115867,
+          "role": "kinetics",
+          "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+        },
+        {
+          "artifact_ref": "gxa_01m8d9pq2eq2391mhb",
+          "bytes": 66435,
+          "role": "conservation",
+          "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "schema": "gx.bglb-retrospective/1",
+    "method": "bglb-retrospective@1",
+    "input_sha256": {
+      "kinetics": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+      "conservation": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+    },
+    "substrate": "pNPG",
+    "endpoint": "kcat/KM",
+    "unit": "M^-1 min^-1",
+    "partition_rule": "GX-BglB-S1-site-v1",
+    "mutant_count": 100,
+    "overall_efficiency_status": {
+      "quantified": 78,
+      "below_reported_bound": 8,
+      "no_quantifiable_soluble_yield": 14
+    },
+    "holdout_count": 41,
+    "holdout_exact": 30,
+    "holdout_score_pairs": 14,
+    "holdout_efficiency_status": {
+      "quantified": 30,
+      "no_quantifiable_soluble_yield": 9,
+      "below_reported_bound": 2
+    },
+    "holdout_absent_score_among_exact": 16,
+    "holdout_spearman": 0.25962611970152905,
+    "constant_wt_spearman": null,
+    "constant_wt_spearman_reason": "Every prediction is identical; rank variance is zero.",
+    "paired_wt_median_absolute_log10_error": 0.388204873286487,
+    "wt_efficiency": {
+      "raw": "176,000 \u00b1 8000",
+      "value": 176000.0,
+      "upper_bound": null,
+      "uncertainty": {
+        "value": 8000.0,
+        "relation": "=",
+        "type": "reported_plus_minus"
+      },
+      "status": "quantified"
+    },
+    "wt_source": "S1 Table, row 3, column 6",
+    "published_disagreements": {
+      "body_WT_efficiency": 171000,
+      "body_WT_plus_minus": 8000,
+      "body_soluble_mutants": 89,
+      "body_below_efficiency_detection": 6,
+      "basis": "S1 row data govern this reanalysis. Counts and the WT comparison do not reconcile with the body."
+    },
+    "interpretation": "S3 covers a selected subset, mostly alanine substitutions. The holdout is within a single public study, with no independent experimental validation. A rank describes only scored, quantified historical records. A constant WT assigns no ranks.",
+    "record_source": "10.1371/journal.pone.0147596.s006",
+    "score_source": "10.1371/journal.pone.0147596.s008"
+  },
+  "evidence_kind": "Deterministic acceptance. Ordinary GX research entry and actual CPU Job; scripted model transport.",
+  "test_module": "acceptance.science_capabilities.test_bglb_retrospective",
+  "tests_passed": 3
+}

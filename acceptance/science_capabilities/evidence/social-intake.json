@@ -1,0 +1,74 @@
+{
+  "method": "social-source-intake@1",
+  "executed_at_utc": "2026-11-27T01:26:20.526704+00:00",
+  "entry_point": {
+    "path": "gx-h/plugins/installed/org.gx.scholarly-sources/1.0.0/bin/scholarly.py",
+    "sha256": "8a74ebf6517cc531aaececee27de8711948ece40ff4dcb3786bfb7296a843e97"
+  },
+  "implementation": {
+    "path": "gx-h/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/social.py",
+    "sha256": "0051cd3916c286972d6e36218aebbb2a81553604ac6c4e78e791ce4291c77c7f"
+  },
+  "execution_scope": "Detached plugin worker, local public-link and historical public-export intake",
+  "authenticated_search_verified": false,
+  "network_used": false,
+  "scientific_use": "Channel-intake checks only. Neither case supplied evidence about the yeast research question.",
+  "archive_root_relative_to_release": "../../../GX-harness/artifacts/articles",
+  "invocation": [
+    "python",
+    "gx-h/plugins/installed/org.gx.scholarly-sources/1.0.0/bin/scholarly.py",
+    "social",
+    "--source",
+    "<public-wrapper.json>",
+    "--implementation",
+    "gx-h/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/social.py",
+    "--out",
+    "<tempdir>"
+  ],
+  "wrapper_encoding": "json.dumps(record, ensure_ascii=False).encode('utf-8') with default separators, no trailing newline",
+  "cases": [
+    {
+      "provider": "wechat",
+      "archive_inputs": [
+        {
+          "path": "wechat/8HYZMtpJi892jYm0U_5TSA/metadata.json",
+          "sha256": "cd4e5cb7fa88beeecf149ebf06e0bc0e8fd4ad815751da752c00b6c1ff777156"
+        }
+      ],
+      "preparation": "Canonicalized the archived original_url and supplied just the url field.",
+      "exit_code": 0,
+      "acquisition_mode": "link_only",
+      "input_sha256": "4acb6f1b6fdc51e7321920d095b4368017d1d930d1296feeb8b86a11071b5304",
+      "output_sha256": "54368ae0cd59f655b90892ffdbdce2cf1d75d8bd9dc747703d94169ff3ece28b",
+      "evidence_kind": "community_lead",
+      "disposition": "requires_primary_source_followup",
+      "paragraph_locators": [],
+      "primary_source_candidate_count": 0
+    },
+    {
+      "provider": "xiaohongshu",
+      "archive_inputs": [
+        {
+          "path": "xiaohongshu/downloader-20261109/fresh-public-test/6a8d0d450000000028031a5d/metadata.json",
+          "sha256": "2a2ede09635ef0c30a977ad83f12c29176d6fb56450110f08a53a1e6972d758b"
+        },
+        {
+          "path": "xiaohongshu/downloader-20261109/fresh-public-test/6a8d0d450000000028031a5d/article.txt",
+          "sha256": "6ea6a9eda4ac5ed9e79a35ef17a5817c42b2bef25b8f6dffc7158744d4a4e1c5"
+        }
+      ],
+      "preparation": "Canonicalized original_url, normalized paragraphs from article.txt with the pinned implementation, joined their texts with two LF characters, and supplied fields url then text.",
+      "exit_code": 0,
+      "acquisition_mode": "manual_import",
+      "input_sha256": "98e0315870e2deece1c113d5878f3b6cda627ad3a977244ec33bde879879cab2",
+      "output_sha256": "ddda69f8280f47aae550c28f7cde2d86cd973724eab5e4ca8442eaee212bb35b",
+      "evidence_kind": "community_lead",
+      "disposition": "requires_primary_source_followup",
+      "paragraph_locators": [
+        "paragraph:1",
+        "paragraph:2"
+      ],
+      "primary_source_candidate_count": 0
+    }
+  ]
+}

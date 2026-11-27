@@ -2,6 +2,10 @@
 
 GX 追蹤每項量測何時首次可得、哪位研究者實際收到，以及哪些數值進入正式結論。本版用兩份公開 mmCIF 原件檢查局部區段對幾何摘要的影響，並提供經官方 Codex 宿主執行的公開研究試點。[版本簽收](V623_ACCEPTANCE.md) · [真資料研究報告](acceptance/v623/V623_SCIENCE_REPORT.md) · [公開四格操作](acceptance/v623/oauth/README.md)
 
+## 科研能力插件
+
+Lead 可檢索論文原件、查詢酵母糖水解資料庫，並把有來源的計量與已執行的工作流留給後繼問題。[啟動、實例與驗收](acceptance/science_capabilities/README.md)
+
 ## 與研究團隊多輪對話
 
 研究進行中，PI 可從網頁或 CLI 追問先前決定、回覆研究者的問題，或把新資料送給指定路線。兩個入口共用同一份訊息紀錄。結題後可引用父題證據，並在同一對話中用新材料開啟後繼研究。[啟動、附著與恢復步驟](acceptance/unified_multiturn/README.md)

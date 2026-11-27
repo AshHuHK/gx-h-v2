@@ -1,0 +1,119 @@
+{
+  "control": "scripted native callbacks and actual detached CPU Jobs, including remote sources via Clash",
+  "run_id": "gxr_01m8d9zrtcvvmsjr84",
+  "substrate": "sucrose",
+  "package": "org.gx.yeast-enzyme-evidence@1.0.1",
+  "package_digest": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+  "counts": {
+    "rhea_rows": 0,
+    "enzyme_rows": 1,
+    "distinct_accessions": 1,
+    "unique_catalytic_blocks": 1
+  },
+  "pool": {
+    "pool_id": "swissprot-2026_03-tax559292",
+    "pool_sha256": "33058b0c6b581a6dbaab61eebbafa97ff3ca8f9a5ac6ced628c44932525fa793",
+    "pool_count": 6733,
+    "taxid": 559292,
+    "release": "2026_03",
+    "source": "uniprot_sprot.fasta.gz",
+    "source_sha256": "a9c3496aa727e61d25d9e1291c9ba28d2c2ad19c0e26569dc083d53ec4169536",
+    "database_program": "makeblastdb: 2.17.0+",
+    "criterion": "exact OX=559292 in reviewed canonical Swiss-Prot FASTA"
+  },
+  "raw_hsps": 1,
+  "non_seed_subjects": [],
+  "sequence_groups": [
+    [
+      "P00724"
+    ]
+  ],
+  "record": {
+    "accession": "P00724",
+    "entry_version": 203,
+    "sequence_version": 1,
+    "sequence_sha256": "d1bf0cef15b14d1b0bb645050f1da2e1a5f4ea0792bb95e5a81e143f6c0b58fe",
+    "sequence_length": 532,
+    "sequence_locator": "/sequence/value",
+    "matches_index_sequence": true,
+    "entry_url": "https://rest.uniprot.org/uniprotkb/P00724.json",
+    "source_sha256": "30cc0a2a02cc89f813a0e94e2243f27c24bb053e466ae48202b8943867734343",
+    "taxid": 559292,
+    "catalytic_block_locators": [
+      "/comments/0/reaction"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "uniprot-server",
+      "title": null,
+      "version": "0.1.0",
+      "websiteUrl": null,
+      "icons": null
+    },
+    "tool": "get_protein_info",
+    "commit": "c3356f79d7559b7761cbf1e0712e20924934ae53",
+    "deployed_build_sha256": "cc7bf67370079056f8a52d42649baea6aca662d95ff6ca59aa5e3a8c9fc17d6b",
+    "transport": "stdio",
+    "provider_route": "legacy Clash proxy preload via http://127.0.0.1:7890",
+    "arguments": {
+      "accession": "P00724",
+      "format": "json"
+    },
+    "retrieved_at": "2026-11-27T01:30:20.536442+00:00",
+    "record_version": 203,
+    "evidence_level": "database_annotation",
+    "source": "UniProtKB:P00724/entry/203",
+    "limitation": "This tool reads the same UniProtKB entry as REST; it supplies no independent experimental evidence."
+  },
+  "source_read": {
+    "source_ref": "gxa_01m8d9zvpzqvde0qss",
+    "source_sha256": "30cc0a2a02cc89f813a0e94e2243f27c24bb053e466ae48202b8943867734343",
+    "segment_id": "p2",
+    "label": "/primaryAccession",
+    "receipt_id": "gxrc_01m8d9zxq5zq3y7ctf"
+  },
+  "jobs": [
+    {
+      "job_id": "gxj_01m8d9zs3qjyr6f4vg",
+      "status": "SUCCEEDED",
+      "capability": {
+        "id": "yeast-reaction-index",
+        "sha256": "ce5879e8a49c44dab166cc0a07e186b5766a4ffca4451c7d8422d25d76a59e2b",
+        "version": "2"
+      },
+      "outputs": {
+        "candidates.json": "gxa_01m8d9zt1m7n853yka",
+        "homology.json": "gxa_01m8d9zt1t4nxy4bsh",
+        "blast.tsv": "gxa_01m8d9zt1xfr7wx780"
+      }
+    },
+    {
+      "job_id": "gxj_01m8d9zt4tjxm1zzk5",
+      "status": "SUCCEEDED",
+      "capability": {
+        "id": "yeast-uniprot-record",
+        "sha256": "aaf66f5af2a14174a8598ceb0255ac877604fb84ca8e7a8f3bdb216ea2279187",
+        "version": "2"
+      },
+      "outputs": {
+        "uniprot.json": "gxa_01m8d9zvpzqvde0qss",
+        "acquisition.json": "gxa_01m8d9zvq3n1cm6m0r",
+        "record-summary.json": "gxa_01m8d9zvq5bacpsn5z"
+      }
+    },
+    {
+      "job_id": "gxj_01m8d9zt93ntsk0s44",
+      "status": "SUCCEEDED",
+      "capability": {
+        "id": "yeast-enzyme-mcp",
+        "sha256": "3ed66401b7a5102ee6c0ef252b9f97386fb96344d389a90d1cf23ade97299076",
+        "version": "2"
+      },
+      "outputs": {
+        "mcp-readback.json": "gxa_01m8d9zxmwnr9269jk"
+      }
+    }
+  ],
+  "retained_state": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-acceptance/science-capabilities/yeast-evidence-20261127/sucrose/state"
+}

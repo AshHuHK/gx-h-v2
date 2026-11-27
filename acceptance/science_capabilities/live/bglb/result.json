@@ -1,0 +1,2610 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8d9q2bhtbhacqk7",
+  "goal": "On the published BglB panel, how informative is the archived site-conservation score about measured catalytic efficiency on pNPG for held-out sites? Use the two original tables together in the retrospective Job. Compare with the unchanged WT reference. Explain the denominators, unquantified records, and whether the material supports generalization. Give an evidence-backed decision about the historical comparison and any disagreement between the original sources. Restrict conclusions to this published assay and panel.\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_a9c353b0f0446b9098332f0a4fa716543cf0e185d0a1895f37416e903ec4e959",
+    "op_digest": "80e88a439301b65c0bff793fc38166800affcee7a19942c2ddbdb9733a2526b0",
+    "requested_event": 74,
+    "committed_event": 79,
+    "closed_event": 81,
+    "closed_utc": "2026-11-27T01:32:54.127Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8da35st21pr53q3",
+        "gxa_01m8da205y3580j805",
+        "gxa_01m8da195q38yp6913"
+      ],
+      "op": "close_run",
+      "reason": "The published BglB pNPG panel supports a limited descriptive rank association among scored, quantified held-out variants. The S1 row data define the reference comparison and denominators.",
+      "unresolved": [
+        "The source records do not explain why the article text and S1 report different counts and WT central estimates.",
+        "Selective score coverage and unquantified outcomes leave performance for excluded variants unknown. The study provides no independent test of generalization.",
+        "The registered scope covered the S1 acquisition alone, so the joint S1 and S3 result cannot formally qualify as prospective confirmation."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_a9c353b0f0446b9098332f0a4fa716543cf0e185d0a1895f37416e903ec4e959",
+    "task_id": "gxt_01m8d9tnnawe5hkyzb",
+    "thread_id": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+    "turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467",
+    "rationale": "The joint retrospective found weak positive ordering by negative S3 conservation (Spearman ρ = {{metric:holdout_spearman}}). Of {{metric:holdout_count}} held out by residue position, {{metric:holdout_exact}} had quantified S1 efficiencies and {{metric:holdout_score_pairs}} also had matching S3 scores. Every eligible row was an alanine substitution at a distinct site. Upper bounds, undetectable soluble yield and missing S3 entries account for the exclusions. The unchanged S1 WT had median absolute log10 error {{metric:paired_wt_median_absolute_log10_error}} on the same pairs. Its constant prediction makes rank correlation undefined. S1 has fewer mutants with quantifiable soluble yield, more efficiencies below detection and a higher WT point estimate than the article text. Use the traceable S1 rows for the historical comparison and preserve the discrepancy. Rerunning the fixed method on these same tables would add no information about the discrepancy or generalization.",
+    "reason": "The published BglB pNPG panel supports a limited descriptive rank association among scored, quantified held-out variants. The S1 row data define the reference comparison and denominators.",
+    "unresolved": [
+      "The source records do not explain why the article text and S1 report different counts and WT central estimates.",
+      "Selective score coverage and unquantified outcomes leave performance for excluded variants unknown. The study provides no independent test of generalization.",
+      "The registered scope covered the S1 acquisition alone, so the joint S1 and S3 result cannot formally qualify as prospective confirmation."
+    ],
+    "claim_refs": [
+      "gxa_01m8da35st21pr53q3",
+      "gxa_01m8da205y3580j805",
+      "gxa_01m8da195q38yp6913"
+    ],
+    "evidence_refs": [
+      "gxa_01m8d9q2c708yr1fr6",
+      "gxa_01m8d9q2cpv3ep2fz9",
+      "gxa_01m8d9tnd8htzeh15b",
+      "gxa_01m8d9tnf70fsyze93",
+      "gxh_01m8d9tmt87fvsm02d@2"
+    ],
+    "stop_reason": "SCIENTIFIC_COMPLETION",
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5",
+        "source_ref": "gxa_01m8d9tnd8htzeh15b",
+        "event_id": 61,
+        "reading": {
+          "metric_id": "holdout_exact",
+          "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+          "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "output_name": "summary.json",
+          "method": {
+            "id": "bglb-retrospective",
+            "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+            "version": "1"
+          },
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "manifest_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "provenance_cursor": 41,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "variants",
+          "places": 0,
+          "selectors": {
+            "pointer": "/holdout_exact"
+          },
+          "scope": {
+            "partition_rule": "GX-BglB-S1-site-v1",
+            "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "substrate": "pNPG"
+          },
+          "value": 30,
+          "raw_value": "30",
+          "display": "30 variants",
+          "metric_ref": "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5"
+        }
+      },
+      {
+        "metric_ref": "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3",
+        "source_ref": "gxa_01m8d9tnd8htzeh15b",
+        "event_id": 61,
+        "reading": {
+          "metric_id": "holdout_count",
+          "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+          "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "output_name": "summary.json",
+          "method": {
+            "id": "bglb-retrospective",
+            "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+            "version": "1"
+          },
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "manifest_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "provenance_cursor": 41,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "variants",
+          "places": 0,
+          "selectors": {
+            "pointer": "/holdout_count"
+          },
+          "scope": {
+            "partition_rule": "GX-BglB-S1-site-v1",
+            "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "substrate": "pNPG"
+          },
+          "value": 41,
+          "raw_value": "41",
+          "display": "41 variants",
+          "metric_ref": "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3"
+        }
+      },
+      {
+        "metric_ref": "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca",
+        "source_ref": "gxa_01m8d9tnd8htzeh15b",
+        "event_id": 62,
+        "reading": {
+          "metric_id": "paired_wt_median_absolute_log10_error",
+          "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+          "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "output_name": "summary.json",
+          "method": {
+            "id": "bglb-retrospective",
+            "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+            "version": "1"
+          },
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "manifest_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "provenance_cursor": 41,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "log10",
+          "places": 6,
+          "selectors": {
+            "pointer": "/paired_wt_median_absolute_log10_error"
+          },
+          "scope": {
+            "partition_rule": "GX-BglB-S1-site-v1",
+            "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "substrate": "pNPG"
+          },
+          "value": 0.388204873286487,
+          "raw_value": "0.388204873286487",
+          "display": "0.388205 log10",
+          "metric_ref": "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca"
+        }
+      },
+      {
+        "metric_ref": "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f",
+        "source_ref": "gxa_01m8d9tnd8htzeh15b",
+        "event_id": 61,
+        "reading": {
+          "metric_id": "holdout_score_pairs",
+          "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+          "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "output_name": "summary.json",
+          "method": {
+            "id": "bglb-retrospective",
+            "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+            "version": "1"
+          },
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "manifest_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "provenance_cursor": 41,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "variants",
+          "places": 0,
+          "selectors": {
+            "pointer": "/holdout_score_pairs"
+          },
+          "scope": {
+            "partition_rule": "GX-BglB-S1-site-v1",
+            "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "substrate": "pNPG"
+          },
+          "value": 14,
+          "raw_value": "14",
+          "display": "14 variants",
+          "metric_ref": "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f"
+        }
+      },
+      {
+        "metric_ref": "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f",
+        "source_ref": "gxa_01m8d9tnd8htzeh15b",
+        "event_id": 62,
+        "reading": {
+          "metric_id": "holdout_spearman",
+          "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+          "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "output_name": "summary.json",
+          "method": {
+            "id": "bglb-retrospective",
+            "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+            "version": "1"
+          },
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "manifest_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "provenance_cursor": 41,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 6,
+          "selectors": {
+            "pointer": "/holdout_spearman"
+          },
+          "scope": {
+            "partition_rule": "GX-BglB-S1-site-v1",
+            "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "substrate": "pNPG"
+          },
+          "value": 0.25962611970152905,
+          "raw_value": "0.25962611970152905",
+          "display": "0.259626",
+          "metric_ref": "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f"
+        }
+      }
+    ],
+    "gap_questions": {},
+    "rendered": {
+      "rationale": "The joint retrospective found weak positive ordering by negative S3 conservation (Spearman ρ = 0.259626). Of 41 variants held out by residue position, 30 variants had quantified S1 efficiencies and 14 variants also had matching S3 scores. Every eligible row was an alanine substitution at a distinct site. Upper bounds, undetectable soluble yield and missing S3 entries account for the exclusions. The unchanged S1 WT had median absolute log10 error 0.388205 log10 on the same pairs. Its constant prediction makes rank correlation undefined. S1 has fewer mutants with quantifiable soluble yield, more efficiencies below detection and a higher WT point estimate than the article text. Use the traceable S1 rows for the historical comparison and preserve the discrepancy. Rerunning the fixed method on these same tables would add no information about the discrepancy or generalization.",
+      "reason": "The published BglB pNPG panel supports a limited descriptive rank association among scored, quantified held-out variants. The S1 row data define the reference comparison and denominators.",
+      "unresolved": [
+        "The source records do not explain why the article text and S1 report different counts and WT central estimates.",
+        "Selective score coverage and unquantified outcomes leave performance for excluded variants unknown. The study provides no independent test of generalization.",
+        "The registered scope covered the S1 acquisition alone, so the joint S1 and S3 result cannot formally qualify as prospective confirmation."
+      ]
+    }
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+      "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+      "bytes": 115867,
+      "role": "kinetics",
+      "provenance": [
+        {
+          "source": "doi:10.1371/journal.pone.0147596.s006",
+          "scope": "run",
+          "acquisition": {
+            "applicability": "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations.",
+            "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s006"
+              ]
+            },
+            "measurement_schema": null,
+            "schema": "gx.acquisition/1",
+            "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "source_identity": {
+              "artifact_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+              "schema": "gx.source_identity/1",
+              "status": "operator_attested"
+            },
+            "unknown_dependencies": [
+              "acquisition",
+              "sample",
+              "processing",
+              "sampling"
+            ]
+          },
+          "event_id": 21,
+          "utc": "2026-11-27T01:25:30.692Z"
+        }
+      ]
+    },
+    {
+      "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+      "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+      "bytes": 66435,
+      "role": "conservation",
+      "provenance": [
+        {
+          "source": "doi:10.1371/journal.pone.0147596.s008",
+          "scope": "run",
+          "acquisition": {
+            "applicability": "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring.",
+            "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s008"
+              ]
+            },
+            "measurement_schema": null,
+            "schema": "gx.acquisition/1",
+            "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "source_identity": {
+              "artifact_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+              "schema": "gx.source_identity/1",
+              "status": "operator_attested"
+            },
+            "unknown_dependencies": [
+              "acquisition",
+              "sample",
+              "processing",
+              "sampling"
+            ]
+          },
+          "event_id": 22,
+          "utc": "2026-11-27T01:25:30.695Z"
+        }
+      ]
+    }
+  ],
+  "predictions": [
+    {
+      "hypothesis_id": "gxh_01m8d9tmt87fvsm02d",
+      "statement": "Among matched, quantified variants at held-out positions in the published BglB pNPG panel, the negative of the S3 site-conservation score is expected to correlate positively by rank with S1 catalytic efficiency.",
+      "scope": "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations.",
+      "criteria": "The directional prediction is met if the held-out Spearman correlation satisfies /holdout_spearman > 0. Interpret the magnitude alongside score coverage, ties, and the number of residue positions contributing data.",
+      "decision_scope": "run",
+      "limitations": "The correlation is defined only on held-out rows with an exact S1 outcome and an archived S3 score. This is a descriptive test of direction in public data with selected score coverage and no independent validation.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8d9sxe9msqc1r1y",
+        "proposed_level": "open",
+        "rationale": "S1 defines the measured outcome and assay population. S3 supplies the archived predictor. The fixed method selects eligible pairs, holds out whole positions, reverses the conservation score and uses average ranks."
+      },
+      "evidence_refs": [
+        "gxa_01m8d9q2c708yr1fr6",
+        "gxa_01m8d9q2cpv3ep2fz9"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "f0235a3676cf93f74e05e77c26c92a571ac2b61014ca58c31d267b759e137978",
+        "brief_turn_id": "01a21a9b-94f8-78e3-81c8-57286e903974",
+        "context_ref": "gxcx_01m8d9q2fmm5bn7y31",
+        "delivery_receipt": "start:39052757-2a0d-4068-8ed0-be90080ffde6",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 22,
+        "state": "acknowledged",
+        "thread_id": "01a21a9b-94bf-7302-8a4c-3fbff8562250",
+        "turn_id": "01a21a9b-94f8-78e3-81c8-57286e903974"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+            ],
+            "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s006"
+              ]
+            },
+            "first_event_id": 11,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8d9q2c708yr1fr6",
+          "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+          "source_class": "supplied_information",
+          "source_event_id": 21
+        },
+        {
+          "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring."
+            ],
+            "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s008"
+              ]
+            },
+            "first_event_id": 12,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8d9q2cpv3ep2fz9",
+          "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+          "source_class": "supplied_information",
+          "source_event_id": 22
+        }
+      ],
+      "goal_version": 1,
+      "prediction": {
+        "data_refs": [
+          "gxa_01m8d9q2c708yr1fr6",
+          "gxa_01m8d9q2cpv3ep2fz9"
+        ],
+        "method": {
+          "capability": "bglb-retrospective@1",
+          "metric_id": "holdout_spearman",
+          "output": "summary.json",
+          "parameters": {},
+          "unit": "1"
+        },
+        "observable": "/holdout_spearman",
+        "operator": "gt",
+        "target": "analysis",
+        "threshold": 0
+      },
+      "registration": {
+        "chronology_scope": "same_store",
+        "claim_revision_id": "gxh_01m8d9tmt87fvsm02d@1",
+        "claim_scope": "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations.",
+        "claim_sha256": "d66af8a8b9e552b7e483cf34b739d7b5696a5effb24e10fe008dfd9fbdf009d7",
+        "data": [
+          {
+            "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+            "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+          },
+          {
+            "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+            "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+          }
+        ],
+        "decision_scope": "run",
+        "endpoint_chronology_at_registration": {
+          "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73": {
+            "endpoint_first_available_event_id": null,
+            "raw_material_received_event_id": 11
+          },
+          "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9": {
+            "endpoint_first_available_event_id": null,
+            "raw_material_received_event_id": 12
+          }
+        },
+        "event_id": 33,
+        "known_at_registration": {
+          "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73": false,
+          "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9": false
+        },
+        "material_identity": "endpoint_verified",
+        "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+        "method_pin": {
+          "capability": "bglb-retrospective@1",
+          "manifest_sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+          "measurement_spec": {
+            "applicability": "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations.",
+            "capability": "bglb-retrospective@1",
+            "input_role": null,
+            "manifest_sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+            "measurement_schema": null,
+            "metric_definition": {
+              "op": "decimal/1",
+              "places": 6,
+              "pointer": "/holdout_spearman",
+              "reader": "json/1",
+              "scope": {
+                "partition_rule": "/partition_rule",
+                "s1_sha256": "/input_sha256/kinetics",
+                "s3_sha256": "/input_sha256/conservation",
+                "substrate": "/substrate"
+              },
+              "unit": "1"
+            },
+            "metric_id": "holdout_spearman",
+            "missing_parameters": [],
+            "observable": "/metrics/holdout_spearman",
+            "output": "summary.json",
+            "output_name": "summary.json",
+            "parameters": {},
+            "result_pointer": null,
+            "schema": "gx.measurement-spec/2",
+            "source_roles": [
+              "conservation",
+              "kinetics"
+            ],
+            "unit": "1"
+          },
+          "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+          "output": "summary.json"
+        },
+        "policy": "gx.claim-proposition/3",
+        "posthoc_revision_of": null,
+        "prediction": {
+          "data_refs": [
+            "gxa_01m8d9q2c708yr1fr6",
+            "gxa_01m8d9q2cpv3ep2fz9"
+          ],
+          "method": {
+            "capability": "bglb-retrospective@1",
+            "metric_id": "holdout_spearman",
+            "output": "summary.json",
+            "parameters": {},
+            "unit": "1"
+          },
+          "observable": "/holdout_spearman",
+          "operator": "gt",
+          "target": "analysis",
+          "threshold": 0
+        },
+        "proposition_sha256": "74d04c754fb02ca8f629728b17712aec9d88639fd89559bb28589236e213363d",
+        "quantifier": "all",
+        "utc": "2026-11-27T01:27:27.816Z",
+        "decision_ref": "gxa_2e94224972ab68e66f4d5cba20741f8839f127e5b9c2119b5a9e91d9d41bb4db"
+      },
+      "assessments": [
+        {
+          "claim_revision_id": "gxh_01m8d9tmt87fvsm02d@1",
+          "decision_id": "gxa_2e94224972ab68e66f4d5cba20741f8839f127e5b9c2119b5a9e91d9d41bb4db",
+          "assessment_cursor": 22,
+          "availability_cursor": 33,
+          "level": "open",
+          "stage": "preregistered",
+          "direction": "undetermined",
+          "results": [],
+          "gaps": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "event_id": 21,
+              "kind": "different_method_or_output"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "event_id": 22,
+              "kind": "different_method_or_output"
+            }
+          ],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 11,
+              "registration_event_id": 33,
+              "retrospective_refs": [],
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 12,
+              "registration_event_id": 33,
+              "retrospective_refs": [],
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "Applicable reviewed evidence or a classified scientific artifact is cited.",
+            "GX froze the rule before each qualifying prospective result.",
+            "Unmeasured outcomes and execution gaps do not establish counterevidence."
+          ],
+          "utc": "2026-11-27T01:27:27.816Z",
+          "event_id": 33,
+          "event": "v6.claim.adopted",
+          "author": "01a21a9b-94bf-7302-8a4c-3fbff8562250"
+        },
+        {
+          "claim_revision_id": "gxh_01m8d9tmt87fvsm02d@2",
+          "decision_id": "gxa_2e94224972ab68e66f4d5cba20741f8839f127e5b9c2119b5a9e91d9d41bb4db",
+          "assessment_cursor": 54,
+          "availability_cursor": 54,
+          "level": "open",
+          "stage": "preregistered",
+          "direction": "undetermined",
+          "results": [],
+          "gaps": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "event_id": 21,
+              "kind": "different_method_or_output"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "event_id": 22,
+              "kind": "different_method_or_output"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+              "event_id": 54,
+              "kind": "out_of_scientific_scope"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+              "event_id": 54,
+              "kind": "different_method_or_output"
+            }
+          ],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 11,
+              "registration_event_id": 33,
+              "retrospective_refs": [],
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 12,
+              "registration_event_id": 33,
+              "retrospective_refs": [],
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "Applicable reviewed evidence or a classified scientific artifact is cited.",
+            "GX froze the rule before each qualifying prospective result.",
+            "Unmeasured outcomes and execution gaps do not establish counterevidence."
+          ],
+          "utc": "2026-11-27T01:27:28.665Z",
+          "event_id": 55,
+          "event": "v62.claim.reassessed",
+          "author": "GX"
+        }
+      ],
+      "classification": "registered_without_qualifying_result",
+      "revisions": [
+        {
+          "hypothesis_id": "gxh_01m8d9tmt87fvsm02d",
+          "statement": "Among matched, quantified variants at held-out positions in the published BglB pNPG panel, the negative of the S3 site-conservation score is expected to correlate positively by rank with S1 catalytic efficiency.",
+          "scope": "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations.",
+          "criteria": "The registered rule is /holdout_spearman > 0. Report the observed direction and magnitude on the eligible held-out rows, and reserve prospective qualification for evidence matching the registered scope.",
+          "decision_scope": "run",
+          "limitations": "The registered scope covers the S1 acquisition. S3 has a distinct applicability, so the observed joint result can be interpreted descriptively but lacks formal prospective qualification. S3 coverage is selective, ties receive average ranks, and variants with undetectable soluble yield or only upper bounds on efficiency cannot supply exact outcome ranks. S1 row data govern the denominator and WT reference where the article text disagrees. The comparison has no independent validation.",
+          "lead_interpretation": {
+            "proposal_ref": "gxa_01m8da195q38yp6913",
+            "proposed_level": "insufficient",
+            "rationale": "The joint retrospective produced a weak positive rank association for negative S3 conservation against S1 pNPG catalytic efficiency (Spearman ρ = 0.259626). The whole-site holdout contained 41 variants, of which 30 variants had an S1 point estimate and 14 variants also had a matched S3 score. Each eligible row was an alanine substitution at a different site. On these pairs the S1 WT had median absolute log10 error 0.388205 log10. Its rank correlation is undefined because its prediction is constant."
+          },
+          "evidence_refs": [
+            "gxa_01m8d9tnd8htzeh15b",
+            "gxa_01m8d9tnf70fsyze93",
+            "gxa_01m8d9q2c708yr1fr6",
+            "gxa_01m8d9q2cpv3ep2fz9"
+          ],
+          "decision_delivery": {
+            "brief_sha256": "6cfddf2e0199bd94e23b78b8059ede083eb5ee4336558fc74be0d0387a8c6031",
+            "brief_turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467",
+            "context_ref": "gxcx_01m8d9tnn82vkpbg7s",
+            "delivery_receipt": "start:a0a9d4bc-bd67-4159-8070-22307f5899f5",
+            "metric_refs": [
+              "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5",
+              "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3",
+              "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca",
+              "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f",
+              "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f"
+            ],
+            "observations": [
+              {
+                "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+                "event_id": 54,
+                "projection_sha256": "7ea60cbce1923697365495c1d71b2e5f88d7feb0c3c4d9af9d313f44d6e60ead",
+                "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85"
+              }
+            ],
+            "snapshot_cursor": 55,
+            "state": "acknowledged",
+            "thread_id": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+            "turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467"
+          },
+          "source_records": [
+            {
+              "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+              "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+              "capability": "bglb-retrospective",
+              "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                  "bytes": 115867,
+                  "role": "kinetics",
+                  "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+                },
+                {
+                  "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                  "bytes": 66435,
+                  "role": "conservation",
+                  "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                }
+              ],
+              "job_id": "gxj_01m8d9tn05f3mtqj6m",
+              "job_status": "SUCCEEDED",
+              "kind": "bglb_summary",
+              "output_provenance": {
+                "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+                "applicability_scopes": [
+                  "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring.",
+                  "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+                ],
+                "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+                "capability": {
+                  "id": "bglb-retrospective",
+                  "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                  "version": "1"
+                },
+                "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+                "data_refs": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                    "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+                  },
+                  {
+                    "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                    "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                  }
+                ],
+                "declaration_name": "summary.json",
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [
+                    "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                    "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                    "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                    "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                  ],
+                  "processing": [
+                    "capability:83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                    "method_source:7eee12f12cfc3816ffcc21ebd631694b45bf56e0a4aca02c5e711fc271a62025"
+                  ],
+                  "publication": [
+                    "https://doi.org/10.1371/journal.pone.0147596"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "doi:10.1371/journal.pone.0147596.s006",
+                    "doi:10.1371/journal.pone.0147596.s008"
+                  ]
+                },
+                "first_event_id": 47,
+                "independence_complete": false,
+                "job_id": "gxj_01m8d9tn05f3mtqj6m",
+                "nature": "analysis",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                    "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+                  },
+                  {
+                    "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                    "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                  }
+                ],
+                "output_name": "summary.json",
+                "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+                "record_kind": "job_output",
+                "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+                "unknown_dependencies": [
+                  "acquisition",
+                  "processing",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": [
+                  "observed"
+                ]
+              },
+              "record_nature": "analysis",
+              "ref": "gxa_01m8d9tnd8htzeh15b",
+              "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+              "source_class": "computed_result",
+              "version": "1"
+            },
+            {
+              "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+              "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+              "capability": "bglb-retrospective",
+              "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                  "bytes": 115867,
+                  "role": "kinetics",
+                  "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+                },
+                {
+                  "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                  "bytes": 66435,
+                  "role": "conservation",
+                  "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                }
+              ],
+              "job_id": "gxj_01m8d9tn05f3mtqj6m",
+              "job_status": "SUCCEEDED",
+              "kind": "bglb_records",
+              "output_provenance": {
+                "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+                "applicability_scopes": [
+                  "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring.",
+                  "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+                ],
+                "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+                "capability": {
+                  "id": "bglb-retrospective",
+                  "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                  "version": "1"
+                },
+                "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+                "data_refs": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                    "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+                  },
+                  {
+                    "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                    "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                  }
+                ],
+                "declaration_name": "records.json",
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [
+                    "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                    "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                    "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                    "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                  ],
+                  "processing": [
+                    "capability:83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                    "method_source:7eee12f12cfc3816ffcc21ebd631694b45bf56e0a4aca02c5e711fc271a62025"
+                  ],
+                  "publication": [
+                    "https://doi.org/10.1371/journal.pone.0147596"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "doi:10.1371/journal.pone.0147596.s006",
+                    "doi:10.1371/journal.pone.0147596.s008"
+                  ]
+                },
+                "first_event_id": 48,
+                "independence_complete": false,
+                "job_id": "gxj_01m8d9tn05f3mtqj6m",
+                "nature": "analysis",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                    "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+                  },
+                  {
+                    "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                    "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                  }
+                ],
+                "output_name": "records.json",
+                "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+                "record_kind": "job_output",
+                "sha256": "6a493c8f80f5987ebd23fdf821be042aea9bbb0d6a47e9ed079d05e3f8ed3e62",
+                "unknown_dependencies": [
+                  "acquisition",
+                  "processing",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": [
+                  "observed"
+                ]
+              },
+              "record_nature": "analysis",
+              "ref": "gxa_01m8d9tnf70fsyze93",
+              "sha256": "6a493c8f80f5987ebd23fdf821be042aea9bbb0d6a47e9ed079d05e3f8ed3e62",
+              "source_class": "computed_result",
+              "version": "1"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [
+                  "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+                ],
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [
+                    "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                    "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+                  ],
+                  "processing": [],
+                  "publication": [
+                    "https://doi.org/10.1371/journal.pone.0147596"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "doi:10.1371/journal.pone.0147596.s006"
+                  ]
+                },
+                "first_event_id": 11,
+                "independence_complete": false,
+                "job_id": null,
+                "measurement_schema": null,
+                "nature": "observed",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                    "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+                  }
+                ],
+                "reason": "Verified operator acquisition receipt on the original ingested bytes",
+                "record_kind": "supplied_observation",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "unknown_dependencies": [
+                  "acquisition",
+                  "processing",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "observed",
+              "ref": "gxa_01m8d9q2c708yr1fr6",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+              "source_class": "supplied_information",
+              "source_event_id": 21
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [
+                  "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring."
+                ],
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [
+                    "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                    "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                  ],
+                  "processing": [],
+                  "publication": [
+                    "https://doi.org/10.1371/journal.pone.0147596"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "doi:10.1371/journal.pone.0147596.s008"
+                  ]
+                },
+                "first_event_id": 12,
+                "independence_complete": false,
+                "job_id": null,
+                "measurement_schema": null,
+                "nature": "observed",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                    "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+                  }
+                ],
+                "reason": "Verified operator acquisition receipt on the original ingested bytes",
+                "record_kind": "supplied_observation",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "unknown_dependencies": [
+                  "acquisition",
+                  "processing",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "observed",
+              "ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+              "source_class": "supplied_information",
+              "source_event_id": 22
+            }
+          ],
+          "goal_version": 1,
+          "prediction": {
+            "data_refs": [
+              "gxa_01m8d9q2c708yr1fr6",
+              "gxa_01m8d9q2cpv3ep2fz9"
+            ],
+            "method": {
+              "capability": "bglb-retrospective@1",
+              "metric_id": "holdout_spearman",
+              "output": "summary.json",
+              "parameters": {},
+              "unit": "1"
+            },
+            "observable": "/holdout_spearman",
+            "operator": "gt",
+            "target": "analysis",
+            "threshold": 0
+          },
+          "registration": {
+            "chronology_scope": "same_store",
+            "claim_revision_id": "gxh_01m8d9tmt87fvsm02d@3",
+            "claim_scope": "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations.",
+            "claim_sha256": "fc9d7cf7087909a39d3230c81975a8add8a6179c8dce8245372dbab736e35b68",
+            "data": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "decision_scope": "run",
+            "endpoint_chronology_at_registration": {
+              "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73": {
+                "endpoint_first_available_event_id": null,
+                "raw_material_received_event_id": 11
+              },
+              "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9": {
+                "endpoint_first_available_event_id": null,
+                "raw_material_received_event_id": 12
+              }
+            },
+            "event_id": 71,
+            "known_at_registration": {
+              "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73": false,
+              "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9": false
+            },
+            "material_identity": "endpoint_verified",
+            "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+            "method_pin": {
+              "capability": "bglb-retrospective@1",
+              "manifest_sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+              "measurement_spec": {
+                "applicability": "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations.",
+                "capability": "bglb-retrospective@1",
+                "input_role": null,
+                "manifest_sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                "measurement_schema": null,
+                "metric_definition": {
+                  "op": "decimal/1",
+                  "places": 6,
+                  "pointer": "/holdout_spearman",
+                  "reader": "json/1",
+                  "scope": {
+                    "partition_rule": "/partition_rule",
+                    "s1_sha256": "/input_sha256/kinetics",
+                    "s3_sha256": "/input_sha256/conservation",
+                    "substrate": "/substrate"
+                  },
+                  "unit": "1"
+                },
+                "metric_id": "holdout_spearman",
+                "missing_parameters": [],
+                "observable": "/metrics/holdout_spearman",
+                "output": "summary.json",
+                "output_name": "summary.json",
+                "parameters": {},
+                "result_pointer": null,
+                "schema": "gx.measurement-spec/2",
+                "source_roles": [
+                  "conservation",
+                  "kinetics"
+                ],
+                "unit": "1"
+              },
+              "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+              "output": "summary.json"
+            },
+            "policy": "gx.claim-proposition/3",
+            "posthoc_revision_of": null,
+            "prediction": {
+              "data_refs": [
+                "gxa_01m8d9q2c708yr1fr6",
+                "gxa_01m8d9q2cpv3ep2fz9"
+              ],
+              "method": {
+                "capability": "bglb-retrospective@1",
+                "metric_id": "holdout_spearman",
+                "output": "summary.json",
+                "parameters": {},
+                "unit": "1"
+              },
+              "observable": "/holdout_spearman",
+              "operator": "gt",
+              "target": "analysis",
+              "threshold": 0
+            },
+            "proposition_sha256": "e2f1a85b9772971644f788febb517a1075104d09950e06fbc3d49111dabe4ee3",
+            "quantifier": "all",
+            "utc": "2026-11-27T01:32:54.009Z",
+            "decision_ref": "gxa_a9c353b0f0446b9098332f0a4fa716543cf0e185d0a1895f37416e903ec4e959"
+          },
+          "assessments": [
+            {
+              "claim_revision_id": "gxh_01m8d9tmt87fvsm02d@3",
+              "decision_id": "gxa_a9c353b0f0446b9098332f0a4fa716543cf0e185d0a1895f37416e903ec4e959",
+              "assessment_cursor": 55,
+              "availability_cursor": 71,
+              "level": "insufficient",
+              "stage": "preregistered",
+              "direction": "undetermined",
+              "results": [],
+              "gaps": [
+                {
+                  "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                  "event_id": 21,
+                  "kind": "different_method_or_output"
+                },
+                {
+                  "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                  "event_id": 22,
+                  "kind": "different_method_or_output"
+                },
+                {
+                  "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+                  "event_id": 54,
+                  "kind": "out_of_scientific_scope"
+                },
+                {
+                  "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+                  "event_id": 54,
+                  "kind": "different_method_or_output"
+                }
+              ],
+              "preexisting_result": false,
+              "material_coverage": [
+                {
+                  "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                  "endpoint_first_available_event_id": null,
+                  "known_at_registration": false,
+                  "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+                  "opposing_refs": [],
+                  "qualification": "unmeasured",
+                  "raw_material_received_event_id": 11,
+                  "registration_event_id": 71,
+                  "retrospective_refs": [],
+                  "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                  "supporting_refs": [],
+                  "uncertain_refs": []
+                },
+                {
+                  "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                  "endpoint_first_available_event_id": null,
+                  "known_at_registration": false,
+                  "measurement_spec_sha256": "3eb63127094e38e4b58ab65a681943a34b12dc8b4627cafe7a6413cd27bf64ec",
+                  "opposing_refs": [],
+                  "qualification": "unmeasured",
+                  "raw_material_received_event_id": 12,
+                  "registration_event_id": 71,
+                  "retrospective_refs": [],
+                  "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                  "supporting_refs": [],
+                  "uncertain_refs": []
+                }
+              ],
+              "supporting_refs": [],
+              "opposing_refs": [],
+              "reviewed_evidence": [],
+              "disputed_extractions": [],
+              "replication": [],
+              "reasons": [
+                "Applicable reviewed evidence or a classified scientific artifact is cited.",
+                "GX froze the rule before each qualifying prospective result.",
+                "Unmeasured outcomes and execution gaps do not establish counterevidence."
+              ],
+              "utc": "2026-11-27T01:32:54.009Z",
+              "event_id": 71,
+              "event": "v6.claim.adopted",
+              "author": "01a21a9d-56cb-7292-a664-ed464c3adf7e"
+            }
+          ],
+          "classification": "registered_without_qualifying_result"
+        }
+      ]
+    }
+  ],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8da4kcpjbkaw5fs",
+      "statement": "paired_wt_median_absolute_log10_error = 0.388205 log10; holdout_score_pairs = 14 variants.",
+      "scope": "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations.",
+      "criteria": "Use S1 row and column identities, soluble-yield status and reported efficiency status to determine the denominator. Evaluate WT on the same eligible variant rows as the conservation score. Preserve discrepancies between traceable source reports.",
+      "decision_scope": "run",
+      "limitations": "These counts and error apply to the reported BglB measurements on pNPG. Limited matched S3 coverage restricts the WT error population. The records do not establish why S1 and the article text differ.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8da205y3580j805",
+        "proposed_level": "limited_support",
+        "rationale": "The WT row in S1 supplies the reference estimate and its reported uncertainty. The mutant rows distinguish quantified efficiencies, reported upper bounds and missing efficiencies after soluble yield fell below detection. The historical job used the S1 rows directly and identified different main-text totals and a different WT central estimate. WT gives each eligible variant the same prediction, so its rank variance is zero."
+      },
+      "evidence_refs": [
+        "gxa_01m8d9q2c708yr1fr6",
+        "gxa_01m8d9q2cpv3ep2fz9",
+        "gxa_01m8d9tnd8htzeh15b",
+        "gxa_01m8d9tnf70fsyze93"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "6cfddf2e0199bd94e23b78b8059ede083eb5ee4336558fc74be0d0387a8c6031",
+        "brief_turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467",
+        "context_ref": "gxcx_01m8d9tnn82vkpbg7s",
+        "delivery_receipt": "start:a0a9d4bc-bd67-4159-8070-22307f5899f5",
+        "metric_refs": [
+          "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5",
+          "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3",
+          "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca",
+          "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f",
+          "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f"
+        ],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+            "event_id": 54,
+            "projection_sha256": "7ea60cbce1923697365495c1d71b2e5f88d7feb0c3c4d9af9d313f44d6e60ead",
+            "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85"
+          }
+        ],
+        "snapshot_cursor": 55,
+        "state": "acknowledged",
+        "thread_id": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+        "turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+            ],
+            "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s006"
+              ]
+            },
+            "first_event_id": 11,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8d9q2c708yr1fr6",
+          "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+          "source_class": "supplied_information",
+          "source_event_id": 21
+        },
+        {
+          "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring."
+            ],
+            "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s008"
+              ]
+            },
+            "first_event_id": 12,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8d9q2cpv3ep2fz9",
+          "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+          "source_class": "supplied_information",
+          "source_event_id": 22
+        },
+        {
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+          "capability": "bglb-retrospective",
+          "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "job_status": "SUCCEEDED",
+          "kind": "bglb_summary",
+          "output_provenance": {
+            "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+            "applicability_scopes": [
+              "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring.",
+              "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+            ],
+            "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+            "capability": {
+              "id": "bglb-retrospective",
+              "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+              "version": "1"
+            },
+            "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "declaration_name": "summary.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              ],
+              "processing": [
+                "capability:83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                "method_source:7eee12f12cfc3816ffcc21ebd631694b45bf56e0a4aca02c5e711fc271a62025"
+              ],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s006",
+                "doi:10.1371/journal.pone.0147596.s008"
+              ]
+            },
+            "first_event_id": 47,
+            "independence_complete": false,
+            "job_id": "gxj_01m8d9tn05f3mtqj6m",
+            "nature": "analysis",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "output_name": "summary.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": [
+              "observed"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8d9tnd8htzeh15b",
+          "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+          "capability": "bglb-retrospective",
+          "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "job_status": "SUCCEEDED",
+          "kind": "bglb_records",
+          "output_provenance": {
+            "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+            "applicability_scopes": [
+              "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring.",
+              "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+            ],
+            "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+            "capability": {
+              "id": "bglb-retrospective",
+              "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+              "version": "1"
+            },
+            "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "declaration_name": "records.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              ],
+              "processing": [
+                "capability:83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                "method_source:7eee12f12cfc3816ffcc21ebd631694b45bf56e0a4aca02c5e711fc271a62025"
+              ],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s006",
+                "doi:10.1371/journal.pone.0147596.s008"
+              ]
+            },
+            "first_event_id": 48,
+            "independence_complete": false,
+            "job_id": "gxj_01m8d9tn05f3mtqj6m",
+            "nature": "analysis",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "output_name": "records.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "6a493c8f80f5987ebd23fdf821be042aea9bbb0d6a47e9ed079d05e3f8ed3e62",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": [
+              "observed"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8d9tnf70fsyze93",
+          "sha256": "6a493c8f80f5987ebd23fdf821be042aea9bbb0d6a47e9ed079d05e3f8ed3e62",
+          "source_class": "computed_result",
+          "version": "1"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8da4kcpjbkaw5fs@1",
+      "decision_id": "gxa_a9c353b0f0446b9098332f0a4fa716543cf0e185d0a1895f37416e903ec4e959",
+      "assessment_cursor": 55,
+      "availability_cursor": 72,
+      "level": "insufficient",
+      "stage": "grounded",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited."
+      ],
+      "utc": "2026-11-27T01:32:54.038Z",
+      "event_id": 72,
+      "event": "v6.claim.adopted",
+      "author": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    },
+    {
+      "hypothesis_id": "gxh_01m8da4kcqsmf774r9",
+      "statement": "holdout_count = 41 variants; holdout_exact = 30 variants; holdout_score_pairs = 14 variants; holdout_spearman = 0.259626.",
+      "scope": "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring.",
+      "criteria": "Describe the measured rank association for S3-scored variants with held-out S1 point estimates. Inspect site representation, substitution coverage and ties, and bound the result to the eligible records.",
+      "decision_scope": "run",
+      "limitations": "S3 coverage is selective. A reported upper bound or a missing efficiency after undetectable soluble yield cannot supply a point rank. The score ranks variants without predicting efficiency in physical units. This historical comparison from a single published assay lacks independent experimental validation.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8da35st21pr53q3",
+        "proposed_level": "limited_support",
+        "rationale": "The fixed job joined the original tables by variant and held out whole residue positions. It used only the archived conservation column as its score and the S1 efficiency estimates as outcomes. Tied conservation percentages received average ranks. All eligible pairs were alanine substitutions at distinct positions."
+      },
+      "evidence_refs": [
+        "gxa_01m8d9q2cpv3ep2fz9",
+        "gxa_01m8d9q2c708yr1fr6",
+        "gxa_01m8d9tnd8htzeh15b",
+        "gxa_01m8d9tnf70fsyze93"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "6cfddf2e0199bd94e23b78b8059ede083eb5ee4336558fc74be0d0387a8c6031",
+        "brief_turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467",
+        "context_ref": "gxcx_01m8d9tnn82vkpbg7s",
+        "delivery_receipt": "start:a0a9d4bc-bd67-4159-8070-22307f5899f5",
+        "metric_refs": [
+          "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5",
+          "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3",
+          "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca",
+          "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f",
+          "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f"
+        ],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+            "event_id": 54,
+            "projection_sha256": "7ea60cbce1923697365495c1d71b2e5f88d7feb0c3c4d9af9d313f44d6e60ead",
+            "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85"
+          }
+        ],
+        "snapshot_cursor": 55,
+        "state": "acknowledged",
+        "thread_id": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+        "turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring."
+            ],
+            "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s008"
+              ]
+            },
+            "first_event_id": 12,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8d9q2cpv3ep2fz9",
+          "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+          "source_class": "supplied_information",
+          "source_event_id": 22
+        },
+        {
+          "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+            ],
+            "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s006"
+              ]
+            },
+            "first_event_id": 11,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8d9q2c708yr1fr6",
+          "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+          "source_class": "supplied_information",
+          "source_event_id": 21
+        },
+        {
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+          "capability": "bglb-retrospective",
+          "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "job_status": "SUCCEEDED",
+          "kind": "bglb_summary",
+          "output_provenance": {
+            "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+            "applicability_scopes": [
+              "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring.",
+              "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+            ],
+            "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+            "capability": {
+              "id": "bglb-retrospective",
+              "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+              "version": "1"
+            },
+            "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "declaration_name": "summary.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              ],
+              "processing": [
+                "capability:83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                "method_source:7eee12f12cfc3816ffcc21ebd631694b45bf56e0a4aca02c5e711fc271a62025"
+              ],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s006",
+                "doi:10.1371/journal.pone.0147596.s008"
+              ]
+            },
+            "first_event_id": 47,
+            "independence_complete": false,
+            "job_id": "gxj_01m8d9tn05f3mtqj6m",
+            "nature": "analysis",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "output_name": "summary.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": [
+              "observed"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8d9tnd8htzeh15b",
+          "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+          "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+          "capability": "bglb-retrospective",
+          "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "job_id": "gxj_01m8d9tn05f3mtqj6m",
+          "job_status": "SUCCEEDED",
+          "kind": "bglb_records",
+          "output_provenance": {
+            "admission_sha256": "3447744d8402c27a373c481f5650e45e04580ed77b08497514cbabcd5cef81be",
+            "applicability_scopes": [
+              "Archived conservation percentages, S3 Table column 3. Column 1 and row order are outcome-derived and excluded from scoring.",
+              "BglB pNPG catalytic efficiency measurements, original S1 Table rows, reported units and censored observations."
+            ],
+            "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+            "capability": {
+              "id": "bglb-retrospective",
+              "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+              "version": "1"
+            },
+            "completion_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "declaration_name": "records.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s006#sha256=b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "https://journals.plos.org/plosone/article/file?type=supplementary&id=info:doi/10.1371/journal.pone.0147596.s008#sha256=d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "sha256:b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "sha256:d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              ],
+              "processing": [
+                "capability:83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+                "method_source:7eee12f12cfc3816ffcc21ebd631694b45bf56e0a4aca02c5e711fc271a62025"
+              ],
+              "publication": [
+                "https://doi.org/10.1371/journal.pone.0147596"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "doi:10.1371/journal.pone.0147596.s006",
+                "doi:10.1371/journal.pone.0147596.s008"
+              ]
+            },
+            "first_event_id": 48,
+            "independence_complete": false,
+            "job_id": "gxj_01m8d9tn05f3mtqj6m",
+            "nature": "analysis",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+                "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+              },
+              {
+                "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+                "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+              }
+            ],
+            "output_name": "records.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "6a493c8f80f5987ebd23fdf821be042aea9bbb0d6a47e9ed079d05e3f8ed3e62",
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": [
+              "observed"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8d9tnf70fsyze93",
+          "sha256": "6a493c8f80f5987ebd23fdf821be042aea9bbb0d6a47e9ed079d05e3f8ed3e62",
+          "source_class": "computed_result",
+          "version": "1"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8da4kcqsmf774r9@1",
+      "decision_id": "gxa_a9c353b0f0446b9098332f0a4fa716543cf0e185d0a1895f37416e903ec4e959",
+      "assessment_cursor": 55,
+      "availability_cursor": 73,
+      "level": "insufficient",
+      "stage": "grounded",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "Applicable reviewed evidence or a classified scientific artifact is cited."
+      ],
+      "utc": "2026-11-27T01:32:54.039Z",
+      "event_id": 73,
+      "event": "v6.claim.adopted",
+      "author": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8d9tn05f3mtqj6m",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "bglb-retrospective",
+        "sha256": "83e5b4d8bc7db62c643bbc8d48f78636b07ccc1d606b86b91c5c1e7096908aae",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+          "bytes": 115867,
+          "role": "kinetics",
+          "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+        },
+        {
+          "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+          "bytes": 66435,
+          "role": "conservation",
+          "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:0f907189a8a1570b8fe88f66fdffe063f4fd2292280aca3515979527fc1e643e",
+        "branch_id": "branch_9414de52b216ccc472ae2d197117b467",
+        "decision_ref": "gxa_2e94224972ab68e66f4d5cba20741f8839f127e5b9c2119b5a9e91d9d41bb4db",
+        "exec_key": "46a696982aecf3e39ccf34894285202228b77dda7cb8423fce1aab5045cb2d9d",
+        "kind": "graph_node",
+        "node_id": "node_0df9ccc202b20b35c0324c5dfc06b2f6",
+        "operation_key": "v6.node:0f907189a8a1570b8fe88f66fdffe063f4fd2292280aca3515979527fc1e643e",
+        "plan_key": "86a84a5c1e6fbee9d04e8ccf42b1abf576195f4a968a4b8a04ebe4f82226dddd",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "de2bed1fddf4245b503771d7666c5ad6c6093d2be16ca3047c7488fac4e1e630",
+      "outputs": [
+        {
+          "output_name": "summary.json",
+          "artifact_ref": "gxa_01m8d9tnd8htzeh15b",
+          "sha256": "5ab21d70e373a3efadd083ada0871d3121e2299735c3ccbaed779b8e192efa85",
+          "bytes": 1966,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8d9q2bhtbhacqk7/jobs/gxj_01m8d9tn05f3mtqj6m",
+            "rel_path": "files/summary.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "holdout_count",
+              "metric_ref": "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3",
+              "value": 41,
+              "raw_value": "41",
+              "display": "41 variants",
+              "unit": "variants",
+              "scope": {
+                "partition_rule": "GX-BglB-S1-site-v1",
+                "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "substrate": "pNPG"
+              },
+              "lead_delivery_event_ids": [
+                60,
+                61
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "holdout_exact",
+              "metric_ref": "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5",
+              "value": 30,
+              "raw_value": "30",
+              "display": "30 variants",
+              "unit": "variants",
+              "scope": {
+                "partition_rule": "GX-BglB-S1-site-v1",
+                "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "substrate": "pNPG"
+              },
+              "lead_delivery_event_ids": [
+                60,
+                61
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "holdout_score_pairs",
+              "metric_ref": "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f",
+              "value": 14,
+              "raw_value": "14",
+              "display": "14 variants",
+              "unit": "variants",
+              "scope": {
+                "partition_rule": "GX-BglB-S1-site-v1",
+                "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "substrate": "pNPG"
+              },
+              "lead_delivery_event_ids": [
+                60,
+                61
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "holdout_spearman",
+              "metric_ref": "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f",
+              "value": 0.25962611970152905,
+              "raw_value": "0.25962611970152905",
+              "display": "0.259626",
+              "unit": "1",
+              "scope": {
+                "partition_rule": "GX-BglB-S1-site-v1",
+                "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "substrate": "pNPG"
+              },
+              "lead_delivery_event_ids": [
+                60,
+                62
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "paired_wt_median_absolute_log10_error",
+              "metric_ref": "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca",
+              "value": 0.388204873286487,
+              "raw_value": "0.388204873286487",
+              "display": "0.388205 log10",
+              "unit": "log10",
+              "scope": {
+                "partition_rule": "GX-BglB-S1-site-v1",
+                "s1_sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73",
+                "s3_sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9",
+                "substrate": "pNPG"
+              },
+              "lead_delivery_event_ids": [
+                60,
+                62
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.bglb-retrospective/1",
+            "method": "bglb-retrospective@1",
+            "substrate": "pNPG",
+            "endpoint": "kcat/KM",
+            "unit": "M^-1 min^-1",
+            "partition_rule": "GX-BglB-S1-site-v1",
+            "mutant_count": 100,
+            "holdout_count": 41,
+            "holdout_exact": 30,
+            "holdout_score_pairs": 14,
+            "holdout_absent_score_among_exact": 16,
+            "holdout_spearman": 0.25962611970152905,
+            "constant_wt_spearman": null,
+            "constant_wt_spearman_reason": "Every prediction is identical; rank variance is zero.",
+            "paired_wt_median_absolute_log10_error": 0.388204873286487,
+            "wt_source": "S1 Table, row 3, column 6",
+            "interpretation": "S3 covers a selected subset, mostly alanine substitutions. The holdout is within a single public study, with no independent experimental validation. A rank describes only scored, quantified historical records. A constant WT assigns no ranks.",
+            "record_source": "10.1371/journal.pone.0147596.s006",
+            "score_source": "10.1371/journal.pone.0147596.s008"
+          },
+          "denominators": {
+            "mutant_count": 100,
+            "holdout_count": 41
+          },
+          "lead_delivery_event_ids": [
+            60,
+            61,
+            62
+          ]
+        },
+        {
+          "output_name": "records.json",
+          "artifact_ref": "gxa_01m8d9tnf70fsyze93",
+          "sha256": "6a493c8f80f5987ebd23fdf821be042aea9bbb0d6a47e9ed079d05e3f8ed3e62",
+          "bytes": 139601,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2c708yr1fr6",
+              "bytes": 115867,
+              "role": "kinetics",
+              "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+            },
+            {
+              "artifact_ref": "gxa_01m8d9q2cpv3ep2fz9",
+              "bytes": 66435,
+              "role": "conservation",
+              "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8d9q2bhtbhacqk7/jobs/gxj_01m8d9tn05f3mtqj6m",
+            "rel_path": "files/records.json"
+          },
+          "metrics": [],
+          "summary": {
+            "schema": "gx.bglb-published-records/1",
+            "parent": "BglB",
+            "source": "10.1371/journal.pone.0147596",
+            "condition_source": "10.1371/journal.pone.0147596.s009",
+            "substrate": "p-nitrophenyl-β-D-glucoside"
+          },
+          "denominators": {},
+          "lead_delivery_event_ids": []
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "metric_ref": "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "metric_ref": "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "metric_ref": "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "metric_ref": "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "row": {
+            "id": "holdout_count",
+            "key": "17d6031e5aa7",
+            "unit": "variants",
+            "value": "41 variants"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3"
+        },
+        {
+          "row": {
+            "id": "holdout_exact",
+            "key": "05f59d847491",
+            "unit": "variants",
+            "value": "30 variants"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5"
+        },
+        {
+          "row": {
+            "id": "holdout_score_pairs",
+            "key": "9b9b0c5d82c0",
+            "unit": "variants",
+            "value": "14 variants"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f"
+        },
+        {
+          "row": {
+            "id": "holdout_spearman",
+            "key": "c2a45860fa45",
+            "unit": "1",
+            "value": "0.259626"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f"
+        },
+        {
+          "row": {
+            "id": "paired_wt_median_absolute_log10_error",
+            "key": "49d6a72ceddb",
+            "unit": "log10",
+            "value": "0.388205 log10"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca"
+        }
+      ],
+      "lease_id": "gxl_01m8d9tnnpqhv54934",
+      "receipt": "start:a0a9d4bc-bd67-4159-8070-22307f5899f5",
+      "task_id": "gxt_01m8d9tnnawe5hkyzb",
+      "thread_id": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+      "turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467",
+      "scope": "run",
+      "event_id": 60,
+      "utc": "2026-11-27T01:27:28.755Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "metric_ref": "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "row": {
+            "id": "holdout_count",
+            "key": "17d6031e5aa7",
+            "unit": "variants",
+            "value": "41 variants"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_17d6031e5aa7c3f2123ffd842b74a204600062edba6f3c124a523b005dc051f3"
+        },
+        {
+          "row": {
+            "id": "holdout_exact",
+            "key": "05f59d847491",
+            "unit": "variants",
+            "value": "30 variants"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_05f59d84749168a2097bb61ed1cab401c76d9da1dd006b285b571196235e29e5"
+        },
+        {
+          "row": {
+            "id": "holdout_score_pairs",
+            "key": "9b9b0c5d82c0",
+            "unit": "variants",
+            "value": "14 variants"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_9b9b0c5d82c00b14e4b297328ec8e3b4e3271634cf5adac064cc70c867622b3f"
+        }
+      ],
+      "lease_id": "gxl_01m8d9tnnpqhv54934",
+      "receipt": "exec-452340cd-cc7c-453d-9dbc-f4209e7b6fc6",
+      "task_id": "gxt_01m8d9tnnawe5hkyzb",
+      "thread_id": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+      "turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467",
+      "scope": "run",
+      "event_id": 61,
+      "utc": "2026-11-27T01:28:51.487Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "metric_ref": "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca",
+          "source_ref": "gxa_01m8d9tnd8htzeh15b"
+        },
+        {
+          "row": {
+            "id": "holdout_spearman",
+            "key": "c2a45860fa45",
+            "unit": "1",
+            "value": "0.259626"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_c2a45860fa45d6b4cc4c215a21d0dd7ca3563f32e796e465081408135c8f0a3f"
+        },
+        {
+          "row": {
+            "id": "paired_wt_median_absolute_log10_error",
+            "key": "49d6a72ceddb",
+            "unit": "log10",
+            "value": "0.388205 log10"
+          },
+          "source_ref": "gxa_01m8d9tnd8htzeh15b",
+          "metric_ref": "metric_49d6a72ceddb539c5670cf122caeee3e087ee05bfd3e66bb173afcbb6e25baca"
+        }
+      ],
+      "lease_id": "gxl_01m8d9tnnpqhv54934",
+      "receipt": "exec-f0518db8-6cfd-4033-8d1e-26ac929061e2",
+      "task_id": "gxt_01m8d9tnnawe5hkyzb",
+      "thread_id": "01a21a9d-56cb-7292-a664-ed464c3adf7e",
+      "turn_id": "01a21a9d-56ef-71a1-816f-6bf8c60bd467",
+      "scope": "run",
+      "event_id": 62,
+      "utc": "2026-11-27T01:28:55.936Z"
+    }
+  ],
+  "routes": {
+    "modules": [],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": []
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "a1fdfdea7c512060816c501953484d07f1d9757458ade2a4982e3ee310017d41",
+      "event_id": 31,
+      "corrected_decision_event": 38
+    },
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "c6be38c50f1a2bde58e2fa56b2283d28a7572c79feb8248c9fd728e2b4921c5c",
+      "event_id": 69,
+      "corrected_decision_event": 79
+    }
+  ],
+  "invocation": {
+    "action": "export_closed",
+    "before": {
+      "jobs": 1,
+      "host_turns": 2
+    },
+    "after": {
+      "jobs": 1,
+      "host_turns": 2
+    },
+    "added": {
+      "jobs": 0,
+      "host_turns": 0
+    }
+  }
+}

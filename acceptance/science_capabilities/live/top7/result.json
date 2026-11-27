@@ -1,0 +1,1698 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8d9q2erbx9qn5qy",
+  "goal": "公开沉积 1QYS 中，有多大比例的声明序列真正受到可复核的骨架坐标覆盖？它能否作为对整条链几何性质的基准？请亲自选择并执行坐标量测。先说明比对的分母和缺失的处理方法，再用实测限定结论。交付中文简报，区分沉积结构、数值分析与生物学推断。\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_febc1aa7c18bee72e8c0d5d9903215fc831b99a11b9207d7d8ed145302540e45",
+    "op_digest": "e0fdd483a31020ea7fc91f75fd1fcddfaee107cf4c74fb359bd58318eca61b1f",
+    "requested_event": 63,
+    "committed_event": 68,
+    "closed_event": 69,
+    "closed_utc": "2026-11-27T01:29:12.039Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8d9x1yegwt4bhbw"
+      ],
+      "op": "close_run",
+      "reason": "逐位核算已确定骨架覆盖的分子、分母、连续区段及其 Cα 回转半径。该沉积缺少两端坐标，重复分析同一文件无法确定全链几何。",
+      "unresolved": [
+        "声明序列两端的构象及全长链的回转半径无法由这份坐标确定。",
+        "两端残基在样品中的存在状态和构象动态需要独立证据。"
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_febc1aa7c18bee72e8c0d5d9903215fc831b99a11b9207d7d8ed145302540e45",
+    "task_id": "gxt_01m8d9tt7ef07e8v2m",
+    "thread_id": "01a21a9d-6919-7e50-bd4d-c5a8434c0de8",
+    "turn_id": "01a21a9d-694e-7750-9c76-7b5367d4dd79",
+    "rationale": "以 1QYS 模型 1、实体 1、A 链声明的全部 {{metric:declared_residues}} 个位置为分母。缺坐标的位置保留在分母中，几何计算只使用实有坐标。按链、实体、序号和残基身份逐位匹配，{{metric:observed_residues}} 个位置有正占有率重原子，{{metric:ca_count}} 个有 Cα，{{metric:complete_backbones}} 个具备 N、Cα、C、O。三者覆盖相同，比例为 {{metric:coordinate_coverage}}，完整骨架计数符合预先登记的预期。原始 mmCIF 标注的未观测位置为 label_seq_id 1–2 和 95–106，与实测缺口一致。对连续区段 3–94 的观测 Cα 等权计算，回转半径为 {{metric:ca_radius_of_gyration_A}}。因此几何基准限于这一区段和相同的原子选择。",
+    "reason": "逐位核算已确定骨架覆盖的分子、分母、连续区段及其 Cα 回转半径。该沉积缺少两端坐标，重复分析同一文件无法确定全链几何。",
+    "unresolved": [
+      "声明序列两端的构象及全长链的回转半径无法由这份坐标确定。",
+      "两端残基在样品中的存在状态和构象动态需要独立证据。"
+    ],
+    "claim_refs": [
+      "gxa_01m8d9x1yegwt4bhbw"
+    ],
+    "evidence_refs": [
+      "gxa_01m8d9q2fhm82wywj2",
+      "gxa_01m8d9tt1d8hbvrx4b"
+    ],
+    "stop_reason": "SCIENTIFIC_COMPLETION",
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_1e720f62f251e973a2c325549578b59a70a1c025a42463f08d793c1c9479a861",
+        "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+        "event_id": 58,
+        "reading": {
+          "metric_id": "declared_residues",
+          "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+          "job_id": "gxj_01m8d9tsd9e04py19n",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+            "version": "1"
+          },
+          "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+          "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+          "provenance_cursor": 38,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "bytes": 119624,
+              "role": "structure",
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_residues"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1QYS",
+            "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+          },
+          "value": 106,
+          "raw_value": "106",
+          "display": "106",
+          "metric_ref": "metric_1e720f62f251e973a2c325549578b59a70a1c025a42463f08d793c1c9479a861"
+        }
+      },
+      {
+        "metric_ref": "metric_806dcedea115d9467b1bfb060775a4b737afb44ce0325713cda250bd9c0ea320",
+        "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+        "event_id": 57,
+        "reading": {
+          "metric_id": "ca_count",
+          "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+          "job_id": "gxj_01m8d9tsd9e04py19n",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+            "version": "1"
+          },
+          "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+          "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+          "provenance_cursor": 38,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "bytes": 119624,
+              "role": "structure",
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/ca_count"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1QYS",
+            "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+          },
+          "value": 92,
+          "raw_value": "92",
+          "display": "92",
+          "metric_ref": "metric_806dcedea115d9467b1bfb060775a4b737afb44ce0325713cda250bd9c0ea320"
+        }
+      },
+      {
+        "metric_ref": "metric_935420f30accb6aa96684c2e93762f23d92a176d30d9aa62e4b21298bf22b1fc",
+        "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+        "event_id": 57,
+        "reading": {
+          "metric_id": "ca_radius_of_gyration_A",
+          "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+          "job_id": "gxj_01m8d9tsd9e04py19n",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+            "version": "1"
+          },
+          "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+          "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+          "provenance_cursor": 38,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "bytes": 119624,
+              "role": "structure",
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "angstrom",
+          "places": 3,
+          "selectors": {
+            "pointer": "/ca_radius_of_gyration_A"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1QYS",
+            "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+          },
+          "value": 12.216062231495131,
+          "raw_value": "12.216062231495131",
+          "display": "12.216 angstrom",
+          "metric_ref": "metric_935420f30accb6aa96684c2e93762f23d92a176d30d9aa62e4b21298bf22b1fc"
+        }
+      },
+      {
+        "metric_ref": "metric_991be41e80b595e59d000cd5a4019797e918e060b351795b911de0d4e9a25544",
+        "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+        "event_id": 58,
+        "reading": {
+          "metric_id": "coordinate_coverage",
+          "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+          "job_id": "gxj_01m8d9tsd9e04py19n",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+            "version": "1"
+          },
+          "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+          "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+          "provenance_cursor": 38,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "bytes": 119624,
+              "role": "structure",
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "ratio/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 4,
+          "selectors": {
+            "numerator": "/observed_residues",
+            "denominator": "/declared_residues"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1QYS",
+            "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+            "model": 1
+          },
+          "value": 0.8679245283018868,
+          "raw_value": "0.86792452830188679245283018867924528301886792452830",
+          "display": "92/106 (0.8679)",
+          "numerator": 92,
+          "denominator": 106,
+          "metric_ref": "metric_991be41e80b595e59d000cd5a4019797e918e060b351795b911de0d4e9a25544"
+        }
+      },
+      {
+        "metric_ref": "metric_aaa0d611ef5251cce063439b0a5beb160ce29599616f94d24e2173ddf06ebcc3",
+        "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+        "event_id": 58,
+        "reading": {
+          "metric_id": "observed_residues",
+          "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+          "job_id": "gxj_01m8d9tsd9e04py19n",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+            "version": "1"
+          },
+          "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+          "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+          "provenance_cursor": 38,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "bytes": 119624,
+              "role": "structure",
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/observed_residues"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1QYS",
+            "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+          },
+          "value": 92,
+          "raw_value": "92",
+          "display": "92",
+          "metric_ref": "metric_aaa0d611ef5251cce063439b0a5beb160ce29599616f94d24e2173ddf06ebcc3"
+        }
+      },
+      {
+        "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22",
+        "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+        "event_id": 57,
+        "reading": {
+          "metric_id": "complete_backbones",
+          "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+          "job_id": "gxj_01m8d9tsd9e04py19n",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+            "version": "1"
+          },
+          "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+          "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+          "provenance_cursor": 38,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "bytes": 119624,
+              "role": "structure",
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/complete_backbones"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1QYS",
+            "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+          },
+          "value": 92,
+          "raw_value": "92",
+          "display": "92",
+          "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22"
+        }
+      }
+    ],
+    "gap_questions": {},
+    "rendered": {
+      "rationale": "以 1QYS 模型 1、实体 1、A 链声明的全部 106 个位置为分母。缺坐标的位置保留在分母中，几何计算只使用实有坐标。按链、实体、序号和残基身份逐位匹配，92 个位置有正占有率重原子，92 个有 Cα，92 个具备 N、Cα、C、O。三者覆盖相同，比例为 92/106 (0.8679)，完整骨架计数符合预先登记的预期。原始 mmCIF 标注的未观测位置为 label_seq_id 1–2 和 95–106，与实测缺口一致。对连续区段 3–94 的观测 Cα 等权计算，回转半径为 12.216 angstrom。因此几何基准限于这一区段和相同的原子选择。",
+      "reason": "逐位核算已确定骨架覆盖的分子、分母、连续区段及其 Cα 回转半径。该沉积缺少两端坐标，重复分析同一文件无法确定全链几何。",
+      "unresolved": [
+        "声明序列两端的构象及全长链的回转半径无法由这份坐标确定。",
+        "两端残基在样品中的存在状态和构象动态需要独立证据。"
+      ]
+    }
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+      "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+      "bytes": 119624,
+      "role": "structure",
+      "provenance": [
+        {
+          "source": "wwPDB:1QYS/revision/1.3",
+          "scope": "run",
+          "acquisition": {
+            "applicability": "Coordinate coverage and geometry of the public deposition.",
+            "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://files.rcsb.org/download/1QYS.cif#sha256=d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1126/science.1089427"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "wwPDB:1QYS/revision/1.3"
+              ]
+            },
+            "measurement_schema": null,
+            "schema": "gx.acquisition/1",
+            "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+            "source_identity": {
+              "artifact_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+              "entry_id": "1QYS",
+              "reader": "gx.pdbx.source-identity/3",
+              "revision": {
+                "claimed": "1.3",
+                "observed": "1.3",
+                "status": "verified"
+              },
+              "schema": "gx.source_identity/1",
+              "status": "matched_accession"
+            },
+            "unknown_dependencies": [
+              "acquisition",
+              "sample",
+              "processing",
+              "sampling"
+            ]
+          },
+          "event_id": 20,
+          "utc": "2026-11-27T01:25:31.074Z"
+        }
+      ]
+    }
+  ],
+  "predictions": [
+    {
+      "hypothesis_id": "gxh_01m8d9ts3n69wdrphp",
+      "statement": "预计除沉积文件标注为未观测的两端外，A 链每个声明位置都具有 N、Cα、C、O 的正占有率坐标。",
+      "scope": "Coordinate coverage and geometry of the public deposition.",
+      "criteria": "以实体序列的全部位置为分母，按链、实体、位置和残基身份匹配坐标。完整骨架位置数应满足 /complete_backbones = 92。",
+      "decision_scope": "run",
+      "limitations": "适用于该版本沉积文件指定模型的 A 链。坐标覆盖只描述模型中可用于比较的位置，样品中这些残基的状态需要独立证据。",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8d9sm9d9kvcw32w",
+        "proposed_level": "open",
+        "rationale": "原始文件列出的未观测残基集中在两端，缺失原子表列出的是侧链原子。对逐位匹配的实际坐标计数，可以检验其余位置的骨架是否齐全。"
+      },
+      "evidence_refs": [
+        "gxa_01m8d9q2fhm82wywj2"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "dcfe81a86d46a7672f6021fe2afb3460cf59a0494b400ab9834241ff7b94533e",
+        "brief_turn_id": "01a21a9b-9e0e-7df2-a681-ad356d7deb20",
+        "context_ref": "gxcx_01m8d9q2vh7gmhhkk9",
+        "delivery_receipt": "start:a6d9ca81-8eaa-420d-b84e-ebf71f0e3f03",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 20,
+        "state": "acknowledged",
+        "thread_id": "01a21a9b-9dd9-74a1-98a8-30a88232d3da",
+        "turn_id": "01a21a9b-9e0e-7df2-a681-ad356d7deb20"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "Coordinate coverage and geometry of the public deposition."
+            ],
+            "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "https://files.rcsb.org/download/1QYS.cif#sha256=d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+                "sha256:d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1126/science.1089427"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "wwPDB:1QYS/revision/1.3"
+              ]
+            },
+            "first_event_id": 11,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+            "source_identity": {
+              "artifact_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+              "entry_id": "1QYS",
+              "reader": "gx.pdbx.source-identity/3",
+              "revision": {
+                "claimed": "1.3",
+                "observed": "1.3",
+                "status": "verified"
+              },
+              "schema": "gx.source_identity/1",
+              "status": "matched_accession"
+            },
+            "unknown_dependencies": [
+              "acquisition",
+              "processing",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8d9q2fhm82wywj2",
+          "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+          "source_class": "supplied_information",
+          "source_event_id": 20
+        }
+      ],
+      "goal_version": 1,
+      "prediction": {
+        "data_refs": [
+          "gxa_01m8d9q2fhm82wywj2"
+        ],
+        "method": {
+          "capability": "deposited-backbone-qc@1",
+          "input_role": "structure",
+          "metric_id": "complete_backbones",
+          "output": "qc.json",
+          "parameters": {},
+          "unit": "1"
+        },
+        "observable": "/complete_backbones",
+        "operator": "eq",
+        "target": "analysis",
+        "threshold": 92
+      },
+      "registration": {
+        "chronology_scope": "same_store",
+        "claim_revision_id": "gxh_01m8d9ts3n69wdrphp@1",
+        "claim_scope": "Coordinate coverage and geometry of the public deposition.",
+        "claim_sha256": "1fa8ba8dc65c698aef6d01de97def09244947e341d4d02e33ce8dea41120b0de",
+        "data": [
+          {
+            "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+            "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+          }
+        ],
+        "decision_scope": "run",
+        "endpoint_chronology_at_registration": {
+          "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd": {
+            "endpoint_first_available_event_id": null,
+            "raw_material_received_event_id": 11
+          }
+        },
+        "event_id": 30,
+        "known_at_registration": {
+          "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd": false
+        },
+        "material_identity": "endpoint_verified",
+        "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+        "method_pin": {
+          "capability": "deposited-backbone-qc@1",
+          "manifest_sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+          "measurement_spec": {
+            "applicability": "Coordinate coverage and geometry of the public deposition.",
+            "capability": "deposited-backbone-qc@1",
+            "input_role": "structure",
+            "manifest_sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+            "measurement_schema": null,
+            "metric_definition": {
+              "op": "integer/1",
+              "places": 0,
+              "pointer": "/complete_backbones",
+              "reader": "json/1",
+              "scope": {
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry",
+                "input_sha256": "/input_sha256"
+              },
+              "unit": "1"
+            },
+            "metric_id": "complete_backbones",
+            "missing_parameters": [],
+            "observable": "/metrics/complete_backbones",
+            "output": "qc.json",
+            "output_name": "qc.json",
+            "parameters": {},
+            "result_pointer": null,
+            "schema": "gx.measurement-spec/2",
+            "source_roles": [
+              "structure"
+            ],
+            "unit": "1"
+          },
+          "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+          "output": "qc.json"
+        },
+        "policy": "gx.claim-proposition/3",
+        "posthoc_revision_of": null,
+        "prediction": {
+          "data_refs": [
+            "gxa_01m8d9q2fhm82wywj2"
+          ],
+          "method": {
+            "capability": "deposited-backbone-qc@1",
+            "input_role": "structure",
+            "metric_id": "complete_backbones",
+            "output": "qc.json",
+            "parameters": {},
+            "unit": "1"
+          },
+          "observable": "/complete_backbones",
+          "operator": "eq",
+          "target": "analysis",
+          "threshold": 92
+        },
+        "proposition_sha256": "481eb82ade8b64d445f6bfa7b1c078a7b58defe67da6ae0bfe062e008dd218ee",
+        "quantifier": "all",
+        "utc": "2026-11-27T01:27:32.213Z",
+        "decision_ref": "gxa_e8f2f9b82cee05880614dc0ab47c2753f012d13f5a83746f11cc51e3c011b7ad"
+      },
+      "assessments": [
+        {
+          "claim_revision_id": "gxh_01m8d9ts3n69wdrphp@1",
+          "decision_id": "gxa_e8f2f9b82cee05880614dc0ab47c2753f012d13f5a83746f11cc51e3c011b7ad",
+          "assessment_cursor": 20,
+          "availability_cursor": 30,
+          "level": "open",
+          "stage": "preregistered",
+          "direction": "undetermined",
+          "results": [],
+          "gaps": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "event_id": 20,
+              "kind": "different_method_or_output"
+            }
+          ],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 11,
+              "registration_event_id": 30,
+              "retrospective_refs": [],
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "Applicable reviewed evidence or a classified scientific artifact is cited.",
+            "GX froze the rule before each qualifying prospective result.",
+            "Unmeasured outcomes and execution gaps do not establish counterevidence."
+          ],
+          "utc": "2026-11-27T01:27:32.213Z",
+          "event_id": 30,
+          "event": "v6.claim.adopted",
+          "author": "01a21a9b-9dd9-74a1-98a8-30a88232d3da"
+        },
+        {
+          "claim_revision_id": "gxh_01m8d9ts3n69wdrphp@2",
+          "decision_id": "gxa_e8f2f9b82cee05880614dc0ab47c2753f012d13f5a83746f11cc51e3c011b7ad",
+          "assessment_cursor": 50,
+          "availability_cursor": 50,
+          "level": "open",
+          "stage": "tested",
+          "direction": "supported",
+          "results": [
+            {
+              "applicability_scopes": [
+                "Coordinate coverage and geometry of the public deposition."
+              ],
+              "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+              "capability": {
+                "id": "deposited-backbone-qc",
+                "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+                "version": "1"
+              },
+              "dependencies": {
+                "acquisition": [],
+                "data": [
+                  "https://files.rcsb.org/download/1QYS.cif#sha256=d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+                  "sha256:d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                ],
+                "processing": [
+                  "capability:18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+                  "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+                ],
+                "publication": [
+                  "https://doi.org/10.1126/science.1089427"
+                ],
+                "sample": [],
+                "sampling": [],
+                "source": [
+                  "wwPDB:1QYS/revision/1.3"
+                ]
+              },
+              "event_id": 50,
+              "first_bytes_event_id": 44,
+              "first_event_id": 47,
+              "independence_complete": false,
+              "launch_event_id": 40,
+              "matched_data_sha256": [
+                "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              ],
+              "matched_material_keys": [
+                "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              ],
+              "measurement": {
+                "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+                "applicability_scopes": [
+                  "Coordinate coverage and geometry of the public deposition."
+                ],
+                "comparison_value": "92",
+                "lineage": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                    "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  }
+                ],
+                "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+                "material_inputs": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                    "bytes": 119624,
+                    "role": "structure",
+                    "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  }
+                ],
+                "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+                "metric": null,
+                "metric_id": "complete_backbones",
+                "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22",
+                "metric_scope": {
+                  "chain": "A",
+                  "entity": "1",
+                  "entry": "1QYS",
+                  "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                },
+                "raw_value": "92",
+                "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+                "source_inputs": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                    "bytes": 119624,
+                    "role": "structure",
+                    "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  }
+                ],
+                "unit": "1",
+                "value": 92
+              },
+              "measurement_schema": null,
+              "nature": "analysis",
+              "original_observations": [
+                {
+                  "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                  "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                }
+              ],
+              "output_name": "qc.json",
+              "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+              "supports": true,
+              "unknown_dependencies": [
+                "acquisition",
+                "processing",
+                "sample",
+                "sampling"
+              ],
+              "upstream_natures": [
+                "observed"
+              ],
+              "value": 92,
+              "lead_delivery_event_ids": [
+                56,
+                57
+              ],
+              "unit": "1",
+              "denominators": {
+                "model_count": 1,
+                "ca_count": 92
+              }
+            }
+          ],
+          "gaps": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "event_id": 20,
+              "kind": "different_method_or_output"
+            }
+          ],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "endpoint_first_available_event_id": 47,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+              "opposing_refs": [],
+              "qualification": "prospective",
+              "raw_material_received_event_id": 11,
+              "registration_event_id": 30,
+              "retrospective_refs": [],
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+              "supporting_refs": [
+                "gxa_01m8d9tt1d8hbvrx4b"
+              ],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [
+            "gxa_01m8d9tt1d8hbvrx4b"
+          ],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "Applicable reviewed evidence or a classified scientific artifact is cited.",
+            "GX froze the rule before each qualifying prospective result.",
+            "GX compared the original measured value with the registered decision rule.",
+            "Unmeasured outcomes and execution gaps do not establish counterevidence."
+          ],
+          "utc": "2026-11-27T01:27:33.339Z",
+          "event_id": 51,
+          "event": "v62.claim.reassessed",
+          "author": "GX"
+        }
+      ],
+      "classification": "prospectively_tested",
+      "revisions": [
+        {
+          "hypothesis_id": "gxh_01m8d9ts3n69wdrphp",
+          "statement": "预计除沉积文件标注为未观测的两端外，A 链每个声明位置都具有 N、Cα、C、O 的正占有率坐标。",
+          "scope": "Coordinate coverage and geometry of the public deposition.",
+          "criteria": "以实体序列的全部位置为分母，按链、实体、位置和残基身份匹配坐标。完整骨架位置数应满足 /complete_backbones = 92。",
+          "decision_scope": "run",
+          "limitations": "几何比较限于这份晶体结构中两端缺口之间的连续骨架，并须使用相同位置和原子口径。两端缺少坐标，无法据此确定全链回转半径。样品中端部的存在状态、构象及动态需要独立的实验证据。",
+          "lead_interpretation": {
+            "proposal_ref": "gxa_01m8d9x1yegwt4bhbw",
+            "proposed_level": "limited_support",
+            "rationale": "以 A 链声明的 106 个位置为分母，正占有率重原子覆盖 92 个位置，其中 92 个有 Cα，92 个具备 N、Cα、C、O。完整骨架计数符合预先登记的判据，三种口径覆盖相同的位置，覆盖比例为 92/106 (0.8679)。逐位复核显示缺口与沉积文件列出的两端位置一致。用已观测 Cα 到其几何中心的均方距离开方，得到等权回转半径 12.216 angstrom。"
+          },
+          "evidence_refs": [
+            "gxa_01m8d9q2fhm82wywj2",
+            "gxa_01m8d9tt1d8hbvrx4b"
+          ],
+          "decision_delivery": {
+            "brief_sha256": "209b3ffa608b52581889fbfc4bd60058cc3e6a2264a263a1c5f5bf7d4df4f3b1",
+            "brief_turn_id": "01a21a9d-694e-7750-9c76-7b5367d4dd79",
+            "context_ref": "gxcx_01m8d9tt7c97y1j2ma",
+            "delivery_receipt": "start:bd15ced4-2fce-4666-83d7-34b5f2a1f17c",
+            "metric_refs": [
+              "metric_1e720f62f251e973a2c325549578b59a70a1c025a42463f08d793c1c9479a861",
+              "metric_806dcedea115d9467b1bfb060775a4b737afb44ce0325713cda250bd9c0ea320",
+              "metric_935420f30accb6aa96684c2e93762f23d92a176d30d9aa62e4b21298bf22b1fc",
+              "metric_991be41e80b595e59d000cd5a4019797e918e060b351795b911de0d4e9a25544",
+              "metric_aaa0d611ef5251cce063439b0a5beb160ce29599616f94d24e2173ddf06ebcc3",
+              "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22"
+            ],
+            "observations": [
+              {
+                "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+                "event_id": 50,
+                "projection_sha256": "7071ae1065fcc54009f250fef9f841c0defb4e13cdee8e353469e44ad7095df7",
+                "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88"
+              }
+            ],
+            "snapshot_cursor": 51,
+            "state": "acknowledged",
+            "thread_id": "01a21a9d-6919-7e50-bd4d-c5a8434c0de8",
+            "turn_id": "01a21a9d-694e-7750-9c76-7b5367d4dd79"
+          },
+          "source_records": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [
+                  "Coordinate coverage and geometry of the public deposition."
+                ],
+                "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [
+                    "https://files.rcsb.org/download/1QYS.cif#sha256=d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+                    "sha256:d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  ],
+                  "processing": [],
+                  "publication": [
+                    "https://doi.org/10.1126/science.1089427"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "wwPDB:1QYS/revision/1.3"
+                  ]
+                },
+                "first_event_id": 11,
+                "independence_complete": false,
+                "job_id": null,
+                "measurement_schema": null,
+                "nature": "observed",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                    "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  }
+                ],
+                "reason": "Verified operator acquisition receipt on the original ingested bytes",
+                "record_kind": "supplied_observation",
+                "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+                "source_identity": {
+                  "artifact_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+                  "entry_id": "1QYS",
+                  "reader": "gx.pdbx.source-identity/3",
+                  "revision": {
+                    "claimed": "1.3",
+                    "observed": "1.3",
+                    "status": "verified"
+                  },
+                  "schema": "gx.source_identity/1",
+                  "status": "matched_accession"
+                },
+                "unknown_dependencies": [
+                  "acquisition",
+                  "processing",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "observed",
+              "ref": "gxa_01m8d9q2fhm82wywj2",
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+              "source_class": "supplied_information",
+              "source_event_id": 20
+            },
+            {
+              "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+              "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+              "capability": "deposited-backbone-qc",
+              "completion_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                  "bytes": 119624,
+                  "role": "structure",
+                  "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                }
+              ],
+              "job_id": "gxj_01m8d9tsd9e04py19n",
+              "job_status": "SUCCEEDED",
+              "kind": "deposited_backbone_qc",
+              "output_provenance": {
+                "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+                "applicability_scopes": [
+                  "Coordinate coverage and geometry of the public deposition."
+                ],
+                "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+                "capability": {
+                  "id": "deposited-backbone-qc",
+                  "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+                  "version": "1"
+                },
+                "completion_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+                "data_refs": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                    "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  }
+                ],
+                "declaration_name": "qc.json",
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [
+                    "https://files.rcsb.org/download/1QYS.cif#sha256=d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+                    "sha256:d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  ],
+                  "processing": [
+                    "capability:18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+                    "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+                  ],
+                  "publication": [
+                    "https://doi.org/10.1126/science.1089427"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "wwPDB:1QYS/revision/1.3"
+                  ]
+                },
+                "first_event_id": 44,
+                "independence_complete": false,
+                "job_id": "gxj_01m8d9tsd9e04py19n",
+                "nature": "analysis",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                    "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  }
+                ],
+                "output_name": "qc.json",
+                "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+                "record_kind": "job_output",
+                "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+                "unknown_dependencies": [
+                  "acquisition",
+                  "processing",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": [
+                  "observed"
+                ]
+              },
+              "record_nature": "analysis",
+              "ref": "gxa_01m8d9tt1d8hbvrx4b",
+              "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+              "source_class": "computed_result",
+              "version": "1"
+            }
+          ],
+          "goal_version": 1,
+          "prediction": {
+            "data_refs": [
+              "gxa_01m8d9q2fhm82wywj2"
+            ],
+            "method": {
+              "capability": "deposited-backbone-qc@1",
+              "input_role": "structure",
+              "metric_id": "complete_backbones",
+              "output": "qc.json",
+              "parameters": {},
+              "unit": "1"
+            },
+            "observable": "/complete_backbones",
+            "operator": "eq",
+            "target": "analysis",
+            "threshold": 92
+          },
+          "registration": {
+            "chronology_scope": "same_store",
+            "claim_revision_id": "gxh_01m8d9ts3n69wdrphp@3",
+            "claim_scope": "Coordinate coverage and geometry of the public deposition.",
+            "claim_sha256": "1fa8ba8dc65c698aef6d01de97def09244947e341d4d02e33ce8dea41120b0de",
+            "data": [
+              {
+                "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              }
+            ],
+            "decision_scope": "run",
+            "endpoint_chronology_at_registration": {
+              "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd": {
+                "endpoint_first_available_event_id": 47,
+                "raw_material_received_event_id": 11
+              }
+            },
+            "event_id": 62,
+            "known_at_registration": {
+              "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd": true
+            },
+            "material_identity": "endpoint_verified",
+            "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+            "method_pin": {
+              "capability": "deposited-backbone-qc@1",
+              "manifest_sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+              "measurement_spec": {
+                "applicability": "Coordinate coverage and geometry of the public deposition.",
+                "capability": "deposited-backbone-qc@1",
+                "input_role": "structure",
+                "manifest_sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+                "measurement_schema": null,
+                "metric_definition": {
+                  "op": "integer/1",
+                  "places": 0,
+                  "pointer": "/complete_backbones",
+                  "reader": "json/1",
+                  "scope": {
+                    "chain": "/chain",
+                    "entity": "/entity",
+                    "entry": "/entry",
+                    "input_sha256": "/input_sha256"
+                  },
+                  "unit": "1"
+                },
+                "metric_id": "complete_backbones",
+                "missing_parameters": [],
+                "observable": "/metrics/complete_backbones",
+                "output": "qc.json",
+                "output_name": "qc.json",
+                "parameters": {},
+                "result_pointer": null,
+                "schema": "gx.measurement-spec/2",
+                "source_roles": [
+                  "structure"
+                ],
+                "unit": "1"
+              },
+              "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+              "output": "qc.json"
+            },
+            "policy": "gx.claim-proposition/3",
+            "posthoc_revision_of": "gxh_01m8d9ts3n69wdrphp@2",
+            "prediction": {
+              "data_refs": [
+                "gxa_01m8d9q2fhm82wywj2"
+              ],
+              "method": {
+                "capability": "deposited-backbone-qc@1",
+                "input_role": "structure",
+                "metric_id": "complete_backbones",
+                "output": "qc.json",
+                "parameters": {},
+                "unit": "1"
+              },
+              "observable": "/complete_backbones",
+              "operator": "eq",
+              "target": "analysis",
+              "threshold": 92
+            },
+            "proposition_sha256": "5402b1271a4f0a06640f777bad0eff5a5f8cfd9ccd21ea7d3b709ce5163979a6",
+            "quantifier": "all",
+            "utc": "2026-11-27T01:29:11.980Z",
+            "decision_ref": "gxa_febc1aa7c18bee72e8c0d5d9903215fc831b99a11b9207d7d8ed145302540e45"
+          },
+          "assessments": [
+            {
+              "claim_revision_id": "gxh_01m8d9ts3n69wdrphp@3",
+              "decision_id": "gxa_febc1aa7c18bee72e8c0d5d9903215fc831b99a11b9207d7d8ed145302540e45",
+              "assessment_cursor": 51,
+              "availability_cursor": 62,
+              "level": "insufficient",
+              "stage": "grounded",
+              "direction": "undetermined",
+              "results": [],
+              "gaps": [
+                {
+                  "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                  "event_id": 20,
+                  "kind": "different_method_or_output"
+                },
+                {
+                  "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+                  "event_id": 50,
+                  "first_bytes_event_id": 44,
+                  "first_event_id": 47,
+                  "kind": "already_available",
+                  "launch_event_id": 40,
+                  "matched_data_sha256": [
+                    "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  ],
+                  "matched_material_keys": [
+                    "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                  ],
+                  "measurement": {
+                    "admission_sha256": "a06fd86e3771eeb35eeaf2bbc88b62e3d5c41d95f15f0af721f0d6cabf05b27a",
+                    "applicability_scopes": [
+                      "Coordinate coverage and geometry of the public deposition."
+                    ],
+                    "comparison_value": "92",
+                    "lineage": [
+                      {
+                        "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                        "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                      }
+                    ],
+                    "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+                    "material_inputs": [
+                      {
+                        "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                        "bytes": 119624,
+                        "role": "structure",
+                        "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                      }
+                    ],
+                    "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+                    "metric": null,
+                    "metric_id": "complete_backbones",
+                    "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22",
+                    "metric_scope": {
+                      "chain": "A",
+                      "entity": "1",
+                      "entry": "1QYS",
+                      "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                    },
+                    "raw_value": "92",
+                    "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+                    "source_inputs": [
+                      {
+                        "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                        "bytes": 119624,
+                        "role": "structure",
+                        "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+                      }
+                    ],
+                    "unit": "1",
+                    "value": 92
+                  },
+                  "nature": "analysis",
+                  "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+                  "supports": true,
+                  "value": 92
+                }
+              ],
+              "preexisting_result": true,
+              "material_coverage": [
+                {
+                  "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+                  "endpoint_first_available_event_id": 47,
+                  "known_at_registration": true,
+                  "measurement_spec_sha256": "8f1a95b02d5c4548380a0f6aa744dfc7f6c78092d6b6a62c9c6f6f8d42f1ffd0",
+                  "opposing_refs": [],
+                  "qualification": "retrospective",
+                  "raw_material_received_event_id": 11,
+                  "registration_event_id": 62,
+                  "retrospective_refs": [
+                    "gxa_01m8d9tt1d8hbvrx4b"
+                  ],
+                  "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+                  "supporting_refs": [],
+                  "uncertain_refs": []
+                }
+              ],
+              "supporting_refs": [],
+              "opposing_refs": [],
+              "reviewed_evidence": [],
+              "disputed_extractions": [],
+              "replication": [],
+              "reasons": [
+                "Applicable reviewed evidence or a classified scientific artifact is cited.",
+                "An applicable result existed by registration; interpretation of this rule is retrospective.",
+                "Unmeasured outcomes and execution gaps do not establish counterevidence."
+              ],
+              "utc": "2026-11-27T01:29:11.980Z",
+              "event_id": 62,
+              "event": "v6.claim.adopted",
+              "author": "01a21a9d-6919-7e50-bd4d-c5a8434c0de8"
+            }
+          ],
+          "classification": "contains_retrospective_evidence"
+        }
+      ]
+    }
+  ],
+  "exploratory_claims": [],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8d9tsd9e04py19n",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "deposited-backbone-qc",
+        "sha256": "18d19930805007b63b27e1f350e84f5d7b23ed08df9dbd73a4d644d88e2dddcc",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+          "bytes": 119624,
+          "role": "structure",
+          "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:681dc96a90a03c038ca5508a00703b63c98ccfa157e031752c61a480f7f900bb",
+        "branch_id": "branch_1fa21853b71d876508eaa259f61d43ce",
+        "decision_ref": "gxa_e8f2f9b82cee05880614dc0ab47c2753f012d13f5a83746f11cc51e3c011b7ad",
+        "exec_key": "5778b0b4a573cab06d5a2b48b58e219092b577b080135430636cf8a865917161",
+        "kind": "graph_node",
+        "node_id": "node_31cc0c24a3846362831b0ec1e89a67db",
+        "operation_key": "v6.node:681dc96a90a03c038ca5508a00703b63c98ccfa157e031752c61a480f7f900bb",
+        "plan_key": "9c53cdcd4a92874db51cb976c0c9f136a0995581d9720a263a271972e76f3a3a",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "d1c5abd3f29921dea622f71d2ad15d5545942527bc242b8ee90219b723c5b005",
+      "outputs": [
+        {
+          "output_name": "qc.json",
+          "artifact_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+          "bytes": 519,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8d9q2fhm82wywj2",
+              "bytes": 119624,
+              "role": "structure",
+              "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8d9q2erbx9qn5qy/jobs/gxj_01m8d9tsd9e04py19n",
+            "rel_path": "files/qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_count",
+              "metric_ref": "metric_806dcedea115d9467b1bfb060775a4b737afb44ce0325713cda250bd9c0ea320",
+              "value": 92,
+              "raw_value": "92",
+              "display": "92",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1QYS",
+                "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              },
+              "lead_delivery_event_ids": [
+                56,
+                57
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_935420f30accb6aa96684c2e93762f23d92a176d30d9aa62e4b21298bf22b1fc",
+              "value": 12.216062231495131,
+              "raw_value": "12.216062231495131",
+              "display": "12.216 angstrom",
+              "unit": "angstrom",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1QYS",
+                "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              },
+              "lead_delivery_event_ids": [
+                56,
+                57
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22",
+              "value": 92,
+              "raw_value": "92",
+              "display": "92",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1QYS",
+                "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              },
+              "lead_delivery_event_ids": [
+                56,
+                57
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "coordinate_coverage",
+              "metric_ref": "metric_991be41e80b595e59d000cd5a4019797e918e060b351795b911de0d4e9a25544",
+              "value": 0.8679245283018868,
+              "raw_value": "0.86792452830188679245283018867924528301886792452830",
+              "display": "92/106 (0.8679)",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1QYS",
+                "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+                "model": 1
+              },
+              "numerator": 92,
+              "denominator": 106,
+              "lead_delivery_event_ids": [
+                56,
+                58
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_1e720f62f251e973a2c325549578b59a70a1c025a42463f08d793c1c9479a861",
+              "value": 106,
+              "raw_value": "106",
+              "display": "106",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1QYS",
+                "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              },
+              "lead_delivery_event_ids": [
+                56,
+                58
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "observed_residues",
+              "metric_ref": "metric_aaa0d611ef5251cce063439b0a5beb160ce29599616f94d24e2173ddf06ebcc3",
+              "value": 92,
+              "raw_value": "92",
+              "display": "92",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1QYS",
+                "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+              },
+              "lead_delivery_event_ids": [
+                56,
+                58
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.deposited-backbone-qc/1",
+            "entry": "1QYS",
+            "chain": "A",
+            "entity": "1",
+            "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+            "declared_residues": 106,
+            "model_count": 1,
+            "model": 1,
+            "observed_residues": 92,
+            "ca_count": 92,
+            "complete_backbones": 92,
+            "missing_label_positions": [
+              1,
+              2,
+              95,
+              96,
+              97,
+              98,
+              99,
+              100,
+              101,
+              102,
+              103,
+              104,
+              105,
+              106
+            ],
+            "ca_radius_of_gyration_A": 12.216062231495131
+          },
+          "denominators": {
+            "model_count": 1,
+            "ca_count": 92
+          },
+          "lead_delivery_event_ids": [
+            56,
+            57,
+            58
+          ]
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_806dcedea115d9467b1bfb060775a4b737afb44ce0325713cda250bd9c0ea320",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_935420f30accb6aa96684c2e93762f23d92a176d30d9aa62e4b21298bf22b1fc",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_991be41e80b595e59d000cd5a4019797e918e060b351795b911de0d4e9a25544",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_1e720f62f251e973a2c325549578b59a70a1c025a42463f08d793c1c9479a861",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_aaa0d611ef5251cce063439b0a5beb160ce29599616f94d24e2173ddf06ebcc3",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "806dcedea115",
+            "unit": "1",
+            "value": "92"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_806dcedea115d9467b1bfb060775a4b737afb44ce0325713cda250bd9c0ea320"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "935420f30acc",
+            "unit": "angstrom",
+            "value": "12.216 angstrom"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_935420f30accb6aa96684c2e93762f23d92a176d30d9aa62e4b21298bf22b1fc"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "f9ece0f16de5",
+            "unit": "1",
+            "value": "92"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "991be41e80b5",
+            "unit": "1",
+            "value": "92/106 (0.8679)"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_991be41e80b595e59d000cd5a4019797e918e060b351795b911de0d4e9a25544"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "1e720f62f251",
+            "unit": "1",
+            "value": "106"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_1e720f62f251e973a2c325549578b59a70a1c025a42463f08d793c1c9479a861"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "aaa0d611ef52",
+            "unit": "1",
+            "value": "92"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_aaa0d611ef5251cce063439b0a5beb160ce29599616f94d24e2173ddf06ebcc3"
+        }
+      ],
+      "lease_id": "gxl_01m8d9tt7v3yjnyrs7",
+      "receipt": "start:bd15ced4-2fce-4666-83d7-34b5f2a1f17c",
+      "task_id": "gxt_01m8d9tt7ef07e8v2m",
+      "thread_id": "01a21a9d-6919-7e50-bd4d-c5a8434c0de8",
+      "turn_id": "01a21a9d-694e-7750-9c76-7b5367d4dd79",
+      "scope": "run",
+      "event_id": 56,
+      "utc": "2026-11-27T01:27:33.459Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_806dcedea115d9467b1bfb060775a4b737afb44ce0325713cda250bd9c0ea320",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_935420f30accb6aa96684c2e93762f23d92a176d30d9aa62e4b21298bf22b1fc",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "806dcedea115",
+            "unit": "1",
+            "value": "92"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_806dcedea115d9467b1bfb060775a4b737afb44ce0325713cda250bd9c0ea320"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "935420f30acc",
+            "unit": "angstrom",
+            "value": "12.216 angstrom"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_935420f30accb6aa96684c2e93762f23d92a176d30d9aa62e4b21298bf22b1fc"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "f9ece0f16de5",
+            "unit": "1",
+            "value": "92"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_f9ece0f16de56d960d2e8995f1ed21ef858ef40be3cf86264f96d2b279fbee22"
+        }
+      ],
+      "lease_id": "gxl_01m8d9tt7v3yjnyrs7",
+      "receipt": "exec-69788ac0-e2d2-4033-86d7-08ea3de51262",
+      "task_id": "gxt_01m8d9tt7ef07e8v2m",
+      "thread_id": "01a21a9d-6919-7e50-bd4d-c5a8434c0de8",
+      "turn_id": "01a21a9d-694e-7750-9c76-7b5367d4dd79",
+      "scope": "run",
+      "event_id": 57,
+      "utc": "2026-11-27T01:27:47.906Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_991be41e80b595e59d000cd5a4019797e918e060b351795b911de0d4e9a25544",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_1e720f62f251e973a2c325549578b59a70a1c025a42463f08d793c1c9479a861",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "metric_ref": "metric_aaa0d611ef5251cce063439b0a5beb160ce29599616f94d24e2173ddf06ebcc3",
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "991be41e80b5",
+            "unit": "1",
+            "value": "92/106 (0.8679)"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_991be41e80b595e59d000cd5a4019797e918e060b351795b911de0d4e9a25544"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "1e720f62f251",
+            "unit": "1",
+            "value": "106"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_1e720f62f251e973a2c325549578b59a70a1c025a42463f08d793c1c9479a861"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "aaa0d611ef52",
+            "unit": "1",
+            "value": "92"
+          },
+          "source_ref": "gxa_01m8d9tt1d8hbvrx4b",
+          "metric_ref": "metric_aaa0d611ef5251cce063439b0a5beb160ce29599616f94d24e2173ddf06ebcc3"
+        }
+      ],
+      "lease_id": "gxl_01m8d9tt7v3yjnyrs7",
+      "receipt": "exec-9dc94a43-a675-496e-9db7-2146c86e28d3",
+      "task_id": "gxt_01m8d9tt7ef07e8v2m",
+      "thread_id": "01a21a9d-6919-7e50-bd4d-c5a8434c0de8",
+      "turn_id": "01a21a9d-694e-7750-9c76-7b5367d4dd79",
+      "scope": "run",
+      "event_id": 58,
+      "utc": "2026-11-27T01:28:01.061Z"
+    }
+  ],
+  "routes": {
+    "modules": [],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": []
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "bb3c399384718fdc41100843e8342f8c21a4b6ebe585417cafe3782ee354b664",
+      "event_id": 28,
+      "corrected_decision_event": 35
+    }
+  ],
+  "invocation": {
+    "action": "export_closed",
+    "before": {
+      "jobs": 1,
+      "host_turns": 2
+    },
+    "after": {
+      "jobs": 1,
+      "host_turns": 2
+    },
+    "added": {
+      "jobs": 0,
+      "host_turns": 0
+    }
+  }
+}

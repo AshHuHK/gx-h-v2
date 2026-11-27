@@ -1,0 +1,118 @@
+{
+  "mode": "controlled native callbacks, real public mmCIF originals and detached CPU Jobs",
+  "recipe": {
+    "kind": "recipe",
+    "reference": "deposited-backbone-coverage@1",
+    "digest": "02f2e98a6b0f0603acfa52c0dda1425e6b812b0dc63b1b1d8ee5e12781c57d46",
+    "title": "Model-1 complete versus declared backbone positions",
+    "inputs": {
+      "structure": {
+        "kind": "run_input",
+        "media_type": "chemical/x-mmcif"
+      }
+    },
+    "methods": {
+      "backbone": "deposited-backbone-qc@1"
+    },
+    "method_pins": {
+      "deposited-backbone-qc@1": "2e93f4d6cb3c175f00c3183d5615980e2635fabb30e5c6d0585b10b517dd1ee9"
+    },
+    "outputs": {
+      "backbone": [
+        {
+          "name": "qc.json",
+          "kind": "deposited_backbone_qc"
+        }
+      ]
+    }
+  },
+  "runs": [
+    {
+      "run_id": "gxr_01m8da27xyhh52hz3j",
+      "closed_by": "gxa_f20ac0f0800f1dc7a278696a10705970b32e6f4b57154a24789a11571003b246",
+      "interpretation": "Limit structural comparisons to the modeled residue range.",
+      "job_id": "gxj_01m8da281pc0qw0754",
+      "node_id": "node_fe39052c815b04ee119bc2739a32387f",
+      "decision_id": "gxa_5820beb3dc8ef95a0110d827a7f09efa26674083f0e275667a3d6372bcd6a0d4",
+      "input": {
+        "artifact_ref": "gxa_01m8da27y49gcg5kxc",
+        "bytes": 119624,
+        "role": "structure",
+        "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+      },
+      "output_ref": "gxa_01m8da28mrey3a8rhe",
+      "output_sha256": "215f485bea4df800845ecce8a99bb558768a056a1a9a7ec8508d78f2f5b85d88",
+      "method": {
+        "id": "deposited-backbone-qc",
+        "sha256": "eb6f6f971ea9c3a2cc599e357c1d31e860505a8e616e04da2082aecf943fb9b2",
+        "version": "1"
+      },
+      "measured": {
+        "schema": "gx.deposited-backbone-qc/1",
+        "entry": "1QYS",
+        "chain": "A",
+        "entity": "1",
+        "input_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+        "declared_residues": 106,
+        "model_count": 1,
+        "model": 1,
+        "observed_residues": 92,
+        "ca_count": 92,
+        "complete_backbones": 92,
+        "missing_label_positions": [
+          1,
+          2,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106
+        ],
+        "ca_radius_of_gyration_A": 12.216062231495131
+      }
+    },
+    {
+      "run_id": "gxr_01m8da28vbeq5hrzcf",
+      "closed_by": "gxa_bd4d556dc25fe70df2055fa8aa665912b416407edad41706d30efc6d8eb55015",
+      "interpretation": "The entire declared chain is available for a backbone comparison in this deposited model.",
+      "job_id": "gxj_01m8da28ygwtyh684r",
+      "node_id": "node_a5b0ed20e81355e99df233f0e33ef34a",
+      "decision_id": "gxa_27353f9e1790be33ea60a1a90ccc54065f1b5aab692341c29ca6702332e9509c",
+      "input": {
+        "artifact_ref": "gxa_01m8da28vy06cjs83a",
+        "bytes": 272904,
+        "role": "structure",
+        "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2"
+      },
+      "output_ref": "gxa_01m8da29hktkbqe6fy",
+      "output_sha256": "c48807bead61b6bad3da91f95f38c8ede0885a376b30a2de0bf14637f32f348f",
+      "method": {
+        "id": "deposited-backbone-qc",
+        "sha256": "eb6f6f971ea9c3a2cc599e357c1d31e860505a8e616e04da2082aecf943fb9b2",
+        "version": "1"
+      },
+      "measured": {
+        "schema": "gx.deposited-backbone-qc/1",
+        "entry": "6BEN",
+        "chain": "A",
+        "entity": "1",
+        "input_sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+        "declared_residues": 8,
+        "model_count": 20,
+        "model": 1,
+        "observed_residues": 8,
+        "ca_count": 8,
+        "complete_backbones": 8,
+        "missing_label_positions": [],
+        "ca_radius_of_gyration_A": 4.04123704761302
+      }
+    }
+  ]
+}

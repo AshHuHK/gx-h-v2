@@ -1,0 +1,58 @@
+{
+  "run_id": "gxr_01m8daeg56f68eqbc1",
+  "query": "ti:\"Observation of Gravitational Waves from a Binary Black Hole Merger\"",
+  "search_job": "gxj_01m8daegz1bsq69wh0",
+  "sources": [
+    {
+      "provider": "arxiv",
+      "url": "https://export.arxiv.org/api/query?search_query=ti%3A%22Observation+of+Gravitational+Waves+from+a+Binary+Black+Hole+Merger%22&max_results=8",
+      "retrieved_at": "2026-11-27T01:38:19.466972+00:00",
+      "sha256": "c3514104edc94932f701c981fce17bb9b39004cb351c8208e1318c3b67cdd815",
+      "status": "hits",
+      "provider_hits": 2,
+      "returned": 2
+    }
+  ],
+  "match": {
+    "arxiv_id": "1602.03837v1",
+    "title": "Observation of Gravitational Waves from a Binary Black Hole Merger",
+    "doi": "10.1103/PhysRevLett.116.061102",
+    "abs_url": "https://arxiv.org/abs/1602.03837v1",
+    "pdf_url": "https://arxiv.org/pdf/1602.03837v1"
+  },
+  "source_mode": "live_search",
+  "fetch_job": "gxj_01m8daejetxmj2bh4f",
+  "descriptor": {
+    "source": "arXiv:1602.03837v1",
+    "sha256": "e5e864c23d015b69be17e5b5d51b5b462d2829353a867513414b6728f54589c4",
+    "data": "https://arxiv.org/pdf/1602.03837v1#sha256=e5e864c23d015b69be17e5b5d51b5b462d2829353a867513414b6728f54589c4",
+    "publication": "https://arxiv.org/abs/1602.03837v1",
+    "applicability": "Versioned preprint. Embedded text, figures and cited publications have different evidential scope.",
+    "external_source": {
+      "kind": "article",
+      "accession": "1602.03837v1",
+      "url": "https://arxiv.org/pdf/1602.03837v1",
+      "version": "sha256:e5e864c23d015b69be17e5b5d51b5b462d2829353a867513414b6728f54589c4",
+      "retrieved_at": "2026-11-27T01:38:23.010628+00:00"
+    }
+  },
+  "outputs": {
+    "article.pdf": "gxa_01m8daemwzhzbhnspj",
+    "acquisition.json": "gxa_01m8daemxe2fz46xww"
+  },
+  "reader": {
+    "source_ref": "gxa_01m8daemwzhzbhnspj",
+    "segment_id": "p1.1",
+    "label": "page 1 characters [0,2336)",
+    "text_sha256": "9e4805b666cde9f322a63794e37019181985141358c9560772bf3822c7b8835f",
+    "receipt_id": "gxrc_01m8dag50g3661g1jf",
+    "task_id": "gxt_01m8daep20gr1wh9sd"
+  },
+  "page_coverage": "PARTIAL_TEXT",
+  "segment_count": 41,
+  "transport": "Scripted decision turns on the normal research entry. Both Jobs contacted official arXiv through Clash.",
+  "job_count_after_cold_readback": 2,
+  "reader_recovery": "Initial probe looked for an unsplit page label. Reopened this Run, selected its existing page-1 text segment and read it. Both original Jobs were reused.",
+  "reproduce": "GX_CODEX_OFFLINE=1 PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a .venv/bin/python -B -m acceptance.science_capabilities.arxiv_handoff /absolute/path/outside/product/arxiv-study",
+  "package_sha256": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5"
+}

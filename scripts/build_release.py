@@ -10,7 +10,7 @@ import subprocess
 import tarfile
 import tempfile
 
-from release_assets import ASSETS, LOCK, ROOT, digest, official_archive
+from release_assets import ASSETS, LOCK, ROOT, checked, digest, official_archive
 
 
 def candidate_paths():
@@ -48,6 +48,12 @@ def build(output, supplied):
         base = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     pin = LOCK["linux_x64"]
     paths[(ASSETS / pin["file"]).relative_to(ROOT).as_posix()] = official_archive(supplied)
+    node_pin = ASSETS / "node/SHA256SUMS"
+    node_hash, node_name = node_pin.read_text().split()
+    node_archive = node_pin.parent / node_name
+    if not node_archive.is_file():
+        raise FileNotFoundError(f"Supply {node_archive}. See RELEASE.md.")
+    paths[node_archive.relative_to(ROOT).as_posix()] = checked(node_archive, node_hash)
     files = {}
     output = output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)

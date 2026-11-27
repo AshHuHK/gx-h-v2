@@ -1,9 +1,0 @@
-{
-  "schema": "gx.public-coordinate-methods/1",
-  "methods": [
-    {"capability":"deposited-chain-geometry@2","measures":"Coverage of matched positions; baseline proper-fit RMSD and unsigned rotation by chain pair.","scope":"One deposited model and assembly of matching observed chains. Baseline differences do not measure the effect of excluding a segment."},
-    {"capability":"deposited-block-influence@1","measures":"Refit each same-deposition chain pair after leaving out one fixed label-position interval. Inspect the absolute change of the unsigned rotation angle (degrees) and fitted RMSD (angstrom), separately. The named maxima summarize eligible pair/interval cells; the full table preserves eligibility, all three chain pairs and the separate median summaries.","parameters":"common_backbone requires N, CA, C, O and common_ca requires CA. Retain the input digest, mask, denominator, coverage and omitted blocks."},
-    {"capability":"deposited-block-reading@1","measures":"Extract a selected pair and interval from an existing named block table using the registered row selectors.","scope":"This reads an existing result. It does not create a new independent observation."}
-  ],
-  "domain": "Describe deposited coordinate completeness and sensitivity of the reported geometry within a single archive entry. Coverage alone cannot determine sensitivity. Unknown or insufficient observations are reported as unavailable. A shared chain label across different entries does not identify the same independent sample."
-}

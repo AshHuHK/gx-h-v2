@@ -299,6 +299,17 @@ def instantiate(conn, run_id, arguments):
         if cap not in target_providers or target_providers[cap] != pin:
             raise ScopeDenied(f"The target Goal needs the saved provider and dependencies for {cap}")
     prefix = _name(arguments["prefix"])
+    branch = arguments["branch"]
+    if definition["schema"] == "gx.research-recipe/2" and not branch.startswith("local:"):
+        existing = conn.execute("SELECT 1 FROM v6_branches WHERE run_id=? AND branch_id=?",
+                                (run_id, branch)).fetchone()
+        if not existing:
+            suggested = "local:" + (branch if _NAME.fullmatch(branch) else prefix)
+            raise SchemaInvalid(
+                f"No branch {branch!r} exists in this Goal. For a new branch, call gx_instantiate_recipe "
+                f"again with branch {suggested!r} to receive the open_branch fields and budget. "
+                "To extend an existing branch, pass its open branch_id from gx_task_context.",
+                details={"field": "branch", "suggested_new_branch": suggested})
     alias = {s["slot"]: f"local:{prefix}-{s['slot']}" for s in definition["steps"]}
     calibration = definition.get("calibration")
     point = definition.get("decision_point")
@@ -337,7 +348,7 @@ def instantiate(conn, run_id, arguments):
             else:
                 inputs.append(alias[src["step"]])
                 ports.append({"index": index, "output": src["output"]})
-        ops.append({"op": "add_node", "node": alias[step["slot"]], "branch": arguments["branch"],
+        ops.append({"op": "add_node", "node": alias[step["slot"]], "branch": branch,
                     "capability": cap, "parameters": step["parameters"], "inputs": inputs,
                     "depends_on": [alias[d] for d in step["depends_on"] if d != skipped], "question": step["question"],
                     **({"independent_repeat": True} if repeat or (calibration and step["slot"] == calibration["step"]) else {}),
@@ -346,7 +357,7 @@ def instantiate(conn, run_id, arguments):
                     **({"input_ports": ports} if ports else {})})
     answer = {"recipe": reference, "digest": row[0], "ops": ops,
               **({"decision_point": point} if point else {}), **({"calibration": receipt} if receipt else {})}
-    if definition["schema"] == "gx.research-recipe/2" and arguments["branch"].startswith("local:"):
+    if definition["schema"] == "gx.research-recipe/2" and branch.startswith("local:"):
         from . import v6_graph
         contracts = v6_graph.decision_schema()["properties"]["ops"]["items"]["oneOf"]
         opening = next(kind for kind in contracts if kind["properties"]["op"]["const"] == "open_branch")
@@ -355,7 +366,7 @@ def instantiate(conn, run_id, arguments):
             method = registry.candidate(conn, op["capability"])["manifest"]
             minimum.update(JobService._budget_amounts(capabilities.effective_resources(method, {})))
         answer["submission"] = {
-            "tool": "gx_decide_revision", "branch": arguments["branch"],
+            "tool": "gx_decide_revision", "branch": branch,
             "instructions": "Prepend one open_branch operation to these add_node operations. "
                             "Fill the scientific fields for this Goal and fund the expanded Jobs.",
             "required_open_branch_fields": opening["required"], "minimum_budget_limits": dict(minimum)}

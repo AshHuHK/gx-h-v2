@@ -1,11 +1,41 @@
 test_changed_contract_under_the_same_operation_is_retained_as_unqualified (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_changed_contract_under_the_same_operation_is_retained_as_unqualified) ... ok
-test_duplicate_source_rows_retained_without_silent_curated_collision (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_duplicate_source_rows_retained_without_silent_curated_collision) ... ok
+test_duplicate_source_rows_retained_without_silent_curated_collision (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_duplicate_source_rows_retained_without_silent_curated_collision) ... ERROR
 test_missing_original_keeps_historical_row (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_missing_original_keeps_historical_row) ... ok
 test_relocated_mount_preserves_identity_and_unknown_denominators (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_relocated_mount_preserves_identity_and_unknown_denominators) ... ok
 test_reordered_operation_does_not_publish_named_card (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_reordered_operation_does_not_publish_named_card) ... ok
-test_server_lists_and_registry_only_records_are_different_evidence (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_server_lists_and_registry_only_records_are_different_evidence) ... ok
+test_server_lists_and_registry_only_records_are_different_evidence (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_server_lists_and_registry_only_records_are_different_evidence) ... ERROR
+
+======================================================================
+ERROR: test_duplicate_source_rows_retained_without_silent_curated_collision (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_duplicate_source_rows_retained_without_silent_curated_collision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/inventory/test_inventory.py", line 87, in test_duplicate_source_rows_retained_without_silent_curated_collision
+    summary,ledger,_ = reconcile(self.mount,self.tables,[])
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/inventory/build.py", line 331, in reconcile
+    reason = disposition_reason(table,row,status,fact["status"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/inventory/build.py", line 195, in disposition_reason
+    if row["category"] in {"database","literature"}:
+       ~~~^^^^^^^^^^^^
+KeyError: 'category'
+
+======================================================================
+ERROR: test_server_lists_and_registry_only_records_are_different_evidence (acceptance.science_assets.inventory.test_inventory.HistoricalInventory.test_server_lists_and_registry_only_records_are_different_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/inventory/test_inventory.py", line 74, in test_server_lists_and_registry_only_records_are_different_evidence
+    report,_,_ = reconcile(self.mount,self.tables,[])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/inventory/build.py", line 331, in reconcile
+    reason = disposition_reason(table,row,status,fact["status"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/inventory/build.py", line 195, in disposition_reason
+    if row["category"] in {"database","literature"}:
+       ~~~^^^^^^^^^^^^
+KeyError: 'category'
 
 ----------------------------------------------------------------------
-Ran 6 tests in 0.009s
+Ran 6 tests in 0.011s
 
-OK
+FAILED (errors=2)

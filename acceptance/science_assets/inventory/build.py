@@ -176,6 +176,42 @@ def disposition(table, domains, selected):
     return "indexed_only"
 
 
+def disposition_reason(table, row, status, source_state):
+    if status == "catalog_reference":
+        return "reviewed_archive_description"
+    if source_state in {"unreadable_source","missing_source","identity_mismatch","unresolved_pointer",
+                        "operation_schema_changed","unreadable_catalog","invalid_locator"}:
+        return "origin_or_operation_qualification_incomplete"
+    if table == "mcp-servers":
+        return "component_metadata_not_an_operation"
+    if table == "mcp-tools":
+        tool = row["tool_name"].lower()
+        if tool == "parse_and_execute" or "shell" in tool or "execute_code" in tool:
+            return "general_command_execution_outside_inventory"
+        if tool in {"cancel_job","list_jobs","get_job_status","get_job_log","get_server_info","get_job_result"}:
+            return "service_lifecycle_not_a_scientific_measurement"
+        if tool.startswith(("submit_", "create_", "register_", "save_", "upload_", "delete_", "resume_")):
+            return "changes_runtime_state_outside_read_only_import"
+        if row["category"] in {"database","literature"}:
+            return "specific_operation_or_source_scope_not_curated"
+        return "historical_tool_without_reviewed_read_only_operation"
+    if status == "rna_index_deferred":
+        return "rna_workstream_deferred"
+    if table == "skills":
+        return "historical_document_without_this_release_skill_binding"
+    if table == "workflows":
+        if "defer" in row.get("history_status","").lower() or "fail" in row.get("history_status","").lower():
+            return "historical_deferred_or_failed_route"
+        if row.get("kind") in {"stage","scenario","cases"}:
+            return "historical_stage_or_fixture"
+        return "workflow_only_indexed_in_this_transfer"
+    if table == "data":
+        return "directory_lacks_verified_scope_or_release" if source_state=="directory_opened" else "data_scope_or_query_binding_not_curated"
+    if table == "methods":
+        return "separate_provider_and_scope_review_needed_for_this_transfer"
+    return "historical_source_route_only"
+
+
 def native_relation(spec, product_root):
     if product_root is None:
         return None
@@ -262,6 +298,7 @@ def reconcile(root, table_dir, select=None, *, product_root=None):
             continue
 
         keys = Counter()
+        reasons = Counter()
         row_hashes, source_keys, statuses, domain_records, decisions = set(), set(), Counter(), Counter(), Counter()
         for line, row in records:
             identity = [row[k] for k in identity_cols]
@@ -291,13 +328,15 @@ def reconcile(root, table_dir, select=None, *, product_root=None):
             elif spec:
                 warnings.append({"reference":spec["reference"],"reason":fact["status"]})
             status = disposition(table,domains,public)
+            reason = disposition_reason(table,row,status,fact["status"])
+            reasons[reason] += 1
             domain_records.update(domains)
             decisions[status] += 1
             statuses[fact["status"]] += 1
             # Opaque identifiers keep unreviewed runtime paths, commands and personal records out of the ledger.
             entry = {"table":table,"line":line,"row_sha256":row_sha,"identity_sha256":key,"domains":domains,
                      "classification":"curated" if spec else "locator_terms","source_check":fact["status"],
-                     "disposition":status, "canonical_method_id": None,
+                     "disposition":status, "reason":reason, "canonical_method_id": None,
                      "historical_binding_id": key}
             if spec:
                 entry.update(canonical_method_id=spec["canonical_method_id"], provider_binding=spec["binding"])
@@ -307,7 +346,7 @@ def reconcile(root, table_dir, select=None, *, product_root=None):
         summaries[table] = {"status":"read", "sha256":table_hash, "rows":len(records),
                             "distinct_complete_rows":len(row_hashes), "identity_columns":identity_cols,
                             "distinct_historical_keys":len(keys), "distinct_primary_locators":len(source_keys),
-                            "source_checks":dict(statuses),"domains":dict(domain_records),"dispositions":dict(decisions)}
+                            "source_checks":dict(statuses),"domains":dict(domain_records),"dispositions":dict(decisions),"reasons":dict(reasons)}
     refs = [c["reference"] for c in cards]
     if len(set(refs)) != len(refs):
         raise ValueError("A catalogue selection matched multiple historical rows")

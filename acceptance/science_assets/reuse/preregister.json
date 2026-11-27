@@ -1,0 +1,12 @@
+{
+  "study": "archived single-chain coordinate coverage and C-alpha radius of gyration",
+  "start": "operator enters a new ordinary research Goal with a separately versioned public single-polypeptide deposition and its provenance",
+  "required_steps": ["Lead queries the catalogue", "new GX CPU Job reads the original mmCIF of this Goal and returns per-position backbone counts and a model 1 C-alpha radius of gyration", "Lead sees this Goal's own named result and decides whether the complete-chain compactness label is justified"],
+  "end": "decision takes effect in GX; compare only the covered model 1 positions",
+  "recipe_proof": "A Lead saves successful measured node with explicit input role and a decision point. B Lead independently discovers and instantiates that version; B dispatches a new Job using a different original and adopts its own decision.",
+  "parallel_proof": "Report overlapping native worker turns/tasks and signed delivery separately from CPU or GPU overlap. Operator explicitly asked A's researchers to consider archive conditions and numerical interpretation concurrently.",
+  "required_denominators": ["deposited declared residues", "represented C-alpha positions", "complete N/CA/C/O positions"],
+  "label": "Unqualified deposited full-backbone label only if every declared position has a positive-occupancy N/CA/C/O in model 1; otherwise report the coverage gap. Keep experimental state and coordinate-deposition claims separate.",
+  "independent_check": "Read PDB fixed columns independently of production mmCIF reader. SEQRES denominator, positive-occupancy polymer ATOM rows from model 1 and a pairwise-distance radius of gyration. Counts exact, unrounded radius within 0.0001 angstrom and displayed radius within 0.001 angstrom.",
+  "on_unusable_input": "Record why the archived provider cannot interpret it, keep the failure and never replace a launched Run with an easier replicate."
+}

@@ -1,0 +1,499 @@
+{
+  "run_id": "gxr_01m8fdp0m22cmw5s8d",
+  "goal": "CLOSED",
+  "materials": [
+    {
+      "role": "first_deposition",
+      "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+      "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+    },
+    {
+      "role": "second_deposition",
+      "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+      "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+    }
+  ],
+  "jobs": [
+    {
+      "node_id": "node_dbeb6b993467f119819d5c076b11c9ff",
+      "job_id": "gxj_01m8fdsx30tj2nenvr",
+      "status": "SUCCEEDED",
+      "method": "archival-peptide-coverage@1",
+      "depends_on": [],
+      "recipe_decision": null,
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+          "bytes": 223975,
+          "role": "structure",
+          "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+        }
+      ],
+      "manifest_hash": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+      "outputs": [
+        {
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "output_name": "peptide-qc.json",
+          "kind": "archival_peptide_coverage",
+          "nature": "analysis"
+        }
+      ],
+      "adopted_by": "gxa_c1b9690e49e74f1b9c29a4ff95a317fbf7706928077f0de18b45078cf78795f7",
+      "selected_inputs": [
+        "gxa_01m8fdp0n8eksfb7rp"
+      ],
+      "parameters": {},
+      "measurements": [
+        {
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "summary": {
+            "entry": "1UAO",
+            "chain": "A",
+            "model": 1,
+            "model_count": 18,
+            "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+            "declared_positions": 10,
+            "observed_positions": 10,
+            "peptide_residue_positions": 10,
+            "backbone_positions": 10,
+            "declared_modified_positions": 0,
+            "annotation_status": "category_absent",
+            "non_peptide_components": [],
+            "unknown_chemistry_positions": [],
+            "predicted_confidence": null
+          }
+        }
+      ]
+    },
+    {
+      "node_id": "node_48f7785c5d1a0026e2e03829423492c0",
+      "job_id": "gxj_01m8fdsx9b5axbjh5k",
+      "status": "SUCCEEDED",
+      "method": "archival-peptide-coverage@1",
+      "depends_on": [],
+      "recipe_decision": null,
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+          "bytes": 403360,
+          "role": "structure",
+          "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+        }
+      ],
+      "manifest_hash": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+      "outputs": [
+        {
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "output_name": "peptide-qc.json",
+          "kind": "archival_peptide_coverage",
+          "nature": "analysis"
+        }
+      ],
+      "adopted_by": "gxa_c1b9690e49e74f1b9c29a4ff95a317fbf7706928077f0de18b45078cf78795f7",
+      "selected_inputs": [
+        "gxa_01m8fdp0nxgc0q2m3c"
+      ],
+      "parameters": {},
+      "measurements": [
+        {
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "summary": {
+            "entry": "1LE0",
+            "chain": "A",
+            "model": 1,
+            "model_count": 20,
+            "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+            "declared_positions": 13,
+            "observed_positions": 13,
+            "peptide_residue_positions": 12,
+            "backbone_positions": 12,
+            "declared_modified_positions": 0,
+            "annotation_status": "category_absent",
+            "non_peptide_components": [
+              {
+                "label_seq_id": 13,
+                "comp_id": "NH2",
+                "chem_comp_type": "non-polymer",
+                "in_chain_covalent_links": [
+                  {
+                    "id": "covale1",
+                    "partner_position": 12,
+                    "partner_component": "LYS"
+                  }
+                ]
+              }
+            ],
+            "unknown_chemistry_positions": [],
+            "predicted_confidence": null
+          }
+        }
+      ]
+    }
+  ],
+  "release_events": [
+    {
+      "event_id": 100,
+      "node": "node_dbeb6b993467f119819d5c076b11c9ff",
+      "type": "v6.node.settled"
+    },
+    {
+      "event_id": 107,
+      "node": "node_48f7785c5d1a0026e2e03829423492c0",
+      "type": "v6.node.settled"
+    }
+  ],
+  "recipe_expansions": [],
+  "lead_points": [],
+  "decisions": [
+    {
+      "decision_ref": "gxa_c1b9690e49e74f1b9c29a4ff95a317fbf7706928077f0de18b45078cf78795f7",
+      "turn_id": "01a21edb-0989-75d3-b583-1be53e1a24d4",
+      "rationale": "The sequence and connectivity tables assign the terminal amide its own polymer position in 1LE0. Matched measurements of the two deposits will quantify the effect on backbone coverage. The independent inventory checks coverage in the other NMR models.",
+      "evidence_refs": [
+        "gxa_01m8fdp0n8eksfb7rp",
+        "gxa_01m8fdp0nxgc0q2m3c"
+      ],
+      "ops": [
+        "open_branch",
+        "add_node",
+        "add_node"
+      ],
+      "outcome": "adopted"
+    },
+    {
+      "decision_ref": "gxa_841a9702ee3a559f18d18f9ba3b21a47e980075a851743fb5c9d11fb88c36080",
+      "turn_id": "01a21edc-f60d-7412-80b8-a1debdb61104",
+      "rationale": "The original coordinate tables show a positive-occupancy heavy atom at every declared chain A site and N, CA, C and O at every amino acid in each deposited model. Chignolin assigns OXT to its final glycine. The tryptophan zipper assigns its terminal amide a separate position and records a covalent link to the terminal lysine’s carbonyl carbon. The two commissioned measurements will supply the formal model-1 counts, and the independent inventory will cross-check the ensemble result. Await those reports before closing the run.",
+      "evidence_refs": [
+        "gxa_01m8fdp0n8eksfb7rp",
+        "gxa_01m8fdp0nxgc0q2m3c"
+      ],
+      "ops": [],
+      "outcome": "maintained"
+    },
+    {
+      "decision_ref": "gxa_20b8ae07fe1dc9af4f1deef91d26ccf38bc247a83cfa350b2b897ae8baaad1fe",
+      "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+      "rationale": "The measured fractions agree with a direct count of the original atom sites in every deposited model. Each declared position has a positive-occupancy heavy atom, and every amino acid has N, CA, C and O. Chignolin assigns its terminal oxygen to glycine. The tryptophan zipper gives its terminal amide a separate position and explicitly bonds its nitrogen to the terminal lysine carbonyl. Publish the two archive findings and await the commissioned independent inventory of the original annotations before final closure. Repeating the coordinate measurements would add no new observation.",
+      "evidence_refs": [
+        "gxa_01m8fdp0n8eksfb7rp",
+        "gxa_01m8fdp0nxgc0q2m3c",
+        "gxa_01m8fdsxqfrs678s88",
+        "gxa_01m8fdsxx3sh6c94sq",
+        "gxa_01m8fe26wvd1y5ke6n",
+        "gxa_01m8fe29ys4d3n7jcc"
+      ],
+      "ops": [],
+      "outcome": "maintained"
+    },
+    {
+      "decision_ref": "gxa_a75f630d331c9e80eb87f1faa9951b1aa4aa8fa8ce5e411a8db0a0d1c1a41476",
+      "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+      "rationale": "The completed inventory checked the original sequence, chemistry, linkage and atom-site records and agrees with the coverage tables model by model. Chignolin assigns OXT to the final glycine. The tryptophan zipper numbers the terminal NH2 separately, includes coordinates for its nitrogen and bonds that nitrogen to the last lysine carbonyl. Those records account for both denominators. The two readings of each file agree, and further counts of those files would add no independent information about the sample.",
+      "evidence_refs": [
+        "gxa_01m8fdp0n8eksfb7rp",
+        "gxa_01m8fdp0nxgc0q2m3c",
+        "gxa_01m8fdsxqfrs678s88",
+        "gxa_01m8fdsxx3sh6c94sq",
+        "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89"
+      ],
+      "ops": [
+        "close_run"
+      ],
+      "outcome": "adopted"
+    }
+  ],
+  "lead_turns": [
+    {
+      "thread_id": "01a21edb-0942-7de1-8b8c-f8233a443fcc",
+      "turn_id": "01a21edb-0989-75d3-b583-1be53e1a24d4",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21edc-f5e0-7412-959f-cc6160fba00f",
+      "turn_id": "01a21edc-f60d-7412-80b8-a1debdb61104",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+      "state": "acknowledged"
+    }
+  ],
+  "endpoint_deliveries": [
+    {
+      "event_id": 122,
+      "task_id": "gxt_01m8fdxw1pbqpk8nx1",
+      "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "delivery_kind": "brief",
+      "sources": [
+        "gxa_01m8fdsxqfrs678s88",
+        "gxa_01m8fdsxx3sh6c94sq"
+      ]
+    },
+    {
+      "event_id": 135,
+      "task_id": "gxt_01m8fdxw1pbqpk8nx1",
+      "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "delivery_kind": "artifact_read",
+      "sources": [
+        "gxa_01m8fdsxx3sh6c94sq"
+      ]
+    },
+    {
+      "event_id": 136,
+      "task_id": "gxt_01m8fdxw1pbqpk8nx1",
+      "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "delivery_kind": "artifact_read",
+      "sources": [
+        "gxa_01m8fdsxqfrs678s88"
+      ]
+    },
+    {
+      "event_id": 161,
+      "task_id": "gxt_01m8fe37ayg4yaefe9",
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "delivery_kind": "artifact_read",
+      "sources": [
+        "gxa_01m8fdsxqfrs678s88"
+      ]
+    },
+    {
+      "event_id": 162,
+      "task_id": "gxt_01m8fe37ayg4yaefe9",
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "delivery_kind": "artifact_read",
+      "sources": [
+        "gxa_01m8fdsxx3sh6c94sq"
+      ]
+    },
+    {
+      "event_id": 163,
+      "task_id": "gxt_01m8fe37ayg4yaefe9",
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "delivery_kind": "artifact_read",
+      "sources": [
+        "gxa_01m8fdsxx3sh6c94sq"
+      ]
+    },
+    {
+      "event_id": 164,
+      "task_id": "gxt_01m8fe37ayg4yaefe9",
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "delivery_kind": "artifact_read",
+      "sources": [
+        "gxa_01m8fdsxqfrs678s88"
+      ]
+    }
+  ],
+  "catalog": [
+    {
+      "event_id": 20,
+      "kind": "all",
+      "query": "mmCIF deposited peptide chain coordinate completeness model coverage polymer sequence residue annotations and terminal groups",
+      "total": 49,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-peptide-coverage@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-backbone-qc@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.pcna-archive@1.0.0",
+          "reference": "pcna-archive-fetch@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.3.0",
+          "reference": "deposited-chain-geometry@2",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-fold-calibration@1.0.0",
+          "reference": "mapped-structure-agreement@1",
+          "status": "selectable"
+        }
+      ]
+    },
+    {
+      "event_id": 109,
+      "kind": "all",
+      "query": "coordinate completeness of deposited peptide chains from mmCIF, model-1 declared polymer sites, annotated amino acids, N CA C O backbone, terminal components and NMR ensemble coverage",
+      "total": 65,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-peptide-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-backbone-qc@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-fab-coverage@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.pcna-archive@1.0.0",
+          "reference": "pcna-archive-fetch@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.3.0",
+          "reference": "deposited-chain-geometry@2",
+          "status": "selectable"
+        }
+      ]
+    },
+    {
+      "event_id": 123,
+      "kind": "all",
+      "query": "Quantify deposited chain A position and amino-acid backbone coordinate coverage per model in 1UAO and 1LE0, distinguish chemical-component and modified-residue annotations and terminal linkages in the original mmCIFs",
+      "total": 59,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-peptide-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.block-influence@1.0.0",
+          "reference": "deposited-block-influence@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.3.0",
+          "reference": "deposited-chain-geometry@2",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.2.0",
+          "reference": "deposited-chain-geometry@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.1.0-v6.1",
+          "reference": "tl1a-review@1",
+          "status": "catalog_only"
+        }
+      ]
+    },
+    {
+      "event_id": 155,
+      "kind": "all",
+      "query": "Archival coordinate coverage of chain A in deposited solution NMR models of 1UAO and 1LE0, amino acid backbone denominator, terminal component annotations, scope of evidence",
+      "total": 49,
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.archival-molecule-qc@1.0.0",
+          "reference": "archival-peptide-coverage@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-macrocycle-qc@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.deposited-structure-qc@1.0.0",
+          "reference": "deposited-backbone-qc@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.3.0",
+          "reference": "deposited-chain-geometry@2",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.block-influence@1.0.0",
+          "reference": "deposited-block-influence@1",
+          "status": "catalog_only"
+        }
+      ]
+    }
+  ],
+  "closure_event": 175,
+  "adopted_decision_events": [
+    {
+      "event_id": 75,
+      "subject_id": "gxa_c1b9690e49e74f1b9c29a4ff95a317fbf7706928077f0de18b45078cf78795f7"
+    },
+    {
+      "event_id": 116,
+      "subject_id": "gxa_841a9702ee3a559f18d18f9ba3b21a47e980075a851743fb5c9d11fb88c36080"
+    },
+    {
+      "event_id": 148,
+      "subject_id": "gxa_20b8ae07fe1dc9af4f1deef91d26ccf38bc247a83cfa350b2b897ae8baaad1fe"
+    },
+    {
+      "event_id": 173,
+      "subject_id": "gxa_a75f630d331c9e80eb87f1faa9951b1aa4aa8fa8ce5e411a8db0a0d1c1a41476"
+    }
+  ],
+  "host": "Existing official Codex OAuth through Clash; admitted native turn IDs, including modules.",
+  "native_turns": [
+    {
+      "thread_id": "01a21edb-0942-7de1-8b8c-f8233a443fcc",
+      "turn_id": "01a21edb-0989-75d3-b583-1be53e1a24d4",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21edc-54fa-7e91-83e6-1e79a651bccc",
+      "turn_id": "01a21edc-5529-7682-823c-6fe05a65f204",
+      "scope": "module:module_07e647ba7f2bd27657f471a02ddf90ab"
+    },
+    {
+      "thread_id": "01a21edc-f5e0-7412-959f-cc6160fba00f",
+      "turn_id": "01a21edc-f60d-7412-80b8-a1debdb61104",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+      "scope": "run"
+    },
+    {
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+      "scope": "run"
+    }
+  ],
+  "recipes_published_from_run": [],
+  "native_recipe_calls": []
+}

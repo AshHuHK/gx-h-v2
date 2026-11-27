@@ -1,0 +1,23 @@
+E
+======================================================================
+ERROR: test_archive (unittest.loader._FailedTest.test_archive)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_archive
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.11/unittest/loader.py", line 419, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/unittest/loader.py", line 362, in _get_module_from_name
+    __import__(name)
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/enzyme/test_archive.py", line 14, in <module>
+    spec.loader.exec_module(archive)
+  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1073, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1130, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/plugins/installed/org.gx.yeast-enzyme-archive/1.0.0/archive.py'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)

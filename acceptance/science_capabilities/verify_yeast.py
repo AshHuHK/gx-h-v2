@@ -3,17 +3,21 @@ from argparse import ArgumentParser
 import base64
 from contextlib import closing
 from hashlib import sha256
+import html
 import json
 from pathlib import Path
+import re
 import sqlite3
 import xml.etree.ElementTree as ET
 
 # Examples selected for scientifically consequential links to methods, results and limitations.
 ANCHORS = {
     "trehalose": {"PMC11540316": {"p18", "p26", "p50", "p55"}, "PMC11206128": {"p9.2"},
-                  "PMC3953731": {"p240", "p272"}, "PMC7124472": {"p125", "p194", "p195"}},
+                  "PMC3953731": {"p240", "p272"}, "PMC7124472": {"p125", "p194", "p195"},
+                  "PMC3531729": {"p51", "p88", "p99", "p101", "p114"}},
     "sucrose": {"PMC11462787": {"p19", "p65"}, "PMC3153487": {"p66"},
-                "PMC5021340": {"p81", "p82", "p362"}, "PMC10456111": {"p111", "p129"}},
+                "PMC5021340": {"p81", "p82", "p362"}, "PMC10456111": {"p111", "p129"},
+                "PMC10539294": {"p32", "p30.1"}},
 }
 TEXT_TAGS = {"p", "title", "article-title", "td", "th", "mixed-citation"}
 
@@ -102,7 +106,7 @@ def originals(conn, state, study):
         if digest(raw) != row["blob_sha256"]:
             raise ValueError("The registered source hash differs from the stored bytes")
         provenance = json.loads(row["provenance_json"])["external_source"]
-        doc = {"source": row["title"], "url": provenance["url"], "job": row["job_id"],
+        doc = {"source": row["title"], "url": provenance["url"], "version": provenance["version"], "job": row["job_id"],
                "ref": row["artifact_ref"], "sha256": row["sha256"]}
         if row["kind"] == "jats":
             extra, table = article_receipts(conn, row, raw, ANCHORS[study])
@@ -114,6 +118,10 @@ def originals(conn, state, study):
             doc.update(taxon=item.get("organism", {}).get("taxonId"), accession=item.get("primaryAccession"),
                        gene=[g.get("geneName", {}).get("value") for g in item.get("genes", [])],
                        reviewed_entry_version=item.get("entryAudit", {}).get("entryVersion"))
+            sequence = (item.get("sequence") or {}).get("value")
+            if sequence:
+                doc.update(sequence_sha256=digest(sequence.encode("ascii")),
+                           sequence_version=item.get("entryAudit", {}).get("sequenceVersion"))
             doc["alpha_trehalase_GO_evidence"] = [
                 prop["value"] for db in item.get("uniProtKBCrossReferences", []) if db.get("id") == "GO:0004555"
                 for prop in db.get("properties", []) if prop.get("key") == "GoEvidenceType"]
@@ -142,14 +150,50 @@ def search_receipts(conn, state):
     return {"jobs": len(queries), "examples": samples}
 
 
-def selected_index_only(conn, state, wanted):
+def rendered(text):
+    return words(html.unescape(re.sub(r"<[^>]+>", "", text)).replace(r"\n", " ").replace(r"\t", " ").replace(r'\"', '"'))
+
+
+def delivered_abstracts(conn, state, abstracts, through):
+    """Only saved tool outputs on the original research threads show what was sent back to the model."""
+    threads = {r[0] for r in conn.execute("SELECT thread_id FROM p0_roots WHERE thread_id IS NOT NULL")}
+    found = {}
+    for path in sorted((state.parent / "codex/sessions").rglob("rollout-*.jsonl")):
+        thread = path.stem[-36:]
+        if thread not in threads:
+            continue
+        with path.open("rb") as lines:
+            for line in lines:
+                if b'"custom_tool_call_output"' not in line:
+                    continue
+                event = json.loads(line)
+                item = event.get("payload", {})
+                if event["timestamp"] > through:
+                    continue
+                if event.get("type") != "response_item" or item.get("type") != "custom_tool_call_output":
+                    continue
+                output = rendered(str(item.get("output", "")))
+                for pmid, abstract in abstracts.items():
+                    complete = abstract in output
+                    if not complete and abstract[:200] not in output:
+                        continue
+                    prior = found.get(pmid)
+                    if prior and (prior["full_abstract_matched"] or not complete):
+                        continue
+                    found[pmid] = {"full_abstract_matched": complete, "first_200_characters_matched": True,
+                                   "call_id": item["call_id"], "thread": thread, "time": event["timestamp"],
+                                   "normalized_abstract_sha256": digest(abstract.encode())}
+    return found
+
+
+def selected_index_only(conn, state, wanted, through):
     """Track selected catalogue hits. An abstract in an archived API payload is not a paragraph read."""
-    seen = {}
+    seen, abstracts = {}, {}
     query = "SELECT * FROM artifacts WHERE kind='scholarly_snapshot' ORDER BY rowid"
     for a in conn.execute(query):
         snap = json.loads(artifact_bytes(state, a))
         for call in snap["calls"]:
-            if call["provider"] != "europepmc" or "raw_b64" not in call:
+            if call["provider"] != "europepmc" or call.get("error") or "raw_b64" not in call:
                 continue
             raw = base64.b64decode(call["raw_b64"], validate=True)
             if digest(raw) != call["sha256"]:
@@ -158,12 +202,71 @@ def selected_index_only(conn, state, wanted):
             for row in records:
                 pmid = row.get("pmid")
                 if pmid in wanted and pmid not in seen:
+                    if row.get("abstractText"):
+                        abstracts[pmid] = rendered(row["abstractText"])
                     seen[pmid] = {"pmid": pmid, "catalogue_title": row.get("title"), "doi": row.get("doi"),
                                   "catalogue_pmcid": row.get("pmcid"), "open_access": row.get("isOpenAccess"),
                                   "abstract_in_raw_provider_payload": bool(row.get("abstractText")),
                                   "search_job": a["job_id"], "snapshot_ref": a["artifact_ref"],
                                   "snapshot_sha256": a["sha256"], "raw_provider_sha256": call["sha256"]}
+    for pmid, receipt in delivered_abstracts(conn, state, abstracts, through).items():
+        seen[pmid]["native_abstract_delivery"] = receipt
     return list(seen.values())
+
+
+def offline_locator(conn, state, originals, pmcid, segment):
+    """Give the exact element path and hashes needed to check one quotation without SQLite."""
+    original = next(doc for doc in originals if doc.get("pmcid") == pmcid and
+                    any(e["segment"] == segment for e in doc["example_receipts"]))
+    receipt = next(e for e in original["example_receipts"] if e["segment"] == segment)
+    a = conn.execute("SELECT * FROM artifacts WHERE artifact_ref=?", (original["ref"],)).fetchone()
+    root = ET.fromstring(artifact_bytes(state, a))
+    target = receipt["paragraph_sha256"]
+    paths = []
+    def walk(node, path):
+        if node.tag in TEXT_TAGS and digest("".join(node.itertext()).strip().encode()) == target:
+            paths.append(path)
+        counts = {}
+        for child in node:
+            counts[child.tag] = counts.get(child.tag, 0) + 1
+            walk(child, f"{path}/{child.tag}[{counts[child.tag]}]")
+    walk(root, ".")
+    if not paths:
+        raise ValueError(f"No complete element matches {pmcid}/{segment}")
+    return {"pmcid": pmcid, "doi": original["doi"], "url": original["url"], "job": original["job"],
+            "artifact_ref": original["ref"], "version": original["version"], "sha256": original["sha256"],
+            "segment": segment, "locator": receipt["locator"], "paragraph_sha256": target,
+            "elementpath": paths[0], "read_receipt": receipt["read_receipt"]}
+
+
+def check_raw_files(snapshot, directory):
+    checks = []
+    for study, result in json.loads(snapshot.read_bytes()).items():
+        loc = result["offline_locator"]
+        raw = (directory / (loc["pmcid"] + ".xml")).read_bytes()
+        if digest(raw) != loc["sha256"]:
+            raise ValueError(f"{loc['pmcid']}: original differs from the frozen version")
+        node = ET.fromstring(raw).find(loc["elementpath"])
+        if node is None or digest("".join(node.itertext()).strip().encode()) != loc["paragraph_sha256"]:
+            raise ValueError(f"{loc['pmcid']}: paragraph does not match the stored receipt")
+        checks.append({"study": study, "pmcid": loc["pmcid"], "segment": loc["segment"], "verified": True})
+    return checks
+
+
+def retrospective_inputs(workspace, records):
+    other = workspace / "live-bglb" / "state" / "gx.db"
+    if not other.exists():
+        return {"status": "retrospective_run_not_available"}
+    with closing(sqlite3.connect(other.resolve().as_uri() + "?mode=ro", uri=True)) as conn:
+        rid, files = conn.execute("SELECT run_id,inputs_json FROM runs").fetchone()
+        inputs = [{"role": f["role"], "name": Path(f["path"]).name, "ref": f["artifact_ref"], "sha256": f["sha256"]}
+                  for f in json.loads(files)["files"]]
+        methods = [r[0] for r in conn.execute("SELECT DISTINCT capability_id FROM jobs ORDER BY capability_id")]
+    source_hashes = {doc["sha256"] for doc in records if doc.get("accession")}
+    source_hashes.update(doc["sequence_sha256"] for doc in records if "sequence_sha256" in doc)
+    return {"scope": "Source and accepted inputs of the observed retrospective Run only",
+            "target_run": rid, "methods_executed": methods, "input_files": inputs,
+            "yeast_original_or_sequence_digest_found_in_target_inputs": any(f["sha256"] in source_hashes for f in inputs)}
 
 
 def verify(state, study):
@@ -207,20 +310,37 @@ def verify(state, study):
             operation = next(op["spec"] for op in receipt["resolved_ops"] if op["spec"]["op"] == "close_run")
             refs = receipt.get("evidence_refs", decision["evidence_refs"])
             enacted_close = {k: closure[k] for k in ("ts", "event_id", "decision_ref", "task_id", "turn_id")}
-            enacted_close.update(claim_refs=operation["claim_refs"], evidence_refs=refs,
+            published_claims = [{
+                "claim_ref": record["claim_ref"], "claim_revision_id": record["claim_revision_id"],
+                "statement": record["statement"], "publication_level": record["science"]["level"],
+                "maturity": record["maturity"]["stage"], "direction": record["science"]["direction"],
+            } for record in receipt["claim_revisions"] if record["claim_ref"] in operation["claim_refs"]]
+            if {item["claim_ref"] for item in published_claims} != set(operation["claim_refs"]):
+                raise ValueError("Closing claim references differ from the applied scientific revisions")
+            enacted_close.update(claim_refs=operation["claim_refs"], claims=published_claims,
+                                 lead_rationale=decision["rationale"], close_reason=operation["reason"],
+                                 unresolved=operation["unresolved"], evidence_refs=refs,
                                  cited_reports=[m["report_ref"] for m in reports if m["report_ref"] in refs])
+        cutoff = ({k: enacted_close[k] for k in ("event_id", "ts")} if enacted_close else
+                  dict(conn.execute("SELECT event_id,ts FROM events ORDER BY event_id DESC LIMIT 1").fetchone()))
         pi = []
         for m in conn.execute("""SELECT m.message_id,r.turn_id,r.status,r.response FROM p0_conversation_messages m
-                                 LEFT JOIN p0_main_replies r USING(message_id) ORDER BY m.rowid"""):
+                                 JOIN events e ON e.subject_id=m.message_id AND e.kind='p0.conversation.received'
+                                 LEFT JOIN p0_main_replies r USING(message_id)
+                                 WHERE e.event_id<=? ORDER BY e.event_id""", (cutoff["event_id"],)):
             pi.append({"message_id": m["message_id"], "reply_status": m["status"], "turn": m["turn_id"],
                        "answer_sha256": digest(m["response"].encode()) if m["response"] else None})
-        return {**dict(one), "as_of": dict(conn.execute("SELECT event_id,ts FROM events ORDER BY event_id DESC LIMIT 1").fetchone()),
+        pmcid, segment = ("PMC7124472", "p195") if study == "trehalose" else ("PMC5021340", "p82")
+        additional = {"offline_locator": offline_locator(conn, state, articles, pmcid, segment)}
+        if study == "trehalose":
+            additional["A_to_C_observed_handoff"] = retrospective_inputs(state.parent.parent, articles)
+        return {**dict(one), **additional, "as_of": cutoff,
                 "provider_roots": dict(conn.execute("SELECT provider,count(*) FROM p0_roots GROUP BY provider")),
                 "jobs": [dict(row) for row in conn.execute("""SELECT capability_id,status,count(*) count FROM jobs
                               GROUP BY capability_id,status ORDER BY capability_id,status""")],
                 "search": search_receipts(conn, state),
-                "selected_bibliographic_hits": selected_index_only(conn, state, {"7730323"} if study == "trehalose"
-                                                                   else {"363706", "3902817"}),
+                "selected_bibliographic_hits": selected_index_only(conn, state, {"7730323", "8346677", "8764988", "18065618", "15128531", "24951963"} if study == "trehalose"
+                                                                   else {"363706", "3902817"}, cutoff["ts"]),
                 "originals": articles, "independent_tables_by_sha256": tables,
                 "in_run_evidence_reviews": [dict(row) for row in conn.execute(
                     "SELECT independence_level,verdict,count(*) count FROM evidence_reviews GROUP BY 1,2 ORDER BY 1,2")],
@@ -229,9 +349,19 @@ def verify(state, study):
 
 def main():
     parser = ArgumentParser(description=__doc__)
-    parser.add_argument("--runs", required=True, type=Path, help="directory containing live-trehalose and live-sucrose")
-    parser.add_argument("--output", required=True, type=Path)
+    modes = parser.add_mutually_exclusive_group(required=True)
+    modes.add_argument("--runs", type=Path, help="directory containing live-trehalose and live-sucrose")
+    modes.add_argument("--check-originals", type=Path, metavar="SUMMARY", help="check saved XML using a summary, with no database")
+    parser.add_argument("--article-dir", type=Path, help="directory containing PMCID.xml files for --check-originals")
+    parser.add_argument("--output", type=Path, help="summary output for --runs")
     args = parser.parse_args()
+    if args.check_originals:
+        if not args.article_dir or args.output:
+            parser.error("--check-originals takes --article-dir, and writes its verification to stdout")
+        print(json.dumps(check_raw_files(args.check_originals, args.article_dir), indent=2))
+        return
+    if not args.output or args.article_dir:
+        parser.error("--runs takes --output")
     result = {study: verify(args.runs / ("live-" + study) / "state", study) for study in ANCHORS}
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 

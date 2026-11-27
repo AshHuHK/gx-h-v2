@@ -1,14 +1,50 @@
 {
   "trehalose": {
     "run_id": "gxr_01m8d9q2sexhdhq33k",
-    "run_state": "ACTIVE",
-    "goal_state": "OPEN",
+    "run_state": "STOPPED",
+    "goal_state": "CLOSED",
+    "offline_locator": {
+      "pmcid": "PMC7124472",
+      "doi": "10.1074/mcp.RA120.001955",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7124472/fullTextXML",
+      "job": "gxj_01m8dc1ebarkwcz9xn",
+      "artifact_ref": "gxa_01m8dc1rt58hjaqq8e",
+      "version": "sha256:e3b9535d9d1fe36baa4479e885b8f3fd5f56d28e9fa048f11230edb622eb38b9",
+      "sha256": "e3b9535d9d1fe36baa4479e885b8f3fd5f56d28e9fa048f11230edb622eb38b9",
+      "segment": "p195",
+      "locator": "body/sec29/p",
+      "paragraph_sha256": "5fd3c52f8ddee5de891fa177e1cbcaea4b39eaf9c5d5deb184f2c80b02a5935e",
+      "elementpath": "./body[1]/sec[2]/sec[1]/sec[1]/sec[8]/fig[2]/caption[1]/p[1]",
+      "read_receipt": "gxrc_01m8dc4mwx2nfc0p29"
+    },
+    "A_to_C_observed_handoff": {
+      "scope": "Source and accepted inputs of the observed retrospective Run only",
+      "target_run": "gxr_01m8d9q2bhtbhacqk7",
+      "methods_executed": [
+        "bglb-retrospective"
+      ],
+      "input_files": [
+        {
+          "role": "kinetics",
+          "name": "S1-table.docx",
+          "ref": "gxa_01m8d9q2c708yr1fr6",
+          "sha256": "b580e7573ece03bf1dba2c0dc27238a12b1bf627eb1307f35a0cedffbc1b2a73"
+        },
+        {
+          "role": "conservation",
+          "name": "S3-table.docx",
+          "ref": "gxa_01m8d9q2cpv3ep2fz9",
+          "sha256": "d08605c3f5370061b1cdfe5119e215e45338b4ff173f0c56ee244af964bdf0e9"
+        }
+      ],
+      "yeast_original_or_sequence_digest_found_in_target_inputs": false
+    },
     "as_of": {
-      "event_id": 1809,
-      "ts": "2026-11-27T02:10:13.774Z"
+      "event_id": 2617,
+      "ts": "2026-11-27T05:31:25.620Z"
     },
     "provider_roots": {
-      "openai": 25
+      "openai": 38
     },
     "jobs": [
       {
@@ -19,12 +55,12 @@
       {
         "capability_id": "scholarly-fetch",
         "status": "SUCCEEDED",
-        "count": 9
+        "count": 10
       },
       {
         "capability_id": "scholarly-search",
         "status": "SUCCEEDED",
-        "count": 22
+        "count": 24
       },
       {
         "capability_id": "yeast-enzyme-mcp",
@@ -43,7 +79,7 @@
       }
     ],
     "search": {
-      "jobs": 22,
+      "jobs": 24,
       "examples": [
         {
           "job": "gxj_01m8d9s7va1g9xh84g",
@@ -58,24 +94,24 @@
           }
         },
         {
-          "job": "gxj_01m8da2kh710rhe426",
-          "query": "TITLE_ABS:Nth1 AND (TITLE_ABS:phosphorylation OR TITLE_ABS:Bmh1 OR TITLE_ABS:trehalase) AND (\"Saccharomyces cerevisiae\" OR \"budding yeast\") AND OPEN_ACCESS:Y",
+          "job": "gxj_01m8da2kqh1c1m4hz6",
+          "query": "(TITLE_ABS:Ath1 OR TITLE_ABS:Nth2 OR TITLE:\"trehalose assimilation\" OR TITLE:\"trehalose utilization\") AND (\"Saccharomyces cerevisiae\" OR \"baker's yeast\") AND OPEN_ACCESS:Y",
           "status": "SUCCEEDED",
-          "index_ref": "gxa_01m8da3595sshjg44g",
-          "returned": 8,
-          "unique": 8,
+          "index_ref": "gxa_01m8da35nmdne39336",
+          "returned": 21,
+          "unique": 21,
           "providers": {
             "europepmc": "hits",
-            "crossref": "unavailable"
+            "crossref": "hits"
           }
         },
         {
-          "job": "gxj_01m8dbxva8bdp9esnj",
-          "query": "TITLE:\"cyclin-dependent kinase routes carbon fluxes\" OR (TITLE:trehalase AND TITLE:\"14-3-3\" AND Nth1) OR (TITLE:trehalose AND TITLE:mobilization AND NTH2 AND OPEN_ACCESS:y)",
+          "job": "gxj_01m8dmr9pwzhn6kg2b",
+          "query": "(NTH2 OR YBR001C OR YBR0106) AND (\"trehalase activity\" OR \"trehalose hydrolysis\") AND (purified OR recombinant OR extract OR extracts) AND \"Saccharomyces cerevisiae\"",
           "status": "SUCCEEDED",
-          "index_ref": "gxa_01m8dbype92d06p90b",
-          "returned": 21,
-          "unique": 21,
+          "index_ref": "gxa_01m8dmryevcm0v9tef",
+          "returned": 24,
+          "unique": 23,
           "providers": {
             "europepmc": "hits",
             "crossref": "hits"
@@ -84,6 +120,106 @@
       ]
     },
     "selected_bibliographic_hits": [
+      {
+        "pmid": "15128531",
+        "catalogue_title": "Two distinct pathways for trehalose assimilation in the yeast Saccharomyces cerevisiae.",
+        "doi": "10.1128/aem.70.5.2771-2778.2004",
+        "catalogue_pmcid": "PMC404389",
+        "open_access": "N",
+        "abstract_in_raw_provider_payload": true,
+        "search_job": "gxj_01m8d9saa1a9dztwxc",
+        "snapshot_ref": "gxa_01m8d9sekkybnca1d8",
+        "snapshot_sha256": "3933d076cb439a95062a3fc6e32537b2359836b3248ee13465c3f78645149d85",
+        "raw_provider_sha256": "5286575105359788ba70151d7ea29efc71beb87b8fde99ceddc276a13bbea8b1",
+        "native_abstract_delivery": {
+          "full_abstract_matched": true,
+          "first_200_characters_matched": true,
+          "call_id": "call_9599ad5417694140a049cbc479c1d4c6",
+          "thread": "01a21a9d-0116-78e1-965f-af25010692a2",
+          "time": "2026-11-27T01:27:38.258Z",
+          "normalized_abstract_sha256": "f768a7cf919b4b7a9666d5058d63f2b77b2ddd3ec869225c50cb77833a5a5ef4"
+        }
+      },
+      {
+        "pmid": "24951963",
+        "catalogue_title": "Enhanced freeze tolerance of baker's yeast by overexpressed trehalose-6-phosphate synthase gene (TPS1) and deleted trehalase genes in frozen dough.",
+        "doi": "10.1007/s10295-014-1467-7",
+        "catalogue_pmcid": null,
+        "open_access": "N",
+        "abstract_in_raw_provider_payload": true,
+        "search_job": "gxj_01m8d9sa3mr0qx2vx2",
+        "snapshot_ref": "gxa_01m8d9sz9r0v42j76t",
+        "snapshot_sha256": "6e4b819b8ced1c8c2d0123827c85e90f8e1ad39c92568223fb15799c88ebf14a",
+        "raw_provider_sha256": "046b51ec682e08ac0537086389b2dab7fa47d60671561b33e16594f6e61dddcf",
+        "native_abstract_delivery": {
+          "full_abstract_matched": false,
+          "first_200_characters_matched": true,
+          "call_id": "call_25c5574312364656aa6d51f26b4e90ee",
+          "thread": "01a21b56-ebf8-7190-8ea4-202797f0ef75",
+          "time": "2026-11-27T04:51:15.382Z",
+          "normalized_abstract_sha256": "1649242f3f777b358884d112be29af294c8a5650ae7f3db5f38768a887eff629"
+        }
+      },
+      {
+        "pmid": "18065618",
+        "catalogue_title": "New insights into trehalose metabolism by Saccharomyces cerevisiae: NTH2 encodes a functional cytosolic trehalase, and deletion of TPS1 reveals Ath1p-dependent trehalose mobilization.",
+        "doi": "10.1128/aem.00557-07",
+        "catalogue_pmcid": "PMC2227697",
+        "open_access": "N",
+        "abstract_in_raw_provider_payload": true,
+        "search_job": "gxj_01m8d9sa3mr0qx2vx2",
+        "snapshot_ref": "gxa_01m8d9sz9r0v42j76t",
+        "snapshot_sha256": "6e4b819b8ced1c8c2d0123827c85e90f8e1ad39c92568223fb15799c88ebf14a",
+        "raw_provider_sha256": "046b51ec682e08ac0537086389b2dab7fa47d60671561b33e16594f6e61dddcf",
+        "native_abstract_delivery": {
+          "full_abstract_matched": true,
+          "first_200_characters_matched": true,
+          "call_id": "call_9599ad5417694140a049cbc479c1d4c6",
+          "thread": "01a21a9d-0116-78e1-965f-af25010692a2",
+          "time": "2026-11-27T01:27:38.258Z",
+          "normalized_abstract_sha256": "9406f5d63ff8bd504f6ea4f923d5a9ea645b103fdaed23573f0812bd1d453224"
+        }
+      },
+      {
+        "pmid": "8764988",
+        "catalogue_title": "Purification and biochemical characterization of the ATH1 gene product, vacuolar acid trehalase, from Saccharomyces cerevisiae.",
+        "doi": "10.1016/0014-5793(96)00751-x",
+        "catalogue_pmcid": null,
+        "open_access": "N",
+        "abstract_in_raw_provider_payload": true,
+        "search_job": "gxj_01m8d9xfammzf2pgq6",
+        "snapshot_ref": "gxa_01m8d9xsesaa32znhj",
+        "snapshot_sha256": "e77169b324f4cee28297aafb4790ab6e99d95fd5d9009f0fa2d7e827154d3e48",
+        "raw_provider_sha256": "b67d1a315a37c13d163db5b7a38e90fe0620282aa231c76798277a2c5390fba6",
+        "native_abstract_delivery": {
+          "full_abstract_matched": true,
+          "first_200_characters_matched": true,
+          "call_id": "call_105e271bbeda473b919381fe91085e44",
+          "thread": "01a21aa8-90b6-7282-b40d-6781bed08fa9",
+          "time": "2026-11-27T01:42:23.980Z",
+          "normalized_abstract_sha256": "70a90373b2d2e9ddbb206a03635721bb861ae35f7d1d5f75eccbd6a3dee58520"
+        }
+      },
+      {
+        "pmid": "8346677",
+        "catalogue_title": "Assay of trehalose with acid trehalase purified from Saccharomyces cerevisiae.",
+        "doi": "10.1002/yea.320090607",
+        "catalogue_pmcid": null,
+        "open_access": "N",
+        "abstract_in_raw_provider_payload": true,
+        "search_job": "gxj_01m8d9xfammzf2pgq6",
+        "snapshot_ref": "gxa_01m8d9xsesaa32znhj",
+        "snapshot_sha256": "e77169b324f4cee28297aafb4790ab6e99d95fd5d9009f0fa2d7e827154d3e48",
+        "raw_provider_sha256": "b67d1a315a37c13d163db5b7a38e90fe0620282aa231c76798277a2c5390fba6",
+        "native_abstract_delivery": {
+          "full_abstract_matched": true,
+          "first_200_characters_matched": true,
+          "call_id": "call_105e271bbeda473b919381fe91085e44",
+          "thread": "01a21aa8-90b6-7282-b40d-6781bed08fa9",
+          "time": "2026-11-27T01:42:23.980Z",
+          "normalized_abstract_sha256": "b0878ebd27dbfd5742135c9de2c01e39422223e9497ed5acc6ebc5bda06e9194"
+        }
+      },
       {
         "pmid": "7730323",
         "catalogue_title": "Expression and function of the trehalase genes NTH1 and YBR0106 in Saccharomyces cerevisiae.",
@@ -94,13 +230,22 @@
         "search_job": "gxj_01m8da43t81km7sqxw",
         "snapshot_ref": "gxa_01m8da4trebaqj0663",
         "snapshot_sha256": "2ccb02dff785164fe670014f372f30fe41ee6a35ded11086532ea92135a99b7b",
-        "raw_provider_sha256": "0ffd9c1a1ea41c4cb08ccd0c69913e56e6bd4bc9c2ff4557c724d9bd97dc2977"
+        "raw_provider_sha256": "0ffd9c1a1ea41c4cb08ccd0c69913e56e6bd4bc9c2ff4557c724d9bd97dc2977",
+        "native_abstract_delivery": {
+          "full_abstract_matched": true,
+          "first_200_characters_matched": true,
+          "call_id": "call_54dec22e495c47959c20421e16084687",
+          "thread": "01a21aab-f2fc-7113-8de6-6a45b0302c1e",
+          "time": "2026-11-27T01:44:53.465Z",
+          "normalized_abstract_sha256": "ee3891c5a2651b697b0344937bca932bb2e94e3cb73c657d722df8f7f7e62594"
+        }
       }
     ],
     "originals": [
       {
         "source": "PMC11540316.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11540316/fullTextXML",
+        "version": "sha256:811a67776862068696320d07e0bdc7b868d9370f532b0c69f85eb7529e19fb51",
         "job": "gxj_01m8d9vsmejmsqt2b7",
         "ref": "gxa_01m8d9w5ay5preewfn",
         "sha256": "811a67776862068696320d07e0bdc7b868d9370f532b0c69f85eb7529e19fb51",
@@ -108,11 +253,11 @@
         "doi": "10.1093/g3journal/jkae215",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 50,
-        "read_segments_matched_to_xml": 50,
-        "located_extractions": 25,
-        "extract_quotes_in_segment": 25,
-        "extract_quotes_in_xml": 25,
+        "distinct_read_segments": 52,
+        "read_segments_matched_to_xml": 52,
+        "located_extractions": 31,
+        "extract_quotes_in_segment": 31,
+        "extract_quotes_in_xml": 31,
         "example_receipts": [
           {
             "segment": "p18",
@@ -163,6 +308,7 @@
       {
         "source": "PMC11206128.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11206128/fullTextXML",
+        "version": "sha256:81bb74cd65c110de913b91d39d78854591008222e987b189cd8222358ab97552",
         "job": "gxj_01m8d9vtayq6pkpqmm",
         "ref": "gxa_01m8d9w689bfg0t6ns",
         "sha256": "81bb74cd65c110de913b91d39d78854591008222e987b189cd8222358ab97552",
@@ -170,8 +316,8 @@
         "doi": "10.3390/microorganisms12061232",
         "article_type": "other",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 9,
-        "read_segments_matched_to_xml": 9,
+        "distinct_read_segments": 11,
+        "read_segments_matched_to_xml": 11,
         "located_extractions": 3,
         "extract_quotes_in_segment": 3,
         "extract_quotes_in_xml": 3,
@@ -183,7 +329,7 @@
             "read_receipt": "gxrc_01m8d9ywtszfdrdy81",
             "paragraph_sha256": "01b8131ed69e52d2b32beccc53a526c02bfabeb1c898451b8a80c0af7402cf60",
             "evidence": "gxv_01m8da1j9c5shx3bh6",
-            "review_status": "LOCATOR_VERIFIED",
+            "review_status": "REVIEWED",
             "quote_in_segment": true,
             "quote_in_xml": true
           }
@@ -192,6 +338,7 @@
       {
         "source": "P35172.json",
         "url": "https://rest.uniprot.org/uniprotkb/P35172.json",
+        "version": "179",
         "job": "gxj_01m8d9x5cbbsgtv2yt",
         "ref": "gxa_01m8d9x70fth1q61cx",
         "sha256": "7e82ab962213aa605a4c32fa6b703fdbbb92ea4c6713cbb2104626dde69d5b29",
@@ -201,6 +348,8 @@
           "NTH2"
         ],
         "reviewed_entry_version": 179,
+        "sequence_sha256": "f97799f685260c58568413822738249aa67a2efbae3d13ac4eeb23f3a2370207",
+        "sequence_version": 1,
         "alpha_trehalase_GO_evidence": [
           "IMP:SGD"
         ],
@@ -209,6 +358,7 @@
       {
         "source": "P48016.json",
         "url": "https://rest.uniprot.org/uniprotkb/P48016.json",
+        "version": "183",
         "job": "gxj_01m8d9x5shf5wva30g",
         "ref": "gxa_01m8d9x7f5qwbd55zt",
         "sha256": "d0281923cd36a28d606fa178c26060fed4a9bd9643fb0672a78e4b5ef3752793",
@@ -218,6 +368,8 @@
           "ATH1"
         ],
         "reviewed_entry_version": 183,
+        "sequence_sha256": "aa75d1f45e4bed990b303bf30562dafefbfc0536c58b36fca319905ee9d0c411",
+        "sequence_version": 1,
         "alpha_trehalase_GO_evidence": [
           "IDA:UniProtKB"
         ],
@@ -226,6 +378,7 @@
       {
         "source": "P32356.json",
         "url": "https://rest.uniprot.org/uniprotkb/P32356.json",
+        "version": "202",
         "job": "gxj_01m8d9x5jteqhww8ds",
         "ref": "gxa_01m8d9x82mvzqkccq8",
         "sha256": "61fa5bbc6d04733da3f7280f68e33f64e48dc7162fe66e32d356a0e56ede42bd",
@@ -235,6 +388,8 @@
           "NTH1"
         ],
         "reviewed_entry_version": 202,
+        "sequence_sha256": "2a7c15974d2c490d8e7f2b6c8f03c389a6ab330535f65de5fd1c85336b4a3c9b",
+        "sequence_version": 3,
         "alpha_trehalase_GO_evidence": [
           "IDA:UniProtKB"
         ],
@@ -243,6 +398,7 @@
       {
         "source": "PMC3953731.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3953731/fullTextXML",
+        "version": "sha256:63b3827c77ffba679a5093262c4a5450e07e654aff194733048517363958941f",
         "job": "gxj_01m8d9y2vpf58ppjgs",
         "ref": "gxa_01m8d9ynv310n9ctvd",
         "sha256": "63b3827c77ffba679a5093262c4a5450e07e654aff194733048517363958941f",
@@ -250,11 +406,11 @@
         "doi": "10.1016/j.fob.2014.02.004",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 69,
-        "read_segments_matched_to_xml": 69,
-        "located_extractions": 8,
-        "extract_quotes_in_segment": 8,
-        "extract_quotes_in_xml": 8,
+        "distinct_read_segments": 72,
+        "read_segments_matched_to_xml": 72,
+        "located_extractions": 11,
+        "extract_quotes_in_segment": 11,
+        "extract_quotes_in_xml": 11,
         "example_receipts": [
           {
             "segment": "p240",
@@ -263,7 +419,7 @@
             "read_receipt": "gxrc_01m8dazcstazrtcmdy",
             "paragraph_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
             "evidence": "gxv_01m8dbq454agdf5450",
-            "review_status": "LOCATOR_VERIFIED",
+            "review_status": "REVIEWED",
             "quote_in_segment": true,
             "quote_in_xml": true
           }
@@ -272,6 +428,7 @@
       {
         "source": "PMC3953731.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3953731/fullTextXML",
+        "version": "sha256:63b3827c77ffba679a5093262c4a5450e07e654aff194733048517363958941f",
         "job": "gxj_01m8da2kazcrzgxt91",
         "ref": "gxa_01m8da2s06kxbtmpmv",
         "sha256": "63b3827c77ffba679a5093262c4a5450e07e654aff194733048517363958941f",
@@ -312,6 +469,7 @@
       {
         "source": "PMC11540316.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11540316/fullTextXML",
+        "version": "sha256:811a67776862068696320d07e0bdc7b868d9370f532b0c69f85eb7529e19fb51",
         "job": "gxj_01m8daqw44brk66xgj",
         "ref": "gxa_01m8darc0st7bv56g1",
         "sha256": "811a67776862068696320d07e0bdc7b868d9370f532b0c69f85eb7529e19fb51",
@@ -363,6 +521,7 @@
       {
         "source": "PMC7806596.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7806596/fullTextXML",
+        "version": "sha256:40cea1934f91d31c2a0f852e1221b5495cae3508e845d82a236171e1c2a41282",
         "job": "gxj_01m8daqvxn00tcce6z",
         "ref": "gxa_01m8darcmk6cf02h0q",
         "sha256": "40cea1934f91d31c2a0f852e1221b5495cae3508e845d82a236171e1c2a41282",
@@ -380,6 +539,7 @@
       {
         "source": "PMC7806596.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7806596/fullTextXML",
+        "version": "sha256:40cea1934f91d31c2a0f852e1221b5495cae3508e845d82a236171e1c2a41282",
         "job": "gxj_01m8dax0gwttd2f0rx",
         "ref": "gxa_01m8daxjfkf4svmdcg",
         "sha256": "40cea1934f91d31c2a0f852e1221b5495cae3508e845d82a236171e1c2a41282",
@@ -397,6 +557,7 @@
       {
         "source": "PMC7124472.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7124472/fullTextXML",
+        "version": "sha256:e3b9535d9d1fe36baa4479e885b8f3fd5f56d28e9fa048f11230edb622eb38b9",
         "job": "gxj_01m8dc1ebarkwcz9xn",
         "ref": "gxa_01m8dc1rt58hjaqq8e",
         "sha256": "e3b9535d9d1fe36baa4479e885b8f3fd5f56d28e9fa048f11230edb622eb38b9",
@@ -404,11 +565,11 @@
         "doi": "10.1074/mcp.RA120.001955",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 19,
-        "read_segments_matched_to_xml": 19,
-        "located_extractions": 8,
-        "extract_quotes_in_segment": 8,
-        "extract_quotes_in_xml": 8,
+        "distinct_read_segments": 32,
+        "read_segments_matched_to_xml": 32,
+        "located_extractions": 13,
+        "extract_quotes_in_segment": 13,
+        "extract_quotes_in_xml": 13,
         "example_receipts": [
           {
             "segment": "p125",
@@ -417,7 +578,7 @@
             "read_receipt": "gxrc_01m8dc4mahys0rgsah",
             "paragraph_sha256": "346c6e9283468942b36a2e4e05a8199a8b3cdc05af8d6bddd693288c96bf5c5c",
             "evidence": "gxv_01m8dc7z5g6xbhs7xn",
-            "review_status": "LOCATOR_VERIFIED",
+            "review_status": "REVIEWED",
             "quote_in_segment": true,
             "quote_in_xml": true
           },
@@ -428,7 +589,7 @@
             "read_receipt": "gxrc_01m8dc4mwx2nfc0p29",
             "paragraph_sha256": "5fd3c52f8ddee5de891fa177e1cbcaea4b39eaf9c5d5deb184f2c80b02a5935e",
             "evidence": "gxv_01m8dc7zdp5meqkngj",
-            "review_status": "LOCATOR_VERIFIED",
+            "review_status": "REVIEWED",
             "quote_in_segment": true,
             "quote_in_xml": true
           },
@@ -439,7 +600,7 @@
             "read_receipt": "gxrc_01m8dc4mnysz8ddjss",
             "paragraph_sha256": "310b140164b9355015159a03e4e9ead6d8ad2325d265a920c840f572ba82ce7e",
             "evidence": "gxv_01m8dc7zhwjk8q3qsf",
-            "review_status": "LOCATOR_VERIFIED",
+            "review_status": "REVIEWED",
             "quote_in_segment": true,
             "quote_in_xml": true
           }
@@ -448,6 +609,7 @@
       {
         "source": "PMC9310457.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9310457/fullTextXML",
+        "version": "sha256:58e2027d9bdb1a8c7fac53f83e8dbae1c6bbe8786b831fbebc42708542e0cda7",
         "job": "gxj_01m8dc6zd9wcrykqmn",
         "ref": "gxa_01m8dc7n0rbqw7e3wv",
         "sha256": "58e2027d9bdb1a8c7fac53f83e8dbae1c6bbe8786b831fbebc42708542e0cda7",
@@ -455,12 +617,86 @@
         "doi": "10.1186/s12934-022-01876-4",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 0,
-        "read_segments_matched_to_xml": 0,
-        "located_extractions": 0,
-        "extract_quotes_in_segment": 0,
-        "extract_quotes_in_xml": 0,
+        "distinct_read_segments": 30,
+        "read_segments_matched_to_xml": 30,
+        "located_extractions": 8,
+        "extract_quotes_in_segment": 8,
+        "extract_quotes_in_xml": 8,
         "example_receipts": []
+      },
+      {
+        "source": "PMC3531729.xml",
+        "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3531729/fullTextXML",
+        "version": "sha256:29aaa27d83c1ad82a00a256c56c8d39f91893c7d5b8424ef78713d5f4dce2e81",
+        "job": "gxj_01m8dndtm4am7wvk2k",
+        "ref": "gxa_01m8dneaamqvpvf9jw",
+        "sha256": "29aaa27d83c1ad82a00a256c56c8d39f91893c7d5b8424ef78713d5f4dce2e81",
+        "pmcid": "PMC3531729",
+        "doi": "10.1074/jbc.M112.421503",
+        "article_type": "research-article",
+        "coverage": "FULL_TEXT",
+        "distinct_read_segments": 66,
+        "read_segments_matched_to_xml": 66,
+        "located_extractions": 5,
+        "extract_quotes_in_segment": 5,
+        "extract_quotes_in_xml": 5,
+        "example_receipts": [
+          {
+            "segment": "p88",
+            "locator": "body/sec11/p",
+            "read_scope": "run",
+            "read_receipt": "gxrc_01m8dnq7t4s1hpmy0h",
+            "paragraph_sha256": "3af1a0f4cf2cf937e2c4183112445a289388d2d2d9bdcdbb808466c87052dfba",
+            "evidence": "gxv_01m8dnx09rfmh8d3s2",
+            "review_status": "REVIEWED",
+            "quote_in_segment": true,
+            "quote_in_xml": true
+          },
+          {
+            "segment": "p101",
+            "locator": "body/sec19/p",
+            "read_scope": "run",
+            "read_receipt": "gxrc_01m8dnq7wk8d922jv0",
+            "paragraph_sha256": "9ebbe27e593721488252c69fc1efc58a325df3df54c9903e6e5aa7437e033abb",
+            "evidence": "gxv_01m8dnx0d528bm6hzq",
+            "review_status": "REVIEWED",
+            "quote_in_segment": true,
+            "quote_in_xml": true
+          },
+          {
+            "segment": "p99",
+            "locator": "body/sec18/p",
+            "read_scope": "run",
+            "read_receipt": "gxrc_01m8dnq7vcvd288c4j",
+            "paragraph_sha256": "e2738b8b5c378386b5ceaf675a3bc69b2347dfd57d4352cd9952a3860391f3f6",
+            "evidence": "gxv_01m8dnx0fxm35sp3w6",
+            "review_status": "REVIEWED",
+            "quote_in_segment": true,
+            "quote_in_xml": true
+          },
+          {
+            "segment": "p51",
+            "locator": "body/sec5/T1/td",
+            "read_scope": "run",
+            "read_receipt": "gxrc_01m8dnryeppcp3pakm",
+            "paragraph_sha256": "a8c1cd41d4cad24592d5c8d757c9cf7e6dd5f5b457b1d54c1cfef80d97ff3252",
+            "evidence": "gxv_01m8dnx0jf9xn7hjqy",
+            "review_status": "REVIEWED",
+            "quote_in_segment": true,
+            "quote_in_xml": true
+          },
+          {
+            "segment": "p114",
+            "locator": "body/sec23/p",
+            "read_scope": "run",
+            "read_receipt": "gxrc_01m8dnq884y2ecjwfe",
+            "paragraph_sha256": "819d657c4a59485ca4da0112188a672e36d6d64e68cad78ecf79dca602eb090c",
+            "evidence": "gxv_01m8dnx0ng51ram5a8",
+            "review_status": "REVIEWED",
+            "quote_in_segment": true,
+            "quote_in_xml": true
+          }
+        ]
       }
     ],
     "independent_tables_by_sha256": {
@@ -501,19 +737,34 @@
         ]
       }
     },
-    "in_run_evidence_reviews": [],
+    "in_run_evidence_reviews": [
+      {
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "verdict": "SUPPORTED",
+        "count": 36
+      }
+    ],
     "module_reports": [
       {
         "module_id": "scholarly_investigation",
         "scope": "module:module_6e9e2baba0ee9470019d32befb608a3d",
-        "status": "OPEN",
-        "report_ref": null
+        "status": "PARTIAL",
+        "report_ref": "gxa_374e41cfd869676a308fee86725a661460662a91a9bf7765581d8a10158e1c58",
+        "author": "GX",
+        "findings": 0,
+        "cited_source_ref_count": 0,
+        "gaps": [
+          "module report structural repair and task attempts exhausted"
+        ]
       },
       {
         "module_id": "scholarly_investigation",
         "scope": "module:module_cf88bcb0020e8cb3034d245a04410f0b",
-        "status": "OPEN",
-        "report_ref": null
+        "status": "PARTIAL",
+        "report_ref": "gxa_ef26ddde4caa659ec5d07aab5fef939c83b2d7be7bf3755320adf9f545b587b9",
+        "author": "MODULE",
+        "findings": 7,
+        "cited_source_ref_count": 37
       },
       {
         "module_id": "investigation",
@@ -525,6 +776,18 @@
         "cited_source_ref_count": 0,
         "gaps": [
           "module report structural repair and task attempts exhausted"
+        ]
+      },
+      {
+        "module_id": "scholarly_investigation",
+        "scope": "module:module_4d2e80d0a11d8223785bb63701d3e6a2",
+        "status": "PARTIAL",
+        "report_ref": "gxa_d2b099cf8a5e8433a63ec82e0cd9cba5c885d30d91e2967edd5c1e66efbe3db0",
+        "author": "GX",
+        "findings": 0,
+        "cited_source_ref_count": 0,
+        "gaps": [
+          "module tokens allowance exhausted"
         ]
       }
     ],
@@ -566,20 +829,257 @@
           "add_node"
         ],
         "cited_module_reports": []
+      },
+      {
+        "decision": "gxa_db52fd9e19835530d19d1efdd11e2389540e416c8131060a22baa4e208673e7d",
+        "ops": [
+          "stop_branch",
+          "open_branch",
+          "add_node"
+        ],
+        "cited_module_reports": [
+          "gxa_27245517223e48c3ac49f1799663935afa5d4c20a045e21fb1de9b091a31e94b"
+        ]
+      },
+      {
+        "decision": "gxa_4e09b707bfa6d1cbe8c30c8724ae04a05ede5b8eac6c3cd8ebe308391097df3c",
+        "ops": [
+          "stop_branch"
+        ],
+        "cited_module_reports": [
+          "gxa_27245517223e48c3ac49f1799663935afa5d4c20a045e21fb1de9b091a31e94b"
+        ]
+      },
+      {
+        "decision": "gxa_774cc7be6e69e028c81cd10c7d11757a0cce0c995c8e165fd67d445ce1369a3c",
+        "ops": [
+          "stop_branch",
+          "open_branch",
+          "add_node"
+        ],
+        "cited_module_reports": [
+          "gxa_ef26ddde4caa659ec5d07aab5fef939c83b2d7be7bf3755320adf9f545b587b9",
+          "gxa_27245517223e48c3ac49f1799663935afa5d4c20a045e21fb1de9b091a31e94b",
+          "gxa_d2b099cf8a5e8433a63ec82e0cd9cba5c885d30d91e2967edd5c1e66efbe3db0"
+        ]
+      },
+      {
+        "decision": "gxa_46ae8c77b0caeed686bc07840a7bcff8ebc2d779b6530d131fa19d06b0193ec9",
+        "ops": [
+          "open_branch",
+          "add_node"
+        ],
+        "cited_module_reports": [
+          "gxa_374e41cfd869676a308fee86725a661460662a91a9bf7765581d8a10158e1c58",
+          "gxa_ef26ddde4caa659ec5d07aab5fef939c83b2d7be7bf3755320adf9f545b587b9"
+        ]
+      },
+      {
+        "decision": "gxa_8b71f0f74c76a5fdc50a965b032255163cb7fb683a2c216a6df74086362fb9e9",
+        "ops": [
+          "stop_branch"
+        ],
+        "cited_module_reports": [
+          "gxa_ef26ddde4caa659ec5d07aab5fef939c83b2d7be7bf3755320adf9f545b587b9"
+        ]
+      },
+      {
+        "decision": "gxa_080413a8d4c9bc1732cab04052593de2ccd01527b03bbbb5b2a896194734ac63",
+        "ops": [
+          "close_run"
+        ],
+        "cited_module_reports": [
+          "gxa_ef26ddde4caa659ec5d07aab5fef939c83b2d7be7bf3755320adf9f545b587b9"
+        ]
       }
     ],
-    "enacted_close": null
+    "enacted_close": {
+      "ts": "2026-11-27T05:31:25.620Z",
+      "event_id": 2617,
+      "decision_ref": "gxa_080413a8d4c9bc1732cab04052593de2ccd01527b03bbbb5b2a896194734ac63",
+      "task_id": "gxt_01m8dqgyc4b4davbct",
+      "turn_id": "01a21b78-7a87-7ac2-ac71-36867105a2ba",
+      "claim_refs": [
+        "gxa_01m8dqns5fcx8pbfph",
+        "gxa_01m8dqpgc4cr84atha",
+        "gxa_01m8dqq79r0b0wbadk",
+        "gxa_01m8dqq7d51965m4bj",
+        "gxa_01m8dqq7jex180r63v",
+        "gxa_01m8dqqt40ek7czbs3",
+        "gxa_01m8dqqt9jw387cxkm",
+        "gxa_01m8dqqtfkj9ae66ga",
+        "gxa_01m8dqqtkvcfx302gs"
+      ],
+      "claims": [
+        {
+          "claim_ref": "gxa_01m8dqns5fcx8pbfph",
+          "claim_revision_id": "gxh_01m8dm13ftweqnkqgk@4",
+          "statement": "Plank 等用 PKA 或 Ypk1 和 ATP 处理纯化的酿酒酵母 Nth1，在含 Bmh1 的体系中加入海藻糖，测得葡萄糖随时间生成。该实验直接支持这一制剂催化海藻糖水解。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dqpgc4cr84atha",
+          "claim_revision_id": "gxh_01m8dnp10eds3vz1ev@3",
+          "statement": "在 Chen 等的 S288C 衍生株中，静止期胞内海藻糖从低到高依次为同背景野生型、仅缺失 NTH2、仅缺失 NTH1、同时缺失 NTH1 和 NTH2 的细胞。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dqq79r0b0wbadk",
+          "claim_revision_id": "gxh_01m8dm13fwgqr5mkb2@2",
+          "statement": "Chen 等观察到，在受试 S288C 衍生株中，ath1Δ 不能以外源海藻糖为唯一碳源生长，保留 ATH1 的 nth1Δ nth2Δ 双缺失株仍可生长。这支持该条件下外源海藻糖利用对 ATH1 的依赖。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dqq7d51965m4bj",
+          "claim_revision_id": "gxh_01m8dmr9gdr5w1b28q@2",
+          "statement": "稳定期删除 ATH1 后，Chen 等的 S288C 衍生株胞内海藻糖升高，葡萄酒菌株 CSM 的储量与其亲本相当。该储糖表型随菌株而异。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dqq7jex180r63v",
+          "claim_revision_id": "gxh_01m8dbt5ena3z07rrk@5",
+          "statement": "Deng 等所测 Ima1p、Ima2p、Ima3p 和 Ima5p 均有异麦芽糖活性，同批制剂对海藻糖均未检出水解。该结果对 S288C 等位基因的适用性有待确认。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dqqt40ek7czbs3",
+          "claim_revision_id": "gxh_01m8dk5z8bn2jqr9ax@2",
+          "statement": "S288C 的 Nth1 和 Ath1 的海藻糖水解注释指向直接实验。Nth2 也列有这一反应，其分子功能注释依据是突变体表型。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dqqt9jw387cxkm",
+          "claim_revision_id": "gxh_01m8dndtdfw3xszmwg@2",
+          "statement": "Kienle 等的作者摘要报告，酿酒酵母纯化酸性海藻糖酶能由海藻糖释放葡萄糖，无酶反应用于测量原有葡萄糖。Alizadeh 与 Klionsky 的另一项纯化研究用肽段序列及特异抗血清把酸性海藻糖酶鉴定为 ATH1 产物。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dqqtfkj9ae66ga",
+          "claim_revision_id": "gxh_01m8dah3k597xycqa9@6",
+          "statement": "Chen 等在 S288C 衍生株中观察到 NTH2 缺失使静止期胞内海藻糖升高。关于 S288C Nth2 蛋白自身催化 α,α-海藻糖水解，已核材料提供的证据仍不足。",
+          "publication_level": "insufficient",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dqqtkvcfx302gs",
+          "claim_revision_id": "gxh_01m8dqsbe2tvbsd80a@1",
+          "statement": "Schepers 等给呼吸生长的酿酒酵母补糖后观察到粗提液海藻糖酶活升高，并在相应实验中观察到标记 Nth1 的磷酸化和结合变化。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        }
+      ],
+      "lead_rationale": "已核对 S288C 的三份 Swiss-Prot 原始记录及文献实验的材料、底物和读数。Nth1 和 Ath1 的分子功能注释列有直接测定，Nth2 列的是突变体表型。Plank 等把纯化重组 Nth1、海藻糖和随时间生成的葡萄糖对应到同一实验，编码供体未注明。Kienle 等与 Alizadeh 和 Klionsky 的作者摘要分别提供纯化酸性酶的水解对照及其与 ATH1 的蛋白鉴定。Chen 等在同背景对照中发现胞内储糖依次为亲本、nth2Δ、nth1Δ、双缺失株递增，定量时外加了商品海藻糖酶。ath1Δ 失去了利用外源海藻糖生长的能力，其稳定期储糖效应在葡萄酒株 CSM 中亦有例外。Deng 等的纯化 Ima 制剂保有异麦芽糖活性，对海藻糖的未检出只适用于原条件。根据前一轮选定的原文，Schepers 等在营养刺激后测到粗提液总酶活，BY4742 衍生宿主中对 Nth1 的免疫检测读出为磷酸化和蛋白结合，无法据此把总水解活性分配给该株的 Nth1。文献和数据库的并行调查已提供评述所需的证据层次，并已查到 Nth2 的相反结果。",
+      "close_reason": "完成一页中文证据评述。新增营养激活研究确定了混合制剂与蛋白特异读数各自的适用范围。当前可读原文足以区分参考株注释、受试制剂的催化能力与衍生株的细胞表型。",
+      "unresolved": [
+        "优先核对 Jules 等关于 NTH2 的酶活原图、菌株和生长阶段，同 Nwaka 等用旧名 YBR0106 报告的阴性结果对读。本次开放全文索引只覆盖两文摘要，尚不能判断两组条件下是否都控制了 Nth1 和 Ath1 的贡献。",
+        "纯化 Nth1 及酸性酶的编码或分离来源尚未追溯到 S288C 原始株。两项酸性酶研究只核到各自的作者摘要。S288C 来源纯化 Nth2 的直接水解证据、同条件原始保藏株细胞观察以及所检 Ima 制剂的天然等位基因供体仍缺。"
+      ],
+      "evidence_refs": [
+        "gxa_01m8dc1rt58hjaqq8e",
+        "gxa_01m8dc7z66tkwdxjvp",
+        "gxa_01m8dc7za9kaya2n42",
+        "gxa_01m8dc7ze2jky3eye0",
+        "gxa_01m8dc7zj9yzcewaef",
+        "gxa_01m8dc7zpgkx5h5ss8",
+        "gxa_01m8dnxmt8wh1xh9qa",
+        "gxa_01m8dnxn01qecjybnh",
+        "gxa_01m8dnxn55p2w35jq4",
+        "gxa_01m8dnxnbrap4jtb4t",
+        "gxa_01m8dnxngq678gksfn",
+        "gxa_01m8dpx01msge1veb4",
+        "gxa_01m8dq4p5pkx7qkgz2",
+        "gxa_01m8d9w5ay5preewfn",
+        "gxa_01m8dpx04wch8tvvnj",
+        "gxa_01m8dq4pf0hh17hw7g",
+        "gxa_01m8dm8arj68xcdyyx",
+        "gxa_01m8dm8atehd7hjrvy",
+        "gxa_01m8dm8aynb1w907k5",
+        "gxa_01m8dc2zfdqvsjp091",
+        "gxa_01m8dnz3xkman32q0d",
+        "gxa_01m8da9f28vnhyk8dx",
+        "gxa_01m8dnz42rzyc79g6h",
+        "gxa_01m8da1hgszxk0mj8d",
+        "gxa_01m8dnz3r1e53ytg7b",
+        "gxa_01m8d9ynv310n9ctvd",
+        "gxa_01m8da2s06kxbtmpmv",
+        "gxa_01m8damy0tyqyvhwty",
+        "gxa_01m8damyafhrdh9j9c",
+        "gxa_01m8damyy2qq2hqktr",
+        "gxa_01m8damz2e43ss62f5",
+        "gxa_01m8damz6ha4hfwtx2",
+        "gxa_01m8damzaykj2gfm5k",
+        "gxa_01m8damzf7sdfny9pk",
+        "gxa_01m8damzkbjf6n5sgf",
+        "gxa_01m8damzqmdcz21p0k",
+        "gxa_01m8damzvvk0255aah",
+        "gxa_01m8dnz39sf4gqf1k3",
+        "gxa_01m8dnz3esxy3kjksj",
+        "gxa_01m8dnz3k4rj72cq4w",
+        "gxa_01m8d9x82mvzqkccq8",
+        "gxa_01m8d9x7f5qwbd55zt",
+        "gxa_01m8d9x70fth1q61cx",
+        "gxa_01m8d9xsesaa32znhj",
+        "gxa_01m8d9xse78jcc34h7",
+        "gxa_01m8dke73nyz7j2jsh",
+        "gxa_01m8dke752exbm3aw2",
+        "gxa_01m8dke788bem8h3js",
+        "gxa_01m8dahkabxe120hc6",
+        "gxa_01m8dmryevcm0v9tef",
+        "gxa_01m8dmryfd2j7c9ewb",
+        "gxa_01m8d9w689bfg0t6ns",
+        "gxa_01m8dneaamqvpvf9jw",
+        "gxa_01m8dpq66q58n89bd4",
+        "gxa_01m8dpq6cssezfqn49",
+        "gxa_01m8dpq6hkhsfwx99p",
+        "gxa_01m8dpq6pct2eaj7v6",
+        "gxa_01m8dpq6v6ep5prhyt",
+        "gxa_ef26ddde4caa659ec5d07aab5fef939c83b2d7be7bf3755320adf9f545b587b9"
+      ],
+      "cited_reports": [
+        "gxa_ef26ddde4caa659ec5d07aab5fef939c83b2d7be7bf3755320adf9f545b587b9"
+      ]
+    }
   },
   "sucrose": {
     "run_id": "gxr_01m8d9xyhw3b1ftg09",
-    "run_state": "ACTIVE",
-    "goal_state": "OPEN",
+    "run_state": "STOPPED",
+    "goal_state": "CLOSED",
+    "offline_locator": {
+      "pmcid": "PMC5021340",
+      "doi": "10.1371/journal.pone.0162838",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5021340/fullTextXML",
+      "job": "gxj_01m8dab88k27f1peh1",
+      "artifact_ref": "gxa_01m8dabp5expfanf60",
+      "version": "sha256:a555fa075780b0baa89bf8a8714a03724fc2e1bc6d62bcae4184e8453b41512e",
+      "sha256": "a555fa075780b0baa89bf8a8714a03724fc2e1bc6d62bcae4184e8453b41512e",
+      "segment": "p82",
+      "locator": "body/sec004/p",
+      "paragraph_sha256": "af478bd388b8a679fd2799b451aaefdf4f1907243311629f0deea941c63139d7",
+      "elementpath": "./body[1]/sec[2]/sec[2]/p[2]",
+      "read_receipt": "gxrc_01m8daemwf2xk5drwz"
+    },
     "as_of": {
-      "event_id": 1949,
-      "ts": "2026-11-27T02:10:05.839Z"
+      "event_id": 2083,
+      "ts": "2026-11-27T04:45:20.949Z"
     },
     "provider_roots": {
-      "openai": 23
+      "openai": 27
     },
     "jobs": [
       {
@@ -660,7 +1160,15 @@
         "search_job": "gxj_01m8damfb5sxpfsbbp",
         "snapshot_ref": "gxa_01m8damtsjrnf3g5p8",
         "snapshot_sha256": "0f1c4a892ff45fde16bd73f5943683ae839ec6cb9e0fc693beb218500c33030d",
-        "raw_provider_sha256": "6f871567edd6acf5fc4f11d1dec5ba090acc78f8929bf72b2adc900740c7d825"
+        "raw_provider_sha256": "6f871567edd6acf5fc4f11d1dec5ba090acc78f8929bf72b2adc900740c7d825",
+        "native_abstract_delivery": {
+          "full_abstract_matched": true,
+          "first_200_characters_matched": true,
+          "call_id": "call_2c1f1eb5c9d14d51bdfe0123f94a8cd3",
+          "thread": "01a21aaa-6bf3-7062-8fad-58071873e059",
+          "time": "2026-11-27T01:42:19.484Z",
+          "normalized_abstract_sha256": "7247a978c3f85cb82fe1900dd561cd594b8233ed7fedff5861b66538c7ebc012"
+        }
       },
       {
         "pmid": "363706",
@@ -679,6 +1187,7 @@
       {
         "source": "PMC11462787.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11462787/fullTextXML",
+        "version": "sha256:89b44db13acb9447c844ab6bbdb7c29fbe017999a52b31cb6c227cade8c82bc4",
         "job": "gxj_01m8da3dxff6wdehgs",
         "ref": "gxa_01m8da3yq927rz8bre",
         "sha256": "89b44db13acb9447c844ab6bbdb7c29fbe017999a52b31cb6c227cade8c82bc4",
@@ -686,8 +1195,8 @@
         "doi": "10.1177/00037028241258109",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 47,
-        "read_segments_matched_to_xml": 47,
+        "distinct_read_segments": 49,
+        "read_segments_matched_to_xml": 49,
         "located_extractions": 8,
         "extract_quotes_in_segment": 8,
         "extract_quotes_in_xml": 8,
@@ -699,7 +1208,7 @@
             "read_receipt": "gxrc_01m8da5yvqrsnwk5jf",
             "paragraph_sha256": "56e8d325946fb27b83a0e2b1663d3e2800d2a3e3d2856ee950e3dbe8315a1fe3",
             "evidence": "gxv_01m8da6p4pj1gy4e73",
-            "review_status": "LOCATOR_VERIFIED",
+            "review_status": "REVIEWED",
             "quote_in_segment": true,
             "quote_in_xml": true
           },
@@ -719,6 +1228,7 @@
       {
         "source": "P00724.json",
         "url": "https://rest.uniprot.org/uniprotkb/P00724.json",
+        "version": "203",
         "job": "gxj_01m8da4srfh2wd117c",
         "ref": "gxa_01m8da4vv9601k405j",
         "sha256": "30cc0a2a02cc89f813a0e94e2243f27c24bb053e466ae48202b8943867734343",
@@ -728,12 +1238,15 @@
           "SUC2"
         ],
         "reviewed_entry_version": 203,
+        "sequence_sha256": "d1bf0cef15b14d1b0bb645050f1da2e1a5f4ea0792bb95e5a81e143f6c0b58fe",
+        "sequence_version": 1,
         "alpha_trehalase_GO_evidence": [],
         "distinct_read_segments": 11
       },
       {
         "source": "PMC4404613.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4404613/fullTextXML",
+        "version": "sha256:b8f4784cb8b0dc0ff24b6a328dae10184c30cc479cc36669b23349870c465f01",
         "job": "gxj_01m8da4n6s3bvzdhgf",
         "ref": "gxa_01m8da55ccs9x5a458",
         "sha256": "b8f4784cb8b0dc0ff24b6a328dae10184c30cc479cc36669b23349870c465f01",
@@ -741,8 +1254,8 @@
         "doi": "10.1186/s12934-015-0243-3",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 28,
-        "read_segments_matched_to_xml": 28,
+        "distinct_read_segments": 31,
+        "read_segments_matched_to_xml": 31,
         "located_extractions": 3,
         "extract_quotes_in_segment": 3,
         "extract_quotes_in_xml": 3,
@@ -751,6 +1264,7 @@
       {
         "source": "PMC3153487.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3153487/fullTextXML",
+        "version": "sha256:a90c5b5f4d7f141021016ddeeca719be32713730eced69629efb8c0aca5f6ee2",
         "job": "gxj_01m8da4mzc27nfns1j",
         "ref": "gxa_01m8da5fvgjm3qhd2b",
         "sha256": "a90c5b5f4d7f141021016ddeeca719be32713730eced69629efb8c0aca5f6ee2",
@@ -780,6 +1294,7 @@
       {
         "source": "PMC12193214.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12193214/fullTextXML",
+        "version": "sha256:8656f1b84116a664b53a25808fb4a05ff8267f5b95e0b349aced1670ccd47bad",
         "job": "gxj_01m8da8adkbek129ky",
         "ref": "gxa_01m8da8ggx5haqs53q",
         "sha256": "8656f1b84116a664b53a25808fb4a05ff8267f5b95e0b349aced1670ccd47bad",
@@ -787,16 +1302,17 @@
         "doi": "10.3390/insects16060622",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 20,
-        "read_segments_matched_to_xml": 20,
-        "located_extractions": 5,
-        "extract_quotes_in_segment": 5,
-        "extract_quotes_in_xml": 5,
+        "distinct_read_segments": 25,
+        "read_segments_matched_to_xml": 25,
+        "located_extractions": 6,
+        "extract_quotes_in_segment": 6,
+        "extract_quotes_in_xml": 6,
         "example_receipts": []
       },
       {
         "source": "PMC10539294.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10539294/fullTextXML",
+        "version": "sha256:c15007502c9f7bb94a94fdf2466a13bf83716244c0f00b9b77f4c062520cc162",
         "job": "gxj_01m8da8ama48w2q18a",
         "ref": "gxa_01m8da8gqxx4qsjyd3",
         "sha256": "c15007502c9f7bb94a94fdf2466a13bf83716244c0f00b9b77f4c062520cc162",
@@ -804,16 +1320,40 @@
         "doi": "10.1038/s41598-023-43502-2",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 13,
-        "read_segments_matched_to_xml": 13,
+        "distinct_read_segments": 15,
+        "read_segments_matched_to_xml": 15,
         "located_extractions": 10,
         "extract_quotes_in_segment": 10,
         "extract_quotes_in_xml": 10,
-        "example_receipts": []
+        "example_receipts": [
+          {
+            "segment": "p32",
+            "locator": "body/Sec14/p/Par16",
+            "read_scope": "module:module_989935470208e28305d4b6ff29cbc140",
+            "read_receipt": "gxrc_01m8dadywqarmrj3cg",
+            "paragraph_sha256": "b432ade6f845124fd789ef77565598cf4a2db4b8dbf3afb71d5e9b638ea2739b",
+            "evidence": "gxv_01m8dafmr4h2m1dg7d",
+            "review_status": "LOCATOR_VERIFIED",
+            "quote_in_segment": true,
+            "quote_in_xml": true
+          },
+          {
+            "segment": "p30.1",
+            "locator": "body/Sec13/p/Par15 characters [0,2363)",
+            "read_scope": "module:module_989935470208e28305d4b6ff29cbc140",
+            "read_receipt": "gxrc_01m8daz8aw1pczvvng",
+            "paragraph_sha256": "f184feaff5033ab144e8fb000d20493ed2d4503b799765c5dfee427b681b81b5",
+            "evidence": "gxv_01m8db0drq3a602cqm",
+            "review_status": "REVIEWED",
+            "quote_in_segment": true,
+            "quote_in_xml": true
+          }
+        ]
       },
       {
         "source": "PMC4404613.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4404613/fullTextXML",
+        "version": "sha256:b8f4784cb8b0dc0ff24b6a328dae10184c30cc479cc36669b23349870c465f01",
         "job": "gxj_01m8da8avg4cf823jp",
         "ref": "gxa_01m8da93hw27hv6z41",
         "sha256": "b8f4784cb8b0dc0ff24b6a328dae10184c30cc479cc36669b23349870c465f01",
@@ -831,6 +1371,7 @@
       {
         "source": "PMC12195727.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12195727/fullTextXML",
+        "version": "sha256:0644cb20690533ff8a3720f3e07457e3a1c9009c76f4a437198c3f36070ad24c",
         "job": "gxj_01m8da8a5m8y59963g",
         "ref": "gxa_01m8da94843868jttb",
         "sha256": "0644cb20690533ff8a3720f3e07457e3a1c9009c76f4a437198c3f36070ad24c",
@@ -838,8 +1379,8 @@
         "doi": "10.3390/molecules30122663",
         "article_type": "research-article",
         "coverage": "FULL_TEXT",
-        "distinct_read_segments": 34,
-        "read_segments_matched_to_xml": 34,
+        "distinct_read_segments": 37,
+        "read_segments_matched_to_xml": 37,
         "located_extractions": 7,
         "extract_quotes_in_segment": 7,
         "extract_quotes_in_xml": 7,
@@ -848,6 +1389,7 @@
       {
         "source": "PMC5021340.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5021340/fullTextXML",
+        "version": "sha256:a555fa075780b0baa89bf8a8714a03724fc2e1bc6d62bcae4184e8453b41512e",
         "job": "gxj_01m8dab88k27f1peh1",
         "ref": "gxa_01m8dabp5expfanf60",
         "sha256": "a555fa075780b0baa89bf8a8714a03724fc2e1bc6d62bcae4184e8453b41512e",
@@ -857,9 +1399,9 @@
         "coverage": "FULL_TEXT",
         "distinct_read_segments": 40,
         "read_segments_matched_to_xml": 40,
-        "located_extractions": 20,
-        "extract_quotes_in_segment": 20,
-        "extract_quotes_in_xml": 20,
+        "located_extractions": 21,
+        "extract_quotes_in_segment": 21,
+        "extract_quotes_in_xml": 21,
         "example_receipts": [
           {
             "segment": "p81",
@@ -899,6 +1441,7 @@
       {
         "source": "PMC10616653.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10616653/fullTextXML",
+        "version": "sha256:db2fe49c391cea92811167578edf0dd38aaacb6bb4124fcb7995b6b8550d605e",
         "job": "gxj_01m8dab7wdhksn814a",
         "ref": "gxa_01m8dabtys7akbq0an",
         "sha256": "db2fe49c391cea92811167578edf0dd38aaacb6bb4124fcb7995b6b8550d605e",
@@ -916,6 +1459,7 @@
       {
         "source": "PMC10846273.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10846273/fullTextXML",
+        "version": "sha256:9eda532943694c76c27d746216f94a523a1f4c8635559c509163e32d1d809aac",
         "job": "gxj_01m8dabazzevqrmbmc",
         "ref": "gxa_01m8dac028nw8mbyyd",
         "sha256": "9eda532943694c76c27d746216f94a523a1f4c8635559c509163e32d1d809aac",
@@ -933,6 +1477,7 @@
       {
         "source": "PMC5424818.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5424818/fullTextXML",
+        "version": "sha256:484e2d2483e567b5cbf7335d153c4f5202b232166eba5f2e475f1156ce3a2c69",
         "job": "gxj_01m8dam8rg7m14yts7",
         "ref": "gxa_01m8damvmkkf3nb3hy",
         "sha256": "484e2d2483e567b5cbf7335d153c4f5202b232166eba5f2e475f1156ce3a2c69",
@@ -950,6 +1495,7 @@
       {
         "source": "PMC10456111.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10456111/fullTextXML",
+        "version": "sha256:f1915671f082521772430b2d5f73246be58793f4f9653f5892b23bd1f03005bd",
         "job": "gxj_01m8dam8j4c7a54mqk",
         "ref": "gxa_01m8damw1kwzq92zcr",
         "sha256": "f1915671f082521772430b2d5f73246be58793f4f9653f5892b23bd1f03005bd",
@@ -990,6 +1536,7 @@
       {
         "source": "PMC10456111.xml",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10456111/fullTextXML",
+        "version": "sha256:f1915671f082521772430b2d5f73246be58793f4f9653f5892b23bd1f03005bd",
         "job": "gxj_01m8daq1ssvjqmjm93",
         "ref": "gxa_01m8daqhqrh1azwp9k",
         "sha256": "f1915671f082521772430b2d5f73246be58793f4f9653f5892b23bd1f03005bd",
@@ -1030,6 +1577,7 @@
       {
         "source": "P32356.json",
         "url": "https://rest.uniprot.org/uniprotkb/P32356.json",
+        "version": "202",
         "job": "gxj_01m8dc0h0ffx0xdfzg",
         "ref": "gxa_01m8dc0mhytg1a1xe4",
         "sha256": "61fa5bbc6d04733da3f7280f68e33f64e48dc7162fe66e32d356a0e56ede42bd",
@@ -1039,10 +1587,12 @@
           "NTH1"
         ],
         "reviewed_entry_version": 202,
+        "sequence_sha256": "2a7c15974d2c490d8e7f2b6c8f03c389a6ab330535f65de5fd1c85336b4a3c9b",
+        "sequence_version": 3,
         "alpha_trehalase_GO_evidence": [
           "IDA:UniProtKB"
         ],
-        "distinct_read_segments": 0
+        "distinct_read_segments": 4
       }
     ],
     "independent_tables_by_sha256": {
@@ -1074,15 +1624,18 @@
       {
         "independence_level": "FRESH_CONTEXT_SAME_HOST",
         "verdict": "SUPPORTED",
-        "count": 23
+        "count": 29
       }
     ],
     "module_reports": [
       {
         "module_id": "scholarly_investigation",
         "scope": "module:module_989935470208e28305d4b6ff29cbc140",
-        "status": "OPEN",
-        "report_ref": null
+        "status": "PARTIAL",
+        "report_ref": "gxa_bb5c161c46b8909d23d6af81dc29ebb8594c4a5c09e1757d05904b446fa4343f",
+        "author": "MODULE",
+        "findings": 6,
+        "cited_source_ref_count": 28
       },
       {
         "module_id": "scholarly_investigation",
@@ -1154,8 +1707,107 @@
         "cited_module_reports": [
           "gxa_01eb92d48e9c83e4bf10232fa57cc26bc5eafad914da6b7e488414121ab0c4f1"
         ]
+      },
+      {
+        "decision": "gxa_9b89b0a94f373f4676d38e7229e0bcceac14b0b54a4f2c6dc1d395789cfe5dac",
+        "ops": [
+          "close_run"
+        ],
+        "cited_module_reports": [
+          "gxa_bb5c161c46b8909d23d6af81dc29ebb8594c4a5c09e1757d05904b446fa4343f",
+          "gxa_c4adf5cd0ec360fbc2961d10cd6d23e42b18332cda52c04127ac539519d3bfca",
+          "gxa_01eb92d48e9c83e4bf10232fa57cc26bc5eafad914da6b7e488414121ab0c4f1"
+        ]
       }
     ],
-    "enacted_close": null
+    "enacted_close": {
+      "ts": "2026-11-27T04:45:20.949Z",
+      "event_id": 2083,
+      "decision_ref": "gxa_9b89b0a94f373f4676d38e7229e0bcceac14b0b54a4f2c6dc1d395789cfe5dac",
+      "task_id": "gxt_01m8dmt32vax2t5rdm",
+      "turn_id": "01a21b4d-0cc4-7143-8f54-029f0f1059f0",
+      "claim_refs": [
+        "gxa_01m8dmyzsrns1h2xs3",
+        "gxa_01m8dn0srvq03m5n1v",
+        "gxa_01m8dn11xs2yt0bb22"
+      ],
+      "claims": [
+        {
+          "claim_ref": "gxa_01m8dmyzsrns1h2xs3",
+          "claim_revision_id": "gxh_01m8da3xb6pwx2jvvv@9",
+          "statement": "S288C 自身的天然蛋白能以蔗糖为底物，催化向葡萄糖和果糖的水解。",
+          "publication_level": "insufficient",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dn0srvq03m5n1v",
+          "claim_revision_id": "gxh_01m8daz883smcmx80y@9",
+          "statement": "酿酒酵母 S288C 亲本的洗涤整细胞在蔗糖测定中释放还原糖。半乳糖培养后可测到这项活性，培养时同时加入葡萄糖会降低随后测得的活性。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        },
+        {
+          "claim_ref": "gxa_01m8dn11xs2yt0bb22",
+          "claim_revision_id": "gxh_01m8dc0gwv53n8spka@3",
+          "statement": "更换底物后，P32356 催化栏把有实验引文的反应归于海藻糖加水生成两分子葡萄糖。",
+          "publication_level": "open",
+          "maturity": "idea",
+          "direction": "undetermined"
+        }
+      ],
+      "lead_rationale": "Alcaíno 等的菌株表、测活方法与亲本列直接支持洗涤整细胞在蔗糖上释放还原糖，Muller 等提供了按葡萄糖生成测活的细胞证据。两组独立核查表明，发酵中分别测定葡萄糖和果糖的曲线来自工业菌株，带失活对照的纯化天然酶来自棕榈酒分离株，具两种单糖光谱特征的商品酶只注明面包酵母。酶类规则和 GO 实验引文在 P00724 的不同字段。换底物后 P32356 的实验引文明确属于海藻糖。文献模块与原始记录据此限定了解释范围。继续重复索引或同源搜索无法解决样品来源问题，具名亲本的酶级归因仍应判为直接证据不足。",
+      "close_reason": "各调查均已返回，原文和两种底物的官方数据库条目已可用于判断各层级证据。",
+      "unresolved": [
+        "尚缺将 S288C 亲本、纯化天然 Suc2、蔗糖消耗及相对空白分别测定的两种单糖归于同一酶制剂的原文。",
+        "已核查的来源没有给出亲本的完整糖浓度与生长时间序列，整细胞读数无法确定 Suc2 所占份额。",
+        "在可用目录中无法取得 GO 两篇实验引文的完整方法以核实亲本样品。"
+      ],
+      "evidence_refs": [
+        "gxa_01m8dabp5expfanf60",
+        "gxa_01m8dkepzegmb3yt86",
+        "gxa_01m8dkx6f5mxbs21dv",
+        "gxa_01m8dbfejjgxrxnpn2",
+        "gxa_01m8dbfeqvzazqrj80",
+        "gxa_01m8dc5qzajpjkkrkj",
+        "gxa_01m8dc5r4qxkexb7wa",
+        "gxa_01m8dc5r9e36a3fsg3",
+        "gxa_01m8dc5rfhc9jm1n5g",
+        "gxa_01m8damw1kwzq92zcr",
+        "gxa_01m8dc5rnxkyta0x4h",
+        "gxa_01m8dc5rvw0b7ncz0y",
+        "gxa_01m8dc5s298hy14njm",
+        "gxa_01m8da8gqxx4qsjyd3",
+        "gxa_01m8dbbmqpkn013az2",
+        "gxa_01m8dbbmw9fm8agakq",
+        "gxa_01m8dbbn0f4ybzj665",
+        "gxa_01m8dmhkdt2be1yzj1",
+        "gxa_01m8da3yq927rz8bre",
+        "gxa_01m8dm8p8g649tc50n",
+        "gxa_01m8dm8pf39cssmfrd",
+        "gxa_01m8da4vv9601k405j",
+        "gxa_01m8daq2ctrkhz213k",
+        "gxa_01m8daq2j01gh8gbzp",
+        "gxa_01m8daq2q3mxtxybnq",
+        "gxa_01m8da3ycr9b6q6w87",
+        "gxa_01m8da3yd71twvdk3w",
+        "gxa_01m8dabc0q99v74myq",
+        "gxa_01m8dc0mhytg1a1xe4",
+        "gxa_01m8dk7fj87d4pg21t",
+        "gxa_01m8dkx6m7k0sjp8yy",
+        "gxa_01m8damtrzbgkypa5e",
+        "gxa_01m8damtsjrnf3g5p8",
+        "gxa_01m8dazwvn5s8d9h07",
+        "gxa_bb5c161c46b8909d23d6af81dc29ebb8594c4a5c09e1757d05904b446fa4343f",
+        "gxa_c4adf5cd0ec360fbc2961d10cd6d23e42b18332cda52c04127ac539519d3bfca",
+        "gxa_01eb92d48e9c83e4bf10232fa57cc26bc5eafad914da6b7e488414121ab0c4f1"
+      ],
+      "cited_reports": [
+        "gxa_bb5c161c46b8909d23d6af81dc29ebb8594c4a5c09e1757d05904b446fa4343f",
+        "gxa_c4adf5cd0ec360fbc2961d10cd6d23e42b18332cda52c04127ac539519d3bfca",
+        "gxa_01eb92d48e9c83e4bf10232fa57cc26bc5eafad914da6b7e488414121ab0c4f1"
+      ]
+    }
   }
 }

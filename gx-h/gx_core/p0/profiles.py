@@ -266,11 +266,14 @@ def clash_env(*, check: bool = True, native_http: bool = False) -> dict[str, str
     return {**os.environ, **selected}
 
 
+def codex_executable() -> str:
+    return os.environ.get("GX_P0_CODEX") or "codex"
+
+
 def codex_argv(*, test_mode: bool | None = None, provider: str | None = None) -> list[str]:
     chosen_provider = provider_name(test_mode=test_mode, provider=provider)
-    packaged = Path(__file__).resolve().parents[3] / "vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex"
     return [
-        os.environ.get("GX_P0_CODEX") or (str(packaged) if packaged.is_file() else "codex"),
+        codex_executable(),
         "--enable", "respect_system_proxy",
         "--disable", "system_proxy_fallback",
         "-c", f"model_provider={json.dumps(chosen_provider)}",

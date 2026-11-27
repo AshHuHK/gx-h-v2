@@ -389,7 +389,9 @@ def decision_citations(conn, task, lease, thread, turn, candidates):
         AND a.artifact_ref IN (SELECT value FROM json_each(?))""",
         (thread, turn, task["run_id"], task["task_id"], lease, task["scope"],
          EXTRACT, EXTRACTION, REVIEW, REVIEW_RECORD, ids.canonical_json(sorted(candidates))))
-    return {row[0] for row in rows}
+    from . import v62_catalog
+    owned = {row[0] for row in rows}
+    return owned | v62_catalog.method_citations(conn, task, lease, thread, turn, candidates - owned)
 
 
 def _owned(conn, run_id, ref, *, cursor=None):

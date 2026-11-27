@@ -136,7 +136,7 @@ def _visible(conn, task, lease_id, thread_id, turn_id, decision):
     denied = cited - refs - staged
     if denied:
         from . import v62_sources
-        # Citing a delivered extraction/review does not add a graph input grant.
+        # Evidence-tool records and exact method cards are citeable only as decision references.
         missing_citations = denied.intersection(decision["evidence_refs"])
         denied_citations = missing_citations - v62_sources.decision_citations(
             conn, task, lease_id, thread_id, turn_id, missing_citations)

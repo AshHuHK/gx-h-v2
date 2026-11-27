@@ -40,3 +40,28 @@ gx_run="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_id
 .venv/bin/python -B acceptance/science_capabilities/verify_native_source_citation.py \
   "$gx_work" "$gx_run" --output "$gx_work/receipt.json"
 ```
+
+## 真实方法卡能在本回合被 Lead 引作方法依据
+
+父题及后继的 5 次既有 `SCOPE_DENIED` 均按原始参数、任务、租约和回合进行了只读回放。官方 Codex 的 `function_call.arguments` 与 GX 保存的原参数逐字段相同。5 个被拒字段的对象都已由该次任务的早先调用送达。[5 条原始请求的回放](evidence/native-method-citation-replay.json)
+
+| Run 与原拒绝事件 | 当时被拒的首个引用 | 修补后的引用检查 |
+| --- | --- | --- |
+| 海藻糖 30、75 | 分别为本回合的来源提取与证据复核 | 2/2 通过 |
+| 蔗糖 178 | 精确查询返回的方法卡 `gxa_01m8dar7xdgdmj9g2g`。同一提交还引用了来源提取。 | 通过 |
+| 蔗糖 179、229 | 分别为来源提取与证据复核。事件 229 的同一提交还附上了本任务已暂存的主张。 | 2/2 通过 |
+
+在 `0664513` 的引用检查下，事件 178 是剩余的拒绝。Lead 当时引用具名方法来说明按登录号连接和保留空值的理由。核验所得卡片含版本、方法 SHA、分母、字段关系和局限。当时的方法尚未启用；同回合取得方法文档足以引用其出处，执行仍需要单独的能力选定和实际 Job。
+
+GX 按同一 Run、任务、租约、线程和回合的精确查询查找方法依据。不同研究者可拿到同一公开卡，谁实际收到它由各自的原生请求及回执确定。Lead 以回执生成的正式公开卡核对原件字节。具有 `public_methods` 授权的子模组以实际收到的 `spec` 核对原件字节，同时匹配本模组的 `v62.module.tool_completed` 回执中的原件与完整返回摘要。幂等重送沿用原模组回执。原始五条只读回放均来自 Lead，历史决定与科学结论保留。
+
+受派研究者的离线验收安装了获准查询与决策的测试插件，从正常 Goal 入口建立两个模组实例。第一名研究者查阅后，GX 接纳了其引用该卡的决定。第二名借用同一引用时被拒，在亲自查询后成功提交。伪造角色以及修改任一原生返回内容也触发拒绝。该组测试使用脚本传输及真实 GX 任务与租约。现有只读 survey 仍可在自己的模组报告引用已读方法，已有工具授权决定它能提交的操作。科学主张、图输入、量测值仍分别由原入口管理。[受派研究者回归](test_method_citations.py)
+
+```bash
+gx_checks=../gx-science/capabilities-check
+.venv/bin/python -B acceptance/science_capabilities/replay_source_citations.py \
+  "$gx_checks/live-record-coverage" "$gx_checks/live-record-successor" \
+  --run-id gxr_01m8d9xyaych3h1z2b --run-id gxr_01m8daq09da52k64ar \
+  --output /tmp/gx-native-method-citation-replay.json
+cmp /tmp/gx-native-method-citation-replay.json acceptance/science_capabilities/evidence/native-method-citation-replay.json
+```

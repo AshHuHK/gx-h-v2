@@ -180,6 +180,58 @@ def _public_card(row, *, metric_contract=False):
     return card
 
 
+def _module_method_receipts(conn, run_id, scope, refs):
+    """The module owner pins the public card bytes and complete response on first delivery."""
+    rows = conn.execute("""SELECT p.key,p.value,
+            json_extract(e.payload_json,'$.arguments.reference'),json_extract(e.payload_json,'$.result_sha256')
+        FROM v62_modules m JOIN events e ON e.run_id=m.run_id AND e.subject_id=m.module_instance_id
+        JOIN json_each(e.payload_json,'$.artifact_sha256') p
+        WHERE m.run_id=? AND m.scope=? AND json_extract(m.grant_json,'$.catalog_access')='public_methods'
+        AND 'gx_query_catalog' IN (SELECT value FROM json_each(m.grant_json,'$.tools'))
+        AND e.subject_kind='module' AND e.kind='v62.module.tool_completed'
+        AND e.actor=json_extract(e.payload_json,'$.thread_id') AND m.scope=json_extract(e.payload_json,'$.scope')
+        AND m.module_instance_id=json_extract(e.payload_json,'$.module_instance_id')
+        AND json_extract(e.payload_json,'$.tool')='gx_query_catalog'
+        AND json_extract(e.payload_json,'$.arguments.kind')='method'
+        AND p.key IN (SELECT value FROM json_each(?))""", (run_id, scope, refs))
+    return {tuple(row) for row in rows}
+
+
+def method_citations(conn, task, lease, thread, turn, candidates):
+    """Recognize the exact method document delivered to this native decision maker."""
+    scope = task["scope"]
+    if not candidates or (scope != "run" and not scope.startswith("module:")):
+        return set()
+    from ..artifacts import ArtifactService
+    refs = ids.canonical_json(sorted(candidates))
+    module_receipts = _module_method_receipts(conn, task["run_id"], scope, refs) if scope != "run" else None
+    cards = conn.execute("""SELECT DISTINCT a.artifact_ref,a.sha256,c.result_json
+        FROM p0_root_calls c JOIN p0_v6_native_calls n USING(thread_id,call_id,turn_id)
+        JOIN p0_roots r ON r.thread_id=c.thread_id
+        JOIN v6_decision_tasks t ON t.task_id=r.task_id AND t.run_id=r.run_id AND t.scope=?
+        JOIN artifacts a ON a.artifact_ref=json_extract(c.result_json,'$.source_ref')
+        WHERE c.thread_id=? AND c.turn_id=? AND r.run_id=? AND r.task_id=? AND r.lease_id=?
+        AND a.run_id=r.run_id AND a.kind='v62_public_method_spec' AND a.published=1 AND a.origin='BACKEND'
+        AND json_extract(n.request_json,'$.tool')='gx_query_catalog'
+        AND json_extract(n.request_json,'$.arguments.kind')='method'
+        AND json_extract(n.request_json,'$.arguments.reference')=json_extract(c.result_json,'$.reference')
+        AND json_extract(c.result_json,'$.reference')=json_extract(c.result_json,'$.spec.capability_version')
+        AND json_extract(c.result_json,'$.kind')='method'
+        AND a.artifact_ref IN (SELECT value FROM json_each(?))""",
+        (scope, thread, turn, task["run_id"], task["task_id"], lease, refs))
+    valid = set()
+    for ref, sha, response in cards:
+        answer = json.loads(response)
+        card = answer["spec"]
+        if module_receipts is None:
+            card = _public_card(card, metric_contract=True)
+        elif (ref, sha, answer["reference"], ids.sha256_of_obj(answer)) not in module_receipts:
+            continue
+        if ids.sha256_of_obj(card) == sha and ArtifactService(conn).verify(ref)["ok"]:
+            valid.add(ref)
+    return valid
+
+
 def _inputs(conn, run_id):
     run = conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)).fetchone()
     if not run:

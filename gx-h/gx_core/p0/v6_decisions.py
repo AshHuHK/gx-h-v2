@@ -386,7 +386,31 @@ def accept_product(conn, root, content_sha256, product_ref):
     return submission_id
 
 
-def _require_close_context(conn, run_id, task, root, turn_id):
+def _own_close_reviews(conn, task, root, turn_id, decision):
+    """A plain close can account for its own newly delivered untargeted reviews."""
+    from . import v6_goal, v62_sources, v621_policy
+    if (task["scope"] != "run" or not v621_policy.science_execution(conn, task["run_id"])
+            or decision.get("convergence") is not None or decision.get("resolved_gaps")):
+        return set()
+    rid, cursor = task["run_id"], task["event_cursor"]
+    refs = set()
+    for event in v6_goal._events(conn, rid, cursor):
+        if event["kind"] != "v62.source.reviewed":
+            return set()
+        payload = store.loads(event, "payload_json")
+        if ("target_claim_ref" not in payload or payload["target_claim_ref"] is not None
+                or payload.get("scope") != "run" or payload.get("review_turn_id") != turn_id):
+            return set()
+        refs.add(event["subject_id"])
+    # A Job may already have changed while its node settlement has yet to be published.
+    if not refs or conn.execute("SELECT 1 FROM events WHERE run_id=? AND event_id>? AND "
+                                "kind IN ('job.created','job.transition') LIMIT 1", (rid, cursor)).fetchone():
+        return set()
+    returned = v62_sources.decision_citations(conn, task, root["lease_id"], root["thread_id"], turn_id, refs)
+    return refs if refs == returned else set()
+
+
+def _require_close_context(conn, run_id, task, root, turn_id, decision):
     # Early watches and sealed rounds are the only ways a module report enters a Run brief.
     # A report may already exist even while its commissioning Lead keeps the round unsealed.
     from . import v621_goal_scope
@@ -415,9 +439,16 @@ def _require_close_context(conn, run_id, task, root, turn_id):
             raise ScopeDenied("The delivered research brief and current Goal decision context disagree")
         late = v62_rounds.late_evidence(conn, run_id, cursor)
         if late is not None:
-            raise StaleRevision("New research evidence arrived after the delivered brief; reconsider before closing",
-                                details={"reason": "close_context_changed", "event_id": late, "goal_version": version,
-                                         "brief_cursor": cursor, "context_ref": task["context_ref"]})
+            delivered_reviews = _own_close_reviews(conn, task, root, turn_id, decision)
+            missing = delivered_reviews.difference(decision["evidence_refs"])
+            if not delivered_reviews or missing:
+                details = {"reason": "close_context_changed", "event_id": late, "goal_version": version,
+                           "brief_cursor": cursor, "context_ref": task["context_ref"]}
+                message = "New research evidence arrived after the delivered brief; reconsider before closing"
+                if missing:
+                    details["uncited_review_refs"] = sorted(missing)
+                    message += ". The refreshed Lead can cite the listed review refs in decision.evidence_refs"
+                raise StaleRevision(message, details=details)
         return {"brief_cursor": cursor, "goal_version": version, "context_ref": task["context_ref"],
                 "brief_sha256": native_receipt["text_sha256"], "brief_delivery": native_receipt["event_id"],
                 "brief_turn": native_receipt["turn_id"], "closing_turn": turn_id}
@@ -442,7 +473,7 @@ def commit(conn, plan):
         report_preference = None
         if any(item["spec"]["op"] == "close_run" for item in plan.resolved_ops):
             from . import report_language
-            close_context = _require_close_context(conn, run_id, task, root, plan.turn_id)
+            close_context = _require_close_context(conn, run_id, task, root, plan.turn_id, request["decision"])
             report_preference = report_language.current(conn, run_id)
             report_language.require_close(report_preference, request["decision"], plan.resolved_ops[0]["spec"])
         from . import v623_endpoint_use

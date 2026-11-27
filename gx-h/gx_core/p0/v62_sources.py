@@ -285,7 +285,9 @@ def _save(conn, kind, doc, identity):
         subject_kind='artifact', subject_id=result.artifact_ref, payload={
             'scope':identity['scope'], 'artifact_ref':result.artifact_ref, 'sha256':digest,
             'target_claim_ref':doc.get('target_claim_ref'),
-            'evidence_id':doc['evidence_id'], 'review_id':doc.get('review_id')}, evidence_level='EXECUTION_OBSERVED')
+            'evidence_id':doc['evidence_id'], 'review_id':doc.get('review_id'),
+            **({'review_turn_id': identity['turn_id']} if kind == REVIEW_RECORD else {})},
+        evidence_level='EXECUTION_OBSERVED')
     return result.artifact_ref
 
 

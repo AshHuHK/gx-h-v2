@@ -1,0 +1,71 @@
+{
+  "case": "B0",
+  "run_id": "gxr_01m8f5r59yyx9gmekh",
+  "run_status": "STOPPED",
+  "goal_status": "CLOSED",
+  "scientific_decision": {
+    "source_ref": "gxa_ad4f8a198ca02c4d63f966cf5cb7e30ff8ec9ea2dd06fc6c2f1888612fe7cdf6",
+    "thread_id": "01a21e67-57ce-7421-a508-6d376b60a792",
+    "turn_id": "01a21e67-5812-75a1-b031-418eaebf0dea",
+    "decision_event": 219,
+    "closure": {
+      "goal_version": 1,
+      "decision_ref": "gxa_ad4f8a198ca02c4d63f966cf5cb7e30ff8ec9ea2dd06fc6c2f1888612fe7cdf6",
+      "op_digest": "bdcb4c9dc6d766d03a057a75475f042e8a60febbcbd08b45ea3b153ff178ad07",
+      "requested_event": 214,
+      "committed_event": 219,
+      "closed_event": 221,
+      "closed_utc": "2026-11-27T19:10:47.608Z",
+      "operation": {
+        "claim_refs": [
+          "gxa_01m8f6m721gyjtp4jz"
+        ],
+        "op": "close_run",
+        "reason": "The fresh prediction and the completed mapped Cα fit establish paired coverage and structural discrepancy for the supplied Top7 fragment.",
+        "unresolved": [
+          "Individual residue deviations, side-chain conformations and the unobserved termini lie outside this global Cα comparison.",
+          "One fixed-seed prediction leaves run-to-run variation unmeasured. Top7 predates the model training cutoff, so training exposure is possible and performance on unseen proteins remains open."
+        ]
+      }
+    },
+    "rationale": "The approved AlphaFold prediction supplied the coordinates used in agreement.json. The equal-weight, proper-rotation fit used {{metric:matched_positions}} of {{metric:mapped_positions}} mapped Cα pairs and gave an RMSD of {{metric:calpha_rmsd_A}}. The matched-pair list reproduces the supplied map, including the methionine–selenomethionine pair identified in the inventory and confirmed in both coordinate files. This answers the calibration question over the entire intended fragment."
+  },
+  "jobs": [
+    {
+      "node_id": "node_ea82809e2ae5243cab3fb6f7ea27b920",
+      "job_id": "gxj_01m8f5wrxp23f9dx16",
+      "result_ref": "gxa_01m8f6940tr4n0gqdm",
+      "status": "SUCCEEDED"
+    },
+    {
+      "node_id": "node_82e3f826d9fcae94314f8fb538b5d886",
+      "job_id": "gxj_01m8f6bc8gzxnvrwxj",
+      "result_ref": "gxa_01m8f6bcx8xdtga8t1",
+      "status": "SUCCEEDED"
+    }
+  ],
+  "reference_acquisition_event": 19,
+  "brief_delivery_event": 206,
+  "artifact_read_delivery_event": 208,
+  "claim_adoption_event": 213,
+  "first_post_read_decision_rejection_event": 211,
+  "native_budget_summary": {
+    "api_calls": 11,
+    "cpu_seconds": 339,
+    "gpu_jobs": 1,
+    "gpu_minutes": 5,
+    "job_submissions": 2,
+    "tokens": 1855154,
+    "worker_tasks": 1
+  },
+  "saved_recipes_by_lead_at_closure": 0,
+  "scientific_scope": "Calibration on one published archival specimen with possible training exposure; independent numerics use the same experimental deposition.",
+  "actual_native_turn_ids_seen": 11,
+  "report_render": {
+    "original": "REPORT.initial.md",
+    "original_sha256": "ee49607823011238124471e16b965a89d918093798935b4f2e9e5e9fd980f9cc",
+    "current": "REPORT.md",
+    "current_sha256": "9f06a5624cf97812d644b1809509bd7c3346598141bcddecdbcc2f532108ebae",
+    "data": "same original exported result.json, unchanged decisions and measurements"
+  }
+}

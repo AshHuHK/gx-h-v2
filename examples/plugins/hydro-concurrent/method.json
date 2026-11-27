@@ -1,0 +1,133 @@
+{
+  "entry_script": "worker.py",
+  "manifest": {
+    "capability_id": "discharge-concurrent",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--record",
+        "{in.record}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "hydrometric_water_balance",
+      "objective": "Integrate both channels on their simultaneous valid discharge intervals and bound the signed excess volume.",
+      "mechanism": "Intersect half-open monitoring intervals, integrate piecewise constant flow, and propagate each absolute rate bound without assuming error independence. Inputs: one gx.hydrometry/1 time-resolved JSON record (input role record); no parameters.",
+      "estimator": "Simultaneous accepted duration (minutes), one volume (litres) per channel and the signed left-minus-right difference with deterministic lower and upper limits.",
+      "training_data_lineage": "Deterministic dimensional analysis of the supplied instrument record; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.hydro-concurrent/1.0.0/worker.py",
+      "sha256": "fd151217616aa52127df134b1b93fc9d7ec23f5a28740b16d9f00a7c625a3c77"
+    },
+    "licence": "GX release implementation",
+    "licence_basis": "Python standard library and author-generated instrument fixture.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "paired.json",
+        "kind": "file:hydrometric_concurrent",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "record"
+        ],
+        "media_type": "application/json",
+        "metric_specs": {
+          "left_L": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/left_L",
+            "unit": "L",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "right_L": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/right_L",
+            "unit": "L",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "common_minutes": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/common_minutes",
+            "unit": "min",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "outside_common_minutes": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/outside_common_minutes",
+            "unit": "min",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "difference_L": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/difference_L",
+            "unit": "L",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "difference_low_L": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/difference_low_L",
+            "unit": "L",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "difference_high_L": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/difference_high_L",
+            "unit": "L",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Complete interval rates, nonoverlapping within station, known timestamps, flags and absolute uncertainty required. Only describes jointly observed times; cannot impute missing discharge or identify causes.",
+    "parameter_defaults": {}
+  }
+}

@@ -1,0 +1,1 @@
+A regional observatory is considering ranking countries by economic growth using changes in the night lights reported in the enclosed paper. What comparison, if any, can the director defend from this study? Give the most relevant quantitative basis and the limits of your conclusion.

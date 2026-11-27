@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from acceptance.v62a.interleavings_fixture import PRODUCT, branch, draft
-from acceptance.v622.test_close import CloseStudy
+from acceptance.v622.test_close import SurveyedStudy
 from gx_core.artifacts import ArtifactService
 from gx_core.p0 import cli, manifest, v621_metrics
 
@@ -17,7 +17,9 @@ EXAMPLE = PRODUCT / "examples/bglb-retrospective"
 SCRIPT = PRODUCT / "gx-h/plugins/installed/org.gx.published-kinetics/1.0.0/methods/retrospective.py"
 spec = importlib.util.spec_from_file_location("published_bglb", SCRIPT)
 method = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(method)
+# The installed package hash covers every file in its directory.
+with patch("sys.dont_write_bytecode", True):
+    spec.loader.exec_module(method)
 
 
 class BglBRetrospective(unittest.TestCase):
@@ -58,7 +60,7 @@ class BglBRetrospective(unittest.TestCase):
             with patch.object(cli, "run_until_stopped", side_effect=lambda conn, args, rid, timeout: cli.snapshot(conn, rid)), contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(cli.main(["research", "--state", str(work / "state"), "--run-key", "bglb-acceptance",
                                            "--goal-file", str(EXAMPLE / "question.md"), "--goal-config", str(EXAMPLE / "goal.json")]), 0)
-            with CloseStudy(work, reopen=True) as s:
+            with SurveyedStudy(work, reopen=True) as s:
                 s.next_actor("run")
                 study = branch("historical")
                 study["budget_limits"]["cpu_seconds"] = 60

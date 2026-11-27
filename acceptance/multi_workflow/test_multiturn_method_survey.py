@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from acceptance.multi_workflow.test_pcna_native import INTERFACE, MATERIALS, PLUGIN
 from acceptance.v62a.interleavings_fixture import PRODUCT, draft
-from acceptance.v622.test_close import CloseStudy
+from acceptance.v622.test_close import SurveyedStudy
 from acceptance.v623 import test_close_metrics
 from gx_core.p0 import cli, manifest, v621_metrics
 
@@ -47,7 +47,7 @@ class MethodSurvey(unittest.TestCase):
                                "--goal", "Which interface QC observations are available on these deposited coordinates?",
                                "--goal-config", str(grant)])
         self.assertEqual(status, 0)
-        s = self.enterContext(CloseStudy(work, reopen=True))
+        s = self.enterContext(SurveyedStudy(work, reopen=True))
         lead = s.next_actor("run")
         coord_ref, note_ref = s.materials
         args = {**s.open_args("commission-survey", inputs=[note_ref], caps=[]), "module_id": "method_workflow_survey",
@@ -56,7 +56,7 @@ class MethodSurvey(unittest.TestCase):
         survey = s.bind(opened["task_id"])
         hits = s.call(survey, "gx_query_catalog", {"kind": "method", "query": "pcna-interface"}, "search-interface")
         self.assertIn(INTERFACE, [item["capability_version"] for item in hits["items"]])
-        card = s.call(survey, "gx_query_catalog", {"kind": "method", "reference": INTERFACE}, "open-card")
+        card = s.call(survey, "gx_query_catalog", {"reference": INTERFACE}, "open-card")
         card_ref = card["source_ref"]
         self.assertEqual(s.call(survey, "gx_read_artifact", {"ref": card_ref}, "read-card"), card["spec"])
         self.assertEqual(s.call(survey, "gx_read_artifact", {"ref": note_ref}, "read-note"), source_note)

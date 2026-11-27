@@ -1,0 +1,27 @@
+F
+======================================================================
+FAIL: test_identical_method_names_require_an_explicit_provider_choice (test_science_capability_collections.GoalMethodCollections.test_identical_method_names_require_an_explicit_provider_choice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/tests/test_science_capability_collections.py", line 60, in test_identical_method_names_require_an_explicit_provider_choice
+    self.assertEqual(views.freeze_scope({**spec, "capability_options": [named]})["capability_options"], expected)
+AssertionError: Lists differ: [{'me[115 chars]aaaa'}] != [{'me[115 chars]aaaa', 'provider_digest': 'aaaaaaaaaaaaaaaaaaa[43 chars]aa'}]
+
+First differing element 0:
+{'met[114 chars]aaaa'}
+{'met[114 chars]aaaa', 'provider_digest': 'aaaaaaaaaaaaaaaaaaa[42 chars]aaa'}
+
+  [{'digest': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    'method': 'index@1',
+-   'provider': 'vendor.a@1'}]
+?                           ^^
+
++   'provider': 'vendor.a@1',
+?                           ^
+
++   'provider_digest': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}]
+
+----------------------------------------------------------------------
+Ran 1 test in 0.011s
+
+FAILED (failures=1)

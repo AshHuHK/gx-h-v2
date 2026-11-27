@@ -39,3 +39,14 @@ python acceptance/science_capabilities/recipe_reuse.py --receipt /tmp/gx-structu
 ```
 
 首次验收先用 1QYS 建立 `deposited-backbone-coverage@1`，再由仅带 6BEN 原件的新题从目录查得该配方。两次均从 `qc.json` 读取具名端点并提交结题决定。1QYS 的完整骨架为 92/106，比较应限于建模位置。6BEN 的模型 1 为 8/8。该计数判据用于评价坐标是否齐备，构象准确性仍需另外评价。两次方法、原件、Job、产物、配方摘要及结题决定均可在回执中复查。[回执](evidence/recipe_reuse.json)
+
+
+## 预报、证据决策与校准
+
+保存含有 `model_prediction` 的已完成计算会生成 `gx.research-recipe/2`。每个具名输出记录 Job 当时绑定的性质和输入角色。先读预测产物再以 artifact 引用派评分 Job 时，选入两步即可恢复它们之间的具名数据依赖。复用时绑定当前 Goal 的材料。
+
+`gx_save_recipe` 的可选 `decision_point` 接受 `step`、`output`、`question`、`actions` 和 `stop_condition`。保存开放问题与可选行动。当前 Goal 的节点结算时，GX 唤醒新的 Run Lead，交付该节点与 Job 的身份、实产输出、摘要及性质。Lead 用当前读数决定是否维持、更改路线、补测或停止。首次决策及其原始依据留在原 Run。压缩简报保留完整简报引用。
+
+可选 `calibration` 指定使用原始材料的独立准备步骤和适用范围。目标 Goal 的 `calibration_scope`、原件内容、方法、有效参数、环境与已固定的小型方法资源一致时，实例化回执引用原校准 Job 及其完成摘要。正式数据流仍需校准产物时保留该步骤。条件变化、输入转换器、权重或未能识别的外部数据会令校准重新执行。使用 `calibration_parameters` 改变条件，或指定 `independent_repeat: true` 独立复做。独立重复的 Job 身份包含节点 ID，原节点崩溃恢复继续办理同一 Job。
+
+[记录覆盖与校准回执](../science_plugin_blueprint/recipes/coverage.json) · [条件变更后重算](../science_plugin_blueprint/recipes/recalibration.json) · [预报、重复计算与冷恢复](../science_plugin_blueprint/recipes/sensor-prediction.json)

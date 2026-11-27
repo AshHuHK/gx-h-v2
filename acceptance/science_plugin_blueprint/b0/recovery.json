@@ -1,0 +1,83 @@
+{
+  "before_status": "RUNNING",
+  "scheduler_ref": "runner:4149315:3012543587",
+  "job_id": "gxj_01m8f5wrxp23f9dx16",
+  "run_id": "gxr_01m8f5r59yyx9gmekh",
+  "driver_pid": 4124292,
+  "ts_unix": 1795805986.739079,
+  "signal": "SIGKILL to private GX driver only",
+  "after_restart_driver_pid": 4151005,
+  "after_restart_time": "2026-11-27T19:03:35.728751+00:00",
+  "after_restart_jobs": [
+    {
+      "job_id": "gxj_01m8f5wrxp23f9dx16",
+      "status": "RUNNING",
+      "scheduler_ref": "runner:4149315:3012543587",
+      "idempotency_key": "job:gxr_01m8f5r59yyx9gmekh:v6.node:98b1eaa0c7387ad91c5eb70fa4f4e1bef6a906e8e1f3e79b47ac705e6e24609a"
+    }
+  ],
+  "terminal": {
+    "job_id": "gxj_01m8f5wrxp23f9dx16",
+    "status": "SUCCEEDED",
+    "scheduler_ref": "runner:4149315:3012543587",
+    "exit_code": 0,
+    "cpu_seconds": 337.818,
+    "wall_seconds": 263.254,
+    "model_processing_seconds": 216.27
+  },
+  "job_events": [
+    {
+      "event_id": 73,
+      "ts": "2026-11-27T18:57:12.289Z",
+      "kind": "job.created",
+      "new_state": "CREATED",
+      "reason": null
+    },
+    {
+      "event_id": 111,
+      "ts": "2026-11-27T18:59:33.080Z",
+      "kind": "job.transition",
+      "new_state": "SUBMITTING",
+      "reason": "intent persisted; starting the runner"
+    },
+    {
+      "event_id": 112,
+      "ts": "2026-11-27T18:59:33.150Z",
+      "kind": "job.transition",
+      "new_state": "SUBMITTED",
+      "reason": "runner pid 4149315 started"
+    },
+    {
+      "event_id": 114,
+      "ts": "2026-11-27T18:59:33.208Z",
+      "kind": "job.transition",
+      "new_state": "QUEUED",
+      "reason": "observed queued"
+    },
+    {
+      "event_id": 115,
+      "ts": "2026-11-27T18:59:33.354Z",
+      "kind": "job.transition",
+      "new_state": "RUNNING",
+      "reason": "observed running"
+    },
+    {
+      "event_id": 154,
+      "ts": "2026-11-27T19:03:56.802Z",
+      "kind": "job.transition",
+      "new_state": "SUCCEEDED",
+      "reason": "runner result: exited"
+    },
+    {
+      "event_id": 156,
+      "ts": "2026-11-27T19:03:56.851Z",
+      "kind": "schedule.reacted",
+      "new_state": null,
+      "reason": "job_terminal"
+    }
+  ],
+  "prediction_jobs_in_run": 1,
+  "input_ref": "gxa_01m8f5r5b23h6pajqz",
+  "model_output_ref": "gxa_01m8f6940tr4n0gqdm",
+  "reference_acquisition_event": 19
+}

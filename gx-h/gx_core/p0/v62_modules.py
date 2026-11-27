@@ -250,8 +250,12 @@ def _brief(conn, row, nodes, proofs):
     revision = capability_views.latest(conn, row["run_id"])
     methods = [c for c in grant["capabilities"] if revision is None or c in revision["active"]]
     dialogue = research_dialogue.packet(conn, row["run_id"], row["scope"], row["goal_version"])
+    from . import research_handoff
+    handoff = research_handoff.active(conn, row["run_id"])
     return {
         **({"pi_dialogue": dialogue} if dialogue else {}),
+        **({"researcher_handoff": True, "peer_hints": research_handoff.inbox(conn, row["run_id"], row["scope"])}
+           if handoff else {}),
         "run_id": row["run_id"],
         **({"evidence_policy": policy} if policy in v621_policy.GOVERNED else {}),
         "scope": row["scope"],
@@ -396,6 +400,9 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
         raise ScopeDenied("Requested module methods exceed the parent and declaration grants")
     materials = v62b_handoff.select_materials(conn, task, frozen, refs, decl["input_roles"],
                                              published_only=decl.get("published_inputs_only", False))
+    if "gx_review_evidence" in tools and frozen.get("catalog_discovery"):
+        from . import research_handoff
+        research_handoff.review_materials(conn, run_id, materials)
     targets = v62b_handoff.select_claims(conn, task, frozen, target_refs)
     from ..plugins import goal as providers
 

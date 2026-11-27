@@ -1,0 +1,356 @@
+{
+  "version": "4759c260310dbd79b640c826371ec20aebc3b272",
+  "transport": "gx-p0 start; controlled native callback; no external jobs or model calls",
+  "experiments": [
+    {
+      "run_id": "gxr_01m8f527q4h6jn46yp",
+      "grant": {
+        "evidence_policy": "gx.evidence/6.2.4",
+        "research_effort": "deep",
+        "research_modules": [],
+        "plugins": [
+          "org.gx.scholarly-sources@1.0.0"
+        ],
+        "capabilities": [
+          "scholarly-search@1",
+          "scholarly-fetch@1"
+        ],
+        "capability_options": [],
+        "input_files": []
+      },
+      "thread": "script-gxl_01m8f527wmwb4jdrsd",
+      "tools": [
+        "gx_task_context",
+        "gx_read_artifact",
+        "gx_decide_revision",
+        "gx_stage_claim",
+        "gx_query_catalog",
+        "gx_read_source",
+        "gx_extract_evidence",
+        "gx_review_evidence"
+      ],
+      "results": [
+        {
+          "call": "probe-0",
+          "arguments": {
+            "kind": "method"
+          },
+          "answer": {
+            "kind": "method",
+            "items": [
+              {
+                "capability_version": "artifact-analysis@1",
+                "category": "bounded_json_analysis",
+                "purpose": "Summarize or compare JSON measurements.",
+                "cost_class": "local_cpu",
+                "outputs": [
+                  {
+                    "kind": "file:artifact_analysis_result",
+                    "name": "result.json"
+                  }
+                ],
+                "execution_granted": false,
+                "status": "catalog_only"
+              },
+              {
+                "capability_version": "fixture-grid@1",
+                "category": "synthetic_grid",
+                "purpose": "Compare two synthetic predictions.",
+                "cost_class": "local_cpu",
+                "outputs": [
+                  {
+                    "kind": "file:synthetic_grid",
+                    "name": "observations.json"
+                  }
+                ],
+                "execution_granted": false,
+                "status": "catalog_only"
+              },
+              {
+                "capability_version": "scholarly-fetch@1",
+                "category": "public_literature_acquisition",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "cost_class": "local_cpu",
+                "outputs": [
+                  {
+                    "kind": "file:journal_article",
+                    "name": "article.xml",
+                    "nature": "observed"
+                  },
+                  {
+                    "kind": "file:acquisition_descriptor",
+                    "name": "acquisition.json",
+                    "nature": "analysis"
+                  }
+                ],
+                "execution_granted": true,
+                "status": "available"
+              },
+              {
+                "capability_version": "scholarly-search@1",
+                "category": "public_literature_search",
+                "purpose": "Find indexed publications with an investigator-selected query and identify open full-text candidates.",
+                "cost_class": "local_cpu",
+                "outputs": [
+                  {
+                    "kind": "file:scholarly_candidates",
+                    "name": "candidates.json",
+                    "nature": "analysis"
+                  },
+                  {
+                    "kind": "file:scholarly_snapshot",
+                    "name": "search-snapshot.json",
+                    "nature": "analysis"
+                  }
+                ],
+                "execution_granted": true,
+                "status": "available"
+              },
+              {
+                "capability_version": "tl1a-coordinate-quality@1",
+                "category": "coordinate_completeness",
+                "purpose": "Quantify sensitivity of pairwise geometry to observed atom selection in the deposited 2RE9 crystal coordinates.",
+                "cost_class": "local_cpu",
+                "outputs": [
+                  {
+                    "kind": "file:coordinate_inventory",
+                    "name": "quality.json"
+                  }
+                ],
+                "execution_granted": false,
+                "status": "catalog_only"
+              },
+              {
+                "capability_version": "tl1a-geometry@1",
+                "category": "rigid_protein_backbone_superposition",
+                "purpose": "Quantify sensitivity of pairwise geometry to observed atom selection in the deposited 2RE9 crystal coordinates.",
+                "cost_class": "local_cpu",
+                "outputs": [
+                  {
+                    "kind": "file:tl1a_geometry",
+                    "name": "geometry.json"
+                  }
+                ],
+                "execution_granted": false,
+                "status": "catalog_only"
+              },
+              {
+                "capability_version": "tl1a-review@1",
+                "category": "rigid_protein_backbone_superposition",
+                "purpose": "Compare the frozen original measurements with independent proper least-squares SVD fits.",
+                "cost_class": "local_cpu",
+                "outputs": [
+                  {
+                    "kind": "file:geometry_review_batch",
+                    "name": "checks.json"
+                  }
+                ],
+                "execution_granted": false,
+                "status": "catalog_only"
+              }
+            ],
+            "total": 7,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-1",
+          "arguments": {
+            "kind": "method",
+            "query": "Crossref"
+          },
+          "answer": {
+            "kind": "method",
+            "items": [],
+            "total": 0,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-2",
+          "arguments": {
+            "kind": "research",
+            "query": "Crossref"
+          },
+          "answer": {
+            "kind": "research",
+            "items": [
+              {
+                "reference": "scholarly-search@1",
+                "kind": "research",
+                "category": "public_literature_search",
+                "status": "available",
+                "purpose": "Find indexed publications with an investigator-selected query and identify open full-text candidates.",
+                "digest": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "version": "1"
+              }
+            ],
+            "total": 1,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-3",
+          "arguments": {
+            "kind": "method",
+            "query": "JATS"
+          },
+          "answer": {
+            "kind": "method",
+            "items": [],
+            "total": 0,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-4",
+          "arguments": {
+            "kind": "research",
+            "query": "JATS"
+          },
+          "answer": {
+            "kind": "research",
+            "items": [
+              {
+                "reference": "gx_read_source@1",
+                "kind": "research",
+                "category": "source_reading",
+                "status": "available",
+                "purpose": "List locators and extraction coverage for assigned documents and data records (text, Markdown, JATS, HTML, PDF or JSON), or read one original segment with a receipt for this lease.",
+                "digest": "023b6a830feac830a55bfae269d5f449bda9a4a02d8c63732ad839a3290ac5a9",
+                "output_names": [
+                  "source or evidence receipt"
+                ],
+                "version": "1"
+              },
+              {
+                "reference": "scholarly-fetch@1",
+                "kind": "research",
+                "category": "public_literature_acquisition",
+                "status": "available",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "digest": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "version": "1"
+              }
+            ],
+            "total": 2,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-5",
+          "arguments": {
+            "kind": "research",
+            "query": "文獻"
+          },
+          "answer": {
+            "kind": "research",
+            "items": [],
+            "total": 0,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-6",
+          "arguments": {
+            "kind": "research",
+            "query": "文献"
+          },
+          "answer": {
+            "kind": "research",
+            "items": [],
+            "total": 0,
+            "next_offset": null
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "gxr_01m8f528p6vxx08aza",
+      "grant": {
+        "evidence_policy": "gx.evidence/6.2.4",
+        "research_effort": "deep",
+        "research_modules": [],
+        "plugins": [
+          "org.gx.yeast-enzyme-evidence@1.0.1"
+        ],
+        "capabilities": [
+          "yeast-reaction-index@2"
+        ],
+        "capability_options": [],
+        "input_files": []
+      },
+      "thread": "script-gxl_01m8f528tdqrpehthh",
+      "tools": [
+        "gx_task_context",
+        "gx_read_artifact",
+        "gx_decide_revision",
+        "gx_stage_claim",
+        "gx_query_catalog",
+        "gx_read_source",
+        "gx_extract_evidence",
+        "gx_review_evidence"
+      ],
+      "results": [
+        {
+          "call": "probe-0",
+          "arguments": {
+            "kind": "method",
+            "query": "BLASTp"
+          },
+          "answer": {
+            "kind": "method",
+            "items": [],
+            "total": 0,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-1",
+          "arguments": {
+            "kind": "database",
+            "query": "BLASTp"
+          },
+          "answer": {
+            "kind": "database",
+            "items": [
+              {
+                "reference": "yeast-reaction-index@2",
+                "kind": "database",
+                "category": "yeast_enzyme_evidence",
+                "status": "available",
+                "purpose": "Search reviewed S288C yeast hydrolysis annotations and sequence homologs for trehalose or sucrose.",
+                "digest": "30ce7d9abae575572373314848a82f43a9adee42c522ce6107504a2e2d17c0a4",
+                "input_roles": [
+                  "scope"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "homology.json",
+                  "blast.tsv"
+                ],
+                "version": "2"
+              }
+            ],
+            "total": 1,
+            "next_offset": null
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1339 @@
+{
+  "positive": {
+    "case": "positive",
+    "run_id": "gxr_01m8f5fp86mpxmg73p",
+    "status": "STOPPED",
+    "goal_status": "CLOSED",
+    "enrollment": {
+      "case": "positive",
+      "preregistration_sha256": "daa99b2c6c5bfbb436d268efa4315d1e11a60f94defb55a96da89385d850d85d",
+      "source_tree_sha256": "fc7beaa4fe30acdc03bf54c8689bdf1ba6b198a332f6b0ee456705699fe4b80a",
+      "installed_plugins": [
+        {
+          "id": "org.gx.hydro-marginal",
+          "version": "1.0.0",
+          "sha256": "0ca1e652d43b890280a4b44887bf035935e354e02fbe8bd91fdb87d16afad3cd",
+          "namespace": "gx_ext_org_gx_hydro_marginal_1_0_0_ab35db17901f3e389ca46e541265474fcf7d714f1292b78259218b046c156bfa",
+          "contributions": {
+            "workflows": [],
+            "tools": [],
+            "capabilities": [
+              "method.json"
+            ]
+          }
+        },
+        {
+          "id": "org.gx.hydro-concurrent",
+          "version": "1.0.0",
+          "sha256": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729",
+          "namespace": "gx_ext_org_gx_hydro_concurrent_1_0_0_095ace77b82bc95c010a2e89deb4b4d130c7bdac0ec7b7b4894ac0f124f9868c",
+          "contributions": {
+            "workflows": [],
+            "tools": [],
+            "capabilities": [
+              "method.json"
+            ]
+          }
+        }
+      ],
+      "skill_reference": {
+        "kind": "skill",
+        "reference": "gauge-logbook@reference",
+        "category": "hydrometry",
+        "title": "Discharge field logbook",
+        "purpose": "Background on archival gauge discharge log terminology.",
+        "digest": "4ec7774cf8a8a1a89a315b75644890efbc99d61c7c670a752a164d63c3807b3f",
+        "source": {
+          "workspace": "release",
+          "path": "gx-h/docs/gauge-observation-note.md",
+          "sha256": "4ec7774cf8a8a1a89a315b75644890efbc99d61c7c670a752a164d63c3807b3f"
+        },
+        "inputs": [
+          "observation note"
+        ],
+        "outputs": [
+          "archival reading note"
+        ]
+      },
+      "goal_config_sha256": "3db1166c87327fce1b2a6e5473f039c9e3d835b999deeed27860758d0401bf5f"
+    },
+    "material_sha256": "ef0d39569a8fd5c0e26b3d856f1c6847d8241a42d2ad798da73b343038c872e3",
+    "question_sha256": "21ef761e4c5c5c058cc69b9b45ec77d2cc78ba9b60a59fd875107cbc15d593b3",
+    "host_turns": [
+      {
+        "thread_id": "01a21e57-e5e0-7012-aee3-529a57e98bf4",
+        "turn_id": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "event_id": "start:11996a3d-e8c4-4c7d-9036-3885b82e49fa",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e58-cb01-7bf2-b179-238891b51f7e",
+        "turn_id": "01a21e58-cb4d-7cc0-8a84-8e43205e3325",
+        "event_id": "start:d6bf2787-33f4-4d55-9927-2ff76e1eb641",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+        "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "event_id": "start:ed8da276-1eab-4e9d-a946-3b420eb58662",
+        "state": "acknowledged"
+      }
+    ],
+    "native_calls": [
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "call_id": "exec-c978efb4-f32f-4e43-806a-57edc3bfa469",
+        "read_ref": "gxa_01m8f5fp9194pt7mgh",
+        "result_schema": "gx.hydrometry/1"
+      },
+      {
+        "tool": "gx_task_context",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "call_id": "exec-e86eed47-321f-427a-8ff7-0da30a53ee3d"
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "call_id": "exec-1967ed98-48fb-4d50-a6a4-3b8b609cb645",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "Rill West Rill East paired concurrent valid discharge intervals partial trial integrated water volumes calibration bounds signed West minus East excess channel follow-up"
+        },
+        "total": 41,
+        "status": null,
+        "top_references": [
+          "discharge-concurrent@1",
+          "discharge-marginal@1",
+          "pcna-local-geometry@1"
+        ],
+        "subject_candidates": [
+          {
+            "rank": 1,
+            "reference": "discharge-concurrent@1",
+            "provider": "org.gx.hydro-concurrent@1.0.0",
+            "kind": "method",
+            "status": "selectable",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "paired.json"
+            ],
+            "match_reason": "paired: outputs, concurrent: reference, valid: purpose, discharge: reference, intervals: purpose, trial: outputs, water: category,",
+            "execution_granted": false
+          },
+          {
+            "rank": 2,
+            "reference": "discharge-marginal@1",
+            "provider": "org.gx.hydro-marginal@1.0.0",
+            "kind": "method",
+            "status": "selectable",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "marginal.json"
+            ],
+            "match_reason": "paired: limitations, valid: purpose, discharge: reference, trial: outputs, water: category, volumes: purpose, bounds: limitations,",
+            "execution_granted": false
+          }
+        ],
+        "survey_event": 19
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "call_id": "exec-1f9cfcc3-6af5-419c-bcaf-f90569b52ff6",
+        "arguments": {
+          "kind": "all",
+          "reference": "discharge-concurrent@1"
+        },
+        "total": null,
+        "status": "selectable"
+      },
+      {
+        "tool": "gx_select_capability",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "call_id": "exec-c33a491d-0ef2-4082-b97a-bd1dc7044b2b",
+        "arguments": {
+          "action": "enable",
+          "method": "discharge-concurrent@1",
+          "revision": 0
+        },
+        "revision": 1
+      },
+      {
+        "tool": "gx_stage_claim",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "call_id": "exec-7bf1c1e6-6bf9-4480-9310-6c2df5d4bf40",
+        "accepted_ref": "gxa_01m8f5h2jqeh1z2htt"
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "call_id": "exec-bccc9113-480c-44b2-a0f3-201ae2ed9d04",
+        "arguments": {
+          "category": "hydrometric_water_balance",
+          "kind": "all",
+          "query": "paired valid interval record discharge volume difference calibration duration",
+          "required_outputs": [
+            "paired.json"
+          ]
+        },
+        "total": 2,
+        "status": null,
+        "top_references": [
+          "discharge-concurrent@1",
+          "discharge-marginal@1"
+        ],
+        "subject_candidates": [
+          {
+            "rank": 1,
+            "reference": "discharge-concurrent@1",
+            "provider": "org.gx.hydro-concurrent@1.0.0",
+            "kind": "method",
+            "status": "available",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "paired.json"
+            ],
+            "match_reason": "paired: outputs, valid: purpose, interval: purpose, record: method, discharge: reference, volume: purpose, difference: method, dur",
+            "execution_granted": true
+          },
+          {
+            "rank": 2,
+            "reference": "discharge-marginal@1",
+            "provider": "org.gx.hydro-marginal@1.0.0",
+            "kind": "method",
+            "status": "selectable",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "marginal.json"
+            ],
+            "match_reason": "paired: limitations, valid: purpose, interval: method, record: method, discharge: reference, volume: purpose, duration: purpose",
+            "execution_granted": false
+          }
+        ]
+      },
+      {
+        "tool": "gx_decide_revision",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "call_id": "call_ff5a50ca4d0f4a9e9d3f4e90ee70f6a2",
+        "accepted_ref": "gxa_f671c1c7baecde19cd0ffff1f0b16d1c90131a825587af7f3b6d35e4ad8cf529"
+      },
+      {
+        "tool": "gx_task_context",
+        "turn": "01a21e58-cb4d-7cc0-8a84-8e43205e3325",
+        "call_id": "exec-f2d756eb-b712-4210-b34f-84210ebbf8ae"
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e58-cb4d-7cc0-8a84-8e43205e3325",
+        "call_id": "exec-e467100a-ab53-4345-8951-7f0c51101dd4",
+        "arguments": {
+          "kind": "all",
+          "query": "Rill diversion trial time series record, coincident valid discharge intervals and calibration-bounded West-minus-East volume, excluded duration and follow-up",
+          "required_outputs": [
+            "paired.json"
+          ]
+        },
+        "total": 43,
+        "status": null,
+        "top_references": [
+          "discharge-concurrent@1",
+          "discharge-marginal@1",
+          "pcna-local-geometry@1"
+        ],
+        "subject_candidates": [
+          {
+            "rank": 1,
+            "reference": "discharge-concurrent@1",
+            "provider": "org.gx.hydro-concurrent@1.0.0",
+            "kind": "method",
+            "status": "available",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "paired.json"
+            ],
+            "match_reason": "trial: outputs, time: method, record: method, valid: purpose, discharge: reference, intervals: purpose, minus: method, volume: pur",
+            "execution_granted": true
+          },
+          {
+            "rank": 2,
+            "reference": "discharge-marginal@1",
+            "provider": "org.gx.hydro-marginal@1.0.0",
+            "kind": "method",
+            "status": "selectable",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "marginal.json"
+            ],
+            "match_reason": "trial: outputs, time: method, record: method, coincident: method, valid: purpose, discharge: reference, volume: purpose, duration:",
+            "execution_granted": false
+          }
+        ],
+        "survey_event": 55
+      },
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e58-cb4d-7cc0-8a84-8e43205e3325",
+        "call_id": "exec-e7631135-f2b9-4916-9e7c-d09cd8200b86",
+        "read_ref": "gxa_01m8f5fp9194pt7mgh",
+        "result_schema": "gx.hydrometry/1"
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e58-cb4d-7cc0-8a84-8e43205e3325",
+        "call_id": "exec-0d321d66-668c-4bde-8406-7c9c5a411edb",
+        "arguments": {
+          "kind": "method",
+          "reference": "discharge-concurrent@1"
+        },
+        "total": null,
+        "status": "available"
+      },
+      {
+        "tool": "gx_decide_revision",
+        "turn": "01a21e58-cb4d-7cc0-8a84-8e43205e3325",
+        "call_id": "call_62643985ee0b41c58c1a8438e0cd74e8",
+        "accepted_ref": "gxa_ca03d49a0a4efbaaf2b5ef42a077120a0d44761b8bc01c8324f2d8d988e37b31"
+      },
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-0295f2c8-7edd-44c7-a27e-e76ce36b8d64",
+        "read_ref": "gxa_01m8f5fp9194pt7mgh",
+        "result_schema": "gx.hydrometry/1"
+      },
+      {
+        "tool": "gx_task_context",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-ee17913c-d04d-4ee8-8824-196562086548"
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-9c7ed6d8-8ce8-48d2-bc69-2ff3db12100b",
+        "arguments": {
+          "kind": "all",
+          "query": "APR-17 Rill West and East discharges from material.json and paired.json: integrate only simultaneous valid intervals, compare volumes and bound the West-minus-East excess under stated calibration errors",
+          "required_outputs": [
+            "paired.json"
+          ]
+        },
+        "total": 45,
+        "status": null,
+        "top_references": [
+          "discharge-concurrent@1",
+          "pcna-local-geometry@1",
+          "discharge-marginal@1"
+        ],
+        "subject_candidates": [
+          {
+            "rank": 1,
+            "reference": "discharge-concurrent@1",
+            "provider": "org.gx.hydro-concurrent@1.0.0",
+            "kind": "method",
+            "status": "available",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "paired.json"
+            ],
+            "match_reason": "json: method, paired: outputs, integrate: purpose, only: limitations, simultaneous: purpose, valid: purpose, intervals: purpose, b",
+            "execution_granted": true
+          },
+          {
+            "rank": 3,
+            "reference": "discharge-marginal@1",
+            "provider": "org.gx.hydro-marginal@1.0.0",
+            "kind": "method",
+            "status": "selectable",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "marginal.json"
+            ],
+            "match_reason": "json: method, paired: limitations, simultaneous: limitations, valid: purpose, volumes: purpose, bound: limitations",
+            "execution_granted": false
+          }
+        ],
+        "survey_event": 69
+      },
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-bea73583-30ce-46fe-8d13-3aecd01ef884",
+        "read_ref": "gxa_01m8f5hjyspqtvqpz0",
+        "result_schema": "gx.v623.endpoint_page/1"
+      },
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-b1c64a1a-ce45-4705-95ef-eefadb182839",
+        "read_ref": "gxa_01m8f5hjyspqtvqpz0",
+        "result_schema": "gx.hydrometry-paired/1"
+      },
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-816c5c00-58c6-4fa4-ae27-b17d724b1782",
+        "read_ref": "gxa_01m8f5hjyspqtvqpz0",
+        "result_schema": "gx.hydrometry-paired/1"
+      },
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-be4eb53a-109b-4294-be25-de5094e4e7da",
+        "read_ref": "gxa_01m8f5hjyspqtvqpz0",
+        "result_schema": "gx.v623.endpoint_page/1"
+      },
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-8add42f6-d7f9-435a-b0ce-ce268f270901",
+        "read_ref": "gxa_01m8f5hjyspqtvqpz0",
+        "result_schema": "gx.v623.endpoint_page/1"
+      },
+      {
+        "tool": "gx_stage_claim",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "exec-553f5665-008e-4e55-ba72-a19ebed66532",
+        "accepted_ref": "gxa_01m8f5p3js56fmxxf1"
+      },
+      {
+        "tool": "gx_decide_revision",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "call_id": "call_07acba546c954c11a423ecafaf528a5c",
+        "accepted_ref": "gxa_961f6d19964ef4d97ddaf18fd5c7c75cadbd6bdeb8f35ebe4897c9ddd7e27b8a"
+      }
+    ],
+    "rejected_host_tool_results": [
+      {
+        "utc": "2026-11-27T18:50:20.398Z",
+        "host_call": "call_0e923383ec0148b499b52f2ba714e69e",
+        "tools_in_call": [
+          "gx_query_catalog",
+          "gx_read_source"
+        ],
+        "reason": "SCHEMA_INVALID: JSON record reads require a registered database original"
+      },
+      {
+        "utc": "2026-11-27T18:50:32.275Z",
+        "host_call": "call_fe615ed400dd4fa8bc1d10577d4348d4",
+        "tools_in_call": [
+          "gx_stage_claim"
+        ],
+        "reason": "SCHEMA_INVALID: The selected original materials have no single verified applicability. Choose the applicable originals or state an explicit scientific scope."
+      },
+      {
+        "utc": "2026-11-27T18:50:39.739Z",
+        "host_call": "call_2cee21a497794b76a5004f976c610531",
+        "tools_in_call": [
+          "gx_stage_claim"
+        ],
+        "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+      },
+      {
+        "utc": "2026-11-27T18:51:42.618Z",
+        "host_call": "call_31a9b2a2e9e948609926905577a1d127",
+        "tools_in_call": [
+          "gx_query_catalog",
+          "gx_read_source"
+        ],
+        "reason": "SCHEMA_INVALID: JSON record reads require a registered database original"
+      },
+      {
+        "utc": "2026-11-27T18:52:27.053Z",
+        "host_call": "call_7963e0314c274882b7844e663291ae21",
+        "tools_in_call": [
+          "gx_read_artifact",
+          "gx_read_source"
+        ],
+        "reason": "SCHEMA_INVALID: JSON record reads require a registered database original"
+      },
+      {
+        "utc": "2026-11-27T18:53:07.512Z",
+        "host_call": "call_f36fa75205514400aa57a3ef5773bb06",
+        "tools_in_call": [
+          "gx_stage_claim"
+        ],
+        "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+      },
+      {
+        "utc": "2026-11-27T18:53:16.816Z",
+        "host_call": "call_f8ac173b14bc4653b0790abc466efe97",
+        "tools_in_call": [
+          "gx_stage_claim"
+        ],
+        "reason": "SCHEMA_INVALID: this level requires applicable evidence or a classified measurement; execution, fixtures and unspecified inputs cannot establish the proposed direction"
+      }
+    ],
+    "surveys": [
+      {
+        "event_id": 19,
+        "utc": "2026-11-27T18:50:16.354Z",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "Rill West Rill East paired concurrent valid discharge intervals partial trial integrated water volumes calibration bounds signed West minus East excess channel follow-up"
+        },
+        "call_id": "exec-1967ed98-48fb-4d50-a6a4-3b8b609cb645",
+        "context_ref": "gxcx_01m8f5fpb52m62rvq1",
+        "thread_id": "01a21e57-e5e0-7012-aee3-529a57e98bf4",
+        "through_event": 14,
+        "total": 41,
+        "trigger_events": [
+          14
+        ],
+        "turn_id": "01a21e57-e610-7c82-a4e9-fad75c61e394"
+      },
+      {
+        "event_id": 55,
+        "utc": "2026-11-27T18:51:15.906Z",
+        "arguments": {
+          "kind": "all",
+          "query": "Rill diversion trial time series record, coincident valid discharge intervals and calibration-bounded West-minus-East volume, excluded duration and follow-up",
+          "required_outputs": [
+            "paired.json"
+          ]
+        },
+        "call_id": "exec-e467100a-ab53-4345-8951-7f0c51101dd4",
+        "context_ref": "gxcx_01m8f5hjpkf0p854wt",
+        "thread_id": "01a21e58-cb01-7bf2-b179-238891b51f7e",
+        "through_event": 26,
+        "total": 43,
+        "trigger_events": [
+          26
+        ],
+        "turn_id": "01a21e58-cb4d-7cc0-8a84-8e43205e3325"
+      },
+      {
+        "event_id": 69,
+        "utc": "2026-11-27T18:52:12.115Z",
+        "arguments": {
+          "kind": "all",
+          "query": "APR-17 Rill West and East discharges from material.json and paired.json: integrate only simultaneous valid intervals, compare volumes and bound the West-minus-East excess under stated calibration errors",
+          "required_outputs": [
+            "paired.json"
+          ]
+        },
+        "call_id": "exec-9c7ed6d8-8ce8-48d2-bc69-2ff3db12100b",
+        "context_ref": "gxcx_01m8f5kbezrf2ngfg3",
+        "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+        "through_event": 54,
+        "total": 45,
+        "trigger_events": [
+          53,
+          54
+        ],
+        "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+      }
+    ],
+    "endpoint_deliveries": [
+      {
+        "event_id": 67,
+        "utc": "2026-11-27T18:52:03.610Z",
+        "delivery_kind": "brief",
+        "endpoints": [
+          {
+            "metric_ref": "metric_0314918dd3373fca9f3b4aa720745d737f8dd4b8f6ddf6e20d81e370b30683c1",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_3c95ac4f2a0c8e4b718a1163803a925764d73ea14e4fccf35c78355a6f544d2f",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_4942acd2dd6aee64edf49d99e266b22857a73d55619caea2d9ce019e3f60a9b2",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_d7c4211875fea5b5577bbcf1c3582b7379d66fefa6099a500351c4fec3b63290",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_b2897fb3de7727a99a9b826ea487658843bd33579132e3a8436a7c6e6e61ee4a",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_cabacdbbcf67c4bef85f07d4d99b316dab402b994a36510afcae88cc8a85e08d",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_1b4c81b629106e5014a3544e6f9c5ee8fb9d66bfa0fd961bdb9b29e21db69d6e",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "common_minutes",
+              "key": "0314918dd337",
+              "unit": "min",
+              "value": "85.00 min"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "difference_L",
+              "key": "3c95ac4f2a0c",
+              "unit": "L",
+              "value": "4740.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "difference_high_L",
+              "key": "4942acd2dd6a",
+              "unit": "L",
+              "value": "6150.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "difference_low_L",
+              "key": "d7c4211875fe",
+              "unit": "L",
+              "value": "3330.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "left_L",
+              "key": "b2897fb3de77",
+              "unit": "L",
+              "value": "16470.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "outside_common_minutes",
+              "key": "cabacdbbcf67",
+              "unit": "min",
+              "value": "35.00 min"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "right_L",
+              "key": "1b4c81b62910",
+              "unit": "L",
+              "value": "11730.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          }
+        ],
+        "lease_id": "gxl_01m8f5kbggnjn0bb24",
+        "receipt": "start:ed8da276-1eab-4e9d-a946-3b420eb58662",
+        "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+        "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+        "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+      },
+      {
+        "event_id": 70,
+        "utc": "2026-11-27T18:52:12.198Z",
+        "delivery_kind": "artifact_read",
+        "endpoints": [
+          {
+            "metric_ref": "metric_0314918dd3373fca9f3b4aa720745d737f8dd4b8f6ddf6e20d81e370b30683c1",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_3c95ac4f2a0c8e4b718a1163803a925764d73ea14e4fccf35c78355a6f544d2f",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_4942acd2dd6aee64edf49d99e266b22857a73d55619caea2d9ce019e3f60a9b2",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "common_minutes",
+              "key": "0314918dd337",
+              "unit": "min",
+              "value": "85.00 min"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "difference_L",
+              "key": "3c95ac4f2a0c",
+              "unit": "L",
+              "value": "4740.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "difference_high_L",
+              "key": "4942acd2dd6a",
+              "unit": "L",
+              "value": "6150.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          }
+        ],
+        "lease_id": "gxl_01m8f5kbggnjn0bb24",
+        "receipt": "exec-bea73583-30ce-46fe-8d13-3aecd01ef884",
+        "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+        "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+        "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+      },
+      {
+        "event_id": 71,
+        "utc": "2026-11-27T18:52:37.492Z",
+        "delivery_kind": "artifact_read",
+        "endpoints": [
+          {
+            "metric_ref": "metric_d7c4211875fea5b5577bbcf1c3582b7379d66fefa6099a500351c4fec3b63290",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_b2897fb3de7727a99a9b826ea487658843bd33579132e3a8436a7c6e6e61ee4a",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "metric_ref": "metric_cabacdbbcf67c4bef85f07d4d99b316dab402b994a36510afcae88cc8a85e08d",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "difference_low_L",
+              "key": "d7c4211875fe",
+              "unit": "L",
+              "value": "3330.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "left_L",
+              "key": "b2897fb3de77",
+              "unit": "L",
+              "value": "16470.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "outside_common_minutes",
+              "key": "cabacdbbcf67",
+              "unit": "min",
+              "value": "35.00 min"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          }
+        ],
+        "lease_id": "gxl_01m8f5kbggnjn0bb24",
+        "receipt": "exec-be4eb53a-109b-4294-be25-de5094e4e7da",
+        "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+        "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+        "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+      },
+      {
+        "event_id": 72,
+        "utc": "2026-11-27T18:52:37.521Z",
+        "delivery_kind": "artifact_read",
+        "endpoints": [
+          {
+            "metric_ref": "metric_1b4c81b629106e5014a3544e6f9c5ee8fb9d66bfa0fd961bdb9b29e21db69d6e",
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          },
+          {
+            "row": {
+              "id": "right_L",
+              "key": "1b4c81b62910",
+              "unit": "L",
+              "value": "11730.00 L"
+            },
+            "source_ref": "gxa_01m8f5hjyspqtvqpz0"
+          }
+        ],
+        "lease_id": "gxl_01m8f5kbggnjn0bb24",
+        "receipt": "exec-8add42f6-d7f9-435a-b0ce-ce268f270901",
+        "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+        "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+        "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+      }
+    ],
+    "jobs": [
+      {
+        "job_id": "gxj_01m8f5hjhntmap80qe",
+        "capability_id": "discharge-concurrent",
+        "capability_version": "1",
+        "status": "SUCCEEDED",
+        "submitted_at": "2026-11-27T18:51:05.266Z",
+        "finished_at": "2026-11-27T18:51:05.582Z",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8f5hjyspqtvqpz0",
+            "kind": "hydrometric_concurrent",
+            "sha256": "659ab7046c1302a8199409d1f51c8a5487424377c74871d49bb25f5c0010ce5a",
+            "rel_path": "files/paired.json",
+            "values": {
+              "schema": "gx.hydrometry-paired/1",
+              "trial": "APR-17",
+              "channels": [
+                "West",
+                "East"
+              ],
+              "input_sha256": "ef0d39569a8fd5c0e26b3d856f1c6847d8241a42d2ad798da73b343038c872e3",
+              "common_minutes": 85.0,
+              "outside_common_minutes": 35.0,
+              "left_L": 16470.0,
+              "right_L": 11730.0,
+              "difference_L": 4740.0,
+              "difference_low_L": 3330.0,
+              "difference_high_L": 6150.0,
+              "left_mean_L_s": 3.2294117647058824,
+              "right_mean_L_s": 2.3,
+              "support": "positive_duration",
+              "intervals": [
+                {
+                  "start_min": 0.0,
+                  "end_min": 10.0
+                },
+                {
+                  "start_min": 10.0,
+                  "end_min": 35.0
+                },
+                {
+                  "start_min": 50.0,
+                  "end_min": 70.0
+                },
+                {
+                  "start_min": 90.0,
+                  "end_min": 100.0
+                },
+                {
+                  "start_min": 100.0,
+                  "end_min": 120.0
+                }
+              ],
+              "scope": "Volumes integrate over valid simultaneous intervals only. An empty support has zero duration and integrated volume; the mean and ordering there are unknown."
+            }
+          }
+        ]
+      }
+    ],
+    "decisions": [
+      {
+        "decision_ref": "gxa_f671c1c7baecde19cd0ffff1f0b16d1c90131a825587af7f3b6d35e4ad8cf529",
+        "turn": "01a21e57-e610-7c82-a4e9-fad75c61e394",
+        "event": 35,
+        "rationale": "Each channel has a rejected interval while the other channel was recording. Integrating both rates over their common valid times gives comparable volumes. The lower bound on West minus East tests whether calibration error alone could reverse the ordering. One local calculation supplies the duration, volumes and both bounds.",
+        "evidence_refs": [
+          "gxa_01m8f5fp9194pt7mgh",
+          "gxa_01m8f5h2jqeh1z2htt"
+        ],
+        "ops": [
+          {
+            "branch": "local:measurement-branch",
+            "budget_limits": {
+              "cpu_seconds": 30,
+              "job_submissions": 1
+            },
+            "op": "open_branch"
+          },
+          {
+            "branch": "local:measurement-branch",
+            "capability": "discharge-concurrent@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m8f5fp9194pt7mgh"
+            ],
+            "node": "local:measurement",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Over the jointly valid intervals, what are the common and excluded durations, the West and East volumes, and the nominal, minimum and maximum West-minus-East volume? Does the lower bound support checking West for excess delivery?"
+          }
+        ],
+        "outcome": "adopted",
+        "endpoint_use": {}
+      },
+      {
+        "decision_ref": "gxa_ca03d49a0a4efbaaf2b5ef42a077120a0d44761b8bc01c8324f2d8d988e37b31",
+        "turn": "01a21e58-cb4d-7cc0-8a84-8e43205e3325",
+        "event": 62,
+        "rationale": "East and West have gaps at different times. The commissioned calculation integrates both channels over their shared valid intervals and tests the registered criterion by putting West at its lower calibration limit and East at its upper limit. Await its result to record the signed bounds and both volumes. The logger record supplies no rate bound for either rejected interval.",
+        "evidence_refs": [
+          "gxa_01m8f5fp9194pt7mgh",
+          "gxa_01m8f5h2jqeh1z2htt"
+        ],
+        "ops": [],
+        "outcome": "maintained",
+        "endpoint_use": {}
+      },
+      {
+        "decision_ref": "gxa_961f6d19964ef4d97ddaf18fd5c7c75cadbd6bdeb8f35ebe4897c9ddd7e27b8a",
+        "turn": "01a21e59-ae95-7231-9b95-5c7415844470",
+        "event": 82,
+        "rationale": "The paired integration answers the delivery question for the shared valid time. West still leads when all its rates take their lower calibration limits and East's take their upper limits. That makes West the first channel to check. A second calculation on the same record would add no information about the rejected rates or the cause of the imbalance.",
+        "evidence_refs": [
+          "gxa_01m8f5hjyspqtvqpz0",
+          "gxa_01m8f5fp9194pt7mgh"
+        ],
+        "ops": [
+          {
+            "claim_refs": [
+              "gxa_01m8f5p3js56fmxxf1"
+            ],
+            "op": "close_run",
+            "reason": "The calculated West-minus-East excess is positive throughout the stated calibration interval for the jointly observed part of the supplied synthetic trial. Check West first to verify its higher delivery against the intended diversion setting.",
+            "unresolved": [
+              "East lacks a valid rate in the earlier gap and West lacks one in the later gap. Each rejected rate has no usable bound, so either channel could have delivered more over the full trial.",
+              "The cause of the difference during shared coverage is unknown."
+            ]
+          }
+        ],
+        "outcome": "adopted",
+        "endpoint_use": {
+          "receipts": {
+            "metric_0314918dd3373fca9f3b4aa720745d737f8dd4b8f6ddf6e20d81e370b30683c1": {
+              "delivery_kind": "artifact_read",
+              "event_id": 70,
+              "lease_id": "gxl_01m8f5kbggnjn0bb24",
+              "receipt": "exec-bea73583-30ce-46fe-8d13-3aecd01ef884",
+              "source_ref": "gxa_01m8f5hjyspqtvqpz0",
+              "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+              "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+              "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+            },
+            "metric_1b4c81b629106e5014a3544e6f9c5ee8fb9d66bfa0fd961bdb9b29e21db69d6e": {
+              "delivery_kind": "artifact_read",
+              "event_id": 72,
+              "lease_id": "gxl_01m8f5kbggnjn0bb24",
+              "receipt": "exec-8add42f6-d7f9-435a-b0ce-ce268f270901",
+              "source_ref": "gxa_01m8f5hjyspqtvqpz0",
+              "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+              "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+              "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+            },
+            "metric_3c95ac4f2a0c8e4b718a1163803a925764d73ea14e4fccf35c78355a6f544d2f": {
+              "delivery_kind": "artifact_read",
+              "event_id": 70,
+              "lease_id": "gxl_01m8f5kbggnjn0bb24",
+              "receipt": "exec-bea73583-30ce-46fe-8d13-3aecd01ef884",
+              "source_ref": "gxa_01m8f5hjyspqtvqpz0",
+              "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+              "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+              "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+            },
+            "metric_4942acd2dd6aee64edf49d99e266b22857a73d55619caea2d9ce019e3f60a9b2": {
+              "delivery_kind": "artifact_read",
+              "event_id": 70,
+              "lease_id": "gxl_01m8f5kbggnjn0bb24",
+              "receipt": "exec-bea73583-30ce-46fe-8d13-3aecd01ef884",
+              "source_ref": "gxa_01m8f5hjyspqtvqpz0",
+              "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+              "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+              "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+            },
+            "metric_b2897fb3de7727a99a9b826ea487658843bd33579132e3a8436a7c6e6e61ee4a": {
+              "delivery_kind": "artifact_read",
+              "event_id": 71,
+              "lease_id": "gxl_01m8f5kbggnjn0bb24",
+              "receipt": "exec-be4eb53a-109b-4294-be25-de5094e4e7da",
+              "source_ref": "gxa_01m8f5hjyspqtvqpz0",
+              "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+              "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+              "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+            },
+            "metric_cabacdbbcf67c4bef85f07d4d99b316dab402b994a36510afcae88cc8a85e08d": {
+              "delivery_kind": "artifact_read",
+              "event_id": 71,
+              "lease_id": "gxl_01m8f5kbggnjn0bb24",
+              "receipt": "exec-be4eb53a-109b-4294-be25-de5094e4e7da",
+              "source_ref": "gxa_01m8f5hjyspqtvqpz0",
+              "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+              "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+              "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+            },
+            "metric_d7c4211875fea5b5577bbcf1c3582b7379d66fefa6099a500351c4fec3b63290": {
+              "delivery_kind": "artifact_read",
+              "event_id": 71,
+              "lease_id": "gxl_01m8f5kbggnjn0bb24",
+              "receipt": "exec-be4eb53a-109b-4294-be25-de5094e4e7da",
+              "source_ref": "gxa_01m8f5hjyspqtvqpz0",
+              "task_id": "gxt_01m8f5kbf1j2w4mcjf",
+              "thread_id": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+              "turn_id": "01a21e59-ae95-7231-9b95-5c7415844470"
+            }
+          },
+          "received_metric_refs": [
+            "metric_0314918dd3373fca9f3b4aa720745d737f8dd4b8f6ddf6e20d81e370b30683c1",
+            "metric_1b4c81b629106e5014a3544e6f9c5ee8fb9d66bfa0fd961bdb9b29e21db69d6e",
+            "metric_3c95ac4f2a0c8e4b718a1163803a925764d73ea14e4fccf35c78355a6f544d2f",
+            "metric_4942acd2dd6aee64edf49d99e266b22857a73d55619caea2d9ce019e3f60a9b2",
+            "metric_b2897fb3de7727a99a9b826ea487658843bd33579132e3a8436a7c6e6e61ee4a",
+            "metric_cabacdbbcf67c4bef85f07d4d99b316dab402b994a36510afcae88cc8a85e08d",
+            "metric_d7c4211875fea5b5577bbcf1c3582b7379d66fefa6099a500351c4fec3b63290"
+          ],
+          "unread_metric_refs": [],
+          "used_metric_refs": [
+            "metric_0314918dd3373fca9f3b4aa720745d737f8dd4b8f6ddf6e20d81e370b30683c1",
+            "metric_1b4c81b629106e5014a3544e6f9c5ee8fb9d66bfa0fd961bdb9b29e21db69d6e",
+            "metric_3c95ac4f2a0c8e4b718a1163803a925764d73ea14e4fccf35c78355a6f544d2f",
+            "metric_4942acd2dd6aee64edf49d99e266b22857a73d55619caea2d9ce019e3f60a9b2",
+            "metric_b2897fb3de7727a99a9b826ea487658843bd33579132e3a8436a7c6e6e61ee4a",
+            "metric_cabacdbbcf67c4bef85f07d4d99b316dab402b994a36510afcae88cc8a85e08d",
+            "metric_d7c4211875fea5b5577bbcf1c3582b7379d66fefa6099a500351c4fec3b63290"
+          ]
+        }
+      }
+    ],
+    "closure": {
+      "goal_version": 1,
+      "decision_ref": "gxa_961f6d19964ef4d97ddaf18fd5c7c75cadbd6bdeb8f35ebe4897c9ddd7e27b8a",
+      "op_digest": "97233f8d71bec6aa0c06ce2db713408c2192edaabb75d7f1f38c105283294238",
+      "requested_event": 77,
+      "committed_event": 82,
+      "closed_event": 83,
+      "closed_utc": "2026-11-27T18:54:11.258Z",
+      "operation": {
+        "claim_refs": [
+          "gxa_01m8f5p3js56fmxxf1"
+        ],
+        "op": "close_run",
+        "reason": "The calculated West-minus-East excess is positive throughout the stated calibration interval for the jointly observed part of the supplied synthetic trial. Check West first to verify its higher delivery against the intended diversion setting.",
+        "unresolved": [
+          "East lacks a valid rate in the earlier gap and West lacks one in the later gap. Each rejected rate has no usable bound, so either channel could have delivered more over the full trial.",
+          "The cause of the difference during shared coverage is unknown."
+        ]
+      }
+    },
+    "rendered_final": {
+      "reason": "The calculated West-minus-East excess is positive throughout the stated calibration interval for the jointly observed part of the supplied synthetic trial. Check West first to verify its higher delivery against the intended diversion setting.",
+      "rationale": "The paired integration answers the delivery question for the shared valid time. West still leads when all its rates take their lower calibration limits and East's take their upper limits. That makes West the first channel to check. A second calculation on the same record would add no information about the rejected rates or the cause of the imbalance.",
+      "unresolved": [
+        "East lacks a valid rate in the earlier gap and West lacks one in the later gap. Each rejected rate has no usable bound, so either channel could have delivered more over the full trial.",
+        "The cause of the difference during shared coverage is unknown."
+      ]
+    },
+    "rejected_decisions": [],
+    "report_sha256": "0c6c466887e0dce5883fb4ac7af3d12c593648b4527744da8de27d2f745a81f5",
+    "decision_md_sha256": "4c1e3d96551a9c6584cddbe89605e071ebb118c684a9e1fcf24c56b3fcf248a0"
+  },
+  "negative": {
+    "case": "negative",
+    "run_id": "gxr_01m8f5fmqqnkcgep1x",
+    "status": "STOPPED",
+    "goal_status": "CLOSED",
+    "enrollment": {
+      "case": "negative",
+      "preregistration_sha256": "daa99b2c6c5bfbb436d268efa4315d1e11a60f94defb55a96da89385d850d85d",
+      "source_tree_sha256": "fc7beaa4fe30acdc03bf54c8689bdf1ba6b198a332f6b0ee456705699fe4b80a",
+      "installed_plugins": [
+        {
+          "id": "org.gx.hydro-marginal",
+          "version": "1.0.0",
+          "sha256": "0ca1e652d43b890280a4b44887bf035935e354e02fbe8bd91fdb87d16afad3cd",
+          "namespace": "gx_ext_org_gx_hydro_marginal_1_0_0_ab35db17901f3e389ca46e541265474fcf7d714f1292b78259218b046c156bfa",
+          "contributions": {
+            "workflows": [],
+            "tools": [],
+            "capabilities": [
+              "method.json"
+            ]
+          }
+        }
+      ],
+      "skill_reference": {
+        "kind": "skill",
+        "reference": "gauge-logbook@reference",
+        "category": "hydrometry",
+        "title": "Discharge field logbook",
+        "purpose": "Background on archival gauge discharge log terminology.",
+        "digest": "4ec7774cf8a8a1a89a315b75644890efbc99d61c7c670a752a164d63c3807b3f",
+        "source": {
+          "workspace": "release",
+          "path": "gx-h/docs/gauge-observation-note.md",
+          "sha256": "4ec7774cf8a8a1a89a315b75644890efbc99d61c7c670a752a164d63c3807b3f"
+        },
+        "inputs": [
+          "observation note"
+        ],
+        "outputs": [
+          "archival reading note"
+        ]
+      },
+      "goal_config_sha256": "83df020a8dc317b97ac16a48ac4c04908dfdb536db190b646549de83f31c7997"
+    },
+    "material_sha256": "6157f716c9d1858f725b981636dfca27d3de7018eaa831eb2acfe980ea9515c9",
+    "question_sha256": "83c3ffeb074a76719630dad6a0c276304c6e3aadc032f01d722c983d7e82b9da",
+    "host_turns": [
+      {
+        "thread_id": "01a21e57-e3ca-7df0-835c-767653512cae",
+        "turn_id": "01a21e57-e405-7c81-948d-02db237a117d",
+        "event_id": "start:58e7e7b0-4f76-469b-a976-dc5bec4926f1",
+        "state": "acknowledged"
+      }
+    ],
+    "native_calls": [
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "call_id": "exec-9f0633bb-f2b0-4df7-9b4f-4a465eb947b2",
+        "read_ref": "gxa_01m8f5fms5pk3s5exq",
+        "result_schema": "gx.hydrometry-summary/1"
+      },
+      {
+        "tool": "gx_task_context",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "call_id": "exec-88737d18-269f-4c3f-af55-8e27fa171c59"
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "call_id": "exec-5c61d2c3-5f21-4eaa-bcf1-ee36eab0fd52",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "APR-18 synchronous coverage, West and East water discharge volumes on jointly valid intervals, overlap duration, logger archive paired hydrometry observations or limits from marginal totals"
+        },
+        "total": 33,
+        "status": null,
+        "top_references": [
+          "discharge-marginal@1",
+          "bglb-retrospective@1",
+          "yeast-reaction-index@1"
+        ],
+        "subject_candidates": [
+          {
+            "rank": 1,
+            "reference": "discharge-marginal@1",
+            "provider": "org.gx.hydro-marginal@1.0.0",
+            "kind": "method",
+            "status": "selectable",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "marginal.json"
+            ],
+            "match_reason": "coverage: method, water: category, discharge: reference, volumes: purpose, valid: purpose, duration: purpose, paired: limitations,",
+            "execution_granted": false
+          },
+          {
+            "rank": 18,
+            "reference": "gauge-logbook@reference",
+            "kind": "skill",
+            "status": "reference_only",
+            "input_roles": [
+              "observation note"
+            ],
+            "output_names": [
+              "archival reading note"
+            ],
+            "match_reason": "discharge: title, hydrometry: category",
+            "execution_granted": false
+          }
+        ],
+        "survey_event": 19
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "call_id": "exec-020ace2f-3afd-44a6-abc3-bc1468b641df",
+        "arguments": {
+          "kind": "method",
+          "reference": "discharge-marginal@1"
+        },
+        "total": null,
+        "status": "selectable"
+      },
+      {
+        "tool": "gx_query_catalog",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "call_id": "exec-cc28b124-bc18-4127-b88d-29e265953ab8",
+        "arguments": {
+          "kind": "all",
+          "limit": 16,
+          "query": "hydrometric water balance common support paired volume interval increments validity mask bounds"
+        },
+        "total": 16,
+        "status": null,
+        "top_references": [
+          "discharge-marginal@1",
+          "pcna-local-geometry@1",
+          "deposited-block-signed@1"
+        ],
+        "subject_candidates": [
+          {
+            "rank": 1,
+            "reference": "discharge-marginal@1",
+            "provider": "org.gx.hydro-marginal@1.0.0",
+            "kind": "method",
+            "status": "selectable",
+            "input_roles": [
+              "record"
+            ],
+            "output_names": [
+              "marginal.json"
+            ],
+            "match_reason": "hydrometric: category, water: category, balance: category, support: limitations, paired: limitations, volume: purpose, interval: m",
+            "execution_granted": false
+          }
+        ]
+      },
+      {
+        "tool": "gx_read_artifact",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "call_id": "exec-fdb2dc83-8701-4d6a-9ad6-29ef055f78b3",
+        "read_ref": "gxa_01m8f5fms5pk3s5exq",
+        "result_schema": "gx.v623.endpoint_page/1"
+      },
+      {
+        "tool": "gx_stage_claim",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "call_id": "exec-68079f64-a8b2-4182-bb85-22f09664cb7e",
+        "accepted_ref": "gxa_01m8f5k8bjsy0hsp1d"
+      },
+      {
+        "tool": "gx_decide_revision",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "call_id": "call_47be59441bd04e84b72bfaa7023f73ef",
+        "accepted_ref": "gxa_698f11339bb262ae1224588b0a90b57dd3aea4bbdeb4f8eb781ea5b1d47b5909"
+      }
+    ],
+    "rejected_host_tool_results": [
+      {
+        "utc": "2026-11-27T18:50:18.025Z",
+        "host_call": "call_6100eb7aa2d04cc686bb1f006594c351",
+        "tools_in_call": [
+          "gx_query_catalog",
+          "gx_read_artifact",
+          "gx_read_source",
+          "gx_task_context"
+        ],
+        "reason": "SCHEMA_INVALID: JSON record reads require a registered database original"
+      },
+      {
+        "utc": "2026-11-27T18:50:18.025Z",
+        "host_call": "call_6100eb7aa2d04cc686bb1f006594c351",
+        "tools_in_call": [
+          "gx_query_catalog",
+          "gx_read_artifact",
+          "gx_read_source",
+          "gx_task_context"
+        ],
+        "reason": "SCHEMA_INVALID: Catalog offset must be nonnegative and limit between 1 and 40"
+      },
+      {
+        "utc": "2026-11-27T18:51:28.983Z",
+        "host_call": "call_d3e9accb720548538bff70351822b5a4",
+        "tools_in_call": [
+          "gx_stage_claim"
+        ],
+        "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+      },
+      {
+        "utc": "2026-11-27T18:51:52.017Z",
+        "host_call": "call_caf310eb76d14ce7957ef98191557d15",
+        "tools_in_call": [
+          "gx_stage_claim"
+        ],
+        "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+      }
+    ],
+    "surveys": [
+      {
+        "event_id": 19,
+        "utc": "2026-11-27T18:50:22.504Z",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "APR-18 synchronous coverage, West and East water discharge volumes on jointly valid intervals, overlap duration, logger archive paired hydrometry observations or limits from marginal totals"
+        },
+        "call_id": "exec-5c61d2c3-5f21-4eaa-bcf1-ee36eab0fd52",
+        "context_ref": "gxcx_01m8f5fmv9ggx1xw80",
+        "thread_id": "01a21e57-e3ca-7df0-835c-767653512cae",
+        "through_event": 14,
+        "total": 33,
+        "trigger_events": [
+          14
+        ],
+        "turn_id": "01a21e57-e405-7c81-948d-02db237a117d"
+      }
+    ],
+    "endpoint_deliveries": [],
+    "jobs": [],
+    "decisions": [
+      {
+        "decision_ref": "gxa_698f11339bb262ae1224588b0a90b57dd3aea4bbdeb4f8eb781ea5b1d47b5909",
+        "turn": "01a21e57-e405-7c81-948d-02db237a117d",
+        "event": 30,
+        "rationale": "The synthetic APR-18 export gives 75 observed minutes per channel in a 120-minute window. The shared duration is therefore bounded by 30 and 75 minutes. The 9,000 L West total and 8,100 L East total include each channel’s exclusively observed times. The 900 L marginal difference equals the shared difference plus West-only volume minus East-only volume. Either channel can lead on the shared times, and a tie is possible. Defer channel-specific follow-up. The available discharge method can only reproduce the marginal totals, and there is no pending interval record. Reopen if synchronized validity intervals and flow increments or integrable rates become available, or if a verified summary gives the common duration and both volumes over precisely those times. A resolved positive paired difference would support a West follow-up and a negative one an East follow-up. Verified coincidence of all 75 observed minutes would itself establish a 900 L West lead.",
+        "evidence_refs": [
+          "gxa_01m8f5fms5pk3s5exq"
+        ],
+        "ops": [
+          {
+            "claim_refs": [
+              "gxa_01m8f5k8bjsy0hsp1d"
+            ],
+            "op": "close_run",
+            "reason": "INSUFFICIENT_DATA",
+            "unresolved": [
+              "Exact jointly observed duration, West and East volumes during that time, and the sign of their difference."
+            ]
+          }
+        ],
+        "outcome": "adopted",
+        "endpoint_use": {
+          "receipts": {},
+          "received_metric_refs": [],
+          "unread_metric_refs": [],
+          "used_metric_refs": []
+        }
+      }
+    ],
+    "closure": {
+      "goal_version": 1,
+      "decision_ref": "gxa_698f11339bb262ae1224588b0a90b57dd3aea4bbdeb4f8eb781ea5b1d47b5909",
+      "op_digest": "7461eb8f2d0f3092b79469d9c21762e37f9f906be63568cefe453cc384a61faf",
+      "requested_event": 25,
+      "committed_event": 30,
+      "closed_event": 31,
+      "closed_utc": "2026-11-27T18:52:13.854Z",
+      "operation": {
+        "claim_refs": [
+          "gxa_01m8f5k8bjsy0hsp1d"
+        ],
+        "op": "close_run",
+        "reason": "INSUFFICIENT_DATA",
+        "unresolved": [
+          "Exact jointly observed duration, West and East volumes during that time, and the sign of their difference."
+        ]
+      }
+    },
+    "rendered_final": {
+      "reason": "INSUFFICIENT_DATA",
+      "rationale": "The synthetic APR-18 export gives 75 observed minutes per channel in a 120-minute window. The shared duration is therefore bounded by 30 and 75 minutes. The 9,000 L West total and 8,100 L East total include each channel’s exclusively observed times. The 900 L marginal difference equals the shared difference plus West-only volume minus East-only volume. Either channel can lead on the shared times, and a tie is possible. Defer channel-specific follow-up. The available discharge method can only reproduce the marginal totals, and there is no pending interval record. Reopen if synchronized validity intervals and flow increments or integrable rates become available, or if a verified summary gives the common duration and both volumes over precisely those times. A resolved positive paired difference would support a West follow-up and a negative one an East follow-up. Verified coincidence of all 75 observed minutes would itself establish a 900 L West lead.",
+      "unresolved": [
+        "Exact jointly observed duration, West and East volumes during that time, and the sign of their difference."
+      ]
+    },
+    "rejected_decisions": [],
+    "report_sha256": "935f3791d5ec313aa8cd20c8d871d58e6ee46d8df21e3ede8446ddba2b58d89d",
+    "decision_md_sha256": "e03b7ee104018944f381a7dcfb51c80aa3212ab98ffd420eaa3fbef1f035ff57"
+  }
+}

@@ -18,6 +18,21 @@ from gx_core.plugins.cli import _install
 
 
 class MethodCitations(unittest.TestCase):
+    def test_confirmed_resume_keeps_exact_method_card_for_the_same_decision(self):
+        from dataclasses import replace
+        s = self.enterContext(fx.Scenario(Path(self.enterContext(tempfile.TemporaryDirectory())),
+            spec_updates={"research_effort":"deep","research_modules":[],"evidence_policy":v621_policy.VERSION}))
+        actor = s.lead
+        ref = s.call(actor,"gx_query_catalog",{"kind":"method","reference":"fixture-grid@1"},"inspect")["source_ref"]
+        turn = "confirmed-catalog-resume"
+        s.conn.execute("""INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,human,
+            interrupt,state,method,turn_id) VALUES(?,?,?,?,?,0,0,'acknowledged','turn/start',?)""",
+            (s.run_id,"resume:"+actor.turn,actor.thread,turn,"continuation",turn))
+        s.roots.active_turns[actor.thread] = turn
+        result = s.call(replace(actor,turn=turn),"gx_decide_revision",{"decision":fx.draft(evidence=[ref])},"use-card")
+        self.assertTrue(result["decision_ref"])
+        self.assertFalse(s.rows("SELECT job_id FROM jobs"))
+
     def test_exact_published_card_supports_its_own_lead_decision_only(self):
         study = self.enterContext(fx.Scenario(Path(self.enterContext(tempfile.TemporaryDirectory())),
             spec_updates={"research_effort": "deep", "research_modules": [], "evidence_policy": v621_policy.VERSION}))

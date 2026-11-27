@@ -1,0 +1,105 @@
+{
+  "manifest": {
+    "capability_id": "mapped-structure-agreement",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--prediction",
+        "{in.prediction}",
+        "--reference",
+        "{in.reference}",
+        "--mapping",
+        "{in.mapping}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "mapped_coordinate_agreement",
+      "mechanism": "Two mmCIF files and an explicit one-to-one polymer residue map, in prediction, reference, mapping order.",
+      "objective": "Measure model-1 C-alpha coordinate agreement with the supplied reference.",
+      "estimator": "Proper-rotation Kabsch SVD on positive occupancy matched coordinates. Report missing mapped positions separately.",
+      "training_data_lineage": "Deterministic, no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.archival-fold-calibration/1.0.0/job-scripts/score.py",
+      "sha256": "1f69a4b3a13c319e25df7baff7afeebf772da41eecbf2921e1492d5242f52e4f"
+    },
+    "licence": "GX release source; wwPDB archival coordinates CC0.",
+    "licence_basis": "wwPDB archive terms of use at https://www.wwpdb.org/about/usage-policies",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 45
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "agreement.json",
+        "kind": "file:mapped_structure_agreement",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "prediction",
+          "reference",
+          "mapping"
+        ],
+        "metric_specs": {
+          "mapped_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/mapped_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mapping_sha256": "/mapping_sha256",
+              "reference_sha256": "/reference_sha256",
+              "prediction_chain": "/prediction_chain",
+              "reference_chain": "/reference_chain",
+              "model": "/model"
+            }
+          },
+          "matched_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/matched_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mapping_sha256": "/mapping_sha256",
+              "reference_sha256": "/reference_sha256",
+              "prediction_chain": "/prediction_chain",
+              "reference_chain": "/reference_chain",
+              "model": "/model"
+            }
+          },
+          "calpha_rmsd_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/calpha_rmsd_A",
+            "unit": "angstrom",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mapping_sha256": "/mapping_sha256",
+              "reference_sha256": "/reference_sha256",
+              "prediction_chain": "/prediction_chain",
+              "reference_chain": "/reference_chain",
+              "model": "/model"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Equal-weight structural similarity over mapped positions only. Ambiguous sites cause an error. Missing coordinates reduce coverage."
+  },
+  "entry_script": "job-scripts/score.py"
+}

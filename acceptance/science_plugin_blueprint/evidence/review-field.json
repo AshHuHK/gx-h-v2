@@ -1,0 +1,1123 @@
+{
+  "audited_utc": "2026-11-27T19:34:19.708913+00:00",
+  "method": "Original GX SQLite mode=ro, transaction snapshot per Run. Referenced payload SHA-256 independently recomputed; zero new model/GPU Jobs in review.",
+  "A1": {
+    "positive": {
+      "state": "../release-acceptance/science-plugin-blueprint/a1/positive/state/gx.db",
+      "run": "gxr_01m8f5fp86mpxmg73p",
+      "goal_status": "CLOSED",
+      "first_options": [
+        "bglb-retrospective@1",
+        "deposited-block-influence@2",
+        "deposited-block-signed@1",
+        "discharge-concurrent@1",
+        "discharge-marginal@1"
+      ],
+      "survey": [
+        {
+          "event": 19,
+          "triggers": [
+            {
+              "event_id": 14,
+              "kind": "research.catalog.updated"
+            }
+          ],
+          "total": 41,
+          "top_two": [
+            "discharge-concurrent@1",
+            "discharge-marginal@1"
+          ]
+        },
+        {
+          "event": 55,
+          "triggers": [
+            {
+              "event_id": 26,
+              "kind": "research.capabilities.changed"
+            }
+          ],
+          "total": 43,
+          "top_two": [
+            "discharge-concurrent@1",
+            "discharge-marginal@1"
+          ]
+        },
+        {
+          "event": 69,
+          "triggers": [
+            {
+              "event_id": 53,
+              "kind": "v6.node.settled"
+            },
+            {
+              "event_id": 54,
+              "kind": "v62.claim.reassessed"
+            }
+          ],
+          "total": 45,
+          "top_two": [
+            "discharge-concurrent@1",
+            "pcna-local-geometry@1"
+          ]
+        }
+      ],
+      "material_sha256": "ef0d39569a8fd5c0e26b3d856f1c6847d8241a42d2ad798da73b343038c872e3",
+      "input_source": "GX independent-author synthetic two-channel logger exercise; data generated for this trial, not a measurement of a real stream",
+      "jobs": [
+        {
+          "job_id": "gxj_01m8f5hjhntmap80qe",
+          "capability_id": "discharge-concurrent",
+          "status": "SUCCEEDED"
+        }
+      ],
+      "actual_decisions": [
+        {
+          "id": "gxa_f671c1c7baecde19cd0ffff1f0b16d1c90131a825587af7f3b6d35e4ad8cf529",
+          "thread": "01a21e57-e5e0-7012-aee3-529a57e98bf4",
+          "scope": "run",
+          "ops": [
+            "open_branch",
+            "add_node"
+          ],
+          "evidence_count": 2
+        },
+        {
+          "id": "gxa_ca03d49a0a4efbaaf2b5ef42a077120a0d44761b8bc01c8324f2d8d988e37b31",
+          "thread": "01a21e58-cb01-7bf2-b179-238891b51f7e",
+          "scope": "run",
+          "ops": [],
+          "evidence_count": 2
+        },
+        {
+          "id": "gxa_961f6d19964ef4d97ddaf18fd5c7c75cadbd6bdeb8f35ebe4897c9ddd7e27b8a",
+          "thread": "01a21e59-ae45-7593-b09b-f2ee38ca0844",
+          "scope": "run",
+          "ops": [
+            "close_run"
+          ],
+          "refs": [
+            "gxa_01m8f5hjyspqtvqpz0",
+            "gxa_01m8f5fp9194pt7mgh"
+          ],
+          "rationale": "The paired integration answers the delivery question for the shared valid time. West still leads when all its rates take their lower calibration limits and East's take their upper limits. That makes West the first channel to check. A second calculation on the same record would add no information about the rejected rates or the cause of the imbalance."
+        }
+      ],
+      "close_event": 83,
+      "verified_measurement": {
+        "common_minutes": 85.0,
+        "left_L": 16470.0,
+        "right_L": 11730.0,
+        "difference_L": 4740.0,
+        "difference_low_L": 3330.0,
+        "difference_high_L": 6150.0
+      },
+      "result_ref": "gxa_01m8f5hjyspqtvqpz0",
+      "result_sha256": "659ab7046c1302a8199409d1f51c8a5487424377c74871d49bb25f5c0010ce5a"
+    },
+    "negative": {
+      "state": "../release-acceptance/science-plugin-blueprint/a1/negative/state/gx.db",
+      "run": "gxr_01m8f5fmqqnkcgep1x",
+      "goal_status": "CLOSED",
+      "first_options": [
+        "bglb-retrospective@1",
+        "deposited-block-influence@2",
+        "deposited-block-signed@1",
+        "discharge-marginal@1"
+      ],
+      "survey": [
+        {
+          "event": 19,
+          "triggers": [
+            {
+              "event_id": 14,
+              "kind": "research.catalog.updated"
+            }
+          ],
+          "total": 33,
+          "top_two": [
+            "discharge-marginal@1",
+            "bglb-retrospective@1"
+          ]
+        }
+      ],
+      "material_sha256": "6157f716c9d1858f725b981636dfca27d3de7018eaa831eb2acfe980ea9515c9",
+      "input_source": "GX independent-author synthetic logger export; constructed as a marginal-coverage counterexample, not a field observation",
+      "jobs": [],
+      "actual_decisions": [
+        {
+          "id": "gxa_698f11339bb262ae1224588b0a90b57dd3aea4bbdeb4f8eb781ea5b1d47b5909",
+          "thread": "01a21e57-e3ca-7df0-835c-767653512cae",
+          "scope": "run",
+          "ops": [
+            "close_run"
+          ],
+          "refs": [
+            "gxa_01m8f5fms5pk3s5exq"
+          ],
+          "rationale": "The synthetic APR-18 export gives 75 observed minutes per channel in a 120-minute window. The shared duration is therefore bounded by 30 and 75 minutes. The 9,000 L West total and 8,100 L East total include each channel’s exclusively observed times. The 900 L marginal difference equals the shared difference plus West-only volume minus East-only volume. Either channel can lead on the shared times, and a tie is possible. Defer channel-specific follow-up. The available discharge method can only reproduce the marginal totals, and there is no pending interval record. Reopen if synchronized validity intervals and flow increments or integrable rates become available, or if a verified summary gives the common duration and both volumes over precisely those times. A resolved positive paired difference would support a West follow-up and a negative one an East follow-up. Verified coincidence of all 75 observed minutes would itself establish a 900 L West lead."
+        }
+      ],
+      "close_event": 31,
+      "feasible_counterexamples_litres": [
+        {
+          "west_common": 2000,
+          "east_common": 1000,
+          "west_exclusive": 7000,
+          "east_exclusive": 7100,
+          "west_minus_east_common": 1000
+        },
+        {
+          "west_common": 1000,
+          "east_common": 2000,
+          "west_exclusive": 8000,
+          "east_exclusive": 6100,
+          "west_minus_east_common": -1000
+        }
+      ]
+    }
+  },
+  "A1_separate_same_run_updates": {
+    "run": "gxr_01m8f6ktvmbrk2xzns",
+    "state": "../release-acceptance/science-plugin-blueprint/a1/multiturn/state/gx.db",
+    "goal_status": "CLOSED",
+    "pre_survey_selectable_view": {
+      "option_count": 5,
+      "revision": 0
+    },
+    "surveys": [
+      {
+        "id": 19,
+        "triggers": [
+          {
+            "event_id": 14,
+            "kind": "research.catalog.updated"
+          }
+        ],
+        "query": "Shared valid observation time, two-station flow comparison, logger tolerances, calibrated delivery volume bounds and maintenance dispatch, gx.hydrometry/1 record.",
+        "top": [
+          "discharge-marginal@1",
+          "discharge-concurrent@1"
+        ]
+      },
+      {
+        "id": 66,
+        "triggers": [
+          {
+            "event_id": 28,
+            "kind": "research.capabilities.changed"
+          },
+          {
+            "event_id": 55,
+            "kind": "v6.node.settled"
+          },
+          {
+            "event_id": 56,
+            "kind": "v62.claim.reassessed"
+          },
+          {
+            "event_id": 58,
+            "kind": "v6.observation.added"
+          },
+          {
+            "event_id": 59,
+            "kind": "v621.material.assigned"
+          }
+        ],
+        "query": "simultaneous valid discharge intervals compare POND-6 and POND-7 North minus South volumes shared minutes worst-case logger calibration bounds for maintenance dispatch",
+        "top": [
+          "discharge-concurrent@1",
+          "discharge-marginal@1"
+        ]
+      },
+      {
+        "id": 109,
+        "triggers": [
+          {
+            "event_id": 99,
+            "kind": "v6.node.settled"
+          },
+          {
+            "event_id": 100,
+            "kind": "v62.claim.reassessed"
+          }
+        ],
+        "query": "Compare North and South delivery over simultaneous valid time in POND-6 and POND-7, bound the signed difference using both loggers' absolute calibration tolerances, and identify evidence on the dispatch rule and station label custody.",
+        "top": [
+          "discharge-concurrent@1",
+          "discharge-marginal@1"
+        ]
+      },
+      {
+        "id": 131,
+        "triggers": [
+          {
+            "event_id": 110,
+            "kind": "research.pi.feedback"
+          }
+        ],
+        "query": "Apply a per-trial dispatch threshold to the lower bound of North minus South volume over shared valid logger time. Check station custody for POND-6 and POND-7.",
+        "top": [
+          "discharge-concurrent@1",
+          "discharge-marginal@1"
+        ]
+      },
+      {
+        "id": 160,
+        "triggers": [
+          {
+            "event_id": 154,
+            "kind": "v6.observation.added"
+          }
+        ],
+        "query": "Compare paired North and South water delivery on shared valid time in POND-6 and POND-7 with signed calibration bounds, verify logger to station custody and apply the PI's per-trial technician dispatch criterion",
+        "top": [
+          "discharge-concurrent@1",
+          "discharge-marginal@1"
+        ]
+      }
+    ],
+    "measurements": [
+      {
+        "artifact_ref": "gxa_01m8f6nv8tnv5zff3b",
+        "job_id": "gxj_01m8f6nttg7dr86yf5",
+        "trial": "POND-6",
+        "common_minutes": 20.0,
+        "difference_L": 1200.0,
+        "difference_low_L": 960.0,
+        "difference_high_L": 1440.0,
+        "input_sha256": "68cad55199c269636ba4be334b7249cd0093c3b63b98f9740753966fa22437cd"
+      },
+      {
+        "artifact_ref": "gxa_01m8f6sek4q866nmv4",
+        "job_id": "gxj_01m8f6se4zv8jrddvy",
+        "trial": "POND-7",
+        "common_minutes": 30.0,
+        "difference_L": 600.0,
+        "difference_low_L": 240.0,
+        "difference_high_L": 960.0,
+        "input_sha256": "b3b33aad334ca13cc3a27f00ddfb4a7d06ddae5467e77f7128e1dabbc0fbd39f"
+      }
+    ],
+    "ingress": "PI-supplied second trial, concrete dispatch threshold and station custody evidence. No scientific Job failure occurred in this field case.",
+    "rejected_drafts": 9,
+    "terminal_decision": {
+      "id": "gxa_7c8e12ccfb0b4b55015da218969a60a041b3c25b9572d87bd3772f8b8a934649",
+      "thread": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "scope": "run",
+      "ops": [
+        "close_run"
+      ],
+      "refs": [
+        "gxa_01m8f6ktwzvbjh3b52",
+        "gxa_01m8f6nv8tnv5zff3b",
+        "gxa_01m8f6nw3fx0aj9qzz",
+        "gxa_01m8f6sek4q866nmv4",
+        "gxa_01m8f724wc3f9qfhmc"
+      ],
+      "rationale": "Withhold a maintenance visit for both trials. The PI requires the lower bound on North minus South delivery to exceed 1,000 L within a single trial. The POND-6 bounds are {{metric:gxa_01m8f6nv8tnv5zff3b:difference_low_L}} to {{metric:gxa_01m8f6nv8tnv5zff3b:difference_high_L}}, so North leads but the range straddles the dispatch threshold. The POND-7 bounds are {{metric:gxa_01m8f6sek4q866nmv4:difference_low_L}} to {{metric:gxa_01m8f6sek4q866nmv4:difference_high_L}}, so North leads and even the upper bound falls short. The completed custody register matches the POND-7 export digest, maps North to rack-B and South to rack-A, and confirms the original POND-6 assignment. The paired analyses cover both full trial windows and the reporting packet is complete."
+    },
+    "closed": 179
+  },
+  "A2": {
+    "state": "../gx-science/plugin-blueprint-live/a2/state/gx.db",
+    "run": "gxr_01m8f5kjf8dpqfr1ry",
+    "goal_status": "CLOSED",
+    "reading_skill": {
+      "native_requests": 843,
+      "catalog_replies": 26,
+      "official_session_files": 10,
+      "native_tools_requested": {
+        "gx_decide_revision": 14,
+        "gx_read_source": 608,
+        "gx_extract_evidence": 38,
+        "gx_query_catalog": 26,
+        "gx_task_context": 17,
+        "gx_stage_claim": 8,
+        "gx_read_artifact": 104,
+        "gx_open_module": 3,
+        "gx_review_evidence": 24,
+        "gx_submit_module_report": 1
+      },
+      "named_reading_cards": {
+        "gx2understand": {
+          "request_mentions": 0,
+          "exact_lookups": 0,
+          "shortlist": [
+            {
+              "call_id": "exec-86991797-f308-46e4-b175-560ad6e581c1",
+              "rank": 2,
+              "reference": "gx2understand@1",
+              "status": "available"
+            },
+            {
+              "call_id": "exec-605ec034-01bb-4603-8f06-025c95756bac",
+              "rank": 7,
+              "reference": "gx2understand@1",
+              "status": "available"
+            },
+            {
+              "call_id": "exec-25cfc839-3be0-4469-acdb-5b4413fe237b",
+              "rank": 1,
+              "reference": "gx2understand@1",
+              "status": "available"
+            },
+            {
+              "call_id": "exec-7c839efe-f879-4b44-97d7-e05da1d284e7",
+              "rank": 1,
+              "reference": "gx2understand@1",
+              "status": "available"
+            }
+          ],
+          "official_record_types": {
+            "event_msg/item_completed/": 4,
+            "response_item/custom_tool_call_output/": 5
+          },
+          "authored_mentions": 0
+        },
+        "gx-understand": {
+          "request_mentions": 0,
+          "exact_lookups": 0,
+          "shortlist": [
+            {
+              "call_id": "exec-70ef3a52-5791-4233-b3ea-63b134720820",
+              "rank": 36,
+              "reference": "gx-understand@legacy",
+              "status": "reference_only"
+            }
+          ],
+          "official_record_types": {
+            "event_msg/item_completed/": 1,
+            "response_item/custom_tool_call_output/": 1
+          },
+          "authored_mentions": 0
+        },
+        "source-evidence-review": {
+          "request_mentions": 0,
+          "exact_lookups": 0,
+          "shortlist": [
+            {
+              "call_id": "exec-70ef3a52-5791-4233-b3ea-63b134720820",
+              "rank": 17,
+              "reference": "source-evidence-review@1",
+              "status": "available"
+            },
+            {
+              "call_id": "exec-e38777f2-150a-4f7d-8113-39c0a498a299",
+              "rank": 12,
+              "reference": "source-evidence-review@1",
+              "status": "available"
+            },
+            {
+              "call_id": "exec-605ec034-01bb-4603-8f06-025c95756bac",
+              "rank": 10,
+              "reference": "source-evidence-review@1",
+              "status": "available"
+            }
+          ],
+          "official_record_types": {
+            "event_msg/item_completed/": 3,
+            "response_item/custom_tool_call_output/": 4
+          },
+          "authored_mentions": 0
+        }
+      },
+      "interpretation": "Shortlist inclusion is observed exposure. No named adoption is inferred from untitled native source, extraction or review calls."
+    },
+    "quote_integrity": {
+      "exact": 38,
+      "total": 38,
+      "selected_spectral_and_endpoint_locators": [
+        {
+          "source": "atlas.xml",
+          "locator": "p14",
+          "quote_sha256": "9676f7c5c5383d762d6cbda5e6fa9a918ac466275700ad7c8c6097223ceca057"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p3032",
+          "quote_sha256": "48eea9eeda4b6ecb53c0293cb52e1b4f6bc80d8b26181c4073bdb7b58cd57139"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p3023",
+          "quote_sha256": "6ce90cf8e264a8e7171298dbca77667fb2303c2140dd26e8f489c55553a3fcc1"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p3038",
+          "quote_sha256": "75c400ede373b108f06f01f785022a916064a377fc5d5809f60dddf17229219d"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p3039",
+          "quote_sha256": "47f447e43028626900bb687a1e6b454ba30cd0f8b09b09587324b8c12e832346"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p14",
+          "quote_sha256": "9676f7c5c5383d762d6cbda5e6fa9a918ac466275700ad7c8c6097223ceca057"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p3023",
+          "quote_sha256": "ecad75dc7439d6331f0f9ce379a533964077be878bc068592715b5382342c266"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p3023",
+          "quote_sha256": "5d7bb52a5b1c61261e79e6be4baa84e2eeda3777d059ef054c59168c5ed2cdef"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p3038",
+          "quote_sha256": "75c400ede373b108f06f01f785022a916064a377fc5d5809f60dddf17229219d"
+        },
+        {
+          "source": "trend.xml",
+          "locator": "p24",
+          "quote_sha256": "5ff74935d5dd2194d891f5712a28bbc7df08788cc960063f21bacf3f7b8f907b"
+        },
+        {
+          "source": "trend.xml",
+          "locator": "p10",
+          "quote_sha256": "18bfecc2f0b184ea8e6c58ca441eea3d86bcec8c398900cdf415d0697a94aced"
+        },
+        {
+          "source": "trend.xml",
+          "locator": "p24",
+          "quote_sha256": "cdc1d0feab5c2d03595c1094b5f14b361349c664eb3d1c2818b2cb78d383ffb1"
+        },
+        {
+          "source": "index-record.txt",
+          "locator": "p2",
+          "quote_sha256": "791ac1d8121fb1db2df4bebad5986494512987ed31dd41bfed2d31698f1ae206"
+        },
+        {
+          "source": "atlas.xml",
+          "locator": "p3023",
+          "quote_sha256": "ecad75dc7439d6331f0f9ce379a533964077be878bc068592715b5382342c266"
+        },
+        {
+          "source": "trend.xml",
+          "locator": "p10",
+          "quote_sha256": "ed7487efedc978171d73a606aa49fab5f65fa09c350def127dbcf5f86b8c3b54"
+        }
+      ]
+    },
+    "materials": [
+      {
+        "title": "trend.xml",
+        "artifact": "gxa_01m8f5mbm2ezpkz8y0",
+        "doi": "10.1126/sciadv.1701528",
+        "sha256": "6f3e2528ce96d95830d2e8ff842b8d4312ee001af35ad47fa945da13095b850f",
+        "delivered_unique_segments": 51,
+        "deliveries": 107,
+        "all_segments": 134,
+        "first_delivered": "2026-11-27T18:58:08.437Z"
+      },
+      {
+        "title": "index-record.txt",
+        "artifact": "gxa_01m8f5kjh253w4wmhc",
+        "doi": "10.1126/sciadv.1600377",
+        "sha256": "9222607777969fb1a4233f8e80c4333525e8bb64abd914bb93ee5826ce25876f",
+        "delivered_unique_segments": 2,
+        "deliveries": 16,
+        "all_segments": 2,
+        "first_delivered": "2026-11-27T18:52:35.292Z"
+      },
+      {
+        "title": "atlas.xml",
+        "artifact": "gxa_01m8f5kjgdfvdegx0d",
+        "doi": "10.1126/sciadv.1600377",
+        "sha256": "c957778e0a2527f4a059df94f60330e9f1062f8f6f22fb4418a6dcabc766e636",
+        "delivered_unique_segments": 171,
+        "deliveries": 364,
+        "all_segments": 3217,
+        "first_delivered": "2026-11-27T18:52:35.317Z"
+      }
+    ],
+    "distinct_doi": 2,
+    "close_events": [
+      {
+        "id": 637,
+        "ts": "2026-11-27T19:33:03.001Z",
+        "payload": {
+          "decision_id": "gxa_567d43382f9bdecf896a6cdfe694078c971591acd06ff4196519e8d0cfe4eaf5",
+          "op_digest": "32f6a173a670fc256a98104f3284dfac913728299013b7f2473605d182675d95"
+        }
+      }
+    ],
+    "pi_late_event": 36,
+    "first_read_gate": {
+      "receipt_id": "gxrc_01m8f5majw0vakm58d",
+      "delivered_at": "2026-11-27T18:52:35.292Z",
+      "task_id": "gxt_01m8f5kjj32xpd2cqk",
+      "principal": "01a21e59-d35f-7e51-bd90-6db31c3ce601",
+      "segment_id": "p2",
+      "source_ref": "gxa_01m8f5kjh253w4wmhc",
+      "run_id": "gxr_01m8f5kjf8dpqfr1ry",
+      "status": "OPEN"
+    },
+    "reviews": [
+      {
+        "author": "module:module_881975d3cfe22617213e89331ad11e49",
+        "reviewer": "run",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "n": 1,
+        "separate_bound_reread": 1
+      },
+      {
+        "author": "module:module_8f668a39955bf63a35c8b86f3c2de0ce",
+        "reviewer": "run",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "n": 1,
+        "separate_bound_reread": 1
+      },
+      {
+        "author": "run",
+        "reviewer": "run",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "n": 22,
+        "separate_bound_reread": 22
+      }
+    ],
+    "reports": [
+      {
+        "ref": "gxa_4b2d389cc91595c1063b425a8a87e544abb7e4a04621837a68f12824f29b0463",
+        "sha256": "1ae9ba8e35198950c5a486b5563b1950cb9c0fc071abfdd243fe1dd3be653f79",
+        "explicitly_cited_in_adoptions": [
+          {
+            "decision_ref": "gxa_5ad3232a646b1978acf587ecfa7554d34c15d4bf1136fcef4cad45ad382cd150",
+            "task_id": "gxt_01m8f5xsjn8704fb64"
+          }
+        ],
+        "listed_in_root_briefs": [
+          {
+            "thread_id": "01a21e5e-e676-7840-a4ad-aa0a6747b853",
+            "task_id": "gxt_01m8f5xsjn8704fb64"
+          },
+          {
+            "thread_id": "01a21e65-2922-7643-be87-d7f0ce1c4833",
+            "task_id": "gxt_01m8f6aa6xbwnyw9ma"
+          },
+          {
+            "thread_id": "01a21e6e-f549-78d1-837a-70ce7ce24162",
+            "task_id": "gxt_01m8f6xx90rh2qm07y"
+          },
+          {
+            "thread_id": "01a21e75-1ab0-7882-9373-f4f7eaa30857",
+            "task_id": "gxt_01m8f7a6m6fjnxwkq1"
+          },
+          {
+            "thread_id": "01a21e7a-7cc0-78e3-ad18-2a9b8c3dd3d6",
+            "task_id": "gxt_01m8f7mz4pbgsg839b"
+          }
+        ],
+        "author": "GX",
+        "scope": "module:module_881975d3cfe22617213e89331ad11e49",
+        "status": "PARTIAL",
+        "findings": 0,
+        "published": 358,
+        "wake": 359,
+        "gx_partial_reason": [
+          "module tokens allowance exhausted"
+        ],
+        "tools_naming_report": [
+          {
+            "tool": "gx_decide_revision",
+            "calls": 7
+          },
+          {
+            "tool": "gx_read_artifact",
+            "calls": 5
+          }
+        ]
+      },
+      {
+        "ref": "gxa_0b8e26f96db06531f61fcdf22ddca042284a8575cc0eb0f081774304c5ccd01f",
+        "sha256": "e5caff4cbe075254a1170a9c565fa4477c7713da2597b6f5093ecf1933d60cac",
+        "explicitly_cited_in_adoptions": [],
+        "listed_in_root_briefs": [
+          {
+            "thread_id": "01a21e6e-f549-78d1-837a-70ce7ce24162",
+            "task_id": "gxt_01m8f6xx90rh2qm07y"
+          },
+          {
+            "thread_id": "01a21e75-1ab0-7882-9373-f4f7eaa30857",
+            "task_id": "gxt_01m8f7a6m6fjnxwkq1"
+          },
+          {
+            "thread_id": "01a21e7a-7cc0-78e3-ad18-2a9b8c3dd3d6",
+            "task_id": "gxt_01m8f7mz4pbgsg839b"
+          }
+        ],
+        "author": "GX",
+        "scope": "module:module_c972fe31d8da8686da3c36177aa277f7",
+        "status": "PARTIAL",
+        "findings": 0,
+        "published": 524,
+        "wake": 525,
+        "gx_partial_reason": [
+          "closed-thread usage exposure prevents another turn within the module token ceiling"
+        ],
+        "tools_naming_report": [
+          {
+            "tool": "gx_decide_revision",
+            "calls": 1
+          },
+          {
+            "tool": "gx_read_artifact",
+            "calls": 3
+          }
+        ]
+      },
+      {
+        "ref": "gxa_06da109482a9ff188a44f32f372246097f112b3ec88ab29bb4f7322e90176096",
+        "sha256": "bbb62bae313d4f11681c2fc7813292ea1ba4cce2602ad676d43c092ba28242df",
+        "explicitly_cited_in_adoptions": [
+          {
+            "decision_ref": "gxa_567d43382f9bdecf896a6cdfe694078c971591acd06ff4196519e8d0cfe4eaf5",
+            "task_id": "gxt_01m8f7mz4pbgsg839b"
+          }
+        ],
+        "listed_in_root_briefs": [
+          {
+            "thread_id": "01a21e75-1ab0-7882-9373-f4f7eaa30857",
+            "task_id": "gxt_01m8f7a6m6fjnxwkq1"
+          },
+          {
+            "thread_id": "01a21e7a-7cc0-78e3-ad18-2a9b8c3dd3d6",
+            "task_id": "gxt_01m8f7mz4pbgsg839b"
+          }
+        ],
+        "author": "MODULE",
+        "scope": "module:module_8f668a39955bf63a35c8b86f3c2de0ce",
+        "status": "PARTIAL",
+        "findings": 5,
+        "published": 577,
+        "wake": 578,
+        "gx_partial_reason": null,
+        "tools_naming_report": [
+          {
+            "tool": "gx_decide_revision",
+            "calls": 4
+          },
+          {
+            "tool": "gx_read_artifact",
+            "calls": 3
+          },
+          {
+            "tool": "gx_stage_claim",
+            "calls": 1
+          }
+        ]
+      }
+    ],
+    "decisions": [
+      {
+        "id": "gxa_554a76b2ecd3383dd83515313e42fc066d3c00b99794af1338787f4673897785",
+        "thread": "01a21e59-d35f-7e51-bd90-6db31c3ce601",
+        "scope": "run",
+        "ops": [],
+        "refs": [
+          "gxa_01m8f5kjgdfvdegx0d",
+          "gxa_01m8f5kjh253w4wmhc",
+          "gxa_01m8f5xgxa41k9ad47"
+        ],
+        "rationale": "同版地圖能提供標準晴空、衛星深夜過境時的人工天頂亮度背景。原著的近燈離群觀測及換白光 LED 的光譜情境，都可能改變從圖上亮度推到居民視野的判斷。已委託查找獨立地面研究並複核原圖的適用範圍，等報告核對時段、量測對象及樣本重疊，再決定可採用的比較。"
+      },
+      {
+        "id": "gxa_5ad3232a646b1978acf587ecfa7554d34c15d4bf1136fcef4cad45ad382cd150",
+        "thread": "01a21e5e-e676-7840-a4ad-aa0a6747b853",
+        "scope": "run",
+        "ops": [],
+        "refs": [
+          "gxa_01m8f5mbm2ezpkz8y0",
+          "gxa_01m8f5kjgdfvdegx0d",
+          "gxa_01m8f5q3me985t5kqx",
+          "gxa_01m8f5q3pszb3veyak",
+          "gxa_01m8f5q3sexxg8pk7q",
+          "gxa_01m8f5q4ahmrkcr9gq",
+          "gxa_01m8f5srjhvqq5ebjs",
+          "gxa_01m8f5q40jy6wawb1f",
+          "gxa_01m8f5q3vr640yynrm",
+          "gxa_01m8f5t7vze37wcg3y",
+          "gxa_4b2d389cc91595c1063b425a8a87e544abb7e4a04621837a68f12824f29b0463",
+          "gxa_01m8f65hw4q7c5jaqx"
+        ],
+        "rationale": "Kyba 補件以各年十月的無雲 VIIRS DNB 合成資料比較達門檻的照明面積與向上輻亮度。太空人照片顯示米蘭市中心燈色由橙黃轉白，周邊仍為橙黃，市中心 DNB 輻亮度卻下降。故增列同月跨年的帶限排光比較，須檢查換燈前後光譜。保留 Falchi 同版深夜天頂背景比較。兩文共用 DNB 且部分取樣時段重疊，均缺本地兩區逐時裸眼的介入前後資料。上一輪書目調查的部分報告沒有交付獨立地面結果，不能用作陰性觀測。已委託研究員核讀補件中各統計量的分母、米蘭彩照與 DNB 的端年及人眼推論範圍，等候已在進行的原件複核。"
+      },
+      {
+        "id": "gxa_567d43382f9bdecf896a6cdfe694078c971591acd06ff4196519e8d0cfe4eaf5",
+        "thread": "01a21e7a-7cc0-78e3-ad18-2a9b8c3dd3d6",
+        "scope": "run",
+        "ops": [
+          "close_run"
+        ],
+        "refs": [
+          "gxa_01m8f5kjgdfvdegx0d",
+          "gxa_01m8f5mbm2ezpkz8y0",
+          "gxa_01m8f5kjh253w4wmhc",
+          "gxa_01m8f5q3me985t5kqx",
+          "gxa_01m8f62t9we6sa98sr",
+          "gxa_01m8f62vbvdsefwqrp",
+          "gxa_01m8f62tmny596pfb8",
+          "gxa_01m8f72xfd4zraf0pp",
+          "gxa_01m8f62vfm3dzvdjmn",
+          "gxa_01m8f62tzqc2ha808c",
+          "gxa_01m8f62trdbg00kwxh",
+          "gxa_01m8f62tw1da7dyjkb",
+          "gxa_01m8f72x9nn0hc31jx",
+          "gxa_01m8f62tdzes3kgzg4",
+          "gxa_01m8f5q3sexxg8pk7q",
+          "gxa_01m8f62thke33t26ze",
+          "gxa_01m8f6y0kd5zabhn0m",
+          "gxa_01m8f7ct82er9bndgg",
+          "gxa_01m8f60ed1q3zyam5e",
+          "gxa_01m8f64a2jjj05w1ky",
+          "gxa_01m8f6dae86z0v7ng8",
+          "gxa_01m8f6dry2kt66pkzw",
+          "gxa_01m8f6ds5qwsf3s2e8",
+          "gxa_01m8f6drq4exnr6d1g",
+          "gxa_01m8f6ds1x30cayssw",
+          "gxa_01m8f6drtxw8afx2t7",
+          "gxa_01m8f62t5kqwt6e6gw",
+          "gxa_06da109482a9ff188a44f32f372246097f112b3ec88ab29bb4f7322e90176096"
+        ],
+        "rationale": "結束本次公開材料判讀。Falchi 的同版圖集可比較共同晴空條件下、深夜過境時刻的天頂人造亮度。地面校準及獨立相機驗證支持此用途，靠近路燈的偏亮讀數則顯示居民站位會影響比較。Kyba 補件增加各年同月、無雲過境的受照面積與向上輻亮度比較，適用於兩區可分辨且均有有效像元的情況。採納研究員對米蘭的原件核讀：太空站彩照記錄市中心街燈轉白，衛星日夜波段輻亮度下降。原文顯示換燈可使光譜移出感測波段，即使地表輝度相同也可能讀低。對 Falchi 歐洲暗視情境的兩份獨立複核均支持相同明視光通量及向上配光的假設。兩份摘錄的長短不同，共同句逐字相符，引文疑點已釐清。故保留兩種公開比較，將判定居民星數的工作移到兩區的地面基線和逐時配對觀測。書目索引與圖集為同一原著，兩篇研究亦共用部分時期的衛星資料。繼續查閱一般文獻無法補出指定街區的歷史基線。"
+      }
+    ],
+    "jobs": [],
+    "high_water": 639
+  },
+  "distinct_paging_control": {
+    "run": "gxr_01m8f5k20jd8s08hn9",
+    "transport": "controlled native actions",
+    "pages": [
+      {
+        "job": "gxj_01m8f5k2hfcxtnfn8g",
+        "artifact": "gxa_01m8f5khvyj0edekwf",
+        "mode": "live_search",
+        "raw_candidates_sha256": "a3c9c50dcb3d3caf97466f5633595de7df9f22be6eb0128948ba95a3cc34baef",
+        "page": 1,
+        "source_records": 24,
+        "same_candidates_and_source_windows_as_previous": false
+      },
+      {
+        "job": "gxj_01m8f5kj5m8h87f6r3",
+        "artifact": "gxa_01m8f5kwkxr199mj5p",
+        "mode": "live_search",
+        "raw_candidates_sha256": "228fafae3f794cf1259a9acd7c618d69a81632a49660b5ada9933a2c8110634d",
+        "page": 2,
+        "source_records": 24,
+        "same_candidates_and_source_windows_as_previous": false
+      },
+      {
+        "job": "gxj_01m8f5kwyykn50qx40",
+        "artifact": "gxa_01m8f5kxcj2hm65xbs",
+        "mode": "snapshot_replay",
+        "raw_candidates_sha256": "b91996a3804a00dc4b96e66a4d88604a675f9d0da90f300bf2cb18a6847aa2c5",
+        "page": 2,
+        "source_records": 24,
+        "same_candidates_and_source_windows_as_previous": true
+      }
+    ]
+  },
+  "structural_controls": [
+    {
+      "run": "gxr_01m8f5r59yyx9gmekh",
+      "goal_status": "CLOSED",
+      "jobs": [
+        {
+          "job": "gxj_01m8f5wrxp23f9dx16",
+          "status": "SUCCEEDED",
+          "method": "archived-fold-calibration",
+          "runner": "runner:4149315:3012543587",
+          "inputs": {
+            "specimen": [
+              "gxa_01m8f5r5b23h6pajqz",
+              "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+            ]
+          },
+          "model_ref": "gxa_01m8f6940tr4n0gqdm"
+        },
+        {
+          "job": "gxj_01m8f6bc8gzxnvrwxj",
+          "status": "SUCCEEDED",
+          "method": "mapped-structure-agreement",
+          "runner": "runner:4175630:3012577352",
+          "inputs": {
+            "prediction": [
+              "gxa_01m8f6940tr4n0gqdm",
+              "1ea97f084acdcd4590a3421e8faec51427f281a9c0bf55cee42e301553f245fc"
+            ],
+            "reference": [
+              "gxa_01m8f5r5bq6f0gcxjb",
+              "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+            ],
+            "mapping": [
+              "gxa_01m8f5r5cc1pd82j1a",
+              "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+            ]
+          },
+          "agreement_artifact": "gxa_01m8f6bcx8xdtga8t1",
+          "independent_rmsd_A": 1.0089501330794097,
+          "matched": 92,
+          "intended": 92,
+          "official_rmsd_A": 1.0089501330794226
+        }
+      ],
+      "decisions": [
+        {
+          "id": "gxa_ebf76430361fa9261c9e63aa89cbdb65b6fa37a8985dc207158d548157391163",
+          "thread": "01a21e5c-43a0-7722-af0f-2243ff220467",
+          "scope": "run",
+          "ops": [
+            "open_branch",
+            "add_node"
+          ],
+          "evidence_count": 3
+        },
+        {
+          "id": "gxa_5f5f4ff6c46230cb0377988e975604ff96db7ade5b1c1154aedc4f8a227e4894",
+          "thread": "01a21e5e-6519-79b0-af67-e5134af333bd",
+          "scope": "run",
+          "ops": [],
+          "evidence_count": 3
+        },
+        {
+          "id": "gxa_6fe9cbe01af034abe86204800c62cb12a9d228837202d7ffa45b7dd8bc02f870",
+          "thread": "01a21e60-1454-7b42-a61e-93c850cb178e",
+          "scope": "run",
+          "ops": [],
+          "evidence_count": 4
+        },
+        {
+          "id": "gxa_8f64fedb4f8db8825ba6c470edb2f7c51d3bc8d905849a4439adc1cfbe61fa00",
+          "thread": "01a21e62-d28c-7200-b6a0-206bb0540b56",
+          "scope": "run",
+          "ops": [],
+          "evidence_count": 4
+        },
+        {
+          "id": "gxa_a41ece3b925ca8c7ad03dd687460cb129d32c6e4bb139463afe742e4a533dfd5",
+          "thread": "01a21e64-9193-7f13-97aa-ae9c7d5d0d41",
+          "scope": "run",
+          "ops": [
+            "add_node"
+          ],
+          "evidence_count": 6
+        },
+        {
+          "id": "gxa_2ac211219adb5bbb1a27944f3839d096584a13bdeb5645aee356e0563df72f23",
+          "thread": "01a21e65-b1c7-7bd2-96f8-1add831b2d81",
+          "scope": "run",
+          "ops": [],
+          "evidence_count": 6
+        },
+        {
+          "id": "gxa_ad4f8a198ca02c4d63f966cf5cb7e30ff8ec9ea2dd06fc6c2f1888612fe7cdf6",
+          "thread": "01a21e67-57ce-7421-a508-6d376b60a792",
+          "scope": "run",
+          "ops": [
+            "close_run"
+          ],
+          "refs": [
+            "gxa_01m8f6bcx8xdtga8t1",
+            "gxa_01m8f6941kdabdfg44",
+            "gxa_01m8f6940tr4n0gqdm",
+            "gxa_01m8f5r5bq6f0gcxjb",
+            "gxa_01m8f5r5cc1pd82j1a",
+            "gxa_01m8f5r5b23h6pajqz",
+            "gxa_5d8b8bb97863a8870bfb4705b8be040b90fccefad758861b1e5873d7a4c80aae"
+          ],
+          "rationale": "The approved AlphaFold prediction supplied the coordinates used in agreement.json. The equal-weight, proper-rotation fit used {{metric:matched_positions}} of {{metric:mapped_positions}} mapped Cα pairs and gave an RMSD of {{metric:calpha_rmsd_A}}. The matched-pair list reproduces the supplied map, including the methionine–selenomethionine pair identified in the inventory and confirmed in both coordinate files. This answers the calibration question over the entire intended fragment."
+        }
+      ],
+      "closure": [
+        {
+          "id": 221,
+          "ts": "2026-11-27T19:10:47.608Z",
+          "payload": {
+            "decision_id": "gxa_ad4f8a198ca02c4d63f966cf5cb7e30ff8ec9ea2dd06fc6c2f1888612fe7cdf6",
+            "op_digest": "bdcb4c9dc6d766d03a057a75475f042e8a60febbcbd08b45ea3b153ff178ad07"
+          }
+        }
+      ],
+      "recipe_table_columns": [
+        "reference",
+        "digest",
+        "definition_json",
+        "source_run",
+        "sources_json"
+      ],
+      "recipe_registry": [
+        {
+          "reference": "archived-coordinate-agreement@1",
+          "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+          "source_run": "gxr_01m8f5r59yyx9gmekh"
+        }
+      ],
+      "target_recipe_markers": [],
+      "stored_recipes": 1,
+      "high_water": 245
+    },
+    {
+      "run": "gxr_01m8f6s3pam4nc58dg",
+      "goal_status": "CLOSED",
+      "jobs": [
+        {
+          "job": "gxj_01m8f75vf3h1rk3tc6",
+          "status": "SUCCEEDED",
+          "method": "archived-fold-calibration",
+          "runner": "runner:59952:3012664176",
+          "inputs": {
+            "specimen": [
+              "gxa_01m8f6s3r1n64ck7wh",
+              "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+            ]
+          },
+          "model_ref": "gxa_01m8f7eba7rehettwg"
+        },
+        {
+          "job": "gxj_01m8f7ebh2ab8sy881",
+          "status": "SUCCEEDED",
+          "method": "mapped-structure-agreement",
+          "runner": "runner:84948:3012691964",
+          "inputs": {
+            "prediction": [
+              "gxa_01m8f7eba7rehettwg",
+              "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+            ],
+            "reference": [
+              "gxa_01m8f6s3rq12dpy88g",
+              "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+            ],
+            "mapping": [
+              "gxa_01m8f6s3sj8xm63npg",
+              "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+            ]
+          },
+          "agreement_artifact": "gxa_01m8f7ecax3gfwv32q",
+          "independent_rmsd_A": 0.787816001230421,
+          "matched": 5,
+          "intended": 92,
+          "official_rmsd_A": 0.7878160012303694
+        }
+      ],
+      "decisions": [
+        {
+          "id": "gxa_8009abb9b966db3a0fb7dfcca8e018082d75eb87d5e6c2108837074fb48e626b",
+          "thread": "01a21e6c-a386-7e42-9cb0-c6d2de45965c",
+          "scope": "run",
+          "ops": [
+            "open_branch",
+            "add_node",
+            "add_node"
+          ],
+          "evidence_count": 5
+        },
+        {
+          "id": "gxa_cff71a47f85369a66d96eb2bb47d6d667db36cb7035e12027deaa9a8fa28eda4",
+          "thread": "01a21e72-f187-7ab0-b391-e0539ec92b93",
+          "scope": "run",
+          "ops": [],
+          "evidence_count": 5
+        },
+        {
+          "id": "gxa_19ff4a7422ebb77bac25c7fca817ee6e3f48d63842c3f8b68ff62cbd8b781702",
+          "thread": "01a21e77-2eff-7f81-89e6-45a52ceabb07",
+          "scope": "run",
+          "ops": [],
+          "evidence_count": 7
+        },
+        {
+          "id": "gxa_b22cf1ac9f9191e5446abc4debddbaac699f31b04416d0bc7d469d9be811a226",
+          "thread": "01a21e78-0bb6-7661-80a2-0d6208bb4903",
+          "scope": "run",
+          "ops": [
+            "close_run"
+          ],
+          "refs": [
+            "gxa_01m8f7ecax3gfwv32q",
+            "gxa_01m8f7eba7rehettwg",
+            "gxa_01m8f7ebaxta0cbadn",
+            "gxa_01m8f6s3r1n64ck7wh",
+            "gxa_01m8f6s3rq12dpy88g",
+            "gxa_01m8f6s3sj8xm63npg",
+            "gxa_01m8f6s3t72xwdrrar",
+            "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2"
+          ],
+          "rationale": "The preceding study’s workflow gave an equal-weight, proper-rotation Cα RMSD of {{metric:calpha_rmsd_A}} across {{metric:matched_positions}} of {{metric:mapped_positions}} mapped chain A positions in the fresh calculation. Every reference Cα has the expected residue identity and a counterpart in the prediction. The missing-pair flags and original coordinates confirm the inventory’s finding that the excerpt omits the other mapped positions. Repeating the calculation with this excerpt cannot increase coverage."
+        }
+      ],
+      "closure": [
+        {
+          "id": 378,
+          "ts": "2026-11-27T19:28:05.556Z",
+          "payload": {
+            "decision_id": "gxa_b22cf1ac9f9191e5446abc4debddbaac699f31b04416d0bc7d469d9be811a226",
+            "op_digest": "0602b282eb3b395ec5b3d28c70b4ad04c881fabcd784b589eb1ff0ce090aafe1"
+          }
+        }
+      ],
+      "recipe_table_columns": [
+        "reference",
+        "digest",
+        "definition_json",
+        "source_run",
+        "sources_json"
+      ],
+      "recipe_registry": [
+        {
+          "reference": "archived-coordinate-agreement@1",
+          "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+          "source_run": "gxr_01m8f5r59yyx9gmekh"
+        }
+      ],
+      "target_recipe_markers": [
+        {
+          "node": "node_d433d940730bcef97d4b1091b72db646",
+          "status": "SUCCEEDED",
+          "marker": {
+            "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+            "recipe": "archived-coordinate-agreement@1",
+            "step": "compare"
+          }
+        }
+      ],
+      "stored_recipes": 1,
+      "high_water": 380
+    }
+  ],
+  "prior_structural_attempts": [
+    {
+      "run": "gxr_01m8f5ewenq7gmt793",
+      "goal_status": "OPEN",
+      "state": "../gx-science/science-plugin-blueprint-b0-live/state/gx.db",
+      "run_status": "PAUSED",
+      "acknowledged_turns": 0,
+      "jobs": 0
+    },
+    {
+      "run": "gxr_01m8f5kqst3nh8tn0m",
+      "goal_status": "OPEN",
+      "state": "../gx-science/science-plugin-blueprint-b0-live/state-funded/gx.db",
+      "run_status": "PAUSED",
+      "acknowledged_turns": 1,
+      "jobs": 0
+    }
+  ],
+  "review_queries": {
+    "A1": "Use p0_roots.brief ORDER BY rowid to inspect pre-survey options. Join events.payload_json.thread_id + call_id to p0_root_calls for the actual returned ranks. Read artifacts via namespace/rel_path and compare SHA-256. Independent check enumerates integer minute samples for declared piecewise constant intervals and propagates absolute calibration error on simultaneous valid intervals.",
+    "A2": "Join evidence_reviews to evidence, then join source_reads separately through reviewer and extractor receipt IDs. Compare the task, principal, source and segment. Select original records via sources.blob_artifact_ref and independently parse DOI. Compare first source_reads.delivered_at with event timestamp v621.material.assigned. Read each v62_module_reports.report_ref JSON by content hash to identify original author.",
+    "B0": "Read each jobs.input_manifest_ref and the payload entries; match the prediction Job result to the scorer input. Parse the two registered mmCIF model 1 chain A alpha-carbon sets, apply all predeclared mapping pairs, center and independently compute the proper-rotation Procrustes trace. Compare RMSD and both coverage counts to published agreement.json."
+  },
+  "interpretation": {
+    "A1": "PI prompts omit method names. Before first survey the frozen Lead packets enumerate method IDs among five/four selectable choices. Scoped selection and the paired computation pass on synthetic inputs. The negative case material explicitly calls itself a marginal-coverage counterexample. This pair cannot estimate open-pool blind discovery performance.",
+    "A1_updates": "The positive field Run has three surveys in total. After opening it covers a capability change then node settlement/claim reassessment. The separate deterministic cold-recovery case includes a synthetic failure; these are separate Run IDs.",
+    "A2": "One original + one catalogue entry share DOI; second paper arrived as a queued PI attachment. Scientific comparison after late evidence, genuinely independent original reads, publication of a signed report and its adoption are distinct checks. Do not infer autonomous second-page retrieval from this material injection.",
+    "B0": "One known archived specimen, one seed and deposition. This validates independent structure comparison and Job transport on that specimen. Deposition may overlap model training. Model output is a prediction, not experimental confirmation.",
+    "B": "The preregistered sparse reference derives five unchanged C-alpha rows from the same 1QYS deposition, with the same specimen and frozen prediction settings. Only reference coverage changes. Any new Job tests reuse with fresh execution and changed evaluation material; it is not an independent biological sample or new sequence."
+  }
+}

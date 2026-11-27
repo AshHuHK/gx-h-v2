@@ -1,0 +1,117 @@
+{
+  "transport": "scripted_native_fixture",
+  "live_codex_calls": 0,
+  "recipe": {
+    "kind": "recipe",
+    "reference": "sensor-extrapolation@1",
+    "digest": "bed7412cfd52193426e4ea47dde131f2be2a2b8a93445ed4da0b6d3bb52a1812",
+    "title": "Archived sensor extrapolation",
+    "id_alignment": "Keep the original order",
+    "missing_values": "Reject incomplete time series",
+    "units": "Instrument counts",
+    "inputs": {
+      "series": {
+        "kind": "run_input",
+        "media_type": null
+      }
+    },
+    "methods": {
+      "estimate": "instrument-series@1"
+    },
+    "method_pins": {
+      "instrument-series@1": "4ca567825f94257a90ccadf8c52817fdc272668ee2b1e7da356bd6962e99c968"
+    },
+    "outputs": {
+      "estimate": [
+        {
+          "name": "mean.json",
+          "kind": "series_statistic",
+          "nature": "analysis",
+          "source_roles": [
+            "readings"
+          ]
+        },
+        {
+          "name": "next.json",
+          "kind": "series_prediction",
+          "nature": "model_prediction",
+          "source_roles": [
+            "readings"
+          ]
+        }
+      ]
+    },
+    "decision_point": {
+      "step": "estimate",
+      "output": "next.json",
+      "question": "Is a follow-up indicated?",
+      "actions": [
+        "ask for new observations",
+        "retain the current interval"
+      ],
+      "stop_condition": "A new reading resolves the ambiguity.",
+      "role": "run_lead",
+      "event": "job_settled"
+    },
+    "provider_pins": {
+      "instrument-series@1": {
+        "plugin": {
+          "id": "org.example.instrument-series",
+          "sha256": "81968c4f07ba1ea837e824cfa4d02b2933d8a372664f5fd620f474134cd86424",
+          "version": "1.0.0"
+        },
+        "closure": [
+          {
+            "id": "org.example.instrument-series",
+            "sha256": "81968c4f07ba1ea837e824cfa4d02b2933d8a372664f5fd620f474134cd86424",
+            "version": "1.0.0"
+          }
+        ]
+      }
+    }
+  },
+  "source": {
+    "run_id": "gxr_01m8f7aamny3kt07hj",
+    "input": "gxa_01m8f7aamzmd2mkj6h",
+    "job_id": "gxj_01m8f7aar20x6z4f8c",
+    "forecast": {
+      "artifact_ref": "gxa_01m8f7ab54ypk5tydb",
+      "sha256": "0a1878e22471c15996a8ef61536fff8c70985381fc9ad0298b5a97bdae0d8541",
+      "output_name": "next.json",
+      "kind": "series_prediction",
+      "nature": "model_prediction"
+    },
+    "value": 7
+  },
+  "new_goal": {
+    "run_id": "gxr_01m8f7ab90z7c4e9qd",
+    "input": "gxa_01m8f7ab98tza2ecsb",
+    "jobs": [
+      {
+        "job_id": "gxj_01m8f7abbczyp1yx7h",
+        "node_id": "node_ec0942576555142be80228b7fe5aee1e",
+        "forecast": {
+          "artifact_ref": "gxa_01m8f7aby0qvr0q9z6",
+          "sha256": "aa91c3fdc0441e13428267caab1c99b213d51ef78262dafb6ff5369978489b63",
+          "output_name": "next.json",
+          "kind": "series_prediction",
+          "nature": "model_prediction"
+        },
+        "value": -1
+      },
+      {
+        "job_id": "gxj_01m8f7abmydxx8ykpg",
+        "node_id": "node_4399ad9538754b4496d89f1f29bf4dd7",
+        "forecast": {
+          "artifact_ref": "gxa_01m8f7ac0ew5fvj0qa",
+          "sha256": "aa91c3fdc0441e13428267caab1c99b213d51ef78262dafb6ff5369978489b63",
+          "output_name": "next.json",
+          "kind": "series_prediction",
+          "nature": "model_prediction"
+        },
+        "value": -1
+      }
+    ],
+    "count_after_cold_replay": 2
+  }
+}

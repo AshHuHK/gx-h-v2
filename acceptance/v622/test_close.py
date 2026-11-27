@@ -51,6 +51,17 @@ class CloseStudy(Scenario):
         return actor
 
 
+class SurveyedStudy(CloseStudy):
+    """Scripted research actor for tests of other features under the current normal Goal policy."""
+    def bind(self, task_id):
+        actor = super().bind(task_id)
+        if actor.scope == "run":
+            survey = self.brief(actor).get("catalog_discovery")
+            if survey and not survey.get("survey_event"):
+                self.call(actor, "gx_query_catalog", {"kind": "all"}, "scripted-catalog-survey")
+        return actor
+
+
 def close_decision(references=()):
     return draft({"op": "close_run", "reason": "Record the known coverage at closure.",
                   "claim_refs": [], "unresolved": ["Sampling independence remains unknown."]},

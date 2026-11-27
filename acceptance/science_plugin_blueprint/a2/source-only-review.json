@@ -1,0 +1,18 @@
+{
+  "source_only_module": "module:module_8f668a39955bf63a35c8b86f3c2de0ce",
+  "granted_tools": [
+    "gx_read_source",
+    "gx_extract_evidence",
+    "gx_review_evidence",
+    "gx_submit_module_report"
+  ],
+  "granted_inputs": [
+    "gxa_01m8f5mbm2ezpkz8y0",
+    "gxa_01m8f5kjgdfvdegx0d",
+    "gxa_01m8f5q3sexxg8pk7q"
+  ],
+  "first_field_missing": "The granted extraction stored a quote SHA-256. This worker had source tools only, and the original opening did not deliver the extraction span and quote hash. The worker filed its own partial report; re-reading the original did not by itself validate that extraction.",
+  "fix": "For a selected and verified extraction whose original is also assigned to the reviewer, include the immutable extraction reference, original source and segment, character range, quote digest, bounded claim and quotation preview. A separately delivered original paragraph and an independent task, thread and context are still required for a verdict.",
+  "red_regression": "KeyError: review_target on the original limited-menu module opening",
+  "verification": "tests.test_researcher_handoff.Researchers.test_abstract_duplicate_and_later_page_do_not_imply_an_independent_all_city_comparison"
+}

@@ -90,6 +90,8 @@ class FirstMeasurement(unittest.TestCase):
                 with self.assertRaises(SchemaInvalid) as err:
                     s.call(s.lead, "gx_decide_revision", {"decision": draft}, "not-single-job")
                 self.assertEqual(err.exception.details["field"], "ops[].branch")
+                self.assertIn("discriminating_observation", err.exception.message)
+                self.assertIn('"cpu_seconds": 30', err.exception.message)
                 self.assertIsNone(s.head())
                 route = branch("study")
                 route["budget_limits"]["cpu_seconds"] = 29

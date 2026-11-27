@@ -699,6 +699,7 @@ class JobService:
             if v6_node:
                 from ..p0 import v6_jobs, v6_method_context, v62_evidence
                 gate_proof = v62_evidence.prepare_dispatch(conn, request)
+                required_data = v6_jobs._small_data_pins(manifest["required_data"]) if manifest.get("required_data") else {}
                 method_dependencies = v6_method_context.dependencies(
                     conn, run_id, request["capability_version"], env["python_executable"])
             sample = capacity.sample_admission(conn)
@@ -747,7 +748,7 @@ class JobService:
                 if v6_node:
                     v62_evidence.fence_dispatch(txn, request, gate_proof)
                     v6_jobs.fence_admission(txn, request, request_sha, key, job_id, amounts,
-                                            prepared["runtime"], method_dependencies)
+                                            prepared["runtime"], method_dependencies, required_data)
                 elif txn.execute("SELECT 1 FROM sqlite_master WHERE name='v6_goals'").fetchone() and txn.execute(
                         "SELECT 1 FROM v6_goals WHERE run_id=?", (run_id,)).fetchone():
                     raise ScopeDenied("Goal-only Jobs require an accepted node assignment")

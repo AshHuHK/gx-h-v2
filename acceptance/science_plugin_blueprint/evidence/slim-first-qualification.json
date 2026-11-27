@@ -1,0 +1,90 @@
+{
+  "local_candidate": "41f92e6642b05985ffd9c63e05e1db575646190e",
+  "source": "isolated slim worktree",
+  "initial_suite": {
+    "tests": 24,
+    "errors": 5,
+    "observed": [
+      "four named-port tests missed the slim v62_output fixture",
+      "one peer Goal had been queued while its test asserted synchronous admission"
+    ]
+  },
+  "error_reproduction": "EEEEE\n======================================================================\nERROR: test_catalogue_observes_fault_after_settlement_and_forgets_changed_or_stale_identity (acceptance.science_plugin_blueprint.test_method_health.MethodHealth.test_catalogue_observes_fault_after_settlement_and_forgets_changed_or_stale_identity)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/acceptance/science_plugin_blueprint/test_method_health.py\", line 82, in test_catalogue_observes_fault_after_settlement_and_forgets_changed_or_stale_identity\n    peer, = s.conn.execute(\"SELECT run_id FROM p0_workspace_runs WHERE run_key='method-health-peer'\").fetchone()\n    ^^^^^\nTypeError: cannot unpack non-iterable NoneType object\n\n======================================================================\nERROR: test_prediction_rebinds_new_material_and_controlled_repeat_survives_restart (tests.test_v6_named_ports.ModelRecipe.test_prediction_rebinds_new_material_and_controlled_repeat_survives_restart)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/tests/test_v6_named_ports.py\", line 143, in test_prediction_rebinds_new_material_and_controlled_repeat_survives_restart\n    run_a, ref_a = series.start_series_goal(self, db, tmp)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/tests/test_v62_outputs.py\", line 45, in start_series_goal\n    plugin_cli._install(FIXTURE, package_digest(FIXTURE), installed, catalog)\n                                 ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/gx_core/plugins/catalog.py\", line 90, in package_digest\n    return digest_files(read_package(path))\n                        ^^^^^^^^^^^^^^^^^^\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/gx_core/plugins/catalog.py\", line 79, in read_package\n    with _physical_directory(path) as directory:\n  File \"/opt/conda/lib/python3.11/contextlib.py\", line 137, in __enter__\n    return next(self.gen)\n           ^^^^^^^^^^^^^^\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/gx_core/plugins/catalog.py\", line 54, in _physical_directory\n    directory = stack.enter_context(_directory(part, directory))\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/conda/lib/python3.11/contextlib.py\", line 517, in enter_context\n    result = _enter(cm)\n             ^^^^^^^^^^\n  File \"/opt/conda/lib/python3.11/contextlib.py\", line 137, in __enter__\n    return next(self.gen)\n           ^^^^^^^^^^^^^^\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/gx_core/plugins/catalog.py\", line 39, in _directory\n    if stat.S_ISLNK(os.stat(name, dir_fd=parent, follow_symlinks=False).st_mode):\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'v62_output'\n\n======================================================================\nERROR: test_named_outputs_recover_and_preserve_original_job (tests.test_v6_named_ports.NamedOutputs.test_named_outputs_recover_and_preserve_original_job)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/tests/test_v6_named_ports.py\", line 26, in setUp\n    shutil.copytree(series.FIXTURE, fixture)\n  File \"/opt/conda/lib/python3.11/shutil.py\", line 571, in copytree\n    with os.scandir(src) as itr:\n         ^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/tests/fixtures/v62_output'\n\n======================================================================\nERROR: test_saved_recipe_pins_materials_ports_and_dependencies (tests.test_v6_named_ports.NamedOutputs.test_saved_recipe_pins_materials_ports_and_dependencies)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/tests/test_v6_named_ports.py\", line 26, in setUp\n    shutil.copytree(series.FIXTURE, fixture)\n  File \"/opt/conda/lib/python3.11/shutil.py\", line 571, in copytree\n    with os.scandir(src) as itr:\n         ^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/tests/fixtures/v62_output'\n\n======================================================================\nERROR: test_unknown_output_rejected_before_graph_or_job (tests.test_v6_named_ports.NamedOutputs.test_unknown_output_rejected_before_graph_or_job)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/tests/test_v6_named_ports.py\", line 26, in setUp\n    shutil.copytree(series.FIXTURE, fixture)\n  File \"/opt/conda/lib/python3.11/shutil.py\", line 571, in copytree\n    with os.scandir(src) as itr:\n         ^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/gx-h/tests/fixtures/v62_output'\n\n----------------------------------------------------------------------\nRan 5 tests in 2.867s\n\nFAILED (errors=5)\n",
+  "rerun": "........................\n----------------------------------------------------------------------\nRan 24 tests in 13.522s\n\nOK\n",
+  "providers": [
+    {
+      "id": "org.gx.archival-fold-calibration",
+      "version": "1.0.0",
+      "sha256": "c3e1753f0d21267ad3e3b485435d9ba9079500cc24d0b423cba3aa892bbb0585"
+    },
+    {
+      "id": "org.gx.record-coverage-8902880ed9d712bf6baa5899",
+      "version": "1.0.0",
+      "sha256": "b4bcef57d78bf4ed151427e647f95394a8e8314c77b1e1c1998fdfe55a92dd2d"
+    },
+    {
+      "id": "org.gx.scholarly-sources",
+      "version": "1.0.0",
+      "sha256": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c"
+    },
+    {
+      "id": "org.gx.scholarly-pages",
+      "version": "1.0.0",
+      "sha256": "1ed6a7b520ac439b092fb80940500e69b5d07a6c263d5ec541c445c64f5264be"
+    }
+  ],
+  "provider_failures": {},
+  "offline_entry": {
+    "run_id": "gxr_01m8f602be7zm197h6",
+    "scope_collections": [
+      "public_sources"
+    ],
+    "initial_methods": [
+      "arxiv-fetch@1",
+      "arxiv-search@1",
+      "scholarly-fetch@1",
+      "scholarly-page-fetch@1",
+      "scholarly-page-search@1",
+      "scholarly-search@1"
+    ],
+    "state": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-verification-20261127/provisional",
+    "start": {
+      "action": "resume",
+      "before": {
+        "jobs": 0,
+        "host_turns": 0
+      },
+      "after": {
+        "jobs": 0,
+        "host_turns": 0
+      },
+      "added": {
+        "jobs": 0,
+        "host_turns": 0
+      },
+      "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-verification-20261127/provisional --run-key slim-qualification --goal 'Which published observations would distinguish sensor drift from a shift in the daily water record?' --research-effort quick --timeout 0.01"
+    },
+    "resume": {
+      "action": "resume",
+      "before": {
+        "jobs": 0,
+        "host_turns": 0
+      },
+      "after": {
+        "jobs": 0,
+        "host_turns": 0
+      },
+      "added": {
+        "jobs": 0,
+        "host_turns": 0
+      },
+      "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-candidate/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-verification-20261127/provisional --run-id gxr_01m8f602be7zm197h6 --timeout 0.01"
+    },
+    "counts": {
+      "runs": 1,
+      "jobs": 0,
+      "v6_goals": 1
+    },
+    "inference": false
+  }
+}

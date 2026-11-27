@@ -1,0 +1,186 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8f5fmqqnkcgep1x",
+  "goal": "Two channels were monitored during a second two-hour trial. During times when both channels were observed, did West deliver more water than East? Give the duration and the paired volumes if these can be determined. Decide whether the result justifies scheduling a channel-specific follow-up and identify exactly what additional observation would change your conclusion.\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_698f11339bb262ae1224588b0a90b57dd3aea4bbdeb4f8eb781ea5b1d47b5909",
+    "op_digest": "7461eb8f2d0f3092b79469d9c21762e37f9f906be63568cefe453cc384a61faf",
+    "requested_event": 25,
+    "committed_event": 30,
+    "closed_event": 31,
+    "closed_utc": "2026-11-27T18:52:13.854Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8f5k8bjsy0hsp1d"
+      ],
+      "op": "close_run",
+      "reason": "INSUFFICIENT_DATA",
+      "unresolved": [
+        "Exact jointly observed duration, West and East volumes during that time, and the sign of their difference."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_698f11339bb262ae1224588b0a90b57dd3aea4bbdeb4f8eb781ea5b1d47b5909",
+    "task_id": "gxt_01m8f5fmva4ajata6q",
+    "thread_id": "01a21e57-e3ca-7df0-835c-767653512cae",
+    "turn_id": "01a21e57-e405-7c81-948d-02db237a117d",
+    "rationale": "The synthetic APR-18 export gives 75 observed minutes per channel in a 120-minute window. The shared duration is therefore bounded by 30 and 75 minutes. The 9,000 L West total and 8,100 L East total include each channel’s exclusively observed times. The 900 L marginal difference equals the shared difference plus West-only volume minus East-only volume. Either channel can lead on the shared times, and a tie is possible. Defer channel-specific follow-up. The available discharge method can only reproduce the marginal totals, and there is no pending interval record. Reopen if synchronized validity intervals and flow increments or integrable rates become available, or if a verified summary gives the common duration and both volumes over precisely those times. A resolved positive paired difference would support a West follow-up and a negative one an East follow-up. Verified coincidence of all 75 observed minutes would itself establish a 900 L West lead.",
+    "reason": "INSUFFICIENT_DATA",
+    "unresolved": [
+      "Exact jointly observed duration, West and East volumes during that time, and the sign of their difference."
+    ],
+    "claim_refs": [
+      "gxa_01m8f5k8bjsy0hsp1d"
+    ],
+    "evidence_refs": [
+      "gxa_01m8f5fms5pk3s5exq"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [],
+    "rendered": {
+      "reason": "INSUFFICIENT_DATA",
+      "rationale": "The synthetic APR-18 export gives 75 observed minutes per channel in a 120-minute window. The shared duration is therefore bounded by 30 and 75 minutes. The 9,000 L West total and 8,100 L East total include each channel’s exclusively observed times. The 900 L marginal difference equals the shared difference plus West-only volume minus East-only volume. Either channel can lead on the shared times, and a tie is possible. Defer channel-specific follow-up. The available discharge method can only reproduce the marginal totals, and there is no pending interval record. Reopen if synchronized validity intervals and flow increments or integrable rates become available, or if a verified summary gives the common duration and both volumes over precisely those times. A resolved positive paired difference would support a West follow-up and a negative one an East follow-up. Verified coincidence of all 75 observed minutes would itself establish a 900 L West lead.",
+      "unresolved": [
+        "Exact jointly observed duration, West and East volumes during that time, and the sign of their difference."
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8f5fms5pk3s5exq",
+      "sha256": "6157f716c9d1858f725b981636dfca27d3de7018eaa831eb2acfe980ea9515c9",
+      "bytes": 631,
+      "role": "record"
+    }
+  ],
+  "predictions": [],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8f5knj3yaafjs13",
+      "statement": "The export leaves the exact overlap duration, both overlap volumes and their ordering undetermined. Defer a channel-specific follow-up.",
+      "scope": "West and East during all jointly valid times in the supplied synthetic trial.",
+      "criteria": "Use synchronized validity intervals to measure their intersection. Integrate each channel’s flow on that intersection and compare the resulting volumes. A resolved positive West-minus-East difference favors a West follow-up, a negative one favors East, and a tie favors neither.",
+      "decision_scope": "run",
+      "limitations": "The original timestamps, interval quality flags and within-window rates are missing. A synchronized record of valid intervals with integrable rates or volume increments, or an independently verified common duration and the two corresponding integrated volumes, would answer the question. Verified identical coverage would make the existing totals directly comparable.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8f5k8bjsy0hsp1d",
+        "proposed_level": "insufficient",
+        "rationale": "The minimum possible overlap is the sum of the observed durations less the trial length, and the maximum is the shorter observed duration. Both bounds are attainable. Each reported total includes any water delivered when only that recorder was valid. Even for the same partial overlap, redistributing volume between shared and exclusive times can give West the lead, East the lead, or a tie while preserving both reported totals."
+      },
+      "evidence_refs": [
+        "gxa_01m8f5fms5pk3s5exq"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "de1b931ab9a62b5d5b80d57cdcf12f22c05105ad6097eef5e1aa66f44f837573",
+        "brief_turn_id": "01a21e57-e405-7c81-948d-02db237a117d",
+        "context_ref": "gxcx_01m8f5fmv9ggx1xw80",
+        "delivery_receipt": "start:58e7e7b0-4f76-469b-a976-dc5bec4926f1",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 14,
+        "state": "acknowledged",
+        "thread_id": "01a21e57-e3ca-7df0-835c-767653512cae",
+        "turn_id": "01a21e57-e405-7c81-948d-02db237a117d"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8f5fms5pk3s5exq",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f5fms5pk3s5exq",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "6157f716c9d1858f725b981636dfca27d3de7018eaa831eb2acfe980ea9515c9",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f5fms5pk3s5exq",
+          "sha256": "6157f716c9d1858f725b981636dfca27d3de7018eaa831eb2acfe980ea9515c9",
+          "source_class": "input"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8f5knj3yaafjs13@1",
+      "decision_id": "gxa_698f11339bb262ae1224588b0a90b57dd3aea4bbdeb4f8eb781ea5b1d47b5909",
+      "assessment_cursor": 14,
+      "availability_cursor": 24,
+      "level": "insufficient",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T18:52:13.763Z",
+      "event_id": 24,
+      "event": "v6.claim.adopted",
+      "author": "01a21e57-e3ca-7df0-835c-767653512cae",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [],
+  "deliveries": [],
+  "routes": {
+    "modules": [],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": []
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [],
+  "invocation": {
+    "action": "export_closed",
+    "before": {
+      "jobs": 0,
+      "host_turns": 1
+    },
+    "after": {
+      "jobs": 0,
+      "host_turns": 1
+    },
+    "added": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-acceptance/science-plugin-blueprint/a1/negative/release/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-acceptance/science-plugin-blueprint/a1/negative/state --run-key a1-rill-negative-first --goal-file /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-acceptance/science-plugin-blueprint/a1/negative/release/input/question.md --goal-config /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/release-acceptance/science-plugin-blueprint/a1/negative/release/input/goal.json"
+  }
+}

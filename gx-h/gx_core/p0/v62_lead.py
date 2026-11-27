@@ -27,6 +27,7 @@ def attach_reports(conn, brief, cursor, policy):
         brief["module_report_index"] = report_index
     released = v62_reports.released_evidence_refs(conn, brief["run_id"], through_cursor=cursor)
     brief["evidence_refs"] = list(dict.fromkeys([*brief["evidence_refs"], *released]))
+    return released
 
 
 def _size(obj):
@@ -131,6 +132,8 @@ def deliver(conn, brief, limit):
     ref = artifact.artifact_ref
     full = {**brief, "full_brief_ref": ref, "evidence_refs": list(dict.fromkeys([*brief["evidence_refs"], ref]))}
     packet = {k: brief[k] for k in ("run_id", "scope", "goal_version", "head", "research_effort")}
+    if survey := brief.get("catalog_discovery"):
+        packet["catalog_discovery"] = {k: survey[k] for k in ("state_key", "through_event", "survey_event") if k in survey}
     if "capability_view" in brief:
         packet["capability_view"] = brief["capability_view"]
     if brief.get("branch_delegation") is False:
@@ -149,6 +152,8 @@ def deliver(conn, brief, limit):
         prior = brief["prior_research"]
         packet["prior_research"] = {k: prior[k] for k in (
             "parent_run_id", "parent_decision_ref", "parent_goal_version", "evidence_status")}
+    if brief.get("recipe_decisions"):
+        packet["recipe_decisions_available"] = len(brief["recipe_decisions"])
     if "prospective_opening" in brief:
         packet["prospective_opening"] = brief["prospective_opening"]
     if "report_presentation" in brief:
@@ -185,6 +190,26 @@ def deliver(conn, brief, limit):
         owner[key].pop()
         return False
 
+    if brief.get("recipe_decisions"):
+        packet["recipe_decisions"] = []
+        for point in reversed(brief["recipe_decisions"]):
+            if not append("recipe_decisions", point):
+                break
+
+    if survey := brief.get("catalog_discovery"):
+        preview = packet["catalog_discovery"]
+        # Keep the current PI condition and a representative input/output on the first page.
+        # The native query always receives the full frozen context.
+        samples = {
+            "pi_update": survey.get("pi_update") or "",
+            "latest_input": (survey["available_inputs"] or [{}])[-1].get("artifact_ref", ""),
+            "needed_output": (survey["required_outputs"] or [""])[0],
+        }
+        for key, value in samples.items():
+            if value:
+                preview[key] = _excerpt(value, 144)
+                if _size(packet) > room:
+                    del preview[key]
     if refresh:
         trigger = packet["trigger"]
         # Leave room for independent measurements and reports. The full brief holds every row.
@@ -288,6 +313,21 @@ def deliver(conn, brief, limit):
                             break
                     if not summary[field]:
                         del summary[field]
+    # Keep verbatim words and bound authorship next to the report, after named endpoint allocation.
+    indexed_reports = {entry["report_ref"]: entry for entry in report_index}
+    for row in packet["module_reports"]:
+        original = indexed_reports.get(row["report_ref"], {})
+        message = original.get("researcher_message")
+        if message:
+            row["researcher_message"] = message
+            if _size(packet) > room:
+                row["researcher_message"] = {"author_kind": message["author_kind"], "read_full_report": True}
+                if _size(packet) > room:
+                    del row["researcher_message"]
+            if original.get("gx_facts"):
+                row["gx_facts"] = original["gx_facts"]
+                if _size(packet) > room:
+                    del row["gx_facts"]
     if progress:
         projected = packet["research_progress"]
         for key in ("waiting_for", "open_gaps"):

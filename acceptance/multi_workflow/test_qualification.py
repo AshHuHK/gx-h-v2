@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from acceptance.science_execution.test_signed_native import METHOD, PARAMETERS, signed_claim
-from acceptance.v622.test_close import CloseStudy
+from acceptance.v622.test_close import SurveyedStudy
 from acceptance.v62a.interleavings_fixture import branch, draft
 from adapters.scientific import coordinate_equivalence as coordinates
 from gx_core.artifacts import ArtifactService
@@ -42,7 +42,7 @@ class QualifiedCounts(unittest.TestCase):
             self.assertEqual(cli.main(["research", "--state", str(work/"state"), "--run-key", "qualification",
                                        "--goal-file", str(EXAMPLE/"open-question.md"),
                                        "--goal-config", str(EXAMPLE/"open.json")]), 0)
-        s = self.enterContext(CloseStudy(work, reopen=True))
+        s = self.enterContext(SurveyedStudy(work, reopen=True))
         s.next_actor("run")
         original, _, _, metadata = s.materials
         screen = s.call(s.lead, "gx_read_artifact", {"ref": metadata}, "read-count-screen")

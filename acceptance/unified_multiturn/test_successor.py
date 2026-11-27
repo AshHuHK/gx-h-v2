@@ -14,7 +14,7 @@ from unittest.mock import patch
 from acceptance.v62a.interleavings_fixture import GOAL, PRODUCT, draft
 from acceptance.v621.test_evidence_gate import node
 from acceptance.v621.test_claim_publication import BASE
-from acceptance.v622.test_close import CloseStudy, close_decision
+from acceptance.v622.test_close import CloseStudy, SurveyedStudy, close_decision
 from tests.test_v6_decisions import branch
 from gx_core.p0 import cli, conversation, research_report, successor, v623_endpoints
 from acceptance.v623 import test_close_metrics as receipts
@@ -88,7 +88,7 @@ class SuccessorStudy(unittest.TestCase):
         work.mkdir()
         (work/"grant.json").write_text(json.dumps({**grant,"run_budget":limits,"workspace_budget":limits}))
         warm(expected_code=75)
-        with CloseStudy(work, reopen=True) as s:
+        with SurveyedStudy(work, reopen=True) as s:
             s.lead = s.next_actor("run")
             parent = s.run_id
             acquisition = json.loads((PRODUCT/"examples/pcna/data/1VYM.json").read_bytes())
@@ -127,7 +127,7 @@ class SuccessorStudy(unittest.TestCase):
         child = receipt["run_id"]
         self.assertEqual(receipt["parent_decision_ref"], close["decision_ref"])
         self.assertNotEqual(child, parent)
-        with CloseStudy(work, reopen=True) as s:
+        with SurveyedStudy(work, reopen=True) as s:
             s.run_id = child
             s.roots = Roots(s.conn, run_id=child, cwd=s.state, token_budget=10)
             s.roots.client = SimpleNamespace(transport=SimpleNamespace(process=SimpleNamespace(pid=os.getpid())))

@@ -1,0 +1,1869 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8f6s3pam4nc58dg",
+  "goal": "A public structural specimen and a coordinate excerpt are supplied. Does a fresh calculation with these materials support a conclusion about agreement across the whole specimen? Use the comparable evidence and its limits to decide what to do next. Use an applicable workflow from the preceding study if it is available.",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_b22cf1ac9f9191e5446abc4debddbaac699f31b04416d0bc7d469d9be811a226",
+    "op_digest": "0602b282eb3b395ec5b3d28c70b4ad04c881fabcd784b589eb1ff0ce090aafe1",
+    "requested_event": 372,
+    "committed_event": 377,
+    "closed_event": 378,
+    "closed_utc": "2026-11-27T19:28:05.556Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8f7mk5vn32vmznx"
+      ],
+      "op": "close_run",
+      "reason": "All coordinate pairs available in the supplied materials have been compared. The fitted RMSD describes the sampled sites, and the gaps leave whole-specimen agreement unresolved.",
+      "unresolved": [
+        "To assess the remaining mapped positions, obtain the full wwPDB 1QYS coordinate file at the revision specified in provenance.json. Verify its source digest, then refit the fresh prediction against all identity-checked, observed chain A Cα pairs and report any remaining gaps.",
+        "The frozen excerpt comes from the same deposition used in the preceding study. Independent experimental corroboration requires a separate structural measurement of the same construct."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_b22cf1ac9f9191e5446abc4debddbaac699f31b04416d0bc7d469d9be811a226",
+    "task_id": "gxt_01m8f7g2wfw8aywd77",
+    "thread_id": "01a21e78-0bb6-7661-80a2-0d6208bb4903",
+    "turn_id": "01a21e78-0be1-71b1-b3c2-064511bcf414",
+    "rationale": "The preceding study’s workflow gave an equal-weight, proper-rotation Cα RMSD of {{metric:calpha_rmsd_A}} across {{metric:matched_positions}} of {{metric:mapped_positions}} mapped chain A positions in the fresh calculation. Every reference Cα has the expected residue identity and a counterpart in the prediction. The missing-pair flags and original coordinates confirm the inventory’s finding that the excerpt omits the other mapped positions. Repeating the calculation with this excerpt cannot increase coverage.",
+    "reason": "All coordinate pairs available in the supplied materials have been compared. The fitted RMSD describes the sampled sites, and the gaps leave whole-specimen agreement unresolved.",
+    "unresolved": [
+      "To assess the remaining mapped positions, obtain the full wwPDB 1QYS coordinate file at the revision specified in provenance.json. Verify its source digest, then refit the fresh prediction against all identity-checked, observed chain A Cα pairs and report any remaining gaps.",
+      "The frozen excerpt comes from the same deposition used in the preceding study. Independent experimental corroboration requires a separate structural measurement of the same construct."
+    ],
+    "claim_refs": [
+      "gxa_01m8f7mk5vn32vmznx"
+    ],
+    "evidence_refs": [
+      "gxa_01m8f7ecax3gfwv32q",
+      "gxa_01m8f7eba7rehettwg",
+      "gxa_01m8f7ebaxta0cbadn",
+      "gxa_01m8f6s3r1n64ck7wh",
+      "gxa_01m8f6s3rq12dpy88g",
+      "gxa_01m8f6s3sj8xm63npg",
+      "gxa_01m8f6s3t72xwdrrar",
+      "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_40f724710e59924d7fd918b10ddd62d82e1d22f903b25082e930b8a9e58767fb",
+        "source_ref": "gxa_01m8f7ecax3gfwv32q",
+        "event_id": 366,
+        "reading": {
+          "metric_id": "matched_positions",
+          "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+          "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a",
+          "job_id": "gxj_01m8f7ebh2ab8sy881",
+          "output_name": "agreement.json",
+          "method": {
+            "id": "mapped-structure-agreement",
+            "sha256": "96d09e203d27c3f88b506e2706920399ce02298b6acd12389c04b9886420f690",
+            "version": "1"
+          },
+          "admission_sha256": "2c8a514202d8101223c0a058747c80180ed2fb3fe4cfc39959fd21ba536537e1",
+          "manifest_sha256": "cc83d80a22f84a7bd898ae94328995dde6964bc977d535b61e6c75a7606074ba",
+          "provenance_cursor": 336,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8f7eba7rehettwg",
+              "bytes": 66458,
+              "role": "prediction",
+              "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+              "bytes": 976,
+              "role": "reference",
+              "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+              "bytes": 1398,
+              "role": "mapping",
+              "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/matched_positions"
+          },
+          "scope": {
+            "input_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+            "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+            "model": "1",
+            "prediction_chain": "A",
+            "reference_chain": "A",
+            "reference_sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+          },
+          "value": 5,
+          "raw_value": "5",
+          "display": "5",
+          "metric_ref": "metric_40f724710e59924d7fd918b10ddd62d82e1d22f903b25082e930b8a9e58767fb"
+        }
+      },
+      {
+        "metric_ref": "metric_d55c7da1f01efd087bcf29d325313222d592241977201b09772325331df6bc21",
+        "source_ref": "gxa_01m8f7ecax3gfwv32q",
+        "event_id": 366,
+        "reading": {
+          "metric_id": "mapped_positions",
+          "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+          "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a",
+          "job_id": "gxj_01m8f7ebh2ab8sy881",
+          "output_name": "agreement.json",
+          "method": {
+            "id": "mapped-structure-agreement",
+            "sha256": "96d09e203d27c3f88b506e2706920399ce02298b6acd12389c04b9886420f690",
+            "version": "1"
+          },
+          "admission_sha256": "2c8a514202d8101223c0a058747c80180ed2fb3fe4cfc39959fd21ba536537e1",
+          "manifest_sha256": "cc83d80a22f84a7bd898ae94328995dde6964bc977d535b61e6c75a7606074ba",
+          "provenance_cursor": 336,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8f7eba7rehettwg",
+              "bytes": 66458,
+              "role": "prediction",
+              "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+              "bytes": 976,
+              "role": "reference",
+              "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+              "bytes": 1398,
+              "role": "mapping",
+              "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/mapped_positions"
+          },
+          "scope": {
+            "input_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+            "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+            "model": "1",
+            "prediction_chain": "A",
+            "reference_chain": "A",
+            "reference_sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+          },
+          "value": 92,
+          "raw_value": "92",
+          "display": "92",
+          "metric_ref": "metric_d55c7da1f01efd087bcf29d325313222d592241977201b09772325331df6bc21"
+        }
+      },
+      {
+        "metric_ref": "metric_f160288c4b2a5d2325a6fc88f779fed3aa3d4f0dd4da81b5387a56d47d9d5ad7",
+        "source_ref": "gxa_01m8f7ecax3gfwv32q",
+        "event_id": 366,
+        "reading": {
+          "metric_id": "calpha_rmsd_A",
+          "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+          "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a",
+          "job_id": "gxj_01m8f7ebh2ab8sy881",
+          "output_name": "agreement.json",
+          "method": {
+            "id": "mapped-structure-agreement",
+            "sha256": "96d09e203d27c3f88b506e2706920399ce02298b6acd12389c04b9886420f690",
+            "version": "1"
+          },
+          "admission_sha256": "2c8a514202d8101223c0a058747c80180ed2fb3fe4cfc39959fd21ba536537e1",
+          "manifest_sha256": "cc83d80a22f84a7bd898ae94328995dde6964bc977d535b61e6c75a7606074ba",
+          "provenance_cursor": 336,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8f7eba7rehettwg",
+              "bytes": 66458,
+              "role": "prediction",
+              "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+              "bytes": 976,
+              "role": "reference",
+              "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+              "bytes": 1398,
+              "role": "mapping",
+              "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "angstrom",
+          "places": 6,
+          "selectors": {
+            "pointer": "/calpha_rmsd_A"
+          },
+          "scope": {
+            "input_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+            "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+            "model": "1",
+            "prediction_chain": "A",
+            "reference_chain": "A",
+            "reference_sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+          },
+          "value": 0.7878160012303694,
+          "raw_value": "0.7878160012303694",
+          "display": "0.787816 angstrom",
+          "metric_ref": "metric_f160288c4b2a5d2325a6fc88f779fed3aa3d4f0dd4da81b5387a56d47d9d5ad7"
+        }
+      }
+    ],
+    "rendered": {
+      "reason": "All coordinate pairs available in the supplied materials have been compared. The fitted RMSD describes the sampled sites, and the gaps leave whole-specimen agreement unresolved.",
+      "rationale": "The preceding study’s workflow gave an equal-weight, proper-rotation Cα RMSD of 0.787816 angstrom across 5 of 92 mapped chain A positions in the fresh calculation. Every reference Cα has the expected residue identity and a counterpart in the prediction. The missing-pair flags and original coordinates confirm the inventory’s finding that the excerpt omits the other mapped positions. Repeating the calculation with this excerpt cannot increase coverage.",
+      "unresolved": [
+        "To assess the remaining mapped positions, obtain the full wwPDB 1QYS coordinate file at the revision specified in provenance.json. Verify its source digest, then refit the fresh prediction against all identity-checked, observed chain A Cα pairs and report any remaining gaps.",
+        "The frozen excerpt comes from the same deposition used in the preceding study. Independent experimental corroboration requires a separate structural measurement of the same construct."
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+      "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf",
+      "bytes": 409,
+      "role": "specimen"
+    },
+    {
+      "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+      "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+      "bytes": 976,
+      "role": "reference"
+    },
+    {
+      "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+      "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+      "bytes": 1398,
+      "role": "mapping"
+    },
+    {
+      "artifact_ref": "gxa_01m8f6s3t72xwdrrar",
+      "sha256": "ab8b4be2f55d60de6c8d91197b89c2baf1f8c27d240d4d35f0f20ac5ab8a31c9",
+      "bytes": 706,
+      "role": "provenance"
+    }
+  ],
+  "predictions": [
+    {
+      "hypothesis_id": "gxh_01m8f75v8zqe9scs51",
+      "statement": "A fresh mapped Cα fit will recover one coordinate pair for every residue present in the supplied Top7 reference excerpt.",
+      "scope": "The supplied Top7 sequence and residue map, and the single deposited model present in the frozen chain A coordinate excerpt.",
+      "criteria": "The matched-position count in the fresh agreement.json must satisfy /matched_positions = 5. The identities of the pairs must also agree with the chain A residue map.",
+      "decision_scope": "run",
+      "limitations": "The excerpt contains a preselected subset of the deposition used in the preceding study. Its coordinate rows test agreement only at those positions.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8f6z43wrs1q0ybe",
+        "proposed_level": "open",
+        "rationale": "The positive-occupancy Cα rows map one-to-one to residues in the supplied specimen. Each mapped site must also have a Cα in the fresh model to enter the fit."
+      },
+      "evidence_refs": [
+        "gxa_01m8f6s3r1n64ck7wh",
+        "gxa_01m8f6s3rq12dpy88g",
+        "gxa_01m8f6s3sj8xm63npg",
+        "gxa_01m8f6s3t72xwdrrar"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "a77f85cb23fade5c1c7155d08e1bf3453be147a461e9e9d4130ec94ada172a8d",
+        "brief_turn_id": "01a21e6c-a3c4-7520-a9ad-36887a319821",
+        "context_ref": "gxcx_01m8f6s3w8ttwv6r1t",
+        "delivery_receipt": "start:b1234491-11ef-4832-a487-a5dd6e449c61",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 242,
+        "state": "acknowledged",
+        "thread_id": "01a21e6c-a386-7e42-9cb0-c6d2de45965c",
+        "turn_id": "01a21e6c-a3c4-7520-a9ad-36887a319821"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f6s3r1n64ck7wh",
+          "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 230,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f6s3rq12dpy88g",
+          "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 7,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f6s3sj8xm63npg",
+          "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3t72xwdrrar",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f6s3t72xwdrrar",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 232,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "ab8b4be2f55d60de6c8d91197b89c2baf1f8c27d240d4d35f0f20ac5ab8a31c9",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f6s3t72xwdrrar",
+          "sha256": "ab8b4be2f55d60de6c8d91197b89c2baf1f8c27d240d4d35f0f20ac5ab8a31c9",
+          "source_class": "input"
+        }
+      ],
+      "goal_version": 1,
+      "prediction": {
+        "data_refs": [
+          "gxa_01m8f6s3rq12dpy88g"
+        ],
+        "method": {
+          "capability": "mapped-structure-agreement@1",
+          "input_role": "reference",
+          "metric_id": "matched_positions",
+          "output": "agreement.json",
+          "parameters": {},
+          "unit": "1"
+        },
+        "observable": "/matched_positions",
+        "operator": "eq",
+        "target": "analysis",
+        "threshold": 5
+      },
+      "registration": {
+        "chronology_scope": "same_store",
+        "claim_revision_id": "gxh_01m8f75v8zqe9scs51@1",
+        "claim_scope": "The supplied Top7 sequence and residue map, and the single deposited model present in the frozen chain A coordinate excerpt.",
+        "claim_sha256": "574588ea48fe16ea1ba5620b0d96bbd70862945f58dc029dc51aa0b5ad669cf9",
+        "data": [
+          {
+            "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+            "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+          }
+        ],
+        "decision_scope": "run",
+        "endpoint_chronology_at_registration": {
+          "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e": {
+            "endpoint_first_available_event_id": null,
+            "raw_material_received_event_id": 230
+          }
+        },
+        "event_id": 290,
+        "known_at_registration": {
+          "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e": false
+        },
+        "material_identity": "endpoint_verified",
+        "measurement_spec_sha256": "d7bacd7d46c2a5f6b4618dc2b3cae2de8042d78afc33594d2e3ad4321b0719e8",
+        "method_pin": {
+          "capability": "mapped-structure-agreement@1",
+          "manifest_sha256": "96d09e203d27c3f88b506e2706920399ce02298b6acd12389c04b9886420f690",
+          "measurement_spec": {
+            "applicability": "The supplied Top7 sequence and residue map, and the single deposited model present in the frozen chain A coordinate excerpt.",
+            "capability": "mapped-structure-agreement@1",
+            "input_role": "reference",
+            "manifest_sha256": "96d09e203d27c3f88b506e2706920399ce02298b6acd12389c04b9886420f690",
+            "measurement_schema": null,
+            "metric_definition": {
+              "op": "integer/1",
+              "places": 0,
+              "pointer": "/matched_positions",
+              "reader": "json/1",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "model": "/model",
+                "prediction_chain": "/prediction_chain",
+                "reference_chain": "/reference_chain",
+                "reference_sha256": "/reference_sha256"
+              },
+              "unit": "1"
+            },
+            "metric_id": "matched_positions",
+            "missing_parameters": [],
+            "observable": "/metrics/matched_positions",
+            "output": "agreement.json",
+            "output_name": "agreement.json",
+            "parameters": {},
+            "result_pointer": null,
+            "schema": "gx.measurement-spec/2",
+            "source_roles": [
+              "mapping",
+              "prediction",
+              "reference"
+            ],
+            "unit": "1"
+          },
+          "measurement_spec_sha256": "d7bacd7d46c2a5f6b4618dc2b3cae2de8042d78afc33594d2e3ad4321b0719e8",
+          "output": "agreement.json"
+        },
+        "policy": "gx.claim-proposition/3",
+        "posthoc_revision_of": null,
+        "prediction": {
+          "data_refs": [
+            "gxa_01m8f6s3rq12dpy88g"
+          ],
+          "method": {
+            "capability": "mapped-structure-agreement@1",
+            "input_role": "reference",
+            "metric_id": "matched_positions",
+            "output": "agreement.json",
+            "parameters": {},
+            "unit": "1"
+          },
+          "observable": "/matched_positions",
+          "operator": "eq",
+          "target": "analysis",
+          "threshold": 5
+        },
+        "proposition_sha256": "2e2a33b1b45d2bef1cb16fcf5dadae096f41a83674eee7071163ea8856e0b8c8",
+        "quantifier": "all",
+        "utc": "2026-11-27T19:19:38.016Z",
+        "decision_ref": "gxa_8009abb9b966db3a0fb7dfcca8e018082d75eb87d5e6c2108837074fb48e626b"
+      },
+      "assessments": [
+        {
+          "claim_revision_id": "gxh_01m8f75v8zqe9scs51@1",
+          "decision_id": "gxa_8009abb9b966db3a0fb7dfcca8e018082d75eb87d5e6c2108837074fb48e626b",
+          "assessment_cursor": 242,
+          "availability_cursor": 290,
+          "level": "open",
+          "stage": "preregistered",
+          "direction": "undetermined",
+          "results": [],
+          "gaps": [],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "d7bacd7d46c2a5f6b4618dc2b3cae2de8042d78afc33594d2e3ad4321b0719e8",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 230,
+              "registration_event_id": 290,
+              "retrospective_refs": [],
+              "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "GX froze the rule before each qualifying prospective result."
+          ],
+          "utc": "2026-11-27T19:19:38.016Z",
+          "event_id": 290,
+          "event": "v6.claim.adopted",
+          "author": "01a21e6c-a386-7e42-9cb0-c6d2de45965c"
+        },
+        {
+          "claim_revision_id": "gxh_01m8f75v8zqe9scs51@2",
+          "decision_id": "gxa_8009abb9b966db3a0fb7dfcca8e018082d75eb87d5e6c2108837074fb48e626b",
+          "assessment_cursor": 351,
+          "availability_cursor": 351,
+          "level": "open",
+          "stage": "preregistered",
+          "direction": "undetermined",
+          "results": [],
+          "gaps": [
+            {
+              "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+              "event_id": 351,
+              "kind": "no_individual_material_attribution"
+            }
+          ],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "d7bacd7d46c2a5f6b4618dc2b3cae2de8042d78afc33594d2e3ad4321b0719e8",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 230,
+              "registration_event_id": 290,
+              "retrospective_refs": [],
+              "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "GX froze the rule before each qualifying prospective result.",
+            "Unmeasured outcomes and execution gaps do not establish counterevidence."
+          ],
+          "utc": "2026-11-27T19:24:17.856Z",
+          "event_id": 352,
+          "event": "v62.claim.reassessed",
+          "author": "GX"
+        }
+      ],
+      "classification": "registered_without_qualifying_result",
+      "revisions": []
+    }
+  ],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8f7natjbz553tqg",
+      "statement": "calpha_rmsd_A = 0.787816 angstrom; matched_positions = 5; mapped_positions = 92.",
+      "scope": "All mapped residues of the supplied Top7 specimen, assessed with the fresh prediction and the frozen chain A reference excerpt.",
+      "criteria": "Compute the fit over positive-occupancy Cα pairs and check their residue identities against the map. Retain every mapped position in the coverage denominator. A full-specimen Cα RMSD requires paired coordinates across the entire map.",
+      "decision_scope": "run",
+      "limitations": "The intervening backbone and both termini lack reference coordinates in the excerpt. The excerpt derives from the same experimental deposition used in the preceding study. Independent experimental corroboration requires a separate measurement of the same construct.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8f7mk5vn32vmznx",
+        "proposed_level": "insufficient",
+        "rationale": "The matched_pairs list in agreement.json accounts for every Cα in the excerpt. Each paired residue has the same identity in the specimen sequence and both coordinate files. Every missing pair has a predicted Cα and lacks its reference Cα. The original coordinate rows and map confirm the inventory's coverage finding."
+      },
+      "evidence_refs": [
+        "gxa_01m8f7ecax3gfwv32q",
+        "gxa_01m8f7eba7rehettwg",
+        "gxa_01m8f7ebaxta0cbadn",
+        "gxa_01m8f6s3r1n64ck7wh",
+        "gxa_01m8f6s3rq12dpy88g",
+        "gxa_01m8f6s3sj8xm63npg",
+        "gxa_01m8f6s3t72xwdrrar",
+        "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "351e9c5c11db5650599298e4207c9dcf762f55149fbe769c8d91745bb620e8e8",
+        "brief_turn_id": "01a21e78-0be1-71b1-b3c2-064511bcf414",
+        "context_ref": "gxcx_01m8f7g2wd7k6rshyf",
+        "delivery_receipt": "start:edf779dc-d347-4011-8dc1-19bc293de9a8",
+        "metric_refs": [
+          "metric_40f724710e59924d7fd918b10ddd62d82e1d22f903b25082e930b8a9e58767fb",
+          "metric_d55c7da1f01efd087bcf29d325313222d592241977201b09772325331df6bc21",
+          "metric_f160288c4b2a5d2325a6fc88f779fed3aa3d4f0dd4da81b5387a56d47d9d5ad7"
+        ],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+            "event_id": 351,
+            "projection_sha256": "b592c203ce7d55c3663f44f91fd1592b5dcc74086775b780744a1a0e0954cef6",
+            "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a"
+          }
+        ],
+        "snapshot_cursor": 353,
+        "state": "acknowledged",
+        "thread_id": "01a21e78-0bb6-7661-80a2-0d6208bb4903",
+        "turn_id": "01a21e78-0be1-71b1-b3c2-064511bcf414"
+      },
+      "source_records": [
+        {
+          "admission_sha256": "2c8a514202d8101223c0a058747c80180ed2fb3fe4cfc39959fd21ba536537e1",
+          "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+          "capability": "mapped-structure-agreement",
+          "completion_sha256": "cc83d80a22f84a7bd898ae94328995dde6964bc977d535b61e6c75a7606074ba",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8f7eba7rehettwg",
+              "bytes": 66458,
+              "role": "prediction",
+              "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+              "bytes": 976,
+              "role": "reference",
+              "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+              "bytes": 1398,
+              "role": "mapping",
+              "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+            }
+          ],
+          "job_id": "gxj_01m8f7ebh2ab8sy881",
+          "job_status": "SUCCEEDED",
+          "kind": "mapped_structure_agreement",
+          "output_provenance": {
+            "admission_sha256": "2c8a514202d8101223c0a058747c80180ed2fb3fe4cfc39959fd21ba536537e1",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+            "capability": {
+              "id": "mapped-structure-agreement",
+              "sha256": "96d09e203d27c3f88b506e2706920399ce02298b6acd12389c04b9886420f690",
+              "version": "1"
+            },
+            "completion_sha256": "cc83d80a22f84a7bd898ae94328995dde6964bc977d535b61e6c75a7606074ba",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+                "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+              },
+              {
+                "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+                "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+              },
+              {
+                "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+                "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+              },
+              {
+                "artifact_ref": "gxa_01m8f7eba7rehettwg",
+                "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+              }
+            ],
+            "declaration_name": "agreement.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+                "sha256:12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf",
+                "sha256:f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+                "sha256:f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+              ],
+              "processing": [
+                "capability:96d09e203d27c3f88b506e2706920399ce02298b6acd12389c04b9886420f690",
+                "capability:d80c74732139f4df3cbcb1b5cc76d7990e829f22de8832df817578f30146deae",
+                "method_source:1f69a4b3a13c319e25df7baff7afeebf772da41eecbf2921e1492d5242f52e4f",
+                "method_source:d96992732b084d786e564c522bd69c08108c72b1ef6fcf8b81b8735c09adac84",
+                "weights:74d0258616917cd122f5eab6d076afe4a8930e96823851e65e4f777dfb1f33ff"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 345,
+            "independence_complete": false,
+            "job_id": "gxj_01m8f7ebh2ab8sy881",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "agreement.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "model_prediction",
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8f7ecax3gfwv32q",
+          "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "ded23e6eb7f8a218f5bb9293cef8a4f199e829da7108293658373ab2ad94cc45",
+          "artifact_ref": "gxa_01m8f7eba7rehettwg",
+          "capability": "archived-fold-calibration",
+          "completion_sha256": "62d041667239c8892d1f60c196bef117058bf0d3f751f263f4943f698f572492",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+              "bytes": 409,
+              "role": "specimen",
+              "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+            }
+          ],
+          "job_id": "gxj_01m8f75vf3h1rk3tc6",
+          "job_status": "SUCCEEDED",
+          "kind": "predicted_mmcif",
+          "output_provenance": {
+            "admission_sha256": "ded23e6eb7f8a218f5bb9293cef8a4f199e829da7108293658373ab2ad94cc45",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f7eba7rehettwg",
+            "capability": {
+              "id": "archived-fold-calibration",
+              "sha256": "d80c74732139f4df3cbcb1b5cc76d7990e829f22de8832df817578f30146deae",
+              "version": "1"
+            },
+            "completion_sha256": "62d041667239c8892d1f60c196bef117058bf0d3f751f263f4943f698f572492",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+                "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+              }
+            ],
+            "declaration_name": "model.cif",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+              ],
+              "processing": [
+                "capability:d80c74732139f4df3cbcb1b5cc76d7990e829f22de8832df817578f30146deae",
+                "method_source:d96992732b084d786e564c522bd69c08108c72b1ef6fcf8b81b8735c09adac84",
+                "weights:74d0258616917cd122f5eab6d076afe4a8930e96823851e65e4f777dfb1f33ff"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 326,
+            "independence_complete": false,
+            "job_id": "gxj_01m8f75vf3h1rk3tc6",
+            "nature": "model_prediction",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "model.cif",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "model_prediction",
+          "ref": "gxa_01m8f7eba7rehettwg",
+          "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "ded23e6eb7f8a218f5bb9293cef8a4f199e829da7108293658373ab2ad94cc45",
+          "artifact_ref": "gxa_01m8f7ebaxta0cbadn",
+          "capability": "archived-fold-calibration",
+          "completion_sha256": "62d041667239c8892d1f60c196bef117058bf0d3f751f263f4943f698f572492",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+              "bytes": 409,
+              "role": "specimen",
+              "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+            }
+          ],
+          "job_id": "gxj_01m8f75vf3h1rk3tc6",
+          "job_status": "SUCCEEDED",
+          "kind": "model_execution",
+          "output_provenance": {
+            "admission_sha256": "ded23e6eb7f8a218f5bb9293cef8a4f199e829da7108293658373ab2ad94cc45",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f7ebaxta0cbadn",
+            "capability": {
+              "id": "archived-fold-calibration",
+              "sha256": "d80c74732139f4df3cbcb1b5cc76d7990e829f22de8832df817578f30146deae",
+              "version": "1"
+            },
+            "completion_sha256": "62d041667239c8892d1f60c196bef117058bf0d3f751f263f4943f698f572492",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+                "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+              }
+            ],
+            "declaration_name": "inference.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+              ],
+              "processing": [
+                "capability:d80c74732139f4df3cbcb1b5cc76d7990e829f22de8832df817578f30146deae",
+                "method_source:d96992732b084d786e564c522bd69c08108c72b1ef6fcf8b81b8735c09adac84",
+                "weights:74d0258616917cd122f5eab6d076afe4a8930e96823851e65e4f777dfb1f33ff"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 327,
+            "independence_complete": false,
+            "job_id": "gxj_01m8f75vf3h1rk3tc6",
+            "nature": "model_prediction",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "inference.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "cab9d2368de16e4accdfe447338eac927d3b652e64da92845bcf312eafe0a15f",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "model_prediction",
+          "ref": "gxa_01m8f7ebaxta0cbadn",
+          "sha256": "cab9d2368de16e4accdfe447338eac927d3b652e64da92845bcf312eafe0a15f",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f6s3r1n64ck7wh",
+          "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 230,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f6s3rq12dpy88g",
+          "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 7,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f6s3sj8xm63npg",
+          "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3t72xwdrrar",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8f6s3t72xwdrrar",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 232,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "ab8b4be2f55d60de6c8d91197b89c2baf1f8c27d240d4d35f0f20ac5ab8a31c9",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8f6s3t72xwdrrar",
+          "sha256": "ab8b4be2f55d60de6c8d91197b89c2baf1f8c27d240d4d35f0f20ac5ab8a31c9",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+          "kind": "module_report_bundle",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 268,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "57c7213dc729d0c879cf9595b4d2cd421352b4ce97658dc16a0f78373ebfa557",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+          "sha256": "57c7213dc729d0c879cf9595b4d2cd421352b4ce97658dc16a0f78373ebfa557",
+          "source_class": "input"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8f7natjbz553tqg@1",
+      "decision_id": "gxa_b22cf1ac9f9191e5446abc4debddbaac699f31b04416d0bc7d469d9be811a226",
+      "assessment_cursor": 353,
+      "availability_cursor": 371,
+      "level": "insufficient",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T19:28:05.458Z",
+      "event_id": 371,
+      "event": "v6.claim.adopted",
+      "author": "01a21e78-0bb6-7661-80a2-0d6208bb4903",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8f75vf3h1rk3tc6",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "archived-fold-calibration",
+        "sha256": "d80c74732139f4df3cbcb1b5cc76d7990e829f22de8832df817578f30146deae",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+          "bytes": 409,
+          "role": "specimen",
+          "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:cf3a7f8230a0fd8205cb28d013d0252d33303d022863d39b57f5316b4ab505f7",
+        "branch_id": "branch_c4f3269a43c670a1eb5f1f472e2c11a8",
+        "decision_ref": "gxa_8009abb9b966db3a0fb7dfcca8e018082d75eb87d5e6c2108837074fb48e626b",
+        "exec_key": "c2ab8e7555f303229d6f3b2141fc6d9e1eb18d7f051132aca819bef13978d347",
+        "kind": "graph_node",
+        "node_id": "node_0fa9ea84e66e32b9fbac75dd87b3d511",
+        "operation_key": "v6.node:cf3a7f8230a0fd8205cb28d013d0252d33303d022863d39b57f5316b4ab505f7",
+        "plan_key": "41f5e0be11db0335599ceb7a7b0017eb8e71edec76d2e93317fbd0b27bb47f34",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "62d041667239c8892d1f60c196bef117058bf0d3f751f263f4943f698f572492",
+      "outputs": [
+        {
+          "output_name": "model.cif",
+          "artifact_ref": "gxa_01m8f7eba7rehettwg",
+          "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+          "bytes": 66458,
+          "nature": "model_prediction",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+              "bytes": 409,
+              "role": "specimen",
+              "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8f6s3pam4nc58dg/jobs/gxj_01m8f75vf3h1rk3tc6",
+            "rel_path": "files/model.cif"
+          },
+          "metrics": [],
+          "lead_delivery_event_ids": []
+        },
+        {
+          "output_name": "inference.json",
+          "artifact_ref": "gxa_01m8f7ebaxta0cbadn",
+          "sha256": "cab9d2368de16e4accdfe447338eac927d3b652e64da92845bcf312eafe0a15f",
+          "bytes": 2047,
+          "nature": "model_prediction",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+              "bytes": 409,
+              "role": "specimen",
+              "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8f6s3pam4nc58dg/jobs/gxj_01m8f75vf3h1rk3tc6",
+            "rel_path": "files/inference.json"
+          },
+          "metrics": [],
+          "summary": {
+            "calibration": "published_top7_1qys",
+            "input_sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf",
+            "runner_sha256": "f8aba1ff09cc34dc986a2a4533c79680d688c710c22da6b3ec727549c8cdb526",
+            "weights_sha256": "74d0258616917cd122f5eab6d076afe4a8930e96823851e65e4f777dfb1f33ff",
+            "weights_file": "af3.bin.zst",
+            "model_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+            "seed": 1,
+            "recycles": 10,
+            "samples": 1,
+            "buckets": [
+              128
+            ],
+            "msa": "empty",
+            "templates": [],
+            "output_terms": "TERMS_OF_USE.md"
+          },
+          "denominators": {},
+          "lead_delivery_event_ids": []
+        },
+        {
+          "output_name": "TERMS_OF_USE.md",
+          "artifact_ref": "gxa_01m8f7ebbja568x7n7",
+          "sha256": "7ab1c4ef16a8fe88db3ccef813a5e28dec63b1e2d336876e5ae60b6d6b4686b8",
+          "bytes": 13036,
+          "nature": "unclassified",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+              "bytes": 409,
+              "role": "specimen",
+              "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8f6s3pam4nc58dg/jobs/gxj_01m8f75vf3h1rk3tc6",
+            "rel_path": "files/TERMS_OF_USE.md"
+          },
+          "metrics": [],
+          "lead_delivery_event_ids": []
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8f7ebh2ab8sy881",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "mapped-structure-agreement",
+        "sha256": "96d09e203d27c3f88b506e2706920399ce02298b6acd12389c04b9886420f690",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8f7eba7rehettwg",
+          "bytes": 66458,
+          "role": "prediction",
+          "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+          "bytes": 976,
+          "role": "reference",
+          "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+          "bytes": 1398,
+          "role": "mapping",
+          "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:7ffc4356b4d885dd945fd4ca8020438620e500e023d883bf18ea56433669fc5e",
+        "branch_id": "branch_c4f3269a43c670a1eb5f1f472e2c11a8",
+        "decision_ref": "gxa_8009abb9b966db3a0fb7dfcca8e018082d75eb87d5e6c2108837074fb48e626b",
+        "exec_key": "db850b98dd3d253637f0ebcb660eae3004ec94f0fb1a9b4b57ab09ec09597529",
+        "kind": "graph_node",
+        "node_id": "node_d433d940730bcef97d4b1091b72db646",
+        "operation_key": "v6.node:7ffc4356b4d885dd945fd4ca8020438620e500e023d883bf18ea56433669fc5e",
+        "plan_key": "b0d72d478d4baee7426ce1acb936d8404fe615f60c99cdbed4d95f03c2688e34",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "cc83d80a22f84a7bd898ae94328995dde6964bc977d535b61e6c75a7606074ba",
+      "outputs": [
+        {
+          "output_name": "agreement.json",
+          "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+          "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a",
+          "bytes": 11780,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8f7eba7rehettwg",
+              "bytes": 66458,
+              "role": "prediction",
+              "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+              "bytes": 976,
+              "role": "reference",
+              "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+            },
+            {
+              "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+              "bytes": 1398,
+              "role": "mapping",
+              "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8f6s3pam4nc58dg/jobs/gxj_01m8f7ebh2ab8sy881",
+            "rel_path": "files/agreement.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "calpha_rmsd_A",
+              "metric_ref": "metric_f160288c4b2a5d2325a6fc88f779fed3aa3d4f0dd4da81b5387a56d47d9d5ad7",
+              "value": 0.7878160012303694,
+              "raw_value": "0.7878160012303694",
+              "display": "0.787816 angstrom",
+              "unit": "angstrom",
+              "scope": {
+                "input_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+                "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+                "model": "1",
+                "prediction_chain": "A",
+                "reference_chain": "A",
+                "reference_sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+              },
+              "lead_delivery_event_ids": [
+                366
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "mapped_positions",
+              "metric_ref": "metric_d55c7da1f01efd087bcf29d325313222d592241977201b09772325331df6bc21",
+              "value": 92,
+              "raw_value": "92",
+              "display": "92",
+              "unit": "1",
+              "scope": {
+                "input_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+                "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+                "model": "1",
+                "prediction_chain": "A",
+                "reference_chain": "A",
+                "reference_sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+              },
+              "lead_delivery_event_ids": [
+                366
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "matched_positions",
+              "metric_ref": "metric_40f724710e59924d7fd918b10ddd62d82e1d22f903b25082e930b8a9e58767fb",
+              "value": 5,
+              "raw_value": "5",
+              "display": "5",
+              "unit": "1",
+              "scope": {
+                "input_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+                "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+                "model": "1",
+                "prediction_chain": "A",
+                "reference_chain": "A",
+                "reference_sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+              },
+              "lead_delivery_event_ids": [
+                366
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "input_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+            "reference_sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+            "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da",
+            "model": "1",
+            "prediction_chain": "A",
+            "reference_chain": "A",
+            "mapped_positions": 92,
+            "matched_positions": 5,
+            "calpha_rmsd_A": 0.7878160012303694,
+            "units": "angstrom"
+          },
+          "denominators": {},
+          "lead_delivery_event_ids": [
+            366
+          ]
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_f160288c4b2a5d2325a6fc88f779fed3aa3d4f0dd4da81b5387a56d47d9d5ad7",
+          "source_ref": "gxa_01m8f7ecax3gfwv32q"
+        },
+        {
+          "metric_ref": "metric_d55c7da1f01efd087bcf29d325313222d592241977201b09772325331df6bc21",
+          "source_ref": "gxa_01m8f7ecax3gfwv32q"
+        },
+        {
+          "metric_ref": "metric_40f724710e59924d7fd918b10ddd62d82e1d22f903b25082e930b8a9e58767fb",
+          "source_ref": "gxa_01m8f7ecax3gfwv32q"
+        },
+        {
+          "row": {
+            "id": "calpha_rmsd_A",
+            "key": "f160288c4b2a",
+            "unit": "angstrom",
+            "value": "0.787816 angstrom"
+          },
+          "source_ref": "gxa_01m8f7ecax3gfwv32q",
+          "metric_ref": "metric_f160288c4b2a5d2325a6fc88f779fed3aa3d4f0dd4da81b5387a56d47d9d5ad7"
+        },
+        {
+          "row": {
+            "id": "mapped_positions",
+            "key": "d55c7da1f01e",
+            "unit": "1",
+            "value": "92"
+          },
+          "source_ref": "gxa_01m8f7ecax3gfwv32q",
+          "metric_ref": "metric_d55c7da1f01efd087bcf29d325313222d592241977201b09772325331df6bc21"
+        },
+        {
+          "row": {
+            "id": "matched_positions",
+            "key": "40f724710e59",
+            "unit": "1",
+            "value": "5"
+          },
+          "source_ref": "gxa_01m8f7ecax3gfwv32q",
+          "metric_ref": "metric_40f724710e59924d7fd918b10ddd62d82e1d22f903b25082e930b8a9e58767fb"
+        }
+      ],
+      "lease_id": "gxl_01m8f7g2ww6a5xn22q",
+      "receipt": "start:edf779dc-d347-4011-8dc1-19bc293de9a8",
+      "task_id": "gxt_01m8f7g2wfw8aywd77",
+      "thread_id": "01a21e78-0bb6-7661-80a2-0d6208bb4903",
+      "turn_id": "01a21e78-0be1-71b1-b3c2-064511bcf414",
+      "scope": "run",
+      "event_id": 366,
+      "utc": "2026-11-27T19:25:13.573Z"
+    }
+  ],
+  "routes": {
+    "modules": [
+      {
+        "module_instance_id": "module_dc6061e80a2247bac33ea26cff4eafd3",
+        "scope": "module:module_dc6061e80a2247bac33ea26cff4eafd3",
+        "branch_id": "branch_7ef407a28baef7ba20a5ecb004af6427",
+        "focus": "data",
+        "module_id": "data_inventory",
+        "module_version": "3",
+        "round": 1,
+        "parent_task_id": "gxt_01m8f6s3w9nvtgymzz",
+        "goal_version": 1,
+        "status": "COMPLETE",
+        "threads": [
+          {
+            "thread_id": "01a21e6d-55af-71f1-a1d1-133d7d583de4",
+            "task_id": "gxt_01m8f6tnamdkvan534",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21e6d-55e1-7652-811c-80d7f46debd5",
+                "thread_id": "01a21e6d-55af-71f1-a1d1-133d7d583de4",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T19:13:31.624Z",
+                "end": "2026-11-27T19:15:46.052Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {},
+        "nodes": [],
+        "report": {
+          "artifact_ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+          "author": {
+            "call_id": "call_8c8bd2fe3441475d9e6273fe8297ab82",
+            "context_ref": "gxcx_01m8f6tnams21zdkzq",
+            "kind": "MODULE",
+            "lease_id": "gxl_01m8f6tnct96sy3mng",
+            "run_id": "gxr_01m8f6s3pam4nc58dg",
+            "task_id": "gxt_01m8f6tnamdkvan534",
+            "thread_id": "01a21e6d-55af-71f1-a1d1-133d7d583de4",
+            "turn_id": "01a21e6d-55e1-7652-811c-80d7f46debd5"
+          },
+          "base": null,
+          "event_id": 273,
+          "goal_version": 1,
+          "module_id": "data_inventory",
+          "module_instance_id": "module_dc6061e80a2247bac33ea26cff4eafd3",
+          "module_version": "3",
+          "operation_key": "top7-coordinate-coverage-review",
+          "report_ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+          "report_sha256": "57c7213dc729d0c879cf9595b4d2cd421352b4ce97658dc16a0f78373ebfa557",
+          "round": 1,
+          "run_id": "gxr_01m8f6s3pam4nc58dg",
+          "scope": "module:module_dc6061e80a2247bac33ea26cff4eafd3",
+          "source_refs": [
+            "gxa_01m8f6s3r1n64ck7wh",
+            "gxa_01m8f6s3rq12dpy88g",
+            "gxa_01m8f6s3sj8xm63npg",
+            "gxa_01m8f6s3t72xwdrrar"
+          ],
+          "status": "COMPLETE",
+          "version": 1,
+          "wake_event_id": null,
+          "released_event": 296
+        },
+        "delegated_reports": [],
+        "decisions": []
+      }
+    ],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": [
+      {
+        "publisher": "module:module_dc6061e80a2247bac33ea26cff4eafd3",
+        "report_ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+        "published_event": 273,
+        "released_event": 296,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21e72-f187-7ab0-b391-e0539ec92b93",
+        "turn_id": "01a21e72-f1cc-70f1-9246-b2a970c35e33",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:81ccd185-131d-4adc-a161-2addc8d9bc6e",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-18d0471f-047e-4297-9bb9-6134bf5af65b",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_dc6061e80a2247bac33ea26cff4eafd3",
+        "report_ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+        "published_event": 273,
+        "released_event": 296,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21e72-f187-7ab0-b391-e0539ec92b93",
+        "turn_id": "01a21e73-ddae-7bf1-b3fc-db955831fc55",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "resume:01a21e72-f1cc-70f1-9246-b2a970c35e33",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_cff71a47f85369a66d96eb2bb47d6d667db36cb7035e12027deaa9a8fa28eda4",
+        "effects": [],
+        "decision_event": 324,
+        "rationale": "Keep the preceding study’s workflow running. The independent inventory and the original coordinate rows identify five eligible chain A sites in specimen numbering: Ile2, Thr23, Arg45, Val68 and Gly90. The queued fit will test whether each has a predicted counterpart and measure their Cα RMSD. The excerpt comes from the same 1QYS deposition used previously. Its 87 missing reference positions leave whole-specimen agreement unresolved regardless of the five-site RMSD."
+      },
+      {
+        "publisher": "module:module_dc6061e80a2247bac33ea26cff4eafd3",
+        "report_ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+        "published_event": 273,
+        "released_event": 296,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21e77-2eff-7f81-89e6-45a52ceabb07",
+        "turn_id": "01a21e77-2f37-76c2-a8a6-b00f79fd764d",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:fcf1e155-a6bb-445e-8fef-fdc8b058b182",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-201c37d9-d2ab-44b0-ad86-d679b5936cfb",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_19ff4a7422ebb77bac25c7fca817ee6e3f48d63842c3f8b68ff62cbd8b781702",
+        "effects": [],
+        "decision_event": 360,
+        "rationale": "Keep the preceding study’s mapped Cα comparison and review its agreement.json when delivered. The fresh AlphaFold model has one identity-matched chain A Cα for each reference site at specimen positions 2, 23, 45, 68 and 90. The coordinate rows and independent inventory agree that the excerpt leaves 87 mapped positions unobserved. The pending fit can quantify the discrepancy at the five paired sites. Assessing the remaining positions requires additional reference coordinates."
+      },
+      {
+        "publisher": "module:module_dc6061e80a2247bac33ea26cff4eafd3",
+        "report_ref": "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+        "published_event": 273,
+        "released_event": 296,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": true,
+        "receiver_scope": "run",
+        "thread_id": "01a21e78-0bb6-7661-80a2-0d6208bb4903",
+        "turn_id": "01a21e78-0be1-71b1-b3c2-064511bcf414",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:edf779dc-d347-4011-8dc1-19bc293de9a8",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-ee9ce0e2-e64a-497c-9980-f3ee0a6581be",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "ENACTED",
+        "decision_ref": "gxa_b22cf1ac9f9191e5446abc4debddbaac699f31b04416d0bc7d469d9be811a226",
+        "effects": [
+          {
+            "kind": "v6.claim.adopted",
+            "event_id": 371,
+            "subject": "gxh_01m8f7natjbz553tqg",
+            "claim_revision_id": "gxh_01m8f7natjbz553tqg@1"
+          }
+        ],
+        "decision_event": 377,
+        "rationale": "The preceding study’s workflow gave an equal-weight, proper-rotation Cα RMSD of {{metric:calpha_rmsd_A}} across {{metric:matched_positions}} of {{metric:mapped_positions}} mapped chain A positions in the fresh calculation. Every reference Cα has the expected residue identity and a counterpart in the prediction. The missing-pair flags and original coordinates confirm the inventory’s finding that the excerpt omits the other mapped positions. Repeating the calculation with this excerpt cannot increase coverage."
+      }
+    ]
+  },
+  "post_read_actions": [
+    {
+      "decision_ref": "gxa_cff71a47f85369a66d96eb2bb47d6d667db36cb7035e12027deaa9a8fa28eda4",
+      "event_id": 324,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [],
+      "report_events": [
+        273
+      ],
+      "report_statuses": {
+        "273": "CITED"
+      },
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [],
+      "rationale": "Keep the preceding study’s workflow running. The independent inventory and the original coordinate rows identify five eligible chain A sites in specimen numbering: Ile2, Thr23, Arg45, Val68 and Gly90. The queued fit will test whether each has a predicted counterpart and measure their Cα RMSD. The excerpt comes from the same 1QYS deposition used previously. Its 87 missing reference positions leave whole-specimen agreement unresolved regardless of the five-site RMSD.",
+      "rendered_rationale": "Keep the preceding study’s workflow running. The independent inventory and the original coordinate rows identify five eligible chain A sites in specimen numbering: Ile2, Thr23, Arg45, Val68 and Gly90. The queued fit will test whether each has a predicted counterpart and measure their Cα RMSD. The excerpt comes from the same 1QYS deposition used previously. Its 87 missing reference positions leave whole-specimen agreement unresolved regardless of the five-site RMSD."
+    },
+    {
+      "decision_ref": "gxa_19ff4a7422ebb77bac25c7fca817ee6e3f48d63842c3f8b68ff62cbd8b781702",
+      "event_id": 360,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [],
+      "report_events": [
+        273
+      ],
+      "report_statuses": {
+        "273": "CITED"
+      },
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [],
+      "rationale": "Keep the preceding study’s mapped Cα comparison and review its agreement.json when delivered. The fresh AlphaFold model has one identity-matched chain A Cα for each reference site at specimen positions 2, 23, 45, 68 and 90. The coordinate rows and independent inventory agree that the excerpt leaves 87 mapped positions unobserved. The pending fit can quantify the discrepancy at the five paired sites. Assessing the remaining positions requires additional reference coordinates.",
+      "rendered_rationale": "Keep the preceding study’s mapped Cα comparison and review its agreement.json when delivered. The fresh AlphaFold model has one identity-matched chain A Cα for each reference site at specimen positions 2, 23, 45, 68 and 90. The coordinate rows and independent inventory agree that the excerpt leaves 87 mapped positions unobserved. The pending fit can quantify the discrepancy at the five paired sites. Assessing the remaining positions requires additional reference coordinates."
+    }
+  ],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "2a53faf09e096eefe591a906072b9d317774123f3188406445b3276cbccfa4b3",
+      "event_id": 282,
+      "corrected_decision_event": 295
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "28bbcbd80971e979bd5ad6c049d1abe3ed6f40ec5a6be31511e881bac9bbcfcb",
+      "event_id": 283,
+      "corrected_decision_event": 295
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 2,
+      "reason": "SCHEMA_INVALID",
+      "submission": "5315e6cfc6dfe9ecbee7d9397821a5ec5c23287cc26f2736a71c785fe65b9123",
+      "event_id": 284,
+      "corrected_decision_event": 295
+    },
+    {
+      "attempt": 4,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 3,
+      "reason": "SCHEMA_INVALID",
+      "submission": "2542e3d62b1a06572a8c570e9057f935047f292963f4ed6940901b2a8a77f307",
+      "event_id": 285,
+      "corrected_decision_event": 295
+    },
+    {
+      "attempt": 5,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[].budget_limits",
+      "previous_rejections": 4,
+      "reason": "branch_selection_required",
+      "submission": "a7af8ccfb52a71be45dad5c5f437c88fd08861c4fa63ee226f1399c0774fda39",
+      "event_id": 286,
+      "corrected_decision_event": 295
+    },
+    {
+      "attempt": 6,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 5,
+      "reason": "SCHEMA_INVALID",
+      "submission": "95c6d1e974c0fc7e167470cbd81a23ddb68656c30223deecc3515b088b14e873",
+      "event_id": 287,
+      "corrected_decision_event": 295
+    },
+    {
+      "attempt": 7,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 6,
+      "reason": "SCHEMA_INVALID",
+      "submission": "000cef79b56942ab61611411266a2d275224b4a002725c815a8a5fdd2fb2d50b",
+      "event_id": 288,
+      "corrected_decision_event": 295
+    }
+  ],
+  "invocation": {
+    "action": "resume",
+    "before": {
+      "jobs": 1,
+      "host_turns": 4
+    },
+    "after": {
+      "jobs": 2,
+      "host_turns": 7
+    },
+    "added": {
+      "jobs": 1,
+      "host_turns": 3
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/science-plugin-blueprint-b0-release/deployment/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/science-plugin-blueprint-b0-release/state --run-id gxr_01m8f6s3pam4nc58dg --timeout 1800.0"
+  },
+  "prior_study": {
+    "parent_run_id": "gxr_01m8f5r59yyx9gmekh",
+    "parent_decision_ref": "gxa_ad4f8a198ca02c4d63f966cf5cb7e30ff8ec9ea2dd06fc6c2f1888612fe7cdf6",
+    "parent_goal_version": 1,
+    "request_message_id": "archived-partial-reference-v1",
+    "selected_materials": [
+      {
+        "name": "input.json",
+        "role": "specimen",
+        "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+      },
+      {
+        "name": "reference-excerpt.cif",
+        "role": "reference",
+        "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+      },
+      {
+        "name": "mapping.json",
+        "role": "mapping",
+        "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+      },
+      {
+        "name": "provenance.json",
+        "role": "provenance",
+        "sha256": "ab8b4be2f55d60de6c8d91197b89c2baf1f8c27d240d4d35f0f20ac5ab8a31c9"
+      }
+    ]
+  }
+}

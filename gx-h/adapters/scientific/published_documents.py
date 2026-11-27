@@ -22,7 +22,7 @@ def jats_article(raw):
     return article
 
 
-def _article_ids(article):
+def article_identifiers(article):
     # References and sub-articles frequently identify *different* publications.
     front = article.find('{*}front/{*}article-meta')
     found = set()
@@ -60,7 +60,7 @@ def identity(meta, raw, fmt, digest):
     kind = source['kind']
     if kind == 'article' and fmt == 'jats':
         article = jats_article(raw)
-        if accession.casefold() not in _article_ids(article):
+        if accession.casefold() not in article_identifiers(article):
             raise SchemaInvalid('The publisher article metadata does not identify the requested accession')
         version = article.find('{*}front/{*}article-meta/{*}article-version')
         revision = ''.join(version.itertext()).strip() if version is not None else None

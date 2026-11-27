@@ -92,6 +92,31 @@ class SourceReviewClose(unittest.TestCase):
         self.assertTrue(result["decision_ref"])
         self.assertEqual(len(self.s.rows("SELECT 1 FROM events WHERE kind='v6.run.close_requested'")), 1)
 
+    def test_confirmed_resume_chain_can_cite_prior_native_review_and_close(self):
+        from dataclasses import replace
+        from acceptance.v622.test_close import close_decision
+        s, actor = self.s, self.s.lead
+        prior = actor.turn
+        for turn in ("resume-one","resume-two"):
+            s.conn.execute("""INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,human,
+                interrupt,state,method,turn_id) VALUES(?,?,?,?,?,0,0,'acknowledged','turn/start',?)""",
+                (s.run_id,"resume:"+prior,actor.thread,turn,"confirmed-resume",turn))
+            prior = turn
+        next_actor = replace(actor,turn=prior)
+        s.roots.active_turns[actor.thread] = next_actor.turn
+        receipt = s.call(next_actor,"gx_decide_revision",{"decision":close_decision([self.review_ref])},"finish-resumed")
+        self.assertTrue(receipt["decision_ref"])
+        self.assertEqual(len(s.rows("SELECT 1 FROM events WHERE kind='v6.run.close_requested'")),1)
+
+    def test_unlinked_new_turn_cannot_reuse_prior_source_receipt(self):
+        from gx_core.p0 import v62_sources
+        s, a = self.s, self.s.lead
+        task = s.conn.execute("SELECT * FROM v6_decision_tasks WHERE task_id=?",(a.task_id,)).fetchone()
+        s.conn.execute("""INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,human,
+            interrupt,state,method,turn_id) VALUES(?,?,?,?,?,0,0,'acknowledged','turn/start',?)""",
+            (s.run_id,"unrelated",a.thread,"other","other","other"))
+        self.assertEqual(v62_sources.decision_citations(s.conn,task,a.lease_id,a.thread,"other",{self.review_ref}),set())
+
     def test_uncited_review_still_requires_fresh_brief(self):
         with self.assertRaises(StaleRevision) as stale:
             self.close([])

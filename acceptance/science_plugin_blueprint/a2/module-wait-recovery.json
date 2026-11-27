@@ -1,0 +1,45 @@
+{
+  "run_id": "gxr_01m8f5kjf8dpqfr1ry",
+  "module": "module:module_c972fe31d8da8686da3c36177aa277f7",
+  "issue": "Local native admission could not resume with no live turn, Job or hold. Its settled charge was below the local cap while unassigned, observed closed-thread exposure used the remaining headroom.",
+  "before": {
+    "module_hard_tokens": 190000,
+    "settled_tokens": 173119,
+    "unfunded_closed_thread_tokens": 47365,
+    "committed_tokens": 220484,
+    "reserved_tokens": 0,
+    "active_root_count": 0,
+    "module_status": "OPEN",
+    "waiting": "budget"
+  },
+  "mapping_after_resume": {
+    "module_id": "offline_literature_mechanism",
+    "scope": "module:module_c972fe31d8da8686da3c36177aa277f7",
+    "status": "PARTIAL",
+    "author": {
+      "context_ref": "gxcx_01m8f5r4pt6nd812xw",
+      "kind": "GX",
+      "task_id": "gxt_01m8f5r4pv790wcys7"
+    },
+    "report_ref": "gxa_0b8e26f96db06531f61fcdf22ddca042284a8575cc0eb0f081774304c5ccd01f",
+    "published_event": 524,
+    "released_event": 525,
+    "gx_gaps": [
+      "closed-thread usage exposure prevents another turn within the module token ceiling"
+    ],
+    "source_refs": [
+      "gxa_01m8f5kjgdfvdegx0d",
+      "gxa_01m8f5kjh253w4wmhc",
+      "gxa_01m8f5yy1a4wd7prpd",
+      "gxa_01m8f5yy3xd4dwtjpm",
+      "gxa_01m8f5yy68v7jncxav",
+      "gxa_01m8f5yy8jqcbq8brp",
+      "gxa_01m8f5yyat87w7m9f5",
+      "gxa_01m8f5yyd5kaz018yw"
+    ]
+  },
+  "other_still_working_scope": "module(scholarly_page_investigation, third field assignment) stayed OPEN at this handback",
+  "red_regression": "Ran 1 test in 0.118s\n\nFAILED (failures=1)",
+  "focused_verification": "........\n----------------------------------------------------------------------\nRan 8 tests in 2.663s\n\nOK",
+  "ledger_change_from_fix": "none; the patch reads exposure and returns the existing GX partial reason"
+}

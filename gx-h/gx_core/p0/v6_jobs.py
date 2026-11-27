@@ -42,10 +42,12 @@ def _roles(method, count):
     if "{inputs.json}" in method["entry"]["argv_template"]:
         extra = count - len(roles)
         if not 1 <= extra <= 8:
-            raise SchemaInvalid("A grouped capability accepts one to eight additional inputs")
+            raise SchemaInvalid("A grouped capability accepts one to eight additional inputs", details={
+                "declared_input_roles": roles, "additional_input_range": [1, 8], "input_count": count})
         roles += ["input_" + chr(ord("A") + i) for i in range(extra)]
     if len(roles) != count:
-        raise SchemaInvalid(f"Capability requires the ordered input roles {roles}")
+        raise SchemaInvalid(f"Capability requires the ordered input roles {roles}", details={
+            "declared_input_roles": roles, "input_count": count, "correction": "Supply each required role in order."})
     return roles
 
 
@@ -65,10 +67,19 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
     for index, name in ports.items():
         producer = spec["inputs"][index]
         if producer not in spec["depends_on"] or producer not in producers:
-            raise SchemaInvalid("A named output needs a declared upstream node dependency")
+            raise SchemaInvalid("A named output needs a declared upstream node dependency", details={
+                "input_index": index, "upstream": producer, "requested_output": name,
+                "expected_type": "upstream_node",
+                "correction": "Use an upstream node with a depends_on edge, or omit input_ports for an artifact."})
         declaration = registry.candidate(conn, producers[producer])["manifest"]
-        if not any(out["name"] == name and not manifest.is_dir_output(out) for out in declaration["outputs"]):
-            raise SchemaInvalid(f"{name!r} is not a declared file output of {producers[producer]}")
+        available = [out for out in declaration["outputs"] if not manifest.is_dir_output(out)]
+        if not any(out["name"] == name for out in available):
+            raise SchemaInvalid(f"{name!r} is not a declared file output of {producers[producer]}", details={
+                "input_index": index, "upstream": producer, "requested_output": name,
+                "expected_type": "named_file_output",
+                "available_file_outputs": [{k: out[k] for k in ("name", "kind", "media_type") if k in out}
+                                           for out in available],
+                "correction": "Bind a declared file output by its exact name."})
     assets = storage.artifact_service(conn)
     for ref in spec["inputs"]:
         if ref in producers:
@@ -80,8 +91,13 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
     provider = goal_plugins.method(conn, run_id, capability)
     if provider and provider.validate:
         ctx = v6_method_context.MethodContext(conn, run_id, spec["inputs"])
-        v6_method_context.invoke(provider.validate, ctx, capability, spec["inputs"], parameters,
-                                 producers=producers)
+        try:
+            v6_method_context.invoke(provider.validate, ctx, capability, spec["inputs"], parameters,
+                                     producers=producers)
+        except SchemaInvalid as exc:
+            exc.details.setdefault("declared_input_roles", manifest.input_roles(method))
+            exc.details.setdefault("input_count", len(spec["inputs"]))
+            raise
     else:
         _roles(method, len(spec["inputs"]))
         if set(parameters) != set(manifest.parameter_names(method)):
@@ -178,7 +194,9 @@ def _ports(spec):
     for entry in spec.get("input_ports", ()):
         index = entry["index"]
         if type(index) is not int or not 0 <= index < len(inputs) or index in ports:
-            raise SchemaInvalid("Each input port needs one distinct in-range input index")
+            raise SchemaInvalid("Each input port needs one distinct in-range input index", details={
+                "input_index": index, "input_count": len(inputs),
+                "correction": "Number inputs from zero and bind at most one named output per position."})
         ports[index] = entry["output"]
     if len({(ref, ports.get(i)) for i, ref in enumerate(inputs)}) != len(inputs):
         raise SchemaInvalid("Repeated graph input: select different outputs or supply distinct inputs")
@@ -231,41 +249,70 @@ def _dependencies(conn, node, spec, *, check_all=False):
         matching = [row for row in outputs[ref] if row["output_name"] == ports[index]]
         if len(matching) != 1 or matching[0].get("runner_sha256", matching[0]["sha256"]) != matching[0]["sha256"]:
             raise DependencyUnmet(f"Upstream Job has no unique verified output {ports[index]!r}",
-                                  details={"node": ref, "output": ports[index]})
+                                  details={"node": ref, "consumer": node["node_id"], "input_index": index,
+                                           "output": ports[index],
+                                           "recorded_outputs": sorted(row["output_name"] for row in outputs[ref])})
         refs.append(matching[0]["artifact_ref"])
     return refs
 
 
-def _compile(conn, node, refs):
-    spec = json.loads(node["spec_json"])
-    cap = spec["capability"]
-    method = registry.candidate(conn, cap)
-    parameters = manifest.effective_parameters(method["manifest"], spec["parameters"])
-    provider = goal_plugins.method(conn, node["run_id"], cap)
-    if provider and provider.bind:
-        ctx = v6_method_context.MethodContext(conn, node["run_id"], refs, writable=True)
-        inputs, params = v6_method_context.invoke(provider.bind, ctx, cap, refs, parameters)
-    else:
-        inputs = dict(zip(_roles(method["manifest"], len(refs)), refs))
-        params = parameters
-    artifacts = storage.artifact_service(conn)
-    entries = [{"role": key, "artifact_ref": ref} for key, ref in inputs.items()]
-    inputs_ref = artifacts.make_input_manifest(
-        namespace=f"{node['run_id']}/v6/inputs", run_id=node["run_id"], entries=entries
-    ).artifact_ref
-    entries = artifacts.read_input_manifest(inputs_ref)["entries"]
+def _small_data_pins(paths):
+    # Hash small release assets without adding a scan of a shared dataset or
+    # model-weight directory to ordinary Job admission.
+    remaining = 1024 * 1024
+    pins = {}
+    for item in paths:
+        try:
+            path = manifest.resolve_path(item)
+            if not path.is_file() or path.stat().st_size > remaining:
+                return None
+            remaining -= path.stat().st_size
+            pins[item] = ids.sha256_of_file(path)
+        except (GxError, OSError, KeyError):
+            return None
+    return pins
+
+
+def method_identity(conn, run_id, cap, method, entries, params):
     runtime = environments.require_ready(conn, method["env_id"])
     resources = manifest.effective_resources(method["manifest"], {})
     env = execution._runtime(runtime, resources, {})
-    identity = {
+    return {
         "version": 1,
         "capability": cap,
         "manifest_sha256": method["manifest_sha256"],
         "roles": [[entry["role"], entry["sha256"]] for entry in entries],
         "parameters": params,
         "runtime": env,
-        "method_dependencies": v6_method_context.dependencies(conn, node["run_id"], cap, runtime["python_executable"]),
+        "method_dependencies": v6_method_context.dependencies(conn, run_id, cap, runtime["python_executable"]),
+        **({"required_data_sha256": _small_data_pins(method["manifest"]["required_data"])}
+           if method["manifest"].get("required_data") else {}),
     }
+
+
+def bind_inputs(conn, run_id, cap, method, refs, parameters, *, writable):
+    params = manifest.effective_parameters(method["manifest"], parameters)
+    provider = goal_plugins.method(conn, run_id, cap)
+    if provider and provider.bind:
+        ctx = v6_method_context.MethodContext(conn, run_id, refs, writable=writable)
+        return v6_method_context.invoke(provider.bind, ctx, cap, refs, params)
+    return dict(zip(_roles(method["manifest"], len(refs)), refs, strict=True)), params
+
+
+def _compile(conn, node, refs):
+    spec = json.loads(node["spec_json"])
+    cap = spec["capability"]
+    method = registry.candidate(conn, cap)
+    inputs, params = bind_inputs(conn, node["run_id"], cap, method, refs, spec["parameters"], writable=True)
+    artifacts = storage.artifact_service(conn)
+    entries = [{"role": key, "artifact_ref": ref} for key, ref in inputs.items()]
+    inputs_ref = artifacts.make_input_manifest(
+        namespace=f"{node['run_id']}/v6/inputs", run_id=node["run_id"], entries=entries
+    ).artifact_ref
+    entries = artifacts.read_input_manifest(inputs_ref)["entries"]
+    identity = method_identity(conn, node["run_id"], cap, method, entries, params)
+    if spec.get("independent_repeat"):
+        identity["independent_node"] = node["node_id"]
     exec_key = ids.sha256_of_obj(identity)
     plan_key = ids.sha256_of_obj(
         {"run": node["run_id"], "graph": node["version"], "node": node["node_id"], "spec": spec}
@@ -353,7 +400,7 @@ def _branch_room(conn, node, amounts):
             )
 
 
-def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, method_dependencies):
+def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, method_dependencies, required_data):
     """The Job writer calls this after inserting the row, inside its own admission transaction."""
     binding = request.get("binding") or {}
     node = _node(conn, request["run_id"], binding.get("v6_node_id"))
@@ -395,16 +442,22 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
     ):
         raise IdempotencyConflict("Job request differs from its admitted graph assignment")
     identity = json.loads(attempt["identity_json"])
+    if "required_data_sha256" in identity and identity["required_data_sha256"] != required_data:
+        raise SchemaInvalid("Required method data changed after the graph node was prepared")
     if identity.get("method_dependencies", {}) != method_dependencies:
         raise SchemaInvalid("Method dependencies changed after the graph node was prepared")
     compiled_env = identity["runtime"]
     # GPU availability is a launch observation. Runtime environment identity is frozen separately.
     if _runtime_identity(compiled_env) != _runtime_identity(runtime):
         raise SchemaInvalid("Execution environment changed after the node was compiled")
+    # In-flight equivalents still serialize. A completed node owns no future
+    # measurement when the effective scientific side data could not be pinned.
+    may_reuse = required_data == {} or identity.get("required_data_sha256") is not None
     equivalent = conn.execute(
         "SELECT node_id FROM v6_nodes WHERE run_id=? AND exec_key=? AND node_id<>? "
-        "AND (status IN ('RUNNING','SUCCEEDED','REUSED') OR (status='CANCEL_REQUESTED' AND job_id IS NOT NULL)) LIMIT 1",
-        (node["run_id"], attempt["exec_key"], node["node_id"]),
+        "AND (status='RUNNING' OR (? AND status IN ('SUCCEEDED','REUSED')) "
+        "OR (status='CANCEL_REQUESTED' AND job_id IS NOT NULL)) LIMIT 1",
+        (node["run_id"], attempt["exec_key"], node["node_id"], may_reuse),
     ).fetchone()
     if equivalent:
         raise ResourceDenied(
@@ -656,10 +709,18 @@ def _run_node(conn, node, service, window):
         "status='SUCCEEDED' AND result_ref IS NOT NULL ORDER BY rowid LIMIT 1",
         (node["run_id"], node["node_id"], attempt["exec_key"]),
     ).fetchone()
+    # A large mutable repository or directory has no byte pin. A successful
+    # earlier result cannot establish that this node would use the same data.
+    identity = json.loads(attempt["identity_json"])
     if source:
-        # A previously parked attempt may resume under a changed interpreter or SVD distribution.
-        identity = json.loads(attempt["identity_json"])
         method = registry.candidate(conn, spec["capability"])
+        paths = method["manifest"].get("required_data", ())
+        if paths and identity.get("required_data_sha256") is None:
+            source = None
+    if source:
+        # A previously parked attempt may resume with different data, interpreter or SVD.
+        if paths and _small_data_pins(paths) != identity["required_data_sha256"]:
+            raise SchemaInvalid("Required method data changed before the previous result could be reused")
         active = environments.require_ready(conn, method["env_id"])
         current = execution._runtime(active, manifest.effective_resources(method["manifest"], {}), {})
         if (

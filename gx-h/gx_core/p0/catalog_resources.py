@@ -42,7 +42,7 @@ def _references(kind, occupied):
     return result
 
 
-def query(conn, run_id, brief, kind, args, methods, choices):
+def rows_for_kind(conn, run_id, brief, kind, methods, choices, *, current_reading=False):
     from . import v62_catalog, v6_recipes
     from ..plugins import development
     module = brief["scope"].startswith("module:")
@@ -53,10 +53,12 @@ def query(conn, run_id, brief, kind, args, methods, choices):
     if kind == "recipe":
         if not module:
             pins = {r["capability_version"]:r["portable_sha256"] for r in visible}
+            providers = {r["capability_version"]: v6_recipes.provider_pin(r) for r in visible}
             for card in v6_recipes.cards(conn):
                 row = dict(card, category="workflow", purpose=card["title"])
-                row["status"] = ("available" if all(pins.get(ref) == digest
-                                                       for ref, digest in card["method_pins"].items()) else "requires_method")
+                matches = (all(pins.get(ref) == value for ref, value in card["method_pins"].items())
+                           and all(providers.get(ref) == value for ref, value in card.get("provider_pins", {}).items()))
+                row["status"] = "available" if matches else "requires_method"
                 rows.append(row)
     elif kind == "skill":
         if not module:
@@ -71,6 +73,31 @@ def query(conn, run_id, brief, kind, args, methods, choices):
             rows.append(dict(detail, kind=kind, category="evidence", reference="source-evidence-review@1",
                              digest=ids.sha256_of_obj([contracts.native_goal_tool_spec(n) for n in stages]),
                              status="available"))
+            if current_reading:
+                guide = {
+                    "title": "GX2Understand — source-grounded scientific reading",
+                    "aliases": ["gx2understand", "論文精讀", "论文精读", "interpret research evidence"],
+                    "purpose": "Resolve a disputed interpretation of original methods, measurements or figures.",
+                    "inputs": ["visible original or scientific source"],
+                    "outputs": ["locator-grounded evidence", "reading coverage", "interpretation and limitations"],
+                    "tools": stages,
+                    "adapted_from": {"reference": "gx-understand@legacy",
+                        "sha256": "cfa6161ac65eb8fa77b1a07c8069cefb55aac51d992c91afe0e598e81763f295"},
+                    "reading_guide": [
+                        "Triage relevance to the current decision. Record why a source can be set aside. "
+                        "For a central claim read the original methods or figure, at the exact locator.",
+                        "Extract the endpoint, sample, denominator, units, controls and conditions used. "
+                        "Keep the authors' findings, your inference, unseen pages and contrary evidence distinct.",
+                        "Multiple interfaces can point to one publication. Compare the underlying samples "
+                        "before treating reports as independent. Unknown independence is a valid outcome.",
+                        "Explain which comparison or action this evidence changes or supports keeping. "
+                        "If the disputed interpretation matters to that action, request a fresh reading "
+                        "of the original by an independent researcher."
+                    ],
+                    "limitations": "Record abstracts, partial originals and unavailable appendices as partial coverage.",
+                }
+                rows.append(dict(guide, kind=kind, category="evidence", reference="gx2understand@1",
+                                 status="available", digest=ids.sha256_of_obj([guide, rows[-1]["digest"]])))
     else:
         available = {r["capability_version"] for r in visible}
         for method in [*visible, *(r for r in choices if r["capability_version"] not in available)]:
@@ -88,6 +115,11 @@ def query(conn, run_id, brief, kind, args, methods, choices):
                              "digest":ids.sha256_of_obj(spec), "outputs":["source or evidence receipt"]})
     if not module:
         rows.extend(_references(kind, {row["reference"] for row in rows}))
+    return rows
+
+
+def query(conn, run_id, brief, kind, args, methods, choices):
+    rows = rows_for_kind(conn, run_id, brief, kind, methods, choices)
     reference = args.get("reference")
     if reference:
         for card in rows:

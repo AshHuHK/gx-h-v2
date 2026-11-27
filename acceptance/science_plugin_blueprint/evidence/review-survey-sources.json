@@ -1,0 +1,97 @@
+{
+  "original": {
+    "run_id": "gxr_01m8f5kjf8dpqfr1ry",
+    "source_db": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/plugin-blueprint-live/a2/state/gx.db",
+    "prior_context": "gxcx_01m8f5xsjke05d56a4",
+    "next_context": "gxcx_01m8f6aa6tn26d6ptg",
+    "prior_through_event": 359,
+    "next_through_event": 486,
+    "already_read_evidence_dropped_from_survey": 17,
+    "dropped_inputs": [
+      {
+        "ref": "gxa_01m8f5q3me985t5kqx",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q3pszb3veyak",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q3sexxg8pk7q",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q3vr640yynrm",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q3y5myrv0rj6",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q40jy6wawb1f",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q4311ym3ykng",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q45hz8z58yxs",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q4847an28fxy",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q4ahmrkcr9gq",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5q4d247ahyq3e",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5srdmkx8g2657",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5srftdgfqssey",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5srjhvqq5ebjs",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5srn12eq0bxes",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5srqvz0jwdz4z",
+        "role": "v62.source.extracted"
+      },
+      {
+        "ref": "gxa_01m8f5srtq3hhnt834",
+        "role": "v62.source.extracted"
+      }
+    ]
+  },
+  "before_regression": "Native controlled child explicitly released one of two extractions. The next survey listed the primary article and the signed report, but omitted the child's released evidence_ref.",
+  "candidate": {
+    "command": "PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a .venv/bin/python -B -m unittest acceptance.science_plugin_blueprint.test_catalog_survey_sources acceptance.science_plugin_blueprint.test_catalog_survey tests.test_researcher_handoff",
+    "exit_code": 0,
+    "summary": "........\n----------------------------------------------------------------------\nRan 8 tests in 2.544s\n\nOK",
+    "entry": "gx-p0 research CLI, controlled native Lead and separately leased module, cold reopen of the private store",
+    "checks": [
+      "An authored report contributes its actual interpreted finding and report_ref to the discovery update.",
+      "A source the field worker cited stays in the next survey after an unrelated update and cold reopen.",
+      "The Lead’s past excerpt stays visible.",
+      "An unreported excerpt by the same field worker remains absent.",
+      "The already-consumed author message does not masquerade as a later update."
+    ],
+    "new_external_jobs": 0,
+    "new_model_turns": 0
+  }
+}

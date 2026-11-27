@@ -1,0 +1,624 @@
+{
+  "question": "How do researchers evaluate the accuracy of urban air pollution sensors?",
+  "transport": "controlled native decisions, live publisher requests via Clash",
+  "model_calls": 0,
+  "jobs": [
+    {
+      "action": "first",
+      "node_id": "node_32a70f530b8a69ad07aeff7a43001501",
+      "decision_ref": "gxa_2a674ca3b218e9b1f5b6c8f04b761a9a11cb17100e6a87b058d28758650e98e8",
+      "job_id": "gxj_01m8f6gxjd7jap1k01",
+      "status": "SUCCEEDED",
+      "submitted_inputs": [],
+      "parameters": {
+        "query": "urban air pollution sensors"
+      },
+      "ports": {
+        "candidates.json": "gxa_01m8f6hddt7p824eqh",
+        "search-snapshot.json": "gxa_01m8f6hddyvw5knt31"
+      },
+      "admission_inputs": [],
+      "completion_sha256": "343174b9da6fd7cec7ba22bcdf872f25feb178fecdda5abce9aa8b41b574e5c5",
+      "output_sha256": {
+        "candidates.json": "b3afd165d418406b8b0736629ba7852f83e9e636ba40d84bed47ab59ca0775e0",
+        "search-snapshot.json": "18a9ff27ea107977e4971757edde1f73c29ad5289a503d29750c04d26651b116"
+      }
+    },
+    {
+      "action": "next",
+      "node_id": "node_3635c741c28a2a6ed641696f00a612c4",
+      "decision_ref": "gxa_ce8405b9973890b3839d75fc7f90ebd949a811a5ec0820ae8e03a637f934722d",
+      "job_id": "gxj_01m8f6hdh9a43eqhd3",
+      "status": "SUCCEEDED",
+      "submitted_inputs": [
+        "gxa_01m8f6hddyvw5knt31"
+      ],
+      "parameters": {
+        "action": "next"
+      },
+      "ports": {
+        "candidates.json": "gxa_01m8f6hxezvj0b16fj",
+        "search-snapshot.json": "gxa_01m8f6hxf31gcyd9rk"
+      },
+      "admission_inputs": [
+        {
+          "artifact_ref": "gxa_01m8f6hddyvw5knt31",
+          "bytes": 92266,
+          "role": "snapshot",
+          "sha256": "18a9ff27ea107977e4971757edde1f73c29ad5289a503d29750c04d26651b116"
+        }
+      ],
+      "completion_sha256": "7860a029ea4b90aa9d75c4818a40e3bbef4cfc2e0aa0d9d282de96376d740122",
+      "output_sha256": {
+        "candidates.json": "df54de745364b3a993b932c6cdb7fa3f6c248b9f182a4dd4ef4ae9341b6a846c",
+        "search-snapshot.json": "49f85a49a7035c61cc2e6c9d23abc76506764d0041fdd70df87c207a1a2d81e8"
+      }
+    },
+    {
+      "action": "replay",
+      "node_id": "node_89c46edd184c5248500042c02a15788e",
+      "decision_ref": "gxa_ddbbd245a4750fdb03ef607a18b16c0f04ad75d3b33edbd68ac2f918add43710",
+      "job_id": "gxj_01m8f6hxhqzqgwdpnr",
+      "status": "SUCCEEDED",
+      "submitted_inputs": [
+        "gxa_01m8f6hxf31gcyd9rk"
+      ],
+      "parameters": {
+        "action": "replay"
+      },
+      "ports": {
+        "candidates.json": "gxa_01m8f6hxz3v0rzdy56",
+        "search-snapshot.json": "gxa_01m8f6hxz6gqne9c2g"
+      },
+      "admission_inputs": [
+        {
+          "artifact_ref": "gxa_01m8f6hxf31gcyd9rk",
+          "bytes": 108500,
+          "role": "snapshot",
+          "sha256": "49f85a49a7035c61cc2e6c9d23abc76506764d0041fdd70df87c207a1a2d81e8"
+        }
+      ],
+      "completion_sha256": "7a348cb01b026ac89d2d985160b621837a80c9f39ba119128840da4363ddd3a3",
+      "output_sha256": {
+        "candidates.json": "0eee3079356418b589dc08590832427d4fece8dc94c92896a941cbe3efcdd974",
+        "search-snapshot.json": "49f85a49a7035c61cc2e6c9d23abc76506764d0041fdd70df87c207a1a2d81e8"
+      }
+    },
+    {
+      "action": "original",
+      "node_id": "node_280b489f6515381375f26faded08f892",
+      "decision_ref": "gxa_7659b6a70f5c63d7549e6501389eac78abab6aa901f8c5db827c14d5d78ab846",
+      "job_id": "gxj_01m8f6hy1xb40njqrt",
+      "status": "SUCCEEDED",
+      "submitted_inputs": [
+        "gxa_01m8f6hddt7p824eqh"
+      ],
+      "parameters": {
+        "pmcid": "PMC13629622"
+      },
+      "ports": {
+        "article.xml": "gxa_01m8f6jewgfm9z0sth",
+        "acquisition.json": "gxa_01m8f6jewhww7t730d"
+      },
+      "admission_inputs": [
+        {
+          "artifact_ref": "gxa_01m8f6hddt7p824eqh",
+          "bytes": 14920,
+          "role": "candidates",
+          "sha256": "b3afd165d418406b8b0736629ba7852f83e9e636ba40d84bed47ab59ca0775e0"
+        }
+      ],
+      "completion_sha256": "f72b5fbeb3f9e53a1e7e6cacab8f5c99f8f7b975b25810424b7466a6763ab580",
+      "output_sha256": {
+        "article.xml": "676d1bee755798aa71c6d392ff2a154e9f34b297e8f0345e836f1256319eb565",
+        "acquisition.json": "837192e99daeae2085b4947094c1dbb0a1bf8d78589772e0a626927b8656c055"
+      }
+    }
+  ],
+  "run_id": "gxr_01m8f6gwzh1dfvz1j7",
+  "researcher_materials": [],
+  "first_method": {
+    "capability_version": "literature-query@1",
+    "portable_sha256": "a46da20db15ab8ec3b573da3b0af601f328a49c461df8d5efc9f358b0f844cf6",
+    "cost_class": "local_cpu",
+    "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples.",
+    "method": {
+      "family": "public_literature_search",
+      "objective": "Discover relevant papers from the scientific question alone, even when no materials or search snapshot exist.",
+      "mechanism": "Use inputs=[] and parameter query (the search terms). Europe PMC and Crossref return bibliographic candidates and their retrievable originals; search-snapshot.json archives exact provider response bytes and continuation cursors.",
+      "estimator": "Per-source page, returned count, hit count, continuation cursor and acquisition state; deduplicated publication identifiers on this page plus exact response bytes.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "candidates.json",
+        "kind": "file:scholarly_candidates",
+        "nature": "analysis"
+      },
+      {
+        "name": "search-snapshot.json",
+        "kind": "file:scholarly_snapshot",
+        "nature": "analysis"
+      }
+    ],
+    "provider": "org.gx.publication-discovery@1.0.0",
+    "provider_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+    "aliases": [],
+    "collections": [
+      "public_sources"
+    ]
+  },
+  "module_instance": "module_97106ca9255c753d5034a80c02b85f0c",
+  "first_sources": [
+    {
+      "provider": "europepmc",
+      "page": 1,
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=urban+air+pollution+sensors&format=json&pageSize=12&resultType=core&cursorMark=%2A",
+      "retrieved_at": "2026-11-27T19:08:12.454192+00:00",
+      "sha256": "f08afe29f8576ae8aa94b32a2c0b7cb542b93bfbaa39ff582fa3d6ef4c6f4928",
+      "returned": 12,
+      "provider_hits": 6325,
+      "next_cursor": "AoIIQL0BhCg1NzAxMDUxMg==",
+      "has_more": true,
+      "status": "hits",
+      "indexed_records": 12,
+      "offset_before": 0,
+      "seen_through": 12,
+      "coverage": "partial"
+    },
+    {
+      "provider": "crossref",
+      "page": 1,
+      "url": "https://api.crossref.org/works?query.bibliographic=urban+air+pollution+sensors&rows=12&select=DOI%2Ctitle%2Ctype%2Cissued%2Cupdated-by&cursor=%2A",
+      "retrieved_at": "2026-11-27T19:08:26.272684+00:00",
+      "sha256": "f4fd6b786c468adf716b3932a737db476bd5db74b36507f6e75c31d2d0023e1f",
+      "returned": 12,
+      "provider_hits": 2066958,
+      "next_cursor": "MTAyNzU1NjM2NzAwMCwxMC4xMDY3JTJGbW1qLjIwMDEuMTEyNDIw",
+      "has_more": true,
+      "status": "hits",
+      "indexed_records": 12,
+      "offset_before": 0,
+      "seen_through": 12,
+      "coverage": "partial"
+    }
+  ],
+  "wrong_port": {
+    "code": "SCHEMA_INVALID",
+    "message": "Use the verified search-snapshot.json from a successful publication-search Job in this Run",
+    "retryable": false,
+    "side_effect_status": "NONE",
+    "evidence_ref": null,
+    "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure.",
+    "details": {
+      "declared_input_roles": [
+        "snapshot"
+      ],
+      "input_count": 1,
+      "node": "local:wrong-port",
+      "capability": "literature-page@1"
+    }
+  },
+  "next_sources": [
+    {
+      "provider": "europepmc",
+      "page": 2,
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=urban+air+pollution+sensors&format=json&pageSize=12&resultType=core&cursorMark=AoIIQL0BhCg1NzAxMDUxMg%3D%3D",
+      "retrieved_at": "2026-11-27T19:08:28.782369+00:00",
+      "sha256": "977f6324b6f33c4a8c9f489ae691dc0be0fc17f6c0a496d6262fee33b10e9919",
+      "returned": 12,
+      "provider_hits": 6325,
+      "next_cursor": "AoIIQLCw2Sg1NjMyNjQwNg==",
+      "has_more": true,
+      "status": "hits",
+      "indexed_records": 12,
+      "offset_before": 12,
+      "seen_through": 24,
+      "coverage": "partial"
+    },
+    {
+      "provider": "crossref",
+      "page": 2,
+      "url": "https://api.crossref.org/works?query.bibliographic=urban+air+pollution+sensors&rows=12&select=DOI%2Ctitle%2Ctype%2Cissued%2Cupdated-by&cursor=MTAyNzU1NjM2NzAwMCwxMC4xMDY3JTJGbW1qLjIwMDEuMTEyNDIw",
+      "retrieved_at": "2026-11-27T19:08:41.466115+00:00",
+      "sha256": "d8b4d130a9d7a3d1aa5de43d43e861e0ec5e4cf16c0d61b5b0808a8e3fddb1ad",
+      "returned": 12,
+      "provider_hits": 2066958,
+      "next_cursor": "MTAyNzU1NjUwNDAwMCwxMC4xMDY3JTJGbXZhLjE5OTIuNDExNDk=",
+      "has_more": true,
+      "status": "hits",
+      "indexed_records": 12,
+      "offset_before": 12,
+      "seen_through": 24,
+      "coverage": "partial"
+    }
+  ],
+  "original": {
+    "source": "EuropePMC:PMC13629622",
+    "data": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13629622/fullTextXML#sha256=676d1bee755798aa71c6d392ff2a154e9f34b297e8f0345e836f1256319eb565",
+    "sha256": "676d1bee755798aa71c6d392ff2a154e9f34b297e8f0345e836f1256319eb565",
+    "publication": "https://doi.org/10.1021/acs.est.6c03923",
+    "applicability": "Full JATS original. Abstract, body, and cited references have distinct locators.",
+    "external_source": {
+      "kind": "article",
+      "accession": "PMC13629622",
+      "version": "sha256:676d1bee755798aa71c6d392ff2a154e9f34b297e8f0345e836f1256319eb565",
+      "retrieved_at": "2026-11-27T19:09:02.537115+00:00",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13629622/fullTextXML"
+    }
+  },
+  "verified": true,
+  "actions": [
+    {
+      "key": "scripted-catalog-survey",
+      "tool": "gx_query_catalog",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6gx3qr0dfy562",
+      "task_id": "gxt_01m8f6gx0rpreyph6x",
+      "request_sha256": "01d1d67c18498c24b952f18bede005859e426058eccd3e441bcac4b025fde289",
+      "head_before": null,
+      "reply_sha256": "b9bc6f0567fd2f411f7dfe1e06e3ec6a2edf1b270bc42c1f458e2d9f3254a898",
+      "head_after": null
+    },
+    {
+      "key": "inspect-first",
+      "tool": "gx_query_catalog",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6gx3qr0dfy562",
+      "task_id": "gxt_01m8f6gx0rpreyph6x",
+      "request_sha256": "5383fc7078e238d5b6d97a93dedc2445925de90e5e15b3ce6cf01eff9a485cf6",
+      "head_before": null,
+      "reply_sha256": "4b003ed906e54c47c747f9d5bfa94ea644b31aaee0dbb433a0d44107890e3ed7",
+      "head_after": null
+    },
+    {
+      "key": "enable-literature-query@1",
+      "tool": "gx_select_capability",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6gx3qr0dfy562",
+      "task_id": "gxt_01m8f6gx0rpreyph6x",
+      "request_sha256": "3dccc662dc154861f0268282c63eb7b1a6d1c707d2338019bee180e21de06879",
+      "head_before": null,
+      "reply_sha256": "50f57f7ccf38c05a1b5646e7afc2e33fd71b008ec17575ae1b6613c4f301e7fe",
+      "head_after": null
+    },
+    {
+      "key": "enable-literature-page@1",
+      "tool": "gx_select_capability",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6gx3qr0dfy562",
+      "task_id": "gxt_01m8f6gx0rpreyph6x",
+      "request_sha256": "0edecc30b477b91020823b4e3468e5b35f72916e14edb9a604546c52683c8620",
+      "head_before": null,
+      "reply_sha256": "0c9dee14bf5e54b87e48b0dab9b98c64b5bc215fccf2d39a5571035fe6472549",
+      "head_after": null
+    },
+    {
+      "key": "enable-literature-original@1",
+      "tool": "gx_select_capability",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6gx3qr0dfy562",
+      "task_id": "gxt_01m8f6gx0rpreyph6x",
+      "request_sha256": "08a17b35d8a6560e1ba1258793abad81377783397407430e9bd52e193fdb90b5",
+      "head_before": null,
+      "reply_sha256": "35c4b221aa6ff384a3f7edf4f78e8053e682897f551730ba7c89030676e2bc62",
+      "head_after": null
+    },
+    {
+      "key": "open",
+      "tool": "gx_open_module",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6gx3qr0dfy562",
+      "task_id": "gxt_01m8f6gx0rpreyph6x",
+      "request_sha256": "3204b10ff302de67dd5b3acaea6c959cb69b6005980a7ae358620ced9c33fb44",
+      "head_before": null,
+      "reply_sha256": "614b8ce5016c441afb894e4dba70be9a6e314a73d3cf135ff2fcb11fc70eed0b",
+      "module_instance_id": "module_97106ca9255c753d5034a80c02b85f0c",
+      "operation_key": "source-review",
+      "head_after": null
+    },
+    {
+      "key": "wait",
+      "tool": "gx_decide_revision",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6gx3qr0dfy562",
+      "task_id": "gxt_01m8f6gx0rpreyph6x",
+      "request_sha256": "1a4325545e521287b4e48ebf607e899e3a0c26105cb039edeedce6220b93f77d",
+      "head_before": null,
+      "reply_sha256": "9d60930f3e76513780992d40a92affb2ce983f96583d6e5f50799b9fb7042033",
+      "base": null,
+      "result_head": null,
+      "decision_ref": "gxa_1b0e32a2d5ec855c5040266d1439cffc2a37e951fb3e936172c015984381964d",
+      "head_after": null
+    },
+    {
+      "key": "first",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6gxggj0nkc91k",
+      "task_id": "gxt_01m8f6gxfx8q3fv760",
+      "request_sha256": "952c3b34511fd3f1ccdfe39799bab0578d43330acc6f610e6cb1a7c3e0a2956d",
+      "head_before": null,
+      "reply_sha256": "5b58307d6306c1115cc064f55884791d85c853e1c074a3f5752ffa8b934e4d8e",
+      "module_instance_id": "module_97106ca9255c753d5034a80c02b85f0c",
+      "base": null,
+      "result_head": {
+        "version": 1,
+        "sha256": "2a3ac75b683d1641c2c84b73c5b875136e78f86ab2bb5c14417f7e228a2680c7"
+      },
+      "decision_ref": "gxa_2a674ca3b218e9b1f5b6c8f04b761a9a11cb17100e6a87b058d28758650e98e8",
+      "head_after": {
+        "version": 1,
+        "sha256": "2a3ac75b683d1641c2c84b73c5b875136e78f86ab2bb5c14417f7e228a2680c7"
+      }
+    },
+    {
+      "key": "wrong-port",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6hdf6ngpf6a5m",
+      "task_id": "gxt_01m8f6hdevabajbp3z",
+      "request_sha256": "2d68b9a6cb71256ded01470bd764507b38496d471aeb2b7082f93568ab686ed2",
+      "head_before": {
+        "version": 1,
+        "sha256": "2a3ac75b683d1641c2c84b73c5b875136e78f86ab2bb5c14417f7e228a2680c7"
+      },
+      "error": "SCHEMA_INVALID",
+      "reason": "SCHEMA_INVALID: Use the verified search-snapshot.json from a successful publication-search Job in this Run",
+      "details": {
+        "declared_input_roles": [
+          "snapshot"
+        ],
+        "input_count": 1,
+        "node": "local:wrong-port",
+        "capability": "literature-page@1"
+      },
+      "head_after": {
+        "version": 1,
+        "sha256": "2a3ac75b683d1641c2c84b73c5b875136e78f86ab2bb5c14417f7e228a2680c7"
+      }
+    },
+    {
+      "key": "next",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6hdf6ngpf6a5m",
+      "task_id": "gxt_01m8f6hdevabajbp3z",
+      "request_sha256": "c1f7f6f060f1ec218831d1a0ef52b33529cde5defb903dc4b5da05896289d4b2",
+      "head_before": {
+        "version": 1,
+        "sha256": "2a3ac75b683d1641c2c84b73c5b875136e78f86ab2bb5c14417f7e228a2680c7"
+      },
+      "reply_sha256": "dff3380619dd3c128f4449cab193c12b9ada5a69a16b8829567ea713b65d275d",
+      "module_instance_id": "module_97106ca9255c753d5034a80c02b85f0c",
+      "base": {
+        "version": 1,
+        "sha256": "2a3ac75b683d1641c2c84b73c5b875136e78f86ab2bb5c14417f7e228a2680c7"
+      },
+      "result_head": {
+        "version": 2,
+        "sha256": "d3b0f60000e7657825928fb52831d553a085f0b94814bdf0b8734a3f1ee76a1f"
+      },
+      "decision_ref": "gxa_ce8405b9973890b3839d75fc7f90ebd949a811a5ec0820ae8e03a637f934722d",
+      "head_after": {
+        "version": 2,
+        "sha256": "d3b0f60000e7657825928fb52831d553a085f0b94814bdf0b8734a3f1ee76a1f"
+      }
+    },
+    {
+      "key": "replay",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6hxg4g09dfyxn",
+      "task_id": "gxt_01m8f6hxftvb2jykv1",
+      "request_sha256": "955c73a7d2f79d17a5a76acad1391718a7cfc43763b908735af91258f94f9b0c",
+      "head_before": {
+        "version": 2,
+        "sha256": "d3b0f60000e7657825928fb52831d553a085f0b94814bdf0b8734a3f1ee76a1f"
+      },
+      "reply_sha256": "87a454e04a5b4b464344641d9948d0992a89d07095faf4ef3b5f1487548f6ee9",
+      "module_instance_id": "module_97106ca9255c753d5034a80c02b85f0c",
+      "base": {
+        "version": 2,
+        "sha256": "d3b0f60000e7657825928fb52831d553a085f0b94814bdf0b8734a3f1ee76a1f"
+      },
+      "result_head": {
+        "version": 3,
+        "sha256": "031cc4e965cb4cde8288f38ce85f8a865e7eb2b37795f5056330fabd7a2975a6"
+      },
+      "decision_ref": "gxa_ddbbd245a4750fdb03ef607a18b16c0f04ad75d3b33edbd68ac2f918add43710",
+      "head_after": {
+        "version": 3,
+        "sha256": "031cc4e965cb4cde8288f38ce85f8a865e7eb2b37795f5056330fabd7a2975a6"
+      }
+    },
+    {
+      "key": "original",
+      "tool": "gx_decide_revision",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6hy08fxh305em",
+      "task_id": "gxt_01m8f6hxzzkf0w5p88",
+      "request_sha256": "caffcf9c99c6c63204f8d1a06d79c58f4ae84f9f4d969f65c408f8da4f2e0093",
+      "head_before": {
+        "version": 3,
+        "sha256": "031cc4e965cb4cde8288f38ce85f8a865e7eb2b37795f5056330fabd7a2975a6"
+      },
+      "reply_sha256": "c839fadf4c816ee61412a3efe765609ec5ce6174be3b600c085fe1d72f7f5fbe",
+      "module_instance_id": "module_97106ca9255c753d5034a80c02b85f0c",
+      "base": {
+        "version": 3,
+        "sha256": "031cc4e965cb4cde8288f38ce85f8a865e7eb2b37795f5056330fabd7a2975a6"
+      },
+      "result_head": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "decision_ref": "gxa_7659b6a70f5c63d7549e6501389eac78abab6aa901f8c5db827c14d5d78ab846",
+      "head_after": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      }
+    },
+    {
+      "key": "list-jats-0",
+      "tool": "gx_read_source",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6jexf49ctk3cy",
+      "task_id": "gxt_01m8f6jex8g3emaw6q",
+      "request_sha256": "c483f6e439f885a58a9e556ba46b3d2032612c38b344651a3f70458c27234165",
+      "head_before": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "reply_sha256": "830fbc4c87dc6bd216af995133a5e86e8a0db0cf98a4d8f615ac18501dea3dca",
+      "head_after": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      }
+    },
+    {
+      "key": "read-passage",
+      "tool": "gx_read_source",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6jexf49ctk3cy",
+      "task_id": "gxt_01m8f6jex8g3emaw6q",
+      "request_sha256": "da1eb379a56432a90fd8c51f1184ae6f4f1ba4c1bf2bb7575e32958b8c4bbe97",
+      "head_before": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "reply_sha256": "3962cb12826731fb55b1f1e12e843e955b8c7c1c6cd7db95caea0ab1db8d191c",
+      "head_after": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      }
+    },
+    {
+      "key": "retrieve-original",
+      "tool": "gx_submit_module_report",
+      "scope": "module:module_97106ca9255c753d5034a80c02b85f0c",
+      "lease_id": "gxl_01m8f6jexf49ctk3cy",
+      "task_id": "gxt_01m8f6jex8g3emaw6q",
+      "request_sha256": "28980dae3fb011cc3b9d54d4b01f3b271e3841e40d7fdb2c23fd04e7351434c3",
+      "head_before": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "reply_sha256": "33222a4e994a513f05286d6a4d5aa322f6df81c94c6deb4e60aba1d11be61a99",
+      "module_instance_id": "module_97106ca9255c753d5034a80c02b85f0c",
+      "base": {
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962",
+        "version": 4
+      },
+      "report_ref": "gxa_b8e55dfa7f00b2f055f210d76d5b3dee7071db1fa68f7c0cfb2a5ce318922d7f",
+      "artifact_ref": "gxa_b8e55dfa7f00b2f055f210d76d5b3dee7071db1fa68f7c0cfb2a5ce318922d7f",
+      "operation_key": "retrieve-original",
+      "head_after": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      }
+    },
+    {
+      "key": "scripted-catalog-survey",
+      "tool": "gx_query_catalog",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6n89a0tzy0jm2",
+      "task_id": "gxt_01m8f6gxphmvhmwg1w",
+      "request_sha256": "01d1d67c18498c24b952f18bede005859e426058eccd3e441bcac4b025fde289",
+      "head_before": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "reply_sha256": "23828cdda50375510555b8b643884a1edc321dc256c5d85cbe887546c3f3598c",
+      "head_after": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      }
+    },
+    {
+      "key": "await-reports",
+      "tool": "gx_decide_revision",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6n89a0tzy0jm2",
+      "task_id": "gxt_01m8f6gxphmvhmwg1w",
+      "request_sha256": "1a4325545e521287b4e48ebf607e899e3a0c26105cb039edeedce6220b93f77d",
+      "head_before": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "reply_sha256": "9fe75bc27764fa8e5f268fcff1b3e369568a588695bfc4fed7a3bc43c3f1f1ad",
+      "base": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "result_head": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "decision_ref": "gxa_65bc0f592b9c14705ca79d1bf00656dc3423985c58da800bf7c3fe90e57cf87a",
+      "head_after": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      }
+    },
+    {
+      "key": "scripted-catalog-survey",
+      "tool": "gx_query_catalog",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6n8f7shbptphb",
+      "task_id": "gxt_01m8f6n8f3wrwz512b",
+      "request_sha256": "01d1d67c18498c24b952f18bede005859e426058eccd3e441bcac4b025fde289",
+      "head_before": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "reply_sha256": "abd7a3970015c4e4a0e163806eef9dc494624018b5517f1cb1032af832b6decd",
+      "head_after": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      }
+    },
+    {
+      "key": "keep-original",
+      "tool": "gx_decide_revision",
+      "scope": "run",
+      "lease_id": "gxl_01m8f6n8f7shbptphb",
+      "task_id": "gxt_01m8f6n8f3wrwz512b",
+      "request_sha256": "0d746f80c0dfeb00721d5325a58831a6fa196073cb4ae383cefbfe72d9507542",
+      "head_before": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "reply_sha256": "7aa63f091876aa69150d2f7888b6e8458f45a34cbcb5541058e5407e922ffb2f",
+      "base": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "result_head": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      },
+      "decision_ref": "gxa_54f915ef2a02a072d1e1445e1071b36f4c054bc6f5143fc938a869d3abe816ea",
+      "head_after": {
+        "version": 4,
+        "sha256": "a32211f7261c9c6114ee21463a197f7d53217a369683fee72fd559117deab962"
+      }
+    }
+  ],
+  "readback": {
+    "article": {
+      "source_sha256": "676d1bee755798aa71c6d392ff2a154e9f34b297e8f0345e836f1256319eb565",
+      "segment_id": "p4",
+      "label": "body/sec1/p",
+      "text_sha256": "955c8b4690f0b6abcff0f635469eb9e7ca2d9c64b5aa207ef528c8a2745862d5",
+      "receipt_id": "gxrc_01m8f6n87jqxhxf6k8",
+      "task_id": "gxt_01m8f6jex8g3emaw6q"
+    },
+    "report_ref": "gxa_b8e55dfa7f00b2f055f210d76d5b3dee7071db1fa68f7c0cfb2a5ce318922d7f",
+    "lead_task": "gxt_01m8f6n8f3wrwz512b",
+    "lead_decision_ref": "gxa_54f915ef2a02a072d1e1445e1071b36f4c054bc6f5143fc938a869d3abe816ea",
+    "decision": "Keep the retrieved full-text item for evaluation of the measurement conditions; the sampled pages cover only part of the catalogue."
+  },
+  "archived_originals": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-live-evidence/publication-discovery/gxr_01m8f6gwzh1dfvz1j7"
+}

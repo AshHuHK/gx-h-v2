@@ -203,6 +203,9 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         return saved
     root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                         thread_id=thread_id, turn_id=turn_id)
+    if task["scope"] == "run":
+        from . import catalog_survey
+        catalog_survey.required(conn, json.loads(task["snapshot_json"]))
     from . import v621_policy, v623_endpoint_use
     execution = v621_policy.science_execution(conn, run_id)
     science = v621_policy.live_science(conn, run_id)
@@ -393,13 +396,14 @@ def _own_close_reviews(conn, task, root, turn_id, decision):
             or decision.get("convergence") is not None or decision.get("resolved_gaps")):
         return set()
     rid, cursor = task["run_id"], task["event_cursor"]
+    turns = v62_sources.receipt_turns(conn, rid, root["thread_id"], turn_id)
     refs = set()
     for event in v6_goal._events(conn, rid, cursor):
         if event["kind"] != "v62.source.reviewed":
             return set()
         payload = store.loads(event, "payload_json")
         if ("target_claim_ref" not in payload or payload["target_claim_ref"] is not None
-                or payload.get("scope") != "run" or payload.get("review_turn_id") != turn_id):
+                or payload.get("scope") != "run" or payload.get("review_turn_id") not in turns):
             return set()
         refs.add(event["subject_id"])
     # A Job may already have changed while its node settlement has yet to be published.

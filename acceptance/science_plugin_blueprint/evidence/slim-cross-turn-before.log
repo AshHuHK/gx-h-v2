@@ -1,0 +1,33 @@
+test_confirmed_resume_chain_can_cite_prior_native_review_and_close (regression_source.SourceReviewClose.test_confirmed_resume_chain_can_cite_prior_native_review_and_close) ... ERROR
+test_unlinked_new_turn_cannot_reuse_prior_source_receipt (regression_source.SourceReviewClose.test_unlinked_new_turn_cannot_reuse_prior_source_receipt) ... ok
+
+======================================================================
+ERROR: test_confirmed_resume_chain_can_cite_prior_native_review_and_close (regression_source.SourceReviewClose.test_confirmed_resume_chain_can_cite_prior_native_review_and_close)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/tests/test_source_decision_receipts.py", line 107, in test_confirmed_resume_chain_can_cite_prior_native_review_and_close
+    receipt = s.call(next_actor,"gx_decide_revision",{"decision":close_decision([self.review_ref])},"finish-resumed")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-reviewed/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-reviewed/gx-h/gx_core/p0/roots.py", line 1137, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-reviewed/gx-h/gx_core/p0/v6_native.py", line 266, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-reviewed/gx-h/gx_core/p0/v6_native.py", line 357, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-reviewed/gx-h/gx_core/p0/v6_decisions.py", line 257, in prepare
+    refs = _visible(conn, task, lease_id, thread_id, turn_id, decision)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-plugin-slim-reviewed/gx-h/gx_core/p0/v6_decisions.py", line 145, in _visible
+    raise ScopeDenied("The decision cites evidence outside its frozen context and scoped tool receipts. "
+gx_core.errors.ScopeDenied: SCOPE_DENIED: The decision cites evidence outside its frozen context and scoped tool receipts. Use an evidence reference here. A delivered source#row key belongs in metric_refs.
+
+----------------------------------------------------------------------
+Ran 2 tests in 3.076s
+
+FAILED (errors=1)

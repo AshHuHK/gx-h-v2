@@ -122,6 +122,11 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
         for key in ("inputs", "depends_on"):
             if key in spec:
                 spec[key] = [aliases.get(ref, ref) for ref in spec[key]]
+        if op == "add_node" and "recipe_decision" in spec:
+            from . import v6_recipes
+            if scope != "run":
+                raise ScopeDenied("Only the Run Lead may commission a reusable Lead decision point")
+            v6_recipes.decision_for(conn, spec, run_id=run_id)
         if op == "add_node" and "evidence_gate" in spec:
             gate = dict(spec["evidence_gate"])
             gate["producer_node"] = aliases.get(gate["producer_node"], gate["producer_node"])
@@ -143,7 +148,9 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
             branches[branch] = dict(spec, state="OPEN")
         elif op == "add_node":
             if spec["capability"] not in capabilities:
-                raise ScopeDenied("Capability is outside the Run's pinned catalog")
+                raise ScopeDenied("Capability is outside the Run's pinned catalog", details={
+                    "node": source["node"], "capability": spec["capability"],
+                    "correction": "Select an allowed method before adding the node or choose an active method."})
             nodes[node] = dict(spec, state="ACTIVE")
         elif op == "stop_branch":
             if branch not in branches or branches[branch]["state"] != "OPEN":
@@ -170,14 +177,23 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
                 raise SchemaInvalid("New dependency references an absent node")
             if scope != "run" and nodes[ref]["branch"] != own_branch:
                 raise ScopeDenied("A branch may reuse granted artifacts; a cross-branch dependency requires the Lead")
-        for ref in spec["inputs"]:
+        for index, ref in enumerate(spec["inputs"]):
             if ref in nodes:
                 if ref not in spec["depends_on"]:
-                    raise SchemaInvalid("An input supplied by another node needs a dependency edge")
+                    raise SchemaInvalid("An input supplied by another node needs a dependency edge", details={
+                        "node": spec["node"], "input_index": index, "upstream": ref,
+                        "correction": "Add the producing node to depends_on."})
             elif ref not in visible_refs:
-                raise ScopeDenied("Node input was not granted in this decision context")
-        minimum = v6_jobs.validate_node(conn, run_id, spec, node_ids=producers,
-                                        limits=branches[spec["branch"]]["budget_limits"])
+                raise ScopeDenied("Node input was not granted in this decision context", details={
+                    "node": spec["node"], "input_index": index,
+                    "correction": "Use a visible artifact reference or a declared upstream node."})
+        try:
+            minimum = v6_jobs.validate_node(conn, run_id, spec, node_ids=producers,
+                                            limits=branches[spec["branch"]]["budget_limits"])
+        except (SchemaInvalid, ScopeDenied) as exc:
+            exc.details.setdefault("node", decision["ops"][item["source_index"]]["node"])
+            exc.details.setdefault("capability", spec["capability"])
+            raise
         if module_jobs is not None:
             module_jobs.append((spec, minimum))
     for node, spec in nodes.items():
@@ -195,6 +211,11 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
         raise SchemaInvalid("Execution dependencies contain a cycle") from exc
     watches = [dict(watch, subject_ref=aliases.get(watch["subject_ref"], watch["subject_ref"]))
                for watch in decision["reconsider_when"]]
+    for node, spec in nodes.items():
+        if scope == "run" and spec.get("recipe_decision") and spec["state"] == "ACTIVE":
+            trigger = {"event": "job_settled", "subject_ref": node}
+            if trigger not in watches:
+                watches.append(trigger)
     subjects = {*branches, *nodes, *visible_refs, run_id, "run", "objective"}
     if scope != "run":
         subjects = {*visible_refs, own_branch, "run", run_id, "objective",

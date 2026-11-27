@@ -1,0 +1,100 @@
+{
+  "entry_script": "worker.py",
+  "manifest": {
+    "capability_id": "discharge-marginal",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--record",
+        "{in.record}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "hydrometric_water_balance",
+      "objective": "Summarize absolute discharged volumes and valid duration for each independent channel.",
+      "mechanism": "Compute or read each station’s marginal total and observation time. Accepts a gx.hydrometry/1 interval record or gx.hydrometry-summary/1 aggregate JSON (input role record); no parameters.",
+      "estimator": "Unequal observation windows may reverse the apparent ordering. Returns station-specific volumes and durations; omits coincident coverage and uncertainty.",
+      "training_data_lineage": "Deterministic dimensional analysis of the supplied instrument record; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.hydro-marginal/1.0.0/worker.py",
+      "sha256": "bb5ea559ef64cd62ad74956aa5f41a46ba2bf42e3d4b1b87baced719d24f3e31"
+    },
+    "licence": "GX release implementation",
+    "licence_basis": "Python standard library and author-generated instrument fixture.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "marginal.json",
+        "kind": "file:hydrometric_marginal",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "record"
+        ],
+        "media_type": "application/json",
+        "metric_specs": {
+          "left_L": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/left_L",
+            "unit": "L",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "right_L": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/right_L",
+            "unit": "L",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "left_minutes": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/left_minutes",
+            "unit": "min",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          },
+          "right_minutes": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/right_minutes",
+            "unit": "min",
+            "places": 2,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "trial": "/trial"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Station totals use separate time supports. Does not deliver paired volume, signed bounds or simultaneous duration.",
+    "parameter_defaults": {}
+  }
+}

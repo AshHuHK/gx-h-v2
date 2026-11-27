@@ -1,0 +1,97 @@
+{
+  "status": "published_by_platform_team",
+  "source_run": "gxr_01m8f5r59yyx9gmekh",
+  "source_closing_decision": "gxa_ad4f8a198ca02c4d63f966cf5cb7e30ff8ec9ea2dd06fc6c2f1888612fe7cdf6",
+  "source_lead_saved_recipe": false,
+  "owner": "gx_core.p0.v6_recipes.save",
+  "card": {
+    "kind": "recipe",
+    "reference": "archived-coordinate-agreement@1",
+    "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+    "title": "Compare a fresh archived-specimen prediction with mapped deposited coordinates",
+    "id_alignment": "Use the supplied one-to-one polymer position mapping and declared chain IDs.",
+    "missing_values": "Keep mapped but unavailable positions in the coverage denominator.",
+    "units": "Equal-weight C-alpha RMSD in angstrom; polymer positions counted separately.",
+    "inputs": {
+      "reference": {
+        "kind": "run_input",
+        "media_type": "chemical/x-mmcif"
+      },
+      "mapping": {
+        "kind": "run_input",
+        "media_type": null
+      },
+      "specimen": {
+        "kind": "run_input",
+        "media_type": null
+      }
+    },
+    "methods": {
+      "compare": "mapped-structure-agreement@1",
+      "predict": "archived-fold-calibration@1"
+    },
+    "method_pins": {
+      "mapped-structure-agreement@1": "66f4741f70fb552aa9ebefb9194752620c043074ba14a482dc6d1f5febec2167",
+      "archived-fold-calibration@1": "a6c47ec541c39c089d46bf4173d7dd7bfd60a193fbbe3cd778695c01f4aa0be7"
+    },
+    "outputs": {
+      "compare": [
+        {
+          "name": "agreement.json",
+          "kind": "mapped_structure_agreement",
+          "nature": "analysis",
+          "source_roles": [
+            "prediction",
+            "reference",
+            "mapping"
+          ]
+        }
+      ],
+      "predict": [
+        {
+          "name": "inference.json",
+          "kind": "model_execution",
+          "nature": "model_prediction",
+          "source_roles": [
+            "specimen"
+          ]
+        },
+        {
+          "name": "model.cif",
+          "kind": "predicted_mmcif",
+          "nature": "model_prediction",
+          "source_roles": [
+            "specimen"
+          ]
+        }
+      ]
+    },
+    "decision_point": {
+      "step": "compare",
+      "output": "agreement.json",
+      "question": "Over what positions is comparison supported by this Goal's available coordinates?",
+      "actions": [
+        "Report agreement within the justified scope",
+        "Limit the claim and request additional coverage",
+        "Stop when evidence is inconclusive"
+      ],
+      "stop_condition": "The available mapped coverage and measurement support the stated scope, or the remaining gap requires additional data.",
+      "role": "run_lead",
+      "event": "job_settled"
+    }
+  },
+  "recorded_at_utc": "2026-11-27T19:11:46+00:00",
+  "time_source": "mtime of original platform publication receipt",
+  "source_jobs": {
+    "compare": {
+      "completion_sha256": "0d79b10877e041206dc0d60ace51fb1f62e31e246e5e05691bd0d20754e2ecf3",
+      "job_id": "gxj_01m8f6bc8gzxnvrwxj",
+      "node_id": "node_82e3f826d9fcae94314f8fb538b5d886"
+    },
+    "predict": {
+      "completion_sha256": "9810a823922a68ed90e6dd976a38aa6afb4b18998830e7a6da54b142ba092f94",
+      "job_id": "gxj_01m8f5wrxp23f9dx16",
+      "node_id": "node_ea82809e2ae5243cab3fb6f7ea27b920"
+    }
+  }
+}

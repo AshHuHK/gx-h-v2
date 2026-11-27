@@ -72,6 +72,21 @@ class ModuleFunding(unittest.TestCase):
         self.open("third", tokens=2)
         self.assertEqual(v62_budget.remaining(self.conn, second)["tokens"], 40)
 
+    def test_closed_thread_exposure_can_preclude_another_turn_without_becoming_a_charge(self):
+        from unittest.mock import patch
+        child = self.open("residual", tokens=60, api_calls=2)
+        module = {"run_id": self.run, "budget_ref": child, "branch_id": "residual"}
+        original = budgets.state(self.conn, child)
+        line = {"scope":child, "hard_tokens":60, "settled_tokens":40, "reserved_tokens":0,
+                "active_root_count":0, "unfunded_closed_thread_tokens":21}
+        for changes, expected in (({}, True), ({"unfunded_closed_thread_tokens":19}, False),
+                ({"active_root_count":1}, False), ({"reserved_tokens":1}, False), ({"scope":self.parent}, False)):
+            with self.subTest(changes=changes), patch.object(v62_budget.meter_limits, "scopes",
+                                                              return_value=[{**line, **changes}]):
+                why = v62_budget.exhausted(self.conn, module)
+                self.assertEqual(bool(why), expected)
+        self.assertEqual(budgets.state(self.conn, child), original)
+
     def test_zero_remaining_native_calls_can_still_close_with_measured_job_receipts(self):
         child = self.open("partial", api_calls=0, tokens=0, job_submissions=1, cpu_seconds=30)
         job = budgets.reserve(self.conn, budget_ref=child, subject_kind="job", subject_id="j",

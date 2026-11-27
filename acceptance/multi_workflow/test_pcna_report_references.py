@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from acceptance.multi_workflow.test_pcna_native import INTERFACE
 from acceptance.v62a.interleavings_fixture import PRODUCT, draft
-from acceptance.v622.test_close import CloseStudy
+from acceptance.v622.test_close import SurveyedStudy
 from acceptance.v623 import test_close_metrics
 from gx_core.artifacts import ArtifactService
 from gx_core.errors import GxError
@@ -29,7 +29,7 @@ class PCNAReportReferences(unittest.TestCase):
         with patch.object(cli, "run_until_stopped", side_effect=lambda conn, args, rid, timeout: cli.snapshot(conn, rid)), redirect_stdout(io.StringIO()):
             self.assertEqual(cli.main(["research", "--state", str(directory / "state"), "--run-key", "cited-inputs",
                 "--goal", "Inspect the deposited interfaces and their applicability.", "--goal-config", str(grant)]), 0)
-        s = stack.enter_context(CloseStudy(directory, reopen=True))
+        s = stack.enter_context(SurveyedStudy(directory, reopen=True))
         s.next_actor("run")
         args = s.open_args("source-audit", inputs=s.materials, caps=[INTERFACE], limits={"cpu_seconds": 400})
         args.update(module_id="investigation", focus="evaluation")

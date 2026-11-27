@@ -8,11 +8,11 @@ from pathlib import Path
 from .. import config
 from ..capabilities import manifest, shipped
 from ..domain import ids
-from ..errors import SchemaInvalid, ScopeDenied, VersionImmutable
+from ..errors import GxError, SchemaInvalid, ScopeDenied, VersionImmutable
 from ..plugins import goal, loader
 from ..plugins.author_api import _copy_schema
 from ..plugins.selection import _references
-from . import intent, v621_policy
+from . import capability_views, intent, v621_policy
 
 _EFFORT = {"quick": (0, 0), "medium": (4, 3), "deep": (6, 5)}
 _DEFAULTS = {"report_bytes": 4096, "brief_bytes": 65536, "catalog_limit": 15, "catalog_bytes": 8192,
@@ -100,38 +100,52 @@ def for_start(spec):
         modules.append({**{k: declaration[k] for k in _COMMON}, "plugin": goal._document(plugin.pin),
                         "provider_closure": [goal._document(p) for p in pins],
                         "declaration_sha256": ids.sha256_of_obj(declaration)})
-    from . import capability_views
     options = capability_views.options(spec)
-    choices = _choice_cards(loaded, options) if options else []
+    discovery = spec.get("discovery_policy") == capability_views.DISCOVERY_POLICY
+    choices = _choice_cards(loaded, options) if options and not discovery else []
     return {"policy": settings, "modules": modules,
             **({"choices": choices} if choices else {}),
             **({"branch_delegation": False} if not branch_delegation else {}),
             **({"source_tools": sorted(lead_source_tools)} if lead_source_tools else {}),
             **({"lead_method_cards": True} if independent_science_access else {}),
-            **({"public_methods": _release_method_cards()} if independent_science_access or survey else {})}
+            **({"public_methods": _release_method_cards(unavailable=[] if discovery else None)}
+               if independent_science_access or survey else {})}
 
 
-def _release_method_cards():
-    """Read only the operator's shipped public methods, without attaching executables or visiting study data."""
+def _release_method_card(cap, declaration):
+    bundle = json.loads(declaration.read_bytes())
+    if not isinstance(bundle, dict) or not isinstance(bundle.get("manifest"), dict):
+        raise VersionImmutable("The public method has no declared manifest")
+    for slot in ("entry_script", "parser"):
+        relative = bundle.get(slot)
+        if relative is not None:
+            if Path(relative).is_absolute() or ".." in Path(relative).parts or not manifest.allowed_script_path(relative):
+                raise VersionImmutable("The public method references a script outside the release")
+            bundle[slot] = {"path": relative, "sha256": ids.sha256_of_file(config.HARNESS_ROOT / relative)}
+    pin = shipped.portable_digest(bundle)
+    method = bundle["manifest"]
+    if shipped.pin(cap) != pin or manifest.capability_version(method) != cap:
+        raise VersionImmutable("The public method metadata differs from the registered release")
+    return _public_card({"capability_version": cap, "portable_sha256": pin,
+        "method": method["method_card"], "inputs": manifest.input_roles(method), "outputs": method["outputs"],
+        "limitations": method.get("limitations"), "cost_class": "gpu" if method["resources"].get("gpu") else "local_cpu"})
+
+
+def _release_method_cards(*, unavailable=None):
+    """Keep each unverified method out of the public discovery index."""
     cards = []
     for cap, path in sorted(shipped.MANIFESTS.items()):
         declaration = config.HARNESS_ROOT / path
         if not declaration.is_file():
+            if unavailable is not None:
+                unavailable.append(cap)
             continue
-        bundle = json.loads(declaration.read_bytes())
-        for slot in ("entry_script", "parser"):
-            relative = bundle.get(slot)
-            if relative is not None:
-                if Path(relative).is_absolute() or ".." in Path(relative).parts or not manifest.allowed_script_path(relative):
-                    raise VersionImmutable("The public method references a script outside the release")
-                bundle[slot] = {"path": relative, "sha256": ids.sha256_of_file(config.HARNESS_ROOT / relative)}
-        pin = shipped.portable_digest(bundle)
-        method = bundle["manifest"]
-        if shipped.pin(cap) != pin or manifest.capability_version(method) != cap:
-            raise VersionImmutable("The public method metadata differs from the registered release")
-        cards.append(_public_card({"capability_version": cap, "portable_sha256": pin,
-            "method": method["method_card"], "inputs": manifest.input_roles(method), "outputs": method["outputs"],
-            "limitations": method.get("limitations"), "cost_class": "gpu" if method["resources"].get("gpu") else "local_cpu"}))
+        try:
+            cards.append(_release_method_card(cap, declaration))
+        except (GxError, ValueError, OSError, KeyError, TypeError):
+            if unavailable is None:
+                raise
+            unavailable.append(cap)
     return cards
 
 
@@ -192,13 +206,19 @@ def _module_method_receipts(conn, run_id, scope, refs):
         AND e.actor=json_extract(e.payload_json,'$.thread_id') AND m.scope=json_extract(e.payload_json,'$.scope')
         AND m.module_instance_id=json_extract(e.payload_json,'$.module_instance_id')
         AND json_extract(e.payload_json,'$.tool')='gx_query_catalog'
-        AND json_extract(e.payload_json,'$.arguments.kind')='method'
         AND p.key IN (SELECT value FROM json_each(?))""", (run_id, scope, refs))
     return {tuple(row) for row in rows}
 
 
 def method_citations(conn, task, lease, thread, turn, candidates):
-    """Recognize the exact method document delivered to this native decision maker."""
+    """Recognize this turn's exact method cards and cards on its confirmed resume chain."""
+    from . import v62_sources
+    turns = v62_sources.receipt_turns(conn, task["run_id"], thread, turn)
+    return _returned_method_citations(conn, task, lease, thread, turns, candidates)
+
+
+def _returned_method_citations(conn, task, lease, thread, acknowledged_turns, candidates):
+    """The evidence owner can reuse the checked chain across source and method citations."""
     scope = task["scope"]
     if not candidates or (scope != "run" and not scope.startswith("module:")):
         return set()
@@ -210,15 +230,14 @@ def method_citations(conn, task, lease, thread, turn, candidates):
         JOIN p0_roots r ON r.thread_id=c.thread_id
         JOIN v6_decision_tasks t ON t.task_id=r.task_id AND t.run_id=r.run_id AND t.scope=?
         JOIN artifacts a ON a.artifact_ref=json_extract(c.result_json,'$.source_ref')
-        WHERE c.thread_id=? AND c.turn_id=? AND r.run_id=? AND r.task_id=? AND r.lease_id=?
+        WHERE c.thread_id=? AND c.turn_id IN (SELECT value FROM json_each(?)) AND r.run_id=? AND r.task_id=? AND r.lease_id=?
         AND a.run_id=r.run_id AND a.kind='v62_public_method_spec' AND a.published=1 AND a.origin='BACKEND'
         AND json_extract(n.request_json,'$.tool')='gx_query_catalog'
-        AND json_extract(n.request_json,'$.arguments.kind')='method'
         AND json_extract(n.request_json,'$.arguments.reference')=json_extract(c.result_json,'$.reference')
         AND json_extract(c.result_json,'$.reference')=json_extract(c.result_json,'$.spec.capability_version')
         AND json_extract(c.result_json,'$.kind')='method'
         AND a.artifact_ref IN (SELECT value FROM json_each(?))""",
-        (scope, thread, turn, task["run_id"], task["task_id"], lease, refs))
+        (scope, thread, ids.canonical_json(sorted(acknowledged_turns)), task["run_id"], task["task_id"], lease, refs))
     valid = set()
     for ref, sha, response in cards:
         answer = json.loads(response)
@@ -373,19 +392,27 @@ def project(conn, run_id, brief):
 
 def query(conn, run_id, brief, args):
     """Read exact or paginated catalogue records within a GX-authenticated, frozen task scope."""
-    if (brief.get("run_id") != run_id or not isinstance(args, dict) or args.keys() -
-            {"kind", "reference", "category", "query", "offset", "limit"}):
+    if brief.get("run_id") != run_id or not isinstance(args, dict):
+        raise ScopeDenied("Catalog request is outside the current Run or tool contract")
+    inputs = _inputs(conn, run_id)
+    discovery = inputs.get("discovery_policy") == capability_views.DISCOVERY_POLICY
+    keys = {"kind", "reference", "category", "query", "offset", "limit"}
+    if discovery:
+        keys.update(("provider", "required_outputs"))
+    if args.keys() - keys:
         raise ScopeDenied("Catalog request is outside the current Run or tool contract")
     kind = args.get("kind")
-    if kind not in ("module", "method", "database", "research", "skill", "recipe"):
+    if not discovery and kind not in ("module", "method", "database", "research", "skill", "recipe"):
         raise SchemaInvalid("Unknown research catalogue kind")
-    for key in ("reference", "query", "category"):
+    for key in ("reference", "query", "category", "provider"):
         if key in args and not isinstance(args[key], str):
             raise SchemaInvalid(f"Catalog {key} must be text")
     offset, limit = args.get("offset", 0), args.get("limit", 15)
     if type(offset) is not int or offset < 0 or type(limit) is not int or not 1 <= limit <= 40:
         raise SchemaInvalid("Catalog offset must be nonnegative and limit between 1 and 40")
-    inputs = _inputs(conn, run_id)
+    if discovery:
+        from . import catalog_index
+        return catalog_index.query(conn, run_id, brief, args, inputs)
     catalog = inputs.get("research_catalog")
     if not catalog:
         if kind == "recipe" and brief.get("scope") == "run" and conn.execute(

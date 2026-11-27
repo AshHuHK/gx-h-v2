@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 
-from acceptance.v622.test_close import CloseStudy, close_decision
+from acceptance.v622.test_close import SurveyedStudy, close_decision
 from acceptance.v62a.interleavings_fixture import PRODUCT
 
 
@@ -42,7 +42,7 @@ class ResearchEntry(unittest.TestCase):
             self.assertEqual(resumed["run_id"], first["run_id"])
             self.assertEqual(resumed["invocation"]["action"], "resume")
             self.assertIn("different Goal specification",invoke("--goal","Changed question",expected=1))
-            with CloseStudy(work, reopen=True) as s:
+            with SurveyedStudy(work, reopen=True) as s:
                 self.assertEqual(s.run_id, first["run_id"])
                 obs, = s.conn.execute("SELECT payload_json FROM events WHERE run_id=? AND kind='v6.observation.added'",
                                       (s.run_id,)).fetchall()

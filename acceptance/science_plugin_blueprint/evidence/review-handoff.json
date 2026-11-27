@@ -1,0 +1,304 @@
+{
+  "audit": "Working tree change from 4759c260. Local regression in scoped native callback transport and independent read-only review of the original A2 state.",
+  "findings": [
+    {
+      "code": "gx-h/gx_core/p0/research_handoff.py::message_preview",
+      "red": "Public callback: a cold summary omitted the other findings, gaps and next steps with no full-report flag.",
+      "fix": "Any omitted authored item marks the preview as partial. The receiving Lead used gx_read_artifact to recover all six short passages and the original author from the same report_ref after a cold reopen."
+    },
+    {
+      "code": "gx-h/gx_core/p0/research_routes.py::_handoffs",
+      "red": "A signed gap was delivered with the acknowledged native brief but the field exporter recorded received_content=False.",
+      "fix": "An actual signed finding, gap or next step delivered in the acknowledged report summary/index now counts as received. Handles or author_kind alone do not count; a subsequent wait with zero effects remains CITED."
+    }
+  ],
+  "tests": {
+    "command": "PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a .venv/bin/python -B -m unittest -v tests.test_researcher_handoff tests.test_v62_sources tests.test_v62_lead_delivery tests.test_v62_modules_publication acceptance.science_execution.test_research_routes acceptance.science_execution.test_research_route_history",
+    "before": "Both new tests failed at their new assertions before the respective fixes.",
+    "after": [
+      "Ran 18 tests in 8.344s",
+      "",
+      "OK"
+    ],
+    "cases": [
+      "test_abstract_duplicate_and_later_page_do_not_imply_an_independent_all_city_comparison",
+      "test_addressed_hint_then_verbatim_report_and_cold_read",
+      "test_lead_can_recover_each_authored_word_when_short_preview_omits_items",
+      "test_signed_gap_in_acknowledged_packet_is_delivered_and_waiting_has_no_enacted_effect",
+      "test_namespace_inline_text_long_unicode_old_line_endings_and_abstract",
+      "test_formats_versions_scope_and_warm_receipts",
+      "test_real_module_release_independent_review_and_cold_replay",
+      "test_wrong_locator_and_missing_foreign_and_self_receipts",
+      "test_large_frozen_packet_is_bounded_and_original_is_readable",
+      "test_both_catalog_levels_fit_the_wire_budget_and_keep_every_entry_retrievable",
+      "test_deep_reading_supplies_a_published_source_for_competing_hypotheses",
+      "test_medium_survey_publishes_candidates_costs_exclusions_and_gaps_from_public_cards",
+      "test_quick_has_a_direct_method_and_no_delegation",
+      "test_native_boundaries_do_not_infer_queue_time_or_missing_end",
+      "test_real_gx_handoff_wait_and_sourced_publication",
+      "test_rendered_rationales_keep_each_decisions_used_reading_and_preserve_raw_data",
+      "test_bad_records_preserve_subsequent_native_boundaries_and_report_read",
+      "test_unusable_header_yields_no_attributed_turns"
+    ]
+  },
+  "field_snapshot": {
+    "run_id": "gxr_01m8f5kjf8dpqfr1ry",
+    "through_event": 542,
+    "event_utc": "2026-11-27T19:13:28.157Z",
+    "status": "OPEN",
+    "goal_version": 1,
+    "reviews": [
+      {
+        "review_id": "gxrv_01m8f62t52qtvvy37w",
+        "evidence_id": "gxv_01m8f5t7vfe75p08ac",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "module:module_881975d3cfe22617213e89331ad11e49",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5rg2vtmekwvsk",
+        "rr": "gxrc_01m8f5y535r5akhn9g",
+        "xs": "p1",
+        "quote_sha256": "36f1ceaca1053bfc957720c50ce81aabeb58f222b0dc94142b4117b5ff6b3c66"
+      },
+      {
+        "review_id": "gxrv_01m8f62t9bf3ftentd",
+        "evidence_id": "gxv_01m8f5q3m1s2dpqbdw",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nw1bmg2pwnnn",
+        "rr": "gxrc_01m8f5yg3cecmm7ge6",
+        "xs": "p14",
+        "quote_sha256": "9676f7c5c5383d762d6cbda5e6fa9a918ac466275700ad7c8c6097223ceca057"
+      },
+      {
+        "review_id": "gxrv_01m8f62tdjaxa4n6h9",
+        "evidence_id": "gxv_01m8f5q3p86wr5d06x",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nw8rfbkx06bv",
+        "rr": "gxrc_01m8f5yg4b20dm8h1e",
+        "xs": "p3032",
+        "quote_sha256": "48eea9eeda4b6ecb53c0293cb52e1b4f6bc80d8b26181c4073bdb7b58cd57139"
+      },
+      {
+        "review_id": "gxrv_01m8f62th6j70xp7yy",
+        "evidence_id": "gxv_01m8f5q3s3e8e4jmfr",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nw73ma7e2d62",
+        "rr": "gxrc_01m8f5yg736146qvq6",
+        "xs": "p3023",
+        "quote_sha256": "6ce90cf8e264a8e7171298dbca77667fb2303c2140dd26e8f489c55553a3fcc1"
+      },
+      {
+        "review_id": "gxrv_01m8f62tmaat49zvyq",
+        "evidence_id": "gxv_01m8f5q3vd2fcv1qky",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nw9axzaqz58f",
+        "rr": "gxrc_01m8f5yg3w640ww1rm",
+        "xs": "p3035",
+        "quote_sha256": "4976d074521c7cef6baa666413ba8ea6b4cf7bc19e82bf4dc586bd4bb5a684cb"
+      },
+      {
+        "review_id": "gxrv_01m8f62tqtyqs6m881",
+        "evidence_id": "gxv_01m8f5q404bfvbkrs9",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nw83jrm7fa7s",
+        "rr": "gxrc_01m8f5yg4v7cgz0das",
+        "xs": "p3038",
+        "quote_sha256": "75c400ede373b108f06f01f785022a916064a377fc5d5809f60dddf17229219d"
+      },
+      {
+        "review_id": "gxrv_01m8f62tvgfmz5n1vv",
+        "evidence_id": "gxv_01m8f5q4a5wsxcy52b",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nwdppjk2en8c",
+        "rr": "gxrc_01m8f5yg9gmdwtkb45",
+        "xs": "p3047",
+        "quote_sha256": "467523c868aafb143302974225cd4c64eba24b5ef2122bf62613055199147dfd"
+      },
+      {
+        "review_id": "gxrv_01m8f62tz7zsv76wq6",
+        "evidence_id": "gxv_01m8f5q47r79nqpk6h",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nwe67e2vd6f1",
+        "rr": "gxrc_01m8f5yg6bnbwdr5s4",
+        "xs": "p3156",
+        "quote_sha256": "68c57d930380eb8d179efc959ecbb49a2691e3690e2ec3e56c41cbedc229fd7d"
+      },
+      {
+        "review_id": "gxrv_01m8f62v3c5yjs030j",
+        "evidence_id": "gxv_01m8f5q42kyah3fq6h",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nwcq871r21gk",
+        "rr": "gxrc_01m8f61nk43dvjhnnv",
+        "xs": "p3041",
+        "quote_sha256": "dbedc6379f368027e03a9a27f5fecfbb01a6a2014a480d2812aa3fa7d2c0f522"
+      },
+      {
+        "review_id": "gxrv_01m8f62v7dqcbx0e2x",
+        "evidence_id": "gxv_01m8f5q454v3gd0sjb",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nwas4646ac2x",
+        "rr": "gxrc_01m8f61nkf1jcj3h5z",
+        "xs": "p3042",
+        "quote_sha256": "39bfa245197c65df80c7785587395d2bd4a4bf5d91777ef35cf1f1792fb57ede"
+      },
+      {
+        "review_id": "gxrv_01m8f62vb99y22bj6d",
+        "evidence_id": "gxv_01m8f5srmfq97mdheq",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5rvfg3x2nx12g",
+        "rr": "gxrc_01m8f5yg5b1px49q09",
+        "xs": "p30",
+        "quote_sha256": "18aa3313ab961f6fbb99037cff88dbd4a2105446148e1d6081794a4c9f6444c2"
+      },
+      {
+        "review_id": "gxrv_01m8f62vf4pz0sr7fc",
+        "evidence_id": "gxv_01m8f5srfcyd44293p",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5nwfagg0srtv1",
+        "rr": "gxrc_01m8f61ns1rvy88p5y",
+        "xs": "p3037",
+        "quote_sha256": "afc6f59ed5bd820b57e2961ab42b03a727829b7ce474c862b1e915088513e51a"
+      },
+      {
+        "review_id": "gxrv_01m8f62vjyqbyxydvq",
+        "evidence_id": "gxv_01m8f5srq90ababw82",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5rvf1r2zgend8",
+        "rr": "gxrc_01m8f61nrcsa9x0v1g",
+        "xs": "p3058",
+        "quote_sha256": "25285b6d3b0fbeb9396954173f5012447ac194a91f37294b4d7c402a7b5072ae"
+      },
+      {
+        "review_id": "gxrv_01m8f6dadrb9e8f60w",
+        "evidence_id": "gxv_01m8f60ecnhe5e28y6",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5yw704wmcza8b",
+        "rr": "gxrc_01m8f6ay1ejk4dj5h7",
+        "xs": "p24",
+        "quote_sha256": "5ff74935d5dd2194d891f5712a28bbc7df08788cc960063f21bacf3f7b8f907b"
+      },
+      {
+        "review_id": "gxrv_01m8f6drpp9zvgzsh0",
+        "evidence_id": "gxv_01m8f60e9zp30541pp",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5ywha31jjn9k6",
+        "rr": "gxrc_01m8f6ay2ec2vn094j",
+        "xs": "p38",
+        "quote_sha256": "17835e35feef06887ea2e0902cc0f566d02d64cf0785449311af1de70e8418be"
+      },
+      {
+        "review_id": "gxrv_01m8f6drtgbt65q2k5",
+        "evidence_id": "gxv_01m8f60e6kxx8g0zbh",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5yg5v0q5gpqzs",
+        "rr": "gxrc_01m8f6ay50g2hm0za5",
+        "xs": "p12",
+        "quote_sha256": "20bc441d519adddd012d53725b986321d8c1b8d68e90cb881f0a12d5acc356cb"
+      },
+      {
+        "review_id": "gxrv_01m8f6drxmaq1tdtac",
+        "evidence_id": "gxv_01m8f60er9n9aseqf9",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5yw93zwcmeej7",
+        "rr": "gxrc_01m8f6ay2yygv148h9",
+        "xs": "p26",
+        "quote_sha256": "9d133a14ef3e9990b868c6cb076ee465f4d7fdec2bf51615533d45b371d7bdf5"
+      },
+      {
+        "review_id": "gxrv_01m8f6ds1gpzwz8bb0",
+        "evidence_id": "gxv_01m8f60ev7gs2z2sbk",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5yfyra4etqf94",
+        "rr": "gxrc_01m8f6ay0m67r69yxz",
+        "xs": "p10",
+        "quote_sha256": "18bfecc2f0b184ea8e6c58ca441eea3d86bcec8c398900cdf415d0697a94aced"
+      },
+      {
+        "review_id": "gxrv_01m8f6ds59xw643cyr",
+        "evidence_id": "gxv_01m8f60efjf1b1t34m",
+        "independence_level": "FRESH_CONTEXT_SAME_HOST",
+        "author_role": "run",
+        "reviewer_role": "run",
+        "ar": "gxrc_01m8f5ywpatspjaxnh",
+        "rr": "gxrc_01m8f6ay5n6hwnvsr3",
+        "xs": "p50",
+        "quote_sha256": "ac5b5f90dde87bd2a90276768af53665fb4b2a1dcbfc9b161442e0fe145bf4c4"
+      }
+    ],
+    "reports": [
+      {
+        "ref": "gxa_4b2d389cc91595c1063b425a8a87e544abb7e4a04621837a68f12824f29b0463",
+        "author": "GX",
+        "status": "PARTIAL",
+        "published_event": 358
+      },
+      {
+        "ref": "gxa_0b8e26f96db06531f61fcdf22ddca042284a8575cc0eb0f081774304c5ccd01f",
+        "author": "GX",
+        "status": "PARTIAL",
+        "published_event": 524
+      }
+    ],
+    "decisions": [
+      {
+        "decision_ref": "gxa_554a76b2ecd3383dd83515313e42fc066d3c00b99794af1338787f4673897785",
+        "event": 384,
+        "outcome": "maintained",
+        "graph_ops": [],
+        "adopted_claim_events": [
+          {
+            "event": 379,
+            "claim": "gxh_01m8f5xsbt3b149g3m@1"
+          }
+        ]
+      },
+      {
+        "decision_ref": "gxa_5ad3232a646b1978acf587ecfa7554d34c15d4bf1136fcef4cad45ad382cd150",
+        "event": 495,
+        "outcome": "maintained",
+        "graph_ops": [],
+        "adopted_claim_events": [
+          {
+            "event": 490,
+            "claim": "gxh_01m8f5xsbt3b149g3m@2"
+          }
+        ]
+      }
+    ]
+  },
+  "field_check": "Compared exact quote SHA and paragraph identity, distinct leases, frozen contexts and principals, and both original reader receipts. GX PARTIAL carries no scientific author. Graph mutations and successfully adopted claim versions are attributed separately.",
+  "limits": "Snapshot only. Fresh native context on one host is demonstrated; a second provider or distinct model weights are unproven. Later outcomes are recorded separately in a2/live.json."
+}

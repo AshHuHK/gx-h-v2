@@ -1,0 +1,50 @@
+{
+  "affected_command": "PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a .venv/bin/python -B -m unittest -v acceptance.science_plugin_blueprint.test_method_health tests.test_science_capability_views tests.test_p0_manifest tests.test_v6_jobs",
+  "checks": [
+    {
+      "group": "affected",
+      "passed": 19,
+      "cases": [
+        "test_catalogue_observes_fault_after_settlement_and_forgets_changed_or_stale_identity",
+        "test_disable_preserves_admitted_job_but_blocks_pending_node_after_reopen",
+        "test_public_native_discovery_and_scoped_selection",
+        "test_researcher_can_inspect_only_its_own_tools_and_report_after_method_disable",
+        "test_revisions_and_replay",
+        "test_two_simultaneous_view_writers_and_prepared_graph",
+        "test_changed_bytes_external_shell_and_current_method_ban",
+        "test_external_change_after_backend_completion_before_gx_publication",
+        "test_intent_tightened_between_admission_and_launch",
+        "test_native_metering_requires_enforceable_units",
+        "test_original_launch_manifest_survives_submitter_death",
+        "test_project_caps_share_one_ledger_across_runs",
+        "test_terminal_cleanup_preserves_native_turn_until_usage",
+        "test_compiled_request_cannot_change_and_branch_cap_rolls_back_reservation",
+        "test_lost_launch_ack_reopens_original_job_and_reuses_verified_result",
+        "test_new_compute_requires_an_affordable_branch_and_cache_hit_does_not_spend",
+        "test_recovered_evidence_binds_both_graph_nodes_to_the_original_job",
+        "test_withdraw_after_admission_prevents_launch",
+        "test_withdraw_between_compile_and_admission_keeps_other_node"
+      ],
+      "complete": true
+    },
+    {
+      "group": "latest_with_success_and_partial_source",
+      "passed": 1,
+      "cases": [
+        "test_catalogue_observes_fault_after_settlement_and_forgets_changed_or_stale_identity"
+      ],
+      "complete": true
+    }
+  ],
+  "implementation_note": "Decision validation of completed inputs and prospective producer/port shapes runs during v6_decisions.prepare before adopt_revision. JobService adapter validate_inputs runs before the JobService.admit writer. Catalogue health uses the existing completion receipt and registered deployment environment. Scope is the same workspace. Health is an execution observation. Read the published artifact for per-source query outcomes.",
+  "first_harness_failures": [
+    {
+      "retained": "../gx-science/capabilities-check/science-plugin-method-health-01/run/start.json",
+      "failure": "Relative retained fixture path duplicated by CLI path resolution; canonicalized test material path."
+    },
+    {
+      "retained": "../gx-science/capabilities-check/science-plugin-method-health-02/run/state/gx.db",
+      "failure": "Peer start was queued. Fixture now drains the workspace queue and allocates two independent test Runs within the workspace allowance."
+    }
+  ]
+}

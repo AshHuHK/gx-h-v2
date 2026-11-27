@@ -1,0 +1,668 @@
+{
+  "parent": {
+    "run_id": "gxr_01m8f5r59yyx9gmekh",
+    "goal": "CLOSED",
+    "materials": [
+      {
+        "role": "specimen",
+        "artifact_ref": "gxa_01m8f5r5b23h6pajqz",
+        "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+      },
+      {
+        "role": "reference",
+        "artifact_ref": "gxa_01m8f5r5bq6f0gcxjb",
+        "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+      },
+      {
+        "role": "mapping",
+        "artifact_ref": "gxa_01m8f5r5cc1pd82j1a",
+        "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+      }
+    ],
+    "jobs": [
+      {
+        "node_id": "node_ea82809e2ae5243cab3fb6f7ea27b920",
+        "job_id": "gxj_01m8f5wrxp23f9dx16",
+        "status": "SUCCEEDED",
+        "method": "archived-fold-calibration@1",
+        "depends_on": [],
+        "recipe_decision": null,
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8f5r5b23h6pajqz",
+            "bytes": 409,
+            "role": "specimen",
+            "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+          }
+        ],
+        "manifest_hash": "9810a823922a68ed90e6dd976a38aa6afb4b18998830e7a6da54b142ba092f94",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8f6940tr4n0gqdm",
+            "sha256": "1ea97f084acdcd4590a3421e8faec51427f281a9c0bf55cee42e301553f245fc",
+            "output_name": "model.cif",
+            "kind": "predicted_mmcif",
+            "nature": "model_prediction"
+          },
+          {
+            "artifact_ref": "gxa_01m8f6941kdabdfg44",
+            "sha256": "300e4a4fbcf898b46da20ee29454042ef724493f1ba6bb163a2ccd1cf8ff7aba",
+            "output_name": "inference.json",
+            "kind": "model_execution",
+            "nature": "model_prediction"
+          },
+          {
+            "artifact_ref": "gxa_01m8f6942dtzapg6j0",
+            "sha256": "7ab1c4ef16a8fe88db3ccef813a5e28dec63b1e2d336876e5ae60b6d6b4686b8",
+            "output_name": "TERMS_OF_USE.md",
+            "kind": "model_output_terms",
+            "nature": "unclassified"
+          }
+        ]
+      },
+      {
+        "node_id": "node_82e3f826d9fcae94314f8fb538b5d886",
+        "job_id": "gxj_01m8f6bc8gzxnvrwxj",
+        "status": "SUCCEEDED",
+        "method": "mapped-structure-agreement@1",
+        "depends_on": [
+          "node_ea82809e2ae5243cab3fb6f7ea27b920"
+        ],
+        "recipe_decision": null,
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8f6940tr4n0gqdm",
+            "bytes": 66458,
+            "role": "prediction",
+            "sha256": "1ea97f084acdcd4590a3421e8faec51427f281a9c0bf55cee42e301553f245fc"
+          },
+          {
+            "artifact_ref": "gxa_01m8f5r5bq6f0gcxjb",
+            "bytes": 119624,
+            "role": "reference",
+            "sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd"
+          },
+          {
+            "artifact_ref": "gxa_01m8f5r5cc1pd82j1a",
+            "bytes": 1398,
+            "role": "mapping",
+            "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+          }
+        ],
+        "manifest_hash": "0d79b10877e041206dc0d60ace51fb1f62e31e246e5e05691bd0d20754e2ecf3",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8f6bcx8xdtga8t1",
+            "sha256": "165046ae8b218b800d4d152f8b9affb82064b7d57be1c10869c538a520eb3fde",
+            "output_name": "agreement.json",
+            "kind": "mapped_structure_agreement",
+            "nature": "analysis"
+          }
+        ],
+        "readout": {
+          "matched_positions": 92,
+          "mapped_positions": 92,
+          "calpha_rmsd_A": 1.0089501330794226,
+          "units": "angstrom",
+          "input_sha256": "1ea97f084acdcd4590a3421e8faec51427f281a9c0bf55cee42e301553f245fc",
+          "reference_sha256": "d66b95ad11410ee8ff8b407abc3ea89c5401825170c9cc519556a382334c81bd",
+          "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+        }
+      }
+    ],
+    "release_events": [
+      {
+        "event_id": 157,
+        "node": "node_ea82809e2ae5243cab3fb6f7ea27b920",
+        "type": "v6.node.settled"
+      },
+      {
+        "event_id": 192,
+        "node": "node_82e3f826d9fcae94314f8fb538b5d886",
+        "type": "v6.node.settled"
+      }
+    ],
+    "recipe_expansions": [],
+    "lead_points": [],
+    "decisions": [
+      {
+        "decision_ref": "gxa_ebf76430361fa9261c9e63aa89cbdb65b6fa37a8985dc207158d548157391163",
+        "turn_id": "01a21e5c-43de-79a3-8b1e-b3e85e85de85",
+        "rationale": "Fresh inference on the immutable Top7 input supplies the missing coordinates. The provided mapping fixes chain A positions 1–92 to 1QYS model 1 label positions 3–94 for the subsequent fit.",
+        "evidence_refs": [
+          "gxa_01m8f5r5b23h6pajqz",
+          "gxa_01m8f5r5bq6f0gcxjb",
+          "gxa_01m8f5r5cc1pd82j1a"
+        ],
+        "ops": [
+          "open_branch",
+          "add_node"
+        ],
+        "outcome": "adopted"
+      },
+      {
+        "decision_ref": "gxa_5f5f4ff6c46230cb0377988e975604ff96db7ade5b1c1154aedc4f8a227e4894",
+        "turn_id": "01a21e5e-6542-7843-97c2-e60ee5f34559",
+        "rationale": "Every reference position in the supplied map has a positive-occupancy model 1 chain A Cα, including selenomethionine at label 37. The existing prediction job is awaiting operator approval. Its model.cif is the missing input for the matched-position count and proper-rotation fit. Retain that job and compare its delivered coordinates with 1QYS using the supplied map.",
+        "evidence_refs": [
+          "gxa_01m8f5r5b23h6pajqz",
+          "gxa_01m8f5r5bq6f0gcxjb",
+          "gxa_01m8f5r5cc1pd82j1a"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_6fe9cbe01af034abe86204800c62cb12a9d228837202d7ffa45b7dd8bc02f870",
+        "turn_id": "01a21e61-6691-7663-b7e6-6a70e1e74109",
+        "rationale": "The independent inventory and the original 1QYS records agree. Each mapped reference position has a unique model 1 chain A Cα, including selenomethionine at reference A37 paired with specimen Met35. Keep every pair in the supplied map. The existing AlphaFold 3 job holds the GPU reservation and awaits operator approval. Its model.cif is required to measure paired coverage and fitted RMSD. The requested workspace recipe can be saved from the successful prediction and comparison once agreement.json is available.",
+        "evidence_refs": [
+          "gxa_5d8b8bb97863a8870bfb4705b8be040b90fccefad758861b1e5873d7a4c80aae",
+          "gxa_01m8f5r5b23h6pajqz",
+          "gxa_01m8f5r5bq6f0gcxjb",
+          "gxa_01m8f5r5cc1pd82j1a"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_8f64fedb4f8db8825ba6c470edb2f7c51d3bc8d905849a4439adc1cfbe61fa00",
+        "turn_id": "01a21e62-d2bc-7c82-85ae-9912f3c87b58",
+        "rationale": "I verified a unique, full-occupancy model 1 Cα at every mapped reference site in 1QYS. The supplied map pairs specimen A1–A92 with reference A3–A94, including Met35 with selenomethionine A37. This confirms the independent inventory and preserves all 92 intended pairs for the fit. The existing AlphaFold 3 job holds the GPU reservation and still requires operator approval. Once it delivers model.cif, the registered proper-rotation fit can determine paired coverage and Cα RMSD. Until then the discrepancy is unknown.",
+        "evidence_refs": [
+          "gxa_01m8f5r5b23h6pajqz",
+          "gxa_01m8f5r5cc1pd82j1a",
+          "gxa_01m8f5r5bq6f0gcxjb",
+          "gxa_5d8b8bb97863a8870bfb4705b8be040b90fccefad758861b1e5873d7a4c80aae"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_a41ece3b925ca8c7ad03dd687460cb129d32c6e4bb139463afe742e4a533dfd5",
+        "turn_id": "01a21e64-91e3-7cf1-b139-fa6a03fac3ce",
+        "rationale": "The execution record links the supplied Top7 specimen to the fresh AlphaFold 3 coordinates. The mapping and independent inventory agree that specimen A1–A92 corresponds to 1QYS A3–A94, including Met35 paired with the observed Cα of selenomethionine A37. A single CPU fit using those explicit pairs will measure coverage in both structures and the geometric discrepancy over the usable pairs.",
+        "evidence_refs": [
+          "gxa_01m8f6940tr4n0gqdm",
+          "gxa_01m8f6941kdabdfg44",
+          "gxa_01m8f5r5b23h6pajqz",
+          "gxa_01m8f5r5bq6f0gcxjb",
+          "gxa_01m8f5r5cc1pd82j1a",
+          "gxa_5d8b8bb97863a8870bfb4705b8be040b90fccefad758861b1e5873d7a4c80aae"
+        ],
+        "ops": [
+          "add_node"
+        ],
+        "outcome": "adopted"
+      },
+      {
+        "decision_ref": "gxa_2ac211219adb5bbb1a27944f3839d096584a13bdeb5645aee356e0563df72f23",
+        "turn_id": "01a21e65-b201-7b82-97bf-866d2a616a80",
+        "rationale": "The PI confirmed approval for the original AlphaFold 3 job. Its execution record identifies the supplied specimen and the published model. I checked the inventory’s residue assignment against both coordinate files. The supplied map pairs specimen Met35 with a positive-occupancy Cα at 1QYS selenomethionine A37. The commissioned comparison uses that map and its execution has succeeded. Await delivery of agreement.json to bind the coverage and RMSD to the calibration claim.",
+        "evidence_refs": [
+          "gxa_01m8f6941kdabdfg44",
+          "gxa_01m8f6940tr4n0gqdm",
+          "gxa_01m8f5r5b23h6pajqz",
+          "gxa_01m8f5r5bq6f0gcxjb",
+          "gxa_01m8f5r5cc1pd82j1a",
+          "gxa_5d8b8bb97863a8870bfb4705b8be040b90fccefad758861b1e5873d7a4c80aae"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_ad4f8a198ca02c4d63f966cf5cb7e30ff8ec9ea2dd06fc6c2f1888612fe7cdf6",
+        "turn_id": "01a21e67-5812-75a1-b031-418eaebf0dea",
+        "rationale": "The approved AlphaFold prediction supplied the coordinates used in agreement.json. The equal-weight, proper-rotation fit used {{metric:matched_positions}} of {{metric:mapped_positions}} mapped Cα pairs and gave an RMSD of {{metric:calpha_rmsd_A}}. The matched-pair list reproduces the supplied map, including the methionine–selenomethionine pair identified in the inventory and confirmed in both coordinate files. This answers the calibration question over the entire intended fragment.",
+        "evidence_refs": [
+          "gxa_01m8f6bcx8xdtga8t1",
+          "gxa_01m8f6941kdabdfg44",
+          "gxa_01m8f6940tr4n0gqdm",
+          "gxa_01m8f5r5bq6f0gcxjb",
+          "gxa_01m8f5r5cc1pd82j1a",
+          "gxa_01m8f5r5b23h6pajqz",
+          "gxa_5d8b8bb97863a8870bfb4705b8be040b90fccefad758861b1e5873d7a4c80aae"
+        ],
+        "ops": [
+          "close_run"
+        ],
+        "outcome": "adopted"
+      }
+    ],
+    "lead_turns": [
+      {
+        "thread_id": "01a21e5c-43a0-7722-af0f-2243ff220467",
+        "turn_id": "01a21e5c-43de-79a3-8b1e-b3e85e85de85",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e5e-6519-79b0-af67-e5134af333bd",
+        "turn_id": "01a21e5e-6542-7843-97c2-e60ee5f34559",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e60-1454-7b42-a61e-93c850cb178e",
+        "turn_id": "01a21e60-14ac-7fc1-8569-cad25e9c4827",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e60-1454-7b42-a61e-93c850cb178e",
+        "turn_id": "01a21e61-6691-7663-b7e6-6a70e1e74109",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e62-d28c-7200-b6a0-206bb0540b56",
+        "turn_id": "01a21e62-d2bc-7c82-85ae-9912f3c87b58",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e64-9193-7f13-97aa-ae9c7d5d0d41",
+        "turn_id": "01a21e64-91e3-7cf1-b139-fa6a03fac3ce",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e65-b1c7-7bd2-96f8-1add831b2d81",
+        "turn_id": "01a21e65-b201-7b82-97bf-866d2a616a80",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e67-57ce-7421-a508-6d376b60a792",
+        "turn_id": "01a21e67-5812-75a1-b031-418eaebf0dea",
+        "state": "acknowledged"
+      }
+    ],
+    "readout_calls": [
+      {
+        "thread_id": "01a21e67-57ce-7421-a508-6d376b60a792",
+        "turn_id": "01a21e67-5812-75a1-b031-418eaebf0dea",
+        "call_id": "exec-38eb7e52-ff25-4b19-8146-99dc80b97147",
+        "artifact_ref": "gxa_01m8f6bcx8xdtga8t1",
+        "kind": "full_named_readout"
+      },
+      {
+        "thread_id": "01a21e67-57ce-7421-a508-6d376b60a792",
+        "turn_id": "01a21e67-5812-75a1-b031-418eaebf0dea",
+        "call_id": "exec-87e36852-1e7b-4aa7-b1b9-25c50b7b104c",
+        "artifact_ref": "gxa_01m8f6bcx8xdtga8t1",
+        "kind": "endpoint_page"
+      }
+    ]
+  },
+  "successor": {
+    "run_id": "gxr_01m8f6s3pam4nc58dg",
+    "goal": "CLOSED",
+    "materials": [
+      {
+        "role": "specimen",
+        "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+        "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+      },
+      {
+        "role": "reference",
+        "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+        "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+      },
+      {
+        "role": "mapping",
+        "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+        "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+      },
+      {
+        "role": "provenance",
+        "artifact_ref": "gxa_01m8f6s3t72xwdrrar",
+        "sha256": "ab8b4be2f55d60de6c8d91197b89c2baf1f8c27d240d4d35f0f20ac5ab8a31c9"
+      }
+    ],
+    "jobs": [
+      {
+        "node_id": "node_0fa9ea84e66e32b9fbac75dd87b3d511",
+        "job_id": "gxj_01m8f75vf3h1rk3tc6",
+        "status": "SUCCEEDED",
+        "method": "archived-fold-calibration@1",
+        "depends_on": [],
+        "recipe_decision": null,
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8f6s3r1n64ck7wh",
+            "bytes": 409,
+            "role": "specimen",
+            "sha256": "12e199f65fa119dd141a674ab5881581964c267ff2c7b7770be2ebbefe52bfcf"
+          }
+        ],
+        "manifest_hash": "62d041667239c8892d1f60c196bef117058bf0d3f751f263f4943f698f572492",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8f7eba7rehettwg",
+            "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+            "output_name": "model.cif",
+            "kind": "predicted_mmcif",
+            "nature": "model_prediction"
+          },
+          {
+            "artifact_ref": "gxa_01m8f7ebaxta0cbadn",
+            "sha256": "cab9d2368de16e4accdfe447338eac927d3b652e64da92845bcf312eafe0a15f",
+            "output_name": "inference.json",
+            "kind": "model_execution",
+            "nature": "model_prediction"
+          },
+          {
+            "artifact_ref": "gxa_01m8f7ebbja568x7n7",
+            "sha256": "7ab1c4ef16a8fe88db3ccef813a5e28dec63b1e2d336876e5ae60b6d6b4686b8",
+            "output_name": "TERMS_OF_USE.md",
+            "kind": "model_output_terms",
+            "nature": "unclassified"
+          }
+        ]
+      },
+      {
+        "node_id": "node_d433d940730bcef97d4b1091b72db646",
+        "job_id": "gxj_01m8f7ebh2ab8sy881",
+        "status": "SUCCEEDED",
+        "method": "mapped-structure-agreement@1",
+        "depends_on": [
+          "node_0fa9ea84e66e32b9fbac75dd87b3d511"
+        ],
+        "recipe_decision": {
+          "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+          "recipe": "archived-coordinate-agreement@1",
+          "step": "compare"
+        },
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8f7eba7rehettwg",
+            "bytes": 66458,
+            "role": "prediction",
+            "sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437"
+          },
+          {
+            "artifact_ref": "gxa_01m8f6s3rq12dpy88g",
+            "bytes": 976,
+            "role": "reference",
+            "sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e"
+          },
+          {
+            "artifact_ref": "gxa_01m8f6s3sj8xm63npg",
+            "bytes": 1398,
+            "role": "mapping",
+            "sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+          }
+        ],
+        "manifest_hash": "cc83d80a22f84a7bd898ae94328995dde6964bc977d535b61e6c75a7606074ba",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+            "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a",
+            "output_name": "agreement.json",
+            "kind": "mapped_structure_agreement",
+            "nature": "analysis"
+          }
+        ],
+        "readout": {
+          "matched_positions": 5,
+          "mapped_positions": 92,
+          "calpha_rmsd_A": 0.7878160012303694,
+          "units": "angstrom",
+          "input_sha256": "f3712fd6791aa1690299b5a8655af91e963b78d1a57ad4a596296f338bfeb437",
+          "reference_sha256": "0582e78560438665bf9b2f49dac74c6615623851ed25c227b4e520bdd6a2278e",
+          "mapping_sha256": "f0bcbe193e6050bfb516289dd17f78d0da2af24ffbcbd362314e9da4260935da"
+        }
+      }
+    ],
+    "release_events": [
+      {
+        "event_id": 334,
+        "node": "node_0fa9ea84e66e32b9fbac75dd87b3d511",
+        "type": "v6.node.settled"
+      },
+      {
+        "event_id": 351,
+        "node": "node_d433d940730bcef97d4b1091b72db646",
+        "type": "v6.node.settled"
+      }
+    ],
+    "recipe_expansions": [
+      {
+        "thread_id": "01a21e6c-a386-7e42-9cb0-c6d2de45965c",
+        "turn_id": "01a21e70-24ef-7fe0-babf-85555f76e8de",
+        "call_id": "exec-5d0bf73f-fffb-408d-8c8c-6f684d0aee82",
+        "recipe": "archived-coordinate-agreement@1",
+        "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+        "ops": [
+          {
+            "branch": "excerpt",
+            "capability": "mapped-structure-agreement@1",
+            "depends_on": [
+              "local:top7-predict"
+            ],
+            "independent_repeat": true,
+            "input_ports": [
+              {
+                "index": 0,
+                "output": "model.cif"
+              }
+            ],
+            "inputs": [
+              "local:top7-predict",
+              "gxa_01m8f6s3rq12dpy88g",
+              "gxa_01m8f6s3sj8xm63npg"
+            ],
+            "node": "local:top7-compare",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply mapped-structure-agreement@1 to the named inputs of this Goal.",
+            "recipe_decision": {
+              "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+              "recipe": "archived-coordinate-agreement@1",
+              "step": "compare"
+            }
+          },
+          {
+            "branch": "excerpt",
+            "capability": "archived-fold-calibration@1",
+            "depends_on": [],
+            "independent_repeat": true,
+            "inputs": [
+              "gxa_01m8f6s3r1n64ck7wh"
+            ],
+            "node": "local:top7-predict",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply archived-fold-calibration@1 to the named inputs of this Goal."
+          }
+        ]
+      },
+      {
+        "thread_id": "01a21e6c-a386-7e42-9cb0-c6d2de45965c",
+        "turn_id": "01a21e70-24ef-7fe0-babf-85555f76e8de",
+        "call_id": "exec-046fa5c5-9b78-4e4c-8549-8f3f7186b268",
+        "recipe": "archived-coordinate-agreement@1",
+        "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+        "ops": [
+          {
+            "branch": "local:excerpt",
+            "capability": "mapped-structure-agreement@1",
+            "depends_on": [
+              "local:top7-predict"
+            ],
+            "independent_repeat": true,
+            "input_ports": [
+              {
+                "index": 0,
+                "output": "model.cif"
+              }
+            ],
+            "inputs": [
+              "local:top7-predict",
+              "gxa_01m8f6s3rq12dpy88g",
+              "gxa_01m8f6s3sj8xm63npg"
+            ],
+            "node": "local:top7-compare",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply mapped-structure-agreement@1 to the named inputs of this Goal.",
+            "recipe_decision": {
+              "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+              "recipe": "archived-coordinate-agreement@1",
+              "step": "compare"
+            }
+          },
+          {
+            "branch": "local:excerpt",
+            "capability": "archived-fold-calibration@1",
+            "depends_on": [],
+            "independent_repeat": true,
+            "inputs": [
+              "gxa_01m8f6s3r1n64ck7wh"
+            ],
+            "node": "local:top7-predict",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply archived-fold-calibration@1 to the named inputs of this Goal."
+          }
+        ]
+      }
+    ],
+    "lead_points": [
+      {
+        "task_id": "gxt_01m8f7g2wfw8aywd77",
+        "points": [
+          {
+            "actions": [
+              "Report agreement within the justified scope",
+              "Limit the claim and request additional coverage",
+              "Stop when evidence is inconclusive"
+            ],
+            "digest": "beaf43879127f668655b99bed0eed69190110163d40b7cef24f09010e3f98382",
+            "event": "job_settled",
+            "evidence": {
+              "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+              "kind": "mapped_structure_agreement",
+              "nature": "analysis",
+              "output_name": "agreement.json",
+              "sha256": "be607f9bfdb3a58884f0c6fb085f6f49ac6f2872e25ac11dc2766d4ef5bf7c0a"
+            },
+            "job_id": "gxj_01m8f7ebh2ab8sy881",
+            "node_id": "node_d433d940730bcef97d4b1091b72db646",
+            "output": "agreement.json",
+            "question": "Over what positions is comparison supported by this Goal's available coordinates?",
+            "recipe": "archived-coordinate-agreement@1",
+            "role": "run_lead",
+            "state": "read_and_decide",
+            "step": "compare",
+            "stop_condition": "The available mapped coverage and measurement support the stated scope, or the remaining gap requires additional data."
+          }
+        ]
+      }
+    ],
+    "decisions": [
+      {
+        "decision_ref": "gxa_8009abb9b966db3a0fb7dfcca8e018082d75eb87d5e6c2108837074fb48e626b",
+        "turn_id": "01a21e70-24ef-7fe0-babf-85555f76e8de",
+        "rationale": "Run the preceding study’s saved workflow on the current specimen, residue map and excerpt. A fresh model and a mapped fit will quantify discrepancy at the preselected sites. Retaining every mapped position in the denominator makes the limit on whole-fragment agreement explicit.",
+        "evidence_refs": [
+          "gxa_01m8f6s3r1n64ck7wh",
+          "gxa_01m8f6s3rq12dpy88g",
+          "gxa_01m8f6s3sj8xm63npg",
+          "gxa_01m8f6s3t72xwdrrar",
+          "gxa_01m8f6z43wrs1q0ybe"
+        ],
+        "ops": [
+          "open_branch",
+          "add_node",
+          "add_node"
+        ],
+        "outcome": "adopted"
+      },
+      {
+        "decision_ref": "gxa_cff71a47f85369a66d96eb2bb47d6d667db36cb7035e12027deaa9a8fa28eda4",
+        "turn_id": "01a21e73-ddae-7bf1-b3fc-db955831fc55",
+        "rationale": "Keep the preceding study’s workflow running. The independent inventory and the original coordinate rows identify five eligible chain A sites in specimen numbering: Ile2, Thr23, Arg45, Val68 and Gly90. The queued fit will test whether each has a predicted counterpart and measure their Cα RMSD. The excerpt comes from the same 1QYS deposition used previously. Its 87 missing reference positions leave whole-specimen agreement unresolved regardless of the five-site RMSD.",
+        "evidence_refs": [
+          "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2",
+          "gxa_01m8f6s3rq12dpy88g",
+          "gxa_01m8f6s3sj8xm63npg",
+          "gxa_01m8f6s3r1n64ck7wh",
+          "gxa_01m8f6s3t72xwdrrar"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_19ff4a7422ebb77bac25c7fca817ee6e3f48d63842c3f8b68ff62cbd8b781702",
+        "turn_id": "01a21e77-2f37-76c2-a8a6-b00f79fd764d",
+        "rationale": "Keep the preceding study’s mapped Cα comparison and review its agreement.json when delivered. The fresh AlphaFold model has one identity-matched chain A Cα for each reference site at specimen positions 2, 23, 45, 68 and 90. The coordinate rows and independent inventory agree that the excerpt leaves 87 mapped positions unobserved. The pending fit can quantify the discrepancy at the five paired sites. Assessing the remaining positions requires additional reference coordinates.",
+        "evidence_refs": [
+          "gxa_01m8f7eba7rehettwg",
+          "gxa_01m8f7ebaxta0cbadn",
+          "gxa_01m8f6s3r1n64ck7wh",
+          "gxa_01m8f6s3rq12dpy88g",
+          "gxa_01m8f6s3sj8xm63npg",
+          "gxa_01m8f6s3t72xwdrrar",
+          "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_b22cf1ac9f9191e5446abc4debddbaac699f31b04416d0bc7d469d9be811a226",
+        "turn_id": "01a21e78-0be1-71b1-b3c2-064511bcf414",
+        "rationale": "The preceding study’s workflow gave an equal-weight, proper-rotation Cα RMSD of {{metric:calpha_rmsd_A}} across {{metric:matched_positions}} of {{metric:mapped_positions}} mapped chain A positions in the fresh calculation. Every reference Cα has the expected residue identity and a counterpart in the prediction. The missing-pair flags and original coordinates confirm the inventory’s finding that the excerpt omits the other mapped positions. Repeating the calculation with this excerpt cannot increase coverage.",
+        "evidence_refs": [
+          "gxa_01m8f7ecax3gfwv32q",
+          "gxa_01m8f7eba7rehettwg",
+          "gxa_01m8f7ebaxta0cbadn",
+          "gxa_01m8f6s3r1n64ck7wh",
+          "gxa_01m8f6s3rq12dpy88g",
+          "gxa_01m8f6s3sj8xm63npg",
+          "gxa_01m8f6s3t72xwdrrar",
+          "gxa_573cc53f755fabb561126171e4d5e18ac85752f71efd5e45101250849c98b9d2"
+        ],
+        "ops": [
+          "close_run"
+        ],
+        "outcome": "adopted"
+      }
+    ],
+    "lead_turns": [
+      {
+        "thread_id": "01a21e6c-a386-7e42-9cb0-c6d2de45965c",
+        "turn_id": "01a21e6c-a3c4-7520-a9ad-36887a319821",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e6c-a386-7e42-9cb0-c6d2de45965c",
+        "turn_id": "01a21e70-24ef-7fe0-babf-85555f76e8de",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e72-f187-7ab0-b391-e0539ec92b93",
+        "turn_id": "01a21e72-f1cc-70f1-9246-b2a970c35e33",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e72-f187-7ab0-b391-e0539ec92b93",
+        "turn_id": "01a21e73-ddae-7bf1-b3fc-db955831fc55",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e77-2eff-7f81-89e6-45a52ceabb07",
+        "turn_id": "01a21e77-2f37-76c2-a8a6-b00f79fd764d",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21e78-0bb6-7661-80a2-0d6208bb4903",
+        "turn_id": "01a21e78-0be1-71b1-b3c2-064511bcf414",
+        "state": "acknowledged"
+      }
+    ],
+    "readout_calls": [
+      {
+        "thread_id": "01a21e78-0bb6-7661-80a2-0d6208bb4903",
+        "turn_id": "01a21e78-0be1-71b1-b3c2-064511bcf414",
+        "call_id": "exec-cf39125b-e4af-4e09-8340-12d1ae5c0684",
+        "artifact_ref": "gxa_01m8f7ecax3gfwv32q",
+        "kind": "full_named_readout"
+      }
+    ]
+  }
+}

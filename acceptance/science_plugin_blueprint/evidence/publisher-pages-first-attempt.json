@@ -1,0 +1,102 @@
+{
+  "run_id": "gxr_01m8f5hf8tzcxb9m2f",
+  "mode": "controlled native actions, real publisher Jobs through Clash",
+  "scope": "module:module_56f70d905822f8078f7f5feb2cac5955",
+  "pages": [
+    {
+      "action": "first",
+      "input_ref": "gxa_01m8f5hf9nv1xzqsnn",
+      "job_id": "gxj_01m8f5hft5r7q05hrp",
+      "ports": {
+        "candidates.json": "gxa_01m8f5hyk65d6rwegh",
+        "search-snapshot.json": "gxa_01m8f5hykm72m7gghx"
+      },
+      "archive_sha256": "3fec627a2a5d71bffbfc1b54e92b67ad5e35414f81b19b5be97ee62c9eef04e5",
+      "returned": 24,
+      "unique": 24,
+      "sources": [
+        {
+          "provider": "europepmc",
+          "page": 1,
+          "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=rain+gauge+precipitation+measurement&format=json&pageSize=12&resultType=core&cursorMark=%2A",
+          "retrieved_at": "2026-11-27T18:51:02.573395+00:00",
+          "sha256": "f8212acff2cac20a86f2e543487dcde6002e3f19b7b1f80ac92ecec3776d1667",
+          "returned": 12,
+          "provider_hits": 1353,
+          "next_cursor": "AoIIQJ/Quig1NDcxMjQyNA==",
+          "has_more": true,
+          "status": "hits",
+          "indexed_records": 12,
+          "offset_before": 0,
+          "seen_through": 12,
+          "coverage": "partial"
+        },
+        {
+          "provider": "crossref",
+          "page": 1,
+          "url": "https://api.crossref.org/works?query.bibliographic=rain+gauge+precipitation+measurement&rows=12&select=DOI%2Ctitle%2Ctype%2Cissued%2Cupdated-by&cursor=%2A",
+          "retrieved_at": "2026-11-27T18:51:15.043157+00:00",
+          "sha256": "e9727b85888cd1eb29e953b933a1fd177d5020297684ac3b8f3bb86b8d86b7d6",
+          "returned": 12,
+          "provider_hits": 1098347,
+          "next_cursor": "MTAyNzU1NjU3MTAwMCwxMC4xMDY3JTJGbW10LjIwMDEuMTE1MjY2",
+          "has_more": true,
+          "status": "hits",
+          "indexed_records": 12,
+          "offset_before": 0,
+          "seen_through": 12,
+          "coverage": "partial"
+        }
+      ]
+    },
+    {
+      "action": "next",
+      "input_ref": "gxa_01m8f5hykm72m7gghx",
+      "job_id": "gxj_01m8f5hyxabw4kk22m",
+      "ports": {
+        "candidates.json": "gxa_01m8f5j4azgv9ah9a9",
+        "search-snapshot.json": "gxa_01m8f5j4been9mrk12"
+      },
+      "archive_sha256": "dd03bc55f9f6911593f73d2015f17e2a1d02a16ab9fd6fb9380be20e33db6811",
+      "returned": 24,
+      "unique": 24,
+      "sources": [
+        {
+          "provider": "europepmc",
+          "page": 2,
+          "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=rain+gauge+precipitation+measurement&format=json&pageSize=12&resultType=core&cursorMark=AoIIQJ%2FQuig1NDcxMjQyNA%3D%3D",
+          "retrieved_at": "2026-11-27T18:51:18.027273+00:00",
+          "sha256": "b685b89c6569ba1d55188274282d38bb4670d45efab65091c79b5bd1ebb075f1",
+          "returned": 12,
+          "provider_hits": 1353,
+          "next_cursor": "AoIIQI2sXSg1NzAxMDMyMA==",
+          "has_more": true,
+          "status": "hits",
+          "indexed_records": 12,
+          "offset_before": 12,
+          "seen_through": 24,
+          "coverage": "partial"
+        },
+        {
+          "provider": "crossref",
+          "page": 2,
+          "url": "https://api.crossref.org/works?query.bibliographic=rain+gauge+precipitation+measurement&rows=12&select=DOI%2Ctitle%2Ctype%2Cissued%2Cupdated-by&cursor=MTAyNzU1NjU3MTAwMCwxMC4xMDY3JTJGbW10LjIwMDEuMTE1MjY2",
+          "retrieved_at": "2026-11-27T18:51:21.158296+00:00",
+          "sha256": "05b825ac0b71aab1ee2ecf8135c8007f72d814976d0916731bb0b4ec35695f90",
+          "returned": 12,
+          "provider_hits": 1098347,
+          "next_cursor": "MTAyNzU2NTg5NTAwMCwxMC4xMDA3JTJGczAwMTI4OTkxMDAyNg==",
+          "has_more": true,
+          "status": "hits",
+          "indexed_records": 12,
+          "offset_before": 12,
+          "seen_through": 24,
+          "coverage": "partial"
+        }
+      ]
+    }
+  ],
+  "first_failed_stage": "third (offline replay) Job admission because the controlled child allowance was two Jobs",
+  "raw_database": "../release-acceptance/public-paging-control-01/state/gx.db",
+  "source_receipt": "../release-acceptance/public-paging-control-01/receipt.json"
+}

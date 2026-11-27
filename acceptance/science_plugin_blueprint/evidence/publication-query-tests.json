@@ -1,0 +1,64 @@
+{
+  "tests_command": "PYTHONPATH=gx-h:. .venv/bin/python -B -m unittest -v tests.test_publication_discovery tests.test_science_capability_collections",
+  "exit_code": 0,
+  "output": "test_missing_and_unrelated_inputs_cannot_continue_or_fetch (tests.test_publication_discovery.PublicationDiscovery.test_missing_and_unrelated_inputs_cannot_continue_or_fetch) ... ok\ntest_question_alone_is_discoverable_and_binds_an_empty_input_manifest (tests.test_publication_discovery.PublicationDiscovery.test_question_alone_is_discoverable_and_binds_an_empty_input_manifest) ... ok\ntest_worker_checks_reader_bytes_before_loading_and_replay_stays_offline (tests.test_publication_discovery.PublicationDiscovery.test_worker_checks_reader_bytes_before_loading_and_replay_stays_offline) ... ok\ntest_identical_method_names_require_an_explicit_provider_choice (tests.test_science_capability_collections.GoalMethodCollections.test_identical_method_names_require_an_explicit_provider_choice) ... ok\ntest_original_replay_and_explicit_empty_never_expand (tests.test_science_capability_collections.GoalMethodCollections.test_original_replay_and_explicit_empty_never_expand) ... ok\ntest_public_research_command_freezes_default_options_and_resumes (tests.test_science_capability_collections.GoalMethodCollections.test_public_research_command_freezes_default_options_and_resumes) ... ok\ntest_scoped_selection_binds_saved_package_bytes (tests.test_science_capability_collections.GoalMethodCollections.test_scoped_selection_binds_saved_package_bytes) ... ok\ntest_successor_keeps_parent_choices_without_reexpanding_installation (tests.test_science_capability_collections.GoalMethodCollections.test_successor_keeps_parent_choices_without_reexpanding_installation) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 2.394s\n\nOK\n",
+  "package_verification": {
+    "plugins": [
+      {
+        "id": "org.gx.scholarly-sources",
+        "version": "1.0.0",
+        "sha256": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c",
+        "namespace": "gx_ext_org_gx_scholarly_sources_1_0_0_4abb002c5447bcb7c4c3db549062e947fc20a5cee1ce2f1cfae215f1a05fff62",
+        "contributions": {
+          "workflows": [],
+          "tools": [],
+          "capabilities": [
+            "methods/fetch.json",
+            "methods/search.json",
+            "methods/social.json"
+          ],
+          "research_modules": [
+            "scholarly_investigation@1"
+          ]
+        }
+      },
+      {
+        "id": "org.gx.scholarly-pages",
+        "version": "1.0.0",
+        "sha256": "1ed6a7b520ac439b092fb80940500e69b5d07a6c263d5ec541c445c64f5264be",
+        "namespace": "gx_ext_org_gx_scholarly_pages_1_0_0_d5a8b696c041517073142232a447fb449790f49cd79c3ac3638a257e388667d1",
+        "contributions": {
+          "workflows": [],
+          "tools": [],
+          "capabilities": [
+            "methods/fetch.json",
+            "methods/search.json"
+          ],
+          "research_modules": [
+            "scholarly_page_investigation@1"
+          ]
+        }
+      },
+      {
+        "id": "org.gx.publication-discovery",
+        "version": "1.0.0",
+        "sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "namespace": "gx_ext_org_gx_publication_discovery_1_0_0_ff6c3dd4a481411bdae02085fb81c1e7f42d50090ac8cf4f402e579cb7dd2f91",
+        "contributions": {
+          "workflows": [],
+          "tools": [],
+          "capabilities": [
+            "methods/literature-original.json",
+            "methods/literature-page.json",
+            "methods/literature-query.json"
+          ],
+          "research_modules": [
+            "publication_discovery@1"
+          ]
+        }
+      }
+    ],
+    "failures": {}
+  },
+  "verification_exit_code": 0
+}

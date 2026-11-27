@@ -87,6 +87,18 @@
     {
       "path": "org.gx.arxiv-sources/1.0.0",
       "sha256": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5"
+    },
+    {
+      "path": "org.gx.scholarly-pages/1.0.0",
+      "sha256": "1ed6a7b520ac439b092fb80940500e69b5d07a6c263d5ec541c445c64f5264be"
+    },
+    {
+      "path": "org.gx.archival-fold-calibration/1.0.0",
+      "sha256": "c3e1753f0d21267ad3e3b485435d9ba9079500cc24d0b423cba3aa892bbb0585"
+    },
+    {
+      "path": "org.gx.publication-discovery/1.0.0",
+      "sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d"
     }
   ],
   "packages": [
@@ -169,6 +181,49 @@
   },
   "native_guidance": {
     "module-leads": "workflows/compat_v20/module_leads.txt"
+  },
+  "research_method_collections": {
+    "public_sources": {
+      "org.gx.arxiv-sources@1.0.0": [
+        "arxiv-search@1",
+        "arxiv-fetch@1"
+      ],
+      "org.gx.scholarly-sources@1.0.0": [
+        "scholarly-search@1",
+        "scholarly-fetch@1"
+      ]
+    },
+    "public_databases": {
+      "org.gx.pcna-archive@1.0.0": [
+        "pcna-archive-search@1",
+        "pcna-archive-fetch@1"
+      ],
+      "org.gx.yeast-enzyme-evidence@1.0.1": [
+        "yeast-reaction-index@2",
+        "yeast-uniprot-record@2",
+        "yeast-enzyme-mcp@2"
+      ]
+    },
+    "cpu_analysis": {
+      "org.gx.block-influence@2.0.0": [
+        "deposited-block-influence@2"
+      ],
+      "org.gx.block-signed@1.0.0": [
+        "deposited-block-signed@1"
+      ],
+      "org.gx.published-kinetics@1.0.0": [
+        "bglb-retrospective@1"
+      ]
+    },
+    "archived_structure": {
+      "org.gx.deposited-structure-qc@1.0.0": [
+        "deposited-backbone-qc@1",
+        "deposited-macrocycle-qc@1"
+      ],
+      "org.gx.protein@0.3.0": [
+        "deposited-chain-geometry@2"
+      ]
+    }
   },
   "default_research_module_versions": {
     "gx.evidence/6.2": {

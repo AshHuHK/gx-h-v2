@@ -54,6 +54,13 @@ def command(args, directory):
     return shlex.join(parts)
 
 
+def _same_goal(saved, requested):
+    if "discovery_policy" not in saved and "discovery_policy" in requested:
+        # Reissuing an old research command must preserve that Goal's original policy.
+        requested = {key: value for key, value in requested.items() if key != "discovery_policy"}
+    return saved == requested
+
+
 def execute(args, directory):
     from . import cli, research_report
     if args.goal_file:
@@ -74,7 +81,7 @@ def execute(args, directory):
             before = counts(conn, previous["run_id"]) if previous else {"jobs": 0, "host_turns": 0}
             if previous:
                 saved = store.loads(previous, "inputs_json")["inputs"]["p0_spec"]
-                if saved != spec:
+                if not _same_goal(saved, spec):
                     raise ValueError("This run key belongs to a different Goal specification")
             if previous and conn.execute("SELECT 1 FROM v6_goals WHERE run_id=? AND status='CLOSED'",
                                          (previous["run_id"],)).fetchone():
@@ -106,7 +113,7 @@ def execute(args, directory):
             if getattr(args, "run_id", None):
                 spec = store.loads(run, "inputs_json")["inputs"]["p0_spec"]
             operator.authorize_project(operator.local_context(conn), spec["project"])
-            if not run or store.loads(run, "inputs_json")["inputs"]["p0_spec"] != spec:
+            if not run or not _same_goal(store.loads(run, "inputs_json")["inputs"]["p0_spec"], spec):
                 raise error
             return {**cli.snapshot(conn, run["run_id"]), "driver":"another_native_client",
                     "resume_command":resume_command}

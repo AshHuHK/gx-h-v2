@@ -1,0 +1,124 @@
+{
+  "base_commit": "4759c260310dbd79b640c826371ec20aebc3b272",
+  "transport": "deterministic local Goal and graph callbacks, temporary deployments, real CPU Job executors and SQLite reopens",
+  "real_oauth_calls": 0,
+  "findings": [
+    {
+      "issue": "方法相同但提供者不同仍可套用配方",
+      "before": "兩個受准入的提供者引用相同已發行感測器程式；其中一個要求成對讀數。目標 Goal 的 portable_sha256 相同、plugin pin 不同。配方仍被錯誤展開。",
+      "baseline_failure": "AssertionError: ScopeDenied not raised",
+      "fix": "新配方保存完成 Job 的方法提供者與來源相依套件摘要。目錄、實例化與帶標記的圖節點准入使用該資訊。節點的具名決策也核對原方法參數。",
+      "regression": "test_same_method_manifest_different_registered_provider",
+      "legacy": "具備舊定義的 reference 照原欄位可重存並讀取相同 digest；未記入舊定義的 provider pin 不列為舊配方保證。"
+    },
+    {
+      "issue": "帶有純輸入綁定器的插件每次都重跑校準",
+      "before": "兩題用相同真感測器、相同 byte/環境/條件。原本僅因有 bind handler 而一律判定 run_on_target。",
+      "baseline_failure": "AssertionError: 'referenced' != 'run_on_target'",
+      "fix": "用正式 Job 一致的綁定器在唯讀環境取得實際角色、摘要及參數；需要發布中間件或無法證明的資料重新執行。刻意獨立重複仍另開 Job。",
+      "regression": "test_calibration_with_an_ordinary_read_only_binder"
+    },
+    {
+      "issue": "尚未派工的切換條件，冷恢復後可以取得之前的錯誤讀數",
+      "before": "已編譯的節點在等待中，校準 offset 從 0 改成 11。原版仍將節點標記 REUSED，指向舊校準產物。",
+      "baseline_failure": "('REUSED', 'gxa_01m8f6w8wxg7qbg4mt') instead of ('FAILED', None)",
+      "fix": "比較已釘住的小型方法資料與目前位元組，原節點保留明確失敗且沒有錯誤產物；尚未建立 Job 時也由原 Job admission 在寫事務外取摘要。",
+      "regression": [
+        "test_parked_measurement_detects_changed_calibration_asset",
+        "test_changed_data_before_first_job_admission"
+      ]
+    },
+    {
+      "issue": "同一工作區未能指紋化的可變資料在重用與准入上的歧義",
+      "before": "大型可變資料沒有可驗的內容摘要。只取消 cache 命中的初修仍被 equivalent workload 的舊 SUCCEEDED 永久擋下。",
+      "baseline_failure": "v6.node.waiting: RESOURCE_DENIED, Equivalent workload already has an owner",
+      "fix": "同時在執行的等價請求仍由既有 owner 串行；無法證明資料相同的已完成 Job 不滿足本次量測。新的實際 CPU Job 報告 corrected mean 13（原始均值 2，加新 offset 11），共兩個 Job。",
+      "regression": "test_unfingerprinted_data_runs_a_fresh_scientific_job"
+    }
+  ],
+  "test_command": "PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a .venv/bin/python -B -m unittest -v acceptance.science_plugin_blueprint.test_recipe_binding tests.test_v6_named_ports acceptance.science_capabilities.test_derived_method tests.test_v6_jobs",
+  "tests": [
+    [
+      "test_calibration_with_an_ordinary_read_only_binder",
+      "acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_calibration_with_an_ordinary_read_only_binder"
+    ],
+    [
+      "test_changed_data_before_first_job_admission",
+      "acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_changed_data_before_first_job_admission"
+    ],
+    [
+      "test_parked_measurement_detects_changed_calibration_asset",
+      "acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_parked_measurement_detects_changed_calibration_asset"
+    ],
+    [
+      "test_same_method_manifest_different_registered_provider",
+      "acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_same_method_manifest_different_registered_provider"
+    ],
+    [
+      "test_unfingerprinted_data_runs_a_fresh_scientific_job",
+      "acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_unfingerprinted_data_runs_a_fresh_scientific_job"
+    ],
+    [
+      "test_prediction_rebinds_new_material_and_controlled_repeat_survives_restart",
+      "tests.test_v6_named_ports.ModelRecipe.test_prediction_rebinds_new_material_and_controlled_repeat_survives_restart"
+    ],
+    [
+      "test_named_outputs_recover_and_preserve_original_job",
+      "tests.test_v6_named_ports.NamedOutputs.test_named_outputs_recover_and_preserve_original_job"
+    ],
+    [
+      "test_saved_recipe_pins_materials_ports_and_dependencies",
+      "tests.test_v6_named_ports.NamedOutputs.test_saved_recipe_pins_materials_ports_and_dependencies"
+    ],
+    [
+      "test_unknown_output_rejected_before_graph_or_job",
+      "tests.test_v6_named_ports.NamedOutputs.test_unknown_output_rejected_before_graph_or_job"
+    ],
+    [
+      "test_authored_method_reaches_same_goal_job_and_cited_decision",
+      "acceptance.science_capabilities.test_derived_method.DerivedMethod.test_authored_method_reaches_same_goal_job_and_cited_decision"
+    ],
+    [
+      "test_changed_calibration_runs_a_fresh_job",
+      "acceptance.science_capabilities.test_derived_method.DerivedMethod.test_changed_calibration_runs_a_fresh_job"
+    ],
+    [
+      "test_missing_keys_are_never_dropped_from_a_denominator_and_foreign_ids_do_not_count",
+      "acceptance.science_capabilities.test_derived_method.DerivedMethod.test_missing_keys_are_never_dropped_from_a_denominator_and_foreign_ids_do_not_count"
+    ],
+    [
+      "test_compiled_request_cannot_change_and_branch_cap_rolls_back_reservation",
+      "tests.test_v6_jobs.DynamicJobs.test_compiled_request_cannot_change_and_branch_cap_rolls_back_reservation"
+    ],
+    [
+      "test_lost_launch_ack_reopens_original_job_and_reuses_verified_result",
+      "tests.test_v6_jobs.DynamicJobs.test_lost_launch_ack_reopens_original_job_and_reuses_verified_result"
+    ],
+    [
+      "test_new_compute_requires_an_affordable_branch_and_cache_hit_does_not_spend",
+      "tests.test_v6_jobs.DynamicJobs.test_new_compute_requires_an_affordable_branch_and_cache_hit_does_not_spend"
+    ],
+    [
+      "test_recovered_evidence_binds_both_graph_nodes_to_the_original_job",
+      "tests.test_v6_jobs.DynamicJobs.test_recovered_evidence_binds_both_graph_nodes_to_the_original_job"
+    ],
+    [
+      "test_withdraw_after_admission_prevents_launch",
+      "tests.test_v6_jobs.DynamicJobs.test_withdraw_after_admission_prevents_launch"
+    ],
+    [
+      "test_withdraw_between_compile_and_admission_keeps_other_node",
+      "tests.test_v6_jobs.DynamicJobs.test_withdraw_between_compile_and_admission_keeps_other_node"
+    ]
+  ],
+  "result": "18/18 PASS, 18.985s",
+  "reviewed_file_sha256": {
+    "gx-h/gx_core/p0/v6_recipes.py": "15b2f532496cf10feb2271bc7a2b4b329ee449bf2ef1b6b04a3bb8ff2444d555",
+    "gx-h/gx_core/p0/v6_jobs.py": "f0142dc3fde21af991484618a87c90c83138655b2e404342ef6c5956ac1c56e1",
+    "gx-h/gx_core/jobs/service.py": "21d9e964e151af2d8971a34f0aa340a1a53ced279fc1edcabbb219344d50d5f9",
+    "gx-h/gx_core/p0/v6_graph.py": "2d4e8318d46edd26028b1216363ffe76ca36af06e716db3a09fe7ecc575def5b",
+    "gx-h/gx_core/p0/catalog_resources.py": "39cb57e0703781f6d14a1656254d5eacba4f5fb31d9c37f3b5093d8d0a797869",
+    "acceptance/science_plugin_blueprint/test_recipe_binding.py": "12b7d0b2602cf82ca9990505247d8a769169da87903ef01c9a83c150d127cd96"
+  },
+  "limits": "Workspace-local recipes; unknown mutable data prevents cached result reuse. Byte checks cover planned versus observed admission/reuse; no filesystem snapshot of externally mutable mounts during worker execution."
+}

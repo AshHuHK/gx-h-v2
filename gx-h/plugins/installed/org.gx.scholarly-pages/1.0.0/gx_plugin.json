@@ -1,0 +1,40 @@
+{
+  "id": "org.gx.scholarly-pages",
+  "version": "1.0.0",
+  "api_version": "1.0",
+  "kind": "bundle",
+  "entrypoint": "plugin:register",
+  "gx_compat": ">=3.0,<4.0",
+  "dependencies": [
+    {
+      "id": "org.gx.scholarly-sources",
+      "version": "1.0.0"
+    }
+  ],
+  "extensions": [
+    {
+      "id": "scholarly-page-search",
+      "contract": "capability",
+      "version": "1.0"
+    },
+    {
+      "id": "scholarly-page-fetch",
+      "contract": "capability",
+      "version": "1.0"
+    },
+    {
+      "id": "paged-literature-methods",
+      "contract": "goal_method",
+      "version": "1.0"
+    },
+    {
+      "id": "scholarly_page_investigation",
+      "version": "1",
+      "contract": "research_module"
+    }
+  ],
+  "description": "Follow actual Europe PMC and Crossref result pages and read a selected open original.",
+  "labels": {
+    "gx_capability_collections": "public_sources"
+  }
+}

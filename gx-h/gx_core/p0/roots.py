@@ -583,8 +583,20 @@ class Roots:
                     if packet.get("evidence_policy") == v621_policy.VERSION else v6_native.INSTRUCTIONS)
                 if any(tool["name"] == v62_native.OPEN for tool in tools):
                     params["developerInstructions"] += v62_native.LEAD_INSTRUCTIONS
+                    if packet.get("catalog_discovery"):
+                        params["developerInstructions"] += (
+                            " Read researcher_message for the author's exact words, limitations and next step, or "
+                            "open report_ref for the full researcher_statement. GX partials carry execution facts. "
+                            "Use independent source review when a consequential conflict or claim could change the route: "
+                            "give another Codex the original and released extraction (if available) for an independent "
+                            "gx_review_evidence verdict. Inspect the reasons and record which condition or action "
+                            "changed and why. Compare controls and coverage; "
+                            "count duplicate interfaces to one original once. Choose the depth by decision impact.")
                 if packet.get("research_evidence_version"):
                     params["developerInstructions"] += v6_native.EVIDENCE_INSTRUCTIONS
+            if "catalog_discovery" in packet:
+                from . import catalog_survey
+                params["developerInstructions"] += " " + catalog_survey.INSTRUCTION
             if packet.get("evidence_policy") in v621_policy.GOVERNED:
                 params["developerInstructions"] += (
                     " For a numbered finding from a measurement with declared metrics, cite its output and "
@@ -1197,7 +1209,8 @@ class Roots:
                         self._artifact_access(row, args["ref"])
                     return json.loads(receipt["result_json"])
                 self.heartbeats.observed(tid, turn)
-                if module and tool in ("gx_task_context", "gx_read_artifact"):
+                from . import research_handoff
+                if module and tool in ("gx_task_context", "gx_read_artifact", research_handoff.HINT):
                     def read(arguments):
                         if tool == "gx_read_artifact":
                             return self._read_artifact(row, arguments)

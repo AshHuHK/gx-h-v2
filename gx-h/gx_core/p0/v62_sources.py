@@ -34,13 +34,29 @@ def tool_specs():
     return [contracts.native_goal_tool_spec(name) for name in TOOL_NAMES]
 
 
+def source_spec(name, *, searchable=False):
+    spec = contracts.native_goal_tool_spec(name)
+    if name != READ or not searchable:
+        return spec
+    schema = spec["inputSchema"]
+    return {**spec, "description": spec["description"] +
+            " For a long original, list matching paragraph locators using query (a literal word or phrase), "
+            "then read a selected segment_id for its exact words and receipt.",
+            "inputSchema": {**schema, "properties": {**schema["properties"],
+                "query": {"type":"string","minLength":1,"maxLength":160}}}}
+
+
 def _sha(text):
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
 
-def _blocks(raw, fmt):
+def _blocks(raw, fmt, *, metadata=None):
     if fmt == 'jats':
         root = published_documents.jats_article(raw)
+        if metadata is not None:
+            identifiers = published_documents.article_identifiers(root)
+            if identifiers:
+                metadata["publication_identifiers"] = sorted(identifiers)
         def name(node):
             return node.tag.rsplit('}', 1)[-1]
         blocks = []
@@ -113,9 +129,9 @@ def document_index(raw, fmt):
     elif fmt == 'json':
         coverage, blocks, details = published_documents.json_blocks(raw)
     else:
-        coverage, blocks = _blocks(raw, fmt)
         details = ({'scope': 'JATS article text; figures and supplementary files require separate reads.'}
                    if fmt == 'jats' else {})
+        coverage, blocks = _blocks(raw, fmt, metadata=details)
     segments = []
     for paragraph, (kind, label, text) in enumerate(blocks, 1):
         start, part = 0, 1
@@ -241,6 +257,18 @@ def _pin(src):
 
 def _read(conn, src, args, identity):
     sid = src['source_id']
+    if 'query' in args:
+        if 'segment_id' in args:
+            raise SchemaInvalid('query finds candidate paragraphs; read a named segment separately')
+        start = min(args.get('start', 0), src['segments_count'])
+        sql = """SELECT segment_id,label,kind,char_count,ordinal FROM source_segments WHERE source_id=?
+            AND ordinal>=? AND (instr(lower(label),lower(?))>0 OR instr(lower(text),lower(?))>0)
+            ORDER BY ordinal LIMIT ?"""
+        needle = args['query'].strip()
+        rows = conn.execute(sql, (sid,start,needle,needle,PAGE+1)).fetchall()
+        return {**_pin(src), 'query':needle, 'segments':[{k:r[k] for k in ('segment_id','label','kind','char_count','ordinal')}
+            for r in rows[:PAGE]], 'segments_count':src['segments_count'],
+            'next_start':rows[PAGE]['ordinal'] if len(rows)>PAGE else None}
     if 'segment_id' not in args:
         start = min(args.get('start', 0), src['segments_count'])
         rows = conn.execute('SELECT segment_id,label,kind,char_count FROM source_segments '
@@ -372,15 +400,32 @@ def _extract(conn, src, args, identity, cursor, permitted_targets):
             'found_in':elsewhere, 'scope':identity['scope']}
 
 
+def receipt_turns(conn, run_id, thread, turn):
+    """Only acknowledged GX resumptions inherit source receipts on the same native thread."""
+    rows = conn.execute("""
+        WITH RECURSIVE lineage(turn_id) AS (
+            SELECT ?
+            UNION
+            SELECT prior.turn_id FROM lineage
+            JOIN p0_root_deliveries child ON child.run_id=? AND child.thread_id=? AND child.turn_id=lineage.turn_id
+            JOIN p0_root_deliveries prior ON prior.run_id=child.run_id AND prior.thread_id=child.thread_id
+                AND prior.turn_id=substr(child.event_id,8) AND prior.rowid<child.rowid
+            WHERE child.method='turn/start' AND prior.method='turn/start'
+                AND child.state='acknowledged' AND prior.state='acknowledged' AND substr(child.event_id,1,7)='resume:'
+        ) SELECT turn_id FROM lineage""", (turn,run_id,thread))
+    return {row[0] for row in rows}
+
+
 def decision_citations(conn, task, lease, thread, turn, candidates):
     """Return source records actually delivered by this assignment's native evidence tools."""
     if not candidates:
         return set()
+    turns = receipt_turns(conn, task["run_id"], thread, turn)
     rows = conn.execute("""SELECT a.artifact_ref FROM p0_root_calls c
         JOIN p0_v6_native_calls n USING(thread_id,call_id,turn_id)
         JOIN p0_roots r ON r.thread_id=c.thread_id
         JOIN artifacts a ON a.artifact_ref=json_extract(c.result_json,'$.artifact_ref')
-        WHERE c.thread_id=? AND c.turn_id=? AND r.run_id=? AND r.task_id=? AND r.lease_id=?
+        WHERE c.thread_id=? AND c.turn_id IN (SELECT value FROM json_each(?)) AND r.run_id=? AND r.task_id=? AND r.lease_id=?
         AND a.run_id=r.run_id AND a.task_id=r.task_id AND a.published=1
         AND json_extract(c.result_json,'$.accepted')=1
         AND json_extract(c.result_json,'$.scope')=?
@@ -389,11 +434,11 @@ def decision_citations(conn, task, lease, thread, turn, candidates):
           OR (json_extract(n.request_json,'$.tool')=? AND a.kind=?
               AND a.artifact_ref=json_extract(c.result_json,'$.review_ref')))
         AND a.artifact_ref IN (SELECT value FROM json_each(?))""",
-        (thread, turn, task["run_id"], task["task_id"], lease, task["scope"],
+        (thread, ids.canonical_json(sorted(turns)), task["run_id"], task["task_id"], lease, task["scope"],
          EXTRACT, EXTRACTION, REVIEW, REVIEW_RECORD, ids.canonical_json(sorted(candidates))))
     from . import v62_catalog
     owned = {row[0] for row in rows}
-    return owned | v62_catalog.method_citations(conn, task, lease, thread, turn, candidates - owned)
+    return owned | v62_catalog._returned_method_citations(conn, task, lease, thread, turns, candidates - owned)
 
 
 def _owned(conn, run_id, ref, *, cursor=None):
@@ -504,7 +549,9 @@ def call_tool(conn, tool, payload, *, run_id, task_id, lease_id, thread_id, turn
     from ..errors import OutcomeUnknown
     if tool not in TOOL_NAMES:
         raise SchemaInvalid('Unknown source-evidence tool')
-    errors = schema.validate(payload, contracts.native_goal_tool_spec(tool)['inputSchema'])
+    from . import research_handoff
+    searchable = isinstance(payload, dict) and 'query' in payload and research_handoff.active(conn, run_id)
+    errors = schema.validate(payload, source_spec(tool, searchable=searchable)['inputSchema'])
     if errors:
         raise SchemaInvalid(', '.join(errors[:4]))
     if any(isinstance(v, str) and not v.strip() or type(v) is int and v < 0 for v in payload.values()):

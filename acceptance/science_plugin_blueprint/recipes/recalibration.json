@@ -1,0 +1,247 @@
+{
+  "run_id": "gxr_01m8f7aq2qpz00wa1p",
+  "provider": "scripted_native_transport",
+  "model_calls": 0,
+  "source": {
+    "char_offset": 356,
+    "line": 3,
+    "quote": "an asynchronous job API service to map the identifiers of one database to another",
+    "sha256": "f23a87f93ecbf754d3448ac1370a6b959d41ee6048ad9c0013de0165ec36b615"
+  },
+  "method": "record-coverage-8902880ed9d712bf6baa5899@1",
+  "plugin": {
+    "id": "org.gx.record-coverage-8902880ed9d712bf6baa5899",
+    "version": "1.0.0",
+    "path": "org.gx.record-coverage-8902880ed9d712bf6baa5899/1.0.0",
+    "sha256": "b4bcef57d78bf4ed151427e647f95394a8e8314c77b1e1c1998fdfe55a92dd2d"
+  },
+  "builder_job": "gxj_01m8f7aq6asfj8zqz2",
+  "build_ref": "gxa_01m8f7aqj46ys0rnkk",
+  "execution_job": "gxj_01m8f7aqnzt1yktnt0",
+  "measurement_ref": "gxa_01m8f7ar1vdy6nz5f6",
+  "reading": {
+    "numerator": 2,
+    "denominator": 3,
+    "coverage": 0.6666666666666666,
+    "unit": "fraction of unique cohort IDs",
+    "covered_ids": [
+      "P32356",
+      "P48016"
+    ],
+    "matched_without_value": [
+      "P35172"
+    ],
+    "unmatched_ids": [],
+    "outside_cohort_ids": [],
+    "cohort_rows": 3,
+    "evidence_rows": 4,
+    "schema": "gx.record-coverage/1",
+    "method": "record-coverage-8902880ed9d712bf6baa5899@1",
+    "source": {
+      "char_offset": 356,
+      "line": 3,
+      "quote": "an asynchronous job API service to map the identifiers of one database to another",
+      "sha256": "f23a87f93ecbf754d3448ac1370a6b959d41ee6048ad9c0013de0165ec36b615"
+    },
+    "cohort_sha256": "69e8b6e540acc9e7ecd12fbd364e0923f667d9ba01c77876880574e643d297c6",
+    "evidence_sha256": "416c1106cbf26257dc31f318d5598ea70a28600b07a56bce1b5372c34ec1265e"
+  },
+  "cited_decision_ref": "gxa_04806ba5417ecedc60b2d333b624cb4309f635f6f8c23da2277f6af02d2638b7",
+  "calibration": {
+    "empty_cohort_rejected": "Empty declared cohort; the evidence coverage denominator is undefined",
+    "independent_hand_count": {
+      "covered_ids": [
+        "A",
+        "D"
+      ],
+      "denominator": 4,
+      "matched_without_value": [
+        "B"
+      ],
+      "numerator": 2,
+      "outside_cohort_ids": [
+        "EXTERNAL"
+      ],
+      "unmatched_ids": [
+        "C"
+      ]
+    },
+    "measured": {
+      "covered_ids": [
+        "A",
+        "D"
+      ],
+      "denominator": 4,
+      "matched_without_value": [
+        "B"
+      ],
+      "numerator": 2,
+      "outside_cohort_ids": [
+        "EXTERNAL"
+      ],
+      "unmatched_ids": [
+        "C"
+      ]
+    }
+  },
+  "saved_recipe": {
+    "kind": "recipe",
+    "reference": "accession-evidence-coverage@1",
+    "digest": "70e7916876c59be9477d9540e0e2b758868f947e65ac1c6a303d3ed56112bf40",
+    "title": "Located papers per accession",
+    "id_alignment": "Case-sensitive Swiss-Prot accession",
+    "missing_values": "A null pointer or absent match stays in the population.",
+    "units": "Fraction of unique cohort accessions",
+    "inputs": {
+      "cohort": {
+        "kind": "run_input",
+        "media_type": null
+      },
+      "evidence": {
+        "kind": "run_input",
+        "media_type": null
+      },
+      "method_source": {
+        "kind": "run_input",
+        "media_type": null
+      }
+    },
+    "methods": {
+      "coverage": "record-coverage-8902880ed9d712bf6baa5899@1",
+      "setup": "derive-record-coverage@1"
+    },
+    "method_pins": {
+      "record-coverage-8902880ed9d712bf6baa5899@1": "cf45433b267480075c90d0ff8a5d24eee8d0c79c9e514a6a2a5529bdd5e53981",
+      "derive-record-coverage@1": "107a5d091ed872380a05f7f1fb311ee99cdf171d6d1970746a33431080f469b4"
+    },
+    "outputs": {
+      "coverage": [
+        {
+          "name": "coverage.json",
+          "kind": "record_coverage",
+          "nature": "analysis",
+          "source_roles": [
+            "cohort",
+            "evidence"
+          ]
+        }
+      ],
+      "setup": [
+        {
+          "name": "method-spec.json",
+          "kind": "derived_record_method",
+          "nature": "analysis",
+          "source_roles": [
+            "source"
+          ]
+        }
+      ]
+    },
+    "decision_point": {
+      "step": "coverage",
+      "output": "coverage.json",
+      "question": "Which sources can resolve the remaining evidence gap?",
+      "actions": [
+        "inspect linked papers",
+        "seek independent originals"
+      ],
+      "stop_condition": "The available cohort has been accounted for.",
+      "role": "run_lead",
+      "event": "job_settled"
+    },
+    "calibration": {
+      "step": "setup",
+      "scope": "Accession-level source coverage; case-sensitive identifiers"
+    },
+    "provider_pins": {
+      "record-coverage-8902880ed9d712bf6baa5899@1": {
+        "plugin": {
+          "id": "org.gx.record-coverage-8902880ed9d712bf6baa5899",
+          "sha256": "b4bcef57d78bf4ed151427e647f95394a8e8314c77b1e1c1998fdfe55a92dd2d",
+          "version": "1.0.0"
+        },
+        "closure": [
+          {
+            "id": "org.gx.record-coverage-8902880ed9d712bf6baa5899",
+            "sha256": "b4bcef57d78bf4ed151427e647f95394a8e8314c77b1e1c1998fdfe55a92dd2d",
+            "version": "1.0.0"
+          }
+        ]
+      },
+      "derive-record-coverage@1": {
+        "plugin": {
+          "id": "org.gx.record-method-builder",
+          "sha256": "bd50dc3cce08e0c33689458b06b075b67857f4c4e20ee985fe56f6a5a6ac9eaf",
+          "version": "1.0.0"
+        },
+        "closure": [
+          {
+            "id": "org.gx.record-method-builder",
+            "sha256": "bd50dc3cce08e0c33689458b06b075b67857f4c4e20ee985fe56f6a5a6ac9eaf",
+            "version": "1.0.0"
+          }
+        ]
+      }
+    }
+  },
+  "successor": {
+    "run_id": "gxr_01m8f7ar895dvzj2b5",
+    "job_id": "gxj_01m8f7arvmcrf8v04b",
+    "reading": {
+      "numerator": 0,
+      "denominator": 1,
+      "coverage": 0.0,
+      "unit": "fraction of unique cohort IDs",
+      "covered_ids": [],
+      "matched_without_value": [
+        "P00724"
+      ],
+      "unmatched_ids": [],
+      "outside_cohort_ids": [],
+      "cohort_rows": 1,
+      "evidence_rows": 1,
+      "schema": "gx.record-coverage/1",
+      "method": "record-coverage-8902880ed9d712bf6baa5899@1",
+      "source": {
+        "char_offset": 356,
+        "line": 3,
+        "quote": "an asynchronous job API service to map the identifiers of one database to another",
+        "sha256": "f23a87f93ecbf754d3448ac1370a6b959d41ee6048ad9c0013de0165ec36b615"
+      },
+      "cohort_sha256": "3d5e08fc6069eb315475f582d0c080669182c35c0bc44c8f4e316399fa36561e",
+      "evidence_sha256": "8e1812504bee34dde6fed3f3dc2709c7e5072512ccfb17b5574ef05dd566e6d7"
+    },
+    "output_ref": "gxa_01m8f7as7k3tnv386v",
+    "decision_point": {
+      "actions": [
+        "inspect linked papers",
+        "seek independent originals"
+      ],
+      "digest": "70e7916876c59be9477d9540e0e2b758868f947e65ac1c6a303d3ed56112bf40",
+      "event": "job_settled",
+      "evidence": {
+        "artifact_ref": "gxa_01m8f7as7k3tnv386v",
+        "kind": "record_coverage",
+        "nature": "analysis",
+        "output_name": "coverage.json",
+        "sha256": "aa0c4da36278ca8d9faa9c0909a079bc9d873cb6285e7ed92c83998062a36a3c"
+      },
+      "job_id": "gxj_01m8f7arvmcrf8v04b",
+      "node_id": "node_a54e082f654244b413b9d418d63f1db5",
+      "output": "coverage.json",
+      "question": "Which sources can resolve the remaining evidence gap?",
+      "recipe": "accession-evidence-coverage@1",
+      "role": "run_lead",
+      "state": "read_and_decide",
+      "step": "coverage",
+      "stop_condition": "The available cohort has been accounted for."
+    },
+    "calibration": {
+      "step": "setup",
+      "status": "run_on_target",
+      "scope": "Accession-level source coverage; case-sensitive identifiers"
+    },
+    "cited_decision_ref": "gxa_a3e4e7d5c44bc76070713b16c5bea60b415885be407180430e1ddf87e80c210a",
+    "recipe_digest": "70e7916876c59be9477d9540e0e2b758868f947e65ac1c6a303d3ed56112bf40"
+  }
+}

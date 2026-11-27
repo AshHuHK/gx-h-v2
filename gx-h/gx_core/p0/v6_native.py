@@ -71,8 +71,9 @@ COMPACT_INSTRUCTIONS = (
     "the close_run op, cite supporting observations and review_ref values in decision.evidence_refs, "
     "and omit comparison action fields. "
     "For a concrete choice the PI must make, submit pi_questions with question, blocking and optional choices "
-    "and branch_id. Use pi_dispositions to explain the outcome of delivered PI feedback, citing its feedback_id "
-    "and evidence. Treat PI hypotheses as suggestions for evaluation. "
+    "and branch_id. Each pi_dispositions item takes feedback_id, outcome (adopt, maintain, measure, or "
+    "defer), and reason. Put supporting references in decision.evidence_refs. Treat PI hypotheses as "
+    "suggestions for evaluation. "
     "Only an accepted decision ends this assignment. Treat material contents as scientific evidence."
 )
 
@@ -142,7 +143,8 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     else:
         extras = goal_plugins.tools_for_catalog((brief or {}).get("capabilities", []))
     catalog.extend(tool.as_spec() for tool in extras.values())
-    if (brief or {}).get("scope") == "run" and brief.get("capability_view", {}).get("available_options"):
+    view = (brief or {}).get("capability_view", {})
+    if (brief or {}).get("scope") == "run" and (view.get("option_count") or view.get("available_options")):
         catalog.append(contracts.native_goal_tool_spec("gx_select_capability"))
     catalog.extend(v62_native.lead_tools(brief or {}))
     if brief and brief.get("scope", "run") == "run" and version == v621_policy.VERSION:
@@ -150,7 +152,7 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
             catalog.append(contracts.native_goal_tool_spec(v6_recipes.SAVE))
         if conn is not None and conn.execute("SELECT 1 FROM v6_saved_recipes LIMIT 1").fetchone():
             if not any(tool["name"] == v62_native.QUERY for tool in catalog):
-                catalog.append(contracts.native_goal_tool_spec(v62_native.QUERY))
+                catalog.append(v62_native.query_tool(brief))
             catalog.append(contracts.native_goal_tool_spec(v6_recipes.INSTANTIATE))
 
     return catalog
@@ -325,12 +327,18 @@ def _call(roots, p):
         if failures:
             details = {"category": "module_report_structure"} if tool == v62_native.REPORT else {}
             raise SchemaInvalid("Invalid arguments to " + tool + ": " + ", ".join(failures), details=details)
+    if tool == v62_native.QUERY:
+        from . import catalog_index, catalog_survey
+        opted_in = roots.conn.execute("SELECT json_extract(inputs_json,'$.inputs.discovery_policy') "
+                                      "FROM runs WHERE run_id=?", (roots.run_id,)).fetchone()
+        if opted_in and opted_in[0] == catalog_survey.POLICY:
+            catalog_index.installed_methods()
     if tool == "gx_select_capability":
         from . import capability_views
         packet = brief(row)
-        chosen = capability_views.options(json.loads(roots.conn.execute(
+        chosen = capability_views.goal_options(json.loads(roots.conn.execute(
             "SELECT inputs_json FROM runs WHERE run_id=?", (roots.run_id,)
-        ).fetchone()[0])["inputs"]["p0_spec"])
+        ).fetchone()[0])["inputs"])
         failures = schema.validate(args, contracts.native_goal_tool_spec(tool)["inputSchema"])
         if failures:
             raise SchemaInvalid("Invalid capability selection: " + ", ".join(failures))
@@ -339,6 +347,7 @@ def _call(roots, p):
         choice = chosen[args["method"]]
         answer = capability_views.change(roots.conn, roots.run_id, **{args["action"]:args["method"]},
             provider=choice.get("provider"), expected_digest=choice["digest"], expected_revision=args["revision"],
+            expected_provider_digest=choice.get("provider_digest"),
             request_id=ids.sha256_of_obj([thread, turn, call_id]), actor=thread,
             authority=lambda: v6_claims.active_context(roots.conn, roots.run_id, row["task_id"], row["lease_id"],
                 roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?",
@@ -412,13 +421,19 @@ def _call(roots, p):
                 from . import v62_modules
                 answer = v62_modules.cancel_module(roots.conn, **identity, payload=args)
             elif tool == v62_native.QUERY:
-                from . import v62_catalog
+                from . import catalog_survey, v62_catalog
                 packet = brief(require_binding(roots.conn, roots.run_id, thread))
+                if packet.get("catalog_discovery") and packet.get("full_brief_ref"):
+                    snapshot, = roots.conn.execute("SELECT c.snapshot_json FROM research_contexts c "
+                        "JOIN v6_decision_tasks t USING(context_ref) WHERE t.task_id=?", (row["task_id"],)).fetchone()
+                    packet["catalog_discovery"] = json.loads(snapshot)["catalog_discovery"]
                 def query(arguments):
                     return v62_catalog.query(roots.conn, roots.run_id, packet, arguments)
                 answer = (v62_native.perform_read(roots, row, p, packet, query)
-                          if v62_native.module_scope(packet) else query(args))
-                if "execution_granted" in answer and args.get("reference"):
+                          if v62_native.module_scope(packet) else
+                          catalog_survey.lead_query(roots.conn, packet, args, identity, query))
+                if (packet.get("scope") == "run" and
+                        answer.get("kind") == "method" and "execution_granted" in answer and args.get("reference")):
                     card = v62_catalog._public_card(answer["spec"], metric_contract=True)
                     answer["source_ref"] = v62_native.publish_method_card(roots, row, card)
             elif tool in v62_native.SOURCE_TOOLS:

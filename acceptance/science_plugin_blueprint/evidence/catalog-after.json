@@ -1,0 +1,1594 @@
+{
+  "source_sha256": {
+    "gx-h/config/workflow_packages.json": "16c09ee7575a04ee9d2eb6d2d771659b65847981dcb42098bf4ffa0f831917b5",
+    "gx-h/config/research_asset_cards.json": "2d8ac2863ee4b9f20aa4a72ae0915c852ee254e557e9e87a3b924b2fba24898d",
+    "gx-h/contracts/mcp_tools.json": "1389edba89399aa3665110801edb0d4df79957542d5c0f8acbfd2a6be83cf2db",
+    "gx-h/gx_core/p0/v62_catalog.py": "15f2ff01b25b738463f0d6ca642879705a8b5cf1db46c3e749d55bea132f3339",
+    "gx-h/gx_core/p0/catalog_resources.py": "bac131833d814a90063255cf9690ca415df15fd4a9bcff6ce53ca364fb139d0b",
+    "gx-h/gx_core/p0/catalog_index.py": "68fd1f603bece7094cffcca3fc2cce6871fed7a657a797326406601d900fecd2"
+  },
+  "policy_opt_in": true,
+  "version": "4759c260310dbd79b640c826371ec20aebc3b272",
+  "transport": "gx-p0 start; controlled native callback; no external jobs or model calls",
+  "experiments": [
+    {
+      "run_id": "gxr_01m8f5y87p2f9kckjh",
+      "grant": {
+        "evidence_policy": "gx.evidence/6.2.4",
+        "research_effort": "deep",
+        "research_modules": [],
+        "plugins": [
+          "org.gx.scholarly-sources@1.0.0"
+        ],
+        "capabilities": [
+          "scholarly-search@1",
+          "scholarly-fetch@1"
+        ],
+        "capability_options": [],
+        "input_files": [],
+        "capability_collections": []
+      },
+      "thread": "script-gxl_01m8f5y8dk3cjxpvzz",
+      "tools": [
+        "gx_task_context",
+        "gx_read_artifact",
+        "gx_decide_revision",
+        "gx_stage_claim",
+        "gx_query_catalog",
+        "gx_read_source",
+        "gx_extract_evidence",
+        "gx_review_evidence"
+      ],
+      "results": [
+        {
+          "call": "probe-0",
+          "arguments": {
+            "kind": "method"
+          },
+          "answer": {
+            "kind": "method",
+            "items": [
+              {
+                "reference": "bglb-retrospective@1",
+                "kind": "method",
+                "category": "published_kinetics_retrospective",
+                "status": "catalog_only",
+                "digest": "746ea82c08978e7702bdb645fd1109381ab42f4913136d5cb37e465081419087",
+                "provider": "org.gx.published-kinetics@1.0.0",
+                "capability_version": "bglb-retrospective@1",
+                "cost_class": "local_cpu",
+                "purpose": "Evaluate the rank and coverage of a fixed archived score against published pNPG catalytic efficiencies.",
+                "input_roles": [
+                  "conservation",
+                  "kinetics"
+                ],
+                "output_names": [
+                  "summary.json",
+                  "records.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: public, records, report, coverage",
+                "limitations": "Original BglB pNPG panel; S3 covers a selected subset. Holdout is a repeatable retrospective partition of public data, with no external validation.",
+                "kinds": [
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "conservation",
+                    "kinetics"
+                  ]
+                }
+              },
+              {
+                "reference": "social-source-intake@1",
+                "kind": "method",
+                "category": "community_source_intake",
+                "status": "catalog_only",
+                "digest": "4e2c3cdd0bd1cb6473333985ed2b3f3a717a0c1da717fb121104f02fe1e9a4be",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "social-source-intake@1",
+                "cost_class": "local_cpu",
+                "purpose": "Register a PI-supplied WeChat article or Xiaohongshu note as a community lead.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "community-lead.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: supplied, public, records, report",
+                "limitations": "Link-only input has no observed text. Community content can motivate follow-up and cannot substantiate an experiment independently.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "deposited-block-influence@1",
+                "kind": "method",
+                "category": "coordinate_geometry",
+                "status": "catalog_only",
+                "digest": "0e88a493cfa80d50b6b6fe1a9ceaeb6b8eafc4ba95b7aa2a32d802903bb436d7",
+                "provider": "org.gx.block-influence@1.0.0",
+                "capability_version": "deposited-block-influence@1",
+                "cost_class": "local_cpu",
+                "purpose": "Quantify within-mask influence on reported chain-pair geometry.",
+                "input_roles": [
+                  "structure"
+                ],
+                "output_names": [
+                  "block-influence.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: report, measured, coverage",
+                "limitations": "Descriptive sensitivity on common observed positions only. Fits with insufficient data or non-unique rotations have no numeric value. Geometric sensitivity alone does not establish function, frequency",
+                "kinds": [
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "structure"
+                  ]
+                }
+              },
+              {
+                "reference": "mapped-structure-agreement@1",
+                "kind": "method",
+                "category": "mapped_coordinate_agreement",
+                "status": "catalog_only",
+                "digest": "66f4741f70fb552aa9ebefb9194752620c043074ba14a482dc6d1f5febec2167",
+                "provider": "org.gx.archival-fold-calibration@1.0.0",
+                "capability_version": "mapped-structure-agreement@1",
+                "cost_class": "local_cpu",
+                "purpose": "Measure model-1 C-alpha coordinate agreement with the supplied reference.",
+                "input_roles": [
+                  "mapping",
+                  "prediction",
+                  "reference"
+                ],
+                "output_names": [
+                  "agreement.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: supplied, report, coverage",
+                "limitations": "Equal-weight structural similarity over mapped positions only. Ambiguous sites cause an error. Missing coordinates reduce coverage.",
+                "kinds": [
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "mapping",
+                    "prediction",
+                    "reference"
+                  ]
+                }
+              },
+              {
+                "reference": "scholarly-page-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "486c9c24aa8148e9a0bba29e7bc06480f78c7ed47c28a60e3f89a64dd891f042",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: public, records, coverage",
+                "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can shar",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "scholarly-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "available",
+                "digest": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "context: public, records",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "available",
+                "digest": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Find indexed publications with an investigator-selected query and identify open full-text candidates.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "context: public, records",
+                "limitations": "Covers one ranked page per provider. Empty and unavailable sources have different statuses. Bibliographic matches are leads, not experimental observations. The catalogues can index the same publicatio",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "archived-fold-calibration@1",
+                "kind": "method",
+                "category": "archival_fold_calibration",
+                "status": "catalog_only",
+                "digest": "a6c47ec541c39c089d46bf4173d7dd7bfd60a193fbbe3cd778695c01f4aa0be7",
+                "provider": "org.gx.archival-fold-calibration@1.0.0",
+                "capability_version": "archived-fold-calibration@1",
+                "cost_class": "gpu",
+                "purpose": "Predict the observed fragment for comparison with a separately supplied reference.",
+                "input_roles": [
+                  "specimen"
+                ],
+                "output_names": [
+                  "model.cif",
+                  "inference.json",
+                  "TERMS_OF_USE.md"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: supplied, public",
+                "limitations": "Only the archived byte-identified specimen is accepted. Predictions are computed coordinates.",
+                "kinds": [
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "specimen"
+                  ]
+                }
+              },
+              {
+                "reference": "arxiv-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "catalog_only",
+                "digest": "a7077a6eb3edb0e905a8181038448fd4efa9aae354fe877314fe890a7674266f",
+                "provider": "org.gx.arxiv-sources@1.0.0",
+                "capability_version": "arxiv-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Read the exact PDF revision that the indexed arXiv search returned.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.pdf",
+                  "acquisition.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: public, records",
+                "limitations": "Versioned PDF links from the selected search only, up to 32 MiB. Embedded-text page extraction can miss figures or reading order. Snapshot binding does not establish scientific validity or publication",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "arxiv-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "4b83a31f276d8e83e2d0c506e6275542ac57b183e9aafe4588e766b204fff2c7",
+                "provider": "org.gx.arxiv-sources@1.0.0",
+                "capability_version": "arxiv-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Locate publications in the public arXiv catalogue using investigator-selected field queries.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: public, records",
+                "limitations": "First ranked page of at most eight records. Missing fields, a valid empty feed and an unavailable upstream are distinct. A metadata hit supports discovery only.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "deposited-backbone-qc@1",
+                "kind": "method",
+                "category": "deposited_structure_quality_control",
+                "status": "catalog_only",
+                "digest": "2e93f4d6cb3c175f00c3183d5615980e2635fabb30e5c6d0585b10b517dd1ee9",
+                "provider": "org.gx.deposited-structure-qc@1.0.0",
+                "capability_version": "deposited-backbone-qc@1",
+                "cost_class": "local_cpu",
+                "purpose": "Describe topology or coordinate representation in one known deposited chain.",
+                "input_roles": [
+                  "structure"
+                ],
+                "output_names": [
+                  "qc.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: report, coverage",
+                "limitations": "Single polypeptide label chain; no microheterogeneity or alternate coordinates. Geometry describes deposited models. A missing coordinate does not establish an absent residue.",
+                "kinds": [
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "structure"
+                  ]
+                }
+              },
+              {
+                "reference": "deposited-block-reading@1",
+                "kind": "method",
+                "category": "coordinate_geometry",
+                "status": "catalog_only",
+                "digest": "7be588a3e9d0126886fe20dfe8ee8d6a40f217c4ae0028d10684bb093daef6bb",
+                "provider": "org.gx.block-influence@1.0.0",
+                "capability_version": "deposited-block-reading@1",
+                "cost_class": "local_cpu",
+                "purpose": "Quantify within-mask influence on reported chain-pair geometry.",
+                "input_roles": [
+                  "table"
+                ],
+                "output_names": [
+                  "cell.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: report, measured",
+                "limitations": "Descriptive sensitivity on common observed positions only. Fits with insufficient data or non-unique rotations have no numeric value. Geometric sensitivity alone does not establish function, frequency",
+                "kinds": [
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "table"
+                  ]
+                }
+              },
+              {
+                "reference": "deposited-chain-geometry@1",
+                "kind": "method",
+                "category": "coordinate_geometry",
+                "status": "catalog_only",
+                "digest": "91840fdb7cac9024e0e8b9374e36afc94b7149e100da3b0bfd4278c08a754249",
+                "provider": "org.gx.protein@0.2.0",
+                "capability_version": "deposited-chain-geometry@1",
+                "cost_class": "local_cpu",
+                "purpose": "Describe the effect of atom selection on observed chain-pair geometry.",
+                "input_roles": [
+                  "structure"
+                ],
+                "output_names": [
+                  "geometry.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: report, coverage",
+                "limitations": "Comparisons within the asymmetric unit of two deposited structures from one crystallographic study; the method does not estimate population variance or functional properties.",
+                "kinds": [
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "structure"
+                  ]
+                }
+              },
+              {
+                "reference": "deposited-chain-geometry@2",
+                "kind": "method",
+                "category": "coordinate_geometry",
+                "status": "catalog_only",
+                "digest": "741e860f87822bb1b1b204cd18e6cb3035b5da35c7bded3f5cb1e97ada23ee1f",
+                "provider": "org.gx.protein@0.3.0",
+                "capability_version": "deposited-chain-geometry@2",
+                "cost_class": "local_cpu",
+                "purpose": "Describe the effect of atom selection on observed chain-pair geometry.",
+                "input_roles": [
+                  "structure"
+                ],
+                "output_names": [
+                  "geometry.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: report, coverage",
+                "limitations": "One asymmetric unit per measurement. Alternate locations and ambiguous backbone assignments are unsupported. Absence of a selected position is a coverage limitation. The measurement does not establish",
+                "kinds": [
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "structure"
+                  ]
+                }
+              },
+              {
+                "reference": "pcna-archive-fetch@1",
+                "kind": "method",
+                "category": "public_archive_acquisition",
+                "status": "catalog_only",
+                "digest": "6f9db9f276d3adb9c8137f0f9be5f77f9b048c8d625f4db8a475c3b6a9830a3b",
+                "provider": "org.gx.pcna-archive@1.0.0",
+                "capability_version": "pcna-archive-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the selected PDB deposition of a human PCNA trimer as an immutable original.",
+                "input_roles": [
+                  "archive"
+                ],
+                "output_names": [
+                  "structure.cif",
+                  "acquisition.json",
+                  "structure-context.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "context: public, report",
+                "limitations": "Requires a public human P12004 deposition with three model-1 polypeptide chains in a shared deposited assembly operation. Co-deposited ligands and other polymers do not establish direct binding, apo s",
+                "kinds": [
+                  "database",
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "archive"
+                  ]
+                }
+              }
+            ],
+            "total": 37,
+            "next_offset": 15
+          }
+        },
+        {
+          "call": "probe-1",
+          "arguments": {
+            "kind": "method",
+            "query": "Crossref"
+          },
+          "answer": {
+            "kind": "method",
+            "items": [
+              {
+                "reference": "scholarly-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "available",
+                "digest": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Find indexed publications with an investigator-selected query and identify open full-text candidates.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "crossref: method",
+                "limitations": "Covers one ranked page per provider. Empty and unavailable sources have different statuses. Bibliographic matches are leads, not experimental observations. The catalogues can index the same publicatio",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-page-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "486c9c24aa8148e9a0bba29e7bc06480f78c7ed47c28a60e3f89a64dd891f042",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "crossref: purpose",
+                "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can shar",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              }
+            ],
+            "total": 2,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-2",
+          "arguments": {
+            "kind": "research",
+            "query": "Crossref"
+          },
+          "answer": {
+            "kind": "research",
+            "items": [
+              {
+                "reference": "scholarly-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "available",
+                "digest": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Find indexed publications with an investigator-selected query and identify open full-text candidates.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "crossref: method",
+                "limitations": "Covers one ranked page per provider. Empty and unavailable sources have different statuses. Bibliographic matches are leads, not experimental observations. The catalogues can index the same publicatio",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-page-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "486c9c24aa8148e9a0bba29e7bc06480f78c7ed47c28a60e3f89a64dd891f042",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "crossref: purpose",
+                "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can shar",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              }
+            ],
+            "total": 2,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-3",
+          "arguments": {
+            "kind": "method",
+            "query": "JATS"
+          },
+          "answer": {
+            "kind": "method",
+            "items": [
+              {
+                "reference": "scholarly-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "available",
+                "digest": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "jats: method",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-page-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "486c9c24aa8148e9a0bba29e7bc06480f78c7ed47c28a60e3f89a64dd891f042",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "jats: method",
+                "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can shar",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "scholarly-page-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "catalog_only",
+                "digest": "ad58b8a82d4605b5775ab50945aec32d9761191a6901fdf39e84a32c127e5ce5",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "jats: method",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              }
+            ],
+            "total": 3,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-4",
+          "arguments": {
+            "kind": "research",
+            "query": "JATS"
+          },
+          "answer": {
+            "kind": "research",
+            "items": [
+              {
+                "reference": "gx_read_source@1",
+                "kind": "research",
+                "category": "source_reading",
+                "status": "available",
+                "digest": "023b6a830feac830a55bfae269d5f449bda9a4a02d8c63732ad839a3290ac5a9",
+                "purpose": "List locators and extraction coverage for assigned documents and data records (text, Markdown, JATS, HTML, PDF or JSON), or read one original segment with a receipt for this lease.",
+                "input_roles": [
+                  "source_ref"
+                ],
+                "output_names": [
+                  "source or evidence receipt"
+                ],
+                "execution_granted": true,
+                "match_reason": "jats: purpose"
+              },
+              {
+                "reference": "scholarly-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "available",
+                "digest": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "jats: method",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-page-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "486c9c24aa8148e9a0bba29e7bc06480f78c7ed47c28a60e3f89a64dd891f042",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "jats: method",
+                "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can shar",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "scholarly-page-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "catalog_only",
+                "digest": "ad58b8a82d4605b5775ab50945aec32d9761191a6901fdf39e84a32c127e5ce5",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "jats: method",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              }
+            ],
+            "total": 4,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-5",
+          "arguments": {
+            "kind": "research",
+            "query": "文獻"
+          },
+          "answer": {
+            "kind": "research",
+            "items": [
+              {
+                "reference": "scholarly-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "available",
+                "digest": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "文獻: category",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "available",
+                "digest": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Find indexed publications with an investigator-selected query and identify open full-text candidates.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "文獻: category",
+                "limitations": "Covers one ranked page per provider. Empty and unavailable sources have different statuses. Bibliographic matches are leads, not experimental observations. The catalogues can index the same publicatio",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-page-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "486c9c24aa8148e9a0bba29e7bc06480f78c7ed47c28a60e3f89a64dd891f042",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "文獻: category",
+                "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can shar",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "arxiv-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "catalog_only",
+                "digest": "a7077a6eb3edb0e905a8181038448fd4efa9aae354fe877314fe890a7674266f",
+                "provider": "org.gx.arxiv-sources@1.0.0",
+                "capability_version": "arxiv-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Read the exact PDF revision that the indexed arXiv search returned.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.pdf",
+                  "acquisition.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "文獻: category",
+                "limitations": "Versioned PDF links from the selected search only, up to 32 MiB. Embedded-text page extraction can miss figures or reading order. Snapshot binding does not establish scientific validity or publication",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "arxiv-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "4b83a31f276d8e83e2d0c506e6275542ac57b183e9aafe4588e766b204fff2c7",
+                "provider": "org.gx.arxiv-sources@1.0.0",
+                "capability_version": "arxiv-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Locate publications in the public arXiv catalogue using investigator-selected field queries.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "文獻: category",
+                "limitations": "First ranked page of at most eight records. Missing fields, a valid empty feed and an unavailable upstream are distinct. A metadata hit supports discovery only.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "scholarly-page-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "catalog_only",
+                "digest": "ad58b8a82d4605b5775ab50945aec32d9761191a6901fdf39e84a32c127e5ce5",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "文獻: category",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "academic-search@legacy",
+                "kind": "research",
+                "category": "source_reading",
+                "status": "reference_only",
+                "digest": "f26073ea995eb2482403f2f39d68804ae6ee0d2b254b570de9f253176a1ffed3",
+                "purpose": "Search bibliographic sources; compare identifiers, returned records and full-text availability.",
+                "input_roles": [
+                  "query"
+                ],
+                "output_names": [
+                  "publication candidates"
+                ],
+                "execution_granted": false,
+                "match_reason": "文獻: purpose"
+              }
+            ],
+            "total": 7,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-6",
+          "arguments": {
+            "kind": "research",
+            "query": "文献"
+          },
+          "answer": {
+            "kind": "research",
+            "items": [
+              {
+                "reference": "scholarly-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "available",
+                "digest": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "文献: category",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "available",
+                "digest": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+                "provider": "org.gx.scholarly-sources@1.0.0",
+                "capability_version": "scholarly-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Find indexed publications with an investigator-selected query and identify open full-text candidates.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": true,
+                "match_reason": "文献: category",
+                "limitations": "Covers one ranked page per provider. Empty and unavailable sources have different statuses. Bibliographic matches are leads, not experimental observations. The catalogues can index the same publicatio",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "scholarly-page-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "486c9c24aa8148e9a0bba29e7bc06480f78c7ed47c28a60e3f89a64dd891f042",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "文献: category",
+                "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can shar",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "arxiv-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "catalog_only",
+                "digest": "a7077a6eb3edb0e905a8181038448fd4efa9aae354fe877314fe890a7674266f",
+                "provider": "org.gx.arxiv-sources@1.0.0",
+                "capability_version": "arxiv-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Read the exact PDF revision that the indexed arXiv search returned.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.pdf",
+                  "acquisition.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "文献: category",
+                "limitations": "Versioned PDF links from the selected search only, up to 32 MiB. Embedded-text page extraction can miss figures or reading order. Snapshot binding does not establish scientific validity or publication",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "arxiv-search@1",
+                "kind": "method",
+                "category": "public_literature_search",
+                "status": "catalog_only",
+                "digest": "4b83a31f276d8e83e2d0c506e6275542ac57b183e9aafe4588e766b204fff2c7",
+                "provider": "org.gx.arxiv-sources@1.0.0",
+                "capability_version": "arxiv-search@1",
+                "cost_class": "local_cpu",
+                "purpose": "Locate publications in the public arXiv catalogue using investigator-selected field queries.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "search-snapshot.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "文献: category",
+                "limitations": "First ranked page of at most eight records. Missing fields, a valid empty feed and an unavailable upstream are distinct. A metadata hit supports discovery only.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "scholarly-page-fetch@1",
+                "kind": "method",
+                "category": "public_literature_acquisition",
+                "status": "catalog_only",
+                "digest": "ad58b8a82d4605b5775ab50945aec32d9761191a6901fdf39e84a32c127e5ce5",
+                "provider": "org.gx.scholarly-pages@1.0.0",
+                "capability_version": "scholarly-page-fetch@1",
+                "cost_class": "local_cpu",
+                "purpose": "Acquire the exact open article original for reading at a specific body location.",
+                "input_roles": [
+                  "source"
+                ],
+                "output_names": [
+                  "article.xml",
+                  "acquisition.json"
+                ],
+                "execution_granted": false,
+                "match_reason": "文献: category",
+                "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+                "kinds": [
+                  "method",
+                  "research"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "source"
+                  ]
+                }
+              },
+              {
+                "reference": "academic-search@legacy",
+                "kind": "research",
+                "category": "source_reading",
+                "status": "reference_only",
+                "digest": "f26073ea995eb2482403f2f39d68804ae6ee0d2b254b570de9f253176a1ffed3",
+                "purpose": "Search bibliographic sources; compare identifiers, returned records and full-text availability.",
+                "input_roles": [
+                  "query"
+                ],
+                "output_names": [
+                  "publication candidates"
+                ],
+                "execution_granted": false,
+                "match_reason": "文献: purpose"
+              }
+            ],
+            "total": 7,
+            "next_offset": null
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "gxr_01m8f5y9ejrbvs65yn",
+      "grant": {
+        "evidence_policy": "gx.evidence/6.2.4",
+        "research_effort": "deep",
+        "research_modules": [],
+        "plugins": [
+          "org.gx.yeast-enzyme-evidence@1.0.1"
+        ],
+        "capabilities": [
+          "yeast-reaction-index@2"
+        ],
+        "capability_options": [],
+        "input_files": [],
+        "capability_collections": []
+      },
+      "thread": "script-gxl_01m8f5y9jkqh0qqdvr",
+      "tools": [
+        "gx_task_context",
+        "gx_read_artifact",
+        "gx_decide_revision",
+        "gx_stage_claim",
+        "gx_query_catalog",
+        "gx_read_source",
+        "gx_extract_evidence",
+        "gx_review_evidence"
+      ],
+      "results": [
+        {
+          "call": "probe-0",
+          "arguments": {
+            "kind": "method",
+            "query": "BLASTp"
+          },
+          "answer": {
+            "kind": "method",
+            "items": [
+              {
+                "reference": "yeast-reaction-index@2",
+                "kind": "method",
+                "category": "yeast_enzyme_evidence",
+                "status": "available",
+                "digest": "30ce7d9abae575572373314848a82f43a9adee42c522ce6107504a2e2d17c0a4",
+                "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+                "capability_version": "yeast-reaction-index@2",
+                "cost_class": "local_cpu",
+                "purpose": "Search reviewed S288C yeast hydrolysis annotations and sequence homologs for trehalose or sucrose.",
+                "input_roles": [
+                  "scope"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "homology.json",
+                  "blast.tsv"
+                ],
+                "execution_granted": true,
+                "match_reason": "blastp: method",
+                "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+                "kinds": [
+                  "database",
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "scope"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "yeast-reaction-index@1",
+                "kind": "method",
+                "category": "yeast_enzyme_evidence",
+                "status": "catalog_only",
+                "digest": "1556ea2cbc36ead801211cb4ea49e995a3ece0681a6e1b6ed480ba6e8ba9cbea",
+                "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+                "capability_version": "yeast-reaction-index@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search reviewed S288C yeast hydrolysis annotations and sequence homologs for trehalose or sucrose.",
+                "input_roles": [
+                  "scope"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "homology.json",
+                  "blast.tsv"
+                ],
+                "execution_granted": false,
+                "match_reason": "blastp: method",
+                "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+                "kinds": [
+                  "database",
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "scope"
+                  ]
+                }
+              }
+            ],
+            "total": 2,
+            "next_offset": null
+          }
+        },
+        {
+          "call": "probe-1",
+          "arguments": {
+            "kind": "database",
+            "query": "BLASTp"
+          },
+          "answer": {
+            "kind": "database",
+            "items": [
+              {
+                "reference": "yeast-reaction-index@2",
+                "kind": "method",
+                "category": "yeast_enzyme_evidence",
+                "status": "available",
+                "digest": "30ce7d9abae575572373314848a82f43a9adee42c522ce6107504a2e2d17c0a4",
+                "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+                "capability_version": "yeast-reaction-index@2",
+                "cost_class": "local_cpu",
+                "purpose": "Search reviewed S288C yeast hydrolysis annotations and sequence homologs for trehalose or sucrose.",
+                "input_roles": [
+                  "scope"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "homology.json",
+                  "blast.tsv"
+                ],
+                "execution_granted": true,
+                "match_reason": "blastp: method",
+                "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+                "kinds": [
+                  "database",
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "scope"
+                  ]
+                },
+                "execution_health": {
+                  "status": "unobserved"
+                }
+              },
+              {
+                "reference": "yeast-reaction-index@1",
+                "kind": "method",
+                "category": "yeast_enzyme_evidence",
+                "status": "catalog_only",
+                "digest": "1556ea2cbc36ead801211cb4ea49e995a3ece0681a6e1b6ed480ba6e8ba9cbea",
+                "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+                "capability_version": "yeast-reaction-index@1",
+                "cost_class": "local_cpu",
+                "purpose": "Search reviewed S288C yeast hydrolysis annotations and sequence homologs for trehalose or sucrose.",
+                "input_roles": [
+                  "scope"
+                ],
+                "output_names": [
+                  "candidates.json",
+                  "homology.json",
+                  "blast.tsv"
+                ],
+                "execution_granted": false,
+                "match_reason": "blastp: method",
+                "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+                "kinds": [
+                  "database",
+                  "method"
+                ],
+                "installation_status": "installed",
+                "input_coverage": {
+                  "status": "no_visible_materials",
+                  "unmatched_roles": [
+                    "scope"
+                  ]
+                }
+              }
+            ],
+            "total": 2,
+            "next_offset": null
+          }
+        }
+      ]
+    }
+  ]
+}

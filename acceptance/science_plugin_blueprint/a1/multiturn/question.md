@@ -1,0 +1,3 @@
+Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.
+
+This is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.

@@ -1,0 +1,3148 @@
+{
+  "case": "multiturn",
+  "run_id": "gxr_01m8f6ktvmbrk2xzns",
+  "status": "STOPPED",
+  "goal_status": "CLOSED",
+  "enrollment": {
+    "case": "multiturn",
+    "preregistration_sha256": "b1d2a81e03a47d45d90f9a1c2b0bddc10ff156b234a8b946c8376cafe6596114",
+    "source_tree_sha256": "b6ffbc9df34e7d500ef8236b09517e8e456b0e22ce2239b24a863f4b91acfebd",
+    "installed_plugins": [
+      {
+        "id": "org.gx.hydro-marginal",
+        "version": "1.0.0",
+        "sha256": "0ca1e652d43b890280a4b44887bf035935e354e02fbe8bd91fdb87d16afad3cd",
+        "namespace": "gx_ext_org_gx_hydro_marginal_1_0_0_ab35db17901f3e389ca46e541265474fcf7d714f1292b78259218b046c156bfa",
+        "contributions": {
+          "workflows": [],
+          "tools": [],
+          "capabilities": [
+            "method.json"
+          ]
+        }
+      },
+      {
+        "id": "org.gx.hydro-concurrent",
+        "version": "1.0.0",
+        "sha256": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729",
+        "namespace": "gx_ext_org_gx_hydro_concurrent_1_0_0_095ace77b82bc95c010a2e89deb4b4d130c7bdac0ec7b7b4894ac0f124f9868c",
+        "contributions": {
+          "workflows": [],
+          "tools": [],
+          "capabilities": [
+            "method.json"
+          ]
+        }
+      }
+    ],
+    "skill_reference": {
+      "kind": "skill",
+      "reference": "gauge-logbook@reference",
+      "category": "hydrometry",
+      "title": "Discharge field logbook",
+      "purpose": "Background on archival gauge discharge log terminology.",
+      "digest": "4ec7774cf8a8a1a89a315b75644890efbc99d61c7c670a752a164d63c3807b3f",
+      "source": {
+        "workspace": "release",
+        "path": "gx-h/docs/gauge-observation-note.md",
+        "sha256": "4ec7774cf8a8a1a89a315b75644890efbc99d61c7c670a752a164d63c3807b3f"
+      },
+      "inputs": [
+        "observation note"
+      ],
+      "outputs": [
+        "archival reading note"
+      ]
+    },
+    "goal_config_sha256": "da308e1edc82bba832e2bd5e925b03a094c423f65d0faf12ad30321d07a53496"
+  },
+  "material_sha256": "68cad55199c269636ba4be334b7249cd0093c3b63b98f9740753966fa22437cd",
+  "question_sha256": "475ced182b3eb4eb9dec0189a969c976f49bf7eeb01c1e2892ca737fc435c805",
+  "host_turns": [
+    {
+      "thread_id": "01a21e6c-c1cc-71c1-8397-023fa45c2448",
+      "turn_id": "01a21e6c-c204-72b2-9bc7-8eca1a36d2eb",
+      "event_id": "human:pond-dispatch-rule",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+      "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "event_id": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21e6a-ec45-7861-a8c4-f04dd167a3b6",
+      "turn_id": "01a21e6a-ec70-7960-acac-fc8603c5d885",
+      "event_id": "start:854680a9-2956-4126-a180-089f87770168",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+      "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "event_id": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21e69-feb0-7082-b31e-a9eaff52d58d",
+      "turn_id": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "event_id": "start:a27ceb45-696a-4f6d-85f0-aba02a92cb26",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "event_id": "start:d9040662-662a-4980-9f3d-6f1bd0f14d7d",
+      "state": "acknowledged"
+    },
+    {
+      "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+      "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "event_id": "start:eae703b0-73cc-4562-9a0b-ed104d62a0cd",
+      "state": "acknowledged"
+    }
+  ],
+  "native_calls": [
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "call_id": "exec-63515e68-bb9d-4a22-82dc-5d5bd62d4a67",
+      "read_ref": "gxa_01m8f6ktwzvbjh3b52",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "call_id": "exec-6e4d5439-aa1f-4bcb-bf37-89fc8d589116",
+      "arguments": {
+        "kind": "all",
+        "limit": 40,
+        "query": "Shared valid observation time, two-station flow comparison, logger tolerances, calibrated delivery volume bounds and maintenance dispatch, gx.hydrometry/1 record."
+      },
+      "total": 56,
+      "status": null,
+      "top_references": [
+        "discharge-marginal@1",
+        "discharge-concurrent@1",
+        "scholarly-search@1"
+      ],
+      "subject_candidates": [
+        {
+          "rank": 1,
+          "reference": "discharge-marginal@1",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "kind": "method",
+          "status": "selectable",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "marginal.json"
+          ],
+          "match_reason": "valid: purpose, observation: method, time: method, volume: purpose, bounds: limitations, gx.hydrometry: method, 1: reference, reco",
+          "execution_granted": false
+        },
+        {
+          "rank": 2,
+          "reference": "discharge-concurrent@1",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "kind": "method",
+          "status": "selectable",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "paired.json"
+          ],
+          "match_reason": "valid: purpose, time: method, flow: method, volume: purpose, gx.hydrometry: method, 1: reference, record: method",
+          "execution_granted": false
+        }
+      ],
+      "survey_event": 19
+    },
+    {
+      "tool": "gx_task_context",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "call_id": "exec-913f1ff9-2dea-4cae-8028-a06867858d06"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "call_id": "exec-82a53004-5ece-4fa8-9720-1b86405db219",
+      "arguments": {
+        "kind": "method",
+        "reference": "discharge-concurrent@1"
+      },
+      "total": null,
+      "status": "selectable"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "call_id": "exec-400b47f2-ab57-4021-ad60-da9ab78ab929",
+      "arguments": {
+        "kind": "method",
+        "reference": "discharge-marginal@1"
+      },
+      "total": null,
+      "status": "selectable"
+    },
+    {
+      "tool": "gx_select_capability",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "call_id": "exec-44bf769c-7315-42c9-98dd-ef6c758c79c8",
+      "arguments": {
+        "action": "enable",
+        "method": "discharge-concurrent@1",
+        "revision": 0
+      },
+      "revision": 1
+    },
+    {
+      "tool": "gx_stage_claim",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "call_id": "exec-056fe2a4-f4a4-4eb5-aa7a-8de05021ed8a",
+      "accepted_ref": "gxa_01m8f6njxbtefnr5d3"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "call_id": "call_96891e5106b448cbaae462831e0d5269",
+      "accepted_ref": "gxa_8ae4b792439e22b08a7d80d631f96813d68826295e5de30cab359b5a39f74909"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "exec-29907354-10aa-4e60-b4d5-3c1f12042303",
+      "arguments": {
+        "kind": "all",
+        "query": "simultaneous valid discharge intervals compare POND-6 and POND-7 North minus South volumes shared minutes worst-case logger calibration bounds for maintenance dispatch",
+        "required_outputs": [
+          "paired.json"
+        ]
+      },
+      "total": 25,
+      "status": null,
+      "top_references": [
+        "discharge-concurrent@1",
+        "discharge-marginal@1",
+        "deposited-block-signed@1"
+      ],
+      "subject_candidates": [
+        {
+          "rank": 1,
+          "reference": "discharge-concurrent@1",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "kind": "method",
+          "status": "available",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "paired.json"
+          ],
+          "match_reason": "simultaneous: purpose, valid: purpose, discharge: reference, intervals: purpose, minus: method, minutes: method",
+          "execution_granted": true
+        },
+        {
+          "rank": 2,
+          "reference": "discharge-marginal@1",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "kind": "method",
+          "status": "selectable",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "marginal.json"
+          ],
+          "match_reason": "simultaneous: limitations, valid: purpose, discharge: reference, volumes: purpose, minutes: outputs, bounds: limitations",
+          "execution_granted": false
+        }
+      ],
+      "survey_event": 66
+    },
+    {
+      "tool": "gx_task_context",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "exec-7fbe1a47-eab3-4885-81f9-5842476ab2e0"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "exec-de59dc25-351f-4662-b09e-636dc2e902c0",
+      "read_ref": "gxa_01m8f6ktwzvbjh3b52",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "exec-fafccd79-21d7-4ac5-9ba4-1f015480d946",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.hydrometry-paired/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "exec-d45b6f1c-5065-4de4-a1e6-6bbdd45d39fa",
+      "read_ref": "gxa_01m8f6nw3fx0aj9qzz",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "exec-85558075-e006-4c54-add4-190c3fe7c8e0",
+      "arguments": {
+        "kind": "method",
+        "reference": "discharge-concurrent@1"
+      },
+      "total": null,
+      "status": "available"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6a-ec70-7960-acac-fc8603c5d885",
+      "call_id": "call_08da454064c849cbaa7f5ebeac2f3801"
+    },
+    {
+      "tool": "gx_stage_claim",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "exec-5a62789c-c1a2-442b-9d58-db9a20811ebf",
+      "accepted_ref": "gxa_01m8f6pyys11e2b2dy"
+    },
+    {
+      "tool": "gx_stage_claim",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "exec-59b9a0b9-a93c-430a-b3e9-62865534ecd9",
+      "accepted_ref": "gxa_01m8f6qc0q24rz8e9w"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "call_750b36301db145b298b016c5f839f3d8"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "call_282404c3971a4ac38c52cd4e8663ae12"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "call_ce24d3398eba4ab8a6f3dbe8aa27548a"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "call_id": "call_d397ce0c5eee4d518b702badefaa2e99",
+      "accepted_ref": "gxa_c9a774c062b4bf515d1e4fff7290e90f01c3b1c8c611fb4cc7416b5c9643c530"
+    },
+    {
+      "tool": "gx_task_context",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-46309286-84b5-4b65-9715-88f9b135c412"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-8f553075-aa68-4554-a92b-b2f6928d6b8b",
+      "arguments": {
+        "kind": "all",
+        "limit": 35,
+        "query": "Compare North and South delivery over simultaneous valid time in POND-6 and POND-7, bound the signed difference using both loggers' absolute calibration tolerances, and identify evidence on the dispatch rule and station label custody."
+      },
+      "total": 54,
+      "status": null,
+      "top_references": [
+        "discharge-concurrent@1",
+        "discharge-marginal@1",
+        "bglb-retrospective@1"
+      ],
+      "subject_candidates": [
+        {
+          "rank": 1,
+          "reference": "discharge-concurrent@1",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "kind": "method",
+          "status": "available",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "paired.json"
+          ],
+          "match_reason": "over: limitations, simultaneous: purpose, valid: purpose, time: method, bound: purpose, signed: purpose, difference: method, both:",
+          "execution_granted": true
+        },
+        {
+          "rank": 2,
+          "reference": "discharge-marginal@1",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "kind": "method",
+          "status": "selectable",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "marginal.json"
+          ],
+          "match_reason": "over: method, simultaneous: limitations, valid: purpose, time: method, bound: limitations, signed: limitations, absolute: purpose,",
+          "execution_granted": false
+        }
+      ],
+      "survey_event": 109
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-ebe17a1e-3790-4353-95ac-588d9cee4ad9",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.hydrometry-paired/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-f1f8bdbb-30dc-4072-b4b6-47dfe8b02dcb",
+      "read_ref": "gxa_01m8f6ktwzvbjh3b52",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-41f1795d-32be-4605-8b38-14602074c89e",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.hydrometry-paired/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-667b6884-bbe3-4086-9ff9-62139b807626",
+      "read_ref": "gxa_01m8f6nw3fx0aj9qzz",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-ca4c5063-be4c-4d84-bc76-77bdef10bdcc",
+      "arguments": {
+        "kind": "method",
+        "reference": "discharge-concurrent@1"
+      },
+      "total": null,
+      "status": "available"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-b071c766-a595-4953-9e8e-d54de683d816",
+      "read_ref": "gxa_01m8f6sg80kbm3s406",
+      "result_schema": null
+    },
+    {
+      "tool": "gx_stage_claim",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "exec-2a25cb64-d72f-4c4b-90a2-510cb6bdd99f",
+      "accepted_ref": "gxa_01m8f6v59sftahffsr"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "call_ee504203b1924f86851fe52953328369"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "call_id": "call_0ab115e89a324b018254fcb64cbb5ca7",
+      "accepted_ref": "gxa_9d53db52f38e1d4a098d0508b595d36710e43043a5b4e2b3afe1be69a034cf4f"
+    },
+    {
+      "tool": "gx_task_context",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-2435b0b5-df40-4cb4-a632-a169a8c5a0c3"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-f18efbbb-f18a-4342-b438-fb6185e3b2de",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.hydrometry-paired/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-aa33879e-4a8a-4532-9969-b66e35832a47",
+      "read_ref": "gxa_01m8f6ktwzvbjh3b52",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-1c809052-9a18-4179-8358-c213760dd40a",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.hydrometry-paired/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-ae94a8eb-e0f6-4745-a7d6-83081f758320",
+      "read_ref": "gxa_01m8f6nw3fx0aj9qzz",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-451d7851-f5e9-4372-82fe-95200b9b17d1",
+      "arguments": {
+        "kind": "all",
+        "query": "Apply a per-trial dispatch threshold to the lower bound of North minus South volume over shared valid logger time. Check station custody for POND-6 and POND-7."
+      },
+      "total": 35,
+      "status": null,
+      "top_references": [
+        "discharge-concurrent@1",
+        "discharge-marginal@1",
+        "pcna-local-geometry@1"
+      ],
+      "subject_candidates": [
+        {
+          "rank": 1,
+          "reference": "discharge-concurrent@1",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "kind": "method",
+          "status": "available",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "paired.json"
+          ],
+          "match_reason": "lower: method, bound: purpose, minus: method, volume: purpose, over: limitations, valid: purpose, time: method, station: limitatio",
+          "execution_granted": true
+        },
+        {
+          "rank": 2,
+          "reference": "discharge-marginal@1",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "kind": "method",
+          "status": "selectable",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "marginal.json"
+          ],
+          "match_reason": "bound: limitations, volume: purpose, over: method, valid: purpose, time: method, station: method",
+          "execution_granted": false
+        }
+      ],
+      "survey_event": 131
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-725e1919-28b3-4637-a870-82aa2a39a319",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-d5e76b1c-ef21-40c2-b32c-a99c8fa24e45",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-9e5cb1e6-52ed-48fe-9ff0-eed8d500fefa",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-e9c37641-32f0-4ea4-b7a8-9e27575f20c9",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-14256288-2d66-4b66-b841-0ae13acd27c3",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-51c72a65-56ae-4853-82b0-5c048d418f96",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_stage_claim",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-ffa5b098-309b-459f-a33c-cbdb9e91b706",
+      "accepted_ref": "gxa_01m8f6zf36vvkmhp3w"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "exec-8fc9745d-a493-49ca-a462-e4ee6c177df7",
+      "read_ref": "gxa_01m8f6w3h31kpdn4b0",
+      "result_schema": null
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "call_91fd04c481ea48d7a6b4c38ffe354825"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "call_6c49e5fec4a7404aa1b8b5aedfd5ac1e"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "call_5a59b3a3715b46e199892a68e8bdc31f"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "call_id": "call_019de87b66fb4b8e919c08cddf67639f",
+      "accepted_ref": "gxa_7dc07f0d31abfda2d068d5cf77d6e397fe9123c290d48374d01604b1eb5956a1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-3196be83-b67c-4ccb-a187-cae7073edd7e",
+      "read_ref": "gxa_01m8f6ktwzvbjh3b52",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-911ba136-b8eb-4fe4-82f5-132c1c12056a",
+      "read_ref": "gxa_01m8f6nw3fx0aj9qzz",
+      "result_schema": "gx.hydrometry/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-5cf0972a-d036-460d-a315-da1f7115f70a",
+      "read_ref": "gxa_01m8f6zf36vvkmhp3w",
+      "result_schema": "gx.v6.claim.1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-6519a095-ec93-44eb-aefd-662fc503d996",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.hydrometry-paired/1"
+    },
+    {
+      "tool": "gx_task_context",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-53fc929c-c506-4d95-b4af-5390f4f1244e"
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-525f6482-f5dd-4d51-b543-79032442ff26",
+      "arguments": {
+        "kind": "all",
+        "limit": 20,
+        "query": "Compare paired North and South water delivery on shared valid time in POND-6 and POND-7 with signed calibration bounds, verify logger to station custody and apply the PI's per-trial technician dispatch criterion"
+      },
+      "total": 56,
+      "status": null,
+      "top_references": [
+        "discharge-concurrent@1",
+        "discharge-marginal@1",
+        "bglb-retrospective@1"
+      ],
+      "subject_candidates": [
+        {
+          "rank": 1,
+          "reference": "discharge-concurrent@1",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "kind": "method",
+          "status": "available",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "paired.json"
+          ],
+          "match_reason": "paired: outputs, water: category, valid: purpose, time: method, signed: purpose, station: limitations, pi: method, s: reference",
+          "execution_granted": true
+        },
+        {
+          "rank": 2,
+          "reference": "discharge-marginal@1",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "kind": "method",
+          "status": "selectable",
+          "input_roles": [
+            "record"
+          ],
+          "output_names": [
+            "marginal.json"
+          ],
+          "match_reason": "paired: limitations, water: category, valid: purpose, time: method, signed: limitations, bounds: limitations, station: method, s: ",
+          "execution_granted": false
+        }
+      ],
+      "survey_event": 160
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-d8c8d108-8f5e-45df-8a5d-337e7829a5cf",
+      "read_ref": "gxa_01m8f724wc3f9qfhmc",
+      "result_schema": "gx.pond.station-custody/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-d1be4f23-2427-46ea-8183-03aed5ad2929",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.hydrometry-paired/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-e7ec893a-87c6-4c96-b8f7-dbb0c1877a61",
+      "read_ref": "gxa_01m8f724yvtp37rg0m",
+      "result_schema": null
+    },
+    {
+      "tool": "gx_query_catalog",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-d9a1b6d5-2b66-474c-8113-4795b2c002fa",
+      "arguments": {
+        "kind": "method",
+        "limit": 1,
+        "reference": "discharge-concurrent@1"
+      },
+      "total": null,
+      "status": "available"
+    },
+    {
+      "tool": "gx_stage_claim",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-613d8499-56b3-4032-97b6-7e21a4bdf5ba",
+      "accepted_ref": "gxa_01m8f75t9g0w6wxt9a"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "call_4623f8776d5e4f59a0e77a8b1af5369a"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-a7e47715-4d85-4f06-b78f-4d374d28b362",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-3f42cfde-ca69-4eee-b277-6e810f3b15cc",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-c4ec91fa-f2ea-450d-84fc-b9cef7468c0b",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-a62c4288-d8ec-4f41-8ff5-fce0ab48ab06",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-776fe8be-b684-466d-8c5c-3ace72ab7e28",
+      "read_ref": "gxa_01m8f6sek4q866nmv4",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_read_artifact",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "exec-84f9a8c0-9a33-4186-8fa4-cf3b439adeab",
+      "read_ref": "gxa_01m8f6nv8tnv5zff3b",
+      "result_schema": "gx.v623.endpoint_page/1"
+    },
+    {
+      "tool": "gx_decide_revision",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "call_id": "call_3e7bf473ec2645b8a4e4ec50cb90dc69",
+      "accepted_ref": "gxa_7c8e12ccfb0b4b55015da218969a60a041b3c25b9572d87bd3772f8b8a934649"
+    }
+  ],
+  "rejected_host_tool_results": [
+    {
+      "utc": "2026-11-27T19:10:03.324Z",
+      "host_call": "call_0afe210679f84ba2a7c5ad380cfc9b2c",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_artifact"
+      ],
+      "reason": "SCHEMA_INVALID: Catalog offset must be nonnegative and limit between 1 and 40"
+    },
+    {
+      "utc": "2026-11-27T19:10:07.875Z",
+      "host_call": "call_0fa51f00b09942748436382a5077d90f",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_source",
+        "gx_task_context"
+      ],
+      "reason": "SCHEMA_INVALID: JSON record reads require a registered database original"
+    },
+    {
+      "utc": "2026-11-27T19:10:29.849Z",
+      "host_call": "call_f8a8ba8833d1405b9295c6776cf12182",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCHEMA_INVALID: The selected original materials have no single verified applicability. Choose the applicable originals or state an explicit scientific scope."
+    },
+    {
+      "utc": "2026-11-27T19:10:37.636Z",
+      "host_call": "call_ffe7425014654469bc8e24130057cf9f",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+    },
+    {
+      "utc": "2026-11-27T19:11:03.088Z",
+      "host_call": "call_2d53598e7199408d9fc5a6767188aa53",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_artifact",
+        "gx_task_context"
+      ],
+      "reason": "SCOPE_DENIED: this root no longer owns the current task attempt"
+    },
+    {
+      "utc": "2026-11-27T19:11:03.088Z",
+      "host_call": "call_2d53598e7199408d9fc5a6767188aa53",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_artifact",
+        "gx_task_context"
+      ],
+      "reason": "SCOPE_DENIED: this root no longer owns the current task attempt"
+    },
+    {
+      "utc": "2026-11-27T19:11:03.088Z",
+      "host_call": "call_2d53598e7199408d9fc5a6767188aa53",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_artifact",
+        "gx_task_context"
+      ],
+      "reason": "SCOPE_DENIED: this root no longer owns the current task attempt"
+    },
+    {
+      "utc": "2026-11-27T19:11:12.805Z",
+      "host_call": "call_fcc917ed836e4c36ba7defde80edd3a6",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_source"
+      ],
+      "reason": "SCOPE_DENIED: this root no longer owns the current task attempt"
+    },
+    {
+      "utc": "2026-11-27T19:11:12.805Z",
+      "host_call": "call_fcc917ed836e4c36ba7defde80edd3a6",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_source"
+      ],
+      "reason": "SCOPE_DENIED: this root no longer owns the current task attempt"
+    },
+    {
+      "utc": "2026-11-27T19:11:20.410Z",
+      "host_call": "call_08da454064c849cbaa7f5ebeac2f3801",
+      "tools_in_call": [],
+      "reason": "SCOPE_DENIED: this root no longer owns the current task attempt"
+    },
+    {
+      "utc": "2026-11-27T19:12:16.338Z",
+      "host_call": "call_71cf0873bf2c4b17aae23ea3a9421702",
+      "tools_in_call": [
+        "gx_task_context"
+      ],
+      "reason": "SCOPE_DENIED: this root no longer owns the current task attempt"
+    },
+    {
+      "utc": "2026-11-27T19:11:22.642Z",
+      "host_call": "call_cf3a0f875c3d4521b13c318d47663d19",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+    },
+    {
+      "utc": "2026-11-27T19:12:04.470Z",
+      "host_call": "call_750b36301db145b298b016c5f839f3d8",
+      "tools_in_call": [],
+      "reason": "SCHEMA_INVALID: $: missing required property 'hypothesis'; $: missing required property 'method_family'; $: missing required property 'alternative'; $: missing required property 'discriminating_observation'"
+    },
+    {
+      "utc": "2026-11-27T19:12:22.293Z",
+      "host_call": "call_282404c3971a4ac38c52cd4e8663ae12",
+      "tools_in_call": [],
+      "reason": "SCHEMA_INVALID: $: missing required property 'stop_condition'"
+    },
+    {
+      "utc": "2026-11-27T19:12:35.248Z",
+      "host_call": "call_ce24d3398eba4ab8a6f3dbe8aa27548a",
+      "tools_in_call": [],
+      "reason": "SCHEMA_INVALID: New nodes and branches require distinct local: names"
+    },
+    {
+      "utc": "2026-11-27T19:14:06.621Z",
+      "host_call": "call_ee504203b1924f86851fe52953328369",
+      "tools_in_call": [],
+      "reason": "SCHEMA_INVALID: $.reconsider_when[1].event: 'pi_feedback_received' is not one of ['goal_changed', 'evidence_added', 'claim_changed', 'job_settled', 'budget_changed', 'operator_reopened', 'module_report']"
+    },
+    {
+      "utc": "2026-11-27T19:15:50.482Z",
+      "host_call": "call_45467ebd25c7499185b3b00ee6aec2f8",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+    },
+    {
+      "utc": "2026-11-27T19:15:50.482Z",
+      "host_call": "call_45467ebd25c7499185b3b00ee6aec2f8",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+    },
+    {
+      "utc": "2026-11-27T19:16:28.008Z",
+      "host_call": "call_d3e703c1b1ff4d61a8e6a8e66f4b2f6c",
+      "tools_in_call": [
+        "gx_read_artifact"
+      ],
+      "reason": "SCOPE_DENIED: this artifact has not been cited in the task inputs"
+    },
+    {
+      "utc": "2026-11-27T19:16:28.008Z",
+      "host_call": "call_d3e703c1b1ff4d61a8e6a8e66f4b2f6c",
+      "tools_in_call": [
+        "gx_read_artifact"
+      ],
+      "reason": "SCOPE_DENIED: this artifact has not been cited in the task inputs"
+    },
+    {
+      "utc": "2026-11-27T19:16:43.717Z",
+      "host_call": "call_91fd04c481ea48d7a6b4c38ffe354825",
+      "tools_in_call": [],
+      "reason": "SCHEMA_INVALID: $.pi_dispositions[0]: missing required property 'outcome'; $.pi_dispositions[0]: missing required property 'reason'; $.pi_dispositions[0]: property 'disposition' is not allowed; $.pi_dispositions[0]: property 'rationale' is not allowed"
+    },
+    {
+      "utc": "2026-11-27T19:17:00.209Z",
+      "host_call": "call_6c49e5fec4a7404aa1b8b5aedfd5ac1e",
+      "tools_in_call": [],
+      "reason": "SCHEMA_INVALID: $.pi_dispositions[0].outcome: 'adopted' is not one of ['adopt', 'maintain', 'measure', 'defer']; $.pi_dispositions[0]: property 'evidence_refs' is not allowed"
+    },
+    {
+      "utc": "2026-11-27T19:17:16.580Z",
+      "host_call": "call_5a59b3a3715b46e199892a68e8bdc31f",
+      "tools_in_call": [],
+      "reason": "SCHEMA_INVALID: Choose an operation on the comparison, or omit its action fields."
+    },
+    {
+      "utc": "2026-11-27T19:18:28.061Z",
+      "host_call": "call_3294df47e4df402a967b2bd77f4e071c",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_artifact",
+        "gx_read_source"
+      ],
+      "reason": "SCOPE_DENIED: this artifact has not been cited in the task inputs"
+    },
+    {
+      "utc": "2026-11-27T19:18:28.061Z",
+      "host_call": "call_3294df47e4df402a967b2bd77f4e071c",
+      "tools_in_call": [
+        "gx_query_catalog",
+        "gx_read_artifact",
+        "gx_read_source"
+      ],
+      "reason": "SCOPE_DENIED: Source must be an original, registered material of this Goal"
+    },
+    {
+      "utc": "2026-11-27T19:19:19.113Z",
+      "host_call": "call_3e4abb04b24e48e5bc1ae6be06575876",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCOPE_DENIED: gxa_01m8f6zf36vvkmhp3w does not resolve to a recorded source in this run"
+    },
+    {
+      "utc": "2026-11-27T19:19:19.113Z",
+      "host_call": "call_3e4abb04b24e48e5bc1ae6be06575876",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCOPE_DENIED: gxa_01m8f6zf36vvkmhp3w does not resolve to a recorded source in this run"
+    },
+    {
+      "utc": "2026-11-27T19:19:27.759Z",
+      "host_call": "call_f2c4b1fde2a34f2d96bee0a8d5f12f03",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+    },
+    {
+      "utc": "2026-11-27T19:19:27.759Z",
+      "host_call": "call_f2c4b1fde2a34f2d96bee0a8d5f12f03",
+      "tools_in_call": [
+        "gx_stage_claim"
+      ],
+      "reason": "SCHEMA_INVALID: Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+    },
+    {
+      "utc": "2026-11-27T19:19:56.239Z",
+      "host_call": "call_4623f8776d5e4f59a0e77a8b1af5369a",
+      "tools_in_call": [],
+      "reason": "SCOPE_DENIED: Select a row delivered to this Lead, or read the source's endpoint page first"
+    }
+  ],
+  "surveys": [
+    {
+      "event_id": 19,
+      "utc": "2026-11-27T19:10:07.819Z",
+      "arguments": {
+        "kind": "all",
+        "limit": 40,
+        "query": "Shared valid observation time, two-station flow comparison, logger tolerances, calibrated delivery volume bounds and maintenance dispatch, gx.hydrometry/1 record."
+      },
+      "call_id": "exec-6e4d5439-aa1f-4bcb-bf37-89fc8d589116",
+      "context_ref": "gxcx_01m8f6ktz9t2nt22gv",
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "reference": "discharge-marginal@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "reference": "discharge-concurrent@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.scholarly-sources@1.0.0",
+          "reference": "scholarly-search@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.arxiv-sources@1.0.0",
+          "reference": "arxiv-fetch@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.record-method-builder@1.0.0",
+          "reference": "derive-record-coverage@1",
+          "status": "catalog_only"
+        }
+      ],
+      "semantic_key": "catalog.query:28369f698cb125525e0bbc51706d0a20dad9892cf08e1ea96d1c7151b0357733",
+      "thread_id": "01a21e69-feb0-7082-b31e-a9eaff52d58d",
+      "through_event": 14,
+      "total": 56,
+      "trigger_events": [
+        14
+      ],
+      "turn_id": "01a21e69-fee9-7521-9d0b-34c0670882c6"
+    },
+    {
+      "event_id": 66,
+      "utc": "2026-11-27T19:11:04.858Z",
+      "arguments": {
+        "kind": "all",
+        "query": "simultaneous valid discharge intervals compare POND-6 and POND-7 North minus South volumes shared minutes worst-case logger calibration bounds for maintenance dispatch",
+        "required_outputs": [
+          "paired.json"
+        ]
+      },
+      "call_id": "exec-29907354-10aa-4e60-b4d5-3c1f12042303",
+      "context_ref": "gxcx_01m8f6nw7bv657baks",
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "reference": "discharge-concurrent@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "reference": "discharge-marginal@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.block-signed@1.0.0",
+          "reference": "deposited-block-signed@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.pcna-structure@1.0.0",
+          "reference": "pcna-local-geometry@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.published-kinetics@1.0.0",
+          "reference": "bglb-retrospective@1",
+          "status": "selectable"
+        }
+      ],
+      "semantic_key": "catalog.query:e64e31543dbedc8f3dd1f1b25abe50b1a1ee32f74556c7365355d9ccb325c335",
+      "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+      "through_event": 59,
+      "total": 25,
+      "trigger_events": [
+        28,
+        55,
+        56,
+        58,
+        59
+      ],
+      "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+    },
+    {
+      "event_id": 109,
+      "utc": "2026-11-27T19:13:06.297Z",
+      "arguments": {
+        "kind": "all",
+        "limit": 35,
+        "query": "Compare North and South delivery over simultaneous valid time in POND-6 and POND-7, bound the signed difference using both loggers' absolute calibration tolerances, and identify evidence on the dispatch rule and station label custody."
+      },
+      "call_id": "exec-8f553075-aa68-4554-a92b-b2f6928d6b8b",
+      "context_ref": "gxcx_01m8f6sg8vbkwb04ry",
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "reference": "discharge-concurrent@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "reference": "discharge-marginal@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.published-kinetics@1.0.0",
+          "reference": "bglb-retrospective@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.pcna-structure@1.0.0",
+          "reference": "pcna-interface@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.block-influence@1.0.0",
+          "reference": "deposited-block-influence@1",
+          "status": "catalog_only"
+        }
+      ],
+      "semantic_key": "catalog.query:3c5156430245a622877aed2dbee9deb2f59e22f81d75cfbe9cc1e25b72368b00",
+      "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+      "through_event": 100,
+      "total": 54,
+      "trigger_events": [
+        99,
+        100
+      ],
+      "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+    },
+    {
+      "event_id": 131,
+      "utc": "2026-11-27T19:14:29.579Z",
+      "arguments": {
+        "kind": "all",
+        "query": "Apply a per-trial dispatch threshold to the lower bound of North minus South volume over shared valid logger time. Check station custody for POND-6 and POND-7."
+      },
+      "call_id": "exec-451d7851-f5e9-4372-82fe-95200b9b17d1",
+      "context_ref": "gxcx_01m8f6w3hfd4cjbwn4",
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "reference": "discharge-concurrent@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "reference": "discharge-marginal@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.pcna-structure@1.0.0",
+          "reference": "pcna-local-geometry@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.arxiv-sources@1.0.0",
+          "reference": "arxiv-search@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.3.0",
+          "reference": "deposited-chain-geometry@2",
+          "status": "catalog_only"
+        }
+      ],
+      "semantic_key": "catalog.query:ec1063d51855b2bf037e89ad073bf73b65c9fc8afea726ef4a90fbca14b4fc33",
+      "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+      "through_event": 110,
+      "total": 35,
+      "trigger_events": [
+        110
+      ],
+      "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+    },
+    {
+      "event_id": 160,
+      "utc": "2026-11-27T19:17:50.714Z",
+      "arguments": {
+        "kind": "all",
+        "limit": 20,
+        "query": "Compare paired North and South water delivery on shared valid time in POND-6 and POND-7 with signed calibration bounds, verify logger to station custody and apply the PI's per-trial technician dispatch criterion"
+      },
+      "call_id": "exec-525f6482-f5dd-4d51-b543-79032442ff26",
+      "context_ref": "gxcx_01m8f724zad9grn3sp",
+      "first_candidates": [
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-concurrent@1.0.0",
+          "reference": "discharge-concurrent@1",
+          "status": "available"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.hydro-marginal@1.0.0",
+          "reference": "discharge-marginal@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.published-kinetics@1.0.0",
+          "reference": "bglb-retrospective@1",
+          "status": "selectable"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.pcna-archive@1.0.0",
+          "reference": "pcna-archive-fetch@1",
+          "status": "catalog_only"
+        },
+        {
+          "kind": "method",
+          "provider": "org.gx.protein@0.1.0-v6.1",
+          "reference": "tl1a-review@1",
+          "status": "catalog_only"
+        }
+      ],
+      "semantic_key": "catalog.query:308b0b1601e150a95d7190429c6e6782897b53b503e29cc9d72a1e8740cfa13e",
+      "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "through_event": 154,
+      "total": 56,
+      "trigger_events": [
+        154
+      ],
+      "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+    }
+  ],
+  "endpoint_deliveries": [
+    {
+      "event_id": 65,
+      "utc": "2026-11-27T19:10:54.781Z",
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "1b99a2b2a2e9",
+            "unit": "min",
+            "value": "20.00 min"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "06a4cba6d988",
+            "unit": "L",
+            "value": "1200.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "6042f21a94a2",
+            "unit": "L",
+            "value": "1440.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "fc9b8c21234f",
+            "unit": "L",
+            "value": "960.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "9e6581c9fbbc",
+            "unit": "L",
+            "value": "2400.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "e3fb1d595b21",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "6388bec7befc",
+            "unit": "L",
+            "value": "1200.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        }
+      ],
+      "lease_id": "gxl_01m8f6nw7r8n5dbk44",
+      "receipt": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+      "task_id": "gxt_01m8f6nw7dyg72e1ea",
+      "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+      "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+    },
+    {
+      "event_id": 107,
+      "utc": "2026-11-27T19:12:53.644Z",
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "7d18b97dd133",
+            "unit": "min",
+            "value": "30.00 min"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "7533470751f9",
+            "unit": "L",
+            "value": "600.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "8fe81b974719",
+            "unit": "L",
+            "value": "960.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "6bcbed0044ec",
+            "unit": "L",
+            "value": "240.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "46ea899975ca",
+            "unit": "L",
+            "value": "4080.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "8f93d785e7d3",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "f27a98bf4c82",
+            "unit": "L",
+            "value": "3480.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        }
+      ],
+      "lease_id": "gxl_01m8f6sg9kw4r8t27n",
+      "receipt": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+      "task_id": "gxt_01m8f6sg8y62dc16by",
+      "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+      "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+    },
+    {
+      "event_id": 132,
+      "utc": "2026-11-27T19:15:00.101Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "1b99a2b2a2e9",
+            "unit": "min",
+            "value": "20.00 min"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "06a4cba6d988",
+            "unit": "L",
+            "value": "1200.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "6042f21a94a2",
+            "unit": "L",
+            "value": "1440.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        }
+      ],
+      "lease_id": "gxl_01m8f6w3hyevcgze7s",
+      "receipt": "exec-725e1919-28b3-4637-a870-82aa2a39a319",
+      "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+      "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+      "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+    },
+    {
+      "event_id": 133,
+      "utc": "2026-11-27T19:15:00.107Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "metric_ref": "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "metric_ref": "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "7d18b97dd133",
+            "unit": "min",
+            "value": "30.00 min"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "7533470751f9",
+            "unit": "L",
+            "value": "600.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "8fe81b974719",
+            "unit": "L",
+            "value": "960.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        }
+      ],
+      "lease_id": "gxl_01m8f6w3hyevcgze7s",
+      "receipt": "exec-d5e76b1c-ef21-40c2-b32c-a99c8fa24e45",
+      "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+      "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+      "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+    },
+    {
+      "event_id": 134,
+      "utc": "2026-11-27T19:15:09.994Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "fc9b8c21234f",
+            "unit": "L",
+            "value": "960.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "9e6581c9fbbc",
+            "unit": "L",
+            "value": "2400.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "e3fb1d595b21",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        }
+      ],
+      "lease_id": "gxl_01m8f6w3hyevcgze7s",
+      "receipt": "exec-9e5cb1e6-52ed-48fe-9ff0-eed8d500fefa",
+      "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+      "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+      "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+    },
+    {
+      "event_id": 135,
+      "utc": "2026-11-27T19:15:10.000Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "metric_ref": "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "metric_ref": "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "6bcbed0044ec",
+            "unit": "L",
+            "value": "240.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "46ea899975ca",
+            "unit": "L",
+            "value": "4080.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "8f93d785e7d3",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        }
+      ],
+      "lease_id": "gxl_01m8f6w3hyevcgze7s",
+      "receipt": "exec-e9c37641-32f0-4ea4-b7a8-9e27575f20c9",
+      "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+      "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+      "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+    },
+    {
+      "event_id": 136,
+      "utc": "2026-11-27T19:15:16.358Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "f27a98bf4c82",
+            "unit": "L",
+            "value": "3480.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        }
+      ],
+      "lease_id": "gxl_01m8f6w3hyevcgze7s",
+      "receipt": "exec-14256288-2d66-4b66-b841-0ae13acd27c3",
+      "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+      "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+      "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+    },
+    {
+      "event_id": 137,
+      "utc": "2026-11-27T19:15:16.363Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "6388bec7befc",
+            "unit": "L",
+            "value": "1200.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        }
+      ],
+      "lease_id": "gxl_01m8f6w3hyevcgze7s",
+      "receipt": "exec-51c72a65-56ae-4853-82b0-5c048d418f96",
+      "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+      "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+      "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+    },
+    {
+      "event_id": 164,
+      "utc": "2026-11-27T19:20:02.626Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "1b99a2b2a2e9",
+            "unit": "min",
+            "value": "20.00 min"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "06a4cba6d988",
+            "unit": "L",
+            "value": "1200.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "6042f21a94a2",
+            "unit": "L",
+            "value": "1440.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        }
+      ],
+      "lease_id": "gxl_01m8f724zvds1ch84x",
+      "receipt": "exec-a7e47715-4d85-4f06-b78f-4d374d28b362",
+      "task_id": "gxt_01m8f724zeqebcrtjn",
+      "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+    },
+    {
+      "event_id": 165,
+      "utc": "2026-11-27T19:20:02.639Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "metric_ref": "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "metric_ref": "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "7d18b97dd133",
+            "unit": "min",
+            "value": "30.00 min"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "7533470751f9",
+            "unit": "L",
+            "value": "600.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "8fe81b974719",
+            "unit": "L",
+            "value": "960.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        }
+      ],
+      "lease_id": "gxl_01m8f724zvds1ch84x",
+      "receipt": "exec-3f42cfde-ca69-4eee-b277-6e810f3b15cc",
+      "task_id": "gxt_01m8f724zeqebcrtjn",
+      "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+    },
+    {
+      "event_id": 166,
+      "utc": "2026-11-27T19:20:08.598Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "metric_ref": "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "metric_ref": "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "6bcbed0044ec",
+            "unit": "L",
+            "value": "240.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "46ea899975ca",
+            "unit": "L",
+            "value": "4080.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "8f93d785e7d3",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        }
+      ],
+      "lease_id": "gxl_01m8f724zvds1ch84x",
+      "receipt": "exec-c4ec91fa-f2ea-450d-84fc-b9cef7468c0b",
+      "task_id": "gxt_01m8f724zeqebcrtjn",
+      "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+    },
+    {
+      "event_id": 167,
+      "utc": "2026-11-27T19:20:08.609Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "metric_ref": "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "fc9b8c21234f",
+            "unit": "L",
+            "value": "960.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "9e6581c9fbbc",
+            "unit": "L",
+            "value": "2400.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "e3fb1d595b21",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        }
+      ],
+      "lease_id": "gxl_01m8f724zvds1ch84x",
+      "receipt": "exec-a62c4288-d8ec-4f41-8ff5-fce0ab48ab06",
+      "task_id": "gxt_01m8f724zeqebcrtjn",
+      "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+    },
+    {
+      "event_id": 168,
+      "utc": "2026-11-27T19:20:08.707Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47",
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "f27a98bf4c82",
+            "unit": "L",
+            "value": "3480.00 L"
+          },
+          "source_ref": "gxa_01m8f6sek4q866nmv4"
+        }
+      ],
+      "lease_id": "gxl_01m8f724zvds1ch84x",
+      "receipt": "exec-776fe8be-b684-466d-8c5c-3ace72ab7e28",
+      "task_id": "gxt_01m8f724zeqebcrtjn",
+      "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+    },
+    {
+      "event_id": 169,
+      "utc": "2026-11-27T19:20:08.720Z",
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85",
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "6388bec7befc",
+            "unit": "L",
+            "value": "1200.00 L"
+          },
+          "source_ref": "gxa_01m8f6nv8tnv5zff3b"
+        }
+      ],
+      "lease_id": "gxl_01m8f724zvds1ch84x",
+      "receipt": "exec-84f9a8c0-9a33-4186-8fa4-cf3b439adeab",
+      "task_id": "gxt_01m8f724zeqebcrtjn",
+      "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+      "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8f6nttg7dr86yf5",
+      "capability_id": "discharge-concurrent",
+      "capability_version": "1",
+      "status": "SUCCEEDED",
+      "submitted_at": "2026-11-27T19:10:53.413Z",
+      "finished_at": "2026-11-27T19:10:53.755Z",
+      "outputs": [
+        {
+          "artifact_ref": "gxa_01m8f6nv8tnv5zff3b",
+          "kind": "hydrometric_concurrent",
+          "sha256": "b52c9caf2eac2603d97d126545f975f09eab09f9557e008eb72371e9b0fb2613",
+          "rel_path": "files/paired.json",
+          "values": {
+            "schema": "gx.hydrometry-paired/1",
+            "trial": "POND-6",
+            "channels": [
+              "North",
+              "South"
+            ],
+            "input_sha256": "68cad55199c269636ba4be334b7249cd0093c3b63b98f9740753966fa22437cd",
+            "common_minutes": 20.0,
+            "outside_common_minutes": 0.0,
+            "left_L": 2400.0,
+            "right_L": 1200.0,
+            "difference_L": 1200.0,
+            "difference_low_L": 960.0,
+            "difference_high_L": 1440.0,
+            "left_mean_L_s": 2.0,
+            "right_mean_L_s": 1.0,
+            "support": "positive_duration",
+            "intervals": [
+              {
+                "start_min": 0.0,
+                "end_min": 20.0
+              }
+            ],
+            "scope": "Volumes integrate over valid simultaneous intervals only. An empty support has zero duration and integrated volume; the mean and ordering there are unknown."
+          },
+          "independent_minute_sum": {
+            "source_file": "material.json",
+            "expected": {
+              "common_minutes": 20.0,
+              "left_L": 2400.0,
+              "right_L": 1200.0,
+              "difference_L": 1200.0,
+              "difference_low_L": 960.0,
+              "difference_high_L": 1440.0
+            },
+            "max_abs_error": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8f6se4zv8jrddvy",
+      "capability_id": "discharge-concurrent",
+      "capability_version": "1",
+      "status": "SUCCEEDED",
+      "submitted_at": "2026-11-27T19:12:51.487Z",
+      "finished_at": "2026-11-27T19:12:51.845Z",
+      "outputs": [
+        {
+          "artifact_ref": "gxa_01m8f6sek4q866nmv4",
+          "kind": "hydrometric_concurrent",
+          "sha256": "ba66f213bd61ba8b086a171df93892ed16373ff2695c8496b9970b46159e4dc7",
+          "rel_path": "files/paired.json",
+          "values": {
+            "schema": "gx.hydrometry-paired/1",
+            "trial": "POND-7",
+            "channels": [
+              "North",
+              "South"
+            ],
+            "input_sha256": "b3b33aad334ca13cc3a27f00ddfb4a7d06ddae5467e77f7128e1dabbc0fbd39f",
+            "common_minutes": 30.0,
+            "outside_common_minutes": 0.0,
+            "left_L": 4080.0,
+            "right_L": 3480.0,
+            "difference_L": 600.0,
+            "difference_low_L": 240.0,
+            "difference_high_L": 960.0,
+            "left_mean_L_s": 2.2666666666666666,
+            "right_mean_L_s": 1.9333333333333333,
+            "support": "positive_duration",
+            "intervals": [
+              {
+                "start_min": 0.0,
+                "end_min": 20.0
+              },
+              {
+                "start_min": 20.0,
+                "end_min": 30.0
+              }
+            ],
+            "scope": "Volumes integrate over valid simultaneous intervals only. An empty support has zero duration and integrated volume; the mean and ordering there are unknown."
+          },
+          "independent_minute_sum": {
+            "source_file": "second.json",
+            "expected": {
+              "common_minutes": 30.0,
+              "left_L": 4080.0,
+              "right_L": 3480.0,
+              "difference_L": 600.0,
+              "difference_low_L": 240.0,
+              "difference_high_L": 960.0
+            },
+            "max_abs_error": 0.0
+          }
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "decision_ref": "gxa_8ae4b792439e22b08a7d80d631f96813d68826295e5de30cab359b5a39f74909",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "event": 37,
+      "rationale": "The first POND-6 export covers 20 shared minutes. At 2.0 ± 0.1 L/s for North and 1.0 ± 0.1 L/s for South, even North's minimum exceeds South's maximum. North is provisionally the higher-delivery label. Hold the visit assignment until the PI specifies the dispatch criterion and custody establishes the physical stations. A single concurrent integration will document the shared duration, both volumes and the worst-case signed range. Separate station totals add no information for this export. Keep the study open for the second trial, criterion and custody check.",
+      "evidence_refs": [
+        "gxa_01m8f6ktwzvbjh3b52",
+        "gxa_01m8f6njxbtefnr5d3"
+      ],
+      "ops": [
+        {
+          "branch": "local:measurement-branch",
+          "budget_limits": {
+            "cpu_seconds": 30,
+            "job_submissions": 1
+          },
+          "op": "open_branch"
+        },
+        {
+          "branch": "local:measurement-branch",
+          "capability": "discharge-concurrent@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8f6ktwzvbjh3b52"
+          ],
+          "node": "local:measurement",
+          "op": "add_node",
+          "parameters": {},
+          "question": "For POND-6, what are the shared valid minutes, unpaired minutes, North and South volumes, and the signed North-minus-South volume with deterministic lower and upper bounds from both logger tolerances?"
+        }
+      ],
+      "outcome": "adopted",
+      "endpoint_use": {}
+    },
+    {
+      "decision_ref": "gxa_c9a774c062b4bf515d1e4fff7290e90f01c3b1c8c611fb4cc7416b5c9643c530",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "event": 84,
+      "rationale": "North is provisionally the higher-delivery label in both exports. The first paired calculation puts its excess at {{metric:difference_L}}, with calibration bounds of {{metric:difference_low_L}} to {{metric:difference_high_L}} over {{metric:common_minutes}}. In the second export North leads early, then the rates are equal. The later interval still contributes calibration uncertainty. One concurrent integration will quantify the second margin. Hold the physical visit assignment and keep the study open for the PI’s dispatch criterion and custody check.",
+      "evidence_refs": [
+        "gxa_01m8f6ktwzvbjh3b52",
+        "gxa_01m8f6nv8tnv5zff3b",
+        "gxa_01m8f6nw3fx0aj9qzz",
+        "simulated-pond-trial-7",
+        "gxa_01m8f6qc0q24rz8e9w",
+        "gxa_01m8f6pyys11e2b2dy"
+      ],
+      "ops": [
+        {
+          "alternative": "The logger tolerances permit equal delivery or a South excess on the common intervals.",
+          "branch": "local:pond7",
+          "budget_limits": {
+            "cpu_seconds": 30,
+            "job_submissions": 1
+          },
+          "discriminating_observation": "Whether the lower bound on North minus South volume is strictly positive over shared valid time in POND-7.",
+          "hypothesis": "North has a positive volume excess on POND-7 even at the least favorable allowed calibration.",
+          "method_family": "hydrometric_water_balance",
+          "op": "open_branch",
+          "stop_condition": "Stop this calculation when the paired duration, both volumes and signed calibration bounds have been measured for the supplied POND-7 export."
+        },
+        {
+          "branch": "local:pond7",
+          "capability": "discharge-concurrent@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8f6nw3fx0aj9qzz"
+          ],
+          "node": "local:paired7",
+          "op": "add_node",
+          "parameters": {},
+          "question": "For POND-7 as labeled, what are the common and outside-common durations, North and South volumes, signed North minus South volume and its deterministic lower and upper bounds when both loggers can reach their stated tolerances?"
+        }
+      ],
+      "outcome": "adopted",
+      "endpoint_use": {
+        "receipts": {
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48": {
+            "delivery_kind": "brief",
+            "event_id": 65,
+            "lease_id": "gxl_01m8f6nw7r8n5dbk44",
+            "receipt": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6nw7dyg72e1ea",
+            "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+            "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+          },
+          "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860": {
+            "delivery_kind": "brief",
+            "event_id": 65,
+            "lease_id": "gxl_01m8f6nw7r8n5dbk44",
+            "receipt": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6nw7dyg72e1ea",
+            "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+            "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+          },
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e": {
+            "delivery_kind": "brief",
+            "event_id": 65,
+            "lease_id": "gxl_01m8f6nw7r8n5dbk44",
+            "receipt": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6nw7dyg72e1ea",
+            "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+            "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+          },
+          "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85": {
+            "delivery_kind": "brief",
+            "event_id": 65,
+            "lease_id": "gxl_01m8f6nw7r8n5dbk44",
+            "receipt": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6nw7dyg72e1ea",
+            "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+            "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+          },
+          "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073": {
+            "delivery_kind": "brief",
+            "event_id": 65,
+            "lease_id": "gxl_01m8f6nw7r8n5dbk44",
+            "receipt": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6nw7dyg72e1ea",
+            "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+            "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+          },
+          "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a": {
+            "delivery_kind": "brief",
+            "event_id": 65,
+            "lease_id": "gxl_01m8f6nw7r8n5dbk44",
+            "receipt": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6nw7dyg72e1ea",
+            "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+            "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+          },
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e": {
+            "delivery_kind": "brief",
+            "event_id": 65,
+            "lease_id": "gxl_01m8f6nw7r8n5dbk44",
+            "receipt": "start:a1bdac03-c65b-40c6-9303-9933ee78ba5c",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6nw7dyg72e1ea",
+            "thread_id": "01a21e6a-f10b-7922-93e4-7dc30cb0bb1d",
+            "turn_id": "01a21e6a-f139-7371-bf96-81996203ec87"
+          }
+        },
+        "received_metric_refs": [
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860",
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85",
+          "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073",
+          "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a",
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e"
+        ],
+        "unread_metric_refs": [],
+        "used_metric_refs": [
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860",
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85",
+          "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073",
+          "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a",
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e"
+        ]
+      }
+    },
+    {
+      "decision_ref": "gxa_9d53db52f38e1d4a098d0508b595d36710e43043a5b4e2b3afe1be69a034cf4f",
+      "turn": "01a21e6c-c187-74e3-bf0d-148046a6f0c3",
+      "event": 123,
+      "rationale": "Keep North as the provisional higher-delivery label in both exports. In POND-7, North delivered {{metric:gxa_01m8f6sek4q866nmv4:left_L}} and South {{metric:gxa_01m8f6sek4q866nmv4:right_L}} over {{metric:gxa_01m8f6sek4q866nmv4:common_minutes}} of shared valid time, with {{metric:gxa_01m8f6sek4q866nmv4:outside_common_minutes}} outside it. North's lead was {{metric:gxa_01m8f6sek4q866nmv4:difference_L}}. Its calibration bounds of {{metric:gxa_01m8f6sek4q866nmv4:difference_low_L}} to {{metric:gxa_01m8f6sek4q866nmv4:difference_high_L}} meet the registered positive-lower-bound criterion. POND-7 has the smaller guaranteed margin of the two trials. Both integrations are complete. Defer the physical visit and keep the study open for the PI's dispatch rule and the station custody check.",
+      "evidence_refs": [
+        "gxa_01m8f6ktwzvbjh3b52",
+        "gxa_01m8f6nv8tnv5zff3b",
+        "gxa_01m8f6nw3fx0aj9qzz",
+        "gxa_01m8f6sek4q866nmv4",
+        "gxa_01m8f6v59sftahffsr"
+      ],
+      "ops": [],
+      "outcome": "maintained",
+      "endpoint_use": {
+        "receipts": {
+          "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347": {
+            "delivery_kind": "brief",
+            "event_id": 107,
+            "lease_id": "gxl_01m8f6sg9kw4r8t27n",
+            "receipt": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6sg8y62dc16by",
+            "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+            "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+          },
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f": {
+            "delivery_kind": "brief",
+            "event_id": 107,
+            "lease_id": "gxl_01m8f6sg9kw4r8t27n",
+            "receipt": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6sg8y62dc16by",
+            "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+            "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+          },
+          "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a": {
+            "delivery_kind": "brief",
+            "event_id": 107,
+            "lease_id": "gxl_01m8f6sg9kw4r8t27n",
+            "receipt": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6sg8y62dc16by",
+            "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+            "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+          },
+          "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a": {
+            "delivery_kind": "brief",
+            "event_id": 107,
+            "lease_id": "gxl_01m8f6sg9kw4r8t27n",
+            "receipt": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6sg8y62dc16by",
+            "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+            "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+          },
+          "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4": {
+            "delivery_kind": "brief",
+            "event_id": 107,
+            "lease_id": "gxl_01m8f6sg9kw4r8t27n",
+            "receipt": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6sg8y62dc16by",
+            "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+            "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+          },
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c": {
+            "delivery_kind": "brief",
+            "event_id": 107,
+            "lease_id": "gxl_01m8f6sg9kw4r8t27n",
+            "receipt": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6sg8y62dc16by",
+            "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+            "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+          },
+          "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47": {
+            "delivery_kind": "brief",
+            "event_id": 107,
+            "lease_id": "gxl_01m8f6sg9kw4r8t27n",
+            "receipt": "start:2d47106d-a7b1-4911-b98e-d4c3fe9cd515",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6sg8y62dc16by",
+            "thread_id": "01a21e6c-c154-73e0-a4d6-8ad5f6c465b4",
+            "turn_id": "01a21e6c-c187-74e3-bf0d-148046a6f0c3"
+          }
+        },
+        "received_metric_refs": [
+          "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347",
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f",
+          "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a",
+          "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a",
+          "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4",
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c",
+          "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47"
+        ],
+        "unread_metric_refs": [
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860",
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85",
+          "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073",
+          "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a",
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e"
+        ],
+        "used_metric_refs": [
+          "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347",
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f",
+          "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a",
+          "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a",
+          "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4",
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c",
+          "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47"
+        ]
+      }
+    },
+    {
+      "decision_ref": "gxa_7dc07f0d31abfda2d068d5cf77d6e397fe9123c290d48374d01604b1eb5956a1",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "event": 149,
+      "rationale": "Withhold a technician visit for each trial. The PI requires the lower bound on North minus South volume to exceed 1,000 L on that trial's shared valid observations. POND-6 has an estimated excess of {{metric:gxa_01m8f6nv8tnv5zff3b:difference_L}} with bounds of {{metric:gxa_01m8f6nv8tnv5zff3b:difference_low_L}} to {{metric:gxa_01m8f6nv8tnv5zff3b:difference_high_L}}. Its range straddles the threshold. POND-7 has an estimated excess of {{metric:gxa_01m8f6sek4q866nmv4:difference_L}} with bounds of {{metric:gxa_01m8f6sek4q866nmv4:difference_low_L}} to {{metric:gxa_01m8f6sek4q866nmv4:difference_high_L}}. Even its upper bound falls short. North is the higher-delivery label in both exports. Keep the study open for the station custody check.",
+      "evidence_refs": [
+        "gxa_01m8f6ktwzvbjh3b52",
+        "gxa_01m8f6nv8tnv5zff3b",
+        "gxa_01m8f6nw3fx0aj9qzz",
+        "gxa_01m8f6sek4q866nmv4",
+        "gxa_01m8f6zf36vvkmhp3w"
+      ],
+      "ops": [],
+      "outcome": "maintained",
+      "endpoint_use": {
+        "receipts": {
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48": {
+            "delivery_kind": "artifact_read",
+            "event_id": 132,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-725e1919-28b3-4637-a870-82aa2a39a319",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860": {
+            "delivery_kind": "artifact_read",
+            "event_id": 132,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-725e1919-28b3-4637-a870-82aa2a39a319",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347": {
+            "delivery_kind": "artifact_read",
+            "event_id": 135,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-e9c37641-32f0-4ea4-b7a8-9e27575f20c9",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e": {
+            "delivery_kind": "artifact_read",
+            "event_id": 132,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-725e1919-28b3-4637-a870-82aa2a39a319",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85": {
+            "delivery_kind": "artifact_read",
+            "event_id": 137,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-51c72a65-56ae-4853-82b0-5c048d418f96",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f": {
+            "delivery_kind": "artifact_read",
+            "event_id": 135,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-e9c37641-32f0-4ea4-b7a8-9e27575f20c9",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a": {
+            "delivery_kind": "artifact_read",
+            "event_id": 133,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-d5e76b1c-ef21-40c2-b32c-a99c8fa24e45",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a": {
+            "delivery_kind": "artifact_read",
+            "event_id": 133,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-d5e76b1c-ef21-40c2-b32c-a99c8fa24e45",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4": {
+            "delivery_kind": "artifact_read",
+            "event_id": 135,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-e9c37641-32f0-4ea4-b7a8-9e27575f20c9",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c": {
+            "delivery_kind": "artifact_read",
+            "event_id": 133,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-d5e76b1c-ef21-40c2-b32c-a99c8fa24e45",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073": {
+            "delivery_kind": "artifact_read",
+            "event_id": 134,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-9e5cb1e6-52ed-48fe-9ff0-eed8d500fefa",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a": {
+            "delivery_kind": "artifact_read",
+            "event_id": 134,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-9e5cb1e6-52ed-48fe-9ff0-eed8d500fefa",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47": {
+            "delivery_kind": "artifact_read",
+            "event_id": 136,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-14256288-2d66-4b66-b841-0ae13acd27c3",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          },
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e": {
+            "delivery_kind": "artifact_read",
+            "event_id": 134,
+            "lease_id": "gxl_01m8f6w3hyevcgze7s",
+            "receipt": "exec-9e5cb1e6-52ed-48fe-9ff0-eed8d500fefa",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f6w3hjcvkpv4bk",
+            "thread_id": "01a21e6e-0e57-7ee0-969f-aaff41217139",
+            "turn_id": "01a21e6e-0e7b-7532-a822-d54be76fff31"
+          }
+        },
+        "received_metric_refs": [
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860",
+          "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347",
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85",
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f",
+          "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a",
+          "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a",
+          "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4",
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c",
+          "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073",
+          "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a",
+          "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47",
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e"
+        ],
+        "unread_metric_refs": [],
+        "used_metric_refs": [
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f",
+          "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a",
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c",
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e"
+        ]
+      }
+    },
+    {
+      "decision_ref": "gxa_7c8e12ccfb0b4b55015da218969a60a041b3c25b9572d87bd3772f8b8a934649",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "event": 177,
+      "rationale": "Withhold a maintenance visit for both trials. The PI requires the lower bound on North minus South delivery to exceed 1,000 L within a single trial. The POND-6 bounds are {{metric:gxa_01m8f6nv8tnv5zff3b:difference_low_L}} to {{metric:gxa_01m8f6nv8tnv5zff3b:difference_high_L}}, so North leads but the range straddles the dispatch threshold. The POND-7 bounds are {{metric:gxa_01m8f6sek4q866nmv4:difference_low_L}} to {{metric:gxa_01m8f6sek4q866nmv4:difference_high_L}}, so North leads and even the upper bound falls short. The completed custody register matches the POND-7 export digest, maps North to rack-B and South to rack-A, and confirms the original POND-6 assignment. The paired analyses cover both full trial windows and the reporting packet is complete.",
+      "evidence_refs": [
+        "gxa_01m8f6ktwzvbjh3b52",
+        "gxa_01m8f6nv8tnv5zff3b",
+        "gxa_01m8f6nw3fx0aj9qzz",
+        "gxa_01m8f6sek4q866nmv4",
+        "gxa_01m8f724wc3f9qfhmc"
+      ],
+      "ops": [
+        {
+          "claim_refs": [
+            "gxa_01m8f75t9g0w6wxt9a"
+          ],
+          "op": "close_run",
+          "reason": "SCIENTIFIC_COMPLETION",
+          "unresolved": []
+        }
+      ],
+      "outcome": "adopted",
+      "endpoint_use": {
+        "receipts": {
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48": {
+            "delivery_kind": "artifact_read",
+            "event_id": 164,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-a7e47715-4d85-4f06-b78f-4d374d28b362",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860": {
+            "delivery_kind": "artifact_read",
+            "event_id": 164,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-a7e47715-4d85-4f06-b78f-4d374d28b362",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347": {
+            "delivery_kind": "artifact_read",
+            "event_id": 166,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-c4ec91fa-f2ea-450d-84fc-b9cef7468c0b",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e": {
+            "delivery_kind": "artifact_read",
+            "event_id": 164,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-a7e47715-4d85-4f06-b78f-4d374d28b362",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85": {
+            "delivery_kind": "artifact_read",
+            "event_id": 169,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-84f9a8c0-9a33-4186-8fa4-cf3b439adeab",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f": {
+            "delivery_kind": "artifact_read",
+            "event_id": 166,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-c4ec91fa-f2ea-450d-84fc-b9cef7468c0b",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a": {
+            "delivery_kind": "artifact_read",
+            "event_id": 165,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-3f42cfde-ca69-4eee-b277-6e810f3b15cc",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a": {
+            "delivery_kind": "artifact_read",
+            "event_id": 165,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-3f42cfde-ca69-4eee-b277-6e810f3b15cc",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4": {
+            "delivery_kind": "artifact_read",
+            "event_id": 166,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-c4ec91fa-f2ea-450d-84fc-b9cef7468c0b",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c": {
+            "delivery_kind": "artifact_read",
+            "event_id": 165,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-3f42cfde-ca69-4eee-b277-6e810f3b15cc",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073": {
+            "delivery_kind": "artifact_read",
+            "event_id": 167,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-a62c4288-d8ec-4f41-8ff5-fce0ab48ab06",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a": {
+            "delivery_kind": "artifact_read",
+            "event_id": 167,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-a62c4288-d8ec-4f41-8ff5-fce0ab48ab06",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47": {
+            "delivery_kind": "artifact_read",
+            "event_id": 168,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-776fe8be-b684-466d-8c5c-3ace72ab7e28",
+            "source_ref": "gxa_01m8f6sek4q866nmv4",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          },
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e": {
+            "delivery_kind": "artifact_read",
+            "event_id": 167,
+            "lease_id": "gxl_01m8f724zvds1ch84x",
+            "receipt": "exec-a62c4288-d8ec-4f41-8ff5-fce0ab48ab06",
+            "source_ref": "gxa_01m8f6nv8tnv5zff3b",
+            "task_id": "gxt_01m8f724zeqebcrtjn",
+            "thread_id": "01a21e71-1414-7342-b457-e0ee43ccb2a0",
+            "turn_id": "01a21e71-143d-7602-a83e-bcc1e0daf7f8"
+          }
+        },
+        "received_metric_refs": [
+          "metric_06a4cba6d988f85dbe5bcd937ea6538b7c6d810cf6142446ee52f298657d1c48",
+          "metric_1b99a2b2a2e9e2b6253a8a1ed58447de25319861607fe4e4683a4082f3d4a860",
+          "metric_46ea899975ca0ff584ab1bce2f49811406095e4250a19e8f799a424d5be63347",
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "metric_6388bec7befcb76f47af8f7da8a3b7f08b9784a0802351c45c9aa48028e3bd85",
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f",
+          "metric_7533470751f93e0f1391ee5dd0806024930244a95c7e7279328cbb8019400b8a",
+          "metric_7d18b97dd1331eb09703a088e12d752897e8f52b1f023a00482f23747be5e99a",
+          "metric_8f93d785e7d342ebfa077762616a342c65dbe77ea63c08291c3dbd0a671a4ae4",
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c",
+          "metric_9e6581c9fbbc86c3c2284beaaca32feb83fd5bfa09bb34aec12161a84c875073",
+          "metric_e3fb1d595b21d1b70c83551756fbe7d6cfd04dd0f55388364b3ddbcf142b310a",
+          "metric_f27a98bf4c8254d2b6411a5349c82fb6bcd45f06f3904cd66fc048e2dc8eeb47",
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e"
+        ],
+        "unread_metric_refs": [],
+        "used_metric_refs": [
+          "metric_6042f21a94a2fbaa883e7f026c7236e74e1a26e7a653eed966904e6527aa733e",
+          "metric_6bcbed0044ec927677d80a669225012a7a5f9f686bb154d557edbb0ed41c800f",
+          "metric_8fe81b974719eaa4cea2d79390ddee594a0368c09151fcf6a13e9d4474da5d9c",
+          "metric_fc9b8c21234f9fda5f8e4283adf21bcf08b663c0fb04a0c0174ba952f3f7bf7e"
+        ]
+      }
+    }
+  ],
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_7c8e12ccfb0b4b55015da218969a60a041b3c25b9572d87bd3772f8b8a934649",
+    "op_digest": "dc0681c8b27bc526d94b53af8f64a4b90a1d515345dceeea18886fe2a9fe62a9",
+    "requested_event": 172,
+    "committed_event": 177,
+    "closed_event": 179,
+    "closed_utc": "2026-11-27T19:20:20.931Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8f75t9g0w6wxt9a"
+      ],
+      "op": "close_run",
+      "reason": "SCIENTIFIC_COMPLETION",
+      "unresolved": []
+    }
+  },
+  "rendered_final": {
+    "reason": "SCIENTIFIC_COMPLETION",
+    "rationale": "Withhold a maintenance visit for both trials. The PI requires the lower bound on North minus South delivery to exceed 1,000 L within a single trial. The POND-6 bounds are 960.00 L to 1440.00 L, so North leads but the range straddles the dispatch threshold. The POND-7 bounds are 240.00 L to 960.00 L, so North leads and even the upper bound falls short. The completed custody register matches the POND-7 export digest, maps North to rack-B and South to rack-A, and confirms the original POND-6 assignment. The paired analyses cover both full trial windows and the reporting packet is complete.",
+    "unresolved": []
+  },
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCOPE_DENIED",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCOPE_DENIED",
+      "submission": "c64678c98a861b990957002e40c49dddedee43ba2efbceb110de313515ed8461",
+      "event_id": 68,
+      "corrected_decision_event": null
+    },
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "a325a3fbec69264989ed3898b0a53ce491b93a829ef2a3f64bbc76d60d9e24de",
+      "event_id": 73,
+      "corrected_decision_event": 84
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "73cfc321d7f07c6ca177e432a6fce6a05a475944fe1068dc99c1a838bc631891",
+      "event_id": 74,
+      "corrected_decision_event": 84
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 2,
+      "reason": "SCHEMA_INVALID",
+      "submission": "128ef0731ffba7da914fba02c990b3af7408f075069636e971b004915c211f4a",
+      "event_id": 76,
+      "corrected_decision_event": 84
+    },
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "19ba38350ce091c0f857ed31597d9ad22a63154b31887db8d751fe41475fbe35",
+      "event_id": 116,
+      "corrected_decision_event": 123
+    },
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "60aef1294145b8f9c25af8db9a7084d0b65349a23558396b5c73f760c22b5c5a",
+      "event_id": 140,
+      "corrected_decision_event": 149
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "91ae129d5c1e3f83d628bf4468ed44a4899bd7f6a70fc0ab111f7e71aa7751a6",
+      "event_id": 141,
+      "corrected_decision_event": 149
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "ops",
+      "previous_rejections": 2,
+      "reason": "comparison_action_ambiguous",
+      "submission": "b0809a1e2092cf16cf0b52cac1fef335f6e62e942ec825793e1d44d971db9a43",
+      "event_id": 142,
+      "corrected_decision_event": 149
+    },
+    {
+      "attempt": 1,
+      "code": "SCOPE_DENIED",
+      "field": "metric_refs",
+      "previous_rejections": 0,
+      "reason": "endpoint_not_received",
+      "submission": "3e1d4b3857d862f918f24db90996ac1c5f4d997705f8598355f31a8101c0ee49",
+      "event_id": 163,
+      "corrected_decision_event": 177
+    }
+  ],
+  "report_sha256": "cc731dc40887465c6c774bcc901618f60f665d82cfc00455a3bd352ba7fea6fd",
+  "decision_md_sha256": "04aebb8b0ba9ea7824077060802d1130cd4d9e4b8f9f819c29e6a272a48cab0f",
+  "first_science_brief": {
+    "capability_view": {
+      "option_count": 5,
+      "revision": 0
+    },
+    "method_names_in_snapshot": [],
+    "initial_inputs": [
+      {
+        "role": "record",
+        "name": "material.json",
+        "artifact_ref": "gxa_01m8f6ktwzvbjh3b52"
+      }
+    ]
+  },
+  "external_updates": [
+    {
+      "change": "opening",
+      "operator_event": 0,
+      "payload": null,
+      "found_survey": true,
+      "query_event": 19,
+      "query": {
+        "kind": "all",
+        "limit": 40,
+        "query": "Shared valid observation time, two-station flow comparison, logger tolerances, calibrated delivery volume bounds and maintenance dispatch, gx.hydrometry/1 record."
+      },
+      "utc": "2026-11-27T19:10:07.819Z",
+      "turn": "01a21e69-fee9-7521-9d0b-34c0670882c6",
+      "latest_question": "Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.\n\nThis is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.\n",
+      "latest_pi_update": null,
+      "available_inputs": [
+        {
+          "artifact_ref": "gxa_01m8f6ktwzvbjh3b52",
+          "name": "material.json",
+          "role": "record"
+        }
+      ],
+      "required_outputs": [
+        "Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.\n\nThis is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.\n"
+      ],
+      "decision_event": 37,
+      "decision_ref": "gxa_8ae4b792439e22b08a7d80d631f96813d68826295e5de30cab359b5a39f74909",
+      "outcome": "adopted",
+      "rationale": "The first POND-6 export covers 20 shared minutes. At 2.0 ± 0.1 L/s for North and 1.0 ± 0.1 L/s for South, even North's minimum exceeds South's maximum. North is provisionally the higher-delivery label. Hold the visit assignment until the PI specifies the dispatch criterion and custody establishes the physical stations. A single concurrent integration will document the shared duration, both volumes and the worst-case signed range. Separate station totals add no information for this export. Keep the study open for the second trial, criterion and custody check.",
+      "ops": [
+        {
+          "branch": "local:measurement-branch",
+          "budget_limits": {
+            "cpu_seconds": 30,
+            "job_submissions": 1
+          },
+          "op": "open_branch"
+        },
+        {
+          "branch": "local:measurement-branch",
+          "capability": "discharge-concurrent@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8f6ktwzvbjh3b52"
+          ],
+          "node": "local:measurement",
+          "op": "add_node",
+          "parameters": {},
+          "question": "For POND-6, what are the shared valid minutes, unpaired minutes, North and South volumes, and the signed North-minus-South volume with deterministic lower and upper bounds from both logger tolerances?"
+        }
+      ],
+      "pi_dispositions": []
+    },
+    {
+      "change": "new trial logger",
+      "operator_event": 59,
+      "payload": {
+        "source": "simulated-pond-trial-7",
+        "artifact_ref": "gxa_01m8f6nw3fx0aj9qzz"
+      },
+      "found_survey": true,
+      "query_event": 66,
+      "query": {
+        "kind": "all",
+        "query": "simultaneous valid discharge intervals compare POND-6 and POND-7 North minus South volumes shared minutes worst-case logger calibration bounds for maintenance dispatch",
+        "required_outputs": [
+          "paired.json"
+        ]
+      },
+      "utc": "2026-11-27T19:11:04.858Z",
+      "turn": "01a21e6a-f139-7371-bf96-81996203ec87",
+      "latest_question": "Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.\n\nThis is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.\n",
+      "latest_pi_update": null,
+      "available_inputs": [
+        {
+          "artifact_ref": "gxa_01m8f6ktwzvbjh3b52",
+          "name": "material.json",
+          "role": "record"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6nw3fx0aj9qzz",
+          "name": "second.json",
+          "role": "record"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6nv8tnv5zff3b",
+          "name": "paired.json",
+          "node_id": "node_c69d3334b86be5df4f64150b473c6bce"
+        }
+      ],
+      "required_outputs": [
+        "Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.\n\nThis is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.\n"
+      ],
+      "decision_event": 84,
+      "decision_ref": "gxa_c9a774c062b4bf515d1e4fff7290e90f01c3b1c8c611fb4cc7416b5c9643c530",
+      "outcome": "adopted",
+      "rationale": "North is provisionally the higher-delivery label in both exports. The first paired calculation puts its excess at {{metric:difference_L}}, with calibration bounds of {{metric:difference_low_L}} to {{metric:difference_high_L}} over {{metric:common_minutes}}. In the second export North leads early, then the rates are equal. The later interval still contributes calibration uncertainty. One concurrent integration will quantify the second margin. Hold the physical visit assignment and keep the study open for the PI’s dispatch criterion and custody check.",
+      "ops": [
+        {
+          "alternative": "The logger tolerances permit equal delivery or a South excess on the common intervals.",
+          "branch": "local:pond7",
+          "budget_limits": {
+            "cpu_seconds": 30,
+            "job_submissions": 1
+          },
+          "discriminating_observation": "Whether the lower bound on North minus South volume is strictly positive over shared valid time in POND-7.",
+          "hypothesis": "North has a positive volume excess on POND-7 even at the least favorable allowed calibration.",
+          "method_family": "hydrometric_water_balance",
+          "op": "open_branch",
+          "stop_condition": "Stop this calculation when the paired duration, both volumes and signed calibration bounds have been measured for the supplied POND-7 export."
+        },
+        {
+          "branch": "local:pond7",
+          "capability": "discharge-concurrent@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8f6nw3fx0aj9qzz"
+          ],
+          "node": "local:paired7",
+          "op": "add_node",
+          "parameters": {},
+          "question": "For POND-7 as labeled, what are the common and outside-common durations, North and South volumes, signed North minus South volume and its deterministic lower and upper bounds when both loggers can reach their stated tolerances?"
+        }
+      ],
+      "pi_dispositions": []
+    },
+    {
+      "change": "PI dispatch criterion",
+      "operator_event": 110,
+      "payload": {
+        "artifact_refs": [],
+        "branch_id": null,
+        "feedback_id": "pif_0424e5a59a9300b8dd480d401648d81f",
+        "goal_version": 1,
+        "scope": "run",
+        "source_kind": "information",
+        "source_message_id": "pond-dispatch-rule",
+        "text": "The logistics team has set the actual dispatch rule. Consider each trial separately and send a technician only when a North-minus-South excess of over 1,000 L holds throughout its calibration range on the shared observations. Retain both numerical estimates. The custody check is still pending. Please incorporate this into the next project decision."
+      },
+      "found_survey": true,
+      "query_event": 131,
+      "query": {
+        "kind": "all",
+        "query": "Apply a per-trial dispatch threshold to the lower bound of North minus South volume over shared valid logger time. Check station custody for POND-6 and POND-7."
+      },
+      "utc": "2026-11-27T19:14:29.579Z",
+      "turn": "01a21e6e-0e7b-7532-a822-d54be76fff31",
+      "latest_question": "Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.\n\nThis is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.\n",
+      "latest_pi_update": "The logistics team has set the actual dispatch rule. Consider each trial separately and send a technician only when a North-minus-South excess of over 1,000 L holds throughout its calibration range on the shared observations. Retain both numerical estimates. The custody check is still pending. Please incorporate this into the next project decision.",
+      "available_inputs": [
+        {
+          "artifact_ref": "gxa_01m8f6ktwzvbjh3b52",
+          "name": "material.json",
+          "role": "record"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6nw3fx0aj9qzz",
+          "name": "second.json",
+          "role": "record"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6nv8tnv5zff3b",
+          "name": "paired.json",
+          "node_id": "node_c69d3334b86be5df4f64150b473c6bce"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6sek4q866nmv4",
+          "name": "paired.json",
+          "node_id": "node_a25a29e53537ae900450dc100ff901fa"
+        }
+      ],
+      "required_outputs": [
+        "Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.\n\nThis is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.\n"
+      ],
+      "decision_event": 149,
+      "decision_ref": "gxa_7dc07f0d31abfda2d068d5cf77d6e397fe9123c290d48374d01604b1eb5956a1",
+      "outcome": "maintained",
+      "rationale": "Withhold a technician visit for each trial. The PI requires the lower bound on North minus South volume to exceed 1,000 L on that trial's shared valid observations. POND-6 has an estimated excess of {{metric:gxa_01m8f6nv8tnv5zff3b:difference_L}} with bounds of {{metric:gxa_01m8f6nv8tnv5zff3b:difference_low_L}} to {{metric:gxa_01m8f6nv8tnv5zff3b:difference_high_L}}. Its range straddles the threshold. POND-7 has an estimated excess of {{metric:gxa_01m8f6sek4q866nmv4:difference_L}} with bounds of {{metric:gxa_01m8f6sek4q866nmv4:difference_low_L}} to {{metric:gxa_01m8f6sek4q866nmv4:difference_high_L}}. Even its upper bound falls short. North is the higher-delivery label in both exports. Keep the study open for the station custody check.",
+      "ops": [],
+      "pi_dispositions": [
+        {
+          "feedback_id": "pif_0424e5a59a9300b8dd480d401648d81f",
+          "outcome": "adopt",
+          "reason": "Applied the strict lower-bound test separately to both exports and retained both estimates. Neither trial qualifies for dispatch. The sources for the two lower bounds are gxa_01m8f6nv8tnv5zff3b#fc9b8c21234f and gxa_01m8f6sek4q866nmv4#6bcbed0044ec."
+        }
+      ]
+    },
+    {
+      "change": "station custody observation",
+      "operator_event": 154,
+      "payload": {
+        "source": "simulated-pond-custody-register-v1",
+        "artifact_ref": "gxa_01m8f724wc3f9qfhmc"
+      },
+      "found_survey": true,
+      "query_event": 160,
+      "query": {
+        "kind": "all",
+        "limit": 20,
+        "query": "Compare paired North and South water delivery on shared valid time in POND-6 and POND-7 with signed calibration bounds, verify logger to station custody and apply the PI's per-trial technician dispatch criterion"
+      },
+      "utc": "2026-11-27T19:17:50.714Z",
+      "turn": "01a21e71-143d-7602-a83e-bcc1e0daf7f8",
+      "latest_question": "Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.\n\nThis is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.\n",
+      "latest_pi_update": null,
+      "available_inputs": [
+        {
+          "artifact_ref": "gxa_01m8f6ktwzvbjh3b52",
+          "name": "material.json",
+          "role": "record"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6nw3fx0aj9qzz",
+          "name": "second.json",
+          "role": "record"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6nv8tnv5zff3b",
+          "name": "paired.json",
+          "node_id": "node_c69d3334b86be5df4f64150b473c6bce"
+        },
+        {
+          "artifact_ref": "gxa_01m8f6sek4q866nmv4",
+          "name": "paired.json",
+          "node_id": "node_a25a29e53537ae900450dc100ff901fa"
+        },
+        {
+          "artifact_ref": "gxa_01m8f724wc3f9qfhmc",
+          "role": "observation",
+          "source_id": "simulated-pond-custody-register-v1"
+        }
+      ],
+      "required_outputs": [
+        "Two stations in a simulated flow trial report their own water deliveries. How securely can we prioritize one channel for a maintenance visit, taking account of the shared observed time and each logger's calibration? Give a reproducible numerical comparison for each trial and state what could change the visit decision.\n\nThis is a continuing study with staged input. The first station export is supplied now. A second trial, a dispatch criterion from the PI, and the station custody check will arrive separately. Please choose your own investigations. Record an interim recommendation when any part arrives and keep the study open for outstanding inputs. Close with a final recommendation after the custody check, when the reporting packet is complete.\n"
+      ],
+      "decision_event": 177,
+      "decision_ref": "gxa_7c8e12ccfb0b4b55015da218969a60a041b3c25b9572d87bd3772f8b8a934649",
+      "outcome": "adopted",
+      "rationale": "Withhold a maintenance visit for both trials. The PI requires the lower bound on North minus South delivery to exceed 1,000 L within a single trial. The POND-6 bounds are {{metric:gxa_01m8f6nv8tnv5zff3b:difference_low_L}} to {{metric:gxa_01m8f6nv8tnv5zff3b:difference_high_L}}, so North leads but the range straddles the dispatch threshold. The POND-7 bounds are {{metric:gxa_01m8f6sek4q866nmv4:difference_low_L}} to {{metric:gxa_01m8f6sek4q866nmv4:difference_high_L}}, so North leads and even the upper bound falls short. The completed custody register matches the POND-7 export digest, maps North to rack-B and South to rack-A, and confirms the original POND-6 assignment. The paired analyses cover both full trial windows and the reporting packet is complete.",
+      "ops": [
+        {
+          "claim_refs": [
+            "gxa_01m8f75t9g0w6wxt9a"
+          ],
+          "op": "close_run",
+          "reason": "SCIENTIFIC_COMPLETION",
+          "unresolved": []
+        }
+      ],
+      "pi_dispositions": []
+    }
+  ],
+  "repeated_observation": {
+    "utc": "2026-11-27T19:17:38Z",
+    "same_event": true,
+    "same_source": true,
+    "event_id": 154,
+    "artifact_ref": "gxa_01m8f724wc3f9qfhmc"
+  }
+}

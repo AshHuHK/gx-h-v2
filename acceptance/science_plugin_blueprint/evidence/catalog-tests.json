@@ -1,0 +1,22 @@
+{
+  "base": "4759c260310dbd79b640c826371ec20aebc3b272",
+  "invocation": "PYTHONPATH=gx-h .venv/bin/python -B -m unittest -v acceptance.science_plugin_blueprint.test_catalog tests.test_science_capability_views.CapabilityViews.test_public_native_discovery_and_scoped_selection tests.test_v62_modules_publication.ModulePublications.test_medium_survey_publishes_candidates_costs_exclusions_and_gaps_from_public_cards",
+  "count": 4,
+  "passed": true,
+  "log": "test_new_quick_goal_exposes_catalog_and_preserves_selection_boundary (acceptance.science_plugin_blueprint.test_catalog.CatalogDiscovery.test_new_quick_goal_exposes_catalog_and_preserves_selection_boundary) ... ok\ntest_saved_recipe_preserves_named_slot_and_output_type (acceptance.science_plugin_blueprint.test_catalog.CatalogDiscovery.test_saved_recipe_preserves_named_slot_and_output_type) ... ok\ntest_public_native_discovery_and_scoped_selection (tests.test_science_capability_views.CapabilityViews.test_public_native_discovery_and_scoped_selection) ... ok\ntest_medium_survey_publishes_candidates_costs_exclusions_and_gaps_from_public_cards (tests.test_v62_modules_publication.ModulePublications.test_medium_survey_publishes_candidates_costs_exclusions_and_gaps_from_public_cards) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 4.096s\n\nOK\n",
+  "first_engineering_failures": [
+    {
+      "stage": "new controlled probe startup",
+      "error": "SCHEMA_INVALID: public Goal config does not accept discovery_policy directly",
+      "repair": "Probe uses the documented capability_collections opt-in through gx-p0 start."
+    },
+    {
+      "stage": "quick query negative regression",
+      "query": "never-a-match-zqxvwx",
+      "expected": 0,
+      "observed": 10,
+      "repair": "Preserve hyphen/dot/version-qualified identifiers as terms."
+    }
+  ],
+  "transport": "Fresh public Goal startup and controlled native callbacks; no external model inference."
+}

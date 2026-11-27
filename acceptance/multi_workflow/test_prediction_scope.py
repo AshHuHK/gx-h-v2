@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from acceptance.science_execution.test_signed_native import METHOD, PARAMETERS, PLUGIN, signed_claim
 from acceptance.v62a.interleavings_fixture import branch, draft
-from acceptance.v622.test_close import CloseStudy
+from acceptance.v622.test_close import SurveyedStudy
 from acceptance.v623.test_block_method import synthetic_cif
 from gx_core.artifacts import ArtifactService
 from gx_core.errors import SchemaInvalid
@@ -48,7 +48,7 @@ class PredictionScope(unittest.TestCase):
                 contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(cli.main(["research", "--state", str(directory / "state"), "--run-key", "local",
                                        "--goal", "量測局部鏈對的變化。", "--goal-config", str(config)]), 0)
-        s = self.enterContext(CloseStudy(directory, reopen=True))
+        s = self.enterContext(SurveyedStudy(directory, reopen=True))
         s.next_actor("run")
         return s
 

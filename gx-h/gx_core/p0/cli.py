@@ -17,7 +17,7 @@ from ..errors import OutcomeUnknown
 from ..native_release import native_state, ReleaseStateError
 from ..orchestration import native_worker, packages, run_mode, service
 from ..persistence import store
-from . import deployment, intent
+from . import intent, profiles_cli
 from .driver import Driver, context, enqueue, native_waits, project, snapshot
 from .idle import WorkspaceWait
 
@@ -418,7 +418,7 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command", required=True)
     from . import research
     research.add_command(commands)
-    deployment.add_commands(commands)
+    profiles_cli.add_command(commands)
     from ..plugins.cli import add_commands as add_plugin_commands
     add_plugin_commands(commands)
     from .operator import add_commands

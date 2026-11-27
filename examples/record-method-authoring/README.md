@@ -6,13 +6,12 @@
 
 Lead 查看数据、选择标识与读数字段和一段唯一原文。独立 CPU Job `derive-record-coverage@1` 核对引文、编制有版本的方法并运行手算对照。开发产物含原件哈希、引文位置、字段映射、固定 Python 源码哈希和校准回执。`gx_install_record_method` 只接收该 Goal 已完成开发 Job 的具名输出，安装后由现有能力版本机制绑定到该题。下个决定可以派真正的具名输出 `coverage.json` Job。同一标识的多个 PMID 只增加一次分子，空值与完全匹配不到的情况分别报告；数值零是合法实测值，空分母明确失败。
 
-从产品根目录启动第一题。只使用部署中的官方 OAuth 入口。
+从产品根目录启动第一题。使用部署中已配置的研究宿主。
 
 ```bash
 gx_work=$(mktemp -d)
 gx_state="$gx_work/state"
-gx_oauth() { .venv/bin/python -B acceptance/science_capabilities/gx_oauth.py "$gx_work" "$@"; }
-gx_oauth research --state "$gx_state" --run-key trehalose-record-method \
+bin/gx-p0 research --state "$gx_state" --run-key trehalose-record-method \
   --goal-file examples/record-method-authoring/trehalose/question.md \
   --goal-config examples/record-method-authoring/trehalose/goal.json --research-effort deep
 ```
@@ -22,11 +21,11 @@ gx_oauth research --state "$gx_state" --run-key trehalose-record-method \
 ```bash
 .venv/bin/python -B acceptance/science_capabilities/record_method.py followup \
   --state "$gx_state" --run-id "$gx_parent" > "$gx_work/successor.json"
-gx_oauth message --state "$gx_state" --run-id "$gx_parent" --message-id sucrose-coverage-v1 \
+bin/gx-p0 message --state "$gx_state" --run-id "$gx_parent" --message-id sucrose-coverage-v1 \
   --text "$(cat examples/record-method-authoring/sucrose/question.md)" \
   --successor --successor-config "$gx_work/successor.json"
 bin/gx-p0 conversation --state "$gx_state" --run-id "$gx_parent"
-gx_oauth research --state "$gx_state" --run-id "$gx_child"
+bin/gx-p0 research --state "$gx_state" --run-id "$gx_child"
 .venv/bin/python -B acceptance/science_capabilities/record_method.py report \
   --state "$gx_state" --run-id "$gx_child"
 ```

@@ -119,7 +119,7 @@ def pdf_blocks(raw):
         import pypdf
         from pypdf.errors import PyPdfError
     except ImportError as exc:
-        raise SchemaInvalid('Install the pinned PDF reader from release-assets/python/requirements.lock') from exc
+        raise SchemaInvalid('Install the pinned PDF reader from requirements.txt') from exc
     blocks = []
     extracted = []
     unreadable = []

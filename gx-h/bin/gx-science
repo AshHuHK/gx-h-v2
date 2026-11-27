@@ -1,5 +1,0 @@
-#!/bin/sh
-# Run or reopen the disposable scientific workflow acceptance fixture.
-here=$(readlink -f "$0" 2>/dev/null || printf '%s' "$0")
-root=$(cd "$(dirname "$here")/.." && pwd -P) || exit 2
-PYTHONPATH="$root" PYTHONDONTWRITEBYTECODE=1 exec "${GX_PYTHON:-python3}" -B -P -m examples.science_cycle "$@"

@@ -38,6 +38,78 @@ def _excerpt(value, limit):
     return value if len(raw) <= limit else raw[:limit - 3].decode("utf-8", errors="ignore") + "…"
 
 
+def describe_refresh(conn, brief, events):
+    """Identify what changed since the replaced Lead brief in this frozen event view."""
+    from . import v621_policy
+    if brief.get("scope") != "run" or brief.get("evidence_policy") != v621_policy.VERSION:
+        return
+    marker = next((row for row in reversed(events) if row["kind"] == "v6.decision.superseded"), None)
+    if not marker:
+        return
+    cause = store.loads(marker, "payload_json")
+    if (cause.get("reason") not in {"close_context_changed", "convergence_context_changed", "comparison_context_changed"}
+            or cause.get("scope") != "run" or cause.get("goal_version", brief["goal_version"]) != brief["goal_version"]):
+        return
+    # The previous accepted decision can be older than several consecutive stale attempts.
+    # Use the replaced task's cursor and do not re-announce a previously delivered refresh.
+    task = conn.execute("SELECT event_cursor FROM v6_decision_tasks JOIN research_contexts USING(context_ref) "
+                        "WHERE task_id=? AND v6_decision_tasks.run_id=? AND scope='run' AND goal_version=?",
+                        (marker["subject_id"], brief["run_id"], brief["goal_version"])).fetchone()
+    through = brief["trigger"]["through_cursor"]
+    if not task or conn.execute("SELECT 1 FROM v6_decision_tasks t JOIN research_contexts c USING(context_ref) "
+            "WHERE t.run_id=? AND scope='run' AND goal_version=? AND c.event_cursor>=? AND c.event_cursor<? LIMIT 1",
+            (brief["run_id"], brief["goal_version"], marker["event_id"], through)).fetchone():
+        return
+    after = task["event_cursor"]
+    changes = {c["event_id"]: c for c in brief["trigger"]["changes"] if after < c["event_id"] <= through}
+    visible = set(brief["evidence_refs"])
+    current = {claim["hypothesis_id"]: claim for claim in brief["claims"]}
+    for row in events:
+        if row["kind"] != "v62.claim.reassessed" or row["event_id"] not in changes:
+            continue
+        data = store.loads(row, "payload_json")
+        claim = current.get(row["subject_id"])
+        if not claim or data.get("scope") != "run":
+            continue
+        item = changes[row["event_id"]]
+        item.update({k: data[k] for k in ("before", "after", "direction", "previous_claim_ref") if k in data})
+        revision = data.get("claim_revision_id")
+        if revision in visible:
+            item["claim_revision_id"] = revision
+            if revision == claim["claim_revision_id"]:
+                item["statement"] = _excerpt(claim["statement"], 192)
+    # Use immutable event-time readings and verdicts; the compatibility evidence.status is mutable.
+    sources = conn.execute("""SELECT x.event_id,x.kind,x.subject_id,
+          json_extract(x.payload_json,'$.target_claim_ref') target, a.subject_id extraction_ref,
+          s.blob_artifact_ref source_ref, json_extract(e.source_locator_json,'$.segment_id') segment_id,
+          e.anchor_status,r.verdict
+        FROM events x JOIN evidence e ON e.evidence_id=json_extract(x.payload_json,'$.evidence_id') AND e.run_id=x.run_id
+        JOIN sources s ON s.source_id=e.source_id
+        LEFT JOIN evidence_reviews r ON r.review_id=json_extract(x.payload_json,'$.review_id') AND r.evidence_id=e.evidence_id
+        LEFT JOIN events a ON a.run_id=x.run_id AND a.kind='v62.source.extracted' AND a.event_id<=x.event_id
+             AND json_extract(a.payload_json,'$.evidence_id')=e.evidence_id
+        WHERE x.run_id=? AND x.event_id>? AND x.event_id<=? AND json_extract(x.payload_json,'$.scope')='run'
+          AND x.kind IN ('v62.source.reviewed','v62.source.extracted')""", (brief["run_id"], after, through))
+    for row in sources:
+        if row["event_id"] not in changes or row["subject_id"] not in visible:
+            continue
+        item = changes[row["event_id"]]
+        if row["kind"] == "v62.source.reviewed":
+            item.update(review_ref=row["subject_id"], verdict=row["verdict"])
+        if row["extraction_ref"] in visible:
+            item.update(extraction_ref=row["extraction_ref"], anchor_status=row["anchor_status"])
+        if row["source_ref"] in visible:
+            item.update(source_ref=row["source_ref"], segment_id=row["segment_id"])
+        if row["target"]:
+            item["target_claim_ref"] = row["target"]
+    brief["trigger"]["refresh"] = {
+        "reason": cause["reason"], "after_cursor": after, "superseded_event": marker["event_id"],
+        "first_late_event": cause.get("event_id"),
+        "read_with": "Read review_ref via gx_read_artifact and its source with gx_read_source. "
+                     "Use claim_revision_id for the resulting claim version.",
+    }
+
+
 def deliver(conn, brief, limit):
     """Keep the authoritative scope intact when a large frozen packet needs pagination.
 
@@ -94,6 +166,12 @@ def deliver(conn, brief, limit):
                 packet["research_progress"][key] = progress[key]
         packet["research_progress"].update(open_gaps=[], open_gap_count=len(progress["open_gaps"]),
                                           waiting_for=[], waiting_count=len(progress["waiting_for"]))
+    refresh = brief["trigger"].get("refresh")
+    if refresh:
+        trigger = packet["trigger"]
+        rows = [c for c in brief["trigger"]["changes"] if c["event_id"] > refresh["after_cursor"]
+                and c["event"] != "v6.decision.superseded"]
+        trigger.update(refresh=refresh, changes=[], refresh_change_count=len(rows))
     if _size(packet) > room:
         packet["budget"] = {"initial_job_limit": brief["budget"]["initial_job_limit"]} if "initial_job_limit" in brief["budget"] else {}
     # JSON escaping can expand the goal beyond its UTF-8 excerpt size.
@@ -106,6 +184,20 @@ def deliver(conn, brief, limit):
             return True
         owner[key].pop()
         return False
+
+    if refresh:
+        trigger = packet["trigger"]
+        # Leave room for independent measurements and reports. The full brief holds every row.
+        start = _size(packet)
+        for item in reversed(rows):
+            change = {k: v for k, v in item.items() if k not in {"matched_watches", "branch_watches"}}
+            if change.get("scope") == "run":
+                change.pop("scope")
+            if _size(packet) - start + _size(change) > room // 3:
+                change = {k: change[k] for k in ("event_id", "event", "subject_ref")}
+            if _size(packet) - start + _size(change) > room // 3 or not append("changes", change, owner=trigger):
+                break
+        trigger["changes"].reverse()
 
     if brief.get("pi_dialogue"):
         packet["pi_dialogue"] = []

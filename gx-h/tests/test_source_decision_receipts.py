@@ -98,6 +98,73 @@ class SourceReviewClose(unittest.TestCase):
         self.assertEqual(stale.exception.details["event_id"], self.review_event)
         self.assertEqual(stale.exception.details["uncited_review_refs"], [self.review_ref])
 
+    def test_refresh_brief_names_review_and_original_before_large_inventory(self):
+        from gx_core.p0 import v62_lead, v6_native
+        from gx_core.domain import ids
+        s = self.s
+        self.assertNotIn("refresh", s.brief(s.lead)["trigger"])
+        with self.assertRaises(StaleRevision):
+            self.close([])
+        next_lead = s.next_actor("run")
+        full = s.brief(next_lead)
+        self.assertEqual(full["trigger"]["refresh"]["first_late_event"], self.review_event)
+        full["materials"].extend([dict(full["materials"][0], description="x" * 900)] * 30)
+        authorized, wire = v62_lead.deliver(s.conn, full, 4096)
+        self.assertLessEqual(len((v6_native.PREFIX + ids.canonical_json(wire)).encode()), 4096)
+        change = next(item for item in wire["trigger"]["changes"] if item["event_id"] == self.review_event)
+        self.assertEqual((change["review_ref"], change["verdict"], change["source_ref"], change["segment_id"]),
+                         (self.review_ref, "SUPPORTED", self.segment["source_ref"], self.segment["segment_id"]))
+        self.assertIn(change["review_ref"], authorized["evidence_refs"])
+        self.assertTrue(s.call(next_lead, "gx_read_artifact", {"ref": change["review_ref"]}, "open")["verdict"])
+
+    def test_named_review_refresh_preserves_target_result_revision_and_scope(self):
+        from copy import deepcopy
+        from gx_core.p0 import v6_goal, v6_claims, v62_lead, v62_maturity
+        s = self.s
+        current = s.call(s.lead, "gx_stage_claim", {"level":"open", "statement":"The north gauge fell on visit two.",
+            "rationale":"The field note can distinguish a rise from a fall.", "scope":"Visit two.",
+            "criteria":"A dated observation of the north gauge on that visit.",
+            "limitations":"No continuous record.", "evidence_refs":[self.segment["source_ref"]]}, "stage")
+        s.call(s.lead, "gx_decide_revision", {"decision":draft(evidence=[self.segment["source_ref"],
+               current["claim_ref"], self.review_ref])}, "adopt")
+        claim = v6_claims.read_revision(s.conn, s.run_id, current["claim_ref"])
+        v6_goal.record_observation(s.conn, s.run_id, self.segment["source_ref"], source="request-check")
+        actor = s.next_actor("run")
+        read = s.call(actor, "gx_read_source", self.segment, "check-note")
+        found = s.call(actor, "gx_extract_evidence", dict(self.segment, receipt_id=read["receipt_id"],
+            claim=read["text"], quote=read["text"], direction="opposes", target_claim_ref=claim["claim_revision_id"],
+            applicability="Second visit only.", confidence_basis="The record names both gauge and visit."), "target")
+        s.call(actor, "gx_decide_revision", {"decision":draft(evidence=[found["evidence_ref"]])}, "send")
+        v6_goal.record_observation(s.conn, s.run_id, self.segment["source_ref"], source="request-review")
+        lead = s.next_actor("run")
+        read = s.call(lead, "gx_read_source", self.segment, "check-original")
+        review = s.call(lead, "gx_review_evidence", {"evidence_ref":found["evidence_ref"],
+            "receipt_id":read["receipt_id"], "quote_sha256_seen":found["quote_sha256"],
+            "verdict":"SUPPORTED", "note":"The located sentence reports a rise."}, "check-target")
+        v62_maturity.reassess(s.conn, s.run_id)
+        with self.assertRaises(StaleRevision):
+            self.close([review["review_ref"]])
+        full = s.brief(s.next_actor("run"))
+        full["materials"].extend([dict(full["materials"][0], description="x" * 900)] * 40)
+        _, wire = v62_lead.deliver(s.conn, full, 8192)
+        trigger = wire["trigger"]
+        changes = [r for r in trigger["changes"] if r["event_id"] > trigger["refresh"]["after_cursor"]]
+        result = next(r for r in changes if r["event"] == "v62.claim.reassessed")
+        reviewed = next(r for r in changes if r.get("review_ref") == review["review_ref"])
+        self.assertEqual(reviewed["target_claim_ref"], result["previous_claim_ref"])
+        self.assertNotEqual(result["claim_revision_id"], result["previous_claim_ref"])
+        self.assertIn(result["claim_revision_id"], full["evidence_refs"])
+        self.assertEqual(reviewed["verdict"], "SUPPORTED")
+        self.assertEqual(result["statement"], claim["statement"])
+
+        events = [e for e in v6_goal._events(s.conn, s.run_id, full["trigger"]["since_cursor"])
+                  if e["event_id"] <= full["trigger"]["through_cursor"]]
+        for guard in ({"scope":"module:unrelated"}, {"evidence_policy":"gx.evidence/6.2.3"}):
+            packet = dict(deepcopy(full), **guard)
+            packet["trigger"].pop("refresh")
+            v62_lead.describe_refresh(s.conn, packet, events)
+            self.assertNotIn("refresh", packet["trigger"])
+
     def test_new_observation_requires_refresh_even_with_cited_review(self):
         from gx_core.p0 import v6_goal
         s = self.s

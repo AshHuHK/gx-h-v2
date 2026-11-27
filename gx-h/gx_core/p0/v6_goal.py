@@ -791,6 +791,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     dialogue = research_dialogue.packet(conn, rid, "run", goal["goal_version"], through=cursor)
     if dialogue:
         brief["pi_dialogue"] = dialogue
+    v62_lead.describe_refresh(conn, brief, events)
     return brief
 
 

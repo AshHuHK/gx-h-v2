@@ -1,0 +1,63 @@
+{
+  "manifest": {
+    "kind": "UTILITY",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--mode",
+        "{param.mode}",
+        "--seconds",
+        "{param.seconds}",
+        "--input",
+        "{in.text}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "weights": [],
+    "required_data": [],
+    "method_card": {
+      "family": "platform_selftest",
+      "mechanism": "Does what its mode says; no computation of scientific meaning.",
+      "objective": "none",
+      "estimator": "none",
+      "training_data_lineage": "No learned weights and no data."
+    },
+    "source": {
+      "path": "{harness}/adapters/local/selftest/entry/selftest_entry.py",
+      "sha256": "45a4390a748356333ddf2d58a2f7f883c2d8905ccd20aca238e49fb4d27c42f7"
+    },
+    "licence": "UNVERIFIED",
+    "licence_basis": "Part of this tree; the tree states no licence of its own, so none is claimed.",
+    "limitations": "A utility for checking the job runner. Its outputs say nothing about any scientific question and must never be evaluated as if they did.",
+    "capability_id": "selftest",
+    "version": "1",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 60
+    },
+    "outputs": [
+      {
+        "name": "report.txt",
+        "kind": "file:selftest_text",
+        "required": true
+      },
+      {
+        "name": "report",
+        "kind": "selftest_report",
+        "required": true
+      },
+      {
+        "name": "child.pid",
+        "kind": "file:selftest_text",
+        "required": false
+      }
+    ]
+  },
+  "parser": "adapters/local/selftest/selftest.py",
+  "entry_script": "adapters/local/selftest/entry/selftest_entry.py"
+}

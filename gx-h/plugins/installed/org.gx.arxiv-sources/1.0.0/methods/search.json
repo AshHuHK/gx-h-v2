@@ -1,0 +1,66 @@
+{
+  "manifest": {
+    "capability_id": "arxiv-search",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "search",
+        "--source",
+        "{in.source}",
+        "--out",
+        "{out.dir}",
+        "--query",
+        "{param.query}"
+      ]
+    },
+    "method_card": {
+      "family": "public_literature_search",
+      "objective": "Locate publications in the public arXiv catalogue using investigator-selected field queries.",
+      "mechanism": "Supply {\"schema\":\"gx.scholarly-request/1\"} and parameter query, e.g. ti:\"heat diffusion\". Use search-snapshot.json and the original query to replay one frozen Atom response offline.",
+      "estimator": "candidates.json contains titles, authors, abstracts, dates, versioned IDs, DOI and version-bound PDF links when available. search-snapshot.json preserves the complete raw API response and retrieval details.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.arxiv-sources/1.0.0/methods/arxiv.py",
+      "sha256": "83e4445a184f654b0afd08b7562bcfb301eda0b32b05e3e8b9c79cb9b21765f2"
+    },
+    "licence": "GX release source. Original materials retain their respective licences.",
+    "licence_basis": "Public arXiv metadata and preprints under their respective distribution licences.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "candidates.json",
+        "kind": "file:scholarly_candidates",
+        "nature": "analysis",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      },
+      {
+        "name": "search-snapshot.json",
+        "kind": "file:scholarly_snapshot",
+        "nature": "analysis",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "First ranked page of at most eight records. Missing fields, a valid empty feed and an unavailable upstream are distinct. A metadata hit supports discovery only."
+  },
+  "entry_script": "methods/arxiv.py"
+}

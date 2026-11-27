@@ -1,0 +1,664 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GX scoped research decision submission, version 1",
+  "description": "Wire request created by the authenticated GX transport. The model supplies only decision. For a new base use null.",
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "watch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "subject_ref"
+      ],
+      "properties": {
+        "event": {
+          "enum": [
+            "goal_changed",
+            "evidence_added",
+            "claim_changed",
+            "job_settled",
+            "budget_changed",
+            "operator_reopened",
+            "module_report"
+          ]
+        },
+        "subject_ref": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "head": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "sha256"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "rationale",
+        "evidence_refs",
+        "reconsider_when",
+        "ops"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "amend",
+            "resolve"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/text"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "uniqueItems": true
+        },
+        "reconsider_when": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/watch"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "ops": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "branch",
+                  "hypothesis",
+                  "method_family",
+                  "alternative",
+                  "discriminating_observation",
+                  "budget_limits",
+                  "stop_condition"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "open_branch"
+                  },
+                  "branch": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "hypothesis": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "method_family": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "alternative": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "discriminating_observation": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "budget_limits": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "propertyNames": {
+                      "enum": [
+                        "job_submissions",
+                        "worker_tasks",
+                        "cpu_seconds",
+                        "gpu_jobs",
+                        "gpu_minutes",
+                        "tokens",
+                        "api_calls"
+                      ]
+                    },
+                    "additionalProperties": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  },
+                  "stop_condition": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "branch",
+                  "node",
+                  "capability",
+                  "inputs",
+                  "parameters",
+                  "depends_on",
+                  "question"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "add_node"
+                  },
+                  "branch": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "node": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "capability": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "inputs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    }
+                  },
+                  "input_ports": {
+                    "description": "Select a declared scientific output of an upstream node at a zero-based position in inputs. Omit a selector to use the historical primary result.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["index", "output"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "index": {"type": "integer", "minimum": 0},
+                        "output": {"$ref": "#/$defs/text"}
+                      }
+                    }
+                  },
+                  "parameters": {
+                    "type": "object"
+                  },
+                  "depends_on": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "uniqueItems": true
+                  },
+                  "question": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "evidence_gate": {
+                    "description": "Hold dispatch until a versioned producing node measured the named source and its JSON field equals the required value. Optionally wait for a subsequent evidence-citing Run Lead approval.",
+                    "type": "object",
+                    "properties": {
+                      "producer_node": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "producer_version": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "source_ref": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "pointer": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "equals": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "require_lead_review": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "producer_node",
+                      "producer_version",
+                      "source_ref",
+                      "pointer",
+                      "equals",
+                      "require_lead_review"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "branch",
+                  "reason"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "stop_branch"
+                  },
+                  "branch": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "reason": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "node",
+                  "reason"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "cancel_node"
+                  },
+                  "node": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "reason": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "op",
+                  "reason",
+                  "claim_refs",
+                  "unresolved"
+                ],
+                "properties": {
+                  "op": {
+                    "const": "close_run"
+                  },
+                  "reason": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "claim_refs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "uniqueItems": true
+                  },
+                  "unresolved": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "approve_nodes": {
+          "description": "Pending nodes for which this Run Lead explicitly accepts the cited observed result.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "uniqueItems": true
+        },
+        "convergence": {
+          "type": "object",
+          "description": "Enter convergence with these surviving candidates. Cite their published evidence in evidence_refs and explain the choice in rationale. GX saves this decision and closes ordinary exploration.",
+          "additionalProperties": false,
+          "required": [
+            "candidates",
+            "spec_version"
+          ],
+          "properties": {
+            "candidates": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/text"
+              }
+            },
+            "spec_version": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        "resolved_gaps": {
+          "type": "array",
+          "description": "Resolve these previously reported gaps using later cited observations or analyses.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "comparison_plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "branch",
+            "material_role",
+            "method"
+          ],
+          "properties": {
+            "branch": {
+              "$ref": "#/$defs/text"
+            },
+            "material_role": {
+              "$ref": "#/$defs/text"
+            },
+            "method": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "capability",
+                "parameters",
+                "output_name",
+                "metric_id",
+                "unit"
+              ],
+              "properties": {
+                "capability": {
+                  "$ref": "#/$defs/text"
+                },
+                "parameters": {
+                  "type": "object"
+                },
+                "output_name": {
+                  "$ref": "#/$defs/text"
+                },
+                "metric_id": {
+                  "$ref": "#/$defs/text"
+                },
+                "unit": {
+                  "$ref": "#/$defs/text"
+                }
+              }
+            },
+            "reference_refs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/text"
+              },
+              "minItems": 1,
+              "uniqueItems": true,
+              "description": "Ordered material references for this comparison, taken from the current Goal."
+            },
+            "prediction": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "blind_id",
+                "expected",
+                "on_expected",
+                "on_alternative"
+              ],
+              "properties": {
+                "blind_id": {
+                  "$ref": "#/$defs/text"
+                },
+                "expected": {
+                  "$ref": "#/$defs/text"
+                },
+                "on_expected": {
+                  "$ref": "#/$defs/text"
+                },
+                "on_alternative": {
+                  "$ref": "#/$defs/text"
+                }
+              },
+              "description": "For sealed material name its blind_id, your expectation, and what each outcome would change in the study."
+            }
+          }
+        },
+        "comparison_id": {
+          "$ref": "#/$defs/text"
+        },
+        "disposition": {
+          "enum": [
+            "CHANGE",
+            "MAINTAIN",
+            "STOP"
+          ]
+        },
+        "metric_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "description": "Concrete received metric references adopted in this decision, using metric_ref or source_ref#key."
+        },
+        "affected_scope": {
+          "$ref": "#/$defs/text"
+        },
+        "stop_reason": {
+          "enum": [
+            "INSUFFICIENT_DATA",
+            "UNREAD_EVIDENCE",
+            "BUDGET",
+            "TIME_LIMIT",
+            "OPERATOR",
+            "SCIENTIFIC_COMPLETION"
+          ]
+        },
+        "pi_questions": {
+          "type": "array",
+          "description": "Ask the PI about a scientific choice. Set blocking only for work that depends on the answer. Use an active branch_id to target a branch.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "question",
+              "blocking"
+            ],
+            "properties": {
+              "question": {
+                "$ref": "#/$defs/text"
+              },
+              "choices": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/text"
+                },
+                "uniqueItems": true
+              },
+              "branch_id": {
+                "$ref": "#/$defs/text"
+              },
+              "blocking": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "pi_dispositions": {
+          "$ref": "#/$defs/pi_dispositions"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "resolve"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ops": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "ops": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "pi_dispositions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "feedback_id",
+          "outcome",
+          "reason"
+        ],
+        "properties": {
+          "feedback_id": {
+            "$ref": "#/$defs/text"
+          },
+          "outcome": {
+            "enum": [
+              "adopt",
+              "maintain",
+              "measure",
+              "defer"
+            ]
+          },
+          "reason": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "decision_task_id",
+    "lease_id",
+    "scope",
+    "goal_version",
+    "context_ref",
+    "base",
+    "idempotency_key",
+    "draft_sha256",
+    "decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "gx.v6.decision.1"
+    },
+    "run_id": {
+      "$ref": "#/$defs/text"
+    },
+    "decision_task_id": {
+      "$ref": "#/$defs/text"
+    },
+    "lease_id": {
+      "$ref": "#/$defs/text"
+    },
+    "scope": {
+      "$ref": "#/$defs/text"
+    },
+    "goal_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "context_ref": {
+      "$ref": "#/$defs/text"
+    },
+    "base": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/head"
+        }
+      ]
+    },
+    "idempotency_key": {
+      "$ref": "#/$defs/text"
+    },
+    "draft_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "decision": {
+      "$ref": "#/$defs/decision"
+    }
+  },
+  "x-gx-lead-submission": {
+    "description": "Submit the scientific reason and the operation to enact. Select delivered measurements by their exact row keys in metric_refs. GX binds their sources and the matching registered comparison, fills unique branch fields and wakes on Job results. With multiple matches, select from the comparison_id options in the reply. Legacy explicit fields remain valid.",
+    "required": [
+      "rationale",
+      "ops"
+    ],
+    "operation_required": {
+      "open_branch": [
+        "op",
+        "hypothesis",
+        "method_family",
+        "alternative",
+        "discriminating_observation",
+        "stop_condition"
+      ],
+      "add_node": [
+        "op",
+        "capability",
+        "inputs",
+        "question"
+      ]
+    },
+    "metric_refs_description": "Copy the key from each delivered endpoint row, its metric_ref, or source_ref#key. Use the reading that supports the action.",
+    "example": {
+      "decision": {
+        "rationale": "The calibration residual leaves the drift estimate uncertain; measure the second standard.",
+        "metric_refs": [
+          "<delivered row key>"
+        ],
+        "ops": [
+          {
+            "op": "add_node",
+            "capability": "<listed method@version>",
+            "inputs": [
+              "<second calibration standard ref>"
+            ],
+            "parameters": {
+              "channel": "<method-supported channel>"
+            },
+            "question": "Does drift persist on the second standard?"
+          }
+        ]
+      }
+    }
+  }
+}

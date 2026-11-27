@@ -1,0 +1,49 @@
+{
+  "manifest": {
+    "capability_id": "tl1a-coordinate-quality",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "quality",
+        "--structure",
+        "{in.structure}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "coordinate_completeness",
+      "mechanism": "Inventory the positive-occupancy backbone of the three deposited chains and construct exact protocol-specific atom identity selections.",
+      "objective": "Quantify sensitivity of pairwise geometry to observed atom selection in the deposited 2RE9 crystal coordinates.",
+      "estimator": "Count union, intersection and ordered complete-residue observations by label sequence position.",
+      "training_data_lineage": "Deterministic coordinate analysis; no learned weights or training data."
+    },
+    "source": {
+      "path": "{harness}/adapters/scientific/tl1a_geometry/worker.py",
+      "sha256": "f6a589ae44c53725d8066988cda86b1212aad19d26f89660a2e49a3e96f13003"
+    },
+    "licence": "The deposited data carry CC0-1.0. The Chaperone metric precedent carries MIT.",
+    "licence_basis": "adapters/scientific/tl1a_geometry/data/LICENSE.cc0 and adapters/scientific/tl1a_geometry/LICENSE.chaperone",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "quality.json",
+        "kind": "file:coordinate_inventory",
+        "required": true
+      }
+    ],
+    "limitations": "Single deposited TL1A crystal model 2RE9, label entity 1, chains A/B/C. Monomer mapping and relative rotations describe observed coordinates. No solution assembly, binding or functional estimates."
+  },
+  "entry_script": "adapters/scientific/tl1a_geometry/worker.py"
+}

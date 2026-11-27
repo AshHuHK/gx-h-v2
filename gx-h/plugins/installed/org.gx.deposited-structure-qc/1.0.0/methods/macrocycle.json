@@ -1,0 +1,121 @@
+{
+  "manifest": {
+    "capability_id": "deposited-macrocycle-qc",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--mode",
+        "macrocycle",
+        "--structure",
+        "{in.structure}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "deposited_structure_quality_control",
+      "mechanism": "Distinguish an explicit intra-asymmetric-unit head-to-tail covalent C\u2013N link from close endpoints without a bond declaration.",
+      "objective": "Describe topology or coordinate representation in one known deposited chain.",
+      "estimator": "Count declared closure (0/1); list model-wise terminal C\u2013N length, both adjacent angles, non-neighbor heavy-atom pairs under 2 angstrom with denominators; preserve deposited D/L component identities.",
+      "training_data_lineage": "Deterministic; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.deposited-structure-qc/1.0.0/job-scripts/qc.py",
+      "sha256": "e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+    },
+    "licence": "GX release source; wwPDB originals CC0.",
+    "licence_basis": "wwPDB archive terms of use at https://www.wwpdb.org/about/usage-policies",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "qc.json",
+        "kind": "file:deposited_macrocycle_qc",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "declared_closure": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/declared_closure",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "mapped_models": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/mapped_models",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "model_count": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/model_count",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "declared_residues": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/declared_residues",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "model_1_distance_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/model_1_distance_A",
+            "unit": "angstrom",
+            "places": 3,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Single polypeptide label chain; no microheterogeneity or alternate coordinates. Geometry describes deposited models. Up to 64 residues; tests intra-chain head-to-tail topology only. No prediction, steric refinement or experimental folding claim."
+  },
+  "entry_script": "job-scripts/qc.py"
+}

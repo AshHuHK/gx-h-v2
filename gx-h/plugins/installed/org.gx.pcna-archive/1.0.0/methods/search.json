@@ -1,0 +1,58 @@
+{
+  "manifest": {
+    "capability_id": "pcna-archive-search",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "search",
+        "--implementation",
+        "{data.0}",
+        "--archive",
+        "{in.archive}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "public_archive_search",
+      "objective": "Find PDB entries cross-referenced by the human PCNA UniProt record P12004.",
+      "mechanism": "Supply one archive input: a gx.pcna-archive-request/1 with accession P12004 and optional entry_ids for a live UniProt query, or the original UniProt record. No method parameters.",
+      "estimator": "One candidate per PDB accession; method, resolution and chain annotations copied from UniProt, preserving unknowns. These bibliographic data do not establish partner identity, apo state or coordinate eligibility.",
+      "training_data_lineage": "Archive metadata and deposited coordinates; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.pcna-archive/1.0.0/methods/archive.py",
+      "sha256": "571be03ace92da5db2726663901593fd9e4b20cb9a2b9b9c84ae7d0d02d8680b"
+    },
+    "licence": "GX release source; archived material retains the archive terms.",
+    "licence_basis": "UniProt and wwPDB supply the original metadata and the deposited coordinates.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.pcna-archive/1.0.0/methods/archive.py"
+    ],
+    "outputs": [
+      {
+        "name": "candidates.json",
+        "kind": "file:archive_candidates",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "archive"
+        ],
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "The UniProt P12004 cross-reference list reflects its specific release. Unannotated resolution, chain coverage, partners and apo status remain unknown."
+  },
+  "entry_script": "bin/pcna-archive.py"
+}

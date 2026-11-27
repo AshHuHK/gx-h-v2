@@ -1,0 +1,58 @@
+{
+  "manifest": {
+    "capability_id": "social-source-intake",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "social",
+        "--implementation",
+        "{data.0}",
+        "--source",
+        "{in.source}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "community_source_intake",
+      "objective": "Register a PI-supplied WeChat article or Xiaohongshu note as a community lead.",
+      "mechanism": "Supply one JSON source with a public url plus optional user-exported text, title and captured_at; no parameters. Both link-only and exported-text modes require a recognized original host. No session or network search is performed.",
+      "estimator": "community-lead.json reports the canonical link, acquisition mode, original digest, paragraph locators, and cited identifiers to look up independently.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/social.py",
+      "sha256": "0051cd3916c286972d6e36218aebbb2a81553604ac6c4e78e791ce4291c77c7f"
+    },
+    "licence": "GX release source. Original materials retain their respective licences.",
+    "licence_basis": "Europe PMC and Crossref public metadata and Open Access JATS terms; intake records retain original source rights.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/social.py"
+    ],
+    "outputs": [
+      {
+        "name": "community-lead.json",
+        "kind": "file:community_lead",
+        "nature": "analysis",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Link-only input has no observed text. Community content can motivate follow-up and cannot substantiate an experiment independently."
+  },
+  "entry_script": "bin/scholarly.py"
+}

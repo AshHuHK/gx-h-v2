@@ -1,0 +1,14 @@
+{
+  "workflow_id": "tl1a_geometry",
+  "version": "1",
+  "description": "Plan and test atom-selection sensitivity on the deposited TL1A coordinates, using independently reviewed measurements to select a next investigation or stop.",
+  "entry_transitions": ["AUDITING","PLANNING","ACTIVE"],
+  "nodes": [
+    {"name":"quality","work":"stage","deps":[]},
+    {"name":"proposal","work":"stage","deps":["quality"],"artifact_task_kind":"research_round"},
+    {"name":"experiment","work":"stage","deps":["proposal"]},
+    {"name":"assessment","work":"stage","deps":["experiment"],"artifact_task_kind":"research_round"},
+    {"name":"decision","work":"stage","deps":["assessment"],"artifact_task_kind":"research_round"},
+    {"name":"report","work":"mechanical","deps":["decision"]}
+  ]
+}

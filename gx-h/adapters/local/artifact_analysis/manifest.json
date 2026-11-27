@@ -1,0 +1,52 @@
+{
+  "manifest": {
+    "capability_id": "artifact-analysis",
+    "version": "1",
+    "kind": "UTILITY",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--inputs",
+        "{inputs.json}",
+        "--out",
+        "{out.dir}",
+        "--spec",
+        "{in.spec}"
+      ]
+    },
+    "weights": [],
+    "required_data": [],
+    "method_card": {
+      "family": "bounded_json_analysis",
+      "mechanism": "Interpret one whitelisted expression on selected JSON artifacts in a default-deny Linux process.",
+      "objective": "Summarize or compare JSON measurements.",
+      "estimator": "Exact selected summaries; seeded subsampling is optional.",
+      "training_data_lineage": "No learned weights."
+    },
+    "source": {
+      "path": "{harness}/adapters/local/artifact_analysis/worker.py",
+      "sha256": "3dae41ee90adb96082fc847644728793aab769fd9da65b25b2ad73e9f476dfd0"
+    },
+    "licence": "UNVERIFIED",
+    "licence_basis": "This release contains the implementation.",
+    "limitations": "Linux with libseccomp.so.2; up to eight JSON inputs, 1 MiB total, 32 KiB result.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 10,
+      "memory_mib": 128
+    },
+    "outputs": [
+      {
+        "name": "result.json",
+        "kind": "file:artifact_analysis_result",
+        "required": true
+      }
+    ]
+  },
+  "parser": "adapters/local/artifact_analysis/adapter.py",
+  "entry_script": "adapters/local/artifact_analysis/worker.py"
+}

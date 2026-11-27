@@ -1,0 +1,95 @@
+{
+  "manifest": {
+    "capability_id": "deposited-block-influence",
+    "version": "2",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--structure",
+        "{in.structure}",
+        "--mapping",
+        "{in.mapping}",
+        "--fitter",
+        "{data.0}",
+        "--mask",
+        "{param.mask}",
+        "--interval",
+        "{param.interval}",
+        "--endpoint",
+        "{param.endpoint}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "coordinate_geometry",
+      "mechanism": "Choose one sequence-mapped reference interval, one common three-chain atom mask and one endpoint. Fit each original chain pair before and after omitting the specified positions. Inputs are the immutable deposited mmCIF and its ordered position map. Read the complete four-row segment.json from the admitted Job.",
+      "objective": "Test whether one local interval changes individual or representative geometry.",
+      "estimator": "For each pair and the baseline and omission medians, absolute difference between pre/post unsigned rotation angle (degree) or pre/post RMSD (angstrom).",
+      "training_data_lineage": "Deterministic coordinate analysis of one deposited asymmetric unit."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.block-influence/2.0.0/methods/segment.py",
+      "sha256": "78ac52c3bb55ebaec3400f2edace2d9ce1360565c428e01e1c3bfedea9b17cda"
+    },
+    "licence": "GX release source; the input coordinate deposition retains its licence.",
+    "licence_basis": "Uses released Horn fit; see adapters/scientific/tl1a_geometry/LICENSE.chaperone.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 45
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/adapters/scientific/tl1a_geometry/worker.py"
+    ],
+    "outputs": [
+      {
+        "kind": "file:mapped_segment",
+        "name": "segment.json",
+        "nature": "analysis",
+        "required": true,
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "pair12_before_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair12/angle_deg/before", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair12/chains"}},
+          "pair12_after_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair12/angle_deg/after", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair12/chains"}},
+          "pair12_delta_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair12/angle_deg/delta", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair12/chains"}},
+          "pair12_before_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair12/rmsd_A/before", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair12/chains"}},
+          "pair12_after_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair12/rmsd_A/after", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair12/chains"}},
+          "pair12_delta_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair12/rmsd_A/delta", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair12/chains"}},
+          "pair13_before_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair13/angle_deg/before", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair13/chains"}},
+          "pair13_after_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair13/angle_deg/after", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair13/chains"}},
+          "pair13_delta_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair13/angle_deg/delta", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair13/chains"}},
+          "pair13_before_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair13/rmsd_A/before", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair13/chains"}},
+          "pair13_after_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair13/rmsd_A/after", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair13/chains"}},
+          "pair13_delta_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair13/rmsd_A/delta", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair13/chains"}},
+          "pair23_before_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair23/angle_deg/before", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair23/chains"}},
+          "pair23_after_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair23/angle_deg/after", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair23/chains"}},
+          "pair23_delta_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/pair23/angle_deg/delta", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair23/chains"}},
+          "pair23_before_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair23/rmsd_A/before", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair23/chains"}},
+          "pair23_after_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair23/rmsd_A/after", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair23/chains"}},
+          "pair23_delta_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/pair23/rmsd_A/delta", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/pair23/chains"}},
+          "median_before_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/median/angle_deg/before", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/median/chains"}},
+          "median_after_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/median/angle_deg/after", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/median/chains"}},
+          "median_delta_angle_deg": {"reader": "json/1", "op": "decimal/1", "unit": "deg", "places": 4, "pointer": "/rows/median/angle_deg/delta", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/median/chains"}},
+          "median_before_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/median/rmsd_A/before", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/median/chains"}},
+          "median_after_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/median/rmsd_A/after", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/median/chains"}},
+          "median_delta_rmsd_A": {"reader": "json/1", "op": "decimal/1", "unit": "Å", "places": 4, "pointer": "/rows/median/rmsd_A/delta", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity", "pair": "/rows/median/chains"}},
+          "selected_residues": {"reader": "json/1", "op": "integer/1", "unit": "residues", "places": 0, "pointer": "/selected_residues", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity"}},
+          "retained_residues": {"reader": "json/1", "op": "integer/1", "unit": "residues", "places": 0, "pointer": "/retained_residues", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity"}},
+          "observed_union_residues": {"reader": "json/1", "op": "integer/1", "unit": "residues", "places": 0, "pointer": "/observed_union_residues", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity"}},
+          "omitted_residues": {"reader": "json/1", "op": "integer/1", "unit": "residues", "places": 0, "pointer": "/omitted_residues", "scope": {"input_sha256": "/input_sha256", "mapping_sha256": "/mapping_sha256", "entry": "/entry", "interval": "/interval", "endpoint": "/endpoint", "mask": "/mask", "model": "/model", "entity": "/entity"}}
+        }
+      }
+    ],
+    "limitations": "Descriptive sensitivity on common observed positions only. Fits with insufficient data or non-unique rotations have no numeric value. Geometric sensitivity alone does not establish function, frequency, causation or cross-deposition correspondence.",
+    "parameter_defaults": {}
+  },
+  "entry_script": "methods/segment.py"
+}

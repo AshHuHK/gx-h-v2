@@ -1,0 +1,134 @@
+{
+  "manifest": {
+    "capability_id": "bglb-retrospective",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--kinetics",
+        "{in.kinetics}",
+        "--conservation",
+        "{in.conservation}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "published_kinetics_retrospective",
+      "objective": "Evaluate the rank and coverage of a fixed archived score against published pNPG catalytic efficiencies.",
+      "mechanism": "Supply exactly two input artifact refs together in the same add_node: the original Carlin et al. S1 kinetics and S3 conservation DOCX (in either order), parameters {}. Read summary.json for counts and Spearman; records.json holds each source row, uncertainty and missing status.",
+      "estimator": "Hold out whole residue positions when SHA256(UTF-8 GX-BglB-S1-site-v1:<position>) interpreted as big-endian integer modulo 3 equals zero. Compare negative S3 column 3 conservation with unrounded S1 column 6 using average ranks. Constant S1 WT predicts every record identically and its rank correlation is undefined. Report median absolute log10 error against WT on identical pairs. Quantify missing, yield-limited and censored cases before filtering.",
+      "training_data_lineage": "Fixed descriptive score and split on published records. S3 column 1 and its outcome-sorted row order are excluded. No fitted weights or new sequences."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.published-kinetics/1.0.0/methods/retrospective.py",
+      "sha256": "7eee12f12cfc3816ffcc21ebd631694b45bf56e0a4aca02c5e711fc271a62025"
+    },
+    "licence": "Carlin et al. source data CC BY 4.0; analysis code GX release.",
+    "licence_basis": "Publisher article license: https://creativecommons.org/licenses/by/4.0/",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "summary.json",
+        "kind": "file:bglb_summary",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "kinetics",
+          "conservation"
+        ],
+        "media_type": "application/json",
+        "metric_specs": {
+          "holdout_score_pairs": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/holdout_score_pairs",
+            "unit": "variants",
+            "places": 0,
+            "scope": {
+              "s1_sha256": "/input_sha256/kinetics",
+              "s3_sha256": "/input_sha256/conservation",
+              "partition_rule": "/partition_rule",
+              "substrate": "/substrate"
+            }
+          },
+          "holdout_count": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/holdout_count",
+            "unit": "variants",
+            "places": 0,
+            "scope": {
+              "s1_sha256": "/input_sha256/kinetics",
+              "s3_sha256": "/input_sha256/conservation",
+              "partition_rule": "/partition_rule",
+              "substrate": "/substrate"
+            }
+          },
+          "holdout_exact": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/holdout_exact",
+            "unit": "variants",
+            "places": 0,
+            "scope": {
+              "s1_sha256": "/input_sha256/kinetics",
+              "s3_sha256": "/input_sha256/conservation",
+              "partition_rule": "/partition_rule",
+              "substrate": "/substrate"
+            }
+          },
+          "holdout_spearman": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/holdout_spearman",
+            "unit": "1",
+            "places": 6,
+            "scope": {
+              "s1_sha256": "/input_sha256/kinetics",
+              "s3_sha256": "/input_sha256/conservation",
+              "partition_rule": "/partition_rule",
+              "substrate": "/substrate"
+            }
+          },
+          "paired_wt_median_absolute_log10_error": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/paired_wt_median_absolute_log10_error",
+            "unit": "log10",
+            "places": 6,
+            "scope": {
+              "s1_sha256": "/input_sha256/kinetics",
+              "s3_sha256": "/input_sha256/conservation",
+              "partition_rule": "/partition_rule",
+              "substrate": "/substrate"
+            }
+          }
+        }
+      },
+      {
+        "name": "records.json",
+        "kind": "file:bglb_records",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "kinetics",
+          "conservation"
+        ],
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Original BglB pNPG panel; S3 covers a selected subset. Holdout is a repeatable retrospective partition of public data, with no external validation."
+  },
+  "entry_script": "methods/retrospective.py"
+}

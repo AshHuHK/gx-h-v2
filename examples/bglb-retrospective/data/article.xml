@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD Journal Publishing DTD v3.0 20080202//EN" "http://dtd.nlm.nih.gov/publishing/3.0/journalpublishing3.dtd">
+<article article-type="research-article" dtd-version="3.0" xml:lang="en" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
+<front>
+<journal-meta>
+<journal-id journal-id-type="nlm-ta">PLoS ONE</journal-id>
+<journal-id journal-id-type="publisher-id">plos</journal-id>
+<journal-id journal-id-type="pmc">plosone</journal-id>
+<journal-title-group>
+<journal-title>PLOS ONE</journal-title>
+</journal-title-group>
+<issn pub-type="epub">1932-6203</issn>
+<publisher>
+<publisher-name>Public Library of Science</publisher-name>
+<publisher-loc>San Francisco, CA USA</publisher-loc>
+</publisher>
+</journal-meta>
+<article-meta>
+<article-id pub-id-type="doi">10.1371/journal.pone.0147596</article-id>
+<article-id pub-id-type="publisher-id">PONE-D-15-33567</article-id>
+<article-categories>
+<subj-group subj-group-type="heading">
+<subject>Research Article</subject>
+</subj-group>
+<subj-group subj-group-type="Discipline-v3"><subject>Physical sciences</subject><subj-group><subject>Mathematics</subject><subj-group><subject>Applied mathematics</subject><subj-group><subject>Algorithms</subject><subj-group><subject>Machine learning algorithms</subject></subj-group></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Research and analysis methods</subject><subj-group><subject>Simulation and modeling</subject><subj-group><subject>Algorithms</subject><subj-group><subject>Machine learning algorithms</subject></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Biology and life sciences</subject><subj-group><subject>Neuroscience</subject><subj-group><subject>Cognitive science</subject><subj-group><subject>Artificial intelligence</subject><subj-group><subject>Machine learning</subject><subj-group><subject>Machine learning algorithms</subject></subj-group></subj-group></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Computer and information sciences</subject><subj-group><subject>Artificial intelligence</subject><subj-group><subject>Machine learning</subject><subj-group><subject>Machine learning algorithms</subject></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Physical sciences</subject><subj-group><subject>Chemistry</subject><subj-group><subject>Physical chemistry</subject><subj-group><subject>Chemical bonding</subject><subj-group><subject>Hydrogen bonding</subject></subj-group></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Biology and life sciences</subject><subj-group><subject>Biochemistry</subject><subj-group><subject>Enzymology</subject><subj-group><subject>Enzymes</subject></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Biology and life sciences</subject><subj-group><subject>Biochemistry</subject><subj-group><subject>Proteins</subject><subj-group><subject>Enzymes</subject></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Physical sciences</subject><subj-group><subject>Chemistry</subject><subj-group><subject>Catalysis</subject></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Biology and life sciences</subject><subj-group><subject>Biochemistry</subject><subj-group><subject>Enzymology</subject><subj-group><subject>Enzyme kinetics</subject></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Physical sciences</subject><subj-group><subject>Mathematics</subject><subj-group><subject>Applied mathematics</subject><subj-group><subject>Algorithms</subject></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Research and analysis methods</subject><subj-group><subject>Simulation and modeling</subject><subj-group><subject>Algorithms</subject></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Biology and life sciences</subject><subj-group><subject>Neuroscience</subject><subj-group><subject>Cognitive science</subject><subj-group><subject>Artificial intelligence</subject><subj-group><subject>Machine learning</subject></subj-group></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Computer and information sciences</subject><subj-group><subject>Artificial intelligence</subject><subj-group><subject>Machine learning</subject></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Physical sciences</subject><subj-group><subject>Chemistry</subject><subj-group><subject>Chemical compounds</subject><subj-group><subject>Organic compounds</subject><subj-group><subject>Amino acids</subject><subj-group><subject>Aliphatic amino acids</subject><subj-group><subject>Alanine</subject></subj-group></subj-group></subj-group></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Physical sciences</subject><subj-group><subject>Chemistry</subject><subj-group><subject>Organic chemistry</subject><subj-group><subject>Organic compounds</subject><subj-group><subject>Amino acids</subject><subj-group><subject>Aliphatic amino acids</subject><subj-group><subject>Alanine</subject></subj-group></subj-group></subj-group></subj-group></subj-group></subj-group></subj-group><subj-group subj-group-type="Discipline-v3"><subject>Biology and life sciences</subject><subj-group><subject>Biochemistry</subject><subj-group><subject>Proteins</subject><subj-group><subject>Amino acids</subject><subj-group><subject>Aliphatic amino acids</subject><subj-group><subject>Alanine</subject></subj-group></subj-group></subj-group></subj-group></subj-group></subj-group></article-categories>
+<title-group>
+<article-title>Kinetic Characterization of 100 Glycoside Hydrolase Mutants Enables the Discovery of Structural Features Correlated with Kinetic Constants</article-title>
+<alt-title alt-title-type="running-head">Kinetic Characterization of 100 Glycoside Hydrolase Mutants</alt-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author" equal-contrib="yes" xlink:type="simple">
+<name name-style="western">
+<surname>Carlin</surname>
+<given-names>Dylan Alexander</given-names>
+</name>
+<xref ref-type="aff" rid="aff001"><sup>1</sup></xref>
+</contrib>
+<contrib contrib-type="author" equal-contrib="yes" xlink:type="simple">
+<name name-style="western">
+<surname>Caster</surname>
+<given-names>Ryan W.</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Wang</surname>
+<given-names>Xiaokang</given-names>
+</name>
+<xref ref-type="aff" rid="aff005"><sup>5</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Betzenderfer</surname>
+<given-names>Stephanie A.</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Chen</surname>
+<given-names>Claire X.</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Duong</surname>
+<given-names>Veasna M.</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Ryklansky</surname>
+<given-names>Carolina V.</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Alpekin</surname>
+<given-names>Alp</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Beaumont</surname>
+<given-names>Nathan</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Kapoor</surname>
+<given-names>Harshul</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Kim</surname>
+<given-names>Nicole</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Mohabbot</surname>
+<given-names>Hosna</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Pang</surname>
+<given-names>Boyu</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Teel</surname>
+<given-names>Rachel</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Whithaus</surname>
+<given-names>Lillian</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+</contrib>
+<contrib contrib-type="author" xlink:type="simple">
+<name name-style="western">
+<surname>Tagkopoulos</surname>
+<given-names>Ilias</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+<xref ref-type="aff" rid="aff006"><sup>6</sup></xref>
+</contrib>
+<contrib contrib-type="author" corresp="yes" xlink:type="simple">
+<name name-style="western">
+<surname>Siegel</surname>
+<given-names>Justin B.</given-names>
+</name>
+<xref ref-type="aff" rid="aff002"><sup>2</sup></xref>
+<xref ref-type="aff" rid="aff003"><sup>3</sup></xref>
+<xref ref-type="aff" rid="aff004"><sup>4</sup></xref>
+<xref ref-type="corresp" rid="cor001">*</xref>
+</contrib>
+</contrib-group>
+<aff id="aff001"><label>1</label> <addr-line>Biophysics Graduate Group, University of California Davis, California, United States of America</addr-line></aff>
+<aff id="aff002"><label>2</label> <addr-line>Genome Center, University of California Davis, Davis, California, United States of America</addr-line></aff>
+<aff id="aff003"><label>3</label> <addr-line>Department of Chemistry, University of California Davis, Davis, California, United States of America</addr-line></aff>
+<aff id="aff004"><label>4</label> <addr-line>Department of Biochemistry &amp; Molecular Medicine, University of California Davis, Davis, California, United States of America</addr-line></aff>
+<aff id="aff005"><label>5</label> <addr-line>Department of Biomedical Engineering, University of California Davis, Davis, California, United States of America</addr-line></aff>
+<aff id="aff006"><label>6</label> <addr-line>Department of Computer Science, University of California Davis, Davis, California, United States of America</addr-line></aff>
+<contrib-group>
+<contrib contrib-type="editor" xlink:type="simple">
+<name name-style="western">
+<surname>Hubbard</surname>
+<given-names>Timothy J</given-names>
+</name>
+<role>Editor</role>
+<xref ref-type="aff" rid="edit1"/>
+</contrib>
+</contrib-group>
+<aff id="edit1"><addr-line>King's College London, UNITED KINGDOM</addr-line></aff>
+<author-notes>
+<fn fn-type="conflict" id="coi001">
+<p>The authors have declared that no competing interests exist.</p>
+</fn>
+<fn fn-type="con" id="contrib001">
+<p>Conceived and designed the experiments: DAC JBS. Performed the experiments: DAC RWC SAB CXC VMD CVR AA NB HK NK HM BP RT LW. Analyzed the data: DAC. Wrote the paper: DAC JBS XW IT. Designed the software used in analysis: DAC.</p>
+</fn>
+<corresp id="cor001">* E-mail: <email xlink:type="simple">jbsiegel@ucdavis.edu</email></corresp>
+</author-notes>
+<pub-date pub-type="epub">
+<day>27</day>
+<month>1</month>
+<year>2016</year>
+</pub-date>
+<pub-date pub-type="collection">
+<year>2016</year>
+</pub-date>
+<volume>11</volume>
+<issue>1</issue>
+<elocation-id>e0147596</elocation-id>
+<history>
+<date date-type="received">
+<day>31</day>
+<month>7</month>
+<year>2015</year>
+</date>
+<date date-type="accepted">
+<day>6</day>
+<month>1</month>
+<year>2016</year>
+</date>
+</history>
+<permissions>
+<copyright-year>2016</copyright-year>
+<copyright-holder>Carlin et al</copyright-holder>
+<license xlink:href="http://creativecommons.org/licenses/by/4.0/" xlink:type="simple">
+<license-p>This is an open access article distributed under the terms of the <ext-link ext-link-type="uri" xlink:href="http://creativecommons.org/licenses/by/4.0/" xlink:type="simple">Creative Commons Attribution License</ext-link>, which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</license-p>
+</license>
+</permissions>
+<self-uri content-type="pdf" xlink:href="info:doi/10.1371/journal.pone.0147596"/>
+<abstract>
+<p>The use of computational modeling algorithms to guide the design of novel enzyme catalysts is a rapidly growing field. Force-field based methods have now been used to engineer both enzyme specificity and activity. However, the proportion of designed mutants with the intended function is often less than ten percent. One potential reason for this is that current force-field based approaches are trained on indirect measures of function rather than direct correlation to experimentally-determined functional effects of mutations. We hypothesize that this is partially due to the lack of data sets for which a large panel of enzyme variants has been produced, purified, and kinetically characterized. Here we report the <italic>k</italic><sub>cat</sub> and K<sub>M</sub> values of 100 purified mutants of a glycoside hydrolase enzyme. We demonstrate the utility of this data set by using machine learning to train a new algorithm that enables prediction of each kinetic parameter based on readily-modeled structural features. The generated dataset and analyses carried out in this study not only provide insight into how this enzyme functions, they also provide a clear path forward for the improvement of computational enzyme redesign algorithms.</p>
+</abstract>
+<funding-group>
+<funding-statement>This work was supported by Army Research Office #201121557 and National Science Foundation #1254205 (IT) and Alfred P. Sloan Foundation #BR2014-012 and University of California Davis Startup Funds (JBS).</funding-statement>
+</funding-group>
+<counts>
+<fig-count count="4"/>
+<table-count count="1"/>
+<page-count count="14"/>
+</counts>
+<custom-meta-group>
+<custom-meta id="data-availability">
+<meta-name>Data Availability</meta-name>
+<meta-value>All relevant data are within the paper and its Supporting Information files.</meta-value>
+</custom-meta>
+</custom-meta-group>
+</article-meta>
+</front>
+<body>
+<sec id="sec001" sec-type="intro">
+<title>Introduction</title>
+<p>The ability to rationally reengineer enzyme function using computational approaches has the potential to enable rapid development of highly efficient and specific catalysts tailored for needs beyond those selected for during natural evolution. [<xref ref-type="bibr" rid="pone.0147596.ref001">1</xref>] A growing route for engineering enzyme catalysts is the use of computational tools to evaluate potential mutations <italic>in silico</italic> prior to experimental characterization. Using the Rosetta Molecular Modeling Suite, reengineering of both specificity and chemistry has been accomplished. [<xref ref-type="bibr" rid="pone.0147596.ref002">2</xref>,<xref ref-type="bibr" rid="pone.0147596.ref003">3</xref>,<xref ref-type="bibr" rid="pone.0147596.ref004">4</xref>,<xref ref-type="bibr" rid="pone.0147596.ref005">5</xref>,<xref ref-type="bibr" rid="pone.0147596.ref006">6</xref>] However, often less than ten percent of designs engineered using this force-field based approach are found to have the intended functional effect. Furthermore, there have been no reports evaluating the predictive power of the Rosetta Molecular Modeling Suite on the functional effects of enzyme mutations. Therefore efforts to both evaluate and improve the predictive power of this computationally inexpensive and widely accessible algorithm are necessary.</p>
+<p>The use of large datasets to train and evaluate force-field based algorithms for protein function has been previously validated in the context of protein thermostability. For example, the ProTherm database has over twenty thousand measured effects of mutations on thermostability, and serves as the gold standard for the development of numerous algorithms developed to predict effects of mutations on thermostability. [<xref ref-type="bibr" rid="pone.0147596.ref007">7</xref>,<xref ref-type="bibr" rid="pone.0147596.ref008">8</xref>,<xref ref-type="bibr" rid="pone.0147596.ref009">9</xref>] Current algorithms for protein redesign, in contrast, are not directly trained on experimentally measured effects, but rather indirect measures such as sequence recovery (<italic>i</italic>.<italic>e</italic>. the ability to recapitulate a known active site after running a design simulation). While there have been several previous efforts to construct large families of functionally-characterized mutants, none have produced, purified, and measured the kinetic constants of more than twenty mutants. [<xref ref-type="bibr" rid="pone.0147596.ref010">10</xref>,<xref ref-type="bibr" rid="pone.0147596.ref011">11</xref>,<xref ref-type="bibr" rid="pone.0147596.ref012">12</xref>,<xref ref-type="bibr" rid="pone.0147596.ref013">13</xref>,<xref ref-type="bibr" rid="pone.0147596.ref014">14</xref>] In order to develop algorithms for the rational modulation of kinetic parameters, we hypothesize that it will be necessary to develop libraries of mutant enzymes for which the functional effects of mutations on catalytic efficiency (<italic>k</italic><sub>cat</sub>/K<sub>M</sub>), apparent substrate affinity (estimated by K<sub>M</sub>), and turnover rate (<italic>k</italic><sub>cat</sub>) have been measured.</p>
+<p>Here, we take the first step towards developing a data set of enzyme mutants with measured effects on kinetic constants that is both large enough and has a wide enough dynamic range to enable training of computational protein design algorithms. The initial enzyme of focus is a family 1 glycoside hydrolase: β-glucosidase B (BglB) from <italic>Paenibacillus polymyxa</italic>. The family 1 glycoside hydrolases have been the subject of numerous structural and kinetic studies due to their importance as the penultimate step in cellular ligno-cellulose utilization. [<xref ref-type="bibr" rid="pone.0147596.ref015">15</xref>] The structure of BglB indicates that it follows a classical Koshland double-displacement mechanism in which E353 performs a nucleophilic attack on the anomeric carbon of the substrate’s glucose moiety. The leaving group is protonated by E164. A third active site residue, Y295, orients E353 for catalysis with a hydrogen bond. [<xref ref-type="bibr" rid="pone.0147596.ref015">15</xref>] The protein structure and reaction scheme are provided in <xref ref-type="fig" rid="pone.0147596.g001">Fig 1</xref>.</p>
+<fig id="pone.0147596.g001" position="float">
+<object-id pub-id-type="doi">10.1371/journal.pone.0147596.g001</object-id>
+<label>Fig 1</label>
+<caption>
+<title>Structure and catalyzed reaction of BglB.</title>
+<p>(A) Structure of BglB in complex with the modeled <italic>p</italic>-nitrophenyl-β-D-glucoside (pNPG) used for design. Alpha carbons of residues mutated shown as blue spheres. The image was drawn with PyMOL. [<xref ref-type="bibr" rid="pone.0147596.ref016">16</xref>] (B) The BglB–catalyzed reaction on pNPG used to evaluate kinetic constants of designed mutants.</p>
+</caption>
+<graphic mimetype="image" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.g001" xlink:type="simple"/>
+</fig>
+<p>In this study we report the largest data set of its kind, in which 100 mutants of BglB are produced, purified, and kinetically characterized (<italic>i</italic>.<italic>e</italic>., kinetic constants <italic>k</italic><sub>cat</sub>, K<sub>M</sub>, and K<sub>i</sub> measured) using the reporter substrate <italic>p</italic>-nitrophenyl-β-D-glucoside (pNPG). The production of this dataset revealed several mutations to non-catalytic residues (<italic>i</italic>.<italic>e</italic>. those not directly involved in the proposed reaction chemistry) that are as important to the enzyme-catalyzed reaction as catalytic residues. In addition, we demonstrate the ability to use this dataset to train computational algorithms for the prediction of <italic>k</italic><sub>cat</sub>, K<sub>M</sub>, and <italic>k</italic><sub>cat</sub>/K<sub>M</sub> using readily-calculated metrics derived from molecular modeling. Finally, we illustrate how machine learning can be used to identify structural features from the molecular models that significantly improve the predictive accuracy of the molecular modeling. These analyses provide insight into the factors important for catalysis in BglB as well as a path forward for the development and evaluation of next-generation enzyme reengineering algorithms.</p>
+</sec>
+<sec id="sec002" sec-type="results">
+<title>Results</title>
+<sec id="sec003">
+<title>Computationally-directed engineering of BglB</title>
+<p>A crystal structure (PDB 2JIE) of recombinant BglB in complex with the substrate analog 2-deoxy-2-fluoro-α-D-glucopyranose was used to identify the substrate binding pocket and the catalytic residues. To generate a molecular model representative of a proposed transition state in the hydrolysis of pNPG, an S<sub>N</sub>2-like transition state structure was built and minimized in Spartan based on a 3D conformer of PubChem CID 92930. Functional constraints were used to define catalytic distances, angles, and dihedrals between pNPG, the acid-base E164, the nucleophile E353, and Y295, which is proposed to orient the nucleophilic glutamate. The angle between the attacking oxygen from E353, the anomeric carbon, and the phenolic oxygen was constrained to 180°, in accordance with an S<sub>N</sub>2-like mechanism. [<xref ref-type="bibr" rid="pone.0147596.ref017">17</xref>] A complete set of files that were used for modeling are provided in <xref ref-type="supplementary-material" rid="pone.0147596.s001">S1 Code</xref>.</p>
+<p>Two approaches were used to establish a set of mutants to generate and kinetically characterize. The first approach was a systematic alanine scan of the BglB active site where each residue within 12 Å of the ligand in our model was individually mutated to alanine. In the second approach, mutations predicted to be compatible with the modeled pNPG transition state in BglB structure were selected by students learning about molecular modeling through the program Foldit, a graphical user interface to the Rosetta Molecular Modeling Suite. [<xref ref-type="bibr" rid="pone.0147596.ref004">4</xref>,<xref ref-type="bibr" rid="pone.0147596.ref018">18</xref>] Mutations were modeled and scored in Foldit and a selection of mutations that were either favorable or did not increase the energy of the overall system by greater than 5 Rosetta energy units were chosen to synthesize and experimentally characterize. <xref ref-type="fig" rid="pone.0147596.g001">Fig 1A</xref> illustrates the positions in the protein where mutations were introduced, and the complete set of mutations selected is listed in <xref ref-type="supplementary-material" rid="pone.0147596.s006">S1 Table</xref>. A total of 69 positions were covered over the 100 mutants made.</p>
+</sec>
+<sec id="sec004">
+<title>Protein production and purification</title>
+<p>Each of the 100 mutants was made via Kunkel mutagenesis [<xref ref-type="bibr" rid="pone.0147596.ref019">19</xref>] using the Transcriptic cloud laboratory platform and verified by Sanger sequencing. Plasmids containing the mutant genes were transformed into <italic>Escherichia coli</italic> BL21(DE3), 5 mL cultures grown in Terrific Broth and expression induced with IPTG. Proteins were purified via immobilized metal affinity chromatography and eluted in 200 μL HEPES buffer, as described in detail in <xref ref-type="supplementary-material" rid="pone.0147596.s009">S1 Text</xref>. The absorbance at 280 nm of eluted protein was used to quantify protein yield and SDS-PAGE was used to evaluate purity (<xref ref-type="supplementary-material" rid="pone.0147596.s002">S1 Fig</xref>). All proteins used in this study were greater than 80% pure, and fresh resin was used for each mutant to prevent wild type contamination.</p>
+<p>A total of ten biological replicates of the native BglB were used to assess expression and purification. The average concentration of proteins after purification was found to be 1.2 ± 0.4 mg/mL. Of the 100 mutants synthesized, 89 express and purify as soluble protein (<xref ref-type="fig" rid="pone.0147596.g002">Fig 2</xref>). The final concentrations for all 100 mutants are included in <xref ref-type="supplementary-material" rid="pone.0147596.s006">S1 Table</xref>. Greater than 35% maintained the yields obtained for native BglB, and 15% did not express and purify as a soluble protein above our limit of detection (0.1 mg/mL) for protein yield after purification based on A<sub>280</sub> and SDS-PAGE.</p>
+<fig id="pone.0147596.g002" position="float">
+<object-id pub-id-type="doi">10.1371/journal.pone.0147596.g002</object-id>
+<label>Fig 2</label>
+<caption>
+<title>Log scale relative kinetic constants of 100 BglB mutants.</title>
+<p>The heatmap depicts the effect of each mutation on each kinetic constant relative to native BglB, normalized at 0. As indicated in the color legend, gold is for higher value and blue for a lower value. The metric 1/K<sub>M</sub> is used so a higher value is consistently corresponding to a “better” kinetic constant (assuming a lower K<sub>M</sub> is better) when evaluating <italic>k</italic><sub>cat</sub>, <italic>k</italic><sub>cat</sub>/K<sub>M</sub>, and K<sub>M</sub>. If the kinetic constant was not measurable, an X is depicted in the box. Proteins that were expressed as soluble protein with a final purification concentration of &gt;0.1 mg/mL and validated by SDS-PAGE are labeled with a black box in the first column. Those below our limit of detection of 0.1 mg/mL are labeled with an empty box. Values are on a log scale and the ranges are as follows: 10–11,000 min<sup>-1</sup> (<italic>k</italic><sub>cat</sub>), 0.6–85 mM (K<sub>M</sub>), and 10–560,000 M<sup>-1</sup>min<sup>-1</sup> (<italic>k</italic><sub>cat</sub>/K<sub>M</sub>) with wild type constants of 880 ± 10 min<sup>-1</sup>, 5.0 ± 0.2 mM, and 171,000 ± 8000 M<sup>-1</sup> min<sup>-1</sup> for <italic>k</italic><sub>cat</sub>, K<sub>M</sub>, and <italic>k</italic><sub>cat</sub>/K<sub>M</sub> respectively. A full table of kinetic constants and substrate versus velocity curves for each are provided in <xref ref-type="supplementary-material" rid="pone.0147596.s006">S1 Table</xref> and <xref ref-type="supplementary-material" rid="pone.0147596.s004">S3 Fig</xref>.</p>
+</caption>
+<graphic mimetype="image" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.g002" xlink:type="simple"/>
+</fig>
+</sec>
+<sec id="sec005">
+<title>Kinetic characterization of mutants</title>
+<p>Michaelis-Menten kinetic constants for each of the 100 mutants were determined using the colorimetric assay of pNPG hydrolysis. The results are represented as a heatmap in <xref ref-type="fig" rid="pone.0147596.g002">Fig 2</xref>. Ten biological replicates of the wild type enzyme have an average <italic>k</italic><sub>cat</sub> of 880 ± 10 min<sup>–1</sup>, K<sub>M</sub> of 5.0 ± 0.2 mM, and <italic>k</italic><sub>cat</sub>/K<sub>M</sub> of 171,000 ± 8,000 M<sup>–1</sup> min<sup>–1</sup>. To determine kinetic constants, observed rates at 8 substrate concentrations were fit to the Michaelis-Menten equation. If no clear saturation was observed then a linear equation was used to determine <italic>k</italic><sub>cat</sub>/K<sub>M</sub>. Experimentally measured kinetic constants and nonlinear regression analysis for each mutant can be found in <xref ref-type="supplementary-material" rid="pone.0147596.s006">S1 Table</xref> and <xref ref-type="supplementary-material" rid="pone.0147596.s004">S3 Fig</xref>, respectively.</p>
+<p>Based on the maximum concentration of enzyme used in our assays and colorimetric absorbance changes at the highest substrate concentration used, we estimate our limit of detection for <italic>k</italic><sub>cat</sub>/K<sub>M</sub> to be 10 M<sup>-1</sup>min<sup>-1</sup>. Of the 89 solubly purified mutants, 6 are below the limit of detection. The highest catalytic efficiency observed is 560,000 M<sup>-1</sup>min<sup>-1</sup> for mutation R240A. In addition, while no substrate inhibition is observed for the wild type BglB, four mutants exhibit measurable substrate inhibition (the inhibition parameter K<sub>i</sub> for only these mutants is reported in <xref ref-type="supplementary-material" rid="pone.0147596.s006">S1 Table</xref> as it was not measurable for most mutants).</p>
+</sec>
+<sec id="sec006">
+<title>Observed sequence–structure–function relationships in BglB</title>
+<p>In agreement with previous studies, our results demonstrate the importance of E164, E353, and Y295 for catalysis. Mutating any of these residues to alanine results in a &gt;85,000-fold reduction in catalytic efficiency (<italic>k</italic><sub>cat</sub>/K<sub>M</sub>). However, beyond the catalytic residues, the systematic alanine scan of every residue within 12 Å of the ligand revealed mutations which have an equivalent functional effect to mutating the established catalytic residues to alanine.</p>
+<p>For example, the Q19A mutant showed a dramatic effect on function: catalytic efficiency decreased by 57,000-fold. Analysis of the crystal structure of BglB suggests that both the nitrogen and oxygen of the amide sidechain interact with hydroxyl groups on the substrate (<xref ref-type="fig" rid="pone.0147596.g003">Fig 3A</xref>). A multiple sequence alignment of the BglB enzyme family in the Pfam database (including 1,554 non-redundant proteins), revealed that Q19 is 95% conserved in this family (<xref ref-type="fig" rid="pone.0147596.g003">Fig 3B</xref>). Unlike E353, the nucleophilic glutamate directly involved in the reaction chemistry, Q19 is not directly involved in the reaction. This is consistent with the theory that orientation of the substrate is a critical aspect of catalysis ("orbital steering") for which Q19 is likely crucial. [<xref ref-type="bibr" rid="pone.0147596.ref020">20</xref>] A crystal structure of BglB Q19A in complex with the 2-deoxy-2-fluoro-α-D-glucopyranose inhibitor may help elucidate the structural effect of this mutation. Based on molecular modeling, no major structural change for this mutant is predicted (<xref ref-type="supplementary-material" rid="pone.0147596.s003">S2 Fig</xref>).</p>
+<fig id="pone.0147596.g003" position="float">
+<object-id pub-id-type="doi">10.1371/journal.pone.0147596.g003</object-id>
+<label>Fig 3</label>
+<caption>
+<title>Active site model and conservation analysis of BglB.</title>
+<p>(A) Docked model of pNPG in the active site of BglB showing established catalytic residues (navy) and a selection of residues mutated (gold). A multiple sequence alignment of the Pfam database’s collection of 1,554 family 1 glycoside hydrolases was made and the sequence logo for (B) selected regions around specific residues discussed in the text and (C) over the entire BglB coding sequence is represented. The height for each amino acid indicates the sequence conservation at that position.</p>
+</caption>
+<graphic mimetype="image" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.g003" xlink:type="simple"/>
+</fig>
+<p>A novel finding was a tenfold increase of <italic>k</italic><sub>cat</sub> by a single point mutant, R240A. The BglB crystal structure reveals that R240 forms two hydrogen bonds with E222 (<xref ref-type="fig" rid="pone.0147596.g003">Fig 3A</xref>). Molecular modeling of the R240A mutant predicts that E222 would adopt an alternative conformation in which the acid functional group of the glutamate is 2 Å closer to the active site (<xref ref-type="supplementary-material" rid="pone.0147596.s003">S2 Fig</xref>). This would likely result in a significant change of the electrostatic environment around the active site, and indicates that the electronegative environment enhances catalysis of pNPG hydrolysis. Consistent with this hypothesis is the observation that the mutation E222A decreases <italic>k</italic><sub>cat</sub> by tenfold. Both observations support previous evidence that the electrostatic environment of an enzyme's active site is of primary importance to catalysis. [<xref ref-type="bibr" rid="pone.0147596.ref021">21</xref>]</p>
+</sec>
+<sec id="sec007">
+<title>Conservation analysis of the BglB active site</title>
+<p>Of the 44 positions in the active site systematically mutated to alanine, 11 are conserved by &gt;85% in amino acid identity with respect to 1,554 homologues in the Pfam database. When any one of these amino acids is mutated to alanine, catalytic efficiency decreases &gt;100-fold (<xref ref-type="supplementary-material" rid="pone.0147596.s008">S3 Table</xref>). This supports the widely held assumption that highly conserved residues within an enzyme active site are functionally important. However, only 11 of the 44 residues within 12 Å of the active site are &gt;85% conserved. Of the 33 remaining residues within 12 Å of the active site, only 8 alanine mutations resulted in a decrease in catalytic efficiency of greater than 100-fold, and 10 of these 33 mutations were not found to significantly affect catalytic efficiency.</p>
+<p>Based on these findings, there does not appear to be a strong correlation between residue identity and function if a particular residue is &lt;85% conserved. This observation supports the hypothesis that native sequence recovery is not a good metric for training design algorithms. In addition, the mutation R240A, which is not observed in any natural variant in the glycoside hydrolase 1 family, resulted in a 10-fold increase in <italic>k</italic><sub>cat</sub> on pNPG. This emphasizes the importance of not limiting design efforts to changes previously observed in nature when engineering function towards a new substrate.</p>
+</sec>
+<sec id="sec008">
+<title>Computational modeling and evaluation of predictive ability</title>
+<p>In order to evaluate the Rosetta Molecular Modeling Suite’s ability to predict the functional effects of mutations on BglB kinetic properties, molecular models were generated for each of the 100 BglB mutants. For each mutant, the modeled pNPG previously described was docked into the active site by a Monte Carlo simulation with random perturbation of the ligand followed by functional constraint optimization through rigid body minimization of the ligand, sidechain and ligand conformational sampling, and, finally, ligand, sidechain, and backbone minimization. This protocol was used to mimic protocols used in successful enzyme reengineering efforts. [<xref ref-type="bibr" rid="pone.0147596.ref002">2</xref>] An example set of input files for wild type BglB are provided in <xref ref-type="supplementary-material" rid="pone.0147596.s001">S1 Code</xref>.</p>
+<p>For each mutant, 100 models were generated as described above and the lowest 10 in overall system energy for each mutant were selected for subsequent structural analysis. A value for each of 59 potentially informative features (such as predicted interface energy, number of hydrogen bonds between protein and ligand, and change in solvent accessible surface area upon ligand binding) was calculated for each model. Correlation of the average calculated structural features to each kinetic constant was assessed using Pearson Correlation Coefficient (PCC) and Spearman Rank Correlation (SRC). For both <italic>k</italic><sub>cat</sub>/K<sub>M</sub> and <italic>k</italic><sub>cat</sub>, the strongest correlation observed is to the total number of non-local contacts (count of residues separated by more than 8 sequence positions that interact with each other), with a PCC of 0.57 (p-value 0.009; Wilcoxon test) and 0.43 (p-value 0.004; Wilcoxon test), respectively. For 1/K<sub>M</sub>, the highest PCC is 0.29 (p-value 0.0005; Wilcoxon test) to the total number of hydrogen bonds in each BglB model. The SRC follows similar trends to PCC for all three predicted constants (SRC of 0.55, 0.42 and 0.38 for <italic>k</italic><sub>cat</sub>/K<sub>M</sub>, <italic>k</italic><sub>cat</sub> and 1/K<sub>M</sub> respectively). The PCC and SRC values for all features are available in <xref ref-type="supplementary-material" rid="pone.0147596.s007">S2 Table</xref>.</p>
+</sec>
+<sec id="sec009">
+<title>Machine learning prediction of kinetic constants</title>
+<p>Because no single structural feature predicts <italic>k</italic><sub>cat</sub>, 1/K<sub>M</sub>, or <italic>k</italic><sub>cat</sub>/K<sub>M</sub> with high accuracy, machine learning techniques were used to identify a subset of calculated features correlated to observed kinetic constants. Elastic net regularization, a constraint regression technique that uses both l<sub>1</sub> and l<sub>2</sub> regularization for feature selection, was used to identify structural features that could be combined in order to predict each kinetic constant. To remove bias, we used an ensemble learning technique, where the predicted value was an average of 1000 elastic net models, each trained on a different subset of the data.</p>
+<p>The final prediction from this ensemble learning regression method outperformed single feature selection for each kinetic constant. For <italic>k</italic><sub>cat</sub>/K<sub>M</sub>, the PCC increased to 0.76 from 0.57, in the case of <italic>k</italic><sub>cat</sub> to 0.60 from 0.43, and for 1/K<sub>M</sub> to 0.71 from 0.29. <xref ref-type="fig" rid="pone.0147596.g004">Fig 4</xref> (top panel) illustrates the correlations between machine learning predictions and experimentally-measured values. <xref ref-type="fig" rid="pone.0147596.g004">Fig 4</xref> (bottom panel) depicts the histogram of samples with respect to their measured kinetic constant value and the observed error between predicted and measured value.</p>
+<fig id="pone.0147596.g004" position="float">
+<object-id pub-id-type="doi">10.1371/journal.pone.0147596.g004</object-id>
+<label>Fig 4</label>
+<caption>
+<title>Correlation between machine learning predictions and experimentally-determined kinetic constants.</title>
+<p><italic>Top panels</italic>: predicted versus experimentally-measured values for kinetic constants <italic>k</italic><sub>cat</sub>/K<sub>M</sub> (A), <italic>k</italic><sub>cat</sub> (B), and 1/K<sub>M</sub> (C). All values are relative to the wild type enzyme and on a log scale. The standard deviation (error bars) of the predicted values are calculated based on the prediction by 1000-fold cross validation for each point. The red line corresponds to linear regression and has been added for visualization purposes. <italic>Bottom panels</italic>: Histograms of experimentally-determined values in the data set (90, 80 and 80 samples for <italic>k</italic><sub>cat</sub>/K<sub>M</sub>, <italic>k</italic><sub>cat</sub>, and K<sub>M</sub>, respectively), along with the residual errors (scatter plot) between predicted and measured kinetic values.</p>
+</caption>
+<graphic mimetype="image" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.g004" xlink:type="simple"/>
+</fig>
+<p>The primary features found to correlate to 1/K<sub>M</sub> are metrics of protein packing without the ligand present (<italic>i</italic>.<italic>e</italic>. a minimal number of voids). All of these packing features are positively correlated to 1/K<sub>M</sub>, meaning that, in BglB, a decrease in structural packing (<italic>i</italic>.<italic>e</italic>. a higher packing value) around the catalytic residues and protein results in a lower K<sub>M</sub>. A tightly packed enzyme without voids would likely result in pre-ordering of the active site. Therefore this correlation is consistent with BglB requiring a pre-ordered active site for efficient substrate binding, and potentially catalysis. [<xref ref-type="bibr" rid="pone.0147596.ref020">20</xref>] To further support this proposed classical lock-and-key mechanism, the observed root mean square deviation (RMSD) between the crystal structures of the apo (2O9P) and transition state analogue–bound (2JIE) forms of BglB is &lt; 0.2 Å. It is important to note that K<sub>M</sub> is a complex kinetic constant and not necessarily correlated to substrate binding (<italic>i</italic>.<italic>e</italic>. K<sub>d</sub>). Furthermore, the relationship between K<sub>M</sub> and K<sub>d</sub> may change between mutants. However, when modulating enzyme activity K<sub>M</sub> is a primary parameter of functional interest, and therefore the ability to predictively model K<sub>M</sub> is of significant importance. Future efforts including mechanistic and structural studies for a diverse set of mutants from this data set will be needed in order to elucidate the detailed molecular mechanism of the discovered relationship between K<sub>M,</sub> K<sub>d</sub>, and structural packing in BglB.</p>
+<p>The features selected by the algorithm as predictive of <italic>k</italic><sub>cat</sub> include a count of polar contacts, consistent with mechanistic studies that indicate BglB stabilizes the positive charge on the oxocarbenium ion in the proposed transition state. [<xref ref-type="bibr" rid="pone.0147596.ref022">22</xref>] Another primary featured selected as a predictor of <italic>k</italic><sub>cat</sub> by the elastic net algorithm is a ligand burial term (change in solvent accessible surface area on binding) which is consistent with the stabilization of the transition state and catalysis through tight interface packing and shape complementarity. In addition, these features will all have a significant effect on the electrostatic environment of the enzyme active site, and are consistent with effects observed for R240A and E222A on catalysis. However, similar to the analysis of K<sub>M</sub>, the rate-limiting step for BglB under these experimental conditions with this substrate is not known. As the rate limiting step may change between mutants, further studies on the detailed kinetic parameters of the native enzyme and mutants will likely provide further insight into the determinants of function and key structural factors required for high turnover rates.</p>
+<p>For BglB, the most informative feature predicting <italic>k</italic><sub>cat</sub>/K<sub>M</sub> is the calculated hydrogen bonding energy of the substrate. The identification of this feature by the machine learning algorithm indicates the importance of protein-ligand hydrogen bond interactions. Hydrogen-bonding interactions are exceptionally important for the enzyme-catalyzed reaction, as noted for the Q19A mutation. Strong hydrogen bonding interactions between the protein and substrate are likely of the utmost importance for optimally positioning the substrate and the protein sidechains to enable catalysis ("orbital steering"). [<xref ref-type="bibr" rid="pone.0147596.ref023">23</xref>] This is consistent with the hydrogen bonding energy being selected by machine learning as a feature of primary importance for catalytic efficiency.</p>
+<p>While many of the selected features are consistent with well-established mechanisms of enzyme catalysis, there were several unexpected observations. One unexpected trend is that several features are selected as predictive of <italic>k</italic><sub>cat</sub>/K<sub>M</sub> but not either <italic>k</italic><sub>cat</sub> or K<sub>M</sub>. Further analysis of <italic>k</italic><sub>cat</sub> and K<sub>M</sub> revealed that there is no significant correlation between two parameters in this dataset (<xref ref-type="supplementary-material" rid="pone.0147596.s005">S4 Fig</xref>). This suggests that <italic>k</italic><sub>cat</sub> and K<sub>M</sub> are independent parameters for BglB, and it is therefore not unexpected that features found to be predictive of <italic>k</italic><sub>cat</sub>/K<sub>M</sub> are not predictive of either <italic>k</italic><sub>cat</sub> or K<sub>M</sub> independently.</p>
+<p>A second unexpected observation is that the most common metric used for evaluating designs, interface energy, [<xref ref-type="bibr" rid="pone.0147596.ref002">2</xref>,<xref ref-type="bibr" rid="pone.0147596.ref003">3</xref>,<xref ref-type="bibr" rid="pone.0147596.ref004">4</xref>,<xref ref-type="bibr" rid="pone.0147596.ref005">5</xref>,<xref ref-type="bibr" rid="pone.0147596.ref006">6</xref>] is not selected by the algorithm to be predictive of any kinetic constant. Ideally, this would be the single metric optimally correlated with either <italic>k</italic><sub>cat</sub> or <italic>k</italic><sub>cat</sub>/K<sub>M</sub>. This likely stems from training the enzyme design algorithm on indirect measures of function, further supporting the need to train force-field based algorithms on direct experimental measurements.</p>
+</sec>
+</sec>
+<sec id="sec010" sec-type="conclusions">
+<title>Discussion</title>
+<p>The Rosetta Molecular Modeling Suite has been successfully used to guide the engineering of a wide range of enzyme functions. However, there has been a limited ability to benchmark its predictive power for enzyme reengineering due to the lack of a large, quantitative dataset correlating the effects of mutations to kinetic parameters over a large dynamic range. Here, we construct the first such dataset and report statistically significant evaluation of our ability to predict the functional effects of enzyme mutations.</p>
+<p>The data generated here uncovered new structure-function relationships in BglB, and provides the quantitative contribution towards catalysis of each amino acid in the active site. This systematic analysis revealed that several amino acids in the active site that are not directly involved in the reaction chemistry are almost as important to catalysis as the three residues which are directly involved in the chemistry. This highlights the importance of the entire active site in catalysis. This is consistent with a recent report exploring the interconnectedness of a network of five residues in alkaline phosphatase. [<xref ref-type="bibr" rid="pone.0147596.ref024">24</xref>]</p>
+<p>Furthermore, the large dataset of kinetic constants reported here enabled the use of machine learning to select structural features that are predictive of function. It was unexpected to observe that the calculated interface energy is not found to be predictive of any kinetic parameter, and was not a feature selected by machine learning as predictive of function. This has significant implications for future design strategies since interface energy is one of the most common metrics currently used to evaluate redesigned enzyme-ligand interfaces. It may be pertinent to develop additional training datasets, such as we have done for BglB, in order to further quantify the appropriate metrics to be used for selecting designed mutants to functionally characterize in other enzyme systems. Similarly, the development and quantitative characterization of mutant datasets in the case of other enzymes will show which features are general and which are specific to different enzymatic classes.</p>
+<p>From the machine learning analysis, an interesting non-linear relationship between predicted and experimental rates is revealed as the residual error increases with the measured kinetic value (<xref ref-type="fig" rid="pone.0147596.g004">Fig 4</xref>, bottom panel). There are two factors that contribute to this effect. First, as is evident from the histogram, mutants with lower activity have been sampled more in all cases, and the sampling size per bin tends to bias the error distribution. Second, there are no features or feature combinations in the regression model that correlate well with the observed non-linearity. Non-linear regression methods (second-order polynomial and Poisson kernels) achieved similar performance (data not shown). As such, there is room for improvement in future studies by uniformly sampling the parameter space (which is difficult to predict <italic>a priori</italic> but can be rectified by increasing the sample size). This could be achieved by building on recent high throughput experiments that systematically screen the phenotypic effect of every possible enzyme point mutant. [<xref ref-type="bibr" rid="pone.0147596.ref014">14</xref>] A combination of high throughput screening with molecular modeling could be used to identify a subset of mutants to purify and kinetically characterize in order to maximize the information content when training new algorithms. In addition, introducing informative features that capture different aspects of the variation observed and exploring other non-linear regression methods that balance the bias-variance trade-off could be used to address the non-linear relationship between predicted and experimental kinetic constants.</p>
+<p>This work demonstrates how constrained statistical learning can be integrated with measured functional effects of a mutation on enzyme kinetic constants in order to build predictive models. As more datasets of kinetically characterized mutant variants become available for a variety of enzymes, our understanding of how these systems function and our ability to identify the most informative features will increase. Integration of these data-driven methods with enzyme redesign algorithms has the potential to significantly increase the predictive performance of the computational tools that are currently available, with far-reaching applications.</p>
+</sec>
+<sec id="sec011" sec-type="conclusions">
+<title>Conclusion</title>
+<p>In this work 100 computationally designed mutants of a family 1 glycoside hydrolase were produced, purified, and kinetically characterized. This dataset revealed new insights into structure-function relationships in BglB. Machine learning protocols were employed to select a subset of readily calculated structural features that are highly predictive of each measured kinetic parameter. The development of this large data set allowed a statistically significant assessment of the Rosetta Molecular Modeling Suite’s ability to predict functional effects of mutations on this enzyme’s kinetic properties. This data set will be invaluable for the development of computational enzyme engineering algorithms and providing insight into the physical basis of enzyme sequence-structure-function relationships.</p>
+</sec>
+<sec id="sec012" sec-type="materials|methods">
+<title>Methods</title>
+<sec id="sec013">
+<title>Molecular modeling for mutant selection</title>
+<p>The crystal structure of recombinant BglB in complex with the substrate analog 2-deoxy-2-fluoro-α-D-glucopyranose was used to identify the substrate binding pocket and the catalytic residues. Functional constraints were used to define catalytic distances, angles, and dihedrals among 4-nitrophenyl-β-D-glucoside, E164, E353, and Y295. The structure was then loaded into Foldit, a graphical user interface to Rosetta. Point mutations to the protein were modeled, and a subset were chosen by students learning about molecular modeling. Generally, the designs had energies no more than 5 Rosetta energy units higher than the native structure.</p>
+</sec>
+<sec id="sec014">
+<title>Mutagenesis, expression, and purification</title>
+<p>The BglB gene was codon-optimized for <italic>E</italic>. <italic>coli</italic>, synthesized as a DNA String by Life Technologies, and cloned into a pET29b+ vector using Gibson assembly. [<xref ref-type="bibr" rid="pone.0147596.ref025">25</xref>] Site-directed mutagenesis performed according to the method developed by Kunkel was used to generate mutations to BglB via the Transcriptic cloud laboratory platform. Variants were expressed and purified via immobilized metal ion affinity chromatography and assessed using 4–20% gradient SDS-PAGE Bolt Gels from Life Technologies. More details are provided in <xref ref-type="supplementary-material" rid="pone.0147596.s009">S1 Text</xref>.</p>
+</sec>
+<sec id="sec015">
+<title>Kinetic characterization</title>
+<p>The activity of the computationally designed enzyme variants was measured by monitoring the production of 4-nitrophenol. Mutant proteins ranging in concentration from 0.1 to 1.7 mg/mL were aliquotted in triplicate in 25 μL volumes and 75 μL of <italic>p</italic>-nitrophenyl-β-D-glucoside (100 mM, 25 mM, 6.25 mM, 1.6 mM, 0.4 mM, 0.1 mM, or 0.02 mM) in enzyme storage buffer was added. Absorbance at 420 nm was measured every minute for 30–60 min and the rate of product production in M/min was calculated using a standard curve (see Supplemental Materials). A total of 2944 observed rates for 119 individual proteins (including biological replicates) were fit to the Michaelis-Menten equation using SciPy.</p>
+</sec>
+<sec id="sec016">
+<title>Predictive modeling</title>
+<p>One hundred molecular models of each mutant enzyme were generated using the Rosetta Molecular Modeling Suite by Monte Carlo optimization of total system energy and the lowest 10 selected for feature generation. Elastic net regularization was used to select the most informative features. We assessed the prediction performance of the method with both 10-fold cross-validation (CV) and bootstrapping. First we performed 10-fold cross-validation (CV) and evaluated the predicted performance on the left-out samples (generalization error) at each of the 10 runs. Then we repeated this procedure (<italic>i</italic>.<italic>e</italic>. the 10-fold CV) 1,000 times to randomize the sample distribution among the folds (<xref ref-type="fig" rid="pone.0147596.g004">Fig 4</xref>). That way, we reduce the effect of any bias for evaluating left-out prediction performance. Additionally, we performed bootstrapping by considering sets of size 2n, where n is the number of samples in the whole dataset (90, 80 and 80 samples for <italic>k</italic><sub>cat</sub>/K<sub>M</sub>, <italic>k</italic><sub>cat</sub>, and K<sub>M</sub>, respectively). This setting achieves an average coverage of 86.7% of the original data set in any given bootstrapping sample. The left-out samples were then predicted by an elastic net model training on the bootstrapping set. We repeated this procedure 1,000 times and then we averaged the prediction performance of the left-out samples over all runs. As shown in <xref ref-type="supplementary-material" rid="pone.0147596.s010">S2 Text</xref>, the bootstrapping performance is similar to that of 10-fold CV that is depicted to <xref ref-type="fig" rid="pone.0147596.g004">Fig 4</xref> (slight variations due to smaller training/testing ratio).</p>
+<p>The final three feature sets (one of each parameter to be estimated) were selected according to the averaged weight of each feature in all the 10,000 elastic net models (10 models per cross-validation, randomized 1,000 times). The weight of each selected feature in <xref ref-type="table" rid="pone.0147596.t001">table 1</xref> was normalized with respect to the weight with the largest absolute value. P-values were calculated based on the Wilcoxon signed-rank test after features and kinetic constants were normalized in the [0,1] interval. More information about the optimization and statistical procedure followed is available in <xref ref-type="supplementary-material" rid="pone.0147596.s010">S2 Text</xref>.</p>
+<table-wrap id="pone.0147596.t001" position="float">
+<object-id pub-id-type="doi">10.1371/journal.pone.0147596.t001</object-id>
+<label>Table 1</label> <caption><title>Most informative structural features predicting each kinetic constant.</title> <p>For each mutant, 10 out of 100 models were selected based on the lowest total system energy. Fifty-nine structural features were calculated for the selected models and the most informative features were selected based on a constrained regularization technique (elastic net with bagging; see <xref ref-type="sec" rid="sec012">Methods</xref>). The table contains features that have been assigned non-zero weights during training (9 for <italic>k</italic><sub>cat</sub>/K<sub>M</sub>, 8 for <italic>k</italic><sub>cat</sub>, 10 for K<sub>M</sub>). The weights are multiplied by a normalized form of the value (not shown), and can therefore indicate both a positive or negative relationship. For example, a negative weight for hydrogen bonding is consistent with a positive correlation to hydrogen bonding where a smaller number indicates more hydrogen bonding is occurring. Inversely, a positive weight for packing would indicate a positive correlation since a larger value indicates a system with fewer voids. The relative contribution of each feature in determining the kinetic constant is given as a normalized weight (columns 1–3). Column 4 provides a description of each feature, and columns 5 and 6 show the range of observed values in the training dataset. The full feature table is available in <xref ref-type="supplementary-material" rid="pone.0147596.s007">S2 Table</xref>. <italic>ns = feature not selected by the algorithm</italic>.</p></caption>
+<alternatives>
+<graphic id="pone.0147596.t001g" mimetype="image" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.t001" xlink:type="simple"/>
+<table>
+<colgroup>
+<col align="left" valign="middle"/>
+<col align="left" valign="middle"/>
+<col align="left" valign="middle"/>
+<col align="left" valign="middle"/>
+<col align="left" valign="middle"/>
+<col align="left" valign="middle"/>
+</colgroup>
+<thead>
+<tr>
+<th align="center"><italic>k</italic><sub>cat</sub>/K<sub>M</sub></th>
+<th align="center"><italic>k</italic><sub>cat</sub></th>
+<th align="center">1/K<sub>M</sub></th>
+<th align="left">Description</th>
+<th align="center">Min.</th>
+<th align="center">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">-1.00</td>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="left">Hydrogen bonding energy of pNPG</td>
+<td align="center">-4.53</td>
+<td align="center">-1.8</td>
+</tr>
+<tr>
+<td align="center">-0.63</td>
+<td align="center">1.00</td>
+<td align="center">-0.03</td>
+<td align="left">Total number of polar contacts</td>
+<td align="center">144</td>
+<td align="center">155</td>
+</tr>
+<tr>
+<td align="center">-0.43</td>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="left">Count of hydrogen bonds to pNPG</td>
+<td align="center">4</td>
+<td align="center">9</td>
+</tr>
+<tr>
+<td align="center">-0.03</td>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="left">Hydrogen bonding energy of E164</td>
+<td align="center">-0.93</td>
+<td align="center">-0.21</td>
+</tr>
+<tr>
+<td align="center">0.29</td>
+<td align="center">ns</td>
+<td align="center">-0.27</td>
+<td align="left">Lennard-Jones repulsion of Y295</td>
+<td align="center">0.54</td>
+<td align="center">0.99</td>
+</tr>
+<tr>
+<td align="center">0.39</td>
+<td align="center">0.92</td>
+<td align="center">ns</td>
+<td align="left">Change in pNPG solvent-accessible surface upon binding</td>
+<td align="center">0.86</td>
+<td align="center">0.96</td>
+</tr>
+<tr>
+<td align="center">0.44</td>
+<td align="center">0.15</td>
+<td align="center">1.00</td>
+<td align="left">Packing of the system without pNPG</td>
+<td align="center">0.67</td>
+<td align="center">0.72</td>
+</tr>
+<tr>
+<td align="center">0.44</td>
+<td align="center">0.53</td>
+<td align="center">0.46</td>
+<td align="left">Packing of the system with pNPG</td>
+<td align="center">0.67</td>
+<td align="center">0.73</td>
+</tr>
+<tr>
+<td align="center">0.98</td>
+<td align="center">0.09</td>
+<td align="center">ns</td>
+<td align="left">Hydrogen bonding energy of Y295</td>
+<td align="center">-1.28</td>
+<td align="center">-0.5</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">-0.51</td>
+<td align="center">ns</td>
+<td align="left">Packing with pNPG around E353</td>
+<td align="center">0.19</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">-0.10</td>
+<td align="center">ns</td>
+<td align="left">Total system energy</td>
+<td align="center">-636.44</td>
+<td align="center">-621.6</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">-0.01</td>
+<td align="center">ns</td>
+<td align="left">Hydrogen bond energy of the total system</td>
+<td align="center">-76.7</td>
+<td align="center">-67.63</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="center">0.11</td>
+<td align="left">Lennard-Jones repulsion around E353</td>
+<td align="center">0.67</td>
+<td align="center">1.41</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="center">0.27</td>
+<td align="left">Average hydrophobic surface area without pNPG</td>
+<td align="center">0.51</td>
+<td align="center">1.75</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="center">0.32</td>
+<td align="left">Packing around E353 without pNPG</td>
+<td align="center">0.37</td>
+<td align="center">0.99</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="center">0.34</td>
+<td align="left">Packing around E164 without pNPG</td>
+<td align="center">0.37</td>
+<td align="center">0.99</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="center">0.38</td>
+<td align="left">Packing around Y295 without pNPG</td>
+<td align="center">0.34</td>
+<td align="center">0.99</td>
+</tr>
+<tr>
+<td align="center">ns</td>
+<td align="center">ns</td>
+<td align="center">0.51</td>
+<td align="left">Lennard-Jones repulsion of E164</td>
+<td align="center">0.83</td>
+<td align="center">1.53</td>
+</tr>
+</tbody>
+</table>
+</alternatives>
+</table-wrap>
+</sec>
+</sec>
+<sec id="sec017">
+<title>Supporting Information</title>
+<supplementary-material id="pone.0147596.s001" mimetype="application/zip" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s001" xlink:type="simple">
+<label>S1 Code</label>
+<caption>
+<title>Rosetta input files.</title>
+<p>Rosetta input files and associated scripts for generating and scoring <italic>in silico</italic> mutations to the BglB structure.</p>
+<p>(ZIP)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s002" mimetype="image/tiff" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s002" xlink:type="simple">
+<label>S1 Fig</label>
+<caption>
+<title>SDS-PAGE images for 100 variants of BglB.</title>
+<p>Gel images showing all proteins used in this study, including replicates of wild type assayed with each batch of mutants. Gels were stained overnight with Coomassie Blue. Protein ladder used was SeeBlue<sup>®</sup> Plus2 Pre-stained Protein Standard (Life Technologies). Gels were imaged on a BioRad Gel Doc EZ system.</p>
+<p>(TIFF)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s003" mimetype="image/tiff" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s003" xlink:type="simple">
+<label>S2 Fig</label>
+<caption>
+<title>Active site models of mutants Q19A, R240A, and wild type BglB.</title>
+<p>The lowest energy of 100 models generated for each mutant is depicted. In panel A, mutation of the glutamine at position 19 to an alanine removes two hydrogen bonds (black) to the substrate compared to wild type (C). In panel B, mutation of the arginine at position 240 to an alanine is predicted to stabilize an alternate conformation of E222A, bringing the carboxylate group to 4.2 Å of the substrate's nitro group. Distances and between the substrate, <italic>p</italic>-nitrophenyl-β-D-glucoside, and the BglB molecule are indicated by black lines.</p>
+<p>(TIFF)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s004" mimetype="image/png" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s004" xlink:type="simple">
+<label>S3 Fig</label>
+<caption>
+<title>Diagnostic plots showing Michaelis-Menten, Michaelis-Menten with substrate inhibition, or linear fit for each of 100 mutants.</title>
+<p>For each mutant, 8 observed rates (in triplicate) were fit to the Michaelis-Menten equation using SciPy and plots were generated using Matplotlib. Plots were used to visually confirm statistical analysis of the fits.</p>
+<p>(PNG)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s005" mimetype="image/tiff" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s005" xlink:type="simple">
+<label>S4 Fig</label>
+<caption>
+<title>Plot of the values of log <italic>k</italic><sub>cat</sub> versus log 1/K<sub>M</sub> for 100 mutants relative to wild type BglB, showing the statistical independence of <italic>k</italic><sub>cat</sub> and K<sub>M</sub> in the BglB system.</title>
+<p>(TIFF)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s006" mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s006" xlink:type="simple">
+<label>S1 Table</label>
+<caption>
+<title>Kinetic constants for 100 computationally-designed BglB mutants.</title>
+<p>Included are columns (1) the mutation (2) protein yield as assessed by absorbance at 280 nm (3, 4, 5, 6) kinetic constants and nonlinear regression analysis for each of <italic>k</italic><sub>cat</sub>, K<sub>M</sub>, K<sub>I</sub>, and <italic>k</italic><sub>cat</sub> /K<sub>M</sub>.</p>
+<p>(DOCX)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s007" mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s007" xlink:type="simple">
+<label>S2 Table</label>
+<caption>
+<title>Correlations between individual structural features and each of <italic>k</italic><sub>cat</sub>, K<sub>M</sub>, and <italic>k</italic><sub>cat</sub>/K<sub>M</sub>.</title>
+<p>PCC and SRC values for each individual structural feature, given by Rosetta short name. For explanation of each short name, see reference [<xref ref-type="bibr" rid="pone.0147596.ref026">26</xref>].</p>
+<p>(DOCX)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s008" mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s008" xlink:type="simple">
+<label>S3 Table</label>
+<caption>
+<title>Conservation analysis of BglB active site residues.</title>
+<p>A multiple sequence alignment of 1,554 family 1 glycoside hydrolases from the Pfam database aligned to the BglB wild type sequence was used for this analysis. Column 1 is the relative <italic>k</italic><sub>cat</sub>/K<sub>M</sub> compared to wild type on a log scale. Column two gives the position and native BglB residue at that position. Column three is the percentage of the 1,554 aligned sequences that have the same residue as BglB.</p>
+<p>(DOCX)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s009" mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s009" xlink:type="simple">
+<label>S1 Text</label>
+<caption>
+<title>Supplemental materials and methods.</title>
+<p>(DOCX)</p>
+</caption>
+</supplementary-material>
+<supplementary-material id="pone.0147596.s010" mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document" position="float" xlink:href="info:doi/10.1371/journal.pone.0147596.s010" xlink:type="simple">
+<label>S2 Text</label>
+<caption>
+<title>Prediction and feature selection via Elastic net.</title>
+<p>(DOCX)</p>
+</caption>
+</supplementary-material>
+</sec>
+</body>
+<back>
+<ack>
+<p>This work was supported by Army Research Office #201121557 and National Science Foundation #1254205 (IT) and Alfred P. Sloan Foundation #BR2014-012 and UC Davis Startup Funds (JBS). We are grateful to James E. Lucas, David K. Wilson, and Jeremy H. Mills for insightful comments and discussions that helped shape this manuscript.</p>
+</ack>
+<ref-list>
+<title>References</title>
+<ref id="pone.0147596.ref001"><label>1</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Mak</surname> <given-names>WS</given-names></name>, <name name-style="western"><surname>Siegel</surname> <given-names>JB</given-names></name> (<year>2014</year>) <article-title>Computational enzyme design: Transitioning from catalytic proteins to enzymes</article-title>. <source>Current opinion in structural biology</source> <volume>27</volume>: <fpage>87</fpage>–<lpage>94</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1016/j.sbi.2014.05.010" xlink:type="simple">10.1016/j.sbi.2014.05.010</ext-link></comment> <object-id pub-id-type="pmid">25005925</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref002"><label>2</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Siegel</surname> <given-names>JB</given-names></name>, <name name-style="western"><surname>Smith</surname> <given-names>AL</given-names></name>, <name name-style="western"><surname>Poust</surname> <given-names>S</given-names></name>, <name name-style="western"><surname>Wargacki</surname> <given-names>AJ</given-names></name>, <name name-style="western"><surname>Bar-Even</surname> <given-names>A</given-names></name>, <etal>et al</etal>. (<year>2015</year>) <article-title>Computational protein design enables a novel one-carbon assimilation pathway</article-title>. <source>Proceedings of the National Academy of Sciences</source> <volume>112</volume>: <fpage>3704</fpage>–<lpage>3709</lpage>.</mixed-citation></ref>
+<ref id="pone.0147596.ref003"><label>3</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Damborsky</surname> <given-names>J</given-names></name>, <name name-style="western"><surname>Brezovsky</surname> <given-names>J</given-names></name> (<year>2014</year>) <article-title>Computational tools for designing and engineering enzymes</article-title>. <source>Current Opinion in Chemical Biology</source> <volume>19</volume>: <fpage>8</fpage>–<lpage>16</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1016/j.cbpa.2013.12.003" xlink:type="simple">10.1016/j.cbpa.2013.12.003</ext-link></comment> <object-id pub-id-type="pmid">24780274</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref004"><label>4</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Gordon</surname> <given-names>SR</given-names></name>, <name name-style="western"><surname>Stanley</surname> <given-names>EJ</given-names></name>, <name name-style="western"><surname>Wolf</surname> <given-names>S</given-names></name>, <name name-style="western"><surname>Toland</surname> <given-names>A</given-names></name>, <name name-style="western"><surname>Wu</surname> <given-names>SJ</given-names></name>, <etal>et al</etal>. (<year>2012</year>) <article-title>Computational design of an α-Gliadin Peptidase</article-title>. <source>Journal of the American Chemical Society</source> <volume>134</volume>: <fpage>20513</fpage>–<lpage>20520</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1021/ja3094795" xlink:type="simple">10.1021/ja3094795</ext-link></comment> <object-id pub-id-type="pmid">23153249</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref005"><label>5</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Marcheschi</surname> <given-names>RJ</given-names></name>, <name name-style="western"><surname>Li</surname> <given-names>H</given-names></name>, <name name-style="western"><surname>Zhang</surname> <given-names>K</given-names></name>, <name name-style="western"><surname>Noey</surname> <given-names>EL</given-names></name>, <name name-style="western"><surname>Kim</surname> <given-names>S</given-names></name>, <etal>et al</etal>. (<year>2012</year>) <article-title>A Synthetic Recursive “+1” Pathway for Carbon Chain Elongation</article-title>. <source>ACS Chemical Biology</source> <volume>7</volume>: <fpage>689</fpage>–<lpage>697</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1021/cb200313e" xlink:type="simple">10.1021/cb200313e</ext-link></comment> <object-id pub-id-type="pmid">22242720</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref006"><label>6</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Khare</surname> <given-names>SD</given-names></name>, <name name-style="western"><surname>Kipnis</surname> <given-names>Y</given-names></name>, <name name-style="western"><surname>Greisen</surname> <given-names>P</given-names> <suffix>Jr.</suffix></name>, <name name-style="western"><surname>Takeuchi</surname> <given-names>R</given-names></name>, <name name-style="western"><surname>Ashani</surname> <given-names>Y</given-names></name>, <etal>et al</etal>. (<year>2012</year>) <article-title>Computational redesign of a mononuclear zinc metalloenzyme for organophosphate hydrolysis</article-title>. <source>Nat Chem Biol</source> <volume>8</volume>: <fpage>294</fpage>–<lpage>300</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1038/nchembio.777" xlink:type="simple">10.1038/nchembio.777</ext-link></comment> <object-id pub-id-type="pmid">22306579</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref007"><label>7</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Kumar</surname> <given-names>MS</given-names></name>, <name name-style="western"><surname>Bava</surname> <given-names>KA</given-names></name>, <name name-style="western"><surname>Gromiha</surname> <given-names>MM</given-names></name>, <name name-style="western"><surname>Prabakaran</surname> <given-names>P</given-names></name>, <name name-style="western"><surname>Kitajima</surname> <given-names>K</given-names></name>, <etal>et al</etal>. (<year>2006</year>) <article-title>ProTherm and ProNIT: thermodynamic databases for proteins and protein–nucleic acid interactions</article-title>. <source>Nucleic Acids Research</source> <volume>34</volume>: <fpage>D204</fpage>–<lpage>D206</lpage>. <object-id pub-id-type="pmid">16381846</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref008"><label>8</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Kellogg</surname> <given-names>EH</given-names></name>, <name name-style="western"><surname>Leaver—Fay</surname> <given-names>A</given-names></name>, <name name-style="western"><surname>Baker</surname> <given-names>D</given-names></name> (<year>2011</year>) <article-title>Role of conformational sampling in computing mutation—induced changes in protein structure and stability</article-title>. <source>Proteins: Structure, Function, and Bioinformatics</source> <volume>79</volume>: <fpage>830</fpage>–<lpage>838</lpage>.</mixed-citation></ref>
+<ref id="pone.0147596.ref009"><label>9</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Guerois</surname> <given-names>R</given-names></name>, <name name-style="western"><surname>Nielsen</surname> <given-names>JE</given-names></name>, <name name-style="western"><surname>Serrano</surname> <given-names>L</given-names></name> (<year>2002</year>) <article-title>Predicting changes in the stability of proteins and protein complexes: a study of more than 1000 mutations</article-title>. <source>Journal of molecular biology</source> <volume>320</volume>: <fpage>369</fpage>–<lpage>387</lpage>. <object-id pub-id-type="pmid">12079393</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref010"><label>10</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Minshull</surname> <given-names>J</given-names></name>, <name name-style="western"><surname>Ness</surname> <given-names>JE</given-names></name>, <name name-style="western"><surname>Gustafsson</surname> <given-names>C</given-names></name>, <name name-style="western"><surname>Govindarajan</surname> <given-names>S</given-names></name> (<year>2005</year>) <article-title>Predicting enzyme function from protein sequence</article-title>. <source>Current Opinion in Chemical Biology</source> <volume>9</volume>: <fpage>202</fpage>–<lpage>209</lpage>. <object-id pub-id-type="pmid">15811806</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref011"><label>11</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Govindarajan</surname> <given-names>S</given-names></name>, <name name-style="western"><surname>Mannervik</surname> <given-names>B</given-names></name>, <name name-style="western"><surname>Silverman</surname> <given-names>JA</given-names></name>, <name name-style="western"><surname>Wright</surname> <given-names>K</given-names></name>, <name name-style="western"><surname>Regitsky</surname> <given-names>D</given-names></name>, <etal>et al</etal>. (<year>2014</year>) <article-title>Mapping of amino acid substitutions conferring herbicide resistance in wheat glutathione transferase</article-title>. <source>ACS synthetic biology</source> <volume>4</volume>: <fpage>221</fpage>–<lpage>227</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1021/sb500242x" xlink:type="simple">10.1021/sb500242x</ext-link></comment> <object-id pub-id-type="pmid">24905764</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref012"><label>12</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Liao</surname> <given-names>J</given-names></name>, <name name-style="western"><surname>Warmuth</surname> <given-names>MK</given-names></name>, <name name-style="western"><surname>Govindarajan</surname> <given-names>S</given-names></name>, <name name-style="western"><surname>Ness</surname> <given-names>JE</given-names></name>, <name name-style="western"><surname>Wang</surname> <given-names>RP</given-names></name>, <etal>et al</etal>. (<year>2007</year>) <article-title>Engineering proteinase K using machine learning and synthetic genes</article-title>. <source>BMC biotechnology</source> <volume>7</volume>: <fpage>16</fpage>. <object-id pub-id-type="pmid">17386103</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref013"><label>13</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Romero</surname> <given-names>PA</given-names></name>, <name name-style="western"><surname>Tran</surname> <given-names>TM</given-names></name>, <name name-style="western"><surname>Abate</surname> <given-names>AR</given-names></name> (<year>2015</year>) <article-title>Dissecting enzyme function with microfluidic-based deep mutational scanning</article-title>. <source>Proceedings of the National Academy of Sciences</source>: <fpage>201422285</fpage>.</mixed-citation></ref>
+<ref id="pone.0147596.ref014"><label>14</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Stiffler</surname> <given-names>MA</given-names></name>, <name name-style="western"><surname>Hekstra</surname> <given-names>DR</given-names></name>, <name name-style="western"><surname>Ranganathan</surname> <given-names>R</given-names></name> (<year>2015</year>) <article-title>Evolvability as a Function of Purifying Selection in TEM-1 β-Lactamase</article-title>. <source>Cell</source> <volume>160</volume>: <fpage>882</fpage>–<lpage>892</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1016/j.cell.2015.01.035" xlink:type="simple">10.1016/j.cell.2015.01.035</ext-link></comment> <object-id pub-id-type="pmid">25723163</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref015"><label>15</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Isorna</surname> <given-names>P</given-names></name>, <name name-style="western"><surname>Polaina</surname> <given-names>J</given-names></name>, <name name-style="western"><surname>Latorre-García</surname> <given-names>L</given-names></name>, <name name-style="western"><surname>Cañada</surname> <given-names>FJ</given-names></name>, <name name-style="western"><surname>González</surname> <given-names>B</given-names></name>, <etal>et al</etal>. (<year>2007</year>) <article-title>Crystal Structures of Paenibacillus polymyxa β-Glucosidase B Complexes Reveal the Molecular Basis of Substrate Specificity and Give New Insights into the Catalytic Machinery of Family I Glycosidases</article-title>. <source>Journal of Molecular Biology</source> <volume>371</volume>: <fpage>1204</fpage>–<lpage>1218</lpage>. <object-id pub-id-type="pmid">17585934</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref016"><label>16</label><mixed-citation publication-type="other" xlink:type="simple">DeLano WL (2002) The PyMOL molecular graphics system.</mixed-citation></ref>
+<ref id="pone.0147596.ref017"><label>17</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Rye</surname> <given-names>CS</given-names></name>, <name name-style="western"><surname>Withers</surname> <given-names>SG</given-names></name> (<year>2000</year>) <article-title>Glycosidase mechanisms</article-title>. <source>Current opinion in chemical biology</source> <volume>4</volume>: <fpage>573</fpage>–<lpage>580</lpage>. <object-id pub-id-type="pmid">11006547</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref018"><label>18</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Wu</surname> <given-names>SJ</given-names></name>, <name name-style="western"><surname>Eiben</surname> <given-names>CB</given-names></name>, <name name-style="western"><surname>Carra</surname> <given-names>JH</given-names></name>, <name name-style="western"><surname>Huang</surname> <given-names>I</given-names></name>, <name name-style="western"><surname>Zong</surname> <given-names>D</given-names></name>, <etal>et al</etal>. (<year>2011</year>) <article-title>Improvement of a potential anthrax therapeutic by computational protein design</article-title>. <source>Journal of Biological Chemistry</source> <volume>286</volume>: <fpage>32586</fpage>–<lpage>32592</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1074/jbc.M111.251041" xlink:type="simple">10.1074/jbc.M111.251041</ext-link></comment> <object-id pub-id-type="pmid">21768086</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref019"><label>19</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Kunkel</surname> <given-names>TA</given-names></name> (<year>1985</year>) <article-title>Rapid and efficient site-specific mutagenesis without phenotypic selection</article-title>. <source>Proceedings of the National Academy of Sciences</source> <volume>82</volume>: <fpage>488</fpage>–<lpage>492</lpage>.</mixed-citation></ref>
+<ref id="pone.0147596.ref020"><label>20</label><mixed-citation publication-type="book" xlink:type="simple"><name name-style="western"><surname>Fersht</surname> <given-names>A</given-names></name> (<year>1999</year>) <source>Structure and mechanism in protein science: a guide to enzyme catalysis and protein folding</source>: <publisher-name>Macmillan</publisher-name>.</mixed-citation></ref>
+<ref id="pone.0147596.ref021"><label>21</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Warshel</surname> <given-names>A</given-names></name>, <name name-style="western"><surname>Sharma</surname> <given-names>PK</given-names></name>, <name name-style="western"><surname>Kato</surname> <given-names>M</given-names></name>, <name name-style="western"><surname>Xiang</surname> <given-names>Y</given-names></name>, <name name-style="western"><surname>Liu</surname> <given-names>H</given-names></name>, <etal>et al</etal>. (<year>2006</year>) <article-title>Electrostatic Basis for Enzyme Catalysis</article-title>. <source>Chemical Reviews</source> <volume>106</volume>: <fpage>3210</fpage>–<lpage>3235</lpage>. <object-id pub-id-type="pmid">16895325</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref022"><label>22</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>McCarter</surname> <given-names>JD</given-names></name>, <name name-style="western"><surname>Withers</surname> <given-names>SG</given-names></name> (<year>1994</year>) <article-title>Mechanisms of enzymatic glycoside hydrolysis</article-title>. <source>Curr Opin Struct Biol</source> <volume>4</volume>: <fpage>885</fpage>–<lpage>892</lpage>. <object-id pub-id-type="pmid">7712292</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref023"><label>23</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Mesecar</surname> <given-names>AD</given-names></name>, <name name-style="western"><surname>Stoddard</surname> <given-names>BL</given-names></name>, <name name-style="western"><surname>Koshland</surname> <given-names>DE</given-names> <suffix>Jr.</suffix></name>, (<year>1997</year>) <article-title>Orbital steering in the catalytic power of enzymes: small structural changes with large catalytic consequences</article-title>. <source>Science</source> <volume>277</volume>: <fpage>202</fpage>–<lpage>206</lpage>. <object-id pub-id-type="pmid">9211842</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref024"><label>24</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Sunden</surname> <given-names>F</given-names></name>, <name name-style="western"><surname>Peck</surname> <given-names>A</given-names></name>, <name name-style="western"><surname>Salzman</surname> <given-names>J</given-names></name>, <name name-style="western"><surname>Ressl</surname> <given-names>S</given-names></name>, <name name-style="western"><surname>Herschlag</surname> <given-names>D</given-names></name> (<year>2015</year>) <article-title>Extensive site-directed mutagenesis reveals interconnected functional units in the alkaline phosphatase active site</article-title>. <source>eLife</source> <volume>4</volume>.</mixed-citation></ref>
+<ref id="pone.0147596.ref025"><label>25</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Gibson</surname> <given-names>DG</given-names></name>, <name name-style="western"><surname>Young</surname> <given-names>L</given-names></name>, <name name-style="western"><surname>Chuang</surname> <given-names>R-Y</given-names></name>, <name name-style="western"><surname>Venter</surname> <given-names>JC</given-names></name>, <name name-style="western"><surname>Hutchison</surname> <given-names>CA</given-names></name>, <etal>et al</etal>. (<year>2009</year>) <article-title>Enzymatic assembly of DNA molecules up to several hundred kilobases</article-title>. <source>Nature methods</source> <volume>6</volume>: <fpage>343</fpage>–<lpage>345</lpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1038/nmeth.1318" xlink:type="simple">10.1038/nmeth.1318</ext-link></comment> <object-id pub-id-type="pmid">19363495</object-id></mixed-citation></ref>
+<ref id="pone.0147596.ref026"><label>26</label><mixed-citation publication-type="journal" xlink:type="simple"><name name-style="western"><surname>Richter</surname> <given-names>F</given-names></name>, <name name-style="western"><surname>Leaver-Fay</surname> <given-names>A</given-names></name>, <name name-style="western"><surname>Khare</surname> <given-names>SD</given-names></name>, <name name-style="western"><surname>Bjelic</surname> <given-names>S</given-names></name>, <name name-style="western"><surname>Baker</surname> <given-names>D</given-names></name> (<year>2011</year>) <article-title>De novo enzyme design using Rosetta3</article-title>. <source>PLoS One</source> <volume>6</volume>: <fpage>e19230</fpage>. <comment>doi: <ext-link ext-link-type="uri" xlink:href="http://dx.doi.org/10.1371/journal.pone.0019230" xlink:type="simple">10.1371/journal.pone.0019230</ext-link></comment> <object-id pub-id-type="pmid">21603656</object-id></mixed-citation></ref>
+</ref-list>
+</back>
+</article>

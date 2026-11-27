@@ -1,0 +1,17 @@
+{
+  "schema": "gx.objective_screen_policy/1",
+  "note": "What the applicability screen asks and what it looks for. The screen decides one thing only: whether a legality, privacy or biosafety review by a person applies before anything is planned. It is not a judgement of the science and it does not understand a question; it catches what a requester declares and what a text names. Results: CLEAR (the standing approval rule objective-clear-screen may confirm it), NEEDS_HUMAN_REVIEW (it waits for a person), BLOCKED (no run is started). Changing this file changes its sha256, which every screen result records.",
+  "questions": [
+    {"id": "identifiable_people", "axis": "privacy", "if_true": "NEEDS_HUMAN_REVIEW", "text": "Does the work use data about identifiable people: patient or medical records, a named person's genome, contact details?"},
+    {"id": "private_data_leaves_machine", "axis": "privacy", "if_true": "NEEDS_HUMAN_REVIEW", "text": "Must private or unpublished data be sent to a service outside this machine?"},
+    {"id": "clinical_use", "axis": "legality", "if_true": "NEEDS_HUMAN_REVIEW", "text": "Is the result meant to guide the diagnosis or treatment of a person?"},
+    {"id": "restricted_material_or_access", "axis": "legality", "if_true": "NEEDS_HUMAN_REVIEW", "text": "Does the work need controlled or export-restricted material, or access the requester holds no licence for?"},
+    {"id": "making_or_releasing_an_agent", "axis": "biosafety", "if_true": "NEEDS_HUMAN_REVIEW", "text": "Does the work include making, culturing, modifying or releasing a biological agent, or a protocol for doing so?"},
+    {"id": "harm_enhancement", "axis": "biosafety", "if_true": "BLOCKED", "text": "Is the aim, or a foreseeable use of the result, to make a pathogen or toxin more harmful, more transmissible, harder to detect or harder to treat?"}
+  ],
+  "tripwires": [
+    {"id": "biosafety_terms", "axis": "biosafety", "result": "NEEDS_HUMAN_REVIEW", "terms": ["gain of function", "gain-of-function", "enhance virulence", "increase virulence", "increase transmissibility", "enhance transmissibility", "host range expansion", "immune evasion", "evade immunity", "bioweapon", "biological weapon", "pandemic potential", "weaponiz", "weaponis", "toxin production", "功能获得", "功能獲得", "增强毒力", "增強毒力", "提高传播力", "提高傳播力", "免疫逃逸", "生物武器", "select agents and toxins", "select agent program", "select agent list"]},
+    {"id": "privacy_terms", "axis": "privacy", "result": "NEEDS_HUMAN_REVIEW", "terms": ["patient record", "medical record", "health record", "personally identifiable", "identifiable individual", "named individual", "protected health information", "病历", "病歷", "患者记录", "患者記錄", "个人身份信息", "個人身份資訊"]},
+    {"id": "legality_terms", "axis": "legality", "result": "NEEDS_HUMAN_REVIEW", "terms": ["controlled substance", "export controlled", "export-controlled", "without a licence", "without a license", "circumvent the licence", "circumvent the license", "bypass the paywall", "pirated", "受管制物质", "受管制物質", "出口管制"]}
+  ]
+}

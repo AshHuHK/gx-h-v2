@@ -1,0 +1,59 @@
+{
+  "project": "paired-grid-study",
+  "objective": "Test recoverable research branching on the synthetic score(x)=-(x-2)^2 function.",
+  "max_rounds": 3,
+  "proposal": {
+    "threshold": -0.25,
+    "paths": [
+      {
+        "id": "path-a",
+        "prediction": "A candidate near x=2 has score >= -0.25.",
+        "grid": {
+          "fixture_version": "1",
+          "synthetic": true,
+          "method_id": "fixture-grid",
+          "method_version": "1",
+          "candidates": [
+            {
+              "candidate_id": "path_a-1",
+              "x": 1.5
+            },
+            {
+              "candidate_id": "path_a-2",
+              "x": 2.0
+            },
+            {
+              "candidate_id": "path_a-3",
+              "x": 2.5
+            }
+          ]
+        }
+      },
+      {
+        "id": "path-b",
+        "prediction": "A candidate near x=-2 has score >= -0.25.",
+        "grid": {
+          "fixture_version": "1",
+          "synthetic": true,
+          "method_id": "fixture-grid",
+          "method_version": "1",
+          "candidates": [
+            {
+              "candidate_id": "path_b-1",
+              "x": -2.5
+            },
+            {
+              "candidate_id": "path_b-2",
+              "x": -2.0
+            },
+            {
+              "candidate_id": "path_b-3",
+              "x": -1.5
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "turn_token_budget": 65536
+}

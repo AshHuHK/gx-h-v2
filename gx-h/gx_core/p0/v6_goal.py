@@ -1,0 +1,1167 @@
+"""Question-first project admission, frozen Lead briefs and event-driven decisions."""
+
+import json
+from pathlib import Path
+import uuid
+
+from .. import budgets
+from ..artifacts import ArtifactService
+from ..domain import clock, ids, machines
+from ..errors import ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, StaleRevision, VersionImmutable
+from ..persistence import records, store
+from . import intent, research_dialogue, research_window
+
+INSTANCE_ID = "gx.v6.instance"
+ACTOR = "gx-v6"
+ACTIVE_TASKS = ("PENDING", "READY", "CLAIMED", "RUNNING", "BLOCKED", "RETRYABLE", "SUBMITTED", "VALIDATING")
+
+
+def cli_spec(args):
+    raw = json.loads(args.goal_config.read_text()) if args.goal_config else {}
+    allowed = {
+        "project",
+        "run_budget",
+        "workspace_budget",
+        "budget_profile",
+        "turn_token_budget",
+        "initial_job_limit",
+        "research_window",
+        "research_effort",
+        "research_modules",
+        "prospective_opening",
+        "branch_delegation",
+        "evidence_policy",
+        "historical_replay",
+        "module_policy",
+        "max_parallel_roots",
+        "input_files",
+        "capabilities",
+        "capability_options",
+        "plugins",
+        "workspace",
+        "intent_items",
+    }
+    if not isinstance(raw, dict) or set(raw) - allowed:
+        raise SchemaInvalid("Goal config accepts only " + ", ".join(sorted(allowed)))
+    spec = {"project": "gx-research", **raw, "mode": "goal", "objective": args.goal}
+    if getattr(args, "historical_replay", False):
+        spec["historical_replay"] = True
+    files = raw.get("input_files", [])
+    if not isinstance(files, list):
+        raise SchemaInvalid("input_files must be an array")
+    base = args.goal_config.resolve().parent if args.goal_config else Path.cwd()
+    prepared = []
+    acquisition_files = {}
+    for entry in files:
+        if (
+            not isinstance(entry, dict)
+            or not isinstance(entry.get("path"), str)
+            or set(entry) - {"path", "role", "sha256", "acquisition"}
+        ):
+            raise SchemaInvalid("A material is {path, role?, sha256?, acquisition?}")
+        material = dict(entry)
+        if "acquisition" in material:
+            descriptor = material.pop("acquisition")
+            if getattr(args, "command", None) != "research" or not isinstance(descriptor, str) or not descriptor:
+                raise SchemaInvalid("Supply an acquisition descriptor path to research")
+            acquisition_files[str(len(prepared))] = str((base / descriptor).resolve())
+        prepared.append({**material, "path": str((base / entry["path"]).resolve())})
+    if acquisition_files:
+        spec["material_acquisitions"] = acquisition_files
+    prepared.extend({"path": str(p.resolve())} for p in args.input or ())
+    spec["input_files"] = prepared
+    effort = getattr(args, "research_effort", None)
+    if effort is not None:
+        if "research_effort" in raw and raw["research_effort"] != effort:
+            raise SchemaInvalid("Conflicting research efforts in Goal config and command line")
+        spec["research_effort"] = effort
+    if args.capability:
+        if "capabilities" in raw:
+            raise SchemaInvalid("Select capabilities in the config or on the command line")
+        spec["capabilities"] = args.capability
+    return spec
+
+
+def start(conn, spec, *, run_key, current):
+    from ..capabilities import registry
+    from ..plugins import goal as goal_plugins
+    from ..plugins.runtime import Bound
+    from ..orchestration import service
+    from ..orchestration.hooks import DEFAULT_HOOKS, basic_research_start
+    from . import operator, workspace
+    from .cli import initial_action
+    from .driver import context, snapshot
+
+    if "research_window" in spec:
+        research_window.validate(spec["research_window"])
+    if "initial_job_limit" in spec:
+        limit = spec["initial_job_limit"]
+        if type(limit) is not int or limit < 0:
+            raise SchemaInvalid("initial_job_limit must be a nonnegative integer")
+    if "workflow" in spec:
+        raise SchemaInvalid("A goal-only run selects capabilities; its scientific recipe starts empty")
+    ctx = context(conn)
+    files = []
+    for item in spec.get("input_files", []):
+        path = Path(item["path"]).resolve()
+        if service._forbidden(path) is not None:
+            raise SchemaInvalid("Input material is outside the allowed input scope")
+        observed = ids.sha256_of_file(path)
+        if "sha256" in item and item["sha256"] != observed:
+            raise VersionImmutable("Authorized material differs from its configured SHA-256")
+        files.append({**item, "path": str(path), "sha256": observed})
+    if current:
+        prior = store.loads(current, "inputs_json")
+        if "prospective_opening" in spec and spec["prospective_opening"] != prior["inputs"]["p0_spec"].get("prospective_opening"):
+            raise VersionImmutable("This run key already fixed its prospective opening")
+        if "research_window" in spec and spec["research_window"] != prior["inputs"]["p0_spec"].get("research_window"):
+            raise VersionImmutable("This run key already fixed its research window")
+        if "evidence_policy" in spec:
+            from . import v621_policy
+            if v621_policy.for_start(spec) != prior["inputs"].get("evidence_policy", v621_policy.LEGACY):
+                raise VersionImmutable("This run key already fixed its evidence policy")
+        if any(a["sha256"] != b["sha256"] for a, b in zip(files, prior["files"])):
+            raise VersionImmutable("This run key granted different material bytes; supply a new run key")
+        return snapshot(conn, current["run_id"])
+
+    if spec.get("predecessor"):
+        from . import successor
+        successor.verify_admission(conn, run_key, spec)
+    requested = spec.get("capabilities")
+    if requested is not None and (
+        not isinstance(requested, list)
+        or any(not isinstance(k, str) for k in requested)
+        or len(requested) != len(set(requested))
+    ):
+        raise SchemaInvalid("capabilities must be a list of distinct, versioned methods")
+    from . import v62_catalog, v621_policy
+
+    from . import capability_views
+    capability_views.options(spec)
+    policy = v621_policy.admit(spec)
+    research_catalog = v62_catalog.for_start(spec)
+    public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []),
+                                                 module_catalog=research_catalog)
+    if "prospective_opening" in spec:
+        from . import v6_prospective
+        v6_prospective.validate_opening(spec, public)
+    inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
+    inputs["evidence_policy"] = policy
+    if spec.get("historical_replay"):
+        inputs["study_class"] = "historical_replay"
+    if research_catalog is not None:
+        inputs["research_catalog"] = research_catalog
+        inputs["research_evidence_version"] = "gx.research.v6.2b.1"
+    action = initial_action(spec, basic_research_start(spec))
+
+    def bootstrap(rid):
+        first = workspace.bootstrap_action(conn, rid, action)
+        if first["items"]:
+            mid = str(uuid.uuid5(uuid.NAMESPACE_URL, "gx-p0-bootstrap/" + rid))
+            if operator.apply_bootstrap(conn, rid, first, mid).get("status") != "committed":
+                raise SchemaInvalid("Initial Goal did not commit")
+        # Package-owned methods require an exact saved composition in the Job owner;
+        # a workspace registration on its own does not grant them to this Run.
+        from .manifest import check_capability
+
+        for entry in public:
+            cap = entry["capability_version"]
+            check_capability(conn, rid, cap)
+            registry.resolve(conn, cap, run_id=rid)
+        run = conn.execute("SELECT * FROM runs WHERE run_id=?", (rid,)).fetchone()
+        objective = intent.read_item(conn, rid, "objective")
+        if objective["value"] != spec["objective"]:
+            raise SchemaInvalid("This workspace already has a different project Goal; use its Intent editor")
+        refs = [f["artifact_ref"] for f in store.loads(run, "inputs_json")["files"]]
+        if None in refs:
+            raise SchemaInvalid("Goal inputs must fit the immutable input artifact size bound")
+        limits = budgets.state(conn, run["budget_ref"])["limits"]
+        conn.execute(
+            "INSERT INTO v6_goals(run_id,goal,goal_version,capabilities_json,materials_json,limits_json) "
+            "VALUES(?,?,?,?,?,?)",
+            (
+                rid,
+                objective["value"],
+                objective["version"],
+                store._j({k["capability_version"]: k["portable_sha256"] for k in public}),
+                store._j(refs),
+                store._j(limits),
+            ),
+        )
+        if spec.get("predecessor"):
+            successor.record_transfer(conn, rid, spec["predecessor"], store.loads(run, "inputs_json")["files"])
+        for state in ("PLANNING", "ACTIVE"):
+            store.transition(
+                conn,
+                machine="run",
+                subject_id=rid,
+                to_state=state,
+                actor=ACTOR,
+                reason="Human Goal authorized; a Lead decision is required",
+                evidence_level="EXECUTION_OBSERVED",
+            )
+        # The opening Lead brief must already contain each granted original's source.
+        if spec.get("material_acquisitions"):
+            from .v62_outputs import ingest_measurement
+            materials = store.loads(run, "inputs_json")["files"]
+            for index, descriptor in spec["material_acquisitions"].items():
+                material = materials[int(index)]
+                ingest_measurement(conn, rid, source=None, scope="run", path=None, metadata_path=Path(descriptor),
+                                   actor=operator.local_context(conn).actor, artifact_ref=material["artifact_ref"],
+                                   expected_sha256=material["sha256"])
+        ensure_task(conn, rid)
+
+    outcome = service.run_start(
+        ctx,
+        {
+            "objective": spec["objective"],
+            "project_ref": spec["project"],
+            "budget_profile": spec.get("budget_profile", "p0"),
+            "inputs": inputs,
+            "input_files": files,
+            "idempotency_key": workspace.start_key(spec["project"], run_key),
+        },
+        prepare_p0=bootstrap,
+        plugin_binding=Bound(DEFAULT_HOOKS, composition),
+        workspace_key=run_key,
+    )
+    return snapshot(conn, outcome["run_id"])
+
+
+def _is_json_artifact(meta):
+    media = (meta["media_type"] or "").partition(";")[0].strip().lower()
+    return media == "application/json" or media.endswith("+json") or (
+        not media and Path(meta["rel_path"]).suffix.lower() == ".json"
+    )
+
+
+def record_observation(conn, run_id, artifact_ref, *, source, scope="run", observation=None, acquisition=None, prepared_identity=None, acquired_receipt=None):
+    """Record a citation to verified, run-local material in its original media type."""
+    assets = ArtifactService(conn)
+    meta = assets.describe(artifact_ref)
+    if meta["run_id"] != run_id or not source or not isinstance(source, str):
+        raise SchemaInvalid("The observation needs a run-local artifact and a source ID")
+    if (
+        scope != "run"
+        and not conn.execute(
+            "SELECT 1 FROM v6_branches WHERE run_id=? AND branch_id=?", (run_id, scope)
+        ).fetchone()
+    ):
+        raise SchemaInvalid("The observation scope is unknown in this run")
+    if _is_json_artifact(meta):
+        content = assets.read_json(artifact_ref)
+        if observation is not None and ids.canonical_json(observation) != ids.canonical_json(content):
+            raise SchemaInvalid("The proposed observation differs from its artifact")
+    elif observation is not None:
+        raise SchemaInvalid("A non-JSON observation is registered by its immutable artifact reference")
+    else:
+        verified = assets.verify(artifact_ref)
+        if not verified["ok"]:
+            raise SchemaInvalid("Observation bytes differ from the registered artifact", details=verified)
+    payload = {"source": source, "artifact_ref": artifact_ref, "scope": scope, "sha256": meta["sha256"]}
+    if acquired_receipt is not None:
+        provenance = acquired_receipt.get("archive_job") or {}
+        if (meta["job_id"] != provenance.get("job_id") or acquired_receipt.get("artifact_ref") != artifact_ref
+                or acquired_receipt.get("sha256") != meta["sha256"]):
+            raise SchemaInvalid("The acquisition receipt belongs to a different Job output")
+        payload["acquisition"] = acquired_receipt
+    elif acquisition is not None:
+        from . import v62_outputs
+        payload["acquisition"] = v62_outputs.acquisition_receipt(conn, run_id, artifact_ref, acquisition, scope=scope,
+                                                                      source_id=source, prepared_identity=prepared_identity)
+
+    def save(tx):
+        eid = store.append_event(
+            tx,
+            run_id=run_id,
+            actor=ACTOR,
+            kind="v6.observation.added",
+            subject_kind="source",
+            subject_id=source,
+            evidence_level="EXECUTION_OBSERVED",
+            payload=payload,
+        )
+        return {"event_id": eid, **payload}
+
+    key = "v6-observation:" + ids.sha256_of_obj([run_id, scope, source])
+    return store.run_idempotent(conn, key, "v6.observation", payload, save)[0]
+
+
+def supplement(conn, run_id, source_id):
+    from .science_inputs import _document
+
+    document = _document(conn, run_id, source_id)
+    out = ArtifactService(conn).publish_bytes(
+        namespace=run_id + "/sources",
+        rel_path=source_id + ".json",
+        kind="operator_source",
+        data=ids.canonical_json(document),
+        run_id=run_id,
+        actor="operator",
+        media_type="application/json",
+        provenance={"source_id": source_id},
+        origin="INGEST",
+    )
+    record_observation(conn, run_id, out.artifact_ref, source=source_id)
+    conn.execute(
+        "UPDATE sources SET provenance_json=json_set(provenance_json,'$.review_artifact_ref',?) "
+        "WHERE source_id=?",
+        (out.artifact_ref, source_id),
+    )
+    return {"artifact_ref": out.artifact_ref, "review_status": "pending"}
+
+
+def instance(conn, rid, checkpoint):
+    """Resolve the execution checkpoint against this Run's exact immutable graph revision."""
+    if checkpoint.workflow_id != INSTANCE_ID:
+        raise VersionImmutable("Goal execution checkpoint has an unknown representation")
+    row = conn.execute(
+        "SELECT version,sha256,graph_json FROM v6_graph_versions WHERE run_id=? AND version=?",
+        (rid, checkpoint.workflow_version),
+    ).fetchone()
+    if row is None or checkpoint.state.get("head") != {"version": row["version"], "sha256": row["sha256"]}:
+        raise VersionImmutable("Goal checkpoint has no matching version and digest")
+    graph = store.loads(row, "graph_json")
+    if ids.sha256_of_obj(graph) != row["sha256"]:
+        raise VersionImmutable("Goal execution graph bytes differ from its pinned digest")
+    return graph
+
+
+def _events(conn, rid, after, budget_ref=None):
+    # A workspace-level change can have no run_id. Include only this account's
+    # actual ancestry. Debits for ordinary model turns must not wake another turn.
+    events = conn.execute(
+        """
+        WITH RECURSIVE accounts(ref) AS (
+            SELECT coalesce(?, budget_ref) FROM runs WHERE run_id=?
+            UNION SELECT b.parent_ref FROM budgets b JOIN accounts a ON b.budget_ref=a.ref
+                  WHERE b.parent_ref IS NOT NULL
+        )
+        SELECT event_id,kind,subject_id,payload_json FROM events
+        WHERE event_id>? AND (
+          (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
+                                  'v6.claim.adopted','v6.decision.superseded','v6.prospective.opening_wait','v62.round.settled',
+                                  'v62.claim.reassessed','v62.module.wake','v62.module.invalidated','v621.material.assigned',
+                                  'research.pi.feedback','research.pi.answered','research.capabilities.changed') OR
+          (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
+          (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
+          OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
+              subject_kind='budget' AND subject_id IN (SELECT ref FROM accounts))
+        ) ORDER BY event_id""",
+        (budget_ref, rid, after, rid),
+    ).fetchall()
+
+    from . import v62_lead, v621_goal_scope
+
+    version = v621_goal_scope.active(conn, rid)
+    first = v621_goal_scope.start_cursor(conn, rid, version)
+    module_branches = v62_lead.branch_ids(conn, rid) if events else set()
+    captured = []
+    for row in events:
+        if row["event_id"] < first or not v621_goal_scope.applies(conn, rid, row, store.loads(row, "payload_json"), version):
+            continue
+        if row["kind"] in (research_dialogue.FEEDBACK, research_dialogue.ANSWER):
+            item = store.loads(row, "payload_json")
+            if item["scope"].startswith("module:") and item.get("asking_scope") != "run":
+                continue
+        if module_branches and v62_lead.internal_event(row, module_branches):
+            continue
+        if row["kind"] == "v6.claim.adopted":
+            payload = store.loads(row, "payload_json")
+            # Early receipts identify the decision directly; recover its scope from the
+            # immutable task even if the event itself did not yet carry that field.
+            if "scope" not in payload:
+                delegation = conn.execute(
+                    "SELECT t.scope FROM v6_decisions d JOIN v6_decision_tasks t USING(task_id) "
+                    "WHERE d.run_id=? AND d.decision_ref=?",
+                    (rid, payload["decision_ref"]),
+                ).fetchone()
+                if delegation:
+                    payload["scope"] = delegation["scope"]
+                    if delegation["scope"].startswith("branch:"):
+                        payload["branch_id"] = delegation["scope"].removeprefix("branch:")
+                    row = {**dict(row), "payload_json": store._j(payload)}
+        captured.append(row)
+    return captured
+
+
+def _matches(row, watches, rid):
+    payload = store.loads(row, "payload_json")
+    kind = row["kind"]
+    events = {
+        research_dialogue.ANSWER: set(),
+        research_dialogue.FEEDBACK: set(),
+        "v6.decision.superseded": set(),
+        "v6.prospective.opening_wait": set(),
+        "v62.module.invalidated": set(),
+        "v6.intent.changed": {"goal_changed"},
+        "v6.node.settled": {"evidence_added", "job_settled"},
+        "v6.observation.added": {"evidence_added"},
+        "v621.material.assigned": {"evidence_added"},
+        "v6.claim.adopted": {"claim_changed"},
+        "v62.claim.reassessed": {"claim_changed"},
+        "v62.round.settled": set(),
+        "v62.module.wake": {"module_report"},
+        "v62.source.extracted": {"evidence_added"},
+        "v62.source.reviewed": {"evidence_added"},
+        "run.transition": {"operator_reopened"},
+    }.get(kind, {"budget_changed"})
+    subjects = {
+        "run",
+        rid,
+        row["subject_id"],
+        payload.get("node_id"),
+        payload.get("branch_id"),
+        payload.get("scope"),
+        payload.get("result_ref"),
+        payload.get("artifact_ref"),
+        payload.get("claim_revision_id"),
+        payload.get("claim_ref"),
+        payload.get("key"),
+    }
+    if kind == "v6.intent.changed":
+        subjects.update(item["item_id"] for item in payload["items"])
+    if kind == "v62.module.wake":
+        modules = payload.get("module_instance_ids", ())
+        subjects.update(modules)
+        subjects.update("module:" + instance for instance in modules)
+    return any(w["event"] in events and w["subject_ref"] in subjects for w in watches)
+
+
+def _branch_watch_hits(conn, rid, goal_version, events):
+    """An active branch's last adopted watch can request one Run Lead judgment."""
+    hits = {}
+    if not events:
+        return hits
+    decisions = conn.execute(
+        "SELECT d.decision_ref,d.receipt_json,t.scope,c.event_cursor,b.branch_id,"
+        "json_extract(d.request_json,'$.decision.rationale') AS rationale FROM v6_decisions d "
+        "JOIN v6_decision_tasks t USING(task_id) JOIN research_contexts c ON c.context_ref=t.context_ref "
+        "JOIN v6_branches b ON b.run_id=d.run_id "
+        "AND t.scope='branch:'||b.branch_id WHERE b.status='OPEN' AND d.rowid IN ("
+        "SELECT max(x.rowid) FROM v6_decisions x JOIN v6_decision_tasks s USING(task_id) "
+        "WHERE x.run_id=? AND s.goal_version=? AND s.scope LIKE 'branch:%' GROUP BY s.scope) "
+        "ORDER BY b.branch_id", (rid, goal_version)
+    )
+    for decision in decisions:
+        watches = store.loads(decision, "receipt_json")["reconsider_when"]
+        for event in events:
+            payload = store.loads(event, "payload_json")
+            event_scope = payload.get("branch_id") or payload.get("scope") or "run"
+            if (event["event_id"] <= decision["event_cursor"]
+                    or event_scope not in ("run", decision["scope"], decision["branch_id"])
+                    or payload.get("decision_ref") == decision["decision_ref"] and event["kind"] == "v6.claim.adopted"):
+                continue
+            matched = [w for w in watches if _matches(event, [w], rid)]
+            if matched:
+                hits.setdefault(event["event_id"], []).append({
+                    "scope": decision["scope"], "branch_id": decision["branch_id"],
+                    "decision_ref": decision["decision_ref"], "previous_rationale": decision["rationale"],
+                    "matched_watches": matched,
+                })
+    return hits
+
+
+def _operator_evidence(conn, rid, row):
+    if row["kind"] != "v6.observation.added":
+        return False
+    return conn.execute(
+        "SELECT 1 FROM sources WHERE namespace=? AND source_id=? AND origin='human_input' "
+        "AND kind='operator_note' AND json_extract(provenance_json,'$.review_artifact_ref')=?",
+        (rid, row["subject_id"], store.loads(row, "payload_json")["artifact_ref"]),
+    ).fetchone() is not None
+
+
+def _run_wakes(conn, rid, prior, events):
+    watches = store.loads(prior, "receipt_json")["reconsider_when"]
+    for row in events:
+        if row["kind"] == "v6.prospective.opening_wait":
+            from . import v6_prospective
+            if v6_prospective.opening_pending(conn, rid):
+                return True
+            continue
+        payload = store.loads(row, "payload_json")
+        if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
+            continue
+        if (row["kind"] in {research_dialogue.FEEDBACK, research_dialogue.ANSWER, "v6.intent.changed", "research.capabilities.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
+                or row["kind"] == "v6.decision.superseded" and payload.get("scope") == "run"
+                or row["kind"] == "v62.round.settled" and payload.get("reconsider")
+                or row["kind"] == "v62.claim.reassessed" and payload.get("critical_counterevidence")
+                or _matches(row, watches, rid)):
+            return True
+    return False
+
+
+def _open(conn, rid):
+    marks = ",".join("?" for _ in ACTIVE_TASKS)
+    return conn.execute(
+        "SELECT t.task_id,d.scope,d.goal_version,d.base_json FROM v6_decision_tasks d JOIN tasks t USING(task_id) "
+        f"WHERE d.run_id=? AND d.scope='run' AND t.status IN ({marks}) LIMIT 1",
+        (rid, *ACTIVE_TASKS),
+    ).fetchone()
+
+
+def _latest(conn, rid):
+    return conn.execute(
+        "SELECT d.decision_ref,d.request_json,d.receipt_json,c.event_cursor,c.version FROM v6_decisions d "
+        "JOIN research_contexts c USING(context_ref) JOIN v6_decision_tasks t USING(task_id) "
+        "WHERE d.run_id=? AND t.scope='run' ORDER BY d.rowid DESC LIMIT 1",
+        (rid,),
+    ).fetchone()
+
+
+def _brief(conn, run, goal, head, events, cursor, prior):
+    from ..jobs import diagnostics
+    from ..plugins import goal as goal_plugins
+    from . import v6_claims
+
+    rid = run["run_id"]
+    data = store.loads(run, "inputs_json")
+    files = [
+        {"name": Path(f["path"]).name, **{k: f.get(k) for k in ("artifact_ref", "sha256", "role")}}
+        for f in data["files"]
+    ]
+    from . import v621_assignment, v621_policy
+    current_policy = data["inputs"].get("evidence_policy") in v621_policy.GOVERNED
+    if current_policy:
+        files.extend(v621_assignment.for_lead(conn, rid, goal["goal_version"], cursor))
+    observations = []
+    refs = [f["artifact_ref"] for f in files]
+    for row in events:
+        if row["kind"] in {research_dialogue.ANSWER, research_dialogue.FEEDBACK, "v621.material.assigned", "v6.prospective.opening_wait"}:
+            continue  # Assignment already has an acquisition. An opening wait supplies no evidence.
+        p = store.loads(row, "payload_json")
+        ref = p.get("result_ref") or p.get("artifact_ref")
+        facts = {
+            "id": p.get("source", row["subject_id"]),
+            "subject_ref": row["subject_id"],
+            "event": row["kind"],
+            "event_id": row["event_id"],
+            "source_job_id": p.get("job_id"),
+            "node_id": p.get("node_id"),
+            "branch_id": p.get("branch_id"),
+            "status": p.get("status"),
+            "artifact_ref": ref,
+        }
+        if p.get("condition") and row["kind"] == "v6.node.settled":
+            facts["condition"] = p["condition"]
+        if p.get("dependency") and row["kind"] == "v6.node.settled":
+            facts["dependency"] = p["dependency"]
+        if p.get("failure") and row["kind"] == "v6.node.settled":
+            facts["failure"] = p["failure"]
+        if ref:
+            meta = ArtifactService(conn).describe(ref)
+            if meta["run_id"] != rid:
+                raise SchemaInvalid("Observation artifact belongs to another run")
+            facts["sha256"] = meta["sha256"]
+            refs.append(ref)
+            if row["kind"] == "v6.observation.added":
+                refs.append(facts["id"])
+            if meta["bytes"] <= 32_768 and _is_json_artifact(meta):
+                try:
+                    content = ArtifactService(conn).read_json(ref)
+                    job = (
+                        conn.execute(
+                            "SELECT capability_id,capability_version FROM jobs WHERE job_id=? AND run_id=?",
+                            (p.get("job_id"), rid),
+                        ).fetchone()
+                        if row["kind"] == "v6.node.settled"
+                        else None
+                    )
+                    if job:
+                        provider = goal_plugins.method(conn, rid, f"{job[0]}@{job[1]}", historical=True)
+                        if provider and provider.project:
+                            content = provider.project(content)
+                    facts["observation"] = content
+                except (ArtifactHashMismatch, ArtifactNotFound, OSError, SchemaInvalid, VersionImmutable) as exc:
+                    if not current_policy:
+                        raise
+                    facts["unavailable"] = {"reason": getattr(exc, "code", "IO_ERROR"),
+                                            "recovery": "Restore the cited bytes and verify their digest"}
+            else:
+                facts.update(read_with="gx_read_artifact", media_type=meta["media_type"], bytes=meta["bytes"])
+            from . import v621_metrics
+            if current_policy:
+                if row["kind"] == "v6.node.settled":
+                    metrics = v621_metrics.from_output(conn, rid, ref)
+                    if metrics:
+                        if data["inputs"].get("evidence_policy") in v621_policy.TYPED:
+                            facts["verified_metrics"] = [m for m in metrics if m["schema"] == v621_metrics.SCHEMA]
+                        if data["inputs"].get("evidence_policy") in v621_policy.LIVE_SCIENCE:
+                            from . import v623_endpoints
+                            valid = facts["verified_metrics"]
+                            facts.update(endpoint_rows=v623_endpoints.compact_rows(valid),
+                                         endpoint_total=len(valid), pending_endpoints=False)
+                        facts["metrics"] = metrics
+                elif not _is_json_artifact(meta):
+                    facts["metric_availability"] = {"schema": v621_metrics.MISSING,
+                        "artifact_ref": ref, "sha256": meta["sha256"],
+                        "reason": "A raw source requires an authorized measurement reader or derived named output"}
+        observations.append(facts)
+    nodes = [
+        dict(r)
+        for r in conn.execute(
+            "SELECT n.node_id,branch_id,version,status,job_id,result_ref,spec_json,exec_key,w.wait_json "
+            "FROM v6_nodes n LEFT JOIN v6_node_waits w USING(node_id) WHERE run_id=? ORDER BY n.rowid",
+            (rid,),
+        )
+    ]
+    from . import v62_catalog, v62_lead
+    research = data["inputs"].get("research_catalog")
+    module_branches = v62_lead.branch_ids(conn, rid) if research else set()
+    for node in nodes:
+        spec = json.loads(node.pop("spec_json"))
+        wait = node.pop("wait_json")
+        if node["branch_id"] in module_branches:
+            # Even the module-authored question or parameters can describe a new
+            # observation. Until a report is released the Lead sees only GX identities.
+            node.pop("exec_key")
+            node["result_ref"] = None
+        else:
+            node["wait"] = json.loads(wait or "null")
+            node["commission"] = {
+                k: spec[k] for k in ("capability", "inputs", "input_ports", "depends_on", "parameters", "question") if k in spec
+            }
+            diagnostics.attach_to_node(conn, rid, node)
+            if node["result_ref"]:
+                refs.append(node["result_ref"])
+    branches = [
+        dict(r)
+        for r in conn.execute(
+            "SELECT branch_id,spec_json,status FROM v6_branches WHERE run_id=? ORDER BY rowid", (rid,)
+        )
+    ]
+    for branch in branches:
+        spec = json.loads(branch.pop("spec_json"))
+        branch["spec"] = ({"module_instance_id": spec["module_instance_id"]}
+                          if branch["branch_id"] in module_branches else spec)
+    # Previous observations stay available for citation and scoped reads on continuation.
+    for older in conn.execute(
+        "SELECT subject_id,json_extract(payload_json,'$.artifact_ref') AS ref, "
+        "json_extract(payload_json,'$.scope') AS scope "
+        "FROM events WHERE run_id=? AND kind='v6.observation.added' AND event_id<=?",
+        (rid, cursor),
+    ):
+        if older["scope"] not in module_branches and not str(older["scope"]).startswith("module:"):
+            refs.extend([older["subject_id"], older["ref"]])
+    catalog = [
+        {k: v for k, v in row.items() if k != "content_artifact_ref"}
+        for row in goal_plugins.catalog(conn, rid)
+    ]
+    account = budgets.state(conn, run["budget_ref"])
+    claims = v6_claims.current(conn, rid)
+    for claim in claims:
+        refs.extend(x for x in (claim.get("claim_ref"), claim.get("claim_revision_id")) if x)
+    previous = None
+    watches = []
+    from . import v621_goal_scope
+    current_version = v621_goal_scope.active(conn, rid)
+    if prior and (current_version is None or store.loads(prior, "receipt_json")["goal_version"] == current_version):
+        body = store.loads(prior, "request_json")["decision"]
+        receipt = store.loads(prior, "receipt_json")
+        watches = receipt["reconsider_when"]
+        previous = {
+            "decision_ref": prior["decision_ref"],
+            "scope": receipt["scope"],
+            "outcome": receipt["outcome"],
+            "rationale": body["rationale"],
+            "evidence_refs": body["evidence_refs"],
+            "head": receipt["result_head"],
+            "reconsider_when": watches,
+            "consumed_cursor": prior["event_cursor"],
+        }
+    deltas = [
+        {
+            "event_id": row["event_id"],
+            "event": row["kind"],
+            "subject_ref": row["subject_id"],
+            "scope": store.loads(row, "payload_json").get("scope")
+            or store.loads(row, "payload_json").get("branch_id")
+            or "run",
+            "matched_watches": [w for w in watches if _matches(row, [w], rid)],
+        }
+        for row in events
+    ]
+    for change, event in zip(deltas, events):
+        if event["kind"] in {"v62.module.wake", "v62.module.invalidated"}:
+            payload = store.loads(event, "payload_json")
+            change.update({k: payload[k] for k in ("round", "reason", "module_instance_ids", "module_instance_id", "report_refs", "goal_version") if k in payload})
+    budget = {k: account[k] for k in ("limits", "spent", "reserved", "available")}
+    grant = data.get("inputs", {}).get("p0_spec", {})
+    if head is None and "initial_job_limit" in grant:
+        budget["initial_job_limit"] = grant["initial_job_limit"]
+    brief = {
+        "run_id": rid,
+        "scope": "run",
+        "previous_decision": previous,
+        "trigger": {
+            "since_cursor": prior["event_cursor"] if prior else 0,
+            "through_cursor": cursor,
+            "changes": deltas,
+        },
+        "goal": goal["goal"],
+        "goal_version": goal["goal_version"],
+        "head": head,
+        "intent": {
+            k: {"value": i["value"], "version": i["version"]}
+            for k, i in intent.active_items(conn, rid).items()
+        },
+        "materials": files,
+        "capabilities": catalog,
+        "branches": branches,
+        "nodes": nodes,
+        "claims": claims,
+        "observations": observations,
+        "evidence_refs": list(dict.fromkeys(refs)),
+        "budget": budget,
+    }
+    from . import capability_views
+    revision = capability_views.latest(conn, rid)
+    method_options = capability_views.options(grant)
+    if revision or method_options:
+        brief["capability_view"] = {"revision":revision["revision"] if revision else 0,
+                                    "available_options":list(method_options)}
+        if revision:
+            brief["capability_view"].update(digest=revision["digest"], enabled=revision["enabled"],
+                                            disabled=revision["disabled"])
+    from . import report_language
+    if preference := report_language.current(conn, rid):
+        brief["report_presentation"] = {**preference, "instruction": "Write the closing rationale, reason and each "
+                                         "limitation in " + report_language.LANGUAGES[preference["language"]] + "."}
+    if grant.get("predecessor"):
+        predecessor = grant["predecessor"]
+        brief["prior_research"] = {k: predecessor[k] for k in (
+            "parent_run_id", "parent_decision_ref", "parent_goal_version", "closed_event",
+            "request_message_id", "selected_materials", "prior_conclusion")}
+        brief["prior_research"]["evidence_status"] = "Previously known at entry. Use as historical context."
+    if "prospective_opening" in grant:
+        from . import v6_prospective
+        if v6_prospective.opening_pending(conn, rid):
+            brief["prospective_opening"] = {
+                **grant["prospective_opening"],
+                "instructions": ("Before measuring an eligible endpoint or a table from which it can be computed, "
+                                 "stage your chosen prediction and cite its claim_ref in an adopted decision. "
+                                 "Other investigations can proceed independently."),
+            }
+    if data["inputs"].get("study_class"):
+        brief["study_class"] = data["inputs"]["study_class"]
+    if data["inputs"].get("evidence_policy") in v621_policy.TYPED:
+        brief["evidence_policy"] = data["inputs"]["evidence_policy"]
+    if research:
+        brief = v62_catalog.project(conn, rid, brief)
+        v62_lead.attach_reports(conn, brief, cursor, research["policy"])
+    if data["inputs"].get("research_evidence_version"):
+        from . import v62_outputs, v62_rounds
+        brief["research_evidence_version"] = data["inputs"]["research_evidence_version"]
+        if data["inputs"].get("evidence_policy"):
+            brief["evidence_policy"] = data["inputs"]["evidence_policy"]
+        brief.update(v62_rounds.brief(conn, rid, cursor))
+        # A released node exposes all its named outputs. The primary result
+        # remains the graph dependency, including on cold continuation.
+        visible = dict.fromkeys(brief["evidence_refs"])
+        # Module reads and drafts become shared only through A's report owner.
+        # Direct Lead reviews may be cited again on later frozen turns.
+        visible.update(dict.fromkeys(r[0] for r in conn.execute(
+            "SELECT subject_id FROM events WHERE run_id=? AND event_id<=? "
+            "AND kind IN ('v62.source.extracted','v62.source.reviewed') "
+            "AND json_extract(payload_json,'$.scope')='run'", (rid, cursor)
+        )))
+        for node in brief["nodes"]:
+            if node["result_ref"] and node["status"] in ("SUCCEEDED", "REUSED"):
+                node["outputs"] = v62_outputs.published_outputs(conn, rid, node["job_id"])
+                visible.update(dict.fromkeys(item["artifact_ref"] for item in node["outputs"]))
+                if data["inputs"].get("evidence_policy") in v621_policy.LIVE_SCIENCE:
+                    from . import v623_endpoints
+                    settled = next((o for o in observations if o.get("event") == "v6.node.settled"
+                                    and o.get("node_id") == node["node_id"] and o.get("artifact_ref") == node["result_ref"]), None)
+                    if settled:
+                        for output in node["outputs"]:
+                            extra = output["artifact_ref"]
+                            if extra != node["result_ref"] and (valid := v623_endpoints.registered(conn,rid,extra)):
+                                observations.append({**{k:settled[k] for k in ("event","event_id","node_id","source_job_id","branch_id","status")},
+                                                     "artifact_ref":extra, "sha256":valid[0]["sha256"], "output_name":valid[0]["output_name"],
+                                                     "verified_metrics":valid, "endpoint_rows":v623_endpoints.compact_rows(valid),
+                                                     "endpoint_total":len(valid), "pending_endpoints":False})
+        brief["evidence_refs"] = list(visible)
+    if data["inputs"].get("evidence_policy") in v621_policy.LIVE_SCIENCE:
+        from . import v623_comparison
+        comparisons = v623_comparison.bindings(conn,rid,goal["goal_version"],cursor)
+        if comparisons:
+            brief["comparisons"] = comparisons
+    dialogue = research_dialogue.packet(conn, rid, "run", goal["goal_version"], through=cursor)
+    if dialogue:
+        brief["pi_dialogue"] = dialogue
+    v62_lead.describe_refresh(conn, brief, events)
+    return brief
+
+
+def ensure_task(conn, run_id):
+    """Coalesce eligible evidence; cursors advance only when its exact decision is adopted."""
+    from . import v6_decisions
+
+    run = conn.execute("SELECT * FROM runs WHERE run_id=?", (run_id,)).fetchone()
+    goal = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
+    if not goal or goal["status"] != "OPEN" or run["status"] != "ACTIVE":
+        return None
+    if research_dialogue.blocked(conn, run_id, scope="run"):
+        return None
+    if store.loads(run, "inputs_json")["inputs"].get("research_evidence_version"):
+        from . import v62_maturity, v62_rounds
+        v62_maturity.reassess(conn, run_id)
+        v62_rounds.reconcile(conn, run_id)
+    open_task = _open(conn, run_id)
+    if open_task:
+        if v6_decisions.compatible_head(conn, run_id, open_task, v6_decisions.head(conn, run_id)):
+            return None
+        with store.transaction(
+            conn, transaction_owner="ScientificLead", operation="supersede_base", run_id=run_id
+        ):
+            task = _open(conn, run_id)
+            if task and not v6_decisions.compatible_head(conn, run_id, task, v6_decisions.head(conn, run_id)):
+                cancel_decision(
+                    conn, run_id, task["task_id"], reason="Another scope committed a new graph head"
+                )
+                store.append_event(
+                    conn,
+                    kind="v6.decision.superseded",
+                    run_id=run_id,
+                    subject_kind="task",
+                    subject_id=task["task_id"],
+                    actor=ACTOR,
+                    evidence_level="EXECUTION_OBSERVED",
+                    payload={"scope": "run"},
+                )
+            else:
+                return None
+    # Use one WAL read snapshot for goal, graph, events, budget and artifact references.
+    # A later observation gets a greater cursor and survives this capture for its next decision.
+    conn.execute("SAVEPOINT v6_capture_brief")
+    try:
+        planned = _prepare_brief(conn, run_id)
+    finally:
+        conn.execute("RELEASE v6_capture_brief")
+    if planned is None:
+        return None
+    run, goal, prior, head, cursor, key, brief = planned
+    delivery = brief
+    if "research_effort" in brief:
+        from . import v62_catalog, v62_lead
+        brief, delivery = v62_lead.deliver(conn, brief, v62_catalog.policy(conn, run_id)["brief_bytes"])
+    with store.transaction(
+        conn, transaction_owner="ScientificLead", operation="freeze_brief", run_id=run_id
+    ) as tx:
+        current = tx.execute(
+            "SELECT g.goal_version,g.status,r.status AS run_status FROM v6_goals g JOIN runs r "
+            "USING(run_id) WHERE g.run_id=?",
+            (run_id,),
+        ).fetchone()
+        latest = _latest(tx, run_id)
+        if (
+            (latest["decision_ref"] if latest else None) != (prior["decision_ref"] if prior else None)
+            or current["goal_version"] != goal["goal_version"]
+            or current["status"] != "OPEN"
+            or current["run_status"] != "ACTIVE"
+            or v6_decisions.head(tx, run_id) != head
+            or _open(tx, run_id)
+            or research_dialogue.blocked(tx, run_id, scope="run")
+            or tx.execute(
+                "SELECT 1 FROM events WHERE run_id=? "
+                "AND kind IN ('v6.intent.changed','v621.material.assigned','research.capabilities.changed') AND event_id>? LIMIT 1",
+                (run_id, cursor),
+            ).fetchone()
+        ):
+            return None
+        return persist_brief(
+            tx, run_id, "run", brief, head, goal["goal_version"], key, cursor, run["budget_ref"], delivery_brief=delivery
+        )
+
+
+def _prepare_brief(conn, run_id):
+    from . import v6_decisions
+
+    run = conn.execute("SELECT * FROM runs WHERE run_id=?", (run_id,)).fetchone()
+    goal = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
+    prior = _latest(conn, run_id)
+    last = prior["event_cursor"] if prior else 0
+    events = _events(conn, run_id, last)
+    changed = (
+        conn.execute(
+            "SELECT 1 FROM v6_decision_tasks WHERE run_id=? AND scope='run' AND goal_version=? LIMIT 1",
+            (run_id, goal["goal_version"]),
+        ).fetchone()
+        is None
+    )
+    if not prior and not changed and not events and conn.execute(
+        "SELECT 1 FROM v62_modules WHERE run_id=? AND status='OPEN' LIMIT 1", (run_id,)
+    ).fetchone():
+        return None
+    branch_hits = _branch_watch_hits(conn, run_id, goal["goal_version"], events)
+    if prior and not changed and not branch_hits and not _run_wakes(conn, run_id, prior, events):
+        return None
+    head = v6_decisions.head(conn, run_id)
+    cursor = events[-1]["event_id"] if events else last
+    key = ids.sha256_of_obj([goal["goal_version"], head, cursor])
+    if conn.execute(
+        "SELECT 1 FROM v6_decision_tasks WHERE run_id=? AND scope='run' AND event_key=?", (run_id, key)
+    ).fetchone():
+        return None
+    brief = _brief(conn, run, goal, head, events, cursor, prior)
+    for change in brief["trigger"]["changes"]:
+        hits = branch_hits.get(change["event_id"], [])
+        if hits:
+            change["branch_watches"] = hits
+            brief["evidence_refs"].extend(hit["decision_ref"] for hit in hits)
+    brief["evidence_refs"] = list(dict.fromkeys(brief["evidence_refs"]))
+    return run, goal, prior, head, cursor, key, brief
+
+
+def persist_brief(tx, run_id, scope, brief, head, goal_version, event_key, cursor, budget_ref, *, delivery_brief=None):
+    """Save one scoped delegation and its frozen context under its caller's CAS transaction."""
+    if not tx.in_transaction:
+        raise RuntimeError("Freezing a decision task requires its owning transaction")
+    previous = tx.execute("SELECT * FROM research_context_heads WHERE run_id=?", (run_id,)).fetchone()
+    ref = ids.new_id("research_context")
+    version = previous["version"] + 1 if previous else 1
+    tx.execute(
+        "INSERT INTO research_contexts(context_ref,run_id,version,previous_context_ref,snapshot_json,"
+        "sha256,event_cursor,created_by,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
+        (
+            ref,
+            run_id,
+            version,
+            previous["context_ref"] if previous else None,
+            store._j(brief),
+            ids.sha256_of_obj(brief),
+            cursor,
+            ACTOR,
+            clock.now_iso(),
+        ),
+    )
+    tx.execute(
+        "INSERT INTO research_context_heads(run_id,context_ref,version) VALUES(?,?,?) "
+        "ON CONFLICT(run_id) DO UPDATE SET context_ref=excluded.context_ref,version=excluded.version",
+        (run_id, ref, version),
+    )
+    tid = records.create_task(
+        tx,
+        run_id=run_id,
+        kind="decide_revision",
+        role="planner",
+        actor=ACTOR,
+        budget_ref=budget_ref,
+        task_input={"context_ref": ref, "scope": scope, "brief": brief if delivery_brief is None else delivery_brief},
+    )
+    tx.execute(
+        "INSERT INTO v6_decision_tasks(task_id,run_id,scope,context_ref,goal_version,base_json,"
+        "visible_refs_json,event_key) VALUES(?,?,?,?,?,?,?,?)",
+        (tid, run_id, scope, ref, goal_version, store._j(head), store._j(brief["evidence_refs"]), event_key),
+    )
+    store.transition(
+        tx,
+        machine="task",
+        subject_id=tid,
+        to_state="READY",
+        actor=ACTOR,
+        run_id=run_id,
+        reason="Frozen Lead brief is ready",
+        evidence_level="EXECUTION_OBSERVED",
+    )
+    return tid
+
+
+def cancel_decision(conn, rid, tid, *, reason):
+    for lease in conn.execute("SELECT lease_id FROM leases WHERE task_id=? AND released_at IS NULL", (tid,)):
+        store.release_lease(conn, lease[0])
+    store.transition(
+        conn,
+        machine="task",
+        subject_id=tid,
+        to_state="CANCELLED",
+        actor=ACTOR,
+        run_id=rid,
+        reason=reason,
+        evidence_level="EXECUTION_OBSERVED",
+    )
+
+
+def impact(conn, rid, edits, *, commit):
+    """Fence the previous brief and unaccepted delegations in the PI's Intent transaction."""
+    goal = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (rid,)).fetchone()
+    if goal is None:  # initial operator bootstrap inside run creation
+        return []
+    if edits and goal["status"] in ("CLOSING", "CLOSED"):
+        raise StaleRevision(f"Goal {rid} is {goal['status']}. Its scientific Intent is sealed. "
+                            "Start a successor study for a new question.")
+    if all(edit["item_type"] == "soft_preference" for edit in edits):
+        return []
+    objective = next((e for e in edits if e["item_id"] == "objective"), None)
+    nodes = []
+    if objective:
+        nodes = conn.execute(
+            "SELECT node_id,status FROM v6_nodes WHERE run_id=? AND job_id IS NULL "
+            "AND status='PENDING' ORDER BY node_id",
+            (rid,),
+        ).fetchall()
+    report = [
+        {
+            "object_type": "node",
+            "object_id": n["node_id"],
+            "status": n["status"],
+            "action": "withdraw",
+            "consequence": "This unsubmitted delegation will be withdrawn.",
+        }
+        for n in nodes
+    ]
+    open_tasks = conn.execute(
+        "SELECT t.task_id FROM v6_decision_tasks d JOIN tasks t USING(task_id) "
+        "WHERE d.run_id=? AND t.status NOT IN ('CANCELLED','ACCEPTED') ORDER BY t.task_id",
+        (rid,),
+    ).fetchall()
+    report.extend(
+        {
+            "object_type": "task",
+            "object_id": t["task_id"],
+            "action": "interrupt",
+            "consequence": "The previous Scientific Lead brief will be superseded.",
+        }
+        for t in open_tasks
+    )
+    if not commit:
+        return report
+    if objective:
+        if not isinstance(objective["new_value"], str) or not objective["new_value"].strip():
+            raise SchemaInvalid("An active research Goal needs a nonempty objective")
+        conn.execute(
+            "UPDATE v6_goals SET goal=?,goal_version=? WHERE run_id=?",
+            (objective["new_value"], objective["new_version"], rid),
+        )
+        conn.executemany(
+            "UPDATE v6_nodes SET status='CANCEL_REQUESTED' WHERE node_id=? AND status='PENDING' "
+            "AND job_id IS NULL",
+            [(n["node_id"],) for n in nodes],
+        )
+    for task in open_tasks:
+        cancel_decision(conn, rid, task["task_id"], reason="Formal Intent superseded the decision brief")
+    store.append_event(
+        conn,
+        run_id=rid,
+        kind="v6.intent.changed",
+        subject_kind="run",
+        subject_id=rid,
+        actor="operator",
+        evidence_level="EXECUTION_OBSERVED",
+        payload={"items": [{"item_id": e["item_id"], "version": e["new_version"]} for e in edits]},
+    )
+    return report
+
+
+def waiting_for(conn, rid):
+    marks = ",".join("?" for _ in ACTIVE_TASKS)
+    open_tasks = [
+        dict(row)
+        for row in conn.execute(
+            "SELECT d.task_id, d.scope, d.context_ref, t.status FROM v6_decision_tasks d JOIN tasks t "
+            f"USING(task_id) WHERE d.run_id=? AND t.status IN ({marks}) ORDER BY t.rowid",
+            (rid, *ACTIVE_TASKS),
+        )
+    ]
+    pending = [q for q in research_dialogue.questions(conn, rid) if q["blocking"] and q["status"] == "OPEN"]
+    visible = {"pi_questions": pending} if pending else {}
+    if open_tasks:
+        return {**visible, "kind": "decision", "tasks": open_tasks, "continue_with": "gx-p0 run"}
+    nodes = [
+        dict(row)
+        for row in conn.execute(
+            "SELECT n.node_id,n.branch_id,n.status,n.job_id,w.wait_json "
+            "FROM v6_nodes n LEFT JOIN v6_node_waits w USING(node_id) WHERE n.run_id=? "
+            "AND n.status IN ('PENDING','RUNNING','CANCEL_REQUESTED') ORDER BY n.rowid",
+            (rid,),
+        )
+    ]
+    if nodes:
+        for node in nodes:
+            reason = node.pop("wait_json")
+            if reason:
+                node["wait"] = json.loads(reason)
+        return {**visible, "kind": "nodes", "nodes": nodes, "continue_with": "gx-p0 run"}
+    modules = [dict(row) for row in conn.execute(
+        "SELECT module_instance_id,round,scope FROM v62_modules WHERE run_id=? AND status='OPEN' ORDER BY rowid", (rid,)
+    )]
+    blocked_scopes = {q["scope"] for q in pending}
+    if pending and all(module["scope"] in blocked_scopes for module in modules):
+        return {**visible, "kind": "pi_answer", "continue_with": "gx-p0 message --question-id ID --text ANSWER"}
+    if modules:
+        return {**visible, "kind": "module_reports", "modules": modules, "continue_with": "gx-p0 run"}
+    prior = _latest(conn, rid)
+    if prior:
+        version = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]
+        events = _events(conn, rid, prior["event_cursor"])
+        watches = store.loads(prior, "receipt_json")["reconsider_when"]
+        if _run_wakes(conn, rid, prior, events) or _branch_watch_hits(conn, rid, version, events):
+            return {"kind": "research_event", "through_cursor": events[-1]["event_id"],
+                    "decision_ref": prior["decision_ref"], "watches": watches, "continue_with": "gx-p0 run"}
+        return {
+            "kind": "operator",
+            "reason": "No runnable research node or decision remains. The persisted watches await new input.",
+            "decision_ref": prior["decision_ref"],
+            "watches": watches,
+            "continue_with": "gx-p0 message --supplement <new evidence>, or revise the formal Goal",
+        }
+    return None
+
+
+def projection(conn, run, meter):
+    from . import v6_claims, v6_costs, v6_decisions
+
+    rid = run["run_id"]
+    g = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (rid,)).fetchone()
+    result = {
+        "mode": "goal",
+        "goal": g["goal"],
+        "goal_version": g["goal_version"],
+        "graph_head": v6_decisions.head(conn, rid),
+        "goal_status": g["status"],
+        "waiting_for": waiting_for(conn, rid) if run["status"] == "ACTIVE" else None,
+        "capabilities": store.loads(g, "capabilities_json"),
+        "materials": store.loads(g, "materials_json"),
+        "resources": v6_costs.resource_report(conn, rid, meter=meter),
+        "claims": v6_claims.current(conn, rid),
+        "decisions": [
+            {
+                **store.loads(r, "receipt_json"),
+                "rationale": r["rationale"],
+                "evidence_refs": json.loads(r["refs"]),
+            }
+            for r in conn.execute(
+                "SELECT receipt_json,json_extract(request_json,'$.decision.rationale') AS rationale,"
+                "json_extract(request_json,'$.decision.evidence_refs') AS refs "
+                "FROM v6_decisions WHERE run_id=? ORDER BY rowid",
+                (rid,),
+            )
+        ],
+        "node_attempts": [
+            dict(r)
+            for r in conn.execute(
+                "SELECT node_id,branch_id,version,status,operation_key,job_id,result_ref,exec_key FROM "
+                "v6_nodes WHERE run_id=? ORDER BY rowid",
+                (rid,),
+            )
+        ],
+    }
+    inputs = store.loads(run, "inputs_json")["inputs"]
+    if window := inputs.get("p0_spec", {}).get("research_window"):
+        result.update(research_window=window, research_window_phase=research_window.phase(window))
+    if inputs.get("study_class"):
+        result["study_class"] = inputs["study_class"]
+    if inputs.get("evidence_policy"):
+        result["evidence_policy"] = inputs["evidence_policy"]
+    if inputs.get("research_evidence_version"):
+        from . import v62_rounds
+        result.update(v62_rounds.brief(conn, rid, None))
+    if inputs.get("research_catalog"):
+        result["research_modules"] = [dict(row) for row in conn.execute(
+            "SELECT m.module_instance_id,m.module_id,m.module_version,m.scope,m.round,m.status,m.budget_ref,r.report_ref "
+            "FROM v62_modules m LEFT JOIN v62_module_reports r USING(module_instance_id) WHERE m.run_id=? ORDER BY m.rowid",
+            (rid,),
+        )]
+    return result

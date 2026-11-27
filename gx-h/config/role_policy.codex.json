@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "authoritative": true,
+  "pinned_model": {
+    "id": "gpt-6.1-sol",
+    "aliases": []
+  },
+  "effort_order": [
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+    "ultra"
+  ],
+  "task_classes": {
+    "PLANNING": {
+      "min_effort": "ultra",
+      "default_effort": "ultra",
+      "model": "gpt-6.1-sol"
+    },
+    "AUTHORING": {
+      "min_effort": "xhigh",
+      "default_effort": "xhigh",
+      "model": "gpt-6.1-sol"
+    },
+    "EXECUTION": {
+      "min_effort": "xhigh",
+      "default_effort": "xhigh",
+      "model": "gpt-6.1-sol"
+    },
+    "VERIFICATION": {
+      "min_effort": "ultra",
+      "default_effort": "ultra",
+      "model": "gpt-6.1-sol"
+    },
+    "TESTING": {
+      "min_effort": "xhigh",
+      "default_effort": "xhigh",
+      "model": "gpt-6.1-sol"
+    }
+  },
+  "roles": {
+    "coordinator": {
+      "task_class": "PLANNING",
+      "does": "Coordinates a run, assigns ready tasks to native workers and records the final handoff decision."
+    },
+    "researcher": {
+      "task_class": "PLANNING",
+      "does": "Investigates a question using the assigned inputs, preserves source references, and records limitations."
+    },
+    "evidence_reviewer": {
+      "task_class": "VERIFICATION",
+      "does": "Checks that a claim follows from the cited source and records discrepancies under its own lease."
+    },
+    "planner": {
+      "task_class": "PLANNING",
+      "does": "Divides a module into verifiable work items, then synthesizes the accepted results and unresolved gaps."
+    },
+    "evaluation_designer": {
+      "task_class": "PLANNING",
+      "does": "Defines criteria, test cases and boundary conditions for a deliverable."
+    },
+    "skill_author": {
+      "task_class": "AUTHORING",
+      "does": "Writes a reusable task procedure with examples and checks."
+    },
+    "adapter_author": {
+      "task_class": "AUTHORING",
+      "does": "Implements and documents an adapter and its known-answer checks."
+    },
+    "executor": {
+      "task_class": "EXECUTION",
+      "does": "Executes assigned work and publishes the corresponding outputs and job references."
+    },
+    "verifier": {
+      "task_class": "VERIFICATION",
+      "does": "Independently checks another worker's deliverable against its criteria."
+    },
+    "improver": {
+      "task_class": "PLANNING",
+      "does": "Proposes a scoped change and a comparison that can evaluate it."
+    }
+  },
+  "observation": {
+    "note": "How strictly a worker's model must be shown before its submission is accepted. A verdict is a value of labels.model_policy_verdict.",
+    "by_host": {
+      "claude_code": {
+        "mode": "strict",
+        "accepts": [
+          "CONFORMS"
+        ],
+        "holds": [
+          "REPORTED_ONLY",
+          "UNOBSERVABLE"
+        ],
+        "sources": [
+          "host_hook",
+          "host_transcript"
+        ]
+      },
+      "codex": {
+        "mode": "strict",
+        "accepts": [
+          "CONFORMS"
+        ],
+        "holds": [
+          "REPORTED_ONLY",
+          "UNOBSERVABLE"
+        ],
+        "sources": [
+          "host_hook",
+          "host_transcript"
+        ]
+      },
+      "other_verified": {
+        "mode": "report",
+        "accepts": [
+          "CONFORMS",
+          "REPORTED_ONLY",
+          "UNOBSERVABLE"
+        ],
+        "holds": []
+      }
+    },
+    "always_waits_for_the_user": [
+      "MISMATCH",
+      "REFUSAL_OR_FALLBACK"
+    ],
+    "transcript_reader": {}
+  },
+  "on_deviation": {
+    "approval_action_kind": "model_switch",
+    "run_state": "WAITING_APPROVAL",
+    "standing_policy_may_grant": false,
+    "report_to_user": [
+      "when",
+      "from which model to which",
+      "the category",
+      "the request id",
+      "which task and brief"
+    ]
+  },
+  "models": {
+    "gpt-6.1-sol": {
+      "aliases": []
+    }
+  },
+  "policy_host": "codex",
+  "policy_scope": "host-specific-v1",
+  "native_coordinator_observation": {
+    "accepted_efforts": [
+      "ultra"
+    ],
+    "default_effort": "ultra"
+  }
+}

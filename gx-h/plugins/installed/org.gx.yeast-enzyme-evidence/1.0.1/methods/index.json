@@ -1,0 +1,83 @@
+{
+  "manifest": {
+    "capability_id": "yeast-reaction-index",
+    "version": "2",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "index",
+        "--implementation",
+        "{data.0}",
+        "--mount",
+        "{data.1}",
+        "--input",
+        "{in.scope}",
+        "--selection",
+        "{param.substrate}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "yeast_enzyme_evidence",
+      "objective": "Search reviewed S288C yeast hydrolysis annotations and sequence homologs for trehalose or sucrose.",
+      "mechanism": "Use one gx.yeast-enzyme-scope/1 material (taxid 559292). Set substrate to trehalose or sucrose. Search Rhea, Swiss-Prot and ENZYME. BLASTp searches the old 6,733-member Swiss-Prot S288C database.",
+      "estimator": "Unique accession, row-level reaction direction, experimental-paper pointers, class-only links, sequences grouped by similarity; raw BLAST HSPs and coverage.",
+      "training_data_lineage": "Database annotations and sequences. No trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.yeast-enzyme-evidence/1.0.1/methods/evidence.py",
+      "sha256": "10b4705fa97ae91a82435492eae9fb8edd8632197b1b601fa62e7b3b32cfa8fb"
+    },
+    "licence": "GX release source; database terms apply to data.",
+    "licence_basis": "UniProt CC BY 4.0, Rhea CC BY 4.0, SIB ENZYME terms.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 100
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.yeast-enzyme-evidence/1.0.1/methods/evidence.py",
+      "{harness}/plugins/installed/org.gx.yeast-enzyme-evidence/1.0.1/methods/mounts.json"
+    ],
+    "outputs": [
+      {
+        "name": "candidates.json",
+        "kind": "file:candidates",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "scope"
+        ],
+        "media_type": "application/json"
+      },
+      {
+        "name": "homology.json",
+        "kind": "file:homology",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "scope"
+        ],
+        "media_type": "application/json"
+      },
+      {
+        "name": "blast.tsv",
+        "kind": "file:blast",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "scope"
+        ],
+        "media_type": "text/tab-separated-values"
+      }
+    ],
+    "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own."
+  },
+  "entry_script": "bin/yeast.py"
+}

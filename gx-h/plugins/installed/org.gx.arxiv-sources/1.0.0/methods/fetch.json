@@ -1,0 +1,70 @@
+{
+  "manifest": {
+    "capability_id": "arxiv-fetch",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "fetch",
+        "--source",
+        "{in.source}",
+        "--out",
+        "{out.dir}",
+        "--arxiv-id",
+        "{param.arxiv_id}"
+      ]
+    },
+    "method_card": {
+      "family": "public_literature_acquisition",
+      "objective": "Read the exact PDF revision that the indexed arXiv search returned.",
+      "mechanism": "Supply candidates.json from arxiv-search@1 and parameter arxiv_id, including its vN revision. Download the exact versioned PDF through Clash and record its content hash.",
+      "estimator": "article.pdf contains original PDF bytes. acquisition.json identifies the versioned endpoint, accession, retrieval time and exact bytes for gx_read_source page locations.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.arxiv-sources/1.0.0/methods/arxiv.py",
+      "sha256": "83e4445a184f654b0afd08b7562bcfb301eda0b32b05e3e8b9c79cb9b21765f2"
+    },
+    "licence": "GX release source. Original materials retain their respective licences.",
+    "licence_basis": "Public arXiv metadata and preprints under their respective distribution licences.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "article.pdf",
+        "kind": "file:preprint",
+        "nature": "observed",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/pdf",
+        "acquired_material": {
+          "metadata_output": "acquisition.json",
+          "role": "paper"
+        }
+      },
+      {
+        "name": "acquisition.json",
+        "kind": "file:acquisition_descriptor",
+        "nature": "analysis",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Versioned PDF links from the selected search only, up to 32 MiB. Embedded-text page extraction can miss figures or reading order. Snapshot binding does not establish scientific validity or publication review."
+  },
+  "entry_script": "methods/arxiv.py"
+}

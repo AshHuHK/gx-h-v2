@@ -1,0 +1,51 @@
+{
+  "manifest": {
+    "capability_id": "fixture-grid",
+    "version": "1",
+    "kind": "UTILITY",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--grid",
+        "{in.grid}",
+        "--operation",
+        "{param.operation}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "weights": [],
+    "required_data": [],
+    "method_card": {
+      "family": "synthetic_grid",
+      "mechanism": "Evaluate -(x-2)^2 at a finite set of test points.",
+      "objective": "Compare two synthetic predictions.",
+      "estimator": "Enumerate the frozen grid.",
+      "training_data_lineage": "No learned weights."
+    },
+    "source": {
+      "path": "{harness}/adapters/local/p01_grid/worker.py",
+      "sha256": "76eeb83e853aef0911f69f33ad2670dda4b2f2836fd123cd615ce2218d67a2c3"
+    },
+    "licence": "UNVERIFIED",
+    "licence_basis": "Same tree as the implementation.",
+    "limitations": "Only synthetic tests of persistence and orchestration.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "outputs": [
+      {
+        "name": "observations.json",
+        "kind": "file:synthetic_grid",
+        "required": true
+      }
+    ]
+  },
+  "parser": "adapters/local/p01_grid/adapter.py",
+  "entry_script": "adapters/local/p01_grid/worker.py"
+}

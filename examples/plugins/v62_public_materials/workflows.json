@@ -1,0 +1,43 @@
+{
+  "document_id": "gx.public.deposition-workflows/1",
+  "resource_type": "public_workflow_metadata",
+  "scope": "Model 1, entity 1, label chains A/B/C in the released asymmetric units.",
+  "candidates": [
+    {
+      "id": "deposited-chain-geometry@1",
+      "provider": "org.gx.protein@0.2.0",
+      "kind": "goal_method",
+      "cost_class": "local_cpu",
+      "supported_entries": ["2RE9", "2O0O"],
+      "required_inputs": "One checksum-matched, released mmCIF per invocation and one mask parameter.",
+      "outputs": ["selected_residues", "observed_union_residues", "coverage_fraction", "pairs"],
+      "applicability": "Quantifies shared-atom coverage and fits chain pairs for common_ca, common_backbone or ordered_backbone.",
+      "limitations": "A second entry or mask requires a separate invocation. The values describe deposited coordinates.",
+      "source": {"path": "gx-h/plugins/installed/org.gx.protein/0.2.0/methods/deposited_geometry.json", "sha256": "74db8d27a3e07e48c6e61ac7b3ef3f1508fe2eb50c4878d8a0a4db010bd39f88", "locator": "/manifest/method_card"}
+    },
+    {
+      "id": "tl1a-coordinate-quality@1",
+      "provider": "org.gx.protein@0.2.0",
+      "kind": "goal_method",
+      "cost_class": "local_cpu",
+      "supported_entries": ["2RE9"],
+      "required_inputs": "The checksum-matched, released 2RE9 mmCIF.",
+      "outputs": ["quality.json"],
+      "applicability": "Counts per-chain and shared positive-occupancy backbone atom identities and the observed-union denominator.",
+      "limitations": "Its release is scoped to 2RE9. The inventory does not supply a fitted rotation or RMSD.",
+      "source": {"path": "gx-h/adapters/scientific/tl1a_geometry/quality.json", "sha256": "38c02669d67b1fc886ef36f2f7cbdb034054e4925b8576e019c0582181203416", "locator": "/manifest/limitations"}
+    },
+    {
+      "id": "tl1a_geometry@1",
+      "kind": "static_workflow",
+      "cost_class": "cpu_and_research_turns",
+      "supported_entries": ["2RE9"],
+      "required_inputs": "Single-deposition Goal, original 2RE9 material and the workflow's inventoried atom selections.",
+      "outputs": ["quality", "proposal", "experiment", "assessment", "decision", "report"],
+      "applicability": "Its stage dependencies connect inventory to a proposed measurement, assessment, decision and report.",
+      "limitations": "The historical static recipe describes the original 2RE9 study. Its graph is a reference when composing other studies.",
+      "source": {"path": "gx-h/workflows/tl1a_geometry/v1.json", "sha256": "a62efffcb1a3680fa36f25899ae2681dcc48a49146e1fc64ece79410b1bd4c4b", "locator": "/nodes"}
+    }
+  ],
+  "evaluation_gap": "Check atom-selection coverage and the denominator on each authorized entry before interpreting a joint geometric comparison."
+}

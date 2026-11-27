@@ -1,0 +1,87 @@
+{
+  "manifest": {
+    "capability_id": "pcna-archive-fetch",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "fetch",
+        "--implementation",
+        "{data.0}",
+        "--archive",
+        "{in.archive}",
+        "--entry-id",
+        "{param.entry_id}",
+        "--identity-reader",
+        "{data.1}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "public_archive_acquisition",
+      "objective": "Acquire the selected PDB deposition of a human PCNA trimer as an immutable original.",
+      "mechanism": "Supply one archive request or candidates.json and entry_id. Download original asymmetric-unit mmCIF from RCSB through Clash. Verify accession, revision, species and polypeptide mappings, and three model 1 PCNA label chains in a common assembly operation.",
+      "estimator": "Exact original bytes, SHA-256, archive revision and available primary publication DOI; partners and apo status require separate assessment. Read structure-context.json for deposition-reported non-PCNA polymer identities, ligand annotations, experiment and resolution.",
+      "training_data_lineage": "Archive metadata and deposited coordinates; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.pcna-archive/1.0.0/methods/archive.py",
+      "sha256": "571be03ace92da5db2726663901593fd9e4b20cb9a2b9b9c84ae7d0d02d8680b"
+    },
+    "licence": "GX release source; archived material retains the archive terms.",
+    "licence_basis": "UniProt and wwPDB supply the original metadata and the deposited coordinates.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.pcna-archive/1.0.0/methods/archive.py",
+      "{harness}/adapters/scientific/archive_coordinates.py"
+    ],
+    "outputs": [
+      {
+        "name": "structure.cif",
+        "kind": "file:structure",
+        "required": true,
+        "nature": "observed",
+        "source_roles": [
+          "archive"
+        ],
+        "acquired_material": {
+          "metadata_output": "acquisition.json",
+          "role": "structure"
+        },
+        "media_type": "chemical/x-mmcif"
+      },
+      {
+        "name": "acquisition.json",
+        "kind": "file:acquisition_descriptor",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "archive"
+        ],
+        "media_type": "application/json"
+      },
+      {
+        "name": "structure-context.json",
+        "kind": "file:structure_context",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "archive"
+        ],
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Requires a public human P12004 deposition with three model-1 polypeptide chains in a shared deposited assembly operation. Co-deposited ligands and other polymers do not establish direct binding, apo state, function or geometry."
+  },
+  "entry_script": "bin/pcna-archive.py"
+}

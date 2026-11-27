@@ -1,0 +1,59 @@
+{
+  "project": "two-route-rehearsal",
+  "research_effort": "medium",
+  "research_modules": [
+    "investigation@1"
+  ],
+  "plugins": [
+    "org.gx.investigation@1.0.0",
+    "org.gx.block-signed@1.0.0",
+    "org.gx.block-influence@1.0.0",
+    "org.gx.protein@0.3.0"
+  ],
+  "capabilities": [
+    "deposited-block-signed@1",
+    "deposited-block-influence@1",
+    "deposited-block-reading@1",
+    "deposited-chain-geometry@2"
+  ],
+  "input_files": [
+    {
+      "path": "../../gx-h/adapters/scientific/tl1a_geometry/data/2RE9.cif",
+      "role": "structure",
+      "sha256": "8c8b9a48cf32d0350327a8c74ecb18bec0ebacb4bdea6f484460fd7b1d5dd89b",
+      "acquisition": "../v621-coordinate-analysis/2RE9.json"
+    },
+    {
+      "path": "../../acceptance/v61/adaptive/data/2O0O.cif",
+      "role": "structure",
+      "sha256": "7e9381a6184ae8bc7f9c9423248c25133e135f0857814834cdd88ea8e9eb1103",
+      "acquisition": "../v621-coordinate-analysis/2O0O.json"
+    },
+    {
+      "path": "methods.json",
+      "role": "workflow_spec",
+      "sha256": "5ab0d291f75abda6fefb1ce49f5476ab7c4234a755202e37f45f9238f0ba7167"
+    }
+  ],
+  "budget_profile": "oauth_research",
+  "run_budget": {
+    "worker_tasks": 120,
+    "job_submissions": 80,
+    "cpu_seconds": 14400,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "api_calls": 128,
+    "tokens": 9007199254740991,
+    "wall_hours": 24
+  },
+  "workspace_budget": {
+    "worker_tasks": 120,
+    "job_submissions": 80,
+    "cpu_seconds": 14400,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "api_calls": 128,
+    "tokens": 9007199254740991,
+    "wall_hours": 24
+  }
+}

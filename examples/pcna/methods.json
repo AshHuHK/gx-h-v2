@@ -1,0 +1,81 @@
+{
+  "scope": "Coordinate quality in a single deposited asymmetric unit. Model 1, entity 1 and label chains A, B, C. Residue intervals use the label numbering of that deposition. The three pairs share chains.",
+  "atom_selections": {
+    "common_ca": "One matched C-alpha atom per common residue.",
+    "common_backbone": "Equal-weight N, CA, C and O at residues complete in all three chains.",
+    "ordered_backbone": "Available only for the whole-deposition geometry method: full occupancy and B factor at most 40 in all three chains."
+  },
+  "endpoints": {
+    "angle_deg": "Unsigned proper-rotation fit angle in degrees. A signed change compares two such fit angles.",
+    "rmsd_A": "Root-mean-square residual distance after superposition, in angstroms."
+  },
+  "methods": [
+    {
+      "capability": "deposited-block-signed@1",
+      "input_role": "structure",
+      "parameters": {
+        "mask": [
+          "common_ca",
+          "common_backbone"
+        ],
+        "endpoint": [
+          "angle_deg",
+          "rmsd_A"
+        ],
+        "effect_minimum": "e, an effect magnitude in endpoint units",
+        "zero_limit": "z, 0 < z < e in the same units",
+        "minimum_evaluable": "k, a positive integer number of evaluable intervals"
+      },
+      "outputs": {
+        "signed-summary.json": {
+          "metric_id": "missed_present",
+          "unit": "1",
+          "observable": "/metrics/missed_present",
+          "definition": "At least k evaluable intervals and one observed miss: 1. At least k evaluable, all eligible intervals measured and none missed: 0. Otherwise null (missing), with reason and counts. The numerator counts intervals, not independent samples."
+        },
+        "signed-blocks.json": "Full-precision fitted values and signed differences for the three pairs and their median, with a label interval, classification and eligibility per row."
+      },
+      "classification": "For each eligible measured 20-position interval, delta is after omission minus before. Take the three-pair median before and after separately. If every absolute pair change is < e, quiet. Otherwise classify by absolute median change: < z near_zero, [z,e) attenuated, >= e with a pair of opposite sign and magnitude >= e opposed, else represented. near_zero, attenuated and opposed count as misses. Quiet and represented describe this endpoint and sensitivity threshold."
+    },
+    {
+      "capability": "deposited-chain-geometry@2",
+      "input_role": "structure",
+      "parameters": {
+        "mask": [
+          "common_ca",
+          "common_backbone",
+          "ordered_backbone"
+        ]
+      },
+      "output": "geometry.json",
+      "measures": "Whole-deposition coverage (matched positions / observed union) and pair fits. A whole-deposition measurement cannot establish a local interval effect."
+    },
+    {
+      "capability": "deposited-block-influence@1",
+      "input_role": "structure",
+      "parameters": {
+        "mask": [
+          "common_ca",
+          "common_backbone"
+        ]
+      },
+      "output": "block-influence.json",
+      "measures": "Fit all three pairs before and after omitting each eligible 20-position interval. The table includes dispersed-deletion controls and the values from which signed differences can be calculated."
+    },
+    {
+      "capability": "deposited-block-reading@1",
+      "input_role": "table",
+      "parameters": {
+        "pair": [
+          "AB",
+          "AC",
+          "BC"
+        ],
+        "block_index": "Zero-based label interval index. Index 0 denotes 1–20."
+      },
+      "output": "cell.json",
+      "measures": "Extracts one interval/pair from an existing block-influence.json table, both endpoints and matched controls. The cell shares the original computation and deposited coordinates."
+    }
+  ],
+  "interpretation": "Compare an interval within the same deposition and endpoint when checking atom-selection sensitivity. Histories and admission/coverage counts are descriptive. Sampling independence is unknown. Report missingness and assessable denominators."
+}

@@ -1,0 +1,458 @@
+{
+  "manifest": {
+    "capability_id": "pcna-local-geometry",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--structure",
+        "{in.structure}",
+        "--selection",
+        "{data.0}",
+        "--metrics",
+        "{data.1}",
+        "--engine",
+        "{data.2}",
+        "--fitter",
+        "{data.3}",
+        "--mask",
+        "{param.mask}",
+        "--endpoint",
+        "{param.endpoint}",
+        "--effect-minimum",
+        "{param.effect_minimum}",
+        "--zero-limit",
+        "{param.zero_limit}",
+        "--minimum-evaluable",
+        "{param.minimum_evaluable}",
+        "--pair",
+        "{param.pair}",
+        "--block-index={param.block_index}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "coordinate_geometry",
+      "mechanism": "Resolve the unique deposited UniProt P12004 entity and exactly three label chains of the asymmetric unit in model 1. Sort chain labels lexically and name role pairs 12, 23, 31. On disordered residues select a coherent conformer achieving highest occupancy at each atom, break ties lexically and report conflicting residues as excluded. Fit matching common_ca or all four common_backbone atoms by deposited label sequence and residue identity. Select angle_deg or rmsd_A.",
+      "objective": "Localize pairwise directional asymmetry and decide whether it survives equal-size dispersed deletions in this structure. Match its original material, named chain roles and label interval with pcna-interface@1.",
+      "estimator": "Choose effect_minimum e, zero_limit z (0<z<e) and minimum_evaluable k before fitting. Signed pair change is after minus before. Median change is the difference of stage medians. Raw omissions are near_zero, attenuated or opposed. Uncertainty in a signed change is ±0.02 degrees or ±0.002 Å. For a resolution-qualified omission, a same-direction pair must remain beyond e, at least one signed direction must be missed by the median, and its magnitude must exceed the largest of 20 deterministic size-matched dispersed deletions of at least 3 intervals, even at the conservative margins. A possible but unresolved omission yields null if no resolved positive exists. Specify pair=12/23/31 and block_index (0=label 1–20; -1=whole baseline with missing local cells). For a decimal readout use the metric suffix _deg or _A matching the chosen endpoint. A complete table exposes both registered and subsequently recomputable settings on that mask and endpoint.",
+      "training_data_lineage": "Deterministic released Horn fitting and dispersed-delete engine; original deposited asymmetric unit only."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.pcna-structure/1.0.0/job-scripts/geometry.py",
+      "sha256": "d49ff5e842e0d2569b437e18e89eb633b78fa2b7009964a464e70477ea4ade76"
+    },
+    "licence": "GX release source; public coordinate depositions retain their original terms.",
+    "licence_basis": "Reuses the released GX block-deletion engine and Horn fitter. See adapters/scientific/tl1a_geometry/LICENSE.chaperone.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 120
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.pcna-structure/1.0.0/job-scripts/pcna_selection.py",
+      "{harness}/plugins/installed/org.gx.pcna-structure/1.0.0/methods/geometry_metrics.py",
+      "{harness}/plugins/installed/org.gx.block-influence/1.0.0/methods/block_influence.py",
+      "{harness}/adapters/scientific/tl1a_geometry/worker.py"
+    ],
+    "outputs": [
+      {
+        "name": "geometry.json",
+        "kind": "file:pcna_geometry",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "missed_present": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/missed_present",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            },
+            "bounds": [
+              0,
+              1
+            ]
+          },
+          "noise_resolved_missed_present": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/noise_resolved_missed_present",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            },
+            "bounds": [
+              0,
+              1
+            ]
+          },
+          "blocks_eligible": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_eligible",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint"
+            }
+          },
+          "blocks_evaluable": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_evaluable",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint"
+            }
+          },
+          "blocks_missed": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_missed",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          },
+          "blocks_noise_resolved_missed": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_noise_resolved_missed",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          },
+          "blocks_noise_uncertain": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_noise_uncertain",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          },
+          "blocks_threshold_boundary": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/blocks_threshold_boundary",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "effect_minimum": "/effect_minimum",
+              "zero_limit": "/zero_limit",
+              "minimum_evaluable": "/minimum_evaluable"
+            }
+          },
+          "baseline_pair_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/baseline_pair_deg",
+            "unit": "deg",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "pair_delta_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/pair_delta_deg",
+            "unit": "deg",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "median_delta_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/median_delta_deg",
+            "unit": "deg",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "control_max_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/control_max_deg",
+            "unit": "deg",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "effect_margin_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/effect_margin_deg",
+            "unit": "deg",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index",
+              "effect_minimum": "/effect_minimum"
+            }
+          },
+          "baseline_pair_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/baseline_pair_A",
+            "unit": "Å",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "pair_delta_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/pair_delta_A",
+            "unit": "Å",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "median_delta_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/median_delta_A",
+            "unit": "Å",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "control_max_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/control_max_A",
+            "unit": "Å",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index"
+            }
+          },
+          "effect_margin_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/effect_margin_A",
+            "unit": "Å",
+            "places": 6,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "entry": "/entry",
+              "accession": "/accession",
+              "entity": "/entity",
+              "model": "/model",
+              "chains": "/chains",
+              "mask": "/mask",
+              "endpoint": "/endpoint",
+              "pair": "/pair",
+              "block_index": "/block_index",
+              "effect_minimum": "/effect_minimum"
+            }
+          }
+        },
+        "sufficient_outputs": [
+          {
+            "capability": "pcna-local-geometry@1",
+            "output": "geometry-table.json",
+            "input_role": "structure",
+            "match_parameters": [
+              "mask",
+              "endpoint"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "geometry-table.json",
+        "kind": "file:pcna_geometry_table",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ]
+      }
+    ],
+    "limitations": "Static observed asymmetric-unit coordinates and deposited label windows. Alignment ranges in the table support cross-entry comparison. Assembly mates, other chains, ligands, absent residues and HETATM modifications are outside the selection. Controls and reproducibility margins measure coordinate sensitivity; they are not experimental error estimates or independent biological replicates.",
+    "parameter_defaults": {
+      "pair": "12",
+      "block_index": -1
+    }
+  },
+  "entry_script": "job-scripts/geometry.py"
+}

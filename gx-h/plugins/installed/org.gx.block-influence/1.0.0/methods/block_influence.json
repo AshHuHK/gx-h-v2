@@ -1,0 +1,128 @@
+{
+  "manifest": {
+    "capability_id": "deposited-block-influence",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--structure",
+        "{in.structure}",
+        "--fitter",
+        "{data.0}",
+        "--mask",
+        "{param.mask}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "coordinate_geometry",
+      "mechanism": "Match label position, identity and backbone atom across model 1, entity 1, chains A/B/C. Select mask common_backbone (default; N, CA, C, O equal) or common_ca. Omit each 20-position interval in turn and refit. Record contiguous and equal-size dispersed omissions, all three pairs, median and unique fits.",
+      "objective": "Quantify within-mask influence on reported chain-pair geometry.",
+      "estimator": "Absolute difference in two unsigned proper-fit rotation angle scalars (degrees) and separately in two fitted RMSD scalars (angstrom). Missing or ambiguous geometry remains unmeasured.",
+      "training_data_lineage": "Deterministic analysis of one deposited asymmetric unit."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.block-influence/1.0.0/methods/block_influence.py",
+      "sha256": "9491a496ea180d8177384ac54894ec82da22171f7ceb0aaea1684c2f488c6b99"
+    },
+    "licence": "GX release source; the input coordinate deposition retains its licence.",
+    "licence_basis": "Uses released Horn fit; see adapters/scientific/tl1a_geometry/LICENSE.chaperone.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 120
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/adapters/scientific/tl1a_geometry/worker.py"
+    ],
+    "outputs": [
+      {
+        "name": "block-influence.json",
+        "kind": "file:block_influence",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "coverage": {
+            "reader": "json/1",
+            "op": "ratio/1",
+            "numerator": "/selected_residues",
+            "denominator": "/observed_union_residues",
+            "unit": "1",
+            "places": 3,
+            "bounds": [
+              0,
+              1
+            ],
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry"
+            }
+          },
+          "eligible_blocks": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/eligible_blocks",
+            "unit": "blocks",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry"
+            }
+          },
+          "max_angle_deg": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/summary/angle_deg/max",
+            "unit": "deg",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "pair": "/summary/angle_deg/pair",
+              "block_index": "/summary/angle_deg/block_index"
+            }
+          },
+          "max_rmsd_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/summary/rmsd_A/max",
+            "unit": "Å",
+            "places": 4,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "mask": "/mask",
+              "model": "/model",
+              "entity": "/label_entity",
+              "entry": "/entry",
+              "pair": "/summary/rmsd_A/pair",
+              "block_index": "/summary/rmsd_A/block_index"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Descriptive sensitivity on common observed positions only. Fits with insufficient data or non-unique rotations have no numeric value. Geometric sensitivity alone does not establish function, frequency, causation or cross-deposition correspondence.",
+    "parameter_defaults": {
+      "mask": "common_backbone"
+    }
+  },
+  "entry_script": "methods/block_influence.py"
+}

@@ -1,0 +1,66 @@
+{
+  "project": "open-coordinate-qc",
+  "research_effort": "medium",
+  "research_modules": [
+    "investigation@1",
+    "method_workflow_survey@1"
+  ],
+  "plugins": [
+    "org.gx.investigation@1.0.0",
+    "org.gx.block-signed@1.0.0",
+    "org.gx.block-influence@1.0.0",
+    "org.gx.protein@0.3.0",
+    "org.gx.research-survey@1.0.0"
+  ],
+  "capabilities": [
+    "deposited-block-signed@1",
+    "deposited-block-influence@1",
+    "deposited-block-reading@1",
+    "deposited-chain-geometry@2"
+  ],
+  "input_files": [
+    {
+      "path": "open-data/3JA9.cif",
+      "role": "structure",
+      "sha256": "71782ebe0e53793db2991a2e96c7863878564105fe618bcbe3e0949547993382",
+      "acquisition": "open-data/3JA9.json"
+    },
+    {
+      "path": "open-data/3TBL.cif",
+      "role": "structure",
+      "sha256": "05a1488d313d9926f556f495ad155e3ebf7859b2fa3014bc68ae55465acdb776",
+      "acquisition": "open-data/3TBL.json"
+    },
+    {
+      "path": "methods.json",
+      "role": "workflow_spec",
+      "sha256": "5ab0d291f75abda6fefb1ce49f5476ab7c4234a755202e37f45f9238f0ba7167"
+    },
+    {
+      "path": "open-data/qualification.json",
+      "role": "material_metadata",
+      "sha256": "bb54084001368548901d9d7b0a920f91c252f8f1cdd20817e006e93ec8119daa"
+    }
+  ],
+  "budget_profile": "oauth_research",
+  "run_budget": {
+    "worker_tasks": 120,
+    "job_submissions": 80,
+    "cpu_seconds": 14400,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "api_calls": 128,
+    "tokens": 9007199254740991,
+    "wall_hours": 24
+  },
+  "workspace_budget": {
+    "worker_tasks": 120,
+    "job_submissions": 80,
+    "cpu_seconds": 14400,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "api_calls": 128,
+    "tokens": 9007199254740991,
+    "wall_hours": 24
+  }
+}

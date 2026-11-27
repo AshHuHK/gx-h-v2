@@ -1,0 +1,47 @@
+{
+  "workflow_id": "science_grid",
+  "version": "2",
+  "description": "Test quantitative hypotheses on synthetic grids and commission the next experiment from reviewed evidence.",
+  "entry_transitions": [
+    "AUDITING",
+    "PLANNING",
+    "ACTIVE"
+  ],
+  "nodes": [
+    {
+      "name": "proposal",
+      "work": "mechanical",
+      "deps": []
+    },
+    {
+      "name": "experiment",
+      "work": "stage",
+      "deps": [
+        "proposal"
+      ]
+    },
+    {
+      "name": "assessment",
+      "work": "stage",
+      "artifact_task_kind": "research_round",
+      "deps": [
+        "experiment"
+      ]
+    },
+    {
+      "name": "decision",
+      "work": "stage",
+      "artifact_task_kind": "research_round",
+      "deps": [
+        "assessment"
+      ]
+    },
+    {
+      "name": "report",
+      "work": "mechanical",
+      "deps": [
+        "decision"
+      ]
+    }
+  ]
+}

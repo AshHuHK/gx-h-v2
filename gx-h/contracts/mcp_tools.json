@@ -1,0 +1,3729 @@
+{
+  "schema_version": 2,
+  "server_name": "gxdesign_harness",
+  "protocol": {
+    "jsonrpc": "2.0",
+    "mcp_protocol_version": "2025-06-18",
+    "transport": [
+      "stdio"
+    ],
+    "note": "STDIO: protocol frames on stdout ONLY; every log line goes to stderr or a file. The server validates identity, project scope, phase, budget and approval itself; a client-supplied role, allowed_actions or approved=true is never an authorization."
+  },
+  "transports": {
+    "note": "One dispatcher and existing schema/authorization/handler table are shared by the code surfaces. This native-only release exposes database access through bin/gx-native and controlled official App Server callbacks. Ordinary CLI/MCP database entry is disabled before connect; schema/help queries that do not open a store remain available. The original R8 deployment retains its own CLI/MCP entrypoints unchanged. No transport alone is hostile same-UID isolation.",
+    "store": "Both open the one store named by GX_DB, defaulting to var/gx.db, which is created on first use. v1 shipped a client configuration that opened no store at all.",
+    "identity": "Scope, projects and subject come from the launch environment (GX_SCOPE, GX_PROJECTS, GX_SUBJECT) or from the client's --as option. The default caller is the least privileged scope, worker, over every project of the store unless projects are named; a caller limited to some projects is one started with GX_PROJECTS or --projects. Three scopes exist: worker (a model doing a task), host_adapter (normally a hook or observer the Host runs; the two explicitly specified native Codex dispatch lifecycle events also admit the authenticated native Root) and operator (a person). On one machine a shell can name any of them, so the scope is a procedural boundary and every record says which scope and which source wrote it. The sole native Codex exception is gx_host_event CodexDispatchAuthorize and CodexDispatchConfirm: the authenticated depth-zero native Root may invoke their literal public CLI under host_adapter scope while holding the actual run coordinator lease. Backend verification of the real process, current pending Host call, exact task/assignment/slot/policy tuple and completed authorization receipt supplies authority; a scope name, caller report or arbitrary JSON never does. These are backend-authorized dispatch lifecycle events, not hooks and not HUMAN decisions. Every other event retains the Host-run hook requirement.",
+    "person": "A decision that belongs to a person is taken where a person is: over MCP the tool carries the marker that makes the client ask on every call in every permission mode; on the command line it needs an interactive terminal, which a model's shell does not have. The one alternative is a standing policy file the user wrote (config/approvals.json), applied by the backend and recorded as that policy, never as a person.",
+    "materialize": "The command-line client can write an artifact's verified bytes to a file under the run's outbox directory (`gx get <artifact_ref> --out`), so a worker reads a long brief with its own file tools instead of through a bounded tool result.",
+    "annotations": "The MCP listing derives readOnlyHint from `mutating`. For a mutating tool it derives idempotentHint from `idempotent_by`, so a mutating tool with no key (gx_task_claim) never claims it; for a read-only tool the hint carries no meaning and is not constrained. A client may run reads in parallel and repeat a keyed call.",
+    "leases": "Every accepted lease-bound call by the holder of a task lease renews that lease while it is unexpired, as every accepted run-level write renews the coordinator lease. A lapsed lease is not renewed: the holder's next call answers LEASE_EXPIRED.",
+    "native_app_server": {
+      "source_mode": "codex_native_events_v1",
+      "status": "versioned release candidate; live acceptance required",
+      "authority": "The controlled official stdio client receives thread/turn/call callback identifiers outside model arguments, registers native threads and constructs an internal NativeCall. Ordinary MCP/CLI bodies, environment, claimed UUIDs and copied tokens cannot select this source.",
+      "dispatch": "One api.dispatch, schema/project/scope authorization, and the existing domain services. NativeCall is an internal keyword, never a wire field. Per-thread principal is settled by the registered adapter; tasks and leases remain backend state.",
+      "policy": "New runs pin their Host source and existing Codex role policy. Source selection, claim, bind, submit, reviews and scenario independence use this same source. Host-applied model/effort configuration is labelled as such; upstream served tier is not independently attested. Missing required configuration or reroute is a refusal, not permission to downgrade.",
+      "no_private_readers": "No /proc, private Host SQLite, rollout, literal-command or opaque Authorize/Confirm/Consume fallback anywhere on a new-mode operation. Legacy source stays explicit and is never selected for missing native evidence.",
+      "lifecycle": "Codex owns native threads, messages and capacity. GX owns business tasks, leases, budgets and reviews. Turn completion, archive or unsubscribe does not prove native destruction or release historical GX Owned slots.",
+      "independence": "A native author cannot review its own product under another subject. A different real native reviewer checks substance and submits evidence; backend guards identity, frozen version and mandatory checks. Distinct threads are not hostile isolation or proof of independent cognition.",
+      "events": "Without a native global event ID, deduplication keys are adapter-derived from connection/thread/turn/call/kind and labelled accordingly. No message-text-only deduplication.",
+      "human_decisions": "Native tool callbacks cannot exercise requires_user_interaction tools or impersonate a person. Existing standing policies keep their explicit provenance and do not become HUMAN.",
+      "compatibility": "This release uses only newly owned state directories/databases. The supported entry rejects legacy paths/unmarked state and mismatched installed contracts before writable SQLite connect or automatic resync. No old-run migration/repin. In this native-only release, ordinary CLI/MCP database entry is disabled before writable connect; metadata initialization uses the same guarded bin/gx-native --init-store entry and creates no model turn or product run.",
+      "isolation": "Single local trust domain and procedural enforcement through managed GX tools. Same-UID full-access shell is not adversarial isolation."
+    }
+  },
+  "envelope": {
+    "success": {
+      "ok": true,
+      "request_id": "str",
+      "run_id": "str|null",
+      "revision": "int|null",
+      "status": "str|null",
+      "data": "object",
+      "artifact_refs": [
+        "str"
+      ],
+      "warnings": [
+        "str"
+      ],
+      "error": null
+    },
+    "failure": {
+      "ok": false,
+      "request_id": "str",
+      "run_id": "str|null",
+      "revision": "int|null",
+      "status": "str|null",
+      "data": {},
+      "artifact_refs": [],
+      "warnings": [
+        "str"
+      ],
+      "error": {
+        "code": "str",
+        "message": "str",
+        "retryable": "bool",
+        "side_effect_status": "str",
+        "evidence_ref": "str|null",
+        "suggested_recovery": "str",
+        "details": "object?"
+      }
+    },
+    "limits": {
+      "max_response_bytes": 24000,
+      "max_rows": 200,
+      "max_inline_put_bytes": 262144,
+      "note": "Large products are returned as artifact_refs with bounded summaries, never inlined. The response ceiling sits below both hosts' tool-result limits (a shell result is cut near 30,000 characters and an MCP result near 25,000 tokens), because a result the host truncates is a result the worker reads wrongly. v1 allowed 262,144 bytes."
+    }
+  },
+  "notation": {
+    "types": "str, int, num, bool, object, array, array<T>, array<{keys}> for rows with those keys (a key written with a trailing ? is one that only some rows carry; the tool's note says which), a named type of contracts/bundles.json, enum:<axis> for a str that is a value of that axis of contracts/labels.json, a|b for alternatives (|null: the value may be null), or a literal value. A trailing ? marks an optional input. On an output it marks a key that only some answers carry; the tool's note says which. The data of an answer carries no key its tool does not declare.",
+    "tool": "mutating: the call changes state. idempotent_by: the input whose value replays the call. requires_revision: the call carries expected_revision and is refused STALE_REVISION when the run has moved. requires_attempt: the call carries expected_attempt and is refused STALE_PLAN when the task has moved. records: what the call writes besides its own effect, whether it then answers or refuses. refusal_records: by error code, what a refusal under that code leaves recorded; such a refusal answers side_effect_status APPLIED, and a refusal under a code not named there leaves nothing recorded beyond the tool's records and answers its code's own side_effect_status. backend_checks: what the backend verifies itself. errors: the codes the tool may refuse with, beyond the dispatcher's own."
+  },
+  "references": {
+    "note": "An input field named here carries an artifact reference. A value that is not a reference where one is expected - a path, the name of a kind, anything not shaped as an artifact id - is refused with PATH_TRAVERSAL_DENIED before anything is looked up, and a well-formed reference to nothing with ARTIFACT_NOT_FOUND. Every tool that takes one of these fields declares both codes.",
+    "input_fields": [
+      "artifact_ref",
+      "artifact_refs",
+      "bundle_ref",
+      "decision_rule_ref",
+      "input_manifest_ref"
+    ]
+  },
+  "native_goal_tools": {
+    "transport": "official_codex_app_server",
+    "authority": "The bound Root obtains task, lease, thread, turn and call identifiers from the native callback. Its frozen tool grant and the current run/scope are checked before adoption.",
+    "idempotency": "Callback receipts are keyed by the official thread and call. Replay must match turn and request digest.",
+    "tools": {
+      "gx_decide_revision": {
+        "type": "function",
+        "name": "gx_decide_revision",
+        "description": "Submit a scoped scientific decision. GX authenticates this turn and applies its frozen base.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "decision": {
+              "$ref": "v6_revision.schema.json#/$defs/decision"
+            }
+          },
+          "required": [
+            "decision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_stage_claim": {
+        "type": "function",
+        "name": "gx_stage_claim",
+        "description": "Stage a bounded interpretation with actual visible evidence IDs, criteria and limits. Use previous_claim_ref to revise an existing interpretation. For close_run, list the resulting claim_ref in claim_refs and its underlying observations in decision.evidence_refs. For an intermediate amendment or resolution, cite the staged claim_ref along with its original grounds to publish it with that decision.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "statement",
+            "level",
+            "scope",
+            "criteria",
+            "limitations",
+            "rationale",
+            "evidence_refs"
+          ],
+          "properties": {
+            "statement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scope": {
+              "type": "string",
+              "minLength": 1
+            },
+            "criteria": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limitations": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1
+            },
+            "previous_claim_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "level": {
+              "type": "string",
+              "enum": [
+                "open",
+                "limited_support",
+                "contested",
+                "insufficient",
+                "mixed",
+                "refuted"
+              ]
+            },
+            "evidence_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true,
+              "minItems": 1
+            },
+            "chain_pairs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "prediction": {
+              "type": "object",
+              "description": "Preregister a falsifiable numeric comparison for this statement and scope. Each data reference identifies a pinned acquisition. The JSON Pointer selects the measured value in the original result. Pin a method and its named output for computation or a versioned measurement schema for an ingested observation.",
+              "additionalProperties": false,
+              "required": [
+                "observable",
+                "operator",
+                "threshold",
+                "data_refs",
+                "target"
+              ],
+              "properties": {
+                "observable": {
+                  "type": "string",
+                  "pattern": "^/",
+                  "minLength": 2
+                },
+                "operator": {
+                  "type": "string",
+                  "enum": [
+                    "lt",
+                    "le",
+                    "gt",
+                    "ge",
+                    "eq"
+                  ]
+                },
+                "threshold": {
+                  "type": "number"
+                },
+                "data_refs": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "target": {
+                  "type": "string",
+                  "enum": [
+                    "experimental_observation",
+                    "analysis",
+                    "model_prediction"
+                  ]
+                },
+                "method": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "capability",
+                    "output"
+                  ],
+                  "properties": {
+                    "capability": {
+                      "type": "string",
+                      "minLength": 3
+                    },
+                    "output": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "parameters": {
+                      "type": "object",
+                      "maxProperties": 32
+                    },
+                    "metric_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "input_role": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "measurement_schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Versioned observable and units contract in the original result JSON schema field."
+                },
+                "quantifier": {
+                  "type": "string",
+                  "enum": [
+                    "all"
+                  ]
+                },
+                "external_endpoint": {
+                  "type": "object",
+                  "description": "Typed dimensions of the supplied versioned endpoint. Use the actual acquisition and instrument definition.",
+                  "properties": {
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "instrument": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "selection": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "gx_delegate_branch": {
+        "type": "function",
+        "name": "gx_delegate_branch",
+        "description": "Assign one decision on an open branch. Its Jobs use that branch’s fixed resource limits. The Run pays for the worker task and native turn, subject to any further branch ceilings.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "branch_id": {
+              "type": "string",
+              "description": "Durable ID of an open branch in this brief."
+            },
+            "question": {
+              "type": "string",
+              "description": "Scientific question for the branch owner to decide."
+            }
+          },
+          "required": [
+            "branch_id",
+            "question"
+          ]
+        }
+      },
+      "gx_open_module": {
+        "type": "function",
+        "name": "gx_open_module",
+        "description": "Delegate a scoped research assignment. Cite the granted inputs and methods, choose the round and allocate its resource ceilings. Reuse operation_key to retry the same delegation.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "module_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "module_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "focus": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_delivery": {
+              "type": "string",
+              "minLength": 1
+            },
+            "round": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "input_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "capabilities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "tools": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Optional subset of the granted module tools for this instance."
+            },
+            "sub_budget": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "operation_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "wake_on": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "counterevidence",
+                  "gap",
+                  "partial"
+                ]
+              }
+            },
+            "target_claim_refs": {
+              "type": "array",
+              "description": "Exact published claim revisions from the Lead brief for the module to assess.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "module_id",
+            "module_version",
+            "focus",
+            "expected_delivery",
+            "round",
+            "input_refs",
+            "capabilities",
+            "sub_budget",
+            "operation_key"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_cancel_module": {
+        "type": "function",
+        "name": "gx_cancel_module",
+        "description": "Cancel an open module instance while retaining its confirmed results and charges.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "module_instance_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "operation_key": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "module_instance_id",
+            "reason",
+            "operation_key"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_submit_module_report": {
+        "type": "function",
+        "name": "gx_submit_module_report",
+        "description": "Publish a scoped module report. Cite exact source references, preserve counterevidence and describe unfinished work. GX records authorship, checks scope and returns the report to the Lead.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "COMPLETE",
+                "PARTIAL"
+              ]
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true,
+                    "minItems": 1
+                  },
+                  "kind": {
+                    "enum": [
+                      "support",
+                      "counterevidence",
+                      "observation"
+                    ]
+                  }
+                },
+                "required": [
+                  "text",
+                  "source_refs"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "gaps": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "artifact_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "next_steps": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "operation_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "gap_criteria": {
+              "type": "array",
+              "description": "Optional future closure tests for individual questions in gaps. Bind the cited study material and scientific scope; omit a criterion to leave a narrative gap for review.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "data_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "applicability": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "measurement_schema": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "observable": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "method": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "output_name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "method_parameters": {
+                    "type": "object",
+                    "description": "The admitted analysis settings required to answer this question, such as the selection mask."
+                  },
+                  "nature": {
+                    "enum": [
+                      "observed",
+                      "analysis"
+                    ]
+                  },
+                  "op": {
+                    "enum": [
+                      "finite",
+                      "eq",
+                      "lt",
+                      "lte",
+                      "gt",
+                      "gte"
+                    ]
+                  },
+                  "threshold": {
+                    "type": "number"
+                  },
+                  "metric_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "input_role": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "question",
+                  "data_ref",
+                  "applicability",
+                  "nature",
+                  "measurement_schema",
+                  "observable",
+                  "op"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "qualitative_notes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true,
+                    "minItems": 1
+                  },
+                  "kind": {
+                    "enum": [
+                      "support",
+                      "counterevidence",
+                      "observation"
+                    ]
+                  }
+                },
+                "required": [
+                  "text",
+                  "source_refs"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0,
+              "description": "Unverified interpretations with their own scoped references."
+            },
+            "metric_refs": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "artifact_ref",
+                  "metric_id"
+                ],
+                "properties": {
+                  "artifact_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "metric_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "pi_dispositions": {
+              "$ref": "v6_revision.schema.json#/$defs/pi_dispositions"
+            }
+          },
+          "required": [
+            "status",
+            "findings",
+            "gaps",
+            "artifact_refs",
+            "next_steps",
+            "operation_key"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_save_recipe": {
+        "type": "function",
+        "name": "gx_save_recipe",
+        "description": "Save a reusable analytical subgraph from completed Lead-visible nodes. Name each external material and state alignment, units and missing-data rules.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recipe_id",
+            "version",
+            "title",
+            "nodes",
+            "inputs",
+            "id_alignment",
+            "missing_values",
+            "units"
+          ],
+          "properties": {
+            "recipe_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "slot",
+                  "node_id"
+                ],
+                "properties": {
+                  "slot": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "node_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "artifact_ref"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "artifact_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "id_alignment": {
+              "type": "string",
+              "minLength": 1
+            },
+            "missing_values": {
+              "type": "string",
+              "minLength": 1
+            },
+            "units": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "gx_instantiate_recipe": {
+        "type": "function",
+        "name": "gx_instantiate_recipe",
+        "description": "Expand a saved analytical recipe to add_node operations on a chosen branch using this Goal’s originals. Submit the selected operations using gx_decide_revision.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recipe",
+            "digest",
+            "branch",
+            "inputs",
+            "prefix"
+          ],
+          "properties": {
+            "recipe": {
+              "type": "string",
+              "minLength": 1
+            },
+            "digest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "inputs": {
+              "type": "object",
+              "description": "Named input slots mapped to Goal artifact refs"
+            },
+            "prefix": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "gx_select_capability": {
+        "type": "function",
+        "name": "gx_select_capability",
+        "description": "Select an exact PI-listed method for this Goal, or disable a listed choice. Existing Jobs retain their original method. The receipt reports the new capability revision.",
+        "inputSchema": {
+          "type": "object", "additionalProperties": false,
+          "required": ["method", "action", "revision"],
+          "properties": {
+            "method": {"type": "string", "minLength": 1},
+            "action": {"enum": ["enable", "disable"]},
+            "revision": {"type": "integer", "minimum": 0}
+          }
+        }
+      },
+      "gx_query_catalog": {
+        "type": "function",
+        "name": "gx_query_catalog",
+        "description": "Find methods, research resources, databases, skills, modules and saved recipes by purpose or reference. Inspect a versioned card for details.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "module",
+                "method",
+                "database",
+                "research",
+                "skill",
+                "recipe"
+              ]
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1
+            },
+            "category": {
+              "type": "string",
+              "minLength": 1
+            },
+            "query": {
+              "type": "string",
+              "minLength": 1
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "gx_extract_evidence": {
+        "type": "function",
+        "name": "gx_extract_evidence",
+        "description": "Use your segment receipt to record an exact quotation, its interpretation, direction, scope and limitations. Cite the resulting evidence_ref in a published report.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_ref",
+            "segment_id",
+            "receipt_id",
+            "quote",
+            "claim",
+            "direction",
+            "applicability",
+            "confidence_basis"
+          ],
+          "properties": {
+            "source_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "segment_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "receipt_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "quote": {
+              "type": "string",
+              "minLength": 1
+            },
+            "claim": {
+              "type": "string",
+              "minLength": 1
+            },
+            "direction": {
+              "type": "string",
+              "enum": [
+                "supports",
+                "opposes",
+                "unresolved"
+              ]
+            },
+            "applicability": {
+              "type": "string",
+              "minLength": 1
+            },
+            "confidence_basis": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limitations": {
+              "type": "string",
+              "minLength": 1
+            },
+            "method": {
+              "type": "string",
+              "minLength": 1
+            },
+            "data": {
+              "type": "string",
+              "minLength": 1
+            },
+            "target_claim_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "char_start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "char_end": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "claim_grain": {
+              "type": "string",
+              "enum": [
+                "FINDING",
+                "METHOD_DETAIL",
+                "NUMERIC_VALUE",
+                "CONDITION",
+                "LIMITATION"
+              ]
+            },
+            "evidence_type": {
+              "type": "string",
+              "enum": [
+                "EXPERIMENTAL",
+                "COMPUTATIONAL",
+                "BENCHMARK",
+                "REVIEW",
+                "EXPERT_RULE",
+                "HYPOTHESIS"
+              ]
+            }
+          }
+        }
+      },
+      "gx_review_evidence": {
+        "type": "function",
+        "name": "gx_review_evidence",
+        "description": "Independently assess a published extraction using your own read receipt for its original segment. Cite the resulting review_ref in a report.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "evidence_ref",
+            "receipt_id",
+            "quote_sha256_seen",
+            "verdict",
+            "note"
+          ],
+          "properties": {
+            "evidence_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "receipt_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "quote_sha256_seen": {
+              "type": "string",
+              "minLength": 1
+            },
+            "verdict": {
+              "type": "string",
+              "enum": [
+                "SUPPORTED",
+                "OVERSTATED",
+                "NOT_SUPPORTED",
+                "CONTRADICTED"
+              ]
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "gx_read_source": {
+        "type": "function",
+        "name": "gx_read_source",
+        "description": "List locators and extraction coverage for assigned documents and data records (text, Markdown, JATS, HTML, PDF or JSON), or read one original segment with a receipt for this lease.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_ref"
+          ],
+          "properties": {
+            "source_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "segment_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "start": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "provider_tools": "Installed provider tools are offered only on runs holding their capability grant. The protein provider supplies gx_reevaluate_geometry for its geometry method.",
+    "claim_direction": "gx.v6.claim.1 level describes evidence direction. A staged claim publishes with its adopted decision. Existing payloads may include the optional chain_pairs field.",
+    "reserved": {
+      "maturity": "M3. Independent from the level of evidential support. No maturity transition, archive or PI signature is emitted by this schema.",
+      "watch_measure": "M3. An explicit predicate on a measured value and its units would require a new event contract. The current reconsider_when list accepts six event kinds and matches their subject references."
+    }
+  },
+  "tools": {
+    "gx_run_start": {
+      "phase": "core",
+      "mutating": true,
+      "idempotent_by": "idempotency_key",
+      "requires_revision": false,
+      "input": {
+        "objective": "str|Objective",
+        "project_ref": "str",
+        "budget_profile": "str",
+        "workflow": "object?",
+        "inputs": "object?",
+        "input_files": "array<{path,sha256}>?",
+        "host": "object?",
+        "constraints": "object?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "run_id": "str",
+        "revision": "int",
+        "status": "str",
+        "budget_ref": "str",
+        "objective_status": "str",
+        "workflow": "object",
+        "agent_policy_ref": "str",
+        "coordinator_lease_ref": "str",
+        "pins": "object",
+        "interrupt_ref": "str|null",
+        "objective_id": "str",
+        "directories": "object"
+      },
+      "backend_checks": [
+        "project scope",
+        "permission",
+        "budget profile exists",
+        "objective screen for legality, privacy and biosafety applicability",
+        "the workflow version is an ACTIVE asset, or a definition shipped in the tree whose sha256 equals its pin in config/shipped.json",
+        "every input file re-hashes to the sha256 given for it",
+        "the contract, the workflow definition and the agent policy are pinned on the run by sha256",
+        "under host claude_code: the host recorded a SessionStart for the calling session, and it shows the gx roles and gx-dispatch installed when the session began",
+        "native_app_server: only a registered depth-zero native callback selects codex_native_events_v1; fixed model/effort configuration, per-thread principal and new-release state are checked before any run write"
+      ],
+      "note": "The objective, a sentence or an Objective of contracts/bundles.json, is screened before anything is planned. A flagged objective leaves the run in WAITING_APPROVAL. Inputs and input files are named here, by hash, and nowhere else: v1 took them through an undocumented key of `constraints`, and a run started without it skipped evidence collection. The caller that starts a run holds its coordinator lease. The answer says how the workflow was admitted, as an ACTIVE asset or as SHIPPED product code, and the run's start event keeps it. interrupt_ref names the interrupt the run first stops at, null when it stops at none; objective_id the objective record created with the run. directories names the run's inbox and outbox ({inbox, outbox}), so a client that speaks only the protocol can find them. Under host claude_code a run is refused CLIENT_CAPABILITY_MISSING when the host recorded no SessionStart for the session, or one that shows the gx roles or gx-dispatch absent: start a new session; there is no fallback to untyped agents for gx roles.",
+      "errors": [
+        "PERMISSION_DENIED",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "BUDGET_EXCEEDED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "POLICY_SCREEN_BLOCKED",
+        "CAPABILITY_NOT_APPROVED",
+        "ARTIFACT_NOT_FOUND",
+        "CONTENT_HASH_MISMATCH",
+        "STORE_UNAVAILABLE",
+        "CLIENT_CAPABILITY_MISSING"
+      ]
+    },
+    "gx_run_status": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str"
+      },
+      "output": {
+        "status": "str",
+        "revision": "int",
+        "phase": "str",
+        "interrupt_ref": "str|null",
+        "pending_tasks": "array",
+        "external_jobs": "array",
+        "pending_approvals": "array",
+        "open_gaps": "array",
+        "budget": "object",
+        "coordinator_lease": "object|null",
+        "objective": "object",
+        "workflow": "object",
+        "agent_policy_ref": "str",
+        "pins": "object",
+        "paused": "object|null",
+        "host": "object|null",
+        "stage": "object|null",
+        "in_doubt": "array<{task_id,lease_ref,why}>",
+        "waiting_for": "object|null",
+        "task_counts": "object",
+        "project_ref": "str",
+        "directories": "object"
+      },
+      "note": "A paused or waiting run always says what it is waiting for and from where it would continue. phase is the open stage's name. stage is the open stage as {name, complete, quiescent, resumable, needs}: complete and quiescent as its controller decides them, resumable whether gx_run_resume would be accepted now, needs what is still open, each a need of labels.pause_need_kind; it is computed by the function gx_run_resume uses, and is null when no stage is open. waiting_for says what a run that is not moving waits for, as {kind, reason, continue_with} and what the kind adds (interrupt_ref, node, tasks, approval, jobs, held_submissions, needs); kind is the kind of the pending interrupt, paused, or idle for an ACTIVE run that nothing is advancing; it is null for a run that is moving or has ended. in_doubt lists the leases whose agent the host recorded as stopped without a submission, each {task_id, lease_ref, why}. task_counts is the number of the run's tasks in each state, project_ref the project the run belongs to, and directories names the run's inbox and outbox ({inbox, outbox}).",
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "STORE_UNAVAILABLE"
+      ]
+    },
+    "gx_run_control": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "action": "str",
+        "reason": "str",
+        "coordinator_lease_ref": "str?",
+        "expected_revision": "int",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "status": "str",
+        "revision": "int",
+        "recovery_point": "object|null",
+        "needs": "array",
+        "cancelled_tasks": "array",
+        "cancel_requested_jobs": "array",
+        "action": "str",
+        "run_id": "str",
+        "budget": "object?",
+        "pins": "object?"
+      },
+      "backend_checks": [
+        "action is one of pause, continue, cancel, budget_apply, workflow_repin",
+        "the caller holds the coordinator lease or is the operator",
+        "budget_apply and workflow_repin require the actual current-run Native Root and its own live coordinator lease",
+        "budget_apply raises the original root budget lines to their current reusable profile ceilings through the existing request_increase/raise_limit owners; the selected profile, spent, reserved and original run start are preserved",
+        "workflow_repin records the exact old/new installed transition through the existing run_repin owner at quiescence with no unresolved writes; it neither advances the workflow nor changes a budget",
+        "continue: every need of the pause is cleared, each re-checked by its own predicate",
+        "continue: no other call is advancing the run",
+        "cancel: READY tasks are cancelled, running jobs get a cancel request, artifacts and events are kept"
+      ],
+      "note": "Controls a run or deliberately maintains its existing budget and compatible workflow pins. budget_apply raises only lines below their current reusable profile ceilings, using the profile selected when the original root budget was created. reason is an ordinary explanation and carries no commands or desired values. An expired wall budget can be raised without changing the run start or charges. workflow_repin returns old/new pins and records the existing standing-policy or person decision; routine source maintenance preserves the contract version, owned-store schema and agent policy. Resume and continue require current pins and never perform maintenance implicitly. A continue is refused DEPENDENCY_UNMET while a pause need is uncleared, and CONCURRENT_RUN while another call advances the run. action says what was done and run_id to which run.",
+      "errors": [
+        "STALE_REVISION",
+        "ILLEGAL_TRANSITION",
+        "LEASE_EXPIRED",
+        "APPROVAL_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "HOLD_ACTIVE",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "IDEMPOTENCY_CONFLICT",
+        "DEPENDENCY_UNMET",
+        "CONCURRENT_RUN",
+        "CONTENT_HASH_MISMATCH",
+        "VERSION_IMMUTABLE"
+      ]
+    },
+    "gx_coordinator_claim": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "host": "str",
+        "session_ref": "str?",
+        "action": "str?",
+        "reason": "str?",
+        "expected_revision": "int",
+        "lease_seconds": "int?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "coordinator_lease_ref": "str|null",
+        "expires_at": "str|null",
+        "previous_owner": "str|null",
+        "revision": "int",
+        "action": "str",
+        "run_id": "str"
+      },
+      "backend_checks": [
+        "action is claim (default), renew or release",
+        "claim: no other owner holds an unexpired lease",
+        "the run is not terminal"
+      ],
+      "note": "Exactly one coordinator per run. Run-level writes carry the lease and renew it; a second host takes over after expiry or release, and the former holder's writes are refused from then on. In v1 the lease was acquired only by tests, so a lapsed coordinator could finish another host's run. action says what was done (claim, renew or release) and run_id to which run.",
+      "errors": [
+        "LEASE_HELD",
+        "STALE_REVISION",
+        "ILLEGAL_TRANSITION",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "IDEMPOTENCY_CONFLICT"
+      ]
+    },
+    "gx_next_actions": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "limit": "int?"
+      },
+      "output": {
+        "next_actions": "array<{task_id,kind,role,task_class,model,effort,attempt,brief_ref,brief_sha256,bundle_kind,acceptance,dependencies,independent_of,parallel_group,budget_ref,rank,reason,ready_seq,expected_attempt,lease_seconds}>",
+        "blocked": "array<{task_id,code,reason,approval_id?}>",
+        "offered": "array",
+        "stage": "str|null",
+        "capacity": "object",
+        "as_of_event_id": "int",
+        "earliest_lease_expiry": "str|null",
+        "earliest_job_deadline": "str|null",
+        "jobs_due": "array<str>",
+        "counts": "object",
+        "revision": "int"
+      },
+      "note": "The dispatch plan: a pure query, a function of the store as of an event id, the instant, the limit lines and the caller's limit. It writes nothing and settles nothing; what time has decided is settled by gx_task_claim, gx_task_submit and gx_run_resume. Each legal task names the brief to read, the bundle to return, the acceptance rule it will be judged by, the attempt it is on, and the model and effort the agent policy assigns to its task class; model may differ between rows. Tasks sharing a parallel_group may be handed out together. A review task names the authoring task it must be independent of. Rows come in the plan's order: rank is a row's place, reason names the components of the order that placed it, and ready_seq is the event at which the task became READY; a task that later arrivals have been claimed ahead of run_budget.max_overtakes times goes first. expected_attempt is the attempts the task had started when the plan was made, which a claim of the row sends back. lease_seconds is the lease a claim of the row asks for: for an execute_path row it is the task's own lease plus, for each planned step, the step's reviewed time limit, the settle grace and, for a GPU step, the queue wait; it is null where the task default applies. capacity is {slots, in_flight, max_parallel}, slots = max(0, min(max_parallel_workers, the caller's limit) - in_flight - offered); in_flight counts a task whose lease is unexpired at the plan's instant, or held open by a job submitted under it that is inside its own deadline. offered lists the tasks of an open hand-out that are still READY: they are taken, for every caller alike. blocked lists what is not handed out, each with a code of contracts/errors.json and a reason; the row of a held task also carries approval_id, the approval it waits on. Two reasons are fixed words: settlement_due, a task whose lease lapsed before the plan's instant and is not settled yet, which the next claim, submit or resume settles; and pin, every row when the run's pins no longer match what is installed, with code CONTENT_HASH_MISMATCH. stage names the open stage, or null. as_of_event_id is the store's last event the plan was computed from and identifies the plan; a claim sends it back. earliest_lease_expiry is the earliest expiry among the run's live task leases, null when none is live. earliest_job_deadline is the earliest deadline among the run's open jobs that are still inside it, null when there is none. jobs_due lists the open jobs past their own deadline at the plan's instant, which the next claim, submit or resume reconciles. A waiting coordinator waits until the earlier of earliest_lease_expiry and earliest_job_deadline. revision is the run's write-concurrency number and does not version the plan. counts gives the tasks READY, listed, blocked and blocked-and-listed ({ready, listed, blocked, blocked_listed}).",
+      "errors": [
+        "SCOPE_DENIED",
+        "ARTIFACT_NOT_FOUND",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH"
+      ]
+    },
+    "gx_model_activity": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "input": {
+        "task_id": "str"
+      },
+      "output": {
+        "run_id": "str",
+        "task_id": "str",
+        "status": "str",
+        "operation_id": "str",
+        "artifact_ref": "str|null",
+        "context_ref": "str|null",
+        "response_ref": "str|null"
+      },
+      "note": "Run or recover the project-pinned evidence assessment or decision for your acquired task using the frozen input originals. A completed artifact_ref is a task-scoped manifest_ref for gx_task_finish. When pending, call again on the same task. An unknown provider outcome requires reconciliation.",
+      "errors": [
+        "ARTIFACT_HASH_MISMATCH",
+        "ARTIFACT_NOT_FOUND",
+        "BUDGET_EXCEEDED",
+        "IDEMPOTENCY_CONFLICT",
+        "LEASE_EXPIRED",
+        "MODEL_POLICY_VIOLATION",
+        "SCHEMA_INVALID",
+        "SCOPE_DENIED",
+        "STALE_PLAN",
+        "STORE_UNAVAILABLE"
+      ]
+    },
+    "gx_task_acquire": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "input": {
+        "task_id": "str"
+      },
+      "output": {
+        "task_id": "str",
+        "run_id": "str",
+        "attempt": "int",
+        "lease_ref": "str",
+        "brief_ref": "str|null",
+        "brief_sha256": "str|null",
+        "eligible": "bool",
+        "operation_id": "str",
+        "expires_at": "str",
+        "assignment_generation": "int",
+        "dispatch_operation_id": "str|null",
+        "replayed": "bool"
+      },
+      "note": "Acquire the assigned task and bind its current attempt to the observed worker. Repeating a lost response recovers the same lease and reports current eligibility.",
+      "errors": [
+        "APPROVAL_REQUIRED",
+        "CONCURRENT_RUN",
+        "CONTENT_HASH_MISMATCH",
+        "DEPENDENCY_UNMET",
+        "HOLD_ACTIVE",
+        "IDEMPOTENCY_CONFLICT",
+        "ILLEGAL_TRANSITION",
+        "INDEPENDENCE_REQUIRED",
+        "LEASE_EXPIRED",
+        "LEASE_HELD",
+        "MODEL_POLICY_VIOLATION",
+        "PHASE_DENIED",
+        "SCHEMA_INVALID",
+        "SCOPE_DENIED",
+        "STALE_PLAN",
+        "STALE_REVISION"
+      ]
+    },
+    "gx_task_claim": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "requires_attempt": true,
+      "input": {
+        "task_id": "str",
+        "worker_role": "str",
+        "expected_attempt": "int",
+        "as_of_event_id": "int?",
+        "lease_seconds": "int?"
+      },
+      "output": {
+        "lease_ref": "str",
+        "expires_at": "str",
+        "task": "object",
+        "attempt": "int",
+        "brief_ref": "str|null",
+        "brief_sha256": "str|null",
+        "revision": "int"
+      },
+      "backend_checks": [
+        "the contract, workflow definition and agent policy installed now have the sha256 the run pinned",
+        "the task's attempt equals expected_attempt, and no stage move, pause or cancel of the run is newer than as_of_event_id",
+        "dependencies ACCEPTED",
+        "no unexpired lease",
+        "worker_role is the task's role, from the one role vocabulary",
+        "attempts remaining",
+        "a worker slot is free and not owed to an overdue task ranked ahead",
+        "no model_switch or worker_refusal approval of the run is pending, and no approval about the task or its path",
+        "for a review task: the claimant is not the principal, the lease or the observed agent of any task it must be independent of, the agent being the one the host observed for this claim call; on a strict host a review claim with no host tie is refused",
+        "the brief compiles before the lease is issued"
+      ],
+      "note": "A REJECTED task and a task whose lease lapsed are claimed again as the next attempt, with the brief recompiled to carry what was refused and why. v1 answered both with ILLEGAL_TRANSITION while its own error text said to claim again. The precondition is scoped to the task: expected_attempt is the plan row's value and as_of_event_id the plan's. A claim made on a plan the task or the run has moved past answers STALE_PLAN; one refused because the slots are full or owed answers CONCURRENT_RUN; one withheld for a pending approval answers APPROVAL_REQUIRED; one made while the run's pins no longer match what is installed answers CONTENT_HASH_MISMATCH. Each leaves the task READY for the next plan. The run revision is not compared; revision is the run's write-concurrency number as the claim left it.",
+      "records": [
+        "the lazy path, before anything else: the run's jobs reconciled, lapsed leases, refused submissions, decided holds and finished dependencies settled, and the run's outbox rows consumed; a READY task whose brief does not compile is compiled again, at most once per move of the run's max event id since its last failed compile, each failure recorded as task.dispatch_failed {source: ready_compile, reason}",
+        "task.dispatch_failed {source: claim_compile | claim_refused, reason} when the claim fails for a reason of the task itself; a refusal that concerns the run or the claimant counts against no task"
+      ],
+      "errors": [
+        "DEPENDENCY_UNMET",
+        "LEASE_HELD",
+        "SCOPE_DENIED",
+        "HOLD_ACTIVE",
+        "INDEPENDENCE_REQUIRED",
+        "ILLEGAL_TRANSITION",
+        "SCHEMA_INVALID",
+        "CONCURRENT_RUN",
+        "APPROVAL_REQUIRED",
+        "STALE_PLAN",
+        "CONTENT_HASH_MISMATCH"
+      ]
+    },
+    "gx_task_bind": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "lease_ref": "str",
+        "host": "str",
+        "agent_ref": "str?",
+        "host_session_ref": "str?",
+        "model": "str?",
+        "effort": "str?",
+        "delegation_mode": "str?",
+        "evidence_level": "str",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "bound": true,
+        "worker_observation_id": "str",
+        "observed": "object",
+        "policy_verdict": "str",
+        "task_id": "str",
+        "run_id": "str",
+        "required": "object|null",
+        "reasons": "array",
+        "note": "str",
+        "replayed": "bool?"
+      },
+      "backend_checks": [
+        "lease unexpired",
+        "the reported evidence level is one a client may report",
+        "where the host adapter can read a record the host wrote, the worker and its model are observed rather than taken from the request",
+        "model and effort against what the agent policy the run pinned requires of the task's class",
+        "a refused bind becomes a hold in one transaction: the lease released, the task BLOCKED with hold reason model_policy, no attempt consumed, a worker_refusal approval bound to the task, its brief sha256 and its attempt, and the run WAITING_APPROVAL",
+        "codex_native_events_v1: use trusted NativeCall and backend thread/lease mapping; never self-reported fields or private Host readers"
+      ],
+      "note": "Records a correlation with its evidence level. This is not identity authentication. A worker outside what its task requires is refused here, before it does the work, and the refusal is a hold: the task waits for a person's decision on a worker_refusal approval, and is never re-queued as a plain next attempt. policy_verdict is a value of the model_policy_verdict axis. task_id and run_id say what the lease is for. required is what the agent policy requires of this task's worker ({model, allowed_efforts, basis}), null where no policy applies; reasons says why the verdict is what it is; note says what a bind is. replayed is present, and true, only on an answer replayed for an idempotency key already used.",
+      "refusal_records": {
+        "MODEL_POLICY_VIOLATION": "the observation of the worker that was turned away, the event task.bind_refused, and the hold: the lease released, the task BLOCKED, the worker_refusal approval requested and the run WAITING_APPROVAL"
+      },
+      "errors": [
+        "LEASE_EXPIRED",
+        "SCHEMA_INVALID",
+        "MODEL_POLICY_VIOLATION",
+        "IDEMPOTENCY_CONFLICT"
+      ]
+    },
+    "gx_task_finish": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "input": {
+        "task_id": "str",
+        "manifest_ref": "str",
+        "summary": "str?"
+      },
+      "output": {
+        "run_id": "str",
+        "task_id": "str",
+        "submission_id": "str",
+        "attempt": "int",
+        "manifest_ref": "str",
+        "artifact_refs": "array",
+        "delivery_status": "str",
+        "structure_status": "str",
+        "scientific_status": "str",
+        "operation_id": "str",
+        "replayed": "bool"
+      },
+      "note": "Submit a prepared sha256: delivery manifest or one published artifact for this attempt. GX returns a durable submission receipt with separate delivery, structure and scientific review states.",
+      "errors": [
+        "ARTIFACT_HASH_MISMATCH",
+        "ARTIFACT_NOT_FOUND",
+        "CONTENT_HASH_MISMATCH",
+        "IDEMPOTENCY_CONFLICT",
+        "ILLEGAL_TRANSITION",
+        "INDEPENDENCE_REQUIRED",
+        "LEASE_EXPIRED",
+        "MODEL_POLICY_VIOLATION",
+        "OUTCOME_UNKNOWN",
+        "PATH_TRAVERSAL_DENIED",
+        "PHASE_DENIED",
+        "SCHEMA_INVALID",
+        "SCOPE_DENIED",
+        "STALE_PLAN"
+      ]
+    },
+    "gx_task_submit": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "task_id": "str",
+        "lease_ref": "str",
+        "artifact_refs": "array",
+        "summary": "str?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "task_status": "SUBMITTED|VALIDATING|ACCEPTED|REJECTED|BLOCKED",
+        "submission_id": "str",
+        "validation": "object",
+        "ready": "array",
+        "revision": "int",
+        "records_ref": "str|null",
+        "run_id": "str",
+        "replayed": "bool?"
+      },
+      "backend_checks": [
+        "lease owner and expiry",
+        "the run has not ended: a hand-in to a run that has ended is refused PHASE_DENIED",
+        "each artifact is published and its bytes re-hash",
+        "the bundle validates record by record against contracts/bundles.json and what the backend holds",
+        "the task's acceptance rule",
+        "the submitting worker's model against the agent policy",
+        "a review task that a person claims and hands in under operator scope, with the terminal confirmation, is recorded at independence HUMAN"
+      ],
+      "note": "Stores and validates a deliverable. A worker's submission never declares scientific success; the reaction to its acceptance may then record outcomes - an evaluation, a path's outcome, an episode - as backend decisions. The answer lists every record's verdict; accepted records are kept when others are refused. ready is the plan computed after the acceptance's reaction, in the rows of gx_next_actions: overdue tasks first, then the tasks this acceptance released, then earlier-released tasks by rank, cut to the slots free at that instant. It is computed after every submit, fresh or replayed, and is never part of the stored answer. records_ref names the artifact that holds every record's verdict, null for a held submission; run_id the run the task belongs to; replayed is present, and true, only on an answer replayed for an idempotency key already used. A submission refused for a reason that cannot change within the lease (PHASE_DENIED, INDEPENDENCE_REQUIRED) releases the lease without consuming an attempt.",
+      "records": [
+        "the lazy path, before anything else: the run's jobs reconciled, lapsed leases, refused submissions, decided holds and finished dependencies settled, and the run's outbox rows consumed; a READY task whose brief does not compile is compiled again, at most once per move of the run's max event id since its last failed compile, each failure recorded as task.dispatch_failed {source: ready_compile, reason}",
+        "the reaction to the acceptance it made: the expansions keyed by that acceptance and the outcomes it decides"
+      ],
+      "refusal_records": {
+        "PHASE_DENIED": "the lease released with no attempt consumed, and task.dispatch_failed {source: submit_refused, reason}",
+        "INDEPENDENCE_REQUIRED": "the lease released with no attempt consumed, and task.dispatch_failed {source: submit_refused, reason}"
+      },
+      "errors": [
+        "LEASE_EXPIRED",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "SCHEMA_INVALID",
+        "IDEMPOTENCY_CONFLICT",
+        "MODEL_POLICY_VIOLATION",
+        "INDEPENDENCE_REQUIRED",
+        "PHASE_DENIED",
+        "PATH_TRAVERSAL_DENIED"
+      ]
+    },
+    "gx_run_resume": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "interrupt_ref": "str",
+        "submission_refs": "array",
+        "coordinator_lease_ref": "str",
+        "expected_revision": "int",
+        "idempotency_key": "str?"
+      },
+      "output": {
+        "status": "str",
+        "revision": "int",
+        "interrupt_ref": "str|null",
+        "next_actions": "array",
+        "interrupt": "object|null",
+        "run_id": "str",
+        "waiting_for": "object?"
+      },
+      "backend_checks": [
+        "the caller holds the unexpired coordinator lease",
+        "the contract, workflow definition and agent policy installed now have the sha256 the run pinned, or the ones a GRANTED run_repin approval recorded for it",
+        "no other call is advancing the run",
+        "every precondition of the interrupt, re-validated; for a stage, its completion rule holds or the stage is quiescent, decided in the one transaction that checks expected_revision, makes the ACTIVE transition and clears the interrupt",
+        "no worker of an ACCEPTED submission of the stage's tasks in this round is outside the agent policy; an off-policy verdict found here requests the model_switch approval keyed by that submission and its content sha256"
+      ],
+      "note": "The backend re-validates preconditions and advances the graph. Arbitrary goto or approved flags are refused. A workflow definition that changed under an unchanged version is refused, naming both digests: v1 recorded the digest and never compared it, and resumed into a node that had been added. A stage is resumed when it is complete or quiescent; a resume of a stage that is neither, with nothing changed since its controller last ran, answers DEPENDENCY_UNMET with the stage's needs, and a second advance while one is in progress answers CONCURRENT_RUN. idempotency_key is optional: when it is given, the first answer under it is replayed. interrupt is the interrupt the run stopped at next ({kind, reason, tasks, required_artifacts, approval_ref, job_refs, payload}), or null; run_id the run. When a node raises after the resume has committed, the answer is ok with status ACTIVE, a warning that carries the node's code and message, and waiting_for {kind: idle, reason, continue_with}, the object gx_run_status answers; waiting_for is answered in no other case.",
+      "records": [
+        "the lazy path, before anything else: the run's jobs reconciled, lapsed leases, refused submissions, decided holds and finished dependencies settled, and the run's outbox rows consumed; a READY task whose brief does not compile is compiled again, at most once per move of the run's max event id since its last failed compile, each failure recorded as task.dispatch_failed {source: ready_compile, reason}"
+      ],
+      "refusal_records": {
+        "MODEL_POLICY_VIOLATION": "the model_switch approval it requests for the off-policy submission, keyed by that submission and its content sha256"
+      },
+      "errors": [
+        "STALE_REVISION",
+        "DEPENDENCY_UNMET",
+        "APPROVAL_REQUIRED",
+        "ILLEGAL_TRANSITION",
+        "HOLD_ACTIVE",
+        "MODEL_POLICY_VIOLATION",
+        "LEASE_EXPIRED",
+        "VERSION_IMMUTABLE",
+        "CONTENT_HASH_MISMATCH",
+        "IDEMPOTENCY_CONFLICT",
+        "CONCURRENT_RUN"
+      ]
+    },
+    "gx_plan_submit": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "bundle_ref": "str?",
+        "paths": "array<PathSpec>?",
+        "coordinator_lease_ref": "str",
+        "expected_revision": "int",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "accepted": "array<{index,path_id,identity,relationship,reservation_ref}>",
+        "rejected": "array<{index,code,message}>",
+        "revision": "int"
+      },
+      "backend_checks": [
+        "run is in a plannable state",
+        "PathSpec schema",
+        "every capability version is ACTIVE or a declared gap",
+        "method identity from method cards",
+        "distinctness from identities and the backend's equivalence table",
+        "input manifest resolves and re-hashes",
+        "eval spec exists and is FROZEN or in the builder",
+        "a branch carries its parent's eval_spec_ref@sha256, or a bridge version of it under a GRANTED eval_spec_change approval (states.json path.rules.branch)",
+        "a prediction fits its specification",
+        "a path at reduced scale carries scope_reduction and is recorded as a branch",
+        "supporting evidence is REVIEWED and not withdrawn",
+        "cited skills are ACTIVE at that sha256",
+        "resource estimate basis resolves",
+        "budget checked at acceptance and funded at the selection wave: a path that fails only that check is kept VALIDATED and unfunded, with its checked estimate and the refusal reason",
+        "fingerprint is new or the path cites evidence created after its parent"
+      ],
+      "note": "Validates and persists candidate paths. It never writes workflow engine state directly. The backend returns the identity and independence it computed, so a planner sees that two of its paths are one family as a fact to plan around. Funding is decided at the selection wave: a path accepted unfunded answers reservation_ref null, and each wave funds candidates in cut order.",
+      "errors": [
+        "STALE_REVISION",
+        "SCHEMA_INVALID",
+        "BUDGET_EXCEEDED",
+        "CAPABILITY_NOT_APPROVED",
+        "PHASE_DENIED",
+        "HOLD_ACTIVE",
+        "ARTIFACT_NOT_FOUND",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "PATH_TRAVERSAL_DENIED"
+      ]
+    },
+    "gx_artifact_put": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "task_id": "str?",
+        "kind": "str",
+        "media_type": "str",
+        "content": "str?",
+        "inbox_path": "str?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "artifact_ref": "str",
+        "sha256": "str",
+        "bytes": "int",
+        "kind": "str",
+        "media_type": "str",
+        "origin": "str",
+        "deduplicated": "bool"
+      },
+      "backend_checks": [
+        "exactly one of content and inbox_path",
+        "inbox_path stays inside the run's inbox directory",
+        "size limits",
+        "content that matches a credential pattern of config/limits.json is refused, naming the pattern and never the match",
+        "staging, hash and atomic publish"
+      ],
+      "note": "How a host hands content to the backend. Content it publishes is a claim until a validator has judged it. v1 had no such tool, so no host could ever satisfy a task's required artifact. media_type is the one given; origin is the labels.artifact_origin recorded, HOST_PUT; deduplicated says the same bytes were already published at that place, so the existing artifact is answered and nothing new is stored.",
+      "errors": [
+        "SCHEMA_INVALID",
+        "PATH_TRAVERSAL_DENIED",
+        "SCOPE_DENIED",
+        "IDEMPOTENCY_CONFLICT",
+        "PHASE_DENIED",
+        "POLICY_SCREEN_BLOCKED"
+      ]
+    },
+    "gx_artifact_get": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "artifact_ref": "str",
+        "section": "str?",
+        "limit": "int?",
+        "offset": "int?"
+      },
+      "output": {
+        "metadata": "object",
+        "content": "str|null",
+        "truncated": "bool",
+        "sha256": "str"
+      },
+      "note": "Bounded content by reference only. Arbitrary filesystem paths are refused.",
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "PATH_TRAVERSAL_DENIED",
+        "ARTIFACT_HASH_MISMATCH",
+        "SCOPE_DENIED"
+      ]
+    },
+    "gx_bundle_check": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "artifact_ref": "str",
+        "bundle_kind": "str",
+        "task_id": "str?",
+        "lease_ref": "str?"
+      },
+      "output": {
+        "bundle_kind": "str",
+        "would_accept": "bool",
+        "records": "array<{index,ok,code,message,detail}>",
+        "records_ref": "str|null",
+        "accepted_count": "int",
+        "rejected_count": "int",
+        "records_total": "int",
+        "summary": "str",
+        "run_id": "str|null"
+      },
+      "note": "Judges a bundle exactly as gx_task_submit would and changes nothing, except that when the full verdict does not fit the answer it is published as a content-addressed artifact named in records_ref, with that artifact's own artifact.published event (checking the same bundle again adds nothing), so a worker can correct records before it submits. accepted_count and rejected_count count the records judged, records_total counts them all when only some are listed, and summary is the validator's sentence; run_id is the run the artifact belongs to, null for one that belongs to none.",
+      "records": [
+        "the full verdict, as a content-addressed artifact with its own artifact.published event, when it does not fit the answer; checking the same bundle again adds nothing"
+      ],
+      "errors": [
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "PATH_TRAVERSAL_DENIED"
+      ]
+    },
+    "gx_capability_inspect": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "capability_id": "str?",
+        "filters": "object?",
+        "include": "array?",
+        "limit": "int?"
+      },
+      "output": {
+        "capabilities": "array<{capability_id,version,kind,status,env_id,method_card,resources,probe_rung,test_status,outputs,limitations}>",
+        "equivalences": "array"
+      },
+      "note": "Protocol discovery never establishes that weights or licensed executables are installed. test_status is derived from the highest probe rung with a job id behind it.",
+      "errors": [
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID"
+      ]
+    },
+    "gx_memory_search": {
+      "phase": "knowledge",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "query": "str",
+        "project_scope": "str",
+        "filters": "object?",
+        "limit": "int?"
+      },
+      "output": {
+        "results": "array<{doc_id,namespace,memory_class,outcome,title,score,snippet,source_refs,locators,channels}>",
+        "retrieval_mode": "str",
+        "channels": "array<{channel,status,reason}>",
+        "strategy_version": "str",
+        "searched_namespaces": "array",
+        "strategy_sha256": "str",
+        "query_id": "str|null",
+        "note": "str",
+        "reason": "str?"
+      },
+      "note": "Returns success, failure and uncertainty records, with the retrieval mode, the channels that contributed and the strategy version stated. Use gx_memory_read to read a matching record and gx_artifact_get to retrieve its registered product. strategy_sha256 is the sha256 of the strategy that ranked the hits; query_id names the recorded search, null when it was not recorded; note says what kind of retrieval this was and what a hit is not. reason is answered only when nothing was found, and says why.",
+      "errors": [
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID"
+      ]
+    },
+    "gx_memory_read": {
+      "phase": "knowledge",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "doc_id": "str",
+        "offset": "int?",
+        "limit": "int?"
+      },
+      "output": {
+        "doc_id": "str",
+        "title": "str",
+        "body": "str",
+        "truncated": "bool",
+        "content_sha256": "str",
+        "source_refs": "array",
+        "locators": "array",
+        "evidence_ids": "array",
+        "namespace": "str",
+        "memory_class": "str",
+        "outcome": "str|null",
+        "offset": "int",
+        "next_offset": "int|null",
+        "total_chars": "int",
+        "hash_verified": "bool"
+      },
+      "note": "The body of a retrieved document, re-hashed against its ingest record before it is served. namespace, memory_class and outcome say what the document is; offset, next_offset (null at the end) and total_chars page through its body; hash_verified is false when no sha256 was recorded when it was written, so the body could not be checked.",
+      "errors": [
+        "SCOPE_DENIED",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "GROUNDS_WITHDRAWN"
+      ]
+    },
+    "gx_skill_search": {
+      "phase": "knowledge",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "query": "str",
+        "project_scope": "str",
+        "limit": "int?"
+      },
+      "output": {
+        "skills": "array<{asset_id,version,sha256,title,applicability,out_of_scope,score}>",
+        "retrieval_mode": "str",
+        "strategy_version": "str"
+      },
+      "note": "Only ACTIVE decision skills. A path that follows one cites it by id, version and sha256.",
+      "errors": [
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID"
+      ]
+    },
+    "gx_skill_get": {
+      "phase": "knowledge",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "asset_id": "str",
+        "version": "str?"
+      },
+      "output": {
+        "asset_ref": "object",
+        "title": "str",
+        "document": "str",
+        "truncated": "bool",
+        "sources": "array",
+        "projection": "object|null"
+      },
+      "note": "Serves an ACTIVE skill at the sha256 that was reviewed and approved. projection says where its host files are, as gx_asset_status answers it.",
+      "errors": [
+        "SCOPE_DENIED",
+        "ARTIFACT_NOT_FOUND",
+        "GATE_NOT_MET",
+        "CONTENT_HASH_MISMATCH"
+      ]
+    },
+    "gx_literature_search": {
+      "phase": "knowledge",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "queries": "array",
+        "limit_per_source": "int?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "search_id": "str",
+        "results": "array<{candidate_id,title,identifiers,authors,year,source_api,open_access,license,retraction_flag}>",
+        "per_source": "array<{source_api,query,count,status,error}>",
+        "artifact_ref": "str",
+        "result_count": "int"
+      },
+      "backend_checks": [
+        "proxy variables set and the socket guard installed",
+        "one throttle per upstream host across every caller",
+        "budget",
+        "every query is screened before it leaves; a query matching a credential or outbound-only pattern of config/limits.json is sent nowhere",
+        "the raw response of each call is stored with its sha256"
+      ],
+      "note": "The backend runs the upstream calls and records the search itself, including the sources that failed and the queries that returned nothing. That record is what later backs a statement that the literature was searched and came back empty. result_count is the number of candidates found, all of them in the artifact when fewer are listed. A query the outbound screen refused is recorded with per-source status REFUSED, backs nothing and is kept nowhere.",
+      "errors": [
+        "PROXY_UNAVAILABLE",
+        "UPSTREAM_ERROR",
+        "BUDGET_EXCEEDED",
+        "SCHEMA_INVALID",
+        "HOLD_ACTIVE",
+        "SCOPE_DENIED",
+        "IDEMPOTENCY_CONFLICT",
+        "POLICY_SCREEN_BLOCKED"
+      ]
+    },
+    "gx_source_acquire": {
+      "phase": "knowledge",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "candidate_id": "str?",
+        "identifiers": "object?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "source_id": "str",
+        "status": "str",
+        "blob_sha256": "str|null",
+        "bytes": "int|null",
+        "media_type": "str|null",
+        "text_coverage": "str",
+        "segments": "int",
+        "license": "str|null",
+        "retraction_status": "str|null",
+        "deduplicated": "bool",
+        "title": "str|null",
+        "namespace": "str",
+        "indexed_units": "int",
+        "tier": "str|null",
+        "unavailable_reason": "str?"
+      },
+      "backend_checks": [
+        "proxy",
+        "an identifier is screened before it leaves; one matching a credential or outbound-only pattern of config/limits.json is sent nowhere",
+        "public address, HTTPS, redirect and size limits",
+        "deduplication by strong identifier, then by content sha256",
+        "retraction read from the upstream record",
+        "coverage computed from the parse"
+      ],
+      "note": "Downloads a source, stores its bytes, parses addressable segments and computes its coverage. No agent is involved. namespace is where the source is held, indexed_units how many of its units the retrieval index holds, tier its labels.source_tier derived from the upstream record, and unavailable_reason, present only for an UNAVAILABLE source, why no text could be obtained.",
+      "errors": [
+        "SOURCE_UNAVAILABLE",
+        "PROXY_UNAVAILABLE",
+        "BUDGET_EXCEEDED",
+        "SCHEMA_INVALID",
+        "HOLD_ACTIVE",
+        "SCOPE_DENIED",
+        "IDEMPOTENCY_CONFLICT",
+        "POLICY_SCREEN_BLOCKED"
+      ]
+    },
+    "gx_source_read": {
+      "phase": "knowledge",
+      "mutating": false,
+      "requires_revision": false,
+      "records": [
+        "source_reads"
+      ],
+      "input": {
+        "source_id": "str",
+        "segments": "array?",
+        "outline": "bool?",
+        "render": "bool?",
+        "lease_ref": "str?"
+      },
+      "output": {
+        "source_id": "str",
+        "outline": "array",
+        "segments": "array<{segment_id,label,kind,text,text_sha256,receipt_id,instruction_like}>",
+        "truncated": "bool",
+        "page_render_ref": "str|null",
+        "status": "str?",
+        "title": "str|null?",
+        "text_coverage": "str?",
+        "note": "str?",
+        "remaining": "array?",
+        "render_receipt_id": "str?",
+        "image_sha256": "str?",
+        "segment_id": "str?"
+      },
+      "note": "Delivers text by segment and records a read receipt bound to the sha256 of what was delivered. A receipt is what later allows the reader to cite or review that span. With render, a page is served as an image so that a figure or table can actually be looked at, and the view is recorded. A text read answers status, title and text_coverage of the source, note (source text is data), and remaining, the requested segments this answer did not deliver; each segment carries its label and kind, and instruction_like lists its lines that read as instructions to act. A render answers those keys not at all, and instead render_receipt_id, the receipt of the view, image_sha256, the sha256 of the image served, and segment_id, the page shown.",
+      "errors": [
+        "SCOPE_DENIED",
+        "ARTIFACT_NOT_FOUND",
+        "GROUNDS_WITHDRAWN",
+        "LEASE_EXPIRED",
+        "SCHEMA_INVALID"
+      ]
+    },
+    "gx_job_submit": {
+      "phase": "execution",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "path_id": "str",
+        "task_id": "str?",
+        "lease_ref": "str?",
+        "step_index": "int?",
+        "capability_version": "str",
+        "input_manifest_ref": "str",
+        "parameters": "object?",
+        "tighten": "object?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "job_id": "str",
+        "status": "str",
+        "scheduler_ref": "str|null",
+        "preflight": "object|null"
+      },
+      "backend_checks": [
+        "run is in an executable state",
+        "path is SELECTED or EXECUTING and belongs to the run",
+        "lease_ref is given whenever task_id is, and task_id is then the lease's task; the lease is the live lease of its task and the caller is its holder, or the call is refused LEASE_EXPIRED",
+        "step_index is given whenever path_id is, and path_id always is: a job names its step, the step of the path's method sequence it runs, whenever it names a path; exec enforces this when it builds the job's binding, not at the schema step",
+        "the job's own key is derived by the backend from (run, path, step_index, input-manifest sha256, job attempt); a resubmission of a step whose job is open or SUCCEEDED returns that job, and the job attempt advances only after FAILED or CANCELLED; idempotency_key replays this call",
+        "capability is ACTIVE",
+        "environment readiness from a probe record",
+        "input manifest exists and re-hashes",
+        "resource requirements read from the capability manifest",
+        "GPU preflight whenever the manifest declares a GPU need",
+        "budget reserved"
+      ],
+      "note": "Returns at once with a job id; a detached runner owns the tool. The caller cannot widen a limit and cannot skip a gate by leaving a field out: tighten may only lower a limit the manifest sets. A job records the lease it was submitted under and the step it runs. The caller's idempotency_key is the call's replay key: a call whose key was already used in the run returns that job, or IDEMPOTENCY_CONFLICT for a different request. The backend derives the job key from the run, the path, the step, the input manifest and the job attempt. A resubmission of a step whose job is open or succeeded returns that job; the attempt advances only after FAILED or CANCELLED. A job whose tool never started is charged nothing, whoever refused it, and its hold is released; the wait is counted per path. A task lease does not lapse while a non-terminal job submitted under it exists.",
+      "errors": [
+        "CAPABILITY_NOT_APPROVED",
+        "ENV_NOT_READY",
+        "BUDGET_EXCEEDED",
+        "APPROVAL_REQUIRED",
+        "RESOURCE_DENIED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "PHASE_DENIED",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "SCHEMA_INVALID",
+        "OUTCOME_UNKNOWN",
+        "LEASE_EXPIRED",
+        "PATH_TRAVERSAL_DENIED"
+      ]
+    },
+    "gx_job_status": {
+      "phase": "execution",
+      "mutating": false,
+      "requires_revision": false,
+      "records": [
+        "jobs",
+        "the adoption of a job submitted under an earlier lease: a job.adopted event and jobs.lease_ref"
+      ],
+      "input": {
+        "job_id": "str"
+      },
+      "output": {
+        "status": "str",
+        "stale": "bool",
+        "scheduler_ref": "str|null",
+        "observed_at": "str",
+        "exit_code": "int|null",
+        "measured": "object",
+        "artifact_refs": "array",
+        "job_id": "str",
+        "terminal": "bool",
+        "outputs": "array",
+        "failure": "object|null"
+      },
+      "note": "Reconciles against the runner's own record before it answers and marks stale or unknown rather than guessing. terminal says whether the job's state is final; outputs lists what the job published, each with its artifact_ref; failure, null unless the job failed, is what the backend observed: {observed, failure_class, summary, ...}. A call by the holder of the live lease of the job's task adopts a job submitted under an earlier lease (event job.adopted; jobs.lease_ref moves to that lease).",
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "OUTCOME_UNKNOWN",
+        "SCOPE_DENIED"
+      ]
+    },
+    "gx_job_wait": {
+      "phase": "execution",
+      "mutating": false,
+      "requires_revision": false,
+      "records": [
+        "jobs",
+        "the adoption of a job submitted under an earlier lease: a job.adopted event and jobs.lease_ref"
+      ],
+      "input": {
+        "job_id": "str",
+        "timeout_seconds": "int?"
+      },
+      "output": {
+        "status": "str",
+        "terminal": "bool",
+        "waited_seconds": "num",
+        "exit_code": "int|null",
+        "measured": "object",
+        "artifact_refs": "array",
+        "job_id": "str",
+        "outputs": "array",
+        "failure": "object|null",
+        "stale": "bool",
+        "scheduler_ref": "str|null",
+        "observed_at": "str"
+      },
+      "note": "A bounded wait, at most sixty seconds, so that a host neither holds a tool call open for the length of a job nor polls in a loop. stale, scheduler_ref, observed_at, outputs and failure are as gx_job_status answers them. A call by the holder of the live lease of the job's task adopts a job submitted under an earlier lease (event job.adopted; jobs.lease_ref moves to that lease).",
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID"
+      ]
+    },
+    "gx_job_cancel": {
+      "phase": "execution",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "job_id": "str",
+        "reason": "str",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "status": "CANCEL_REQUESTED|CANCELLED|SUCCEEDED|FAILED",
+        "note": "str"
+      },
+      "note": "A cancel request is not a cancellation. Repeating the same cancel must not produce a second external cancel call, hence the idempotency key. A job that had already finished answers the terminal state it reached; CANCELLED is never answered for a job nobody cancelled.",
+      "errors": [
+        "PERMISSION_DENIED",
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED"
+      ]
+    },
+    "gx_eval_run": {
+      "phase": "execution",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "eval_spec_version": "str",
+        "artifact_refs": "array",
+        "run_id": "str?",
+        "path_id": "str?",
+        "purpose": "str?",
+        "dataset_record": "str?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "eval_id": "str",
+        "layer": "int",
+        "verdict": "str",
+        "metrics": "object",
+        "provenance": "object"
+      },
+      "backend_checks": [
+        "the specification is FROZEN and its sha256 still matches",
+        "artifacts are published and re-hash",
+        "a held-out record is read only through the counted ledger"
+      ],
+      "note": "Runs a frozen evaluator version. Metrics carry source, applicable conditions, direction, units, controls and limitations.",
+      "errors": [
+        "EVALUATOR_INVALID",
+        "EVAL_SPEC_NOT_FROZEN",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "SCHEMA_INVALID",
+        "HELDOUT_LOOK_DENIED",
+        "IMPLEMENTATION_GAP",
+        "SCOPE_DENIED",
+        "PATH_TRAVERSAL_DENIED"
+      ]
+    },
+    "gx_experience_submit": {
+      "phase": "execution",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "path_id": "str?",
+        "outcome": "str",
+        "failure_class": "str?",
+        "fingerprint": "str",
+        "evidence_refs": "array",
+        "root_cause_hypothesis": "str?",
+        "chosen_recovery": "object?",
+        "cost": "object?",
+        "skill_refs": "array?",
+        "proposed_scope": "str",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "episode_id": "str",
+        "promotion_status": "CANDIDATE",
+        "indexed": "bool"
+      },
+      "note": "Writes a candidate episode and indexes it, so that a later run can retrieve the failure. It can never overwrite a global rule; promotion needs cross-task review. Every outcome other than RETAINED names its failure class.",
+      "errors": [
+        "SCHEMA_INVALID",
+        "SCOPE_DENIED",
+        "IDEMPOTENCY_CONFLICT"
+      ]
+    },
+    "gx_asset_submit": {
+      "phase": "governance",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "kind": "str",
+        "bundle_ref": "str",
+        "run_id": "str?",
+        "task_id": "str?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "asset_ref": "object",
+        "status": "str",
+        "queued_checks": "array"
+      },
+      "note": "Registers a candidate skill, workflow, adapter, evaluator or strategy from a bundle. A benchmark is not registered here: gx_ingest (source_kind rsi_benchmark) registers it, and a submission of kind BENCHMARK is refused SCHEMA_INVALID. The candidate is not callable. The backend then runs the checks its kind requires; nothing in the bundle reports a result.",
+      "errors": [
+        "SCHEMA_INVALID",
+        "VERSION_IMMUTABLE",
+        "SCOPE_DENIED",
+        "IDEMPOTENCY_CONFLICT",
+        "ARTIFACT_NOT_FOUND",
+        "PATH_TRAVERSAL_DENIED"
+      ]
+    },
+    "gx_asset_status": {
+      "phase": "governance",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "asset_id": "str",
+        "version": "str?",
+        "kind": "str?"
+      },
+      "output": {
+        "asset_ref": "object",
+        "kind": "str",
+        "status": "str",
+        "checks": "array<{check_id,result,check_run_id,at}>",
+        "reviews": "array<{review_id,verdict,independence_level,at}>",
+        "approvals": "array<{approval_id,status,action_kind}>",
+        "missing": "object",
+        "next_state": "str|null",
+        "projection": "object|null"
+      },
+      "note": "What is on record for an asset's current sha256 and what its next transition still lacks. projection says where the asset's host files are: {where, limited, unverified, written, skipped}. where is a value of labels.projection_state; limited is true when an unestablished licence keeps the asset out of host folders, and unverified names what has no established licence; written lists the files written, each {host, path, sha256, installed}, and skipped the hosts left out, each {host, reason}. It is null for a kind that has no host projection.",
+      "errors": [
+        "SCOPE_DENIED",
+        "ARTIFACT_NOT_FOUND"
+      ]
+    },
+    "gx_rsi_propose": {
+      "phase": "governance",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "object_kind": "str",
+        "bundle_ref": "str",
+        "benchmark_ref": "str",
+        "rationale": "str",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "cycle_id": "str",
+        "status": "str",
+        "candidate_sha256": "str",
+        "checks": "object",
+        "development": "object",
+        "per_item_ref": "str|null"
+      },
+      "backend_checks": [
+        "every target lies inside the improvable scope",
+        "planted controls",
+        "incumbent and candidate run by the backend on the development split"
+      ],
+      "note": "Opens an improvement cycle and returns development results only. The final comparison is an operator action against a stored decision rule. checks is {asset, controls}: what the asset's own checks found and what the planted controls found.",
+      "errors": [
+        "PERMISSION_DENIED",
+        "SCHEMA_INVALID",
+        "SCOPE_DENIED",
+        "ARTIFACT_NOT_FOUND",
+        "IDEMPOTENCY_CONFLICT",
+        "GATE_NOT_MET",
+        "PATH_TRAVERSAL_DENIED"
+      ]
+    },
+    "gx_team_manage": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "action": "str",
+        "payload": "object",
+        "coordinator_lease_ref": "str?",
+        "expected_generation": "int?",
+        "expected_team_revision": "int?",
+        "expected_revision": "int",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "run_id": "str",
+        "team": "object",
+        "result": "object",
+        "revision": "int",
+        "event_id": "int",
+        "replayed": "bool"
+      },
+      "backend_checks": [
+        "project scope and active run",
+        "immutable request idempotency and run revision CAS",
+        "actual coordinator lease or backend-recorded generation-bound team grant",
+        "team tree no cycles and entire subtree depth <= frozen max_depth",
+        "same-run task and context",
+        "active membership and assignment",
+        "close only after descendants, tasks, leases, jobs, held task reservations and pending transfers settle",
+        "assignment transfer preserves task identity and existing worker lease"
+      ],
+      "note": "action is create, revise, reparent, transition, leader, grant, member, assign or handoff. payload is validated for that action by the backend; extra keys are refused. create: {intent,parent_team_id?,context_ref?}; revise: {team_id,intent,context_ref?}; reparent: {team_id,parent_team_id?}; transition: {team_id,status}; leader: {team_id,subject,lease_seconds}; grant: {team_id,subject,scopes,task_ids?}; member: {team_id,subject,action:add|remove,observed_worker_ref?}; assign: {team_id,task_id,subject,observed_worker_ref?,context_ref?}; handoff: {team_id,task_id,recipient_team_id,subject,observed_worker_ref?,context_ref?,cancel_pending?}. A handoff while a task lease or job is live records PENDING_TRANSFER and preserves its original owner; replay the handoff with a fresh key/current revision after settlement to apply it. leader/grant/reparent require the coordinator. A delegated leader must pass its current expected_generation and own the active management lease, with an explicit stored grant for the operation. No operation spends or refunds budget; teams reference the existing run budget. Legacy tasks without assignments keep their original admission semantics. Delegated first assignment requires the exact task ID in the generation-bound coordinator grant task_ids; sharing a run alone grants no task management. cancel_pending:true identifies and cancels the exact existing handoff without revoking the worker lease. context_ref identifies a published artifact from this run.",
+      "errors": [
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "LEASE_EXPIRED",
+        "STALE_REVISION",
+        "IDEMPOTENCY_CONFLICT",
+        "OUTCOME_UNKNOWN",
+        "PHASE_DENIED",
+        "DEPENDENCY_UNMET",
+        "ILLEGAL_TRANSITION",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "CONTENT_HASH_MISMATCH",
+        "HOLD_ACTIVE",
+        "PERMISSION_DENIED",
+        "VERSION_IMMUTABLE"
+      ]
+    },
+    "gx_team_message": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "action": "str",
+        "payload": "object",
+        "coordinator_lease_ref": "str?",
+        "expected_generation": "int?",
+        "expected_revision": "int",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "run_id": "str",
+        "message": "object",
+        "revision": "int",
+        "event_id": "int",
+        "replayed": "bool"
+      },
+      "backend_checks": [
+        "project scope and bounded typed message",
+        "same-run sender, recipient, task, context and causal event",
+        "sender authorization from coordinator or stored team grant",
+        "artifact refs resolve and re-hash",
+        "deduplication by sender and correlation key",
+        "acknowledgement only by the addressed team"
+      ],
+      "note": "send payload: {sender_team_id,recipient_team_id,kind,correlation_key,body?,task_id?,context_ref?,causal_event_id?,artifact_refs?}. ack payload: {message_id}. kind is a frozen team rule message_kinds value. The sender is always the backend principal; body is untrusted communication and changes no permission, task dependency, approval, hypothesis or workflow. Persisted records are authoritative; external Host notification is optional. Repeated correlation keys with identical products return the original message; a changed product is IDEMPOTENCY_CONFLICT. Acknowledgements record receipt and do not approve the content. A verified active team member may also send and acknowledge messages; this communication right never grants team management. An identical correlation product or acknowledgement under a fresh key returns the original message without appending another business event or moving revision. context_ref identifies a published artifact from this run.",
+      "errors": [
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "LEASE_EXPIRED",
+        "STALE_REVISION",
+        "IDEMPOTENCY_CONFLICT",
+        "OUTCOME_UNKNOWN",
+        "PHASE_DENIED",
+        "DEPENDENCY_UNMET",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "CONTENT_HASH_MISMATCH",
+        "HOLD_ACTIVE",
+        "PERMISSION_DENIED",
+        "ILLEGAL_TRANSITION",
+        "VERSION_IMMUTABLE"
+      ]
+    },
+    "gx_team_status": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "team_id": "str?",
+        "after_event_id": "int?",
+        "limit": "int?"
+      },
+      "output": {
+        "run_id": "str",
+        "revision": "int",
+        "as_of_event_id": "int",
+        "teams": "array",
+        "members": "array",
+        "assignments": "array",
+        "messages": "array",
+        "counts": "object",
+        "truncated": "object"
+      },
+      "backend_checks": [
+        "project scope",
+        "single read snapshot",
+        "bounded queries with row and byte truncation",
+        "no lease renewal, job reconciliation, event append or workflow advance"
+      ],
+      "note": "Reads the explicit team tree, leadership generations, immutable intent references, members, assignments, typed messages and acknowledgement counts. after_event_id filters messages by their durable team.message event cursor. counts names full row counts; truncated names omitted counts. Native agent trees and pool capacity remain the Host pool service's records.",
+      "errors": [
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND"
+      ]
+    },
+    "gx_hypothesis_create": {
+      "phase": "planning",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "expected_revision": "int",
+        "coordinator_lease_ref": "str",
+        "idempotency_key": "str",
+        "document": "object"
+      },
+      "output": {
+        "hypothesis": "object",
+        "revision": "int"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "GROUNDS_WITHDRAWN",
+        "GATE_NOT_MET",
+        "EVAL_SPEC_NOT_FROZEN",
+        "EVALUATOR_INVALID",
+        "INDEPENDENCE_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "VERSION_IMMUTABLE"
+      ],
+      "note": "Creates only revision 1. Subsequent revisions require an independently reviewed update proposal; method and parameter branches remain paths."
+    },
+    "gx_hypothesis_get": {
+      "phase": "planning",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "hypothesis_ref": "str?",
+        "limit": "int?",
+        "offset": "int?",
+        "max_characters": "int?"
+      },
+      "output": {
+        "hypotheses": "array",
+        "truncated": "int",
+        "page": "object?"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED"
+      ],
+      "note": " Pure bounded read: responses over 12KB use page={content_json,offset,next_offset,total_characters,sha256}; offsets count characters of canonical JSON. No spill artifact is written."
+    },
+    "gx_research_context_create": {
+      "phase": "planning",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "expected_revision": "int",
+        "coordinator_lease_ref": "str",
+        "idempotency_key": "str",
+        "evidence_refs": "array<str>?",
+        "path_ids": "array<str>?",
+        "eval_spec_refs": "array<str>?",
+        "asset_refs": "array<object>?",
+        "round_index": "int?",
+        "expected_context_ref": "str?"
+      },
+      "output": {
+        "context": "object",
+        "revision": "int"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "GROUNDS_WITHDRAWN",
+        "GATE_NOT_MET",
+        "EVAL_SPEC_NOT_FROZEN",
+        "EVALUATOR_INVALID",
+        "INDEPENDENCE_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "VERSION_IMMUTABLE"
+      ],
+      "note": "Backend snapshots objective, exact hypothesis heads, reviewed evidence and withdrawal status, pinned assets/workflow, inputs, frozen evaluations, budget, round and event cursor. Explicit predecessor CAS; no old run re-pin."
+    },
+    "gx_research_context_get": {
+      "phase": "planning",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "context_ref": "str?",
+        "offset": "int?",
+        "max_characters": "int?"
+      },
+      "output": {
+        "context": "object|null",
+        "page": "object?"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED"
+      ],
+      "note": " Pure bounded read: responses over 12KB use page={content_json,offset,next_offset,total_characters,sha256}; offsets count characters of canonical JSON. No spill artifact is written."
+    },
+    "gx_research_round_open": {
+      "phase": "planning",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "expected_revision": "int",
+        "coordinator_lease_ref": "str",
+        "idempotency_key": "str",
+        "context_ref": "str",
+        "expected_results": "array<object>"
+      },
+      "output": {
+        "round": "object",
+        "revision": "int"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "GROUNDS_WITHDRAWN",
+        "GATE_NOT_MET",
+        "EVAL_SPEC_NOT_FROZEN",
+        "EVALUATOR_INVALID",
+        "INDEPENDENCE_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "VERSION_IMMUTABLE"
+      ],
+      "note": "Expected results {result_key,path_id?,task_id?,evidence_refs?} are immutable. At least one stored path/task/evidence target per item. Exact hypothesis/context scope is backend-validated. First execution of all NEW targets must follow registration in every round. carry_forward:true permits only previous round targets and records all baseline evaluation IDs explicitly. All context paths are required exactly once; round_open reserves synthesis/review funds before head execution."
+    },
+    "gx_research_round_seal": {
+      "phase": "planning",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "expected_revision": "int",
+        "coordinator_lease_ref": "str",
+        "idempotency_key": "str",
+        "round_id": "str"
+      },
+      "output": {
+        "round": "object",
+        "task_ids": "array",
+        "revision": "int"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "GROUNDS_WITHDRAWN",
+        "GATE_NOT_MET",
+        "EVAL_SPEC_NOT_FROZEN",
+        "EVALUATOR_INVALID",
+        "INDEPENDENCE_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "VERSION_IMMUTABLE"
+      ],
+      "note": "Backend fixes every observed candidate evaluation for each expected path, task/job status, evidence and missing entries. Existing expansion reserves synthesis and independent review tasks together. Later evaluations belong to a later round."
+    },
+    "gx_research_round_get": {
+      "phase": "planning",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "round_id": "str",
+        "offset": "int?",
+        "max_characters": "int?"
+      },
+      "output": {
+        "round": "object",
+        "proposals": "array",
+        "truncated": "int",
+        "page": "object?"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED"
+      ],
+      "note": " Pure bounded read: responses over 12KB use page={content_json,offset,next_offset,total_characters,sha256}; offsets count characters of canonical JSON. No spill artifact is written."
+    },
+    "gx_hypothesis_update_propose": {
+      "phase": "planning",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "round_id": "str",
+        "lease_ref": "str",
+        "bundle": "object",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "proposal": "object"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "GROUNDS_WITHDRAWN",
+        "GATE_NOT_MET",
+        "EVAL_SPEC_NOT_FROZEN",
+        "EVALUATOR_INVALID",
+        "INDEPENDENCE_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "VERSION_IMMUTABLE"
+      ],
+      "note": "Lease must belong to this round synthesis task. Bundle {context_ref,context_sha256,sealed_sha256,results,updates,next_tasks,interpretation,limitations}; results cover the full immutable result set. Evidence/evaluation refs are real stored records; no scientific judgment is synthesized by an LLM in the backend."
+    },
+    "gx_hypothesis_update_review": {
+      "phase": "planning",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "proposal_id": "str",
+        "lease_ref": "str",
+        "proposal_sha256": "str",
+        "verdict": "str",
+        "note": "str",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "review": "object"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "GROUNDS_WITHDRAWN",
+        "GATE_NOT_MET",
+        "EVAL_SPEC_NOT_FROZEN",
+        "EVALUATOR_INVALID",
+        "INDEPENDENCE_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "VERSION_IMMUTABLE"
+      ],
+      "note": "APPROVE/REJECT under the round independent-review task lease. Recomputes peer independence against synthesis author and all contributing task/lease principals from host observations. Client identity/role assertions do not count."
+    },
+    "gx_hypothesis_update_commit": {
+      "phase": "planning",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "expected_revision": "int",
+        "coordinator_lease_ref": "str",
+        "idempotency_key": "str",
+        "proposal_id": "str",
+        "review_id": "str"
+      },
+      "output": {
+        "committed": "bool",
+        "proposal_id": "str",
+        "hypotheses": "array",
+        "context": "object",
+        "next_task_ids": "array",
+        "revision": "int"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "GROUNDS_WITHDRAWN",
+        "GATE_NOT_MET",
+        "EVAL_SPEC_NOT_FROZEN",
+        "EVALUATOR_INVALID",
+        "INDEPENDENCE_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "VERSION_IMMUTABLE"
+      ],
+      "note": "Atomically revalidates current context, targets, all sources/evaluations and review identity; appends revisions, closes the fixed round, creates next snapshot and expands next-round tasks through existing expansion. Stale proposals require explicit new proposal/rebase; retries replay the original answer."
+    },
+    "gx_plugin_inspect": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str?",
+        "plugin_id": "str?",
+        "version": "str?",
+        "family": "str?",
+        "limit": "int?"
+      },
+      "output": {
+        "plugins": "array",
+        "catalogue": "array",
+        "families": "array",
+        "truncated": "bool"
+      },
+      "errors": [
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "CONTENT_HASH_MISMATCH",
+        "VERSION_IMMUTABLE",
+        "DEPENDENCY_UNMET",
+        "GATE_NOT_MET",
+        "SCOPE_DENIED",
+        "PERMISSION_DENIED",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "ILLEGAL_TRANSITION",
+        "IMPLEMENTATION_GAP",
+        "OUTCOME_UNKNOWN",
+        "POLICY_SCREEN_BLOCKED",
+        "STORE_UNAVAILABLE",
+        "ENV_NOT_READY",
+        "RESOURCE_DENIED",
+        "BUDGET_EXCEEDED",
+        "APPROVAL_REQUIRED",
+        "HOLD_ACTIVE",
+        "PHASE_DENIED",
+        "PATH_TRAVERSAL_DENIED",
+        "CAPABILITY_NOT_APPROVED",
+        "EVALUATOR_INVALID",
+        "EVAL_SPEC_NOT_FROZEN",
+        "HELDOUT_LOOK_DENIED",
+        "UPSTREAM_ERROR",
+        "PROXY_UNAVAILABLE",
+        "SOURCE_UNAVAILABLE",
+        "STALE_REVISION",
+        "GROUNDS_WITHDRAWN",
+        "READ_RECEIPT_MISSING",
+        "INDEPENDENCE_REQUIRED"
+      ],
+      "note": "Read-only metadata discovery: imports no provider code, runs no health probe, never downloads or infers. Without run_id only the installed static catalogue is visible."
+    },
+    "gx_plugin_register": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "coordinator_lease_ref": "str",
+        "bundle_ref": "str",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "plugin": "object",
+        "created": "bool"
+      },
+      "errors": [
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "CONTENT_HASH_MISMATCH",
+        "VERSION_IMMUTABLE",
+        "DEPENDENCY_UNMET",
+        "GATE_NOT_MET",
+        "SCOPE_DENIED",
+        "PERMISSION_DENIED",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "ILLEGAL_TRANSITION",
+        "IMPLEMENTATION_GAP",
+        "OUTCOME_UNKNOWN",
+        "POLICY_SCREEN_BLOCKED",
+        "STORE_UNAVAILABLE",
+        "ENV_NOT_READY",
+        "RESOURCE_DENIED",
+        "BUDGET_EXCEEDED",
+        "APPROVAL_REQUIRED",
+        "HOLD_ACTIVE",
+        "PHASE_DENIED",
+        "PATH_TRAVERSAL_DENIED",
+        "CAPABILITY_NOT_APPROVED",
+        "EVALUATOR_INVALID",
+        "EVAL_SPEC_NOT_FROZEN",
+        "HELDOUT_LOOK_DENIED",
+        "UPSTREAM_ERROR",
+        "PROXY_UNAVAILABLE",
+        "SOURCE_UNAVAILABLE",
+        "STALE_REVISION",
+        "GROUNDS_WITHDRAWN",
+        "READ_RECEIPT_MISSING",
+        "INDEPENDENCE_REQUIRED"
+      ],
+      "note": "Backend verifies coordinator lease and stored run/project. Registers immutable manifest bytes DISABLED; dependency/source/governance gaps quarantine execution. No model/provider import, installation, probe or job.",
+      "idempotent_by": "idempotency_key"
+    },
+    "gx_plugin_lifecycle": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "coordinator_lease_ref": "str",
+        "plugin_id": "str",
+        "version": "str",
+        "action": "str",
+        "to_version": "str?",
+        "reason": "str",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "plugin": "object",
+        "blockers": "array"
+      },
+      "errors": [
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "CONTENT_HASH_MISMATCH",
+        "VERSION_IMMUTABLE",
+        "DEPENDENCY_UNMET",
+        "GATE_NOT_MET",
+        "SCOPE_DENIED",
+        "PERMISSION_DENIED",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "ILLEGAL_TRANSITION",
+        "IMPLEMENTATION_GAP",
+        "OUTCOME_UNKNOWN",
+        "POLICY_SCREEN_BLOCKED",
+        "STORE_UNAVAILABLE",
+        "ENV_NOT_READY",
+        "RESOURCE_DENIED",
+        "BUDGET_EXCEEDED",
+        "APPROVAL_REQUIRED",
+        "HOLD_ACTIVE",
+        "PHASE_DENIED",
+        "PATH_TRAVERSAL_DENIED",
+        "CAPABILITY_NOT_APPROVED",
+        "EVALUATOR_INVALID",
+        "EVAL_SPEC_NOT_FROZEN",
+        "HELDOUT_LOOK_DENIED",
+        "UPSTREAM_ERROR",
+        "PROXY_UNAVAILABLE",
+        "SOURCE_UNAVAILABLE",
+        "STALE_REVISION",
+        "GROUNDS_WITHDRAWN",
+        "READ_RECEIPT_MISSING",
+        "INDEPENDENCE_REQUIRED"
+      ],
+      "note": "enable, disable, drain, upgrade, reconcile. disable immediately closes admission and becomes DRAINING while any invocation or existing JobService job is active/unknown. drain reads authoritative job/resource state before DISABLED; upgrade never edits an old version/pin or deletes history. No production asset promotion.",
+      "idempotent_by": "idempotency_key"
+    },
+    "gx_plugin_invoke": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "plugin_id": "str",
+        "version": "str",
+        "manifest_sha256": "str",
+        "operation": "str",
+        "request": "object",
+        "task_id": "str?",
+        "attempt": "int?",
+        "lease_ref": "str?",
+        "context_ref": "str?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "invocation": "object",
+        "result": "object"
+      },
+      "errors": [
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "CONTENT_HASH_MISMATCH",
+        "VERSION_IMMUTABLE",
+        "DEPENDENCY_UNMET",
+        "GATE_NOT_MET",
+        "SCOPE_DENIED",
+        "PERMISSION_DENIED",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "ILLEGAL_TRANSITION",
+        "IMPLEMENTATION_GAP",
+        "OUTCOME_UNKNOWN",
+        "POLICY_SCREEN_BLOCKED",
+        "STORE_UNAVAILABLE",
+        "ENV_NOT_READY",
+        "RESOURCE_DENIED",
+        "BUDGET_EXCEEDED",
+        "APPROVAL_REQUIRED",
+        "HOLD_ACTIVE",
+        "PHASE_DENIED",
+        "PATH_TRAVERSAL_DENIED",
+        "CAPABILITY_NOT_APPROVED",
+        "EVALUATOR_INVALID",
+        "EVAL_SPEC_NOT_FROZEN",
+        "HELDOUT_LOOK_DENIED",
+        "UPSTREAM_ERROR",
+        "PROXY_UNAVAILABLE",
+        "SOURCE_UNAVAILABLE",
+        "STALE_REVISION",
+        "GROUNDS_WITHDRAWN",
+        "READ_RECEIPT_MISSING",
+        "INDEPENDENCE_REQUIRED"
+      ],
+      "note": "Five independent typed family protocols, using a static allowlist of existing services. Exact pins and applicability checked at admission and execution. No arbitrary import/exec, no nested detached queue. Job status/cancel/reconcile continue for admitted jobs while disabled. Network is performed only by existing proxy-enforcing providers.",
+      "idempotent_by": "idempotency_key"
+    },
+    "gx_host_pool_snapshot": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "pool_id": "str",
+        "after_slot_id": "str?",
+        "limit": "int?"
+      },
+      "output": {
+        "pool": "object",
+        "slots": "array",
+        "counts": "object",
+        "occupied": "int",
+        "available": "int",
+        "truncated": "int",
+        "next_slot_id": "str|null"
+      },
+      "errors": [
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "RESOURCE_DENIED"
+      ],
+      "note": "A bounded consistent pure store snapshot of all runs sharing one native pool. It neither reads Host files nor reconciles, releases leases or changes any revision. Cursor is lexical slot_id; counts include every generation and nonterminal state. Worker-visible detailed slots are restricted to principal.project_refs, including pagination counts; global occupied/available remain correct and global native session/source/metadata are withheld. The response has a 16000-byte product budget, large opaque metadata/evidence are hash summaries, truncated counts and cursor remain accurate; reads never depend on envelope artifact spill."
+    },
+    "gx_shared_board": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "after_event_id": "int?",
+        "event_limit": "int?",
+        "after_reaction_id": "int?",
+        "after_feedback_event_id": "int?",
+        "after_board": "object?",
+        "board_limit": "int?"
+      },
+      "output": {
+        "schema_version": "int",
+        "run": "object",
+        "as_of": "str",
+        "as_of_event_id": "int",
+        "teams": "array",
+        "tasks": "array",
+        "dependencies": "array",
+        "workers": "array",
+        "jobs": "array",
+        "approvals": "array",
+        "budget": "array",
+        "budgets": "array",
+        "capacity": "object",
+        "dispatch": "object",
+        "needs": "array",
+        "progress": "object",
+        "paths": "array",
+        "coordinator": "object|null",
+        "reactions": "object",
+        "feedback": "object",
+        "events": "array",
+        "event_cursor": "object",
+        "organization": "object?",
+        "research": "object?",
+        "host_pool": "object?",
+        "read_bounds": "object?"
+      },
+      "backend_checks": [
+        "principal project scope for every returned identity",
+        "one bounded consistent read snapshot",
+        "no mutation, settlement, lease renewal, job reconciliation or workflow advancement"
+      ],
+      "note": "Shared board projection over the authoritative store. Legacy logical task groups remain in teams; explicit organization, research and scoped Host pool are separate optional projections. Cursors and truncation record omitted rows. Native identity evidence is distinguished from logical membership. CLI and MCP use the same projection. organization, research and host_pool are present when their additive tables are available; missing legacy records produce empty bounded projections. read_bounds is present with full counts, returned offsets and omissions when the MCP transport bounds the complete projection.",
+      "errors": [
+        "SCHEMA_INVALID",
+        "SCOPE_DENIED",
+        "ARTIFACT_NOT_FOUND"
+      ]
+    },
+    "gx_research_provider_list": {
+      "phase": "knowledge",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {},
+      "output": {
+        "providers": "array"
+      },
+      "backend_checks": [
+        "Fixed backend provider descriptors only; no imports of external providers, network, probe, inference, downloads or service starts"
+      ],
+      "note": "Descriptor discovery is not capability admission or evidence of live readiness. Captured XHS/WeChat providers explicitly report live dependency blocked; deepread conversion is not understanding.",
+      "errors": [
+        "SCHEMA_INVALID"
+      ]
+    },
+    "gx_pubmed_search": {
+      "phase": "knowledge",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "query": "str",
+        "limit": "int?",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "search_id": "str",
+        "results": "array",
+        "per_source": "array",
+        "artifact_ref": "str",
+        "result_count": "int"
+      },
+      "backend_checks": [
+        "Run/project scope and existing search budget/holds/network-download switch",
+        "Query screened before durable request or outbound URL; private content is never persisted or sent",
+        "Durable idempotent intent committed before network; completed replay does not fetch again; incomplete intent returns OUTCOME_UNKNOWN",
+        "No SQLite write transaction is held over ESearch/EFetch",
+        "Anonymous exact eutils.ncbi.nlm.nih.gov HTTPS URLs through existing Clash-only transport/socket guard/throttle; no contact or API key",
+        "One query, 1..25 records, bounded ESearch JSON and EFetch XML; exact requested/returned unique PMID set",
+        "Original response bytes/base64, URLs and hashes retained in the existing literature_searches/artifact ledger",
+        "Journal-only parser preserves publication types/retraction facts and abstract-only coverage; Bookshelf schema is explicitly refused"
+      ],
+      "note": "At most one bounded ESearch/EFetch pair per fresh key. Upstream failure is recorded ERROR/RATE_LIMITED, never EMPTY. A process lost between intent and recording remains unknown and must be reconciled rather than silently refetched. Existing gx_source_acquire can resolve returned PMIDs through its established source chain; a PubMed abstract does not prove full-text availability or scientific correctness.",
+      "errors": [
+        "PROXY_UNAVAILABLE",
+        "UPSTREAM_ERROR",
+        "BUDGET_EXCEEDED",
+        "SCHEMA_INVALID",
+        "HOLD_ACTIVE",
+        "SCOPE_DENIED",
+        "IDEMPOTENCY_CONFLICT",
+        "OUTCOME_UNKNOWN",
+        "ARTIFACT_NOT_FOUND",
+        "POLICY_SCREEN_BLOCKED",
+        "STORE_UNAVAILABLE"
+      ]
+    },
+    "gx_captured_source_intake": {
+      "phase": "knowledge",
+      "mutating": true,
+      "requires_revision": false,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "manifest_artifact_ref": "str",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "source_id": "str",
+        "deduplicated": "bool",
+        "provider_id": "str",
+        "text_coverage": "str",
+        "artifact_refs": "array?",
+        "visual_coverage": "str?",
+        "live_provider_used": "bool?",
+        "warnings": "array?"
+      },
+      "backend_checks": [
+        "Manifest artifact belongs to the selected run; source provider is xhs_captured or wechat_captured",
+        "Manifest schema gx.captured_source/1 binds canonical public source URL, title/captured_at and exact path/hash/role/locator for each file",
+        "Only fixed backend read-only capture roots; path/size/hash/regular-file checks and protected-path refusal before byte reading",
+        "1..64 unique files, at most 32 MiB per file/64 MiB total, actual nonempty UTF-8 text required",
+        "Exact source bytes copied to v2 ArtifactService, source PARSED with PARTIAL_TEXT and REPORTED_EXPERIENCE; images NOT_VIEWED",
+        "No old controller imports, legacy filesystem writes, service starts, networking, source instructions, or fabricated read receipts",
+        "Idempotent completion shares the source/artifact transaction; capture identity pins complete manifest"
+      ],
+      "note": "Capture-only inheritance. The manifest is a backend-held artifact reference, not an unrestricted path argument. Source text becomes addressable for gx_source_read under a task lease; holding an image does not establish it was seen. Fresh XHS/WeChat search and full historical coverage remain separate unverified dependencies. artifact_refs is present when copied capture files were published; an empty capture returns none. visual_coverage and live_provider_used are present for captures to explicitly report NOT_VIEWED and false; warnings is present when provenance or coverage remains incomplete.",
+      "errors": [
+        "SCHEMA_INVALID",
+        "SCOPE_DENIED",
+        "PATH_TRAVERSAL_DENIED",
+        "ARTIFACT_HASH_MISMATCH",
+        "ARTIFACT_NOT_FOUND",
+        "IDEMPOTENCY_CONFLICT",
+        "OUTCOME_UNKNOWN",
+        "POLICY_SCREEN_BLOCKED",
+        "STORE_UNAVAILABLE"
+      ]
+    },
+    "gx_research_round_rebase": {
+      "phase": "planning",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "expected_revision": "int",
+        "coordinator_lease_ref": "str",
+        "idempotency_key": "str",
+        "context_ref": "str",
+        "expected_results": "array<object>",
+        "round_id": "str",
+        "reason": "str"
+      },
+      "output": {
+        "round": "object",
+        "previous_round_id": "str",
+        "cancelled_task_ids": "array",
+        "released_reservations": "array",
+        "revision": "int"
+      },
+      "errors": [
+        "ARTIFACT_NOT_FOUND",
+        "SCOPE_DENIED",
+        "SCHEMA_INVALID",
+        "STORE_UNAVAILABLE",
+        "CONTENT_HASH_MISMATCH",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "HOLD_ACTIVE",
+        "GROUNDS_WITHDRAWN",
+        "GATE_NOT_MET",
+        "EVAL_SPEC_NOT_FROZEN",
+        "EVALUATOR_INVALID",
+        "INDEPENDENCE_REQUIRED",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "VERSION_IMMUTABLE"
+      ],
+      "note": "Explicit coordinator-only rebase onto a later current context. Preserves old round content, fences only its synthesis/review task leases, refuses active or unknown jobs, releases only unused follower holds, never refunds spent task costs or releases native Host slots. Records old/new context hashes and causal round."
+    },
+    "gx_submission_review_request": {
+      "phase": "core",
+      "mutating": true,
+      "requires_revision": true,
+      "idempotent_by": "idempotency_key",
+      "input": {
+        "run_id": "str",
+        "coordinator_lease_ref": "str",
+        "expected_revision": "int",
+        "submission_id": "str",
+        "content_sha256": "str",
+        "source_review_refs": "array<object>",
+        "idempotency_key": "str"
+      },
+      "output": {
+        "subject": "object",
+        "review": "object",
+        "source_review_ids": "array",
+        "source_review_qualified": "bool"
+      },
+      "note": "Additive proposal, not installed. Exact accepted submission of this run only. Sidecar must be among submission artifact refs and hash unchanged. Backend validates fixed gx.source_review/1 metadata and re-hashes materialized source/license closure inside configured allowed roots, rejects protected paths and symlinks escaping roots before open. Backend builds review package from all stored submission refs and explicit source-record items. Reuse existing review_asset/verifier/asset_review_bundle request_review, task budget/reservations/lineage and independent observed native reviewer. CONFORMS is never downgraded. No second truth, no approval or activation at request. Idempotency replay before CAS; same product under a new key reuses open/completed request. Existing objection is returned, not erased; retry only after genuinely revised source submission or within existing bounded task retries. Explicit source requests are available for CONFORMS accepted products and do not claim to satisfy the stricter degraded-host content-review fallback. Before any artifact body/source read, metadata of every accepted-submission artifact is summed and bounded to 8MiB. Materialized source/license full hashing is outside the writer. Ordinary existing review still re-hashes this bounded artifact content within its transaction; no claim that every artifact hash is outside it. source_review_refs_shape: {\"artifact_ref\": \"str\", \"sha256\": \"str\"}. permissions: \"Backend current run coordinator lease plus project scope and current contract/workflow/policy pins; worker/read-only/host-adapter cannot request. Never authorizes a caller-selected reviewer or records a review.\". bounds: {\"accepted_submission_artifacts_total_bytes\": 8388608, \"files_total_bytes\": 67108864, \"records_per_artifact\": [1, 16], \"response_bytes\": 12000, \"source_files_per_record\": [1, 200], \"source_review_refs\": [1, 8]}. Before resolving any accepted artifact body or materialized source, authorize the caller and verify the exact submission/reference metadata and total accepted artifact bytes <= 8388608. Oversized requests refuse without source reads or state changes. Materialized source/license closure rehash (<=67108864 bytes) occurs outside the writer. The existing ordinary review path may rehash the bounded <=8MiB accepted artifacts inside its transaction; this API does not claim every artifact hash is lock-free.",
+      "errors": [
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "CONTENT_HASH_MISMATCH",
+        "SCOPE_DENIED",
+        "PERMISSION_DENIED",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "VERSION_IMMUTABLE",
+        "HOLD_ACTIVE",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "PATH_TRAVERSAL_DENIED",
+        "POLICY_SCREEN_BLOCKED",
+        "STORE_UNAVAILABLE",
+        "GATE_NOT_MET",
+        "ENV_NOT_READY",
+        "EVAL_SPEC_NOT_FROZEN",
+        "INDEPENDENCE_REQUIRED",
+        "IMPLEMENTATION_GAP",
+        "OUTCOME_UNKNOWN"
+      ]
+    },
+    "gx_plugin_identity_preview": {
+      "phase": "core",
+      "mutating": false,
+      "requires_revision": false,
+      "input": {
+        "run_id": "str",
+        "bundle_ref": "str"
+      },
+      "output": {
+        "family": "str",
+        "plugin_id": "str",
+        "version": "str",
+        "draft_sha256": "str",
+        "identity": "object",
+        "identity_sha256": "str",
+        "supplied_identity_matches": "bool|null",
+        "readiness": "object",
+        "registration_performed": "bool"
+      },
+      "note": "Additive proposal, not installed. Backend-held descriptor artifact of this run, direct gx.plugin/1 or manifest envelope, may omit only identity. Validate all other fixed fields, derive all 11 identity components from exact capability candidate/frozen EvalSpec/governed package and already recorded environment observation. No placeholder is declared complete. Return bounded identity plus readiness blocker summary, registration_performed=false; registry/admission remains unchanged. Per-invocation MSA/structure/pool are explicit, never replaced by static labels. Incomplete authoritative backing/environment is a typed error, not a guessed hash. Author writes a new complete descriptor artifact using this identity before immutable register. Output <=12KiB and no envelope spill. permissions: \"Read-only principal with actual project scope. No coordinator lease required because it writes no rows/artifacts/events, launches no provider/probe/job/network, and cannot admit execution.\".",
+      "errors": [
+        "SCHEMA_INVALID",
+        "ARTIFACT_NOT_FOUND",
+        "ARTIFACT_HASH_MISMATCH",
+        "CONTENT_HASH_MISMATCH",
+        "SCOPE_DENIED",
+        "PERMISSION_DENIED",
+        "LEASE_EXPIRED",
+        "IDEMPOTENCY_CONFLICT",
+        "PHASE_DENIED",
+        "STALE_REVISION",
+        "VERSION_IMMUTABLE",
+        "HOLD_ACTIVE",
+        "BUDGET_EXCEEDED",
+        "DEPENDENCY_UNMET",
+        "PATH_TRAVERSAL_DENIED",
+        "POLICY_SCREEN_BLOCKED",
+        "STORE_UNAVAILABLE",
+        "GATE_NOT_MET",
+        "ENV_NOT_READY",
+        "EVAL_SPEC_NOT_FROZEN",
+        "INDEPENDENCE_REQUIRED",
+        "IMPLEMENTATION_GAP",
+        "OUTCOME_UNKNOWN"
+      ]
+    }
+  },
+  "privileged_tools": {
+    "note": "Asset promotion, approvals, capability and environment registration, corpus and asset import, the final look of an improvement cycle and host observation are NOT exposed to scientific workers. Each tool names its scope: operator (a person) or host_adapter (a hook or observer the Host runs, with the two explicitly specified native Codex dispatch lifecycle exceptions), and is refused under any other. On one machine in one user's trust domain this is a procedural boundary, and the documents say so. The sole native Codex exception is gx_host_event CodexDispatchAuthorize and CodexDispatchConfirm: the authenticated depth-zero native Root may invoke their literal public CLI under host_adapter scope while holding the actual run coordinator lease. Backend verification of the real process, current pending Host call, exact task/assignment/slot/policy tuple and completed authorization receipt supplies authority; a scope name, caller report or arbitrary JSON never does. These are backend-authorized dispatch lifecycle events, not hooks and not HUMAN decisions. Every other event retains the Host-run hook requirement.",
+    "names": [
+      "gx_approval_grant",
+      "gx_asset_promote",
+      "gx_capability_register",
+      "gx_ingest",
+      "gx_rsi_final_compare",
+      "gx_strategy_rollback",
+      "gx_host_event",
+      "gx_host_observe",
+      "gx_host_pool_register",
+      "gx_host_pool_reserve",
+      "gx_host_pool_transition",
+      "gx_host_pool_reparent",
+      "gx_host_pool_adopt_existing"
+    ],
+    "tools": {
+      "gx_approval_grant": {
+        "scope": "operator",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "requires_user_interaction": true,
+        "input": {
+          "approval_id": "str",
+          "decision": "enum:approval_decision",
+          "decision_detail": "object?",
+          "expected_subject_sha256": "str?",
+          "policy_ref": "str?",
+          "note": "str",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "approval_id": "str",
+          "status": "str",
+          "granted_by": "str"
+        },
+        "note": "Decides one approval for one subject and one sha256. A person decides it where a person is; under a standing policy the backend applies it and records that policy's sha256 and the instruction it rests on. An approval of action_kind model_switch, worker_refusal or eval_spec_change is never covered by a standing policy. A compatible run_repin may be granted by the current standing source-maintenance policy, checked by the original run owner. Both transports check in one order: the caller's scope, the shape of the arguments, that a person is there to decide or policy_ref names the standing policy, and only then the approval itself. decision is a value of labels.approval_decision; any other word is refused at the schema step, on both transports, so the one order holds by typing. note holds at least one non-space character, checked at the same step. decision_detail is what a decision carries beyond the word, recorded as approvals.decision_json: for a worker_refusal, {choice, note?, omit_sections?, model?}, choice being a value of labels.refusal_decision - GRANTED with reword, a note for the next brief and the sections to leave out, or with authorize_once and the model authorized for that one task; DENIED is skip. A GRANTED run_repin approval, whose subject is a run, re-pins that run, and both sha256s are recorded.",
+        "errors": [
+          "PERMISSION_DENIED",
+          "ARTIFACT_NOT_FOUND",
+          "CONTENT_HASH_MISMATCH",
+          "ILLEGAL_TRANSITION",
+          "SCHEMA_INVALID",
+          "IDEMPOTENCY_CONFLICT"
+        ]
+      },
+      "gx_asset_promote": {
+        "scope": "operator",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "asset_id": "str",
+          "version": "str",
+          "kind": "str?",
+          "to_state": "str",
+          "expected_sha256": "str",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "asset_ref": "object",
+          "status": "str",
+          "gate": "object"
+        },
+        "note": "Runs the gate for the transition and refuses when anything it requires is missing or belongs to another sha256. A projection that would replace a host file generated from another asset, or from none, is refused PROJECTION_TARGET_OCCUPIED, and nothing is written.",
+        "errors": [
+          "PERMISSION_DENIED",
+          "GATE_NOT_MET",
+          "CONTENT_HASH_MISMATCH",
+          "ILLEGAL_TRANSITION",
+          "ARTIFACT_NOT_FOUND",
+          "INDEPENDENCE_REQUIRED",
+          "PROJECTION_TARGET_OCCUPIED"
+        ]
+      },
+      "gx_capability_register": {
+        "scope": "operator",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "environment": "object?",
+          "bundle_ref": "str?",
+          "probe": "bool?",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "env_id": "str|null",
+          "environment_status": "str|null",
+          "asset_ref": "object|null",
+          "status": "str|null",
+          "probes": "array"
+        },
+        "note": "Registers an environment from a probe the backend runs, or a capability candidate from a manifest bundle. A readiness that is declared rather than observed is refused, and an existing id and version cannot change content.",
+        "errors": [
+          "PERMISSION_DENIED",
+          "SCHEMA_INVALID",
+          "VERSION_IMMUTABLE",
+          "ENV_NOT_READY",
+          "ARTIFACT_NOT_FOUND",
+          "PATH_TRAVERSAL_DENIED"
+        ]
+      },
+      "gx_ingest": {
+        "scope": "operator",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "source_kind": "str",
+          "options": "object?",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "ledger_ref": "str",
+          "counts": "object",
+          "verified": "object"
+        },
+        "note": "Imports a corpus, a skill library, model manifests, reading packages or a benchmark (source_kind rsi_benchmark, the one way a benchmark is registered, judged by the benchmark_bundle checks) by content sha256 from a tree that is only read. Everything imported lands unreviewed and takes the same gates as anything written here.",
+        "errors": [
+          "PERMISSION_DENIED",
+          "SCHEMA_INVALID",
+          "ARTIFACT_HASH_MISMATCH",
+          "SCOPE_DENIED"
+        ]
+      },
+      "gx_rsi_final_compare": {
+        "scope": "operator",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "cycle_id": "str",
+          "decision_rule_ref": "str",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "cycle_id": "str",
+          "verdict": "str",
+          "final": "object",
+          "look_number": "int|null",
+          "decision_rule_sha256": "str"
+        },
+        "note": "Spends one counted look at the final split under a decision rule stored beforehand. look_number is null when the planted controls failed: the verdict is CONTROLS_FAILED and no look is spent. A decision rule that is refused answers SCHEMA_INVALID.",
+        "errors": [
+          "PERMISSION_DENIED",
+          "HELDOUT_LOOK_DENIED",
+          "GATE_NOT_MET",
+          "ILLEGAL_TRANSITION",
+          "ARTIFACT_NOT_FOUND",
+          "PATH_TRAVERSAL_DENIED",
+          "SCHEMA_INVALID"
+        ]
+      },
+      "gx_strategy_rollback": {
+        "scope": "operator",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "strategy_kind": "str",
+          "to_version": "str",
+          "reason": "str",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "strategy_kind": "str",
+          "active_version": "str",
+          "previous_version": "str"
+        },
+        "note": "Flips a strategy pointer back to a version that was active before.",
+        "errors": [
+          "PERMISSION_DENIED",
+          "ARTIFACT_NOT_FOUND",
+          "ILLEGAL_TRANSITION"
+        ]
+      },
+      "gx_host_event": {
+        "scope": "host_adapter",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "host": "str",
+          "hook_event": "str",
+          "session_ref": "str",
+          "agent_ref": "str?",
+          "payload": "object",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "event_id": "str",
+          "matched": "object|null",
+          "policy_verdict": "str|null",
+          "decision": "str|null",
+          "reason": "str|null",
+          "effect": "enum:host_event_effect"
+        },
+        "note": "Records one event the host itself raised - a session starting or ending, a worker starting or stopping, a turn that failed, a model switch, a spawn or a workflow launch about to happen - with identifiers, model, effort and the path of the worker's own record. For an event the host lets a hook decide, the answer carries allow, deny or ask, so a spawn on another model or below the required effort is refused before it runs. It stores identifiers and settings, never message content. A SessionStart records whether the gx roles and gx-dispatch were installed when the session began, which gx_run_start reads. A SubagentStop with no submission, a StopFailure and a SessionEnd are recorded as stops of the agents they name. A stopped agent's task lease is released as host-caused, consuming no attempt, by the next settlement that finds the host's own record bearing the stop out (no turn of that agent after the event); a SessionEnd also releases the coordinator lease of that session. An admitted launch of gx-dispatch is recorded as dispatch.handed_out, with its rows, its session, its nonce and when the hand-out lapses; its start as dispatch.launched and its end as dispatch.closed. A gate that denies a row for a reason of that row's own task records task.dispatch_failed; a denial of a launch as a whole counts against no task. An event is the adapter's proposal. effect, a value of labels.host_event_effect, says whether what the event means for state was applied because the host's own record bears it out (applied; also for an event that only records or decides), or whether it was kept as the adapter's report and moved nothing (reported_only); each withheld effect is named in warnings. Every call is recorded with what the backend sees of its caller. R8 native opaque transport amendment: The sole native Codex exception is gx_host_event CodexDispatchAuthorize and CodexDispatchConfirm: the authenticated depth-zero native Root may invoke their literal public CLI under host_adapter scope while holding the actual run coordinator lease. Backend verification of the real process, current pending Host call, exact task/assignment/slot/policy tuple and completed authorization receipt supplies authority; a scope name, caller report or arbitrary JSON never does. These are backend-authorized dispatch lifecycle events, not hooks and not HUMAN decisions. Every other event retains the Host-run hook requirement. CodexDispatchAuthorize payload is exactly {run_id,task_id,principal_subject,slot_id,coordinator_lease_ref,expected_revision,expected_slot_generation,expected_pool_generation}; CodexDispatchConfirm payload is exactly {run_id,authorization_event_id,coordinator_lease_ref,expected_revision}. Both require host=codex, actual Root session_ref and a root-owned current pending literal CLI call. Authorization binds an already OWNED ACTIVE slot and settled READY unclaimed assignment to the current complete task contract. It expires no later than 600 seconds or the coordinator lease. Confirmation independently observes exactly one actual Root followup to the bound native child, ordered after a completed successful authorization response carrying the actual request/event identifiers. Script-running output is not a completion barrier. The sender Root is distinct from the biological native parent. The child still supplies its own later current native CLI claim and actual applied model/effort. Plaintext dispatch validation remains unchanged; opaque validation applies only as a separate fallback. Retained source=host_transcript denotes observed Host metadata only, with evidence_mode=backend_authorized_opaque_followup, authorization_source=backend_native_root_dispatch_intent and message_content_observed=false. The message envelope is hashed without decrypting, storing or claiming to verify its body. After all legacy claim authority checks pass, the new opaque mode atomically rechecks its expiry, live exact coordinator, current slot/assignment tuple, unique confirmation and unconsumed receipt inside the same transaction that issues the lease. A protected consumption event records timely admission; any later business refusal rolls the entire transaction back. An unexpired unconsumed authorization excludes another new-key authorization for the same native; only its original successful key replays without renewing TTL. After consumption or expiry the Root may authorize later work. Expiry, coordinator replacement/release, changed tuples and ambiguous actions deny an unconsumed receipt. A consumed receipt keeps its historical evidence semantics; successful idempotency replay does not renew authority or TTL.",
+        "records": [
+          "host_events, each with what the backend sees of its caller",
+          "dispatch.handed_out, dispatch.launched and dispatch.closed events",
+          "task.dispatch_failed {source: spawn_gate | workflow_gate, reason}",
+          "worker.stopped:<lease_id>:<host_event_id> and worker.verdict:<worker_observation_id> outbox rows",
+          "host.codex_opaque_dispatch_authorized: immutable backend Root intent, complete task/slot/assignment/pin tuple, actual invocation and expiry",
+          "host.codex_opaque_dispatch_confirmed: immutable authorization/action/completion barrier metadata, envelope SHA and explicit unobserved message-content mode",
+          "host.codex_opaque_dispatch_consumed: protected one-use receipt consumption after legacy authority checks, atomic with successful lease issue; no consumption survives a rolled-back refusal"
+        ],
+        "refusal_records": {
+          "PERMISSION_DENIED": "Except for the two R8 native Codex dispatch lifecycle events, a call that does not come from a hook the Host ran is refused and recorded as host_event.refused with observed caller facts. The two exceptions independently verify authenticated native Root dispatch authority; an ordinary worker, MCP caller, scope assertion or forged event receives no dispatch authority."
+        },
+        "errors": [
+          "PERMISSION_DENIED",
+          "SCHEMA_INVALID",
+          "IDEMPOTENCY_CONFLICT",
+          "SCOPE_DENIED",
+          "STALE_PLAN",
+          "STALE_REVISION",
+          "LEASE_EXPIRED",
+          "CONTENT_HASH_MISMATCH",
+          "HOLD_ACTIVE",
+          "RESOURCE_DENIED",
+          "ARTIFACT_NOT_FOUND",
+          "PHASE_DENIED",
+          "MODEL_POLICY_VIOLATION",
+          "VERSION_IMMUTABLE",
+          "DEPENDENCY_UNMET",
+          "EVALUATOR_INVALID",
+          "OUTCOME_UNKNOWN"
+        ],
+        "backend_checks": [
+          "All ordinary host events retain the actual Host-run hook provenance check.",
+          "Only CodexDispatchAuthorize and CodexDispatchConfirm admit the explicitly documented actual native Root CLI protocol.",
+          "Host reads occur outside writer transactions; the exact authority tuple, revision and event cursor are rechecked atomically before immutable receipt commit.",
+          "Opaque message content is never decrypted or represented as observed plaintext; current child process/Host-call/model evidence remains mandatory."
+        ]
+      },
+      "gx_host_observe": {
+        "scope": "host_adapter",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "host": "str",
+          "run_id": "str?",
+          "session_ref": "str?",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "observations": "int",
+          "workers": "array",
+          "violations": "array",
+          "host_version": "str|null",
+          "readable": "bool"
+        },
+        "note": "Has the host adapter read the records the host itself wrote about its workers - which workers existed and which model each turn ran on - and writes them as observations. It reads identifiers and model names, never message content. The reader is gated on the host version it was written against and answers unreadable rather than guess at field names it has not seen.",
+        "errors": [
+          "PERMISSION_DENIED",
+          "CLIENT_CAPABILITY_MISSING",
+          "SCHEMA_INVALID",
+          "IDEMPOTENCY_CONFLICT"
+        ]
+      },
+      "gx_host_pool_register": {
+        "scope": "host_adapter",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "pool_id": "str",
+          "host": "str",
+          "session_ref": "str",
+          "configured_capacity": "int",
+          "effective_capacity": "int?",
+          "external_occupied": "int",
+          "max_depth": "int",
+          "source": "str",
+          "observed_source": "str",
+          "expected_generation": "int?",
+          "metadata": "object?",
+          "idempotency_key": "str",
+          "expected_pool_revision": "int?",
+          "inventory_call_id": "str?"
+        },
+        "output": {
+          "pool": "object"
+        },
+        "errors": [
+          "PERMISSION_DENIED",
+          "SCHEMA_INVALID",
+          "ARTIFACT_NOT_FOUND",
+          "STALE_REVISION",
+          "RESOURCE_DENIED",
+          "IDEMPOTENCY_CONFLICT",
+          "ILLEGAL_TRANSITION",
+          "OUTCOME_UNKNOWN",
+          "CONTENT_HASH_MISMATCH",
+          "HOLD_ACTIVE",
+          "SCOPE_DENIED",
+          "VERSION_IMMUTABLE"
+        ],
+        "note": "Registers observed native total capacity including root. Admission uses the minimum of backend limits, configured and effective capacity; unknown effective capacity admits none. Changed observations fence prior work with a new session generation while retaining all old nonterminal occupancy. Only host_adapter may mutate; source provenance is explicit. Registration reads Host-owned identity outside any SQLite transaction and requires actual depth-zero root with no native parent; a subthread cannot be registered as a distinct native pool. Host/session identity is immutable for a pool_id. Handler uses service idempotency after the read, never an enclosing writer. When inventory_call_id is supplied, read a current root-owned unfiltered collaboration.list_agents call/output and Host ID mappings outside the writer. Validate configured/effective capacity provenance separately. Register identity-correlated external inventory atomically. The request external_occupied is an assertion, never the source of inventory authority; require it to equal verified chargeable external members. Registration without backend inventory remains legacy compatible but cannot authorize adopt_existing. Never infer native termination from inactive/completed runtime lanes. New runs whose backend-pinned policy has policy_host=codex and policy_scope=host-specific-v1 require a backend identity inventory and a fresh complete authenticated root roster before reserve or existing-native adoption. They cannot use legacy scalar-only pool registration as an admission escape. Legacy scalar mode is compatible only with historical policy families; unknown external occupancy remains UNKNOWN and refuses new admission."
+      },
+      "gx_host_pool_reserve": {
+        "scope": "host_adapter",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "pool_id": "str",
+          "run_id": "str",
+          "expected_generation": "int",
+          "request_key": "str",
+          "logical_parent_slot_id": "str?",
+          "task_id": "str?",
+          "metadata": "object?",
+          "idempotency_key": "str",
+          "native_parent_ref": "str?",
+          "inventory_call_id": "str?"
+        },
+        "output": {
+          "slot": "object",
+          "replayed": "bool"
+        },
+        "errors": [
+          "PERMISSION_DENIED",
+          "SCHEMA_INVALID",
+          "ARTIFACT_NOT_FOUND",
+          "STALE_REVISION",
+          "RESOURCE_DENIED",
+          "IDEMPOTENCY_CONFLICT",
+          "ILLEGAL_TRANSITION",
+          "OUTCOME_UNKNOWN",
+          "CONTENT_HASH_MISMATCH",
+          "HOLD_ACTIVE",
+          "SCOPE_DENIED",
+          "VERSION_IMMUTABLE"
+        ],
+        "note": "Atomically reserves one native slot across all runs and generations. RESERVED, CREATING, UNKNOWN, ACTIVE and CLOSING occupy capacity. Durable request_key is immutable and replays the same reservation. Parent/subtree logical depth and backend depth ceiling are enforced before any native call. The actual native creator defaults explicitly to the observed session root; its identity/depth is read before reserving and rechecked at begin_create. Unknown actual native depth is refused. native_parent_ref selects a different actual creator independently of logical parent. Inventory-enabled pools require a fresh backend-authenticated complete active-runtime inventory before admission. Never use an old external integer as current capacity authority; unknown or uncovered identities remain chargeable. inventory_call_id is only a locator to the actual root-owned Host tool call and output. New runs whose backend-pinned policy has policy_host=codex and policy_scope=host-specific-v1 require a backend identity inventory and a fresh complete authenticated root roster before reserve or existing-native adoption. They cannot use legacy scalar-only pool registration as an admission escape. Legacy scalar mode is compatible only with historical policy families; unknown external occupancy remains UNKNOWN and refuses new admission."
+      },
+      "gx_host_pool_transition": {
+        "scope": "host_adapter",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "slot_id": "str",
+          "expected_generation": "int",
+          "action": "str",
+          "native_agent_ref": "str?",
+          "lease_id": "str?",
+          "expected_pool_generation": "int?",
+          "idempotency_key": "str",
+          "source_run_id": "str?",
+          "destination_run_id": "str?",
+          "source_coordinator_lease_ref": "str?",
+          "destination_coordinator_lease_ref": "str?",
+          "expected_source_revision": "int?",
+          "expected_destination_revision": "int?",
+          "destination_task_id": "str?"
+        },
+        "output": {
+          "slot": "object"
+        },
+        "errors": [
+          "PERMISSION_DENIED",
+          "SCHEMA_INVALID",
+          "ARTIFACT_NOT_FOUND",
+          "STALE_REVISION",
+          "RESOURCE_DENIED",
+          "IDEMPOTENCY_CONFLICT",
+          "ILLEGAL_TRANSITION",
+          "OUTCOME_UNKNOWN",
+          "CONTENT_HASH_MISMATCH",
+          "HOLD_ACTIVE",
+          "SCOPE_DENIED",
+          "VERSION_IMMUTABLE",
+          "LEASE_EXPIRED",
+          "EVALUATOR_INVALID"
+        ],
+        "note": "Actions: begin_create, creation_unknown, request_close, reconcile, adopt, bind. No client terminated boolean or hash is accepted. reconcile reads Host-owned evidence outside any SQLite transaction, then fences slot and pool generation at commit; do not enclose it in store.run_idempotent or another transaction. A completed/idle thread, task lease expiry or handout TTL never releases a native slot. Closing an untouched RESERVED intent may release only by backend proof that no Host call began; CREATING/UNKNOWN/CLOSING require verified termination. Codex 0.169.0 can observe identity/depth but has no verified close proof; it preserves occupancy. next_task reuses the same observed native identity for a new lease only after the previous task is terminal, its lease released, active/unknown jobs settled, assignments settled and principal unchanged; the new lease needs its own Host tie. It keeps capacity occupied and records previous/current bindings. Explicit cross-run next_task requires all six source/destination run, coordinator lease and revision assertions. Both actual current run coordinators authorize the move, both current pins and project/root/session must match, all previous resources/assignments must settle and the new lease must have fresh native policy proof. Origin run_id is immutable; current_run_id records the current binding, with explicit logical detachment to the new root where necessary. Occupancy, native identity/parent/depth, author and spending histories never reset; audit both runs. Same-run next_task retains its former semantics. Missing or conflicting cross-run assertions are refused. R8 adds unclaimed_owned_transfer for an already OWNED ACTIVE native slot whose old task and run have been publicly CANCELLED with attempt=0, no lease ever issued, no jobs or submissions and settled assignments. destination_task_id is mandatory for this action; the source task is the slot current task. The six source/destination run, coordinator lease and revision assertions plus slot and pool generations are mandatory. Both actual live coordinator leases are independently verified with renew=false; terminal source cleanup does not renew or reissue its lease. The destination uses ordinary current-run pin, phase, task, settled assignment and policy checks and must have the same project, Root/session and principal. Only an exact enabled source/target contract and unchanged DDL route in the root-owned config/native_contract_migrations.json permits the historical source pin; workflow and agent policy pins must remain identical. Missing, wildcard or unknown routes are refused. This is not run_repin and changes no historical run pins. It advances the slot generation and current task/run binding while preserving origin run_id, native identity/parent/depth, full historical adoption bytes, author/spend history and occupied capacity, with an audit in both runs. No native call, task claim, lease or termination evidence is synthesized. A later actual child claim still needs new current-pin native dispatch evidence. Claimed/leased, unsettled, mismatched or expired-source moves are refused."
+      },
+      "gx_host_pool_reparent": {
+        "scope": "host_adapter",
+        "mutating": true,
+        "idempotent_by": "idempotency_key",
+        "input": {
+          "slot_id": "str",
+          "expected_generation": "int",
+          "logical_parent_slot_id": "str?",
+          "idempotency_key": "str"
+        },
+        "output": {
+          "slot": "object"
+        },
+        "errors": [
+          "PERMISSION_DENIED",
+          "SCHEMA_INVALID",
+          "ARTIFACT_NOT_FOUND",
+          "STALE_REVISION",
+          "RESOURCE_DENIED",
+          "IDEMPOTENCY_CONFLICT",
+          "ILLEGAL_TRANSITION",
+          "OUTCOME_UNKNOWN",
+          "CONTENT_HASH_MISMATCH",
+          "HOLD_ACTIVE",
+          "SCOPE_DENIED",
+          "VERSION_IMMUTABLE"
+        ],
+        "note": "Changes logical parent only, fencing the whole affected subtree. Refuses cycles, cross-run/pool parents and any subtree exceeding min(backend max_agent_depth, observed max_depth). Native parent and depth remain the Host observation."
+      },
+      "gx_host_pool_adopt_existing": {
+        "input": {
+          "pool_id": "str",
+          "run_id": "str",
+          "lease_id": "str?",
+          "native_agent_ref": "str",
+          "inventory_call_id": "str",
+          "expected_pool_generation": "int",
+          "expected_pool_revision": "int",
+          "idempotency_key": "str",
+          "reason": "str",
+          "task_id": "str"
+        },
+        "output": {
+          "slot": "object",
+          "transfer_receipt": "object",
+          "replayed": "bool"
+        },
+        "mutating": true,
+        "requires_revision": false,
+        "scope": "host_adapter",
+        "errors": [
+          "SCHEMA_INVALID",
+          "RESOURCE_DENIED",
+          "SCOPE_DENIED",
+          "ARTIFACT_NOT_FOUND",
+          "CONTENT_HASH_MISMATCH",
+          "ILLEGAL_TRANSITION",
+          "STALE_REVISION",
+          "IDEMPOTENCY_CONFLICT",
+          "OUTCOME_UNKNOWN",
+          "HOLD_ACTIVE",
+          "PERMISSION_DENIED",
+          "LEASE_EXPIRED",
+          "VERSION_IMMUTABLE"
+        ],
+        "note": "Explicit PRE-DISPATCH ownership transfer of an existing externally chargeable native identity; app8 admission happens BEFORE sending a new task or claiming. task_id must identify a real current public READY task/assignment of the target run; lease_id is optional. With no lease, verify current run pins/project permission, actual native root/parent/depth/model/effort against intended task/role and settled assignment principal; insert ACTIVE but task-unbound (task_bound:false), no scientific CONFORMS or fabricated creation/claim causality. The later actual worker firstclaim+bind must independently prove marker/currentcall/currentcontext/policy/principal. With a supplied current lease, allow recovery only after full backend causal binding and CONFORMS audit. Read native inventory+packet outside any writer; in one short fenced transaction require exact already-chargeable external identity, no owned duplicate, inventory/pool/assignment/task CAS, app owned nonterminal < authoritative8, then external-1/owned+1 with total invariant. No spawn/native creation intent/termination. Ninth transfer/reserve is refused before dispatch/claim and makes no slot/intention; unknown external IDs cannot decrement anonymous integers. Inactive external identity requires separate prepared activation; no completion-based GX release. New runs whose backend-pinned policy has policy_host=codex and policy_scope=host-specific-v1 require a backend identity inventory and a fresh complete authenticated root roster before reserve or existing-native adoption. They cannot use legacy scalar-only pool registration as an admission escape. Legacy scalar mode is compatible only with historical policy families; unknown external occupancy remains UNKNOWN and refuses new admission.",
+        "idempotent_by": "idempotency_key"
+      }
+    }
+  }
+}

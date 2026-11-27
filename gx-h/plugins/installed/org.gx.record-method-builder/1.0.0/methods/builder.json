@@ -1,0 +1,70 @@
+{
+  "manifest": {
+    "capability_id": "derive-record-coverage",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--source",
+        "{in.source}",
+        "--engine",
+        "{data.0}",
+        "--cohort-rows={param.cohort_rows}",
+        "--cohort-id={param.cohort_id}",
+        "--evidence-rows={param.evidence_rows}",
+        "--evidence-id={param.evidence_id}",
+        "--evidence-value={param.evidence_value}",
+        "--source-quote={param.source_quote}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.record-method-builder/1.0.0/template/coverage.py"
+    ],
+    "method_card": {
+      "family": "calibrated_method_development",
+      "objective": "Develop a missing read-only CPU method for evidence coverage by accession, for use later in the same Goal.",
+      "mechanism": "Supply one UTF-8 method source plus a unique exact source_quote (12–240 chars). Set cohort_rows/evidence_rows to the JSON array field (or $ for a root array); set cohort_id/evidence_id to exact common-namespace key fields, evidence_value to an observed text or finite numeric field. Names are literal, including case. The builder calibrates before exposing a package for gx_install_record_method.",
+      "estimator": "Coverage is the number of distinct cohort IDs with a nonempty matching value divided by all distinct cohort IDs. Numeric zero is a present value. A missing/invalid cohort ID makes the denominator ambiguous and the method fails.",
+      "training_data_lineage": "An independent declarative extension of identifier mapping, with the chosen article/snapshot quoted by line and byte digest."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.record-method-builder/1.0.0/methods/derive.py",
+      "sha256": "50c23625e15d59d85157aa44c4c70e17693f9a2798bfd2c1c5cb79a988de5f81"
+    },
+    "licence": "GX release implementation",
+    "licence_basis": "GX record analysis template published with this release.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 15
+    },
+    "outputs": [
+      {
+        "name": "method-spec.json",
+        "kind": "file:derived_record_method",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "source"
+        ],
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Analytical method authoring is limited to a documented distinct-key evidence join. ID proximity, homology, sampling independence and semantic annotation correctness are outside scope.",
+    "parameter_defaults": {
+      "cohort_rows": "records",
+      "cohort_id": "id",
+      "evidence_rows": "records",
+      "evidence_id": "id",
+      "evidence_value": "locator"
+    }
+  },
+  "entry_script": "methods/derive.py"
+}

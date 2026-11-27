@@ -1,0 +1,32 @@
+{
+  "id": "org.gx.arxiv-sources",
+  "version": "1.0.0",
+  "api_version": "1.0",
+  "kind": "bundle",
+  "entrypoint": "plugin:register",
+  "gx_compat": ">=3.0,<4.0",
+  "dependencies": [],
+  "extensions": [
+    {
+      "id": "arxiv-search",
+      "version": "1.0",
+      "contract": "capability"
+    },
+    {
+      "id": "arxiv-fetch",
+      "version": "1.0",
+      "contract": "capability"
+    },
+    {
+      "id": "arxiv-methods",
+      "version": "1.0",
+      "contract": "goal_method"
+    },
+    {
+      "id": "arxiv_investigation",
+      "version": "1",
+      "contract": "research_module"
+    }
+  ],
+  "description": "Query the public arXiv Atom catalogue and acquire exact revision PDFs."
+}

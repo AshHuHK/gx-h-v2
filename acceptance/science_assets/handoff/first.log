@@ -1,0 +1,35 @@
+E
+======================================================================
+ERROR: test_one_frozen_child_and_independent_result (acceptance.unified_multiturn.test_successor.SuccessorStudy.test_one_frozen_child_and_independent_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/unified_multiturn/test_successor.py", line 137, in test_one_frozen_child_and_independent_result
+    list(pool.map(retry, range(2)))
+  File "/opt/conda/lib/python3.11/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/opt/conda/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/unified_multiturn/test_successor.py", line 134, in retry
+    return successor.request(db, work/"state", parent, mid, question, frozen)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/successor.py", line 232, in request
+    spec = _spec(conn, directory, parent, close, message_id, text, options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/successor.py", line 98, in _spec
+    raise SchemaInvalid("Select prior material references, new input files or message attachments for the successor")
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Select prior material references, new input files or message attachments for the successor
+
+----------------------------------------------------------------------
+Ran 1 test in 4.460s
+
+FAILED (errors=1)

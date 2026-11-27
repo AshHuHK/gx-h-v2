@@ -164,6 +164,85 @@
         "annotation rows"
       ],
       "related_methods": "yeast-reaction-index@2"
+    },
+    {
+      "reference": "interpret-coordinate-coverage@1",
+      "kind": "skill",
+      "category": "evidence",
+      "title": "Interpret deposited coordinate coverage",
+      "purpose": "Decide how far published coordinates support a structural comparison.",
+      "aliases": [
+        "坐標覆蓋",
+        "坐标覆盖",
+        "缺鏈",
+        "missing residues",
+        "Fab",
+        "沉積結構",
+        "structure QC"
+      ],
+      "inputs": [
+        "predeclared residue mapping",
+        "named coordinate measurement"
+      ],
+      "outputs": [
+        "bounded structural interpretation",
+        "missingness and denominator"
+      ],
+      "reading_guide": [
+        "Start from the chain and residue mapping specified before the measurement. Read the number of matched positions and the number expected, plus the atom selection, model and units.",
+        "If a chosen subset is small, keep the numerical comparison local to those positions. A smaller RMSD on a different subset does not establish improvement for the whole chain.",
+        "Compare accession and sample provenance before treating records as independent. If an observation could change with chain assignment or alternate locations, inspect the original record or ask for the missing material."
+      ],
+      "limitations": "Archive geometry alone provides no measurement of activity, binding or performance in a new sample.",
+      "related_methods": [
+        "deposited-backbone-qc@1",
+        "mapped-structure-agreement@1"
+      ],
+      "source": {
+        "workspace": "gx-h-v2",
+        "path": "acceptance/science_plugin_blueprint/recipes/live-independent.json",
+        "sha256": "6a7abdd194fae1a6e9eb5e5c641e4361381f5d2b3a7152be1eb4d4e67f1cdf56"
+      },
+      "digest": "5b58d82fcd48e1306370bbee45510439505ffeb5cb348a3cd45b72ab96f5c94c"
+    },
+    {
+      "reference": "interpret-enzyme-annotation@1",
+      "kind": "skill",
+      "category": "evidence",
+      "title": "Interpret natural enzyme archive records",
+      "purpose": "Evaluate how a yeast reaction and taxonomy query supports an annotation claim.",
+      "aliases": [
+        "酵母",
+        "酶註釋",
+        "酶注释",
+        "反應方向",
+        "证据覆盖",
+        "annotation evidence"
+      ],
+      "inputs": [
+        "database release and query keys",
+        "named annotation rows"
+      ],
+      "outputs": [
+        "source-linked interpretation",
+        "unanswered measurement question"
+      ],
+      "reading_guide": [
+        "Inspect the organism identifier, snapshot version and the exact reaction or enzyme-class key that returned each row. Preserve unknown direction and distinguish exact annotations from broader class membership.",
+        "Compare accessions and the underlying source before counting independent observations. A second interface for the same curator record adds a retrieval route.",
+        "For a zero-row result verify query coverage and successful completion. Record which measurement under which condition would be needed to answer a remaining activity question."
+      ],
+      "limitations": "An annotation or a class match alone supplies no measured activity or kinetic value.",
+      "related_methods": [
+        "yeast-reaction-index@2",
+        "yeast-archive-lookup@1"
+      ],
+      "source": {
+        "workspace": "gx-h-v2",
+        "path": "acceptance/science_capabilities/YEAST_REVIEW.md",
+        "sha256": "0cf03cd66bf6d7ed8b1654076d12ceb34a4f657367a44d994120d37661eab237"
+      },
+      "digest": "f89d999be47438cff1d5d7a239d6476f86323494c502e459145e139ac84dfbbd"
     }
   ]
 }

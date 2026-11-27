@@ -19,6 +19,8 @@ from tests.test_v6_decisions import branch
 from gx_core.p0 import cli, conversation, research_report, successor, v623_endpoints
 from acceptance.v623 import test_close_metrics as receipts
 from gx_core.p0.roots import Roots
+from gx_core.p0 import v62_outputs
+from gx_core.errors import SchemaInvalid
 from gx_core import budgets
 from gx_core.persistence import store
 
@@ -96,6 +98,10 @@ class SuccessorStudy(unittest.TestCase):
             close = conclude(s, parent_result)
             s.advance()
             parent_material = s.materials[0]
+            output = next(item for item in v62_outputs.published_outputs(s.conn, parent, parent_result["job_id"])
+                          if item["output_name"] == "signed-summary.json")
+            pin = {k: output[k] for k in ("artifact_ref", "output_name", "sha256")}
+            pin.update(job_id=parent_result["job_id"], role="archived_analysis")
             parent_budget = s.conn.execute("SELECT budget_ref FROM runs WHERE run_id=?", (parent,)).fetchone()[0]
             before = budgets.state(s.conn, parent_budget)
             held_turns = [r for r in before["reservations"] if r["subject_kind"] == "native_turn"]
@@ -103,7 +109,7 @@ class SuccessorStudy(unittest.TestCase):
         first_export = warm()
         fresh = directory/"new-coordinate.cif"
         fresh.write_bytes((PRODUCT/"examples/pcna/open-data/3TBL.cif").read_bytes())
-        options = {"parent_material_refs":[parent_material], "input_files":[
+        options = {"parent_material_refs":[parent_material], "parent_outputs":[pin], "input_files":[
             {"path":str(fresh), "role":"structure", "acquisition":str(PRODUCT/"examples/pcna/open-data/3TBL.json")}]}
         question = "On the newly selected coordinates, measure deposited coordinate coverage."
         mid = "successor-cpu"
@@ -111,6 +117,14 @@ class SuccessorStudy(unittest.TestCase):
         selected.write_text(json.dumps(options))
         args = ("message", "--run-id",parent,"--message-id",mid,"--text",question,
                 "--successor","--successor-config",str(selected))
+        with closing(cli.existing_db(work/"state", readonly=False)) as db:
+            parent_row = db.execute("SELECT * FROM runs WHERE run_id=?", (parent,)).fetchone()
+            sealed = research_report.completed_close(db, parent)
+            for amendment in ({"output_name":"wrong-port"}, {"job_id":"unknown-job"},
+                               {"artifact_ref":parent_material}, {"sha256":"0"*64}):
+                with self.subTest(amendment=amendment), self.assertRaises(SchemaInvalid):
+                    successor._spec(db, work/"state", parent_row, sealed, mid, question,
+                                    {"parent_outputs":[{**pin, **amendment}]})
         run_cli(*args, "--queue-only")
         fresh.unlink()
         def retry(_):
@@ -155,6 +169,17 @@ class SuccessorStudy(unittest.TestCase):
             material = next(f["artifact_ref"] for f in packet["materials"] if f["name"] == fresh.name)
             prior = next(f for f in packet["materials"] if f["name"] == "1VYM.cif")
             self.assertNotEqual(prior["artifact_ref"], parent_material)
+            imported = next(f for f in packet["materials"] if f["role"] == "archived_analysis")
+            self.assertEqual(imported["sha256"], output["sha256"])
+            self.assertNotEqual(imported["artifact_ref"], output["artifact_ref"])
+            transfer = json.loads(s.conn.execute("SELECT payload_json FROM events WHERE run_id=? AND "
+                "kind='v6.research.successor_opened'", (child,)).fetchone()[0])
+            local = next(item for item in transfer["material_transfers"] if item["artifact_ref"] == imported["artifact_ref"])
+            self.assertEqual(local["source_output"]["job_id"], parent_result["job_id"])
+            self.assertEqual(local["parent_artifact_ref"], output["artifact_ref"])
+            fact = v62_outputs.classify(s.conn, child, imported["artifact_ref"])
+            self.assertEqual((fact["nature"], fact["record_kind"]), ("analysis","transferred_output"))
+            self.assertFalse(fact["independence_complete"])
             prediction = {"target":"analysis", "method":{"capability":method,"output":"signed-summary.json",
                           "parameters":parameters,"metric_id":"missed_present","unit":"1","input_role":"structure"},
                           "observable":"/missed_present", "measurement_schema":"gx.signed-summary/1",

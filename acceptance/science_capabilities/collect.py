@@ -58,7 +58,9 @@ def check(work, build, rid, destination):
                 decision_ref=decision["decision_ref"],commit_event=result["closure"]["committed_event"],
                 close_event=result["closure"]["closed_event"],reexport_added=export["invocation"]["added"])
     (destination/"receipt.json").write_text(json.dumps(ledger,ensure_ascii=False,indent=2)+"\n")
-    print(rid, len(turns),"official turns",len(result["jobs"]),"Jobs",ledger["close_event"])
+    model_turns = sum(t.get("classification") == "NATIVE_MODEL" for t in turns)
+    print(rid, model_turns, "verified model turns in", len(turns), "acknowledged starts,",
+          len(result["jobs"]), "Jobs, closure event", ledger["close_event"])
 
 
 if __name__=="__main__":

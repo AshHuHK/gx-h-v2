@@ -8,7 +8,7 @@ from .. import config
 from ..domain import clock, machines
 from ..errors import HoldActive
 from ..hostobs import host_policy
-from ..hostobs.app_server_client import AppServerResponseError
+from ..hostobs.app_server_client import AppServerError, AppServerResponseError
 from ..jobs import leases
 from ..persistence import store
 from . import waits
@@ -21,6 +21,9 @@ OPT_OUT = ("item/agentMessage/delta", "item/plan/delta", "item/reasoning/textDel
            "item/reasoning/summaryTextDelta", "item/commandExecution/outputDelta", "item/fileChange/outputDelta")
 PROGRESS = frozenset(("turn/started", "item/started", "item/completed", "thread/tokenUsage/updated",
                       "rawResponse/completed", "item/tool/call"))
+ACCOUNT_REFRESH_SECONDS = 300
+ACCOUNT_READ = "account/rateLimits/read"
+ACCOUNT_UPDATE = "account/rateLimits/updated"
 
 
 def _provider(conn, binding):
@@ -43,19 +46,19 @@ def _save(conn, provider, bucket, facts, source):
                  "blocked_until,source,observed_at) VALUES(?,?,?,?,?,?,?,?)"
                  " ON CONFLICT(provider,bucket) DO UPDATE SET model=excluded.model,primary_json=excluded.primary_json,"
                  "secondary_json=excluded.secondary_json,blocked_until=excluded.blocked_until,"
-                 "source=excluded.source,observed_at=excluded.observed_at",
+                 "source=excluded.source,observed_at=excluded.observed_at,refresh_after=NULL",
                  (provider, bucket, facts.get("model"), facts.get("primary_json"), facts.get("secondary_json"),
                   facts.get("blocked_until"), source, clock.now_iso()))
 
 
-def account_update(conn, provider, snapshot):
+def account_update(conn, provider, snapshot, *, source=ACCOUNT_UPDATE):
     """Merge independently supplied account windows. Only retain fields used for admission."""
     if not isinstance(snapshot, dict):
         return
     bucket = snapshot.get("limitId") or "codex"
     if not isinstance(bucket, str):
         return
-    with store.transaction(conn):
+    with store.transaction(conn, transaction_owner="ProviderLimits", operation="observe_window"):
         prior = conn.execute("SELECT * FROM p0_provider_limits WHERE provider=? AND bucket=?",
                              (provider, bucket)).fetchone()
         facts = dict(prior) if prior else {}
@@ -78,7 +81,58 @@ def account_update(conn, provider, snapshot):
             facts["blocked_until"] = clock.now().timestamp() + _retry_seconds()
         elif snapshot.get("spendControlReached") is False:
             facts["blocked_until"] = None
-        _save(conn, provider, bucket, facts, "account/rateLimits/updated")
+        _save(conn, provider, bucket, facts, source)
+
+
+def refresh_blocked_account(roots, refusal):
+    """Reread only a stale account window that has actually denied admission on this host."""
+    details = refusal.details
+    bucket = details.get("account_bucket")
+    provider = details.get("provider")
+    now = clock.now().timestamp()
+    if not bucket or provider != "openai" or roots.account_provider != provider or now < details["refresh_due"]:
+        return
+    conn = roots.conn
+    if conn.in_transaction:
+        raise RuntimeError("commit the admission refusal before reading account limits")
+    next_read = now + ACCOUNT_REFRESH_SECONDS
+    with store.transaction(conn, transaction_owner="ProviderLimits", operation="schedule_refresh", run_id=roots.run_id):
+        claimed = conn.execute(
+            "UPDATE p0_provider_limits SET refresh_after=? WHERE provider=? AND bucket=? AND observed_at=?"
+            " AND (refresh_after IS NULL OR refresh_after<=?) AND source IN (?,?)",
+            (next_read, provider, bucket, details["observed_at"], now, ACCOUNT_READ, ACCOUNT_UPDATE))
+        if not claimed.rowcount:
+            return
+    try:
+        reply = roots._request(ACCOUNT_READ, {"excludeResetCreditDetails":True}, timeout=5)
+    except (AppServerError, OSError, EOFError):
+        return  # The previous refusal and the persisted retry time remain authoritative.
+    if not isinstance(reply, dict) or reply.get("ordinaryUsageAllowed") is not True:
+        return
+    grouped = reply.get("rateLimitsByLimitId")
+    if isinstance(grouped, dict) and bucket in grouped:
+        snapshot = grouped[bucket]
+        scope = bucket
+    else:
+        snapshot = reply.get("rateLimits")
+        scope = "codex"  # The legacy single-bucket view defaults to the Codex limit.
+    if (not isinstance(snapshot, dict) or (snapshot.get("limitId") or scope) != bucket
+            or snapshot.get("normalModelSlug") != details["bucket_model"]
+            or snapshot.get("spendControlReached") or snapshot.get("rateLimitReachedType")):
+        return
+    spend = snapshot.get("individualLimit")
+    if isinstance(spend, dict) and spend.get("remainingPercent") == 0:
+        return
+    for key in ("primary", "secondary"):
+        window = snapshot.get(key)
+        if window is not None and (not isinstance(window, dict) or type(window.get("usedPercent")) is not int
+                                   or not 0 <= window["usedPercent"] <= 100):
+            return
+    with store.transaction(conn, transaction_owner="ProviderLimits", operation="apply_refresh", run_id=roots.run_id):
+        # A newer push for this bucket invalidates the read, even in the same millisecond.
+        if conn.execute("SELECT 1 FROM p0_provider_limits WHERE provider=? AND bucket=? AND refresh_after=?",
+                        (provider, bucket, next_read)).fetchone():
+            account_update(conn, provider, {**snapshot, "limitId":bucket}, source=ACCOUNT_READ)
 
 
 def rate_refusal(error):
@@ -160,8 +214,8 @@ def require_provider_capacity(conn, binding, event_id):
     provider = _provider(conn, binding)
     now = clock.now().timestamp()
     rows = conn.execute("SELECT * FROM p0_provider_limits WHERE provider=? AND (model IS NULL OR model=?)"
-                        " AND (source='account/rateLimits/updated' OR blocked_until>?)",
-                        (provider, binding.get("model"), now)).fetchall()
+                        " AND (source IN (?,?) OR blocked_until>?)",
+                        (provider, binding.get("model"), ACCOUNT_READ, ACCOUNT_UPDATE, now)).fetchall()
     known = False
     for row in rows:
         known |= bool(row["primary_json"] or row["secondary_json"])
@@ -171,8 +225,13 @@ def require_provider_capacity(conn, binding, event_id):
             if window.get("usedPercent", 0) >= 100:
                 resets.append(window["resetsAt"])
         if max(resets) > now:
-            raise HoldActive("Codex provider capacity is awaiting its reset", details={
-                "reason":"provider_backoff", "provider":provider, "resets_at":max(resets), "event_id":event_id})
+            details = {"reason":"provider_backoff", "provider":provider, "resets_at":max(resets), "event_id":event_id}
+            if row["source"] in (ACCOUNT_READ, ACCOUNT_UPDATE):
+                due = max(clock.parse(row["observed_at"]).timestamp() + ACCOUNT_REFRESH_SECONDS,
+                          row["refresh_after"] or 0)
+                details.update(account_bucket=row["bucket"], bucket_model=row["model"],
+                               observed_at=row["observed_at"], refresh_due=due)
+            raise HoldActive("Codex provider capacity is awaiting its reset", details=details)
     policy = _policy()
     cap = policy.get("parallel_turns", {}).get(provider)
     if cap is None and provider != "openai" and not known:

@@ -344,6 +344,11 @@ class Driver:
                         require_capacity(self.conn, dict(root))
                         waits.finish(self.conn, root_key, "provider_backoff", "transport:" + root_key)
             result = operation(native)
+        except HoldActive as exc:
+            if exc.details.get("account_bucket"):
+                from . import activity
+                activity.refresh_blocked_account(native, exc)
+            raise  # The normal admission path retries the original task with the refreshed facts.
         except (AppServerDisconnected, AppServerTimeout, OutcomeUnknown, AppServerResponseError) as exc:
             if self.conn.in_transaction or isinstance(exc, OutcomeUnknown) and "rollback_error" in exc.details:
                 raise

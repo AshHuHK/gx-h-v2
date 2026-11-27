@@ -1,0 +1,345 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8fdke95wxpbgs7j",
+  "goal": "麵包酵母 S288C 的食品資料庫說明頁需要一段可追查的文字：封存資料對麥芽糖水解有哪些具名天然蛋白記錄？哪些可連到指定反應、方向及該條目的測定條件？來自同一原始記錄的資料只能計一次。請依實際快照結果決定品管頁可以刊登到甚麼程度，並留下可在另一種二糖上重做的程序與可移交原件。\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_c2d6062f5205f2281611f8863c21a83278776fd4474d4937734c33b1c5098ee9",
+    "op_digest": "846030b70d6e314dd6d0bb99484dae6f5a70d43a2dab06dd74cd420c2784cf79",
+    "requested_event": 73,
+    "committed_event": 78,
+    "closed_event": 80,
+    "closed_utc": "2026-11-27T21:16:31.981Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8fdt4b9jt2hxkn1"
+      ],
+      "op": "close_run",
+      "reason": "品管頁可刊登 S. cerevisiae S288C 的天然 α-葡萄糖苷酶 MAL12（Swiss-Prot P53341）與 MAL32（P38158），序列版本均為 1，兩者均註記 EC 3.2.1.20。指定主反應 RHEA:68796 為 D-maltose + H2O = alpha-D-glucose + D-glucose，列 EC 3.2.1.48。兩個蛋白條目均缺少此反應連結、個別方向及可歸屬的麥芽糖測定條件。MAL12 的 BRENDA 3.2.1.20/km_value/131 使用 4-nitrophenyl alpha-d-glucopyranoside，3.2.1.20/specific_activity/33 未指明底物。兩條各自記載 pH 6.6、37 °C，各計一次。已保存程序 s288c-disaccharide-archive-qc@1。交接原件為 query-a.json（gxa_01m8fdkea3wrcvsntp）及 parent-records.json（gxa_01m8fdmcaez3kstbtj，SHA-256 6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907）。在下一個查詢中可將 substrate 換成 isomaltose，保持 taxid 559292，以已存程序查詢。若需跨二糖比對，以新查詢作 query，將本次 parent-records.json 原檔作 prior_records 交給 yeast-archive-compare@1，核對來源與序列身分。",
+      "unresolved": [
+        "在這些封存版本內，仍缺可把指定反應及催化方向連到任一蛋白的條目，也缺可歸屬到該蛋白及麥芽糖的測定條件。兩種蛋白對麥芽糖的實際活性仍待同底物原始測定確認。"
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_c2d6062f5205f2281611f8863c21a83278776fd4474d4937734c33b1c5098ee9",
+    "task_id": "gxt_01m8fdngkhh6jcwv3p",
+    "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+    "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+    "rationale": "已逐筆核對查詢原件及 parent-records.json。MAL12 與 MAL32 各有 ENZYME 分類來源行，兩筆的 reaction_links 都是空陣列。MAL12 所連的 BRENDA 條目分別記載其他具名底物與未指明底物，MAL32 沒有連結測定，SABIO-RK 也沒有連結條目。這些記錄足以決定本版品管頁的刊登範圍。重跑相同快照只會再次讀取同一批原始記錄。可重用程序已儲存並在目錄核對。",
+    "reason": "品管頁可刊登 S. cerevisiae S288C 的天然 α-葡萄糖苷酶 MAL12（Swiss-Prot P53341）與 MAL32（P38158），序列版本均為 1，兩者均註記 EC 3.2.1.20。指定主反應 RHEA:68796 為 D-maltose + H2O = alpha-D-glucose + D-glucose，列 EC 3.2.1.48。兩個蛋白條目均缺少此反應連結、個別方向及可歸屬的麥芽糖測定條件。MAL12 的 BRENDA 3.2.1.20/km_value/131 使用 4-nitrophenyl alpha-d-glucopyranoside，3.2.1.20/specific_activity/33 未指明底物。兩條各自記載 pH 6.6、37 °C，各計一次。已保存程序 s288c-disaccharide-archive-qc@1。交接原件為 query-a.json（gxa_01m8fdkea3wrcvsntp）及 parent-records.json（gxa_01m8fdmcaez3kstbtj，SHA-256 6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907）。在下一個查詢中可將 substrate 換成 isomaltose，保持 taxid 559292，以已存程序查詢。若需跨二糖比對，以新查詢作 query，將本次 parent-records.json 原檔作 prior_records 交給 yeast-archive-compare@1，核對來源與序列身分。",
+    "unresolved": [
+      "在這些封存版本內，仍缺可把指定反應及催化方向連到任一蛋白的條目，也缺可歸屬到該蛋白及麥芽糖的測定條件。兩種蛋白對麥芽糖的實際活性仍待同底物原始測定確認。"
+    ],
+    "claim_refs": [
+      "gxa_01m8fdt4b9jt2hxkn1"
+    ],
+    "evidence_refs": [
+      "gxa_01m8fdkea3wrcvsntp",
+      "gxa_01m8fdmcaez3kstbtj"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [],
+    "rendered": {
+      "reason": "品管頁可刊登 S. cerevisiae S288C 的天然 α-葡萄糖苷酶 MAL12（Swiss-Prot P53341）與 MAL32（P38158），序列版本均為 1，兩者均註記 EC 3.2.1.20。指定主反應 RHEA:68796 為 D-maltose + H2O = alpha-D-glucose + D-glucose，列 EC 3.2.1.48。兩個蛋白條目均缺少此反應連結、個別方向及可歸屬的麥芽糖測定條件。MAL12 的 BRENDA 3.2.1.20/km_value/131 使用 4-nitrophenyl alpha-d-glucopyranoside，3.2.1.20/specific_activity/33 未指明底物。兩條各自記載 pH 6.6、37 °C，各計一次。已保存程序 s288c-disaccharide-archive-qc@1。交接原件為 query-a.json（gxa_01m8fdkea3wrcvsntp）及 parent-records.json（gxa_01m8fdmcaez3kstbtj，SHA-256 6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907）。在下一個查詢中可將 substrate 換成 isomaltose，保持 taxid 559292，以已存程序查詢。若需跨二糖比對，以新查詢作 query，將本次 parent-records.json 原檔作 prior_records 交給 yeast-archive-compare@1，核對來源與序列身分。",
+      "rationale": "已逐筆核對查詢原件及 parent-records.json。MAL12 與 MAL32 各有 ENZYME 分類來源行，兩筆的 reaction_links 都是空陣列。MAL12 所連的 BRENDA 條目分別記載其他具名底物與未指明底物，MAL32 沒有連結測定，SABIO-RK 也沒有連結條目。這些記錄足以決定本版品管頁的刊登範圍。重跑相同快照只會再次讀取同一批原始記錄。可重用程序已儲存並在目錄核對。",
+      "unresolved": [
+        "在這些封存版本內，仍缺可把指定反應及催化方向連到任一蛋白的條目，也缺可歸屬到該蛋白及麥芽糖的測定條件。兩種蛋白對麥芽糖的實際活性仍待同底物原始測定確認。"
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+      "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40",
+      "bytes": 75,
+      "role": "query"
+    }
+  ],
+  "predictions": [],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8fdvwqz8cxvjd0x",
+      "statement": "封存資料可列出麵包酵母 S288C 的 α-葡萄糖苷酶 MAL12（P53341）及 MAL32（P38158）。要將指定麥芽糖水解反應、催化方向或麥芽糖測定條件歸給其中任一蛋白，現有記錄不足。",
+      "scope": "查詢原件指定的 Saccharomyces cerevisiae S288C 與麥芽糖，限 parent-records.json 標示的 Rhea、Swiss-Prot、ENZYME 與 BRENDA/SABIO-RK 封存版本。",
+      "criteria": "反應歸屬須有該 accession 的目標 Rhea 主條目連結，方向另須明載。測定須在依賴底物的參數欄精確具名麥芽糖，並由原始條目載明蛋白歸屬及所引條件。相同原件及群組記錄在聯集中各只計一次。",
+      "decision_scope": "run",
+      "limitations": "本判定描述特定快照的涵蓋範圍。測定的菌株、蛋白製備及個別活性仍須原實驗記錄確認。沒有連結時，實際的麥芽糖水解活性仍屬未知。",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fdt4b9jt2hxkn1",
+        "proposed_level": "insufficient",
+        "rationale": "MAL12 與 MAL32 的 ec_links 各有 α-葡萄糖苷酶來源行，reaction_links 均為空。MAL12 連到的 BRENDA Km 條目明列另一種底物，比活性條目的底物欄為空。MAL32 沒有連到測定，SABIO-RK 也沒有連到任一蛋白的條目。"
+      },
+      "evidence_refs": [
+        "gxa_01m8fdkea3wrcvsntp",
+        "gxa_01m8fdmcaez3kstbtj"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "22632a06ff09e4c87109f78f43060ecd6a04e7fca8b36207aefe169ed518306d",
+        "brief_turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "context_ref": "gxcx_01m8fdngkgw7n643v5",
+        "delivery_receipt": "start:e60a8c84-2ddd-4aae-bdd3-a12f28c16484",
+        "metric_refs": [],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+            "event_id": 51,
+            "projection_sha256": "2cc74e7da9e73a36659e124e4f6281e85763696de3d2870eea1acf3cdcec326a",
+            "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+          }
+        ],
+        "snapshot_cursor": 51,
+        "state": "acknowledged",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdkea3wrcvsntp",
+          "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40",
+          "source_class": "input"
+        },
+        {
+          "admission_sha256": "0c54141eec95588a442e8a0df4a5463a8b949ffb40b5d70e9c07f88da0163d7d",
+          "artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+          "capability": "yeast-archive-lookup",
+          "completion_sha256": "07fa5c9119a18208038f491d029d5b9742453cec00c1ad707ef52dd3a70da529",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+              "bytes": 75,
+              "role": "query",
+              "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+            }
+          ],
+          "job_id": "gxj_01m8fdmbx53g9thef6",
+          "job_status": "SUCCEEDED",
+          "kind": "yeast_archive_records",
+          "output_provenance": {
+            "admission_sha256": "0c54141eec95588a442e8a0df4a5463a8b949ffb40b5d70e9c07f88da0163d7d",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+            "capability": {
+              "id": "yeast-archive-lookup",
+              "sha256": "ec1423557d8dd23e15bdbefa09af1616226b0a4d977f32cd2f70e8e082d2820f",
+              "version": "1"
+            },
+            "completion_sha256": "07fa5c9119a18208038f491d029d5b9742453cec00c1ad707ef52dd3a70da529",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+                "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+              }
+            ],
+            "declaration_name": "parent-records.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+              ],
+              "processing": [
+                "capability:ec1423557d8dd23e15bdbefa09af1616226b0a4d977f32cd2f70e8e082d2820f",
+                "method_source:e07c03c02bb07bfb9df06e90a9e409a7f8e3da37c13633356fbcc4a08bcbb771"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 46,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdmbx53g9thef6",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "parent-records.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdmcaez3kstbtj",
+          "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+          "source_class": "computed_result",
+          "version": "1"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fdvwqz8cxvjd0x@1",
+      "decision_id": "gxa_c2d6062f5205f2281611f8863c21a83278776fd4474d4937734c33b1c5098ee9",
+      "assessment_cursor": 51,
+      "availability_cursor": 72,
+      "level": "insufficient",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:16:31.871Z",
+      "event_id": 72,
+      "event": "v6.claim.adopted",
+      "author": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8fdmbx53g9thef6",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "yeast-archive-lookup",
+        "sha256": "ec1423557d8dd23e15bdbefa09af1616226b0a4d977f32cd2f70e8e082d2820f",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+          "bytes": 75,
+          "role": "query",
+          "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:bb610b2ccda2f93329bf04c30561174a55370599547f5f8ff4819ac8c3b5fc5a",
+        "branch_id": "branch_46907ab67c28e9e8ed8ac4b7be15b616",
+        "decision_ref": "gxa_f4fbc2518fcd99694b5fd44a63b99db21ceb2db7c8848c064ddb1329186acd21",
+        "exec_key": "f6034ef72d63270722ba2ea84785bbd18b937e1b5aa4f520f49c30f6fa4ca6c2",
+        "kind": "graph_node",
+        "node_id": "node_73ef741abef65bbccf82f35260547dba",
+        "operation_key": "v6.node:bb610b2ccda2f93329bf04c30561174a55370599547f5f8ff4819ac8c3b5fc5a",
+        "plan_key": "d0147adfc348f0e5307d062b9476eaea0297c074f33e0481a61f73a0de12ea9c",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "07fa5c9119a18208038f491d029d5b9742453cec00c1ad707ef52dd3a70da529",
+      "outputs": [
+        {
+          "output_name": "parent-records.json",
+          "artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+          "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+          "bytes": 3756,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+              "bytes": 75,
+              "role": "query",
+              "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdke95wxpbgs7j/jobs/gxj_01m8fdmbx53g9thef6",
+            "rel_path": "files/parent-records.json"
+          },
+          "metrics": [],
+          "summary": {
+            "schema": "gx.yeast-archive-parents/1",
+            "context_ec": "3.2.1.20",
+            "context_ec_name": "alpha-glucosidase",
+            "limitations": "EC is a separate class-level search even when the reaction lists that EC. UN direction is unspecified. Missing links in these snapshots do not establish absent activity.",
+            "counts": {
+              "distinct_accessions": 2,
+              "exact_accessions": 0,
+              "class_accessions": 2
+            }
+          },
+          "denominators": {
+            "counts": {
+              "distinct_accessions": 2,
+              "exact_accessions": 0,
+              "class_accessions": 2
+            }
+          },
+          "lead_delivery_event_ids": []
+        }
+      ]
+    }
+  ],
+  "deliveries": [],
+  "routes": {
+    "modules": [],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": []
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [],
+  "invocation": {
+    "action": "start",
+    "before": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "after": {
+      "jobs": 1,
+      "host_turns": 3
+    },
+    "added": {
+      "jobs": 1,
+      "host_turns": 3
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/asset-study-live/yeast/state --run-key yeast-natural-records-maltose-first --goal-file /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/enzyme/field/question-a.md --goal-config /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/asset-study-live/yeast/goal-a.json --timeout 1500.0"
+  }
+}

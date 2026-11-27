@@ -192,7 +192,7 @@ def disposition_reason(table, row, status, source_state):
             return "service_lifecycle_not_a_scientific_measurement"
         if tool.startswith(("submit_", "create_", "register_", "save_", "upload_", "delete_", "resume_")):
             return "changes_runtime_state_outside_read_only_import"
-        if row["category"] in {"database","literature"}:
+        if row.get("category") in {"database","literature"}:
             return "specific_operation_or_source_scope_not_curated"
         return "historical_tool_without_reviewed_read_only_operation"
     if status == "rna_index_deferred":

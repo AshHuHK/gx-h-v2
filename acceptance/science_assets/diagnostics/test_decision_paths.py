@@ -44,6 +44,10 @@ class DecisionPathTests(unittest.TestCase):
         body["ops"][1]["stop_condition"] = stop
         self.refused(study, body, "extra-stop", "ops[1].stop_condition", "add_node")
         del body["ops"][1]["stop_condition"]
+        body["ops"][1]["private_note"] = "a researcher-provided field"
+        self.refused(study, body, "private-field", "ops[1].private_note", "add_node",
+                     public_field="ops[1]")
+        del body["ops"][1]["private_note"]
         route["budget_limits"]["cpu_seconds"] = 60
         self.assertTrue(study.call(study.lead, "gx_decide_revision", {"decision": body}, "corrected")["event_id"])
 

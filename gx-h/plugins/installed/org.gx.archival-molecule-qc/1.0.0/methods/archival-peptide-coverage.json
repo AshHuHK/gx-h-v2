@@ -1,0 +1,120 @@
+{
+  "manifest": {
+    "capability_id": "archival-peptide-coverage",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--structure",
+        "{in.structure}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "archived_molecular_coordinate_coverage",
+      "mechanism": "Compare deposited entity sequence, residue annotations and positive-occupancy atom sites for one archived short polypeptide chain. 线性肽、線性肽、端基和坐标覆盖。",
+      "objective": "Quantify completeness across public peptide deposits and distinguish polymer positions from annotated amino acids and terminal components.",
+      "estimator": "Count declared polymer positions, model-1 observed positions and complete N/CA/C/O backbones. Report recorded chemical modifications and annotation gaps.",
+      "training_data_lineage": "Deterministic coordinate analysis; method performs no model fitting."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.archival-molecule-qc/1.0.0/job-scripts/peptide.py",
+      "sha256": "8f8c2516c95038bcdb1ffe5ddd39380abbb2cc6185ff0326ba489374c0c31d12"
+    },
+    "licence": "GX release source; archive terms apply to supplied materials.",
+    "licence_basis": "wwPDB archival coordinates CC0, see https://www.wwpdb.org/about/usage-policies",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 45
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "peptide-qc.json",
+        "kind": "file:archival_peptide_coverage",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "declared_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/declared_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "entry": "/entry",
+              "input_sha256": "/input_sha256"
+            }
+          },
+          "observed_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/observed_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "entry": "/entry",
+              "input_sha256": "/input_sha256"
+            }
+          },
+          "backbone_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/backbone_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "entry": "/entry",
+              "input_sha256": "/input_sha256"
+            }
+          },
+          "model_count": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/model_count",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "entry": "/entry",
+              "input_sha256": "/input_sha256"
+            }
+          },
+          "peptide_residue_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/peptide_residue_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "entry": "/entry",
+              "input_sha256": "/input_sha256"
+            }
+          },
+          "declared_modified_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/declared_modified_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "entry": "/entry",
+              "input_sha256": "/input_sha256"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Experimental coordinate archive only. One labeled peptide chain. Coverage describes the selected model and deposited scope. No conformation prediction, biological activity or confidence calibration."
+  },
+  "entry_script": "job-scripts/peptide.py"
+}

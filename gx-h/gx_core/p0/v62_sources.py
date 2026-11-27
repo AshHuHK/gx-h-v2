@@ -370,6 +370,28 @@ def _extract(conn, src, args, identity, cursor, permitted_targets):
             'found_in':elsewhere, 'scope':identity['scope']}
 
 
+def decision_citations(conn, task, lease, thread, turn, candidates):
+    """Return source records actually delivered by this assignment's native evidence tools."""
+    if not candidates:
+        return set()
+    rows = conn.execute("""SELECT a.artifact_ref FROM p0_root_calls c
+        JOIN p0_v6_native_calls n USING(thread_id,call_id,turn_id)
+        JOIN p0_roots r ON r.thread_id=c.thread_id
+        JOIN artifacts a ON a.artifact_ref=json_extract(c.result_json,'$.artifact_ref')
+        WHERE c.thread_id=? AND c.turn_id=? AND r.run_id=? AND r.task_id=? AND r.lease_id=?
+        AND a.run_id=r.run_id AND a.task_id=r.task_id AND a.published=1
+        AND json_extract(c.result_json,'$.accepted')=1
+        AND json_extract(c.result_json,'$.scope')=?
+        AND ((json_extract(n.request_json,'$.tool')=? AND a.kind=?
+              AND a.artifact_ref=json_extract(c.result_json,'$.evidence_ref'))
+          OR (json_extract(n.request_json,'$.tool')=? AND a.kind=?
+              AND a.artifact_ref=json_extract(c.result_json,'$.review_ref')))
+        AND a.artifact_ref IN (SELECT value FROM json_each(?))""",
+        (thread, turn, task["run_id"], task["task_id"], lease, task["scope"],
+         EXTRACT, EXTRACTION, REVIEW, REVIEW_RECORD, ids.canonical_json(sorted(candidates))))
+    return {row[0] for row in rows}
+
+
 def _owned(conn, run_id, ref, *, cursor=None):
     return conn.execute("""SELECT a.kind,a.sha256,e.event_id,e.payload_json FROM events e JOIN artifacts a
         ON a.run_id=e.run_id AND a.artifact_ref=e.subject_id AND a.published=1

@@ -135,8 +135,13 @@ def _visible(conn, task, lease_id, thread_id, turn_id, decision):
     staged = set(v6_claims.staged_refs(conn, rid, tid, lease_id, context, cited))
     denied = cited - refs - staged
     if denied:
+        from . import v62_sources
+        # Citing a delivered extraction/review does not add a graph input grant.
+        missing_citations = denied.intersection(decision["evidence_refs"])
+        denied_citations = missing_citations - v62_sources.decision_citations(
+            conn, task, lease_id, thread_id, turn_id, missing_citations)
         for index, ref in enumerate(decision["evidence_refs"]):
-            if ref in denied:
+            if ref in denied_citations:
                 raise ScopeDenied("The decision cites evidence outside its frozen context and scoped tool receipts. "
                                   "Use an evidence reference here. A delivered source#row key belongs in metric_refs.",
                                   details={"field": f"evidence_refs[{index}]"})

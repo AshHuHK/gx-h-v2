@@ -482,7 +482,7 @@ def _submission_event(roots, params, *, error=None, accepted=None):
         common["decision_event"] = accepted
     else:
         kind = "v624.decision.rejected"
-        field = error.details.get("field", "decision")
+        field = error.details.get("public_field", error.details.get("field", "decision"))
         reason = error.details.get("reason", error.code)
         common.update(code=error.code,
                       reason=reason if isinstance(reason, str) and re.fullmatch(r"[A-Za-z_]{1,64}", reason) else error.code,

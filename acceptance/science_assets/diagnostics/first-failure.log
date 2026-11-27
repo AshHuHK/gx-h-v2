@@ -1,0 +1,26 @@
+FF
+======================================================================
+FAIL: test_stop_condition_belongs_only_to_open_branch (acceptance.science_assets.diagnostics.test_decision_paths.DecisionPathTests.test_stop_condition_belongs_only_to_open_branch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/diagnostics/test_decision_paths.py", line 42, in test_stop_condition_belongs_only_to_open_branch
+    self.refused(study, body, "missing-stop", "ops[0].stop_condition", "open_branch")
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/diagnostics/test_decision_paths.py", line 25, in refused
+    self.assertIn(field, error.message)
+AssertionError: 'ops[0].stop_condition' not found in "$: missing required property 'stop_condition'"
+
+======================================================================
+FAIL: test_unknown_budget_unit_lists_rejected_and_supported_units (acceptance.science_assets.diagnostics.test_decision_paths.DecisionPathTests.test_unknown_budget_unit_lists_rejected_and_supported_units)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/diagnostics/test_decision_paths.py", line 56, in test_unknown_budget_unit_lists_rejected_and_supported_units
+    error = self.refused(study, body, "bad-unit", "ops[0].budget_limits.wall_hours", "open_branch")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/diagnostics/test_decision_paths.py", line 25, in refused
+    self.assertIn(field, error.message)
+AssertionError: 'ops[0].budget_limits.wall_hours' not found in 'Unknown branch budget unit'
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.361s
+
+FAILED (failures=2)

@@ -1,6 +1,7 @@
 """Compile a Lead's operation list against one immutable instance graph, outside the writer."""
 from collections import Counter
 from graphlib import CycleError, TopologicalSorter
+from itertools import islice
 import json
 
 from .. import budgets, contracts, schema
@@ -12,45 +13,67 @@ def decision_schema():
     return contracts.native_goal_tool_spec("gx_decide_revision")["inputSchema"]["properties"]["decision"]
 
 
-def _shape(value, spec, *, measurement_branch=None):
-    errors = schema.validate(value, spec)
-    if errors:
-        raise SchemaInvalid("; ".join(errors[:4]))
-    # GX's general schema validator handles types, enum, required and extra properties.
-    # These remaining constraints are the ones used by the V6 decision contract.
+def _shape(value, spec, *, measurement_branch=None, path="$", operation=None, variants=()):
+    def reject(reason, *, field=path, public_field=None, **details):
+        prefix = f"{operation} at {field}" if operation else field
+        details["field"] = field.removeprefix("$.")
+        if operation:
+            details["operation"] = operation
+        if public_field is not None:
+            details["public_field"] = public_field.removeprefix("$.")
+        return SchemaInvalid(f"{prefix}: {reason}", details=details)
+
+    issues = list(islice(schema.validation_issues(value, spec, pointer=path), 4))
+    if issues:
+        first = issues[0]
+        public_field = None
+        # Project only contract-declared keys into public events. A private receipt
+        # can show the exact misspelling or a key from another operation.
+        if first.unknown_field and not any(
+                first.field == f"{path}.{name}" for variant in variants for name in variant["properties"]):
+            public_field = first.container
+        reason = "; ".join([first.reason] + [f"{item.field}: {item.reason}" for item in issues[1:]])
+        raise reject(reason, field=first.field, public_field=public_field)
     if isinstance(value, str) and spec.get("minLength") and not value.strip():
-        raise SchemaInvalid("Decision text and references must be nonempty")
+        raise reject("Decision text and references must be nonempty")
     if isinstance(value, list) and "items" in spec:
         if len(value) < spec.get("minItems", 0):
-            raise SchemaInvalid("A reconsideration event is required")
+            raise reject("A reconsideration event is required")
         if spec.get("uniqueItems") and len(set(map(ids.canonical_json, value))) != len(value):
-            raise SchemaInvalid("Repeated decision reference or watch")
-        for item in value:
-            _shape(item, spec["items"], measurement_branch=measurement_branch)
+            raise reject("Repeated decision reference or watch")
+        for i, item in enumerate(value):
+            _shape(item, spec["items"], measurement_branch=measurement_branch, path=f"{path}[{i}]",
+                   operation=operation)
     if "oneOf" in spec and not isinstance(value, dict):
-        raise SchemaInvalid("Expected a graph operation object")
+        raise reject("Expected a graph operation object")
     if isinstance(value, dict):
         if "oneOf" in spec:
             variant = next((candidate for candidate in spec["oneOf"]
                             if candidate["properties"]["op"]["const"] == value.get("op")), None)
             if not variant:
-                raise SchemaInvalid("Unknown graph operation")
+                raise reject(f"Unknown graph operation {value.get('op')!r}", field=f"{path}.op")
             # Only the private transport branch created for a single cheap measurement
             # has no scientific hypothesis. An explicit opening uses the full contract.
             if (measurement_branch and value.get("branch") == measurement_branch and
                     value.get("op") == "open_branch" and set(value) == {"op", "branch", "budget_limits"}):
                 variant = dict(variant, required=["op", "branch", "budget_limits"])
-            _shape(value, variant, measurement_branch=measurement_branch)
+            _shape(value, variant, measurement_branch=measurement_branch, path=path,
+                   operation=value["op"], variants=spec["oneOf"])
         for name, child in spec.get("properties", {}).items():
             if name in value:
-                _shape(value[name], child, measurement_branch=measurement_branch)
+                _shape(value[name], child, measurement_branch=measurement_branch, path=f"{path}.{name}",
+                       operation=operation)
         if "propertyNames" in spec:
-            if value.keys() - set(spec["propertyNames"]["enum"]):
-                raise SchemaInvalid("Unknown branch budget unit")
+            allowed = spec["propertyNames"]["enum"]
+            unknown = sorted(value.keys() - set(allowed))
+            if unknown:
+                reason = f"Unknown branch budget unit(s) {', '.join(unknown)}. Allowed: {', '.join(allowed)}"
+                raise reject(reason, field=f"{path}.{unknown[0]}", public_field=path,
+                             unknown_units=unknown, allowed_units=allowed)
             try:
                 budgets.check_amounts(value, what="branch budget")
             except OverflowError as exc:
-                raise SchemaInvalid("Branch budget exceeds the supported numeric range") from exc
+                raise reject("Branch budget exceeds the supported numeric range") from exc
 
 
 def validate_body(decision, *, measurement_branch=None):

@@ -1,0 +1,153 @@
+{
+  "run_id": "gxr_01m8fdw087fqx283nq",
+  "policy": "gx.evidence/6.2.4",
+  "source": "gx.db",
+  "role": "read-only contract replay; no new model or Job",
+  "cases": [
+    {
+      "event": 117,
+      "submission": "78446bb7f1782fc986f33e949068d76acae40ddacc6b64fa0f7381988f065c1e",
+      "decision_sha256": "b882a218b3d1934835c35657e936c35ac9437443e8ac4a447587419814d2317d",
+      "original_event": {
+        "attempt": 4,
+        "code": "SCHEMA_INVALID",
+        "field": "decision",
+        "previous_rejections": 3,
+        "reason": "SCHEMA_INVALID",
+        "submission": "78446bb7f1782fc986f33e949068d76acae40ddacc6b64fa0f7381988f065c1e"
+      },
+      "original_refusal": {
+        "code": "SCHEMA_INVALID",
+        "evidence_ref": null,
+        "message": "$: missing required property 'stop_condition'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "replay_refusal": {
+        "code": "SCHEMA_INVALID",
+        "message": "open_branch at $.ops[0].stop_condition: missing required property 'stop_condition'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "evidence_ref": null,
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure.",
+        "details": {
+          "field": "ops[0].stop_condition",
+          "operation": "open_branch"
+        }
+      }
+    },
+    {
+      "event": 118,
+      "submission": "06734f26dabfdbee9c32aac70141d2f1d81a831fa5c2d46c7ccbc00592695de4",
+      "decision_sha256": "76eb287e446ffae95f7bec0693d92aaf2419b526f0c2f9044ae00f2a59ba9ae8",
+      "original_event": {
+        "attempt": 5,
+        "code": "SCHEMA_INVALID",
+        "field": "decision",
+        "previous_rejections": 4,
+        "reason": "SCHEMA_INVALID",
+        "submission": "06734f26dabfdbee9c32aac70141d2f1d81a831fa5c2d46c7ccbc00592695de4"
+      },
+      "original_refusal": {
+        "code": "SCHEMA_INVALID",
+        "evidence_ref": null,
+        "message": "$: property 'stop_condition' is not allowed",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "replay_refusal": {
+        "code": "SCHEMA_INVALID",
+        "message": "add_node at $.ops[1].stop_condition: property 'stop_condition' is not allowed",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "evidence_ref": null,
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure.",
+        "details": {
+          "field": "ops[1].stop_condition",
+          "operation": "add_node"
+        }
+      }
+    },
+    {
+      "event": 119,
+      "submission": "26b7f09edd8ce87d6d4a7250285611ebd2bed843869b7f3abfc5b7ed4a45e4e4",
+      "decision_sha256": "9986ebe2f6e7dec629923cd01a80b952cd019bcd75140f66562a492d0e31b39e",
+      "original_event": {
+        "attempt": 6,
+        "code": "SCHEMA_INVALID",
+        "field": "decision",
+        "previous_rejections": 5,
+        "reason": "SCHEMA_INVALID",
+        "submission": "26b7f09edd8ce87d6d4a7250285611ebd2bed843869b7f3abfc5b7ed4a45e4e4"
+      },
+      "original_refusal": {
+        "code": "SCHEMA_INVALID",
+        "evidence_ref": null,
+        "message": "$: missing required property 'stop_condition'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "replay_refusal": {
+        "code": "SCHEMA_INVALID",
+        "message": "open_branch at $.ops[0].stop_condition: missing required property 'stop_condition'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "evidence_ref": null,
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure.",
+        "details": {
+          "field": "ops[0].stop_condition",
+          "operation": "open_branch"
+        }
+      }
+    },
+    {
+      "event": 121,
+      "submission": "ed1282fc3918ead34753a6912b0a6561d41a77764bdaa26d5455d750e4e21856",
+      "decision_sha256": "b79e29e2353af74d015deeb19b9ae0b8759e05468684df9ecbd035ddf15b9a6c",
+      "original_event": {
+        "attempt": 8,
+        "code": "SCHEMA_INVALID",
+        "field": "decision",
+        "previous_rejections": 7,
+        "reason": "SCHEMA_INVALID",
+        "submission": "ed1282fc3918ead34753a6912b0a6561d41a77764bdaa26d5455d750e4e21856"
+      },
+      "original_refusal": {
+        "code": "SCHEMA_INVALID",
+        "evidence_ref": null,
+        "message": "Unknown branch budget unit",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "replay_refusal": {
+        "code": "SCHEMA_INVALID",
+        "message": "open_branch at $.ops[0].budget_limits.wall_hours: Unknown branch budget unit(s) wall_hours. Allowed: job_submissions, worker_tasks, cpu_seconds, gpu_jobs, gpu_minutes, tokens, api_calls",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "evidence_ref": null,
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure.",
+        "details": {
+          "unknown_units": [
+            "wall_hours"
+          ],
+          "allowed_units": [
+            "job_submissions",
+            "worker_tasks",
+            "cpu_seconds",
+            "gpu_jobs",
+            "gpu_minutes",
+            "tokens",
+            "api_calls"
+          ],
+          "field": "ops[0].budget_limits.wall_hours",
+          "operation": "open_branch",
+          "public_field": "ops[0].budget_limits"
+        }
+      }
+    }
+  ]
+}

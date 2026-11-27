@@ -781,6 +781,16 @@ class ArtifactService:
             )
         return data
 
+    def copy_verified(self, artifact_ref: str, output: BinaryIO, *, expected_sha256: str) -> None:
+        """Stream a pinned publication to a private staging file and verify that same read."""
+        row = self._row(artifact_ref)
+        if row["sha256"] != expected_sha256:
+            raise ArtifactHashMismatch("Selected artifact differs from its pin", details={"artifact_ref": artifact_ref})
+        path = self.resolve_path(row["namespace"], row["rel_path"])
+        if not path.is_file():
+            raise ArtifactNotFound("Selected artifact file is missing", details={"artifact_ref": artifact_ref})
+        self._read_slice(path, row, 0, 0, verify=True, copy_to=output)
+
     def read_json(self, artifact_ref: str) -> Any:
         """The artifact parsed as JSON, from verified bytes."""
         data = self.read_bytes(artifact_ref)

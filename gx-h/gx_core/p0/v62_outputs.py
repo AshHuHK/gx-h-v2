@@ -359,8 +359,11 @@ def classify(conn, run_id, artifact_ref, *, scope="run", through_event=None):
         if (pub["origin"] == "INGEST" and
                 (origin := successor.transferred_output(conn, run_id, ref, cursor))):
             result.update(nature=origin["nature"], source_output=origin,
-                          record_kind="test_fixture" if origin["record_kind"] == "test_fixture" else "transferred_output",
-                          reason="Previously published named output selected at successor admission")
+                          record_kind=(origin["record_kind"] if origin["record_kind"] in {"test_fixture", "ambiguous_transfer"}
+                                       else "transferred_output"),
+                          reason=("Historical successor slots with different origins share this artifact reference"
+                                  if origin["record_kind"] == "ambiguous_transfer" else
+                                  "Previously published named output selected at successor admission"))
             result["dependencies"]["data"].append("sha256:" + pub["sha256"])
         elif not pub["job_id"]:
             _observation(conn, run_id, ref, pub, source_scope, cursor, result,

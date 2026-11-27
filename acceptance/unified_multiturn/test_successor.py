@@ -21,6 +21,8 @@ from acceptance.v623 import test_close_metrics as receipts
 from gx_core.p0.roots import Roots
 from gx_core.p0 import v62_outputs
 from gx_core.errors import SchemaInvalid
+from gx_core.artifacts import ArtifactService
+from gx_core.orchestration import service
 from gx_core import budgets
 from gx_core.persistence import store
 
@@ -48,6 +50,32 @@ class SuccessorStudy(unittest.TestCase):
             self.assertEqual(saved["files"][0]["role"], "material")
             source.unlink()
             self.assertEqual(successor.request(s.conn, s.state, parent, mid, text, options, native_owner=True), accepted)
+
+    def test_module_output_requires_delivery_to_closing_lead_and_report_is_distinct(self):
+        helper = receipts.EndpointClose()
+        self.addCleanup(helper.doCleanups)
+        _, (s, assets, _, node, output, worker) = helper.measured()
+        parent = s.run_id
+        named = next(i for i in v62_outputs.published_outputs(s.conn, parent, node["job_id"])
+                     if i["artifact_ref"] == output)
+        pin = {key: named[key] for key in ("artifact_ref", "output_name", "sha256")}
+        pin.update(job_id=node["job_id"], role="prior_result")
+        # The Job is already successful. An earlier saved Lead snapshot still cannot select its output.
+        previous = s.conn.execute("""SELECT d.decision_ref FROM v6_decisions d JOIN v6_decision_tasks t USING(run_id,task_id)
+            WHERE t.run_id=? AND t.scope='run' ORDER BY d.rowid DESC LIMIT 1""", (parent,)).fetchone()[0]
+        cursor = s.conn.execute("SELECT MAX(event_id) FROM events").fetchone()[0]
+        with self.assertRaisesRegex(SchemaInvalid, "visible to the closing Lead"):
+            successor._output_materials(s.conn, parent, {"decision_ref": previous, "closed_event": cursor}, [pin])
+        report_ref, report, lead, _ = helper.report(s, assets, output, worker)
+        decision = close_decision([report_ref])
+        decision["metric_refs"] = [report["verified_metrics"][0]["metric_ref"]]
+        s.call(lead, "gx_decide_revision", {"decision": decision}, "close-on-module-observation")
+        s.advance()
+        closed = research_report.completed_close(s.conn, parent)
+        self.assertEqual(successor._output_materials(s.conn, parent, closed, [pin])[0]["artifact_ref"], output)
+        with self.assertRaisesRegex(SchemaInvalid, "named output"):
+            successor._output_materials(s.conn, parent, closed, [
+                {**pin, "artifact_ref": report_ref, "sha256": assets.describe(report_ref)["sha256"]}])
 
     def test_one_frozen_child_and_independent_result(self):
         directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
@@ -102,6 +130,8 @@ class SuccessorStudy(unittest.TestCase):
                           if item["output_name"] == "signed-summary.json")
             pin = {k: output[k] for k in ("artifact_ref", "output_name", "sha256")}
             pin.update(job_id=parent_result["job_id"], role="archived_analysis")
+            independent_file = directory / output["output_name"]
+            independent_file.write_bytes(ArtifactService(s.conn).read_bytes(output["artifact_ref"]))
             parent_budget = s.conn.execute("SELECT budget_ref FROM runs WHERE run_id=?", (parent,)).fetchone()[0]
             before = budgets.state(s.conn, parent_budget)
             held_turns = [r for r in before["reservations"] if r["subject_kind"] == "native_turn"]
@@ -110,7 +140,8 @@ class SuccessorStudy(unittest.TestCase):
         fresh = directory/"new-coordinate.cif"
         fresh.write_bytes((PRODUCT/"examples/pcna/open-data/3TBL.cif").read_bytes())
         options = {"parent_material_refs":[parent_material], "parent_outputs":[pin], "input_files":[
-            {"path":str(fresh), "role":"structure", "acquisition":str(PRODUCT/"examples/pcna/open-data/3TBL.json")}]}
+            {"path":str(fresh), "role":"structure", "acquisition":str(PRODUCT/"examples/pcna/open-data/3TBL.json")},
+            {"path":str(independent_file), "role":"pi_copy"}]}
         question = "On the newly selected coordinates, measure deposited coordinate coverage."
         mid = "successor-cpu"
         selected = directory/"selected.json"
@@ -127,6 +158,7 @@ class SuccessorStudy(unittest.TestCase):
                                     {"parent_outputs":[{**pin, **amendment}]})
         run_cli(*args, "--queue-only")
         fresh.unlink()
+        independent_file.unlink()
         def retry(_):
             with closing(cli.existing_db(work/"state", readonly=False)) as db:
                 frozen = json.loads(db.execute("SELECT successor_json FROM p0_conversation_messages WHERE message_id=?",
@@ -180,6 +212,33 @@ class SuccessorStudy(unittest.TestCase):
             fact = v62_outputs.classify(s.conn, child, imported["artifact_ref"])
             self.assertEqual((fact["nature"], fact["record_kind"]), ("analysis","transferred_output"))
             self.assertFalse(fact["independence_complete"])
+            self.assertFalse(fact["original_observations"])
+            self.assertFalse(fact.get("original_inputs_grounded"))
+            pi_copy = next(f for f in packet["materials"] if f["role"] == "pi_copy")
+            self.assertEqual(pi_copy["sha256"], imported["sha256"])
+            self.assertNotEqual(pi_copy["artifact_ref"], imported["artifact_ref"])
+            copy_fact = v62_outputs.classify(s.conn, child, pi_copy["artifact_ref"])
+            self.assertEqual(copy_fact["record_kind"], "unclassified")
+            self.assertFalse(copy_fact["original_observations"])
+            self.assertEqual(copy_fact["first_event_id"], v62_outputs.classify(s.conn, parent, output["artifact_ref"])["first_event_id"])
+            opening = s.conn.execute("SELECT event_id FROM events WHERE run_id=? AND kind='v6.research.successor_opened'",
+                                     (child,)).fetchone()[0]
+            self.assertEqual(v62_outputs.classify(s.conn, child, imported["artifact_ref"],
+                                                  through_event=opening-1)["record_kind"], "unclassified")
+            with self.assertRaisesRegex(SchemaInvalid, "same bytes"):
+                v62_outputs.acquisition_receipt(s.conn, child, pi_copy["artifact_ref"], acquisition)
+            # Recreate the two roles pointing to a single local ref, as persisted by the earlier version.
+            saved = json.loads(s.conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (child,)).fetchone()[0])
+            next(f for f in saved["files"] if f["role"] == "pi_copy")["artifact_ref"] = imported["artifact_ref"]
+            s.conn.execute("SAVEPOINT historical_alias")
+            try:
+                s.conn.execute("UPDATE runs SET inputs_json=? WHERE run_id=?", (store._j(saved), child))
+                ambiguous = v62_outputs.classify(s.conn, child, imported["artifact_ref"])
+                self.assertEqual((ambiguous["nature"], ambiguous["record_kind"]), ("unclassified", "ambiguous_transfer"))
+                self.assertFalse(ambiguous["original_observations"])
+            finally:
+                s.conn.execute("ROLLBACK TO historical_alias")
+                s.conn.execute("RELEASE historical_alias")
             prediction = {"target":"analysis", "method":{"capability":method,"output":"signed-summary.json",
                           "parameters":parameters,"metric_id":"missed_present","unit":"1","input_role":"structure"},
                           "observable":"/missed_present", "measurement_schema":"gx.signed-summary/1",
@@ -207,9 +266,30 @@ class SuccessorStudy(unittest.TestCase):
         self.assertEqual(result_for(child)["prior_study"]["parent_decision_ref"], close["decision_ref"])
         self.assertEqual(parent_export["run_id"], first_export["run_id"])
         self.assertEqual(child_export["run_id"], child)
+        # Lower only the local copy threshold to route a real published Job output through streaming admission.
+        with closing(cli.existing_db(work/"state", readonly=False)) as db:
+            with self.assertRaises(SchemaInvalid):
+                successor._output_materials(db, parent, child_anchor, [pin])
+            third = "prior-publication-only"
+            options = {"parent_outputs": [pin]}
+            conversation.send(db, parent, question, third, successor=options)
+            with patch.object(service, "MAX_COPIED_INPUT_BYTES", 1):
+                larger = successor.request(db, work/"state", parent, third, question, options)
+            self.assertEqual(larger["status"], "successor_started")
+            copied = json.loads(db.execute("SELECT inputs_json FROM runs WHERE run_id=?", (larger["run_id"],)).fetchone()[0])["files"][0]
+            self.assertGreater(copied["bytes"], 1)
+            self.assertEqual(ArtifactService(db).read_bytes(copied["artifact_ref"]),
+                             ArtifactService(db).read_bytes(output["artifact_ref"]))
+            self.assertNotEqual(copied["artifact_ref"], output["artifact_ref"])
         if evidence := os.environ.get("GX_SUCCESSOR_RECEIPT"):
             Path(evidence).write_text(json.dumps({"model":"scripted native replies; real CPU Job",
                 "request":receipt, "parent_job":parent_result["job_id"], "parent_result":parent_result["result_ref"],
                 "known_at_child_registration":registration["known_at_registration"], "child_job":result["job_id"], "child_result":endpoint,
-                "child_close":child_anchor, "parent_export":archived["invocation"], "parent_close":archived["closure"]},
+                "child_close":child_anchor, "parent_export":archived["invocation"], "parent_close":archived["closure"],
+                "named_transfer": {"source": local["source_output"], "local_ref": imported["artifact_ref"],
+                                   "nature": fact["nature"], "kind": fact["record_kind"],
+                                   "separate_pi_attachment_ref": pi_copy["artifact_ref"], "pi_attachment_kind": copy_fact["record_kind"],
+                                   "original_observations": fact["original_observations"]},
+                "large_path_with_lowered_copy_threshold": {"run_id": larger["run_id"], "ref": copied["artifact_ref"],
+                                                          "bytes": copied["bytes"], "sha256": copied["sha256"]}},
                 indent=2))

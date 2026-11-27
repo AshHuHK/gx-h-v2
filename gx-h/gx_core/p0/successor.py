@@ -7,6 +7,7 @@ from pathlib import Path
 import tempfile
 
 from ..artifacts import ArtifactService
+from ..artifacts.service import sync_directory_chain
 from ..domain import ids
 from ..errors import IdempotencyConflict, SchemaInvalid
 from ..native_release import native_state, ReleaseStateError
@@ -14,17 +15,16 @@ from ..persistence import store
 from . import coordinator, research_report, v621_assignment, workspace
 
 
-def _pin(directory, name, raw):
+def _freeze(directory, name, digest, write):
     """Freeze exactly the bytes later read by normal Goal admission, even across a crash."""
     if not name or name != Path(name).name or name in (".", ".."):
         raise SchemaInvalid("A successor material needs a file name")
-    digest = hashlib.sha256(raw).hexdigest()
     target = directory / digest / name
     target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(dir=target.parent, delete=False) as stream:
         tmp = Path(stream.name)
         try:
-            stream.write(raw)
+            write(stream)
             stream.flush()
             os.fsync(stream.fileno())
             try:
@@ -34,7 +34,12 @@ def _pin(directory, name, raw):
                     raise SchemaInvalid("The frozen successor input bytes have changed")
         finally:
             tmp.unlink(missing_ok=True)
+    sync_directory_chain(target.parent, directory.parent)
     return {"path": str(target), "sha256": digest}
+
+
+def _pin(directory, name, raw):
+    return _freeze(directory, name, hashlib.sha256(raw).hexdigest(), lambda stream: stream.write(raw))
 
 
 def freeze_files(directory, options):
@@ -99,6 +104,8 @@ def _output_materials(conn, rid, close, selections):
         return []
     row = conn.execute("""SELECT t.visible_refs_json FROM v6_decision_tasks t JOIN v6_decisions d USING(run_id,task_id)
         WHERE d.run_id=? AND d.decision_ref=? AND t.scope='run'""", (rid, close["decision_ref"])).fetchone()
+    if row is None:
+        raise SchemaInvalid("The closing Lead has no saved visibility snapshot for this Run")
     visible = set(json.loads(row[0]))
     inventory, selected, seen = {}, [], set()
     for pin in selections:
@@ -132,7 +139,17 @@ def transferred_output(conn, rid, ref, cursor):
         WHERE e.run_id=? AND e.kind='v6.research.successor_opened' AND e.event_id<=?
           AND json_extract(pin.value,'$.artifact_ref')=? AND json_type(pin.value,'$.source_output')='object'
         LIMIT 1""", (rid, cursor, ref)).fetchone()
-    return json.loads(row[0]) if row else None
+    if not row:
+        return None
+    # Earlier versions stored using only (digest, basename). Two selected slots could alias
+    # one local ref, including a PI attachment with no transferred-output provenance.
+    different = conn.execute("""SELECT 1 FROM runs r, json_each(r.inputs_json,'$.files') f
+        WHERE r.run_id=? AND json_extract(f.value,'$.artifact_ref')=? AND
+        json_extract(r.inputs_json,'$.inputs.p0_spec.predecessor.selected_materials['||f.key||'].source_output') IS NOT ?
+        LIMIT 1""", (rid, ref, row[0])).fetchone()
+    if different:
+        return {"nature": "unclassified", "record_kind": "ambiguous_transfer"}
+    return json.loads(row[0])
 
 
 def _spec(conn, directory, parent, close, mid, text, options):
@@ -196,7 +213,8 @@ def _spec(conn, directory, parent, close, mid, text, options):
     outputs = _output_materials(conn, rid, close, options.get("parent_outputs", []))
     for item in [public[ref] for ref in prior] + uploaded + outputs:
         ref = item["artifact_ref"]
-        entry = _pin(stage, item["name"], assets.read_bytes(ref, expected_sha256=item["sha256"]))
+        entry = _freeze(stage, item["name"], item["sha256"],
+                        lambda stream: assets.copy_verified(ref, stream, expected_sha256=item["sha256"]))
         origin = item.get("source_output") or transferred_output(conn, rid, ref, close["closed_event"])
         descriptor = None if origin else _prior_descriptor(conn, rid, ref)
         if descriptor:

@@ -16,6 +16,7 @@ STUDIES = {
     "fab":"../gx-science/science-assets-live/modalities/fab-first",
     "literature":"../gx-science/asset-live/literature",
     "slim-peptide":"../science-assets-live/slim-peptide",
+    "slim-yeast": "../science-assets-live/slim-yeast",
     "prior-reading-control":"../gx-science/plugin-blueprint-live/reading-field",
 }
 

@@ -50,7 +50,7 @@ from typing import Any, Mapping, Sequence
 from .. import config, contracts
 from ..domain import ids
 from ..errors import ContentHashMismatch, EnvNotReady, SchemaInvalid
-from . import schema
+from . import input_domain, schema
 
 BUNDLE_KIND = "capability_manifest_bundle"
 ASSET_KIND = "TOOL_ADAPTER"
@@ -236,6 +236,7 @@ def bundle_problems(bundle: Any) -> list[str]:
     for index, item in enumerate(manifest["required_data"]):
         found.extend(_rooted_path_problems(item, where=f"required_data[{index}]"))
     found.extend(_method_card_problems(manifest["method_card"]))
+    found.extend(domain_problems(manifest))
     found.extend(_resources_problems(manifest["resources"]))
     found.extend(_outputs_problems(manifest))
     found.extend(_rooted_path_problems(manifest["source"]["path"], where="source.path"))
@@ -344,6 +345,14 @@ def _weights_problems(manifest: Mapping[str, Any]) -> list[str]:
                 f"{where}: FULL_PICKLE executes code on load and needs an upstream_digest "
                 "recorded before the first load"
             )
+    return found
+
+
+def domain_problems(manifest):
+    found = []
+    for declaration in (manifest.get("applicable_domain"), manifest["method_card"].get("applicable_domain")):
+        if declaration:
+            found.extend(input_domain.problems(declaration, input_roles(manifest), parameter_names(manifest)))
     return found
 
 

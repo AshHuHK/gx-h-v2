@@ -1,0 +1,2704 @@
+[
+  {
+    "run_id": "gxr_01m8fdke95wxpbgs7j",
+    "goal_status": "CLOSED",
+    "engine_status": "STOPPED",
+    "created_at": "2026-11-27T21:11:54.917Z",
+    "native_contract_sha256": "7a0a4c491271e0eebdfecf8196e6641bd0a40550f38f1e690eb269e7c48ad54a",
+    "archive_provider_options": [
+      {
+        "digest": "dab3adf688901bbd9a3edb1aedfb7b1b4479ac12113eebed7c3d21f717e7d7c1",
+        "method": "yeast-archive-compare@1",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "provider_digest": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6"
+      },
+      {
+        "digest": "aef7e787ba570664443ebac48d60acec7b6d9ba65fce72f101b3059b75d84695",
+        "method": "yeast-archive-lookup@1",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "provider_digest": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6"
+      }
+    ],
+    "inputs": [
+      {
+        "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+        "role": "query",
+        "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+      }
+    ],
+    "turns": [
+      {
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "official_session": {
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "provider": "openai"
+        }
+      },
+      {
+        "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "official_session": {
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "provider": "openai"
+        }
+      },
+      {
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "official_session": {
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "provider": "openai"
+        }
+      }
+    ],
+    "jobs": [
+      {
+        "job_id": "gxj_01m8fdmbx53g9thef6",
+        "capability_id": "yeast-archive-lookup",
+        "capability_version": "1",
+        "status": "SUCCEEDED",
+        "created_at": "2026-11-27T21:12:25.299Z",
+        "finished_at": "2026-11-27T21:12:25.707Z",
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+            "bytes": 75,
+            "role": "query",
+            "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+          }
+        ],
+        "manifest_hash": "07fa5c9119a18208038f491d029d5b9742453cec00c1ad707ef52dd3a70da529",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+            "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+            "output_name": "parent-records.json",
+            "kind": "yeast_archive_records",
+            "nature": "analysis"
+          }
+        ],
+        "readouts": {
+          "parent-records.json": {
+            "query": {
+              "schema": "gx.yeast-archive-query/1",
+              "taxid": 559292,
+              "substrate": "maltose"
+            },
+            "releases": {
+              "Rhea": "142",
+              "Swiss-Prot": "2026_03",
+              "ENZYME": "28-Jan-2026",
+              "assays": "brenda2026.1-sabio20260920-v1"
+            },
+            "source_digests": {
+              "reactions": "46efa03be146239b68bb7b2f3c1e5ec73c129c9e263e0658112de532eb7b429e",
+              "rhea": "76c4649d394422d7b168c74728c4c9cdefaa14fc3f8557014d144c8419d50eab",
+              "enzyme": "59fdb6f554e756a19873e45bb3f1bde66fc2d86d4fa8c94bb144382b0e4aa09e",
+              "kinetics": "1cac1d6d47925f227959a6c05274252b09f121801d73f931173c4b4be1c2aec3"
+            },
+            "counts": {
+              "distinct_accessions": 2,
+              "exact_accessions": 0,
+              "class_accessions": 2
+            },
+            "assay_coverage": {
+              "snapshot": "brenda2026.1-sabio20260920-v1",
+              "ec_indexed_rows_all_organisms": {
+                "BRENDA": 1405,
+                "SABIO-RK": 162
+              },
+              "linked_unique_rows_by_source": {
+                "BRENDA": 2,
+                "SABIO-RK": 0
+              },
+              "single_accession_rows": 2,
+              "grouped_accession_rows": 0,
+              "single_target_rows": 0,
+              "grouped_target_rows": 0,
+              "other_named_substrate_rows": 1,
+              "unresolved_substrate_rows": 1,
+              "target_substrate_rows": 0
+            },
+            "parents": [
+              {
+                "accession": "P38158",
+                "sequence_version": 1,
+                "sequence_sha256": "6c38d5b5d26b5c883e726212ba8aced20e26c244e3b129b1f139634ae59f2ae5"
+              },
+              {
+                "accession": "P53341",
+                "sequence_version": 1,
+                "sequence_sha256": "d9af3af2a6c3c2713e197fd5174ab239efb56400147c41ca3249c577e875f807"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "native_actions": [
+      {
+        "native_row": 2,
+        "call_id": "exec-84be0b35-7d15-496f-b7cc-749b6f81a523",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdkea3wrcvsntp"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+      },
+      {
+        "native_row": 3,
+        "call_id": "exec-d9fdc3de-6318-4608-9cb5-f7a1353de603",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "S288C yeast archive disaccharide protein reaction direction assay condition original snapshot provenance repeat procedure transferable artifacts"
+        },
+        "kind": "all",
+        "total": 70,
+        "candidates": [
+          "yeast-archive-compare@1",
+          "yeast-archive-lookup@1",
+          "yeast-uniprot-record@2",
+          "yeast-uniprot-record@1",
+          "yeast-enzyme-mcp@2",
+          "yeast-enzyme-mcp@1",
+          "yeast-reaction-index@2",
+          "yeast-reaction-index@1",
+          "rhea-sprot-index@legacy",
+          "kinetics-assay-snapshot@legacy",
+          "swissprot-rhea-snapshot@legacy",
+          "native-assay-reading@legacy",
+          "bglb-retrospective@1",
+          "literature-page@1",
+          "literature-page@2",
+          "literature-query@1",
+          "literature-query@2",
+          "scholarly-page-search@1",
+          "scholarly-page-search@2",
+          "interpret-enzyme-annotation@1",
+          "rhea-reaction-names@legacy",
+          "gx_extract_evidence@1",
+          "publication_discovery@1",
+          "publication_discovery@2",
+          "scholarly_page_investigation@1",
+          "scholarly_page_investigation@2",
+          "pcna-archive-search@1",
+          "pcna-archive-fetch@1",
+          "arxiv-search@1",
+          "scholarly-search@1",
+          "arxiv-fetch@1",
+          "deposited-chain-geometry@1",
+          "literature-original@1",
+          "literature-original@2",
+          "pcna-local-geometry@1",
+          "tl1a-review@1",
+          "tl1a-review@1",
+          "pdb-entry-mcp@legacy",
+          "pdb-entry-web-route@legacy",
+          "pdb-source-reading@legacy"
+        ]
+      },
+      {
+        "native_row": 4,
+        "call_id": "exec-00db5b80-49bd-4281-90e5-8d85c5637988",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "reference": "yeast-archive-lookup@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-lookup@1",
+        "source_ref": "gxa_01m8fdm0x9nbe2wbkt"
+      },
+      {
+        "native_row": 5,
+        "call_id": "exec-e39faf4d-e853-4c95-a604-859063018507",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "reference": "interpret-enzyme-annotation@1"
+        },
+        "kind": "skill",
+        "reference": "interpret-enzyme-annotation@1"
+      },
+      {
+        "native_row": 6,
+        "call_id": "exec-904fbe99-b1c5-421e-8ed0-6d2bce17fbde",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "reference": "yeast-archive-compare@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-compare@1",
+        "source_ref": "gxa_01m8fdm0z2t0e05k3f"
+      },
+      {
+        "native_row": 7,
+        "call_id": "exec-c6d64f4e-d56a-43bf-a38b-bf09c66a478a",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "recipe",
+          "limit": 30,
+          "query": "yeast disaccharide archive handoff repeat workflow source records substrate"
+        },
+        "kind": "recipe",
+        "total": 3,
+        "candidates": [
+          "cyclic-closure-qc-control@legacy",
+          "reading-package@legacy",
+          "fab-coverage-history@legacy"
+        ]
+      },
+      {
+        "native_row": 8,
+        "call_id": "exec-6760c96f-713f-4510-810e-f77c22172966",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "reference": "data_inventory@3"
+        },
+        "kind": "module",
+        "reference": "data_inventory@3"
+      },
+      {
+        "native_row": 9,
+        "call_id": "exec-158d5d42-b64d-4b17-9601-775780c1aa77",
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+        "scope": "run",
+        "tool": "gx_select_capability",
+        "arguments": {
+          "action": "enable",
+          "method": "yeast-archive-lookup@1",
+          "revision": 0
+        },
+        "digest": "34e75c1a38cd6f3684f4127b9368f421bf8f76e362da0ef5e7c0b0357ce765d6"
+      },
+      {
+        "native_row": 12,
+        "call_id": "exec-305644d4-1ac6-4a3d-b0d6-452da1973b0b",
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdkea3wrcvsntp"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+      },
+      {
+        "native_row": 13,
+        "call_id": "exec-87f12f53-f6bd-40f2-9612-e0a9cb896f60",
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "reference": "yeast-archive-lookup@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-lookup@1",
+        "source_ref": "gxa_01m8fdmqsmjt62s04n"
+      },
+      {
+        "native_row": 14,
+        "call_id": "exec-b2d8daf9-3e96-45dc-bfea-e31a599b4e01",
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "yeast"
+        },
+        "kind": "all",
+        "total": 10,
+        "candidates": [
+          "yeast-archive-lookup@1",
+          "yeast-archive-compare@1",
+          "yeast-enzyme-mcp@2",
+          "yeast-reaction-index@2",
+          "yeast-uniprot-record@2",
+          "yeast-enzyme-mcp@1",
+          "yeast-reaction-index@1",
+          "yeast-uniprot-record@1",
+          "interpret-enzyme-annotation@1",
+          "swissprot-rhea-snapshot@legacy"
+        ]
+      },
+      {
+        "native_row": 15,
+        "call_id": "exec-f5cd4464-fcf2-4079-b672-7e6daa4f252a",
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "S288C archived yeast enzyme reaction-specific direction natural parent identities maltose assay records provenance reproducible QC and handoff"
+        },
+        "kind": "all",
+        "total": 53,
+        "candidates": [
+          "yeast-archive-lookup@1",
+          "yeast-archive-compare@1",
+          "yeast-enzyme-mcp@2",
+          "yeast-reaction-index@2",
+          "yeast-uniprot-record@2",
+          "yeast-enzyme-mcp@1",
+          "yeast-reaction-index@1",
+          "yeast-uniprot-record@1",
+          "interpret-enzyme-annotation@1",
+          "kinetics-assay-snapshot@legacy",
+          "native-assay-reading@legacy",
+          "rhea-sprot-index@legacy",
+          "swissprot-rhea-snapshot@legacy",
+          "bglb-retrospective@1",
+          "literature-page@1",
+          "literature-page@2",
+          "scholarly-page-search@1",
+          "scholarly-page-search@2",
+          "archival-fab-coverage@1",
+          "archival-peptide-coverage@1",
+          "deposited-macrocycle-qc@1",
+          "rhea-reaction-names@legacy",
+          "cyclic-closure-qc-control@legacy",
+          "data_inventory@3",
+          "gx_extract_evidence@1",
+          "gx_read_source@1",
+          "pcna-archive-fetch@1",
+          "arxiv-search@1",
+          "literature-query@1",
+          "literature-query@2",
+          "scholarly-search@1",
+          "archived-fold-calibration@1",
+          "arxiv-fetch@1",
+          "deposited-backbone-qc@1",
+          "deposited-chain-geometry@1",
+          "literature-original@1",
+          "literature-original@2",
+          "mapped-structure-agreement@1",
+          "pcna-local-geometry@1",
+          "scholarly-fetch@1"
+        ]
+      },
+      {
+        "native_row": 16,
+        "call_id": "exec-c63c5d0f-de57-4ec6-bafd-9200f704e3fc",
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "reference": "yeast-archive-compare@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-compare@1",
+        "source_ref": "gxa_01m8fdm0z2t0e05k3f"
+      },
+      {
+        "native_row": 17,
+        "call_id": "exec-421e3571-0298-415c-94c1-9a245075d982",
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "recipe",
+          "limit": 12,
+          "query": "yeast archive reproducible replay handoff"
+        },
+        "kind": "recipe",
+        "total": 1,
+        "candidates": [
+          "cyclic-closure-qc-control@legacy"
+        ]
+      },
+      {
+        "native_row": 19,
+        "call_id": "exec-b425d40b-07cb-481a-96d2-0ebe204d8e38",
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "module",
+          "reference": "data_inventory@3"
+        },
+        "kind": "module",
+        "reference": "data_inventory@3"
+      },
+      {
+        "native_row": 22,
+        "call_id": "exec-10969e28-2750-481e-95bd-5d873dd971c7",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdkea3wrcvsntp"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40"
+      },
+      {
+        "native_row": 23,
+        "call_id": "exec-834c37a6-ad24-461c-bd98-d5c4c1eb2221",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdmcaez3kstbtj"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+      },
+      {
+        "native_row": 24,
+        "call_id": "exec-a99b8288-73c1-455b-8d11-c99aade8a365",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "yeast enzyme archive natural disaccharide protein identities exact reaction direction assay scope provenance reusable workflow artifact handoff"
+        },
+        "kind": "all",
+        "total": 70,
+        "candidates": [
+          "yeast-archive-lookup@1",
+          "yeast-archive-compare@1",
+          "yeast-reaction-index@2",
+          "yeast-uniprot-record@2",
+          "yeast-reaction-index@1",
+          "yeast-uniprot-record@1",
+          "interpret-enzyme-annotation@1",
+          "rhea-sprot-index@legacy",
+          "yeast-enzyme-mcp@2",
+          "bglb-retrospective@1",
+          "yeast-enzyme-mcp@1",
+          "swissprot-rhea-snapshot@legacy",
+          "native-assay-reading@legacy",
+          "gx_extract_evidence@1",
+          "pcna-archive-fetch@1",
+          "pcna-local-geometry@1",
+          "kinetics-assay-snapshot@legacy",
+          "rhea-reaction-names@legacy",
+          "source-evidence-review@1",
+          "literature-page@1",
+          "literature-page@2",
+          "literature-query@1",
+          "literature-query@2",
+          "scholarly-page-search@1",
+          "archival-fab-coverage@1",
+          "archival-peptide-coverage@1",
+          "artifact-analysis@1",
+          "deposited-chain-geometry@1",
+          "deposited-chain-geometry@2",
+          "deposited-macrocycle-qc@1",
+          "derive-record-coverage@1",
+          "mapped-structure-agreement@1",
+          "tl1a-coordinate-quality@1",
+          "tl1a-coordinate-quality@1",
+          "tl1a-geometry@1",
+          "tl1a-geometry@1",
+          "pdb-entry-mcp@legacy",
+          "pdb-entry-web-route@legacy",
+          "cyclic-closure-qc-control@legacy",
+          "interpret-coordinate-coverage@1"
+        ]
+      },
+      {
+        "native_row": 25,
+        "call_id": "exec-1ce1d8b8-4242-4fd7-bcfd-ae40987b2ccc",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "limit": 40
+        },
+        "kind": "method",
+        "total": 54,
+        "candidates": [
+          "yeast-archive-lookup@1",
+          "yeast-archive-compare@1",
+          "yeast-enzyme-mcp@2",
+          "yeast-reaction-index@2",
+          "yeast-uniprot-record@2",
+          "yeast-enzyme-mcp@1",
+          "yeast-reaction-index@1",
+          "yeast-uniprot-record@1",
+          "pcna-archive-search@1",
+          "arxiv-search@1",
+          "literature-page@1",
+          "literature-page@2",
+          "literature-query@1",
+          "literature-query@2",
+          "scholarly-page-search@1",
+          "scholarly-page-search@2",
+          "scholarly-search@1",
+          "bglb-retrospective@1",
+          "deposited-block-influence@2",
+          "deposited-block-signed@1",
+          "pcna-archive-fetch@1",
+          "archival-fab-coverage@1",
+          "archival-peptide-coverage@1",
+          "archived-fold-calibration@1",
+          "artifact-analysis@1",
+          "arxiv-fetch@1",
+          "deposited-backbone-qc@1",
+          "deposited-block-influence@1",
+          "deposited-block-reading@1",
+          "deposited-chain-geometry@1",
+          "deposited-chain-geometry@2",
+          "deposited-macrocycle-qc@1",
+          "derive-record-coverage@1",
+          "fixture-grid@1",
+          "literature-original@1",
+          "literature-original@2",
+          "mapped-structure-agreement@1",
+          "pcna-interface@1",
+          "pcna-local-geometry@1",
+          "scholarly-fetch@1"
+        ]
+      },
+      {
+        "native_row": 26,
+        "call_id": "exec-6dc95a4d-8e83-44f0-8985-3089e84d565c",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "reference": "yeast-archive-lookup@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-lookup@1",
+        "source_ref": "gxa_01m8fdmqsmjt62s04n"
+      },
+      {
+        "native_row": 27,
+        "call_id": "exec-735c76ec-5d1d-4b65-8f20-a14c8dbca5f6",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "recipe",
+          "limit": 20,
+          "query": "yeast archive disaccharide handoff"
+        },
+        "kind": "recipe",
+        "total": 1,
+        "candidates": [
+          "cyclic-closure-qc-control@legacy"
+        ]
+      },
+      {
+        "native_row": 28,
+        "call_id": "exec-dee92faf-1594-423d-94fa-0decf95adf24",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "reference": "yeast-archive-compare@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-compare@1",
+        "source_ref": "gxa_01m8fdm0z2t0e05k3f"
+      },
+      {
+        "native_row": 29,
+        "call_id": "exec-cdfbbab4-1012-48ed-aa01-4bc1f8852a0b",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "research",
+          "limit": 30,
+          "query": "artifact handoff export run output close_run recipe reproducible"
+        },
+        "kind": "research",
+        "total": 3,
+        "candidates": [
+          "social-source-intake@1",
+          "wechat-public-sources@legacy",
+          "xiaohongshu-sources@legacy"
+        ]
+      },
+      {
+        "native_row": 30,
+        "call_id": "exec-fff1dcea-6614-40f4-8e5e-7c54ea51dfe5",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "module",
+          "reference": "data_inventory@3"
+        },
+        "kind": "module",
+        "reference": "data_inventory@3"
+      },
+      {
+        "native_row": 31,
+        "call_id": "exec-388db3e8-73cb-430c-9ad1-1f7365fca546",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "endpoint_offset": 0,
+          "ref": "gxa_01m8fdmcaez3kstbtj"
+        },
+        "source_ref": "gxa_01m8fdmcaez3kstbtj",
+        "receipt": {},
+        "content_returned": false,
+        "endpoint_count": 0
+      },
+      {
+        "native_row": 32,
+        "call_id": "exec-fee9ab2b-0a43-4893-a3cd-7709eed9bf26",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "all",
+          "limit": 12,
+          "query": "gx_save_recipe transferable originals prior parent-records new Goal saved recipe reusable analytical subgraph"
+        },
+        "kind": "all",
+        "total": 19,
+        "candidates": [
+          "yeast-archive-compare@1",
+          "literature-page@2",
+          "literature-query@2",
+          "scholarly-search@1",
+          "derive-record-coverage@1",
+          "fab-coverage-history@legacy",
+          "interpret-coordinate-coverage@1",
+          "yeast-archive-lookup@1",
+          "gx2understand@1",
+          "investigation@1",
+          "method_workflow_survey@1",
+          "bglb-retrospective@1"
+        ]
+      },
+      {
+        "native_row": 33,
+        "call_id": "exec-64f298c9-614a-4a55-b0ae-b10af406631f",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_save_recipe",
+        "arguments": {
+          "decision_point": {
+            "actions": [
+              "刊登有來源的蛋白與 EC，按實際 Rhea 連結及明載方向補記指定反應。",
+              "逐條列出具名目標底物、蛋白歸屬和原報條件，標明共用記錄或資料缺口。"
+            ],
+            "output": "parent-records.json",
+            "question": "本次封存條目可支持哪些蛋白名稱、指定反應與方向，以及可歸屬的同底物測定條件？",
+            "step": "lookup",
+            "stop_condition": "已按 accession、反應與方向、底物、條件及原始 entry_id 核對全部回傳項目，並保存查詢與 parent-records.json 原檔。"
+          },
+          "id_alignment": "以 gx.yeast-archive-query/1 的 taxid 559292 和受支援的 substrate 查詢。先核對 releases 及 source_digests。以 Swiss-Prot accession 去重，跨查詢核對序列版本和殘基序列 SHA-256。逐蛋白核對 Rhea master、條目方向與獨立的 EC 來源行。測定以原始資料庫及 entry_id 對齊，鏡像或交叉引用須回溯同一原始記錄。多蛋白共用記錄在聯集中只計一次並保留全部 accession。",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdkea3wrcvsntp",
+              "name": "query"
+            }
+          ],
+          "missing_values": "空 reaction_links 表示快照未連結，方向碼 UN 表示未指定。底物未列、測定條件缺失及蛋白歸屬未定各自保留。只在依賴底物的欄位精確具名目標二糖時才計入目標測定。其他底物與多蛋白共用條目分列。缺測保留為未知，零筆連結不代表零活性。",
+          "nodes": [
+            {
+              "node_id": "node_73ef741abef65bbccf82f35260547dba",
+              "slot": "lookup"
+            }
+          ],
+          "recipe_id": "s288c-disaccharide-archive-qc",
+          "title": "S288C 二糖水解封存條目核對與品管頁刊登判定",
+          "units": "pH 無量綱，溫度用 °C。動力學或比活性數值只按原條目所載的參數、單位及具名底物呈現。條目數按唯一原始記錄計算。",
+          "version": "1"
+        },
+        "kind": "recipe",
+        "reference": "s288c-disaccharide-archive-qc@1",
+        "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae"
+      },
+      {
+        "native_row": 35,
+        "call_id": "exec-fadaac96-7a7b-4137-8e8f-85a85b726f7d",
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "recipe",
+          "reference": "s288c-disaccharide-archive-qc@1"
+        },
+        "kind": "recipe",
+        "reference": "s288c-disaccharide-archive-qc@1"
+      }
+    ],
+    "decisions": [
+      {
+        "event_id": 34,
+        "ref": "gxa_f4fbc2518fcd99694b5fd44a63b99db21ceb2db7c8848c064ddb1329186acd21",
+        "native_row": 10,
+        "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9",
+        "rationale": "查詢檔指定 S. cerevisiae S288C（taxid 559292）與 maltose。先從固定版本的封存庫取回具名天然蛋白、反應註釋和測定原始條目，才能判定哪些條件可歸到個別蛋白。這項查詢只需一次本機讀取，並產生可供下一種二糖比對的原件。",
+        "ops": [
+          "open_branch",
+          "add_node"
+        ],
+        "evidence_refs": [
+          "gxa_01m8fdkea3wrcvsntp"
+        ],
+        "outcome": "adopted"
+      },
+      {
+        "event_id": 60,
+        "ref": "gxa_5d1bc24207de6837e688ede3ae0939ff780ab5f2bfca95ca155bb5ac9e21caf1",
+        "native_row": 20,
+        "turn_id": "01a21eda-3094-7701-bd78-d494a100c245",
+        "rationale": "查詢檔已指定 S288C（taxid 559292）和麥芽糖，既有查詢正對應這份材料。等待交付 parent-records.json，再依反應識別碼、方向、實測底物及蛋白歸屬決定刊登文字。同一原始測定經不同介面出現時只計一次。重跑相同查詢不會增加獨立證據，本輪保留原件供後續二糖比對。",
+        "ops": [],
+        "evidence_refs": [
+          "gxa_01m8fdkea3wrcvsntp"
+        ],
+        "outcome": "maintained"
+      },
+      {
+        "event_id": 78,
+        "ref": "gxa_c2d6062f5205f2281611f8863c21a83278776fd4474d4937734c33b1c5098ee9",
+        "native_row": 36,
+        "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41",
+        "rationale": "已逐筆核對查詢原件及 parent-records.json。MAL12 與 MAL32 各有 ENZYME 分類來源行，兩筆的 reaction_links 都是空陣列。MAL12 所連的 BRENDA 條目分別記載其他具名底物與未指明底物，MAL32 沒有連結測定，SABIO-RK 也沒有連結條目。這些記錄足以決定本版品管頁的刊登範圍。重跑相同快照只會再次讀取同一批原始記錄。可重用程序已儲存並在目錄核對。",
+        "ops": [
+          "close_run"
+        ],
+        "evidence_refs": [
+          "gxa_01m8fdkea3wrcvsntp",
+          "gxa_01m8fdmcaez3kstbtj"
+        ],
+        "outcome": "adopted"
+      }
+    ],
+    "release_events": [
+      {
+        "id": 51,
+        "subject": "node_73ef741abef65bbccf82f35260547dba",
+        "payload": {
+          "branch_id": "branch_46907ab67c28e9e8ed8ac4b7be15b616",
+          "decision_ref": "gxa_f4fbc2518fcd99694b5fd44a63b99db21ceb2db7c8848c064ddb1329186acd21",
+          "exec_key": "f6034ef72d63270722ba2ea84785bbd18b937e1b5aa4f520f49c30f6fa4ca6c2",
+          "job_id": "gxj_01m8fdmbx53g9thef6",
+          "node_id": "node_73ef741abef65bbccf82f35260547dba",
+          "observed_job_status": "SUCCEEDED",
+          "operation_key": "v6.node:bb610b2ccda2f93329bf04c30561174a55370599547f5f8ff4819ac8c3b5fc5a",
+          "result_ref": "gxa_01m8fdmcaez3kstbtj",
+          "reused_from": null,
+          "status": "SUCCEEDED"
+        }
+      }
+    ],
+    "surveys": [
+      {
+        "id": 19,
+        "subject": "303f50962ee7ae49afe1fe194d28f7e563293b0ccd81d12ed1efa5d897f1ef97",
+        "payload": {
+          "arguments": {
+            "kind": "all",
+            "limit": 40,
+            "query": "S288C yeast archive disaccharide protein reaction direction assay condition original snapshot provenance repeat procedure transferable artifacts"
+          },
+          "call_id": "exec-d9fdc3de-6318-4608-9cb5-f7a1353de603",
+          "context_ref": "gxcx_01m8fdkeb9k00y14tr",
+          "first_candidates": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+              "reference": "yeast-uniprot-record@1",
+              "status": "catalog_only"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-enzyme-mcp@2",
+              "status": "selectable"
+            }
+          ],
+          "semantic_key": "catalog.query:26fb5d090369012474fb817aea187bcaae5216fbc84967004499dff5fc798583",
+          "thread_id": "01a21ed9-c0c8-73a2-ab5d-91a07770a539",
+          "through_event": 14,
+          "total": 70,
+          "trigger_events": [
+            14
+          ],
+          "turn_id": "01a21ed9-c0fb-7203-8e99-a50ff007a6b9"
+        }
+      },
+      {
+        "id": 54,
+        "subject": "6b6c05c52abc2ff36a5d5e5588c3ea8d3c7606823cf2e2ee7b6ef2e502c517cb",
+        "payload": {
+          "arguments": {
+            "kind": "all",
+            "limit": 40,
+            "query": "yeast"
+          },
+          "call_id": "exec-b2d8daf9-3e96-45dc-bfea-e31a599b4e01",
+          "context_ref": "gxcx_01m8fdmc1v8kx0d2zc",
+          "first_candidates": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-enzyme-mcp@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-reaction-index@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            }
+          ],
+          "semantic_key": "catalog.query:59372ee918242fd8bb5a1f3d04a8c568acf1fe316040398fb7bc881d5caae512",
+          "thread_id": "01a21eda-3065-7a32-9f33-6069c7dfe533",
+          "through_event": 28,
+          "total": 10,
+          "trigger_events": [
+            28
+          ],
+          "turn_id": "01a21eda-3094-7701-bd78-d494a100c245"
+        }
+      },
+      {
+        "id": 66,
+        "subject": "d3a3d6857b990d199739311942cbeada6e902e683d4fd60bbd774d31130ab85a",
+        "payload": {
+          "arguments": {
+            "kind": "all",
+            "limit": 40,
+            "query": "yeast enzyme archive natural disaccharide protein identities exact reaction direction assay scope provenance reusable workflow artifact handoff"
+          },
+          "call_id": "exec-a99b8288-73c1-455b-8d11-c99aade8a365",
+          "context_ref": "gxcx_01m8fdngkgw7n643v5",
+          "first_candidates": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-reaction-index@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+              "reference": "yeast-reaction-index@1",
+              "status": "catalog_only"
+            }
+          ],
+          "semantic_key": "catalog.query:9a94c16599bd7a64ce85fc967be7fe5bfb862ceee30a099abc34a71ab323f8ec",
+          "thread_id": "01a21eda-c294-7502-b333-13e1ebc72cd7",
+          "through_event": 51,
+          "total": 70,
+          "trigger_events": [
+            51
+          ],
+          "turn_id": "01a21eda-c2c1-7aa1-8f4d-5c73fd6c7c41"
+        }
+      }
+    ],
+    "recipe_publications": [
+      {
+        "reference": "s288c-disaccharide-archive-qc@1",
+        "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae",
+        "source_run": "gxr_01m8fdke95wxpbgs7j",
+        "definition": {
+          "decision_point": {
+            "actions": [
+              "刊登有來源的蛋白與 EC，按實際 Rhea 連結及明載方向補記指定反應。",
+              "逐條列出具名目標底物、蛋白歸屬和原報條件，標明共用記錄或資料缺口。"
+            ],
+            "event": "job_settled",
+            "output": "parent-records.json",
+            "question": "本次封存條目可支持哪些蛋白名稱、指定反應與方向，以及可歸屬的同底物測定條件？",
+            "role": "run_lead",
+            "step": "lookup",
+            "stop_condition": "已按 accession、反應與方向、底物、條件及原始 entry_id 核對全部回傳項目，並保存查詢與 parent-records.json 原檔。"
+          },
+          "id_alignment": "以 gx.yeast-archive-query/1 的 taxid 559292 和受支援的 substrate 查詢。先核對 releases 及 source_digests。以 Swiss-Prot accession 去重，跨查詢核對序列版本和殘基序列 SHA-256。逐蛋白核對 Rhea master、條目方向與獨立的 EC 來源行。測定以原始資料庫及 entry_id 對齊，鏡像或交叉引用須回溯同一原始記錄。多蛋白共用記錄在聯集中只計一次並保留全部 accession。",
+          "inputs": {
+            "query": {
+              "kind": "run_input",
+              "media_type": null
+            }
+          },
+          "missing_values": "空 reaction_links 表示快照未連結，方向碼 UN 表示未指定。底物未列、測定條件缺失及蛋白歸屬未定各自保留。只在依賴底物的欄位精確具名目標二糖時才計入目標測定。其他底物與多蛋白共用條目分列。缺測保留為未知，零筆連結不代表零活性。",
+          "provider_pins": {
+            "yeast-archive-lookup@1": {
+              "closure": [
+                {
+                  "id": "org.gx.yeast-enzyme-archive",
+                  "sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+                  "version": "1.0.0"
+                }
+              ],
+              "plugin": {
+                "id": "org.gx.yeast-enzyme-archive",
+                "sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+                "version": "1.0.0"
+              }
+            }
+          },
+          "reference": "s288c-disaccharide-archive-qc@1",
+          "schema": "gx.research-recipe/2",
+          "steps": [
+            {
+              "capability": "yeast-archive-lookup@1",
+              "depends_on": [],
+              "inputs": [
+                {
+                  "input": "query"
+                }
+              ],
+              "method_digest": "aef7e787ba570664443ebac48d60acec7b6d9ba65fce72f101b3059b75d84695",
+              "outputs": [
+                {
+                  "kind": "yeast_archive_records",
+                  "name": "parent-records.json",
+                  "nature": "analysis",
+                  "source_roles": [
+                    "query"
+                  ]
+                }
+              ],
+              "parameters": {},
+              "question": "Apply yeast-archive-lookup@1 to the named inputs of this Goal.",
+              "slot": "lookup"
+            }
+          ],
+          "title": "S288C 二糖水解封存條目核對與品管頁刊登判定",
+          "units": "pH 無量綱，溫度用 °C。動力學或比活性數值只按原條目所載的參數、單位及具名底物呈現。條目數按唯一原始記錄計算。"
+        },
+        "sources": {
+          "lookup": {
+            "completion_sha256": "07fa5c9119a18208038f491d029d5b9742453cec00c1ad707ef52dd3a70da529",
+            "job_id": "gxj_01m8fdmbx53g9thef6",
+            "node_id": "node_73ef741abef65bbccf82f35260547dba"
+          }
+        }
+      }
+    ],
+    "transfers": [],
+    "decision_refusals": [],
+    "tool_counts": {
+      "gx_task_context": 4,
+      "gx_read_artifact": 5,
+      "gx_query_catalog": 21,
+      "gx_select_capability": 1,
+      "gx_decide_revision": 3,
+      "gx_save_recipe": 1,
+      "gx_stage_claim": 1
+    },
+    "close_event": 80,
+    "nodes": [
+      {
+        "node_id": "node_73ef741abef65bbccf82f35260547dba",
+        "decision_ref": "gxa_f4fbc2518fcd99694b5fd44a63b99db21ceb2db7c8848c064ddb1329186acd21",
+        "job_id": "gxj_01m8fdmbx53g9thef6",
+        "status": "SUCCEEDED",
+        "spec": {
+          "branch": "branch_46907ab67c28e9e8ed8ac4b7be15b616",
+          "capability": "yeast-archive-lookup@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8fdkea3wrcvsntp"
+          ],
+          "node": "node_73ef741abef65bbccf82f35260547dba",
+          "op": "add_node",
+          "parameters": {},
+          "question": "S288C 麥芽糖查詢回傳哪些具 accession、序列版本及摘要的天然蛋白？依封存條目核對指定反應、方向與酵素分類，抽取同底物測定的條件及歸屬，保留共享條目、其他底物和未知方向，並依原始記錄去重。"
+        }
+      }
+    ],
+    "metrics": {
+      "run_id": "gxr_01m8fdke95wxpbgs7j",
+      "status": "STOPPED",
+      "opened": "2026-11-27T21:11:54.917Z",
+      "surveys": [
+        {
+          "event": 19,
+          "through_event": 14,
+          "total": 70,
+          "top": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+              "reference": "yeast-uniprot-record@1",
+              "status": "catalog_only"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-enzyme-mcp@2",
+              "status": "selectable"
+            }
+          ]
+        },
+        {
+          "event": 54,
+          "through_event": 28,
+          "total": 10,
+          "top": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-enzyme-mcp@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-reaction-index@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            }
+          ]
+        },
+        {
+          "event": 66,
+          "through_event": 51,
+          "total": 70,
+          "top": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-reaction-index@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+              "reference": "yeast-reaction-index@1",
+              "status": "catalog_only"
+            }
+          ]
+        }
+      ],
+      "first_effective_delivery": {
+        "event": 51,
+        "job_id": "gxj_01m8fdmbx53g9thef6",
+        "result_ref": "gxa_01m8fdmcaez3kstbtj",
+        "ts": "2026-11-27T21:12:25.732Z",
+        "seconds_from_open": 30.815
+      },
+      "adjudicated_qualifying_jobs": [
+        "gxj_01m8fdmbx53g9thef6"
+      ],
+      "rejections": [],
+      "rejection_count": 0,
+      "surplus_jobs_with_identical_idempotency_key": 0,
+      "repeated_graph_execution_keys": [],
+      "jobs": [
+        {
+          "job_id": "gxj_01m8fdmbx53g9thef6",
+          "capability_id": "yeast-archive-lookup",
+          "capability_version": "1",
+          "status": "SUCCEEDED"
+        }
+      ],
+      "shortlist_expectation": null,
+      "target_first_top_five_rank": null,
+      "expected_method_admitted": null,
+      "expected_method_executed": null,
+      "expected_method_succeeded": null,
+      "definitions": "Delivery time is GX node settlement of a study-adjudicated result. Repeated graph execution keys count distinct actual Job IDs with the same frozen execution identity. Independent repeats have a distinct key. Whether a repeat or a rejection was avoidable requires inspection of its cause."
+    }
+  },
+  {
+    "run_id": "gxr_01m8fdw087fqx283nq",
+    "goal_status": "CLOSED",
+    "engine_status": "STOPPED",
+    "created_at": "2026-11-27T21:16:35.463Z",
+    "native_contract_sha256": "7a0a4c491271e0eebdfecf8196e6641bd0a40550f38f1e690eb269e7c48ad54a",
+    "archive_provider_options": [
+      {
+        "digest": "dab3adf688901bbd9a3edb1aedfb7b1b4479ac12113eebed7c3d21f717e7d7c1",
+        "method": "yeast-archive-compare@1",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "provider_digest": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6"
+      },
+      {
+        "digest": "aef7e787ba570664443ebac48d60acec7b6d9ba65fce72f101b3059b75d84695",
+        "method": "yeast-archive-lookup@1",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "provider_digest": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6"
+      }
+    ],
+    "inputs": [
+      {
+        "artifact_ref": "gxa_01m8fdw094p69b59nq",
+        "role": "prior_records",
+        "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+      },
+      {
+        "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+        "role": "query",
+        "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+      }
+    ],
+    "turns": [
+      {
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "official_session": {
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "provider": "openai"
+        }
+      },
+      {
+        "thread_id": "01a21ee1-05ca-7391-bc9a-98ef726fe634",
+        "turn_id": "01a21ee1-05f5-7a41-b31e-16a95119dc32",
+        "official_session": {
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "provider": "openai"
+        }
+      },
+      {
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "official_session": {
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "provider": "openai"
+        }
+      }
+    ],
+    "jobs": [
+      {
+        "job_id": "gxj_01m8fe211d7m5avz56",
+        "capability_id": "yeast-archive-lookup",
+        "capability_version": "1",
+        "status": "SUCCEEDED",
+        "created_at": "2026-11-27T21:19:52.929Z",
+        "finished_at": "2026-11-27T21:19:53.455Z",
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+            "bytes": 78,
+            "role": "query",
+            "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+          }
+        ],
+        "manifest_hash": "30e7b2b3d786f61086c4f277a94e4e87c330a72c55ed606bdd8ab59538fab490",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8fe21j8tk5x3vxn",
+            "sha256": "faa60617de090f1bd86e38be37e38db44ed5da85b168b1e4e4ed8b755865690d",
+            "output_name": "parent-records.json",
+            "kind": "yeast_archive_records",
+            "nature": "analysis"
+          }
+        ],
+        "readouts": {
+          "parent-records.json": {
+            "query": {
+              "schema": "gx.yeast-archive-query/1",
+              "taxid": 559292,
+              "substrate": "isomaltose"
+            },
+            "releases": {
+              "Rhea": "142",
+              "Swiss-Prot": "2026_03",
+              "ENZYME": "28-Jan-2026",
+              "assays": "brenda2026.1-sabio20260920-v1"
+            },
+            "source_digests": {
+              "reactions": "46efa03be146239b68bb7b2f3c1e5ec73c129c9e263e0658112de532eb7b429e",
+              "rhea": "76c4649d394422d7b168c74728c4c9cdefaa14fc3f8557014d144c8419d50eab",
+              "enzyme": "59fdb6f554e756a19873e45bb3f1bde66fc2d86d4fa8c94bb144382b0e4aa09e",
+              "kinetics": "1cac1d6d47925f227959a6c05274252b09f121801d73f931173c4b4be1c2aec3"
+            },
+            "counts": {
+              "distinct_accessions": 5,
+              "exact_accessions": 0,
+              "class_accessions": 5
+            },
+            "assay_coverage": {
+              "snapshot": "brenda2026.1-sabio20260920-v1",
+              "ec_indexed_rows_all_organisms": {
+                "BRENDA": 367,
+                "SABIO-RK": 8
+              },
+              "linked_unique_rows_by_source": {
+                "BRENDA": 107,
+                "SABIO-RK": 0
+              },
+              "single_accession_rows": 92,
+              "grouped_accession_rows": 15,
+              "single_target_rows": 10,
+              "grouped_target_rows": 1,
+              "other_named_substrate_rows": 52,
+              "unresolved_substrate_rows": 44,
+              "target_substrate_rows": 11
+            },
+            "parents": [
+              {
+                "accession": "P0CW40",
+                "sequence_version": 1,
+                "sequence_sha256": "a0be9f5a82cbc4f3cd1aabaa42f0f1292c956d903b034d4d898760a946ef3cf9"
+              },
+              {
+                "accession": "P0CW41",
+                "sequence_version": 1,
+                "sequence_sha256": "a0be9f5a82cbc4f3cd1aabaa42f0f1292c956d903b034d4d898760a946ef3cf9"
+              },
+              {
+                "accession": "P40884",
+                "sequence_version": 1,
+                "sequence_sha256": "097beabfbc8ff61e0e88ddd4cc61c3095c725a87ce5816362cd4e3ac25472091"
+              },
+              {
+                "accession": "P53051",
+                "sequence_version": 1,
+                "sequence_sha256": "b00d7a8f5b64a0453cdb612190553893402eda54581955af26aa07b415ab2147"
+              },
+              {
+                "accession": "Q08295",
+                "sequence_version": 1,
+                "sequence_sha256": "d64011c9c94211e2b7d86f4446d98280ad6146a5a6686cc72fd8a37e5805fc1d"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "job_id": "gxj_01m8fe218m9yw27h80",
+        "capability_id": "yeast-archive-compare",
+        "capability_version": "1",
+        "status": "SUCCEEDED",
+        "created_at": "2026-11-27T21:19:53.151Z",
+        "finished_at": "2026-11-27T21:19:53.536Z",
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8fdw094p69b59nq",
+            "bytes": 3756,
+            "role": "prior_records",
+            "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+          },
+          {
+            "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+            "bytes": 78,
+            "role": "query",
+            "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+          }
+        ],
+        "manifest_hash": "c962d34ba0a410defec40436c13b3315fc3c1baa7bb02c3859781d1d1f96a9ec",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8fe21mtypg6ms7n",
+            "sha256": "87c16549288698f30a7ca7cfd01a87ffa6f01193a9bd10782c7e8bf55301e6d7",
+            "output_name": "comparison.json",
+            "kind": "yeast_archive_comparison",
+            "nature": "analysis"
+          }
+        ],
+        "readouts": {
+          "comparison.json": {
+            "prior_query": {
+              "schema": "gx.yeast-archive-query/1",
+              "taxid": 559292,
+              "substrate": "maltose"
+            },
+            "new_query": {
+              "schema": "gx.yeast-archive-query/1",
+              "taxid": 559292,
+              "substrate": "isomaltose"
+            },
+            "prior_counts": {
+              "distinct_accessions": 2,
+              "exact_accessions": 0,
+              "class_accessions": 2
+            },
+            "prior_parents": [
+              {
+                "accession": "P38158",
+                "sequence_version": 1,
+                "sequence_sha256": "6c38d5b5d26b5c883e726212ba8aced20e26c244e3b129b1f139634ae59f2ae5"
+              },
+              {
+                "accession": "P53341",
+                "sequence_version": 1,
+                "sequence_sha256": "d9af3af2a6c3c2713e197fd5174ab239efb56400147c41ca3249c577e875f807"
+              }
+            ],
+            "shared_accessions": [],
+            "new_only_accessions": [
+              "P0CW40",
+              "P0CW41",
+              "P40884",
+              "P53051",
+              "Q08295"
+            ],
+            "prior_assays": {
+              "snapshot": "brenda2026.1-sabio20260920-v1",
+              "ec_indexed_rows_all_organisms": {
+                "BRENDA": 1405,
+                "SABIO-RK": 162
+              },
+              "linked_unique_rows_by_source": {
+                "BRENDA": 2,
+                "SABIO-RK": 0
+              },
+              "single_accession_rows": 2,
+              "grouped_accession_rows": 0,
+              "single_target_rows": 0,
+              "grouped_target_rows": 0,
+              "other_named_substrate_rows": 1,
+              "unresolved_substrate_rows": 1,
+              "target_substrate_rows": 0
+            },
+            "current": {
+              "query": {
+                "schema": "gx.yeast-archive-query/1",
+                "taxid": 559292,
+                "substrate": "isomaltose"
+              },
+              "releases": {
+                "Rhea": "142",
+                "Swiss-Prot": "2026_03",
+                "ENZYME": "28-Jan-2026",
+                "assays": "brenda2026.1-sabio20260920-v1"
+              },
+              "source_digests": {
+                "reactions": "46efa03be146239b68bb7b2f3c1e5ec73c129c9e263e0658112de532eb7b429e",
+                "rhea": "76c4649d394422d7b168c74728c4c9cdefaa14fc3f8557014d144c8419d50eab",
+                "enzyme": "59fdb6f554e756a19873e45bb3f1bde66fc2d86d4fa8c94bb144382b0e4aa09e",
+                "kinetics": "1cac1d6d47925f227959a6c05274252b09f121801d73f931173c4b4be1c2aec3"
+              },
+              "counts": {
+                "distinct_accessions": 5,
+                "exact_accessions": 0,
+                "class_accessions": 5
+              },
+              "assay_coverage": {
+                "snapshot": "brenda2026.1-sabio20260920-v1",
+                "ec_indexed_rows_all_organisms": {
+                  "BRENDA": 367,
+                  "SABIO-RK": 8
+                },
+                "linked_unique_rows_by_source": {
+                  "BRENDA": 107,
+                  "SABIO-RK": 0
+                },
+                "single_accession_rows": 92,
+                "grouped_accession_rows": 15,
+                "single_target_rows": 10,
+                "grouped_target_rows": 1,
+                "other_named_substrate_rows": 52,
+                "unresolved_substrate_rows": 44,
+                "target_substrate_rows": 11
+              },
+              "parents": [
+                {
+                  "accession": "P0CW40",
+                  "sequence_version": 1,
+                  "sequence_sha256": "a0be9f5a82cbc4f3cd1aabaa42f0f1292c956d903b034d4d898760a946ef3cf9"
+                },
+                {
+                  "accession": "P0CW41",
+                  "sequence_version": 1,
+                  "sequence_sha256": "a0be9f5a82cbc4f3cd1aabaa42f0f1292c956d903b034d4d898760a946ef3cf9"
+                },
+                {
+                  "accession": "P40884",
+                  "sequence_version": 1,
+                  "sequence_sha256": "097beabfbc8ff61e0e88ddd4cc61c3095c725a87ce5816362cd4e3ac25472091"
+                },
+                {
+                  "accession": "P53051",
+                  "sequence_version": 1,
+                  "sequence_sha256": "b00d7a8f5b64a0453cdb612190553893402eda54581955af26aa07b415ab2147"
+                },
+                {
+                  "accession": "Q08295",
+                  "sequence_version": 1,
+                  "sequence_sha256": "d64011c9c94211e2b7d86f4446d98280ad6146a5a6686cc72fd8a37e5805fc1d"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "native_actions": [
+      {
+        "native_row": 37,
+        "call_id": "exec-b0f815b3-1ebc-4e2e-bad8-13e294e9f296",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdw09qzzn4z3ba"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+      },
+      {
+        "native_row": 38,
+        "call_id": "exec-5c87441a-553c-44a6-a44a-bb5090029542",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdw094p69b59nq"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+      },
+      {
+        "native_row": 40,
+        "call_id": "exec-8fd14230-95b6-464d-b02c-0c3202b54bf2",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "limit": 20,
+          "query": "yeast-archive"
+        },
+        "kind": "method",
+        "total": 2,
+        "candidates": [
+          "yeast-archive-compare@1",
+          "yeast-archive-lookup@1"
+        ]
+      },
+      {
+        "native_row": 41,
+        "call_id": "exec-a9525bd6-1fc9-4705-9b22-5e38014a5c95",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "recipe",
+          "limit": 10,
+          "query": "s288c-disaccharide-archive-qc"
+        },
+        "kind": "recipe",
+        "total": 1,
+        "candidates": [
+          "s288c-disaccharide-archive-qc@1"
+        ]
+      },
+      {
+        "native_row": 42,
+        "call_id": "exec-2e27f845-621d-4ba7-804b-e1ddcabb57e7",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "all",
+          "limit": 40,
+          "query": "S288C isomaltose natural yeast protein records maltose prior archive reaction assay compare"
+        },
+        "kind": "all",
+        "total": 62,
+        "candidates": [
+          "yeast-archive-compare@1",
+          "yeast-archive-lookup@1",
+          "yeast-uniprot-record@2",
+          "yeast-uniprot-record@1",
+          "interpret-enzyme-annotation@1",
+          "s288c-disaccharide-archive-qc@1",
+          "native-assay-reading@legacy",
+          "bglb-retrospective@1",
+          "yeast-enzyme-mcp@2",
+          "yeast-reaction-index@2",
+          "yeast-enzyme-mcp@1",
+          "yeast-reaction-index@1",
+          "rhea-sprot-index@legacy",
+          "kinetics-assay-snapshot@legacy",
+          "pdb-entry-web-route@legacy",
+          "literature-page@1",
+          "literature-page@2",
+          "literature-query@1",
+          "literature-query@2",
+          "scholarly-page-search@1",
+          "scholarly-page-search@2",
+          "archival-peptide-coverage@1",
+          "deposited-chain-geometry@1",
+          "scholarly-fetch@1",
+          "tl1a-review@1",
+          "tl1a-review@1",
+          "academic-search@legacy",
+          "native-coordinate-comparison@legacy",
+          "pdb-chemical-dictionary@legacy",
+          "pdb-entry-mcp@legacy",
+          "protenix-model@legacy",
+          "swissprot-rhea-snapshot@legacy",
+          "gx_read_source@1",
+          "pcna-archive-search@1",
+          "pcna-archive-fetch@1",
+          "arxiv-search@1",
+          "scholarly-search@1",
+          "archival-fab-coverage@1",
+          "archived-fold-calibration@1",
+          "artifact-analysis@1"
+        ]
+      },
+      {
+        "native_row": 43,
+        "call_id": "exec-2c45fb93-4e7a-4860-a7e2-bd80f38b2d54",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "reference": "yeast-archive-compare@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-compare@1",
+        "source_ref": "gxa_01m8fdwq70msffp80f"
+      },
+      {
+        "native_row": 44,
+        "call_id": "exec-2e199f09-29cd-4098-a005-d63ada02b396",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "reference": "yeast-archive-lookup@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-lookup@1",
+        "source_ref": "gxa_01m8fdwq84s5rsdrvq"
+      },
+      {
+        "native_row": 45,
+        "call_id": "exec-4ca35409-2376-45e2-a3fa-7aa30cbbfad8",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "reference": "s288c-disaccharide-archive-qc@1"
+        },
+        "kind": "recipe",
+        "reference": "s288c-disaccharide-archive-qc@1"
+      },
+      {
+        "native_row": 46,
+        "call_id": "exec-b2ac5a14-3c05-45ca-b82c-12183c3c1435",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "reference": "data_inventory@3"
+        },
+        "kind": "module",
+        "reference": "data_inventory@3"
+      },
+      {
+        "native_row": 47,
+        "call_id": "exec-fa73c478-7924-47da-9cd2-31a27e7b7500",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_select_capability",
+        "arguments": {
+          "action": "enable",
+          "method": "yeast-archive-lookup@1",
+          "revision": 0
+        },
+        "digest": "34e75c1a38cd6f3684f4127b9368f421bf8f76e362da0ef5e7c0b0357ce765d6"
+      },
+      {
+        "native_row": 48,
+        "call_id": "exec-06c4862b-cd2c-463d-9ffc-226f727cc2ea",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_select_capability",
+        "arguments": {
+          "action": "enable",
+          "method": "yeast-archive-compare@1",
+          "revision": 1
+        },
+        "digest": "c0b2bcc781b368fddd20a26ee9078f9e9498a40d67c702ebb6e16800d402d657"
+      },
+      {
+        "native_row": 49,
+        "call_id": "exec-f7a11124-e539-4aa4-b2ec-f2a147fddc32",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_instantiate_recipe",
+        "arguments": {
+          "branch": "archive_qc",
+          "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae",
+          "inputs": {
+            "query": "gxa_01m8fdw09qzzn4z3ba"
+          },
+          "prefix": "isomaltose",
+          "recipe": "s288c-disaccharide-archive-qc@1"
+        },
+        "recipe": "s288c-disaccharide-archive-qc@1",
+        "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae",
+        "expanded_steps": [
+          {
+            "branch": "archive_qc",
+            "capability": "yeast-archive-lookup@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m8fdw09qzzn4z3ba"
+            ],
+            "node": "local:isomaltose-lookup",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply yeast-archive-lookup@1 to the named inputs of this Goal.",
+            "recipe_decision": {
+              "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae",
+              "recipe": "s288c-disaccharide-archive-qc@1",
+              "step": "lookup"
+            }
+          }
+        ],
+        "decision_point": {
+          "actions": [
+            "刊登有來源的蛋白與 EC，按實際 Rhea 連結及明載方向補記指定反應。",
+            "逐條列出具名目標底物、蛋白歸屬和原報條件，標明共用記錄或資料缺口。"
+          ],
+          "event": "job_settled",
+          "output": "parent-records.json",
+          "question": "本次封存條目可支持哪些蛋白名稱、指定反應與方向，以及可歸屬的同底物測定條件？",
+          "role": "run_lead",
+          "step": "lookup",
+          "stop_condition": "已按 accession、反應與方向、底物、條件及原始 entry_id 核對全部回傳項目，並保存查詢與 parent-records.json 原檔。"
+        }
+      },
+      {
+        "native_row": 59,
+        "call_id": "exec-a23f291f-f61c-4897-9e2b-245e0b2c2266",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+        "scope": "run",
+        "tool": "gx_instantiate_recipe",
+        "arguments": {
+          "branch": "local:archive-qc",
+          "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae",
+          "inputs": {
+            "query": "gxa_01m8fdw09qzzn4z3ba"
+          },
+          "prefix": "isomaltose",
+          "recipe": "s288c-disaccharide-archive-qc@1"
+        },
+        "recipe": "s288c-disaccharide-archive-qc@1",
+        "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae",
+        "expanded_steps": [
+          {
+            "branch": "local:archive-qc",
+            "capability": "yeast-archive-lookup@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m8fdw09qzzn4z3ba"
+            ],
+            "node": "local:isomaltose-lookup",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply yeast-archive-lookup@1 to the named inputs of this Goal.",
+            "recipe_decision": {
+              "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae",
+              "recipe": "s288c-disaccharide-archive-qc@1",
+              "step": "lookup"
+            }
+          }
+        ],
+        "decision_point": {
+          "actions": [
+            "刊登有來源的蛋白與 EC，按實際 Rhea 連結及明載方向補記指定反應。",
+            "逐條列出具名目標底物、蛋白歸屬和原報條件，標明共用記錄或資料缺口。"
+          ],
+          "event": "job_settled",
+          "output": "parent-records.json",
+          "question": "本次封存條目可支持哪些蛋白名稱、指定反應與方向，以及可歸屬的同底物測定條件？",
+          "role": "run_lead",
+          "step": "lookup",
+          "stop_condition": "已按 accession、反應與方向、底物、條件及原始 entry_id 核對全部回傳項目，並保存查詢與 parent-records.json 原檔。"
+        }
+      },
+      {
+        "native_row": 61,
+        "call_id": "exec-739a0fb8-5d3e-477e-b01b-d5bc336a94f4",
+        "turn_id": "01a21ee1-05f5-7a41-b31e-16a95119dc32",
+        "thread_id": "01a21ee1-05ca-7391-bc9a-98ef726fe634",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "all",
+          "query": "S288C archived isomaltose natural parent records, reaction and assay attribution, compare prior maltose accession and residue sequence",
+          "required_outputs": [
+            "comparison.json",
+            "parent-records.json"
+          ]
+        },
+        "kind": "all",
+        "total": 99,
+        "candidates": [
+          "yeast-archive-compare@1",
+          "yeast-archive-lookup@1",
+          "s288c-disaccharide-archive-qc@1",
+          "bglb-retrospective@1",
+          "yeast-uniprot-record@2",
+          "yeast-uniprot-record@1",
+          "yeast-reaction-index@2",
+          "archival-peptide-coverage@1",
+          "yeast-reaction-index@1",
+          "rhea-sprot-index@legacy",
+          "kinetics-assay-snapshot@legacy",
+          "native-assay-reading@legacy",
+          "uniprot-archive@legacy",
+          "yeast-enzyme-mcp@2",
+          "pcna-local-geometry@1"
+        ]
+      },
+      {
+        "native_row": 62,
+        "call_id": "exec-846465c0-9276-475a-8a9c-b7ead4e1ea17",
+        "turn_id": "01a21ee1-05f5-7a41-b31e-16a95119dc32",
+        "thread_id": "01a21ee1-05ca-7391-bc9a-98ef726fe634",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdw094p69b59nq"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+      },
+      {
+        "native_row": 64,
+        "call_id": "exec-4c7bed78-ef89-4d18-8c09-2c22d667a731",
+        "turn_id": "01a21ee1-05f5-7a41-b31e-16a95119dc32",
+        "thread_id": "01a21ee1-05ca-7391-bc9a-98ef726fe634",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdw09qzzn4z3ba"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+      },
+      {
+        "native_row": 65,
+        "call_id": "exec-cedcf71d-c7a5-4696-806a-7c4c805f1f55",
+        "turn_id": "01a21ee1-05f5-7a41-b31e-16a95119dc32",
+        "thread_id": "01a21ee1-05ca-7391-bc9a-98ef726fe634",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "reference": "yeast-archive-lookup@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-lookup@1",
+        "source_ref": "gxa_01m8fe2t0cf44axejt"
+      },
+      {
+        "native_row": 66,
+        "call_id": "exec-5e73b3a0-5c07-4030-b1ab-a92f7d1f48cc",
+        "turn_id": "01a21ee1-05f5-7a41-b31e-16a95119dc32",
+        "thread_id": "01a21ee1-05ca-7391-bc9a-98ef726fe634",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "reference": "yeast-archive-compare@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-compare@1",
+        "source_ref": "gxa_01m8fe2t18g4vvdsjy"
+      },
+      {
+        "native_row": 68,
+        "call_id": "exec-a054bbb9-95a4-470b-8cf5-7a50e217e04b",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdw094p69b59nq"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+      },
+      {
+        "native_row": 69,
+        "call_id": "exec-7f3139c8-ec1f-4d81-ba2c-cc1bb58a2cdc",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fdw09qzzn4z3ba"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+      },
+      {
+        "native_row": 70,
+        "call_id": "exec-c220b5f4-9402-4e4f-a35d-b972eda7ef84",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fe21j8tk5x3vxn"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "faa60617de090f1bd86e38be37e38db44ed5da85b168b1e4e4ed8b755865690d"
+      },
+      {
+        "native_row": 71,
+        "call_id": "exec-494fe3da-11e2-4f82-a13e-4daf135e0572",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "scope": "run",
+        "tool": "gx_read_artifact",
+        "arguments": {
+          "ref": "gxa_01m8fe21mtypg6ms7n"
+        },
+        "receipt": {},
+        "content_returned": true,
+        "verified_json_sha256": "87c16549288698f30a7ca7cfd01a87ffa6f01193a9bd10782c7e8bf55301e6d7"
+      },
+      {
+        "native_row": 72,
+        "call_id": "exec-88e1dbe6-be9d-4b1f-9c44-4b5640aaae91",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "all",
+          "query": "S288C archived maltose and isomaltose parent records, accession and sequence comparison, Rhea and ENZYME provenance, BRENDA and SABIO-RK assay entry attribution"
+        },
+        "kind": "all",
+        "total": 119,
+        "candidates": [
+          "yeast-archive-compare@1",
+          "yeast-archive-lookup@1",
+          "s288c-disaccharide-archive-qc@1",
+          "kinetics-assay-snapshot@legacy",
+          "yeast-reaction-index@2",
+          "yeast-uniprot-record@2",
+          "yeast-reaction-index@1",
+          "yeast-uniprot-record@1",
+          "yeast-enzyme-mcp@2",
+          "pcna-local-geometry@1",
+          "yeast-enzyme-mcp@1",
+          "augmented-nature-uniprot-mcp-server-get-protein-info@legacy",
+          "rhea-sprot-index@legacy",
+          "brenda-route@legacy",
+          "local-brenda@legacy"
+        ]
+      },
+      {
+        "native_row": 74,
+        "call_id": "exec-4b698f83-d222-41fe-aaa5-77b2d798874f",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "reference": "yeast-archive-compare@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-compare@1",
+        "source_ref": "gxa_01m8fe2t18g4vvdsjy"
+      },
+      {
+        "native_row": 75,
+        "call_id": "exec-c5006243-9869-41bc-8448-e13a0f23dbd9",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "scope": "run",
+        "tool": "gx_query_catalog",
+        "arguments": {
+          "kind": "method",
+          "reference": "yeast-archive-lookup@1"
+        },
+        "kind": "method",
+        "reference": "yeast-archive-lookup@1",
+        "source_ref": "gxa_01m8fe2t0cf44axejt"
+      }
+    ],
+    "decisions": [
+      {
+        "event_id": 128,
+        "ref": "gxa_13e8ef0947ed7646010588a7aa87530978937491f6bac503df33b2123ce3bf04",
+        "native_row": 60,
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "rationale": "沿用前案程序取得異麥芽糖逐筆記錄，並與隨案麥芽糖原檔直接對照。前案只有 EC 類別連結且未找到同底物測定，因此要分別檢查來源行、方向、底物及測定歸屬，另以 accession、版本與序列校驗碼判定重疊。",
+        "ops": [
+          "open_branch",
+          "add_node",
+          "add_node"
+        ],
+        "evidence_refs": [
+          "gxa_01m8fdw09qzzn4z3ba",
+          "gxa_01m8fdw094p69b59nq"
+        ],
+        "outcome": "adopted"
+      },
+      {
+        "event_id": 167,
+        "ref": "gxa_846b9fc4e3c2fe9a85f7de2be6f62d0d6a7f78066d8d3df272515006df3ba42e",
+        "native_row": 67,
+        "turn_id": "01a21ee1-05f5-7a41-b31e-16a95119dc32",
+        "rationale": "麥芽糖原件裡，MAL12（P53341）與 MAL32（P38158）各有 ENZYME 的 EC 3.2.1.20 來源行，兩筆 reaction_links 均為空。MAL12 的兩個 BRENDA 條目分別記載其他具名底物與未指明底物，均無法給出麥芽糖實測條件。現有異麥芽糖查詢與跨原件比對已涵蓋尚待判讀的蛋白交集、來源、方向及測定歸屬。待兩份產物送達即可逐筆核對，重複執行不會增加封存資料的涵蓋範圍。",
+        "ops": [],
+        "evidence_refs": [
+          "gxa_01m8fdw094p69b59nq",
+          "gxa_01m8fdw09qzzn4z3ba"
+        ],
+        "outcome": "maintained"
+      },
+      {
+        "event_id": 183,
+        "ref": "gxa_fdf0a7372644f31834703f057fd403fca23d286c834c161752cc7ba5f9404f37",
+        "native_row": 77,
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "rationale": "兩份 parent-records.json 的資料庫版本及來源 SHA-256 均一致。comparison.json 的 prior_parents 逐筆對回隨案原件，current 與本次異麥芽糖輸出一致。登錄號及完整殘基雜湊各自比較，測定則以來源和 entry_id 在聯集中去重。兩個查詢介面讀到同一批條目。異麥芽糖的單一登錄號目標測定分布為 IMA1 與 IMA2 各 2 筆、IMA3 與 IMA5 各 3 筆、IMA4 為 0 筆。唯一的目標底物群組條目同列 IMA1 和 IMA2。全物種 EC 索引的 BRENDA／SABIO-RK 筆數分別為麥芽糖分類 1405／162 及異麥芽糖分類 367／8，品管頁的計數採用實際連至本組登錄號的條目。這些原件已足以決定兩頁可刊登的內容。",
+        "ops": [
+          "close_run"
+        ],
+        "evidence_refs": [
+          "gxa_01m8fdw094p69b59nq",
+          "gxa_01m8fdw09qzzn4z3ba",
+          "gxa_01m8fe21j8tk5x3vxn",
+          "gxa_01m8fe21mtypg6ms7n"
+        ],
+        "outcome": "adopted"
+      }
+    ],
+    "release_events": [
+      {
+        "id": 157,
+        "subject": "node_7fa9d86f7a3338c2df727816451b7c27",
+        "payload": {
+          "branch_id": "branch_2450d3df22afbd640973a86ec1183fb9",
+          "decision_ref": "gxa_13e8ef0947ed7646010588a7aa87530978937491f6bac503df33b2123ce3bf04",
+          "exec_key": "5677e15fa4b9592de9e743344a70e240a71a0c6a6b532738e9ce0850d8fcbacf",
+          "job_id": "gxj_01m8fe211d7m5avz56",
+          "node_id": "node_7fa9d86f7a3338c2df727816451b7c27",
+          "observed_job_status": "SUCCEEDED",
+          "operation_key": "v6.node:5da9b2f04bf55ba0ff93ee560ed27259ef9365154afdbd1d03d298c338f776fb",
+          "result_ref": "gxa_01m8fe21j8tk5x3vxn",
+          "reused_from": null,
+          "status": "SUCCEEDED"
+        }
+      },
+      {
+        "id": 158,
+        "subject": "node_02056f05f63400c820989a20f347466e",
+        "payload": {
+          "branch_id": "branch_2450d3df22afbd640973a86ec1183fb9",
+          "decision_ref": "gxa_13e8ef0947ed7646010588a7aa87530978937491f6bac503df33b2123ce3bf04",
+          "exec_key": "3c88b89a46d3c72654bf50ab1ec4cafc91eba2ec8475e0673bf756d7360e4687",
+          "job_id": "gxj_01m8fe218m9yw27h80",
+          "node_id": "node_02056f05f63400c820989a20f347466e",
+          "observed_job_status": "SUCCEEDED",
+          "operation_key": "v6.node:eafca2320689aa70c3a2adbec4441428109a5b935b7d18a35fd82602f4cc411f",
+          "result_ref": "gxa_01m8fe21mtypg6ms7n",
+          "reused_from": null,
+          "status": "SUCCEEDED"
+        }
+      }
+    ],
+    "surveys": [
+      {
+        "id": 104,
+        "subject": "bd483517a9be635b307f84f092b3d72b5de23ca4baae56a75c28f7c24b9f6874",
+        "payload": {
+          "arguments": {
+            "kind": "all",
+            "limit": 40,
+            "query": "S288C isomaltose natural yeast protein records maltose prior archive reaction assay compare"
+          },
+          "call_id": "exec-2e27f845-621d-4ba7-804b-e1ddcabb57e7",
+          "context_ref": "gxcx_01m8fdw0ay6ypdc5ex",
+          "first_candidates": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+              "reference": "yeast-uniprot-record@1",
+              "status": "catalog_only"
+            },
+            {
+              "kind": "skill",
+              "provider": null,
+              "reference": "interpret-enzyme-annotation@1",
+              "status": "reference_only"
+            }
+          ],
+          "semantic_key": "catalog.query:ccf8c11de9ba5febb122f13a3ba76f238504b253c177b39a8ca0ddb594068c77",
+          "thread_id": "01a21ede-08ea-76a3-bf6d-00c655cb4880",
+          "through_event": 98,
+          "total": 62,
+          "trigger_events": [
+            98
+          ],
+          "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2"
+        }
+      },
+      {
+        "id": 159,
+        "subject": "7b2556f78e42b887749c56e5e60b06ef01c186ad451be518ec159f204419098e",
+        "payload": {
+          "arguments": {
+            "kind": "all",
+            "query": "S288C archived isomaltose natural parent records, reaction and assay attribution, compare prior maltose accession and residue sequence",
+            "required_outputs": [
+              "comparison.json",
+              "parent-records.json"
+            ]
+          },
+          "call_id": "exec-739a0fb8-5d3e-477e-b01b-d5bc336a94f4",
+          "context_ref": "gxcx_01m8fe21d42hg44pmb",
+          "first_candidates": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "available"
+            },
+            {
+              "kind": "recipe",
+              "reference": "s288c-disaccharide-archive-qc@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.published-kinetics@1.0.0",
+              "reference": "bglb-retrospective@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            }
+          ],
+          "semantic_key": "catalog.query:accd82b46ce7cc60c554061c94eaf232168c75c95c495177447175bd54818eab",
+          "thread_id": "01a21ee1-05ca-7391-bc9a-98ef726fe634",
+          "through_event": 116,
+          "total": 99,
+          "trigger_events": [
+            107,
+            111,
+            112,
+            116
+          ],
+          "turn_id": "01a21ee1-05f5-7a41-b31e-16a95119dc32"
+        }
+      },
+      {
+        "id": 173,
+        "subject": "4df36ea0cb8694321af18a41402de3c5b64d14e61258f49e22cf69084cb0b7a7",
+        "payload": {
+          "arguments": {
+            "kind": "all",
+            "query": "S288C archived maltose and isomaltose parent records, accession and sequence comparison, Rhea and ENZYME provenance, BRENDA and SABIO-RK assay entry attribution"
+          },
+          "call_id": "exec-88e1dbe6-be9d-4b1f-9c44-4b5640aaae91",
+          "context_ref": "gxcx_01m8fe3bthxna4xh5w",
+          "first_candidates": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "available"
+            },
+            {
+              "kind": "recipe",
+              "reference": "s288c-disaccharide-archive-qc@1",
+              "status": "available"
+            },
+            {
+              "kind": "database",
+              "provider": null,
+              "reference": "kinetics-assay-snapshot@legacy",
+              "status": "reference_only"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-reaction-index@2",
+              "status": "selectable"
+            }
+          ],
+          "semantic_key": "catalog.query:493c36ef73acfbf652b7a63abf4e1e622f780d59c167f8678e673c008a85ed0b",
+          "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+          "through_event": 158,
+          "total": 119,
+          "trigger_events": [
+            157,
+            158
+          ],
+          "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05"
+        }
+      }
+    ],
+    "recipe_publications": [],
+    "transfers": [
+      {
+        "id": 95,
+        "subject": "yeast-natural-records-isomaltose-first",
+        "payload": {
+          "material_transfers": [
+            {
+              "artifact_ref": "gxa_01m8fdw094p69b59nq",
+              "parent_artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+              "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+              "source_output": {
+                "artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+                "job_id": "gxj_01m8fdmbx53g9thef6",
+                "nature": "analysis",
+                "output_name": "parent-records.json",
+                "record_kind": "job_output",
+                "run_id": "gxr_01m8fdke95wxpbgs7j",
+                "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+              }
+            }
+          ],
+          "parent_decision_ref": "gxa_c2d6062f5205f2281611f8863c21a83278776fd4474d4937734c33b1c5098ee9",
+          "parent_run_id": "gxr_01m8fdke95wxpbgs7j"
+        }
+      }
+    ],
+    "decision_refusals": [
+      {
+        "call_id": "call_3792ad3a99ca4b349df0ff143ef5604e",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 50,
+        "code": "SCHEMA_INVALID",
+        "message": "Unknown graph operation",
+        "side_effect_status": "NONE"
+      },
+      {
+        "call_id": "call_0e1c7da5e5a64c15b7e3336a04daee7e",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 51,
+        "code": "SCHEMA_INVALID",
+        "message": "A new node requires an open branch",
+        "side_effect_status": "NONE"
+      },
+      {
+        "call_id": "call_5de8928c5c1b494082a51b7018df7421",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 52,
+        "code": "SCHEMA_INVALID",
+        "message": "$: missing required property 'hypothesis'; $: missing required property 'method_family'; $: missing required property 'alternative'; $: missing required property 'discriminating_observation'",
+        "side_effect_status": "NONE"
+      },
+      {
+        "call_id": "call_7e9a575586da4550bfd420781b607acb",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 53,
+        "code": "SCHEMA_INVALID",
+        "message": "$: missing required property 'stop_condition'",
+        "side_effect_status": "NONE"
+      },
+      {
+        "call_id": "call_b0c2277ddb06405ebe1f3768eed0b986",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 54,
+        "code": "SCHEMA_INVALID",
+        "message": "$: property 'stop_condition' is not allowed",
+        "side_effect_status": "NONE"
+      },
+      {
+        "call_id": "call_70e62aa2e8824eaea5a4ec7fef2ffcdd",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 55,
+        "code": "SCHEMA_INVALID",
+        "message": "$: missing required property 'stop_condition'",
+        "side_effect_status": "NONE"
+      },
+      {
+        "call_id": "call_4f807e12d91a4ac8b4648401ad4f5388",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 56,
+        "code": "SCHEMA_INVALID",
+        "message": "Set budget_limits for this branch's work",
+        "side_effect_status": "NONE"
+      },
+      {
+        "call_id": "call_872d751fbdc1434ea31ebb73fea26c2a",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 57,
+        "code": "SCHEMA_INVALID",
+        "message": "Unknown branch budget unit",
+        "side_effect_status": "NONE"
+      },
+      {
+        "call_id": "call_f0bf212ad12e4b8f8ae8e2da5a97447f",
+        "turn_id": "01a21ede-091f-7472-8742-cdf5f9599eb2",
+        "native_row": 58,
+        "code": "SCHEMA_INVALID",
+        "message": "New nodes and branches require distinct local: names",
+        "side_effect_status": "NONE"
+      }
+    ],
+    "tool_counts": {
+      "gx_read_artifact": 8,
+      "gx_task_context": 3,
+      "gx_query_catalog": 13,
+      "gx_select_capability": 2,
+      "gx_instantiate_recipe": 2,
+      "gx_decide_revision": 12,
+      "gx_stage_claim": 1
+    },
+    "close_event": 184,
+    "nodes": [
+      {
+        "node_id": "node_02056f05f63400c820989a20f347466e",
+        "decision_ref": "gxa_13e8ef0947ed7646010588a7aa87530978937491f6bac503df33b2123ce3bf04",
+        "job_id": "gxj_01m8fe218m9yw27h80",
+        "status": "SUCCEEDED",
+        "spec": {
+          "branch": "branch_2450d3df22afbd640973a86ec1183fb9",
+          "capability": "yeast-archive-compare@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8fdw094p69b59nq",
+            "gxa_01m8fdw09qzzn4z3ba"
+          ],
+          "node": "node_02056f05f63400c820989a20f347466e",
+          "op": "add_node",
+          "parameters": {},
+          "question": "以隨案麥芽糖原件為對照，兩組來源、序列身分與記錄交集各為何？"
+        }
+      },
+      {
+        "node_id": "node_7fa9d86f7a3338c2df727816451b7c27",
+        "decision_ref": "gxa_13e8ef0947ed7646010588a7aa87530978937491f6bac503df33b2123ce3bf04",
+        "job_id": "gxj_01m8fe211d7m5avz56",
+        "status": "SUCCEEDED",
+        "spec": {
+          "branch": "branch_2450d3df22afbd640973a86ec1183fb9",
+          "capability": "yeast-archive-lookup@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8fdw09qzzn4z3ba"
+          ],
+          "node": "node_7fa9d86f7a3338c2df727816451b7c27",
+          "op": "add_node",
+          "parameters": {},
+          "question": "異麥芽糖查詢重得哪些天然蛋白、Rhea 方向、EC 來源及可按底物與蛋白歸屬的測定？",
+          "recipe_decision": {
+            "digest": "46a75730e83b5305c6fe6ed8edb86c996a573220a889746d688be7c5d9220eae",
+            "recipe": "s288c-disaccharide-archive-qc@1",
+            "step": "lookup"
+          }
+        }
+      }
+    ],
+    "metrics": {
+      "run_id": "gxr_01m8fdw087fqx283nq",
+      "status": "STOPPED",
+      "opened": "2026-11-27T21:16:35.463Z",
+      "surveys": [
+        {
+          "event": 104,
+          "through_event": 98,
+          "total": 62,
+          "top": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+              "reference": "yeast-uniprot-record@1",
+              "status": "catalog_only"
+            },
+            {
+              "kind": "skill",
+              "provider": null,
+              "reference": "interpret-enzyme-annotation@1",
+              "status": "reference_only"
+            }
+          ]
+        },
+        {
+          "event": 159,
+          "through_event": 116,
+          "total": 99,
+          "top": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "available"
+            },
+            {
+              "kind": "recipe",
+              "reference": "s288c-disaccharide-archive-qc@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.published-kinetics@1.0.0",
+              "reference": "bglb-retrospective@1",
+              "status": "selectable"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-uniprot-record@2",
+              "status": "selectable"
+            }
+          ]
+        },
+        {
+          "event": 173,
+          "through_event": 158,
+          "total": 119,
+          "top": [
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-compare@1",
+              "status": "available"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+              "reference": "yeast-archive-lookup@1",
+              "status": "available"
+            },
+            {
+              "kind": "recipe",
+              "reference": "s288c-disaccharide-archive-qc@1",
+              "status": "available"
+            },
+            {
+              "kind": "database",
+              "provider": null,
+              "reference": "kinetics-assay-snapshot@legacy",
+              "status": "reference_only"
+            },
+            {
+              "kind": "method",
+              "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+              "reference": "yeast-reaction-index@2",
+              "status": "selectable"
+            }
+          ]
+        }
+      ],
+      "first_effective_delivery": {
+        "event": 157,
+        "job_id": "gxj_01m8fe211d7m5avz56",
+        "result_ref": "gxa_01m8fe21j8tk5x3vxn",
+        "ts": "2026-11-27T21:19:53.610Z",
+        "seconds_from_open": 198.147
+      },
+      "adjudicated_qualifying_jobs": [
+        "gxj_01m8fe211d7m5avz56",
+        "gxj_01m8fe218m9yw27h80"
+      ],
+      "rejections": [
+        {
+          "event": 113,
+          "reason": "SCHEMA_INVALID",
+          "field": "decision"
+        },
+        {
+          "event": 114,
+          "reason": "SCHEMA_INVALID",
+          "field": "decision"
+        },
+        {
+          "event": 115,
+          "reason": "SCHEMA_INVALID",
+          "field": "decision"
+        },
+        {
+          "event": 117,
+          "reason": "SCHEMA_INVALID",
+          "field": "decision"
+        },
+        {
+          "event": 118,
+          "reason": "SCHEMA_INVALID",
+          "field": "decision"
+        },
+        {
+          "event": 119,
+          "reason": "SCHEMA_INVALID",
+          "field": "decision"
+        },
+        {
+          "event": 120,
+          "reason": "branch_selection_required",
+          "field": "ops[].budget_limits"
+        },
+        {
+          "event": 121,
+          "reason": "SCHEMA_INVALID",
+          "field": "decision"
+        },
+        {
+          "event": 122,
+          "reason": "SCHEMA_INVALID",
+          "field": "decision"
+        }
+      ],
+      "rejection_count": 9,
+      "surplus_jobs_with_identical_idempotency_key": 0,
+      "repeated_graph_execution_keys": [],
+      "jobs": [
+        {
+          "job_id": "gxj_01m8fe211d7m5avz56",
+          "capability_id": "yeast-archive-lookup",
+          "capability_version": "1",
+          "status": "SUCCEEDED"
+        },
+        {
+          "job_id": "gxj_01m8fe218m9yw27h80",
+          "capability_id": "yeast-archive-compare",
+          "capability_version": "1",
+          "status": "SUCCEEDED"
+        }
+      ],
+      "shortlist_expectation": null,
+      "target_first_top_five_rank": null,
+      "expected_method_admitted": null,
+      "expected_method_executed": null,
+      "expected_method_succeeded": null,
+      "definitions": "Delivery time is GX node settlement of a study-adjudicated result. Repeated graph execution keys count distinct actual Job IDs with the same frozen execution identity. Independent repeats have a distinct key. Whether a repeat or a rejection was avoidable requires inspection of its cause."
+    }
+  }
+]

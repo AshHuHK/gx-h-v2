@@ -1,0 +1,73 @@
+{
+  "manifest": {
+    "capability_id": "yeast-archive-lookup",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "lookup",
+        "{data.0}",
+        "{in.query}",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "yeast_enzyme_archive",
+      "objective": "Query reaction-specific and enzyme-class annotations, documented assays and natural yeast parent identities.",
+      "mechanism": "One material with schema gx.yeast-archive-query/1, taxid 559292 and substrate maltose, isomaltose, trehalose or lactose. No parameters.",
+      "estimator": "S288C taxon filter; distinct accession, sequence version and digest. Exact reaction and EC links are separate. Count unique assay entries with single or grouped attribution. Retain unclear direction, substrate or undetermined activity.",
+      "training_data_lineage": "Read-only Rhea 142, Swiss-Prot 2026_03, ENZYME 28-Jan-2026 and compiled BRENDA/SABIO-RK snapshots."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.yeast-enzyme-archive/1.0.0/archive.py",
+      "sha256": "e07c03c02bb07bfb9df06e90a9e409a7f8e3da37c13633356fbcc4a08bcbb771"
+    },
+    "licence": "GX archive reader; upstream sources retain their own terms.",
+    "licence_basis": "Rhea and UniProt attribution; SIB ENZYME, BRENDA and SABIO-RK data remain on the licensed source deployment.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 60
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/var/science-assets/yeast-archive/indexes/reaction-names/rhea139-142.sqlite",
+      "{harness}/var/science-assets/yeast-archive/indexes/rhea142-sprot2026_03/lookup.sqlite",
+      "{harness}/var/science-assets/yeast-archive/indexes/enzyme-food-20260128-sprot2026_03/lookup.sqlite",
+      "{harness}/var/science-assets/yeast-archive/kinetics/brenda2026.1-sabio20260920-v1.sqlite",
+      "{harness}/plugins/installed/org.gx.yeast-enzyme-archive/1.0.0/snapshots.json"
+    ],
+    "outputs": [
+      {
+        "name": "parent-records.json",
+        "kind": "file:yeast_archive_records",
+        "media_type": "application/json",
+        "nature": "analysis",
+        "source_roles": [
+          "query"
+        ],
+        "required": true
+      }
+    ],
+    "limitations": "S. cerevisiae S288C only; four disaccharide archive queries. The target-specific observation depends on exact assay substrate and conditions. Class associations and records shared by multiple proteins cannot establish individual measured activity.",
+    "applicable_domain": {
+      "schema": "gx.science-domain/1",
+      "inputs": {
+        "query": {
+          "json_fields": {
+            "schema": {
+              "one_of": [
+                "gx.yeast-archive-query/1"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "entry_script": "archive.py"
+}

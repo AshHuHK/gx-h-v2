@@ -1,0 +1,30 @@
+usage: python -m unittest [-h]
+                          {research,login,login-status,doctor,profiles,plugin,operator,start,status,run,resume,stop,message,conversation,team,observe,assign-material,capabilities}
+                          ...
+python -m unittest: error: unrecognized arguments: --task-card /tmp/tmpclw062bg/task.json
+E
+======================================================================
+ERROR: test_frozen_terms_and_reference_guides_on_normal_research (acceptance.science_assets.cards.test_task_card.TaskCard.test_frozen_terms_and_reference_guides_on_normal_research)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/cards/test_task_card.py", line 25, in test_frozen_terms_and_reference_guides_on_normal_research
+    self.assertEqual(invoke(arguments), 0)
+                     ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/cards/test_task_card.py", line 24, in invoke
+    return cli.main(parts)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/cli.py", line 498, in main
+    args = parser.parse_args(argv)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/argparse.py", line 1877, in parse_args
+    self.error(msg % ' '.join(argv))
+  File "/opt/conda/lib/python3.11/argparse.py", line 2640, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+  File "/opt/conda/lib/python3.11/argparse.py", line 2627, in exit
+    _sys.exit(status)
+SystemExit: 2
+
+----------------------------------------------------------------------
+Ran 1 test in 0.014s
+
+FAILED (errors=1)

@@ -1,0 +1,3982 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8fdp0m22cmw5s8d",
+  "goal": "A peptide archive wants to compare coordinate completeness across the two attached deposits. What denominator should a curator use for each? Measure the coverage of the deposited chains, explain how end groups and residue annotations affect the comparison, and identify anything the observations cannot establish.\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_a75f630d331c9e80eb87f1faa9951b1aa4aa8fa8ce5e411a8db0a0d1c1a41476",
+    "op_digest": "b677ffed11f388285bcfc3a3442163ef329d6583dbe3d2ec24e00d762bc9099d",
+    "requested_event": 168,
+    "committed_event": 173,
+    "closed_event": 175,
+    "closed_utc": "2026-11-27T21:22:56.429Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8fe5texvpws4ajv",
+        "gxa_01m8fe629hnbk0r05q"
+      ],
+      "op": "close_run",
+      "reason": "Both deposits have complete coverage of declared positions and amino-acid backbones in every submitted model. The original terminal and residue annotations explain the difference in denominators.",
+      "unresolved": [
+        "Local coordinate precision, per-atom restraint support and side-chain atom completeness require separate assessments.",
+        "The counts and annotations leave sample stereochemistry, enantiomeric purity, solution protonation, unrecorded modifications, conformational populations, activity and prediction confidence unverified."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_a75f630d331c9e80eb87f1faa9951b1aa4aa8fa8ce5e411a8db0a0d1c1a41476",
+    "task_id": "gxt_01m8fe37ayg4yaefe9",
+    "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+    "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+    "rationale": "The completed inventory checked the original sequence, chemistry, linkage and atom-site records and agrees with the coverage tables model by model. Chignolin assigns OXT to the final glycine. The tryptophan zipper numbers the terminal NH2 separately, includes coordinates for its nitrogen and bonds that nitrogen to the last lysine carbonyl. Those records account for both denominators. The two readings of each file agree, and further counts of those files would add no independent information about the sample.",
+    "reason": "Both deposits have complete coverage of declared positions and amino-acid backbones in every submitted model. The original terminal and residue annotations explain the difference in denominators.",
+    "unresolved": [
+      "Local coordinate precision, per-atom restraint support and side-chain atom completeness require separate assessments.",
+      "The counts and annotations leave sample stereochemistry, enantiomeric purity, solution protonation, unrecorded modifications, conformational populations, activity and prediction confidence unverified."
+    ],
+    "claim_refs": [
+      "gxa_01m8fe5texvpws4ajv",
+      "gxa_01m8fe629hnbk0r05q"
+    ],
+    "evidence_refs": [
+      "gxa_01m8fdp0n8eksfb7rp",
+      "gxa_01m8fdp0nxgc0q2m3c",
+      "gxa_01m8fdsxqfrs678s88",
+      "gxa_01m8fdsxx3sh6c94sq",
+      "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+        "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+        "event_id": 162,
+        "reading": {
+          "metric_id": "declared_modified_positions",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "job_id": "gxj_01m8fdsx9b5axbjh5k",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+          "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+          "provenance_cursor": 83,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_modified_positions"
+          },
+          "scope": {
+            "entry": "1LE0",
+            "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+          },
+          "value": 0,
+          "raw_value": "0",
+          "display": "0",
+          "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6"
+        }
+      },
+      {
+        "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+        "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+        "event_id": 163,
+        "reading": {
+          "metric_id": "observed_positions",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "job_id": "gxj_01m8fdsx9b5axbjh5k",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+          "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+          "provenance_cursor": 83,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/observed_positions"
+          },
+          "scope": {
+            "entry": "1LE0",
+            "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+          },
+          "value": 13,
+          "raw_value": "13",
+          "display": "13",
+          "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065"
+        }
+      },
+      {
+        "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+        "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+        "event_id": 163,
+        "reading": {
+          "metric_id": "peptide_residue_positions",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "job_id": "gxj_01m8fdsx9b5axbjh5k",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+          "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+          "provenance_cursor": 83,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/peptide_residue_positions"
+          },
+          "scope": {
+            "entry": "1LE0",
+            "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+          },
+          "value": 12,
+          "raw_value": "12",
+          "display": "12",
+          "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7"
+        }
+      },
+      {
+        "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+        "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+        "event_id": 162,
+        "reading": {
+          "metric_id": "backbone_positions",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "job_id": "gxj_01m8fdsx9b5axbjh5k",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+          "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+          "provenance_cursor": 83,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/backbone_positions"
+          },
+          "scope": {
+            "entry": "1LE0",
+            "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+          },
+          "value": 12,
+          "raw_value": "12",
+          "display": "12",
+          "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7"
+        }
+      },
+      {
+        "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+        "source_ref": "gxa_01m8fdsxqfrs678s88",
+        "event_id": 164,
+        "reading": {
+          "metric_id": "model_count",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "job_id": "gxj_01m8fdsx30tj2nenvr",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+          "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+          "provenance_cursor": 78,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/model_count"
+          },
+          "scope": {
+            "entry": "1UAO",
+            "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+          },
+          "value": 18,
+          "raw_value": "18",
+          "display": "18",
+          "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00"
+        }
+      },
+      {
+        "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+        "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+        "event_id": 163,
+        "reading": {
+          "metric_id": "model_count",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "job_id": "gxj_01m8fdsx9b5axbjh5k",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+          "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+          "provenance_cursor": 83,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/model_count"
+          },
+          "scope": {
+            "entry": "1LE0",
+            "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+          },
+          "value": 20,
+          "raw_value": "20",
+          "display": "20",
+          "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b"
+        }
+      },
+      {
+        "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+        "source_ref": "gxa_01m8fdsxqfrs678s88",
+        "event_id": 164,
+        "reading": {
+          "metric_id": "peptide_residue_positions",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "job_id": "gxj_01m8fdsx30tj2nenvr",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+          "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+          "provenance_cursor": 78,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/peptide_residue_positions"
+          },
+          "scope": {
+            "entry": "1UAO",
+            "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+          },
+          "value": 10,
+          "raw_value": "10",
+          "display": "10",
+          "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60"
+        }
+      },
+      {
+        "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+        "source_ref": "gxa_01m8fdsxqfrs678s88",
+        "event_id": 161,
+        "reading": {
+          "metric_id": "declared_positions",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "job_id": "gxj_01m8fdsx30tj2nenvr",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+          "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+          "provenance_cursor": 78,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_positions"
+          },
+          "scope": {
+            "entry": "1UAO",
+            "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+          },
+          "value": 10,
+          "raw_value": "10",
+          "display": "10",
+          "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0"
+        }
+      },
+      {
+        "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+        "source_ref": "gxa_01m8fdsxqfrs678s88",
+        "event_id": 161,
+        "reading": {
+          "metric_id": "declared_modified_positions",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "job_id": "gxj_01m8fdsx30tj2nenvr",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+          "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+          "provenance_cursor": 78,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_modified_positions"
+          },
+          "scope": {
+            "entry": "1UAO",
+            "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+          },
+          "value": 0,
+          "raw_value": "0",
+          "display": "0",
+          "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6"
+        }
+      },
+      {
+        "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+        "source_ref": "gxa_01m8fdsxqfrs678s88",
+        "event_id": 164,
+        "reading": {
+          "metric_id": "observed_positions",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "job_id": "gxj_01m8fdsx30tj2nenvr",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+          "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+          "provenance_cursor": 78,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/observed_positions"
+          },
+          "scope": {
+            "entry": "1UAO",
+            "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+          },
+          "value": 10,
+          "raw_value": "10",
+          "display": "10",
+          "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2"
+        }
+      },
+      {
+        "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+        "source_ref": "gxa_01m8fdsxqfrs678s88",
+        "event_id": 161,
+        "reading": {
+          "metric_id": "backbone_positions",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "job_id": "gxj_01m8fdsx30tj2nenvr",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+          "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+          "provenance_cursor": 78,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/backbone_positions"
+          },
+          "scope": {
+            "entry": "1UAO",
+            "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+          },
+          "value": 10,
+          "raw_value": "10",
+          "display": "10",
+          "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1"
+        }
+      },
+      {
+        "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc",
+        "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+        "event_id": 162,
+        "reading": {
+          "metric_id": "declared_positions",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "job_id": "gxj_01m8fdsx9b5axbjh5k",
+          "output_name": "peptide-qc.json",
+          "method": {
+            "id": "archival-peptide-coverage",
+            "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+            "version": "1"
+          },
+          "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+          "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+          "provenance_cursor": 83,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_positions"
+          },
+          "scope": {
+            "entry": "1LE0",
+            "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+          },
+          "value": 13,
+          "raw_value": "13",
+          "display": "13",
+          "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+        }
+      }
+    ],
+    "rendered": {
+      "reason": "Both deposits have complete coverage of declared positions and amino-acid backbones in every submitted model. The original terminal and residue annotations explain the difference in denominators.",
+      "rationale": "The completed inventory checked the original sequence, chemistry, linkage and atom-site records and agrees with the coverage tables model by model. Chignolin assigns OXT to the final glycine. The tryptophan zipper numbers the terminal NH2 separately, includes coordinates for its nitrogen and bonds that nitrogen to the last lysine carbonyl. Those records account for both denominators. The two readings of each file agree, and further counts of those files would add no independent information about the sample.",
+      "unresolved": [
+        "Local coordinate precision, per-atom restraint support and side-chain atom completeness require separate assessments.",
+        "The counts and annotations leave sample stereochemistry, enantiomeric purity, solution protonation, unrecorded modifications, conformational populations, activity and prediction confidence unverified."
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+      "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+      "bytes": 223975,
+      "role": "first_deposition"
+    },
+    {
+      "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+      "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+      "bytes": 403360,
+      "role": "second_deposition"
+    }
+  ],
+  "predictions": [],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8fe375rc9sszk93",
+      "statement": "observed_positions = 10; declared_positions = 10; backbone_positions = 10; peptide_residue_positions = 10; model_count = 18; declared_modified_positions = 0.",
+      "scope": "Deposited chignolin chain A, model by model.",
+      "criteria": "Count a declared position when a heavy atom of the declared component has coordinates and positive occupancy at its label position. Require N, CA, C and O at the same amino-acid position in the same model for a complete backbone.",
+      "decision_scope": "run",
+      "limitations": "The archive records nominal stereochemistry. Glycine is achiral. Coordinate counts leave sample chemistry, side-chain completeness, coordinate accuracy, conformational populations, biological activity and prediction confidence unverified.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fe26wvd1y5ke6n",
+        "proposed_level": "open",
+        "rationale": "GYDPETGTWG consists entirely of standard amino acids. The atom-site table assigns OXT to the terminal glycine. The modified-residue category is absent, yielding 0 annotated modified positions. The per-model table agrees with the supplied atom sites."
+      },
+      "evidence_refs": [
+        "gxa_01m8fdsxqfrs678s88",
+        "gxa_01m8fdp0n8eksfb7rp"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "544974ff27393cf420420416a6d21a4070501450e3b3d69e54e22f4bcac3d076",
+        "brief_turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+        "context_ref": "gxcx_01m8fdxw1m6m7e5z8v",
+        "delivery_receipt": "start:01e3c262-6873-41ec-a118-35075535d92e",
+        "metric_refs": [
+          "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+          "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+          "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+          "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+          "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+          "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+          "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+          "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+          "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+          "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+          "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+          "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+        ],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+            "event_id": 100,
+            "projection_sha256": "7622109d9ce9dd9bd4ffcf9fc33dd7b071af5e57c56a1beaf7be0bf7051db6a4",
+            "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a"
+          },
+          {
+            "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+            "event_id": 107,
+            "projection_sha256": "51edb10c4b453eb596f4b449ad1813d8a00ad9a0a139056f2f49c7c0016ccca0",
+            "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2"
+          }
+        ],
+        "snapshot_cursor": 107,
+        "state": "acknowledged",
+        "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+        "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e"
+      },
+      "source_records": [
+        {
+          "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "capability": "archival-peptide-coverage",
+          "completion_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "job_id": "gxj_01m8fdsx30tj2nenvr",
+          "job_status": "SUCCEEDED",
+          "kind": "archival_peptide_coverage",
+          "output_provenance": {
+            "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+            "capability": {
+              "id": "archival-peptide-coverage",
+              "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+              "version": "1"
+            },
+            "completion_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              }
+            ],
+            "declaration_name": "peptide-qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              ],
+              "processing": [
+                "capability:3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "method_source:8f8c2516c95038bcdb1ffe5ddd39380abbb2cc6185ff0326ba489374c0c31d12"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 94,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdsx30tj2nenvr",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "peptide-qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdp0n8eksfb7rp",
+          "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+          "source_class": "input"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fe375rc9sszk93@1",
+      "decision_id": "gxa_20b8ae07fe1dc9af4f1deef91d26ccf38bc247a83cfa350b2b897ae8baaad1fe",
+      "assessment_cursor": 107,
+      "availability_cursor": 142,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:20:31.928Z",
+      "event_id": 142,
+      "event": "v6.claim.adopted",
+      "author": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    },
+    {
+      "hypothesis_id": "gxh_01m8fe3764a4sr1ybz",
+      "statement": "observed_positions = 13; declared_positions = 13; backbone_positions = 12; peptide_residue_positions = 12; model_count = 20; declared_modified_positions = 0.",
+      "scope": "Deposited tryptophan zipper chain A, model by model.",
+      "criteria": "Count a declared position when a heavy atom of the declared component has coordinates and positive occupancy at its label position. Require N, CA, C and O at the same amino-acid position in the same model for a complete backbone.",
+      "decision_scope": "run",
+      "limitations": "The archive records nominal stereochemistry. Glycine is achiral. Coordinate counts leave sample chemistry, side-chain completeness, coordinate accuracy, conformational populations, biological activity and prediction confidence unverified.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fe29ys4d3n7jcc",
+        "proposed_level": "open",
+        "rationale": "The deposited sequence ends SWTWEGNKWTWK(NH2). The canonical sequence gives the cap as X, and the entity flags a nonstandard monomer. The component dictionary types NH2 as a non-polymer. The covalent-link record connects its nitrogen to the terminal lysine's carbonyl carbon. The modified-residue category is absent, yielding 0 annotated modified amino-acid positions. The per-model table agrees with the original atom sites."
+      },
+      "evidence_refs": [
+        "gxa_01m8fdsxx3sh6c94sq",
+        "gxa_01m8fdp0nxgc0q2m3c"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "544974ff27393cf420420416a6d21a4070501450e3b3d69e54e22f4bcac3d076",
+        "brief_turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+        "context_ref": "gxcx_01m8fdxw1m6m7e5z8v",
+        "delivery_receipt": "start:01e3c262-6873-41ec-a118-35075535d92e",
+        "metric_refs": [
+          "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+          "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+          "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+          "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+          "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+          "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+          "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+          "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+          "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+          "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+          "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+          "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+        ],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+            "event_id": 100,
+            "projection_sha256": "7622109d9ce9dd9bd4ffcf9fc33dd7b071af5e57c56a1beaf7be0bf7051db6a4",
+            "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a"
+          },
+          {
+            "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+            "event_id": 107,
+            "projection_sha256": "51edb10c4b453eb596f4b449ad1813d8a00ad9a0a139056f2f49c7c0016ccca0",
+            "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2"
+          }
+        ],
+        "snapshot_cursor": 107,
+        "state": "acknowledged",
+        "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+        "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e"
+      },
+      "source_records": [
+        {
+          "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "capability": "archival-peptide-coverage",
+          "completion_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "job_id": "gxj_01m8fdsx9b5axbjh5k",
+          "job_status": "SUCCEEDED",
+          "kind": "archival_peptide_coverage",
+          "output_provenance": {
+            "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+            "capability": {
+              "id": "archival-peptide-coverage",
+              "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+              "version": "1"
+            },
+            "completion_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              }
+            ],
+            "declaration_name": "peptide-qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              ],
+              "processing": [
+                "capability:3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "method_source:8f8c2516c95038bcdb1ffe5ddd39380abbb2cc6185ff0326ba489374c0c31d12"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 101,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdsx9b5axbjh5k",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "peptide-qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 6,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdp0nxgc0q2m3c",
+          "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+          "source_class": "input"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fe3764a4sr1ybz@1",
+      "decision_id": "gxa_20b8ae07fe1dc9af4f1deef91d26ccf38bc247a83cfa350b2b897ae8baaad1fe",
+      "assessment_cursor": 107,
+      "availability_cursor": 143,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:20:31.940Z",
+      "event_id": 143,
+      "event": "v6.claim.adopted",
+      "author": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    },
+    {
+      "hypothesis_id": "gxh_01m8fe375rc9sszk93",
+      "statement": "model_count = 18; observed_positions = 10; declared_positions = 10; backbone_positions = 10; peptide_residue_positions = 10; declared_modified_positions = 0.",
+      "scope": "Deposited chignolin chain A, model by model.",
+      "criteria": "Match each declared chain A position to a heavy atom of the same component with finite coordinates and positive occupancy. For backbone coverage require N, CA, C and O at the same amino-acid position in the same model.",
+      "decision_scope": "run",
+      "limitations": "Coverage describes deposited model coordinates. Side-chain completeness requires an expected atom inventory. Local precision, per-atom restraint support and conformational populations require separate analysis. Component labels alone cannot confirm sample stereochemistry, purity, protonation or unrecorded modifications. Biological activity and prediction confidence were unmeasured.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fe5texvpws4ajv",
+        "proposed_level": "open",
+        "rationale": "The declared and canonical sequences both read GYDPETGTWG. Terminal amine hydrogens belong to the first glycine, and O and OXT belong to the last. The entry describes a polypeptide(L) with standard amino acids, including achiral glycine, and lists 0 modified positions. The independent inventory of these same files confirms the position and backbone counts model by model."
+      },
+      "evidence_refs": [
+        "gxa_01m8fdsxqfrs678s88",
+        "gxa_01m8fdp0n8eksfb7rp",
+        "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "8a18468b8267f9ccf9a2e2658dc93e03ad9985364ad12b5072812a61589ac00f",
+        "brief_turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+        "context_ref": "gxcx_01m8fe37awpx0ta3vy",
+        "delivery_receipt": "start:a7b52ab8-5164-4936-b7fb-3b9a880fb091",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 143,
+        "state": "acknowledged",
+        "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+        "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c"
+      },
+      "source_records": [
+        {
+          "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "capability": "archival-peptide-coverage",
+          "completion_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "job_id": "gxj_01m8fdsx30tj2nenvr",
+          "job_status": "SUCCEEDED",
+          "kind": "archival_peptide_coverage",
+          "output_provenance": {
+            "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+            "capability": {
+              "id": "archival-peptide-coverage",
+              "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+              "version": "1"
+            },
+            "completion_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              }
+            ],
+            "declaration_name": "peptide-qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              ],
+              "processing": [
+                "capability:3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "method_source:8f8c2516c95038bcdb1ffe5ddd39380abbb2cc6185ff0326ba489374c0c31d12"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 94,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdsx30tj2nenvr",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "peptide-qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdp0n8eksfb7rp",
+          "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+          "kind": "module_report_bundle",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 125,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "b538ee1e3cc6210e19a0ffb26057b88c46a61df8478e6b6af8e065703c3e2a75",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+          "sha256": "b538ee1e3cc6210e19a0ffb26057b88c46a61df8478e6b6af8e065703c3e2a75",
+          "source_class": "input"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fe375rc9sszk93@2",
+      "decision_id": "gxa_a75f630d331c9e80eb87f1faa9951b1aa4aa8fa8ce5e411a8db0a0d1c1a41476",
+      "assessment_cursor": 143,
+      "availability_cursor": 166,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:22:56.308Z",
+      "event_id": 166,
+      "event": "v6.claim.adopted",
+      "author": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    },
+    {
+      "hypothesis_id": "gxh_01m8fe3764a4sr1ybz",
+      "statement": "model_count = 20; observed_positions = 13; declared_positions = 13; backbone_positions = 12; peptide_residue_positions = 12; declared_modified_positions = 0.",
+      "scope": "Deposited tryptophan zipper chain A, model by model.",
+      "criteria": "Match each declared chain A position to a heavy atom of the same component with finite coordinates and positive occupancy. For backbone coverage require N, CA, C and O at the same amino-acid position in the same model.",
+      "decision_scope": "run",
+      "limitations": "Coverage describes deposited model coordinates. Side-chain completeness requires an expected atom inventory. Local precision, per-atom restraint support and conformational populations require separate analysis. Component labels alone cannot confirm sample stereochemistry, purity, protonation or unrecorded modifications. Biological activity and prediction confidence were unmeasured.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fe629hnbk0r05q",
+        "proposed_level": "open",
+        "rationale": "The chain lists SWTWEGNKWTWK(NH2). Its canonical terminal X represents the separately numbered NH2 component. The component dictionary calls NH2 a non-polymer amino group, and the covalent-link record joins its nitrogen to the terminal lysine carbonyl. Its HETATM nitrogen meets the position criterion. The cap accounts for the nonstandard-monomer flag. The modified-residue category is absent, with 0 annotated modified amino-acid positions. The independent inventory of the same file confirms these assignments and the per-model counts."
+      },
+      "evidence_refs": [
+        "gxa_01m8fdsxx3sh6c94sq",
+        "gxa_01m8fdp0nxgc0q2m3c",
+        "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "8a18468b8267f9ccf9a2e2658dc93e03ad9985364ad12b5072812a61589ac00f",
+        "brief_turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+        "context_ref": "gxcx_01m8fe37awpx0ta3vy",
+        "delivery_receipt": "start:a7b52ab8-5164-4936-b7fb-3b9a880fb091",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 143,
+        "state": "acknowledged",
+        "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+        "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c"
+      },
+      "source_records": [
+        {
+          "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "capability": "archival-peptide-coverage",
+          "completion_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "job_id": "gxj_01m8fdsx9b5axbjh5k",
+          "job_status": "SUCCEEDED",
+          "kind": "archival_peptide_coverage",
+          "output_provenance": {
+            "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+            "capability": {
+              "id": "archival-peptide-coverage",
+              "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+              "version": "1"
+            },
+            "completion_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              }
+            ],
+            "declaration_name": "peptide-qc.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              ],
+              "processing": [
+                "capability:3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "method_source:8f8c2516c95038bcdb1ffe5ddd39380abbb2cc6185ff0326ba489374c0c31d12"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 101,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fdsx9b5axbjh5k",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "peptide-qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 6,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdp0nxgc0q2m3c",
+          "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+          "kind": "module_report_bundle",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 125,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "b538ee1e3cc6210e19a0ffb26057b88c46a61df8478e6b6af8e065703c3e2a75",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+          "sha256": "b538ee1e3cc6210e19a0ffb26057b88c46a61df8478e6b6af8e065703c3e2a75",
+          "source_class": "input"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fe3764a4sr1ybz@2",
+      "decision_id": "gxa_a75f630d331c9e80eb87f1faa9951b1aa4aa8fa8ce5e411a8db0a0d1c1a41476",
+      "assessment_cursor": 143,
+      "availability_cursor": 167,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:22:56.313Z",
+      "event_id": 167,
+      "event": "v6.claim.adopted",
+      "author": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8fdsx30tj2nenvr",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "archival-peptide-coverage",
+        "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+          "bytes": 223975,
+          "role": "structure",
+          "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:af0c4c3242daab49dad48348783446e186ad411218f886dd3906a5470339ac5c",
+        "branch_id": "branch_cde65f0f41e8da2daca6116db1d5642a",
+        "decision_ref": "gxa_c1b9690e49e74f1b9c29a4ff95a317fbf7706928077f0de18b45078cf78795f7",
+        "exec_key": "eb01e8b5886cd63d20040350d57dd3e02f5270857067094f024bff9a69cb4419",
+        "kind": "graph_node",
+        "node_id": "node_dbeb6b993467f119819d5c076b11c9ff",
+        "operation_key": "v6.node:af0c4c3242daab49dad48348783446e186ad411218f886dd3906a5470339ac5c",
+        "plan_key": "558795c56646bb87a5d5912f657e761dc79e75d08f2b4be71132aa707f6906ab",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+      "outputs": [
+        {
+          "output_name": "peptide-qc.json",
+          "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+          "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+          "bytes": 3768,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "bytes": 223975,
+              "role": "structure",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdp0m22cmw5s8d/jobs/gxj_01m8fdsx30tj2nenvr",
+            "rel_path": "files/peptide-qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "backbone_positions",
+              "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+              "value": 10,
+              "raw_value": "10",
+              "display": "10",
+              "unit": "1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                136,
+                161
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_modified_positions",
+              "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+              "value": 0,
+              "raw_value": "0",
+              "display": "0",
+              "unit": "1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                136,
+                161
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_positions",
+              "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+              "value": 10,
+              "raw_value": "10",
+              "display": "10",
+              "unit": "1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                136,
+                161
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "model_count",
+              "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+              "value": 18,
+              "raw_value": "18",
+              "display": "18",
+              "unit": "1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                164
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "observed_positions",
+              "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+              "value": 10,
+              "raw_value": "10",
+              "display": "10",
+              "unit": "1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                164
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "peptide_residue_positions",
+              "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+              "value": 10,
+              "raw_value": "10",
+              "display": "10",
+              "unit": "1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                164
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.archival-peptide-coverage/1",
+            "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+            "entry": "1UAO",
+            "experimental_methods": [
+              "SOLUTION NMR"
+            ],
+            "chain": "A",
+            "entity": "1",
+            "declared_positions": 10,
+            "peptide_residue_positions": 10,
+            "model": 1,
+            "observed_positions": 10,
+            "backbone_positions": 10,
+            "model_count": 18,
+            "declared_modified_positions": 0,
+            "annotation_status": "category_absent",
+            "modified_residues": [],
+            "unknown_chemistry_positions": [],
+            "non_peptide_components": [],
+            "nonstandard_peptide_components": [],
+            "connection_status": "category_absent",
+            "predicted_confidence": null
+          },
+          "denominators": {
+            "model_count": 18
+          },
+          "lead_delivery_event_ids": [
+            122,
+            136,
+            161,
+            164
+          ]
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8fdsx9b5axbjh5k",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "archival-peptide-coverage",
+        "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+          "bytes": 403360,
+          "role": "structure",
+          "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:2f25b9ab048bf9308a856f7f11f1c6ffd7ac8e1289747eea274460209f5cfa84",
+        "branch_id": "branch_cde65f0f41e8da2daca6116db1d5642a",
+        "decision_ref": "gxa_c1b9690e49e74f1b9c29a4ff95a317fbf7706928077f0de18b45078cf78795f7",
+        "exec_key": "ea5be9b65c85f11fed089da0a1e7adc8e9a30a9f2888db092c475788ff1cbe78",
+        "kind": "graph_node",
+        "node_id": "node_48f7785c5d1a0026e2e03829423492c0",
+        "operation_key": "v6.node:2f25b9ab048bf9308a856f7f11f1c6ffd7ac8e1289747eea274460209f5cfa84",
+        "plan_key": "47beafe6f80b2b9c40c2c62d6bd66989e53be9b992e709e0d99ae5fae914658a",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+      "outputs": [
+        {
+          "output_name": "peptide-qc.json",
+          "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+          "bytes": 4376,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "bytes": 403360,
+              "role": "structure",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdp0m22cmw5s8d/jobs/gxj_01m8fdsx9b5axbjh5k",
+            "rel_path": "files/peptide-qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "backbone_positions",
+              "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+              "value": 12,
+              "raw_value": "12",
+              "display": "12",
+              "unit": "1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                135,
+                162
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_modified_positions",
+              "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+              "value": 0,
+              "raw_value": "0",
+              "display": "0",
+              "unit": "1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                135,
+                162
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_positions",
+              "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc",
+              "value": 13,
+              "raw_value": "13",
+              "display": "13",
+              "unit": "1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                135,
+                162
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "model_count",
+              "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+              "value": 20,
+              "raw_value": "20",
+              "display": "20",
+              "unit": "1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                163
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "observed_positions",
+              "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+              "value": 13,
+              "raw_value": "13",
+              "display": "13",
+              "unit": "1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                163
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "peptide_residue_positions",
+              "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+              "value": 12,
+              "raw_value": "12",
+              "display": "12",
+              "unit": "1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "lead_delivery_event_ids": [
+                122,
+                163
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.archival-peptide-coverage/1",
+            "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+            "entry": "1LE0",
+            "experimental_methods": [
+              "SOLUTION NMR"
+            ],
+            "chain": "A",
+            "entity": "1",
+            "declared_positions": 13,
+            "peptide_residue_positions": 12,
+            "model": 1,
+            "observed_positions": 13,
+            "backbone_positions": 12,
+            "model_count": 20,
+            "declared_modified_positions": 0,
+            "annotation_status": "category_absent",
+            "modified_residues": [],
+            "unknown_chemistry_positions": [],
+            "nonstandard_peptide_components": [],
+            "connection_status": "category_present",
+            "predicted_confidence": null
+          },
+          "denominators": {
+            "model_count": 20
+          },
+          "lead_delivery_event_ids": [
+            122,
+            135,
+            162,
+            163
+          ]
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "row": {
+            "id": "backbone_positions",
+            "key": "b6822959105c",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1"
+        },
+        {
+          "row": {
+            "id": "declared_modified_positions",
+            "key": "96b0e8705889",
+            "unit": "1",
+            "value": "0"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6"
+        },
+        {
+          "row": {
+            "id": "declared_positions",
+            "key": "8a3c0ffae103",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0"
+        },
+        {
+          "row": {
+            "id": "model_count",
+            "key": "2045840f7340",
+            "unit": "1",
+            "value": "18"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00"
+        },
+        {
+          "row": {
+            "id": "observed_positions",
+            "key": "b6453f359dc8",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2"
+        },
+        {
+          "row": {
+            "id": "peptide_residue_positions",
+            "key": "70aefa1f3d3f",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60"
+        },
+        {
+          "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "row": {
+            "id": "backbone_positions",
+            "key": "1c0b7603aee6",
+            "unit": "1",
+            "value": "12"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7"
+        },
+        {
+          "row": {
+            "id": "declared_modified_positions",
+            "key": "0a40d84aab4e",
+            "unit": "1",
+            "value": "0"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6"
+        },
+        {
+          "row": {
+            "id": "declared_positions",
+            "key": "f288154ae8a7",
+            "unit": "1",
+            "value": "13"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+        },
+        {
+          "row": {
+            "id": "model_count",
+            "key": "5f6159688af3",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b"
+        },
+        {
+          "row": {
+            "id": "observed_positions",
+            "key": "0dea1eebd06d",
+            "unit": "1",
+            "value": "13"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065"
+        },
+        {
+          "row": {
+            "id": "peptide_residue_positions",
+            "key": "1620650c01a2",
+            "unit": "1",
+            "value": "12"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7"
+        }
+      ],
+      "lease_id": "gxl_01m8fdxw21eqc5vyyf",
+      "receipt": "start:01e3c262-6873-41ec-a118-35075535d92e",
+      "task_id": "gxt_01m8fdxw1pbqpk8nx1",
+      "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+      "scope": "run",
+      "event_id": 122,
+      "utc": "2026-11-27T21:17:36.772Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "row": {
+            "id": "backbone_positions",
+            "key": "1c0b7603aee6",
+            "unit": "1",
+            "value": "12"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7"
+        },
+        {
+          "row": {
+            "id": "declared_modified_positions",
+            "key": "0a40d84aab4e",
+            "unit": "1",
+            "value": "0"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6"
+        },
+        {
+          "row": {
+            "id": "declared_positions",
+            "key": "f288154ae8a7",
+            "unit": "1",
+            "value": "13"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+        }
+      ],
+      "lease_id": "gxl_01m8fdxw21eqc5vyyf",
+      "receipt": "exec-ab48ad8a-6406-4195-871a-e21e01780736",
+      "task_id": "gxt_01m8fdxw1pbqpk8nx1",
+      "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+      "scope": "run",
+      "event_id": 135,
+      "utc": "2026-11-27T21:19:29.842Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "row": {
+            "id": "backbone_positions",
+            "key": "b6822959105c",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1"
+        },
+        {
+          "row": {
+            "id": "declared_modified_positions",
+            "key": "96b0e8705889",
+            "unit": "1",
+            "value": "0"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6"
+        },
+        {
+          "row": {
+            "id": "declared_positions",
+            "key": "8a3c0ffae103",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0"
+        }
+      ],
+      "lease_id": "gxl_01m8fdxw21eqc5vyyf",
+      "receipt": "exec-e7a983fd-b417-4820-9690-d1d56fe5ea59",
+      "task_id": "gxt_01m8fdxw1pbqpk8nx1",
+      "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+      "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+      "scope": "run",
+      "event_id": 136,
+      "utc": "2026-11-27T21:19:29.851Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "row": {
+            "id": "backbone_positions",
+            "key": "b6822959105c",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1"
+        },
+        {
+          "row": {
+            "id": "declared_modified_positions",
+            "key": "96b0e8705889",
+            "unit": "1",
+            "value": "0"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6"
+        },
+        {
+          "row": {
+            "id": "declared_positions",
+            "key": "8a3c0ffae103",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0"
+        }
+      ],
+      "lease_id": "gxl_01m8fe37b8fjbzcf6f",
+      "receipt": "exec-7b8b99d0-5240-437e-81e4-92d8943435f0",
+      "task_id": "gxt_01m8fe37ayg4yaefe9",
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+      "scope": "run",
+      "event_id": 161,
+      "utc": "2026-11-27T21:22:39.582Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "row": {
+            "id": "backbone_positions",
+            "key": "1c0b7603aee6",
+            "unit": "1",
+            "value": "12"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7"
+        },
+        {
+          "row": {
+            "id": "declared_modified_positions",
+            "key": "0a40d84aab4e",
+            "unit": "1",
+            "value": "0"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6"
+        },
+        {
+          "row": {
+            "id": "declared_positions",
+            "key": "f288154ae8a7",
+            "unit": "1",
+            "value": "13"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+        }
+      ],
+      "lease_id": "gxl_01m8fe37b8fjbzcf6f",
+      "receipt": "exec-c93b85bd-3d15-4153-b8e8-79591dc2df0e",
+      "task_id": "gxt_01m8fe37ayg4yaefe9",
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+      "scope": "run",
+      "event_id": 162,
+      "utc": "2026-11-27T21:22:39.586Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq"
+        },
+        {
+          "row": {
+            "id": "model_count",
+            "key": "5f6159688af3",
+            "unit": "1",
+            "value": "20"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b"
+        },
+        {
+          "row": {
+            "id": "observed_positions",
+            "key": "0dea1eebd06d",
+            "unit": "1",
+            "value": "13"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065"
+        },
+        {
+          "row": {
+            "id": "peptide_residue_positions",
+            "key": "1620650c01a2",
+            "unit": "1",
+            "value": "12"
+          },
+          "source_ref": "gxa_01m8fdsxx3sh6c94sq",
+          "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7"
+        }
+      ],
+      "lease_id": "gxl_01m8fe37b8fjbzcf6f",
+      "receipt": "exec-2b3657ea-265e-4827-a9f6-6e30ed2505d1",
+      "task_id": "gxt_01m8fe37ayg4yaefe9",
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+      "scope": "run",
+      "event_id": 163,
+      "utc": "2026-11-27T21:22:44.344Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+          "source_ref": "gxa_01m8fdsxqfrs678s88"
+        },
+        {
+          "row": {
+            "id": "model_count",
+            "key": "2045840f7340",
+            "unit": "1",
+            "value": "18"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00"
+        },
+        {
+          "row": {
+            "id": "observed_positions",
+            "key": "b6453f359dc8",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2"
+        },
+        {
+          "row": {
+            "id": "peptide_residue_positions",
+            "key": "70aefa1f3d3f",
+            "unit": "1",
+            "value": "10"
+          },
+          "source_ref": "gxa_01m8fdsxqfrs678s88",
+          "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60"
+        }
+      ],
+      "lease_id": "gxl_01m8fe37b8fjbzcf6f",
+      "receipt": "exec-80893ee6-2728-4261-bd14-7bd3310a49bf",
+      "task_id": "gxt_01m8fe37ayg4yaefe9",
+      "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+      "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+      "scope": "run",
+      "event_id": 164,
+      "utc": "2026-11-27T21:22:44.350Z"
+    }
+  ],
+  "routes": {
+    "modules": [
+      {
+        "module_instance_id": "module_07e647ba7f2bd27657f471a02ddf90ab",
+        "scope": "module:module_07e647ba7f2bd27657f471a02ddf90ab",
+        "branch_id": "branch_315d6337298a94291c360c7c1e57fa57",
+        "focus": "data",
+        "module_id": "data_inventory",
+        "module_version": "3",
+        "round": 1,
+        "parent_task_id": "gxt_01m8fdp0r1y9bjxja4",
+        "goal_version": 1,
+        "status": "COMPLETE",
+        "threads": [
+          {
+            "thread_id": "01a21edc-54fa-7e91-83e6-1e79a651bccc",
+            "task_id": "gxt_01m8fdrn4kxz8jweyz",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21edc-5529-7682-823c-6fe05a65f204",
+                "thread_id": "01a21edc-54fa-7e91-83e6-1e79a651bccc",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:14:45.934Z",
+                "end": "2026-11-27T21:19:26.969Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {},
+        "nodes": [],
+        "report": {
+          "artifact_ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+          "author": {
+            "call_id": "call_121ee7e11cc7441e87deece5503b61c7",
+            "context_ref": "gxcx_01m8fdrn4jd37xy5fk",
+            "kind": "MODULE",
+            "lease_id": "gxl_01m8fdrn72xsys58vk",
+            "run_id": "gxr_01m8fdp0m22cmw5s8d",
+            "task_id": "gxt_01m8fdrn4kxz8jweyz",
+            "thread_id": "01a21edc-54fa-7e91-83e6-1e79a651bccc",
+            "turn_id": "01a21edc-5529-7682-823c-6fe05a65f204"
+          },
+          "base": null,
+          "event_id": 130,
+          "goal_version": 1,
+          "module_id": "data_inventory",
+          "module_instance_id": "module_07e647ba7f2bd27657f471a02ddf90ab",
+          "module_version": "3",
+          "operation_key": "submit-deposited-termini-and-ensemble-inspection",
+          "report_ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+          "report_sha256": "b538ee1e3cc6210e19a0ffb26057b88c46a61df8478e6b6af8e065703c3e2a75",
+          "round": 1,
+          "run_id": "gxr_01m8fdp0m22cmw5s8d",
+          "scope": "module:module_07e647ba7f2bd27657f471a02ddf90ab",
+          "source_refs": [
+            "gxa_01m8fdp0n8eksfb7rp",
+            "gxa_01m8fdp0nxgc0q2m3c"
+          ],
+          "status": "COMPLETE",
+          "version": 1,
+          "wake_event_id": 131,
+          "released_event": 131
+        },
+        "delegated_reports": [],
+        "decisions": []
+      }
+    ],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": [
+      {
+        "publisher": "module:module_07e647ba7f2bd27657f471a02ddf90ab",
+        "report_ref": "gxa_4263c8dbcfb53c12f075557bc562c7f1eb412098d555bbe5cce4e5ae99a08b89",
+        "published_event": 130,
+        "released_event": 131,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": true,
+        "receiver_scope": "run",
+        "thread_id": "01a21ee1-9d7e-7b72-b3ae-54fdda233ef4",
+        "turn_id": "01a21ee1-9db3-7552-9e21-aa8f96a1a29c",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:a7b52ab8-5164-4936-b7fb-3b9a880fb091",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-a0a67f3a-2e3c-493f-b41a-5d5afeed687c",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "ENACTED",
+        "decision_ref": "gxa_a75f630d331c9e80eb87f1faa9951b1aa4aa8fa8ce5e411a8db0a0d1c1a41476",
+        "effects": [
+          {
+            "kind": "v6.claim.adopted",
+            "event_id": 166,
+            "subject": "gxh_01m8fe375rc9sszk93",
+            "claim_revision_id": "gxh_01m8fe375rc9sszk93@2"
+          },
+          {
+            "kind": "v6.claim.adopted",
+            "event_id": 167,
+            "subject": "gxh_01m8fe3764a4sr1ybz",
+            "claim_revision_id": "gxh_01m8fe3764a4sr1ybz@2"
+          }
+        ],
+        "decision_event": 173,
+        "rationale": "The completed inventory checked the original sequence, chemistry, linkage and atom-site records and agrees with the coverage tables model by model. Chignolin assigns OXT to the final glycine. The tryptophan zipper numbers the terminal NH2 separately, includes coordinates for its nitrogen and bonds that nitrogen to the last lysine carbonyl. Those records account for both denominators. The two readings of each file agree, and further counts of those files would add no independent information about the sample."
+      }
+    ]
+  },
+  "post_read_actions": [
+    {
+      "decision_ref": "gxa_20b8ae07fe1dc9af4f1deef91d26ccf38bc247a83cfa350b2b897ae8baaad1fe",
+      "event_id": 148,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [
+        "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+        "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+        "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+        "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+        "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+        "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+        "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+        "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+        "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+        "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+        "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+        "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+      ],
+      "report_events": [],
+      "report_statuses": {},
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [
+        {
+          "assessment_cursor": 107,
+          "availability_cursor": 142,
+          "claim_ref": "gxa_01m8fe26wvd1y5ke6n",
+          "claim_revision_id": "gxh_01m8fe375rc9sszk93@1",
+          "context_ref": "gxcx_01m8fdxw1m6m7e5z8v",
+          "criteria": "Count a declared position when a heavy atom of the declared component has coordinates and positive occupancy at its label position. Require N, CA, C and O at the same amino-acid position in the same model for a complete backbone.",
+          "criteria_sha256": "a14e34622bac1085cbf95c866e944ebc19ee3f4f2b85767b80074bbf43f77001",
+          "decision_delivery": {
+            "brief_sha256": "544974ff27393cf420420416a6d21a4070501450e3b3d69e54e22f4bcac3d076",
+            "brief_turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+            "context_ref": "gxcx_01m8fdxw1m6m7e5z8v",
+            "delivery_receipt": "start:01e3c262-6873-41ec-a118-35075535d92e",
+            "metric_refs": [
+              "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+              "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+              "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+              "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+              "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+              "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+              "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+              "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+              "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+              "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+              "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+              "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+            ],
+            "observations": [
+              {
+                "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+                "event_id": 100,
+                "projection_sha256": "7622109d9ce9dd9bd4ffcf9fc33dd7b071af5e57c56a1beaf7be0bf7051db6a4",
+                "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a"
+              },
+              {
+                "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+                "event_id": 107,
+                "projection_sha256": "51edb10c4b453eb596f4b449ad1813d8a00ad9a0a139056f2f49c7c0016ccca0",
+                "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2"
+              }
+            ],
+            "snapshot_cursor": 107,
+            "state": "acknowledged",
+            "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+            "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e"
+          },
+          "decision_id": "gxa_20b8ae07fe1dc9af4f1deef91d26ccf38bc247a83cfa350b2b897ae8baaad1fe",
+          "decision_scope": "run",
+          "event_cursor": 107,
+          "evidence_refs": [
+            "gxa_01m8fdsxqfrs678s88",
+            "gxa_01m8fdp0n8eksfb7rp"
+          ],
+          "hypothesis_id": "gxh_01m8fe375rc9sszk93",
+          "lead_interpretation": {
+            "proposal_ref": "gxa_01m8fe26wvd1y5ke6n",
+            "proposed_level": "open",
+            "rationale": "GYDPETGTWG consists entirely of standard amino acids. The atom-site table assigns OXT to the terminal glycine. The modified-residue category is absent, yielding 0 annotated modified positions. The per-model table agrees with the supplied atom sites."
+          },
+          "level": "open",
+          "limitations": "The archive records nominal stereochemistry. Glycine is achiral. Coordinate counts leave sample chemistry, side-chain completeness, coordinate accuracy, conformational populations, biological activity and prediction confidence unverified.",
+          "maturity": {
+            "direction": "undetermined",
+            "disputed_extractions": [],
+            "gaps": [],
+            "grounds": [],
+            "opposing_refs": [],
+            "preexisting_result": false,
+            "reasons": [
+              "No applicable independently reviewed evidence or classified scientific result is cited."
+            ],
+            "registration": null,
+            "replication": [],
+            "results": [],
+            "reviewed_evidence": [],
+            "rule": "gx.claim-maturity/1",
+            "stage": "idea",
+            "supporting_refs": []
+          },
+          "maturity_lineage": [
+            "gxa_01m8fe26wvd1y5ke6n",
+            "gxh_01m8fe375rc9sszk93@1"
+          ],
+          "metrics": [
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "10",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "observed_positions",
+              "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "10",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/observed_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 10
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "10",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "declared_positions",
+              "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "10",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/declared_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 10
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "10",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "backbone_positions",
+              "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "10",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/backbone_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 10
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "10",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "peptide_residue_positions",
+              "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "10",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/peptide_residue_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 10
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "18",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "model_count",
+              "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "18",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/model_count"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 18
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "0",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "declared_modified_positions",
+              "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "0",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/declared_modified_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 0
+            }
+          ],
+          "publication": {
+            "admissible_levels": [
+              "open",
+              "insufficient"
+            ],
+            "assessment_cursor": 107,
+            "claim_revision_id": "gxh_01m8fe375rc9sszk93@1",
+            "direction": "undetermined",
+            "level": "open",
+            "maturity": "idea",
+            "opposing_refs": [],
+            "policy": "gx.claim-publication/1",
+            "proposal_ref": "gxa_01m8fe26wvd1y5ke6n",
+            "proposed_level": "open",
+            "reasons": [
+              "No applicable independently reviewed evidence or classified scientific result is cited."
+            ],
+            "registration_event_id": null,
+            "scope": "Deposited chignolin chain A, model by model.",
+            "supporting_refs": [],
+            "unmeasured_data_refs": []
+          },
+          "qualitative_notes": {
+            "limitations": "The archive records nominal stereochemistry. Glycine is achiral. Coordinate counts leave sample chemistry, side-chain completeness, coordinate accuracy, conformational populations, biological activity and prediction confidence unverified.",
+            "rationale": "GYDPETGTWG consists entirely of standard amino acids. The atom-site table assigns OXT to the terminal glycine. The modified-residue category is absent, yielding {{metric:declared_modified_positions}} annotated modified positions. The per-model table agrees with the supplied atom sites.",
+            "statement": "For chain A of 1UAO (chignolin), the first deposited model has coordinates at {{metric:observed_positions}}/{{metric:declared_positions}} declared positions and complete backbones at {{metric:backbone_positions}}/{{metric:peptide_residue_positions}} amino acids. Each of the {{metric:model_count}} solution NMR models has the same coverage. The terminal oxygen OXT belongs to the final glycine.",
+            "status": "UNVERIFIED"
+          },
+          "rationale": "No applicable independently reviewed evidence or classified scientific result is cited.",
+          "revision": 1,
+          "schema": "gx.v6.claim.1",
+          "science": {
+            "claim_revision_id": "gxh_01m8fe375rc9sszk93@1",
+            "direction": "undetermined",
+            "level": "open",
+            "level_source": "gx.claim-publication/1",
+            "metric_refs": [
+              "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+              "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+              "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+              "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+              "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+              "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6"
+            ]
+          },
+          "scope": "Deposited chignolin chain A, model by model.",
+          "source_records": [
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "capability": "archival-peptide-coverage",
+              "completion_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "job_status": "SUCCEEDED",
+              "kind": "archival_peptide_coverage",
+              "output_provenance": {
+                "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+                "applicability_scopes": [],
+                "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+                "capability": {
+                  "id": "archival-peptide-coverage",
+                  "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                  "version": "1"
+                },
+                "completion_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+                "data_refs": [
+                  {
+                    "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                    "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                  }
+                ],
+                "declaration_name": "peptide-qc.json",
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [
+                    "sha256:101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                  ],
+                  "processing": [
+                    "capability:3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                    "method_source:8f8c2516c95038bcdb1ffe5ddd39380abbb2cc6185ff0326ba489374c0c31d12"
+                  ],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": []
+                },
+                "first_event_id": 94,
+                "independence_complete": false,
+                "job_id": "gxj_01m8fdsx30tj2nenvr",
+                "nature": "analysis",
+                "original_inputs_grounded": false,
+                "original_observations": [],
+                "output_name": "peptide-qc.json",
+                "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+                "record_kind": "job_output",
+                "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+                "unknown_dependencies": [
+                  "acquisition",
+                  "data",
+                  "processing",
+                  "publication",
+                  "sample",
+                  "sampling",
+                  "source"
+                ],
+                "upstream_natures": [
+                  "unclassified"
+                ]
+              },
+              "record_nature": "analysis",
+              "ref": "gxa_01m8fdsxqfrs678s88",
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "source_class": "computed_result",
+              "version": "1"
+            },
+            {
+              "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [],
+                "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [],
+                  "processing": [],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": []
+                },
+                "first_event_id": 5,
+                "independence_complete": false,
+                "job_id": null,
+                "nature": "unclassified",
+                "original_inputs_grounded": false,
+                "original_observations": [],
+                "reason": "No pinned declaration or original acquisition receipt",
+                "record_kind": "unclassified",
+                "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+                "unknown_dependencies": [
+                  "data",
+                  "acquisition",
+                  "sample",
+                  "source",
+                  "publication",
+                  "processing",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "unclassified",
+              "ref": "gxa_01m8fdp0n8eksfb7rp",
+              "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+              "source_class": "input"
+            }
+          ],
+          "statement": "observed_positions = 10; declared_positions = 10; backbone_positions = 10; peptide_residue_positions = 10; model_count = 18; declared_modified_positions = 0.",
+          "statement_role": "gx_measurement",
+          "verified_metrics": [
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "10",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "observed_positions",
+              "metric_ref": "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "10",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/observed_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 10
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "10",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "declared_positions",
+              "metric_ref": "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "10",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/declared_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 10
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "10",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "backbone_positions",
+              "metric_ref": "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "10",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/backbone_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 10
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "10",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "peptide_residue_positions",
+              "metric_ref": "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "10",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/peptide_residue_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 10
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "18",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "model_count",
+              "metric_ref": "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "18",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/model_count"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 18
+            },
+            {
+              "admission_sha256": "9e6b433fa38b1087603a3acc719f6660c7dff2aab2413a57d42d5fee6bdfdd17",
+              "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+              "display": "0",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0n8eksfb7rp",
+                  "bytes": 223975,
+                  "role": "structure",
+                  "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx30tj2nenvr",
+              "manifest_sha256": "bb633e5abbaa2e728f0eb43fd3b95cddfbdc20a6b49f6f77a65da9f8d7b9a7ed",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "declared_modified_positions",
+              "metric_ref": "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 78,
+              "raw_value": "0",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1UAO",
+                "input_sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9"
+              },
+              "selectors": {
+                "pointer": "/declared_modified_positions"
+              },
+              "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a",
+              "unit": "1",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "assessment_cursor": 107,
+          "availability_cursor": 143,
+          "claim_ref": "gxa_01m8fe29ys4d3n7jcc",
+          "claim_revision_id": "gxh_01m8fe3764a4sr1ybz@1",
+          "context_ref": "gxcx_01m8fdxw1m6m7e5z8v",
+          "criteria": "Count a declared position when a heavy atom of the declared component has coordinates and positive occupancy at its label position. Require N, CA, C and O at the same amino-acid position in the same model for a complete backbone.",
+          "criteria_sha256": "a14e34622bac1085cbf95c866e944ebc19ee3f4f2b85767b80074bbf43f77001",
+          "decision_delivery": {
+            "brief_sha256": "544974ff27393cf420420416a6d21a4070501450e3b3d69e54e22f4bcac3d076",
+            "brief_turn_id": "01a21ede-f081-7073-a091-b3f63efd578e",
+            "context_ref": "gxcx_01m8fdxw1m6m7e5z8v",
+            "delivery_receipt": "start:01e3c262-6873-41ec-a118-35075535d92e",
+            "metric_refs": [
+              "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+              "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+              "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+              "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+              "metric_2045840f734058d27f7d1d65a73b5ec48c7aff308fa260a15dbe939d3ae92b00",
+              "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+              "metric_70aefa1f3d3f48a679c37fc77c7aac3d571d6867c7b2bc42033b8ad211df2d60",
+              "metric_8a3c0ffae103b3ce16f8dd226566b5662deb84e9aab5ca1943bfe7b462cbe5f0",
+              "metric_96b0e87058899ba0a6aa6640191668d1a36f2270d780155f89704f4fd126f4f6",
+              "metric_b6453f359dc8cf149d9544e3285e9dfff26f0977ae4bf7634107169ce6d5fec2",
+              "metric_b6822959105c158b37c3a8ddfa535a5f0d71a7e3798042589c0385b58dd320e1",
+              "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc"
+            ],
+            "observations": [
+              {
+                "artifact_ref": "gxa_01m8fdsxqfrs678s88",
+                "event_id": 100,
+                "projection_sha256": "7622109d9ce9dd9bd4ffcf9fc33dd7b071af5e57c56a1beaf7be0bf7051db6a4",
+                "sha256": "0699870b03b028a3b41d5bbf1dbbc06628d4dbbd3cecc85168c2809b7e8e464a"
+              },
+              {
+                "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+                "event_id": 107,
+                "projection_sha256": "51edb10c4b453eb596f4b449ad1813d8a00ad9a0a139056f2f49c7c0016ccca0",
+                "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2"
+              }
+            ],
+            "snapshot_cursor": 107,
+            "state": "acknowledged",
+            "thread_id": "01a21ede-f05a-7fd3-ab17-04ad99a170b9",
+            "turn_id": "01a21ede-f081-7073-a091-b3f63efd578e"
+          },
+          "decision_id": "gxa_20b8ae07fe1dc9af4f1deef91d26ccf38bc247a83cfa350b2b897ae8baaad1fe",
+          "decision_scope": "run",
+          "event_cursor": 107,
+          "evidence_refs": [
+            "gxa_01m8fdsxx3sh6c94sq",
+            "gxa_01m8fdp0nxgc0q2m3c"
+          ],
+          "hypothesis_id": "gxh_01m8fe3764a4sr1ybz",
+          "lead_interpretation": {
+            "proposal_ref": "gxa_01m8fe29ys4d3n7jcc",
+            "proposed_level": "open",
+            "rationale": "The deposited sequence ends SWTWEGNKWTWK(NH2). The canonical sequence gives the cap as X, and the entity flags a nonstandard monomer. The component dictionary types NH2 as a non-polymer. The covalent-link record connects its nitrogen to the terminal lysine's carbonyl carbon. The modified-residue category is absent, yielding 0 annotated modified amino-acid positions. The per-model table agrees with the original atom sites."
+          },
+          "level": "open",
+          "limitations": "The archive records nominal stereochemistry. Glycine is achiral. Coordinate counts leave sample chemistry, side-chain completeness, coordinate accuracy, conformational populations, biological activity and prediction confidence unverified.",
+          "maturity": {
+            "direction": "undetermined",
+            "disputed_extractions": [],
+            "gaps": [],
+            "grounds": [],
+            "opposing_refs": [],
+            "preexisting_result": false,
+            "reasons": [
+              "No applicable independently reviewed evidence or classified scientific result is cited."
+            ],
+            "registration": null,
+            "replication": [],
+            "results": [],
+            "reviewed_evidence": [],
+            "rule": "gx.claim-maturity/1",
+            "stage": "idea",
+            "supporting_refs": []
+          },
+          "maturity_lineage": [
+            "gxa_01m8fe29ys4d3n7jcc",
+            "gxh_01m8fe3764a4sr1ybz@1"
+          ],
+          "metrics": [
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "13",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "observed_positions",
+              "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "13",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/observed_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 13
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "13",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "declared_positions",
+              "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "13",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/declared_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 13
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "12",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "backbone_positions",
+              "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "12",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/backbone_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 12
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "12",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "peptide_residue_positions",
+              "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "12",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/peptide_residue_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 12
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "20",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "model_count",
+              "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "20",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/model_count"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 20
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "0",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "declared_modified_positions",
+              "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "0",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/declared_modified_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 0
+            }
+          ],
+          "publication": {
+            "admissible_levels": [
+              "open",
+              "insufficient"
+            ],
+            "assessment_cursor": 107,
+            "claim_revision_id": "gxh_01m8fe3764a4sr1ybz@1",
+            "direction": "undetermined",
+            "level": "open",
+            "maturity": "idea",
+            "opposing_refs": [],
+            "policy": "gx.claim-publication/1",
+            "proposal_ref": "gxa_01m8fe29ys4d3n7jcc",
+            "proposed_level": "open",
+            "reasons": [
+              "No applicable independently reviewed evidence or classified scientific result is cited."
+            ],
+            "registration_event_id": null,
+            "scope": "Deposited tryptophan zipper chain A, model by model.",
+            "supporting_refs": [],
+            "unmeasured_data_refs": []
+          },
+          "qualitative_notes": {
+            "limitations": "The archive records nominal stereochemistry. Glycine is achiral. Coordinate counts leave sample chemistry, side-chain completeness, coordinate accuracy, conformational populations, biological activity and prediction confidence unverified.",
+            "rationale": "The deposited sequence ends SWTWEGNKWTWK(NH2). The canonical sequence gives the cap as X, and the entity flags a nonstandard monomer. The component dictionary types NH2 as a non-polymer. The covalent-link record connects its nitrogen to the terminal lysine's carbonyl carbon. The modified-residue category is absent, yielding {{metric:declared_modified_positions}} annotated modified amino-acid positions. The per-model table agrees with the original atom sites.",
+            "statement": "For chain A of 1LE0 (tryptophan zipper), the first deposited model has coordinates at {{metric:observed_positions}}/{{metric:declared_positions}} declared positions and complete backbones at {{metric:backbone_positions}}/{{metric:peptide_residue_positions}} amino acids. These fractions hold in all {{metric:model_count}} solution NMR models. The final numbered component is the C-terminal amide and enters only the position denominator.",
+            "status": "UNVERIFIED"
+          },
+          "rationale": "No applicable independently reviewed evidence or classified scientific result is cited.",
+          "revision": 1,
+          "schema": "gx.v6.claim.1",
+          "science": {
+            "claim_revision_id": "gxh_01m8fe3764a4sr1ybz@1",
+            "direction": "undetermined",
+            "level": "open",
+            "level_source": "gx.claim-publication/1",
+            "metric_refs": [
+              "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+              "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc",
+              "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+              "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+              "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+              "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6"
+            ]
+          },
+          "scope": "Deposited tryptophan zipper chain A, model by model.",
+          "source_records": [
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "capability": "archival-peptide-coverage",
+              "completion_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "job_status": "SUCCEEDED",
+              "kind": "archival_peptide_coverage",
+              "output_provenance": {
+                "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+                "applicability_scopes": [],
+                "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+                "capability": {
+                  "id": "archival-peptide-coverage",
+                  "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                  "version": "1"
+                },
+                "completion_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+                "data_refs": [
+                  {
+                    "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                    "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                  }
+                ],
+                "declaration_name": "peptide-qc.json",
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [
+                    "sha256:a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                  ],
+                  "processing": [
+                    "capability:3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                    "method_source:8f8c2516c95038bcdb1ffe5ddd39380abbb2cc6185ff0326ba489374c0c31d12"
+                  ],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": []
+                },
+                "first_event_id": 101,
+                "independence_complete": false,
+                "job_id": "gxj_01m8fdsx9b5axbjh5k",
+                "nature": "analysis",
+                "original_inputs_grounded": false,
+                "original_observations": [],
+                "output_name": "peptide-qc.json",
+                "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+                "record_kind": "job_output",
+                "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+                "unknown_dependencies": [
+                  "acquisition",
+                  "data",
+                  "processing",
+                  "publication",
+                  "sample",
+                  "sampling",
+                  "source"
+                ],
+                "upstream_natures": [
+                  "unclassified"
+                ]
+              },
+              "record_nature": "analysis",
+              "ref": "gxa_01m8fdsxx3sh6c94sq",
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "source_class": "computed_result",
+              "version": "1"
+            },
+            {
+              "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [],
+                "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [],
+                  "processing": [],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": []
+                },
+                "first_event_id": 6,
+                "independence_complete": false,
+                "job_id": null,
+                "nature": "unclassified",
+                "original_inputs_grounded": false,
+                "original_observations": [],
+                "reason": "No pinned declaration or original acquisition receipt",
+                "record_kind": "unclassified",
+                "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+                "unknown_dependencies": [
+                  "data",
+                  "acquisition",
+                  "sample",
+                  "source",
+                  "publication",
+                  "processing",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "unclassified",
+              "ref": "gxa_01m8fdp0nxgc0q2m3c",
+              "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+              "source_class": "input"
+            }
+          ],
+          "statement": "observed_positions = 13; declared_positions = 13; backbone_positions = 12; peptide_residue_positions = 12; model_count = 20; declared_modified_positions = 0.",
+          "statement_role": "gx_measurement",
+          "verified_metrics": [
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "13",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "observed_positions",
+              "metric_ref": "metric_0dea1eebd06dcece7333c3df402345e227fe5bd8e86b4d8cd94acd5c15698065",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "13",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/observed_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 13
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "13",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "declared_positions",
+              "metric_ref": "metric_f288154ae8a7e7c6db33392f9b0a6fdf4cb8d523ab1c32ec133452ac51084acc",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "13",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/declared_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 13
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "12",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "backbone_positions",
+              "metric_ref": "metric_1c0b7603aee6ea15030b02f3f880acd6a1d22ded89a12898fe76440401f0aed7",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "12",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/backbone_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 12
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "12",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "peptide_residue_positions",
+              "metric_ref": "metric_1620650c01a2d05151c5cc747a77f683ca6cbf08f3c2cb54ae580d1c532556f7",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "12",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/peptide_residue_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 12
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "20",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "model_count",
+              "metric_ref": "metric_5f6159688af3dbff9a8247d409f9cd68db8494b579f29b0e308be8f9f5fe9e0b",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "20",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/model_count"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 20
+            },
+            {
+              "admission_sha256": "19c4cf788529c56a04753d81313097a7e3c089b59e12c7f9ad1ae9aa7b29800b",
+              "artifact_ref": "gxa_01m8fdsxx3sh6c94sq",
+              "display": "0",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fdp0nxgc0q2m3c",
+                  "bytes": 403360,
+                  "role": "structure",
+                  "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+                }
+              ],
+              "job_id": "gxj_01m8fdsx9b5axbjh5k",
+              "manifest_sha256": "811beb5fd9ecdb1cf1783ac399a220adafb35439ef22682f1c7dc3bf91640ddd",
+              "method": {
+                "id": "archival-peptide-coverage",
+                "sha256": "3f8b0548082c50faad8d579ddabc70a9f1c35b291400e06b64cf6abdd84b2ad4",
+                "version": "1"
+              },
+              "metric_id": "declared_modified_positions",
+              "metric_ref": "metric_0a40d84aab4e587a8bc52fced7061e836c40b7a7621d6b418bb837976513d5e6",
+              "op": "integer/1",
+              "output_name": "peptide-qc.json",
+              "places": 0,
+              "provenance_cursor": 83,
+              "raw_value": "0",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "entry": "1LE0",
+                "input_sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2"
+              },
+              "selectors": {
+                "pointer": "/declared_modified_positions"
+              },
+              "sha256": "6696aee579bf83016a2a241821ebda617bafe2c970e295b7c8a747473519dcb2",
+              "unit": "1",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "rationale": "The measured fractions agree with a direct count of the original atom sites in every deposited model. Each declared position has a positive-occupancy heavy atom, and every amino acid has N, CA, C and O. Chignolin assigns its terminal oxygen to glycine. The tryptophan zipper gives its terminal amide a separate position and explicitly bonds its nitrogen to the terminal lysine carbonyl. Publish the two archive findings and await the commissioned independent inventory of the original annotations before final closure. Repeating the coordinate measurements would add no new observation.",
+      "rendered_rationale": "The measured fractions agree with a direct count of the original atom sites in every deposited model. Each declared position has a positive-occupancy heavy atom, and every amino acid has N, CA, C and O. Chignolin assigns its terminal oxygen to glycine. The tryptophan zipper gives its terminal amide a separate position and explicitly bonds its nitrogen to the terminal lysine carbonyl. Publish the two archive findings and await the commissioned independent inventory of the original annotations before final closure. Repeating the coordinate measurements would add no new observation."
+    }
+  ],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[].branch",
+      "previous_rejections": 0,
+      "reason": "branch_selection_required",
+      "submission": "02ea04517570e58dd0babe428d5e1754686e39ca5ea49361331d23cbc7809b6a",
+      "event_id": 42,
+      "corrected_decision_event": 75
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "ee23214be06a3463061e2adf49b302351643b16e19a5f568ff53b19a6e488ebe",
+      "event_id": 43,
+      "corrected_decision_event": 75
+    },
+    {
+      "attempt": 1,
+      "code": "SCOPE_DENIED",
+      "field": "metric_refs",
+      "previous_rejections": 0,
+      "reason": "endpoint_not_received",
+      "submission": "dde17499ea14fee64ab955e0f62ef382e1e56e5c5c245522e97696830c6f6848",
+      "event_id": 160,
+      "corrected_decision_event": 173
+    }
+  ],
+  "invocation": {
+    "action": "start",
+    "before": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "after": {
+      "jobs": 2,
+      "host_turns": 5
+    },
+    "added": {
+      "jobs": 2,
+      "host_turns": 5
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-live/slim-peptide/state --run-key local-slim-peptide --goal-file /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/acceptance/science_assets/modalities/studies/linear-peptides/question.md --goal-config /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/acceptance/science_assets/modalities/studies/linear-peptides/goal.json --timeout 1200.0"
+  }
+}

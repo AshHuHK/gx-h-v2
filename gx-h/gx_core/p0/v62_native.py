@@ -43,6 +43,13 @@ def evidence_tool(name, version):
     if name == "gx_decide_revision":
         for key in ("pi_questions", "pi_dispositions"):
             fields["decision"]["properties"].pop(key)
+        # Historical native menus predate reusable nodes and named upstream outputs.
+        for variant in fields["decision"]["properties"]["ops"]["items"]["oneOf"]:
+            op = variant["properties"]
+            if op["op"]["const"] == "add_node":
+                for field in ("recipe_decision", "independent_repeat", "input_ports"):
+                    op.pop(field)
+                op["inputs"]["uniqueItems"] = True
         plan = fields["decision"]["properties"]["comparison_plan"]["properties"]
         for key in ("reference_refs", "prediction"):
             plan.pop(key, None)
@@ -303,6 +310,7 @@ def perform_read(roots, row, params, packet, execute):
     artifacts = list(sources)
     pins = {}
     if (tool == QUERY and answer.get("kind") == "method" and args.get("reference")
+            and answer.get("status") != "reference_only"
             and json.loads(instance["grant_json"]).get("catalog_access") == "public_methods"):
         card = answer["spec"]
         original = publish_method_card(roots, row, card)

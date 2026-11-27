@@ -1,0 +1,706 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8fdw087fqx283nq",
+  "goal": "現在品管頁要加入同株酵母的異麥芽糖。請把這次能從檔案重得的天然蛋白記錄與隨案收到的麥芽糖原件逐項比較。兩組共用多少記錄，各自的來源、反應方向及實測支持能否合併表述？用這次取得的讀數決定兩張品管頁如何撰寫。",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_fdf0a7372644f31834703f057fd403fca23d286c834c161752cc7ba5f9404f37",
+    "op_digest": "eb4c7216003591143d2cdd7b1ad1fd1ad7bac574373f95d73271186458ea951f",
+    "requested_event": 178,
+    "committed_event": 183,
+    "closed_event": 184,
+    "closed_utc": "2026-11-27T21:25:07.947Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8fe8we1dhhw2z5m"
+      ],
+      "op": "close_run",
+      "reason": "兩頁共用釀酒酵母 S. cerevisiae S288C（taxid 559292）及資料來源說明，使用 Swiss-Prot 2026_03、Rhea 142、ENZYME 28-Jan-2026 和 brenda2026.1-sabio20260920-v1。麥芽糖 2 個登錄號、異麥芽糖 5 個，跨組共用 0 個登錄號和 0 種殘基序列。七筆的序列版本均為 1，共有 6 種殘基序列。異麥芽糖組內 IMA3 和 IMA4 的完整序列 SHA-256 相同，只有 IMA3 的登錄號連到測定。\n麥芽糖頁列出 α-葡萄糖苷酶 MAL12（P53341，ENZYME 行 102400）與 MAL32（P38158，行 102402），兩筆蛋白來源均為 EC 3.2.1.20。指定主反應 RHEA:68796 為 D-maltose + H2O = alpha-D-glucose + D-glucose，列 EC 3.2.1.48。直接連至該反應的蛋白為 0 筆，個別催化方向未定。BRENDA 連結 2 筆，均單列 MAL12。3.2.1.20/km_value/131 的底物為 4-nitrophenyl alpha-d-glucopyranoside，3.2.1.20/specific_activity/33 的底物未指明，原報條件均為 pH 6.6、37 °C。明列麥芽糖的測定為 0 筆，MAL32 和本組的 SABIO-RK 都沒有連結測定。\n異麥芽糖頁列出寡糖-1,6-葡萄糖苷酶 IMA1（P53051，ENZYME 行 102056）、IMA2（Q08295，行 102055）、IMA3（P0CW40，行 102055）、IMA4（P0CW41，行 102056）及 IMA5（P40884，行 102055）。五筆均由 EC 3.2.1.10 分類取得。指定主反應 RHEA:68864 為 isomaltose + H2O = alpha-D-glucose + D-glucose，也列 EC 3.2.1.10。直接連至該反應的蛋白為 0 筆，個別催化方向未定。BRENDA 連結 107 個不重複條目，其中 92 筆單列一個登錄號，15 筆列多個登錄號。11 筆明列異麥芽糖（10 單一、1 群組），52 筆為其他具名底物，44 筆底物未定。SABIO-RK 連結 0 筆。BRENDA 3.2.1.10/kcat_km_value/16 的異麥芽糖 kcat/Km 測定單列 IMA1，3.2.1.10/km_value/92 的異麥芽糖 Km 測定由 IMA1 與 IMA2 共同列名，群組只計一筆。兩個條目均記載 pH 7.0、30 °C，條件隨各自條目刊登。",
+      "unresolved": [
+        "兩頁都缺少把指定 Rhea 主反應及其方向直接連至個別蛋白的封存記錄。生理催化方向與底物專一性仍待相符的原始實驗確認。",
+        "麥芽糖頁缺可同時歸屬到具名麥芽糖與任一 MAL 蛋白的測定。異麥芽糖頁的 IMA4 缺少相連測定。IMA1 與 IMA2 共同列名的 Km 條目無法分配個別數值。",
+        "輸出提供測定筆數與代表條目的條件。其餘異麥芽糖目標條目的逐筆條件、動力學參數數值及單位、實際受測菌株、製備與獨立實驗數仍待原研究核實。"
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_fdf0a7372644f31834703f057fd403fca23d286c834c161752cc7ba5f9404f37",
+    "task_id": "gxt_01m8fe3btk6yhe73bp",
+    "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+    "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+    "rationale": "兩份 parent-records.json 的資料庫版本及來源 SHA-256 均一致。comparison.json 的 prior_parents 逐筆對回隨案原件，current 與本次異麥芽糖輸出一致。登錄號及完整殘基雜湊各自比較，測定則以來源和 entry_id 在聯集中去重。兩個查詢介面讀到同一批條目。異麥芽糖的單一登錄號目標測定分布為 IMA1 與 IMA2 各 2 筆、IMA3 與 IMA5 各 3 筆、IMA4 為 0 筆。唯一的目標底物群組條目同列 IMA1 和 IMA2。全物種 EC 索引的 BRENDA／SABIO-RK 筆數分別為麥芽糖分類 1405／162 及異麥芽糖分類 367／8，品管頁的計數採用實際連至本組登錄號的條目。這些原件已足以決定兩頁可刊登的內容。",
+    "reason": "兩頁共用釀酒酵母 S. cerevisiae S288C（taxid 559292）及資料來源說明，使用 Swiss-Prot 2026_03、Rhea 142、ENZYME 28-Jan-2026 和 brenda2026.1-sabio20260920-v1。麥芽糖 2 個登錄號、異麥芽糖 5 個，跨組共用 0 個登錄號和 0 種殘基序列。七筆的序列版本均為 1，共有 6 種殘基序列。異麥芽糖組內 IMA3 和 IMA4 的完整序列 SHA-256 相同，只有 IMA3 的登錄號連到測定。\n麥芽糖頁列出 α-葡萄糖苷酶 MAL12（P53341，ENZYME 行 102400）與 MAL32（P38158，行 102402），兩筆蛋白來源均為 EC 3.2.1.20。指定主反應 RHEA:68796 為 D-maltose + H2O = alpha-D-glucose + D-glucose，列 EC 3.2.1.48。直接連至該反應的蛋白為 0 筆，個別催化方向未定。BRENDA 連結 2 筆，均單列 MAL12。3.2.1.20/km_value/131 的底物為 4-nitrophenyl alpha-d-glucopyranoside，3.2.1.20/specific_activity/33 的底物未指明，原報條件均為 pH 6.6、37 °C。明列麥芽糖的測定為 0 筆，MAL32 和本組的 SABIO-RK 都沒有連結測定。\n異麥芽糖頁列出寡糖-1,6-葡萄糖苷酶 IMA1（P53051，ENZYME 行 102056）、IMA2（Q08295，行 102055）、IMA3（P0CW40，行 102055）、IMA4（P0CW41，行 102056）及 IMA5（P40884，行 102055）。五筆均由 EC 3.2.1.10 分類取得。指定主反應 RHEA:68864 為 isomaltose + H2O = alpha-D-glucose + D-glucose，也列 EC 3.2.1.10。直接連至該反應的蛋白為 0 筆，個別催化方向未定。BRENDA 連結 107 個不重複條目，其中 92 筆單列一個登錄號，15 筆列多個登錄號。11 筆明列異麥芽糖（10 單一、1 群組），52 筆為其他具名底物，44 筆底物未定。SABIO-RK 連結 0 筆。BRENDA 3.2.1.10/kcat_km_value/16 的異麥芽糖 kcat/Km 測定單列 IMA1，3.2.1.10/km_value/92 的異麥芽糖 Km 測定由 IMA1 與 IMA2 共同列名，群組只計一筆。兩個條目均記載 pH 7.0、30 °C，條件隨各自條目刊登。",
+    "unresolved": [
+      "兩頁都缺少把指定 Rhea 主反應及其方向直接連至個別蛋白的封存記錄。生理催化方向與底物專一性仍待相符的原始實驗確認。",
+      "麥芽糖頁缺可同時歸屬到具名麥芽糖與任一 MAL 蛋白的測定。異麥芽糖頁的 IMA4 缺少相連測定。IMA1 與 IMA2 共同列名的 Km 條目無法分配個別數值。",
+      "輸出提供測定筆數與代表條目的條件。其餘異麥芽糖目標條目的逐筆條件、動力學參數數值及單位、實際受測菌株、製備與獨立實驗數仍待原研究核實。"
+    ],
+    "claim_refs": [
+      "gxa_01m8fe8we1dhhw2z5m"
+    ],
+    "evidence_refs": [
+      "gxa_01m8fdw094p69b59nq",
+      "gxa_01m8fdw09qzzn4z3ba",
+      "gxa_01m8fe21j8tk5x3vxn",
+      "gxa_01m8fe21mtypg6ms7n"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [],
+    "rendered": {
+      "reason": "兩頁共用釀酒酵母 S. cerevisiae S288C（taxid 559292）及資料來源說明，使用 Swiss-Prot 2026_03、Rhea 142、ENZYME 28-Jan-2026 和 brenda2026.1-sabio20260920-v1。麥芽糖 2 個登錄號、異麥芽糖 5 個，跨組共用 0 個登錄號和 0 種殘基序列。七筆的序列版本均為 1，共有 6 種殘基序列。異麥芽糖組內 IMA3 和 IMA4 的完整序列 SHA-256 相同，只有 IMA3 的登錄號連到測定。\n麥芽糖頁列出 α-葡萄糖苷酶 MAL12（P53341，ENZYME 行 102400）與 MAL32（P38158，行 102402），兩筆蛋白來源均為 EC 3.2.1.20。指定主反應 RHEA:68796 為 D-maltose + H2O = alpha-D-glucose + D-glucose，列 EC 3.2.1.48。直接連至該反應的蛋白為 0 筆，個別催化方向未定。BRENDA 連結 2 筆，均單列 MAL12。3.2.1.20/km_value/131 的底物為 4-nitrophenyl alpha-d-glucopyranoside，3.2.1.20/specific_activity/33 的底物未指明，原報條件均為 pH 6.6、37 °C。明列麥芽糖的測定為 0 筆，MAL32 和本組的 SABIO-RK 都沒有連結測定。\n異麥芽糖頁列出寡糖-1,6-葡萄糖苷酶 IMA1（P53051，ENZYME 行 102056）、IMA2（Q08295，行 102055）、IMA3（P0CW40，行 102055）、IMA4（P0CW41，行 102056）及 IMA5（P40884，行 102055）。五筆均由 EC 3.2.1.10 分類取得。指定主反應 RHEA:68864 為 isomaltose + H2O = alpha-D-glucose + D-glucose，也列 EC 3.2.1.10。直接連至該反應的蛋白為 0 筆，個別催化方向未定。BRENDA 連結 107 個不重複條目，其中 92 筆單列一個登錄號，15 筆列多個登錄號。11 筆明列異麥芽糖（10 單一、1 群組），52 筆為其他具名底物，44 筆底物未定。SABIO-RK 連結 0 筆。BRENDA 3.2.1.10/kcat_km_value/16 的異麥芽糖 kcat/Km 測定單列 IMA1，3.2.1.10/km_value/92 的異麥芽糖 Km 測定由 IMA1 與 IMA2 共同列名，群組只計一筆。兩個條目均記載 pH 7.0、30 °C，條件隨各自條目刊登。",
+      "rationale": "兩份 parent-records.json 的資料庫版本及來源 SHA-256 均一致。comparison.json 的 prior_parents 逐筆對回隨案原件，current 與本次異麥芽糖輸出一致。登錄號及完整殘基雜湊各自比較，測定則以來源和 entry_id 在聯集中去重。兩個查詢介面讀到同一批條目。異麥芽糖的單一登錄號目標測定分布為 IMA1 與 IMA2 各 2 筆、IMA3 與 IMA5 各 3 筆、IMA4 為 0 筆。唯一的目標底物群組條目同列 IMA1 和 IMA2。全物種 EC 索引的 BRENDA／SABIO-RK 筆數分別為麥芽糖分類 1405／162 及異麥芽糖分類 367／8，品管頁的計數採用實際連至本組登錄號的條目。這些原件已足以決定兩頁可刊登的內容。",
+      "unresolved": [
+        "兩頁都缺少把指定 Rhea 主反應及其方向直接連至個別蛋白的封存記錄。生理催化方向與底物專一性仍待相符的原始實驗確認。",
+        "麥芽糖頁缺可同時歸屬到具名麥芽糖與任一 MAL 蛋白的測定。異麥芽糖頁的 IMA4 缺少相連測定。IMA1 與 IMA2 共同列名的 Km 條目無法分配個別數值。",
+        "輸出提供測定筆數與代表條目的條件。其餘異麥芽糖目標條目的逐筆條件、動力學參數數值及單位、實際受測菌株、製備與獨立實驗數仍待原研究核實。"
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8fdw094p69b59nq",
+      "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+      "bytes": 3756,
+      "role": "prior_records"
+    },
+    {
+      "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+      "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94",
+      "bytes": 78,
+      "role": "query"
+    }
+  ],
+  "predictions": [],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8febmm1a6kac810",
+      "statement": "封存資料對「麥芽糖與異麥芽糖兩頁可以共用蛋白身分、指定反應方向及同底物活性證據」的支持不足。可共用菌株與資料版本，蛋白、反應和測定應依各自條目刊登。",
+      "scope": "同一封存版本中釀酒酵母 S288C 的麥芽糖原件、異麥芽糖查詢輸出以及兩者的比對結果。",
+      "criteria": "共用蛋白須核對登錄號、序列版本和完整殘基雜湊。個別反應方向須有指定主反應的蛋白連結及明載方向。個別實測須有相符的具名底物、底物相關測定欄位及單一登錄號歸屬。",
+      "decision_scope": "run",
+      "limitations": "封存查詢界定可刊登的條目。實際催化方向、底物專一性、受測菌株與製備仍需相符的原始實驗。多個條目可能描述同一實驗。",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fe8we1dhhw2z5m",
+        "proposed_level": "insufficient",
+        "rationale": "共同菌株、資料庫版本及來源摘要一致。兩組登錄號與殘基序列集合均互斥。異麥芽糖組內 IMA3 和 IMA4 的殘基雜湊相同，測定僅連至 IMA3。各蛋白的 reaction_links 均為空。麥芽糖原件的 BRENDA 條目分屬其他底物與底物未定的測定。異麥芽糖有單列 IMA1 的具名底物測定，也有 IMA1 與 IMA2 共同列名的條目。"
+      },
+      "evidence_refs": [
+        "gxa_01m8fdw094p69b59nq",
+        "gxa_01m8fdw09qzzn4z3ba",
+        "gxa_01m8fe21j8tk5x3vxn",
+        "gxa_01m8fe21mtypg6ms7n"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "a5d3792a7ae28bb731f0a690e499d938d5b9a6fc0ab1f53322119bf6a88ea672",
+        "brief_turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05",
+        "context_ref": "gxcx_01m8fe3bthxna4xh5w",
+        "delivery_receipt": "start:e74fdede-36ec-49c0-8fa0-65a17677c90e",
+        "metric_refs": [],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8fe21j8tk5x3vxn",
+            "event_id": 157,
+            "projection_sha256": "1364f51f293962c1166d2f24982e688ba2a807ce9c196e54548897ca9f796c63",
+            "sha256": "faa60617de090f1bd86e38be37e38db44ed5da85b168b1e4e4ed8b755865690d"
+          },
+          {
+            "artifact_ref": "gxa_01m8fe21mtypg6ms7n",
+            "event_id": 158,
+            "projection_sha256": "04745dbe483f3e2ae3aa06344024cf9552107c187cff9a0ee86cfadb336e33b8",
+            "sha256": "87c16549288698f30a7ca7cfd01a87ffa6f01193a9bd10782c7e8bf55301e6d7"
+          }
+        ],
+        "snapshot_cursor": 158,
+        "state": "acknowledged",
+        "thread_id": "01a21ee1-af76-74a0-b0a5-47350574b315",
+        "turn_id": "01a21ee1-afa3-7773-94c4-29765d192b05"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8fdw094p69b59nq",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdw094p69b59nq",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+              ],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 46,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "Previously published named output selected at successor admission",
+            "record_kind": "transferred_output",
+            "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+            "source_output": {
+              "artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+              "job_id": "gxj_01m8fdmbx53g9thef6",
+              "nature": "analysis",
+              "output_name": "parent-records.json",
+              "record_kind": "job_output",
+              "run_id": "gxr_01m8fdke95wxpbgs7j",
+              "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+            },
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fdw094p69b59nq",
+          "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 88,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8fdw09qzzn4z3ba",
+          "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94",
+          "source_class": "input"
+        },
+        {
+          "admission_sha256": "e921a28f74167521c4ec23a1485690f026c5e9d53fd1516aa9bda012a343d370",
+          "artifact_ref": "gxa_01m8fe21j8tk5x3vxn",
+          "capability": "yeast-archive-lookup",
+          "completion_sha256": "30e7b2b3d786f61086c4f277a94e4e87c330a72c55ed606bdd8ab59538fab490",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+              "bytes": 78,
+              "role": "query",
+              "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+            }
+          ],
+          "job_id": "gxj_01m8fe211d7m5avz56",
+          "job_status": "SUCCEEDED",
+          "kind": "yeast_archive_records",
+          "output_provenance": {
+            "admission_sha256": "e921a28f74167521c4ec23a1485690f026c5e9d53fd1516aa9bda012a343d370",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fe21j8tk5x3vxn",
+            "capability": {
+              "id": "yeast-archive-lookup",
+              "sha256": "ec1423557d8dd23e15bdbefa09af1616226b0a4d977f32cd2f70e8e082d2820f",
+              "version": "1"
+            },
+            "completion_sha256": "30e7b2b3d786f61086c4f277a94e4e87c330a72c55ed606bdd8ab59538fab490",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+                "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+              }
+            ],
+            "declaration_name": "parent-records.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+              ],
+              "processing": [
+                "capability:ec1423557d8dd23e15bdbefa09af1616226b0a4d977f32cd2f70e8e082d2820f",
+                "method_source:e07c03c02bb07bfb9df06e90a9e409a7f8e3da37c13633356fbcc4a08bcbb771"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 145,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fe211d7m5avz56",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "parent-records.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "faa60617de090f1bd86e38be37e38db44ed5da85b168b1e4e4ed8b755865690d",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fe21j8tk5x3vxn",
+          "sha256": "faa60617de090f1bd86e38be37e38db44ed5da85b168b1e4e4ed8b755865690d",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "admission_sha256": "15a506105914ee6364a89595af51defaf397f42267001a3041eca1abeb3d3f97",
+          "artifact_ref": "gxa_01m8fe21mtypg6ms7n",
+          "capability": "yeast-archive-compare",
+          "completion_sha256": "c962d34ba0a410defec40436c13b3315fc3c1baa7bb02c3859781d1d1f96a9ec",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdw094p69b59nq",
+              "bytes": 3756,
+              "role": "prior_records",
+              "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+            },
+            {
+              "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+              "bytes": 78,
+              "role": "query",
+              "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+            }
+          ],
+          "job_id": "gxj_01m8fe218m9yw27h80",
+          "job_status": "SUCCEEDED",
+          "kind": "yeast_archive_comparison",
+          "output_provenance": {
+            "admission_sha256": "15a506105914ee6364a89595af51defaf397f42267001a3041eca1abeb3d3f97",
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8fe21mtypg6ms7n",
+            "capability": {
+              "id": "yeast-archive-compare",
+              "sha256": "c5fe74486d3c795dcd2128a29abdfff0ee529b76bdf7eafe718aa51a68acd564",
+              "version": "1"
+            },
+            "completion_sha256": "c962d34ba0a410defec40436c13b3315fc3c1baa7bb02c3859781d1d1f96a9ec",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8fdw094p69b59nq",
+                "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+              },
+              {
+                "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+                "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+              }
+            ],
+            "declaration_name": "comparison.json",
+            "dependencies": {
+              "acquisition": [],
+              "data": [
+                "sha256:506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94",
+                "sha256:6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+              ],
+              "processing": [
+                "capability:c5fe74486d3c795dcd2128a29abdfff0ee529b76bdf7eafe718aa51a68acd564",
+                "method_source:e07c03c02bb07bfb9df06e90a9e409a7f8e3da37c13633356fbcc4a08bcbb771"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 150,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fe218m9yw27h80",
+            "nature": "analysis",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "output_name": "comparison.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "87c16549288698f30a7ca7cfd01a87ffa6f01193a9bd10782c7e8bf55301e6d7",
+            "unknown_dependencies": [
+              "acquisition",
+              "data",
+              "processing",
+              "publication",
+              "sample",
+              "sampling",
+              "source"
+            ],
+            "upstream_natures": [
+              "analysis",
+              "unclassified"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fe21mtypg6ms7n",
+          "sha256": "87c16549288698f30a7ca7cfd01a87ffa6f01193a9bd10782c7e8bf55301e6d7",
+          "source_class": "computed_result",
+          "version": "1"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8febmm1a6kac810@1",
+      "decision_id": "gxa_fdf0a7372644f31834703f057fd403fca23d286c834c161752cc7ba5f9404f37",
+      "assessment_cursor": 158,
+      "availability_cursor": 177,
+      "level": "insufficient",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:25:07.841Z",
+      "event_id": 177,
+      "event": "v6.claim.adopted",
+      "author": "01a21ee1-af76-74a0-b0a5-47350574b315",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8fe211d7m5avz56",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "yeast-archive-lookup",
+        "sha256": "ec1423557d8dd23e15bdbefa09af1616226b0a4d977f32cd2f70e8e082d2820f",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+          "bytes": 78,
+          "role": "query",
+          "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:5da9b2f04bf55ba0ff93ee560ed27259ef9365154afdbd1d03d298c338f776fb",
+        "branch_id": "branch_2450d3df22afbd640973a86ec1183fb9",
+        "decision_ref": "gxa_13e8ef0947ed7646010588a7aa87530978937491f6bac503df33b2123ce3bf04",
+        "exec_key": "5677e15fa4b9592de9e743344a70e240a71a0c6a6b532738e9ce0850d8fcbacf",
+        "kind": "graph_node",
+        "node_id": "node_7fa9d86f7a3338c2df727816451b7c27",
+        "operation_key": "v6.node:5da9b2f04bf55ba0ff93ee560ed27259ef9365154afdbd1d03d298c338f776fb",
+        "plan_key": "d206314607d9785529526384540de0daf7335d2b5ff291790c58af5f806657d4",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "30e7b2b3d786f61086c4f277a94e4e87c330a72c55ed606bdd8ab59538fab490",
+      "outputs": [
+        {
+          "output_name": "parent-records.json",
+          "artifact_ref": "gxa_01m8fe21j8tk5x3vxn",
+          "sha256": "faa60617de090f1bd86e38be37e38db44ed5da85b168b1e4e4ed8b755865690d",
+          "bytes": 7359,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+              "bytes": 78,
+              "role": "query",
+              "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdw087fqx283nq/jobs/gxj_01m8fe211d7m5avz56",
+            "rel_path": "files/parent-records.json"
+          },
+          "metrics": [],
+          "summary": {
+            "schema": "gx.yeast-archive-parents/1",
+            "context_ec": "3.2.1.10",
+            "context_ec_name": "oligo-1,6-glucosidase",
+            "limitations": "EC is a separate class-level search even when the reaction lists that EC. UN direction is unspecified. Missing links in these snapshots do not establish absent activity.",
+            "counts": {
+              "distinct_accessions": 5,
+              "exact_accessions": 0,
+              "class_accessions": 5
+            }
+          },
+          "denominators": {
+            "counts": {
+              "distinct_accessions": 5,
+              "exact_accessions": 0,
+              "class_accessions": 5
+            }
+          },
+          "lead_delivery_event_ids": []
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8fe218m9yw27h80",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "yeast-archive-compare",
+        "sha256": "c5fe74486d3c795dcd2128a29abdfff0ee529b76bdf7eafe718aa51a68acd564",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fdw094p69b59nq",
+          "bytes": 3756,
+          "role": "prior_records",
+          "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+        },
+        {
+          "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+          "bytes": 78,
+          "role": "query",
+          "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:eafca2320689aa70c3a2adbec4441428109a5b935b7d18a35fd82602f4cc411f",
+        "branch_id": "branch_2450d3df22afbd640973a86ec1183fb9",
+        "decision_ref": "gxa_13e8ef0947ed7646010588a7aa87530978937491f6bac503df33b2123ce3bf04",
+        "exec_key": "3c88b89a46d3c72654bf50ab1ec4cafc91eba2ec8475e0673bf756d7360e4687",
+        "kind": "graph_node",
+        "node_id": "node_02056f05f63400c820989a20f347466e",
+        "operation_key": "v6.node:eafca2320689aa70c3a2adbec4441428109a5b935b7d18a35fd82602f4cc411f",
+        "plan_key": "14cbbf253677b653c2e6726aba4d46eb8801355bf21333ee1b54b02b26bf9283",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "c962d34ba0a410defec40436c13b3315fc3c1baa7bb02c3859781d1d1f96a9ec",
+      "outputs": [
+        {
+          "output_name": "comparison.json",
+          "artifact_ref": "gxa_01m8fe21mtypg6ms7n",
+          "sha256": "87c16549288698f30a7ca7cfd01a87ffa6f01193a9bd10782c7e8bf55301e6d7",
+          "bytes": 10492,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fdw094p69b59nq",
+              "bytes": 3756,
+              "role": "prior_records",
+              "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+            },
+            {
+              "artifact_ref": "gxa_01m8fdw09qzzn4z3ba",
+              "bytes": 78,
+              "role": "query",
+              "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fdw087fqx283nq/jobs/gxj_01m8fe218m9yw27h80",
+            "rel_path": "files/comparison.json"
+          },
+          "metrics": [],
+          "summary": {
+            "schema": "gx.yeast-archive-comparison/1",
+            "new_only_accessions": [
+              "P0CW40",
+              "P0CW41",
+              "P40884",
+              "P53051",
+              "Q08295"
+            ],
+            "shared_accessions": [],
+            "interpretation": "Archive coverage under separate reaction and EC definitions. Distinct entries can describe one experiment."
+          },
+          "denominators": {},
+          "lead_delivery_event_ids": []
+        }
+      ]
+    }
+  ],
+  "deliveries": [],
+  "routes": {
+    "modules": [],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": []
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "dc8d3b37ba14b0febc0e4f43df89319802de4fdec8e9c721f976c738b745367d",
+      "event_id": 113,
+      "corrected_decision_event": 128
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "4bf2a1b072bd0c4ef4e5f58ace0f73a42400cfd757c44939ad3fe5c4b3601c21",
+      "event_id": 114,
+      "corrected_decision_event": 128
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 2,
+      "reason": "SCHEMA_INVALID",
+      "submission": "6e5e3b34abfed0ede79344d257204d38616eeac4af1c48b44c221701f6ac9f45",
+      "event_id": 115,
+      "corrected_decision_event": 128
+    },
+    {
+      "attempt": 4,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 3,
+      "reason": "SCHEMA_INVALID",
+      "submission": "78446bb7f1782fc986f33e949068d76acae40ddacc6b64fa0f7381988f065c1e",
+      "event_id": 117,
+      "corrected_decision_event": 128
+    },
+    {
+      "attempt": 5,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 4,
+      "reason": "SCHEMA_INVALID",
+      "submission": "06734f26dabfdbee9c32aac70141d2f1d81a831fa5c2d46c7ccbc00592695de4",
+      "event_id": 118,
+      "corrected_decision_event": 128
+    },
+    {
+      "attempt": 6,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 5,
+      "reason": "SCHEMA_INVALID",
+      "submission": "26b7f09edd8ce87d6d4a7250285611ebd2bed843869b7f3abfc5b7ed4a45e4e4",
+      "event_id": 119,
+      "corrected_decision_event": 128
+    },
+    {
+      "attempt": 7,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[].budget_limits",
+      "previous_rejections": 6,
+      "reason": "branch_selection_required",
+      "submission": "19c1ff3e2a4f13f7c9b131a66be2edb1267553d01cd9c17ac79c92271dbd597d",
+      "event_id": 120,
+      "corrected_decision_event": 128
+    },
+    {
+      "attempt": 8,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 7,
+      "reason": "SCHEMA_INVALID",
+      "submission": "ed1282fc3918ead34753a6912b0a6561d41a77764bdaa26d5455d750e4e21856",
+      "event_id": 121,
+      "corrected_decision_event": 128
+    },
+    {
+      "attempt": 9,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 8,
+      "reason": "SCHEMA_INVALID",
+      "submission": "10bdac778d0ac8e21aa7f53ba141327b855520971f027cb7932c7744866efdb1",
+      "event_id": 122,
+      "corrected_decision_event": 128
+    }
+  ],
+  "invocation": {
+    "action": "resume",
+    "before": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "after": {
+      "jobs": 2,
+      "host_turns": 3
+    },
+    "added": {
+      "jobs": 2,
+      "host_turns": 3
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/asset-study-live/yeast/state --run-id gxr_01m8fdw087fqx283nq --timeout 1500.0"
+  },
+  "prior_study": {
+    "parent_run_id": "gxr_01m8fdke95wxpbgs7j",
+    "parent_decision_ref": "gxa_c2d6062f5205f2281611f8863c21a83278776fd4474d4937734c33b1c5098ee9",
+    "parent_goal_version": 1,
+    "request_message_id": "yeast-natural-records-isomaltose-first",
+    "selected_materials": [
+      {
+        "name": "parent-records.json",
+        "parent_artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+        "role": "prior_records",
+        "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907",
+        "source_output": {
+          "artifact_ref": "gxa_01m8fdmcaez3kstbtj",
+          "job_id": "gxj_01m8fdmbx53g9thef6",
+          "nature": "analysis",
+          "output_name": "parent-records.json",
+          "record_kind": "job_output",
+          "run_id": "gxr_01m8fdke95wxpbgs7j",
+          "sha256": "6ac837e862e61b7ea98f7a7374340813bd1f8b23f713eccd74eb9aca39a6e907"
+        }
+      },
+      {
+        "name": "query-c.json",
+        "role": "query",
+        "sha256": "506bc391b483e0b8ef8faed76de0a65e16a900b6d080e7f22dc0c078b1d5da94"
+      }
+    ]
+  }
+}

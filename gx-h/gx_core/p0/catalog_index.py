@@ -6,7 +6,8 @@ import re
 import unicodedata
 
 from .. import config
-from ..capabilities import manifest, shipped
+from ..artifacts import ArtifactService
+from ..capabilities import input_domain, manifest, shipped
 from ..errors import GxError, SchemaInvalid, ScopeDenied
 from ..plugins import goal, loader
 from . import capability_views, catalog_resources, intent, method_health, v62_catalog
@@ -49,7 +50,7 @@ def _installed(root, directory, revisions):
                     card = v62_catalog._public_card({
                         "capability_version": cap, "portable_sha256": shipped.portable_digest(bundle),
                         "method": method["method_card"], "inputs": manifest.input_roles(method), "outputs": method["outputs"],
-                        "limitations": method.get("limitations"),
+                        "limitations": method.get("limitations"), "applicable_domain": method.get("applicable_domain"),
                         "cost_class": "gpu" if method["resources"].get("gpu") else "local_cpu",
                     }, metric_contract=True)
                 except (GxError, KeyError, TypeError, ValueError, OSError):
@@ -115,7 +116,8 @@ def _fields(row):
     return {key: _text(row[key]) for key in (
         "reference", "provider", "title", "category", "aliases", "purpose", "method", "inputs", "outputs",
         "limitations", "kind", "focuses", "description", "related_methods", "collections", "methods",
-        "tools", "source", "cost_class", "units", "id_alignment", "missing_values", "version", "training_data_lineage"
+        "tools", "source", "cost_class", "units", "id_alignment", "missing_values", "version", "training_data_lineage",
+        "canonical_method_id", "provider_binding", "domain"
     ) if row.get(key)}
 
 
@@ -126,6 +128,10 @@ def _match(fields, words):
             if any(candidate in value for candidate in _ALIASES.get(word, (word,))):
                 hits[word] = key
                 break
+    # Chinese questions often contain the declared alias inside an unsegmented phrase.
+    for alias in re.findall(r"[㐀-鿿]{2,}", fields.get("aliases", "")):
+        if any(alias in word for word in words):
+            hits.setdefault(alias, "aliases")
     return hits
 
 
@@ -209,7 +215,7 @@ def _input_roles(row):
     return list(roles)
 
 
-def _input_status(row, materials):
+def _input_status(row, materials, facts):
     roles = _input_roles(row)
     available = {m["role"] for m in materials if isinstance(m, dict) and m.get("role")}
     missing = [role for role in roles if role not in available]
@@ -221,7 +227,22 @@ def _input_status(row, materials):
         status = "role_names_match"
     else:
         status = "no_fixed_roles"
-    return {"status": status, "unmatched_roles": missing}
+    result = {"status": status, "unmatched_roles": missing}
+    if row.get("installation_status") == "unbound":
+        return {**result, "domain": {"status": "unknown", "reason": "no_installed_provider"}}
+    method = row.get("method")
+    domain = input_domain.declarations(method.get("applicable_domain") if isinstance(method, dict) else None,
+                                       row.get("applicable_domain"))
+    if not domain:
+        return {**result, "domain": input_domain.assess(domain, {}, facts)}
+    # Multiple originals under one role require the Lead to choose the actual input.
+    candidates = {}
+    for item in materials:
+        if isinstance(item, dict) and item.get("artifact_ref") and item.get("role"):
+            candidates.setdefault(item["role"], set()).add(item["artifact_ref"])
+    assigned = {role: next(iter(refs)) for role, refs in candidates.items() if len(refs) == 1}
+    matched = input_domain.assess(domain, assigned, facts)
+    return {**result, "domain": {**matched, "basis": "unambiguous_role_candidates"}}
 
 
 def query(conn, run_id, brief, args, inputs):
@@ -243,7 +264,8 @@ def query(conn, run_id, brief, args, inputs):
     for resource_kind in ("skill", "recipe", "research", "database"):
         if kind in ("all", resource_kind):
             records = catalog_resources.rows_for_kind(conn, run_id, brief, resource_kind,
-                                                       active if resource_kind == "recipe" else (), (), current_reading=True)
+                                                       active if resource_kind == "recipe" else (), (), current_reading=True,
+                                                       include_references=False)
             rows.extend(dict(r, kind=resource_kind) for r in records)
     if kind in ("all", "module"):
         modules = (inputs.get("research_catalog") or {}).get("modules", ())
@@ -252,10 +274,17 @@ def query(conn, run_id, brief, args, inputs):
                 rows.append({**v62_catalog._module_summary(mod), "reference": mod["module_id"] + "@" + mod["version"],
                              "kind": "module", "category": "module", "outputs": [mod["output"]], "status": "available",
                              "digest": mod["declaration_sha256"]})
+    unavailable_assets = []
+    public_method_survey = brief.get("catalog_access") == "public_methods" and kind in ("all", "method")
+    if scope == "run" or public_method_survey:
+        occupied = {(row["kind"], row["reference"]) for row in rows}
+        references, unavailable_assets = catalog_resources.reference_rows(kind if scope == "run" else "method", occupied)
+        rows.extend(references)
     if args.get("provider"):
         rows = [r for r in rows if r.get("provider") == args["provider"]]
     context = brief.get("catalog_discovery") or {}
     materials = context.get("available_inputs", brief.get("materials", ()))
+    facts = input_domain.InputFacts(ArtifactService(conn), run_id, preview=True)
     visible_active = {r["reference"] for r in rows if r["kind"] == "method" and r["execution_granted"]}
     observations = (method_health.recent(conn, run_id, [m for m in active if m["capability_version"] in visible_active])
                     if scope == "run" else {})
@@ -277,7 +306,7 @@ def query(conn, run_id, brief, args, inputs):
             spec = row.get("_spec", row)
         return {"kind": row["kind"], "reference": reference, "spec": spec, "status": row["status"],
                 "execution_granted": row.get("execution_granted", row["status"] == "available"), "provider": row.get("provider"),
-                **({"installation_status": row["installation_status"], "input_coverage": _input_status(row, materials)}
+                **({"installation_status": row["installation_status"], "input_coverage": _input_status(row, materials, facts)}
                    if row["kind"] == "method" else {}),
                 **({"execution_health": observations.get(row["reference"], {"status": "unobserved"})}
                    if row["kind"] == "method" and scope == "run" and row["execution_granted"] else {})}
@@ -299,7 +328,7 @@ def query(conn, run_id, brief, args, inputs):
         supplied = {_fold(v) for name, aliases in outputs.items() for v in (name, *aliases) if isinstance(v, str)}
         missing = [v for v in required if _fold(v) not in supplied]
         summary = {key: row[key] for key in ("reference", "kind", "category", "status", "digest", "provider",
-                    "capability_version", "cost_class", "module_id", "version") if key in row}
+                    "capability_version", "cost_class", "module_id", "version", "canonical_method_id", "domain") if key in row}
         summary.update(purpose=str(row.get("purpose", ""))[:210], input_roles=_input_roles(row),
                        output_names=list(outputs), execution_granted=row.get("execution_granted", row["status"] == "available"))
         summary["match_reason"] = ("exact reference" if exact else ", ".join(f"{term}: {field}" for term, field in matches.items())[:130]
@@ -309,12 +338,13 @@ def query(conn, run_id, brief, args, inputs):
         if row.get("limitations"):
             summary["limitations"] = str(row["limitations"])[:200]
         if row["kind"] == "method":
-            summary.update(kinds=sorted(row["_kinds"]), installation_status=row["installation_status"],
-                           input_coverage=_input_status(row, materials))
+            summary.update(kinds=sorted(row.get("_kinds", {"method"})), installation_status=row["installation_status"],
+                           input_coverage=_input_status(row, materials, facts))
             if scope == "run" and row["execution_granted"]:
                 summary["execution_health"] = observations.get(row["reference"], {"status": "unobserved"})
         scope_priority = {"available": 0, "selectable": 1, "catalog_only": 2}.get(row["status"], 3)
-        rank = (not exact, len(missing), -len(matches), scope_priority if words else 0,
+        domain_fit = summary.get("input_coverage", {}).get("domain", {}).get("status")
+        rank = (not exact, len(missing), domain_fit == "unsupported", -len(matches), scope_priority if words else 0,
                 -len(context_matches), scope_priority,
                 row["reference"], row.get("provider") or "")
         results.append((rank, summary))
@@ -323,6 +353,8 @@ def query(conn, run_id, brief, args, inputs):
     end = start + args.get("limit", 15)
     response = {"kind": kind, "items": [item for _, item in results[start:end]], "total": len(results),
                 "next_offset": end if end < len(results) else None}
+    if unavailable_assets:
+        response["unavailable_asset_metadata"] = unavailable_assets
     if scope == "run" and kind in ("all", "method", "research", "database"):
         unavailable = _snapshot()[1]
         if unavailable:

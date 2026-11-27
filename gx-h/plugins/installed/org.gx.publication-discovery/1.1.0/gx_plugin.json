@@ -1,0 +1,49 @@
+{
+  "id": "org.gx.publication-discovery",
+  "version": "1.1.0",
+  "api_version": "1.0",
+  "kind": "bundle",
+  "entrypoint": "plugin:register",
+  "gx_compat": ">=3.0,<4.0",
+  "dependencies": [
+    {
+      "id": "org.gx.scholarly-sources",
+      "version": "1.0.0"
+    },
+    {
+      "id": "org.gx.scholarly-pages",
+      "version": "1.1.0"
+    }
+  ],
+  "extensions": [
+    {
+      "id": "literature-query",
+      "contract": "capability",
+      "version": "1.0"
+    },
+    {
+      "id": "literature-page",
+      "contract": "capability",
+      "version": "1.0"
+    },
+    {
+      "id": "literature-original",
+      "contract": "capability",
+      "version": "1.0"
+    },
+    {
+      "id": "publication-methods",
+      "contract": "goal_method",
+      "version": "1.0"
+    },
+    {
+      "id": "publication_discovery",
+      "contract": "research_module",
+      "version": "2"
+    }
+  ],
+  "description": "Question-first public literature discovery with zero-input search, verified page continuation, replay and open JATS acquisition.",
+  "labels": {
+    "gx_capability_collections": "public_sources"
+  }
+}

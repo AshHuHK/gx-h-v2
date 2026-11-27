@@ -7,6 +7,7 @@ from pathlib import Path
 import tempfile
 
 from ..artifacts import ArtifactService
+from ..artifacts.service import sync_directory_chain
 from ..domain import ids
 from ..errors import IdempotencyConflict, SchemaInvalid
 from ..native_release import native_state, ReleaseStateError
@@ -14,17 +15,16 @@ from ..persistence import store
 from . import coordinator, research_report, v621_assignment, workspace
 
 
-def _pin(directory, name, raw):
+def _freeze(directory, name, digest, write):
     """Freeze exactly the bytes later read by normal Goal admission, even across a crash."""
     if not name or name != Path(name).name or name in (".", ".."):
         raise SchemaInvalid("A successor material needs a file name")
-    digest = hashlib.sha256(raw).hexdigest()
     target = directory / digest / name
     target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(dir=target.parent, delete=False) as stream:
         tmp = Path(stream.name)
         try:
-            stream.write(raw)
+            write(stream)
             stream.flush()
             os.fsync(stream.fileno())
             try:
@@ -34,7 +34,12 @@ def _pin(directory, name, raw):
                     raise SchemaInvalid("The frozen successor input bytes have changed")
         finally:
             tmp.unlink(missing_ok=True)
+    sync_directory_chain(target.parent, directory.parent)
     return {"path": str(target), "sha256": digest}
+
+
+def _pin(directory, name, raw):
+    return _freeze(directory, name, hashlib.sha256(raw).hexdigest(), lambda stream: stream.write(raw))
 
 
 def freeze_files(directory, options):
@@ -90,10 +95,67 @@ def _prior_descriptor(conn, rid, ref):
     return {**deps, "sha256": receipt["sha256"], "applicability": receipt.get("applicability")}
 
 
+def _output_materials(conn, rid, close, selections):
+    """Select exact scientific outputs that were public to the closing Lead."""
+    from . import v62_outputs
+    if not isinstance(selections, list):
+        raise SchemaInvalid("parent_outputs must be a list of named output bindings")
+    if not selections:
+        return []
+    row = conn.execute("""SELECT t.visible_refs_json FROM v6_decision_tasks t JOIN v6_decisions d USING(run_id,task_id)
+        WHERE d.run_id=? AND d.decision_ref=? AND t.scope='run'""", (rid, close["decision_ref"])).fetchone()
+    if row is None:
+        raise SchemaInvalid("The closing Lead has no saved visibility snapshot for this Run")
+    visible = set(json.loads(row[0]))
+    inventory, selected, seen = {}, [], set()
+    for pin in selections:
+        keys = {"job_id", "output_name", "artifact_ref", "sha256", "role"}
+        if not isinstance(pin, dict) or set(pin) != keys or not all(
+                isinstance(value, str) and value.strip() for value in pin.values()):
+            raise SchemaInvalid("A parent output requires job_id, output_name, artifact_ref, sha256 and target role")
+        ref, job = pin["artifact_ref"], pin["job_id"]
+        if ref not in visible or (ref, pin["role"]) in seen:
+            raise SchemaInvalid("Choose a published output visible to the closing Lead once per target role")
+        seen.add((ref, pin["role"]))
+        if job not in inventory:
+            if not conn.execute("SELECT 1 FROM jobs WHERE run_id=? AND job_id=? AND status='SUCCEEDED'",
+                                (rid, job)).fetchone():
+                raise SchemaInvalid("The selected Job did not succeed on the sealed parent")
+            inventory[job] = {out["output_name"]:out for out in v62_outputs.published_outputs(conn, rid, job)}
+        output = inventory[job].get(pin["output_name"])
+        if not output or output["artifact_ref"] != ref or output["sha256"] != pin["sha256"]:
+            raise SchemaInvalid("The selected parent Job, named output, artifact and digest must agree")
+        fact = v62_outputs.classify(conn, rid, ref, through_event=close["closed_event"])
+        origin = {"run_id": rid, "job_id": job, "output_name": pin["output_name"], "artifact_ref": ref,
+                  "sha256": output["sha256"], "nature": fact["nature"], "record_kind": fact["record_kind"]}
+        selected.append({"name": Path(pin["output_name"]).name, "sha256": pin["sha256"], "role": pin["role"],
+                         "artifact_ref": ref, "source_output": origin})
+    return selected
+
+
+def transferred_output(conn, rid, ref, cursor):
+    row = conn.execute("""SELECT json_extract(pin.value,'$.source_output') FROM events e,
+        json_each(e.payload_json,'$.material_transfers') pin
+        WHERE e.run_id=? AND e.kind='v6.research.successor_opened' AND e.event_id<=?
+          AND json_extract(pin.value,'$.artifact_ref')=? AND json_type(pin.value,'$.source_output')='object'
+        LIMIT 1""", (rid, cursor, ref)).fetchone()
+    if not row:
+        return None
+    # Earlier versions stored using only (digest, basename). Two selected slots could alias
+    # one local ref, including a PI attachment with no transferred-output provenance.
+    different = conn.execute("""SELECT 1 FROM runs r, json_each(r.inputs_json,'$.files') f
+        WHERE r.run_id=? AND json_extract(f.value,'$.artifact_ref')=? AND
+        json_extract(r.inputs_json,'$.inputs.p0_spec.predecessor.selected_materials['||f.key||'].source_output') IS NOT ?
+        LIMIT 1""", (rid, ref, row[0])).fetchone()
+    if different:
+        return {"nature": "unclassified", "record_kind": "ambiguous_transfer"}
+    return json.loads(row[0])
+
+
 def _spec(conn, directory, parent, close, mid, text, options):
     rid = parent["run_id"]
     if not isinstance(options, dict) or set(options) - {
-        "parent_material_refs", "input_files", "research_effort", "include_message_attachments", "parent_method_options"
+        "parent_material_refs", "input_files", "research_effort", "include_message_attachments", "parent_method_options", "parent_outputs"
     }:
         raise SchemaInvalid("Select prior material references, new input files or message attachments for the successor")
     prior = options.get("parent_material_refs", [])
@@ -148,15 +210,18 @@ def _spec(conn, directory, parent, close, mid, text, options):
     for ref in prior:
         if ref not in public:
             raise SchemaInvalid("The selected material is outside the parent Goal's public originals")
-    for item in [public[ref] for ref in prior] + uploaded:
+    outputs = _output_materials(conn, rid, close, options.get("parent_outputs", []))
+    for item in [public[ref] for ref in prior] + uploaded + outputs:
         ref = item["artifact_ref"]
-        entry = _pin(stage, item["name"], assets.read_bytes(ref, expected_sha256=item["sha256"]))
-        descriptor = _prior_descriptor(conn, rid, ref)
+        entry = _freeze(stage, item["name"], item["sha256"],
+                        lambda stream: assets.copy_verified(ref, stream, expected_sha256=item["sha256"]))
+        origin = item.get("source_output") or transferred_output(conn, rid, ref, close["closed_event"])
+        descriptor = None if origin else _prior_descriptor(conn, rid, ref)
         if descriptor:
             acquisitions[str(len(files))] = _pin(stage, "acquisition.json", ids.canonical_json(descriptor).encode())["path"]
         files.append({**entry, "role": item.get("role") or "material"})
         sources.append({"parent_artifact_ref": ref, "sha256": entry["sha256"], "name": item["name"],
-                        "role": files[-1]["role"]})
+                        "role": files[-1]["role"], **({"source_output": origin} if origin else {})})
     # Early conversation journals stored the original local options. An already queued
     # start keeps its frozen specification; an inbox-only request pins its inputs once here.
     # Its request_digest below still binds the unchanged, originally recorded envelope.
@@ -197,10 +262,16 @@ def verify_admission(conn, run_key, spec):
 
 def record_transfer(conn, rid, predecessor, materials):
     """Pin the identity of publicly selected prior originals at the child's admission cut."""
-    transfers = [{"parent_artifact_ref": source["parent_artifact_ref"], "artifact_ref": material["artifact_ref"],
-                  "sha256": source["sha256"]}
-                 for material, source in zip(materials, predecessor["selected_materials"], strict=True)
-                 if source.get("parent_artifact_ref") and source["sha256"] == material["sha256"]]
+    transfers = []
+    for material, source in zip(materials, predecessor["selected_materials"], strict=True):
+        if source["sha256"] != material["sha256"]:
+            raise SchemaInvalid("Successor material changed during admission")
+        if source.get("parent_artifact_ref"):
+            transfer = {"parent_artifact_ref": source["parent_artifact_ref"], "artifact_ref": material["artifact_ref"],
+                        "sha256": source["sha256"]}
+            if origin := source.get("source_output"):
+                transfer["source_output"] = origin
+            transfers.append(transfer)
     store.append_event(conn, run_id=rid, kind="v6.research.successor_opened", actor="gx-v6",
                        subject_kind="message", subject_id=predecessor["request_message_id"],
                        payload={"parent_run_id":predecessor["parent_run_id"],

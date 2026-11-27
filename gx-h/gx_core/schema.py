@@ -30,7 +30,7 @@ means a handler cannot read one even by accident.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, NamedTuple
 
 from . import contracts
 
@@ -163,6 +163,13 @@ def tool_output_shape(tool: str) -> dict[str, Any]:
 
 # ----------------------------------------------------------------------- validation
 
+class ValidationIssue(NamedTuple):
+    container: str
+    field: str
+    reason: str
+    unknown_field: bool = False
+
+
 def validate(instance: Any, schema: dict[str, Any], *, pointer: str = "") -> list[str]:
     """Validate against the subset of JSON Schema this contract uses.
 
@@ -172,33 +179,35 @@ def validate(instance: Any, schema: dict[str, Any], *, pointer: str = "") -> lis
     generator above only emits the supported subset, and
     :func:`unsupported_schema_keywords` fails a contract test if that stops being true.
     """
-    errors: list[str] = []
-    where = pointer or "$"
+    return [f"{issue.container}: {issue.reason}" for issue in validation_issues(instance, schema, pointer=pointer)]
 
+
+def validation_issues(instance: Any, schema: dict[str, Any], *, pointer: str = ""):
+    """Report the affected field as well as the original, compatible container location."""
+    where = pointer or "$"
     expected = schema.get("type")
     if expected is not None and not _type_matches(instance, expected):
-        errors.append(f"{where}: expected {_describe(expected)}, got {_json_type(instance)}")
-        return errors
+        yield ValidationIssue(where, where, f"expected {_describe(expected)}, got {_json_type(instance)}")
+        return
 
     if "enum" in schema and instance not in schema["enum"]:
-        errors.append(f"{where}: {instance!r} is not one of {schema['enum']}")
+        yield ValidationIssue(where, where, f"{instance!r} is not one of {schema['enum']}")
 
     if _json_type(instance) == "object":
         for name in schema.get("required", []):
             if name not in instance:
-                errors.append(f"{where}: missing required property {name!r}")
+                yield ValidationIssue(where, f"{where}.{name}", f"missing required property {name!r}")
         properties = schema.get("properties", {})
         for name, value in instance.items():
             if name in properties:
-                errors.extend(validate(value, properties[name], pointer=f"{where}.{name}"))
+                yield from validation_issues(value, properties[name], pointer=f"{where}.{name}")
             elif schema.get("additionalProperties") is False:
-                errors.append(f"{where}: property {name!r} is not allowed")
+                yield ValidationIssue(where, f"{where}.{name}", f"property {name!r} is not allowed", True)
 
     if _json_type(instance) == "array" and "items" in schema:
         for index, value in enumerate(instance):
-            errors.extend(validate(value, schema["items"], pointer=f"{where}[{index}]"))
+            yield from validation_issues(value, schema["items"], pointer=f"{where}[{index}]")
 
-    return errors
 
 
 _SUPPORTED_KEYWORDS = frozenset({

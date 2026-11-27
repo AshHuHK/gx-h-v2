@@ -1,0 +1,395 @@
+{
+  "schema": "gx.s288c_public_sugar_audit/2",
+  "root": "S288C_ENZYME_ARCHIVE",
+  "mode": "read-only independent lookup; archived protein references only",
+  "snapshots": {
+    "associations": {
+      "file": "indexes/rhea142-sprot2026_03/lookup.sqlite",
+      "sha256": "76c4649d394422d7b168c74728c4c9cdefaa14fc3f8557014d144c8419d50eab",
+      "tables": {
+        "alias": 14912,
+        "association": 400643,
+        "direction": 74444,
+        "enzyme": 8441,
+        "evidence": 192,
+        "meta": 8,
+        "obsolete": 1184,
+        "panel": 5,
+        "protein": 6909,
+        "reaction_ec": 7941
+      }
+    },
+    "classes": {
+      "file": "indexes/enzyme-food-20260128-sprot2026_03/lookup.sqlite",
+      "sha256": "59fdb6f554e756a19873e45bb3f1bde66fc2d86d4fa8c94bb144382b0e4aa09e",
+      "tables": {
+        "alias": 1758,
+        "dr": 1044,
+        "enzyme": 14,
+        "evidence": 3152,
+        "meta": 8,
+        "protein": 1031
+      }
+    },
+    "names": {
+      "file": "indexes/reaction-names/rhea139-142.sqlite",
+      "sha256": "46efa03be146239b68bb7b2f3c1e5ec73c129c9e263e0658112de532eb7b429e",
+      "tables": {
+        "aliases": 98549,
+        "current": 74444,
+        "direction": 74232,
+        "metadata": 1,
+        "obsolete": 1184,
+        "participants": 87342,
+        "reaction": 18558
+      }
+    },
+    "kinetics": {
+      "file": "kinetics/brenda2026.1-sabio20260920-v1.sqlite",
+      "sha256": "1cac1d6d47925f227959a6c05274252b09f121801d73f931173c4b4be1c2aec3",
+      "tables": {
+        "assays": 12690,
+        "snapshot": 1
+      }
+    },
+    "features": {
+      "file": "features/horizyn-selected/reference-v2.sqlite",
+      "sha256": "d693220759fc3a3bf26a68cb4a2ec289a697664f14bcd0102671a00df20e1988",
+      "tables": {
+        "metadata": 2,
+        "protein": 6733
+      },
+      "identity": {
+        "encoder": "Rostlab/prot_t5_xl_half_uniref50-enc",
+        "encoder_revision": "94a6abc029ae13029317b140b7424e012bf8dfbf",
+        "checkpoint_sha256": "730e1ac381cb1a75d21131510eeb75352ce4c1ac86bb3f1094e6cd715ff83c31"
+      }
+    }
+  },
+  "cases": {
+    "maltose": {
+      "rhea_master": 68796,
+      "reaction_definition": "D-maltose + H2O = alpha-D-glucose + D-glucose",
+      "direction_ids": {
+        "UN": 68796,
+        "LR": 68797,
+        "RL": 68798,
+        "BI": 68799
+      },
+      "raw_rhea": {
+        "protein_rows_any_species": 8,
+        "pool_hits": [],
+        "ec_mappings": [
+          [
+            "3.2.1.48",
+            68796,
+            "UN"
+          ]
+        ]
+      },
+      "checked_ec_separately": "3.2.1.20",
+      "ec_taxon_members": {
+        "P38158": {
+          "entry_name": "MAL32_YEAST",
+          "line": 102402,
+          "sequence_sha256": "6c38d5b5d26b5c883e726212ba8aced20e26c244e3b129b1f139634ae59f2ae5",
+          "residues": 584,
+          "sequence_version": 1
+        },
+        "P53341": {
+          "entry_name": "MAL12_YEAST",
+          "line": 102400,
+          "sequence_sha256": "d9af3af2a6c3c2713e197fd5174ab239efb56400147c41ca3249c577e875f807",
+          "residues": 584,
+          "sequence_version": 1
+        }
+      },
+      "assays": {
+        "all_species_ec_rows": {
+          "BRENDA": 1405,
+          "SABIO-RK": 162
+        },
+        "distinct_rows_any_member": 2,
+        "rows_by_source_and_attribution": {
+          "BRENDA/accession_linked_assay": 2
+        },
+        "pmids_in_linked_brenda_rows": [
+          "22927369"
+        ],
+        "brenda_rows_with_exact_compound_label": {},
+        "brenda_catalytic_rows_with_exact_substrate": {},
+        "exact_brenda_archive_locators": []
+      }
+    },
+    "isomaltose": {
+      "rhea_master": 68864,
+      "reaction_definition": "isomaltose + H2O = alpha-D-glucose + D-glucose",
+      "direction_ids": {
+        "UN": 68864,
+        "LR": 68865,
+        "RL": 68866,
+        "BI": 68867
+      },
+      "raw_rhea": {
+        "protein_rows_any_species": 8,
+        "pool_hits": [],
+        "ec_mappings": [
+          [
+            "3.2.1.10",
+            68864,
+            "UN"
+          ]
+        ]
+      },
+      "checked_ec_separately": "3.2.1.10",
+      "ec_taxon_members": {
+        "P0CW40": {
+          "entry_name": "MALX2_YEAST",
+          "line": 102055,
+          "sequence_sha256": "a0be9f5a82cbc4f3cd1aabaa42f0f1292c956d903b034d4d898760a946ef3cf9",
+          "residues": 589,
+          "sequence_version": 1
+        },
+        "P0CW41": {
+          "entry_name": "MALX4_YEAST",
+          "line": 102056,
+          "sequence_sha256": "a0be9f5a82cbc4f3cd1aabaa42f0f1292c956d903b034d4d898760a946ef3cf9",
+          "residues": 589,
+          "sequence_version": 1
+        },
+        "P40884": {
+          "entry_name": "IMA5_YEAST",
+          "line": 102055,
+          "sequence_sha256": "097beabfbc8ff61e0e88ddd4cc61c3095c725a87ce5816362cd4e3ac25472091",
+          "residues": 581,
+          "sequence_version": 1
+        },
+        "P53051": {
+          "entry_name": "MALX3_YEAST",
+          "line": 102056,
+          "sequence_sha256": "b00d7a8f5b64a0453cdb612190553893402eda54581955af26aa07b415ab2147",
+          "residues": 589,
+          "sequence_version": 1
+        },
+        "Q08295": {
+          "entry_name": "IMA2_YEAST",
+          "line": 102055,
+          "sequence_sha256": "d64011c9c94211e2b7d86f4446d98280ad6146a5a6686cc72fd8a37e5805fc1d",
+          "residues": 589,
+          "sequence_version": 1
+        }
+      },
+      "assays": {
+        "all_species_ec_rows": {
+          "BRENDA": 367,
+          "SABIO-RK": 8
+        },
+        "distinct_rows_any_member": 107,
+        "rows_by_source_and_attribution": {
+          "BRENDA/accession_linked_assay": 92,
+          "BRENDA/grouped_local_proteins_or_accessions": 15
+        },
+        "pmids_in_linked_brenda_rows": [
+          "11676021",
+          "11856334",
+          "20562106",
+          "20812985",
+          "24649402",
+          "28366860",
+          "34439895",
+          "35163903",
+          "37378888"
+        ],
+        "brenda_rows_with_exact_compound_label": {
+          "accession_linked_assay": 12,
+          "grouped_local_proteins_or_accessions": 2
+        },
+        "brenda_catalytic_rows_with_exact_substrate": {
+          "accession_linked_assay": 10,
+          "grouped_local_proteins_or_accessions": 1
+        },
+        "exact_brenda_archive_locators": [
+          {
+            "entry_id": "3.2.1.10/kcat_km_value/16",
+            "parameter": "kcat_km_value",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P53051"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/kcat_km_value/18",
+            "parameter": "kcat_km_value",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "Q08295"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/kcat_km_value/27",
+            "parameter": "kcat_km_value",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P0CW40"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/kcat_km_value/31",
+            "parameter": "kcat_km_value",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P40884"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/ki_value/17",
+            "parameter": "ki_value",
+            "catalytic_substrate_endpoint": false,
+            "assigned_accessions": [
+              "P40884",
+              "P53051"
+            ],
+            "attribution": "grouped_local_proteins_or_accessions"
+          },
+          {
+            "entry_id": "3.2.1.10/ki_value/21",
+            "parameter": "ki_value",
+            "catalytic_substrate_endpoint": false,
+            "assigned_accessions": [
+              "Q08295"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/ki_value/24",
+            "parameter": "ki_value",
+            "catalytic_substrate_endpoint": false,
+            "assigned_accessions": [
+              "P0CW40"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/km_value/101",
+            "parameter": "km_value",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P0CW40"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/km_value/29",
+            "parameter": "km_value",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P40884"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/km_value/92",
+            "parameter": "km_value",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P53051",
+              "Q08295"
+            ],
+            "attribution": "grouped_local_proteins_or_accessions"
+          },
+          {
+            "entry_id": "3.2.1.10/turnover_number/10",
+            "parameter": "turnover_number",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "Q08295"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/turnover_number/37",
+            "parameter": "turnover_number",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P53051"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/turnover_number/43",
+            "parameter": "turnover_number",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P0CW40"
+            ],
+            "attribution": "accession_linked_assay"
+          },
+          {
+            "entry_id": "3.2.1.10/turnover_number/51",
+            "parameter": "turnover_number",
+            "catalytic_substrate_endpoint": true,
+            "assigned_accessions": [
+              "P40884"
+            ],
+            "attribution": "accession_linked_assay"
+          }
+        ]
+      }
+    }
+  },
+  "fasta": {
+    "pool_id": "swissprot-2026_03-tax559292",
+    "pool_sha256": "33058b0c6b581a6dbaab61eebbafa97ff3ca8f9a5ac6ced628c44932525fa793",
+    "taxid": 559292,
+    "release": "2026_03"
+  },
+  "blast": {
+    "dbtype": "Protein",
+    "db-version": 5,
+    "number-of-sequences": 6733,
+    "number-of-letters": 3025957,
+    "files": [
+      "s288c.pdb",
+      "s288c.phr",
+      "s288c.pin",
+      "s288c.pog",
+      "s288c.pos",
+      "s288c.pot",
+      "s288c.psq",
+      "s288c.ptf",
+      "s288c.pto"
+    ],
+    "actual_database_read": {
+      "program_version": "blastdbcmd: 2.17.0+",
+      "matching_ids_and_lengths": 6733,
+      "residue_count": 3025957
+    }
+  },
+  "releases": {
+    "swissprot_release": "2026_03",
+    "rhea_release": "142",
+    "enzyme_release": "28-Jan-2026",
+    "kinetics_sources": {
+      "BRENDA": {
+        "member": "brenda_2026_1.json",
+        "release": "2026.1",
+        "sha256": "bb2549d02b7255de2272b35701c331493caad16b82eb38a41adb2e03bbb0d2e1",
+        "source": "Enzyme_Databases/BRENDA/releases/2026.1/raw/brenda_2026_1.json.tar.gz"
+      },
+      "SABIO-RK": {
+        "export_date": "2026-09-20",
+        "records_scanned": 76973,
+        "sha256": "e4c0c0c1107b19aad131a9ecd39861b3564ee642615f93b9881108f740929e2c",
+        "source": "Systems_Biology/enzymes/SABIO_RK/full_export/sabio_rk_kinlaw_entries_full.jsonl"
+      }
+    }
+  },
+  "flat_sources": {
+    "enzyme": "6df8cb885aebe63e90a6780935da544678c10f663eaf87f55e08696a52915256",
+    "rhea": "a9e6f83186633fd223e02240ca07262fd9bb73e9956e9294ebac71f0786971dd"
+  }
+}

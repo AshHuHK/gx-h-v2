@@ -69,7 +69,7 @@ class MethodContext:
 
     def publish_json(self, folder, kind, value):
         if not self._writable:
-            raise ScopeDenied("This method is validating inputs")
+            raise ScopeDenied("This method is validating inputs", details={"reason": "binding_needs_materialization"})
         ref = science._publish(self._conn, self._run, folder, kind, value)
         self._refs.add(ref)
         return ref

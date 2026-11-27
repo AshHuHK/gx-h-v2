@@ -7,6 +7,7 @@ from .. import config
 from ..domain import ids
 from ..errors import SchemaInvalid
 from ..persistence import store
+from . import catalog_resources
 from .capability_views import DISCOVERY_POLICY as POLICY
 
 INVENTORY = "research.catalog.updated"
@@ -29,13 +30,15 @@ def _digest(path, stat_key):
 
 def inventory(conn):
     pins = []
-    for name in ("workflow_packages.json", "shipped.json", "research_asset_cards.json"):
+    for name in ("workflow_packages.json", "shipped.json"):
         path = config.CONFIG_DIR / name
-        if name == "research_asset_cards.json" and not path.is_file():
-            pins.append(None)
-            continue
         stat = path.stat()
         pins.append(_digest(path, (stat.st_dev, stat.st_ino, stat.st_mtime_ns, stat.st_size)))
+    for name in catalog_resources.REFERENCE_FILES:
+        digest, _, _ = catalog_resources.reference_index(name)
+        # Preserve the earlier survey identity in deployments without the optional inventory.
+        if digest is not None or name == "research_asset_cards.json":
+            pins.append(digest)
     # Recipes are immutable and append-only; new publications change the available choices.
     recipe = conn.execute("SELECT rowid,digest FROM v6_saved_recipes ORDER BY rowid DESC LIMIT 1").fetchone()
     return ids.sha256_of_obj([*pins, list(recipe) if recipe else None])

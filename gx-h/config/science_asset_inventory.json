@@ -1,0 +1,5107 @@
+{
+  "cards": [
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "PMC",
+        "JATS"
+      ],
+      "canonical_method_id": "publication-retrieval",
+      "category": "research",
+      "digest": "7986456ea7690a1e548df50a4eb00384656ee47bc3c94d4c737ef260aa375a8d",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query or PMCID"
+      ],
+      "kind": "research",
+      "limitations": "The historical route includes metadata-only hits. Full-text coverage is article-specific.",
+      "outputs": [
+        "bibliographic record",
+        "available article text"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-europe-pmc-route",
+        "revision": null
+      },
+      "purpose": "Find a publication and inspect available full text.",
+      "reference": "europe-pmc-research-route@legacy",
+      "source": {
+        "line": 5,
+        "path": "research.tsv",
+        "sha256": "51b1bbe0023a290284e043da3d3d3eb9866142fd4f903b3ae1d6012cb67f90f2",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Europe PMC / PMC literature records"
+    },
+    {
+      "aliases": [
+        "模型檔案",
+        "缺失",
+        "覆蓋"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "uniprotId"
+        ],
+        "operation_sha256": "4246bb87cf1342ee72dd2d4e954a3b444e8fde9de3435eda9558a4e000000502",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "uniprotId"
+        ]
+      },
+      "canonical_method_id": "model-record-coverage",
+      "category": "database",
+      "digest": "e9e35c43cfcdec5e4fe2e6d5853996a40365aec1cfef3f9d493e43bded6167e6",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "uniprotId"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "AlphaFold-MCP-Server/check_availability",
+        "revision": "2c1b16b6c9590a5eeb1e8d565342975bfdd01496"
+      },
+      "purpose": "Inspect archived prediction coverage",
+      "reference": "alphafold-mcp-server-check-availability@legacy",
+      "source": {
+        "line": 28,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "0893aa3edb77da4f95d6a99f012e792250a5678fc69b46870a1cb943b3842d60",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "AlphaFold-MCP-Server • check_availability"
+    },
+    {
+      "aliases": [
+        "模型置信度",
+        "原始檔案"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "uniprotId",
+          "threshold"
+        ],
+        "operation_sha256": "b8ffd5ce0690c90db282cdc733a067787010dc24e16b15fb9dc2cb3fe92e152f",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "uniprotId"
+        ]
+      },
+      "canonical_method_id": "model-record-confidence",
+      "category": "database",
+      "digest": "7c6f1be5e86d569b067f85aac1e817dc403a47c73430d159837632d0afa4321c",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "uniprotId",
+        "threshold"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "AlphaFold-MCP-Server/get_confidence_scores",
+        "revision": "2c1b16b6c9590a5eeb1e8d565342975bfdd01496"
+      },
+      "purpose": "Inspect recorded prediction confidence",
+      "reference": "alphafold-mcp-server-get-confidence-scores@legacy",
+      "source": {
+        "line": 32,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "0893aa3edb77da4f95d6a99f012e792250a5678fc69b46870a1cb943b3842d60",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "AlphaFold-MCP-Server • get_confidence_scores"
+    },
+    {
+      "aliases": [
+        "已發表模型",
+        "版本",
+        "日期"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "uniprotId"
+        ],
+        "operation_sha256": "96aa75508f1ba8175936800e066bc45552b34512d73592c4c0543d7bd06a7078",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "uniprotId"
+        ]
+      },
+      "canonical_method_id": "model-record-metadata",
+      "category": "database",
+      "digest": "b8d0e22fb0f85c29e3e10d2a68ff70315b6bd5f57cc3c7a02da902263713a68a",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "uniprotId"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "AlphaFold-MCP-Server/get_prediction_metadata",
+        "revision": "2c1b16b6c9590a5eeb1e8d565342975bfdd01496"
+      },
+      "purpose": "Inspect an existing model record",
+      "reference": "alphafold-mcp-server-get-prediction-metadata@legacy",
+      "source": {
+        "line": 34,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "0893aa3edb77da4f95d6a99f012e792250a5678fc69b46870a1cb943b3842d60",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "AlphaFold-MCP-Server • get_prediction_metadata"
+    },
+    {
+      "aliases": [
+        "已發表模型",
+        "版本",
+        "日期"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "uniprotIds",
+          "format"
+        ],
+        "operation_sha256": "d2a1602e118d56f139e9486e321edfed491d29ed76473c0baf8404f697873fc9",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "uniprotIds"
+        ]
+      },
+      "canonical_method_id": "model-record-metadata",
+      "category": "database",
+      "digest": "6f17190a4ffc4223c8462159b0f956f6ac85f6aaa8fd6fe161a3cf20f90e7e1a",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "uniprotIds",
+        "format"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "AlphaFold-MCP-Server/batch_structure_info",
+        "revision": "2c1b16b6c9590a5eeb1e8d565342975bfdd01496"
+      },
+      "purpose": "Inspect an existing model record",
+      "reference": "alphafold-mcp-server-batch-structure-info@legacy",
+      "source": {
+        "line": 35,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "0893aa3edb77da4f95d6a99f012e792250a5678fc69b46870a1cb943b3842d60",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "AlphaFold-MCP-Server • batch_structure_info"
+    },
+    {
+      "aliases": [
+        "模型檔案",
+        "缺失",
+        "覆蓋"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "uniprotId"
+        ],
+        "operation_sha256": "ace06f7de0b9ba4dcc3fbaa175eb4632d2e997ad814eb88e6583ea0ab9ef8aaa",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "uniprotId"
+        ]
+      },
+      "canonical_method_id": "model-record-coverage",
+      "category": "database",
+      "digest": "7dc953816084b6286b415811d42b125c27e516436b23fc7174190dd21d23e199",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "uniprotId"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "AlphaFold-MCP-Server/get_coverage_info",
+        "revision": "2c1b16b6c9590a5eeb1e8d565342975bfdd01496"
+      },
+      "purpose": "Inspect archived prediction coverage",
+      "reference": "alphafold-mcp-server-get-coverage-info@legacy",
+      "source": {
+        "line": 40,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "0893aa3edb77da4f95d6a99f012e792250a5678fc69b46870a1cb943b3842d60",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "AlphaFold-MCP-Server • get_coverage_info"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "max_results",
+          "date_from",
+          "date_to",
+          "categories",
+          "sort_by"
+        ],
+        "operation_sha256": "1d178edce0118c1a13e63297e4249c2b55458c912fbfd90fc3b32ee307961dbb",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "18e2e253168986e1d5af2cd3e43648a6afbb4f58581aee7027d2987612057a0d",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "max_results",
+        "date_from",
+        "date_to",
+        "categories",
+        "sort_by"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "018956e3666cfe1d41967decb2455ac6e3492cac73c6f4bda7af049e32d1e6b7",
+        "package_sha256": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5",
+        "provider": "org.gx.arxiv-sources@1.0.0",
+        "reference": "arxiv-search@1",
+        "scope": "Search published arXiv records."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "arxiv-mcp-server/search_papers",
+        "revision": "057e2000be7b56823239815b0fe7c7fc0dbced96"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "arxiv-mcp-server-search-papers@legacy",
+      "related_methods": "arxiv-search@1 • Search published arXiv records.",
+      "source": {
+        "line": 76,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "62f1a88004aed303124ac1c200ce65aa23756f2727f1c44629fd64109b4a3460",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "arxiv-mcp-server • search_papers"
+    },
+    {
+      "aliases": [
+        "學術全文",
+        "文献原件",
+        "论文全文"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "paper_id"
+        ],
+        "operation_sha256": "6c79eaa7d913d05dac68484e0aa1b7a0aea3781ca16598ef042778c3dc7fea7d",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "paper_id"
+        ]
+      },
+      "canonical_method_id": "literature-fulltext",
+      "category": "research",
+      "digest": "a38f4f014045b8a8efccb74463131498769db0b498b3b4f2c1a7baa048cb3fac",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "paper_id"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "21c79968856be5863dffd3b47575a5ab9bd33d4e032ea16faff6d8a38590fb60",
+        "package_sha256": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5",
+        "provider": "org.gx.arxiv-sources@1.0.0",
+        "reference": "arxiv-fetch@1",
+        "scope": "Fetches the versioned arXiv article where available."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "arxiv-mcp-server/read_paper",
+        "revision": "057e2000be7b56823239815b0fe7c7fc0dbced96"
+      },
+      "purpose": "Read available publication text",
+      "reference": "arxiv-mcp-server-read-paper@legacy",
+      "related_methods": "arxiv-fetch@1 • Fetches the versioned arXiv article where available.",
+      "source": {
+        "line": 79,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "62f1a88004aed303124ac1c200ce65aa23756f2727f1c44629fd64109b4a3460",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "arxiv-mcp-server • read_paper"
+    },
+    {
+      "aliases": [
+        "天然蛋白",
+        "酵母",
+        "注释",
+        "註釋"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "accession",
+          "format"
+        ],
+        "operation_sha256": "73c91ea8aeffee86eee766cfc107d9c7cbc3eb65976e968a048bc860817dfa0a",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "accession"
+        ]
+      },
+      "canonical_method_id": "curated-protein-description",
+      "category": "database",
+      "digest": "025b5a30bfc67842de0216eecd937690aab96efd13310e82758b0a0a4982d55f",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "accession",
+        "format"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "0a8833501c8c8c73f2febeb9d1f6223172cea775b884b9bc30e338c444e06572",
+        "package_sha256": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+        "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+        "reference": "yeast-uniprot-record@2",
+        "scope": "Assigned S288C protein records only."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "Augmented-Nature-UniProt-MCP-Server/get_protein_info",
+        "revision": "c3356f79d7559b7761cbf1e0712e20924934ae53"
+      },
+      "purpose": "Inspect a public protein annotation",
+      "reference": "augmented-nature-uniprot-mcp-server-get-protein-info@legacy",
+      "related_methods": "yeast-uniprot-record@2 • Assigned S288C protein records only.",
+      "source": {
+        "line": 81,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "7ade5e8612ff45d89e937ab29ff48f77f64b571ccec870a957e455d6b7487cc2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Augmented-Nature-UniProt-MCP-Server • get_protein_info"
+    },
+    {
+      "aliases": [
+        "來源",
+        "溯源",
+        "文獻",
+        "蛋白"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "accession"
+        ],
+        "operation_sha256": "14b091e366b48dc9db14c226f1cd20a02297b264819dd822e484578ed04b96c2",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "accession"
+        ]
+      },
+      "canonical_method_id": "protein-archive-xref",
+      "category": "database",
+      "digest": "be60fae5cce199b9f696cf1a6811c72910ca0d9913e86d06d11344db0bf6e036",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "accession"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "Augmented-Nature-UniProt-MCP-Server/get_external_references",
+        "revision": "c3356f79d7559b7761cbf1e0712e20924934ae53"
+      },
+      "purpose": "Find an external archive or publication for an entry",
+      "reference": "augmented-nature-uniprot-mcp-server-get-external-references@legacy",
+      "source": {
+        "line": 100,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "7ade5e8612ff45d89e937ab29ff48f77f64b571ccec870a957e455d6b7487cc2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Augmented-Nature-UniProt-MCP-Server • get_external_references"
+    },
+    {
+      "aliases": [
+        "來源",
+        "溯源",
+        "文獻",
+        "蛋白"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "accession"
+        ],
+        "operation_sha256": "0d6e82563f61154137fbb67be64c4f633ed45efc768ba434835c4ba025c6f2f0",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "accession"
+        ]
+      },
+      "canonical_method_id": "protein-archive-xref",
+      "category": "database",
+      "digest": "c2f872c95a925b023d5e27cf8ad44a6f62ea882eca3d31650f48bc03dfa48542",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "accession"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "Augmented-Nature-UniProt-MCP-Server/get_literature_references",
+        "revision": "c3356f79d7559b7761cbf1e0712e20924934ae53"
+      },
+      "purpose": "Find an external archive or publication for an entry",
+      "reference": "augmented-nature-uniprot-mcp-server-get-literature-references@legacy",
+      "source": {
+        "line": 101,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "7ade5e8612ff45d89e937ab29ff48f77f64b571ccec870a957e455d6b7487cc2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Augmented-Nature-UniProt-MCP-Server • get_literature_references"
+    },
+    {
+      "aliases": [
+        "酶证据",
+        "蛋白註釋",
+        "證據等級"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "accession"
+        ],
+        "operation_sha256": "bc33df777600110eb0c9082b49380a0adbbd977db069b7729f933e2ab4c18da4",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "accession"
+        ]
+      },
+      "canonical_method_id": "protein-annotation-confidence",
+      "category": "database",
+      "digest": "70cd0c801306f4226c73e2c4e15d6fcd0178ae6554b4d343c8114003fd6341df",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "accession"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "Augmented-Nature-UniProt-MCP-Server/get_annotation_confidence",
+        "revision": "c3356f79d7559b7761cbf1e0712e20924934ae53"
+      },
+      "purpose": "Inspect annotation evidence",
+      "reference": "augmented-nature-uniprot-mcp-server-get-annotation-confidence@legacy",
+      "source": {
+        "line": 102,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "7ade5e8612ff45d89e937ab29ff48f77f64b571ccec870a957e455d6b7487cc2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Augmented-Nature-UniProt-MCP-Server • get_annotation_confidence"
+    },
+    {
+      "aliases": [
+        "識別碼",
+        "分類",
+        "登錄號",
+        "物種"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "accession"
+        ],
+        "operation_sha256": "db126610afe586ef87680e6639c433b4c01b1e1fe7a4d7a3cc858c72ba6ec94f",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "accession"
+        ]
+      },
+      "canonical_method_id": "protein-archive-accession",
+      "category": "database",
+      "digest": "7f0d050c2cf6c711c89ed2b06c9bcca3239382b7a957f1708fe339dbf8627764",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "accession"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "Augmented-Nature-UniProt-MCP-Server/validate_accession",
+        "revision": "c3356f79d7559b7761cbf1e0712e20924934ae53"
+      },
+      "purpose": "Check an archive accession or taxon identity",
+      "reference": "augmented-nature-uniprot-mcp-server-validate-accession@legacy",
+      "source": {
+        "line": 104,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "7ade5e8612ff45d89e937ab29ff48f77f64b571ccec870a957e455d6b7487cc2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Augmented-Nature-UniProt-MCP-Server • validate_accession"
+    },
+    {
+      "aliases": [
+        "識別碼",
+        "分類",
+        "登錄號",
+        "物種"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "accession"
+        ],
+        "operation_sha256": "6d6df5b47b8df79e103a4de5ee5c26f4a08a0b83f2581f46d19f2abce618db27",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "accession"
+        ]
+      },
+      "canonical_method_id": "protein-archive-accession",
+      "category": "database",
+      "digest": "f295f430c35cac6dace61d35647167458b0d6bb2e6ea305b297f06a4ebd5e886",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "accession"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "Augmented-Nature-UniProt-MCP-Server/get_taxonomy_info",
+        "revision": "c3356f79d7559b7761cbf1e0712e20924934ae53"
+      },
+      "purpose": "Check an archive accession or taxon identity",
+      "reference": "augmented-nature-uniprot-mcp-server-get-taxonomy-info@legacy",
+      "source": {
+        "line": 105,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "7ade5e8612ff45d89e937ab29ff48f77f64b571ccec870a957e455d6b7487cc2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Augmented-Nature-UniProt-MCP-Server • get_taxonomy_info"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "sources",
+          "rows",
+          "type",
+          "entity_type",
+          "enrich",
+          "filters",
+          "ranking"
+        ],
+        "operation_sha256": "b2f85dada96d43b4554e37e5274e573df2bdf9953a3dc4753fc9eec2fe1d2782",
+        "output_properties": [
+          "result"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "1ceaf5d4200680c7b81ffc9a3e78c1bcad9b7efe15ed03c5238853261aa20ae3",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "sources",
+        "rows",
+        "type",
+        "entity_type",
+        "enrich",
+        "filters",
+        "ranking"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [
+        "result"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_nature_v1/search_papers",
+        "revision": "725c2ec894a2f40b7d3f811528b9cc7e4ebff6c8"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-nature-v1-search-papers@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 269,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "6760940ebd51dd3881771469e1b8a3a53a635363bad5abbfa404fb1e5c2176d3",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_nature_v1 • search_papers"
+    },
+    {
+      "aliases": [
+        "書目",
+        "原件",
+        "摘要"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "id",
+          "id_type",
+          "expected",
+          "include_relations",
+          "relation",
+          "depth",
+          "rows",
+          "relation_sources"
+        ],
+        "operation_sha256": "4face8209ed1dda72534be7330b2e099181a45b79f139febb44bc016c10d827c",
+        "output_properties": [
+          "result"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "id"
+        ]
+      },
+      "canonical_method_id": "literature-record",
+      "category": "research",
+      "digest": "ba6e855594e2a364561453d24e16185322c6bf272fb34d3fb446fad64a2c0da3",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "id",
+        "id_type",
+        "expected",
+        "include_relations",
+        "relation",
+        "depth",
+        "rows",
+        "relation_sources"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "result"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_nature_v1/get_paper_by_id",
+        "revision": "725c2ec894a2f40b7d3f811528b9cc7e4ebff6c8"
+      },
+      "purpose": "Read publication metadata for a record",
+      "reference": "gx-academic-nature-v1-get-paper-by-id@legacy",
+      "source": {
+        "line": 270,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "6760940ebd51dd3881771469e1b8a3a53a635363bad5abbfa404fb1e5c2176d3",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_nature_v1 • get_paper_by_id"
+    },
+    {
+      "aliases": [
+        "引用",
+        "引用資料"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "id",
+          "id_type",
+          "style"
+        ],
+        "operation_sha256": "3422b4ecf9f08ff7bbf9bcab8845408ef3a26bece9fdf22e056f7bc8653b7672",
+        "output_properties": [
+          "result"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "id"
+        ]
+      },
+      "canonical_method_id": "literature-citation",
+      "category": "research",
+      "digest": "1ca80a453438d9ea02566a93eb76bcb3603058329d911c92b92825059f59a9a1",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "id",
+        "id_type",
+        "style"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "result"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_nature_v1/get_citation",
+        "revision": "725c2ec894a2f40b7d3f811528b9cc7e4ebff6c8"
+      },
+      "purpose": "Read citation metadata",
+      "reference": "gx-academic-nature-v1-get-citation@legacy",
+      "source": {
+        "line": 271,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "6760940ebd51dd3881771469e1b8a3a53a635363bad5abbfa404fb1e5c2176d3",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_nature_v1 • get_citation"
+    },
+    {
+      "aliases": [
+        "主題詞",
+        "文献主题"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "term"
+        ],
+        "operation_sha256": "1473daa539a1d6f3f3f12a8cb1d5a96d22fd7b7962a2f0a1b719563150824e7a",
+        "output_properties": [
+          "result"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "term"
+        ]
+      },
+      "canonical_method_id": "literature-controlled-vocabulary",
+      "category": "research",
+      "digest": "f40313ff7f637268600bf36de7a20c4a5fde3acd774e45af962bd008d6b0eaa0",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "term"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "result"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_nature_v1/lookup_mesh",
+        "revision": "725c2ec894a2f40b7d3f811528b9cc7e4ebff6c8"
+      },
+      "purpose": "Look up controlled subject headings",
+      "reference": "gx-academic-nature-v1-lookup-mesh@legacy",
+      "source": {
+        "line": 272,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "6760940ebd51dd3881771469e1b8a3a53a635363bad5abbfa404fb1e5c2176d3",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_nature_v1 • lookup_mesh"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "exact_phrase",
+          "search_field",
+          "from_year",
+          "to_year",
+          "min_citations",
+          "cited_by_count",
+          "source_name",
+          "source_id",
+          "source_issn",
+          "author_institution",
+          "institution_group",
+          "is_oa",
+          "type",
+          "sort",
+          "page",
+          "per_page"
+        ],
+        "operation_sha256": "dce3754e7801aa87c98ec070bcf792d9a7e12e64a9a6c5e05531f9e3ec0e4520",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": []
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "f025b0d70e827b977fad6740496d2f3f6e5ddcae4987810424f6c1a941a5df83",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "exact_phrase",
+        "search_field",
+        "from_year",
+        "to_year",
+        "min_citations",
+        "cited_by_count",
+        "source_name",
+        "source_id",
+        "source_issn",
+        "author_institution",
+        "institution_group",
+        "is_oa",
+        "type",
+        "sort",
+        "page",
+        "per_page"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/search_works",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-openalex-v1-search-works@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 273,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • search_works"
+    },
+    {
+      "aliases": [
+        "書目",
+        "原件",
+        "摘要"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "id"
+        ],
+        "operation_sha256": "617371e2af4f812637064a262774665372f61e89885f1c872b0a539fef12fcb8",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "id"
+        ]
+      },
+      "canonical_method_id": "literature-record",
+      "category": "research",
+      "digest": "37d873f2f9062bf2fb7e9e151e83d78539d6ebc1dcf745890ac4b9e3fb3638dc",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "id"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/get_work",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Read publication metadata for a record",
+      "reference": "gx-academic-openalex-v1-get-work@legacy",
+      "source": {
+        "line": 274,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • get_work"
+    },
+    {
+      "aliases": [
+        "文獻引用",
+        "溯源",
+        "關聯研究"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "id",
+          "per_page"
+        ],
+        "operation_sha256": "d14edca000bddc8f461a3c2e38446bdd2f7c866b849863ca96e8bb18ab7bb926",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "id"
+        ]
+      },
+      "canonical_method_id": "literature-related",
+      "category": "research",
+      "digest": "f6f653edeb84f7c15ea38dcdd0d83d8fe102d6fc7095415444e52b6a23470c26",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "id",
+        "per_page"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/get_related_works",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Read linked publication records",
+      "reference": "gx-academic-openalex-v1-get-related-works@legacy",
+      "source": {
+        "line": 275,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • get_related_works"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "topic",
+          "exact_phrase",
+          "search_field",
+          "from_year",
+          "to_year",
+          "source_name",
+          "source_issn",
+          "min_citations",
+          "author_institution",
+          "institution_group",
+          "sort",
+          "per_page"
+        ],
+        "operation_sha256": "8a99b6cf4ae8476c420be2258ae9cbfe621a24133342c2d71730fbf6b02719f1",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "topic"
+        ]
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "33df22e8538172b85566ae0857a744f8f569c9b37a8612f52e8d4c472b744f9c",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "topic",
+        "exact_phrase",
+        "search_field",
+        "from_year",
+        "to_year",
+        "source_name",
+        "source_issn",
+        "min_citations",
+        "author_institution",
+        "institution_group",
+        "sort",
+        "per_page"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/search_by_topic",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-openalex-v1-search-by-topic@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 276,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • search_by_topic"
+    },
+    {
+      "aliases": [
+        "文獻引用",
+        "溯源",
+        "關聯研究"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "id",
+          "page",
+          "per_page",
+          "sort"
+        ],
+        "operation_sha256": "d0f0774c54fdf8218c7d818bf45e51570120cd318dad869604e0bd49dcf165f1",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "id"
+        ]
+      },
+      "canonical_method_id": "literature-related",
+      "category": "research",
+      "digest": "4a33e0fce08528de1576e1df405fca0f7a882539b14fccc4b614ff50ec3484cb",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "id",
+        "page",
+        "per_page",
+        "sort"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/get_work_citations",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Read linked publication records",
+      "reference": "gx-academic-openalex-v1-get-work-citations@legacy",
+      "source": {
+        "line": 278,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • get_work_citations"
+    },
+    {
+      "aliases": [
+        "文獻引用",
+        "溯源",
+        "關聯研究"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "id"
+        ],
+        "operation_sha256": "abe63e0dc8c243b3cf1f6c706a01e42eac85d7bbfd30dd75be4acf2bd2c93d3f",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "id"
+        ]
+      },
+      "canonical_method_id": "literature-related",
+      "category": "research",
+      "digest": "d36f5d61d8025af434fd3997db26c44c9e8dcc29c75cb2754cd70fef03d7d8da",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "id"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/get_work_references",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Read linked publication records",
+      "reference": "gx-academic-openalex-v1-get-work-references@legacy",
+      "source": {
+        "line": 279,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • get_work_references"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "exact_phrase",
+          "search_field",
+          "journal_list",
+          "from_year",
+          "to_year",
+          "min_citations",
+          "author_institution",
+          "institution_group",
+          "sort",
+          "per_page"
+        ],
+        "operation_sha256": "5424eb1918f4529fc6d4d6ff1804572771e7ef721036d674729bf0c64f8cac24",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "journal_list"
+        ]
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "24781b5633efeae3907bd92251989e5948e15e06783e7eb2f3da586ceff3a32c",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "exact_phrase",
+        "search_field",
+        "journal_list",
+        "from_year",
+        "to_year",
+        "min_citations",
+        "author_institution",
+        "institution_group",
+        "sort",
+        "per_page"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/search_in_journal_list",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-openalex-v1-search-in-journal-list@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 293,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • search_in_journal_list"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "exact_phrase",
+          "search_field",
+          "venue_name",
+          "venue_issn",
+          "venue_id",
+          "from_year",
+          "to_year",
+          "min_citations",
+          "sort",
+          "per_page"
+        ],
+        "operation_sha256": "0b3aa774a87a623834f5e212825edfe30ac243af19c9709e8ba060da90b7cd8e",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": []
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "ac9581c915dc536a0ac38bd4c713c0f4bc8df4a3f459ecc5c2e637c6c16a1868",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "exact_phrase",
+        "search_field",
+        "venue_name",
+        "venue_issn",
+        "venue_id",
+        "from_year",
+        "to_year",
+        "min_citations",
+        "sort",
+        "per_page"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/search_works_in_venue",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-openalex-v1-search-works-in-venue@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 294,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • search_works_in_venue"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "exact_phrase",
+          "search_field",
+          "from_year",
+          "to_year",
+          "source_name",
+          "min_citations",
+          "per_page"
+        ],
+        "operation_sha256": "53bbd7c202f7b5dd5defaa93bc8cbe925ff9de229365443be67864f0ba87591d",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "769968924746d34b35047cbac6d0d06b5b8664ae93c029fccfb496416cf08d3a",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "exact_phrase",
+        "search_field",
+        "from_year",
+        "to_year",
+        "source_name",
+        "min_citations",
+        "per_page"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/find_review_articles",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-openalex-v1-find-review-articles@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 299,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • find_review_articles"
+    },
+    {
+      "aliases": [
+        "書目識別碼",
+        "文献索引"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "ids"
+        ],
+        "operation_sha256": "f1654469a4d922dc4813a8dd791166fd53be51e7cbebd297146cf43ab6b0c8c6",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "ids"
+        ]
+      },
+      "canonical_method_id": "publication-identifiers",
+      "category": "research",
+      "digest": "207a7e1294c659286bf28e28ea0863ace3810475790f26ed8ff8fd9e6f5b7e01",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "ids"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/batch_resolve_references",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Look up indexed publication references",
+      "reference": "gx-academic-openalex-v1-batch-resolve-references@legacy",
+      "source": {
+        "line": 301,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • batch_resolve_references"
+    },
+    {
+      "aliases": [
+        "公開原件",
+        "開放取用"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "exact_phrase",
+          "search_field",
+          "from_year",
+          "source_name",
+          "min_citations",
+          "per_page"
+        ],
+        "operation_sha256": "5b86db83f27fc1c7f093cac790d91419fed0e9bf2e321c8c00b31d786359be16",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "literature-access-status",
+      "category": "research",
+      "digest": "754f2db44c7f56839b63456abd6e02ae38b28de241482c7a50cbbd7fd849a154",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "exact_phrase",
+        "search_field",
+        "from_year",
+        "source_name",
+        "min_citations",
+        "per_page"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_openalex_v1/find_open_access_version",
+        "revision": "32cf0fa14a4c0a0a9839050fecab558224ea8595"
+      },
+      "purpose": "Locate available public copies",
+      "reference": "gx-academic-openalex-v1-find-open-access-version@legacy",
+      "source": {
+        "line": 302,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "2f652b93afcf74536d6d6e1cf43fad526fd46ff7e654c5c2286d619d49c3212e",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_openalex_v1 • find_open_access_version"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "maxResults",
+          "offset",
+          "sort",
+          "dateRange",
+          "publicationTypes",
+          "author",
+          "journal",
+          "meshTerms",
+          "language",
+          "hasAbstract",
+          "freeFullText",
+          "species",
+          "summaryCount"
+        ],
+        "operation_sha256": "d521e0b3393abc5724ec8ca26f051a5d39e03638b0c527d6b52df7e64c24f804",
+        "output_properties": [
+          "query",
+          "offset",
+          "pmids",
+          "summaries",
+          "searchUrl",
+          "totalCount",
+          "effectiveQuery",
+          "appliedFilters",
+          "notice",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": []
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "e7eba9a44602ad4bcb18145205967b36c6021c188c6a12a3fb3d1c5210e0e7fb",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "maxResults",
+        "offset",
+        "sort",
+        "dateRange",
+        "publicationTypes",
+        "author",
+        "journal",
+        "meshTerms",
+        "language",
+        "hasAbstract",
+        "freeFullText",
+        "species",
+        "summaryCount"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [
+        "query",
+        "offset",
+        "pmids",
+        "summaries",
+        "searchUrl",
+        "totalCount",
+        "effectiveQuery",
+        "appliedFilters",
+        "notice",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_search_articles",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-pubmed-v1-pubmed-search-articles@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 304,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_search_articles"
+    },
+    {
+      "aliases": [
+        "書目",
+        "原件",
+        "摘要"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pmids",
+          "includeMesh",
+          "includeGrants",
+          "includeInvestigators",
+          "maxResponseCharacters"
+        ],
+        "operation_sha256": "59390a3f04cde51f5395176934e431e390fba0529781f966acbc6b096cf36d2e",
+        "output_properties": [
+          "articles",
+          "totalReturned",
+          "unavailablePmids",
+          "deferred",
+          "notice",
+          "truncated",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "pmids"
+        ]
+      },
+      "canonical_method_id": "literature-record",
+      "category": "research",
+      "digest": "9b33263d1ac380c08b71e0e319f219a4ea0ec8dd9278ee2c42d3270bc5a3e5ea",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "pmids",
+        "includeMesh",
+        "includeGrants",
+        "includeInvestigators",
+        "maxResponseCharacters"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "articles",
+        "totalReturned",
+        "unavailablePmids",
+        "deferred",
+        "notice",
+        "truncated",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_fetch_articles",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Read publication metadata for a record",
+      "reference": "gx-academic-pubmed-v1-pubmed-fetch-articles@legacy",
+      "source": {
+        "line": 305,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_fetch_articles"
+    },
+    {
+      "aliases": [
+        "學術全文",
+        "文献原件",
+        "论文全文"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pmcids",
+          "pmids",
+          "dois",
+          "includeReferences",
+          "includeTables",
+          "includeAssets",
+          "maxSections",
+          "sections",
+          "maxCharacters",
+          "maxCharactersPerSection",
+          "maxResponseCharacters",
+          "overflowMode"
+        ],
+        "operation_sha256": "c0e1626face636e16f08cd7393470c1860f2470d8316c66d064e8929d41ae8d3",
+        "output_properties": [
+          "articles",
+          "totalReturned",
+          "unavailable",
+          "truncation",
+          "sectionCap",
+          "deferred",
+          "overLimit",
+          "notice",
+          "truncated",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": []
+      },
+      "canonical_method_id": "literature-fulltext",
+      "category": "research",
+      "digest": "cc1f45af553a0a8b3351a807dc21de40138eaf726bd857e501bd2e3d7a71cdaf",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "pmcids",
+        "pmids",
+        "dois",
+        "includeReferences",
+        "includeTables",
+        "includeAssets",
+        "maxSections",
+        "sections",
+        "maxCharacters",
+        "maxCharactersPerSection",
+        "maxResponseCharacters",
+        "overflowMode"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "native_relation": {
+        "manifest_sha256": "6f0ddeb6ddee7cde4d957fa00b2f127f84eb6d7cbe0f5a9849f6c72bcaa9a441",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-original@1",
+        "scope": "Full text when the indexed public source is supported."
+      },
+      "outputs": [
+        "articles",
+        "totalReturned",
+        "unavailable",
+        "truncation",
+        "sectionCap",
+        "deferred",
+        "overLimit",
+        "notice",
+        "truncated",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_fetch_fulltext",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Read available publication text",
+      "reference": "gx-academic-pubmed-v1-pubmed-fetch-fulltext@legacy",
+      "related_methods": "literature-original@1 • Full text when the indexed public source is supported.",
+      "source": {
+        "line": 306,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_fetch_fulltext"
+    },
+    {
+      "aliases": [
+        "引用",
+        "引用資料"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pmids",
+          "format"
+        ],
+        "operation_sha256": "c228aa6d1783aed36525d0184f1211385ea543954462d3ae150621d8a30efdcd",
+        "output_properties": [
+          "citations",
+          "totalSubmitted",
+          "totalFormatted",
+          "unavailablePmids",
+          "notice",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "pmids"
+        ]
+      },
+      "canonical_method_id": "literature-citation",
+      "category": "research",
+      "digest": "8fd8eba5dae4918f45f299d133f9cde26e9fad4eb84999eaee2fe9fd8428d67c",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "pmids",
+        "format"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "citations",
+        "totalSubmitted",
+        "totalFormatted",
+        "unavailablePmids",
+        "notice",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_format_citations",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Read citation metadata",
+      "reference": "gx-academic-pubmed-v1-pubmed-format-citations@legacy",
+      "source": {
+        "line": 307,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_format_citations"
+    },
+    {
+      "aliases": [
+        "文獻引用",
+        "溯源",
+        "關聯研究"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pmid",
+          "relationship",
+          "maxResults",
+          "offset"
+        ],
+        "operation_sha256": "cf3d5da312805d33785f66da0ddcd66ce8b78b5c784a222b1f9f56fae698231d",
+        "output_properties": [
+          "sourcePmid",
+          "relationship",
+          "offset",
+          "articles",
+          "totalCount",
+          "source",
+          "notice",
+          "coverageFailures",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "pmid"
+        ]
+      },
+      "canonical_method_id": "literature-related",
+      "category": "research",
+      "digest": "adcdec671e75c2fa38768f24ed315c83996b8c3d9bb7f4f3cba2cf0017396b01",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "pmid",
+        "relationship",
+        "maxResults",
+        "offset"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "sourcePmid",
+        "relationship",
+        "offset",
+        "articles",
+        "totalCount",
+        "source",
+        "notice",
+        "coverageFailures",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_find_related",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Read linked publication records",
+      "reference": "gx-academic-pubmed-v1-pubmed-find-related@legacy",
+      "source": {
+        "line": 308,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_find_related"
+    },
+    {
+      "aliases": [
+        "主題詞",
+        "文献主题"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "maxResults",
+          "offset",
+          "includeDetails"
+        ],
+        "operation_sha256": "4369bff29e2164708f7da7051066c7f96d43042a7fbb9f1d27a072052a500f63",
+        "output_properties": [
+          "query",
+          "offset",
+          "nextOffset",
+          "results",
+          "totalCount",
+          "notice",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "literature-controlled-vocabulary",
+      "category": "research",
+      "digest": "824e51b8042e01c988c99470d06f841a8824108337ccaf9df5fdc3dc8a1a3a75",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "maxResults",
+        "offset",
+        "includeDetails"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "query",
+        "offset",
+        "nextOffset",
+        "results",
+        "totalCount",
+        "notice",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_lookup_mesh",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Look up controlled subject headings",
+      "reference": "gx-academic-pubmed-v1-pubmed-lookup-mesh@legacy",
+      "source": {
+        "line": 310,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_lookup_mesh"
+    },
+    {
+      "aliases": [
+        "書目識別碼",
+        "文献索引"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "citations"
+        ],
+        "operation_sha256": "e8bb23cae01b837748337136f0aad658ed5f06e98a6e6b2d46aae9f42181d540",
+        "output_properties": [
+          "results",
+          "totalMatched",
+          "totalSubmitted",
+          "totalWarnings",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "citations"
+        ]
+      },
+      "canonical_method_id": "publication-identifiers",
+      "category": "research",
+      "digest": "399d1f4cd1ad133f3e6a0a2d6dcb901d85e52f302178c3a9ce2d1b7f127640dc",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "citations"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "results",
+        "totalMatched",
+        "totalSubmitted",
+        "totalWarnings",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_lookup_citation",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Look up indexed publication references",
+      "reference": "gx-academic-pubmed-v1-pubmed-lookup-citation@legacy",
+      "source": {
+        "line": 311,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_lookup_citation"
+    },
+    {
+      "aliases": [
+        "書目識別碼",
+        "文献索引"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "ids",
+          "idType"
+        ],
+        "operation_sha256": "778688b390961edd237d0850642e94be4ff047546848086d17e62b9d6e1b0938",
+        "output_properties": [
+          "records",
+          "totalConverted",
+          "totalSubmitted",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "ids",
+          "idType"
+        ]
+      },
+      "canonical_method_id": "publication-identifiers",
+      "category": "research",
+      "digest": "b80d9fe0c3df8ead25057575813baba71b8cd2edd05d6147705c106278cfbf1b",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "ids",
+        "idType"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "records",
+        "totalConverted",
+        "totalSubmitted",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_convert_ids",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Look up indexed publication references",
+      "reference": "gx-academic-pubmed-v1-pubmed-convert-ids@legacy",
+      "source": {
+        "line": 312,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_convert_ids"
+    },
+    {
+      "aliases": [
+        "引用",
+        "引用資料"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pmids"
+        ],
+        "operation_sha256": "1e9c9d6bddb62fdd1e4b740a07d087fea40bd8bf4cea4ad1d3f3eb79eee02753",
+        "output_properties": [
+          "records",
+          "unavailablePmids",
+          "overLimit",
+          "notice",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "pmids"
+        ]
+      },
+      "canonical_method_id": "literature-citation",
+      "category": "research",
+      "digest": "0e3c42550f7eae9b9e9339cabf32d064f54fd85212b4ed4c6979e28eade5784c",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "pmids"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "records",
+        "unavailablePmids",
+        "overLimit",
+        "notice",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_fetch_citation_metrics",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Read citation metadata",
+      "reference": "gx-academic-pubmed-v1-pubmed-fetch-citation-metrics@legacy",
+      "source": {
+        "line": 313,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_fetch_citation_metrics"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "pageSize",
+          "cursorMark",
+          "sources",
+          "resultType",
+          "sort"
+        ],
+        "operation_sha256": "9a5d46719cc8ed4e9cff0174bf25e6c0a667b0c02fb18280bfef1c49a28cb44d",
+        "output_properties": [
+          "hits",
+          "cursorMark",
+          "nextCursorMark",
+          "searchUrl",
+          "totalCount",
+          "query",
+          "appliedSources",
+          "notice",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "4858ea0ac1c11afd7bf63b2a1e8b9be2344810d8d29cb6f647a2806927b6202b",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "query",
+        "pageSize",
+        "cursorMark",
+        "sources",
+        "resultType",
+        "sort"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [
+        "hits",
+        "cursorMark",
+        "nextCursorMark",
+        "searchUrl",
+        "totalCount",
+        "query",
+        "appliedSources",
+        "notice",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_europepmc_search",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-pubmed-v1-pubmed-europepmc-search@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 314,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_europepmc_search"
+    },
+    {
+      "aliases": [
+        "書目",
+        "原件",
+        "摘要"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "records",
+          "maxResponseCharacters"
+        ],
+        "operation_sha256": "0c512219c79fcb213eb47ff88f437c600880bd9e7fbb41238c470eb7685c7022",
+        "output_properties": [
+          "records",
+          "notFound",
+          "deferred",
+          "notice",
+          "truncated",
+          "error"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "records"
+        ]
+      },
+      "canonical_method_id": "literature-record",
+      "category": "research",
+      "digest": "bc6ecbac730422321ad17c09b5f44ee0bd1acd01cf27295374aee27dcf2bb636",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "records",
+        "maxResponseCharacters"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "records",
+        "notFound",
+        "deferred",
+        "notice",
+        "truncated",
+        "error"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_pubmed_v1/pubmed_europepmc_fetch",
+        "revision": "5ab7f43a3dbe7f2c4fb21c2ff921f1827b32a6f2"
+      },
+      "purpose": "Read publication metadata for a record",
+      "reference": "gx-academic-pubmed-v1-pubmed-europepmc-fetch@legacy",
+      "source": {
+        "line": 315,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd2a50e70320613c12fb14e97ad8ea5dbe8a46c2746e28021598f24db8e0486f",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_pubmed_v1 • pubmed_europepmc_fetch"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "question",
+          "queries",
+          "sources",
+          "rows"
+        ],
+        "operation_sha256": "972935b5e05fb24b08955b5ad1abad40e1926eeb2c8cc454f87097cc1029c499",
+        "output_properties": [],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "question"
+        ]
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "de91356f7bcf53bd2b2d24e9e8bfbadf8f497c9edc6716123087f3318d34c63f",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "question",
+        "queries",
+        "sources",
+        "rows"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "gx_academic_search_v1/search_literature",
+        "revision": null
+      },
+      "purpose": "Search publication metadata",
+      "reference": "gx-academic-search-v1-search-literature@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 317,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "a774c6dd2fd5531c427eab797d5a5310fcaaa1246d41f527b43f52b7099d30c1",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "gx_academic_search_v1 • search_literature"
+    },
+    {
+      "aliases": [
+        "物种",
+        "物種",
+        "索引"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "limit"
+        ],
+        "operation_sha256": "fbf7d823ff5291db7327d882841cfbba111d6b0d49c5eb934390d10b282e3edb",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": []
+      },
+      "canonical_method_id": "organism-archive-list",
+      "category": "database",
+      "digest": "02716543d9a67752e4ca28a3cb1af00af0be7e9067d75bce09702a90152afa64",
+      "domain": [
+        "enzyme",
+        "protein"
+      ],
+      "inputs": [
+        "limit"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/list_organisms",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read the archive organism list",
+      "reference": "kegg-mcp-server-list-organisms@legacy",
+      "source": {
+        "line": 501,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • list_organisms"
+    },
+    {
+      "aliases": [
+        "通路",
+        "徑路",
+        "歸檔"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pathway_id",
+          "format"
+        ],
+        "operation_sha256": "b3bb58d0587ede7bcb11834ee349c0df99a522cc310663cc526c8d549051fec1",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "pathway_id"
+        ]
+      },
+      "canonical_method_id": "pathway-archive-record",
+      "category": "database",
+      "digest": "f20d325ce4796667bd3fbaca1c535a8805571ce04e6fd9f71b18053d4535ff2e",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "pathway_id",
+        "format"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/get_pathway_info",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read published pathway descriptions",
+      "reference": "kegg-mcp-server-get-pathway-info@legacy",
+      "source": {
+        "line": 503,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • get_pathway_info"
+    },
+    {
+      "aliases": [
+        "底物",
+        "化合物",
+        "編號"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "search_type",
+          "max_results"
+        ],
+        "operation_sha256": "7feb729dd8958d5499b90c9720de0df121bc6fb1016e0c1c4289970e677582d4",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "compound-archive-record",
+      "category": "database",
+      "digest": "45a4e92e614e33a859e593de6f1c450ca209d6bf1df1d36f104f79ce8379af7e",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "query",
+        "search_type",
+        "max_results"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/search_compounds",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read a recorded compound identifier or description",
+      "reference": "kegg-mcp-server-search-compounds@legacy",
+      "source": {
+        "line": 507,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • search_compounds"
+    },
+    {
+      "aliases": [
+        "底物",
+        "化合物",
+        "編號"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "compound_id"
+        ],
+        "operation_sha256": "a9cf81c498fc8f5abe8241e1c4b1e21d17b39402e4b16826158b501df2e8432f",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "compound_id"
+        ]
+      },
+      "canonical_method_id": "compound-archive-record",
+      "category": "database",
+      "digest": "87f405170dd6e8b34b2a7b7d4d1ab41fc9cdf882fba1e2f85f4c520d2acc0eed",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "compound_id"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/get_compound_info",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read a recorded compound identifier or description",
+      "reference": "kegg-mcp-server-get-compound-info@legacy",
+      "source": {
+        "line": 508,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • get_compound_info"
+    },
+    {
+      "aliases": [
+        "天然酶",
+        "反應資料库",
+        "数据库"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "max_results"
+        ],
+        "operation_sha256": "fa7b4632cfbd99ceef1e12a665b43a41276e496700c2645a7300298bc7fa6eae",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "reaction-archive-record",
+      "category": "database",
+      "digest": "360a7c7edf18434167c4bbde41d9622d25fad9ca30e7fb7bd0dee67e299f1bb6",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "query",
+        "max_results"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/search_reactions",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read a recorded reaction",
+      "reference": "kegg-mcp-server-search-reactions@legacy",
+      "source": {
+        "line": 509,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • search_reactions"
+    },
+    {
+      "aliases": [
+        "天然酶",
+        "反應資料库",
+        "数据库"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "reaction_id"
+        ],
+        "operation_sha256": "18318c31f2b49669989edf99ae6fc60329a773d964d04dc4c51e47dc17c23e61",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "reaction_id"
+        ]
+      },
+      "canonical_method_id": "reaction-archive-record",
+      "category": "database",
+      "digest": "b58d709da7f02c7af23419193195479f10474c2104aa20296d6553f92493e50e",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "reaction_id"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/get_reaction_info",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read a recorded reaction",
+      "reference": "kegg-mcp-server-get-reaction-info@legacy",
+      "source": {
+        "line": 510,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • get_reaction_info"
+    },
+    {
+      "aliases": [
+        "酶分類",
+        "EC",
+        "注释",
+        "注釋"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "max_results"
+        ],
+        "operation_sha256": "7102186b98bcc0a6659af1241483fc3205d46b5d923e11dbdab1faefd7bae549",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "enzyme-archive-record",
+      "category": "database",
+      "digest": "21d70184a4d6b65d198fbb2b4ab11e3ee5fb704e6ff9ee3ea03662c447dba700",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "query",
+        "max_results"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/search_enzymes",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read published enzyme classifications",
+      "reference": "kegg-mcp-server-search-enzymes@legacy",
+      "source": {
+        "line": 511,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • search_enzymes"
+    },
+    {
+      "aliases": [
+        "酶分類",
+        "EC",
+        "注释",
+        "注釋"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "ec_number"
+        ],
+        "operation_sha256": "96e2208dcd11faff3d56ff6a5be7ffc71abf59eeb26069fc5a207118c1ea1584",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "ec_number"
+        ]
+      },
+      "canonical_method_id": "enzyme-archive-record",
+      "category": "database",
+      "digest": "373e34e384b28a5131ed41e814fa61abdf4490205bc11d9f8f36b62b32bd72d1",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "ec_number"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/get_enzyme_info",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read published enzyme classifications",
+      "reference": "kegg-mcp-server-get-enzyme-info@legacy",
+      "source": {
+        "line": 512,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • get_enzyme_info"
+    },
+    {
+      "aliases": [
+        "通路",
+        "徑路",
+        "歸檔"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pathway_id"
+        ],
+        "operation_sha256": "b46fab52c9bd2788eddc070f6e5d617ef91af088b899d148eadd08a8c44403e5",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "pathway_id"
+        ]
+      },
+      "canonical_method_id": "pathway-archive-record",
+      "category": "database",
+      "digest": "66c2c6e3dbe38e788654387b3ffc12b605984cfdf73823a2a5a2883bc291cb88",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "pathway_id"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "KEGG-MCP-Server/get_pathway_reactions",
+        "revision": "e1b40d3f94797cf849ead5da51b28b17a397f54d"
+      },
+      "purpose": "Read published pathway descriptions",
+      "reference": "kegg-mcp-server-get-pathway-reactions@legacy",
+      "source": {
+        "line": 527,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "e189c6de5842e604fdffd2cfe25a36dce5daf90235e40befd2e343cd4f66294d",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "KEGG-MCP-Server • get_pathway_reactions"
+    },
+    {
+      "aliases": [
+        "識別碼",
+        "分類",
+        "登錄號",
+        "物種"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "tax_id",
+          "include_lineage"
+        ],
+        "operation_sha256": "5159e7812eed5b46bcd24c09be2e3de468e9c0d407d245b64dd4f1e12e33d6b4",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "tax_id"
+        ]
+      },
+      "canonical_method_id": "protein-archive-accession",
+      "category": "database",
+      "digest": "c98ee81617cdfe875e3a2a12044ff80b6fd0e9a0963ffd6f37850c23205ddcd3",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "tax_id",
+        "include_lineage"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "NCBI-Datasets-MCP-Server/get_taxonomy_info",
+        "revision": "a308fa6f2a06bce359860cf94e159b83fcbaaa39"
+      },
+      "purpose": "Check an archive accession or taxon identity",
+      "reference": "ncbi-datasets-mcp-server-get-taxonomy-info@legacy",
+      "source": {
+        "line": 610,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "444a72aedae79fc431a57e7801998f29d8952b3a90b2ede9510b95b671164dd1",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "NCBI-Datasets-MCP-Server • get_taxonomy_info"
+    },
+    {
+      "aliases": [
+        "識別碼",
+        "分類",
+        "登錄號",
+        "物種"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "tax_id",
+          "include_ranks",
+          "include_synonyms",
+          "format"
+        ],
+        "operation_sha256": "784e39bc863e807e65a23087365578f17bcc55b628ccfab04adca46714d707eb",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "tax_id"
+        ]
+      },
+      "canonical_method_id": "protein-archive-accession",
+      "category": "database",
+      "digest": "7af8cd6ea7f5f69ef3687a9f406e908b65ef13e0bc9ae93cdf1e8b3ddf4d2a91",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "tax_id",
+        "include_ranks",
+        "include_synonyms",
+        "format"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "NCBI-Datasets-MCP-Server/get_taxonomic_lineage",
+        "revision": "a308fa6f2a06bce359860cf94e159b83fcbaaa39"
+      },
+      "purpose": "Check an archive accession or taxon identity",
+      "reference": "ncbi-datasets-mcp-server-get-taxonomic-lineage@legacy",
+      "source": {
+        "line": 628,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "444a72aedae79fc431a57e7801998f29d8952b3a90b2ede9510b95b671164dd1",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "NCBI-Datasets-MCP-Server • get_taxonomic_lineage"
+    },
+    {
+      "aliases": [
+        "公開結構",
+        "搜索",
+        "沉積",
+        "PDB"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "query",
+          "limit",
+          "sort_by",
+          "experimental_method",
+          "resolution_range"
+        ],
+        "operation_sha256": "eb24efbc456e67b8ac8bebcf22edb6c4feacd2d0c9fb5dffbfb5b2415fa67064",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "query"
+        ]
+      },
+      "canonical_method_id": "structure-entry-search",
+      "category": "database",
+      "digest": "455d5d60cd034673a044fea8317837026fa9d9b2c18a037a59f32ec2ed6b2cb6",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "query",
+        "limit",
+        "sort_by",
+        "experimental_method",
+        "resolution_range"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "fe078f2a5d4d9b95a10a864f31f3de174c83d75a6d926ccc40a3dd9d4c645cf1",
+        "package_sha256": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5",
+        "provider": "org.gx.pcna-archive@1.0.0",
+        "reference": "pcna-archive-search@1",
+        "scope": "PCNA archive search limited to P12004."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "PDB-MCP-Server/search_structures",
+        "revision": "6bb2b9600e1846800d0ba222613241031c58a1ae"
+      },
+      "purpose": "Search deposited structures",
+      "reference": "pdb-mcp-server-search-structures@legacy",
+      "related_methods": "pcna-archive-search@1 • PCNA archive search limited to P12004.",
+      "source": {
+        "line": 753,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "20b2dced7b1f22a3e1cfb7cca9dbc3b45269acf78deb1ba03f830ba586f131f2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PDB-MCP-Server • search_structures"
+    },
+    {
+      "aliases": [
+        "存檔蛋白",
+        "資料",
+        "结构记录",
+        "PDB"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pdb_id",
+          "format"
+        ],
+        "operation_sha256": "a4dd42c76de3200ec050c2256533561b28ba13b72c14b5a907039dbbb285e6d3",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "pdb_id"
+        ]
+      },
+      "canonical_method_id": "structure-entry-description",
+      "category": "database",
+      "digest": "1253b5692915bfcde6c153f0f71892a975a7489cba20d05fd2fa9f1c22a891ce",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "pdb_id",
+        "format"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "dc43a56e5a53626b2e1af66e869c72aeca09443d36f18982e8c9ff76364c8521",
+        "package_sha256": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5",
+        "provider": "org.gx.pcna-archive@1.0.0",
+        "reference": "pcna-archive-fetch@1",
+        "scope": "Fetches a coordinate record in the P12004 study scope."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "PDB-MCP-Server/get_structure_info",
+        "revision": "6bb2b9600e1846800d0ba222613241031c58a1ae"
+      },
+      "purpose": "Inspect public deposition metadata",
+      "reference": "pdb-mcp-server-get-structure-info@legacy",
+      "related_methods": "pcna-archive-fetch@1 • Fetches a coordinate record in the P12004 study scope.",
+      "source": {
+        "line": 754,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "20b2dced7b1f22a3e1cfb7cca9dbc3b45269acf78deb1ba03f830ba586f131f2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PDB-MCP-Server • get_structure_info"
+    },
+    {
+      "aliases": [
+        "公開結構",
+        "搜索",
+        "沉積",
+        "PDB"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "uniprot_id",
+          "limit"
+        ],
+        "operation_sha256": "72c71869c5e10fbb50fb7799bb7031b7bc31676b5cbc6fc876d68b3dcf25da95",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "uniprot_id"
+        ]
+      },
+      "canonical_method_id": "structure-entry-search",
+      "category": "database",
+      "digest": "4102d7a69925d912cc93ef4bdedde72daf3711b30ef180d2c06e8cadfa745193",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "uniprot_id",
+        "limit"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "native_relation": {
+        "manifest_sha256": "fe078f2a5d4d9b95a10a864f31f3de174c83d75a6d926ccc40a3dd9d4c645cf1",
+        "package_sha256": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5",
+        "provider": "org.gx.pcna-archive@1.0.0",
+        "reference": "pcna-archive-search@1",
+        "scope": "PCNA archive search limited to P12004."
+      },
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "PDB-MCP-Server/search_by_uniprot",
+        "revision": "6bb2b9600e1846800d0ba222613241031c58a1ae"
+      },
+      "purpose": "Search deposited structures",
+      "reference": "pdb-mcp-server-search-by-uniprot@legacy",
+      "related_methods": "pcna-archive-search@1 • PCNA archive search limited to P12004.",
+      "source": {
+        "line": 756,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "20b2dced7b1f22a3e1cfb7cca9dbc3b45269acf78deb1ba03f830ba586f131f2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PDB-MCP-Server • search_by_uniprot"
+    },
+    {
+      "aliases": [
+        "坐標質控",
+        "结构质量",
+        "PDB quality"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pdb_id"
+        ],
+        "operation_sha256": "565ac87a0b003e551754cc0b1f66739a6d69b1e36567d9a2b82bcd72944ca43c",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "pdb_id"
+        ]
+      },
+      "canonical_method_id": "pdb-entry-quality",
+      "category": "method",
+      "digest": "a447f15f2a836553435a6c0b6626ec2f9c525de5f7aa0f7c6f699086c17be66a",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "pdb_id"
+      ],
+      "kind": "method",
+      "limitations": "Schema checked. Historical service status is not operation-level execution evidence. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-pdb-mcp.get_structure_quality",
+        "revision": "6bb2b9600e1846800d0ba222613241031c58a1ae"
+      },
+      "purpose": "Look up publicly deposited entry quality metadata.",
+      "reference": "pdb-quality-operation@legacy",
+      "source": {
+        "line": 757,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "20b2dced7b1f22a3e1cfb7cca9dbc3b45269acf78deb1ba03f830ba586f131f2",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PDB deposited structure quality"
+    },
+    {
+      "aliases": [
+        "天然蛋白",
+        "酵母",
+        "注释",
+        "註釋"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "gene",
+          "format"
+        ],
+        "operation_sha256": "07594c2cfca6efdaaafab0217193451dca4d9ef876fc25e100a1116216487848",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "gene"
+        ]
+      },
+      "canonical_method_id": "curated-protein-description",
+      "category": "database",
+      "digest": "cc1deeb76782ab45a07e790968ca36aa917038a6b2e768a558e40c10d050e6ea",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "gene",
+        "format"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "ProteinAtlas-MCP-Server/get_protein_info",
+        "revision": "b28f96604bc5af592b54afbea1ac9d5c6a657fd5"
+      },
+      "purpose": "Inspect a public protein annotation",
+      "reference": "proteinatlas-mcp-server-get-protein-info@legacy",
+      "source": {
+        "line": 814,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "cefea2feeba960e9a4f7dfa644ae2248680fe048c9f7f7e899c621230e96781a",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "ProteinAtlas-MCP-Server • get_protein_info"
+    },
+    {
+      "aliases": [
+        "天然蛋白",
+        "酵母",
+        "注释",
+        "註釋"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "ensemblId",
+          "format"
+        ],
+        "operation_sha256": "1df034b0c9e606fc07c60339c6fe6cdb5991314d7ccb1c2ec345c893c120c33a",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "ensemblId"
+        ]
+      },
+      "canonical_method_id": "curated-protein-description",
+      "category": "database",
+      "digest": "729bb89ee0925566fea263845e784e0f91319f65fb1f17ca1ef68b3c24a6f98b",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "ensemblId",
+        "format"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "ProteinAtlas-MCP-Server/get_protein_by_ensembl",
+        "revision": "b28f96604bc5af592b54afbea1ac9d5c6a657fd5"
+      },
+      "purpose": "Inspect a public protein annotation",
+      "reference": "proteinatlas-mcp-server-get-protein-by-ensembl@legacy",
+      "source": {
+        "line": 815,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "cefea2feeba960e9a4f7dfa644ae2248680fe048c9f7f7e899c621230e96781a",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "ProteinAtlas-MCP-Server • get_protein_by_ensembl"
+    },
+    {
+      "aliases": [
+        "抗體資料",
+        "抗体注释",
+        "抗體原件"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "gene",
+          "format"
+        ],
+        "operation_sha256": "14d5c1cb4cc344340afe4adb05b1cbc199e09c151f689339e6ea6e7a2c064001",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "gene"
+        ]
+      },
+      "canonical_method_id": "antibody-annotation",
+      "category": "database",
+      "digest": "0b3e6b3d329802a5f696bd28161cd093a869d88da4efa332784cd94e02d7e9c4",
+      "domain": [
+        "antibody"
+      ],
+      "inputs": [
+        "gene",
+        "format"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "ProteinAtlas-MCP-Server/get_antibody_info",
+        "revision": "b28f96604bc5af592b54afbea1ac9d5c6a657fd5"
+      },
+      "purpose": "Read a published antibody reagent annotation",
+      "reference": "proteinatlas-mcp-server-get-antibody-info@legacy",
+      "source": {
+        "line": 824,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "cefea2feeba960e9a4f7dfa644ae2248680fe048c9f7f7e899c621230e96781a",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "ProteinAtlas-MCP-Server • get_antibody_info"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "key_words",
+          "num_results"
+        ],
+        "operation_sha256": "315387b7dce7009adad859309b8a291a82e6006faa209327ae3ab5e0345a1ef1",
+        "output_properties": [
+          "result"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "key_words"
+        ]
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "d17fe9e7fd3216fd53c39afd30cd149d97c5cb39b684da4f85d695132cf95e25",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "key_words",
+        "num_results"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [
+        "result"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "PubMed-MCP-Server/search_pubmed_key_words",
+        "revision": "2a254f418f431e7ee5c161e38c8144890d52c20b"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "pubmed-mcp-server-search-pubmed-key-words@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 858,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "d3886f5f7a2af8575e8e9f0894debf5023bd25ffd7cd51caec2d5b2320a19af8",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PubMed-MCP-Server • search_pubmed_key_words"
+    },
+    {
+      "aliases": [
+        "文献",
+        "文獻",
+        "搜尋",
+        "检索"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "term",
+          "title",
+          "author",
+          "journal",
+          "start_date",
+          "end_date",
+          "num_results"
+        ],
+        "operation_sha256": "fcaca89ee656b76b1fdb7b595f61604559d3d83f5e373d8c8956cb77ea833931",
+        "output_properties": [
+          "result"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": []
+      },
+      "canonical_method_id": "literature-record-search",
+      "category": "research",
+      "digest": "d3f93211c75aad660fb9c000eb7d4ab3521e61a8cb448d74a70002a30d6da772",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "term",
+        "title",
+        "author",
+        "journal",
+        "start_date",
+        "end_date",
+        "num_results"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "native_relation": {
+        "manifest_sha256": "6c5f821d76ab97b9e7a9fbaa4e43d441903275c43f5d0e8c8c5ed0b254a7518f",
+        "package_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+        "provider": "org.gx.publication-discovery@1.0.0",
+        "reference": "literature-query@1",
+        "scope": "Bibliographic search through Europe PMC and Crossref."
+      },
+      "outputs": [
+        "result"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "PubMed-MCP-Server/search_pubmed_advanced",
+        "revision": "2a254f418f431e7ee5c161e38c8144890d52c20b"
+      },
+      "purpose": "Search publication metadata",
+      "reference": "pubmed-mcp-server-search-pubmed-advanced@legacy",
+      "related_methods": "literature-query@1 • Bibliographic search through Europe PMC and Crossref.",
+      "source": {
+        "line": 859,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "d3886f5f7a2af8575e8e9f0894debf5023bd25ffd7cd51caec2d5b2320a19af8",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PubMed-MCP-Server • search_pubmed_advanced"
+    },
+    {
+      "aliases": [
+        "書目",
+        "原件",
+        "摘要"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "pmid"
+        ],
+        "operation_sha256": "6a7dc216730b640730d3ad098725e35452cc256aa328f843d3b29d48609a6a8f",
+        "output_properties": [
+          "result"
+        ],
+        "output_schema_declared": true,
+        "required_inputs": [
+          "pmid"
+        ]
+      },
+      "canonical_method_id": "literature-record",
+      "category": "research",
+      "digest": "7495e8c1436ffa2437c93b4e3cbebdf420e89abd31c9d9546db7b1a3fd8f9311",
+      "domain": [
+        "research"
+      ],
+      "inputs": [
+        "pmid"
+      ],
+      "kind": "research",
+      "limitations": "A returned record is subject to the archive's own release and coverage.",
+      "outputs": [
+        "result"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "PubMed-MCP-Server/get_pubmed_article_metadata",
+        "revision": "2a254f418f431e7ee5c161e38c8144890d52c20b"
+      },
+      "purpose": "Read publication metadata for a record",
+      "reference": "pubmed-mcp-server-get-pubmed-article-metadata@legacy",
+      "source": {
+        "line": 860,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "d3886f5f7a2af8575e8e9f0894debf5023bd25ffd7cd51caec2d5b2320a19af8",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PubMed-MCP-Server • get_pubmed_article_metadata"
+    },
+    {
+      "aliases": [
+        "天然蛋白",
+        "酵母",
+        "注释",
+        "註釋"
+      ],
+      "archived_operation": {
+        "input_properties": [
+          "protein_ids",
+          "species"
+        ],
+        "operation_sha256": "e7fa0bc5b786d824b411f6056d251a4c94b804909c55a151aa7fc08460c4f105",
+        "output_properties": [],
+        "output_schema_declared": false,
+        "required_inputs": [
+          "protein_ids"
+        ]
+      },
+      "canonical_method_id": "curated-protein-description",
+      "category": "database",
+      "digest": "4f4c1226158338ac195c83964e73feb3ca2a4e3290fe1b925b91e4f5bbaa5759",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "protein_ids",
+        "species"
+      ],
+      "kind": "database",
+      "limitations": "A returned record is subject to the archive's own release and coverage. No named output fields declared in this source schema.",
+      "outputs": [],
+      "provider_binding": {
+        "historical": true,
+        "id": "STRING-db-MCP-Server/get_protein_annotations",
+        "revision": "e7d903e05a27465293d0ec3dbc74d189d355a337"
+      },
+      "purpose": "Inspect a public protein annotation",
+      "reference": "string-db-mcp-server-get-protein-annotations@legacy",
+      "source": {
+        "line": 957,
+        "path": "mcp-tools.tsv",
+        "primary_sha256": "fd892188608fc1f0c9d6ddb77d58bdf9493c1b116de234677d189e0a85614e47",
+        "sha256": "b222055fb51c366bb721982c58987eda33c7d46f305b1a9a5ea99d4e998c34b9",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "STRING-db-MCP-Server • get_protein_annotations"
+    },
+    {
+      "aliases": [
+        "环肽质控",
+        "環肽質控",
+        "環化連接",
+        "topology QC"
+      ],
+      "canonical_method_id": "archived-peptide-topology-qc",
+      "category": "recipe",
+      "digest": "349b066107f631ea2336baffb4d93ebf0534e954065ac722b04edf8665d3b9eb",
+      "domain": [
+        "cyclic-peptide"
+      ],
+      "inputs": [
+        "deposited connectivity record"
+      ],
+      "kind": "recipe",
+      "limitations": "The historical control failed its closure-distance criterion. It does not establish prediction or experimental validity.",
+      "outputs": [
+        "historical control verdict"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-topology-scenario",
+        "revision": null
+      },
+      "purpose": "Inspect the first documented failure of the deposited connectivity control.",
+      "reference": "cyclic-closure-qc-control@legacy",
+      "source": {
+        "line": 118,
+        "path": "workflows.tsv",
+        "primary_sha256": "b1aa181dd69b1c878350fe1a714e5c2bcdd0ba2ed7d86a46f9b1c549fe1ae5b9",
+        "sha256": "6d9fe50589c16c522af9cc6f44f3865160c6ee6be242d2a7babac5b333521a26",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Cyclic peptide archived closure control"
+    },
+    {
+      "aliases": [
+        "Fab",
+        "抗體",
+        "抗体",
+        "VH/VL",
+        "重輕鏈配對"
+      ],
+      "canonical_method_id": "fab-deposit-coverage",
+      "category": "recipe",
+      "digest": "a4fc3c91a0057a8bff42b220d6f896a7d7f89c4ee24cf21f530d6ff94ca1e582",
+      "domain": [
+        "antibody"
+      ],
+      "inputs": [
+        "paired Fab deposit"
+      ],
+      "kind": "recipe",
+      "limitations": "Recorded as deferred. Evidence from VHH does not establish a paired Fab result.",
+      "outputs": [
+        "prior coverage assessment"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-fab-case",
+        "revision": null
+      },
+      "purpose": "Find the recorded gap in paired heavy/light chain validation.",
+      "reference": "fab-coverage-history@legacy",
+      "source": {
+        "line": 146,
+        "path": "workflows.tsv",
+        "primary_sha256": "24fbb858384baea5f4b1a519829668db48f6f4bf29672a3fa385c44355c17e8a",
+        "sha256": "6d9fe50589c16c522af9cc6f44f3865160c6ee6be242d2a7babac5b333521a26",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Fab historical coverage gap"
+    },
+    {
+      "aliases": [
+        "糖水解酶",
+        "既有酶實驗",
+        "反应条件",
+        "archived assay"
+      ],
+      "canonical_method_id": "archived-enzyme-assays",
+      "category": "method",
+      "digest": "4a5556f87c148afdf804df654947e5d15e9f51fc2e93aa8a38051e14de8af63b",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "enzyme class",
+        "substrate"
+      ],
+      "kind": "method",
+      "limitations": "Limited to fourteen carbohydrate hydrolase EC classes. No transfer of activity across proteins.",
+      "native_relation": {
+        "manifest_sha256": "8a2d10638c42ff05857e81f01e9d815b56f6df18639dfd725e1ca440f341f6f0",
+        "package_sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "reference": "yeast-archive-lookup@1",
+        "scope": "Curated yeast archive lookup in the declared reaction/taxon panel."
+      },
+      "outputs": [
+        "assays.jsonl",
+        "report"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "science-native-v2.enzyme-kinetics",
+        "revision": "1"
+      },
+      "purpose": "Read previously measured assay records with the reported material and conditions.",
+      "reference": "native-assay-reading@legacy",
+      "related_methods": "yeast-archive-lookup@1 • Curated yeast archive lookup in the declared reaction/taxon panel.",
+      "source": {
+        "line": 32,
+        "path": "methods.tsv",
+        "primary_sha256": "fe618ef61543da7d265240215bf5225a35394554fa90b516218a5ab47f14b972",
+        "sha256": "68f92f1a30db2eab3eb8b9f69158fc1e92987405a08e76663e15e83fb6cbe196",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Historical carbohydrate hydrolase assay lookup"
+    },
+    {
+      "aliases": [
+        "RNA 模型",
+        "RNA secondary structure"
+      ],
+      "canonical_method_id": "rna-secondary-structure",
+      "category": "method",
+      "digest": "8e16780a593193cc89c9d8617ebe7a5da9161fdf15f75f7979ce394d1b56a56b",
+      "domain": [
+        "rna"
+      ],
+      "inputs": [
+        "RNA record"
+      ],
+      "kind": "method",
+      "limitations": "Indexed for the deferred RNA workstream.",
+      "outputs": [
+        "historical model record"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "native-eternafold-manifest",
+        "revision": "13d2487-gx1"
+      },
+      "purpose": "Locate the identity of an archived RNA secondary-structure model.",
+      "reference": "rna-structure-archive@legacy",
+      "source": {
+        "line": 77,
+        "path": "methods.tsv",
+        "primary_sha256": "1b6d3f052b838df5cfff62f62e160580b3cc65420e678ac9ba0460c1f04f38c5",
+        "sha256": "68f92f1a30db2eab3eb8b9f69158fc1e92987405a08e76663e15e83fb6cbe196",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "EternaFold historical RNA model"
+    },
+    {
+      "aliases": [
+        "骨架讀數",
+        "骨架读数",
+        "鏈幾何",
+        "链几何",
+        "structure geometry"
+      ],
+      "canonical_method_id": "deposited-coordinate-geometry",
+      "category": "method",
+      "digest": "1fdfd64ff964afd21a1f741c30a9b5f0afbf5b807a96bfce600139bdb446a59c",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "deposited mmCIF",
+        "three explicit chains"
+      ],
+      "kind": "method",
+      "limitations": "Single coordinate state. Coverage describes observed coordinates only.",
+      "outputs": [
+        "chain comparison report"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "science-native-v2.structure-geometry",
+        "revision": "1.0.0"
+      },
+      "purpose": "Compare observed backbone positions across three chains of one entity.",
+      "reference": "native-coordinate-comparison@legacy",
+      "source": {
+        "line": 102,
+        "path": "methods.tsv",
+        "primary_sha256": "713ebfdb4484d18cac6956b5c884ad9f04ae0d1b504c367f55e0f6dd998b3860",
+        "sha256": "68f92f1a30db2eab3eb8b9f69158fc1e92987405a08e76663e15e83fb6cbe196",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Deposited three-chain geometry"
+    },
+    {
+      "aliases": [
+        "結構模型",
+        "结构模型",
+        "蛋白模型",
+        "Protenix"
+      ],
+      "canonical_method_id": "protein-structure-prediction",
+      "category": "method",
+      "digest": "49be8c40e3b3a8a54ef77a359faf9539ccbe8fe4b50ade8c867a2c5bfbaff8df",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "model identity"
+      ],
+      "kind": "method",
+      "limitations": "The historical model declaration has no current Job binding.",
+      "outputs": [
+        "historical model description"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "historical-gx-model-register",
+        "revision": "85767b811c40ed46e73a9b39519cf6bfca8701ba"
+      },
+      "purpose": "Inspect the archived identity of a structure prediction model.",
+      "reference": "protenix-model@legacy",
+      "source": {
+        "line": 110,
+        "path": "methods.tsv",
+        "primary_sha256": "e04ae7da5f03a3faf59ea043a4884587d8d5107b0ec8199c746f64213b6365f7",
+        "sha256": "68f92f1a30db2eab3eb8b9f69158fc1e92987405a08e76663e15e83fb6cbe196",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protenix v2 model registration"
+    },
+    {
+      "aliases": [
+        "PDB",
+        "公開結構",
+        "公共结构"
+      ],
+      "canonical_method_id": "pdb-archive",
+      "category": "database",
+      "digest": "419b4aaafb7122d0fbf3cfed09bca6d52e078cece1b0683541da0bf068655603",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "PDB accession"
+      ],
+      "kind": "database",
+      "limitations": "PDB is also exposed through a historical web route. Two representations of the same entry share one scientific source.",
+      "outputs": [
+        "deposition metadata"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-pdb-mcp",
+        "revision": "6bb2b9600e1846800d0ba222613241031c58a1ae"
+      },
+      "purpose": "Locate archived macromolecular structures by accession.",
+      "reference": "pdb-entry-mcp@legacy",
+      "source": {
+        "line": 10,
+        "path": "data.tsv",
+        "primary_sha256": "8ba7cc3d6439cbcda6fa206314a687fd2c147227d90da0f7a727dfd5747540f0",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein Data Bank via MCP"
+    },
+    {
+      "aliases": [
+        "蛋白註釋",
+        "蛋白注释"
+      ],
+      "canonical_method_id": "curated-protein-description",
+      "category": "database",
+      "digest": "ffa76d22b023c9b996d5ff83045b8d07aaa193c68e9bf98220553285289cdfd2",
+      "domain": [
+        "enzyme",
+        "protein"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "native_relation": {
+        "manifest_sha256": "0a8833501c8c8c73f2febeb9d1f6223172cea775b884b9bc30e338c444e06572",
+        "package_sha256": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+        "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+        "reference": "yeast-uniprot-record@2",
+        "scope": "Assigned S288C protein records only."
+      },
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "uniprot-route",
+        "revision": null
+      },
+      "purpose": "Locate the db-uniprot-api source listed in the historical asset index.",
+      "reference": "uniprot-route@legacy",
+      "related_methods": "yeast-uniprot-record@2 • Assigned S288C protein records only.",
+      "source": {
+        "line": 16,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Curated natural protein records"
+    },
+    {
+      "aliases": [
+        "蛋白家族",
+        "歸檔分類"
+      ],
+      "canonical_method_id": "protein-family-annotation",
+      "category": "database",
+      "digest": "e40950f7c4cef2ae8098629c52c743ee8e80fec059de1f8eeea518218750551f",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "interpro-route",
+        "revision": null
+      },
+      "purpose": "Locate the db-interpro source listed in the historical asset index.",
+      "reference": "interpro-route@legacy",
+      "source": {
+        "line": 17,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein family classifications"
+    },
+    {
+      "aliases": [
+        "蛋白家族",
+        "歸檔分類"
+      ],
+      "canonical_method_id": "protein-family-annotation",
+      "category": "database",
+      "digest": "a0c9821c302a634060a1e23406577a6e105779bb927408129eb37b5ffaa5a6aa",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "pfam-route",
+        "revision": null
+      },
+      "purpose": "Locate the db-pfam source listed in the historical asset index.",
+      "reference": "pfam-route@legacy",
+      "source": {
+        "line": 18,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein family classifications"
+    },
+    {
+      "aliases": [
+        "預測歸檔",
+        "预测版本"
+      ],
+      "canonical_method_id": "model-record-metadata",
+      "category": "database",
+      "digest": "528e07942dda69bfa496727717726d3e6b9b2e3874ba3bfa8c5af279e2d3891a",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "alphafold-db-route",
+        "revision": null
+      },
+      "purpose": "Locate the db-alphafold-db source listed in the historical asset index.",
+      "reference": "alphafold-db-route@legacy",
+      "source": {
+        "line": 19,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Precomputed public structure-model metadata"
+    },
+    {
+      "aliases": [
+        "蛋白分類"
+      ],
+      "canonical_method_id": "archive-structure-classification",
+      "category": "database",
+      "digest": "e76d9d6ff4e649be6c62db2160a53734f73c62369e3a69aac2fecb08be5b489c",
+      "domain": [
+        "protein"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "cath-route",
+        "revision": null
+      },
+      "purpose": "Locate the db-cath source listed in the historical asset index.",
+      "reference": "cath-route@legacy",
+      "source": {
+        "line": 20,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Structural classification of deposited macromolecules"
+    },
+    {
+      "aliases": [
+        "PDB",
+        "結構資料庫",
+        "结构数据库"
+      ],
+      "canonical_method_id": "pdb-archive",
+      "category": "database",
+      "digest": "437e49ef8293aca0487db2a4067d24519ec21896a4e692c1fed27d9da3365181",
+      "domain": [
+        "protein",
+        "peptide",
+        "antibody"
+      ],
+      "inputs": [
+        "PDB accession"
+      ],
+      "kind": "database",
+      "limitations": "Known archive route. Deployment and per-operation evidence are independent of the MCP provider.",
+      "outputs": [
+        "deposition metadata"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "legacy-rcsb-web",
+        "revision": null
+      },
+      "purpose": "Find structural records on the same archive through the RCSB route.",
+      "reference": "pdb-entry-web-route@legacy",
+      "source": {
+        "line": 21,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein Data Bank via RCSB"
+    },
+    {
+      "aliases": [
+        "原始酶实验",
+        "酶實驗條件"
+      ],
+      "canonical_method_id": "archived-enzyme-assays",
+      "category": "database",
+      "digest": "fced6abe18d7ef4ebbac41472d2fd6cc949c768d5d53c098318f19d81b13b216",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "native_relation": {
+        "manifest_sha256": "8a2d10638c42ff05857e81f01e9d815b56f6df18639dfd725e1ca440f341f6f0",
+        "package_sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "reference": "yeast-archive-lookup@1",
+        "scope": "Curated yeast archive lookup in the declared reaction/taxon panel."
+      },
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "brenda-route",
+        "revision": null
+      },
+      "purpose": "Locate the db-brenda source listed in the historical asset index.",
+      "reference": "brenda-route@legacy",
+      "related_methods": "yeast-archive-lookup@1 • Curated yeast archive lookup in the declared reaction/taxon panel.",
+      "source": {
+        "line": 24,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Archival enzyme measurements"
+    },
+    {
+      "aliases": [
+        "坐標對照",
+        "结构编号"
+      ],
+      "canonical_method_id": "archive-residue-cross-reference",
+      "category": "database",
+      "digest": "3e04f38d98fe98f08b2f2a54f8b180df6c9c51c60f52631798794f2c7a5db690",
+      "domain": [
+        "protein",
+        "antibody",
+        "peptide"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "pdbe-kb-route",
+        "revision": null
+      },
+      "purpose": "Locate the db-pdbe-kb source listed in the historical asset index.",
+      "reference": "pdbe-kb-route@legacy",
+      "source": {
+        "line": 25,
+        "path": "data.tsv",
+        "primary_sha256": "a3ad57306b502886048b0e70655158d2a62b737f01251ffacb3d3add618a9afe",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "json_pointer_verified",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Cross-reference deposited residue identifiers"
+    },
+    {
+      "aliases": [
+        "原始酶实验",
+        "酶實驗條件"
+      ],
+      "canonical_method_id": "archived-enzyme-assays",
+      "category": "database",
+      "digest": "395caac79b37be5edd1446304e4aaff229f993365b6ad5d4e059a8ea9b8f7f0a",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "native_relation": {
+        "manifest_sha256": "8a2d10638c42ff05857e81f01e9d815b56f6df18639dfd725e1ca440f341f6f0",
+        "package_sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "reference": "yeast-archive-lookup@1",
+        "scope": "Curated yeast archive lookup in the declared reaction/taxon panel."
+      },
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "local-brenda",
+        "revision": null
+      },
+      "purpose": "Locate the BRENDA source listed in the historical asset index.",
+      "reference": "local-brenda@legacy",
+      "related_methods": "yeast-archive-lookup@1 • Curated yeast archive lookup in the declared reaction/taxon panel.",
+      "source": {
+        "line": 49,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Archival enzyme measurements"
+    },
+    {
+      "aliases": [
+        "蛋白家族",
+        "歸檔分類"
+      ],
+      "canonical_method_id": "protein-family-annotation",
+      "category": "database",
+      "digest": "29795ad9193b8f417f585aebad924a7f3808323f042ba186f668842f32313d23",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "cazy-archive",
+        "revision": null
+      },
+      "purpose": "Locate the CAZy source listed in the historical asset index.",
+      "reference": "cazy-archive@legacy",
+      "source": {
+        "line": 50,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein family classifications"
+    },
+    {
+      "aliases": [
+        "數據標準",
+        "记录格式"
+      ],
+      "canonical_method_id": "annotation-interchange",
+      "category": "database",
+      "digest": "1c075b327aa99d198e0c51eca9c18bfe0ac920093bb54c33efbb5320542013f4",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "enzymeml-spec",
+        "revision": null
+      },
+      "purpose": "Locate the EnzymeML_Specification source listed in the historical asset index.",
+      "reference": "enzymeml-spec@legacy",
+      "source": {
+        "line": 57,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Enzyme experiment metadata standard"
+    },
+    {
+      "aliases": [
+        "蛋白家族",
+        "歸檔分類"
+      ],
+      "canonical_method_id": "protein-family-annotation",
+      "category": "database",
+      "digest": "1f353f9396af272c1c5bd261de9588af1923065b3aec242d42663638805bb533",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "hamap-archive",
+        "revision": null
+      },
+      "purpose": "Locate the HAMAP source listed in the historical asset index.",
+      "reference": "hamap-archive@legacy",
+      "source": {
+        "line": 62,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein family classifications"
+    },
+    {
+      "aliases": [
+        "蛋白家族",
+        "歸檔分類"
+      ],
+      "canonical_method_id": "protein-family-annotation",
+      "category": "database",
+      "digest": "92338ac08f549510a2604242a1fbbad66ed84caf6c339b1472ba30cc146ecdaf",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "local-interpro",
+        "revision": null
+      },
+      "purpose": "Locate the InterPro source listed in the historical asset index.",
+      "reference": "local-interpro@legacy",
+      "source": {
+        "line": 64,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein family classifications"
+    },
+    {
+      "aliases": [
+        "CCD",
+        "線性多肽",
+        "线性多肽",
+        "殘基註釋"
+      ],
+      "canonical_method_id": "pdb-chemical-components",
+      "category": "database",
+      "digest": "46fc74889f115e2cd8310b4c33d0d70555addf4f109a52987f8e982e6f76d3c8",
+      "domain": [
+        "peptide",
+        "cyclic-peptide",
+        "protein"
+      ],
+      "inputs": [
+        "component ID"
+      ],
+      "kind": "database",
+      "limitations": "The source row identifies a directory; content release and modification coverage remain unverified.",
+      "outputs": [
+        "component definition"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "historical-ccd-directory",
+        "revision": null
+      },
+      "purpose": "Resolve component identifiers when checking deposited peptide records.",
+      "reference": "pdb-chemical-dictionary@legacy",
+      "source": {
+        "line": 69,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "PDB Chemical Component Dictionary"
+    },
+    {
+      "aliases": [
+        "反應命名",
+        "反应编号"
+      ],
+      "canonical_method_id": "reaction-names",
+      "category": "database",
+      "digest": "5454f9caa25aebceaf3bd86b0f8275fe1ba1efc6bbf676a694b0099875ea2c91",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "local-rhea",
+        "revision": null
+      },
+      "purpose": "Locate the Rhea source listed in the historical asset index.",
+      "reference": "local-rhea@legacy",
+      "source": {
+        "line": 71,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Rhea reaction identifiers"
+    },
+    {
+      "aliases": [
+        "坐標對照",
+        "结构编号"
+      ],
+      "canonical_method_id": "archive-residue-cross-reference",
+      "category": "database",
+      "digest": "766cb14dd01e213f5b890ee076f39b8b7101f2d15af54cf277fc2fb33b300940",
+      "domain": [
+        "protein",
+        "antibody",
+        "peptide"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "sifts-archive",
+        "revision": null
+      },
+      "purpose": "Locate the SIFTS source listed in the historical asset index.",
+      "reference": "sifts-archive@legacy",
+      "source": {
+        "line": 72,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Cross-reference deposited residue identifiers"
+    },
+    {
+      "aliases": [
+        "蛋白註釋",
+        "蛋白注释"
+      ],
+      "canonical_method_id": "curated-protein-description",
+      "category": "database",
+      "digest": "a7fb5110746e2dc89f83d745e5d4166693f033469fe1430d08c281aa41cf6916",
+      "domain": [
+        "enzyme",
+        "protein"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "native_relation": {
+        "manifest_sha256": "0a8833501c8c8c73f2febeb9d1f6223172cea775b884b9bc30e338c444e06572",
+        "package_sha256": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+        "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+        "reference": "yeast-uniprot-record@2",
+        "scope": "Assigned S288C protein records only."
+      },
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "local-swissprot",
+        "revision": null
+      },
+      "purpose": "Locate the UniProtKB_Swiss-Prot source listed in the historical asset index.",
+      "reference": "local-swissprot@legacy",
+      "related_methods": "yeast-uniprot-record@2 • Assigned S288C protein records only.",
+      "source": {
+        "line": 73,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Curated natural protein records"
+    },
+    {
+      "aliases": [
+        "蛋白家族",
+        "歸檔分類"
+      ],
+      "canonical_method_id": "protein-family-annotation",
+      "category": "database",
+      "digest": "33f323123d689825e812bab1d94de73a80d051f1ad42709e24a17dae8760f11d",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "interpro-archive",
+        "revision": null
+      },
+      "purpose": "Locate the sequence_data/InterPro source listed in the historical asset index.",
+      "reference": "interpro-archive@legacy",
+      "source": {
+        "line": 74,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein family classifications"
+    },
+    {
+      "aliases": [
+        "蛋白註釋",
+        "蛋白注释"
+      ],
+      "canonical_method_id": "curated-protein-description",
+      "category": "database",
+      "digest": "28800a947cdea3a733f07671be2b5e7ca94560a7f19be522df99b69f52efd7ba",
+      "domain": [
+        "enzyme",
+        "protein"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "native_relation": {
+        "manifest_sha256": "0a8833501c8c8c73f2febeb9d1f6223172cea775b884b9bc30e338c444e06572",
+        "package_sha256": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+        "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+        "reference": "yeast-uniprot-record@2",
+        "scope": "Assigned S288C protein records only."
+      },
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "uniprot-archive",
+        "revision": null
+      },
+      "purpose": "Locate the sequence_data/UniProt source listed in the historical asset index.",
+      "reference": "uniprot-archive@legacy",
+      "related_methods": "yeast-uniprot-record@2 • Assigned S288C protein records only.",
+      "source": {
+        "line": 75,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Curated natural protein records"
+    },
+    {
+      "aliases": [
+        "蛋白家族",
+        "歸檔分類"
+      ],
+      "canonical_method_id": "protein-family-annotation",
+      "category": "database",
+      "digest": "7f188da66df47ec3b5b5768b1ad9c34f0525a05a6986cf0b1850516a589775d9",
+      "domain": [
+        "protein",
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "pfam-archive",
+        "revision": null
+      },
+      "purpose": "Locate the Proteins/Pfam source listed in the historical asset index.",
+      "reference": "pfam-archive@legacy",
+      "source": {
+        "line": 76,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Protein family classifications"
+    },
+    {
+      "aliases": [
+        "蛋白沉积",
+        "歸檔坐標"
+      ],
+      "canonical_method_id": "pdb-archive",
+      "category": "database",
+      "digest": "30da3539bed45623c8d31ce5f49e02325e10f53efe1674f3ef06dc0a10d0ef1a",
+      "domain": [
+        "protein",
+        "antibody",
+        "peptide",
+        "cyclic-peptide"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "local-pdb-mmcif",
+        "revision": null
+      },
+      "purpose": "Locate the Proteins/Protein_Structures/PDB_mmCIF source listed in the historical asset index.",
+      "reference": "local-pdb-mmcif@legacy",
+      "source": {
+        "line": 79,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Deposited PDB coordinate records"
+    },
+    {
+      "aliases": [
+        "原始酶实验",
+        "酶實驗條件"
+      ],
+      "canonical_method_id": "archived-enzyme-assays",
+      "category": "database",
+      "digest": "9ee6c99cd1b962989f0c0723ee84ad69638e7515439aeb4cd0fa0a23a02f2df2",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "native_relation": {
+        "manifest_sha256": "8a2d10638c42ff05857e81f01e9d815b56f6df18639dfd725e1ca440f341f6f0",
+        "package_sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "reference": "yeast-archive-lookup@1",
+        "scope": "Curated yeast archive lookup in the declared reaction/taxon panel."
+      },
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "systems-biology-brenda",
+        "revision": null
+      },
+      "purpose": "Locate the Systems_Biology/enzymes/BRENDA source listed in the historical asset index.",
+      "reference": "systems-biology-brenda@legacy",
+      "related_methods": "yeast-archive-lookup@1 • Curated yeast archive lookup in the declared reaction/taxon panel.",
+      "source": {
+        "line": 80,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Archival enzyme measurements"
+    },
+    {
+      "aliases": [
+        "EC 命名",
+        "酶名索引"
+      ],
+      "canonical_method_id": "enzyme-nomenclature",
+      "category": "database",
+      "digest": "de644c505ed56e1fb86db4fcc893abeebd342854bb612096b3fdfa91aa17e877",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "enzyme-archive",
+        "revision": null
+      },
+      "purpose": "Locate the Systems_Biology/enzymes/ENZYME source listed in the historical asset index.",
+      "reference": "enzyme-archive@legacy",
+      "source": {
+        "line": 81,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Enzyme classification and archival identity"
+    },
+    {
+      "aliases": [
+        "EC 命名",
+        "酶名索引"
+      ],
+      "canonical_method_id": "enzyme-nomenclature",
+      "category": "database",
+      "digest": "11e65af0e62b5e8485a7e86420b54dd813bfcce993b464c36b142cf48e96cdc3",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "explorenz-archive",
+        "revision": null
+      },
+      "purpose": "Locate the Systems_Biology/enzymes/ExplorEnz source listed in the historical asset index.",
+      "reference": "explorenz-archive@legacy",
+      "source": {
+        "line": 82,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Enzyme classification and archival identity"
+    },
+    {
+      "aliases": [
+        "原始酶实验",
+        "酶實驗條件"
+      ],
+      "canonical_method_id": "archived-enzyme-assays",
+      "category": "database",
+      "digest": "a770027860e0619f98e9da2b1839d73c0385b8e996e86fcd2b33af4361ee4da2",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "native_relation": {
+        "manifest_sha256": "8a2d10638c42ff05857e81f01e9d815b56f6df18639dfd725e1ca440f341f6f0",
+        "package_sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "reference": "yeast-archive-lookup@1",
+        "scope": "Curated yeast archive lookup in the declared reaction/taxon panel."
+      },
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "systems-biology-sabio",
+        "revision": null
+      },
+      "purpose": "Locate the Systems_Biology/enzymes/SABIO_RK source listed in the historical asset index.",
+      "reference": "systems-biology-sabio@legacy",
+      "related_methods": "yeast-archive-lookup@1 • Curated yeast archive lookup in the declared reaction/taxon panel.",
+      "source": {
+        "line": 83,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Archival enzyme measurements"
+    },
+    {
+      "aliases": [
+        "反應命名",
+        "反应编号"
+      ],
+      "canonical_method_id": "reaction-names",
+      "category": "database",
+      "digest": "157b65496d96b92aa7709df2b561293c629966cbe96298d23d02d53b7d9b0e41",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "systems-biology-rhea",
+        "revision": null
+      },
+      "purpose": "Locate the Systems_Biology/enzymes/rhea source listed in the historical asset index.",
+      "reference": "systems-biology-rhea@legacy",
+      "source": {
+        "line": 84,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Rhea reaction identifiers"
+    },
+    {
+      "aliases": [
+        "底物編號",
+        "反应物"
+      ],
+      "canonical_method_id": "compound-archive-record",
+      "category": "database",
+      "digest": "94cd953405ef197450a54417c16848513d0e8fa8c6ec957135d21b62007adb7f",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "chebi-archive",
+        "revision": null
+      },
+      "purpose": "Locate the Systems_Biology/metabolic_networks/ChEBI source listed in the historical asset index.",
+      "reference": "chebi-archive@legacy",
+      "source": {
+        "line": 85,
+        "path": "data.tsv",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "directory_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Small-molecule identifier annotations"
+    },
+    {
+      "aliases": [
+        "EC 命名",
+        "酶名索引"
+      ],
+      "canonical_method_id": "enzyme-nomenclature",
+      "category": "database",
+      "digest": "fd5fd16a8368d281aee881e46685930457e95feb00799d8773efcbc774bcf20b",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "source identifier"
+      ],
+      "kind": "database",
+      "limitations": "Current content release, licence and sample coverage require the underlying data record.",
+      "outputs": [
+        "archive reference"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "enzyme-food-swissprot",
+        "revision": null
+      },
+      "purpose": "Locate the indexes/enzyme-food-20260128-sprot2026_03/lookup.sqlite source listed in the historical asset index.",
+      "reference": "enzyme-food-swissprot@legacy",
+      "source": {
+        "line": 87,
+        "path": "data.tsv",
+        "primary_sha256": "59fdb6f554e756a19873e45bb3f1bde66fc2d86d4fa8c94bb144382b0e4aa09e",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Enzyme classification and archival identity"
+    },
+    {
+      "aliases": [
+        "Rhea",
+        "反應別名",
+        "反应名称"
+      ],
+      "canonical_method_id": "reaction-name-history",
+      "category": "database",
+      "digest": "81186d41eb44ebad824bbc1a585652be0de29196d6f2357f873c4f98ce7b48fe",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "reaction ID or alias"
+      ],
+      "kind": "database",
+      "limitations": "The snapshot covers releases 139–142.",
+      "outputs": [
+        "release and direction record"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "native-rhea-name-snapshot",
+        "revision": "139–142"
+      },
+      "purpose": "Resolve a public reaction identifier across the indexed releases.",
+      "reference": "rhea-reaction-names@legacy",
+      "source": {
+        "line": 88,
+        "path": "data.tsv",
+        "primary_sha256": "46efa03be146239b68bb7b2f3c1e5ec73c129c9e263e0658112de532eb7b429e",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Rhea reaction identifiers and names"
+    },
+    {
+      "aliases": [
+        "Rhea",
+        "Swiss-Prot",
+        "酿酒酵母",
+        "酵母",
+        "天然酶注釋"
+      ],
+      "canonical_method_id": "reaction-protein-annotation",
+      "category": "database",
+      "digest": "e201c0e748343d205fa63ee3d5b386cc552968e6f0cefc3295d9af1428bf5ddc",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "reaction accession",
+        "taxon"
+      ],
+      "kind": "database",
+      "limitations": "A curated association with unspecified direction or no direct measurement remains qualified.",
+      "native_relation": {
+        "manifest_sha256": "76e64fdaa24b0c7bcad713d4d83264c5356b91a635de4e84d9f87e84e7a2ae13",
+        "package_sha256": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+        "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+        "reference": "yeast-reaction-index@2",
+        "scope": "S288C annotation for the plugin's supported substrates."
+      },
+      "outputs": [
+        "reaction/protein annotation"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "native-rhea-swissprot-snapshot",
+        "revision": "Rhea 142 / Swiss-Prot 2026_03"
+      },
+      "purpose": "Read recorded links between a reaction, taxon and curated natural protein.",
+      "reference": "rhea-sprot-index@legacy",
+      "related_methods": "yeast-reaction-index@2 • S288C annotation for the plugin's supported substrates.",
+      "source": {
+        "line": 89,
+        "path": "data.tsv",
+        "primary_sha256": "76c4649d394422d7b168c74728c4c9cdefaa14fc3f8557014d144c8419d50eab",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Rhea / reviewed Swiss-Prot annotation snapshot"
+    },
+    {
+      "aliases": [
+        "酶动学",
+        "酶動力學",
+        "BRENDA",
+        "SABIO-RK"
+      ],
+      "canonical_method_id": "archived-enzyme-assays",
+      "category": "database",
+      "digest": "701b95595ca1f6c7f64c8cc0aacabaa0e8b1609c5cf1e21133caee9c1c12392e",
+      "domain": [
+        "enzyme"
+      ],
+      "inputs": [
+        "enzyme annotation",
+        "substrate"
+      ],
+      "kind": "database",
+      "license_basis": "The native assay manifest records BRENDA CC BY 4.0 and academic use for this SABIO-RK export.",
+      "limitations": "Evidence and conditions belong to individual assays. Filter missing identifiers and units explicitly.",
+      "native_relation": {
+        "manifest_sha256": "8a2d10638c42ff05857e81f01e9d815b56f6df18639dfd725e1ca440f341f6f0",
+        "package_sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+        "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+        "reference": "yeast-archive-lookup@1",
+        "scope": "Curated yeast archive lookup in the declared reaction/taxon panel."
+      },
+      "outputs": [
+        "assay records"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "native-brenda-sabio-snapshot",
+        "revision": "BRENDA 2026.1 / SABIO-RK 2026-09-20 v1"
+      },
+      "purpose": "Find archival measurements with experiment, unit and substrate context.",
+      "reference": "kinetics-assay-snapshot@legacy",
+      "related_methods": "yeast-archive-lookup@1 • Curated yeast archive lookup in the declared reaction/taxon panel.",
+      "source": {
+        "line": 90,
+        "path": "data.tsv",
+        "primary_sha256": "1cac1d6d47925f227959a6c05274252b09f121801d73f931173c4b4be1c2aec3",
+        "sha256": "aa66ebbd59c505e6004bfeea7f57add5f1e800441b1085735e6795379f1ab70c",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "BRENDA and SABIO-RK assay records"
+    },
+    {
+      "aliases": [
+        "PDB 精讀",
+        "PDB 原件",
+        "結構閱讀",
+        "structure reading"
+      ],
+      "canonical_method_id": "structure-record-reading",
+      "category": "skill",
+      "digest": "5588ba4d0d3c340de295df276936773d4f92bf725c814ee9939aba3e42e5eca9",
+      "domain": [
+        "protein",
+        "antibody",
+        "peptide"
+      ],
+      "inputs": [
+        "structure accession"
+      ],
+      "kind": "skill",
+      "limitations": "Guide only. Record-specific evidence needs the original deposit.",
+      "outputs": [
+        "reading guidance"
+      ],
+      "provider_binding": {
+        "historical": true,
+        "id": "shared-pdb-reading-guide",
+        "revision": null
+      },
+      "purpose": "Find the original archival record and qualify deposition-level evidence.",
+      "reference": "pdb-source-reading@legacy",
+      "source": {
+        "line": 472,
+        "path": "skills.tsv",
+        "primary_sha256": "d90908a9d49de46b41293195e93814cd2594387374fdacbb33e69402446fb47b",
+        "sha256": "94881337de66e904073e007f6aacb3cf1d04c4fd4b85cfd91663e6323c73dd4f",
+        "verification": "file_opened",
+        "workspace": "historical-science-inventory"
+      },
+      "title": "Public structural record reading guide"
+    }
+  ]
+}

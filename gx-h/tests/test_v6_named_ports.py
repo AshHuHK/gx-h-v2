@@ -112,6 +112,10 @@ class NamedOutputs(unittest.TestCase):
             v6_recipes.save(self.conn, self.run, dict(fields, units="milliseconds"))
         args = {"recipe": card["reference"], "digest": card["digest"], "branch": "local:next",
                 "inputs": {"series": self.raw}, "prefix": "qc"}
+        # A v1 preview supported draft labels without consulting live branch state.
+        legacy = v6_recipes.instantiate(self.conn, self.run, dict(args, branch="draft"))
+        self.assertTrue(all(op["branch"] == "draft" for op in legacy["ops"]))
+        self.assertNotIn("submission", legacy)
         steps = {s["node"]: s for s in v6_recipes.instantiate(self.conn, self.run, args)["ops"]}
         for label, name in (("second", "next.json"), ("third", "optional.json")):
             op = steps["local:qc-" + label]
@@ -180,6 +184,10 @@ class ModelRecipe(unittest.TestCase):
         ref = json.loads(db.execute("SELECT inputs_json FROM runs WHERE run_id=?", (self.run,)).fetchone()[0])["files"][0]["artifact_ref"]
         params = {"recipe": card["reference"], "digest": card["digest"], "branch": "local:sample", "prefix": "fresh",
                   "inputs": {"series": ref}}
+        with self.assertRaisesRegex(SchemaInvalid, "local:sample") as wrong_branch:
+            v6_recipes.instantiate(db, self.run, dict(params, branch="sample"))
+        self.assertEqual(wrong_branch.exception.details["field"], "branch")
+        self.assertEqual(db.execute("SELECT count(*) FROM v6_nodes WHERE run_id=?", (self.run,)).fetchone()[0], 0)
         expansion = v6_recipes.instantiate(db, self.run, params)
         ops = expansion["ops"]
         self.assertIn("stop_condition", expansion["submission"]["required_open_branch_fields"])
@@ -188,6 +196,10 @@ class ModelRecipe(unittest.TestCase):
         call_b = bind_native_fixture(db, self.run, tmp)
         change = draft(route, *ops, *repeat)
         answer = v6_decisions.adopt(db, **call_b, decision=change)
+        live_branch = answer["aliases"]["local:sample"]
+        existing = v6_recipes.instantiate(db, self.run, dict(params, branch=live_branch))
+        self.assertTrue(all(op["branch"] == live_branch for op in existing["ops"]))
+        self.assertNotIn("submission", existing)
         nodes = [answer["aliases"][op["node"]] for op in [*ops, *repeat]]
         self.assertTrue(all({"event": "job_settled", "subject_ref": node} in answer["reconsider_when"] for node in nodes))
         v6_jobs.advance(db, self.run)

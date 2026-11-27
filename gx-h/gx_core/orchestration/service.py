@@ -29,17 +29,20 @@ import fnmatch
 import importlib
 import json
 import logging
+import os
+import shutil
+import tempfile
 import secrets
 import sqlite3
 import string
 import time
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .. import config, contracts
-from ..artifacts.service import ArtifactService
+from ..artifacts.service import ArtifactService, PublishedArtifact, sync_directory_chain
 from ..context import SCOPE_OPERATOR, Ctx
 from ..domain import clock, ids, machines
 from ..errors import (
@@ -459,6 +462,43 @@ def _check_input_files(entries: Sequence[Any]) -> list[dict[str, Any]]:
     return checked
 
 
+def _prepare_transfers(conn, files, predecessor, pending):
+    """Make private, verified copies of large GX publications before acquiring the Run writer."""
+    prepared = {}
+    for index, source in enumerate(predecessor["selected_materials"] if predecessor else ()):
+        item = files[index]
+        if not source.get("parent_artifact_ref") or item["bytes"] <= MAX_COPIED_INPUT_BYTES:
+            continue
+        stage = pending.enter_context(tempfile.TemporaryDirectory(dir=ArtifactService(conn).staging_root()))
+        target = Path(stage) / "input"
+        shutil.copyfile(item["path"], target)
+        if target.stat().st_size != item["bytes"] or ids.sha256_of_file(target) != item["sha256"]:
+            raise ContentHashMismatch("Frozen successor material changed before admission")
+        with target.open("rb") as stream:
+            os.fsync(stream.fileno())
+        prepared[index] = target
+    return prepared
+
+
+def _install_transfer(arts, stage, item, namespace, rel_path, *, run_id, media_type, provenance, actor):
+    """Register the prepared file under its new Run, leaving the parent and other inputs independent."""
+    target = arts.resolve_path(namespace, rel_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    os.link(stage, target)
+    record = PublishedArtifact(artifact_ref=ids.new_id("artifact"), namespace=namespace, rel_path=rel_path,
+                               kind=INPUT_KIND, sha256=item["sha256"], bytes=item["bytes"], media_type=media_type,
+                               path=str(target), created_at=clock.now_iso())
+    try:
+        sync_directory_chain(target.parent, arts.base)
+        arts.register_materialized(record, run_id=run_id, task_id=None, actor=actor, origin="INGEST",
+                                   provenance=provenance)
+        arts.discard_on_rollback(record)
+    except Exception:
+        target.unlink(missing_ok=True)
+        raise
+    return record.artifact_ref
+
+
 def _workflow_ref(spec: Any) -> tuple[str, str]:
     default_id, default_version = default_workflow_ref()
     if spec is None:
@@ -614,6 +654,8 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
         request["native_host"] = {key: selected[key] for key in
                                   ("source", "session_ref", "native_agent_ref")}
 
+    predecessor = inputs.get("p0_spec", {}).get("predecessor") if inputs.get("p0") is True else None
+
     def create(tx: sqlite3.Connection) -> dict[str, Any]:
         p0 = inputs.get("p0") is True
         budget_ref = None if p0 else seams.create_root_budget(
@@ -638,9 +680,21 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
 
         arts = ArtifactService(tx)
         stored_files = []
-        for item in files:
+        for index, item in enumerate(files):
             ref = None
-            if item["bytes"] <= MAX_COPIED_INPUT_BYTES:
+            name = Path(item["path"]).name
+            rel_path = f"{item['sha256'][:24]}/{name}"
+            source = predecessor["selected_materials"][index] if predecessor else {}
+            if predecessor:
+                # A named Job output and a PI attachment may have identical bytes and names but distinct custody.
+                rel_path = f"{index}/{rel_path}"
+            original = arts.describe(source["parent_artifact_ref"]) if source.get("parent_artifact_ref") else {}
+            provenance = {"path": item["path"], "role": item.get("role")}
+            if index in prepared_transfers:
+                ref = _install_transfer(arts, prepared_transfers[index], item, f"{run_id}/inputs", rel_path,
+                                        run_id=run_id, media_type=original["media_type"],
+                                        provenance=provenance, actor=ctx.actor)
+            elif item["bytes"] <= MAX_COPIED_INPUT_BYTES:
                 raw = Path(item["path"]).read_bytes()
                 media_type = "chemical/x-mmcif" if Path(item["path"]).suffix.lower() in (".cif", ".mmcif") else None
                 if Path(item["path"]).suffix.lower() == ".py" and b"\x00" not in raw:
@@ -651,9 +705,9 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
                     else:
                         media_type = "text/x-python"
                 published = arts.publish_bytes(
-                    namespace=f"{run_id}/inputs", rel_path=f"{item['sha256'][:24]}/{Path(item['path']).name}",
-                    kind=INPUT_KIND, data=raw, run_id=run_id, media_type=media_type,
-                    provenance={"path": item["path"], "role": item.get("role")},
+                    namespace=f"{run_id}/inputs", rel_path=rel_path,
+                    kind=INPUT_KIND, data=raw, run_id=run_id, media_type=original.get("media_type") or media_type,
+                    provenance=provenance,
                     actor=ctx.actor, origin="INGEST",
                 )
                 if published.sha256 != item["sha256"]:
@@ -705,7 +759,9 @@ def run_start(ctx: Ctx, args: Mapping[str, Any], *, prepare_p0=None, workspace_k
     from ..jobs.run_resources import observe
     previous = conn.execute("SELECT 1 FROM idempotency WHERE idempotency_key=?", (key,)).fetchone()
     resource_profile = None if previous else observe()
-    created, replayed = store.run_idempotent(conn, key, "gx_run_start", request, create)
+    with ExitStack() as pending:
+        prepared_transfers = _prepare_transfers(conn, files, predecessor, pending) if not previous else {}
+        created, replayed = store.run_idempotent(conn, key, "gx_run_start", request, create)
     run_id = created["run_id"]
     # Creation has committed (or this exact request replayed that committed
     # record). A later node failure must not erase its durable recovery refs.

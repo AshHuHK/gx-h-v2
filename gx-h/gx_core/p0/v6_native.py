@@ -333,6 +333,9 @@ def _call(roots, p):
                                       "FROM runs WHERE run_id=?", (roots.run_id,)).fetchone()
         if opted_in and opted_in[0] == catalog_survey.POLICY:
             catalog_index.installed_methods()
+            from . import catalog_resources
+            for name in catalog_resources.REFERENCE_FILES:
+                catalog_resources.reference_index(name)
     if tool == "gx_select_capability":
         from . import capability_views
         packet = brief(row)
@@ -433,7 +436,8 @@ def _call(roots, p):
                           if v62_native.module_scope(packet) else
                           catalog_survey.lead_query(roots.conn, packet, args, identity, query))
                 if (packet.get("scope") == "run" and
-                        answer.get("kind") == "method" and "execution_granted" in answer and args.get("reference")):
+                        answer.get("kind") == "method" and "execution_granted" in answer and args.get("reference")
+                        and answer.get("status") != "reference_only"):
                     card = v62_catalog._public_card(answer["spec"], metric_contract=True)
                     answer["source_ref"] = v62_native.publish_method_card(roots, row, card)
             elif tool in v62_native.SOURCE_TOOLS:
@@ -478,7 +482,7 @@ def _submission_event(roots, params, *, error=None, accepted=None):
         common["decision_event"] = accepted
     else:
         kind = "v624.decision.rejected"
-        field = error.details.get("field", "decision")
+        field = error.details.get("public_field", error.details.get("field", "decision"))
         reason = error.details.get("reason", error.code)
         common.update(code=error.code,
                       reason=reason if isinstance(reason, str) and re.fullmatch(r"[A-Za-z_]{1,64}", reason) else error.code,

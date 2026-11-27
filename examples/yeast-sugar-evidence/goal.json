@@ -1,0 +1,56 @@
+{
+  "project": "yeast-sugar-evidence",
+  "research_effort": "deep",
+  "research_modules": [
+    "scholarly_investigation@1",
+    "investigation@1",
+    "offline_literature_mechanism@1"
+  ],
+  "plugins": [
+    "org.gx.scholarly-sources@1.0.0",
+    "org.gx.yeast-enzyme-evidence@1.0.0",
+    "org.gx.investigation@1.0.0",
+    "org.gx.research-survey@1.0.0"
+  ],
+  "capabilities": [
+    "scholarly-search@1",
+    "scholarly-fetch@1",
+    "yeast-reaction-index@1",
+    "yeast-uniprot-record@1",
+    "yeast-enzyme-mcp@1"
+  ],
+  "input_files": [
+    {
+      "path": "scholarly.json",
+      "role": "source_request",
+      "sha256": "0cf9ff3d03a15e906c4f05aef8ba1237719ba111e31337cd3db7915df942e6fe"
+    },
+    {
+      "path": "scope.json",
+      "role": "database_scope",
+      "sha256": "7d1d1475f5e93410817a176120eb2ea7fb42734a7947a1cd9c9f91bd87312260"
+    }
+  ],
+  "budget_profile": "oauth_research",
+  "run_budget": {
+    "worker_tasks": 120,
+    "job_submissions": 80,
+    "cpu_seconds": 14400,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "api_calls": 128,
+    "tokens": 9007199254740991,
+    "wall_hours": 24
+  },
+  "workspace_budget": {
+    "worker_tasks": 120,
+    "job_submissions": 80,
+    "cpu_seconds": 14400,
+    "gpu_jobs": 0,
+    "gpu_minutes": 0,
+    "api_calls": 128,
+    "tokens": 9007199254740991,
+    "wall_hours": 24
+  },
+  "max_parallel_roots": 3
+}

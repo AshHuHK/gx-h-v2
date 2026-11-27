@@ -1,10 +1,14 @@
 """Register a Job's verified archive bytes as original material on the scientific graph."""
 import json
+from pathlib import Path
+import re
+
+from adapters.scientific import published_documents
 
 from ..artifacts import ArtifactService
 from ..errors import SchemaInvalid
 from ..persistence import store
-from . import manifest, v621_assignment, v622_sources, v62_catalog, v62_outputs
+from . import manifest, v621_assignment, v622_sources, v62_catalog, v62_outputs, v62_sources
 
 
 def declared(record):
@@ -31,13 +35,32 @@ def prepare(conn, node, job_id):
         raise SchemaInvalid("The acquired original must match the named source descriptor and SHA-256")
     source = meta["source"]
     pub = assets.describe(raw["artifact_ref"])
-    identity = v622_sources.prepare(conn, rid, source, meta, raw["sha256"], pub["media_type"], ref=raw["artifact_ref"])
-    if (not identity or identity.get("status") != "matched_accession" or
-            (identity.get("revision") or {}).get("status") != "verified"):
-        raise SchemaInvalid("An acquired coordinate source must match its archive accession and revision")
-    material = dict(artifact_ref=raw["artifact_ref"], sha256=raw["sha256"], name=identity["entry_id"] + ".cif",
+    index = None
+    if "external_source" in meta:
+        name = decl["name"]
+        fmt = v62_sources.FORMATS.get(Path(name).suffix.lower())
+        media = (pub["media_type"] or "").partition(";")[0].strip().lower()
+        if fmt is None or (media != v62_sources.MEDIA[fmt] and not (fmt == "jats" and media == "text/xml")):
+            raise SchemaInvalid("The original filename and registered document media type disagree")
+        if meta.get("derived_from") or meta.get("transformation"):
+            raise SchemaInvalid("A normalized derivative cannot be registered as the fetched original")
+        content = assets.read_bytes(raw["artifact_ref"], expected_sha256=raw["sha256"])
+        identity = published_documents.identity(meta.pop("external_source"), content, fmt, raw["sha256"])
+        index = v62_sources.document_index(content, fmt)
+        label = re.sub(r"[^-A-Za-z0-9_.]+", "_", identity["external_source"]["accession"]).strip("._")
+        name = (label[:120] or "source") + Path(name).suffix
+    else:
+        identity = v622_sources.prepare(conn, rid, source, meta, raw["sha256"], pub["media_type"], ref=raw["artifact_ref"])
+        if (not identity or identity.get("status") != "matched_accession" or
+                (identity.get("revision") or {}).get("status") != "verified"):
+            raise SchemaInvalid("An acquired coordinate source must match its archive accession and revision")
+        name = identity["entry_id"] + ".cif"
+    material = dict(artifact_ref=raw["artifact_ref"], sha256=raw["sha256"], name=name,
                     role=rules["role"], source=source, job_id=job_id,
                     descriptor_ref=descriptor["artifact_ref"], completion_sha256=record["manifest_hash"])
+    if index is not None:
+        material.update(index=index, length=len(content), format=fmt, external_source=identity["external_source"],
+                        source_identity_status=identity["status"])
     material["receipt"] = v62_outputs.acquisition_receipt(conn, rid, raw["artifact_ref"], meta,
         source_id=source, prepared_identity=identity, acquired_job=material)
     return material
@@ -57,6 +80,12 @@ def attach(conn, node, material):
     if assigned:
         event = assigned[0]
     else:
+        if "index" in material:
+            provenance = {k: material[k] for k in ("role", "job_id", "descriptor_ref", "completion_sha256",
+                                                   "external_source", "source_identity_status")}
+            provenance["source_kind"] = "job_acquired"
+            v62_sources.persist_index(conn, rid, ref, material["sha256"], material["name"], material["format"],
+                                      material["length"], provenance, material["index"])
         observation = v6_goal.record_observation(conn, rid, ref, source=material["source"] + "#" + ref,
                                                   acquired_receipt=material["receipt"])
         detail["acquisition_event_id"] = observation["event_id"]

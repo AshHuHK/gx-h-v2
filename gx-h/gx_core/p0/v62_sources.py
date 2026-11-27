@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
-from xml.etree import ElementTree
+from adapters.scientific import published_documents
 
 from .. import contracts, schema
 from ..artifacts import ArtifactService
@@ -17,9 +17,13 @@ from . import v6_decisions
 READ, EXTRACT, REVIEW = TOOL_NAMES = ('gx_read_source', 'gx_extract_evidence', 'gx_review_evidence')
 EXTRACTION = 'v62_source_extraction'
 REVIEW_RECORD = 'v62_evidence_review'
-PARSER = 'gx.offline.paragraphs.1'
+PARSER = 'gx.offline.paragraphs.2'
+LEGACY_PARSER = 'gx.offline.paragraphs.1'
 FORMATS = {'.txt': 'text', '.text': 'text', '.md': 'markdown', '.markdown': 'markdown',
-           '.xml': 'jats', '.nxml': 'jats', '.jats': 'jats'}
+           '.xml': 'jats', '.nxml': 'jats', '.jats': 'jats', '.json': 'json',
+           '.pdf': 'pdf', '.htm': 'html', '.html': 'html'}
+MEDIA = {'text':'text/plain', 'markdown':'text/markdown','jats':'application/xml',
+         'pdf':'application/pdf', 'html':'text/html', 'json':'application/json'}
 PAGE = 12
 # Leave room for locators, escape sequences and the receipt in the native tool response.
 SEGMENT_BYTES = 2400
@@ -35,38 +39,31 @@ def _sha(text):
 
 def _blocks(raw, fmt):
     if fmt == 'jats':
-        # ElementTree does not fetch external DTDs. Forbid internal entity declarations,
-        # including UTF-16/32 encodings, before parsing any expandable content.
-        if b'<!ENTITY' in raw.replace(b'\0', b'').upper():
-            raise SchemaInvalid('Offline JATS sources cannot include entity declarations')
-        try:
-            root = ElementTree.fromstring(raw)
-        except (ElementTree.ParseError, ValueError, LookupError) as exc:
-            raise SchemaInvalid('The registered JATS document is not readable XML') from exc
+        root = published_documents.jats_article(raw)
         def name(node):
             return node.tag.rsplit('}', 1)[-1]
-        if name(root) != 'article':
-            raise SchemaInvalid('Offline XML must be a JATS article')
         blocks = []
         # Direct ancestry distinguishes an abstract from the body and prevents duplicate
         # extraction of nested inline markup. Locations keep the publisher's IDs.
-        stack = [(root, '', '')]
+        stack = [(root, '', '', '')]
         body_paragraph = False
         while stack:
-            node, region, section = stack.pop()
+            node, region, section, table = stack.pop()
             tag = name(node)
             if tag in ('front', 'abstract', 'body', 'back'):
                 region = tag
+            if tag == 'table-wrap':
+                table = node.get('id') or 'table'
             if tag == 'sec':
                 section = node.get('id') or section
             if tag in ('p', 'article-title', 'title', 'td', 'th', 'mixed-citation'):
                 text = ''.join(node.itertext()).strip()
                 if text:
-                    locator = '/'.join(filter(None, (region, section, tag, node.get('id'))))
+                    locator = '/'.join(filter(None, (region, section, table, tag, node.get('id'))))
                     blocks.append((region or 'text', locator[:160], text))
                     body_paragraph |= region == 'body' and tag in ('p', 'td', 'th')
             else:
-                stack.extend((child, region, section) for child in reversed(node))
+                stack.extend((child, region, section, table) for child in reversed(node))
         regions = {kind for kind, _, _ in blocks}
         coverage = 'FULL_TEXT' if body_paragraph else 'ABSTRACT_ONLY' if 'abstract' in regions else 'PARTIAL_TEXT'
         return coverage, blocks
@@ -93,8 +90,16 @@ def _blocks(raw, fmt):
     return 'ABSTRACT_ONLY' if abstract_only else 'PARTIAL_TEXT', blocks
 
 
-def _segments(raw, fmt):
-    coverage, blocks = _blocks(raw, fmt)
+def document_index(raw, fmt):
+    if fmt == 'html':
+        coverage, blocks, details = published_documents.html_blocks(raw)
+    elif fmt == 'pdf':
+        coverage, blocks, details = published_documents.pdf_blocks(raw)
+    elif fmt == 'json':
+        coverage, blocks, details = published_documents.json_blocks(raw)
+    else:
+        coverage, blocks = _blocks(raw, fmt)
+        details = {}
     segments = []
     for paragraph, (kind, label, text) in enumerate(blocks, 1):
         start, part = 0, 1
@@ -116,12 +121,35 @@ def _segments(raw, fmt):
                 location = f'{label} characters [{start},{lo})'
             segments.append((segment_id, len(segments), kind, location, piece, _sha(piece), len(piece)))
             start, part = lo, part + 1
-    if not segments:
+    if not segments and coverage != 'UNAVAILABLE':
         raise SchemaInvalid('The registered source contains no readable paragraphs')
+    return coverage, segments, details
+
+
+def _segments(raw, fmt):
+    coverage, segments, _ = document_index(raw, fmt)
     return coverage, segments
 
 
-def _source(conn, run_id, ref, *, verify=False):
+def persist_index(conn, run_id, ref, digest, name, fmt, length, provenance, index):
+    sid = 'gxs_' + ids.sha256_of_obj([run_id, ref, digest, PARSER])[:32]
+    if conn.execute("SELECT 1 FROM sources WHERE source_id=?", (sid,)).fetchone():
+        return sid
+    coverage, segments, details = index
+    if details:
+        provenance = {**provenance, 'parsing': details}
+    conn.execute("""INSERT INTO sources(source_id,namespace,status,kind,title,version,blob_artifact_ref,
+        blob_sha256,bytes,media_type,parser,parser_version,text_coverage,segments_count,origin,provenance_json,
+        created_at) VALUES(?,?,'PARSED',?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (sid, run_id, fmt, name, digest, ref, digest, length, MEDIA[fmt], PARSER, '2', coverage,
+         len(segments), 'JOB_OUTPUT' if provenance.get('job_id') else 'INGEST',
+         ids.canonical_json(provenance), clock.now_iso()))
+    conn.executemany('INSERT INTO source_segments(source_id,segment_id,ordinal,kind,label,text,text_sha256,char_count) '
+                     'VALUES(?,?,?,?,?,?,?,?)', ((sid, *segment) for segment in segments))
+    return sid
+
+
+def _source(conn, run_id, ref, *, verify=False, cursor=None):
     # Only original inputs admitted by the Goal owner participate. A supplied output,
     # report or arbitrary path cannot masquerade as a registered publication.
     material = conn.execute("""SELECT a.*,json_extract(f.value,'$.role') AS role,
@@ -138,33 +166,37 @@ def _source(conn, run_id, ref, *, verify=False):
             AND a.artifact_ref=json_extract(e.payload_json,'$.artifact_ref')
             AND a.sha256=json_extract(e.payload_json,'$.sha256') AND a.published=1 LIMIT 1''',
             (run_id, ref)).fetchone()
+    if not material:
+        # Admission and scope are separate: the pinned Job assignment must have existed
+        # when this reader's task was frozen, even if the raw output was already published.
+        material = conn.execute("""SELECT a.*,json_extract(e.payload_json,'$.role') AS role,
+            json_extract(e.payload_json,'$.name') AS input_path FROM events e
+            JOIN artifacts a ON a.run_id=e.run_id AND a.artifact_ref=e.subject_id
+            WHERE e.run_id=? AND e.subject_id=? AND e.kind='v621.material.assigned' AND e.actor='gx:job'
+            AND a.origin='JOB_OUTPUT' AND a.published=1 AND a.job_id=json_extract(e.payload_json,'$.job_id')
+            AND a.sha256=json_extract(e.payload_json,'$.sha256') AND (? IS NULL OR e.event_id<=?)
+            ORDER BY e.event_id LIMIT 1""", (run_id, ref, cursor, cursor)).fetchone()
         if not material:
             raise ScopeDenied('Source must be an original, registered material of this Goal')
     path = Path(material['input_path'])
     fmt = FORMATS.get(path.suffix.lower())
     if not fmt:
-        raise SchemaInvalid('Only registered TXT, Markdown and JATS XML files support paragraph reads')
+        raise SchemaInvalid('This registered file has no paragraph or record reader')
     digest = material['sha256']
     sid = 'gxs_' + ids.sha256_of_obj([run_id, ref, digest, PARSER])[:32]
-    row = conn.execute('SELECT * FROM sources WHERE source_id=?', (sid,)).fetchone()
-    raw = None
+    old_sid = 'gxs_' + ids.sha256_of_obj([run_id, ref, digest, LEGACY_PARSER])[:32]
+    row = conn.execute('SELECT * FROM sources WHERE source_id IN (?,?) ORDER BY created_at LIMIT 1',
+                       (sid, old_sid)).fetchone()
+    if material['origin'] == 'JOB_OUTPUT' and (not row or row['origin'] != 'JOB_OUTPUT'):
+        raise ScopeDenied('This acquired output has no verified document registration')
     if not row or verify:
         raw = ArtifactService(conn).read_bytes(ref, expected_sha256=digest)
     if not row:
-        coverage, segments = _segments(raw, fmt)
-        now = clock.now_iso()
         provenance = {'role': material['role']}
         message_id = store.loads(material, 'provenance_json', {}).get('source_message_id')
         if message_id:
             provenance.update(source_message_id=message_id, source_kind='pi_material')
-        conn.execute("""INSERT INTO sources(source_id,namespace,status,kind,title,version,blob_artifact_ref,
-            blob_sha256,bytes,media_type,parser,parser_version,text_coverage,segments_count,origin,provenance_json,
-            created_at) VALUES(?,?,'PARSED',?,?,?,?,?,?,?,?,?,?,?,'INGEST',?,?)""",
-            (sid, run_id, fmt, path.name, digest, ref, digest, len(raw),
-             {'text':'text/plain','markdown':'text/markdown','jats':'application/xml'}[fmt],
-             PARSER, '1', coverage, len(segments), ids.canonical_json(provenance), now))
-        conn.executemany('INSERT INTO source_segments(source_id,segment_id,ordinal,kind,label,text,text_sha256,char_count) '
-                         'VALUES(?,?,?,?,?,?,?,?)', ((sid, *segment) for segment in segments))
+        sid = persist_index(conn, run_id, ref, digest, path.name, fmt, len(raw), provenance, document_index(raw, fmt))
         row = conn.execute('SELECT * FROM sources WHERE source_id=?', (sid,)).fetchone()
     if ((row['namespace'], row['blob_artifact_ref'], row['blob_sha256'], row['version']) != (run_id, ref, digest, digest)
             or row['status'] != 'PARSED' or row['retraction_status'] == 'RETRACTED'):
@@ -183,7 +215,8 @@ def _segment(conn, sid, segment_id):
 
 def _pin(src):
     provenance = store.loads(src, 'provenance_json', {})
-    supplied = {k: provenance[k] for k in ('source_kind', 'source_message_id') if k in provenance}
+    supplied = {k: provenance[k] for k in ('source_kind', 'source_message_id', 'external_source', 'job_id',
+                                          'descriptor_ref', 'source_identity_status', 'parsing') if k in provenance}
     return dict(**supplied, run_id=src['namespace'], source_id=src['source_id'], source_ref=src['blob_artifact_ref'], source_sha256=src['blob_sha256'],
                 source_version=src['version'], parser=src['parser'], text_coverage=src['text_coverage'])
 
@@ -271,7 +304,7 @@ def _target(conn, target, identity, cursor, permitted):
 def _extract(conn, src, args, identity, cursor, permitted_targets):
     seg = _receipt(conn, src, args['segment_id'], args['receipt_id'], identity)
     grain = args.get('claim_grain', 'FINDING')
-    if (src['text_coverage'] == 'ABSTRACT_ONLY' and (grain in ('METHOD_DETAIL', 'NUMERIC_VALUE') or
+    if ((src['text_coverage'] == 'ABSTRACT_ONLY' or seg['kind'] == 'abstract') and (grain in ('METHOD_DETAIL', 'NUMERIC_VALUE') or
             args.get('method') or args.get('data'))):
         raise SchemaInvalid('Abstract-only coverage cannot substantiate a numerical value or a method detail')
     if re.fullmatch(r'\s*[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?\s*%?\s*', args['confidence_basis'], re.I):
@@ -478,7 +511,7 @@ def call_tool(conn, tool, payload, *, run_id, task_id, lease_id, thread_id, turn
             return idem.response
         if not idem.fresh:
             raise OutcomeUnknown('The original scoped evidence operation is awaiting reconciliation')
-        src = _source(conn, run_id, sref, verify=tool == READ and 'segment_id' in payload)
+        src = _source(conn, run_id, sref, cursor=task['event_cursor'], verify=tool == READ and 'segment_id' in payload)
         if tool == READ:
             answer = _read(conn, src, payload, identity)
         elif tool == EXTRACT:

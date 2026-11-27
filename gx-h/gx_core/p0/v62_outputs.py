@@ -154,7 +154,7 @@ def acquisition_receipt(conn, run_id, artifact_ref, acquisition, *, scope="run",
     if acquired_job is not None:
         if (pub["origin"] != "JOB_OUTPUT" or pub["job_id"] != acquired_job["job_id"] or
                 artifact_ref != acquired_job["artifact_ref"] or pub["sha256"] != acquired_job["sha256"]):
-            raise SchemaInvalid("The original must be the verified coordinate output of its acquisition Job")
+            raise SchemaInvalid("The original must be the verified original output of its acquisition Job")
     elif pub["origin"] != "INGEST" or pub["job_id"] or pub["task_id"] or pub["kind"] in FIXTURES:
         raise SchemaInvalid("Only original ingested measurements may receive an acquisition receipt")
     elif _known_derivative_or_fixture(conn, pub["sha256"], pub["event_id"]):
@@ -283,7 +283,7 @@ def _observation(conn, run, ref, pub, scope, cursor, result, read, *, archive_jo
         return
     (event_id, receipt), = versions.values()
     identity = receipt.get("source_identity") or {}
-    if "revision" in identity:
+    if "revision" in identity or "external_source" in identity:
         # Preserve the distinction between matching bytes, the accession and the archive revision.
         result["source_identity"] = identity
     deps = {k: set(v) for k, v in receipt["dependencies"].items()}

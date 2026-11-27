@@ -1,0 +1,140 @@
+{
+  "manifest": {
+    "capability_id": "deposited-backbone-qc",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--mode",
+        "backbone",
+        "--structure",
+        "{in.structure}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "deposited_structure_quality_control",
+      "mechanism": "Match positive-occupancy heavy atom sites in model 1 to label chain, entity, polymer position and declared residue identity.",
+      "objective": "Describe topology or coordinate representation in one known deposited chain.",
+      "estimator": "Count declared positions, observed positions, C-alpha sites and complete N/CA/C/O backbones. Report equal-weight C-alpha radius of gyration in angstrom from observed C-alpha sites.",
+      "training_data_lineage": "Deterministic; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.deposited-structure-qc/1.0.0/job-scripts/qc.py",
+      "sha256": "e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+    },
+    "licence": "GX release source; wwPDB originals CC0.",
+    "licence_basis": "wwPDB archive terms of use at https://www.wwpdb.org/about/usage-policies",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 30
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "qc.json",
+        "kind": "file:deposited_backbone_qc",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure"
+        ],
+        "metric_specs": {
+          "declared_residues": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/declared_residues",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "observed_residues": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/observed_residues",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "complete_backbones": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/complete_backbones",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "ca_count": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/ca_count",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "ca_radius_of_gyration_A": {
+            "reader": "json/1",
+            "op": "decimal/1",
+            "pointer": "/ca_radius_of_gyration_A",
+            "unit": "angstrom",
+            "places": 3,
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          },
+          "coordinate_coverage": {
+            "reader": "json/1",
+            "op": "ratio/1",
+            "numerator": "/observed_residues",
+            "denominator": "/declared_residues",
+            "unit": "1",
+            "places": 4,
+            "bounds": [
+              0,
+              1
+            ],
+            "scope": {
+              "input_sha256": "/input_sha256",
+              "model": "/model",
+              "chain": "/chain",
+              "entity": "/entity",
+              "entry": "/entry"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Single polypeptide label chain; no microheterogeneity or alternate coordinates. Geometry describes deposited models. A missing coordinate does not establish an absent residue."
+  },
+  "entry_script": "job-scripts/qc.py"
+}

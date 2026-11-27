@@ -1,0 +1,74 @@
+{
+  "manifest": {
+    "capability_id": "scholarly-fetch",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "fetch",
+        "--implementation",
+        "{data.0}",
+        "--source",
+        "{in.source}",
+        "--out",
+        "{out.dir}",
+        "--pmcid",
+        "{param.pmcid}"
+      ]
+    },
+    "method_card": {
+      "family": "public_literature_acquisition",
+      "objective": "Acquire the exact open article original for reading at a specific body location.",
+      "mechanism": "Supply candidates.json from scholarly-search@1 and parameter pmcid (one of its fetchable_pmcids). Transfer the original Europe PMC JATS bytes and compare the embedded article accession to the selected identifier. Read the acquired paper with gx_read_source.",
+      "estimator": "article.xml is the original article. acquisition.json records PMCID, source URL, retrieval time and a content-addressed version for the exact bytes.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/scholarly.py",
+      "sha256": "6f731eadb23f5a89bb8d0bfa92a2d8243158e92a0c192307d80aa8a6e7d88068"
+    },
+    "licence": "GX release source. Original materials retain their respective licences.",
+    "licence_basis": "Europe PMC and Crossref public metadata and Open Access JATS terms; intake records retain original source rights.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/scholarly.py"
+    ],
+    "outputs": [
+      {
+        "name": "article.xml",
+        "kind": "file:journal_article",
+        "nature": "observed",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/xml",
+        "acquired_material": {
+          "metadata_output": "acquisition.json",
+          "role": "paper"
+        }
+      },
+      {
+        "name": "acquisition.json",
+        "kind": "file:acquisition_descriptor",
+        "nature": "analysis",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original."
+  },
+  "entry_script": "bin/scholarly.py"
+}

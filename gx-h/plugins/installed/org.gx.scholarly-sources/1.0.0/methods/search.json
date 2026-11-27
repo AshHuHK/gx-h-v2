@@ -1,0 +1,70 @@
+{
+  "manifest": {
+    "capability_id": "scholarly-search",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "search",
+        "--implementation",
+        "{data.0}",
+        "--source",
+        "{in.source}",
+        "--out",
+        "{out.dir}",
+        "--query",
+        "{param.query}"
+      ]
+    },
+    "method_card": {
+      "family": "public_literature_search",
+      "objective": "Find indexed publications with an investigator-selected query and identify open full-text candidates.",
+      "mechanism": "Supply one input request {\"schema\":\"gx.scholarly-request/1\"} and parameter query (a free-text string); use the same request with a new query to refine a search. Europe PMC and Crossref each return a ranked page of up to 12 results. A previous search-snapshot.json and its identical query replays saved source responses offline.",
+      "estimator": "candidates.json lists title, bibliographic identifiers, source ranks, type and fetchable_pmcids for each deduplicated publication. search-snapshot.json retains the provider response bytes, query, observation times, statuses and digests.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/scholarly.py",
+      "sha256": "6f731eadb23f5a89bb8d0bfa92a2d8243158e92a0c192307d80aa8a6e7d88068"
+    },
+    "licence": "GX release source. Original materials retain their respective licences.",
+    "licence_basis": "Europe PMC and Crossref public metadata and Open Access JATS terms; intake records retain original source rights.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/scholarly.py"
+    ],
+    "outputs": [
+      {
+        "name": "candidates.json",
+        "kind": "file:scholarly_candidates",
+        "nature": "analysis",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      },
+      {
+        "name": "search-snapshot.json",
+        "kind": "file:scholarly_snapshot",
+        "nature": "analysis",
+        "source_roles": [
+          "source"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Covers one ranked page per provider. Empty and unavailable sources have different statuses. Bibliographic matches are leads, not experimental observations. The catalogues can index the same publication."
+  },
+  "entry_script": "bin/scholarly.py"
+}

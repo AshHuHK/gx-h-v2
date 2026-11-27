@@ -1,0 +1,3563 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8fddc2b6pjbf83p",
+  "goal": "We are checking a historical structure before using its reported compactness as a classroom example. Can the model-1 C-alpha radius of gyration in the supplied deposition be described as covering the entire declared single polypeptide chain? Give the measurement in angstroms, the counted residues and the declared denominator; also check whether N, CA, C and O are represented at each position. A complete-chain label requires all declared positions to have these four backbone atoms. If a position is missing, state the scope of the measurement. Keep crystallographic and solution claims distinct.\n\nPlease run the coordinate analysis on the original. In parallel, have one researcher examine what the archived experimental record can support and a different researcher examine the scope and limits of the proposed numerical interpretation. Have them return their own signed reasons; use their reports as appropriate when you decide. If your calculation and readout are suitable for a second independent entry, publish the executed measurement as a reusable workspace recipe before closing, with a question for the future Lead to answer about its own result.\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a",
+    "op_digest": "a25f6508bcee351e5aeb47034eaa66494688a38edb6e3237634bfd6ec447b123",
+    "requested_event": 289,
+    "committed_event": 294,
+    "closed_event": 296,
+    "closed_utc": "2026-11-27T21:25:00.227Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8fdrx0w3h44j4pp"
+      ],
+      "op": "close_run",
+      "reason": "Report a whole-chain model-1 Cα radius for ubiquitin chain A. The original coordinate readout supplies the radius and denominator, and the two signed reviews establish residue coverage and crystallographic scope. The published workspace recipe single-chain-backbone-coverage-rg@1 asks a future Lead to compare both the Cα count and the complete-backbone count with the new entry's own declared length before labeling its radius.",
+      "unresolved": [
+        "Solution compactness and between-sample variation remain unmeasured. A solution radius requires solution data under stated conditions."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a",
+    "task_id": "gxt_01m8fe3tynr50hpb6e",
+    "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+    "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+    "rationale": "The executed analysis of the original 1UBQ coordinates gives {{metric:ca_radius_of_gyration_A}} for {{metric:ca_count}} equally weighted Cα sites. Chain A has {{metric:declared_residues}} declared residues and {{metric:complete_backbones}} positions with N, CA, C and O. The numerical researcher matched each position from Met1 through Gly76 and confirmed that the partially occupied tail sites each contribute once. The archive researcher verified the X-ray method and showed that the completeness fields describe diffraction reflections. Both records concern the same deposition. The position-by-position coordinate check supports the whole-chain label for this crystal model.",
+    "reason": "Report a whole-chain model-1 Cα radius for ubiquitin chain A. The original coordinate readout supplies the radius and denominator, and the two signed reviews establish residue coverage and crystallographic scope. The published workspace recipe single-chain-backbone-coverage-rg@1 asks a future Lead to compare both the Cα count and the complete-backbone count with the new entry's own declared length before labeling its radius.",
+    "unresolved": [
+      "Solution compactness and between-sample variation remain unmeasured. A solution radius requires solution data under stated conditions."
+    ],
+    "claim_refs": [
+      "gxa_01m8fdrx0w3h44j4pp"
+    ],
+    "evidence_refs": [
+      "gxa_01m8fddc3e1wqp6k5j",
+      "gxa_01m8fdfj28mg23xpj0",
+      "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+      "gxa_01m8fddc418bd0brsp",
+      "gxa_01m8fdf671z5sxjvfs",
+      "gxa_01m8fdkmc2wbb6e4nw",
+      "gxa_01m8fdwkm8savphb5h",
+      "gxa_01m8fdx0fka0mhxjm3",
+      "gxa_01m8fdqq5z5r6mmfjz",
+      "gxa_725bdbf7b8f49ec6b53c00478290197546d362fc22769c11a5936637cab490d2"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+        "source_ref": "gxa_01m8fdfj28mg23xpj0",
+        "event_id": 286,
+        "reading": {
+          "metric_id": "complete_backbones",
+          "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+          "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+          "job_id": "gxj_01m8fdfhdwep1qw3h0",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "version": "1"
+          },
+          "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+          "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+          "provenance_cursor": 75,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "bytes": 103220,
+              "role": "structure",
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/complete_backbones"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1UBQ",
+            "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+          },
+          "value": 76,
+          "raw_value": "76",
+          "display": "76",
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6"
+        }
+      },
+      {
+        "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+        "source_ref": "gxa_01m8fdfj28mg23xpj0",
+        "event_id": 287,
+        "reading": {
+          "metric_id": "declared_residues",
+          "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+          "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+          "job_id": "gxj_01m8fdfhdwep1qw3h0",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "version": "1"
+          },
+          "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+          "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+          "provenance_cursor": 75,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "bytes": 103220,
+              "role": "structure",
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_residues"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1UBQ",
+            "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+          },
+          "value": 76,
+          "raw_value": "76",
+          "display": "76",
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960"
+        }
+      },
+      {
+        "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+        "source_ref": "gxa_01m8fdfj28mg23xpj0",
+        "event_id": 286,
+        "reading": {
+          "metric_id": "ca_count",
+          "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+          "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+          "job_id": "gxj_01m8fdfhdwep1qw3h0",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "version": "1"
+          },
+          "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+          "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+          "provenance_cursor": 75,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "bytes": 103220,
+              "role": "structure",
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/ca_count"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1UBQ",
+            "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+          },
+          "value": 76,
+          "raw_value": "76",
+          "display": "76",
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2"
+        }
+      },
+      {
+        "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+        "source_ref": "gxa_01m8fdfj28mg23xpj0",
+        "event_id": 286,
+        "reading": {
+          "metric_id": "ca_radius_of_gyration_A",
+          "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+          "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+          "job_id": "gxj_01m8fdfhdwep1qw3h0",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "version": "1"
+          },
+          "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+          "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+          "provenance_cursor": 75,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "bytes": 103220,
+              "role": "structure",
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "angstrom",
+          "places": 3,
+          "selectors": {
+            "pointer": "/ca_radius_of_gyration_A"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1UBQ",
+            "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+          },
+          "value": 11.492894876207687,
+          "raw_value": "11.492894876207687",
+          "display": "11.493 angstrom",
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+        }
+      }
+    ],
+    "rendered": {
+      "reason": "Report a whole-chain model-1 Cα radius for ubiquitin chain A. The original coordinate readout supplies the radius and denominator, and the two signed reviews establish residue coverage and crystallographic scope. The published workspace recipe single-chain-backbone-coverage-rg@1 asks a future Lead to compare both the Cα count and the complete-backbone count with the new entry's own declared length before labeling its radius.",
+      "rationale": "The executed analysis of the original 1UBQ coordinates gives 11.493 angstrom for 76 equally weighted Cα sites. Chain A has 76 declared residues and 76 positions with N, CA, C and O. The numerical researcher matched each position from Met1 through Gly76 and confirmed that the partially occupied tail sites each contribute once. The archive researcher verified the X-ray method and showed that the completeness fields describe diffraction reflections. Both records concern the same deposition. The position-by-position coordinate check supports the whole-chain label for this crystal model.",
+      "unresolved": [
+        "Solution compactness and between-sample variation remain unmeasured. A solution radius requires solution data under stated conditions."
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+      "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+      "bytes": 103220,
+      "role": "structure",
+      "provenance": [
+        {
+          "source": "https://files.rcsb.org/download/1UBQ.cif#1.3",
+          "scope": "run",
+          "acquisition": {
+            "applicability": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+            "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [
+                "wwPDB:1UBQ:1.3"
+              ],
+              "data": [],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1016/0022-2836(87)90679-6"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "https://files.rcsb.org/download/1UBQ.cif#1.3"
+              ]
+            },
+            "measurement_schema": null,
+            "schema": "gx.acquisition/1",
+            "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+            "source_identity": {
+              "artifact_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+              "entry_id": "1UBQ",
+              "reader": "gx.pdbx.source-identity/3",
+              "revision": {
+                "claimed": null,
+                "observed": "1.3",
+                "status": "observed"
+              },
+              "schema": "gx.source_identity/1",
+              "status": "matched_accession"
+            },
+            "unknown_dependencies": [
+              "data",
+              "sample",
+              "sampling"
+            ]
+          },
+          "event_id": 15,
+          "utc": "2026-11-27T21:08:36.331Z"
+        }
+      ]
+    },
+    {
+      "artifact_ref": "gxa_01m8fddc418bd0brsp",
+      "sha256": "9bd788b380d9cd13b8116e4afe556fcfb7a0c79f7b6d194c3abae674d6e0bb76",
+      "bytes": 4564,
+      "role": "literature"
+    }
+  ],
+  "predictions": [
+    {
+      "hypothesis_id": "gxh_01m8fdfh9avw1pb9t3",
+      "statement": "Every declared position of ubiquitin chain A in the first deposited model has coordinates for N, CA, C and O, allowing a whole-chain C-alpha radius of gyration.",
+      "scope": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+      "criteria": "The complete-backbone count must satisfy /complete_backbones = 76, with the threshold set by the original declared polymer sequence. Check the C-alpha count against the same denominator.",
+      "decision_scope": "run",
+      "limitations": "A position with only a C-alpha would contribute to the geometric radius. Whole-chain labeling also requires its other backbone atoms. Applicability is restricted to the deposited crystal model.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fdf8mm1hjgbsb4",
+        "proposed_level": "open",
+        "rationale": "The declared polymer sequence fixes the denominator independently of the observed coordinates. Counting declared positions with the full backbone would detect either an entirely unmodeled residue or a partially modeled backbone."
+      },
+      "evidence_refs": [
+        "gxa_01m8fddc3e1wqp6k5j"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "36645e2187d812f2c424c8f6bc3e68f72f47bc1d2ab150c787ab9ede52486841",
+        "brief_turn_id": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "context_ref": "gxcx_01m8fddcbqbthhsr3d",
+        "delivery_receipt": "start:a987422f-25de-4f5d-9deb-f361e430d223",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 16,
+        "state": "acknowledged",
+        "thread_id": "01a21ed6-b799-7fd3-8250-c9e37a6530d1",
+        "turn_id": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+            ],
+            "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [
+                "wwPDB:1UBQ:1.3"
+              ],
+              "data": [
+                "sha256:056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              ],
+              "processing": [],
+              "publication": [
+                "https://doi.org/10.1016/0022-2836(87)90679-6"
+              ],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "https://files.rcsb.org/download/1UBQ.cif#1.3"
+              ]
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+            "source_identity": {
+              "artifact_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+              "entry_id": "1UBQ",
+              "reader": "gx.pdbx.source-identity/3",
+              "revision": {
+                "claimed": null,
+                "observed": "1.3",
+                "status": "observed"
+              },
+              "schema": "gx.source_identity/1",
+              "status": "matched_accession"
+            },
+            "unknown_dependencies": [
+              "data",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8fddc3e1wqp6k5j",
+          "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+          "source_class": "supplied_information",
+          "source_event_id": 15
+        }
+      ],
+      "goal_version": 1,
+      "prediction": {
+        "data_refs": [
+          "gxa_01m8fddc3e1wqp6k5j"
+        ],
+        "method": {
+          "capability": "deposited-backbone-qc@1",
+          "input_role": "structure",
+          "metric_id": "complete_backbones",
+          "output": "qc.json",
+          "parameters": {},
+          "unit": "1"
+        },
+        "observable": "/complete_backbones",
+        "operator": "eq",
+        "target": "analysis",
+        "threshold": 76
+      },
+      "registration": {
+        "chronology_scope": "same_store",
+        "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@1",
+        "claim_scope": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+        "claim_sha256": "703c80d2b3bfd3a7e95c5610cbcd6839f5b33c22c4aab7d2bef943740bc1cff1",
+        "data": [
+          {
+            "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+            "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+          }
+        ],
+        "decision_scope": "run",
+        "endpoint_chronology_at_registration": {
+          "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6": {
+            "endpoint_first_available_event_id": null,
+            "raw_material_received_event_id": 5
+          }
+        },
+        "event_id": 68,
+        "known_at_registration": {
+          "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6": false
+        },
+        "material_identity": "endpoint_verified",
+        "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+        "method_pin": {
+          "capability": "deposited-backbone-qc@1",
+          "manifest_sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+          "measurement_spec": {
+            "applicability": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+            "capability": "deposited-backbone-qc@1",
+            "input_role": "structure",
+            "manifest_sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "measurement_schema": null,
+            "metric_definition": {
+              "op": "integer/1",
+              "places": 0,
+              "pointer": "/complete_backbones",
+              "reader": "json/1",
+              "scope": {
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry",
+                "input_sha256": "/input_sha256"
+              },
+              "unit": "1"
+            },
+            "metric_id": "complete_backbones",
+            "missing_parameters": [],
+            "observable": "/metrics/complete_backbones",
+            "output": "qc.json",
+            "output_name": "qc.json",
+            "parameters": {},
+            "result_pointer": null,
+            "schema": "gx.measurement-spec/2",
+            "source_roles": [
+              "structure"
+            ],
+            "unit": "1"
+          },
+          "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+          "output": "qc.json"
+        },
+        "policy": "gx.claim-proposition/3",
+        "posthoc_revision_of": null,
+        "prediction": {
+          "data_refs": [
+            "gxa_01m8fddc3e1wqp6k5j"
+          ],
+          "method": {
+            "capability": "deposited-backbone-qc@1",
+            "input_role": "structure",
+            "metric_id": "complete_backbones",
+            "output": "qc.json",
+            "parameters": {},
+            "unit": "1"
+          },
+          "observable": "/complete_backbones",
+          "operator": "eq",
+          "target": "analysis",
+          "threshold": 76
+        },
+        "proposition_sha256": "0cee9c7c9e7b3dd037ba3ae38d7ffb069d13420441dda958ff707dde24794708",
+        "quantifier": "all",
+        "utc": "2026-11-27T21:09:46.922Z",
+        "decision_ref": "gxa_d64ef081ab62ab2477b8072f04c4d8d13004bee66cf90fcba35a5ac54552e65c"
+      },
+      "assessments": [
+        {
+          "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@1",
+          "decision_id": "gxa_d64ef081ab62ab2477b8072f04c4d8d13004bee66cf90fcba35a5ac54552e65c",
+          "assessment_cursor": 16,
+          "availability_cursor": 68,
+          "level": "open",
+          "stage": "preregistered",
+          "direction": "undetermined",
+          "results": [],
+          "gaps": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "event_id": 15,
+              "kind": "different_method_or_output"
+            }
+          ],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "endpoint_first_available_event_id": null,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+              "opposing_refs": [],
+              "qualification": "unmeasured",
+              "raw_material_received_event_id": 5,
+              "registration_event_id": 68,
+              "retrospective_refs": [],
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+              "supporting_refs": [],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "Applicable reviewed evidence or a classified scientific artifact is cited.",
+            "GX froze the rule before each qualifying prospective result.",
+            "Unmeasured outcomes and execution gaps do not establish counterevidence."
+          ],
+          "utc": "2026-11-27T21:09:46.922Z",
+          "event_id": 68,
+          "event": "v6.claim.adopted",
+          "author": "01a21ed6-b799-7fd3-8250-c9e37a6530d1"
+        },
+        {
+          "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@2",
+          "decision_id": "gxa_d64ef081ab62ab2477b8072f04c4d8d13004bee66cf90fcba35a5ac54552e65c",
+          "assessment_cursor": 91,
+          "availability_cursor": 91,
+          "level": "open",
+          "stage": "tested",
+          "direction": "supported",
+          "results": [
+            {
+              "applicability_scopes": [
+                "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+              ],
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "capability": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "dependencies": {
+                "acquisition": [
+                  "wwPDB:1UBQ:1.3"
+                ],
+                "data": [
+                  "sha256:056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                ],
+                "processing": [
+                  "capability:641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                  "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+                ],
+                "publication": [
+                  "https://doi.org/10.1016/0022-2836(87)90679-6"
+                ],
+                "sample": [],
+                "sampling": [],
+                "source": [
+                  "https://files.rcsb.org/download/1UBQ.cif#1.3"
+                ]
+              },
+              "event_id": 91,
+              "first_bytes_event_id": 85,
+              "first_event_id": 88,
+              "independence_complete": false,
+              "launch_event_id": 77,
+              "matched_data_sha256": [
+                "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              ],
+              "matched_material_keys": [
+                "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              ],
+              "measurement": {
+                "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+                "applicability_scopes": [
+                  "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+                ],
+                "comparison_value": "76",
+                "lineage": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+                "material_inputs": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "bytes": 103220,
+                    "role": "structure",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+                "metric": null,
+                "metric_id": "complete_backbones",
+                "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+                "metric_scope": {
+                  "chain": "A",
+                  "entity": "1",
+                  "entry": "1UBQ",
+                  "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                },
+                "raw_value": "76",
+                "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+                "source_inputs": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "bytes": 103220,
+                    "role": "structure",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "unit": "1",
+                "value": 76
+              },
+              "measurement_schema": null,
+              "nature": "analysis",
+              "original_observations": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "output_name": "qc.json",
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "supports": true,
+              "unknown_dependencies": [
+                "data",
+                "sample",
+                "sampling"
+              ],
+              "upstream_natures": [
+                "observed"
+              ],
+              "value": 76,
+              "lead_delivery_event_ids": [
+                108,
+                161,
+                224,
+                269,
+                286
+              ],
+              "unit": "1",
+              "denominators": {
+                "model_count": 1,
+                "ca_count": 76
+              }
+            }
+          ],
+          "gaps": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "event_id": 15,
+              "kind": "different_method_or_output"
+            }
+          ],
+          "preexisting_result": false,
+          "material_coverage": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "endpoint_first_available_event_id": 88,
+              "known_at_registration": false,
+              "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+              "opposing_refs": [],
+              "qualification": "prospective",
+              "raw_material_received_event_id": 5,
+              "registration_event_id": 68,
+              "retrospective_refs": [],
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+              "supporting_refs": [
+                "gxa_01m8fdfj28mg23xpj0"
+              ],
+              "uncertain_refs": []
+            }
+          ],
+          "supporting_refs": [
+            "gxa_01m8fdfj28mg23xpj0"
+          ],
+          "opposing_refs": [],
+          "reviewed_evidence": [],
+          "disputed_extractions": [],
+          "replication": [],
+          "reasons": [
+            "Applicable reviewed evidence or a classified scientific artifact is cited.",
+            "GX froze the rule before each qualifying prospective result.",
+            "GX compared the original measured value with the registered decision rule.",
+            "Unmeasured outcomes and execution gaps do not establish counterevidence."
+          ],
+          "utc": "2026-11-27T21:09:47.822Z",
+          "event_id": 92,
+          "event": "v62.claim.reassessed",
+          "author": "GX"
+        }
+      ],
+      "classification": "prospectively_tested",
+      "revisions": [
+        {
+          "hypothesis_id": "gxh_01m8fdfh9avw1pb9t3",
+          "statement": "Every declared position of ubiquitin chain A in the first deposited model has coordinates for N, CA, C and O, allowing a whole-chain C-alpha radius of gyration.",
+          "scope": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+          "criteria": "The complete-backbone count must satisfy /complete_backbones = 76, with the threshold set by the original declared polymer sequence. Check the C-alpha count against the same denominator.",
+          "decision_scope": "run",
+          "limitations": "The result describes model 1 in the supplied 1UBQ X-ray deposition. A partially occupied site with coordinates contributes once. Solution dimensions and between-sample variation require additional observations.",
+          "lead_interpretation": {
+            "proposal_ref": "gxa_01m8fdrx0w3h44j4pp",
+            "proposed_level": "limited_support",
+            "rationale": "The model has 76 Cα sites for 76 declared positions, and 76 positions contain N, CA, C and O. The equal-weight root-mean-square distance of those Cα sites from their centroid is 11.493 angstrom. The numerical interpretation researcher matched Met1 through Gly76 individually and verified one Cα per declared residue, including the partially occupied tail."
+          },
+          "evidence_refs": [
+            "gxa_01m8fddc3e1wqp6k5j",
+            "gxa_01m8fdfj28mg23xpj0",
+            "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956"
+          ],
+          "decision_delivery": {
+            "brief_sha256": "4f232fd714408194aad09c188a91e189fed9b3e5d28e9c114fd3aea28eaa6eaa",
+            "brief_turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+            "context_ref": "gxcx_01m8fdnc5ttg4r33nn",
+            "delivery_receipt": "start:79d160b6-4ee2-49ef-861e-b3689424c621",
+            "metric_refs": [],
+            "observations": [],
+            "snapshot_cursor": 148,
+            "state": "acknowledged",
+            "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+            "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5"
+          },
+          "source_records": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [
+                  "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+                ],
+                "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [
+                    "wwPDB:1UBQ:1.3"
+                  ],
+                  "data": [
+                    "sha256:056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  ],
+                  "processing": [],
+                  "publication": [
+                    "https://doi.org/10.1016/0022-2836(87)90679-6"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "https://files.rcsb.org/download/1UBQ.cif#1.3"
+                  ]
+                },
+                "first_event_id": 5,
+                "independence_complete": false,
+                "job_id": null,
+                "measurement_schema": null,
+                "nature": "observed",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "reason": "Verified operator acquisition receipt on the original ingested bytes",
+                "record_kind": "supplied_observation",
+                "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+                "source_identity": {
+                  "artifact_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+                  "entry_id": "1UBQ",
+                  "reader": "gx.pdbx.source-identity/3",
+                  "revision": {
+                    "claimed": null,
+                    "observed": "1.3",
+                    "status": "observed"
+                  },
+                  "schema": "gx.source_identity/1",
+                  "status": "matched_accession"
+                },
+                "unknown_dependencies": [
+                  "data",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "observed",
+              "ref": "gxa_01m8fddc3e1wqp6k5j",
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+              "source_class": "supplied_information",
+              "source_event_id": 15
+            },
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "capability": "deposited-backbone-qc",
+              "completion_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "job_status": "SUCCEEDED",
+              "kind": "deposited_backbone_qc",
+              "output_provenance": {
+                "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+                "applicability_scopes": [
+                  "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+                ],
+                "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+                "capability": {
+                  "id": "deposited-backbone-qc",
+                  "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                  "version": "1"
+                },
+                "completion_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+                "data_refs": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "declaration_name": "qc.json",
+                "dependencies": {
+                  "acquisition": [
+                    "wwPDB:1UBQ:1.3"
+                  ],
+                  "data": [
+                    "sha256:056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  ],
+                  "processing": [
+                    "capability:641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                    "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+                  ],
+                  "publication": [
+                    "https://doi.org/10.1016/0022-2836(87)90679-6"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "https://files.rcsb.org/download/1UBQ.cif#1.3"
+                  ]
+                },
+                "first_event_id": 85,
+                "independence_complete": false,
+                "job_id": "gxj_01m8fdfhdwep1qw3h0",
+                "nature": "analysis",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "output_name": "qc.json",
+                "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+                "record_kind": "job_output",
+                "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+                "unknown_dependencies": [
+                  "data",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": [
+                  "observed"
+                ]
+              },
+              "record_nature": "analysis",
+              "ref": "gxa_01m8fdfj28mg23xpj0",
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "source_class": "computed_result",
+              "version": "1"
+            },
+            {
+              "artifact_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+              "kind": "module_report_bundle",
+              "output_provenance": {
+                "applicability_scopes": [],
+                "artifact_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [],
+                  "processing": [],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": []
+                },
+                "first_event_id": 139,
+                "independence_complete": false,
+                "job_id": null,
+                "nature": "unclassified",
+                "original_inputs_grounded": false,
+                "original_observations": [],
+                "reason": "No pinned declaration or original acquisition receipt",
+                "record_kind": "unclassified",
+                "sha256": "c1f30461f76e1312065961898e202a66b7652412a26413084fcc24df43e2f04d",
+                "unknown_dependencies": [
+                  "data",
+                  "acquisition",
+                  "sample",
+                  "source",
+                  "publication",
+                  "processing",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "unclassified",
+              "ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+              "sha256": "c1f30461f76e1312065961898e202a66b7652412a26413084fcc24df43e2f04d",
+              "source_class": "input"
+            }
+          ],
+          "goal_version": 1,
+          "prediction": {
+            "data_refs": [
+              "gxa_01m8fddc3e1wqp6k5j"
+            ],
+            "method": {
+              "capability": "deposited-backbone-qc@1",
+              "input_role": "structure",
+              "metric_id": "complete_backbones",
+              "output": "qc.json",
+              "parameters": {},
+              "unit": "1"
+            },
+            "observable": "/complete_backbones",
+            "operator": "eq",
+            "target": "analysis",
+            "threshold": 76
+          },
+          "registration": {
+            "chronology_scope": "same_store",
+            "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@3",
+            "claim_scope": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+            "claim_sha256": "703c80d2b3bfd3a7e95c5610cbcd6839f5b33c22c4aab7d2bef943740bc1cff1",
+            "data": [
+              {
+                "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              }
+            ],
+            "decision_scope": "run",
+            "endpoint_chronology_at_registration": {
+              "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6": {
+                "endpoint_first_available_event_id": 88,
+                "raw_material_received_event_id": 5
+              }
+            },
+            "event_id": 194,
+            "known_at_registration": {
+              "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6": true
+            },
+            "material_identity": "endpoint_verified",
+            "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+            "method_pin": {
+              "capability": "deposited-backbone-qc@1",
+              "manifest_sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+              "measurement_spec": {
+                "applicability": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+                "capability": "deposited-backbone-qc@1",
+                "input_role": "structure",
+                "manifest_sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "measurement_schema": null,
+                "metric_definition": {
+                  "op": "integer/1",
+                  "places": 0,
+                  "pointer": "/complete_backbones",
+                  "reader": "json/1",
+                  "scope": {
+                    "chain": "/chain",
+                    "entity": "/entity",
+                    "entry": "/entry",
+                    "input_sha256": "/input_sha256"
+                  },
+                  "unit": "1"
+                },
+                "metric_id": "complete_backbones",
+                "missing_parameters": [],
+                "observable": "/metrics/complete_backbones",
+                "output": "qc.json",
+                "output_name": "qc.json",
+                "parameters": {},
+                "result_pointer": null,
+                "schema": "gx.measurement-spec/2",
+                "source_roles": [
+                  "structure"
+                ],
+                "unit": "1"
+              },
+              "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+              "output": "qc.json"
+            },
+            "policy": "gx.claim-proposition/3",
+            "posthoc_revision_of": "gxh_01m8fdfh9avw1pb9t3@2",
+            "prediction": {
+              "data_refs": [
+                "gxa_01m8fddc3e1wqp6k5j"
+              ],
+              "method": {
+                "capability": "deposited-backbone-qc@1",
+                "input_role": "structure",
+                "metric_id": "complete_backbones",
+                "output": "qc.json",
+                "parameters": {},
+                "unit": "1"
+              },
+              "observable": "/complete_backbones",
+              "operator": "eq",
+              "target": "analysis",
+              "threshold": 76
+            },
+            "proposition_sha256": "ca12b1e913a9b61ff24909556be4ba07eddf426e4d8a5b7a05735cc3052b63cb",
+            "quantifier": "all",
+            "utc": "2026-11-27T21:15:20.933Z",
+            "decision_ref": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec"
+          },
+          "assessments": [
+            {
+              "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@3",
+              "decision_id": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+              "assessment_cursor": 148,
+              "availability_cursor": 194,
+              "level": "insufficient",
+              "stage": "grounded",
+              "direction": "undetermined",
+              "results": [],
+              "gaps": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "event_id": 15,
+                  "kind": "different_method_or_output"
+                },
+                {
+                  "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+                  "event_id": 91,
+                  "first_bytes_event_id": 85,
+                  "first_event_id": 88,
+                  "kind": "already_available",
+                  "launch_event_id": 77,
+                  "matched_data_sha256": [
+                    "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  ],
+                  "matched_material_keys": [
+                    "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  ],
+                  "measurement": {
+                    "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+                    "applicability_scopes": [
+                      "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+                    ],
+                    "comparison_value": "76",
+                    "lineage": [
+                      {
+                        "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                        "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                      }
+                    ],
+                    "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+                    "material_inputs": [
+                      {
+                        "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                        "bytes": 103220,
+                        "role": "structure",
+                        "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                      }
+                    ],
+                    "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+                    "metric": null,
+                    "metric_id": "complete_backbones",
+                    "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+                    "metric_scope": {
+                      "chain": "A",
+                      "entity": "1",
+                      "entry": "1UBQ",
+                      "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                    },
+                    "raw_value": "76",
+                    "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+                    "source_inputs": [
+                      {
+                        "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                        "bytes": 103220,
+                        "role": "structure",
+                        "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                      }
+                    ],
+                    "unit": "1",
+                    "value": 76
+                  },
+                  "nature": "analysis",
+                  "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+                  "supports": true,
+                  "value": 76
+                }
+              ],
+              "preexisting_result": true,
+              "material_coverage": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "endpoint_first_available_event_id": 88,
+                  "known_at_registration": true,
+                  "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+                  "opposing_refs": [],
+                  "qualification": "retrospective",
+                  "raw_material_received_event_id": 5,
+                  "registration_event_id": 194,
+                  "retrospective_refs": [
+                    "gxa_01m8fdfj28mg23xpj0"
+                  ],
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+                  "supporting_refs": [],
+                  "uncertain_refs": []
+                }
+              ],
+              "supporting_refs": [],
+              "opposing_refs": [],
+              "reviewed_evidence": [],
+              "disputed_extractions": [],
+              "replication": [],
+              "reasons": [
+                "Applicable reviewed evidence or a classified scientific artifact is cited.",
+                "An applicable result existed by registration; interpretation of this rule is retrospective.",
+                "Unmeasured outcomes and execution gaps do not establish counterevidence."
+              ],
+              "utc": "2026-11-27T21:15:20.933Z",
+              "event_id": 194,
+              "event": "v6.claim.adopted",
+              "author": "01a21eda-b108-7d71-977b-cd006274fb58"
+            }
+          ],
+          "classification": "contains_retrospective_evidence"
+        }
+      ]
+    }
+  ],
+  "exploratory_claims": [],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8fdfhdwep1qw3h0",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "deposited-backbone-qc",
+        "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+          "bytes": 103220,
+          "role": "structure",
+          "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:735fe48fe8bca2c7a10d7b0d2332e986fcc74b09545d63fe9e4ce9dd85ae9e65",
+        "branch_id": "branch_405d1fd2f4f72bd5c995acbfe4f00206",
+        "decision_ref": "gxa_d64ef081ab62ab2477b8072f04c4d8d13004bee66cf90fcba35a5ac54552e65c",
+        "exec_key": "13ff833885d4ed67cb94fd7a1850d9c7aa4c29b639d95f38330bdd5141d4bf51",
+        "kind": "graph_node",
+        "node_id": "node_40d5236c4dfcad52b7dfe7dca83a1e47",
+        "operation_key": "v6.node:735fe48fe8bca2c7a10d7b0d2332e986fcc74b09545d63fe9e4ce9dd85ae9e65",
+        "plan_key": "08d3c436e6461918747a98cfeaad959fbbfe5ebd61d9011296172c64aaf1816f",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+      "outputs": [
+        {
+          "output_name": "qc.json",
+          "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+          "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+          "bytes": 399,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "bytes": 103220,
+              "role": "structure",
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fddc2b6pjbf83p/jobs/gxj_01m8fdfhdwep1qw3h0",
+            "rel_path": "files/qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_count",
+              "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+              "value": 76,
+              "raw_value": "76",
+              "display": "76",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "lead_delivery_event_ids": [
+                108,
+                161,
+                224,
+                269,
+                286
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+              "value": 11.492894876207687,
+              "raw_value": "11.492894876207687",
+              "display": "11.493 angstrom",
+              "unit": "angstrom",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "lead_delivery_event_ids": [
+                108,
+                161,
+                224,
+                269,
+                286
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+              "value": 76,
+              "raw_value": "76",
+              "display": "76",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "lead_delivery_event_ids": [
+                108,
+                161,
+                224,
+                269,
+                286
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "coordinate_coverage",
+              "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+              "value": 1,
+              "raw_value": "1",
+              "display": "76/76 (1.0000)",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+                "model": 1
+              },
+              "numerator": 76,
+              "denominator": 76,
+              "lead_delivery_event_ids": [
+                108,
+                162,
+                225,
+                270,
+                287
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+              "value": 76,
+              "raw_value": "76",
+              "display": "76",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "lead_delivery_event_ids": [
+                108,
+                162,
+                225,
+                270,
+                287
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "observed_residues",
+              "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+              "value": 76,
+              "raw_value": "76",
+              "display": "76",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "lead_delivery_event_ids": [
+                108,
+                162,
+                225,
+                270,
+                287
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.deposited-backbone-qc/1",
+            "entry": "1UBQ",
+            "chain": "A",
+            "entity": "1",
+            "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+            "declared_residues": 76,
+            "model_count": 1,
+            "model": 1,
+            "observed_residues": 76,
+            "ca_count": 76,
+            "complete_backbones": 76,
+            "missing_label_positions": [],
+            "ca_radius_of_gyration_A": 11.492894876207687
+          },
+          "denominators": {
+            "model_count": 1,
+            "ca_count": 76
+          },
+          "lead_delivery_event_ids": [
+            108,
+            161,
+            162,
+            224,
+            225,
+            269,
+            270,
+            286,
+            287
+          ]
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "9343c65fa17c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "ba9a70caba84",
+            "unit": "angstrom",
+            "value": "11.493 angstrom"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "0bc1bd3dd49c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "81fe88f9aec9",
+            "unit": "1",
+            "value": "76/76 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "75166741d379",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "2d2388582e7e",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a"
+        }
+      ],
+      "lease_id": "gxl_01m8fdhpy8dt043hzf",
+      "receipt": "start:2dec0d2e-cb56-45ff-a0e1-05f88410037a",
+      "task_id": "gxt_01m8fdhpxx801n9zet",
+      "thread_id": "01a21ed8-dbde-7de0-83bd-c73821dcae79",
+      "turn_id": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+      "scope": "run",
+      "event_id": 108,
+      "utc": "2026-11-27T21:10:58.327Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "9343c65fa17c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "ba9a70caba84",
+            "unit": "angstrom",
+            "value": "11.493 angstrom"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "0bc1bd3dd49c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6"
+        }
+      ],
+      "lease_id": "gxl_01m8fdnc7mvngb425m",
+      "receipt": "exec-c9cb7959-5af1-480d-8494-c54e50563a9a",
+      "task_id": "gxt_01m8fdnc5vv3xe1zmd",
+      "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+      "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+      "scope": "run",
+      "event_id": 161,
+      "utc": "2026-11-27T21:13:12.414Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "81fe88f9aec9",
+            "unit": "1",
+            "value": "76/76 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "75166741d379",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "2d2388582e7e",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a"
+        }
+      ],
+      "lease_id": "gxl_01m8fdnc7mvngb425m",
+      "receipt": "exec-5edf0a90-ed9f-4f3a-a55d-8041751c8950",
+      "task_id": "gxt_01m8fdnc5vv3xe1zmd",
+      "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+      "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+      "scope": "run",
+      "event_id": 162,
+      "utc": "2026-11-27T21:13:21.948Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "9343c65fa17c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "ba9a70caba84",
+            "unit": "angstrom",
+            "value": "11.493 angstrom"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "0bc1bd3dd49c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6"
+        }
+      ],
+      "lease_id": "gxl_01m8fdsqmvg3rk6g51",
+      "receipt": "exec-8810f6be-63f7-4406-9634-a91b1ec1d01b",
+      "task_id": "gxt_01m8fdsqmf4hmf47w6",
+      "thread_id": "01a21edc-deae-72c2-ad11-a1e1e791ee48",
+      "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+      "scope": "run",
+      "event_id": 224,
+      "utc": "2026-11-27T21:16:57.134Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "81fe88f9aec9",
+            "unit": "1",
+            "value": "76/76 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "75166741d379",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "2d2388582e7e",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a"
+        }
+      ],
+      "lease_id": "gxl_01m8fdsqmvg3rk6g51",
+      "receipt": "exec-6428d028-c168-492f-9d78-8c631a7b9983",
+      "task_id": "gxt_01m8fdsqmf4hmf47w6",
+      "thread_id": "01a21edc-deae-72c2-ad11-a1e1e791ee48",
+      "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+      "scope": "run",
+      "event_id": 225,
+      "utc": "2026-11-27T21:16:57.204Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "9343c65fa17c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "ba9a70caba84",
+            "unit": "angstrom",
+            "value": "11.493 angstrom"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "0bc1bd3dd49c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6"
+        }
+      ],
+      "lease_id": "gxl_01m8fdzyt1mzmcve8d",
+      "receipt": "exec-0cbe7f81-eddf-45e7-8833-50d884f32eab",
+      "task_id": "gxt_01m8fdzyscytzvdefz",
+      "thread_id": "01a21edf-fb5d-7a83-baba-e72f96809657",
+      "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+      "scope": "run",
+      "event_id": 269,
+      "utc": "2026-11-27T21:20:29.611Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "81fe88f9aec9",
+            "unit": "1",
+            "value": "76/76 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "75166741d379",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "2d2388582e7e",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a"
+        }
+      ],
+      "lease_id": "gxl_01m8fdzyt1mzmcve8d",
+      "receipt": "exec-6ea8e2ab-fbdc-4ab0-b7f3-294f8c9e8179",
+      "task_id": "gxt_01m8fdzyscytzvdefz",
+      "thread_id": "01a21edf-fb5d-7a83-baba-e72f96809657",
+      "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+      "scope": "run",
+      "event_id": 270,
+      "utc": "2026-11-27T21:20:32.366Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "9343c65fa17c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "ba9a70caba84",
+            "unit": "angstrom",
+            "value": "11.493 angstrom"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "0bc1bd3dd49c",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6"
+        }
+      ],
+      "lease_id": "gxl_01m8fe3tzamwg6c185",
+      "receipt": "exec-afda3f28-5a3c-46e4-81ee-aecbb4b6be59",
+      "task_id": "gxt_01m8fe3tynr50hpb6e",
+      "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+      "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+      "scope": "run",
+      "event_id": 286,
+      "utc": "2026-11-27T21:24:43.476Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+          "source_ref": "gxa_01m8fdfj28mg23xpj0"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "81fe88f9aec9",
+            "unit": "1",
+            "value": "76/76 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "75166741d379",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "2d2388582e7e",
+            "unit": "1",
+            "value": "76"
+          },
+          "source_ref": "gxa_01m8fdfj28mg23xpj0",
+          "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a"
+        }
+      ],
+      "lease_id": "gxl_01m8fe3tzamwg6c185",
+      "receipt": "exec-db07f46b-f491-47f1-8263-05fdf2f8aeb6",
+      "task_id": "gxt_01m8fe3tynr50hpb6e",
+      "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+      "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+      "scope": "run",
+      "event_id": 287,
+      "utc": "2026-11-27T21:24:46.678Z"
+    }
+  ],
+  "routes": {
+    "modules": [
+      {
+        "module_instance_id": "module_8f55440060edf8e13f0b6d818412046f",
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "branch_id": "branch_8012bf7300f3a3df35f4f68e34409ce9",
+        "focus": "literature",
+        "module_id": "offline_literature_mechanism",
+        "module_version": "1",
+        "round": 1,
+        "parent_task_id": "gxt_01m8fddcbqj03n7adw",
+        "goal_version": 1,
+        "status": "PARTIAL",
+        "threads": [
+          {
+            "thread_id": "01a21ed7-1a58-7090-8a50-dae542cfe6ad",
+            "task_id": "gxt_01m8fde6gb02vqvjba",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21ed7-1a96-79c1-aeef-87a37a61e9ab",
+                "thread_id": "01a21ed7-1a58-7090-8a50-dae542cfe6ad",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:09:03.261Z",
+                "end": "2026-11-27T21:11:00.722Z"
+              }
+            ]
+          },
+          {
+            "thread_id": "01a21ed8-e608-7f92-99fe-ca6a7151e7a4",
+            "task_id": "gxt_01m8fde6gb02vqvjba",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21ed8-e63a-7082-968c-50a481222711",
+                "thread_id": "01a21ed8-e608-7f92-99fe-ca6a7151e7a4",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:11:00.927Z",
+                "end": "2026-11-27T21:12:01.160Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {},
+        "nodes": [],
+        "report": {
+          "artifact_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+          "author": {
+            "context_ref": "gxcx_01m8fde6gads7wc3z8",
+            "kind": "GX",
+            "task_id": "gxt_01m8fde6gb02vqvjba"
+          },
+          "base": null,
+          "event_id": 135,
+          "goal_version": 1,
+          "module_id": "offline_literature_mechanism",
+          "module_instance_id": "module_8f55440060edf8e13f0b6d818412046f",
+          "module_version": "1",
+          "operation_key": "gx.partial:module_8f55440060edf8e13f0b6d818412046f",
+          "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+          "report_sha256": "89e037020b06930c7c84d9e6e81a8b72ed9c7f90d34b34757edc6dfbaf5ccf53",
+          "round": 1,
+          "run_id": "gxr_01m8fddc2b6pjbf83p",
+          "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+          "source_refs": [
+            "gxa_01m8fddc418bd0brsp",
+            "gxa_01m8fdf671z5sxjvfs",
+            "gxa_01m8fdk4dcv0snvgnp",
+            "gxa_01m8fdkdb9dh4hxrq4",
+            "gxa_01m8fdkmc2wbb6e4nw"
+          ],
+          "status": "PARTIAL",
+          "version": 1,
+          "wake_event_id": 136,
+          "released_event": 136
+        },
+        "delegated_reports": [],
+        "decisions": []
+      },
+      {
+        "module_instance_id": "module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "branch_id": "branch_56d4bc92dc4cf233136ecddb836d6e0f",
+        "focus": "hypothesis",
+        "module_id": "hypothesis_space",
+        "module_version": "1",
+        "round": 1,
+        "parent_task_id": "gxt_01m8fddcbqj03n7adw",
+        "goal_version": 1,
+        "status": "COMPLETE",
+        "threads": [
+          {
+            "thread_id": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+            "task_id": "gxt_01m8fdecrb3pysx8fw",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21ed7-3386-7723-92a9-fe35dd61511a",
+                "thread_id": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:09:09.643Z",
+                "end": "2026-11-27T21:12:15.725Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {},
+        "nodes": [],
+        "report": {
+          "artifact_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+          "author": {
+            "call_id": "call_73d8c32d5abf4810a1339222dc556729",
+            "context_ref": "gxcx_01m8fdecrakmat95vg",
+            "kind": "MODULE",
+            "lease_id": "gxl_01m8fdect8j4w385zs",
+            "run_id": "gxr_01m8fddc2b6pjbf83p",
+            "task_id": "gxt_01m8fdecrb3pysx8fw",
+            "thread_id": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+            "turn_id": "01a21ed7-3386-7723-92a9-fe35dd61511a"
+          },
+          "base": null,
+          "event_id": 144,
+          "goal_version": 1,
+          "module_id": "hypothesis_space",
+          "module_instance_id": "module_e6560dfa32cb40472be0ee3f3bb96af8",
+          "module_version": "1",
+          "operation_key": "1ubq-signed-scope-review",
+          "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+          "report_sha256": "c1f30461f76e1312065961898e202a66b7652412a26413084fcc24df43e2f04d",
+          "round": 1,
+          "run_id": "gxr_01m8fddc2b6pjbf83p",
+          "scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+          "source_refs": [
+            "gxa_01m8fddc3e1wqp6k5j"
+          ],
+          "status": "COMPLETE",
+          "version": 1,
+          "wake_event_id": 145,
+          "released_event": 145
+        },
+        "delegated_reports": [],
+        "decisions": []
+      },
+      {
+        "module_instance_id": "module_e01eb599c3640853489b490e626cfc5c",
+        "scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "branch_id": "branch_dcc9d3acd158de159db6ed31009e268f",
+        "focus": "literature",
+        "module_id": "offline_literature_mechanism",
+        "module_version": "1",
+        "round": 2,
+        "parent_task_id": "gxt_01m8fdnc5vv3xe1zmd",
+        "goal_version": 1,
+        "status": "COMPLETE",
+        "threads": [
+          {
+            "thread_id": "01a21edb-3a19-7031-a382-592022f57695",
+            "task_id": "gxt_01m8fdpeeqfdnhqa5c",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21edb-3a36-7ed0-b3da-d80c51ce3945",
+                "thread_id": "01a21edb-3a19-7031-a382-592022f57695",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:13:33.500Z",
+                "end": "2026-11-27T21:16:02.862Z"
+              }
+            ]
+          },
+          {
+            "thread_id": "01a21edd-8218-70f1-801c-e3a0dd1d66a8",
+            "task_id": "gxt_01m8fdpeeqfdnhqa5c",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21edd-8249-7501-8a67-8a85781b10d4",
+                "thread_id": "01a21edd-8218-70f1-801c-e3a0dd1d66a8",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:16:03.022Z",
+                "end": "2026-11-27T21:19:07.071Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {
+          "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab": [
+            "gxa_01m8fdf671z5sxjvfs",
+            "gxa_01m8fdkmc2wbb6e4nw"
+          ]
+        },
+        "nodes": [],
+        "report": {
+          "artifact_ref": "gxa_725bdbf7b8f49ec6b53c00478290197546d362fc22769c11a5936637cab490d2",
+          "author": {
+            "call_id": "call_731d2faa0c5c4eabbefd3fc00c2de31b",
+            "context_ref": "gxcx_01m8fdpeepee1x9ytr",
+            "kind": "MODULE",
+            "lease_id": "gxl_01m8fdv0g3tnddq0c2",
+            "run_id": "gxr_01m8fddc2b6pjbf83p",
+            "task_id": "gxt_01m8fdpeeqfdnhqa5c",
+            "thread_id": "01a21edd-8218-70f1-801c-e3a0dd1d66a8",
+            "turn_id": "01a21edd-8249-7501-8a67-8a85781b10d4"
+          },
+          "base": {
+            "sha256": "f6bec1577a188a95c864a139c565d855597b62215dcd942def2d3b7e270f9fd7",
+            "version": 1
+          },
+          "event_id": 263,
+          "goal_version": 1,
+          "module_id": "offline_literature_mechanism",
+          "module_instance_id": "module_e01eb599c3640853489b490e626cfc5c",
+          "module_version": "1",
+          "operation_key": "1ubq-signed-archival-review-final",
+          "report_ref": "gxa_725bdbf7b8f49ec6b53c00478290197546d362fc22769c11a5936637cab490d2",
+          "report_sha256": "1a5bf23d50777236f70aab164787075e6844f420ed35bea8711f67b0e2b48678",
+          "round": 2,
+          "run_id": "gxr_01m8fddc2b6pjbf83p",
+          "scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+          "source_refs": [
+            "gxa_01m8fddc418bd0brsp",
+            "gxa_01m8fdf671z5sxjvfs",
+            "gxa_01m8fdkmc2wbb6e4nw",
+            "gxa_01m8fdqq5z5r6mmfjz",
+            "gxa_01m8fdwkm8savphb5h",
+            "gxa_01m8fdx0fka0mhxjm3"
+          ],
+          "status": "COMPLETE",
+          "version": 1,
+          "wake_event_id": 264,
+          "released_event": 264
+        },
+        "delegated_reports": [
+          "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab"
+        ],
+        "decisions": []
+      }
+    ],
+    "real_turn_overlaps": [
+      {
+        "left_scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "right_scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "left_turn": "01a21ed7-1a96-79c1-aeef-87a37a61e9ab",
+        "right_turn": "01a21ed7-3386-7723-92a9-fe35dd61511a",
+        "left_thread": "01a21ed7-1a58-7090-8a50-dae542cfe6ad",
+        "right_thread": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+        "seconds": 111.079
+      },
+      {
+        "left_scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "right_scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "left_turn": "01a21ed8-e63a-7082-968c-50a481222711",
+        "right_turn": "01a21ed7-3386-7723-92a9-fe35dd61511a",
+        "left_thread": "01a21ed8-e608-7f92-99fe-ca6a7151e7a4",
+        "right_thread": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+        "seconds": 60.233
+      }
+    ],
+    "job_turn_overlaps": [],
+    "handoffs": [
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+        "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:79d160b6-4ee2-49ef-861e-b3689424c621",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+        "effects": [],
+        "decision_event": 199,
+        "rationale": "The executed 1UBQ readout gives {{metric:ca_radius_of_gyration_A}} from {{metric:ca_count}} Cα sites across {{metric:declared_residues}} declared positions. The {{metric:complete_backbones}} complete backbones meet the registered criterion. The signed scope review matched each position to the sequence and confirmed that the partially occupied terminal Cα sites retain all required backbone coordinates. The archive module delivered extractions before exhausting its allowance. The follow-up researcher has the archived original and released extractions to review and sign. Keep the run open for that report. The executed coordinate recipe is already published."
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "thread_id": "01a21edb-3a19-7031-a382-592022f57695",
+        "turn_id": "01a21edb-3a36-7ed0-b3da-d80c51ce3945",
+        "handoff_kind": "MODULE_TO_MODULE",
+        "delivery_receipt": "start:aa8fad72-30c4-462c-9917-422fdac23626",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21edc-deae-72c2-ad11-a1e1e791ee48",
+        "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:690b8dfe-2271-4d0d-afc3-851549ad2701",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "thread_id": "01a21edd-8218-70f1-801c-e3a0dd1d66a8",
+        "turn_id": "01a21edd-8249-7501-8a67-8a85781b10d4",
+        "handoff_kind": "MODULE_TO_MODULE",
+        "delivery_receipt": "start:20555fe3-7d07-4820-9836-9ab4902b0d50",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ede-a97f-78a0-863d-64375a0ea2a5",
+        "turn_id": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:616b5b98-7c1c-40c6-b843-8ee05ca85c30",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21edf-fb5d-7a83-baba-e72f96809657",
+        "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:dd69a507-a9b8-4634-82a7-4ed70bbb449b",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:6c5fda09-4b64-4cef-81bf-aabe01cb8450",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": true,
+        "receiver_scope": "run",
+        "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+        "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:79d160b6-4ee2-49ef-861e-b3689424c621",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-9f4b85b7-3b83-4313-a1b2-2d2c4722e5b8",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "ENACTED",
+        "decision_ref": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+        "effects": [
+          {
+            "kind": "v6.claim.adopted",
+            "event_id": 194,
+            "subject": "gxh_01m8fdfh9avw1pb9t3",
+            "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@3"
+          }
+        ],
+        "decision_event": 199,
+        "rationale": "The executed 1UBQ readout gives {{metric:ca_radius_of_gyration_A}} from {{metric:ca_count}} Cα sites across {{metric:declared_residues}} declared positions. The {{metric:complete_backbones}} complete backbones meet the registered criterion. The signed scope review matched each position to the sequence and confirmed that the partially occupied terminal Cα sites retain all required backbone coordinates. The archive module delivered extractions before exhausting its allowance. The follow-up researcher has the archived original and released extractions to review and sign. Keep the run open for that report. The executed coordinate recipe is already published."
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21edc-deae-72c2-ad11-a1e1e791ee48",
+        "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:690b8dfe-2271-4d0d-afc3-851549ad2701",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-1bcb350c-cbbc-47aa-ac67-3acde7794294",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_2006662889e6824290edc16ac7449405aa0f2278a9fcc10cddea57339601443b",
+        "effects": [],
+        "decision_event": 236,
+        "rationale": "Await the archive researcher's signed assessment. The original coordinate readout is complete and the signed numerical review explains how the partially occupied terminal sites enter the whole-chain radius. The archived 1.80 Å X-ray diffraction record and its reflection-completeness field have distinct evidential roles from the atom table. The published single-chain-backbone-coverage-rg@1 recipe already asks a future Lead to determine coverage from the next entry's own counts."
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ede-a97f-78a0-863d-64375a0ea2a5",
+        "turn_id": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:616b5b98-7c1c-40c6-b843-8ee05ca85c30",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-22da4d3d-021f-4e9f-a2d4-edcc6870eb26",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_725671666249cda035ffe334a2140fbed5bcfbcf61f0bcce6c9959c2e3601dc5",
+        "effects": [],
+        "decision_event": 250,
+        "rationale": "Keep the coordinate result and await the signed archive assessment already in progress. The executed readout and a position-by-position check of the original agree with the numerical researcher's signed interpretation, including the treatment of partially occupied terminal Cα sites. The published single-chain-backbone-coverage-rg@1 recipe contains the decision for a future independent entry. The remaining deliverable is the second researcher's own assessment of the diffraction record and its scope."
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21edf-fb5d-7a83-baba-e72f96809657",
+        "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:dd69a507-a9b8-4634-82a7-4ed70bbb449b",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-a8f4100b-9acd-4927-978c-b91882bb8f74",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_907297d1fc17c1abc7c31048583f23cbb0661687d9a27aca08428c1341fe4a99",
+        "effects": [],
+        "decision_event": 277,
+        "rationale": "The executed readout gives {{metric:ca_radius_of_gyration_A}} over {{metric:ca_count}} Cα sites, with {{metric:complete_backbones}} complete backbones among {{metric:declared_residues}} declared positions. The numerical researcher's signed position-by-position check confirms that the partially occupied tail contributes. The published single-chain-backbone-coverage-rg@1 recipe asks the next Lead to judge coverage from the new entry's own counts. Keep the run open for the assigned archive researcher's signed interpretation of the diffraction record."
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:6c5fda09-4b64-4cef-81bf-aabe01cb8450",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-f60bf315-e39c-408f-beea-4598b5e69fd3",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a",
+        "effects": [],
+        "decision_event": 294,
+        "rationale": "The executed analysis of the original 1UBQ coordinates gives {{metric:ca_radius_of_gyration_A}} for {{metric:ca_count}} equally weighted Cα sites. Chain A has {{metric:declared_residues}} declared residues and {{metric:complete_backbones}} positions with N, CA, C and O. The numerical researcher matched each position from Met1 through Gly76 and confirmed that the partially occupied tail sites each contribute once. The archive researcher verified the X-ray method and showed that the completeness fields describe diffraction reflections. Both records concern the same deposition. The position-by-position coordinate check supports the whole-chain label for this crystal model."
+      },
+      {
+        "publisher": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "report_ref": "gxa_725bdbf7b8f49ec6b53c00478290197546d362fc22769c11a5936637cab490d2",
+        "published_event": 263,
+        "released_event": 264,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:6c5fda09-4b64-4cef-81bf-aabe01cb8450",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-c21ca472-8297-4cf1-92ad-d767650a6ba3",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a",
+        "effects": [],
+        "decision_event": 294,
+        "rationale": "The executed analysis of the original 1UBQ coordinates gives {{metric:ca_radius_of_gyration_A}} for {{metric:ca_count}} equally weighted Cα sites. Chain A has {{metric:declared_residues}} declared residues and {{metric:complete_backbones}} positions with N, CA, C and O. The numerical researcher matched each position from Met1 through Gly76 and confirmed that the partially occupied tail sites each contribute once. The archive researcher verified the X-ray method and showed that the completeness fields describe diffraction reflections. Both records concern the same deposition. The position-by-position coordinate check supports the whole-chain label for this crystal model."
+      }
+    ]
+  },
+  "post_read_actions": [
+    {
+      "decision_ref": "gxa_7df31392e56899de129a9d772c0d87938abfeecf63ba1e9487aea0d8d27c7118",
+      "event_id": 154,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [
+        "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+        "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+        "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+        "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+      ],
+      "report_events": [],
+      "report_statuses": {},
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [],
+      "rationale": "The original model-1 coordinates give a C-alpha radius of {{metric:ca_radius_of_gyration_A}} across {{metric:ca_count}} C-alpha sites. The sequence declares {{metric:declared_residues}} positions and {{metric:complete_backbones}} have N, CA, C and O. This meets the registered whole-chain criterion. The executed measurement is published as single-chain-backbone-coverage-rg@1. Keep the run open for the two commissioned researchers’ signed reasons about the experimental record and the scope of the numerical result.",
+      "rendered_rationale": "The original model-1 coordinates give a C-alpha radius of 11.493 angstrom across 76 C-alpha sites. The sequence declares 76 positions and 76 have N, CA, C and O. This meets the registered whole-chain criterion. The executed measurement is published as single-chain-backbone-coverage-rg@1. Keep the run open for the two commissioned researchers’ signed reasons about the experimental record and the scope of the numerical result."
+    },
+    {
+      "decision_ref": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+      "event_id": 199,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [
+        "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+        "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+        "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+        "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+      ],
+      "report_events": [
+        144
+      ],
+      "report_statuses": {
+        "144": "ENACTED"
+      },
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [
+        {
+          "assessment_cursor": 148,
+          "availability_cursor": 194,
+          "claim_ref": "gxa_01m8fdrx0w3h44j4pp",
+          "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@3",
+          "context_ref": "gxcx_01m8fdnc5ttg4r33nn",
+          "criteria": "The complete-backbone count must satisfy /complete_backbones = 76, with the threshold set by the original declared polymer sequence. Check the C-alpha count against the same denominator.",
+          "criteria_sha256": "d1d91366756ccf4f87f6511c32e6ca1fc38e8b0d0bc512f0e4bf0650cf8e25a1",
+          "decision_delivery": {
+            "brief_sha256": "4f232fd714408194aad09c188a91e189fed9b3e5d28e9c114fd3aea28eaa6eaa",
+            "brief_turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+            "context_ref": "gxcx_01m8fdnc5ttg4r33nn",
+            "delivery_receipt": "start:79d160b6-4ee2-49ef-861e-b3689424c621",
+            "metric_refs": [],
+            "observations": [],
+            "snapshot_cursor": 148,
+            "state": "acknowledged",
+            "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+            "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5"
+          },
+          "decision_id": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+          "decision_scope": "run",
+          "event_cursor": 148,
+          "evidence_refs": [
+            "gxa_01m8fddc3e1wqp6k5j",
+            "gxa_01m8fdfj28mg23xpj0",
+            "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956"
+          ],
+          "hypothesis_id": "gxh_01m8fdfh9avw1pb9t3",
+          "lead_interpretation": {
+            "proposal_ref": "gxa_01m8fdrx0w3h44j4pp",
+            "proposed_level": "limited_support",
+            "rationale": "The model has 76 Cα sites for 76 declared positions, and 76 positions contain N, CA, C and O. The equal-weight root-mean-square distance of those Cα sites from their centroid is 11.493 angstrom. The numerical interpretation researcher matched Met1 through Gly76 individually and verified one Cα per declared residue, including the partially occupied tail."
+          },
+          "level": "insufficient",
+          "limitations": "The result describes model 1 in the supplied 1UBQ X-ray deposition. A partially occupied site with coordinates contributes once. Solution dimensions and between-sample variation require additional observations.",
+          "maturity": {
+            "direction": "undetermined",
+            "disputed_extractions": [],
+            "gaps": [
+              {
+                "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                "event_id": 15,
+                "kind": "different_method_or_output"
+              },
+              {
+                "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+                "event_id": 91,
+                "first_bytes_event_id": 85,
+                "first_event_id": 88,
+                "kind": "already_available",
+                "launch_event_id": 77,
+                "matched_data_sha256": [
+                  "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                ],
+                "matched_material_keys": [
+                  "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                ],
+                "measurement": {
+                  "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+                  "applicability_scopes": [
+                    "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+                  ],
+                  "comparison_value": "76",
+                  "lineage": [
+                    {
+                      "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                      "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                    }
+                  ],
+                  "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+                  "material_inputs": [
+                    {
+                      "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                      "bytes": 103220,
+                      "role": "structure",
+                      "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                    }
+                  ],
+                  "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+                  "metric": null,
+                  "metric_id": "complete_backbones",
+                  "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+                  "metric_scope": {
+                    "chain": "A",
+                    "entity": "1",
+                    "entry": "1UBQ",
+                    "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  },
+                  "raw_value": "76",
+                  "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+                  "source_inputs": [
+                    {
+                      "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                      "bytes": 103220,
+                      "role": "structure",
+                      "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                    }
+                  ],
+                  "unit": "1",
+                  "value": 76
+                },
+                "nature": "analysis",
+                "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+                "supports": true,
+                "value": 76
+              }
+            ],
+            "grounds": [
+              "gxa_01m8fddc3e1wqp6k5j",
+              "gxa_01m8fdfj28mg23xpj0"
+            ],
+            "material_coverage": [
+              {
+                "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                "endpoint_first_available_event_id": 88,
+                "known_at_registration": true,
+                "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+                "opposing_refs": [],
+                "qualification": "retrospective",
+                "raw_material_received_event_id": 5,
+                "registration_event_id": 194,
+                "retrospective_refs": [
+                  "gxa_01m8fdfj28mg23xpj0"
+                ],
+                "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+                "supporting_refs": [],
+                "uncertain_refs": []
+              }
+            ],
+            "opposing_refs": [],
+            "preexisting_result": true,
+            "reasons": [
+              "Applicable reviewed evidence or a classified scientific artifact is cited.",
+              "An applicable result existed by registration; interpretation of this rule is retrospective.",
+              "Unmeasured outcomes and execution gaps do not establish counterevidence."
+            ],
+            "registration": {
+              "chronology_scope": "same_store",
+              "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@3",
+              "claim_scope": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+              "claim_sha256": "703c80d2b3bfd3a7e95c5610cbcd6839f5b33c22c4aab7d2bef943740bc1cff1",
+              "data": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "decision_scope": "run",
+              "endpoint_chronology_at_registration": {
+                "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6": {
+                  "endpoint_first_available_event_id": 88,
+                  "raw_material_received_event_id": 5
+                }
+              },
+              "event_id": 194,
+              "known_at_registration": {
+                "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6": true
+              },
+              "material_identity": "endpoint_verified",
+              "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+              "method_pin": {
+                "capability": "deposited-backbone-qc@1",
+                "manifest_sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "measurement_spec": {
+                  "applicability": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+                  "capability": "deposited-backbone-qc@1",
+                  "input_role": "structure",
+                  "manifest_sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                  "measurement_schema": null,
+                  "metric_definition": {
+                    "op": "integer/1",
+                    "places": 0,
+                    "pointer": "/complete_backbones",
+                    "reader": "json/1",
+                    "scope": {
+                      "chain": "/chain",
+                      "entity": "/entity",
+                      "entry": "/entry",
+                      "input_sha256": "/input_sha256"
+                    },
+                    "unit": "1"
+                  },
+                  "metric_id": "complete_backbones",
+                  "missing_parameters": [],
+                  "observable": "/metrics/complete_backbones",
+                  "output": "qc.json",
+                  "output_name": "qc.json",
+                  "parameters": {},
+                  "result_pointer": null,
+                  "schema": "gx.measurement-spec/2",
+                  "source_roles": [
+                    "structure"
+                  ],
+                  "unit": "1"
+                },
+                "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+                "output": "qc.json"
+              },
+              "policy": "gx.claim-proposition/3",
+              "posthoc_revision_of": "gxh_01m8fdfh9avw1pb9t3@2",
+              "prediction": {
+                "data_refs": [
+                  "gxa_01m8fddc3e1wqp6k5j"
+                ],
+                "method": {
+                  "capability": "deposited-backbone-qc@1",
+                  "input_role": "structure",
+                  "metric_id": "complete_backbones",
+                  "output": "qc.json",
+                  "parameters": {},
+                  "unit": "1"
+                },
+                "observable": "/complete_backbones",
+                "operator": "eq",
+                "target": "analysis",
+                "threshold": 76
+              },
+              "proposition_sha256": "ca12b1e913a9b61ff24909556be4ba07eddf426e4d8a5b7a05735cc3052b63cb",
+              "quantifier": "all"
+            },
+            "replication": [],
+            "results": [],
+            "reviewed_evidence": [],
+            "rule": "gx.claim-proposition/3",
+            "stage": "grounded",
+            "supporting_refs": []
+          },
+          "maturity_lineage": [
+            "gxa_01m8fdrx0w3h44j4pp",
+            "gxh_01m8fdfh9avw1pb9t3@3"
+          ],
+          "metrics": [
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "display": "76",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "ca_count",
+              "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 75,
+              "raw_value": "76",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "selectors": {
+                "pointer": "/ca_count"
+              },
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "unit": "1",
+              "value": 76
+            },
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "display": "76",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 75,
+              "raw_value": "76",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "selectors": {
+                "pointer": "/declared_residues"
+              },
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "unit": "1",
+              "value": 76
+            },
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "display": "76",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 75,
+              "raw_value": "76",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "selectors": {
+                "pointer": "/complete_backbones"
+              },
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "unit": "1",
+              "value": 76
+            },
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "display": "11.493 angstrom",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+              "op": "decimal/1",
+              "output_name": "qc.json",
+              "places": 3,
+              "provenance_cursor": 75,
+              "raw_value": "11.492894876207687",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "selectors": {
+                "pointer": "/ca_radius_of_gyration_A"
+              },
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "unit": "angstrom",
+              "value": 11.492894876207687
+            }
+          ],
+          "prediction": {
+            "data_refs": [
+              "gxa_01m8fddc3e1wqp6k5j"
+            ],
+            "method": {
+              "capability": "deposited-backbone-qc@1",
+              "input_role": "structure",
+              "metric_id": "complete_backbones",
+              "output": "qc.json",
+              "parameters": {},
+              "unit": "1"
+            },
+            "observable": "/complete_backbones",
+            "operator": "eq",
+            "target": "analysis",
+            "threshold": 76
+          },
+          "previous_claim_ref": "gxh_01m8fdfh9avw1pb9t3@2",
+          "publication": {
+            "admissible_levels": [
+              "open",
+              "insufficient"
+            ],
+            "assessment_cursor": 148,
+            "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@3",
+            "direction": "undetermined",
+            "level": "insufficient",
+            "material_coverage": [
+              {
+                "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                "endpoint_first_available_event_id": 88,
+                "known_at_registration": true,
+                "measurement_spec_sha256": "26486d7ebad8bcdfec32bd71cf2ab957ed6319afb1be1aa4a93df6d4ea464045",
+                "opposing_refs": [],
+                "qualification": "retrospective",
+                "raw_material_received_event_id": 5,
+                "registration_event_id": 194,
+                "retrospective_refs": [
+                  "gxa_01m8fdfj28mg23xpj0"
+                ],
+                "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+                "supporting_refs": [],
+                "uncertain_refs": []
+              }
+            ],
+            "maturity": "grounded",
+            "measured_unqualified_data_refs": [],
+            "missing_prospective_data_refs": [
+              "gxa_01m8fddc3e1wqp6k5j"
+            ],
+            "opposing_refs": [],
+            "policy": "gx.claim-publication/3",
+            "proposal_ref": "gxa_01m8fdrx0w3h44j4pp",
+            "proposed_level": "limited_support",
+            "proposition_sha256": "ca12b1e913a9b61ff24909556be4ba07eddf426e4d8a5b7a05735cc3052b63cb",
+            "prospective_data_refs": [],
+            "quantifier": "all",
+            "reasons": [
+              "Applicable reviewed evidence or a classified scientific artifact is cited.",
+              "An applicable result existed by registration; interpretation of this rule is retrospective.",
+              "Unmeasured outcomes and execution gaps do not establish counterevidence.",
+              "The proposed limited_support exceeds the undetermined evidence for this proposition, endpoint and population. The Lead may request review or stage a narrower proposition."
+            ],
+            "registration_event_id": 194,
+            "retrospective_data_refs": [
+              "gxa_01m8fddc3e1wqp6k5j"
+            ],
+            "scope": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+            "supporting_refs": [],
+            "timing_unknown_data_refs": [],
+            "unmeasured_data_refs": []
+          },
+          "qualitative_notes": {
+            "limitations": "The result describes model 1 in the supplied 1UBQ X-ray deposition. A partially occupied site with coordinates contributes once. Solution dimensions and between-sample variation require additional observations.",
+            "rationale": "The model has {{metric:ca_count}} Cα sites for {{metric:declared_residues}} declared positions, and {{metric:complete_backbones}} positions contain N, CA, C and O. The equal-weight root-mean-square distance of those Cα sites from their centroid is {{metric:ca_radius_of_gyration_A}}. The numerical interpretation researcher matched Met1 through Gly76 individually and verified one Cα per declared residue, including the partially occupied tail.",
+            "statement": "Every declared position of ubiquitin chain A in the first deposited model has coordinates for N, CA, C and O, allowing a whole-chain C-alpha radius of gyration.",
+            "status": "UNVERIFIED"
+          },
+          "rationale": "Applicable reviewed evidence or a classified scientific artifact is cited. An applicable result existed by registration; interpretation of this rule is retrospective. Unmeasured outcomes and execution gaps do not establish counterevidence. The proposed limited_support exceeds the undetermined evidence for this proposition, endpoint and population. The Lead may request review or stage a narrower proposition.",
+          "revision": 3,
+          "schema": "gx.v6.claim.1",
+          "science": {
+            "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@3",
+            "direction": "undetermined",
+            "level": "insufficient",
+            "level_source": "gx.claim-publication/3",
+            "metric_refs": [
+              "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+              "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+              "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+              "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+            ]
+          },
+          "scope": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+          "scope_feedback": {
+            "field": "scope",
+            "matching_refs": [
+              "gxa_01m8fddc3e1wqp6k5j"
+            ],
+            "scope": "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition.",
+            "status": "bound"
+          },
+          "source_records": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [
+                  "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+                ],
+                "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [
+                    "wwPDB:1UBQ:1.3"
+                  ],
+                  "data": [
+                    "sha256:056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  ],
+                  "processing": [],
+                  "publication": [
+                    "https://doi.org/10.1016/0022-2836(87)90679-6"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "https://files.rcsb.org/download/1UBQ.cif#1.3"
+                  ]
+                },
+                "first_event_id": 5,
+                "independence_complete": false,
+                "job_id": null,
+                "measurement_schema": null,
+                "nature": "observed",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "reason": "Verified operator acquisition receipt on the original ingested bytes",
+                "record_kind": "supplied_observation",
+                "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+                "source_identity": {
+                  "artifact_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+                  "entry_id": "1UBQ",
+                  "reader": "gx.pdbx.source-identity/3",
+                  "revision": {
+                    "claimed": null,
+                    "observed": "1.3",
+                    "status": "observed"
+                  },
+                  "schema": "gx.source_identity/1",
+                  "status": "matched_accession"
+                },
+                "unknown_dependencies": [
+                  "data",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "observed",
+              "ref": "gxa_01m8fddc3e1wqp6k5j",
+              "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+              "source_class": "supplied_information",
+              "source_event_id": 15
+            },
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "capability": "deposited-backbone-qc",
+              "completion_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "job_status": "SUCCEEDED",
+              "kind": "deposited_backbone_qc",
+              "output_provenance": {
+                "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+                "applicability_scopes": [
+                  "Original experimental archive record 1UBQ revision 1.3. Limited to this deposition."
+                ],
+                "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+                "capability": {
+                  "id": "deposited-backbone-qc",
+                  "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                  "version": "1"
+                },
+                "completion_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+                "data_refs": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "declaration_name": "qc.json",
+                "dependencies": {
+                  "acquisition": [
+                    "wwPDB:1UBQ:1.3"
+                  ],
+                  "data": [
+                    "sha256:056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  ],
+                  "processing": [
+                    "capability:641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                    "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+                  ],
+                  "publication": [
+                    "https://doi.org/10.1016/0022-2836(87)90679-6"
+                  ],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "https://files.rcsb.org/download/1UBQ.cif#1.3"
+                  ]
+                },
+                "first_event_id": 85,
+                "independence_complete": false,
+                "job_id": "gxj_01m8fdfhdwep1qw3h0",
+                "nature": "analysis",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                    "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                  }
+                ],
+                "output_name": "qc.json",
+                "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+                "record_kind": "job_output",
+                "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+                "unknown_dependencies": [
+                  "data",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": [
+                  "observed"
+                ]
+              },
+              "record_nature": "analysis",
+              "ref": "gxa_01m8fdfj28mg23xpj0",
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "source_class": "computed_result",
+              "version": "1"
+            },
+            {
+              "artifact_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+              "kind": "module_report_bundle",
+              "output_provenance": {
+                "applicability_scopes": [],
+                "artifact_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [],
+                  "processing": [],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": []
+                },
+                "first_event_id": 139,
+                "independence_complete": false,
+                "job_id": null,
+                "nature": "unclassified",
+                "original_inputs_grounded": false,
+                "original_observations": [],
+                "reason": "No pinned declaration or original acquisition receipt",
+                "record_kind": "unclassified",
+                "sha256": "c1f30461f76e1312065961898e202a66b7652412a26413084fcc24df43e2f04d",
+                "unknown_dependencies": [
+                  "data",
+                  "acquisition",
+                  "sample",
+                  "source",
+                  "publication",
+                  "processing",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "unclassified",
+              "ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+              "sha256": "c1f30461f76e1312065961898e202a66b7652412a26413084fcc24df43e2f04d",
+              "source_class": "input"
+            }
+          ],
+          "statement": "Every declared position of ubiquitin chain A in the first deposited model has coordinates for N, CA, C and O, allowing a whole-chain C-alpha radius of gyration.",
+          "statement_role": "registered_proposition",
+          "verified_metrics": [
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "display": "76",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "ca_count",
+              "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 75,
+              "raw_value": "76",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "selectors": {
+                "pointer": "/ca_count"
+              },
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "unit": "1",
+              "value": 76
+            },
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "display": "76",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 75,
+              "raw_value": "76",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "selectors": {
+                "pointer": "/declared_residues"
+              },
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "unit": "1",
+              "value": 76
+            },
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "display": "76",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 75,
+              "raw_value": "76",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "selectors": {
+                "pointer": "/complete_backbones"
+              },
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "unit": "1",
+              "value": 76
+            },
+            {
+              "admission_sha256": "29967dce820c044c8e5223ccbc239897e8f056e2f72150065f028d9ac48ec3b9",
+              "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+              "display": "11.493 angstrom",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+                  "bytes": 103220,
+                  "role": "structure",
+                  "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+                }
+              ],
+              "job_id": "gxj_01m8fdfhdwep1qw3h0",
+              "manifest_sha256": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+              "op": "decimal/1",
+              "output_name": "qc.json",
+              "places": 3,
+              "provenance_cursor": 75,
+              "raw_value": "11.492894876207687",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1UBQ",
+                "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+              },
+              "selectors": {
+                "pointer": "/ca_radius_of_gyration_A"
+              },
+              "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+              "unit": "angstrom",
+              "value": 11.492894876207687
+            }
+          ]
+        }
+      ],
+      "rationale": "The executed 1UBQ readout gives {{metric:ca_radius_of_gyration_A}} from {{metric:ca_count}} Cα sites across {{metric:declared_residues}} declared positions. The {{metric:complete_backbones}} complete backbones meet the registered criterion. The signed scope review matched each position to the sequence and confirmed that the partially occupied terminal Cα sites retain all required backbone coordinates. The archive module delivered extractions before exhausting its allowance. The follow-up researcher has the archived original and released extractions to review and sign. Keep the run open for that report. The executed coordinate recipe is already published.",
+      "rendered_rationale": "The executed 1UBQ readout gives 11.493 angstrom from 76 Cα sites across 76 declared positions. The 76 complete backbones meet the registered criterion. The signed scope review matched each position to the sequence and confirmed that the partially occupied terminal Cα sites retain all required backbone coordinates. The archive module delivered extractions before exhausting its allowance. The follow-up researcher has the archived original and released extractions to review and sign. Keep the run open for that report. The executed coordinate recipe is already published."
+    },
+    {
+      "decision_ref": "gxa_2006662889e6824290edc16ac7449405aa0f2278a9fcc10cddea57339601443b",
+      "event_id": 236,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [
+        "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+        "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+        "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+        "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+      ],
+      "report_events": [
+        144
+      ],
+      "report_statuses": {
+        "144": "CITED"
+      },
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [],
+      "rationale": "Await the archive researcher's signed assessment. The original coordinate readout is complete and the signed numerical review explains how the partially occupied terminal sites enter the whole-chain radius. The archived 1.80 Å X-ray diffraction record and its reflection-completeness field have distinct evidential roles from the atom table. The published single-chain-backbone-coverage-rg@1 recipe already asks a future Lead to determine coverage from the next entry's own counts.",
+      "rendered_rationale": "Await the archive researcher's signed assessment. The original coordinate readout is complete and the signed numerical review explains how the partially occupied terminal sites enter the whole-chain radius. The archived 1.80 Å X-ray diffraction record and its reflection-completeness field have distinct evidential roles from the atom table. The published single-chain-backbone-coverage-rg@1 recipe already asks a future Lead to determine coverage from the next entry's own counts."
+    },
+    {
+      "decision_ref": "gxa_725671666249cda035ffe334a2140fbed5bcfbcf61f0bcce6c9959c2e3601dc5",
+      "event_id": 250,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [],
+      "report_events": [
+        144
+      ],
+      "report_statuses": {
+        "144": "CITED"
+      },
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [],
+      "rationale": "Keep the coordinate result and await the signed archive assessment already in progress. The executed readout and a position-by-position check of the original agree with the numerical researcher's signed interpretation, including the treatment of partially occupied terminal Cα sites. The published single-chain-backbone-coverage-rg@1 recipe contains the decision for a future independent entry. The remaining deliverable is the second researcher's own assessment of the diffraction record and its scope.",
+      "rendered_rationale": "Keep the coordinate result and await the signed archive assessment already in progress. The executed readout and a position-by-position check of the original agree with the numerical researcher's signed interpretation, including the treatment of partially occupied terminal Cα sites. The published single-chain-backbone-coverage-rg@1 recipe contains the decision for a future independent entry. The remaining deliverable is the second researcher's own assessment of the diffraction record and its scope."
+    },
+    {
+      "decision_ref": "gxa_907297d1fc17c1abc7c31048583f23cbb0661687d9a27aca08428c1341fe4a99",
+      "event_id": 277,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [
+        "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+        "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+        "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+        "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2"
+      ],
+      "report_events": [
+        144
+      ],
+      "report_statuses": {
+        "144": "CITED"
+      },
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [],
+      "rationale": "The executed readout gives {{metric:ca_radius_of_gyration_A}} over {{metric:ca_count}} Cα sites, with {{metric:complete_backbones}} complete backbones among {{metric:declared_residues}} declared positions. The numerical researcher's signed position-by-position check confirms that the partially occupied tail contributes. The published single-chain-backbone-coverage-rg@1 recipe asks the next Lead to judge coverage from the new entry's own counts. Keep the run open for the assigned archive researcher's signed interpretation of the diffraction record.",
+      "rendered_rationale": "The executed readout gives 11.493 angstrom over 76 Cα sites, with 76 complete backbones among 76 declared positions. The numerical researcher's signed position-by-position check confirms that the partially occupied tail contributes. The published single-chain-backbone-coverage-rg@1 recipe asks the next Lead to judge coverage from the new entry's own counts. Keep the run open for the assigned archive researcher's signed interpretation of the diffraction record."
+    }
+  ],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCOPE_DENIED",
+      "field": "decision",
+      "previous_rejections": 0,
+      "reason": "SCOPE_DENIED",
+      "submission": "14e8f18649fd01c6cdae0c40244c15acafe762f5e655ba523f47949dc32a9fbf",
+      "event_id": 192,
+      "corrected_decision_event": 199
+    },
+    {
+      "attempt": 1,
+      "code": "SCOPE_DENIED",
+      "field": "metric_refs",
+      "previous_rejections": 0,
+      "reason": "endpoint_not_received",
+      "submission": "a243f4f2a179af6fa81efbf3183625036f870bf79007568d654a77b34c9763f5",
+      "event_id": 220,
+      "corrected_decision_event": 236
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "18561156774829f10f4b8919da44e37d87f9424da7ff8510edb7eae77a057cfa",
+      "event_id": 226,
+      "corrected_decision_event": 236
+    },
+    {
+      "attempt": 1,
+      "code": "SCOPE_DENIED",
+      "field": "metric_refs",
+      "previous_rejections": 0,
+      "reason": "endpoint_not_received",
+      "submission": "a633452828a1a4780c272f179b006e1797f83b96cd1528276902212789d6a9c7",
+      "event_id": 268,
+      "corrected_decision_event": 277
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "73666e8674b304d923b1e76f3c3f6aba2b81d8faa0888e9e683213a0e6fe543b",
+      "event_id": 271,
+      "corrected_decision_event": 277
+    },
+    {
+      "attempt": 1,
+      "code": "SCOPE_DENIED",
+      "field": "metric_refs",
+      "previous_rejections": 0,
+      "reason": "endpoint_not_received",
+      "submission": "bd2b74a4a6488060feedee47476db59a132556e2aeed96776abb95e7161f2bb4",
+      "event_id": 285,
+      "corrected_decision_event": 294
+    }
+  ],
+  "invocation": {
+    "action": "start",
+    "before": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "after": {
+      "jobs": 1,
+      "host_turns": 13
+    },
+    "added": {
+      "jobs": 1,
+      "host_turns": 13
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/science-assets-live/archived-qc/state --run-key assets-archive-qc-parent --goal-file /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/reuse/case-a/question.md --goal-config /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/reuse/case-a/goal.json --timeout 1500.0"
+  }
+}

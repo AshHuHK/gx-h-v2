@@ -1,0 +1,96 @@
+{
+  "run_id": "gxr_01m8febe21hn46darv",
+  "original_real_calls": [
+    {
+      "call": "exec-416bc8f7-dca4-43f8-861e-807909887689",
+      "request": {
+        "branch": "myoglobin",
+        "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+        "inputs": {
+          "structure": "gxa_01m8febe320303ngc7"
+        },
+        "prefix": "mbn",
+        "recipe": "single-chain-backbone-coverage-rg@1"
+      },
+      "returned_operations": [
+        {
+          "branch": "myoglobin",
+          "capability": "deposited-backbone-qc@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8febe320303ngc7"
+          ],
+          "node": "local:mbn-backbone_qc",
+          "op": "add_node",
+          "parameters": {},
+          "question": "Apply deposited-backbone-qc@1 to the named inputs of this Goal.",
+          "recipe_decision": {
+            "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+            "recipe": "single-chain-backbone-coverage-rg@1",
+            "step": "backbone_qc"
+          }
+        }
+      ],
+      "submission_hint": null
+    },
+    {
+      "call": "exec-2838142f-32e1-4f82-a1b5-4a4134394fb3",
+      "request": {
+        "branch": "local:myoglobin",
+        "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+        "inputs": {
+          "structure": "gxa_01m8febe320303ngc7"
+        },
+        "prefix": "mbn",
+        "recipe": "single-chain-backbone-coverage-rg@1"
+      },
+      "returned_operations": [
+        {
+          "branch": "local:myoglobin",
+          "capability": "deposited-backbone-qc@1",
+          "depends_on": [],
+          "inputs": [
+            "gxa_01m8febe320303ngc7"
+          ],
+          "node": "local:mbn-backbone_qc",
+          "op": "add_node",
+          "parameters": {},
+          "question": "Apply deposited-backbone-qc@1 to the named inputs of this Goal.",
+          "recipe_decision": {
+            "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+            "recipe": "single-chain-backbone-coverage-rg@1",
+            "step": "backbone_qc"
+          }
+        }
+      ],
+      "submission_hint": {
+        "branch": "local:myoglobin",
+        "instructions": "Prepend one open_branch operation to these add_node operations. Fill the scientific fields for this Goal and fund the expanded Jobs.",
+        "minimum_budget_limits": {
+          "cpu_seconds": 30,
+          "job_submissions": 1
+        },
+        "required_open_branch_fields": [
+          "op",
+          "branch",
+          "hypothesis",
+          "method_family",
+          "alternative",
+          "discriminating_observation",
+          "budget_limits",
+          "stop_condition"
+        ],
+        "tool": "gx_decide_revision"
+      }
+    }
+  ],
+  "replay_read_only_after_fix": {
+    "error": "SCHEMA_INVALID: No branch 'myoglobin' exists in this Goal. For a new branch, call gx_instantiate_recipe again with branch 'local:myoglobin' to receive the open_branch fields and budget. To extend an existing branch, pass its open branch_id from gx_task_context.",
+    "details": {
+      "field": "branch",
+      "suggested_new_branch": "local:myoglobin"
+    },
+    "total_changed_rows": 0
+  },
+  "valid_local_expansion_unchanged": true
+}

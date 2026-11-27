@@ -1,0 +1,3004 @@
+{
+  "parent": {
+    "run_id": "gxr_01m8fddc2b6pjbf83p",
+    "goal": "CLOSED",
+    "materials": [
+      {
+        "role": "structure",
+        "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+        "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+      },
+      {
+        "role": "literature",
+        "artifact_ref": "gxa_01m8fddc418bd0brsp",
+        "sha256": "9bd788b380d9cd13b8116e4afe556fcfb7a0c79f7b6d194c3abae674d6e0bb76"
+      }
+    ],
+    "jobs": [
+      {
+        "node_id": "node_40d5236c4dfcad52b7dfe7dca83a1e47",
+        "job_id": "gxj_01m8fdfhdwep1qw3h0",
+        "status": "SUCCEEDED",
+        "method": "deposited-backbone-qc@1",
+        "depends_on": [],
+        "recipe_decision": null,
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+            "bytes": 103220,
+            "role": "structure",
+            "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6"
+          }
+        ],
+        "manifest_hash": "e363ec2c407630520354b9d626a7a9dfb5326f865746ac43eddd40d388d30d45",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+            "sha256": "8c0f2e4e01cb7df9d794371505f5b7351c4c991951b92018db75dc5efd27593d",
+            "output_name": "qc.json",
+            "kind": "deposited_backbone_qc",
+            "nature": "analysis"
+          }
+        ],
+        "provider": {
+          "id": "deposited-backbone-qc",
+          "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+          "version": "1"
+        },
+        "independent_pdb": {
+          "pdb_sha256": "d4a6812d8951cf6594e6a0763f089e35f5a80b62acb3c117b2c5565228a7b161",
+          "denominator": 76,
+          "observed": 76,
+          "c_alpha": 76,
+          "complete_n_ca_c_o": 76,
+          "radius_of_gyration_A": 11.492894876207687
+        },
+        "comparison": {
+          "counts_identical": true,
+          "abs_difference_A": 0.0,
+          "tolerance_A": 0.0001
+        },
+        "readout": {
+          "schema": "gx.deposited-backbone-qc/1",
+          "entry": "1UBQ",
+          "chain": "A",
+          "entity": "1",
+          "input_sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+          "declared_residues": 76,
+          "model_count": 1,
+          "model": 1,
+          "observed_residues": 76,
+          "ca_count": 76,
+          "complete_backbones": 76,
+          "missing_label_positions": [],
+          "ca_radius_of_gyration_A": 11.492894876207687
+        }
+      }
+    ],
+    "release_events": [
+      {
+        "event_id": 91,
+        "node": "node_40d5236c4dfcad52b7dfe7dca83a1e47",
+        "type": "v6.node.settled"
+      }
+    ],
+    "recipe_expansions": [],
+    "lead_points": [],
+    "decisions": [
+      {
+        "decision_ref": "gxa_d64ef081ab62ab2477b8072f04c4d8d13004bee66cf90fcba35a5ac54552e65c",
+        "turn_id": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "rationale": "The declared sequence fixes the denominator for chain A. Run the backbone check on the original coordinates to count positions with N, CA, C and O and compute the equal-weight radius from the observed C-alpha sites. The two commissioned researchers are examining the experimental record and the interpretation independently.",
+        "evidence_refs": [
+          "gxa_01m8fddc3e1wqp6k5j",
+          "gxa_01m8fddc418bd0brsp",
+          "gxa_01m8fdf8mm1hjgbsb4"
+        ],
+        "ops": [
+          "open_branch",
+          "add_node"
+        ],
+        "outcome": "adopted"
+      },
+      {
+        "decision_ref": "gxa_da98e3f008bf3a963bbf90cbbcde458cd2934e96c60bb8b58585857f61993e47",
+        "turn_id": "01a21ed7-c6cd-7dc3-b421-c479e6da16ba",
+        "rationale": "The original mmCIF maps chain A to the ubiquitin polymer sequence, and the archived record identifies the X-ray diffraction experiment. The registered coordinate calculation tests backbone coverage position by position. Its output and the two pending signed interpretations are the evidence needed to label the radius and publish the executed calculation for reuse. A second job on the same coordinates would add no independent observation.",
+        "evidence_refs": [
+          "gxa_01m8fddc3e1wqp6k5j",
+          "gxa_01m8fddc418bd0brsp",
+          "gxa_01m8fdf8mm1hjgbsb4"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_7df31392e56899de129a9d772c0d87938abfeecf63ba1e9487aea0d8d27c7118",
+        "turn_id": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "rationale": "The original model-1 coordinates give a C-alpha radius of {{metric:ca_radius_of_gyration_A}} across {{metric:ca_count}} C-alpha sites. The sequence declares {{metric:declared_residues}} positions and {{metric:complete_backbones}} have N, CA, C and O. This meets the registered whole-chain criterion. The executed measurement is published as single-chain-backbone-coverage-rg@1. Keep the run open for the two commissioned researchers’ signed reasons about the experimental record and the scope of the numerical result.",
+        "evidence_refs": [
+          "gxa_01m8fdfj28mg23xpj0",
+          "gxa_01m8fddc3e1wqp6k5j",
+          "gxa_01m8fddc418bd0brsp",
+          "gxh_01m8fdfh9avw1pb9t3@2"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+        "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "rationale": "The executed 1UBQ readout gives {{metric:ca_radius_of_gyration_A}} from {{metric:ca_count}} Cα sites across {{metric:declared_residues}} declared positions. The {{metric:complete_backbones}} complete backbones meet the registered criterion. The signed scope review matched each position to the sequence and confirmed that the partially occupied terminal Cα sites retain all required backbone coordinates. The archive module delivered extractions before exhausting its allowance. The follow-up researcher has the archived original and released extractions to review and sign. Keep the run open for that report. The executed coordinate recipe is already published.",
+        "evidence_refs": [
+          "gxa_01m8fdrx0w3h44j4pp",
+          "gxa_01m8fddc3e1wqp6k5j",
+          "gxa_01m8fdfj28mg23xpj0",
+          "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+          "gxa_01m8fddc418bd0brsp",
+          "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+          "gxa_01m8fdf671z5sxjvfs",
+          "gxa_01m8fdkmc2wbb6e4nw"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_2006662889e6824290edc16ac7449405aa0f2278a9fcc10cddea57339601443b",
+        "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "rationale": "Await the archive researcher's signed assessment. The original coordinate readout is complete and the signed numerical review explains how the partially occupied terminal sites enter the whole-chain radius. The archived 1.80 Å X-ray diffraction record and its reflection-completeness field have distinct evidential roles from the atom table. The published single-chain-backbone-coverage-rg@1 recipe already asks a future Lead to determine coverage from the next entry's own counts.",
+        "evidence_refs": [
+          "gxa_01m8fdfj28mg23xpj0",
+          "gxa_01m8fddc3e1wqp6k5j",
+          "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+          "gxa_01m8fddc418bd0brsp",
+          "gxa_01m8fdf671z5sxjvfs",
+          "gxa_01m8fdkmc2wbb6e4nw"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_725671666249cda035ffe334a2140fbed5bcfbcf61f0bcce6c9959c2e3601dc5",
+        "turn_id": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "rationale": "Keep the coordinate result and await the signed archive assessment already in progress. The executed readout and a position-by-position check of the original agree with the numerical researcher's signed interpretation, including the treatment of partially occupied terminal Cα sites. The published single-chain-backbone-coverage-rg@1 recipe contains the decision for a future independent entry. The remaining deliverable is the second researcher's own assessment of the diffraction record and its scope.",
+        "evidence_refs": [
+          "gxa_01m8fddc3e1wqp6k5j",
+          "gxa_01m8fdfj28mg23xpj0",
+          "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+          "gxa_01m8fddc418bd0brsp",
+          "gxa_01m8fdf671z5sxjvfs",
+          "gxa_01m8fdkmc2wbb6e4nw"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_907297d1fc17c1abc7c31048583f23cbb0661687d9a27aca08428c1341fe4a99",
+        "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "rationale": "The executed readout gives {{metric:ca_radius_of_gyration_A}} over {{metric:ca_count}} Cα sites, with {{metric:complete_backbones}} complete backbones among {{metric:declared_residues}} declared positions. The numerical researcher's signed position-by-position check confirms that the partially occupied tail contributes. The published single-chain-backbone-coverage-rg@1 recipe asks the next Lead to judge coverage from the new entry's own counts. Keep the run open for the assigned archive researcher's signed interpretation of the diffraction record.",
+        "evidence_refs": [
+          "gxa_01m8fddc3e1wqp6k5j",
+          "gxa_01m8fdfj28mg23xpj0",
+          "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+          "gxa_01m8fddc418bd0brsp",
+          "gxa_01m8fdf671z5sxjvfs",
+          "gxa_01m8fdkmc2wbb6e4nw"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "rationale": "The executed analysis of the original 1UBQ coordinates gives {{metric:ca_radius_of_gyration_A}} for {{metric:ca_count}} equally weighted Cα sites. Chain A has {{metric:declared_residues}} declared residues and {{metric:complete_backbones}} positions with N, CA, C and O. The numerical researcher matched each position from Met1 through Gly76 and confirmed that the partially occupied tail sites each contribute once. The archive researcher verified the X-ray method and showed that the completeness fields describe diffraction reflections. Both records concern the same deposition. The position-by-position coordinate check supports the whole-chain label for this crystal model.",
+        "evidence_refs": [
+          "gxa_01m8fddc3e1wqp6k5j",
+          "gxa_01m8fdfj28mg23xpj0",
+          "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+          "gxa_01m8fddc418bd0brsp",
+          "gxa_01m8fdf671z5sxjvfs",
+          "gxa_01m8fdkmc2wbb6e4nw",
+          "gxa_01m8fdwkm8savphb5h",
+          "gxa_01m8fdx0fka0mhxjm3",
+          "gxa_01m8fdqq5z5r6mmfjz",
+          "gxa_725bdbf7b8f49ec6b53c00478290197546d362fc22769c11a5936637cab490d2"
+        ],
+        "ops": [
+          "close_run"
+        ],
+        "outcome": "adopted"
+      }
+    ],
+    "lead_turns": [
+      {
+        "thread_id": "01a21ed6-b799-7fd3-8250-c9e37a6530d1",
+        "turn_id": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21ed7-c6a3-7061-923d-b7d7c2d1ff10",
+        "turn_id": "01a21ed7-c6cd-7dc3-b421-c479e6da16ba",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21ed8-dbde-7de0-83bd-c73821dcae79",
+        "turn_id": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+        "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21edc-deae-72c2-ad11-a1e1e791ee48",
+        "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21ede-a97f-78a0-863d-64375a0ea2a5",
+        "turn_id": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21edf-fb5d-7a83-baba-e72f96809657",
+        "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "state": "acknowledged"
+      }
+    ],
+    "deployment": {
+      "created_at": "2026-11-27T21:08:36.043Z",
+      "contract_sha256": "7a0a4c491271e0eebdfecf8196e6641bd0a40550f38f1e690eb269e7c48ad54a",
+      "workflow_sha256": null,
+      "agent_policy_sha256": "caab30afa94e8aae750159b5dfdccddcf62c4d959570ca4f5c011a6a97ae3216"
+    },
+    "initially_active_qc_provider": [],
+    "goal_pins": [
+      {
+        "digest": "2e93f4d6cb3c175f00c3183d5615980e2635fabb30e5c6d0585b10b517dd1ee9",
+        "method": "deposited-backbone-qc@1",
+        "provider": "org.gx.deposited-structure-qc@1.0.0",
+        "provider_digest": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336"
+      }
+    ],
+    "catalog": [
+      {
+        "turn": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "call": "exec-33097ad5-657b-49db-a60c-ae748816c647",
+        "query": {
+          "kind": "all",
+          "limit": 35,
+          "query": "Model 1 single polypeptide C-alpha coordinate radius of gyration angstrom and counted residue coverage against declared sequence and per-position N CA C O backbone completeness on original mmCIF, archived experimental record interpretation and reusable workflow"
+        },
+        "selected": null,
+        "references": [
+          "deposited-backbone-qc@1",
+          "deposited-chain-geometry@2",
+          "deposited-macrocycle-qc@1",
+          "mapped-structure-agreement@1",
+          "deposited-chain-geometry@1"
+        ],
+        "total": 62,
+        "survey_event": 21
+      },
+      {
+        "turn": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "call": "exec-8abee83f-6ae9-4f39-8f14-5f4657e23e4a",
+        "query": {
+          "kind": "method",
+          "reference": "deposited-backbone-qc@1"
+        },
+        "selected": "deposited-backbone-qc@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "call": "exec-e0114b35-fe50-4d28-a019-4fce5ecfc9da",
+        "query": {
+          "kind": "recipe",
+          "query": "single deposited polypeptide model C-alpha radius of gyration backbone completeness"
+        },
+        "selected": null,
+        "references": [],
+        "total": 0,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "call": "exec-9fa79036-dfdb-475f-8e2a-89cd367f2419",
+        "query": {
+          "kind": "module",
+          "reference": "hypothesis_space@1"
+        },
+        "selected": "hypothesis_space@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "call": "exec-24194b98-7171-439a-8c6c-af72f781acf2",
+        "query": {
+          "kind": "module",
+          "reference": "offline_literature_mechanism@1"
+        },
+        "selected": "offline_literature_mechanism@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ed7-c6cd-7dc3-b421-c479e6da16ba",
+        "call": "exec-3e9a8274-9018-48ea-97f6-84ef19fd7b30",
+        "query": {
+          "kind": "all",
+          "query": "deposited backbone completeness and model-1 C-alpha radius of gyration in original mmCIF, chain sequence denominator, reusable executed measurement recipe"
+        },
+        "selected": null,
+        "references": [
+          "deposited-backbone-qc@1",
+          "deposited-chain-geometry@2",
+          "deposited-block-signed@1",
+          "tl1a-review@1",
+          "tl1a-review@1"
+        ],
+        "total": 64,
+        "survey_event": 93
+      },
+      {
+        "turn": "01a21ed7-c6cd-7dc3-b421-c479e6da16ba",
+        "call": "exec-b8b6faf4-8683-4d5e-9a0c-072316683fd9",
+        "query": {
+          "kind": "method",
+          "reference": "deposited-backbone-qc@1"
+        },
+        "selected": "deposited-backbone-qc@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ed7-c6cd-7dc3-b421-c479e6da16ba",
+        "call": "exec-34c5c123-9f6a-41bc-92c5-ea228a09368d",
+        "query": {
+          "kind": "recipe",
+          "query": "reusable workspace recipe publish executed measurement source node metric readout"
+        },
+        "selected": null,
+        "references": [
+          "reading-package@legacy",
+          "cyclic-closure-qc-control@legacy",
+          "fab-coverage-history@legacy"
+        ],
+        "total": 3,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "call": "exec-a1d2610f-6919-45b3-a28a-e9f68ff87c6a",
+        "query": {
+          "kind": "all",
+          "limit": 15,
+          "query": "Model-1 single declared polypeptide in original mmCIF, backbone completeness and equal-weight C-alpha radius of gyration; read or publish the executed measurement for an independent entry"
+        },
+        "selected": null,
+        "references": [
+          "deposited-backbone-qc@1",
+          "deposited-chain-geometry@2",
+          "pcna-interface@1",
+          "tl1a-review@1",
+          "tl1a-review@1"
+        ],
+        "total": 70,
+        "survey_event": 114
+      },
+      {
+        "turn": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "call": "exec-927b32d7-6533-469d-bfd5-8773ace44dc8",
+        "query": {
+          "kind": "method",
+          "reference": "deposited-backbone-qc@1"
+        },
+        "selected": "deposited-backbone-qc@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "call": "exec-e3e3e076-cc8f-4d69-b295-137ad84ff70e",
+        "query": {
+          "kind": "recipe",
+          "limit": 4,
+          "query": "single polypeptide deposited backbone quality control C-alpha radius model 1"
+        },
+        "selected": null,
+        "references": [
+          "cyclic-closure-qc-control@legacy",
+          "fab-coverage-history@legacy",
+          "reading-package@legacy"
+        ],
+        "total": 3,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "call": "exec-462954d0-6101-49a0-aec5-1b3a6b3e2f2a",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "call": "exec-ada56376-d4c6-49f3-a4ab-499b75eed18b",
+        "query": {
+          "kind": "all",
+          "limit": 15,
+          "query": "1UBQ archived experimental record independent source review and scope of the single-chain backbone coverage and C-alpha radius of gyration",
+          "required_outputs": [
+            "signed researcher interpretation of the supplied experimental record",
+            "deposited model coverage and equal-weight C-alpha radius of gyration"
+          ]
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "deposited-backbone-qc@1",
+          "archival-peptide-coverage@1",
+          "gx_extract_evidence@1",
+          "mapped-structure-agreement@1"
+        ],
+        "total": 79,
+        "survey_event": 160
+      },
+      {
+        "turn": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "call": "exec-9fa337cb-2b51-4c9d-a4f3-335935ed9ddd",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "call": "exec-b0d057cb-3b3c-4813-ab33-7b211ad85160",
+        "query": {
+          "kind": "module",
+          "reference": "offline_literature_mechanism@1"
+        },
+        "selected": "offline_literature_mechanism@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "call": "exec-730f3155-0dd8-475a-accb-954736580cfc",
+        "query": {
+          "kind": "method",
+          "reference": "deposited-backbone-qc@1"
+        },
+        "selected": "deposited-backbone-qc@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "call": "exec-37b0bb00-c419-47bb-a7c1-a8fd5d6067f9",
+        "query": {
+          "kind": "all",
+          "limit": 12,
+          "query": "model 1 deposited chain C-alpha radius of gyration backbone coverage reusable measurement recipe"
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "deposited-backbone-qc@1",
+          "deposited-chain-geometry@2",
+          "deposited-block-influence@1",
+          "tl1a-review@1"
+        ],
+        "total": 89,
+        "survey_event": 206
+      },
+      {
+        "turn": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "call": "exec-1911b65b-33ce-4a93-ace6-66e604f5748b",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "call": "exec-7e4272fe-f8ad-4620-849d-f75bb2cd69c2",
+        "query": {
+          "kind": "all",
+          "limit": 30,
+          "query": "single-chain model 1 C-alpha radius of gyration deposited backbone coverage N CA C O original PDBx mmCIF archival X-ray diffraction record independent interpretation reusable workspace recipe"
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "deposited-backbone-qc@1",
+          "tl1a-review@1",
+          "tl1a-review@1",
+          "archival-peptide-coverage@1"
+        ],
+        "total": 176,
+        "survey_event": 243
+      },
+      {
+        "turn": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "call": "exec-e3c289d2-e902-4afd-a066-86712b439064",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "call": "exec-581533db-12d1-4cee-a1fd-04f603f4abe3",
+        "query": {
+          "kind": "method",
+          "reference": "deposited-backbone-qc@1"
+        },
+        "selected": "deposited-backbone-qc@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "call": "exec-0d8e3821-6656-4714-be4d-a4a542602a70",
+        "query": {
+          "kind": "all",
+          "limit": 8,
+          "query": "single-chain crystallographic model-1 C-alpha radius, declared backbone coverage, reusable executed measurement and archival experimental evidence"
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "archival-peptide-coverage@1",
+          "deposited-backbone-qc@1",
+          "interpret-coordinate-coverage@1",
+          "mapped-structure-agreement@1"
+        ],
+        "total": 153,
+        "survey_event": 257
+      },
+      {
+        "turn": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "call": "exec-34c36766-ada4-4bd1-9ae6-af6979bc1854",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "call": "exec-d0f7c820-9b5c-44cd-8d85-1cee29faa539",
+        "query": {
+          "kind": "all",
+          "limit": 20,
+          "query": "Single-chain deposited backbone coverage and model-1 C-alpha radius of gyration, executed coordinate method and reusable workspace recipe for a second independent deposition."
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "deposited-backbone-qc@1",
+          "interpret-coordinate-coverage@1",
+          "deposited-block-influence@1",
+          "archival-peptide-coverage@1"
+        ],
+        "total": 170,
+        "survey_event": 284
+      },
+      {
+        "turn": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "call": "exec-a1314801-b5d0-43ed-b2d7-d2cf79d4c9fa",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      }
+    ],
+    "save_calls": [
+      {
+        "turn": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "call": "exec-48069957-bab5-498a-8e10-cde2e72228f1",
+        "args": {
+          "decision_point": {
+            "actions": [
+              "If both counts equal the declared denominator, give the radius in angstroms and the counted/declared residues, and label it a whole-chain C-alpha radius for this deposited model.",
+              "If either count falls short, give the observed C-alpha radius when defined, both counts and the denominator. Identify missing sites from this entry and qualify the measurement by its coordinate coverage, including a partial backbone even when every C-alpha is present."
+            ],
+            "output": "qc.json",
+            "question": "For this entry's model 1, do ca_count and complete_backbones both equal declared_residues, and what scope do those counts justify for its C-alpha radius?",
+            "step": "backbone_qc",
+            "stop_condition": "Finish when the new entry's radius or reason it is undefined, counts, denominator and supported model-specific label have been recorded. Stop with an unresolved scope if the entry or mapping fails the method's requirements."
+          },
+          "id_alignment": "For each independent original mmCIF, identify its single polypeptide label chain through _struct_asym and its entity. Take the distinct positions of that entity in _entity_poly_seq as the denominator. Match model-1 atom sites by label_asym_id, label_entity_id, label_seq_id and declared residue identity. Keep the entry, input digest, model, chain and entity with the readout. The method requires unambiguous sites without alternate coordinates or microheterogeneity.",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fddc3e1wqp6k5j",
+              "name": "structure"
+            }
+          ],
+          "missing_values": "Only positive-occupancy sites count. Retain unmodeled positions in the declared denominator. Omit missing C-alpha sites from the radius without imputation. A present C-alpha contributes even when N, C or O is missing. Such a position fails the four-atom test. Inspect missing_label_positions for unrepresented positions and the atom records for partial backbones. If no C-alpha radius is available or the mapping is ambiguous, leave the corresponding measurement unresolved.",
+          "nodes": [
+            {
+              "node_id": "node_40d5236c4dfcad52b7dfe7dca83a1e47",
+              "slot": "backbone_qc"
+            }
+          ],
+          "recipe_id": "single-chain-backbone-coverage-rg",
+          "title": "Model-1 C-alpha radius of gyration and backbone coverage of a declared polypeptide",
+          "units": "Use Cartesian coordinates in angstroms. Report the root-mean-square distance of the observed C-alpha sites from their arithmetic centroid in angstroms with one equal vote per site. Report observed positions, C-alpha sites and complete N/CA/C/O backbones as counts against the declared residue count. Coordinate coverage is the observed-position count divided by that denominator.",
+          "version": "1"
+        },
+        "returned": {
+          "decision_point": {
+            "actions": [
+              "If both counts equal the declared denominator, give the radius in angstroms and the counted/declared residues, and label it a whole-chain C-alpha radius for this deposited model.",
+              "If either count falls short, give the observed C-alpha radius when defined, both counts and the denominator. Identify missing sites from this entry and qualify the measurement by its coordinate coverage, including a partial backbone even when every C-alpha is present."
+            ],
+            "event": "job_settled",
+            "output": "qc.json",
+            "question": "For this entry's model 1, do ca_count and complete_backbones both equal declared_residues, and what scope do those counts justify for its C-alpha radius?",
+            "role": "run_lead",
+            "step": "backbone_qc",
+            "stop_condition": "Finish when the new entry's radius or reason it is undefined, counts, denominator and supported model-specific label have been recorded. Stop with an unresolved scope if the entry or mapping fails the method's requirements."
+          },
+          "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+          "id_alignment": "For each independent original mmCIF, identify its single polypeptide label chain through _struct_asym and its entity. Take the distinct positions of that entity in _entity_poly_seq as the denominator. Match model-1 atom sites by label_asym_id, label_entity_id, label_seq_id and declared residue identity. Keep the entry, input digest, model, chain and entity with the readout. The method requires unambiguous sites without alternate coordinates or microheterogeneity.",
+          "inputs": {
+            "structure": {
+              "kind": "run_input",
+              "media_type": "chemical/x-mmcif"
+            }
+          },
+          "kind": "recipe",
+          "method_pins": {
+            "deposited-backbone-qc@1": "2e93f4d6cb3c175f00c3183d5615980e2635fabb30e5c6d0585b10b517dd1ee9"
+          },
+          "methods": {
+            "backbone_qc": "deposited-backbone-qc@1"
+          },
+          "missing_values": "Only positive-occupancy sites count. Retain unmodeled positions in the declared denominator. Omit missing C-alpha sites from the radius without imputation. A present C-alpha contributes even when N, C or O is missing. Such a position fails the four-atom test. Inspect missing_label_positions for unrepresented positions and the atom records for partial backbones. If no C-alpha radius is available or the mapping is ambiguous, leave the corresponding measurement unresolved.",
+          "outputs": {
+            "backbone_qc": [
+              {
+                "kind": "deposited_backbone_qc",
+                "name": "qc.json",
+                "nature": "analysis",
+                "source_roles": [
+                  "structure"
+                ]
+              }
+            ]
+          },
+          "provider_pins": {
+            "deposited-backbone-qc@1": {
+              "closure": [
+                {
+                  "id": "org.gx.deposited-structure-qc",
+                  "sha256": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336",
+                  "version": "1.0.0"
+                }
+              ],
+              "plugin": {
+                "id": "org.gx.deposited-structure-qc",
+                "sha256": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336",
+                "version": "1.0.0"
+              }
+            }
+          },
+          "reference": "single-chain-backbone-coverage-rg@1",
+          "title": "Model-1 C-alpha radius of gyration and backbone coverage of a declared polypeptide",
+          "units": "Use Cartesian coordinates in angstroms. Report the root-mean-square distance of the observed C-alpha sites from their arithmetic centroid in angstroms with one equal vote per site. Report observed positions, C-alpha sites and complete N/CA/C/O backbones as counts against the declared residue count. Coordinate coverage is the observed-position count divided by that denominator."
+        }
+      }
+    ],
+    "reads": [
+      {
+        "turn": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "call": "exec-797f410a-e83e-4012-b71e-cb8a394b12aa",
+        "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+        "tool": "gx_read_artifact"
+      },
+      {
+        "turn": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "call": "exec-3cd15f3a-c114-4ff0-96e8-243d7b739dec",
+        "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+        "tool": "gx_read_artifact"
+      },
+      {
+        "turn": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "call": "exec-e40646e5-76b1-4606-a72c-2d354f59ccf6",
+        "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+        "tool": "gx_read_artifact"
+      },
+      {
+        "turn": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "call": "exec-028a84af-f1ec-409f-a63b-242b5e58bd02",
+        "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+        "tool": "gx_read_artifact"
+      },
+      {
+        "turn": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "call": "exec-e6bbe86e-a341-4b94-bc43-cf48b96f92dd",
+        "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+        "tool": "gx_read_artifact"
+      },
+      {
+        "turn": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "call": "exec-b076dcce-cb1b-4834-b4cc-261f70ef49fc",
+        "artifact_ref": "gxa_01m8fdfj28mg23xpj0",
+        "tool": "gx_read_artifact"
+      }
+    ],
+    "researcher_extracts": [
+      {
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "turn": "01a21ed7-1a96-79c1-aeef-87a37a61e9ab",
+        "call": "exec-768b68c9-79a0-43df-b1a1-bb7cbb8f3e21",
+        "evidence_ref": "gxa_01m8fdf671z5sxjvfs",
+        "source_ref": "gxa_01m8fddc418bd0brsp",
+        "cited_by_run_decisions": [
+          "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+          "gxa_2006662889e6824290edc16ac7449405aa0f2278a9fcc10cddea57339601443b",
+          "gxa_725671666249cda035ffe334a2140fbed5bcfbcf61f0bcce6c9959c2e3601dc5",
+          "gxa_907297d1fc17c1abc7c31048583f23cbb0661687d9a27aca08428c1341fe4a99",
+          "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a"
+        ]
+      },
+      {
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "turn": "01a21ed8-e63a-7082-968c-50a481222711",
+        "call": "exec-2fae1223-50e5-4319-bc04-6be49ac72d5b",
+        "evidence_ref": "gxa_01m8fdk4dcv0snvgnp",
+        "source_ref": "gxa_01m8fddc418bd0brsp",
+        "cited_by_run_decisions": []
+      },
+      {
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "turn": "01a21ed8-e63a-7082-968c-50a481222711",
+        "call": "exec-8cfa3dcb-8fdb-41dd-85fb-8c0a059b6ee5",
+        "evidence_ref": "gxa_01m8fdkdb9dh4hxrq4",
+        "source_ref": "gxa_01m8fddc418bd0brsp",
+        "cited_by_run_decisions": []
+      },
+      {
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "turn": "01a21ed8-e63a-7082-968c-50a481222711",
+        "call": "exec-fef920d3-ea74-45c2-b206-a93c12737f26",
+        "evidence_ref": "gxa_01m8fdkmc2wbb6e4nw",
+        "source_ref": "gxa_01m8fddc418bd0brsp",
+        "cited_by_run_decisions": [
+          "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+          "gxa_2006662889e6824290edc16ac7449405aa0f2278a9fcc10cddea57339601443b",
+          "gxa_725671666249cda035ffe334a2140fbed5bcfbcf61f0bcce6c9959c2e3601dc5",
+          "gxa_907297d1fc17c1abc7c31048583f23cbb0661687d9a27aca08428c1341fe4a99",
+          "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a"
+        ]
+      },
+      {
+        "scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "turn": "01a21edb-3a36-7ed0-b3da-d80c51ce3945",
+        "call": "exec-75173ee8-31a0-41a2-aeef-f50edfb6ca02",
+        "evidence_ref": "gxa_01m8fdqq5z5r6mmfjz",
+        "source_ref": "gxa_01m8fddc418bd0brsp",
+        "cited_by_run_decisions": [
+          "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a"
+        ]
+      }
+    ],
+    "signed_reports": [
+      {
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "author": {
+          "context_ref": "gxcx_01m8fde6gads7wc3z8",
+          "kind": "GX",
+          "task_id": "gxt_01m8fde6gb02vqvjba"
+        },
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "status": "PARTIAL",
+        "findings": [],
+        "qualitative_notes": {
+          "findings": [],
+          "gaps": [
+            "module tokens allowance exhausted"
+          ],
+          "next_steps": [],
+          "status": "UNVERIFIED"
+        },
+        "gaps": [
+          "module tokens allowance exhausted"
+        ],
+        "next_steps": []
+      },
+      {
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "author": {
+          "call_id": "call_73d8c32d5abf4810a1339222dc556729",
+          "context_ref": "gxcx_01m8fdecrakmat95vg",
+          "kind": "MODULE",
+          "lease_id": "gxl_01m8fdect8j4w385zs",
+          "run_id": "gxr_01m8fddc2b6pjbf83p",
+          "task_id": "gxt_01m8fdecrb3pysx8fw",
+          "thread_id": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+          "turn_id": "01a21ed7-3386-7723-92a9-fe35dd61511a"
+        },
+        "scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "status": "COMPLETE",
+        "findings": [
+          {
+            "evidence_status": "UNVERIFIED",
+            "kind": "support",
+            "source_refs": [
+              "gxa_01m8fddc3e1wqp6k5j"
+            ],
+            "text": "The sole polypeptide in `_entity_poly_seq` maps to chain A in `_pdbx_poly_seq_scheme`. I matched every declared residue by label entity, chain, sequence position and residue identity to the model’s `_atom_site` rows. Every position has finite coordinates for N, CA, C and O, with a single carbon atom named CA. Water belongs to label chain B despite sharing author chain ID A."
+          },
+          {
+            "evidence_status": "UNVERIFIED",
+            "kind": "counterevidence",
+            "source_refs": [
+              "gxa_01m8fddc3e1wqp6k5j"
+            ],
+            "text": "The terminal leucine, arginine and glycine pair have partial Cα occupancies. Each retains coordinates for every required backbone atom. The terminal glycine has both O and a separate OXT. The polymer Cα rows have no alternate locations."
+          }
+        ],
+        "qualitative_notes": {
+          "findings": [
+            {
+              "kind": "support",
+              "source_refs": [
+                "gxa_01m8fddc3e1wqp6k5j"
+              ],
+              "text": "The sole polypeptide in `_entity_poly_seq` maps to chain A in `_pdbx_poly_seq_scheme`. I matched every declared residue by label entity, chain, sequence position and residue identity to the model’s `_atom_site` rows. Every position has finite coordinates for N, CA, C and O, with a single carbon atom named CA. Water belongs to label chain B despite sharing author chain ID A."
+            },
+            {
+              "kind": "counterevidence",
+              "source_refs": [
+                "gxa_01m8fddc3e1wqp6k5j"
+              ],
+              "text": "The terminal leucine, arginine and glycine pair have partial Cα occupancies. Each retains coordinates for every required backbone atom. The terminal glycine has both O and a separate OXT. The polymer Cα rows have no alternate locations."
+            },
+            {
+              "kind": "support",
+              "source_refs": [
+                "gxa_01m8fddc3e1wqp6k5j"
+              ],
+              "text": "I support the label “model-1 Cα radius of gyration covering the entire declared 1UBQ chain A.” The declared denominator is the consecutive sequence from Met1 through Gly76. The radius denominator is the count of Cα sites mapped singly to those same positions. Take the arithmetic centroid, then the square root of the sum of squared distances to the centroid divided by the Cα count. Every Cα has equal weight, including Leu73, Arg74, Gly75 and Gly76. N, C and O decide coverage and carry no weight in the radius. Signed by Codex, numerical interpretation researcher."
+            },
+            {
+              "kind": "observation",
+              "source_refs": [
+                "gxa_01m8fddc3e1wqp6k5j"
+              ],
+              "text": "The competing observed-subset interpretation predicts a declared position missing a required atom. A missing CA reduces the radius denominator and requires recomputing the centroid over the observed sites. A missing O with its CA retained leaves the Cα count and radius unchanged while failing the complete-chain rule. Report the observed Cα scope, name the position and absent atom, and give four-atom coverage separately. A position-by-position comparison with the declared sequence discriminates cases that can give identical radii."
+            },
+            {
+              "kind": "observation",
+              "source_refs": [
+                "gxa_01m8fddc3e1wqp6k5j"
+              ],
+              "text": "`_exptl.method` identifies X-ray diffraction. The radius describes the geometry of a single refined crystal model. Partial occupancies limit inference about how uniformly the tail adopts the deposited coordinates. Recomputing this model checks arithmetic. Independent sampling requires a separately acquired dataset. A solution comparison requires solution data under stated conditions and attention to ensemble averaging and scattering weights."
+            }
+          ],
+          "gaps": [
+            "The original supplies a single crystallographic coordinate model. Between-sample variation and solution compactness remain unmeasured.",
+            "The numerical radius in ångströms requires the Lead’s executed coordinate readout. The original coordinate table supplies the position and atom identities for this scope review."
+          ],
+          "next_steps": [
+            "For a separately acquired second deposition, ask which positions in its selected chain and model have N, CA, C and O, which Cα positions enter the radius, and what equal-weight radius in ångströms those coordinates yield. Rebuild its declared denominator from its own sequence. Verify position identities, resolve any alternate Cα rows to a single coordinate per position under a stated rule, record partial occupancies and list missing atoms. Recompute the centroid and radius. Full four-atom coverage supports the complete-chain label. Any deficit requires the observed-site scope even if every Cα is present."
+          ],
+          "status": "UNVERIFIED"
+        },
+        "gaps": [
+          "The original supplies a single crystallographic coordinate model. Between-sample variation and solution compactness remain unmeasured.",
+          "The numerical radius in ångströms requires the Lead’s executed coordinate readout. The original coordinate table supplies the position and atom identities for this scope review."
+        ],
+        "next_steps": [
+          "For a separately acquired second deposition, ask which positions in its selected chain and model have N, CA, C and O, which Cα positions enter the radius, and what equal-weight radius in ångströms those coordinates yield. Rebuild its declared denominator from its own sequence. Verify position identities, resolve any alternate Cα rows to a single coordinate per position under a stated rule, record partial occupancies and list missing atoms. Recompute the centroid and radius. Full four-atom coverage supports the complete-chain label. Any deficit requires the observed-site scope even if every Cα is present."
+        ]
+      },
+      {
+        "report_ref": "gxa_725bdbf7b8f49ec6b53c00478290197546d362fc22769c11a5936637cab490d2",
+        "author": {
+          "call_id": "call_731d2faa0c5c4eabbefd3fc00c2de31b",
+          "context_ref": "gxcx_01m8fdpeepee1x9ytr",
+          "kind": "MODULE",
+          "lease_id": "gxl_01m8fdv0g3tnddq0c2",
+          "run_id": "gxr_01m8fddc2b6pjbf83p",
+          "task_id": "gxt_01m8fdpeeqfdnhqa5c",
+          "thread_id": "01a21edd-8218-70f1-801c-e3a0dd1d66a8",
+          "turn_id": "01a21edd-8249-7501-8a67-8a85781b10d4"
+        },
+        "scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "status": "COMPLETE",
+        "findings": [
+          {
+            "evidence_status": "UNVERIFIED",
+            "kind": "support",
+            "source_refs": [
+              "gxa_01m8fddc418bd0brsp",
+              "gxa_01m8fdf671z5sxjvfs",
+              "gxa_01m8fdwkm8savphb5h"
+            ],
+            "text": "The archive identifies X-ray diffraction as the experiment on crystalline ubiquitin. The title and resolution remark agree on the refinement resolution in angstroms. The collection date, temperature in kelvin, pH and crystal count are each recorded as NULL."
+          },
+          {
+            "evidence_status": "UNVERIFIED",
+            "kind": "observation",
+            "source_refs": [
+              "gxa_01m8fddc418bd0brsp",
+              "gxa_01m8fdkmc2wbb6e4nw",
+              "gxa_01m8fdx0fka0mhxjm3",
+              "gxa_01m8fdqq5z5r6mmfjz"
+            ],
+            "text": "The overall and highest-shell diffraction completeness fields both read NULL. A percentage here would give the fraction of expected unique reflections measured within a resolution range. The supplied extract lists no missing residues or missing atoms. Its provenance identifies the same deposition as the source for both reviewed passages."
+          }
+        ],
+        "qualitative_notes": {
+          "findings": [
+            {
+              "kind": "support",
+              "source_refs": [
+                "gxa_01m8fddc418bd0brsp",
+                "gxa_01m8fdf671z5sxjvfs",
+                "gxa_01m8fdwkm8savphb5h"
+              ],
+              "text": "The archive identifies X-ray diffraction as the experiment on crystalline ubiquitin. The title and resolution remark agree on the refinement resolution in angstroms. The collection date, temperature in kelvin, pH and crystal count are each recorded as NULL."
+            },
+            {
+              "kind": "observation",
+              "source_refs": [
+                "gxa_01m8fddc418bd0brsp",
+                "gxa_01m8fdkmc2wbb6e4nw",
+                "gxa_01m8fdx0fka0mhxjm3",
+                "gxa_01m8fdqq5z5r6mmfjz"
+              ],
+              "text": "The overall and highest-shell diffraction completeness fields both read NULL. A percentage here would give the fraction of expected unique reflections measured within a resolution range. The supplied extract lists no missing residues or missing atoms. Its provenance identifies the same deposition as the source for both reviewed passages."
+            },
+            {
+              "kind": "support",
+              "source_refs": [
+                "gxa_01m8fddc418bd0brsp",
+                "gxa_01m8fdqq5z5r6mmfjz",
+                "gxa_01m8fdwkm8savphb5h",
+                "gxa_01m8fdx0fka0mhxjm3"
+              ],
+              "text": "Researcher statement signed by Codex, independent experimental-record reviewer. I verified “RESOLUTION.    1.80 ANGSTROMS.” for the 1UBQ X-ray crystal structure. My method and resolution review is gxrv_01m8fdwkkw43e1jazp (p2.1, characters [324,940)). My diffraction completeness review is gxrv_01m8fdx0f39y4p124g (p2.2, characters [302,351)). I read the entire supplied extract. Its provenance line (p1) identifies the parent wwPDB 1UBQ.pdb by SHA-256 d4a6812d8951cf6594e6a0763f089e35f5a80b62acb3c117b2c5565228a7b161."
+            },
+            {
+              "kind": "observation",
+              "source_refs": [
+                "gxa_01m8fddc418bd0brsp",
+                "gxa_01m8fdwkm8savphb5h",
+                "gxa_01m8fdx0fka0mhxjm3"
+              ],
+              "text": "My reason for reserving whole-chain wording for the coordinate audit is that silence in the omission records is compatible with either complete coordinates or an unlisted gap. A Cα radius derived from this crystal model describes the deposited conformation. The archived experiment leaves the solution radius undetermined."
+            }
+          ],
+          "gaps": [
+            "The selected experimental extract contains neither a declared sequence nor atom coordinates. The numerical radius, residue count, declared denominator and backbone coverage require the companion coordinate analysis.",
+            "Establishing a solution radius would require solution data under stated conditions, such as a radius derived from small-angle scattering."
+          ],
+          "next_steps": [
+            "Map each declared position of the single chain to the first coordinate model and check N, CA, C and O. Calculate the root mean square distance in Å of one modeled Cα per represented position from their unweighted centroid. Report the Cα count over the declared chain length. Apply the complete-chain label only if every position passes the backbone check. Otherwise identify the missing atoms or positions and specify which Cα coordinates contributed."
+          ],
+          "status": "UNVERIFIED"
+        },
+        "gaps": [
+          "The selected experimental extract contains neither a declared sequence nor atom coordinates. The numerical radius, residue count, declared denominator and backbone coverage require the companion coordinate analysis.",
+          "Establishing a solution radius would require solution data under stated conditions, such as a radius derived from small-angle scattering."
+        ],
+        "next_steps": [
+          "Map each declared position of the single chain to the first coordinate model and check N, CA, C and O. Calculate the root mean square distance in Å of one modeled Cα per represented position from their unweighted centroid. Report the Cα count over the declared chain length. Apply the complete-chain label only if every position passes the backbone check. Otherwise identify the missing atoms or positions and specify which Cα coordinates contributed."
+        ]
+      }
+    ],
+    "lead_endpoint_receipts": [
+      {
+        "event_id": 108,
+        "turn": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "endpoints": [
+          {
+            "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_count",
+              "key": "9343c65fa17c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_radius_of_gyration_A",
+              "key": "ba9a70caba84",
+              "unit": "angstrom",
+              "value": "11.493 angstrom"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "complete_backbones",
+              "key": "0bc1bd3dd49c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "coordinate_coverage",
+              "key": "81fe88f9aec9",
+              "unit": "1",
+              "value": "76/76 (1.0000)"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "declared_residues",
+              "key": "75166741d379",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "observed_residues",
+              "key": "2d2388582e7e",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      },
+      {
+        "event_id": 161,
+        "turn": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "endpoints": [
+          {
+            "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_count",
+              "key": "9343c65fa17c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_radius_of_gyration_A",
+              "key": "ba9a70caba84",
+              "unit": "angstrom",
+              "value": "11.493 angstrom"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "complete_backbones",
+              "key": "0bc1bd3dd49c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      },
+      {
+        "event_id": 162,
+        "turn": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "endpoints": [
+          {
+            "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "coordinate_coverage",
+              "key": "81fe88f9aec9",
+              "unit": "1",
+              "value": "76/76 (1.0000)"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "declared_residues",
+              "key": "75166741d379",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "observed_residues",
+              "key": "2d2388582e7e",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      },
+      {
+        "event_id": 224,
+        "turn": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "endpoints": [
+          {
+            "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_count",
+              "key": "9343c65fa17c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_radius_of_gyration_A",
+              "key": "ba9a70caba84",
+              "unit": "angstrom",
+              "value": "11.493 angstrom"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "complete_backbones",
+              "key": "0bc1bd3dd49c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      },
+      {
+        "event_id": 225,
+        "turn": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "endpoints": [
+          {
+            "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "coordinate_coverage",
+              "key": "81fe88f9aec9",
+              "unit": "1",
+              "value": "76/76 (1.0000)"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "declared_residues",
+              "key": "75166741d379",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "observed_residues",
+              "key": "2d2388582e7e",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      },
+      {
+        "event_id": 269,
+        "turn": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "endpoints": [
+          {
+            "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_count",
+              "key": "9343c65fa17c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_radius_of_gyration_A",
+              "key": "ba9a70caba84",
+              "unit": "angstrom",
+              "value": "11.493 angstrom"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "complete_backbones",
+              "key": "0bc1bd3dd49c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      },
+      {
+        "event_id": 270,
+        "turn": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "endpoints": [
+          {
+            "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "coordinate_coverage",
+              "key": "81fe88f9aec9",
+              "unit": "1",
+              "value": "76/76 (1.0000)"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "declared_residues",
+              "key": "75166741d379",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "observed_residues",
+              "key": "2d2388582e7e",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      },
+      {
+        "event_id": 286,
+        "turn": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "endpoints": [
+          {
+            "metric_ref": "metric_9343c65fa17c7585e5d75f23a503487624264ba9682438f24f525e1e11177be2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_ba9a70caba843ea9c06dd946e54ba0ef8b7f0291d979e082d827bba74b4ba4d2",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_0bc1bd3dd49c8ef6958dfaca5953bbfd0f661169a033b63c0e8c499c803aa1e6",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_count",
+              "key": "9343c65fa17c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "ca_radius_of_gyration_A",
+              "key": "ba9a70caba84",
+              "unit": "angstrom",
+              "value": "11.493 angstrom"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "complete_backbones",
+              "key": "0bc1bd3dd49c",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      },
+      {
+        "event_id": 287,
+        "turn": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "endpoints": [
+          {
+            "metric_ref": "metric_81fe88f9aec900e1018ff9ca7003443a76b91c166110177907e142ddb39d1167",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_75166741d379b2448f5fe399b5c1da6c37485940526df6033fb5e7c1009cc960",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "metric_ref": "metric_2d2388582e7ed6d5ab59eae6e025bee031d486417a479fee1b0a89f5c5a74c5a",
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "coordinate_coverage",
+              "key": "81fe88f9aec9",
+              "unit": "1",
+              "value": "76/76 (1.0000)"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "declared_residues",
+              "key": "75166741d379",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          },
+          {
+            "row": {
+              "id": "observed_residues",
+              "key": "2d2388582e7e",
+              "unit": "1",
+              "value": "76"
+            },
+            "source_ref": "gxa_01m8fdfj28mg23xpj0"
+          }
+        ]
+      }
+    ],
+    "handoffs": [
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+        "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:79d160b6-4ee2-49ef-861e-b3689424c621",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+        "effects": [],
+        "decision_event": 199,
+        "rationale": "The executed 1UBQ readout gives {{metric:ca_radius_of_gyration_A}} from {{metric:ca_count}} Cα sites across {{metric:declared_residues}} declared positions. The {{metric:complete_backbones}} complete backbones meet the registered criterion. The signed scope review matched each position to the sequence and confirmed that the partially occupied terminal Cα sites retain all required backbone coordinates. The archive module delivered extractions before exhausting its allowance. The follow-up researcher has the archived original and released extractions to review and sign. Keep the run open for that report. The executed coordinate recipe is already published."
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "thread_id": "01a21edb-3a19-7031-a382-592022f57695",
+        "turn_id": "01a21edb-3a36-7ed0-b3da-d80c51ce3945",
+        "handoff_kind": "MODULE_TO_MODULE",
+        "delivery_receipt": "start:aa8fad72-30c4-462c-9917-422fdac23626",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21edc-deae-72c2-ad11-a1e1e791ee48",
+        "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:690b8dfe-2271-4d0d-afc3-851549ad2701",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "thread_id": "01a21edd-8218-70f1-801c-e3a0dd1d66a8",
+        "turn_id": "01a21edd-8249-7501-8a67-8a85781b10d4",
+        "handoff_kind": "MODULE_TO_MODULE",
+        "delivery_receipt": "start:20555fe3-7d07-4820-9836-9ab4902b0d50",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ede-a97f-78a0-863d-64375a0ea2a5",
+        "turn_id": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:616b5b98-7c1c-40c6-b843-8ee05ca85c30",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21edf-fb5d-7a83-baba-e72f96809657",
+        "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:dd69a507-a9b8-4634-82a7-4ed70bbb449b",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "report_ref": "gxa_dcd0c137524f5f8514dfd8d4399a227c28375618826e4c0d183caace101de3ab",
+        "published_event": 135,
+        "released_event": 136,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:6c5fda09-4b64-4cef-81bf-aabe01cb8450",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": true,
+        "receiver_scope": "run",
+        "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+        "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:79d160b6-4ee2-49ef-861e-b3689424c621",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-9f4b85b7-3b83-4313-a1b2-2d2c4722e5b8",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "ENACTED",
+        "decision_ref": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec",
+        "effects": [
+          {
+            "kind": "v6.claim.adopted",
+            "event_id": 194,
+            "subject": "gxh_01m8fdfh9avw1pb9t3",
+            "claim_revision_id": "gxh_01m8fdfh9avw1pb9t3@3"
+          }
+        ],
+        "decision_event": 199,
+        "rationale": "The executed 1UBQ readout gives {{metric:ca_radius_of_gyration_A}} from {{metric:ca_count}} Cα sites across {{metric:declared_residues}} declared positions. The {{metric:complete_backbones}} complete backbones meet the registered criterion. The signed scope review matched each position to the sequence and confirmed that the partially occupied terminal Cα sites retain all required backbone coordinates. The archive module delivered extractions before exhausting its allowance. The follow-up researcher has the archived original and released extractions to review and sign. Keep the run open for that report. The executed coordinate recipe is already published."
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21edc-deae-72c2-ad11-a1e1e791ee48",
+        "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:690b8dfe-2271-4d0d-afc3-851549ad2701",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-1bcb350c-cbbc-47aa-ac67-3acde7794294",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_2006662889e6824290edc16ac7449405aa0f2278a9fcc10cddea57339601443b",
+        "effects": [],
+        "decision_event": 236,
+        "rationale": "Await the archive researcher's signed assessment. The original coordinate readout is complete and the signed numerical review explains how the partially occupied terminal sites enter the whole-chain radius. The archived 1.80 Å X-ray diffraction record and its reflection-completeness field have distinct evidential roles from the atom table. The published single-chain-backbone-coverage-rg@1 recipe already asks a future Lead to determine coverage from the next entry's own counts."
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ede-a97f-78a0-863d-64375a0ea2a5",
+        "turn_id": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:616b5b98-7c1c-40c6-b843-8ee05ca85c30",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-22da4d3d-021f-4e9f-a2d4-edcc6870eb26",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_725671666249cda035ffe334a2140fbed5bcfbcf61f0bcce6c9959c2e3601dc5",
+        "effects": [],
+        "decision_event": 250,
+        "rationale": "Keep the coordinate result and await the signed archive assessment already in progress. The executed readout and a position-by-position check of the original agree with the numerical researcher's signed interpretation, including the treatment of partially occupied terminal Cα sites. The published single-chain-backbone-coverage-rg@1 recipe contains the decision for a future independent entry. The remaining deliverable is the second researcher's own assessment of the diffraction record and its scope."
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21edf-fb5d-7a83-baba-e72f96809657",
+        "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:dd69a507-a9b8-4634-82a7-4ed70bbb449b",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-a8f4100b-9acd-4927-978c-b91882bb8f74",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_907297d1fc17c1abc7c31048583f23cbb0661687d9a27aca08428c1341fe4a99",
+        "effects": [],
+        "decision_event": 277,
+        "rationale": "The executed readout gives {{metric:ca_radius_of_gyration_A}} over {{metric:ca_count}} Cα sites, with {{metric:complete_backbones}} complete backbones among {{metric:declared_residues}} declared positions. The numerical researcher's signed position-by-position check confirms that the partially occupied tail contributes. The published single-chain-backbone-coverage-rg@1 recipe asks the next Lead to judge coverage from the new entry's own counts. Keep the run open for the assigned archive researcher's signed interpretation of the diffraction record."
+      },
+      {
+        "publisher": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "report_ref": "gxa_bf79319773a256c0177009c16a2c0b59757202c59315a0e6b390f653bcbf9956",
+        "published_event": 144,
+        "released_event": 145,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:6c5fda09-4b64-4cef-81bf-aabe01cb8450",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-f60bf315-e39c-408f-beea-4598b5e69fd3",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a",
+        "effects": [],
+        "decision_event": 294,
+        "rationale": "The executed analysis of the original 1UBQ coordinates gives {{metric:ca_radius_of_gyration_A}} for {{metric:ca_count}} equally weighted Cα sites. Chain A has {{metric:declared_residues}} declared residues and {{metric:complete_backbones}} positions with N, CA, C and O. The numerical researcher matched each position from Met1 through Gly76 and confirmed that the partially occupied tail sites each contribute once. The archive researcher verified the X-ray method and showed that the completeness fields describe diffraction reflections. Both records concern the same deposition. The position-by-position coordinate check supports the whole-chain label for this crystal model."
+      },
+      {
+        "publisher": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "report_ref": "gxa_725bdbf7b8f49ec6b53c00478290197546d362fc22769c11a5936637cab490d2",
+        "published_event": 263,
+        "released_event": 264,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:6c5fda09-4b64-4cef-81bf-aabe01cb8450",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-c21ca472-8297-4cf1-92ad-d767650a6ba3",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a",
+        "effects": [],
+        "decision_event": 294,
+        "rationale": "The executed analysis of the original 1UBQ coordinates gives {{metric:ca_radius_of_gyration_A}} for {{metric:ca_count}} equally weighted Cα sites. Chain A has {{metric:declared_residues}} declared residues and {{metric:complete_backbones}} positions with N, CA, C and O. The numerical researcher matched each position from Met1 through Gly76 and confirmed that the partially occupied tail sites each contribute once. The archive researcher verified the X-ray method and showed that the completeness fields describe diffraction reflections. Both records concern the same deposition. The position-by-position coordinate check supports the whole-chain label for this crystal model."
+      }
+    ],
+    "native_worker_overlaps": [
+      {
+        "left_scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "right_scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "left_turn": "01a21ed7-1a96-79c1-aeef-87a37a61e9ab",
+        "right_turn": "01a21ed7-3386-7723-92a9-fe35dd61511a",
+        "left_thread": "01a21ed7-1a58-7090-8a50-dae542cfe6ad",
+        "right_thread": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+        "seconds": 111.079
+      },
+      {
+        "left_scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "right_scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "left_turn": "01a21ed8-e63a-7082-968c-50a481222711",
+        "right_turn": "01a21ed7-3386-7723-92a9-fe35dd61511a",
+        "left_thread": "01a21ed8-e608-7f92-99fe-ca6a7151e7a4",
+        "right_thread": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+        "seconds": 60.233
+      }
+    ],
+    "turns": [
+      {
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "thread_id": "01a21ed7-1a58-7090-8a50-dae542cfe6ad",
+        "turn_id": "01a21ed7-1a96-79c1-aeef-87a37a61e9ab",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:09:03.261Z",
+        "end": "2026-11-27T21:11:00.722Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "thread_id": "01a21ed8-e608-7f92-99fe-ca6a7151e7a4",
+        "turn_id": "01a21ed8-e63a-7082-968c-50a481222711",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:11:00.927Z",
+        "end": "2026-11-27T21:12:01.160Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "thread_id": "01a21edb-3a19-7031-a382-592022f57695",
+        "turn_id": "01a21edb-3a36-7ed0-b3da-d80c51ce3945",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:13:33.500Z",
+        "end": "2026-11-27T21:16:02.862Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "module:module_e01eb599c3640853489b490e626cfc5c",
+        "thread_id": "01a21edd-8218-70f1-801c-e3a0dd1d66a8",
+        "turn_id": "01a21edd-8249-7501-8a67-8a85781b10d4",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:16:03.022Z",
+        "end": "2026-11-27T21:19:07.071Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "thread_id": "01a21ed7-3359-7f30-be3b-2e24edfee53d",
+        "turn_id": "01a21ed7-3386-7723-92a9-fe35dd61511a",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:09:09.643Z",
+        "end": "2026-11-27T21:12:15.725Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21ee1-ec05-7d81-b599-a249b2393c76",
+        "turn_id": "01a21ee1-ec3f-76c2-b492-f9d8a11e52fc",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:20:52.293Z",
+        "end": "2026-11-27T21:25:00.181Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21ed7-c6a3-7061-923d-b7d7c2d1ff10",
+        "turn_id": "01a21ed7-c6cd-7dc3-b421-c479e6da16ba",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:09:47.348Z",
+        "end": "2026-11-27T21:10:58.170Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21eda-b108-7d71-977b-cd006274fb58",
+        "turn_id": "01a21eda-b12d-7912-9c46-72e63d3780e5",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:12:58.419Z",
+        "end": "2026-11-27T21:15:21.019Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21ed8-dbde-7de0-83bd-c73821dcae79",
+        "turn_id": "01a21ed8-dc12-7fe0-8b30-69cfc4c1ab32",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:10:58.329Z",
+        "end": "2026-11-27T21:12:58.239Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21edf-fb5d-7a83-baba-e72f96809657",
+        "turn_id": "01a21edf-fb95-7fd1-bc12-19ca67da9416",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:18:45.147Z",
+        "end": "2026-11-27T21:20:52.347Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21ede-a97f-78a0-863d-64375a0ea2a5",
+        "turn_id": "01a21ede-a9b4-7c30-a239-e7ac5416a948",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:17:18.650Z",
+        "end": "2026-11-27T21:18:44.940Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21ed6-b799-7fd3-8250-c9e37a6530d1",
+        "turn_id": "01a21ed6-b7c0-7222-b3cb-ab22558e9e65",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:08:37.959Z",
+        "end": "2026-11-27T21:09:46.983Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21edc-deae-72c2-ad11-a1e1e791ee48",
+        "turn_id": "01a21edc-ded9-7a22-beaa-c83de916f0b4",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:15:21.182Z",
+        "end": "2026-11-27T21:17:18.492Z",
+        "terminal_status": "interrupted"
+      }
+    ],
+    "job_running_intervals": [
+      {
+        "start": "2026-11-27T21:09:47.391Z",
+        "end": "2026-11-27T21:09:47.743Z",
+        "job_id": "gxj_01m8fdfhdwep1qw3h0"
+      }
+    ],
+    "job_turn_overlap_intervals": [
+      {
+        "job_id": "gxj_01m8fdfhdwep1qw3h0",
+        "turn_id": "01a21ed7-1a96-79c1-aeef-87a37a61e9ab",
+        "scope": "module:module_8f55440060edf8e13f0b6d818412046f",
+        "seconds": 0.352
+      },
+      {
+        "job_id": "gxj_01m8fdfhdwep1qw3h0",
+        "turn_id": "01a21ed7-3386-7723-92a9-fe35dd61511a",
+        "scope": "module:module_e6560dfa32cb40472be0ee3f3bb96af8",
+        "seconds": 0.352
+      },
+      {
+        "job_id": "gxj_01m8fdfhdwep1qw3h0",
+        "turn_id": "01a21ed7-c6cd-7dc3-b421-c479e6da16ba",
+        "scope": "run",
+        "seconds": 0.352
+      }
+    ],
+    "closing": [
+      {
+        "event_id": 73,
+        "ts": "2026-11-27T21:09:46.932Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_d64ef081ab62ab2477b8072f04c4d8d13004bee66cf90fcba35a5ac54552e65c"
+      },
+      {
+        "event_id": 102,
+        "ts": "2026-11-27T21:10:58.123Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_da98e3f008bf3a963bbf90cbbcde458cd2934e96c60bb8b58585857f61993e47"
+      },
+      {
+        "event_id": 154,
+        "ts": "2026-11-27T21:12:58.175Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_7df31392e56899de129a9d772c0d87938abfeecf63ba1e9487aea0d8d27c7118"
+      },
+      {
+        "event_id": 199,
+        "ts": "2026-11-27T21:15:20.961Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_d7a928717bd836d32d9931218b7f1f4442376dad66fd8a82da001779affd93ec"
+      },
+      {
+        "event_id": 236,
+        "ts": "2026-11-27T21:17:18.411Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_2006662889e6824290edc16ac7449405aa0f2278a9fcc10cddea57339601443b"
+      },
+      {
+        "event_id": 250,
+        "ts": "2026-11-27T21:18:44.854Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_725671666249cda035ffe334a2140fbed5bcfbcf61f0bcce6c9959c2e3601dc5"
+      },
+      {
+        "event_id": 277,
+        "ts": "2026-11-27T21:20:52.085Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_907297d1fc17c1abc7c31048583f23cbb0661687d9a27aca08428c1341fe4a99"
+      },
+      {
+        "event_id": 294,
+        "ts": "2026-11-27T21:25:00.113Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a"
+      },
+      {
+        "event_id": 296,
+        "ts": "2026-11-27T21:25:00.227Z",
+        "kind": "v6.run.closed",
+        "subject_id": "gxr_01m8fddc2b6pjbf83p"
+      }
+    ]
+  },
+  "successor": {
+    "run_id": "gxr_01m8febe21hn46darv",
+    "goal": "CLOSED",
+    "materials": [
+      {
+        "role": "structure",
+        "artifact_ref": "gxa_01m8febe320303ngc7",
+        "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+      },
+      {
+        "role": "literature",
+        "artifact_ref": "gxa_01m8febe3v8fx2jfcq",
+        "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2"
+      }
+    ],
+    "jobs": [
+      {
+        "node_id": "node_96e0eaeb463e5dd93445e78b3a47b02d",
+        "job_id": "gxj_01m8fefs2bw2c25tp3",
+        "status": "SUCCEEDED",
+        "method": "deposited-backbone-qc@1",
+        "depends_on": [],
+        "recipe_decision": {
+          "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+          "recipe": "single-chain-backbone-coverage-rg@1",
+          "step": "backbone_qc"
+        },
+        "inputs": [
+          {
+            "artifact_ref": "gxa_01m8febe320303ngc7",
+            "bytes": 191665,
+            "role": "structure",
+            "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+          }
+        ],
+        "manifest_hash": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+        "outputs": [
+          {
+            "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+            "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+            "output_name": "qc.json",
+            "kind": "deposited_backbone_qc",
+            "nature": "analysis"
+          }
+        ],
+        "provider": {
+          "id": "deposited-backbone-qc",
+          "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+          "version": "1"
+        },
+        "independent_pdb": {
+          "pdb_sha256": "e4635115be5a605e58f449f82824e15182a7000c3677876c33fc44118defef78",
+          "denominator": 153,
+          "observed": 153,
+          "c_alpha": 153,
+          "complete_n_ca_c_o": 153,
+          "radius_of_gyration_A": 15.127861444764998
+        },
+        "comparison": {
+          "counts_identical": true,
+          "abs_difference_A": 0.0,
+          "tolerance_A": 0.0001
+        },
+        "readout": {
+          "schema": "gx.deposited-backbone-qc/1",
+          "entry": "1MBN",
+          "chain": "A",
+          "entity": "1",
+          "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+          "declared_residues": 153,
+          "model_count": 1,
+          "model": 1,
+          "observed_residues": 153,
+          "ca_count": 153,
+          "complete_backbones": 153,
+          "missing_label_positions": [],
+          "ca_radius_of_gyration_A": 15.127861444764998
+        }
+      }
+    ],
+    "release_events": [
+      {
+        "event_id": 375,
+        "node": "node_96e0eaeb463e5dd93445e78b3a47b02d",
+        "type": "v6.node.settled"
+      }
+    ],
+    "recipe_expansions": [
+      {
+        "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+        "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "call_id": "exec-416bc8f7-dca4-43f8-861e-807909887689",
+        "recipe": "single-chain-backbone-coverage-rg@1",
+        "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+        "ops": [
+          {
+            "branch": "myoglobin",
+            "capability": "deposited-backbone-qc@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m8febe320303ngc7"
+            ],
+            "node": "local:mbn-backbone_qc",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply deposited-backbone-qc@1 to the named inputs of this Goal.",
+            "recipe_decision": {
+              "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+              "recipe": "single-chain-backbone-coverage-rg@1",
+              "step": "backbone_qc"
+            }
+          }
+        ]
+      },
+      {
+        "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+        "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "call_id": "exec-2838142f-32e1-4f82-a1b5-4a4134394fb3",
+        "recipe": "single-chain-backbone-coverage-rg@1",
+        "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+        "ops": [
+          {
+            "branch": "local:myoglobin",
+            "capability": "deposited-backbone-qc@1",
+            "depends_on": [],
+            "inputs": [
+              "gxa_01m8febe320303ngc7"
+            ],
+            "node": "local:mbn-backbone_qc",
+            "op": "add_node",
+            "parameters": {},
+            "question": "Apply deposited-backbone-qc@1 to the named inputs of this Goal.",
+            "recipe_decision": {
+              "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+              "recipe": "single-chain-backbone-coverage-rg@1",
+              "step": "backbone_qc"
+            }
+          }
+        ]
+      }
+    ],
+    "lead_points": [
+      {
+        "task_id": "gxt_01m8fejgg1jmtpd76w",
+        "points": [
+          {
+            "actions": [
+              "If both counts equal the declared denominator, give the radius in angstroms and the counted/declared residues, and label it a whole-chain C-alpha radius for this deposited model.",
+              "If either count falls short, give the observed C-alpha radius when defined, both counts and the denominator. Identify missing sites from this entry and qualify the measurement by its coordinate coverage, including a partial backbone even when every C-alpha is present."
+            ],
+            "digest": "1bd44aa1d92a2c06ea346f02cc748732c0e109c1ca0169e46010cb552d0e4f79",
+            "event": "job_settled",
+            "evidence": {
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "kind": "deposited_backbone_qc",
+              "nature": "analysis",
+              "output_name": "qc.json",
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de"
+            },
+            "job_id": "gxj_01m8fefs2bw2c25tp3",
+            "node_id": "node_96e0eaeb463e5dd93445e78b3a47b02d",
+            "output": "qc.json",
+            "question": "For this entry's model 1, do ca_count and complete_backbones both equal declared_residues, and what scope do those counts justify for its C-alpha radius?",
+            "recipe": "single-chain-backbone-coverage-rg@1",
+            "role": "run_lead",
+            "state": "read_and_decide",
+            "step": "backbone_qc",
+            "stop_condition": "Finish when the new entry's radius or reason it is undefined, counts, denominator and supported model-specific label have been recorded. Stop with an unresolved scope if the entry or mapping fails the method's requirements."
+          }
+        ]
+      }
+    ],
+    "decisions": [
+      {
+        "decision_ref": "gxa_da22a95ea5fd1b7c9fce6c032932cde3a7724cf5a2165a1623b4c4a9c93224e6",
+        "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "rationale": "Run the saved single-chain-backbone-coverage-rg@1 recipe on the original 1MBN coordinates. Its single-polypeptide mapping fits this entry and its output measures the Cα radius, Cα count, complete-backbone count and declared length. The previous entry supplies the method. The new measurement and an independent atom-row check will determine this entry's label.",
+        "evidence_refs": [
+          "gxa_01m8febe320303ngc7",
+          "gxa_01m8febe3v8fx2jfcq",
+          "gxa_01m8fecwn45rv0y1np"
+        ],
+        "ops": [
+          "open_branch",
+          "add_node"
+        ],
+        "outcome": "adopted"
+      },
+      {
+        "decision_ref": "gxa_e5fed3b550683664cc1cb51f556123d3cf640772685d175c633423236feb68d9",
+        "turn_id": "01a21ee7-e53c-7491-accd-7fc150883392",
+        "rationale": "Retain the commissioned 1MBN recipe run and independent atom-site audit. Reading the original coordinates shows positive-occupancy N, CA, C and O through terminal Gly153. The independently reviewed archive caveat identifies a local chirality error at Gln8, and the four Gln8 atom rows are present. This warrants a local stereochemistry note. The recipe output and the residue audit already cover the remaining checks, so another job would duplicate them.",
+        "evidence_refs": [
+          "gxa_01m8febe320303ngc7",
+          "gxa_01m8febe3v8fx2jfcq",
+          "gxa_01m8fecwn45rv0y1np",
+          "gxa_01m8feg9j5s8qmk0v8"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_7840baad0fadea0e8da2a9fac39dc0834e8d5a97646e0acafd4419622b536b27",
+        "turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "rationale": "Record a whole-chain Cα radius of {{metric:ca_radius_of_gyration_A}} for the first deposited model of 1MBN chain A. The saved workflow ran on the original coordinates and found {{metric:ca_count}} Cα sites and {{metric:complete_backbones}} complete positive-occupancy N/Cα/C/O backbones across {{metric:declared_residues}} declared residues. The reviewed archive note flags incorrect chirality at Gln8, and the original atom rows show all four required sites there. Retain the model-specific label and wait for the commissioned independent residue audit before closing. A discrepancy in its sequence-to-coordinate mapping would warrant revisiting the label.",
+        "evidence_refs": [
+          "gxa_01m8ferr72cv20jswn",
+          "gxa_01m8fefsnq1sbyy8sy",
+          "gxa_01m8febe320303ngc7",
+          "gxa_01m8febe3v8fx2jfcq",
+          "gxa_01m8fecwn45rv0y1np",
+          "gxa_01m8feg9j5s8qmk0v8"
+        ],
+        "ops": [],
+        "outcome": "maintained"
+      },
+      {
+        "decision_ref": "gxa_e62c8ee1097226537a74cea60ed7bfc24959a03f34eb5812095e3354838643d1",
+        "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "rationale": "The saved single-chain-backbone-coverage-rg@1 workflow applied to the original 1MBN coordinates gives a model-1 chain A Cα radius of gyration of {{metric:ca_radius_of_gyration_A}}. It counted {{metric:ca_count}} Cα sites and {{metric:complete_backbones}} complete N/Cα/C/O backbones across {{metric:declared_residues}} declared positions. The completed residue audit matched those sites to the polymer sequence through both termini. The reviewed archive remark identifies the Gln8 Cα chirality issue, and the original atom rows confirm full occupancy for all four required atoms there. These checks of the same deposition resolve the labeling question.",
+        "evidence_refs": [
+          "gxa_01m8fefsnq1sbyy8sy",
+          "gxa_01m8febe320303ngc7",
+          "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+          "gxa_01m8febe3v8fx2jfcq",
+          "gxa_01m8fecwn45rv0y1np",
+          "gxa_01m8feg9j5s8qmk0v8"
+        ],
+        "ops": [
+          "close_run"
+        ],
+        "outcome": "adopted"
+      }
+    ],
+    "lead_turns": [
+      {
+        "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+        "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21ee7-e50d-7271-ad07-b62a6240a2f1",
+        "turn_id": "01a21ee7-e53c-7491-accd-7fc150883392",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21ee9-4365-7ce0-8f7d-0ff58b541e5b",
+        "turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "state": "acknowledged"
+      },
+      {
+        "thread_id": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+        "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "state": "acknowledged"
+      }
+    ],
+    "deployment": {
+      "created_at": "2026-11-27T21:25:01.121Z",
+      "contract_sha256": "7a0a4c491271e0eebdfecf8196e6641bd0a40550f38f1e690eb269e7c48ad54a",
+      "workflow_sha256": null,
+      "agent_policy_sha256": "caab30afa94e8aae750159b5dfdccddcf62c4d959570ca4f5c011a6a97ae3216"
+    },
+    "initially_active_qc_provider": [],
+    "goal_pins": [
+      {
+        "digest": "2e93f4d6cb3c175f00c3183d5615980e2635fabb30e5c6d0585b10b517dd1ee9",
+        "method": "deposited-backbone-qc@1",
+        "provider": "org.gx.deposited-structure-qc@1.0.0",
+        "provider_digest": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336"
+      }
+    ],
+    "catalog": [
+      {
+        "turn": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "call": "exec-39164b84-3361-481c-a67a-8f237ce14c02",
+        "query": {
+          "kind": "all",
+          "limit": 35,
+          "query": "single-chain deposited backbone N CA C O coverage declared sequence model 1 C-alpha radius of gyration compactness saved workspace recipe"
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "deposited-backbone-qc@1",
+          "archival-peptide-coverage@1",
+          "interpret-coordinate-coverage@1",
+          "deposited-chain-geometry@2"
+        ],
+        "total": 178,
+        "survey_event": 322
+      },
+      {
+        "turn": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "call": "exec-ebcf384c-8ecf-4406-a597-8a78ddedb913",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "call": "exec-6fe9dfeb-4673-45bc-9fb5-57c88b22331a",
+        "query": {
+          "kind": "method",
+          "reference": "deposited-backbone-qc@1"
+        },
+        "selected": "deposited-backbone-qc@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "call": "exec-a2f03c65-a209-45ef-a0d9-f1d847c2cfa5",
+        "query": {
+          "kind": "module",
+          "reference": "data_inventory@3"
+        },
+        "selected": "data_inventory@3",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "call": "exec-09fda138-9fe5-4414-84b8-794a521831f7",
+        "query": {
+          "kind": "module",
+          "reference": "offline_literature_mechanism@1"
+        },
+        "selected": "offline_literature_mechanism@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ee7-e53c-7491-accd-7fc150883392",
+        "call": "exec-a8f6d036-c168-47f8-9440-78b1e6dd8a59",
+        "query": {
+          "kind": "all",
+          "query": "saved single-chain-backbone-coverage-rg recipe for model 1 C-alpha radius of gyration and coverage of positive-occupancy N CA C O in a single deposited polypeptide 1MBN"
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "deposited-backbone-qc@1",
+          "archival-peptide-coverage@1",
+          "deposited-chain-geometry@2",
+          "deposited-macrocycle-qc@1"
+        ],
+        "total": 178,
+        "survey_event": 376
+      },
+      {
+        "turn": "01a21ee7-e53c-7491-accd-7fc150883392",
+        "call": "exec-59d6e39a-45ad-42d5-9891-17a6414adb1f",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "call": "exec-dfd2f7b0-6ab5-4541-83e0-43d475793474",
+        "query": {
+          "kind": "all",
+          "limit": 12,
+          "query": "1MBN model 1 chain A deposited backbone coverage complete N CA C O C-alpha radius of gyration single-chain-backbone-coverage-rg recipe"
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "deposited-backbone-qc@1",
+          "archival-peptide-coverage@1",
+          "deposited-chain-geometry@2",
+          "pcna-local-geometry@1"
+        ],
+        "total": 178,
+        "survey_event": 396
+      },
+      {
+        "turn": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "call": "exec-d488122a-482d-42c8-9621-71345ee3dbc6",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "call": "exec-44f7311f-9bc7-476e-9831-9b8f974ef9fd",
+        "query": {
+          "kind": "method",
+          "reference": "deposited-backbone-qc@1"
+        },
+        "selected": "deposited-backbone-qc@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      },
+      {
+        "turn": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "call": "exec-e8e9de66-320a-4b1a-88d4-6b15f0416345",
+        "query": {
+          "kind": "all",
+          "limit": 12,
+          "query": "whole-chain C-alpha radius of gyration and backbone coverage in a deposited chain"
+        },
+        "selected": null,
+        "references": [
+          "single-chain-backbone-coverage-rg@1",
+          "deposited-backbone-qc@1",
+          "deposited-chain-geometry@2",
+          "archival-peptide-coverage@1",
+          "deposited-block-influence@1"
+        ],
+        "total": 133,
+        "survey_event": 425
+      },
+      {
+        "turn": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "call": "exec-0401a511-eaf6-477b-99f0-5e6737a913cc",
+        "query": {
+          "kind": "recipe",
+          "reference": "single-chain-backbone-coverage-rg@1"
+        },
+        "selected": "single-chain-backbone-coverage-rg@1",
+        "references": [],
+        "total": null,
+        "survey_event": null
+      }
+    ],
+    "save_calls": [],
+    "reads": [
+      {
+        "turn": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "call": "exec-916ef225-3c6c-41b4-9642-8dc390ea276d",
+        "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+        "tool": "gx_read_artifact"
+      },
+      {
+        "turn": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "call": "exec-8b3fd29b-492f-4fb5-a17d-2a25a0fb3667",
+        "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+        "tool": "gx_read_artifact"
+      }
+    ],
+    "researcher_extracts": [],
+    "signed_reports": [
+      {
+        "report_ref": "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+        "author": {
+          "call_id": "call_a2b3b81bf84649fab273d73515fc3c8e",
+          "context_ref": "gxcx_01m8fed75qdkg94kx5",
+          "kind": "MODULE",
+          "lease_id": "gxl_01m8fehextq6tda6cr",
+          "run_id": "gxr_01m8febe21hn46darv",
+          "task_id": "gxt_01m8fed75qssp20e8y",
+          "thread_id": "01a21ee8-bbde-7253-a77d-19e59e823ca0",
+          "turn_id": "01a21ee8-bc12-7a03-8aec-acc8a2311e0e"
+        },
+        "scope": "module:module_ad72ed1c50bc0c62dc9e06bbd0432248",
+        "status": "COMPLETE",
+        "findings": [
+          {
+            "evidence_status": "UNVERIFIED",
+            "kind": "support",
+            "source_refs": [
+              "gxa_01m8febe320303ngc7"
+            ],
+            "text": "I matched each chain A polymer position and monomer in _entity_poly_seq and _pdbx_poly_seq_scheme to the complete _atom_site loop for the requested model and entity. Every declared position has exactly one N, CA, C and O with numeric coordinates and full occupancy. The polymer rows all carry the alternate-site marker '.'. Both termini meet the same criterion, and the terminal glycine carbonyl oxygen is explicitly labeled O."
+          },
+          {
+            "evidence_status": "UNVERIFIED",
+            "kind": "observation",
+            "source_refs": [
+              "gxa_01m8febe320303ngc7"
+            ],
+            "text": "The OH and HEM coordinate rows share the polymer's author chain identifier A. Their label chain and entity identifiers assign them to separate nonpolymer entities, and their label_seq_id is '.'."
+          },
+          {
+            "evidence_status": "UNVERIFIED",
+            "kind": "observation",
+            "source_refs": [
+              "gxa_01m8febe320303ngc7",
+              "gxa_01m8febe3v8fx2jfcq"
+            ],
+            "text": "The mmCIF and the same-deposition PDB extract flag wrong chirality at a glutamine Cα. The mmCIF validation record describes planar geometry at that atom. Its coordinate row and those for the other required backbone atoms are present at full occupancy."
+          }
+        ],
+        "qualitative_notes": {
+          "findings": [
+            {
+              "kind": "support",
+              "source_refs": [
+                "gxa_01m8febe320303ngc7"
+              ],
+              "text": "I matched each chain A polymer position and monomer in _entity_poly_seq and _pdbx_poly_seq_scheme to the complete _atom_site loop for the requested model and entity. Every declared position has exactly one N, CA, C and O with numeric coordinates and full occupancy. The polymer rows all carry the alternate-site marker '.'. Both termini meet the same criterion, and the terminal glycine carbonyl oxygen is explicitly labeled O."
+            },
+            {
+              "kind": "observation",
+              "source_refs": [
+                "gxa_01m8febe320303ngc7"
+              ],
+              "text": "The OH and HEM coordinate rows share the polymer's author chain identifier A. Their label chain and entity identifiers assign them to separate nonpolymer entities, and their label_seq_id is '.'."
+            },
+            {
+              "kind": "observation",
+              "source_refs": [
+                "gxa_01m8febe320303ngc7",
+                "gxa_01m8febe3v8fx2jfcq"
+              ],
+              "text": "The mmCIF and the same-deposition PDB extract flag wrong chirality at a glutamine Cα. The mmCIF validation record describes planar geometry at that atom. Its coordinate row and those for the other required backbone atoms are present at full occupancy."
+            },
+            {
+              "kind": "support",
+              "source_refs": [
+                "gxa_01m8febe320303ngc7"
+              ],
+              "text": "Source row audit for PDB 1MBN, model 1, label_asym_id A, label_entity_id 1. The declaration and chain scheme run from Val1 to Gly153 inclusive. Checking all _atom_site IDs 1–1260 gives 153 of 153 Cα sites and 612 of 612 required N, CA, C and O sites matched by label sequence position and monomer. All polymer rows, IDs 1–1216, carry occupancy 1.00 and label_alt_id '.'. There are no gaps, zero-occupancy polymer sites or alternate polymer sites."
+            },
+            {
+              "kind": "observation",
+              "source_refs": [
+                "gxa_01m8febe320303ngc7"
+              ],
+              "text": "In N, CA, C, O order, _atom_site.id values are 1, 2, 3, 4 for Val A 1 and 1213, 1214, 1215, 1216 for Gly A 153. OH is ID 1217, label chain B, entity 2, author A 154. HEM spans IDs 1218–1260, label chain C, entity 3, author A 155."
+            },
+            {
+              "kind": "observation",
+              "source_refs": [
+                "gxa_01m8febe320303ngc7",
+                "gxa_01m8febe3v8fx2jfcq"
+              ],
+              "text": "Gln A 8 has _atom_site IDs 58, 59, 60, 61 for N, CA, C, O, each with occupancy 1.00. The mmCIF _database_PDB_caveat.text and the extract's CAVEAT identify Gln A 8 CA. The _pdbx_validate_chiral record lists model 1 and gives details as PLANAR. EXPDTA and REMARK 2 in the same-deposition extract identify X-ray diffraction at 2.00 Å resolution."
+            },
+            {
+              "kind": "support",
+              "source_refs": [
+                "gxa_01m8febe320303ngc7",
+                "gxa_01m8febe3v8fx2jfcq"
+              ],
+              "text": "The whole-declared-chain coverage label is justified for the model-1 Cα radius. A viewer can interpret the radius as the spatial spread of the deposited Cα trace from Val1 through Gly153. The Gln8 caveat concerns the local geometry at an occupied Cα."
+            }
+          ],
+          "gaps": [],
+          "next_steps": [
+            "Pair the Lead’s saved-recipe radius in ångströms with the full declared-chain coverage and the archived Gln stereochemical caveat."
+          ],
+          "status": "UNVERIFIED"
+        },
+        "gaps": [],
+        "next_steps": [
+          "Pair the Lead’s saved-recipe radius in ångströms with the full declared-chain coverage and the archived Gln stereochemical caveat."
+        ]
+      }
+    ],
+    "lead_endpoint_receipts": [
+      {
+        "event_id": 395,
+        "turn": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "endpoints": [
+          {
+            "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "ca_count",
+              "key": "0351f78a02d5",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "ca_radius_of_gyration_A",
+              "key": "202f12792413",
+              "unit": "angstrom",
+              "value": "15.128 angstrom"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "complete_backbones",
+              "key": "e05fc6e043d3",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "coordinate_coverage",
+              "key": "879fabad3538",
+              "unit": "1",
+              "value": "153/153 (1.0000)"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "declared_residues",
+              "key": "a8d1347a5d07",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "observed_residues",
+              "key": "36e382aacfeb",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          }
+        ]
+      },
+      {
+        "event_id": 397,
+        "turn": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "endpoints": [
+          {
+            "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "ca_count",
+              "key": "0351f78a02d5",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "ca_radius_of_gyration_A",
+              "key": "202f12792413",
+              "unit": "angstrom",
+              "value": "15.128 angstrom"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "complete_backbones",
+              "key": "e05fc6e043d3",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          }
+        ]
+      },
+      {
+        "event_id": 398,
+        "turn": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "endpoints": [
+          {
+            "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "coordinate_coverage",
+              "key": "879fabad3538",
+              "unit": "1",
+              "value": "153/153 (1.0000)"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "declared_residues",
+              "key": "a8d1347a5d07",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "observed_residues",
+              "key": "36e382aacfeb",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          }
+        ]
+      },
+      {
+        "event_id": 429,
+        "turn": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "endpoints": [
+          {
+            "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "ca_count",
+              "key": "0351f78a02d5",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "ca_radius_of_gyration_A",
+              "key": "202f12792413",
+              "unit": "angstrom",
+              "value": "15.128 angstrom"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "complete_backbones",
+              "key": "e05fc6e043d3",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          }
+        ]
+      },
+      {
+        "event_id": 430,
+        "turn": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "endpoints": [
+          {
+            "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "coordinate_coverage",
+              "key": "879fabad3538",
+              "unit": "1",
+              "value": "153/153 (1.0000)"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "declared_residues",
+              "key": "a8d1347a5d07",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          },
+          {
+            "row": {
+              "id": "observed_residues",
+              "key": "36e382aacfeb",
+              "unit": "1",
+              "value": "153"
+            },
+            "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+          }
+        ]
+      }
+    ],
+    "handoffs": [
+      {
+        "publisher": "module:module_ad72ed1c50bc0c62dc9e06bbd0432248",
+        "report_ref": "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+        "published_event": 405,
+        "released_event": 406,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": true,
+        "receiver_scope": "run",
+        "thread_id": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+        "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:bd7300ed-e921-4d36-acba-5a0497fcb4a2",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-d8081ef9-070d-472d-b863-93c2ed9139f5",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "ENACTED",
+        "decision_ref": "gxa_e62c8ee1097226537a74cea60ed7bfc24959a03f34eb5812095e3354838643d1",
+        "effects": [
+          {
+            "kind": "v6.claim.adopted",
+            "event_id": 432,
+            "subject": "gxh_01m8fes79e6mkd8rjm",
+            "claim_revision_id": "gxh_01m8fes79e6mkd8rjm@2"
+          }
+        ],
+        "decision_event": 438,
+        "rationale": "The saved single-chain-backbone-coverage-rg@1 workflow applied to the original 1MBN coordinates gives a model-1 chain A Cα radius of gyration of {{metric:ca_radius_of_gyration_A}}. It counted {{metric:ca_count}} Cα sites and {{metric:complete_backbones}} complete N/Cα/C/O backbones across {{metric:declared_residues}} declared positions. The completed residue audit matched those sites to the polymer sequence through both termini. The reviewed archive remark identifies the Gln8 Cα chirality issue, and the original atom rows confirm full occupancy for all four required atoms there. These checks of the same deposition resolve the labeling question."
+      }
+    ],
+    "native_worker_overlaps": [],
+    "turns": [
+      {
+        "scope": "module:module_ad72ed1c50bc0c62dc9e06bbd0432248",
+        "thread_id": "01a21ee6-9d14-7342-b0ca-33a1bd499042",
+        "turn_id": "01a21ee6-9d38-7c00-bf49-64c5eb57835a",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:25:59.741Z",
+        "end": "2026-11-27T21:28:18.564Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "module:module_ad72ed1c50bc0c62dc9e06bbd0432248",
+        "thread_id": "01a21ee8-bbde-7253-a77d-19e59e823ca0",
+        "turn_id": "01a21ee8-bc12-7a03-8aec-acc8a2311e0e",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:28:18.714Z",
+        "end": "2026-11-27T21:30:46.234Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+        "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:25:03.616Z",
+        "end": "2026-11-27T21:27:23.354Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21ee9-4365-7ce0-8f7d-0ff58b541e5b",
+        "turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:28:53.694Z",
+        "end": "2026-11-27T21:32:33.097Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21ee7-e50d-7271-ad07-b62a6240a2f1",
+        "turn_id": "01a21ee7-e53c-7491-accd-7fc150883392",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:27:23.714Z",
+        "end": "2026-11-27T21:28:52.869Z",
+        "terminal_status": "interrupted"
+      },
+      {
+        "scope": "run",
+        "thread_id": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+        "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "provider": "openai",
+        "model": "gpt-6.2-astra",
+        "classification": "NATIVE_MODEL",
+        "start": "2026-11-27T21:32:33.386Z",
+        "end": "2026-11-27T21:34:30.481Z",
+        "terminal_status": "interrupted"
+      }
+    ],
+    "job_running_intervals": [
+      {
+        "start": "2026-11-27T21:27:23.764Z",
+        "end": "2026-11-27T21:27:24.113Z",
+        "job_id": "gxj_01m8fefs2bw2c25tp3"
+      }
+    ],
+    "job_turn_overlap_intervals": [
+      {
+        "job_id": "gxj_01m8fefs2bw2c25tp3",
+        "turn_id": "01a21ee6-9d38-7c00-bf49-64c5eb57835a",
+        "scope": "module:module_ad72ed1c50bc0c62dc9e06bbd0432248",
+        "seconds": 0.349
+      },
+      {
+        "job_id": "gxj_01m8fefs2bw2c25tp3",
+        "turn_id": "01a21ee7-e53c-7491-accd-7fc150883392",
+        "scope": "run",
+        "seconds": 0.349
+      }
+    ],
+    "closing": [
+      {
+        "event_id": 356,
+        "ts": "2026-11-27T21:27:23.302Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_da22a95ea5fd1b7c9fce6c032932cde3a7724cf5a2165a1623b4c4a9c93224e6"
+      },
+      {
+        "event_id": 390,
+        "ts": "2026-11-27T21:28:52.514Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_e5fed3b550683664cc1cb51f556123d3cf640772685d175c633423236feb68d9"
+      },
+      {
+        "event_id": 419,
+        "ts": "2026-11-27T21:32:32.957Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_7840baad0fadea0e8da2a9fac39dc0834e8d5a97646e0acafd4419622b536b27"
+      },
+      {
+        "event_id": 438,
+        "ts": "2026-11-27T21:34:30.381Z",
+        "kind": "v6.decision.committed",
+        "subject_id": "gxa_e62c8ee1097226537a74cea60ed7bfc24959a03f34eb5812095e3354838643d1"
+      },
+      {
+        "event_id": 440,
+        "ts": "2026-11-27T21:34:30.512Z",
+        "kind": "v6.run.closed",
+        "subject_id": "gxr_01m8febe21hn46darv"
+      }
+    ]
+  }
+}

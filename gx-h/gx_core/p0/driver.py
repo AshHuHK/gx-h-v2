@@ -12,7 +12,7 @@ import uuid
 from .. import metrics
 from ..context import Ctx, Principal
 from ..domain import clock, ids, machines
-from ..errors import ArtifactNotFound, BudgetExceeded, HoldActive, IdempotencyConflict, IllegalTransition, LeaseExpired, OutcomeUnknown, PermissionDenied, SchemaInvalid, StaleRevision
+from ..errors import ArtifactNotFound, BudgetExceeded, HoldActive, IdempotencyConflict, IllegalTransition, LeaseExpired, OutcomeUnknown, PermissionDenied, SchemaInvalid, ScopeDenied, StaleRevision
 from ..hostobs.app_server_client import AppServerDisconnected, AppServerResponseError, AppServerTimeout
 from ..jobs.service import JobService
 from ..orchestration import branches, native_worker, reactor, service
@@ -770,7 +770,7 @@ class Driver:
                     result["driver"] = "usage_pending"
                 return result
             last_terminal_event = None
-            tasks = self.conn.execute("SELECT t.task_id,t.status,t.attempt,j.status AS waiting_job, "
+            tasks = self.conn.execute("SELECT t.task_id,t.status,t.attempt,r.root_key,j.status AS waiting_job, "
                                       "EXISTS (SELECT 1 FROM p0_job_proposals p WHERE p.root_key=r.root_key "
                                       "AND p.wait_turn IS NOT NULL AND p.wait_ended IS NULL) AS waiting_proposal "
                                       "FROM tasks t LEFT JOIN p0_roots r ON r.lease_id=t.lease_id "
@@ -798,10 +798,11 @@ class Driver:
                         if not opened[watch]:
                             continue
                 retry = False
-                if turn_id := sent.get(key):
-                    outcome = self.conn.execute("SELECT terminal_status FROM p0_root_turn_usage WHERE turn_id=?",
-                                                (turn_id,)).fetchone()
-                    if outcome and outcome[0] in ("interrupted", "failed"):
+                if sent.get(key):
+                    latest, resumable = waits.worker_turn(self.conn, t["root_key"], cached=True)
+                    if latest:
+                        sent[key] = latest
+                    if resumable:
                         delay, at = retry_delay.setdefault(key, (0.5, time.monotonic() + 0.5))
                         if time.monotonic() >= at:
                             retry = True
@@ -814,11 +815,13 @@ class Driver:
                                 receipt = self._native_call("task", t["task_id"], lambda n: n.dispatch(t["task_id"]))
                             finally:
                                 metrics.record("p0_dispatch", started=started)
-                    except (IllegalTransition, LeaseExpired):
-                        # The task list predates native I/O. A concurrent Goal edit or new grant can retire
-                        # a decision before claim, or after thread/start but before its first paid turn.
-                        fresh = self.conn.execute("SELECT status,attempt FROM tasks WHERE run_id=? AND task_id=?",
+                    except (IllegalTransition, LeaseExpired, ScopeDenied):
+                        # A stop or Goal edit can commit while Codex is reporting the thread state.
+                        fresh = self.conn.execute("SELECT t.status,t.attempt,r.status AS run_status FROM tasks t "
+                                                  "JOIN runs r USING(run_id) WHERE t.run_id=? AND t.task_id=?",
                                                   (self.rid, t["task_id"])).fetchone()
+                        if fresh and fresh["run_status"] in stopped:
+                            break
                         if fresh and (machines.is_terminal("task", fresh["status"]) or fresh["attempt"] > key[1]):
                             continue
                         raise

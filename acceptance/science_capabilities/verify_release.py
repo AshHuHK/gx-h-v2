@@ -23,7 +23,8 @@ def main():
     suites["science_capabilities"]=["acceptance.science_capabilities."+file.stem for file in sorted(
         (ROOT/"acceptance/science_capabilities").glob("test_*.py"))]
     suites["boundaries"]=["tests.test_acquired_documents","tests.test_science_capability_views","tests.test_v6_named_ports",
-                          "tests.test_source_decision_receipts","tests.test_v61_schema","tests.test_v61_native_contract","tests.test_v2_fencing",
+                          "tests.test_source_decision_receipts","tests.test_p0_warm_pause_resume","tests.test_p0_wait_leases",
+                          "tests.test_v61_schema","tests.test_v61_native_contract","tests.test_v2_fencing",
                           "acceptance.unified_multiturn.test_live_receipts","acceptance.unified_multiturn.test_web_delivery_recovery"]
     env=dict(os.environ,GX_CODEX_OFFLINE="1",PYTHONDONTWRITEBYTECODE="1",
              PYTHONPATH=os.pathsep.join(str(ROOT/path) for path in (".","gx-h","gx-h/tests","acceptance/v62a")))

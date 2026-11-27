@@ -331,20 +331,50 @@ def on_run_transition(conn, run, to_state, event_id):
         resume_run(conn, run_id)
 
 
+def paused_turn(conn, root_key, turn_id):
+    """Match the turn observed at stop, including a receipt recovered after stop."""
+    return conn.execute(
+        "SELECT 1 FROM p0_attempt_waits w JOIN p0_roots r USING(root_key)"
+        " LEFT JOIN p0_root_deliveries d ON d.run_id=r.run_id AND d.thread_id=r.thread_id"
+        " AND d.event_id=w.wait_key AND d.state='acknowledged'"
+        " WHERE w.root_key=? AND w.reason='operator_pause' AND (w.turn_id=? OR d.turn_id=?) LIMIT 1",
+        (root_key, turn_id, turn_id)).fetchone() is not None
+
+
 def deferred_turn(conn, root_key, turn_id):
     """An observed park/stop for this very turn explains its ending without a worker product."""
     if _installed(conn, "p0_job_proposals") and conn.execute(
             "SELECT 1 FROM p0_job_proposals WHERE root_key=? AND wait_turn=?", (root_key,turn_id)).fetchone():
         return True
+    if paused_turn(conn, root_key, turn_id):
+        return True
     return conn.execute(
         "SELECT 1 FROM p0_attempt_waits w JOIN p0_roots r USING(root_key)"
-        " LEFT JOIN p0_root_deliveries stopped ON w.reason='operator_pause' AND stopped.run_id=r.run_id"
-        " AND stopped.thread_id=r.thread_id AND stopped.event_id=w.wait_key"
         " WHERE w.root_key=? AND ((w.reason IN ('budget','provider_backoff') AND w.wait_key=('resume:'||?)"
         " AND (w.turn_id IS NULL OR w.turn_id=?))"
-        " OR (w.reason='operator_pause' AND (w.turn_id=? OR stopped.turn_id=?))"
         " OR (w.reason='job' AND w.turn_id=?"
         " AND NOT EXISTS(SELECT 1 FROM p0_root_deliveries d WHERE d.run_id=r.run_id AND d.thread_id=r.thread_id"
         " AND d.turn_id=w.turn_id AND d.event_id=('wake:'||r.lease_id||':'||w.wait_key)"
         " AND d.state='acknowledged'))) LIMIT 1",
-        (root_key, turn_id, turn_id, turn_id, turn_id, turn_id)).fetchone() is not None
+        (root_key, turn_id, turn_id, turn_id)).fetchone() is not None
+
+
+def worker_turn(conn, root_key, *, cached=False):
+    """Return the current attempt's last acknowledged start and whether it needs a continuation."""
+    row = conn.execute(
+        "SELECT d.turn_id,u.terminal_status,terminal.thread_id AS product" + _CURRENT +
+        " JOIN p0_root_deliveries d ON d.thread_id=r.thread_id AND d.run_id=r.run_id"
+        " LEFT JOIN p0_root_turn_usage u ON u.thread_id=d.thread_id AND u.turn_id=d.turn_id"
+        " LEFT JOIN p0_root_terminals terminal ON terminal.thread_id=r.thread_id"
+        " WHERE r.root_key=? AND d.method='turn/start' AND d.state='acknowledged'"
+        " ORDER BY d.rowid DESC LIMIT 1", (root_key,)).fetchone()
+    if row is None:
+        return None, False
+    status = row["terminal_status"]
+    # A running Driver already handles its Job/proposal handoffs. Cold attachment
+    # must also reconstruct these older waits from the journal.
+    explains_completion = paused_turn if cached else deferred_turn
+    retry = row["product"] is None and (
+        status in ("interrupted", "failed") or
+        (status == "completed" and explains_completion(conn, root_key, row["turn_id"])))
+    return row["turn_id"], retry

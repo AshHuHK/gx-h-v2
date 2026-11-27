@@ -231,6 +231,30 @@ class WaitLeases(unittest.TestCase):
         self.assertEqual(budgets.state(self.db, self.budget)["spent"], {"tokens":22, "api_calls":1})
         self.assertEqual(waits.pending(self.db, self.run), [])
 
+    def test_resume_waits_for_an_unrelated_live_host_turn(self):
+        first = self.roots.dispatch(self.task)["turn_id"]
+        self.roots.delivery.observe("turn/started", {"threadId":self.thread, "turn":{"id":first}})
+        self.roots.delivery.observe("rawResponse/completed", {"threadId":self.thread, "turnId":first,
+                                    "responseId":"original-response", "usage":{"totalTokens":11}})
+        self.roots.delivery.observe("thread/tokenUsage/updated", {"threadId":self.thread, "turnId":first,
+                                    "tokenUsage":{"total":{"totalTokens":11}}})
+        change_state(self.db, project(self.db), "pause")
+        self.peer.turns[0]["status"] = "completed"
+        self.roots.delivery.observe("turn/completed", {"threadId":self.thread, "turn":self.peer.turns[0]})
+        change_state(self.db, project(self.db), "continue")
+        self.peer.turns.append({"id":"unowned-live-turn", "status":"inProgress", "items":[]})
+        with self.assertRaisesRegex(HoldActive, "active Codex turn"):
+            self.roots.dispatch(self.task)
+        self.assertEqual(len(self.peer.sent), 1)
+        self.assertIsNone(self.roots.delivery._get("resume:" + first))
+
+        self.peer.turns[-1]["status"] = "completed"
+        resumed = self.roots.dispatch(self.task)["turn_id"]
+        self.assertEqual(self.roots.delivery._get("resume:" + first)["turn_id"], resumed)
+        self.assertEqual(self.roots.dispatch(self.task)["turn_id"], resumed)
+        self.assertEqual(len(self.peer.sent), 2)
+        self.assert_owned()
+
     def test_turn_completed_during_operator_pause_resumes_once_without_job_or_failure(self):
         turn = self.roots.dispatch(self.task)["turn_id"]
         self.roots.delivery.observe("turn/started", {"threadId":self.thread, "turn":{"id":turn}})

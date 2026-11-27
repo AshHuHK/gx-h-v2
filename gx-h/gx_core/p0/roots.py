@@ -957,12 +957,12 @@ class Roots:
                 return {**self._binding(tid),"turn_id":wake["turn_id"]}
             return {**self._binding(tid), "turn_id":None}
         event_id = "start:"+row["root_key"]
-        prior = self.conn.execute("SELECT d.turn_id,u.terminal_status FROM p0_root_deliveries d "
-                                  "JOIN p0_root_turn_usage u USING(thread_id,turn_id) WHERE d.thread_id=? "
-                                  "AND d.method='turn/start' ORDER BY d.rowid DESC LIMIT 1", (tid,)).fetchone()
-        if prior and (prior["terminal_status"] in ("interrupted","failed") or
-                (prior["terminal_status"] and waits.deferred_turn(self.conn, row["root_key"], prior["turn_id"]))):
-            event_id = "resume:"+prior["turn_id"]
+        prior, retry = waits.worker_turn(self.conn, row["root_key"])
+        if prior and not retry:
+            # An acknowledged continuation can predate its first usage notification.
+            return {**self._binding(tid), "turn_id":prior}
+        if retry:
+            event_id = "resume:"+prior
         text = row["brief"]
         if event_id.startswith("resume:"):
             text = self.worker.resume_text(text)

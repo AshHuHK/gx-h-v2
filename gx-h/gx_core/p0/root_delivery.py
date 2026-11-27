@@ -604,6 +604,8 @@ class RootDelivery:
                 raise HoldActive("another input to this thread still needs a delivery receipt")
             if human and active:
                 raise HoldActive("a new operator message needs a distinct idle main-thread turn")
+            if active and binding.get("task_id") and event_id.startswith("resume:"):
+                raise HoldActive("the worker already has an active Codex turn")
             if not row:
                 self.conn.execute("INSERT INTO p0_root_deliveries(run_id,event_id,thread_id,client_id,text_sha256,"
                                   "human,interrupt,state) VALUES(?,?,?,?,?,?,?,'ready')",

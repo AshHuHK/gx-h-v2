@@ -400,15 +400,32 @@ def _extract(conn, src, args, identity, cursor, permitted_targets):
             'found_in':elsewhere, 'scope':identity['scope']}
 
 
+def receipt_turns(conn, run_id, thread, turn):
+    """Only acknowledged GX resumptions inherit source receipts on the same native thread."""
+    rows = conn.execute("""
+        WITH RECURSIVE lineage(turn_id) AS (
+            SELECT ?
+            UNION
+            SELECT prior.turn_id FROM lineage
+            JOIN p0_root_deliveries child ON child.run_id=? AND child.thread_id=? AND child.turn_id=lineage.turn_id
+            JOIN p0_root_deliveries prior ON prior.run_id=child.run_id AND prior.thread_id=child.thread_id
+                AND prior.turn_id=substr(child.event_id,8) AND prior.rowid<child.rowid
+            WHERE child.method='turn/start' AND prior.method='turn/start'
+                AND child.state='acknowledged' AND prior.state='acknowledged' AND substr(child.event_id,1,7)='resume:'
+        ) SELECT turn_id FROM lineage""", (turn,run_id,thread))
+    return {row[0] for row in rows}
+
+
 def decision_citations(conn, task, lease, thread, turn, candidates):
     """Return source records actually delivered by this assignment's native evidence tools."""
     if not candidates:
         return set()
+    turns = receipt_turns(conn, task["run_id"], thread, turn)
     rows = conn.execute("""SELECT a.artifact_ref FROM p0_root_calls c
         JOIN p0_v6_native_calls n USING(thread_id,call_id,turn_id)
         JOIN p0_roots r ON r.thread_id=c.thread_id
         JOIN artifacts a ON a.artifact_ref=json_extract(c.result_json,'$.artifact_ref')
-        WHERE c.thread_id=? AND c.turn_id=? AND r.run_id=? AND r.task_id=? AND r.lease_id=?
+        WHERE c.thread_id=? AND c.turn_id IN (SELECT value FROM json_each(?)) AND r.run_id=? AND r.task_id=? AND r.lease_id=?
         AND a.run_id=r.run_id AND a.task_id=r.task_id AND a.published=1
         AND json_extract(c.result_json,'$.accepted')=1
         AND json_extract(c.result_json,'$.scope')=?
@@ -417,11 +434,11 @@ def decision_citations(conn, task, lease, thread, turn, candidates):
           OR (json_extract(n.request_json,'$.tool')=? AND a.kind=?
               AND a.artifact_ref=json_extract(c.result_json,'$.review_ref')))
         AND a.artifact_ref IN (SELECT value FROM json_each(?))""",
-        (thread, turn, task["run_id"], task["task_id"], lease, task["scope"],
+        (thread, ids.canonical_json(sorted(turns)), task["run_id"], task["task_id"], lease, task["scope"],
          EXTRACT, EXTRACTION, REVIEW, REVIEW_RECORD, ids.canonical_json(sorted(candidates))))
     from . import v62_catalog
     owned = {row[0] for row in rows}
-    return owned | v62_catalog.method_citations(conn, task, lease, thread, turn, candidates - owned)
+    return owned | v62_catalog._returned_method_citations(conn, task, lease, thread, turns, candidates - owned)
 
 
 def _owned(conn, run_id, ref, *, cursor=None):

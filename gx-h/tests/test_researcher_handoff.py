@@ -130,6 +130,11 @@ class Researchers(unittest.TestCase):
         from gx_core.p0 import v6_native
         frozen = v6_native.brief(self.roots._binding(reviewer["threadId"]))
         self.assertNotIn("gx_read_artifact",frozen["allowed_tools"])
+        _, limited = self.open(lead,[evidence],3)
+        limited_packet = v6_native.brief(self.roots._binding(limited["threadId"]))
+        self.assertNotIn("review_target", next(m for m in limited_packet["materials"] if m["artifact_ref"]==evidence))
+        with self.assertRaises(ScopeDenied):
+            self.paragraph(limited,"paper.xml",segment)
         quote = next(x["review_target"] for x in frozen["materials"] if x["artifact_ref"]==evidence)
         self.assertEqual((quote["source_ref"],quote["segment_id"],quote["quote_preview"]),(paper,segment,read["text"]))
         reread = self.paragraph(reviewer, "paper.xml", segment)

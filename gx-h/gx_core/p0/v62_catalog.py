@@ -211,7 +211,14 @@ def _module_method_receipts(conn, run_id, scope, refs):
 
 
 def method_citations(conn, task, lease, thread, turn, candidates):
-    """Recognize the exact method document delivered to this native decision maker."""
+    """Recognize this turn's exact method cards and cards on its confirmed resume chain."""
+    from . import v62_sources
+    turns = v62_sources.receipt_turns(conn, task["run_id"], thread, turn)
+    return _returned_method_citations(conn, task, lease, thread, turns, candidates)
+
+
+def _returned_method_citations(conn, task, lease, thread, acknowledged_turns, candidates):
+    """The evidence owner can reuse the checked chain across source and method citations."""
     scope = task["scope"]
     if not candidates or (scope != "run" and not scope.startswith("module:")):
         return set()
@@ -223,14 +230,14 @@ def method_citations(conn, task, lease, thread, turn, candidates):
         JOIN p0_roots r ON r.thread_id=c.thread_id
         JOIN v6_decision_tasks t ON t.task_id=r.task_id AND t.run_id=r.run_id AND t.scope=?
         JOIN artifacts a ON a.artifact_ref=json_extract(c.result_json,'$.source_ref')
-        WHERE c.thread_id=? AND c.turn_id=? AND r.run_id=? AND r.task_id=? AND r.lease_id=?
+        WHERE c.thread_id=? AND c.turn_id IN (SELECT value FROM json_each(?)) AND r.run_id=? AND r.task_id=? AND r.lease_id=?
         AND a.run_id=r.run_id AND a.kind='v62_public_method_spec' AND a.published=1 AND a.origin='BACKEND'
         AND json_extract(n.request_json,'$.tool')='gx_query_catalog'
         AND json_extract(n.request_json,'$.arguments.reference')=json_extract(c.result_json,'$.reference')
         AND json_extract(c.result_json,'$.reference')=json_extract(c.result_json,'$.spec.capability_version')
         AND json_extract(c.result_json,'$.kind')='method'
         AND a.artifact_ref IN (SELECT value FROM json_each(?))""",
-        (scope, thread, turn, task["run_id"], task["task_id"], lease, refs))
+        (scope, thread, ids.canonical_json(sorted(acknowledged_turns)), task["run_id"], task["task_id"], lease, refs))
     valid = set()
     for ref, sha, response in cards:
         answer = json.loads(response)

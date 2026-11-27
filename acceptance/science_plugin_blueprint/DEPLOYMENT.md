@@ -42,6 +42,7 @@ PYTHONPATH=.:gx-h:gx-h/tests GX_CODEX_OFFLINE=1 .venv/bin/python -B -m unittest 
   acceptance.science_plugin_blueprint.test_scholarly_pages \
   acceptance.science_plugin_blueprint.test_reading_skill acceptance.v624.test_cheap_job \
   acceptance.science_plugin_blueprint.test_method_health \
+  tests.test_source_decision_receipts acceptance.science_capabilities.test_method_citations \
   tests.test_v62_module_funding tests.test_publication_discovery \
   tests.test_science_capability_collections tests.test_researcher_handoff \
   acceptance.multi_workflow.test_multiturn_method_survey tests.test_v6_named_ports \

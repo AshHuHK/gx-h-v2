@@ -396,13 +396,14 @@ def _own_close_reviews(conn, task, root, turn_id, decision):
             or decision.get("convergence") is not None or decision.get("resolved_gaps")):
         return set()
     rid, cursor = task["run_id"], task["event_cursor"]
+    turns = v62_sources.receipt_turns(conn, rid, root["thread_id"], turn_id)
     refs = set()
     for event in v6_goal._events(conn, rid, cursor):
         if event["kind"] != "v62.source.reviewed":
             return set()
         payload = store.loads(event, "payload_json")
         if ("target_claim_ref" not in payload or payload["target_claim_ref"] is not None
-                or payload.get("scope") != "run" or payload.get("review_turn_id") != turn_id):
+                or payload.get("scope") != "run" or payload.get("review_turn_id") not in turns):
             return set()
         refs.add(event["subject_id"])
     # A Job may already have changed while its node settlement has yet to be published.

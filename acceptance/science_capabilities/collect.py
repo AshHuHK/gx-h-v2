@@ -10,12 +10,15 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "gx-h"))
+from acceptance.science_capabilities.release_identity import revision
 from gx_core.p0.research_page import complete_decision
 from gx_core.p0 import research_routes
 
 
 def check(work, build, rid, destination):
+    commit = revision(build)
     state = work / "state"
     src = state / "research" / rid
     first = json.loads((src / "result.json").read_bytes())
@@ -53,7 +56,6 @@ def check(work, build, rid, destination):
     # The normal command contains deployment-local file paths. Evidence and original report keep their identity.
     result["invocation"]={k:v for k,v in export["invocation"].items() if k!="command"}
     (destination/"result.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n")
-    commit = subprocess.check_output(["git","rev-parse","HEAD"],cwd=build,text=True).strip()
     ledger=dict(run_id=rid,release=commit,report_sha256=report_hash,turns=turns,source_events=reads,
                 decision_ref=decision["decision_ref"],commit_event=result["closure"]["committed_event"],
                 close_event=result["closure"]["closed_event"],reexport_added=export["invocation"]["added"])

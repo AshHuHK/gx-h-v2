@@ -10,12 +10,15 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from acceptance.science_capabilities.release_identity import revision
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("logs",type=Path)
     args=parser.parse_args()
+    candidate=revision(ROOT)
     logs=args.logs.resolve()
     logs.mkdir(parents=True,exist_ok=True)
     prior=json.loads((ROOT/"acceptance/unified_multiturn/evidence/controlled/observations.json").read_text())
@@ -44,7 +47,7 @@ def main():
         return summary
     with ThreadPoolExecutor(max_workers=3) as pool:
         results=list(pool.map(check,suites.items()))
-    receipt={"candidate":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),
+    receipt={"candidate":candidate,
              "python":sys.version.split()[0],"suites":results}
     (logs/"release-tests.json").write_text(json.dumps(receipt,indent=2)+"\n")
     return any(r["exit"]!=0 or r["tests"] is None for r in results)

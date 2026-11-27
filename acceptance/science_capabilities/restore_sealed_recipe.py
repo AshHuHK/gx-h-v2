@@ -12,6 +12,9 @@ import subprocess
 import sys
 import tempfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from acceptance.science_capabilities.release_identity import revision
+
 
 def snapshot(db, run, recipe):
     row = db.execute("SELECT status,goal_version,stop_decision_ref FROM v6_goals WHERE run_id=?", (run,)).fetchone()
@@ -43,6 +46,7 @@ def run(args):
     runtime = release / ".venv/bin/python"
     if Path(sys.prefix).resolve() != runtime.parents[1]:
         raise ValueError(f"Run this script with {runtime}")
+    source_revision, destination_revision = revision(before_release), revision(release)
     sys.path.insert(0, str(release / "gx-h"))
     from gx_core.native_release import native_state
 
@@ -106,16 +110,12 @@ def run(args):
         raise ValueError("Cold report export differs from the sealed decision or archived report")
     if export["invocation"]["added"] != {"jobs": 0, "host_turns": 0}:
         raise ValueError("Cold report export dispatched work")
-    receipt = {"source_release": revision(before_release), "destination_release": revision(release),
+    receipt = {"source_release": source_revision, "destination_release": destination_revision,
                "copied": copied, "sealed": after, "report_sha256": after_sha,
                "invocation": export["invocation"]["added"], "generated_plugin": plugin,
                "environment_ledger_interpreter": interpreter}
     (dest / "restoration.json").write_text(json.dumps(receipt, indent=2, ensure_ascii=False) + "\n")
     return receipt
-
-
-def revision(directory):
-    return subprocess.check_output(["git", "-C", str(directory), "rev-parse", "HEAD"], text=True).strip()
 
 
 if __name__ == "__main__":

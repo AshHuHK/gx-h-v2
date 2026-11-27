@@ -4,6 +4,19 @@
 
 ## 开始或恢复
 
+现场已部署在 `gx-v-6/science-capabilities-release`。若使用 Linux x86_64 附件，在存放 tar 和同名 .sha256 的目录校验并解压到一个新目录。准备 CPython 3.11 及 Node 22.17.0，然后安装随包运行时与固定的 Python 依赖。
+
+```bash
+sha256sum -c gx-science-capabilities-linux-x86_64.tar.sha256
+mkdir gx-science-release
+tar -xf gx-science-capabilities-linux-x86_64.tar -C gx-science-release
+cd gx-science-release
+python3.11 -B scripts/release_assets.py all
+python3.11 -m venv .venv
+.venv/bin/python -m pip --isolated --disable-pip-version-check install --no-index \
+  --find-links release-assets/python --require-hashes -r release-assets/python/requirements.lock
+```
+
 在部署目录运行下列命令。当前机器使用既有官方 Codex 登录，网络经本机 Clash。命令用私有目录存放宿主会话，GX 从普通 research 入口建题并持续推进。需要本地酶库的示例依赖部署机的只读挂载。[发布依赖](../../RELEASE.md) · [能力迁移及挂载](MIGRATION.md)
 
 ```bash

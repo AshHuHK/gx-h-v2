@@ -5,8 +5,10 @@ import hashlib
 import json
 from pathlib import Path
 import sqlite3
+import sys
 import tempfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "gx-h"))
 from gx_core.domain import ids
 from gx_core.p0 import v6_goal, v6_native, v62_lead, v62_catalog
 

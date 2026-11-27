@@ -1,0 +1,506 @@
+{
+  "schema": "gx.science-capabilities.sealed-followup/1",
+  "run_id": "gxr_01m8d9q2sexhdhq33k",
+  "delivery": "public gx-p0 message through original deployment and stock ChatGPT OAuth",
+  "message": {
+    "message_id": "field-research-trace-01",
+    "message_text": "这次哪条原始证据使你更改了检索或方法？请给出实际看过的原文位置、相关的数据库记录、已执行的 Job 和生效的决定，也说明这次仍没解决什么。",
+    "created_at": "2026-11-27T05:32:11.430Z",
+    "rejected": null,
+    "response": "**Deng 等的表 2 和方法段改变了检索方向。** 表 2 已经回答了四种酶是否测过海藻糖，方法段却留下了一个影响 S288C 归属的问题。研究者因此从查底物谱转为追查编码模板的供体菌株。\n\n**原文怎样触发了决定。** Deng 等用葡萄糖释放量测水解活性。纯化的 Ima1p、Ima2p、Ima3p 和 Ima5p 对异麦芽糖均有活性，对 α,α-海藻糖均未检出活性。可复核位置是方法 p54、表 2 的 p238–243 和 p270–275，以及表注 p352。这里的 p 是归档全文定位号。方法 p52 给出表达宿主 CEN.PK113-5D，p51 将编码模板 `pGEMt-IMAx` 指向引文 6。负责人据此在**决定 1323** 中新增了按引文题名检索 Teste 等论文的任务。检索命中 PMID 20562106，本次取得的摘要未交代供体。**决定 2274** 随后结束这条支线，将结论限定为这四种制剂在原实验条件下的阴性结果。[Deng 等，方法与表 2](https://pmc.ncbi.nlm.nih.gov/articles/PMC3953731/) · [Teste 等，PMID 20562106](https://pubmed.ncbi.nlm.nih.gov/20562106/)\n\n**另一项调整来自 Nth2 的原文与数据库记录。** Chen 等图 2a（p35.1）显示，S288C 衍生背景中的 `nth2Δ` 比同背景亲本积累更多海藻糖。方法 p26 表明，定量所用的葡萄糖由取样后外加的商品海藻糖酶释放。S288C 的 Swiss-Prot 条目 Nth2 P35172 也把相关分子功能的依据列为突变表型，Nth1 P32356 和 Ath1 P48016 则列有直接测定依据。**决定 781** 由此追查 NTH2 的旧名 `YBR0106`，找到了 Nwaka 等报告总酶活和储量均无变化的作者摘要。**决定 2364** 进一步限定检索，专找能区分 Nth2、Nth1 和 Ath1 贡献的酶活实验。[Chen 等，图 2a 及方法](https://pmc.ncbi.nlm.nih.gov/articles/PMC11540316/) · [Nwaka 等，PMID 7730323](https://pubmed.ncbi.nlm.nih.gov/7730323/) · [Nth2 P35172](https://www.uniprot.org/uniprotkb/P35172/entry) · [Nth1 P32356](https://www.uniprot.org/uniprotkb/P32356/entry) · [Ath1 P48016](https://www.uniprot.org/uniprotkb/P48016/entry)\n\n**已执行的 Job。** 在运行 `gxr_01m8d9q2sexhdhq33k` 中，文献路线于事件 652 采纳了上次的原文核对要求。以下三项均有 `SUCCEEDED` 回执。第一项的结果被决定 1323 直接引用。\n\n| 实际执行内容 | Job ID | 结果记录 |\n|---|---|---|\n| 调取 Deng 等全文 PMC3953731 | `gxj_01m8da2kazcrzgxt91` | `gxa_01m8da2s06kxbtmpmv` |\n| 按 Nth1、磷酸化、Bmh1 和海藻糖酶活性检索 | `gxj_01m8da2kh710rhe426` | `gxa_01m8da3595sshjg44g` |\n| 按 Ath1、Nth2 和海藻糖利用检索 | `gxj_01m8da2kqh1c1m4hz6` | `gxa_01m8da35nmdne39336` |\n\n**结题时仍有两项归属问题。** Plank 等图 9 确实把纯化重组 Nth1、海藻糖和随时间生成的葡萄糖放在同一实验中（方法 p125–126，图 p194–195），但酵母编码供体未注明。决定 2412 随后调取的 Schepers 等原文，把水解活性测到粗提液层面，在 BY4742 衍生宿主中对 Nth1 的特异读数则是磷酸化和蛋白结合。纯化 Nth1 与酸性酶的来源仍未追溯到 S288C 原株。对 Nth2，Jules 与 Nwaka 两篇本次均只取得作者摘要，尚缺生长阶段、基因型和酶活对照来解释相反结果，也缺 S288C 来源纯化 Nth2 的直接水解读数。决定 2448 结束了这轮 Nth2 检索，**决定 2616 已结题并保留上述缺口**。[Schepers 等原文](https://pmc.ncbi.nlm.nih.gov/articles/PMC3531729/)",
+    "status": "completed",
+    "turn_id": "01a21b7d-6c5f-7f61-af2f-32ed974dc344",
+    "thread_id": "01a21a9c-5b85-75f1-9d13-3169c4523460",
+    "provider": "openai",
+    "model": "gpt-6.2-astra"
+  },
+  "reply_event": {
+    "event_id": 2624,
+    "ts": "2026-11-27T05:36:01.493Z"
+  },
+  "official_rollout": {
+    "path": "codex/sessions/2026/11/27/rollout-2026-11-27T01-26-24-01a21a9c-5b85-75f1-9d13-3169c4523460.jsonl",
+    "frames": [
+      {
+        "line": 1,
+        "start_meta": {
+          "id": "01a21a9c-5b85-75f1-9d13-3169c4523460",
+          "cli_version": "0.169.0",
+          "model_provider": "openai",
+          "originator": "gx_p0"
+        }
+      },
+      {
+        "line": 436,
+        "ts": "2026-11-27T05:32:14.308Z",
+        "kind": "event_msg",
+        "event": "task_started"
+      },
+      {
+        "line": 439,
+        "ts": "2026-11-27T05:32:15.953Z",
+        "kind": "turn_context",
+        "model": "gpt-6.2-astra"
+      },
+      {
+        "line": 524,
+        "ts": "2026-11-27T05:36:01.192Z",
+        "kind": "response_item",
+        "reply_matches": true
+      },
+      {
+        "line": 527,
+        "ts": "2026-11-27T05:36:01.363Z",
+        "kind": "event_msg",
+        "event": "task_complete"
+      }
+    ]
+  },
+  "closure": {
+    "event_id": 2617,
+    "ts": "2026-11-27T05:31:25.620Z",
+    "decision_ref": "gxa_080413a8d4c9bc1732cab04052593de2ccd01527b03bbbb5b2a896194734ac63"
+  },
+  "readback": {
+    "checked_before_after": true,
+    "jobs_before": 43,
+    "jobs_after": 43,
+    "job_ids_and_statuses_identical": true,
+    "new_native_turns": [
+      {
+        "thread_id": "01a21a9c-5b85-75f1-9d13-3169c4523460",
+        "turn_id": "01a21b7d-6c5f-7f61-af2f-32ed974dc344"
+      }
+    ],
+    "host_turns_before": 44,
+    "host_turns_after": 45,
+    "report_and_result_sha256_before_after": {
+      "REPORT.md": "a585246f6972b0d7939439b19fb7d75d882d33c7ac6d680ef32ce5eb798fc26f",
+      "result.json": "e419cb4b093cb2b95d651b1a368db23bda9b7f264f47b66e7e63a72e6c2f9e3c"
+    },
+    "goal_version": 1
+  },
+  "cited_source_locators": [
+    {
+      "article": "PMC3953731",
+      "raw_sha256": "63b3827c77ffba679a5093262c4a5450e07e654aff194733048517363958941f",
+      "locators": [
+        {
+          "segment": "p51",
+          "text_sha256": "1004fecddab6130aad5b52f10531de5f9bf0a6d9dfe29ef4ce7caa8c3c561305",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dajm30ee6jsnds",
+          "read_at": "2026-11-27T01:40:33.504Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p52",
+          "text_sha256": "24e8526e1a91aaeb79a6dcd3d6d1f21e6a6f6a8b1ba5d13bf9db02483dc7f4ca",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dajmakd5fpy450",
+          "read_at": "2026-11-27T01:40:33.747Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p54",
+          "text_sha256": "269e91bc2a15b85ff9ab4da19676bb12afefb50d7618cbf838989e5a89841c01",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dajm7rdgnpvn1m",
+          "read_at": "2026-11-27T01:40:33.656Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p238",
+          "text_sha256": "5b93dafdbe6ed9c414efcea60151501eff3987df1973136f57a85c5f8bd601ac",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam0jacqpg8827",
+          "read_at": "2026-11-27T01:41:19.050Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p239",
+          "text_sha256": "e9ff3a16aa4d9f7d7619da24b83309c56ab08acf5a62480aba589aed13b8cbf7",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam0rpryweekxv",
+          "read_at": "2026-11-27T01:41:19.254Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p240",
+          "text_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam0jt97jgyf5b",
+          "read_at": "2026-11-27T01:41:19.066Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p241",
+          "text_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam0kc7db0vv5y",
+          "read_at": "2026-11-27T01:41:19.084Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p242",
+          "text_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam0qhb9s1pbhx",
+          "read_at": "2026-11-27T01:41:19.217Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p243",
+          "text_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam0r3dxzzgh86",
+          "read_at": "2026-11-27T01:41:19.235Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p270",
+          "text_sha256": "33c3e17efb6026253e879f8460d4f7669257c903e45e2f0ffb90dc315a0dcb98",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam12y2xdkmc7c",
+          "read_at": "2026-11-27T01:41:19.582Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p271",
+          "text_sha256": "14ebc8aac4bf95361732229f615d2c9bfbd920f19045cf0de589b1f70340c564",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam13cdv8vb170",
+          "read_at": "2026-11-27T01:41:19.596Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p272",
+          "text_sha256": "1f23079a7d2ccdf6e159a43ee73fca9818559fa6eb7ee40e43880ac516b5e7f6",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam11bbmd631nt",
+          "read_at": "2026-11-27T01:41:19.531Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p273",
+          "text_sha256": "fc21336828fb3302482ff99260ef706adf7240a339de2e116facf37119d653a1",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam12ja0tx1se2",
+          "read_at": "2026-11-27T01:41:19.570Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p274",
+          "text_sha256": "90250deda10b51151d6e924737a95df3e1ab20cdabd255e0ccc34ef2b39ebd60",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam11y9kr1xwhr",
+          "read_at": "2026-11-27T01:41:19.550Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p275",
+          "text_sha256": "971370557c0a7f922834f39398fc834dba8a2f0f09e542d5e34075ec17c6d74b",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam16hsdf87rjq",
+          "read_at": "2026-11-27T01:41:19.697Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        },
+        {
+          "segment": "p352",
+          "text_sha256": "60ff8133b2cfa3fb16e9c7076c11a3164c9d711cd92f4ac56b485635467c38bc",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dam171p1brz9pw",
+          "read_at": "2026-11-27T01:41:19.713Z",
+          "read_task": "gxt_01m8da35ve4jyjw8jc",
+          "source_ref": "gxa_01m8da2s06kxbtmpmv"
+        }
+      ],
+      "table2": {
+        "id": "t0010",
+        "trehalose": [
+          "Trehalose",
+          "O-α-d-Glucosyl-(1→1)-α-d-glucose",
+          "0",
+          "0",
+          "0",
+          "0",
+          "nd",
+          "nd"
+        ],
+        "isomaltose": [
+          "Isomaltose",
+          "O-α-d-Glucosyl-(1→6)-α-d-glucose",
+          "60 (100)",
+          "54 (100)",
+          "7.2 (100)",
+          "65 (100)",
+          "2.2",
+          "29"
+        ]
+      }
+    },
+    {
+      "article": "PMC11540316",
+      "raw_sha256": "811a67776862068696320d07e0bdc7b868d9370f532b0c69f85eb7529e19fb51",
+      "locators": [
+        {
+          "segment": "p26",
+          "text_sha256": "591cdf8c5f873cfaa4b865c040f87531fbac884ff22a224dd4241aaeb8d46f28",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8d9ywhv7kvyjxyv",
+          "read_at": "2026-11-27T01:29:46.811Z",
+          "read_task": "gxt_01m8d9w6kfy2aq0z8a",
+          "source_ref": "gxa_01m8d9w5ay5preewfn"
+        },
+        {
+          "segment": "p35.1",
+          "text_sha256": "a675ff78f69af119d766a840311b468200bb589e4dda5c8828ded4a19b0c0a7e",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8d9ywechjyf4qth",
+          "read_at": "2026-11-27T01:29:46.700Z",
+          "read_task": "gxt_01m8d9w6kfy2aq0z8a",
+          "source_ref": "gxa_01m8d9w5ay5preewfn"
+        }
+      ]
+    },
+    {
+      "article": "PMC7124472",
+      "raw_sha256": "e3b9535d9d1fe36baa4479e885b8f3fd5f56d28e9fa048f11230edb622eb38b9",
+      "locators": [
+        {
+          "segment": "p125",
+          "text_sha256": "346c6e9283468942b36a2e4e05a8199a8b3cdc05af8d6bddd693288c96bf5c5c",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dc4mahys0rgsah",
+          "read_at": "2026-11-27T02:07:52.145Z",
+          "read_task": "gxt_01m8dc1s1z8enqywbm",
+          "source_ref": "gxa_01m8dc1rt58hjaqq8e"
+        },
+        {
+          "segment": "p126",
+          "text_sha256": "73f529b6a6a2859499dd8a73d398a0480f28861730bd7465f952f52cbcabea03",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dc4mf305t5vtae",
+          "read_at": "2026-11-27T02:07:52.291Z",
+          "read_task": "gxt_01m8dc1s1z8enqywbm",
+          "source_ref": "gxa_01m8dc1rt58hjaqq8e"
+        },
+        {
+          "segment": "p194",
+          "text_sha256": "310b140164b9355015159a03e4e9ead6d8ad2325d265a920c840f572ba82ce7e",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dc4mnysz8ddjss",
+          "read_at": "2026-11-27T02:07:52.510Z",
+          "read_task": "gxt_01m8dc1s1z8enqywbm",
+          "source_ref": "gxa_01m8dc1rt58hjaqq8e"
+        },
+        {
+          "segment": "p195",
+          "text_sha256": "5fd3c52f8ddee5de891fa177e1cbcaea4b39eaf9c5d5deb184f2c80b02a5935e",
+          "matches_raw_xml": true,
+          "read_receipt": "gxrc_01m8dc4mwx2nfc0p29",
+          "read_at": "2026-11-27T02:07:52.733Z",
+          "read_task": "gxt_01m8dc1s1z8enqywbm",
+          "source_ref": "gxa_01m8dc1rt58hjaqq8e"
+        }
+      ]
+    }
+  ],
+  "uniprot_raw_rows": [
+    {
+      "accession": "P35172",
+      "go_id": "GO:0004555",
+      "go_evidence": "IMP:SGD",
+      "source_ref": "gxa_01m8d9x70fth1q61cx",
+      "source_sha256": "7e82ab962213aa605a4c32fa6b703fdbbb92ea4c6713cbb2104626dde69d5b29",
+      "job_id": "gxj_01m8d9x5cbbsgtv2yt"
+    },
+    {
+      "accession": "P32356",
+      "go_id": "GO:0004555",
+      "go_evidence": "IDA:UniProtKB",
+      "source_ref": "gxa_01m8d9x82mvzqkccq8",
+      "source_sha256": "61fa5bbc6d04733da3f7280f68e33f64e48dc7162fe66e32d356a0e56ede42bd",
+      "job_id": "gxj_01m8d9x5jteqhww8ds"
+    },
+    {
+      "accession": "P48016",
+      "go_id": "GO:0004555",
+      "go_evidence": "IDA:UniProtKB",
+      "source_ref": "gxa_01m8d9x7f5qwbd55zt",
+      "source_sha256": "d0281923cd36a28d606fa178c26060fed4a9bd9643fb0672a78e4b5ef3752793",
+      "job_id": "gxj_01m8d9x5shf5wva30g"
+    }
+  ],
+  "cited_executed_jobs": [
+    {
+      "job_id": "gxj_01m8da2kazcrzgxt91",
+      "status": "SUCCEEDED",
+      "capability_id": "scholarly-fetch",
+      "node_id": "node_e04dbfd2604a320df7f041bc870f16db",
+      "result_ref": "gxa_01m8da2s06kxbtmpmv",
+      "decision_ref": "gxa_2a0b9de3a09ebe2153f1e3650d43f38c71067b2df2f0d2442935628cf351d7ff"
+    },
+    {
+      "job_id": "gxj_01m8da2kh710rhe426",
+      "status": "SUCCEEDED",
+      "capability_id": "scholarly-search",
+      "node_id": "node_eb1553909e1ec87b94944029a479851a",
+      "result_ref": "gxa_01m8da3595sshjg44g",
+      "decision_ref": "gxa_2a0b9de3a09ebe2153f1e3650d43f38c71067b2df2f0d2442935628cf351d7ff"
+    },
+    {
+      "job_id": "gxj_01m8da2kqh1c1m4hz6",
+      "status": "SUCCEEDED",
+      "capability_id": "scholarly-search",
+      "node_id": "node_9a14f19ec455ebe5d4c576aa5d535547",
+      "result_ref": "gxa_01m8da35nmdne39336",
+      "decision_ref": "gxa_2a0b9de3a09ebe2153f1e3650d43f38c71067b2df2f0d2442935628cf351d7ff"
+    }
+  ],
+  "cited_search_hits": [
+    {
+      "pmid": "20562106",
+      "cited_decision_event": 1323,
+      "search_job_id": "gxj_01m8dbt5myna2x5t98",
+      "candidate_output": "gxa_01m8dbtqc755gq0b3s",
+      "matching_candidates": 1
+    },
+    {
+      "pmid": "7730323",
+      "cited_decision_event": 781,
+      "search_job_id": "gxj_01m8dah3setqj2vnxy",
+      "candidate_output": "gxa_01m8dahk9fyz1bdxp9",
+      "matching_candidates": 1
+    }
+  ],
+  "cited_decisions": [
+    {
+      "event_id": 781,
+      "ts": "2026-11-27T01:39:43.862Z",
+      "decision_ref": "gxa_cdb72a867c5da83a093c03f1353ac109700f6fca9339621d4987ec6300452487",
+      "scope": "run",
+      "goal_version": 1,
+      "operations": [
+        "open_branch",
+        "add_node"
+      ],
+      "spawned_jobs": [
+        {
+          "job_id": "gxj_01m8dah3setqj2vnxy",
+          "result_ref": "gxa_01m8dahk9fyz1bdxp9",
+          "status": "SUCCEEDED",
+          "capability_id": "scholarly-search"
+        }
+      ]
+    },
+    {
+      "event_id": 1323,
+      "ts": "2026-11-27T02:02:09.252Z",
+      "decision_ref": "gxa_8e5dc2b964a0da22dfd7704517932e3090676b044c5786e100706b03af9cb49b",
+      "scope": "run",
+      "goal_version": 1,
+      "operations": [
+        "add_node"
+      ],
+      "spawned_jobs": [
+        {
+          "job_id": "gxj_01m8dbt5myna2x5t98",
+          "result_ref": "gxa_01m8dbtqc755gq0b3s",
+          "status": "SUCCEEDED",
+          "capability_id": "scholarly-search"
+        }
+      ],
+      "exact_job_output_cited": "gxa_01m8da2s06kxbtmpmv"
+    },
+    {
+      "event_id": 2274,
+      "ts": "2026-11-27T04:25:45.215Z",
+      "decision_ref": "gxa_4e09b707bfa6d1cbe8c30c8724ae04a05ede5b8eac6c3cd8ebe308391097df3c",
+      "scope": "run",
+      "goal_version": 1,
+      "operations": [
+        "stop_branch"
+      ],
+      "spawned_jobs": []
+    },
+    {
+      "event_id": 2364,
+      "ts": "2026-11-27T04:38:25.046Z",
+      "decision_ref": "gxa_774cc7be6e69e028c81cd10c7d11757a0cce0c995c8e165fd67d445ce1369a3c",
+      "scope": "run",
+      "goal_version": 1,
+      "operations": [
+        "stop_branch",
+        "open_branch",
+        "add_node"
+      ],
+      "spawned_jobs": [
+        {
+          "job_id": "gxj_01m8dmr9pwzhn6kg2b",
+          "result_ref": "gxa_01m8dmryevcm0v9tef",
+          "status": "SUCCEEDED",
+          "capability_id": "scholarly-search"
+        }
+      ]
+    },
+    {
+      "event_id": 2412,
+      "ts": "2026-11-27T04:50:10.485Z",
+      "decision_ref": "gxa_46ae8c77b0caeed686bc07840a7bcff8ebc2d779b6530d131fa19d06b0193ec9",
+      "scope": "run",
+      "goal_version": 1,
+      "operations": [
+        "open_branch",
+        "add_node"
+      ],
+      "spawned_jobs": [
+        {
+          "job_id": "gxj_01m8dndtm4am7wvk2k",
+          "result_ref": "gxa_01m8dneaamqvpvf9jw",
+          "status": "SUCCEEDED",
+          "capability_id": "scholarly-fetch"
+        }
+      ]
+    },
+    {
+      "event_id": 2448,
+      "ts": "2026-11-27T04:54:39.386Z",
+      "decision_ref": "gxa_8b71f0f74c76a5fdc50a965b032255163cb7fb683a2c216a6df74086362fb9e9",
+      "scope": "run",
+      "goal_version": 1,
+      "operations": [
+        "stop_branch"
+      ],
+      "spawned_jobs": []
+    },
+    {
+      "event_id": 2616,
+      "ts": "2026-11-27T05:31:25.521Z",
+      "decision_ref": "gxa_080413a8d4c9bc1732cab04052593de2ccd01527b03bbbb5b2a896194734ac63",
+      "scope": "run",
+      "goal_version": 1,
+      "operations": [
+        "close_run"
+      ],
+      "spawned_jobs": []
+    }
+  ],
+  "pi_disposition_event": 652,
+  "scope": "Retrieval, interpretation and quotation of public records. No new laboratory measurement."
+}

@@ -46,3 +46,11 @@ bin/gx-p0 research --state "$study" --run-id "$RUN_ID"
 兩個候選共有 51 個本輪更動過的產品路徑，其中 49 個位元相同；差異為精簡部署原有的 CLI profile 註冊和一個額外已安裝的書目插件。官方 Codex 二進位 SHA 與既有發行鎖相符。最終候選另外通過 10 項壓縮原件、具名埠和普通 Goal 配方回歸。[逐檔 SHA、Python 與 Node](release-comparison.json) · [最終候選回歸](slim-field-fixes.log)
 
 整合候選另以普通 `--task-card` 啟動麥芽糖研究 `gxr_01m8fekb5gbjkvze1w`。凍結後的分項與任務卡相符。真 Lead 在三個回合中選法、派出新 CPU Job `gxj_01m8femjkrqb8xkr8q`、實讀 `parent-records.json`，於事件 80 引用該結果、81 結題。兩個命中的 S288C accession 中，直接反應指派 0/2，較寬 EC 類別 2/2。重開新增 0 個 Job、0 個回合。[任務卡、材料、實讀呼叫與決定](yeast/task-to-action.json) · [Lead 的完整結論](yeast/DECISION.md) · [恢復記錄](yeast/warm-recovery.json)
+
+## 兩份發行的 Goal 材料
+
+已在完整版與精簡版各核對 12 份可攜 Goal，包含首次實驗設定、更新後的設定和無附件文獻題。每版有 21 筆材料綁定，對應 13 組不同的實際 SHA-256。全部材料、配套題面、7 份取得描述都能從各發行自己的相對路徑讀取，兩版內容逐位元相同。5 份取得描述另列材料摘要；1UBQ 與 1MBN 的既有描述由 Goal 材料 pin 綁定，描述本身亦各有實算摘要。兩版的 6BEN 原件及其刪除一項聲明的衍生控制均在 `acceptance/science_capabilities/structure_controls/materials/`，精簡版的 `examples/deposited-structure-controls/macrocycle.json` 也引用相同兩檔。精簡版已補上文獻題的原題與零附件 Goal。此項是檔案可攜性查核，酵母方法用的唯讀外部快照仍需依上述說明掛載。[兩份發行的逐 Goal 檔案摘要](portable-inputs.json)
+
+```bash
+python acceptance/science_assets/deployment/portable_inputs.py . ../science-assets-slim
+```

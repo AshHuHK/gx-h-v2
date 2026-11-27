@@ -61,6 +61,14 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
         raise SchemaInvalid("Capability differs from this Goal's granted content pin")
     registry.active_view(conn, view, run_id=run_id)
     producers = dict(node_ids)
+    ports = _ports(spec)
+    for index, name in ports.items():
+        producer = spec["inputs"][index]
+        if producer not in spec["depends_on"] or producer not in producers:
+            raise SchemaInvalid("A named output needs a declared upstream node dependency")
+        declaration = registry.candidate(conn, producers[producer])["manifest"]
+        if not any(out["name"] == name and not manifest.is_dir_output(out) for out in declaration["outputs"]):
+            raise SchemaInvalid(f"{name!r} is not a declared file output of {producers[producer]}")
     assets = storage.artifact_service(conn)
     for ref in spec["inputs"]:
         if ref in producers:
@@ -164,12 +172,25 @@ def confirmed_result_identity(conn, node_id, proof, *, verify_inputs=False):
             "environment_sha256": ids.sha256_of_obj(environment)}
 
 
+def _ports(spec):
+    ports = {}
+    inputs = spec["inputs"]
+    for entry in spec.get("input_ports", ()):
+        index = entry["index"]
+        if type(index) is not int or not 0 <= index < len(inputs) or index in ports:
+            raise SchemaInvalid("Each input port needs one distinct in-range input index")
+        ports[index] = entry["output"]
+    if len({(ref, ports.get(i)) for i, ref in enumerate(inputs)}) != len(inputs):
+        raise SchemaInvalid("Repeated graph input: select different outputs or supply distinct inputs")
+    return ports
+
+
 def _dependencies(conn, node, spec, *, check_all=False):
     resolved = {}
     waiting = False
     for ref in dict.fromkeys([*spec["depends_on"], *spec["inputs"]]):
         dep = conn.execute(
-            "SELECT status,result_ref FROM v6_nodes WHERE run_id=? AND node_id=?", (node["run_id"], ref)
+            "SELECT status,result_ref,job_id FROM v6_nodes WHERE run_id=? AND node_id=?", (node["run_id"], ref)
         ).fetchone()
         if dep:
             if dep["status"] in {"FAILED", "CANCELLED", "BLOCKED"}:
@@ -187,8 +208,32 @@ def _dependencies(conn, node, spec, *, check_all=False):
                     return None
                 waiting = True
                 continue
-            resolved[ref] = dep["result_ref"]
-    return None if waiting else [resolved.get(ref, ref) for ref in spec["inputs"]]
+            resolved[ref] = dep
+    if waiting:
+        return None
+    ports = _ports(spec)
+    outputs = {}
+    refs = []
+    for index, ref in enumerate(spec["inputs"]):
+        dep = resolved.get(ref)
+        if index not in ports:
+            refs.append(dep["result_ref"] if dep else ref)
+            continue
+        if not dep or not dep["job_id"]:
+            raise DependencyUnmet("Named input has no successful upstream Job", details={"node": ref})
+        if ref not in outputs:
+            from . import v62_outputs
+            proof = execution.read_manifest(conn, dep["job_id"])
+            confirmed_result_identity(conn, ref, proof)
+            inventory, _ = v62_outputs.recorded_outputs(conn, node["run_id"], dep["job_id"],
+                                                        record=proof, check_publications=True)
+            outputs[ref] = inventory
+        matching = [row for row in outputs[ref] if row["output_name"] == ports[index]]
+        if len(matching) != 1 or matching[0].get("runner_sha256", matching[0]["sha256"]) != matching[0]["sha256"]:
+            raise DependencyUnmet(f"Upstream Job has no unique verified output {ports[index]!r}",
+                                  details={"node": ref, "output": ports[index]})
+        refs.append(matching[0]["artifact_ref"])
+    return refs
 
 
 def _compile(conn, node, refs):
@@ -316,6 +361,8 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
     from . import research_dialogue
     if research_dialogue.blocked(conn, node["run_id"], branch_id=node["branch_id"]):
         raise HoldActive("This branch is waiting for a PI answer")
+    from . import capability_views
+    capability_views.require_for_node(conn, node["run_id"], request["capability_version"])
     _prospective(conn, request)
     _module_grant(conn, node, json.loads(node["spec_json"]))
     run_status = conn.execute("SELECT status FROM runs WHERE run_id=?", (request["run_id"],)).fetchone()[0]
@@ -429,6 +476,8 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
         if source:
             _live(current, "PENDING")
             attempt = tx.execute("SELECT request_json FROM v6_job_attempts WHERE node_id=?", (node["node_id"],)).fetchone()
+            from . import capability_views
+            capability_views.require_for_node(tx, node["run_id"], json.loads(attempt[0])["capability_version"])
             _prospective(tx, json.loads(attempt[0]))
             spec = json.loads(current["spec_json"])
             _module_grant(tx, current, spec)
@@ -577,6 +626,8 @@ def _run_node(conn, node, service, window):
         return "waiting"
     research_window.require_open(window)
     spec = json.loads(node["spec_json"])
+    from . import capability_views
+    capability_views.require_for_node(conn, node["run_id"], spec["capability"])
     _module_grant(conn, node, spec)
     from . import v621_policy
     fixed_conditions = v621_policy.enabled(conn, node["run_id"])
@@ -770,7 +821,7 @@ def advance(conn, run_id):
                 counts["waiting"] += 1
                 continue
             status = "BLOCKED" if isinstance(error, DependencyUnmet) else "FAILED"
-            dependency = error.details if error.details.get("reason") == "evidence_route_blocked" else None
+            dependency = error.details if error.details.get("reason") in {"evidence_route_blocked", "capability_disabled"} else None
             if _finish(conn, node, status, reason=f"{error.code}: {error.message}", dependency=dependency):
                 counts["settled"] += 1
     _finalize(conn, run_id)

@@ -117,7 +117,7 @@ def blocked(conn, rid, *, scope=None, branch_id=None):
         LIMIT 1""", (rid, ASK, scope, branch_id, ANSWER)).fetchone() is not None
 
 
-def answer(conn, run_id, question_id, message_id, text, *, goal_version=None):
+def answer(conn, run_id, question_id, message_id, text, *, goal_version=None, selected_choice=None):
     with store.transaction(conn, transaction_owner="ResearchDialogue", operation="answer", run_id=run_id):
         _source(conn, run_id, message_id, text)
         q = next((q for q in questions(conn, run_id) if q["question_id"] == question_id), None)
@@ -131,6 +131,8 @@ def answer(conn, run_id, question_id, message_id, text, *, goal_version=None):
             return q
         payload = {k: q[k] for k in ("goal_version", "scope", "branch_id", "question_id", "asking_scope")}
         payload.update(answer=text, answer_message_id=message_id)
+        if selected_choice is not None:
+            payload["selected_choice"] = selected_choice
         _save(conn, run_id, ANSWER, question_id, "PI", payload)
         return next(q for q in questions(conn, run_id) if q["question_id"] == question_id)
 

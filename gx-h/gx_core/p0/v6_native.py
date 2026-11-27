@@ -13,7 +13,7 @@ from ..domain import ids
 from ..errors import BY_CODE, BudgetExceeded, HoldActive, LeaseExpired, ResourceDenied, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
 from ..plugins import goal as goal_plugins
-from . import v621_policy, v6_claims, v6_delegation, v6_method_context, v62_native
+from . import v6_recipes, v621_policy, v6_claims, v6_delegation, v6_method_context, v62_native
 
 
 DECIDE = "gx_decide_revision"
@@ -140,7 +140,15 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     else:
         extras = goal_plugins.tools_for_catalog((brief or {}).get("capabilities", []))
     catalog.extend(tool.as_spec() for tool in extras.values())
+    if (brief or {}).get("scope") == "run" and brief.get("capability_view", {}).get("available_options"):
+        catalog.append(contracts.native_goal_tool_spec("gx_select_capability"))
     catalog.extend(v62_native.lead_tools(brief or {}))
+    if brief and brief.get("scope", "run") == "run" and version == v621_policy.VERSION:
+        if any(n.get("result_ref") for n in brief.get("nodes", [])):
+            catalog.append(contracts.native_goal_tool_spec(v6_recipes.SAVE))
+        if conn is not None and conn.execute("SELECT 1 FROM v6_saved_recipes LIMIT 1").fetchone():
+            catalog.append(contracts.native_goal_tool_spec(v6_recipes.INSTANTIATE))
+
     return catalog
 
 
@@ -237,9 +245,12 @@ def saved_result(receipt, turn, request_sha):
     return result
 
 
+@registry.native_goal_tool(v6_recipes.SAVE)
+@registry.native_goal_tool(v6_recipes.INSTANTIATE)
 @registry.native_goal_tool(v62_native.OPEN)
 @registry.native_goal_tool(v62_native.REPORT)
 @registry.native_goal_tool(v62_native.CANCEL)
+@registry.native_goal_tool("gx_select_capability")
 @registry.native_goal_tool(v62_native.QUERY)
 @registry.native_goal_tool(DECIDE)
 @registry.native_goal_tool(STAGE)
@@ -303,14 +314,32 @@ def _call(roots, p):
                     thread_id=thread, turn_id=turn, call_id=call_id)
     if roots.conn.in_transaction:
         raise RuntimeError("Prepare scientific decisions outside the GX writer")
-    if tool in (v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY):
+    if tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE, v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY):
         spec = (v62_native.evidence_tool(tool, brief(row).get("evidence_policy"))
                 if tool == v62_native.REPORT else contracts.native_goal_tool_spec(tool))
         failures = schema.validate(args, spec["inputSchema"])
         if failures:
             details = {"category": "module_report_structure"} if tool == v62_native.REPORT else {}
             raise SchemaInvalid("Invalid arguments to " + tool + ": " + ", ".join(failures), details=details)
-    if tool == DECIDE:
+    if tool == "gx_select_capability":
+        from . import capability_views
+        packet = brief(row)
+        chosen = capability_views.options(json.loads(roots.conn.execute(
+            "SELECT inputs_json FROM runs WHERE run_id=?", (roots.run_id,)
+        ).fetchone()[0])["inputs"]["p0_spec"])
+        failures = schema.validate(args, contracts.native_goal_tool_spec(tool)["inputSchema"])
+        if failures:
+            raise SchemaInvalid("Invalid capability selection: " + ", ".join(failures))
+        if packet.get("scope") != "run" or args["method"] not in chosen:
+            raise ScopeDenied("This method selection exceeds the PI's choices for this Goal")
+        choice = chosen[args["method"]]
+        answer = capability_views.change(roots.conn, roots.run_id, **{args["action"]:args["method"]},
+            provider=choice.get("provider"), expected_digest=choice["digest"], expected_revision=args["revision"],
+            request_id=ids.sha256_of_obj([thread, turn, call_id]), actor=thread,
+            authority=lambda: v6_claims.active_context(roots.conn, roots.run_id, row["task_id"], row["lease_id"],
+                roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?",
+                                   (row["task_id"],)).fetchone()[0], thread, turn))
+    elif tool == DECIDE:
         try:
             prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
         except StaleRevision as exc:
@@ -332,13 +361,19 @@ def _call(roots, p):
     elif tool == v62_native.REPORT:
         from . import v62_reports
         prepared = v62_reports.prepare_report(roots.conn, **identity, payload=args)
+    elif tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE):
+        v6_recipes.authorize(roots.conn, identity, tool, args)
+        if tool == v6_recipes.SAVE:
+            prepared = v6_recipes.prepare(roots.conn, roots.run_id, args)
+        else:
+            answer = v6_recipes.instantiate(roots.conn, roots.run_id, args)
     elif tool == DELEGATE:
         prepared = v6_delegation.prepare(roots.conn, **identity, payload=args)
     elif tool == STAGE:
         task = roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?", (row["task_id"],)).fetchone()
         answer = v6_claims.stage(roots.conn, **identity, context_ref=task[0], payload=args,
                                  allowed_refs=task_refs(roots.conn, row))
-    elif tool not in (v62_native.CANCEL, v62_native.QUERY) and tool not in v62_native.SOURCE_TOOLS:
+    elif tool not in (v62_native.CANCEL, v62_native.QUERY, "gx_select_capability") and tool not in v62_native.SOURCE_TOOLS:
         task = roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?", (row["task_id"],)).fetchone()
         answer = v6_method_context.call_tool(roots.conn, tool, args, context_ref=task[0], **identity)
 
@@ -361,6 +396,10 @@ def _call(roots, p):
                     _submission_event(roots, p, accepted=answer["event_id"])
             elif tool == v62_native.OPEN:
                 answer = v62_modules.commit_open(roots.conn, prepared)
+            elif tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE):
+                v6_recipes.authorize(roots.conn, identity, tool, args)
+                if tool == v6_recipes.SAVE:
+                    answer = v6_recipes.publish(roots.conn, roots.run_id, *prepared)
             elif tool == v62_native.REPORT:
                 answer = v62_reports.commit_report(roots.conn, prepared)
                 if answer["author"]["call_id"] == call_id:

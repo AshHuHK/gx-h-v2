@@ -284,6 +284,17 @@ def execute(args):
             write_native_bytes(target, (json.dumps(output["result"], indent=2, ensure_ascii=False) + "\n").encode())
             return {"message_id": output["message_id"], "run_id": rid, "audit_file": str(args.output)}
         return output
+    if args.command == "capabilities":
+        from . import capability_views
+        with closing(existing_db(directory, readonly=False)) as conn:
+            rid = selected_run(conn)["run_id"]
+            if not (args.enable or args.disable):
+                return capability_views.current(conn, rid)
+            if args.revision is None or not args.request_id:
+                raise ValueError("Supply --revision and --request-id for a capability change")
+            return capability_views.change(conn, rid, enable=args.enable, disable=args.disable,
+                provider=args.provider, expected_digest=args.sha256, expected_revision=args.revision,
+                request_id=args.request_id, actor=operator.local_context(conn).actor)
     if args.command == "assign-material":
         from . import v621_assignment
         with closing(existing_db(directory, readonly=False)) as conn:
@@ -351,7 +362,8 @@ def execute(args):
             with closing(existing_db(directory, readonly=False)) as conn:
                 rid = selected_run(conn)["run_id"]
                 receipt = conversation.send(conn, rid, args.text, args.message_id, reply_to=args.reply_to,
-                    branch_id=args.branch_id, question_id=args.question_id, conversation_id=args.conversation_id,
+                    branch_id=args.branch_id, question_id=args.question_id, answer_option=args.answer_option,
+                    conversation_id=args.conversation_id,
                     goal_version=args.goal_version, attachments=attachments, successor=successor)
                 if args.queue_only:
                     return receipt
@@ -411,11 +423,19 @@ def main(argv=None):
     add_plugin_commands(commands)
     from .operator import add_commands
     add_commands(commands)
-    for name in ("start", "status", "run", "resume", "stop", "message", "conversation", "team", "observe", "assign-material"):
+    for name in ("start", "status", "run", "resume", "stop", "message", "conversation", "team", "observe", "assign-material", "capabilities"):
         sub = commands.add_parser(name)
         sub.add_argument("--state", required=True, type=Path)
         if name != "start":
             sub.add_argument("--run-id", help="Select a run within this workspace")
+        if name == "capabilities":
+            selection = sub.add_mutually_exclusive_group()
+            selection.add_argument("--enable", metavar="METHOD@VERSION")
+            selection.add_argument("--disable", metavar="METHOD@VERSION")
+            sub.add_argument("--provider", help="Installed plugin id@version")
+            sub.add_argument("--sha256", help="Expected portable method digest")
+            sub.add_argument("--revision", type=int, help="Base revision returned by capabilities")
+            sub.add_argument("--request-id", help="Stable identity for replaying the same selection")
         if name == "assign-material":
             sub.add_argument("--after-decision", required=True, help="Accepted Run Lead decision receiving this assignment")
             sub.add_argument("--source", required=True, help="Stable operator citation and idempotency key")
@@ -468,7 +488,8 @@ def main(argv=None):
             sub.add_argument("--goal-version", type=int)
             sub.add_argument("--reply-to", help="Prior PI message ID")
             sub.add_argument("--branch-id", help="Run-scoped route or module")
-            sub.add_argument("--question-id", help="Answer this exact research question")
+            sub.add_argument("--question-id", help="Refer to this research question in the conversation")
+            sub.add_argument("--answer-option", help="Select an exact offered choice for --question-id")
             sub.add_argument("--attachment", action="append", type=Path, default=[], help="Attach a UTF-8 source file")
             sub.add_argument("--material-ref", action="append", default=[], help="Attach an authorized artifact")
             sub.add_argument("--successor", action="store_true", help="Start a follow-up to this sealed Run")

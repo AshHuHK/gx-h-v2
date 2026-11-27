@@ -81,7 +81,8 @@ def closing_decision(conn, rid, close):
     adopted = json.loads(d["receipt_json"])
     proposal = json.loads(d["request_json"])["decision"]
     readings = decision_readings(conn, rid, d, adopted)
-    return {"decision_ref":d["decision_ref"], "task_id":d["task_id"], "thread_id":d["thread_id"],
+    return {**({"report_presentation":adopted["report_presentation"]} if "report_presentation" in adopted else {}),
+            "decision_ref":d["decision_ref"], "task_id":d["task_id"], "thread_id":d["thread_id"],
             "turn_id":d["turn_id"], "rationale":proposal["rationale"], "reason":close["operation"]["reason"],
             "unresolved":close["operation"].get("unresolved", []), "claim_refs":close["operation"].get("claim_refs", []),
             "evidence_refs":adopted.get("evidence_refs", proposal.get("evidence_refs", [])),
@@ -115,6 +116,20 @@ def _gap_questions(conn, rid, decision_ref, texts):
         if r[0] in refs and r[1]:
             questions[r[0]] = r[1]
     return questions
+
+
+def render_close(conn, rid, final, questions):
+    ref = final["decision_ref"]
+    cache = {ref: final["used_endpoints"]}
+    fields = [final["reason"], final["rationale"], *final["unresolved"]]
+    questions.update(_gap_questions(conn, rid, ref, fields))
+    def display(text):
+        rendered = render_decision(conn, rid, cache, ref, text)
+        for key, question in questions.items():
+            rendered = rendered.replace(key, question)
+        return rendered
+    return {"reason": display(final["reason"]), "rationale": display(final["rationale"]),
+            "unresolved": [display(item) for item in final["unresolved"]]}
 
 
 def _decisions_after_reading(conn, rid, close, work, cache):
@@ -181,25 +196,18 @@ def export(conn, rid, directory, invocation):
         work = routes(conn, rid, directory, goal_version=close["goal_version"])
         cache = {final["decision_ref"]: final["used_endpoints"]}
         actions = _decisions_after_reading(conn, rid, close, work, cache)
-        texts = [final["rationale"], final["reason"], *final["unresolved"]]
-        for item in actions:
-            texts.extend([item["rendered_rationale"], *item["objectives"]])
+        texts = [text for item in actions for text in (item["rendered_rationale"], *item["objectives"])]
         questions = _gap_questions(conn, rid, final["decision_ref"], texts)
+        final["rendered"] = render_close(conn, rid, final, questions)
         final["gap_questions"] = questions
-        def display(text):
-            rendered = render_decision(conn, rid, cache, final["decision_ref"], text)
-            for ref, question in questions.items():
-                rendered = rendered.replace(ref, question)
-            return rendered
-        final_text = {key:display(final[key]) for key in ("rationale","reason")}
-        final_text["unresolved"] = [display(item) for item in final["unresolved"]]
-        final["rendered"] = final_text
         rejected = _rejections(conn, rid, close["closed_event"])
     finally:
         conn.execute("RELEASE research_report")
     result = {"schema":"gx.research-result/1", "run_id":rid, "goal":goal, "goal_status":"CLOSED",
               "goal_version":close["goal_version"], "closure":close, "final_decision":final,
               **science, "routes":work, "post_read_actions":actions, "rejected_decisions":rejected, "invocation":invocation}
+    if preference := final.get("report_presentation"):
+        result["presentation"] = preference
     predecessor = conn.execute("SELECT json_extract(inputs_json,'$.inputs.p0_spec.predecessor') "
                                "FROM runs WHERE run_id=?", (rid,)).fetchone()[0]
     if predecessor:
@@ -208,10 +216,30 @@ def export(conn, rid, directory, invocation):
             "parent_run_id", "parent_decision_ref", "parent_goal_version", "request_message_id", "selected_materials")}
     out = directory/"research"/rid
     out.mkdir(parents=True, exist_ok=True)
-    for name, data in (("REPORT.md", page(result)),
-                       ("result.json", json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False)+"\n")):
+    files = {"REPORT.md": page(result), "result.json": json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False)+"\n"}
+    readers = []
+    for row in conn.execute("""SELECT c.value FROM events e, json_each(e.payload_json,'$.clauses') c
+            WHERE e.run_id=? AND e.event_id>? AND e.kind='pi.message.routed'
+            AND json_extract(c.value,'$.decision_ref')=? AND json_type(c.value,'$.reader')='object'
+            ORDER BY e.event_id,c.key""", (rid, close["closed_event"], final["decision_ref"])):
+        clause = json.loads(row[0])
+        name = "READER." + clause["report_language"] + "." + clause["clause_id"] + ".md"
+        translation = clause["reader"]
+        zh = clause["report_language"] == "zh"
+        lines = ["# 结题决定译读本" if zh else "# Translated closing decision", "",
+                 translation["reason"], "", translation["rationale"], "",
+                 *("- " + item for item in translation["unresolved"]), "",
+                 f"{final['decision_ref']} · " + ("[封存原报告](REPORT.md) · [原件与决定](result.json)" if zh else
+                                                   "[Sealed report](REPORT.md) · [Evidence and decision](result.json)")]
+        if final["evidence_refs"]:
+            lines.extend(["", "原件与产物引用" if zh else "Evidence references", "",
+                          *("- " + ref for ref in final["evidence_refs"])])
+        files[name] = "\n".join(lines) + "\n"
+        readers.append({"file": str(out/name), "source_message_id": clause["source_message_id"],
+                        "language": clause["report_language"], "decision_ref": final["decision_ref"]})
+    for name, data in files.items():
         target = out/name
         encoded = data.encode()
         if not target.is_file() or target.read_bytes() != encoded:
             write_native_bytes(target, encoded)
-    return {"report":str(out/"REPORT.md"), "result":str(out/"result.json"), "invocation":invocation}
+    return {**({"readers": readers} if readers else {}), "report":str(out/"REPORT.md"), "result":str(out/"result.json"), "invocation":invocation}

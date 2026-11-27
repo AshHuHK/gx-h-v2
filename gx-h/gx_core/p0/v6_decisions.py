@@ -253,7 +253,11 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
             request["gap_resolutions"] = v621_gaps.prepare(conn, task, decision)
     previous = v62_graph.graph_at(conn, run_id, base)
     allowed = json.loads(goal["capabilities_json"])
-    config_pin = (goal["capabilities_json"], goal["materials_json"])
+    from . import capability_views
+    cap_revision = capability_views.current(conn, run_id)["revision"]
+    if cap_revision:
+        request["capability_view_revision"] = cap_revision
+    config_pin = (goal["capabilities_json"], goal["materials_json"], cap_revision)
     if base != original:
         request["original_base"] = original
         v62_graph.require_compatible(v62_graph.graph_at(conn, run_id, original), previous,
@@ -265,7 +269,7 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
             raise ScopeDenied("This module's grant excludes graph decisions")
         from .v62_catalog import effective_methods
         allowed = set(allowed) & effective_methods(conn, run_id, grant)
-        config_pin = (module["grant_json"], module["snapshot_json"], module["budget_json"])
+        config_pin = (module["grant_json"], module["snapshot_json"], module["budget_json"], cap_revision)
     caps = {op["capability"] for op in decision["ops"] if op["op"] == "add_node"}
     if any("@" not in cap for cap in caps):
         raise SchemaInvalid("A node requires a pinned capability id@version")
@@ -430,8 +434,12 @@ def commit(conn, plan):
         root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                             thread_id=plan.thread_id, turn_id=plan.turn_id)
         close_context = None
+        report_preference = None
         if any(item["spec"]["op"] == "close_run" for item in plan.resolved_ops):
+            from . import report_language
             close_context = _require_close_context(conn, run_id, task, root, plan.turn_id)
+            report_preference = report_language.current(conn, run_id)
+            report_language.require_close(report_preference, request["decision"], plan.resolved_ops[0]["spec"])
         from . import v623_endpoint_use
         decision = request["decision"]
         decision_facts = {k: decision[k] for k in v623_endpoint_use.FIELDS if k in decision}
@@ -450,13 +458,15 @@ def commit(conn, plan):
             decision_facts["endpoint_use"] = endpoint_use
             if close_context is not None:
                 close_context.update({k: v for k, v in endpoint_use.items() if k != "receipts"})
-        config = (goal["capabilities_json"], goal["materials_json"])
+        from . import capability_views
+        cap_revision = capability_views.current(conn, run_id)["revision"]
+        config = (goal["capabilities_json"], goal["materials_json"], cap_revision)
         if task["scope"] == "run":
             base = head(conn, run_id)
             if base != request["base"]:
                 raise StaleRevision("The graph moved during preparation; retry the decision on the current graph")
         if module is not None:
-            config = (module["grant_json"], module["snapshot_json"], module["budget_json"])
+            config = (module["grant_json"], module["snapshot_json"], module["budget_json"], cap_revision)
             actual = head(conn, run_id)
             if base != request["original_base"] or actual != request["base"]:
                 raise StaleRevision("The graph moved after module preparation; obtain a fresh decision",
@@ -507,6 +517,8 @@ def commit(conn, plan):
             receipt["normalized_sha256"] = request["normalized_sha256"]
         if "gap_resolutions" in request:
             receipt["gap_resolutions"] = request["gap_resolutions"]
+        if report_preference:
+            receipt["report_presentation"] = report_preference
         if close_context is not None:
             receipt["close_context"] = close_context
         if convergence is not None:

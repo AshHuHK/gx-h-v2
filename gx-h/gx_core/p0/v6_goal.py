@@ -36,6 +36,7 @@ def cli_spec(args):
         "max_parallel_roots",
         "input_files",
         "capabilities",
+        "capability_options",
         "plugins",
         "workspace",
         "intent_items",
@@ -135,6 +136,8 @@ def start(conn, spec, *, run_key, current):
         raise SchemaInvalid("capabilities must be a list of distinct, versioned methods")
     from . import v62_catalog, v621_policy
 
+    from . import capability_views
+    capability_views.options(spec)
     policy = v621_policy.admit(spec)
     research_catalog = v62_catalog.for_start(spec)
     public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []),
@@ -339,7 +342,7 @@ def _events(conn, rid, after, budget_ref=None):
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
                                   'v6.claim.adopted','v6.decision.superseded','v6.prospective.opening_wait','v62.round.settled',
                                   'v62.claim.reassessed','v62.module.wake','v62.module.invalidated','v621.material.assigned',
-                                  'research.pi.feedback','research.pi.answered') OR
+                                  'research.pi.feedback','research.pi.answered','research.capabilities.changed') OR
           (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
           OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
@@ -480,7 +483,7 @@ def _run_wakes(conn, rid, prior, events):
         payload = store.loads(row, "payload_json")
         if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
             continue
-        if (row["kind"] in {research_dialogue.FEEDBACK, research_dialogue.ANSWER, "v6.intent.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
+        if (row["kind"] in {research_dialogue.FEEDBACK, research_dialogue.ANSWER, "v6.intent.changed", "research.capabilities.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
                 or row["kind"] == "v6.decision.superseded" and payload.get("scope") == "run"
                 or row["kind"] == "v62.round.settled" and payload.get("reconsider")
                 or row["kind"] == "v62.claim.reassessed" and payload.get("critical_counterevidence")
@@ -564,7 +567,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                         else None
                     )
                     if job:
-                        provider = goal_plugins.method(conn, rid, f"{job[0]}@{job[1]}")
+                        provider = goal_plugins.method(conn, rid, f"{job[0]}@{job[1]}", historical=True)
                         if provider and provider.project:
                             content = provider.project(content)
                     facts["observation"] = content
@@ -615,7 +618,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         else:
             node["wait"] = json.loads(wait or "null")
             node["commission"] = {
-                k: spec[k] for k in ("capability", "inputs", "depends_on", "parameters", "question") if k in spec
+                k: spec[k] for k in ("capability", "inputs", "input_ports", "depends_on", "parameters", "question") if k in spec
             }
             diagnostics.attach_to_node(conn, rid, node)
             if node["result_ref"]:
@@ -641,7 +644,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             refs.extend([older["subject_id"], older["ref"]])
     catalog = [
         {k: v for k, v in row.items() if k != "content_artifact_ref"}
-        for row in data["inputs"]["capability_catalog"]
+        for row in goal_plugins.catalog(conn, rid)
     ]
     account = budgets.state(conn, run["budget_ref"])
     claims = v6_claims.current(conn, rid)
@@ -710,6 +713,19 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "evidence_refs": list(dict.fromkeys(refs)),
         "budget": budget,
     }
+    from . import capability_views
+    revision = capability_views.latest(conn, rid)
+    method_options = capability_views.options(grant)
+    if revision or method_options:
+        brief["capability_view"] = {"revision":revision["revision"] if revision else 0,
+                                    "available_options":list(method_options)}
+        if revision:
+            brief["capability_view"].update(digest=revision["digest"], enabled=revision["enabled"],
+                                            disabled=revision["disabled"])
+    from . import report_language
+    if preference := report_language.current(conn, rid):
+        brief["report_presentation"] = {**preference, "instruction": "Write the closing rationale, reason and each "
+                                         "limitation in " + report_language.LANGUAGES[preference["language"]] + "."}
     if grant.get("predecessor"):
         predecessor = grant["predecessor"]
         brief["prior_research"] = {k: predecessor[k] for k in (
@@ -847,7 +863,7 @@ def ensure_task(conn, run_id):
             or research_dialogue.blocked(tx, run_id, scope="run")
             or tx.execute(
                 "SELECT 1 FROM events WHERE run_id=? "
-                "AND kind IN ('v6.intent.changed','v621.material.assigned') AND event_id>? LIMIT 1",
+                "AND kind IN ('v6.intent.changed','v621.material.assigned','research.capabilities.changed') AND event_id>? LIMIT 1",
                 (run_id, cursor),
             ).fetchone()
         ):

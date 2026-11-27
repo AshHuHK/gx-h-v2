@@ -353,7 +353,7 @@ def availability(conn, reg, through, *, bindings=None):
         if not spec.get("sufficient_outputs"):
             return records
         owner = conn.execute("SELECT run_id FROM events WHERE event_id=?", (reg["event_id"],)).fetchone()
-        provider = goal_plugins.method(conn, owner[0], spec["capability"]) if owner else None
+        provider = goal_plugins.method(conn, owner[0], spec["capability"], historical=True) if owner else None
         if not provider or not provider.sufficient_metric:
             return records
         for table in spec.get("sufficient_outputs", ()):

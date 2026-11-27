@@ -23,10 +23,13 @@ class Evaluation:
 
 
 class MethodContext:
-    def __init__(self, conn, run_id, refs, *, writable=False):
+    def __init__(self, conn, run_id, refs, *, writable=False, tool_capability=None, authority=None):
         self._conn = conn
         self._run = run_id
         self._writable = writable
+        self._tool_capability = tool_capability
+        self._authority = authority
+        self._verified_outputs = set()
         self._refs = set(refs)
         self._assets = ArtifactService(conn)
 
@@ -61,6 +64,7 @@ class MethodContext:
             raise SchemaInvalid("Artifact does not match the immutable Job outcome")
         frozen = {item["role"]: item for item in admitted["inputs"]}
         self._refs.update(item["artifact_ref"] for item in frozen.values())
+        self._verified_outputs.add((ref, capability))
         return row, frozen
 
     def publish_json(self, folder, kind, value):
@@ -69,6 +73,17 @@ class MethodContext:
         ref = science._publish(self._conn, self._run, folder, kind, value)
         self._refs.add(ref)
         return ref
+
+    def install_analysis_template(self, *, build_ref, capability, scripts, documents, expected_revision):
+        """Use only a successful builder Job in this Run and the builder's pinned Python templates."""
+        from ..plugins import development
+        if not self._writable or (build_ref, self._tool_capability) not in self._verified_outputs:
+            raise ScopeDenied("A granted method author tool is required")
+        row = next(row for row in goal.catalog(self._conn, self._run)
+                   if row["capability_version"] == self._tool_capability)
+        return development.install(self._conn, self._run, goal._provider(row), build_ref=build_ref,
+                                   capability=capability, scripts=scripts, documents=documents,
+                                   expected_revision=expected_revision, authority=self._authority)
 
     def evaluation(self, value, source_refs, *, folder="evaluations", kind="goal_evaluation"):
         return Evaluation(value, tuple(source_refs), folder, kind)
@@ -125,7 +140,7 @@ def call_tool(conn, name, arguments, *, run_id, task_id, lease_id, context_ref, 
     problems = schema.validate(arguments, tool.as_spec()["inputSchema"])
     if problems:
         raise SchemaInvalid(f"Invalid arguments to {name}: " + ", ".join(problems))
-    ctx = MethodContext(conn, run_id, visible, writable=True)
+    ctx = MethodContext(conn, run_id, visible, writable=True, tool_capability=tool.capability, authority=authority)
     result = invoke(tool.handler, ctx, arguments)
     if isinstance(result, Evaluation):
         if not result.sources or not set(result.sources) <= visible:

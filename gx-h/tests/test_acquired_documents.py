@@ -29,7 +29,7 @@ class DocumentReaders(unittest.TestCase):
         for invalid in (dict(meta, accession='PMC456'), dict(meta, version='3'), dict(meta, retrieved_at='unknown')):
             with self.assertRaises(SchemaInvalid):
                 documents.identity(invalid, raw, 'jats', digest)
-        self.assertEqual(reader._segments(raw, 'jats')[1][0][3:5], ('body/s1/t1/td', '0.89'))
+        self.assertEqual(reader._segments(raw, 'jats')[1][0][3:5], ('body/s1/t1/row[1]/cell[1]/td', '0.89'))
 
     def test_database_verifies_accession_and_release_and_preserves_rows(self):
         record = {'primaryAccession':'P12345', 'entryAudit':{'entryVersion':4},

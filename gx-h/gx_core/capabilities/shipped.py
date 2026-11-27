@@ -189,6 +189,11 @@ def participates(conn, run_id, capability):
             catalog = inputs["capability_catalog"]
     # Goal grants include the exact workspace manifest and artifact. Historical
     # Goals saved this catalog before compositions became a first-class receipt.
+    # A later Goal selection owns its own immutable method and plugin receipt.
+    from ..p0.capability_views import latest
+    revision = latest(conn, run_id)
+    if revision is not None:
+        catalog = revision["catalog"]
     grant = None
     if catalog is not None:
         grant = next((entry for entry in catalog if entry["capability_version"] == capability), None)
@@ -207,7 +212,7 @@ def participates(conn, run_id, capability):
         if (grant.get("content_artifact_ref") != asset["content_artifact_ref"] or
                 grant.get("manifest_sha256") != asset["content_sha256"]):
             return False
-        if recorded_goal:
+        if recorded_goal and revision is None:
             fields = ("capability_version", "portable_sha256", "manifest_sha256", "content_artifact_ref")
             receipt = {field: grant.get(field) for field in fields}
             if receipt not in binding["capabilities"] or (grant.get("plugin") and grant["plugin"] not in binding["packages"]):

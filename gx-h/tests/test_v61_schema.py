@@ -32,8 +32,9 @@ class PromotedSchema(unittest.TestCase):
     def test_all_sql_objects_and_immutable_original_receipts(self):
         rows = list(self.db.execute("SELECT type,name FROM sqlite_schema "
                                     "WHERE name GLOB 'v6_*' OR name='p0_v6_native_calls'"))
+        self.assertIn(("table", "v6_saved_recipes"), [tuple(r) for r in rows])
         self.assertEqual(sorted([r[0] for r in rows]),
-                         sorted(["table"] * 9 + ["index"] * 8 + ["trigger"] * 4))
+                         sorted(["table"] * 10 + ["index"] * 8 + ["trigger"] * 4))
         for key, digest, _ in schema.migrations():
             self.assertEqual(store.read_meta(self.db)[key], digest)
         schema.verify_promoted(self.db, require_all=True)

@@ -81,7 +81,12 @@ def _assert_sources(conn, run_id, goal_version, grant, snapshot, *, for_projecti
     live_methods = json.loads(goal["capabilities_json"])
     v62b_handoff.require_materials(conn, run_id, live_inputs, snapshot["materials"])
     v62b_handoff.require_claims(conn, run_id, snapshot.get("target_claims", ()))
+    from . import capability_views
     for cap, pin in snapshot["method_pins"].items():
+        if cap not in live_methods and capability_views.latest(conn, run_id):
+            # A disabled method closes future admission. The module can still read
+            # an already admitted result, report it, or use its other granted methods.
+            continue
         if live_methods.get(cap) != pin:
             raise StaleRevision("A delegated method pin changed")
         try:
@@ -241,6 +246,9 @@ def _brief(conn, row, nodes, proofs):
     # A new decision receives confirmed references and field summaries, never another scope's materials.
     from . import v621_policy
     policy = v621_policy.pinned(conn, row["run_id"])
+    from . import capability_views
+    revision = capability_views.latest(conn, row["run_id"])
+    methods = [c for c in grant["capabilities"] if revision is None or c in revision["active"]]
     dialogue = research_dialogue.packet(conn, row["run_id"], row["scope"], row["goal_version"])
     return {
         **({"pi_dialogue": dialogue} if dialogue else {}),
@@ -257,11 +265,12 @@ def _brief(conn, row, nodes, proofs):
         "module_instructions": snapshot["instructions"],
         "expected_delivery": row["expected_delivery"],
         "allowed_tools": grant["tools"],
-        "allowed_method_ids": grant["capabilities"],
+        "allowed_method_ids": methods,
         "materials": [{k: v for k, v in item.items() if k != "publication"} for item in
                       [*snapshot["materials"], *v621_assignment.for_module(conn, row)]],
         **({"catalog_access": grant["catalog_access"]} if "catalog_access" in grant else {}),
-        "capabilities": snapshot["capabilities"],
+        "capabilities": [c for c in snapshot["capabilities"] if c["capability_version"] in methods],
+        **({"capability_view":{"revision":revision["revision"], "digest":revision["digest"]}} if revision else {}),
         "budget": {k: funds[k] for k in ("limits", "spent", "reserved", "available")},
         "branches": [{"branch_id": row["branch_id"], "status": "OPEN", "budget_limits": funds["limits"]}],
         "nodes": nodes,

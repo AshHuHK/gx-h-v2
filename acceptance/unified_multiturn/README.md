@@ -77,7 +77,7 @@ gx_oauth "$gx_root/bin/gx-p0" message --state "$gx_state" --run-id "$gx_run" \
 bin/gx-p0 conversation --state "$gx_state" --run-id "$gx_run"
 ```
 
-在网页的目标选择中选出正在工作的真实路线并发送质疑。CLI 的等效参数为 `--branch-id`。追问已有消息使用 `--reply-to <原消息 ID>`。回答研究者提问使用 `--question-id <问题 ID>`，可从 `conversation` 的 `questions` 中取得。补充 UTF-8 文本文件用 `--attachment <文件>`，引用已获准读取的原件用 `--material-ref <artifact_ref>`。对“我的哪句话改变了哪条判断”的追问应核对原消息、Lead 处置与实际行动。`--queue-only` 可以只提交并让现有 Driver 或网页桥接继续投递。
+在网页的目标选择中选出正在工作的真实路线并发送质疑。CLI 的等效参数为 `--branch-id`。追问已有消息使用 `--reply-to <原消息 ID>`。引用研究者提问使用 `--question-id <问题 ID>`；追问或延后选择会保留等待。明确采纳某个列出的选项时，加上 `--answer-option <完整选项>`。网页也可选取选项并发送。自由文字回答沿用 Main 解读。补充 UTF-8 文本文件用 `--attachment <文件>`，引用已获准读取的原件用 `--material-ref <artifact_ref>`。对“我的哪句话改变了哪条判断”的追问应核对原消息、Lead 处置与实际行动。`--queue-only` 可以只提交并让现有 Driver 或网页桥接继续投递。
 
 ## 3. 恢复原研究及只读重导
 

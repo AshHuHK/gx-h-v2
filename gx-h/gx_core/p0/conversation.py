@@ -55,7 +55,7 @@ def reply_anchor(conn, run, ref):
 
 
 def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, question_id=None,
-         conversation_id=None, goal_version=None, attachments=None, successor=None):
+         answer_option=None, conversation_id=None, goal_version=None, attachments=None, successor=None):
     """Persist verbatim PI input before attempting any native or scientific action."""
     from .driver import enqueue
     if not isinstance(text, str) or not text.strip():
@@ -64,6 +64,8 @@ def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, 
     for value in (mid, reply_to, branch_id, question_id, conversation_id):
         if value is not None and (not isinstance(value, str) or not value.strip()):
             raise ValueError("Conversation and message anchors must be nonempty strings")
+    if answer_option is not None and (not question_id or not isinstance(answer_option, str) or not answer_option.strip()):
+        raise ValueError("An answer option requires a question ID and a nonempty choice")
     if goal_version is not None and (type(goal_version) is not int or goal_version < 1):
         raise ValueError("Goal version must be a positive integer")
     if attachments is not None and not isinstance(attachments, list):
@@ -74,7 +76,10 @@ def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, 
     cid = _conversation(run)
     if conversation_id is not None and conversation_id != cid:
         raise ValueError("Conversation does not belong to this project")
-    digest = ids.sha256_of_obj([run_id, text, reply_to, branch_id, question_id, attachments or [], successor])
+    envelope = [run_id, text, reply_to, branch_id, question_id, attachments or [], successor]
+    if answer_option is not None:  # Existing receipts retain their original digest.
+        envelope.append(answer_option)
+    digest = ids.sha256_of_obj(envelope)
     answer = None
     pinned = successor
     if successor and successor.get("input_files") and not conn.execute(
@@ -101,14 +106,18 @@ def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, 
                 raise ValueError("Unknown Goal version on this Run")
             if reply_to:
                 reply_anchor(tx, run, reply_to)
-            if branch_id:
+            if question_id or branch_id:
                 from . import research_dialogue
-                _, canonical_branch, _ = research_dialogue._target(tx, run_id, branch_id)
+                canonical_branch = research_dialogue._target(tx, run_id, branch_id)[1] if branch_id else None
                 if question_id:
                     question = next((q for q in research_dialogue.questions(tx, run_id)
                                      if q["question_id"] == question_id), None)
-                    if not question or question["branch_id"] != canonical_branch:
+                    if question is None:
+                        raise ScopeDenied("No such PI question in this Run")
+                    if branch_id and question["branch_id"] != canonical_branch:
                         raise ScopeDenied("The selected branch and question refer to different research")
+                    if answer_option is not None and answer_option not in question["choices"]:
+                        raise ValueError("Choose an option offered by this exact research question")
             enqueue(tx, run_id, {"kind": "text", "text": text}, text, mid)
             tx.execute("INSERT INTO p0_conversation_messages VALUES(?,?,?,?,?,?,?,NULL,?)",
                        (mid, cid, version, reply_to, branch_id, question_id, digest,
@@ -116,9 +125,9 @@ def send(conn, run_id, text, message_id=None, *, reply_to=None, branch_id=None, 
             if attachments:
                 from . import pi_materials
                 pi_materials.register(tx, run_id, mid, branch_id=branch_id, attachments=attachments)
-            if question_id:
-                from . import research_dialogue
-                answer = research_dialogue.answer(tx, run_id, question_id, mid, text, goal_version=version)
+            if answer_option is not None:
+                answer = research_dialogue.answer(tx, run_id, question_id, mid, text, goal_version=version,
+                                                  selected_choice=answer_option)
                 tx.execute("UPDATE p0_conversation_messages SET answer_json=? WHERE message_id=?",
                            (ids.canonical_json(answer), mid))
             store.append_event(tx, kind="p0.conversation.received", actor="gx-operator", run_id=run_id,
@@ -156,7 +165,14 @@ def _entries(conn, run, *, through=None, limit=None):
         status = ("rejected" if row["rejected"] else "answered" if reply and reply["text"] else
                   "ended_without_reply" if reply else "successor_started" if result and result.get("status") == "successor_started"
                   else "main_received" if result else "received")
-        entries.append({"run_id":run["run_id"], "conversation_id":_conversation(run),
+        followup = {}
+        if result and result.get("status") == "successor_started":
+            started = conn.execute("""SELECT 1 FROM p0_roots r JOIN p0_root_deliveries d
+                ON d.run_id=r.run_id AND d.thread_id=r.thread_id WHERE r.run_id=? AND r.task_id IS NOT NULL
+                AND d.event_id='start:'||r.root_key AND d.state='acknowledged' AND d.turn_id IS NOT NULL LIMIT 1""",
+                (result["run_id"],)).fetchone()
+            followup["successor_execution"] = "started" if started else "created"
+        entries.append({**followup, "run_id":run["run_id"], "conversation_id":_conversation(run),
                         "text":row["message_text"], "status":status, "reply":reply, "result":result,
                         "successor":row["successor_json"] is not None, "answer":json.loads(row["answer_json"]) if row["answer_json"] else None,
                         **{k:row[k] for k in ("message_id","created_at","goal_version","reply_to",

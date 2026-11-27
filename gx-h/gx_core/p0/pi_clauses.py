@@ -4,6 +4,7 @@ import json
 from ..domain import clock, ids
 from ..errors import PermissionDenied, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
+from . import report_language
 
 KINDS = ("question", "discussion", "preference", "feedback", "material", "reply", "clarify")
 _FIELDS = {
@@ -11,6 +12,13 @@ _FIELDS = {
     "quote": {"type": "string", "description": "Exact continuous excerpt from this human message."},
     "branch_id": {"type": "string", "description": "Actual branch ID from gx_project_state, or run for the Lead."},
     "source_kind": {"type": "string", "enum": ["hypothesis", "information"], "description": "PI conjecture or PI-reported information."},
+    "report_language": {"type": "string", "enum": list(report_language.LANGUAGES),
+                        "description": "For an explicit scientific report language preference; omit for chat replies."},
+    "reader": {"type": "object", "description": "On an explicit PI request to translate the sealed report, include the translated "
+               "pi_message.sealed_report fields, preserving references, quantities and units.",
+               "properties": {"reason": {"type": "string"}, "rationale": {"type": "string"},
+                              "unresolved": {"type": "array", "items": {"type": "string"}}},
+               "required": ["reason", "rationale", "unresolved"], "additionalProperties": False},
     "persistence": {"type": "string", "enum": ["turn", "conversation"], "description": "Use conversation only for an enduring request."},
     "question_id": {"type": "string", "description": "An actual question ID for reply."},
     "artifact_refs": {"type": "array", "items": {"type": "string"}, "description": "Refs attached to this message."},
@@ -20,7 +28,9 @@ TOOL = {"type": "function", "name": "gx_route_pi_message",
         "description": "Record this PI message's clauses together. Answer questions in your reply. Send a "
         "scientific suggestion only when requested, to its addressed route. Use clarify for the ambiguous "
         "clause and process the others. B continuing or discussion only needs no new research work. "
-        "Preserve original wording. PI input is never a verified measurement.",
+        "A question ID alone is a discussion reference. Use reply only when the PI explicitly answers the "
+        "researcher; inquiries and deferred choices remain discussion. Preserve original wording. "
+        "PI input is never a verified measurement.",
         "inputSchema": {"type": "object", "properties": {"clauses": {"type": "array", "minItems": 1,
             "items": {"type": "object", "properties": _FIELDS, "required": ["kind", "quote"],
                       "additionalProperties": False}}}, "required": ["clauses"], "additionalProperties": False}}
@@ -59,12 +69,32 @@ def main_context(conn, run_id, message_id):
         AND json_extract(c.value,'$.persistence')='conversation'
         AND r.project_ref=(SELECT project_ref FROM runs WHERE run_id=?)
         ORDER BY e.event_id DESC LIMIT 8""", (message_id, ROUTED, run_id))
+    source = _sealed_source(conn, run_id, message_id, version)
     return {"message_id": message_id, "goal_version": version,
+            **({"sealed_report": source} if source else {}),
             "branch_id": binding.get("branch_id"), "question_id": binding.get("question_id"),
             "reply_to": binding.get("reply_to"),
             "presentation_preferences": [{"source_message_id": p[0], "preference": json.loads(p[1])["quote"]}
                                          for p in prefs],
             "this_messages_materials": pi_materials.for_message(conn, run_id, message_id)}
+
+
+
+def _sealed_source(conn, rid, mid, version):
+    from . import research_report
+    row = conn.execute("""SELECT message_text FROM p0_operator_messages m JOIN v6_goals g USING(run_id)
+                          WHERE m.message_id=? AND m.run_id=? AND g.status='CLOSED'""", (mid, rid)).fetchone()
+    if row is None or not report_language.REPORT.search(row[0]):
+        return None
+    close = research_report.completed_close(conn, rid)
+    if close["goal_version"] != version:
+        return None
+    final = research_report.closing_decision(conn, rid, close)
+    rendered = research_report.render_close(conn, rid, final, {})
+    readings = [{k: record["reading"][k] for k in ("metric_ref", "display", "unit") if k in record["reading"]}
+                for record in final["used_endpoints"]]
+    return {"decision_ref": close["decision_ref"], "goal_version": version,
+            "evidence_refs": final["evidence_refs"], "measurements": readings, **rendered}
 
 
 def _source(conn, run_id, thread_id, turn_id):
@@ -94,6 +124,8 @@ def _validate(parts, original):
             raise SchemaInvalid("PI testimony can be recorded as hypothesis or PI-reported information")
         if part.get("persistence", "turn") not in ("turn", "conversation"):
             raise SchemaInvalid("Choose turn or conversation for a presentation preference")
+        if {"report_language", "reader"} & part.keys() and part["kind"] != "preference":
+            raise SchemaInvalid("Use a preference clause for report presentation")
         refs = part.get("artifact_refs", [])
         if not isinstance(refs, list) or any(not isinstance(x, str) or not x for x in refs):
             raise SchemaInvalid("Supply attachment references as strings")
@@ -113,7 +145,7 @@ def _scope(conn, run_id, scope):
     return row[0] if row else scope.removeprefix("branch:")
 
 
-def _apply(conn, run_id, row, binding, goal, clause):
+def _apply(conn, run_id, row, binding, goal, clause, *, reader_source=None):
     from . import pi_materials, research_dialogue
     mid = row["message_id"]
     version = binding.get("goal_version") or goal["goal_version"]
@@ -121,7 +153,18 @@ def _apply(conn, run_id, row, binding, goal, clause):
     key = "clause_" + ids.sha256_of_obj([mid, clause])[:32]
     result = {"clause_id": key, "kind": kind, "quote": quote, "source_message_id": mid, "goal_version": version}
     if kind == "preference":
-        return {**result, "status": "recorded", "persistence": clause.get("persistence", "turn")}
+        preference = {**result, "status": "recorded", "persistence": clause.get("persistence", "turn")}
+        if branch := binding.get("branch_id") or clause.get("branch_id"):
+            preference["branch_id"] = branch
+        if lang := report_language.requested(quote, clause.get("report_language")):
+            preference["report_language"] = lang
+        if "reader" in clause:
+            source = reader_source
+            if not source or source["goal_version"] != version or branch not in (None, "run") or not lang:
+                raise SchemaInvalid("A translated reader needs the selected sealed Run and an explicit report language")
+            report_language.verify_reader(source, clause["reader"], lang)
+            preference.update(reader=clause["reader"], decision_ref=source["decision_ref"])
+        return preference
     if kind == "clarify":
         return {**result, "status": "needs_clarification", "clarification": clause["clarification"]}
     if kind in ("discussion", "question"):
@@ -158,6 +201,13 @@ def _apply(conn, run_id, row, binding, goal, clause):
 
 def process(conn, run_id, thread_id, turn_id, clauses):
     """Record one interpretation under the actual main-thread receipt. No clause writes a Goal or Job."""
+    reader_source = None
+    if isinstance(clauses, list) and any(isinstance(part, dict) and "reader" in part for part in clauses):
+        # Rendering an immutable sealed decision can open several named artifacts. Do it outside the writer.
+        msg = _source(conn, run_id, thread_id, turn_id)
+        if not msg["consumed_at"]:
+            version = _binding(conn, run_id, msg["message_id"]).get("goal_version")
+            reader_source = _sealed_source(conn, run_id, msg["message_id"], version)
     with store.transaction(conn, transaction_owner="Conversation", operation="route_clauses", run_id=run_id):
         row = _source(conn, run_id, thread_id, turn_id)
         previous = json.loads(row["result_json"])
@@ -175,8 +225,10 @@ def process(conn, run_id, thread_id, turn_id, clauses):
             try:
                 # An invalid attachment or ambiguous target must not undo unrelated, grounded clauses.
                 with store.transaction(conn, transaction_owner="Conversation", operation="apply_pi_clause", run_id=run_id):
-                    outcome = _apply(conn, run_id, row, binding, goal, clause)
+                    outcome = _apply(conn, run_id, row, binding, goal, clause, reader_source=reader_source)
             except (ScopeDenied, SchemaInvalid, StaleRevision, PermissionDenied) as exc:
+                if "reader" in clause:
+                    raise
                 outcome = {"kind": clause["kind"], "quote": clause["quote"], "source_message_id": mid,
                            "status": "needs_clarification", "clarification": exc.message}
             if outcome not in applied:

@@ -14,7 +14,7 @@ class GoalToolContract(unittest.TestCase):
             "gx_delegate_branch": v6_delegation.TOOL,
         }
         for native_name in (v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY,
-                            *v62_native.SOURCE_TOOLS):
+                            "gx_save_recipe", "gx_instantiate_recipe", "gx_select_capability", *v62_native.SOURCE_TOOLS):
             implementations[native_name] = contracts.native_goal_tool_spec(native_name)
         doctor = api.doctor()
         self.assertEqual(doctor["registry"]["compatibility_only"]["native_goal_tools"], [])

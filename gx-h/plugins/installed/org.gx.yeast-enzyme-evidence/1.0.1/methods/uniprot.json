@@ -1,0 +1,90 @@
+{
+  "manifest": {
+    "capability_id": "yeast-uniprot-record",
+    "version": "2",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "uniprot",
+        "--implementation",
+        "{data.0}",
+        "--mount",
+        "{data.1}",
+        "--input",
+        "{in.candidates}",
+        "--selection",
+        "{param.accession}",
+        "--out",
+        "{out.dir}",
+        "--reader",
+        "{data.2}"
+      ]
+    },
+    "method_card": {
+      "family": "yeast_enzyme_evidence",
+      "objective": "Acquire the original current reviewed UniProt entry for a selected yeast candidate.",
+      "mechanism": "Use candidates.json from yeast-reaction-index@2; supply one returned accession. Download official original bytes via Clash and compare strain accession and sequence version to indexed protein.",
+      "estimator": "Immutable original plus record/sequence version, hash and JSON locations of annotation blocks.",
+      "training_data_lineage": "Database annotations and sequences. No trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.yeast-enzyme-evidence/1.0.1/methods/evidence.py",
+      "sha256": "10b4705fa97ae91a82435492eae9fb8edd8632197b1b601fa62e7b3b32cfa8fb"
+    },
+    "licence": "GX release source; database terms apply to data.",
+    "licence_basis": "UniProt CC BY 4.0, Rhea CC BY 4.0, SIB ENZYME terms.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 100
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.yeast-enzyme-evidence/1.0.1/methods/evidence.py",
+      "{harness}/plugins/installed/org.gx.yeast-enzyme-evidence/1.0.1/methods/mounts.json",
+      "{harness}/plugins/installed/org.gx.pcna-archive/1.0.0/methods/archive.py"
+    ],
+    "outputs": [
+      {
+        "name": "uniprot.json",
+        "kind": "file:uniprot",
+        "required": true,
+        "nature": "observed",
+        "source_roles": [
+          "candidates"
+        ],
+        "media_type": "application/json",
+        "acquired_material": {
+          "metadata_output": "acquisition.json",
+          "role": "database_record"
+        }
+      },
+      {
+        "name": "acquisition.json",
+        "kind": "file:acquisition",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "candidates"
+        ],
+        "media_type": "application/json"
+      },
+      {
+        "name": "record-summary.json",
+        "kind": "file:record_summary",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "candidates"
+        ],
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own."
+  },
+  "entry_script": "bin/yeast.py"
+}

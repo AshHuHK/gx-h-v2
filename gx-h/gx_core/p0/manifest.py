@@ -189,6 +189,14 @@ def admit(conn, job_id, *, launch, bundle, inputs, resources, prepared):
         doc.update(schema="gx.execution-manifest.admission/2",
                    output_declarations=freeze_declarations(method["outputs"], frozen_inputs),
                    provenance_cursor=conn.execute("SELECT COALESCE(MAX(event_id),0) FROM events").fetchone()[0])
+    if owner["kind"] == "graph_node":
+        from . import capability_views
+        revision = capability_views.latest(conn, run_id)
+        if revision:
+            entry = next(record for record in revision["catalog"] if record["capability_version"] == cap)
+            doc["goal_capability"] = {"revision":revision["revision"], "view_sha256":revision["digest"],
+                                      **{key:entry[key] for key in ("portable_sha256","plugin","provider_closure")
+                                         if key in entry}}
     conn.execute("INSERT INTO p0_execution_manifests(job_id,admission_json,admission_sha256) VALUES(?,?,?)",
                  (job_id, ids.canonical_json(doc), ids.sha256_of_obj(doc)))
 

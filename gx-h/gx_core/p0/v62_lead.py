@@ -59,6 +59,8 @@ def deliver(conn, brief, limit):
     ref = artifact.artifact_ref
     full = {**brief, "full_brief_ref": ref, "evidence_refs": list(dict.fromkeys([*brief["evidence_refs"], ref]))}
     packet = {k: brief[k] for k in ("run_id", "scope", "goal_version", "head", "research_effort")}
+    if "capability_view" in brief:
+        packet["capability_view"] = brief["capability_view"]
     if brief.get("branch_delegation") is False:
         packet["branch_delegation"] = False
     packet.update(goal=_excerpt(brief["goal"], 512), full_brief_ref=ref, read_with="gx_read_artifact",
@@ -77,6 +79,8 @@ def deliver(conn, brief, limit):
             "parent_run_id", "parent_decision_ref", "parent_goal_version", "evidence_status")}
     if "prospective_opening" in brief:
         packet["prospective_opening"] = brief["prospective_opening"]
+    if "report_presentation" in brief:
+        packet["report_presentation"] = brief["report_presentation"]
     if "study_class" in brief:
         packet["study_class"] = brief["study_class"]
     if "evidence_policy" in brief:

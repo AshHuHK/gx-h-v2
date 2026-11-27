@@ -1,5 +1,6 @@
 """Verify real browser, scoped PI effects, native research and independent child measurement."""
 import json
+import re
 
 from .live import CARDS, db, module_turns, parent_id, research_routes, write
 
@@ -42,6 +43,144 @@ def contact_tables(assets, study):
     return rows
 
 
+def lead_decisions(conn, study):
+    """Committed decisions for the exact Run, Goal version and Lead scope."""
+    rows = conn.execute("""SELECT d.*,t.goal_version FROM v6_decisions d
+        JOIN v6_decision_tasks t USING(run_id,task_id)
+        WHERE t.run_id=? AND t.goal_version=? AND t.scope='run'""",
+        (study["run_id"], study["goal_version"]))
+    result = {}
+    for row in rows:
+        decision = json.loads(row["request_json"])["decision"]
+        result[row["decision_ref"]] = dict(
+            ref=row["decision_ref"], event=json.loads(row["receipt_json"])["event_id"],
+            turn=(row["thread_id"], row["turn_id"]), evidence=set(decision.get("evidence_refs", [])),
+            waiting_for={w.get("subject_ref") for w in decision.get("reconsider_when", [])
+                         if w.get("event") == "module_report"})
+    return result
+
+
+def reply_citations(message, receipts):
+    """Only explicit event citations and complete GX identifiers in an acknowledged reply."""
+    reply = message.get("reply") or {}
+    receipt = receipts.get((message["message_id"], reply.get("turn_id")))
+    if not receipt or reply.get("status") != "completed":
+        return set()
+    text = reply.get("text") or ""
+    groups = re.findall(r"(?:事件|报告|報告|决定|決定|记录|紀錄|events?|reports?|decisions?)"
+                        r"\s*[#＃]?\s*([0-9]+(?:(?:\s*[、,，和及]\s*)[0-9]+)*)", text, re.I)
+    events = {int(n) for group in groups for n in re.findall(r"[0-9]+", group)}
+    refs = set(re.findall(r"(?<![A-Za-z0-9_])(?:gxa|pif)_[A-Za-z0-9]+(?![A-Za-z0-9_])", text))
+    return {event for event in events if event < receipt} | refs
+
+
+def targeted_feedback(challenge, module, study):
+    report = module.get("report") or {}
+    identity = (study["run_id"], study["goal_version"], module["scope"], module["module_instance_id"])
+    if ((report.get("run_id"), report.get("goal_version"), report.get("scope"), report.get("module_instance_id"))
+            != identity or challenge["run_id"] != study["run_id"]
+            or challenge["branch_id"] != module["branch_id"] or challenge["goal_version"] != study["goal_version"]):
+        return []
+    valid = []
+    for item in challenge["feedback"]:
+        disposition = item.get("disposition") or {}
+        if (item.get("source_message_id") != challenge["message_id"] or item.get("branch_id") != module["branch_id"]
+                or item.get("scope") != module["scope"] or item.get("goal_version") != study["goal_version"]
+                or disposition.get("feedback_id") != item["feedback_id"]
+                or disposition.get("scope") != module["scope"] or disposition.get("goal_version") != study["goal_version"]
+                or disposition.get("product_ref") != report["report_ref"]
+                or disposition.get("product_event_id") != report["event_id"]
+                or disposition not in report.get("pi_dispositions", [])):
+            continue
+        if any(d["delivery_event_id"] == disposition.get("delivery_event_id")
+               and d["turn_id"] == disposition.get("delivery_turn_id") and d["scope"] == module["scope"]
+               for d in item["deliveries"]):
+            valid.append(item)
+    return valid
+
+
+def discussion_checks(challenge, trace, sealed, feedback, module_b, study, decisions, receipts):
+    # A count or a residue position coinciding with an event number is not a citation.
+    mid = challenge["message_id"]
+    def cited(message, ref, event):
+        reply = message.get("reply") or {}
+        before = receipts.get((message["message_id"], reply.get("turn_id")), 0)
+        return (event is not None and event < before
+                and bool({event, ref} & citations[message["message_id"]]))
+    citations = {m["message_id"]:reply_citations(m, receipts) for m in (challenge, trace, sealed)}
+    def explains_b(message):
+        return any(module_b["module_instance_id"] in d["waiting_for"] and cited(message, d["ref"], d["event"])
+                   for d in decisions.values())
+    def explains_a(message, item):
+        disp = item["disposition"]
+        return (cited(message, disp["product_ref"], disp["product_event_id"])
+                and cited(message, None, disp["event_id"]))
+    def same_version(message):
+        return message["run_id"] == study["run_id"] and message["goal_version"] == study["goal_version"]
+    compound_and_trace = same_version(challenge) and same_version(trace) and trace["reply_to"] == mid and explains_b(challenge) and any(
+        explains_a(challenge, item) and cited(trace, item["feedback_id"], item["event_id"])
+        and explains_a(trace, item) for item in feedback)
+    close = study["closure"]
+    sealed_explanation = same_version(sealed) and explains_b(sealed) and cited(sealed, close["decision_ref"], close["committed_event"])
+    return compound_and_trace, sealed_explanation
+
+
+def lead_handoffs(study, module, decisions):
+    report = module.get("report") or {}
+    if (report.get("run_id") != study["run_id"] or report.get("goal_version") != study["goal_version"]
+            or report.get("scope") != module["scope"] or not report.get("released_event")):
+        return
+    for h in study["routes"]["handoffs"]:
+        d = decisions.get(h.get("decision_ref"))
+        if (not d or h.get("report_ref") != report["report_ref"] or h.get("publisher") != module["scope"]
+                or h.get("receiver_scope") != "run" or h.get("published_event") != report["event_id"]
+                or h.get("released_event") != report["released_event"] or not h.get("received_content")
+                or d["turn"] != (h.get("thread_id"), h.get("turn_id")) or d["event"] != h.get("decision_event")
+                or report["report_ref"] not in d["evidence"] or report["released_event"] >= d["event"]):
+            continue
+        if h.get("status") == "ENACTED" or any(
+                report["released_event"] < e < d["event"] for e in h.get("endpoint_delivery_events", [])):
+            yield d
+
+
+def measurement_deliveries(study, new_jobs, decisions):
+    """Link a named Job output to its receipt and the Lead decision in that turn."""
+    final = study["final_decision"]
+    close = study["closure"]
+    committed = decisions.get(close["decision_ref"])
+    if (not committed or final["decision_ref"] != close["decision_ref"] or close["committed_event"] != committed["event"]
+            or committed["turn"] != (final["thread_id"], final["turn_id"])):
+        return []
+    final_refs = set(final["evidence_refs"]) & committed["evidence"]
+    used = []
+    for job in new_jobs:
+        outputs = {o["artifact_ref"] for o in job["outputs"]
+                   if o["output_name"] in {"interface.json", "interface-table.json"}}
+        for delivery in study["deliveries"]:
+            if delivery["scope"] != "run":
+                continue
+            delivered = {e.get("source_ref") for e in delivery["endpoints"]} & outputs
+            for d in decisions.values():
+                if d["turn"] != (delivery["thread_id"], delivery["turn_id"]) or delivery["event_id"] >= d["event"]:
+                    continue
+                for ref in sorted(delivered & d["evidence"] & final_refs):
+                    used.append(dict(job_id=job["job_id"], output_ref=ref, delivery_event=delivery["event_id"],
+                                     decision_ref=d["ref"], decision_event=d["event"]))
+        for module in study["routes"]["modules"]:
+            report = module.get("report") or {}
+            if module["branch_id"] != job["owner"]["branch_id"]:
+                continue
+            linked = set(report.get("source_refs", [])) & outputs
+            if report.get("report_ref") not in final_refs:
+                linked &= final_refs
+            if linked:
+                for d in lead_handoffs(study, module, decisions):
+                    for ref in sorted(linked):
+                        used.append(dict(job_id=job["job_id"], output_ref=ref, report_ref=report["report_ref"],
+                                         decision_ref=d["ref"], decision_event=d["event"]))
+    return used
+
+
 def verify(work, key):
     from gx_core.artifacts import ArtifactService
     from gx_core.p0 import conversation
@@ -71,15 +210,22 @@ def verify(work, key):
         released = conn.execute("""SELECT e.ts FROM v62_module_reports p JOIN events e
                 ON e.run_id=p.run_id AND e.event_id=json_extract(p.receipt_json,'$.event_id')
                 WHERE p.run_id=? AND p.module_instance_id=?""", (parent,b["module_instance_id"])).fetchone()
+        parent_decisions = lead_decisions(conn, first)
+        child_decisions = lead_decisions(conn, second)
+        replies = {(r["subject_id"], r["turn_id"]): r["event_id"] for r in conn.execute(
+            """SELECT subject_id,event_id,json_extract(payload_json,'$.turn_id') AS turn_id FROM events
+               WHERE run_id=? AND kind='p0.conversation.replied'""", (parent,))}
         real = [t for t in module_turns(conn,work,parent) if t["turn_id"] in ids and t["classification"]=="NATIVE_MODEL"]
     arrival = research_routes._instant(challenge["created_at"])
     bounds = [(research_routes._instant(t["start"]),research_routes._instant(t["end"])) for t in real]
     overlaps = [x for x in first["routes"]["real_turn_overlaps"] if {x["left_turn"],x["right_turn"]} == set(ids)]
     modules = {m["module_instance_id"]:m for m in first["routes"]["modules"]}
     module_a,module_b = [modules[r["module_instance_id"]] for r in (a,b)]
-    feedback = challenge["feedback"]
-    targeted = [f for f in feedback if f["branch_id"]==a["branch_id"]]
-    dispositions = [f["disposition"] for f in targeted if f["deliveries"] and f["disposition"]]
+    targeted = targeted_feedback(challenge, module_a, first)
+    dispositions = [f["disposition"] for f in targeted]
+    sealed = messages[follow["sealed"]["payload"]["client_message_id"]]
+    explained, sealed_explained = discussion_checks(challenge, messages[key+"-trace"], sealed, targeted,
+                                                   module_b, first, parent_decisions, replies)
     follow_msg = messages[key+"-new-material"]["result"]
     b_reports = module_b["report"] or {}
     b_turn = next((t for th in module_b["threads"] for t in th["turns"]
@@ -88,15 +234,12 @@ def verify(work, key):
     b_real = (author.get("kind")=="MODULE" and b_turn.get("classification")=="NATIVE_MODEL"
               and accepted_by_host.get("report_ref")==b_reports.get("report_ref") and bool(b_source))
     reopen = load(work/"reopen.json")["result"]["invocation"]
-    rcv = {h["report_ref"] for h in first["routes"]["handoffs"] if h.get("received_content")
-           and h.get("receiver_scope")=="run" and h.get("decision_ref")}
-    parent_reports = {m["report"]["report_ref"] for m in (module_a,module_b) if m["report"]}
+    parent_reports_used = all(any(lead_handoffs(first, module, parent_decisions)) for module in (module_a, module_b))
     new_digest = "05a1488d313d9926f556f495ad155e3ebf7859b2fa3014bc68ae55465acdb776"
-    new_jobs = [j for j in second["jobs"] if j["status"]=="SUCCEEDED" and j["outputs"] and
-                any(i["sha256"]==new_digest for i in j["inputs"])]
-    new_outputs = {o["artifact_ref"] for j in new_jobs for o in j["outputs"]}
-    new_delivery = any(d["scope"]=="run" and any(e.get("source_ref") in new_outputs for e in d["endpoints"])
-                       for d in second["deliveries"])
+    measured_jobs = {row["job_id"] for row in tables[child] if row["sha256"] == new_digest
+                     and row["entry"].upper() == "3TBL" and len(row["pairs"]) == 3}
+    new_jobs = [j for j in second["jobs"] if j["job_id"] in measured_jobs and j["method"]["id"] == "pcna-interface"]
+    new_delivery = measurement_deliveries(second, new_jobs, child_decisions)
     check = {
         "driver_restarted_same_run": load(work/"study.json")["result"]["invocation"]["action"]=="start"
              and load(work/"continue-study.json")["result"]["invocation"]["action"]=="resume"
@@ -111,23 +254,21 @@ def verify(work, key):
             and all(lo is not None and hi is not None and lo <= arrival < hi for lo,hi in bounds),
         "actual_parent_coordinate_tables": {row["entry"].upper() for row in tables[parent]} == {"1VYM","9VGW"}
              and all(len(row["pairs"])==3 for row in tables[parent]),
-        "main_answered_compound_and_trace": all(bool(messages[x]["reply"] and messages[x]["reply"]["text"])
-             for x in [mid,key+"-trace"]),
+        "main_answered_compound_and_trace": explained,
         "a_scientific_disposition": any(d["outcome"] in {"measure","adopt","maintain"}
              and d["reason"] and d["product_ref"] for d in dispositions),
         "b_continued_original_work": b_real and bool(b_reports.get("released_event")) and bool(released)
              and arrival is not None and research_routes._instant(released[0]) >= arrival and module_b["status"] in ("COMPLETE","PARTIAL")
              and any(n["job_status"]=="SUCCEEDED" for n in module_b["nodes"])
              and any(th["task_id"]==b["task_id"] and th["thread_id"]==b["thread_id"] for th in module_b["threads"]),
-        "lead_used_published_evidence": len(parent_reports)==2 and parent_reports<=rcv,
-        "sealed_explanation": bool(follow["sealed_response"]["reply"]["text"]) and
+        "lead_used_published_evidence": parent_reports_used,
+        "sealed_explanation": sealed_explained and sealed["reply"] == follow["sealed_response"]["reply"] and
              follow["sealed_before"]["jobs"]==follow["sealed_after"]["jobs"],
         "child_same_conversation_and_parent": parent_view["conversation_id"]==child_view["conversation_id"]
-             and follow_msg["parent_decision_ref"]==first["closure"]["decision_ref"] and
+             and follow_msg["request_message_id"]==key+"-new-material" and follow_msg["parent_run_id"]==parent
+             and follow_msg["goal_version"]==first["goal_version"] and follow_msg["parent_decision_ref"]==first["closure"]["decision_ref"] and
              follow_msg["run_id"]==child and parent!=child and follow["switched"]["runId"]==child,
-        "child_new_coordinate_measurement": bool(new_jobs) and (new_delivery or
-            any(h.get("receiver_scope")=="run" and h.get("received_content") and h.get("decision_ref")
-                for h in second["routes"]["handoffs"])),
+        "child_new_coordinate_measurement": bool(new_delivery),
         "sealed_reexport": reopen["action"]=="export_closed" and reopen["added"]=={"jobs":0,"host_turns":0}
     }
     evidence = dict(tested_build=load(work/"study.json")["build"], checks=check, credential_route="official Codex ChatGPT OAuth via local Clash",
@@ -137,7 +278,7 @@ def verify(work, key):
                                                for m in (module_a,module_b)],
         replies=[{k:m[k] for k in ("message_id","text","reply","status")} for m in parent_view["messages"]
                  if m["message_id"] in (mid,key+"-trace",follow["sealed"]["payload"]["client_message_id"])],
-        successor=follow_msg, reopen=reopen)
+        successor=follow_msg, successor_measurement_use=new_delivery, reopen=reopen)
     write(work/"live-evidence.json",evidence)
     lines = ["# 人 PCNA 沉积坐标的界面质控", "", (CARDS/"question.md").read_text().split("\n\n")[1],
              "", "## 首航研究", "", first["final_decision"]["rendered"]["rationale"],"",

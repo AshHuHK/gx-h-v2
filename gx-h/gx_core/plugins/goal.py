@@ -139,14 +139,24 @@ def _provider(row):
 
 
 def catalog(conn, run_id):
+    from ..p0.capability_views import latest
+    revised = latest(conn, run_id)
+    if revised is not None:
+        return revised["catalog"]
     row = conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)).fetchone()
     return json.loads(row[0]).get("inputs", {}).get("capability_catalog", ()) if row else ()
 
 
-def method(conn, run_id, capability):
+def method(conn, run_id, capability, *, historical=False):
     for row in catalog(conn, run_id):
         if row["capability_version"] == capability:
             plugin = _provider(row)
+            return plugin.contributions.goal_methods.get(capability) if plugin else None
+    if historical:
+        from ..p0.capability_views import historical_method
+        prior = historical_method(conn, run_id, capability)
+        if prior:
+            plugin = _provider(prior)
             return plugin.contributions.goal_methods.get(capability) if plugin else None
     return None
 

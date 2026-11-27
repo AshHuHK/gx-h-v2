@@ -672,17 +672,160 @@
           "additionalProperties": false
         }
       },
+      "gx_save_recipe": {
+        "type": "function",
+        "name": "gx_save_recipe",
+        "description": "Save a reusable analytical subgraph from completed Lead-visible nodes. Name each external material and state alignment, units and missing-data rules.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recipe_id",
+            "version",
+            "title",
+            "nodes",
+            "inputs",
+            "id_alignment",
+            "missing_values",
+            "units"
+          ],
+          "properties": {
+            "recipe_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nodes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "slot",
+                  "node_id"
+                ],
+                "properties": {
+                  "slot": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "node_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "artifact_ref"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "artifact_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "id_alignment": {
+              "type": "string",
+              "minLength": 1
+            },
+            "missing_values": {
+              "type": "string",
+              "minLength": 1
+            },
+            "units": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "gx_instantiate_recipe": {
+        "type": "function",
+        "name": "gx_instantiate_recipe",
+        "description": "Expand a saved analytical recipe to add_node operations on a chosen branch using this Goal’s originals. Submit the selected operations using gx_decide_revision.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recipe",
+            "digest",
+            "branch",
+            "inputs",
+            "prefix"
+          ],
+          "properties": {
+            "recipe": {
+              "type": "string",
+              "minLength": 1
+            },
+            "digest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "inputs": {
+              "type": "object",
+              "description": "Named input slots mapped to Goal artifact refs"
+            },
+            "prefix": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "gx_select_capability": {
+        "type": "function",
+        "name": "gx_select_capability",
+        "description": "Select an exact PI-listed method for this Goal, or disable a listed choice. Existing Jobs retain their original method. The receipt reports the new capability revision.",
+        "inputSchema": {
+          "type": "object", "additionalProperties": false,
+          "required": ["method", "action", "revision"],
+          "properties": {
+            "method": {"type": "string", "minLength": 1},
+            "action": {"enum": ["enable", "disable"]},
+            "revision": {"type": "integer", "minimum": 0}
+          }
+        }
+      },
       "gx_query_catalog": {
         "type": "function",
         "name": "gx_query_catalog",
-        "description": "Find granted research modules or methods by category or text. Supply a granted reference to inspect its full specification.",
+        "description": "Find methods, research resources, databases, skills, modules and saved recipes by purpose or reference. Inspect a versioned card for details.",
         "inputSchema": {
           "type": "object",
           "properties": {
             "kind": {
               "enum": [
                 "module",
-                "method"
+                "method",
+                "database",
+                "research",
+                "skill",
+                "recipe"
               ]
             },
             "reference": {
@@ -860,7 +1003,7 @@
       "gx_read_source": {
         "type": "function",
         "name": "gx_read_source",
-        "description": "List locators in an assigned text, Markdown or JATS source, or read one segment and obtain a receipt for this lease.",
+        "description": "List locators and extraction coverage for assigned documents and data records (text, Markdown, JATS, HTML, PDF or JSON), or read one original segment with a receipt for this lease.",
         "inputSchema": {
           "type": "object",
           "additionalProperties": false,

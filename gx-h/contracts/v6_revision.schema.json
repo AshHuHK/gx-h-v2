@@ -177,8 +177,20 @@
                     "type": "array",
                     "items": {
                       "$ref": "#/$defs/text"
-                    },
-                    "uniqueItems": true
+                    }
+                  },
+                  "input_ports": {
+                    "description": "Select a declared scientific output of an upstream node at a zero-based position in inputs. Omit a selector to use the historical primary result.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["index", "output"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "index": {"type": "integer", "minimum": 0},
+                        "output": {"$ref": "#/$defs/text"}
+                      }
+                    }
                   },
                   "parameters": {
                     "type": "object"

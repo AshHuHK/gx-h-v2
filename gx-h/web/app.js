@@ -110,7 +110,13 @@ async function openResearch(path, initial) {
   let lastView;
   const storageKey = (kind, rid) => "gx:" + path + ":" + rid + ":" + kind;
 
+  // Only an explicit choice button creates a structured answer. Editing the question
+  // or text returns to ordinary discussion and cannot accidentally send an old choice.
+  let answerOption = null;
+  for (const id of ["question-id", "text"]) byId(id).addEventListener("input", () => { answerOption = null; });
+
   function clearComposer() {
+    answerOption = null;
     for (const id of ["text", "reply-to", "branch-id", "question-id", "material-ref", "attachment"]) byId(id).value = "";
     byId("follow").checked = false;
     byId("parent-materials").hidden = true;
@@ -125,6 +131,7 @@ async function openResearch(path, initial) {
     byId("reply-to").value = draft.reply_to || "";
     byId("branch-id").value = draft.branch_id || "";
     byId("question-id").value = draft.question_id || "";
+    answerOption = draft.answer_option || null;
     byId("material-ref").value = draft.attachments?.find(item => item.artifact_ref)?.artifact_ref || "";
     byId("follow").checked = Boolean(draft.successor);
     byId("parent-materials").hidden = !draft.successor;
@@ -184,7 +191,7 @@ async function openResearch(path, initial) {
       if (msg.result?.status === "successor_started") {
         const child = msg.result.run_id;
         if (view.runs.some(r => r.run_id === child)) {
-          const link = element("a", "Open follow-up study");
+          const link = element("a", msg.successor_execution === "started" ? "Open started follow-up" : "Open newly created follow-up");
           const url = new URL(location.href); url.searchParams.set("run_id", child);
           link.href = url.href; li.append(link);
         }
@@ -203,9 +210,21 @@ async function openResearch(path, initial) {
       li.append(element("small", [q.question_id, q.branch_id, q.status].filter(Boolean).join(" · ")));
       if (q.choices?.length) li.append(element("p", q.choices.join(" · ")));
       if ((q.status || "OPEN").toUpperCase() === "OPEN") {
-        const answer = element("button", "Answer"); answer.type = "button";
-        answer.onclick = () => { byId("target-controls").open = true; byId("question-id").value = q.question_id; byId("text").focus(); };
+        const answer = element("button", "Discuss question"); answer.type = "button";
+        answer.onclick = () => { answerOption = null; byId("target-controls").open = true; byId("question-id").value = q.question_id; byId("text").focus(); };
         li.append(answer);
+        for (const option of q.choices || []) {
+          const button = element("button", "Choose " + option);
+          button.type = "button";
+          button.onclick = () => {
+            byId("target-controls").open = true;
+            byId("question-id").value = q.question_id;
+            byId("text").value = option;
+            answerOption = option;
+            byId("send").focus();
+          };
+          li.append(button);
+        }
       }
       posts.push({at: q.asked_at, li});
     }
@@ -268,6 +287,7 @@ async function openResearch(path, initial) {
     const previous = JSON.parse(sessionStorage.getItem(key) || "null");
     for (const [field, id] of [["reply_to","reply-to"], ["branch_id","branch-id"], ["question_id","question-id"]])
       if (byId(id).value.trim()) body[field] = byId(id).value.trim();
+    if (answerOption !== null) body.answer_option = answerOption;
     const upload = byId("attachment").files[0];
     const original = byId("material-ref").value.trim();
     const follow = !byId("follow-controls").hidden && byId("follow").checked;

@@ -136,19 +136,19 @@ def _inbox_version(conn, rid):
     return conn.execute("SELECT MAX(rowid) FROM p0_operator_messages WHERE run_id=?", (rid,)).fetchone()[0]
 
 
-def drive_workspace(conn, directory, timeout):
+def drive_workspace(conn, directory, timeout, *, stop=None):
     with WorkspaceWait(conn) as listener:
-        return _drive_workspace(conn, directory, timeout, listener)
+        return _drive_workspace(conn, directory, timeout, listener, stop=stop)
 
 
-def _drive_workspace(conn, directory, timeout, listener):
+def _drive_workspace(conn, directory, timeout, listener, *, stop=None):
     from .workspace import list_runs
     deadline = time.monotonic() + timeout
     drivers, finished, retry_at, failures = {}, {}, {}, {}
     plugin_waits = {}
     start_retry_at = {}
     try:
-        while time.monotonic() < deadline:
+        while time.monotonic() < deadline and not (stop and stop.is_set()):
             drain_starts(conn, directory, start_retry_at)
             runs = list_runs(conn)
             if not runs and not _pending_start(conn):

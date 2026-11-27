@@ -44,18 +44,19 @@ class PIQuestions(unittest.TestCase):
     def setUp(self):
         self.work = Path(self.enterContext(tempfile.TemporaryDirectory())) / "questions"
 
-    def answer(self, study, qid, mid, text):
+    def answer(self, study, qid, mid, text, option):
         result = cli(study, "message", "--run-id", study.run_id, "--question-id", qid,
-                     "--message-id", mid, "--text", text)
+                     "--message-id", mid, "--text", text, "--answer-option", option)
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
         return json.loads(result.stdout)
 
-    def route_message(self, study, message_id, text, kind, **anchors):
+    def route_message(self, study, message_id, text, kind, *, addressed_question=None, **anchors):
         from gx_core.p0.driver import Driver
         from tests.test_v6_operator_recovery import HumanReceipt
 
+        options = ("--question-id", addressed_question) if addressed_question else ()
         sent = cli(study, "message", "--run-id", study.run_id, "--message-id", message_id,
-                   "--text", text, "--queue-only")
+                   "--text", text, "--queue-only", *options)
         self.assertEqual(sent.returncode, 0, sent.stderr)
         row = study.conn.execute("SELECT * FROM p0_operator_messages WHERE run_id=? AND message_id=?",
                                  (study.run_id, message_id)).fetchone()
@@ -82,6 +83,17 @@ class PIQuestions(unittest.TestCase):
             self.assertEqual([qa], ask(s, ar, "ask-a", first))
             self.assertEqual((qa["scope"], qa["branch_id"], qa["goal_version"]),
                              (a["scope"], a["branch_id"], 1))
+            # A question ID addresses the discussion. Receiving a request for explanation
+            # must leave the branch blocked even before the native Main has responded.
+            inquiry = "这两个选项各是什么意思？我还没有选，请继续等待"
+            sent = cli(s, "message", "--run-id", s.run_id, "--message-id", "ask-before-choice",
+                       "--question-id", qa["question_id"], "--queue-only", "--text", inquiry)
+            self.assertEqual(sent.returncode, 0, sent.stderr)
+            from gx_core.p0 import research_dialogue
+            self.assertTrue(research_dialogue.blocked(s.conn, s.run_id, scope=a["scope"]))
+            self.assertNotIn("answer", json.loads(sent.stdout))
+            self.route_message(s, "ask-before-choice", inquiry, "question", addressed_question=qa["question_id"])
+            self.assertTrue(research_dialogue.blocked(s.conn, s.run_id, scope=a["scope"]))
             # B runs a real coordinate inventory and receives its result while A waits.
             measured = s.submit_node(br, "inventory-second", s.materials[0])
             job = s.settle(measured["aliases"]["local:inventory-second"])
@@ -90,7 +102,6 @@ class PIQuestions(unittest.TestCase):
             qb, = ask(s, br, "ask-b", second)
             self.assertNotEqual(qb["question_id"], qa["question_id"])
             self.assertEqual(qb["scope"], b["scope"])
-            from gx_core.p0 import research_dialogue
 
             self.assertEqual({q["question_id"] for q in research_dialogue.questions(s.conn, s.run_id)
                               if q["status"] == "OPEN"}, {qa["question_id"], qb["question_id"]})
@@ -115,15 +126,22 @@ class PIQuestions(unittest.TestCase):
             self.assertEqual(tasks(s, a["scope"], active=True), [])
             self.assertEqual(tasks(s, b["scope"], active=True), [])
             raw = "前者。請附上缺失位置表。"
-            first_reply = self.answer(s, qa["question_id"], "pi-answer-a", raw)
+            invalid = cli(s, "message", "--run-id", s.run_id, "--question-id", qa["question_id"],
+                          "--message-id", "unoffered", "--text", "Other", "--answer-option", "Other")
+            self.assertNotEqual(invalid.returncode, 0, invalid.stdout)
+            self.assertTrue(research_dialogue.blocked(s.conn, s.run_id, scope=a["scope"]))
+            first_reply = self.answer(s, qa["question_id"], "pi-answer-a", raw, "Separate table")
             s.advance()
             self.assertEqual(len(tasks(s, a["scope"])), len(a_before) + 1)
             self.assertEqual(tasks(s, b["scope"]), b_before)
             self.assertEqual(tasks(s, b["scope"], active=True), [])
-            replay = self.answer(s, qa["question_id"], "pi-answer-a", raw)
+            replay = self.answer(s, qa["question_id"], "pi-answer-a", raw, "Separate table")
             self.assertIn("ANSWERED", json.dumps(first_reply).upper())
             self.assertIn("ANSWERED", json.dumps(replay).upper())
-            second_reply = self.answer(s, qa["question_id"], "late-second-answer-a", "Actually choose the latter.")
+            changed = cli(s, "message", "--run-id", s.run_id, "--question-id", qa["question_id"],
+                          "--message-id", "pi-answer-a", "--text", raw, "--answer-option", "Unknown")
+            self.assertNotEqual(changed.returncode, 0, changed.stdout)
+            second_reply = self.answer(s, qa["question_id"], "late-second-answer-a", "Actually choose the latter.", "Unknown")
             self.assertIn("ALREADY_ANSWERED", json.dumps(second_reply).upper())
             s.advance()
             self.assertEqual(len(tasks(s, a["scope"])), len(a_before) + 1)
@@ -134,6 +152,7 @@ class PIQuestions(unittest.TestCase):
             self.assertEqual((answer["answer"], answer["question"], answer["answer_message_id"]),
                              (raw, first["question"], "pi-answer-a"))
             self.assertEqual(answer["choices"], first["choices"])
+            self.assertEqual(answer["selected_choice"], "Separate table")
             self.assertNotIn(qb["question_id"], json.dumps(refreshed))
             self.assertNotIn("Actually choose the latter.", json.dumps(refreshed))
             self.assertEqual({q["question_id"]: q["status"] for q in research_dialogue.questions(s.conn, s.run_id)},
@@ -157,7 +176,7 @@ class PIQuestions(unittest.TestCase):
             self.assertEqual(actual_packet(s, actor), original)
             test_goal_versions.GoalVersions().change_goal(s)
             before = tasks(s, assigned["scope"])
-            result = self.answer(s, asked["question_id"], "after-change", "Use all chains.")
+            result = self.answer(s, asked["question_id"], "after-change", "Use all chains.", "All chains")
             self.assertIn("STALE", json.dumps(result).upper())
             s.advance()
             self.assertEqual(tasks(s, assigned["scope"]), before)
@@ -335,7 +354,7 @@ class PIQuestions(unittest.TestCase):
             self.assertEqual(research_dialogue.questions(s.conn, s.run_id)[0]["status"], "OPEN")
             self.assertEqual(research_dialogue.questions(s.conn, other_id)[0]["status"], "OPEN")
             self.assertNotEqual(q["question_id"], other_q["question_id"])
-            self.answer(other, other_q["question_id"], "right-run", "Relative coverage.")
+            self.route_message(other, "right-run", "Relative coverage.", "reply", question_id=other_q["question_id"])
             s.advance()
             other.advance()
             self.assertEqual(tasks(s, a["scope"]), original)

@@ -180,7 +180,8 @@ def _observations(prediction, assessment, output_labels, materials, zh):
 
 
 def page(result):
-    zh = bool(re.search(r"[\u3400-\u9fff]", result["goal"]))
+    language = result.get("presentation", {}).get("language")
+    zh = language == "zh" if language else bool(re.search(r"[\u3400-\u9fff]", result["goal"]))
     def tr(en, cn):
         return cn if zh else en
 

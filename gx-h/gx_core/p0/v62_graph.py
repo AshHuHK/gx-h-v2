@@ -59,15 +59,15 @@ def job_demand(conn, run_id, jobs):
     demand = Counter()
     # Input binding can resolve a node to its actual bytes later. Reuse here is
     # provisional. It never grants launch authority if the final fingerprint differs.
-    keys = ("capability", "inputs", "parameters", "depends_on")
+    keys = ("capability", "inputs", "input_ports", "parameters", "depends_on")
     seen = set()
     if jobs:
         for row in conn.execute("SELECT spec_json FROM v6_nodes WHERE run_id=? "
                                 "AND status IN ('RUNNING','SUCCEEDED','REUSED','PENDING')", (run_id,)):
             spec = json.loads(row[0])
-            seen.add(tuple(json.dumps(spec[k], sort_keys=True) for k in keys))
+            seen.add(tuple(json.dumps(spec.get(k, []), sort_keys=True) for k in keys))
     for spec, amounts in jobs:
-        identity = tuple(json.dumps(spec[k], sort_keys=True) for k in keys)
+        identity = tuple(json.dumps(spec.get(k, []), sort_keys=True) for k in keys)
         if identity not in seen:
             demand.update(amounts)
             seen.add(identity)

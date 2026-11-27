@@ -174,7 +174,7 @@ def _methods(conn, run_id, inputs):
     goals = conn.execute("SELECT capabilities_json FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
     granted = json.loads(goals[0]) if goals else {}
     bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
-    return [row for row in inputs["capability_catalog"]
+    return [row for row in goal.catalog(conn, run_id)
             if granted.get(row["capability_version"]) == row["portable_sha256"]
             and not intent.forbidden_capability(*row["capability_version"].rsplit("@", 1), bans)]
 
@@ -298,8 +298,8 @@ def query(conn, run_id, brief, args):
             {"kind", "reference", "category", "query", "offset", "limit"}):
         raise ScopeDenied("Catalog request is outside the current Run or tool contract")
     kind = args.get("kind")
-    if kind not in ("module", "method"):
-        raise SchemaInvalid("Catalog kind must be module or method")
+    if kind not in ("module", "method", "database", "research", "skill", "recipe"):
+        raise SchemaInvalid("Unknown research catalogue kind")
     for key in ("reference", "query", "category"):
         if key in args and not isinstance(args[key], str):
             raise SchemaInvalid(f"Catalog {key} must be text")
@@ -315,6 +315,9 @@ def query(conn, run_id, brief, args):
     if scope != "run" and not module_scope:
         raise ScopeDenied("This task has no module catalog grant")
     reference = args.get("reference")
+    if kind in ("database", "research", "skill", "recipe"):
+        from . import catalog_resources
+        return catalog_resources.query(conn, run_id, brief, kind, args, _methods(conn, run_id, inputs))
     if kind == "method":
         rows = _methods(conn, run_id, inputs)
         survey = module_scope and brief.get("catalog_access") == "public_methods"

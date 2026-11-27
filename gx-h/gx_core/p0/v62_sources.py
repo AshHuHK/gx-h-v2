@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+
 from adapters.scientific import published_documents
 
 from .. import contracts, schema
@@ -63,7 +64,21 @@ def _blocks(raw, fmt):
                     blocks.append((region or 'text', locator[:160], text))
                     body_paragraph |= region == 'body' and tag in ('p', 'td', 'th')
             else:
-                stack.extend((child, region, section, table) for child in reversed(node))
+                children = []
+                row = cell = 0
+                for child in node:
+                    tag_child = name(child)
+                    position = table
+                    if tag_child in ('thead', 'tbody', 'tfoot'):
+                        position = '/'.join(filter(None, (position, tag_child)))
+                    elif tag_child == 'tr':
+                        row += 1
+                        position = f'{position or "table"}/row[{row}]'
+                    elif tag_child in ('td', 'th'):
+                        cell += 1
+                        position = f'{position or "table"}/cell[{cell}]'
+                    children.append((child, region, section, position))
+                stack.extend(reversed(children))
         regions = {kind for kind, _, _ in blocks}
         coverage = 'FULL_TEXT' if body_paragraph else 'ABSTRACT_ONLY' if 'abstract' in regions else 'PARTIAL_TEXT'
         return coverage, blocks
@@ -99,7 +114,8 @@ def document_index(raw, fmt):
         coverage, blocks, details = published_documents.json_blocks(raw)
     else:
         coverage, blocks = _blocks(raw, fmt)
-        details = {}
+        details = ({'scope': 'JATS article text; figures and supplementary files require separate reads.'}
+                   if fmt == 'jats' else {})
     segments = []
     for paragraph, (kind, label, text) in enumerate(blocks, 1):
         start, part = 0, 1
@@ -182,6 +198,8 @@ def _source(conn, run_id, ref, *, verify=False, cursor=None):
     fmt = FORMATS.get(path.suffix.lower())
     if not fmt:
         raise SchemaInvalid('This registered file has no paragraph or record reader')
+    if fmt == 'json' and material['origin'] != 'JOB_OUTPUT':
+        raise SchemaInvalid('JSON record reads require a registered database original')
     digest = material['sha256']
     sid = 'gxs_' + ids.sha256_of_obj([run_id, ref, digest, PARSER])[:32]
     old_sid = 'gxs_' + ids.sha256_of_obj([run_id, ref, digest, LEGACY_PARSER])[:32]

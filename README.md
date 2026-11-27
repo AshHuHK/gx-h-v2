@@ -9,6 +9,8 @@ GX 把一個研究問題保存為 Goal。Lead 可查方法卡及插件目錄、�
 | 執行、評測與證據 | [科研工作流](gx-h/workflows/) · [科研適配器](gx-h/adapters/) · [證據與報告](gx-h/gx_core/p0/research_evidence.py) |
 | 例題 | [沉積結構質控](examples/deposited-structure-controls/) · [酶學留出回測](examples/bglb-retrospective/) · [從研究建立可重用方法](examples/record-method-authoring/) |
 
+已接入的實際科研資產涵蓋文獻、天然酵母酶、已發表蛋白、肽及 Fab。各類卡的使用時機、普通 Goal 啟動命令、跨題配方和新 Job 的現場回執見[科研資產與部署](acceptance/science_assets/README.md)。
+
 ## 接上現有宿主
 
 使用已配置的 Codex App Server，本版接口驗證版本為 0.169.0。GX 從 PATH 呼叫 `codex`，也可用 `GX_P0_CODEX` 指定現有執行檔。工作區的研究狀態由 GX 保存。宿主通訊見[stdio 客戶端](gx-h/gx_core/hostobs/app_server_client.py)。

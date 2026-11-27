@@ -1,0 +1,2755 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8febe21hn46darv",
+  "goal": "This is a separate deposited protein for the same classroom collection. Could we label a model-1 compactness value as describing the entire declared chain? An unqualified label requires N, CA, C and O at every declared position. If you can measure the C-alpha radius of gyration, report it in angstroms with its coverage and explain what a viewer can conclude. Assess whether there is applicable work already available in the workspace and, when appropriate, apply it to this entry's original coordinates. Decide on the label after you see this entry's own result.",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_e62c8ee1097226537a74cea60ed7bfc24959a03f34eb5812095e3354838643d1",
+    "op_digest": "36f4b018eba900c223e78fffe6b0f2e82933382072c739eb7b92f9639f925928",
+    "requested_event": 433,
+    "committed_event": 438,
+    "closed_event": 440,
+    "closed_utc": "2026-11-27T21:34:30.512Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8fevhk6hm837wa8"
+      ],
+      "op": "close_run",
+      "reason": "Use the whole-chain Cα radius of gyration label for myoglobin chain A in model 1 of 1MBN. Every declared residue meets the four-atom criterion. The radius describes the root-mean-square spread of the equally weighted Cα atoms about their centroid in this crystal model.",
+      "unresolved": [
+        "A radius for myoglobin in solution would require solution data. The deposited model retains the local Gln8 stereochemical caveat."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_e62c8ee1097226537a74cea60ed7bfc24959a03f34eb5812095e3354838643d1",
+    "task_id": "gxt_01m8fes7gbc77fjdea",
+    "thread_id": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+    "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+    "rationale": "The saved single-chain-backbone-coverage-rg@1 workflow applied to the original 1MBN coordinates gives a model-1 chain A Cα radius of gyration of {{metric:ca_radius_of_gyration_A}}. It counted {{metric:ca_count}} Cα sites and {{metric:complete_backbones}} complete N/Cα/C/O backbones across {{metric:declared_residues}} declared positions. The completed residue audit matched those sites to the polymer sequence through both termini. The reviewed archive remark identifies the Gln8 Cα chirality issue, and the original atom rows confirm full occupancy for all four required atoms there. These checks of the same deposition resolve the labeling question.",
+    "reason": "Use the whole-chain Cα radius of gyration label for myoglobin chain A in model 1 of 1MBN. Every declared residue meets the four-atom criterion. The radius describes the root-mean-square spread of the equally weighted Cα atoms about their centroid in this crystal model.",
+    "unresolved": [
+      "A radius for myoglobin in solution would require solution data. The deposited model retains the local Gln8 stereochemical caveat."
+    ],
+    "claim_refs": [
+      "gxa_01m8fevhk6hm837wa8"
+    ],
+    "evidence_refs": [
+      "gxa_01m8fefsnq1sbyy8sy",
+      "gxa_01m8febe320303ngc7",
+      "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+      "gxa_01m8febe3v8fx2jfcq",
+      "gxa_01m8fecwn45rv0y1np",
+      "gxa_01m8feg9j5s8qmk0v8"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+        "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+        "event_id": 429,
+        "reading": {
+          "metric_id": "ca_count",
+          "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+          "job_id": "gxj_01m8fefs2bw2c25tp3",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "version": "1"
+          },
+          "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+          "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+          "provenance_cursor": 359,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8febe320303ngc7",
+              "bytes": 191665,
+              "role": "structure",
+              "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/ca_count"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1MBN",
+            "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+          },
+          "value": 153,
+          "raw_value": "153",
+          "display": "153",
+          "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6"
+        }
+      },
+      {
+        "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+        "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+        "event_id": 429,
+        "reading": {
+          "metric_id": "ca_radius_of_gyration_A",
+          "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+          "job_id": "gxj_01m8fefs2bw2c25tp3",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "version": "1"
+          },
+          "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+          "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+          "provenance_cursor": 359,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8febe320303ngc7",
+              "bytes": 191665,
+              "role": "structure",
+              "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "angstrom",
+          "places": 3,
+          "selectors": {
+            "pointer": "/ca_radius_of_gyration_A"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1MBN",
+            "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+          },
+          "value": 15.127861444764998,
+          "raw_value": "15.127861444764998",
+          "display": "15.128 angstrom",
+          "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446"
+        }
+      },
+      {
+        "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+        "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+        "event_id": 430,
+        "reading": {
+          "metric_id": "declared_residues",
+          "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+          "job_id": "gxj_01m8fefs2bw2c25tp3",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "version": "1"
+          },
+          "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+          "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+          "provenance_cursor": 359,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8febe320303ngc7",
+              "bytes": 191665,
+              "role": "structure",
+              "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/declared_residues"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1MBN",
+            "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+          },
+          "value": 153,
+          "raw_value": "153",
+          "display": "153",
+          "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423"
+        }
+      },
+      {
+        "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+        "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+        "event_id": 429,
+        "reading": {
+          "metric_id": "complete_backbones",
+          "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+          "job_id": "gxj_01m8fefs2bw2c25tp3",
+          "output_name": "qc.json",
+          "method": {
+            "id": "deposited-backbone-qc",
+            "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+            "version": "1"
+          },
+          "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+          "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+          "provenance_cursor": 359,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8febe320303ngc7",
+              "bytes": 191665,
+              "role": "structure",
+              "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "integer/1",
+          "reader": "json/1",
+          "unit": "1",
+          "places": 0,
+          "selectors": {
+            "pointer": "/complete_backbones"
+          },
+          "scope": {
+            "chain": "A",
+            "entity": "1",
+            "entry": "1MBN",
+            "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+          },
+          "value": 153,
+          "raw_value": "153",
+          "display": "153",
+          "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e"
+        }
+      }
+    ],
+    "rendered": {
+      "reason": "Use the whole-chain Cα radius of gyration label for myoglobin chain A in model 1 of 1MBN. Every declared residue meets the four-atom criterion. The radius describes the root-mean-square spread of the equally weighted Cα atoms about their centroid in this crystal model.",
+      "rationale": "The saved single-chain-backbone-coverage-rg@1 workflow applied to the original 1MBN coordinates gives a model-1 chain A Cα radius of gyration of 15.128 angstrom. It counted 153 Cα sites and 153 complete N/Cα/C/O backbones across 153 declared positions. The completed residue audit matched those sites to the polymer sequence through both termini. The reviewed archive remark identifies the Gln8 Cα chirality issue, and the original atom rows confirm full occupancy for all four required atoms there. These checks of the same deposition resolve the labeling question.",
+      "unresolved": [
+        "A radius for myoglobin in solution would require solution data. The deposited model retains the local Gln8 stereochemical caveat."
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8febe320303ngc7",
+      "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+      "bytes": 191665,
+      "role": "structure",
+      "provenance": [
+        {
+          "source": "https://files.rcsb.org/download/1MBN.cif#1.5",
+          "scope": "run",
+          "acquisition": {
+            "applicability": "Original experimental archive record 1MBN revision 1.5. Limited to this deposition.",
+            "artifact_ref": "gxa_01m8febe320303ngc7",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [
+                "wwPDB:1MBN:1.5"
+              ],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "https://files.rcsb.org/download/1MBN.cif#1.5"
+              ]
+            },
+            "measurement_schema": null,
+            "schema": "gx.acquisition/1",
+            "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+            "source_identity": {
+              "artifact_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+              "entry_id": "1MBN",
+              "reader": "gx.pdbx.source-identity/3",
+              "revision": {
+                "claimed": null,
+                "observed": "1.5",
+                "status": "observed"
+              },
+              "schema": "gx.source_identity/1",
+              "status": "matched_accession"
+            },
+            "unknown_dependencies": [
+              "data",
+              "sample",
+              "publication",
+              "sampling"
+            ]
+          },
+          "event_id": 315,
+          "utc": "2026-11-27T21:25:01.463Z"
+        }
+      ]
+    },
+    {
+      "artifact_ref": "gxa_01m8febe3v8fx2jfcq",
+      "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+      "bytes": 4645,
+      "role": "literature"
+    }
+  ],
+  "predictions": [],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8fes79e6mkd8rjm",
+      "statement": "ca_radius_of_gyration_A = 15.128 angstrom; ca_count = 153; declared_residues = 153; complete_backbones = 153.",
+      "scope": "The declared polymer chain A of deposited myoglobin entry 1MBN, first X-ray model.",
+      "criteria": "A whole-chain label requires positive-occupancy N, Cα, C and O at every declared position. Both coverage counts must equal the declared length.",
+      "decision_scope": "run",
+      "limitations": "The radius measures the spread of equally weighted Cα coordinates in this crystal model. The archive flags incorrect Cα chirality at Gln8. Compactness in solution would require a separate measurement.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8ferr72cv20jswn",
+        "proposed_level": "open",
+        "rationale": "The workspace recipe was executed on this entry's original coordinates. The Cα and complete-backbone counts both equal the declared length. The atom list also confirms all four required atoms at the glutamine with the archive chirality flag."
+      },
+      "evidence_refs": [
+        "gxa_01m8fefsnq1sbyy8sy",
+        "gxa_01m8febe320303ngc7",
+        "gxa_01m8febe3v8fx2jfcq",
+        "gxa_01m8fecwn45rv0y1np",
+        "gxa_01m8feg9j5s8qmk0v8"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "bcbb372f964cc03f64508a40ca1a43b025400bab23b6206210a0fde7b3b6e94e",
+        "brief_turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+        "context_ref": "gxcx_01m8fejgfywsbzhtnq",
+        "delivery_receipt": "start:8cb41c80-0947-4807-a1e3-368cacf96ccb",
+        "metric_refs": [
+          "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+          "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+          "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+          "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+          "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+          "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e"
+        ],
+        "observations": [
+          {
+            "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+            "event_id": 375,
+            "projection_sha256": "30f49a2eb84ddc5946d888c7b62f48b23bad006ae493e5975422a14bb6d1b4a5",
+            "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de"
+          },
+          {
+            "artifact_ref": "gxa_01m8feg9j5s8qmk0v8",
+            "event_id": 378,
+            "projection_sha256": "a24979336ed4463a70505486b8c777d7ce5d313b857bc4b4871e20dcb2408488",
+            "sha256": "a24979336ed4463a70505486b8c777d7ce5d313b857bc4b4871e20dcb2408488"
+          }
+        ],
+        "snapshot_cursor": 378,
+        "state": "acknowledged",
+        "thread_id": "01a21ee9-4365-7ce0-8f7d-0ff58b541e5b",
+        "turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b"
+      },
+      "source_records": [
+        {
+          "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+          "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "capability": "deposited-backbone-qc",
+          "completion_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8febe320303ngc7",
+              "bytes": 191665,
+              "role": "structure",
+              "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+            }
+          ],
+          "job_id": "gxj_01m8fefs2bw2c25tp3",
+          "job_status": "SUCCEEDED",
+          "kind": "deposited_backbone_qc",
+          "output_provenance": {
+            "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+            "applicability_scopes": [
+              "Original experimental archive record 1MBN revision 1.5. Limited to this deposition."
+            ],
+            "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+            "capability": {
+              "id": "deposited-backbone-qc",
+              "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+              "version": "1"
+            },
+            "completion_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8febe320303ngc7",
+                "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              }
+            ],
+            "declaration_name": "qc.json",
+            "dependencies": {
+              "acquisition": [
+                "wwPDB:1MBN:1.5"
+              ],
+              "data": [
+                "sha256:91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              ],
+              "processing": [
+                "capability:641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "https://files.rcsb.org/download/1MBN.cif#1.5"
+              ]
+            },
+            "first_event_id": 369,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fefs2bw2c25tp3",
+            "nature": "analysis",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8febe320303ngc7",
+                "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              }
+            ],
+            "output_name": "qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+            "unknown_dependencies": [
+              "data",
+              "publication",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": [
+              "observed"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fefsnq1sbyy8sy",
+          "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "artifact_ref": "gxa_01m8febe320303ngc7",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "Original experimental archive record 1MBN revision 1.5. Limited to this deposition."
+            ],
+            "artifact_ref": "gxa_01m8febe320303ngc7",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [
+                "wwPDB:1MBN:1.5"
+              ],
+              "data": [
+                "sha256:91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              ],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "https://files.rcsb.org/download/1MBN.cif#1.5"
+              ]
+            },
+            "first_event_id": 304,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8febe320303ngc7",
+                "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+            "source_identity": {
+              "artifact_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+              "entry_id": "1MBN",
+              "reader": "gx.pdbx.source-identity/3",
+              "revision": {
+                "claimed": null,
+                "observed": "1.5",
+                "status": "observed"
+              },
+              "schema": "gx.source_identity/1",
+              "status": "matched_accession"
+            },
+            "unknown_dependencies": [
+              "data",
+              "publication",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8febe320303ngc7",
+          "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+          "source_class": "supplied_information",
+          "source_event_id": 315
+        },
+        {
+          "artifact_ref": "gxa_01m8febe3v8fx2jfcq",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8febe3v8fx2jfcq",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 305,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8febe3v8fx2jfcq",
+          "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "source_class": "input"
+        },
+        {
+          "anchor_status": "VERBATIM",
+          "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+          "artifact_ref": "gxa_01m8fecwn45rv0y1np",
+          "char_end": 219,
+          "char_start": 162,
+          "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+          "claim_grain": "LIMITATION",
+          "confidence_basis": "The archive identifies the atom, chain, residue and issue explicitly.",
+          "data": null,
+          "direction": "supports",
+          "event_id": 326,
+          "evidence_id": "gxv_01m8fecwmkmjy7pmya",
+          "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+          "evidence_type": "EXPERIMENTAL",
+          "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+          "extractor": {
+            "call_id": "exec-4baf8fb4-0073-4fbd-8167-bb9e3e81f054",
+            "context_ref": "gxcx_01m8febed3khyv6vew",
+            "lease_id": "gxl_01m8febgcsc67q4mv1",
+            "run_id": "gxr_01m8febe21hn46darv",
+            "scope": "run",
+            "task_id": "gxt_01m8febed4fkn1pgw1",
+            "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+            "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a"
+          },
+          "found_in": [],
+          "kind": "v62_source_extraction",
+          "label": "lines 3-57 characters [0,2371)",
+          "limitations": "This flag alone gives neither the atom occupancy nor the coverage of the other backbone atoms. It supplies no corrected geometry.",
+          "method": null,
+          "parser": "gx.offline.paragraphs.2",
+          "publication_event_id": 326,
+          "quote": "CAVEAT     1MBN    GLN A 8 HAS WRONG CHIRALITY AT ATOM CA",
+          "quote_sha256": "364e4ccadffd49ca5680716d51c009150d2621f12d9660a8bf896323fa38c162",
+          "record_nature": "module_suggestion",
+          "ref": "gxa_01m8fecwn45rv0y1np",
+          "review_ref": null,
+          "run_id": "gxr_01m8febe21hn46darv",
+          "schema": "gx.v62.source_extraction.1",
+          "scope": "run",
+          "segment_id": "p2.1",
+          "sha256": "279299f2f2dfd164e8b830ea7f3eaa61528968ffc2cb5a862ec6a0f5d88fb193",
+          "source_class": "source_extraction",
+          "source_id": "gxs_18fc3bfc60819454b3b0bd26734b031b",
+          "source_ref": "gxa_01m8febe3v8fx2jfcq",
+          "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "source_version": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "status": "LOCATOR_VERIFIED",
+          "target_claim": null,
+          "target_claim_ref": null,
+          "text_coverage": "PARTIAL_TEXT",
+          "text_sha256": "68df46046ba7f258cedb7483d8d494ea837368027f3b23880375fb9346606a13"
+        },
+        {
+          "anchor_status": "VERBATIM",
+          "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+          "artifact_ref": "gxa_01m8feg9j5s8qmk0v8",
+          "char_end": 219,
+          "char_start": 162,
+          "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+          "claim_grain": "LIMITATION",
+          "confidence_basis": "The archive identifies the atom, chain, residue and issue explicitly.",
+          "data": null,
+          "direction": "supports",
+          "event_id": 378,
+          "evidence_id": "gxv_01m8fecwmkmjy7pmya",
+          "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+          "evidence_type": "EXPERIMENTAL",
+          "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+          "extractor": {
+            "call_id": "exec-4baf8fb4-0073-4fbd-8167-bb9e3e81f054",
+            "context_ref": "gxcx_01m8febed3khyv6vew",
+            "lease_id": "gxl_01m8febgcsc67q4mv1",
+            "run_id": "gxr_01m8febe21hn46darv",
+            "scope": "run",
+            "task_id": "gxt_01m8febed4fkn1pgw1",
+            "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+            "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a"
+          },
+          "found_in": [],
+          "independence": {
+            "author": {
+              "lease_id": "gxl_01m8febgcsc67q4mv1",
+              "principal": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+              "task_id": "gxt_01m8febed4fkn1pgw1",
+              "workers": []
+            },
+            "level": "FRESH_CONTEXT_SAME_HOST",
+            "reviewer": {
+              "lease_id": "gxl_01m8fefs7nhy6b7zsk",
+              "observation_ids": [],
+              "principal": "01a21ee7-e50d-7271-ad07-b62a6240a2f1",
+              "task_id": "gxt_01m8fefs748xddvz4g",
+              "workers": []
+            },
+            "why": "Distinct native Goal Roots, leased tasks and acknowledged turns in independent frozen contexts"
+          },
+          "kind": "v62_evidence_review",
+          "label": "lines 3-57 characters [0,2371)",
+          "limitations": "This flag alone gives neither the atom occupancy nor the coverage of the other backbone atoms. It supplies no corrected geometry.",
+          "method": null,
+          "note": "The archive explicitly identifies wrong chirality at chain A Gln8 Cα in this X-ray model. The remark concerns local geometry. The atom-site records supply the separate evidence needed to count backbone coverage.",
+          "parser": "gx.offline.paragraphs.2",
+          "publication_event_id": 378,
+          "quote": "CAVEAT     1MBN    GLN A 8 HAS WRONG CHIRALITY AT ATOM CA",
+          "quote_sha256": "364e4ccadffd49ca5680716d51c009150d2621f12d9660a8bf896323fa38c162",
+          "record_nature": "formal_evidence",
+          "ref": "gxa_01m8feg9j5s8qmk0v8",
+          "review_id": "gxrv_01m8feg9hp1xxprrmc",
+          "review_receipt_id": "gxrc_01m8feg0cz5q1qrdhy",
+          "review_ref": "gxa_01m8feg9j5s8qmk0v8",
+          "reviewer": {
+            "call_id": "exec-bac4f0ad-5882-4197-980a-26ba08edfeb6",
+            "context_ref": "gxcx_01m8fefs73d76g0kyk",
+            "lease_id": "gxl_01m8fefs7nhy6b7zsk",
+            "run_id": "gxr_01m8febe21hn46darv",
+            "scope": "run",
+            "task_id": "gxt_01m8fefs748xddvz4g",
+            "thread_id": "01a21ee7-e50d-7271-ad07-b62a6240a2f1",
+            "turn_id": "01a21ee7-e53c-7491-accd-7fc150883392"
+          },
+          "run_id": "gxr_01m8febe21hn46darv",
+          "schema": "gx.v62.evidence_review.1",
+          "scope": "run",
+          "segment_id": "p2.1",
+          "sha256": "a24979336ed4463a70505486b8c777d7ce5d313b857bc4b4871e20dcb2408488",
+          "source_class": "reviewed_source_evidence",
+          "source_id": "gxs_18fc3bfc60819454b3b0bd26734b031b",
+          "source_ref": "gxa_01m8febe3v8fx2jfcq",
+          "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "source_version": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "status": "REVIEWED",
+          "target_claim": null,
+          "target_claim_ref": null,
+          "text_coverage": "PARTIAL_TEXT",
+          "text_sha256": "68df46046ba7f258cedb7483d8d494ea837368027f3b23880375fb9346606a13",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fes79e6mkd8rjm@1",
+      "decision_id": "gxa_7840baad0fadea0e8da2a9fac39dc0834e8d5a97646e0acafd4419622b536b27",
+      "assessment_cursor": 378,
+      "availability_cursor": 414,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [
+        {
+          "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+          "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+          "direction": "supports",
+          "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+          "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+          "record_nature": "formal_evidence",
+          "review_receipt_id": "gxrc_01m8feg0cz5q1qrdhy",
+          "review_ref": "gxa_01m8feg9j5s8qmk0v8",
+          "segment_id": "p2.1",
+          "source_ref": "gxa_01m8febe3v8fx2jfcq",
+          "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "target_claim_ref": null,
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:32:32.943Z",
+      "event_id": 414,
+      "event": "v6.claim.adopted",
+      "author": "01a21ee9-4365-7ce0-8f7d-0ff58b541e5b",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    },
+    {
+      "hypothesis_id": "gxh_01m8fes79e6mkd8rjm",
+      "statement": "ca_radius_of_gyration_A = 15.128 angstrom; ca_count = 153; declared_residues = 153; complete_backbones = 153.",
+      "scope": "The declared polymer chain A of deposited myoglobin entry 1MBN, first X-ray model.",
+      "criteria": "Both the Cα count and the count of positions with positive-occupancy N, Cα, C and O must equal the declared length, with each site assigned to the matching polymer position.",
+      "decision_scope": "run",
+      "limitations": "The radius is the root-mean-square distance of equally weighted Cα sites from their centroid in this crystal model. The archive flags incorrect Cα chirality at Gln8. Compactness in solution would require solution data.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8fevhk6hm837wa8",
+        "proposed_level": "open",
+        "rationale": "The saved workspace recipe ran on the original 1MBN coordinates. The residue audit matched the sequence to the atom list from the initial valine through the terminal glycine and confirmed all four required sites at the glutamine flagged by the archive. The count agreement therefore supports the whole-chain label."
+      },
+      "evidence_refs": [
+        "gxa_01m8fefsnq1sbyy8sy",
+        "gxa_01m8febe320303ngc7",
+        "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+        "gxa_01m8febe3v8fx2jfcq",
+        "gxa_01m8fecwn45rv0y1np",
+        "gxa_01m8feg9j5s8qmk0v8"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "97cf20451019b725d8225b3cebb85f7056dd415b98aed19ea9ad3f85a9bd7c30",
+        "brief_turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "context_ref": "gxcx_01m8fes7g939xndqrz",
+        "delivery_receipt": "start:bd7300ed-e921-4d36-acba-5a0497fcb4a2",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 414,
+        "state": "acknowledged",
+        "thread_id": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+        "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f"
+      },
+      "source_records": [
+        {
+          "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+          "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "capability": "deposited-backbone-qc",
+          "completion_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8febe320303ngc7",
+              "bytes": 191665,
+              "role": "structure",
+              "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+            }
+          ],
+          "job_id": "gxj_01m8fefs2bw2c25tp3",
+          "job_status": "SUCCEEDED",
+          "kind": "deposited_backbone_qc",
+          "output_provenance": {
+            "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+            "applicability_scopes": [
+              "Original experimental archive record 1MBN revision 1.5. Limited to this deposition."
+            ],
+            "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+            "capability": {
+              "id": "deposited-backbone-qc",
+              "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+              "version": "1"
+            },
+            "completion_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+            "data_refs": [
+              {
+                "artifact_ref": "gxa_01m8febe320303ngc7",
+                "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              }
+            ],
+            "declaration_name": "qc.json",
+            "dependencies": {
+              "acquisition": [
+                "wwPDB:1MBN:1.5"
+              ],
+              "data": [
+                "sha256:91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              ],
+              "processing": [
+                "capability:641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+              ],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "https://files.rcsb.org/download/1MBN.cif#1.5"
+              ]
+            },
+            "first_event_id": 369,
+            "independence_complete": false,
+            "job_id": "gxj_01m8fefs2bw2c25tp3",
+            "nature": "analysis",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8febe320303ngc7",
+                "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              }
+            ],
+            "output_name": "qc.json",
+            "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+            "record_kind": "job_output",
+            "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+            "unknown_dependencies": [
+              "data",
+              "publication",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": [
+              "observed"
+            ]
+          },
+          "record_nature": "analysis",
+          "ref": "gxa_01m8fefsnq1sbyy8sy",
+          "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+          "source_class": "computed_result",
+          "version": "1"
+        },
+        {
+          "artifact_ref": "gxa_01m8febe320303ngc7",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [
+              "Original experimental archive record 1MBN revision 1.5. Limited to this deposition."
+            ],
+            "artifact_ref": "gxa_01m8febe320303ngc7",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [
+                "wwPDB:1MBN:1.5"
+              ],
+              "data": [
+                "sha256:91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              ],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": [
+                "https://files.rcsb.org/download/1MBN.cif#1.5"
+              ]
+            },
+            "first_event_id": 304,
+            "independence_complete": false,
+            "job_id": null,
+            "measurement_schema": null,
+            "nature": "observed",
+            "original_inputs_grounded": true,
+            "original_observations": [
+              {
+                "artifact_ref": "gxa_01m8febe320303ngc7",
+                "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              }
+            ],
+            "reason": "Verified operator acquisition receipt on the original ingested bytes",
+            "record_kind": "supplied_observation",
+            "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+            "source_identity": {
+              "artifact_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+              "entry_id": "1MBN",
+              "reader": "gx.pdbx.source-identity/3",
+              "revision": {
+                "claimed": null,
+                "observed": "1.5",
+                "status": "observed"
+              },
+              "schema": "gx.source_identity/1",
+              "status": "matched_accession"
+            },
+            "unknown_dependencies": [
+              "data",
+              "publication",
+              "sample",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "observed",
+          "ref": "gxa_01m8febe320303ngc7",
+          "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+          "source_class": "supplied_information",
+          "source_event_id": 315
+        },
+        {
+          "artifact_ref": "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+          "kind": "module_report_bundle",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 400,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "43cab4eabccf8c606e2408eb853e8d2364e0f159d8d7861c18ad35c8f08d5693",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+          "sha256": "43cab4eabccf8c606e2408eb853e8d2364e0f159d8d7861c18ad35c8f08d5693",
+          "source_class": "input"
+        },
+        {
+          "artifact_ref": "gxa_01m8febe3v8fx2jfcq",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8febe3v8fx2jfcq",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 305,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8febe3v8fx2jfcq",
+          "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "source_class": "input"
+        },
+        {
+          "anchor_status": "VERBATIM",
+          "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+          "artifact_ref": "gxa_01m8fecwn45rv0y1np",
+          "char_end": 219,
+          "char_start": 162,
+          "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+          "claim_grain": "LIMITATION",
+          "confidence_basis": "The archive identifies the atom, chain, residue and issue explicitly.",
+          "data": null,
+          "direction": "supports",
+          "event_id": 326,
+          "evidence_id": "gxv_01m8fecwmkmjy7pmya",
+          "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+          "evidence_type": "EXPERIMENTAL",
+          "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+          "extractor": {
+            "call_id": "exec-4baf8fb4-0073-4fbd-8167-bb9e3e81f054",
+            "context_ref": "gxcx_01m8febed3khyv6vew",
+            "lease_id": "gxl_01m8febgcsc67q4mv1",
+            "run_id": "gxr_01m8febe21hn46darv",
+            "scope": "run",
+            "task_id": "gxt_01m8febed4fkn1pgw1",
+            "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+            "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a"
+          },
+          "found_in": [],
+          "kind": "v62_source_extraction",
+          "label": "lines 3-57 characters [0,2371)",
+          "limitations": "This flag alone gives neither the atom occupancy nor the coverage of the other backbone atoms. It supplies no corrected geometry.",
+          "method": null,
+          "parser": "gx.offline.paragraphs.2",
+          "publication_event_id": 326,
+          "quote": "CAVEAT     1MBN    GLN A 8 HAS WRONG CHIRALITY AT ATOM CA",
+          "quote_sha256": "364e4ccadffd49ca5680716d51c009150d2621f12d9660a8bf896323fa38c162",
+          "record_nature": "module_suggestion",
+          "ref": "gxa_01m8fecwn45rv0y1np",
+          "review_ref": null,
+          "run_id": "gxr_01m8febe21hn46darv",
+          "schema": "gx.v62.source_extraction.1",
+          "scope": "run",
+          "segment_id": "p2.1",
+          "sha256": "279299f2f2dfd164e8b830ea7f3eaa61528968ffc2cb5a862ec6a0f5d88fb193",
+          "source_class": "source_extraction",
+          "source_id": "gxs_18fc3bfc60819454b3b0bd26734b031b",
+          "source_ref": "gxa_01m8febe3v8fx2jfcq",
+          "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "source_version": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "status": "LOCATOR_VERIFIED",
+          "target_claim": null,
+          "target_claim_ref": null,
+          "text_coverage": "PARTIAL_TEXT",
+          "text_sha256": "68df46046ba7f258cedb7483d8d494ea837368027f3b23880375fb9346606a13"
+        },
+        {
+          "anchor_status": "VERBATIM",
+          "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+          "artifact_ref": "gxa_01m8feg9j5s8qmk0v8",
+          "char_end": 219,
+          "char_start": 162,
+          "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+          "claim_grain": "LIMITATION",
+          "confidence_basis": "The archive identifies the atom, chain, residue and issue explicitly.",
+          "data": null,
+          "direction": "supports",
+          "event_id": 378,
+          "evidence_id": "gxv_01m8fecwmkmjy7pmya",
+          "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+          "evidence_type": "EXPERIMENTAL",
+          "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+          "extractor": {
+            "call_id": "exec-4baf8fb4-0073-4fbd-8167-bb9e3e81f054",
+            "context_ref": "gxcx_01m8febed3khyv6vew",
+            "lease_id": "gxl_01m8febgcsc67q4mv1",
+            "run_id": "gxr_01m8febe21hn46darv",
+            "scope": "run",
+            "task_id": "gxt_01m8febed4fkn1pgw1",
+            "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+            "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a"
+          },
+          "found_in": [],
+          "independence": {
+            "author": {
+              "lease_id": "gxl_01m8febgcsc67q4mv1",
+              "principal": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+              "task_id": "gxt_01m8febed4fkn1pgw1",
+              "workers": []
+            },
+            "level": "FRESH_CONTEXT_SAME_HOST",
+            "reviewer": {
+              "lease_id": "gxl_01m8fefs7nhy6b7zsk",
+              "observation_ids": [],
+              "principal": "01a21ee7-e50d-7271-ad07-b62a6240a2f1",
+              "task_id": "gxt_01m8fefs748xddvz4g",
+              "workers": []
+            },
+            "why": "Distinct native Goal Roots, leased tasks and acknowledged turns in independent frozen contexts"
+          },
+          "kind": "v62_evidence_review",
+          "label": "lines 3-57 characters [0,2371)",
+          "limitations": "This flag alone gives neither the atom occupancy nor the coverage of the other backbone atoms. It supplies no corrected geometry.",
+          "method": null,
+          "note": "The archive explicitly identifies wrong chirality at chain A Gln8 Cα in this X-ray model. The remark concerns local geometry. The atom-site records supply the separate evidence needed to count backbone coverage.",
+          "parser": "gx.offline.paragraphs.2",
+          "publication_event_id": 378,
+          "quote": "CAVEAT     1MBN    GLN A 8 HAS WRONG CHIRALITY AT ATOM CA",
+          "quote_sha256": "364e4ccadffd49ca5680716d51c009150d2621f12d9660a8bf896323fa38c162",
+          "record_nature": "formal_evidence",
+          "ref": "gxa_01m8feg9j5s8qmk0v8",
+          "review_id": "gxrv_01m8feg9hp1xxprrmc",
+          "review_receipt_id": "gxrc_01m8feg0cz5q1qrdhy",
+          "review_ref": "gxa_01m8feg9j5s8qmk0v8",
+          "reviewer": {
+            "call_id": "exec-bac4f0ad-5882-4197-980a-26ba08edfeb6",
+            "context_ref": "gxcx_01m8fefs73d76g0kyk",
+            "lease_id": "gxl_01m8fefs7nhy6b7zsk",
+            "run_id": "gxr_01m8febe21hn46darv",
+            "scope": "run",
+            "task_id": "gxt_01m8fefs748xddvz4g",
+            "thread_id": "01a21ee7-e50d-7271-ad07-b62a6240a2f1",
+            "turn_id": "01a21ee7-e53c-7491-accd-7fc150883392"
+          },
+          "run_id": "gxr_01m8febe21hn46darv",
+          "schema": "gx.v62.evidence_review.1",
+          "scope": "run",
+          "segment_id": "p2.1",
+          "sha256": "a24979336ed4463a70505486b8c777d7ce5d313b857bc4b4871e20dcb2408488",
+          "source_class": "reviewed_source_evidence",
+          "source_id": "gxs_18fc3bfc60819454b3b0bd26734b031b",
+          "source_ref": "gxa_01m8febe3v8fx2jfcq",
+          "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "source_version": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "status": "REVIEWED",
+          "target_claim": null,
+          "target_claim_ref": null,
+          "text_coverage": "PARTIAL_TEXT",
+          "text_sha256": "68df46046ba7f258cedb7483d8d494ea837368027f3b23880375fb9346606a13",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8fes79e6mkd8rjm@2",
+      "decision_id": "gxa_e62c8ee1097226537a74cea60ed7bfc24959a03f34eb5812095e3354838643d1",
+      "assessment_cursor": 414,
+      "availability_cursor": 432,
+      "level": "open",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [
+        {
+          "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+          "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+          "direction": "supports",
+          "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+          "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+          "record_nature": "formal_evidence",
+          "review_receipt_id": "gxrc_01m8feg0cz5q1qrdhy",
+          "review_ref": "gxa_01m8feg9j5s8qmk0v8",
+          "segment_id": "p2.1",
+          "source_ref": "gxa_01m8febe3v8fx2jfcq",
+          "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "target_claim_ref": null,
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-27T21:34:30.364Z",
+      "event_id": 432,
+      "event": "v6.claim.adopted",
+      "author": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8fefs2bw2c25tp3",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "deposited-backbone-qc",
+        "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8febe320303ngc7",
+          "bytes": 191665,
+          "role": "structure",
+          "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:52053003adf90d8f015cf0e672127b89143e92907a70a78c08ac95ffa40adaf5",
+        "branch_id": "branch_0239c5069d790c601b7cf4b4c90a78b1",
+        "decision_ref": "gxa_da22a95ea5fd1b7c9fce6c032932cde3a7724cf5a2165a1623b4c4a9c93224e6",
+        "exec_key": "b4176a14ca90b7953c87ab01dc873c2a961d7a611ef01539c64543ea8bc00da9",
+        "kind": "graph_node",
+        "node_id": "node_96e0eaeb463e5dd93445e78b3a47b02d",
+        "operation_key": "v6.node:52053003adf90d8f015cf0e672127b89143e92907a70a78c08ac95ffa40adaf5",
+        "plan_key": "55db7a0c141360c7ffa69a9a6342830a25b7cd3f47eede7c84ae1c14124eba52",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+      "outputs": [
+        {
+          "output_name": "qc.json",
+          "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+          "bytes": 403,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8febe320303ngc7",
+              "bytes": 191665,
+              "role": "structure",
+              "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8febe21hn46darv/jobs/gxj_01m8fefs2bw2c25tp3",
+            "rel_path": "files/qc.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_count",
+              "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+              "value": 153,
+              "raw_value": "153",
+              "display": "153",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "lead_delivery_event_ids": [
+                395,
+                397,
+                429
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+              "value": 15.127861444764998,
+              "raw_value": "15.127861444764998",
+              "display": "15.128 angstrom",
+              "unit": "angstrom",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "lead_delivery_event_ids": [
+                395,
+                397,
+                429
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+              "value": 153,
+              "raw_value": "153",
+              "display": "153",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "lead_delivery_event_ids": [
+                395,
+                397,
+                429
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "coordinate_coverage",
+              "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+              "value": 1,
+              "raw_value": "1",
+              "display": "153/153 (1.0000)",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+                "model": 1
+              },
+              "numerator": 153,
+              "denominator": 153,
+              "lead_delivery_event_ids": [
+                395,
+                398,
+                430
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+              "value": 153,
+              "raw_value": "153",
+              "display": "153",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "lead_delivery_event_ids": [
+                395,
+                398,
+                430
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "observed_residues",
+              "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+              "value": 153,
+              "raw_value": "153",
+              "display": "153",
+              "unit": "1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "lead_delivery_event_ids": [
+                395,
+                398,
+                430
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.deposited-backbone-qc/1",
+            "entry": "1MBN",
+            "chain": "A",
+            "entity": "1",
+            "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+            "declared_residues": 153,
+            "model_count": 1,
+            "model": 1,
+            "observed_residues": 153,
+            "ca_count": 153,
+            "complete_backbones": 153,
+            "missing_label_positions": [],
+            "ca_radius_of_gyration_A": 15.127861444764998
+          },
+          "denominators": {
+            "model_count": 1,
+            "ca_count": 153
+          },
+          "lead_delivery_event_ids": [
+            395,
+            397,
+            398,
+            429,
+            430
+          ]
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "0351f78a02d5",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "202f12792413",
+            "unit": "angstrom",
+            "value": "15.128 angstrom"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "e05fc6e043d3",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "879fabad3538",
+            "unit": "1",
+            "value": "153/153 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "a8d1347a5d07",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "36e382aacfeb",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510"
+        }
+      ],
+      "lease_id": "gxl_01m8fejgj990zsg123",
+      "receipt": "start:8cb41c80-0947-4807-a1e3-368cacf96ccb",
+      "task_id": "gxt_01m8fejgg1jmtpd76w",
+      "thread_id": "01a21ee9-4365-7ce0-8f7d-0ff58b541e5b",
+      "turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+      "scope": "run",
+      "event_id": 395,
+      "utc": "2026-11-27T21:28:53.692Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "0351f78a02d5",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "202f12792413",
+            "unit": "angstrom",
+            "value": "15.128 angstrom"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "e05fc6e043d3",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e"
+        }
+      ],
+      "lease_id": "gxl_01m8fejgj990zsg123",
+      "receipt": "exec-4b0ab817-34ad-4a9d-b855-6a6ca9748bb2",
+      "task_id": "gxt_01m8fejgg1jmtpd76w",
+      "thread_id": "01a21ee9-4365-7ce0-8f7d-0ff58b541e5b",
+      "turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+      "scope": "run",
+      "event_id": 397,
+      "utc": "2026-11-27T21:29:05.261Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "879fabad3538",
+            "unit": "1",
+            "value": "153/153 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "a8d1347a5d07",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "36e382aacfeb",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510"
+        }
+      ],
+      "lease_id": "gxl_01m8fejgj990zsg123",
+      "receipt": "exec-11730210-9445-477c-8b05-bdab05283cf6",
+      "task_id": "gxt_01m8fejgg1jmtpd76w",
+      "thread_id": "01a21ee9-4365-7ce0-8f7d-0ff58b541e5b",
+      "turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+      "scope": "run",
+      "event_id": 398,
+      "utc": "2026-11-27T21:29:16.109Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "row": {
+            "id": "ca_count",
+            "key": "0351f78a02d5",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6"
+        },
+        {
+          "row": {
+            "id": "ca_radius_of_gyration_A",
+            "key": "202f12792413",
+            "unit": "angstrom",
+            "value": "15.128 angstrom"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446"
+        },
+        {
+          "row": {
+            "id": "complete_backbones",
+            "key": "e05fc6e043d3",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e"
+        }
+      ],
+      "lease_id": "gxl_01m8fes7j2x6vgqmvz",
+      "receipt": "exec-b6e94fd1-b651-4809-acaa-df0c65af0fc4",
+      "task_id": "gxt_01m8fes7gbc77fjdea",
+      "thread_id": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+      "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+      "scope": "run",
+      "event_id": 429,
+      "utc": "2026-11-27T21:34:16.891Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy"
+        },
+        {
+          "row": {
+            "id": "coordinate_coverage",
+            "key": "879fabad3538",
+            "unit": "1",
+            "value": "153/153 (1.0000)"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732"
+        },
+        {
+          "row": {
+            "id": "declared_residues",
+            "key": "a8d1347a5d07",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423"
+        },
+        {
+          "row": {
+            "id": "observed_residues",
+            "key": "36e382aacfeb",
+            "unit": "1",
+            "value": "153"
+          },
+          "source_ref": "gxa_01m8fefsnq1sbyy8sy",
+          "metric_ref": "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510"
+        }
+      ],
+      "lease_id": "gxl_01m8fes7j2x6vgqmvz",
+      "receipt": "exec-94ad0191-ec2e-45fb-bd21-fd4b6329901e",
+      "task_id": "gxt_01m8fes7gbc77fjdea",
+      "thread_id": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+      "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+      "scope": "run",
+      "event_id": 430,
+      "utc": "2026-11-27T21:34:16.944Z"
+    }
+  ],
+  "routes": {
+    "modules": [
+      {
+        "module_instance_id": "module_ad72ed1c50bc0c62dc9e06bbd0432248",
+        "scope": "module:module_ad72ed1c50bc0c62dc9e06bbd0432248",
+        "branch_id": "branch_3df4bcabc939fbf3d970a0b2e6ce2fe7",
+        "focus": "data",
+        "module_id": "data_inventory",
+        "module_version": "3",
+        "round": 1,
+        "parent_task_id": "gxt_01m8febed4fkn1pgw1",
+        "goal_version": 1,
+        "status": "COMPLETE",
+        "threads": [
+          {
+            "thread_id": "01a21ee6-9d14-7342-b0ca-33a1bd499042",
+            "task_id": "gxt_01m8fed75qssp20e8y",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21ee6-9d38-7c00-bf49-64c5eb57835a",
+                "thread_id": "01a21ee6-9d14-7342-b0ca-33a1bd499042",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:25:59.741Z",
+                "end": "2026-11-27T21:28:18.564Z"
+              }
+            ]
+          },
+          {
+            "thread_id": "01a21ee8-bbde-7253-a77d-19e59e823ca0",
+            "task_id": "gxt_01m8fed75qssp20e8y",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21ee8-bc12-7a03-8aec-acc8a2311e0e",
+                "thread_id": "01a21ee8-bbde-7253-a77d-19e59e823ca0",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-27T21:28:18.714Z",
+                "end": "2026-11-27T21:30:46.234Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {},
+        "nodes": [],
+        "report": {
+          "artifact_ref": "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+          "author": {
+            "call_id": "call_a2b3b81bf84649fab273d73515fc3c8e",
+            "context_ref": "gxcx_01m8fed75qdkg94kx5",
+            "kind": "MODULE",
+            "lease_id": "gxl_01m8fehextq6tda6cr",
+            "run_id": "gxr_01m8febe21hn46darv",
+            "task_id": "gxt_01m8fed75qssp20e8y",
+            "thread_id": "01a21ee8-bbde-7253-a77d-19e59e823ca0",
+            "turn_id": "01a21ee8-bc12-7a03-8aec-acc8a2311e0e"
+          },
+          "base": null,
+          "event_id": 405,
+          "goal_version": 1,
+          "module_id": "data_inventory",
+          "module_instance_id": "module_ad72ed1c50bc0c62dc9e06bbd0432248",
+          "module_version": "3",
+          "operation_key": "1mbn-per-site-audit-with-source-row-locators",
+          "report_ref": "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+          "report_sha256": "43cab4eabccf8c606e2408eb853e8d2364e0f159d8d7861c18ad35c8f08d5693",
+          "round": 1,
+          "run_id": "gxr_01m8febe21hn46darv",
+          "scope": "module:module_ad72ed1c50bc0c62dc9e06bbd0432248",
+          "source_refs": [
+            "gxa_01m8febe320303ngc7",
+            "gxa_01m8febe3v8fx2jfcq"
+          ],
+          "status": "COMPLETE",
+          "version": 1,
+          "wake_event_id": 406,
+          "released_event": 406
+        },
+        "delegated_reports": [],
+        "decisions": []
+      }
+    ],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": [
+      {
+        "publisher": "module:module_ad72ed1c50bc0c62dc9e06bbd0432248",
+        "report_ref": "gxa_50c233be9fb2ff097533e85dda02c736fce4b5e918a89f798f9a45aff719945c",
+        "published_event": 405,
+        "released_event": 406,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": true,
+        "receiver_scope": "run",
+        "thread_id": "01a21eec-9e81-7c11-ba11-a06fcd9a3234",
+        "turn_id": "01a21eec-9ee4-7700-a1b3-5f6dcb111d5f",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:bd7300ed-e921-4d36-acba-5a0497fcb4a2",
+        "endpoint_delivery_events": [],
+        "received_content": true,
+        "received_read_call": "exec-d8081ef9-070d-472d-b863-93c2ed9139f5",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "ENACTED",
+        "decision_ref": "gxa_e62c8ee1097226537a74cea60ed7bfc24959a03f34eb5812095e3354838643d1",
+        "effects": [
+          {
+            "kind": "v6.claim.adopted",
+            "event_id": 432,
+            "subject": "gxh_01m8fes79e6mkd8rjm",
+            "claim_revision_id": "gxh_01m8fes79e6mkd8rjm@2"
+          }
+        ],
+        "decision_event": 438,
+        "rationale": "The saved single-chain-backbone-coverage-rg@1 workflow applied to the original 1MBN coordinates gives a model-1 chain A Cα radius of gyration of {{metric:ca_radius_of_gyration_A}}. It counted {{metric:ca_count}} Cα sites and {{metric:complete_backbones}} complete N/Cα/C/O backbones across {{metric:declared_residues}} declared positions. The completed residue audit matched those sites to the polymer sequence through both termini. The reviewed archive remark identifies the Gln8 Cα chirality issue, and the original atom rows confirm full occupancy for all four required atoms there. These checks of the same deposition resolve the labeling question."
+      }
+    ]
+  },
+  "post_read_actions": [
+    {
+      "decision_ref": "gxa_7840baad0fadea0e8da2a9fac39dc0834e8d5a97646e0acafd4419622b536b27",
+      "event_id": 419,
+      "scope": "run",
+      "outcome": "maintained",
+      "metric_refs": [
+        "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+        "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+        "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+        "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e"
+      ],
+      "report_events": [],
+      "report_statuses": {},
+      "operations": [],
+      "jobs": [],
+      "objectives": [],
+      "claim_revisions": [
+        {
+          "assessment_cursor": 378,
+          "availability_cursor": 414,
+          "claim_ref": "gxa_01m8ferr72cv20jswn",
+          "claim_revision_id": "gxh_01m8fes79e6mkd8rjm@1",
+          "context_ref": "gxcx_01m8fejgfywsbzhtnq",
+          "criteria": "A whole-chain label requires positive-occupancy N, Cα, C and O at every declared position. Both coverage counts must equal the declared length.",
+          "criteria_sha256": "dd64502b4c9e969e40b1c6095f3b8b1bf73adb94f90784bb435eb9e0fb56d335",
+          "decision_delivery": {
+            "brief_sha256": "bcbb372f964cc03f64508a40ca1a43b025400bab23b6206210a0fde7b3b6e94e",
+            "brief_turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b",
+            "context_ref": "gxcx_01m8fejgfywsbzhtnq",
+            "delivery_receipt": "start:8cb41c80-0947-4807-a1e3-368cacf96ccb",
+            "metric_refs": [
+              "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+              "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+              "metric_36e382aacfebeb343087cf6fecc7c059418d21af396cea1a155be4ff5d729510",
+              "metric_879fabad353878a776ac04111482bb3f5b8e128e53b9f8bd6f9e1edf83593732",
+              "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+              "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e"
+            ],
+            "observations": [
+              {
+                "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+                "event_id": 375,
+                "projection_sha256": "30f49a2eb84ddc5946d888c7b62f48b23bad006ae493e5975422a14bb6d1b4a5",
+                "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de"
+              },
+              {
+                "artifact_ref": "gxa_01m8feg9j5s8qmk0v8",
+                "event_id": 378,
+                "projection_sha256": "a24979336ed4463a70505486b8c777d7ce5d313b857bc4b4871e20dcb2408488",
+                "sha256": "a24979336ed4463a70505486b8c777d7ce5d313b857bc4b4871e20dcb2408488"
+              }
+            ],
+            "snapshot_cursor": 378,
+            "state": "acknowledged",
+            "thread_id": "01a21ee9-4365-7ce0-8f7d-0ff58b541e5b",
+            "turn_id": "01a21ee9-44b4-7240-9257-ccc971a0375b"
+          },
+          "decision_id": "gxa_7840baad0fadea0e8da2a9fac39dc0834e8d5a97646e0acafd4419622b536b27",
+          "decision_scope": "run",
+          "event_cursor": 378,
+          "evidence_refs": [
+            "gxa_01m8fefsnq1sbyy8sy",
+            "gxa_01m8febe320303ngc7",
+            "gxa_01m8febe3v8fx2jfcq",
+            "gxa_01m8fecwn45rv0y1np",
+            "gxa_01m8feg9j5s8qmk0v8"
+          ],
+          "hypothesis_id": "gxh_01m8fes79e6mkd8rjm",
+          "lead_interpretation": {
+            "proposal_ref": "gxa_01m8ferr72cv20jswn",
+            "proposed_level": "open",
+            "rationale": "The workspace recipe was executed on this entry's original coordinates. The Cα and complete-backbone counts both equal the declared length. The atom list also confirms all four required atoms at the glutamine with the archive chirality flag."
+          },
+          "level": "open",
+          "limitations": "The radius measures the spread of equally weighted Cα coordinates in this crystal model. The archive flags incorrect Cα chirality at Gln8. Compactness in solution would require a separate measurement.",
+          "maturity": {
+            "direction": "undetermined",
+            "disputed_extractions": [],
+            "gaps": [],
+            "grounds": [],
+            "opposing_refs": [],
+            "preexisting_result": false,
+            "reasons": [
+              "No applicable independently reviewed evidence or classified scientific result is cited."
+            ],
+            "registration": null,
+            "replication": [],
+            "results": [],
+            "reviewed_evidence": [
+              {
+                "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+                "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+                "direction": "supports",
+                "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+                "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+                "record_nature": "formal_evidence",
+                "review_receipt_id": "gxrc_01m8feg0cz5q1qrdhy",
+                "review_ref": "gxa_01m8feg9j5s8qmk0v8",
+                "segment_id": "p2.1",
+                "source_ref": "gxa_01m8febe3v8fx2jfcq",
+                "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+                "target_claim_ref": null,
+                "verdict": "SUPPORTED"
+              }
+            ],
+            "rule": "gx.claim-maturity/1",
+            "stage": "idea",
+            "supporting_refs": []
+          },
+          "maturity_lineage": [
+            "gxa_01m8ferr72cv20jswn",
+            "gxh_01m8fes79e6mkd8rjm@1"
+          ],
+          "metrics": [
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "display": "15.128 angstrom",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+              "op": "decimal/1",
+              "output_name": "qc.json",
+              "places": 3,
+              "provenance_cursor": 359,
+              "raw_value": "15.127861444764998",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "selectors": {
+                "pointer": "/ca_radius_of_gyration_A"
+              },
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "unit": "angstrom",
+              "value": 15.127861444764998
+            },
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "display": "153",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "ca_count",
+              "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 359,
+              "raw_value": "153",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "selectors": {
+                "pointer": "/ca_count"
+              },
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "unit": "1",
+              "value": 153
+            },
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "display": "153",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 359,
+              "raw_value": "153",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "selectors": {
+                "pointer": "/declared_residues"
+              },
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "unit": "1",
+              "value": 153
+            },
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "display": "153",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 359,
+              "raw_value": "153",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "selectors": {
+                "pointer": "/complete_backbones"
+              },
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "unit": "1",
+              "value": 153
+            }
+          ],
+          "publication": {
+            "admissible_levels": [
+              "open",
+              "insufficient"
+            ],
+            "assessment_cursor": 378,
+            "claim_revision_id": "gxh_01m8fes79e6mkd8rjm@1",
+            "direction": "undetermined",
+            "level": "open",
+            "maturity": "idea",
+            "opposing_refs": [],
+            "policy": "gx.claim-publication/1",
+            "proposal_ref": "gxa_01m8ferr72cv20jswn",
+            "proposed_level": "open",
+            "reasons": [
+              "No applicable independently reviewed evidence or classified scientific result is cited."
+            ],
+            "registration_event_id": null,
+            "scope": "The declared polymer chain A of deposited myoglobin entry 1MBN, first X-ray model.",
+            "supporting_refs": [],
+            "unmeasured_data_refs": []
+          },
+          "qualitative_notes": {
+            "limitations": "The radius measures the spread of equally weighted Cα coordinates in this crystal model. The archive flags incorrect Cα chirality at Gln8. Compactness in solution would require a separate measurement.",
+            "rationale": "The workspace recipe was executed on this entry's original coordinates. The Cα and complete-backbone counts both equal the declared length. The atom list also confirms all four required atoms at the glutamine with the archive chirality flag.",
+            "statement": "In the first deposited model of 1MBN, the whole-chain Cα radius of gyration of myoglobin chain A is {{metric:ca_radius_of_gyration_A}}. Cα coverage is {{metric:ca_count}} of {{metric:declared_residues}} residues and complete N/Cα/C/O coverage is {{metric:complete_backbones}} of {{metric:declared_residues}} residues.",
+            "status": "UNVERIFIED"
+          },
+          "rationale": "No applicable independently reviewed evidence or classified scientific result is cited.",
+          "revision": 1,
+          "schema": "gx.v6.claim.1",
+          "science": {
+            "claim_revision_id": "gxh_01m8fes79e6mkd8rjm@1",
+            "direction": "undetermined",
+            "level": "open",
+            "level_source": "gx.claim-publication/1",
+            "metric_refs": [
+              "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+              "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+              "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+              "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e"
+            ]
+          },
+          "scope": "The declared polymer chain A of deposited myoglobin entry 1MBN, first X-ray model.",
+          "source_records": [
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "capability": "deposited-backbone-qc",
+              "completion_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "job_status": "SUCCEEDED",
+              "kind": "deposited_backbone_qc",
+              "output_provenance": {
+                "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+                "applicability_scopes": [
+                  "Original experimental archive record 1MBN revision 1.5. Limited to this deposition."
+                ],
+                "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+                "capability": {
+                  "id": "deposited-backbone-qc",
+                  "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                  "version": "1"
+                },
+                "completion_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+                "data_refs": [
+                  {
+                    "artifact_ref": "gxa_01m8febe320303ngc7",
+                    "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                  }
+                ],
+                "declaration_name": "qc.json",
+                "dependencies": {
+                  "acquisition": [
+                    "wwPDB:1MBN:1.5"
+                  ],
+                  "data": [
+                    "sha256:91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                  ],
+                  "processing": [
+                    "capability:641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                    "method_source:e71474d65591c4b50cda7d1092d3305da0ed8be5fdd6ae273ae410854dbabbc7"
+                  ],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "https://files.rcsb.org/download/1MBN.cif#1.5"
+                  ]
+                },
+                "first_event_id": 369,
+                "independence_complete": false,
+                "job_id": "gxj_01m8fefs2bw2c25tp3",
+                "nature": "analysis",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8febe320303ngc7",
+                    "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                  }
+                ],
+                "output_name": "qc.json",
+                "reason": "Verified output bytes, prospective OutputDecl and admitted source inputs",
+                "record_kind": "job_output",
+                "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+                "unknown_dependencies": [
+                  "data",
+                  "publication",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": [
+                  "observed"
+                ]
+              },
+              "record_nature": "analysis",
+              "ref": "gxa_01m8fefsnq1sbyy8sy",
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "source_class": "computed_result",
+              "version": "1"
+            },
+            {
+              "artifact_ref": "gxa_01m8febe320303ngc7",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [
+                  "Original experimental archive record 1MBN revision 1.5. Limited to this deposition."
+                ],
+                "artifact_ref": "gxa_01m8febe320303ngc7",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [
+                    "wwPDB:1MBN:1.5"
+                  ],
+                  "data": [
+                    "sha256:91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                  ],
+                  "processing": [],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": [
+                    "https://files.rcsb.org/download/1MBN.cif#1.5"
+                  ]
+                },
+                "first_event_id": 304,
+                "independence_complete": false,
+                "job_id": null,
+                "measurement_schema": null,
+                "nature": "observed",
+                "original_inputs_grounded": true,
+                "original_observations": [
+                  {
+                    "artifact_ref": "gxa_01m8febe320303ngc7",
+                    "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                  }
+                ],
+                "reason": "Verified operator acquisition receipt on the original ingested bytes",
+                "record_kind": "supplied_observation",
+                "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+                "source_identity": {
+                  "artifact_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+                  "entry_id": "1MBN",
+                  "reader": "gx.pdbx.source-identity/3",
+                  "revision": {
+                    "claimed": null,
+                    "observed": "1.5",
+                    "status": "observed"
+                  },
+                  "schema": "gx.source_identity/1",
+                  "status": "matched_accession"
+                },
+                "unknown_dependencies": [
+                  "data",
+                  "publication",
+                  "sample",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "observed",
+              "ref": "gxa_01m8febe320303ngc7",
+              "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+              "source_class": "supplied_information",
+              "source_event_id": 315
+            },
+            {
+              "artifact_ref": "gxa_01m8febe3v8fx2jfcq",
+              "kind": "run_input",
+              "output_provenance": {
+                "applicability_scopes": [],
+                "artifact_ref": "gxa_01m8febe3v8fx2jfcq",
+                "data_refs": [],
+                "dependencies": {
+                  "acquisition": [],
+                  "data": [],
+                  "processing": [],
+                  "publication": [],
+                  "sample": [],
+                  "sampling": [],
+                  "source": []
+                },
+                "first_event_id": 305,
+                "independence_complete": false,
+                "job_id": null,
+                "nature": "unclassified",
+                "original_inputs_grounded": false,
+                "original_observations": [],
+                "reason": "No pinned declaration or original acquisition receipt",
+                "record_kind": "unclassified",
+                "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+                "unknown_dependencies": [
+                  "data",
+                  "acquisition",
+                  "sample",
+                  "source",
+                  "publication",
+                  "processing",
+                  "sampling"
+                ],
+                "upstream_natures": []
+              },
+              "record_nature": "unclassified",
+              "ref": "gxa_01m8febe3v8fx2jfcq",
+              "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+              "source_class": "input"
+            },
+            {
+              "anchor_status": "VERBATIM",
+              "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+              "artifact_ref": "gxa_01m8fecwn45rv0y1np",
+              "char_end": 219,
+              "char_start": 162,
+              "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+              "claim_grain": "LIMITATION",
+              "confidence_basis": "The archive identifies the atom, chain, residue and issue explicitly.",
+              "data": null,
+              "direction": "supports",
+              "event_id": 326,
+              "evidence_id": "gxv_01m8fecwmkmjy7pmya",
+              "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+              "evidence_type": "EXPERIMENTAL",
+              "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+              "extractor": {
+                "call_id": "exec-4baf8fb4-0073-4fbd-8167-bb9e3e81f054",
+                "context_ref": "gxcx_01m8febed3khyv6vew",
+                "lease_id": "gxl_01m8febgcsc67q4mv1",
+                "run_id": "gxr_01m8febe21hn46darv",
+                "scope": "run",
+                "task_id": "gxt_01m8febed4fkn1pgw1",
+                "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+                "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a"
+              },
+              "found_in": [],
+              "kind": "v62_source_extraction",
+              "label": "lines 3-57 characters [0,2371)",
+              "limitations": "This flag alone gives neither the atom occupancy nor the coverage of the other backbone atoms. It supplies no corrected geometry.",
+              "method": null,
+              "parser": "gx.offline.paragraphs.2",
+              "publication_event_id": 326,
+              "quote": "CAVEAT     1MBN    GLN A 8 HAS WRONG CHIRALITY AT ATOM CA",
+              "quote_sha256": "364e4ccadffd49ca5680716d51c009150d2621f12d9660a8bf896323fa38c162",
+              "record_nature": "module_suggestion",
+              "ref": "gxa_01m8fecwn45rv0y1np",
+              "review_ref": null,
+              "run_id": "gxr_01m8febe21hn46darv",
+              "schema": "gx.v62.source_extraction.1",
+              "scope": "run",
+              "segment_id": "p2.1",
+              "sha256": "279299f2f2dfd164e8b830ea7f3eaa61528968ffc2cb5a862ec6a0f5d88fb193",
+              "source_class": "source_extraction",
+              "source_id": "gxs_18fc3bfc60819454b3b0bd26734b031b",
+              "source_ref": "gxa_01m8febe3v8fx2jfcq",
+              "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+              "source_version": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+              "status": "LOCATOR_VERIFIED",
+              "target_claim": null,
+              "target_claim_ref": null,
+              "text_coverage": "PARTIAL_TEXT",
+              "text_sha256": "68df46046ba7f258cedb7483d8d494ea837368027f3b23880375fb9346606a13"
+            },
+            {
+              "anchor_status": "VERBATIM",
+              "applicability": "The 1MBN crystallographic model, chain A, Gln8.",
+              "artifact_ref": "gxa_01m8feg9j5s8qmk0v8",
+              "char_end": 219,
+              "char_start": 162,
+              "claim": "The deposition flags the stereochemistry of the Cα at Gln8 in chain A. Coordinate presence and stereochemical quality require distinct checks.",
+              "claim_grain": "LIMITATION",
+              "confidence_basis": "The archive identifies the atom, chain, residue and issue explicitly.",
+              "data": null,
+              "direction": "supports",
+              "event_id": 378,
+              "evidence_id": "gxv_01m8fecwmkmjy7pmya",
+              "evidence_ref": "gxa_01m8fecwn45rv0y1np",
+              "evidence_type": "EXPERIMENTAL",
+              "extract_receipt_id": "gxrc_01m8fecb5yx1awvta1",
+              "extractor": {
+                "call_id": "exec-4baf8fb4-0073-4fbd-8167-bb9e3e81f054",
+                "context_ref": "gxcx_01m8febed3khyv6vew",
+                "lease_id": "gxl_01m8febgcsc67q4mv1",
+                "run_id": "gxr_01m8febe21hn46darv",
+                "scope": "run",
+                "task_id": "gxt_01m8febed4fkn1pgw1",
+                "thread_id": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+                "turn_id": "01a21ee5-c1fa-72a0-b288-288a9cdca43a"
+              },
+              "found_in": [],
+              "independence": {
+                "author": {
+                  "lease_id": "gxl_01m8febgcsc67q4mv1",
+                  "principal": "01a21ee5-c1c1-73b2-8f69-f3b67c49d543",
+                  "task_id": "gxt_01m8febed4fkn1pgw1",
+                  "workers": []
+                },
+                "level": "FRESH_CONTEXT_SAME_HOST",
+                "reviewer": {
+                  "lease_id": "gxl_01m8fefs7nhy6b7zsk",
+                  "observation_ids": [],
+                  "principal": "01a21ee7-e50d-7271-ad07-b62a6240a2f1",
+                  "task_id": "gxt_01m8fefs748xddvz4g",
+                  "workers": []
+                },
+                "why": "Distinct native Goal Roots, leased tasks and acknowledged turns in independent frozen contexts"
+              },
+              "kind": "v62_evidence_review",
+              "label": "lines 3-57 characters [0,2371)",
+              "limitations": "This flag alone gives neither the atom occupancy nor the coverage of the other backbone atoms. It supplies no corrected geometry.",
+              "method": null,
+              "note": "The archive explicitly identifies wrong chirality at chain A Gln8 Cα in this X-ray model. The remark concerns local geometry. The atom-site records supply the separate evidence needed to count backbone coverage.",
+              "parser": "gx.offline.paragraphs.2",
+              "publication_event_id": 378,
+              "quote": "CAVEAT     1MBN    GLN A 8 HAS WRONG CHIRALITY AT ATOM CA",
+              "quote_sha256": "364e4ccadffd49ca5680716d51c009150d2621f12d9660a8bf896323fa38c162",
+              "record_nature": "formal_evidence",
+              "ref": "gxa_01m8feg9j5s8qmk0v8",
+              "review_id": "gxrv_01m8feg9hp1xxprrmc",
+              "review_receipt_id": "gxrc_01m8feg0cz5q1qrdhy",
+              "review_ref": "gxa_01m8feg9j5s8qmk0v8",
+              "reviewer": {
+                "call_id": "exec-bac4f0ad-5882-4197-980a-26ba08edfeb6",
+                "context_ref": "gxcx_01m8fefs73d76g0kyk",
+                "lease_id": "gxl_01m8fefs7nhy6b7zsk",
+                "run_id": "gxr_01m8febe21hn46darv",
+                "scope": "run",
+                "task_id": "gxt_01m8fefs748xddvz4g",
+                "thread_id": "01a21ee7-e50d-7271-ad07-b62a6240a2f1",
+                "turn_id": "01a21ee7-e53c-7491-accd-7fc150883392"
+              },
+              "run_id": "gxr_01m8febe21hn46darv",
+              "schema": "gx.v62.evidence_review.1",
+              "scope": "run",
+              "segment_id": "p2.1",
+              "sha256": "a24979336ed4463a70505486b8c777d7ce5d313b857bc4b4871e20dcb2408488",
+              "source_class": "reviewed_source_evidence",
+              "source_id": "gxs_18fc3bfc60819454b3b0bd26734b031b",
+              "source_ref": "gxa_01m8febe3v8fx2jfcq",
+              "source_sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+              "source_version": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+              "status": "REVIEWED",
+              "target_claim": null,
+              "target_claim_ref": null,
+              "text_coverage": "PARTIAL_TEXT",
+              "text_sha256": "68df46046ba7f258cedb7483d8d494ea837368027f3b23880375fb9346606a13",
+              "verdict": "SUPPORTED"
+            }
+          ],
+          "statement": "ca_radius_of_gyration_A = 15.128 angstrom; ca_count = 153; declared_residues = 153; complete_backbones = 153.",
+          "statement_role": "gx_measurement",
+          "verified_metrics": [
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "display": "15.128 angstrom",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "ca_radius_of_gyration_A",
+              "metric_ref": "metric_202f1279241367736c60d8dca4ffdf83b58cdbf1a0f13714e8b19a12d5e94446",
+              "op": "decimal/1",
+              "output_name": "qc.json",
+              "places": 3,
+              "provenance_cursor": 359,
+              "raw_value": "15.127861444764998",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "selectors": {
+                "pointer": "/ca_radius_of_gyration_A"
+              },
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "unit": "angstrom",
+              "value": 15.127861444764998
+            },
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "display": "153",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "ca_count",
+              "metric_ref": "metric_0351f78a02d509d0493b99084b79451974a83867177ed34177e6624c936be0a6",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 359,
+              "raw_value": "153",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "selectors": {
+                "pointer": "/ca_count"
+              },
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "unit": "1",
+              "value": 153
+            },
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "display": "153",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "declared_residues",
+              "metric_ref": "metric_a8d1347a5d075008a18b948ee29e5503d8fac9e9e88a69d5b3869a49381f9423",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 359,
+              "raw_value": "153",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "selectors": {
+                "pointer": "/declared_residues"
+              },
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "unit": "1",
+              "value": 153
+            },
+            {
+              "admission_sha256": "7e1525591f28d60856efee22c292b46065eab58e8206f7dbe4f030cd37e5c2f0",
+              "artifact_ref": "gxa_01m8fefsnq1sbyy8sy",
+              "display": "153",
+              "inputs": [
+                {
+                  "artifact_ref": "gxa_01m8febe320303ngc7",
+                  "bytes": 191665,
+                  "role": "structure",
+                  "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+                }
+              ],
+              "job_id": "gxj_01m8fefs2bw2c25tp3",
+              "manifest_sha256": "2ac9706f1f43410423df70be110d2ef4f08e18e559dc18c84fecbb913a0fe5fd",
+              "method": {
+                "id": "deposited-backbone-qc",
+                "sha256": "641e227860585acf3c7cf1185cab2a16b7ab6ddd79e18a11a748c99ec3555932",
+                "version": "1"
+              },
+              "metric_id": "complete_backbones",
+              "metric_ref": "metric_e05fc6e043d394a864bd3db4392d1c0496594e387f33ae4189a0b09b0b886e5e",
+              "op": "integer/1",
+              "output_name": "qc.json",
+              "places": 0,
+              "provenance_cursor": 359,
+              "raw_value": "153",
+              "reader": "json/1",
+              "schema": "gx.verified_metric/1",
+              "scope": {
+                "chain": "A",
+                "entity": "1",
+                "entry": "1MBN",
+                "input_sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+              },
+              "selectors": {
+                "pointer": "/complete_backbones"
+              },
+              "sha256": "660fa50334aaaafa76f856236d7dc2de577420bcb9850ed5af5187ce385479de",
+              "unit": "1",
+              "value": 153
+            }
+          ]
+        }
+      ],
+      "rationale": "Record a whole-chain Cα radius of {{metric:ca_radius_of_gyration_A}} for the first deposited model of 1MBN chain A. The saved workflow ran on the original coordinates and found {{metric:ca_count}} Cα sites and {{metric:complete_backbones}} complete positive-occupancy N/Cα/C/O backbones across {{metric:declared_residues}} declared residues. The reviewed archive note flags incorrect chirality at Gln8, and the original atom rows show all four required sites there. Retain the model-specific label and wait for the commissioned independent residue audit before closing. A discrepancy in its sequence-to-coordinate mapping would warrant revisiting the label.",
+      "rendered_rationale": "Record a whole-chain Cα radius of 15.128 angstrom for the first deposited model of 1MBN chain A. The saved workflow ran on the original coordinates and found 153 Cα sites and 153 complete positive-occupancy N/Cα/C/O backbones across 153 declared residues. The reviewed archive note flags incorrect chirality at Gln8, and the original atom rows show all four required sites there. Retain the model-specific label and wait for the commissioned independent residue audit before closing. A discrepancy in its sequence-to-coordinate mapping would warrant revisiting the label."
+    }
+  ],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[0].op",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "9fe9b35620a216870e88d8685d7005d9a2dc7d0e9ed60d1ebf00f31825baa6ad",
+      "event_id": 346,
+      "corrected_decision_event": 356
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "6366d055fbc13c0b87a409bdb499663584a9f59d6d6554986f36112e66bfe9a4",
+      "event_id": 347,
+      "corrected_decision_event": 356
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[0].method_family",
+      "previous_rejections": 2,
+      "reason": "SCHEMA_INVALID",
+      "submission": "d9be748b2024d6fa2150e1a1af2bd0623e89888d199ff3ccf33d32a011cb99d5",
+      "event_id": 348,
+      "corrected_decision_event": 356
+    },
+    {
+      "attempt": 4,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[0]",
+      "previous_rejections": 3,
+      "reason": "SCHEMA_INVALID",
+      "submission": "a19bcc194686936fd4e32cdc445828a60ce3f9d150a92f4dad2a3df294eb155a",
+      "event_id": 349,
+      "corrected_decision_event": 356
+    },
+    {
+      "attempt": 5,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 4,
+      "reason": "SCHEMA_INVALID",
+      "submission": "aac56c016fc3eba2a5385a0a8a86055198793f012862305dc4ddfdf61e08e384",
+      "event_id": 350,
+      "corrected_decision_event": 356
+    },
+    {
+      "attempt": 1,
+      "code": "SCOPE_DENIED",
+      "field": "metric_refs",
+      "previous_rejections": 0,
+      "reason": "endpoint_not_received",
+      "submission": "1f040f0f358abe79f94cf238e050816096a378cca84250df0bdb83cb6fe3fdb2",
+      "event_id": 428,
+      "corrected_decision_event": 438
+    }
+  ],
+  "invocation": {
+    "action": "resume",
+    "before": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "after": {
+      "jobs": 1,
+      "host_turns": 6
+    },
+    "added": {
+      "jobs": 1,
+      "host_turns": 6
+    },
+    "command": "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/bin/gx-p0 research --state /inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/gx-science/science-assets-live/archived-qc/state --run-id gxr_01m8febe21hn46darv --timeout 1200.0"
+  },
+  "prior_study": {
+    "parent_run_id": "gxr_01m8fddc2b6pjbf83p",
+    "parent_decision_ref": "gxa_403d1ce097889c3cbabfca62082cbb0c38ffc19cf166a2a5625291781660098a",
+    "parent_goal_version": 1,
+    "request_message_id": "archive-qc-next-independent-deposition-1",
+    "selected_materials": [
+      {
+        "name": "1MBN.cif",
+        "role": "structure",
+        "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e"
+      },
+      {
+        "name": "experimental-record.txt",
+        "role": "literature",
+        "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2"
+      }
+    ]
+  }
+}

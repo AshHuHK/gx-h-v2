@@ -48,7 +48,7 @@ PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a .venv/bin/python -B -m unittest \
 
 線性肽 Run `gxr_01m8fdh3yc0s0mvghe` 已結題，含子模組共 5 個原生回合。兩個一般覆蓋 Job 成功，仍欠末端化學資訊，Lead 追加兩個專用 Job。子模組的部分盤點沒有取得獨立測量。事件 177 將專用結果送達：1UAO 的 18 個構象均為 10/10 胺基酸主鏈，1LE0 的 20 個構象均為 12/12；額外的 NH2 基團使後者已表示成分成為 13/13。Lead 在 193 決定主鏈完整度以具肽鍵的胺基酸殘基為分母，修飾缺載保留未知；195 結題。首案缺 GX 結構化原件取得紀錄，當次前註冊預測仍開放。[正式判斷與限制](studies/linear-peptides/DECISION.md) · [四個 Job／兩份原件](studies/linear-peptides/receipt.json)
 
-1MCP 後繼 Run `gxr_01m8fe32rdt8mqrbaf` 讀取 4FAB 的配方。Lead 原生呼叫 `gx_instantiate_recipe`，採納回傳的圖操作。新 Job `gxj_01m8fe748m25bw7qaq` 的 `recipe_decision` 綁定同一配方摘要 `f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b`；實際結構與編號均換成 1MCP，各有新 Artifact 和輸入 SHA。事件 206 將新量測 55/55 送達；VH 為 8/8、10/10、13/13，VL 為 12/12、3/3、9/9。Lead 在 216 決定保留全部六區，以兩份原件共有的域、IMGT 號和插入碼為座標對照條件；尚未直接量測兩份沉積的實際交集。217 結題，共 3 個官方回合。此配方從既有編號對映與座標開始。兩次沉積各自的編號檔已隨發行提供。[後繼正式決定](studies/fab-successor/DECISION.md) · [配方原生調用、真正的 Job、讀數及來源](studies/fab-successor/receipt.json)
+1MCP 後繼 Run `gxr_01m8fe32rdt8mqrbaf` 讀取 4FAB 的配方。Lead 原生呼叫 `gx_instantiate_recipe`，採納回傳的圖操作。新 Job `gxj_01m8fe748m25bw7qaq` 的 `recipe_decision` 綁定同一配方摘要 `f425a8f54342460e8b09c0f3cc097eb2dcd0d77117062fa740caa22e18e3cb7b`；實際結構與編號均換成 1MCP，各有新 Artifact 和輸入 SHA。事件 206 將新量測 55/55 送達；VH 為 8/8、10/10、13/13，VL 為 12/12、3/3、9/9。Lead 在 216 決定保留全部六區，以兩份原件共有的域、IMGT 號和插入碼為座標對照條件；尚未直接量測兩份沉積的實際交集。217 結題，共 3 個官方回合。此配方從既有編號對映與座標開始。兩次沉積各自的編號檔已隨發行提供。[後繼正式決定](studies/fab-successor/DECISION.md) · [配方原生調用、真正的 Job、讀數及來源](studies/fab-successor/receipt.json) · [重送同一後繼訊息，新增 0 個 Job、0 個回合](studies/fab-successor/warm-recovery.json)
 
 ## 原件取得回執
 

@@ -147,6 +147,9 @@ class DerivedMethod(unittest.TestCase):
         params = {"recipe": saved["reference"], "digest": saved["digest"], "branch": "local:sucrose", "prefix": "sucrose",
                   "calibration_scope": saved["calibration"]["scope"],
                   "inputs": {role: child_inputs[role] for role in ("cohort", "evidence", "method_source")}}
+        with self.assertRaisesRegex(SchemaInvalid, "gx_instantiate_recipe.*local:sucrose") as refused:
+            s.call(actor, "gx_instantiate_recipe", dict(params, branch="sucrose"), "unopened-branch")
+        self.assertEqual(refused.exception.details["suggested_new_branch"], params["branch"])
         calibration_asset = release / "plugins/installed/org.gx.record-method-builder/1.0.0/template/coverage.py"
         original_bytes = calibration_asset.read_bytes()
         calibration_asset.write_bytes(original_bytes + b"\n# Changed calibration environment.\n")

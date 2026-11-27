@@ -1,0 +1,312 @@
+{
+  "scope": "Per-release local Goal, question/task card, input bytes and acquisition descriptor checks. Includes first-run configs and input-free studies.",
+  "checkouts": [
+    "product-multi-workflow",
+    "science-assets-slim"
+  ],
+  "result": "PASS",
+  "counts_per_release": {
+    "goals": 12,
+    "input_bindings": 21,
+    "unique_input_sha256": 13,
+    "acquisition_bindings": 7,
+    "descriptor_material_sha256_present": 5
+  },
+  "slim_examples_sharing_pinned_inputs": {
+    "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2": [
+      "examples/deposited-structure-controls/macrocycle.json"
+    ],
+    "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031": [
+      "examples/deposited-structure-controls/macrocycle.json"
+    ]
+  },
+  "goals": {
+    "acceptance/science_assets/deployment/yeast-goal.json": {
+      "project": "deployment-natural-yeast-archive",
+      "goal_sha256": "b6935e4adcabf25d7eeea6df609e1834c0ad8c43dcac0a5479db3095f70be56c",
+      "prompt": {
+        "path": "acceptance/science_assets/deployment/yeast-task.json",
+        "sha256": "2c13d9e3baeafd20ffc7400945c29441f6b15ae437a30250cc82a07fe6601a6d"
+      },
+      "inputs": [
+        {
+          "role": "query",
+          "path": "acceptance/science_assets/enzyme/field/query-a.json",
+          "sha256": "501be46096194e583464cfa51b0f4be1ed9de57f5b9f168f6635ffdafdd80f40",
+          "bytes": 75
+        }
+      ]
+    },
+    "acceptance/science_assets/literature/goal.json": {
+      "project": "field-evidence-for-optical-particle-monitors",
+      "goal_sha256": "f8ceffa253c3c316d34281f4428e125ee3196390c7eeb578fe636ffb6d6a406d",
+      "prompt": {
+        "path": "acceptance/science_assets/literature/question.md",
+        "sha256": "4a824fa884b6737c672f649d28e12fef6cfd2283e122c5b98a8c036c43bd3c47"
+      },
+      "inputs": []
+    },
+    "acceptance/science_assets/modalities/studies/fab-first/first-goal.json": {
+      "project": "archival-fab-first",
+      "goal_sha256": "9b9ec276059cf447ab4981da76575f845ea782fe09e41985090642c5aed88c1f",
+      "prompt": {
+        "path": "acceptance/science_assets/modalities/studies/fab-first/question.md",
+        "sha256": "609d60c6a5391230f9e189d2ebdb32343b2bd79af5f469cf2218f3b9e62bc878"
+      },
+      "inputs": [
+        {
+          "role": "structure",
+          "path": "acceptance/science_assets/modalities/fab/materials/4fab.cif.gz",
+          "sha256": "197b8da21af9f573230efdc28b9821ef60db4354cd18476a0040e8f42d9c0c6c",
+          "bytes": 101044
+        },
+        {
+          "role": "numbering",
+          "path": "acceptance/science_assets/modalities/fab/materials/4fab.imgt.json",
+          "sha256": "17de85a6c309c21258a2f40a4ead8f6d8b3da949f261622f7d0a0bf458f59def",
+          "bytes": 2516
+        }
+      ]
+    },
+    "acceptance/science_assets/modalities/studies/fab-first/goal.json": {
+      "project": "archival-fab-first",
+      "goal_sha256": "0c06b43634eab1b3c45f95c77f06d626dd1a48182647212c7a757823f0ce9d39",
+      "prompt": {
+        "path": "acceptance/science_assets/modalities/studies/fab-first/question.md",
+        "sha256": "609d60c6a5391230f9e189d2ebdb32343b2bd79af5f469cf2218f3b9e62bc878"
+      },
+      "inputs": [
+        {
+          "role": "structure",
+          "path": "acceptance/science_assets/modalities/fab/materials/4fab.cif.gz",
+          "sha256": "197b8da21af9f573230efdc28b9821ef60db4354cd18476a0040e8f42d9c0c6c",
+          "bytes": 101044,
+          "acquisition": {
+            "path": "acceptance/science_assets/modalities/studies/fab-first/acquisition.json",
+            "sha256": "6d7ef79e65e3e1a16da877debeb19b611e24564767dc1436c4d6eb89eee0a600",
+            "source": "https://files.rcsb.org/download/4FAB.cif.gz",
+            "material_sha256_in_descriptor": true
+          }
+        },
+        {
+          "role": "numbering",
+          "path": "acceptance/science_assets/modalities/fab/materials/4fab.imgt.json",
+          "sha256": "17de85a6c309c21258a2f40a4ead8f6d8b3da949f261622f7d0a0bf458f59def",
+          "bytes": 2516
+        }
+      ]
+    },
+    "acceptance/science_assets/modalities/studies/fab-successor/first-goal.json": {
+      "project": "archival-fab-successor",
+      "goal_sha256": "f5e6702e2946750b6b585ea8a0780cf9cfa077b1bd591b28770d9883bc5644d6",
+      "prompt": {
+        "path": "acceptance/science_assets/modalities/studies/fab-successor/question.md",
+        "sha256": "e634c6e84eda05166adeddd36aaf8f040389ef2afe2d7d8295cc96ad5852e932"
+      },
+      "inputs": [
+        {
+          "role": "structure",
+          "path": "acceptance/science_assets/modalities/fab/materials/1mcp.cif.gz",
+          "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+          "bytes": 104105
+        },
+        {
+          "role": "numbering",
+          "path": "acceptance/science_assets/modalities/fab/materials/1mcp.imgt.json",
+          "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+          "bytes": 2560
+        }
+      ]
+    },
+    "acceptance/science_assets/modalities/studies/fab-successor/goal.json": {
+      "project": "archival-fab-successor",
+      "goal_sha256": "dd17deda08f671e7d2fda0e370dbf9aa956049cbfe3345e992a01892e2ef4b1b",
+      "prompt": {
+        "path": "acceptance/science_assets/modalities/studies/fab-successor/question.md",
+        "sha256": "e634c6e84eda05166adeddd36aaf8f040389ef2afe2d7d8295cc96ad5852e932"
+      },
+      "inputs": [
+        {
+          "role": "structure",
+          "path": "acceptance/science_assets/modalities/fab/materials/1mcp.cif.gz",
+          "sha256": "cf86839aaaa4b8c512d38e764942cbbae3e75be5e56e2682db220ae6d4bfba6e",
+          "bytes": 104105,
+          "acquisition": {
+            "path": "acceptance/science_assets/modalities/studies/fab-successor/acquisition.json",
+            "sha256": "dd08bf9d55dc4c04b1882887402a18f4ec0ee6229130cce32202e88324ce8e64",
+            "source": "https://files.rcsb.org/download/1MCP.cif.gz",
+            "material_sha256_in_descriptor": true
+          }
+        },
+        {
+          "role": "numbering",
+          "path": "acceptance/science_assets/modalities/fab/materials/1mcp.imgt.json",
+          "sha256": "a99b8939c1bbd9436b0bd36019ebc673dcb506908e7f047dea5370480b5ee5b8",
+          "bytes": 2560
+        }
+      ]
+    },
+    "acceptance/science_assets/modalities/studies/linear-peptides/first-goal.json": {
+      "project": "archival-linear-peptides",
+      "goal_sha256": "14bed75f0335f7db3d2fcbe68e7d28a9a300ae497365c0c97fbcf3d49464a5ed",
+      "prompt": {
+        "path": "acceptance/science_assets/modalities/studies/linear-peptides/question.md",
+        "sha256": "c26c9569f6118fdc988709203392bb8074040e67c8a09d5d602344f53de872b1"
+      },
+      "inputs": [
+        {
+          "role": "first_deposition",
+          "path": "acceptance/science_assets/modalities/peptide/materials/1UAO.cif",
+          "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+          "bytes": 223975
+        },
+        {
+          "role": "second_deposition",
+          "path": "acceptance/science_assets/modalities/peptide/materials/1LE0.cif",
+          "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+          "bytes": 403360
+        }
+      ]
+    },
+    "acceptance/science_assets/modalities/studies/linear-peptides/goal.json": {
+      "project": "archival-linear-peptides",
+      "goal_sha256": "42aed76418264e0ce9680c328298e2728481e69d01f9304eab7478a24af2d721",
+      "prompt": {
+        "path": "acceptance/science_assets/modalities/studies/linear-peptides/question.md",
+        "sha256": "c26c9569f6118fdc988709203392bb8074040e67c8a09d5d602344f53de872b1"
+      },
+      "inputs": [
+        {
+          "role": "first_deposition",
+          "path": "acceptance/science_assets/modalities/peptide/materials/1UAO.cif",
+          "sha256": "101c558e5364dd3731ce4cdf354db316a113e0cfe8242b2bb3b15410271053b9",
+          "bytes": 223975,
+          "acquisition": {
+            "path": "acceptance/science_assets/modalities/studies/linear-peptides/acquisition-1uao.json",
+            "sha256": "3104cda5886f003a0e179fc97dd9d49d70a5fdfeaa13c0e69bf1035da2641fb6",
+            "source": "https://storage.googleapis.com/alphafold-databases/v3.0/pdb_2022_09_28_mmcif_files.tar.zst#1uao.cif",
+            "material_sha256_in_descriptor": true
+          }
+        },
+        {
+          "role": "second_deposition",
+          "path": "acceptance/science_assets/modalities/peptide/materials/1LE0.cif",
+          "sha256": "a755afb060181bd43e31ccb0ce12d46d21621fae5257894a371de3948994e8c2",
+          "bytes": 403360,
+          "acquisition": {
+            "path": "acceptance/science_assets/modalities/studies/linear-peptides/acquisition-1le0.json",
+            "sha256": "9dace1c9ddba3b985a0a28cea263cdd9bf68c992fb2a6414a225a680e1cc6dfb",
+            "source": "https://storage.googleapis.com/alphafold-databases/v3.0/pdb_2022_09_28_mmcif_files.tar.zst#1le0.cif",
+            "material_sha256_in_descriptor": true
+          }
+        }
+      ]
+    },
+    "acceptance/science_assets/modalities/studies/macrocycle/first-goal.json": {
+      "project": "archival-macrocycle-controls",
+      "goal_sha256": "07ef14d782092d6ec1183d5a40d579c9849f5cef3c9bfc8d3dda214932cb8886",
+      "prompt": {
+        "path": "acceptance/science_assets/modalities/studies/macrocycle/question.md",
+        "sha256": "e296e882bc37304f4edfffc793838e027769761e15e9395e10fe25dfd2112d34"
+      },
+      "inputs": [
+        {
+          "role": "original",
+          "path": "acceptance/science_capabilities/structure_controls/materials/6BEN.cif",
+          "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+          "bytes": 272904
+        },
+        {
+          "role": "derived_representation",
+          "path": "acceptance/science_capabilities/structure_controls/materials/6BEN-minus-closure.cif",
+          "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+          "bytes": 272799
+        }
+      ]
+    },
+    "acceptance/science_assets/modalities/studies/macrocycle/goal.json": {
+      "project": "archival-macrocycle-controls",
+      "goal_sha256": "b0a603d6412a1ed21106b3d2947d5c7477fa698b438f6116224e161da5a14dc3",
+      "prompt": {
+        "path": "acceptance/science_assets/modalities/studies/macrocycle/question.md",
+        "sha256": "e296e882bc37304f4edfffc793838e027769761e15e9395e10fe25dfd2112d34"
+      },
+      "inputs": [
+        {
+          "role": "original",
+          "path": "acceptance/science_capabilities/structure_controls/materials/6BEN.cif",
+          "sha256": "000c14272535e109760ccd3bdf11bdf1abc33176ee7831d5e5db5ae7d6d017d2",
+          "bytes": 272904,
+          "acquisition": {
+            "path": "acceptance/science_assets/modalities/studies/macrocycle/acquisition-6ben.json",
+            "sha256": "36eef0cf9e13782f3f2fabf78853df629a61adf0723dab3e8f08dfef0c4325db",
+            "source": "https://files.rcsb.org/download/6BEN.cif",
+            "material_sha256_in_descriptor": true
+          }
+        },
+        {
+          "role": "derived_representation",
+          "path": "acceptance/science_capabilities/structure_controls/materials/6BEN-minus-closure.cif",
+          "sha256": "36ff9c7a314de4ba5f80f7d4053928de8b08c020d2b4a4bd6d4f6ebced730031",
+          "bytes": 272799
+        }
+      ]
+    },
+    "acceptance/science_assets/reuse/case-a/goal.json": {
+      "project": "two-deposited-chain-qc",
+      "goal_sha256": "26249dc512ba0adbecd5dfea0c707e2de1081176891a0a761b930510226a1a90",
+      "prompt": {
+        "path": "acceptance/science_assets/reuse/case-a/question.md",
+        "sha256": "d8a950f3c63dc19afe2058de6c0ce04e0981ae4b4e3e9a7601e5fdc38f37fd70"
+      },
+      "inputs": [
+        {
+          "role": "structure",
+          "path": "acceptance/science_assets/reuse/materials/1UBQ.cif",
+          "sha256": "056f98710cb2b36f633c45e41902a02eb446e82871da21ff2dd44f74a56ca0f6",
+          "bytes": 103220,
+          "acquisition": {
+            "path": "acceptance/science_assets/reuse/case-a/acquisition.json",
+            "sha256": "cf4642688426f3d2c051066032c858058f6dff3f8305c57eb514017dbde70470",
+            "source": "https://files.rcsb.org/download/1UBQ.cif#1.3",
+            "material_sha256_in_descriptor": false
+          }
+        },
+        {
+          "role": "literature",
+          "path": "acceptance/science_assets/reuse/case-a/experimental-record.txt",
+          "sha256": "9bd788b380d9cd13b8116e4afe556fcfb7a0c79f7b6d194c3abae674d6e0bb76",
+          "bytes": 4564
+        }
+      ]
+    },
+    "acceptance/science_assets/reuse/case-b/goal.json": {
+      "project": "two-deposited-chain-qc",
+      "goal_sha256": "375d98c05f2130c6f330af39e4b3a0b467a84f98d73d17b573c618c71428431a",
+      "prompt": {
+        "path": "acceptance/science_assets/reuse/case-b/question.md",
+        "sha256": "0436a4e75a4e5fd98a5591b200f9a27d8395f301008cafcb38e44098312d5c61"
+      },
+      "inputs": [
+        {
+          "role": "structure",
+          "path": "acceptance/science_assets/reuse/materials/1MBN.cif",
+          "sha256": "91c8a5754c748c7cc1c1508ee92bc1df4c332be2383c8ae93fd084292ec8722e",
+          "bytes": 191665,
+          "acquisition": {
+            "path": "acceptance/science_assets/reuse/case-b/acquisition.json",
+            "sha256": "2d2c014570eb69160e9029143c1c056a7f80f1bdc39abf568d690c5b11b2b3b1",
+            "source": "https://files.rcsb.org/download/1MBN.cif#1.5",
+            "material_sha256_in_descriptor": false
+          }
+        },
+        {
+          "role": "literature",
+          "path": "acceptance/science_assets/reuse/case-b/experimental-record.txt",
+          "sha256": "359d6119a48c64f0c2edb914803c20eb5a4412cb0f9d3e7a1d10547f9b8639d2",
+          "bytes": 4645
+        }
+      ]
+    }
+  }
+}

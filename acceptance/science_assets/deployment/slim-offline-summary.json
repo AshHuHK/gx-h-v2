@@ -1,0 +1,119 @@
+{
+  "slim_checkout": "science-assets-slim",
+  "slim_git_base": "1ceb8e954e80e427dc55a0ff41f49abf20e52652",
+  "full_candidate": "596ef0b94b8b6666af727164eca03746d1b25fda",
+  "verified_sources": {
+    "gx-h/gx_core/schema.py": {
+      "sha256": "19024250259f42518ff0c75ea2c7504216b5742936e1d6b6381f6dccb54e11ca",
+      "source": "596ef0b"
+    },
+    "gx-h/gx_core/p0/v6_graph.py": {
+      "sha256": "a088220bd030fbaabca7343094561dc10ac8ecd1737bbfe926b1f3728252b9b5",
+      "source": "596ef0b"
+    },
+    "gx-h/gx_core/p0/v6_native.py": {
+      "sha256": "56fc5fc8611d3d20c52b2b4e5c2e71827a1c915d429a4a88e5930bb248ec3091",
+      "source": "596ef0b"
+    },
+    "gx-h/gx_core/p0/v62_native.py": {
+      "sha256": "787f857c321f6222aac725016c5bd2fb26b92171f39b15aee74cef4ca997f027",
+      "source": "596ef0b"
+    },
+    "gx-h/config/science_asset_inventory.json": {
+      "sha256": "c7ab69490666560829f7eb772958e5364d3cf3dd8d44a23eee8a3f764e6117c9",
+      "source": "596ef0b"
+    },
+    "gx-h/gx_core/artifacts/service.py": {
+      "sha256": "6ca7a887d360f9eec0ecaddb7a3086ed4cd4e185a1c79c173294667cafa132e8",
+      "source": "596ef0b"
+    },
+    "gx-h/gx_core/orchestration/service.py": {
+      "sha256": "04b1d70c406030c5f275f95aaec421acdea2af7b0bedad562ad33c0bf0a8226b",
+      "source": "596ef0b"
+    },
+    "gx-h/gx_core/p0/research.py": {
+      "sha256": "3fa4079f47c6d4b5f41ab381a7baeb7f7bbd25dfe50b57a969eecdea1f62a8f2",
+      "source": "596ef0b"
+    },
+    "gx-h/gx_core/p0/successor.py": {
+      "sha256": "72a4048c2bcfd61a4a82acd8c9fd5486c151bb616638efc5a8acb056949e813e",
+      "source": "596ef0b"
+    },
+    "gx-h/gx_core/p0/v62_outputs.py": {
+      "sha256": "9380b86ab188fa91ba8f4650082e816751b93e329b240bde44ce3b95fb832f94",
+      "source": "596ef0b"
+    },
+    "acceptance/science_assets/inventory/build.py": {
+      "sha256": "4aff9660c318205312dc25540eb66d958c77416e8b3fa6750758a3636be85474",
+      "source": "596ef0b"
+    }
+  },
+  "python": ".venv/bin/python",
+  "python_version": "3.11.9",
+  "oauth_model_turns": 0,
+  "first_pass": {
+    "log": "slim-offline-asset-first.log",
+    "passed": 34,
+    "errors": 2,
+    "reason": "Inventory reconciliation raised KeyError for historic uncurated operations without a category column. The final build retains these records with a fallback disposition."
+  },
+  "tests": [
+    {
+      "log": "slim-offline-assets.log",
+      "unittest_modules": [
+        "acceptance.science_assets.cards.test_task_card",
+        "acceptance.science_assets.catalog.test_assets",
+        "acceptance.science_assets.inventory.test_inventory",
+        "acceptance.science_assets.contracts.test_domain",
+        "acceptance.science_assets.diagnostics.test_decision_paths",
+        "acceptance.science_assets.enzyme.test_archive",
+        "acceptance.science_assets.modalities.peptide.test_peptide",
+        "acceptance.science_assets.modalities.fab.test_fab"
+      ],
+      "passed": 36,
+      "skipped": 0,
+      "sha256": "15a495b1441968a05f8010a82483ea57bb3a05d5b41fe705aff61c48dfb716c9"
+    },
+    {
+      "log": "slim-offline-final-regressions.log",
+      "unittest_modules": [
+        "acceptance.v624.test_cheap_job",
+        "test_v6_decisions",
+        "test_v6_named_ports",
+        "test_science_capability_views",
+        "test_researcher_handoff"
+      ],
+      "passed": 27,
+      "skipped": 0,
+      "sha256": "532500252f86d6fed1699684690a61058408d03008dab59829d491197d11a30c"
+    },
+    {
+      "log": "slim-offline-successors.log",
+      "unittest_modules": [
+        "acceptance.science_assets.contracts.test_transfer_size",
+        "acceptance.unified_multiturn.test_successor"
+      ],
+      "passed": 4,
+      "skipped": 0,
+      "sha256": "4c0ffca2707f19ce4e19935c5ad366b013898026f543c62c7623f04e4a09c6ab"
+    }
+  ],
+  "passed_total": 67,
+  "skipped": 0,
+  "plugin_verify": {
+    "log": "slim-offline-plugins.json",
+    "loaded": 30,
+    "failures": 0,
+    "full_receipt": "596ef0b:acceptance/science_assets/inventory/installed-verify.json",
+    "common_full_pins_equal": 29,
+    "slim_only": [
+      "org.gx.record-coverage-8902880ed9d712bf6baa5899@1.0.0"
+    ],
+    "receipt_sha256": "736c65d439b6ceb88021316d6d5efa2f628d518ddc4aa8a1a1d3116101fb2a26"
+  },
+  "deployment_scope": {
+    "site_archive": "gx-h/var/science-assets/yeast-archive is a site-provided mount in this deployment; the three archive-dependent controls ran.",
+    "successor_tests": "The slim distribution omits test_successor.py and test_claim_publication.py. These two test-only files from the full candidate were put on a temporary test path. The Python interpreter, fixtures, product code, data and bin/gx-p0 used by these tests were the slim deployment.",
+    "prior_regression_log": "slim-offline-regressions.log is the pre-final 27-test pass, excluded from the total."
+  }
+}

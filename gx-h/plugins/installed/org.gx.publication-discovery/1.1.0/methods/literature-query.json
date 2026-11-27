@@ -1,0 +1,65 @@
+{
+  "manifest": {
+    "capability_id": "literature-query",
+    "version": "2",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "query",
+        "--base",
+        "{data.0}",
+        "--pages",
+        "{data.1}",
+        "--out",
+        "{out.dir}",
+        "--query",
+        "{param.query}"
+      ]
+    },
+    "method_card": {
+      "family": "public_literature_search",
+      "objective": "Discover relevant papers from the scientific question alone, even when no materials or search snapshot exist.",
+      "mechanism": "Use inputs=[] and parameter query (the search terms). Europe PMC and Crossref return bibliographic candidates and their retrievable originals; search-snapshot.json archives exact provider response bytes and continuation cursors.",
+      "estimator": "Per source and query window: rows fetched, published total when provided, new and cumulative distinct records and metadata access. The merged view reconciles stable identifiers across providers. Duplicate pages and failed fetches leave completeness unknown. Original acquisition and located reads have their own receipts.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.publication-discovery/1.1.0/methods/publications.py",
+      "sha256": "4a21781c34e5f62d4659166eaf2d11e91dcb3f47b94d46f7620670f928d47a91"
+    },
+    "licence": "GX release source. Original materials retain their respective licences.",
+    "licence_basis": "Europe PMC and Crossref public metadata and Open Access JATS terms; intake records retain original source rights.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/scholarly.py",
+      "{harness}/plugins/installed/org.gx.scholarly-pages/1.1.0/methods/windows.py"
+    ],
+    "outputs": [
+      {
+        "name": "candidates.json",
+        "kind": "file:scholarly_candidates",
+        "nature": "analysis",
+        "required": true,
+        "media_type": "application/json"
+      },
+      {
+        "name": "search-snapshot.json",
+        "kind": "file:scholarly_snapshot",
+        "nature": "analysis",
+        "required": true,
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples."
+  },
+  "entry_script": "methods/publications.py"
+}

@@ -206,6 +206,10 @@ def export(conn, rid, directory, invocation):
     result = {"schema":"gx.research-result/1", "run_id":rid, "goal":goal, "goal_status":"CLOSED",
               "goal_version":close["goal_version"], "closure":close, "final_decision":final,
               **science, "routes":work, "post_read_actions":actions, "rejected_decisions":rejected, "invocation":invocation}
+    from adapters.scientific import publication_coverage
+    coverage = publication_coverage.report(conn, rid)
+    if coverage is not None:
+        result["publication_coverage"] = coverage
     if preference := final.get("report_presentation"):
         result["presentation"] = preference
     predecessor = conn.execute("SELECT json_extract(inputs_json,'$.inputs.p0_spec.predecessor') "

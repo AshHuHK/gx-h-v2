@@ -1,0 +1,81 @@
+{
+  "manifest": {
+    "capability_id": "archival-fab-coverage",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--structure",
+        "{in.structure}",
+        "--numbering",
+        "{in.numbering}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "archived_molecular_coordinate_coverage",
+      "mechanism": "The ordered inputs are the supplied IMGT numbering map, then the deposited mmCIF structure. Map each of six IMGT CDRs onto positive-occupancy deposited coordinates of one annotated Fab heavy/light pair. 抗体、抗體、重輕鏈配對、CDR 覆蓋。",
+      "objective": "Assess the observability of complementary regions of the supplied heavy/light variable domains in one public Fab deposition.",
+      "estimator": "Cross-check deposition identity and chain/position map, then count CDR sites with observed coordinates against all numbered CDR sites. Preserve insertion labels, absent sites and chain roles.",
+      "training_data_lineage": "Deterministic coordinate analysis; method performs no model fitting."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.archival-molecule-qc/1.0.0/job-scripts/fab.py",
+      "sha256": "385ef5e54e22cd25a0a328d0c2e88539137d164b1917c828b9df45cc4cac8c01"
+    },
+    "licence": "GX release source; archive terms apply to supplied materials.",
+    "licence_basis": "wwPDB archival coordinates CC0, see https://www.wwpdb.org/about/usage-policies",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 45
+    },
+    "weights": [],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "fab_coverage.json",
+        "kind": "file:archival_fab_coverage",
+        "required": true,
+        "nature": "analysis",
+        "source_roles": [
+          "structure",
+          "numbering"
+        ],
+        "metric_specs": {
+          "mapped_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/mapped_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "entry": "/entry",
+              "input_sha256": "/input_sha256",
+              "numbering_sha256": "/numbering_sha256"
+            }
+          },
+          "matched_positions": {
+            "reader": "json/1",
+            "op": "integer/1",
+            "pointer": "/matched_positions",
+            "unit": "1",
+            "places": 0,
+            "scope": {
+              "entry": "/entry",
+              "input_sha256": "/input_sha256",
+              "numbering_sha256": "/numbering_sha256"
+            }
+          }
+        }
+      }
+    ],
+    "limitations": "Requires compatible, source-attributed IMGT mapping and the corresponding deposited chains. Coverage is restricted to the declared pair and model. No binding, affinity or specificity estimate."
+  },
+  "entry_script": "job-scripts/fab.py"
+}

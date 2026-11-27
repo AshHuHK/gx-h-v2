@@ -34,19 +34,20 @@ def admit(work):
         raise RuntimeError(proc.stderr or proc.stdout)
 
 
-def run(study, receipt, result):
+def run(study, receipt, result, method_version=1):
+    search, continuation, original = (name.rsplit("@", 1)[0] + f"@{method_version}" for name in (FIRST, PAGE, ORIGINAL))
     lead = study.next_actor("run")
     assert not study.materials
     result.update(run_id=study.run_id, researcher_materials=study.materials)
-    detail = study.call(lead, "gx_query_catalog", {"kind": "method", "reference": FIRST}, "inspect-first")
+    detail = study.call(lead, "gx_query_catalog", {"kind": "method", "reference": search}, "inspect-first")
     assert detail["spec"]["inputs"] == []
     result["first_method"] = detail["spec"]
-    for revision, method in enumerate((FIRST, PAGE, ORIGINAL)):
+    for revision, method in enumerate((search, continuation, original)):
         study.call(lead, "gx_select_capability", dict(action="enable", method=method, revision=revision), "enable-" + method)
-    assignment = study.open_args("source-review", caps=[FIRST, PAGE, ORIGINAL], inputs=[],
+    assignment = study.open_args("source-review", caps=[search, continuation, original], inputs=[],
                                  limits={"cpu_seconds": 630, "job_submissions": 6, "worker_tasks": 20,
                                          "tokens": 25000, "api_calls": 18})
-    assignment.update(module_id="publication_discovery", focus="literature",
+    assignment.update(module_id="publication_discovery", module_version=str(method_version), focus="literature",
                       expected_delivery="Check reported methods against an actual open article and note the coverage.")
     module = study.call(lead, "gx_open_module", assignment, "open")
     result["module_instance"] = module["module_instance_id"]
@@ -83,21 +84,28 @@ def run(study, receipt, result):
         actor = study.next_actor(module["scope"])
         return ports
 
-    first = launch("first", FIRST, [], {"query": QUERY})
+    first = launch("first", search, [], {"query": QUERY})
     assert result["jobs"][0]["admission_inputs"] == []
     candidates = assets.read_json(first["candidates.json"])
     result["first_sources"] = candidates["sources"]
+    if "merged" in candidates:
+        result["first_merged"] = candidates["merged"]
     assert any(row["has_more"] for row in candidates["sources"]), candidates["sources"]
     try:
-        launch("wrong-port", PAGE, [first["candidates.json"]], {"action":"replay"})
+        launch("wrong-port", continuation, [first["candidates.json"]], {"action":"replay"})
     except SchemaInvalid as error:
         result["wrong_port"] = error.to_payload()
     else:
         raise AssertionError("A candidate list was accepted as a page snapshot")
-    next_page = launch("next", PAGE, [first["search-snapshot.json"]], {"action":"next"})
-    replayed = launch("replay", PAGE, [next_page["search-snapshot.json"]], {"action":"replay"})
+    next_page = launch("next", continuation, [first["search-snapshot.json"]], {"action":"next"})
+    replayed = launch("replay", continuation, [next_page["search-snapshot.json"]], {"action":"replay"})
     assert assets.describe(replayed["search-snapshot.json"])["sha256"] == assets.describe(next_page["search-snapshot.json"])["sha256"]
-    result["next_sources"] = json.loads(assets.read_bytes(next_page["candidates.json"]))["sources"]
+    later = assets.read_json(next_page["candidates.json"])
+    result["next_sources"] = later["sources"]
+    if "merged" in later:
+        result["next_merged"] = later["merged"]
+        replay = assets.read_json(replayed["candidates.json"])
+        assert later["merged"] == replay["merged"] and later["sources"] == replay["sources"]
     for ports in (first, next_page):
         data = json.loads(assets.read_bytes(ports["candidates.json"]))
         open_ids = [pmcid for row in data["candidates"] for pmcid in row["fetchable_pmcids"]]
@@ -105,7 +113,7 @@ def run(study, receipt, result):
             break
     if not open_ids:
         raise ValueError("Neither provider page returned an open JATS candidate")
-    fetched = launch("original", ORIGINAL, [ports["candidates.json"]], {"pmcid":open_ids[0]})
+    fetched = launch("original", original, [ports["candidates.json"]], {"pmcid":open_ids[0]})
     desc = json.loads(assets.read_bytes(fetched["acquisition.json"]))
     assert desc["sha256"] == assets.describe(fetched["article.xml"])["sha256"]
     result.update(original=desc, verified=True)
@@ -159,21 +167,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path)
     parser.add_argument("--export-originals", type=Path)
+    parser.add_argument("--method-version", type=int, choices=(1, 2), default=1)
     args = parser.parse_args()
     work = args.directory.resolve()
     receipt = work / "receipt.json"
     if work.exists():
         evidence = json.loads(receipt.read_text())
+        if evidence.get("method_version", 1) != args.method_version:
+            raise ValueError("Resume with the same method version used at admission")
         if not evidence.get("verified"):
             raise ValueError("The existing trial has unfinished Jobs. Inspect its original state before continuing.")
     else:
         admit(work)
         evidence = dict(question=QUESTION, transport="controlled native decisions, live publisher requests via Clash",
-                        model_calls=0, jobs=[])
+                        model_calls=0, method_version=args.method_version, jobs=[])
     with SurveyedStudy(work, reopen=True) as study:
         try:
             if not evidence.get("verified"):
-                run(study, receipt, evidence)
+                run(study, receipt, evidence, args.method_version)
             if not evidence.get("readback"):
                 read_original(study, evidence)
             if args.export_originals:

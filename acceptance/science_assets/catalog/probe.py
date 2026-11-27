@@ -72,5 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("directory", type=Path)
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
+    if args.output.exists():
+        parser.error("Choose a new receipt path to retain prior evidence")
     result = probe(args.directory)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")

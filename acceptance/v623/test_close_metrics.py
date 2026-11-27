@@ -106,6 +106,72 @@ class EndpointClose(unittest.TestCase):
         self.assertEqual(len(report["verified_metrics"]), 6)
         return directory, s, actor, lead, nodes, submitted["report_ref"], report
 
+    def test_report_accepts_a_delivered_source_row_in_prose_and_keeps_named_metric(self):
+        _, (s, assets, _, node, output, worker) = self.measured()
+        page = self.read_page(s, worker, output, 0, "source-page")
+        row, = page["endpoint_rows"]
+        citation = output + "#" + row["key"]
+        finding = {"text": "The recorded selection is grounded in " + citation + ".", "source_refs": [output]}
+        gaps = ["Deposited coverage alone leaves sampling unknown; see " + citation + "."]
+        steps = ["Inspect other deposited selections against " + citation + "."]
+        receipt = s.report(worker, output, key="cite-deposited-row", findings=[finding], gaps=gaps, next_steps=steps)
+        report = assets.read_json(receipt["report_ref"])
+        metric, = report["verified_metrics"]
+        self.assertEqual((metric["artifact_ref"], metric["display"]), (output, row["value"]))
+        self.assertTrue(any(metric["metric_ref"] in f.get("metric_refs", ()) for f in report["findings"]))
+        self.assertEqual((report["gaps"], report["next_steps"]), (gaps, steps))
+        self.assertEqual(s.report(worker, output, key="cite-deposited-row", findings=[finding], gaps=gaps,
+                                  next_steps=steps), receipt)
+        lead, _, shown = report_fixture.ReportEvidence.delivered_report(self, s, receipt)
+        self.assertEqual(shown["report_ref"], receipt["report_ref"])
+        trace("report-prose-row", {"run_id": s.run_id, "worker_turn": worker.turn, "cpu_job": node["job_id"],
+                                  "read_call": "source-page", "citation": citation, "metric": metric,
+                                  "report_ref": receipt["report_ref"], "lead_turn": lead.turn})
+
+    def test_report_rejects_unreceived_forged_misbound_rows_and_unregistered_number(self):
+        for case in ("unreceived", "forged", "wrong-source", "foreign-run", "undeclared-finding-source", "number-in-step",
+                     "number-in-finding"):
+            with self.subTest(case=case):
+                _, (s, _, _, _, output, worker) = self.measured()
+                page = self.read_page(s, worker, output, 0, "source-page", acknowledge=case != "unreceived")
+                row, = page["endpoint_rows"]
+                key = row["key"]
+                if case == "forged":
+                    key = ("e" if key[0] == "f" else "f") + key[1:]
+                source = s.materials[0] if case == "wrong-source" else output
+                if case == "foreign-run":
+                    _, (other, _, _, _, source, outsider) = self.measured()
+                    try:
+                        foreign = self.read_page(other, outsider, source, 0, "foreign-page")
+                        key = foreign["endpoint_rows"][0]["key"]
+                        self.assertNotEqual(other.run_id, s.run_id)
+                        self.assertNotEqual(source, output)
+                    finally:
+                        other.__exit__(None, None, None)
+                citation = source + "#" + key
+                payload = {"findings": [], "gaps": [], "next_steps": []}
+                if case in {"wrong-source", "undeclared-finding-source"}:
+                    s.call(worker, "gx_read_artifact", {"ref": s.materials[0], "operation_key": "original"}, "original")
+                    payload["artifact_refs"] = [output, s.materials[0]]
+                if case in {"undeclared-finding-source", "number-in-finding"}:
+                    text = "This reading " + citation + " establishes the reported selection."
+                    refs = [output]
+                    if case == "undeclared-finding-source":
+                        refs = [s.materials[0]]
+                    else:
+                        text += " Coverage is 149/164."
+                    payload["findings"] = [{"text": text, "source_refs": refs}]
+                elif case == "forged":
+                    payload["gaps"] = ["Clarify the source of " + citation + "."]
+                else:
+                    text = "Recheck the selection in " + citation + "."
+                    if case == "number-in-step":
+                        text += " Coverage is 149/164."
+                    payload["next_steps"] = [text]
+                with self.assertRaises(GxError):
+                    s.report(worker, output, key="invalid-" + case, **payload)
+                self.assertFalse(s.rows("SELECT 1 FROM v62_module_reports WHERE run_id=?", s.run_id))
+
     def test_registered_mask_leads_in_a_tight_real_report(self):
         from acceptance.v623.test_decision_action import comparison_open
         from gx_core.p0 import v623_endpoints

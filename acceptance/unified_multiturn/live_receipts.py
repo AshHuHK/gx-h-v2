@@ -62,6 +62,12 @@ def verify(work, key):
         challenge = messages[mid]
         table_count = conn.execute("SELECT count(*) FROM p0_operator_messages WHERE run_id=? AND message_id=?",
                                    (parent,mid)).fetchone()[0]
+        b_pub = conn.execute("""SELECT p.receipt_json FROM v62_module_reports p
+             WHERE p.run_id=? AND p.module_instance_id=?""",(parent,b["module_instance_id"])).fetchone()
+        author = json.loads(b_pub[0]).get("author",{}) if b_pub else {}
+        call = conn.execute("""SELECT result_json FROM p0_root_calls WHERE thread_id=? AND turn_id=? AND call_id=?""",
+                            (author.get("thread_id"),author.get("turn_id"),author.get("call_id"))).fetchone()
+        accepted_by_host = json.loads(call[0]) if call else {}
         released = conn.execute("""SELECT e.ts FROM v62_module_reports p JOIN events e
                 ON e.run_id=p.run_id AND e.event_id=json_extract(p.receipt_json,'$.event_id')
                 WHERE p.run_id=? AND p.module_instance_id=?""", (parent,b["module_instance_id"])).fetchone()
@@ -76,6 +82,11 @@ def verify(work, key):
     dispositions = [f["disposition"] for f in targeted if f["deliveries"] and f["disposition"]]
     follow_msg = messages[key+"-new-material"]["result"]
     b_reports = module_b["report"] or {}
+    b_turn = next((t for th in module_b["threads"] for t in th["turns"]
+                   if th["thread_id"]==author.get("thread_id") and t["turn_id"]==author.get("turn_id")), {})
+    b_source = b_reports.get("source_refs") or []
+    b_real = (author.get("kind")=="MODULE" and b_turn.get("classification")=="NATIVE_MODEL"
+              and accepted_by_host.get("report_ref")==b_reports.get("report_ref") and bool(b_source))
     reopen = load(work/"reopen.json")["result"]["invocation"]
     rcv = {h["report_ref"] for h in first["routes"]["handoffs"] if h.get("received_content")
            and h.get("receiver_scope")=="run" and h.get("decision_ref")}
@@ -104,7 +115,7 @@ def verify(work, key):
              for x in [mid,key+"-trace"]),
         "a_scientific_disposition": any(d["outcome"] in {"measure","adopt","maintain"}
              and d["reason"] and d["product_ref"] for d in dispositions),
-        "b_continued_original_work": bool(b_reports.get("released_event")) and bool(released)
+        "b_continued_original_work": b_real and bool(b_reports.get("released_event")) and bool(released)
              and arrival is not None and research_routes._instant(released[0]) >= arrival and module_b["status"] in ("COMPLETE","PARTIAL")
              and any(n["job_status"]=="SUCCEEDED" for n in module_b["nodes"])
              and any(th["task_id"]==b["task_id"] and th["thread_id"]==b["thread_id"] for th in module_b["threads"]),

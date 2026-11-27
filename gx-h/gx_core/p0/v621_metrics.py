@@ -21,6 +21,8 @@ OPERANDS = {"integer/1": ("pointer",), "decimal/1": ("pointer",),
             "ratio/1": ("numerator", "denominator"), "difference/1": ("left", "right")}
 NAME = re.compile(r"[A-Za-z][A-Za-z0-9_.-]{0,63}")
 TAG = re.compile(r"\{\{metric:([^{}]+)\}\}")
+ROW_CITATION = re.compile(r"(?<![a-zA-Z0-9_])(?P<source>gxa_[a-zA-Z0-9_-]+)#(?P<key>[a-zA-Z0-9_-]+)")
+JSON_LOCATOR = re.compile(r"(?<![A-Za-z0-9_/])(?:/[A-Za-z0-9_~-]+){2,}")
 NUMBER = re.compile(r"(?<![a-zA-Z_\d])[+−-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?")
 # File names, accessions, calendar years and document labels are not scientific measurements.
 IDENTIFIER = re.compile(r"(?<!\w)(?:[a-zA-Z0-9_.-]+\.(?:cif|pdb|csv|json|txt|pdf|xml)|"
@@ -247,14 +249,14 @@ def _method_identifiers(conn, rid):
     return {m["capability_version"] for m in cards if m.get("capability_version")}
 
 
-def _render(text, metrics, methods=(), *, protected=(), used=None):
+def _render(text, metrics, methods=(), *, protected=(), used=None, field=None):
     if isinstance(text, list):
         return [_render(part, metrics, methods, used=used) for part in text]
     if not isinstance(text, str):
         raise SchemaInvalid("Quantitative interpretation must be text")
     checked = text
-    for start, end in sorted(protected, reverse=True):
-        checked = checked[:start] + " " + checked[end:]
+    for start, end in protected:
+        checked = checked[:start] + " " * (end - start) + checked[end:]
     without_tags = TAG.sub("", checked)
     if "@" in without_tags:
         without_tags = re.sub(r"(?<![\w.-])[A-Za-z][A-Za-z0-9_.-]*@[0-9]+(?:\.[0-9]+)*",
@@ -270,8 +272,12 @@ def _render(text, metrics, methods=(), *, protected=(), used=None):
         for key, value in metric.get("scope", {}).items():
             if isinstance(value, (str, int)) and str(value).isdecimal():
                 prose = re.sub(r"\b" + re.escape(key) + r"\s+" + re.escape(str(value)) + r"\b", "", prose, flags=re.I)
-    if NUMBER.search(prose):
-        raise SchemaInvalid("Cite a declared metric for scientific numbers, for example {{metric:coverage}}")
+    if match := NUMBER.search(prose):
+        message = "Cite a declared metric for scientific numbers, for example {{metric:coverage}}"
+        if field:
+            fragment = prose[max(0, match.start() - 16):match.end() + 16].strip()
+            message += f" ({field}, numeric text {match[0]!r} in {fragment!r})."
+        raise SchemaInvalid(message, details={"pointer": field} if field else {})
     return _substitute_tags(text, metrics, without_tags, used=used)
 
 
@@ -373,6 +379,79 @@ def measured_statement(metrics):
     return "; ".join(m["metric_id"] + " = " + m["display"] for m in metrics) + "."
 
 
+def _scope_coordinates(text, source_refs, metrics):
+    # A model/entity label on the original can be grounded by a named output only
+    # when the registered selection is pinned to those exact input bytes.
+    spans = set()
+    translations = {"model": ("model", "模型"), "entity": ("entity", "实体", "實體")}
+    for metric in metrics:
+        scope = metric.get("scope", {})
+        own_output = metric["artifact_ref"] in source_refs
+        original = any(p["artifact_ref"] in source_refs and p["sha256"] == scope.get("input_sha256")
+                       for p in metric.get("inputs", ()))
+        for key, value in scope.items():
+            if not own_output and not (original and key in translations):
+                continue
+            if not re.fullmatch(r"-?\d+(?:\.\d+)?", str(value)):
+                continue
+            for label in translations.get(key, (key,)):
+                selector = r"(?<![A-Za-z0-9_])" + re.escape(label) + r"(?:\s*[:=]\s*|\s+)"
+                selector += re.escape(str(value)) + r"(?![A-Za-z0-9_]|[.,]\d)"
+                spans.update(m.span() for m in re.finditer(selector, text, flags=re.I))
+    return spans
+
+
+def _report_source_spans(conn, rid, bundle, metrics, *, live):
+    """Recognize delivered row citations, verified method coordinates and actual JSON paths."""
+    allowed = None
+    documents = {}
+
+    def spans(text, source_refs, pointer):
+        nonlocal allowed
+        if not live:
+            return []
+        matches = list(ROW_CITATION.finditer(text))
+        if matches and allowed is None:
+            from . import v623_endpoints, v623_exposure
+            author = bundle["author"]
+            identity = {k: author[k] for k in ("task_id", "lease_id", "thread_id", "turn_id") if k in author}
+            allowed = set()
+            if len(identity) == 4:
+                received = v623_exposure.received(conn, run_id=rid, **identity, by_source=True)
+                for ref in {src for src, _ in received}:
+                    entries = v623_endpoints.registered(conn, rid, ref)
+                    rows = v623_endpoints.compact_rows(entries)
+                    allowed.update(ref + "#" + row["key"] for row, metric in zip(rows, entries, strict=True)
+                                   if (ref, metric["metric_ref"]) in received)
+        for match in matches:
+            if match["source"] not in source_refs or match[0] not in allowed:
+                raise SchemaInvalid(f"At {pointer}, row citation {match[0]!r} must identify a received "
+                                    "row on the cited source", details={"pointer": pointer,
+                                    "category": "module_report_structure"})
+        proven = _scope_coordinates(text, source_refs, metrics)
+        proven.update(match.span() for match in matches)
+        for locator in JSON_LOCATOR.finditer(text):
+            if not any(ch.isdigit() for ch in locator[0]):
+                continue
+            for ref in source_refs:
+                if ref not in documents:
+                    from .v6_goal import _is_json_artifact
+                    assets = ArtifactService(conn)
+                    meta = assets.describe(ref)
+                    documents[ref] = None
+                    if meta["bytes"] <= METRIC_READER_BYTES and _is_json_artifact(meta):
+                        documents[ref] = assets.read_json(ref)
+                try:
+                    _fact(documents[ref], locator[0])
+                except KeyError:
+                    continue
+                proven.add(locator.span())
+                break
+        return proven
+
+    return spans
+
+
 def render_report(conn, rid, bundle, *, current=False, auto_endpoints=False, metric_refs=(), qualitative_notes=()):
     """Only a finding's own citations may supply its numerical statements."""
     cache = {}
@@ -381,12 +460,17 @@ def render_report(conn, rid, bundle, *, current=False, auto_endpoints=False, met
     selected = {}
     quotations = []
     reads = None
-    for finding in bundle["findings"]:
+    source_refs = {source["artifact_ref"] for source in bundle["sources"]}
+    metrics = _cited(conn, rid, [s["artifact_ref"] for s in bundle["sources"]], cache)
+    source_spans = _report_source_spans(conn, rid, bundle, metrics, live=auto_endpoints)
+    for index, finding in enumerate(bundle["findings"]):
         quote = None
         entries = _cited(conn, rid, finding["source_refs"], cache)
         used = {}
+        pointer = f"/findings/{index}/text"
+        cited_spans = source_spans(finding["text"], finding["source_refs"], pointer)
         try:
-            text = _render(finding["text"], entries, methods, used=used)
+            text = _render(finding["text"], entries, methods, protected=cited_spans, used=used, field=pointer)
         except SchemaInvalid as error:
             # A verified quotation is a source attribution, never an executed measurement.
             from . import v62_native, v62_sources
@@ -395,12 +479,13 @@ def render_report(conn, rid, bundle, *, current=False, auto_endpoints=False, met
             quote = v62_sources.report_quotation(conn, rid, bundle["scope"], finding, reads)
             if quote:
                 try:
-                    text = _render(finding["text"], entries, methods, protected=[quote["finding_span"]], used=used)
+                    text = _render(finding["text"], entries, methods, protected=[*cited_spans, quote["finding_span"]],
+                                   used=used, field=pointer)
                 except SchemaInvalid as error:
                     if current and "metric" not in error.details:
                         error.details["category"] = "module_report_structure"
                     raise
-            elif auto_endpoints and entries and "{{metric:" not in finding["text"]:
+            elif auto_endpoints and entries and not cited_spans and "{{metric:" not in finding["text"]:
                 # Free observations, including an incorrect literal, stay available as notes.
                 # Their formatting need not consume another model attempt.
                 text = finding["text"]
@@ -435,7 +520,6 @@ def render_report(conn, rid, bundle, *, current=False, auto_endpoints=False, met
                              "evidence_status": "UNVERIFIED"})
     if quotations:
         bundle["source_quotations"] = quotations
-    metrics = _cited(conn, rid, [s["artifact_ref"] for s in bundle["sources"]], cache)
     bundle.update(schema="gx.v621.module_report_bundle.1", metrics=metrics,
                   interpretation={"findings": bundle["findings"], "gaps": bundle["gaps"], "next_steps": bundle["next_steps"]})
     if current:
@@ -479,7 +563,12 @@ def render_report(conn, rid, bundle, *, current=False, auto_endpoints=False, met
     bundle.update(fields)
     for key in ("gaps", "next_steps"):
         try:
-            bundle[key] = _render(bundle[key], metrics, methods)
+            projected = []
+            for index, part in enumerate(bundle[key]):
+                pointer = f"/{key}/{index}"
+                projected.append(_render(part, metrics, methods, protected=source_spans(part, source_refs, pointer),
+                                         field=pointer))
+            bundle[key] = projected
         except SchemaInvalid as error:
             if current and "metric" not in error.details:
                 error.details["category"] = "module_report_structure"

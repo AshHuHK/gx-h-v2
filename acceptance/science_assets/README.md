@@ -24,12 +24,15 @@ Lead 可保留證據不夠的結論。相同位元的原始附件與研究產物
 
 ## 真研究驗收與受控回歸
 
+完整版與獨立精簡部署合計 11 個不同的官方 OAuth 研究 Run 已結題，72 個原生模型回合、39 個真 CPU Job。37 個 Job 成功，2 個原始失敗分別是 4FAB 的一般方法不適用與文獻來源讀取逾時。計數按實際 Run、Turn、Job ID 核對；獨立數值讀取、回放與離線回歸另計。[逐案計數與證據摘要](field-index.json)
+
 | 科研工作 | 原始 Run（順序） | 從讀數到實際決定 |
 |---|---|---|
 | 公開蛋白的完整坐標質控 | `gxr_01m8fddc2b6pjbf83p` → `gxr_01m8febe21hn46darv` | A 和 B 各以不同的實驗沉積派一個新 Job，完整主鏈 76/76、153/153，Cα 回轉半徑 11.493、15.128 Å；兩題均在預定容差內由獨立 PDB 程式重算。B 引用新讀數，將主張限於晶體模型並註記 Gln8。A 的兩名原生研究員有 111.079 秒回合重疊，Lead 實際採納了一份具署名的報告。[兩題 Job、回合、配方與結題](reuse/README.md) |
 | 線性肽、環肽 | `gxr_01m8fdh3yc0s0mvghe`、`gxr_01m8fdbhka9m2tahwb` | 1UAO 主鏈 10/10，1LE0 主鏈 12/12，另有一個末端基團；Lead 分列兩種分母。6BEN 對照的端點幾何維持，明示共價連接由 1 變 0，Lead 只用原件支持明示閉環。[讀數、負例、原案與決定](modalities/README.md) |
 | Fab 跨題質控 | `gxr_01m8fdh3yjvwr7ph5s` → `gxr_01m8fe32rdt8mqrbaf` | 4FAB 的一般方法失敗後，Lead 改用編號與坐標雙輸入，50/50 並保存配方。1MCP 自行實例化、換兩份輸入，55/55；該題決定以共有 IMGT 位點作比較條件。此範圍從既有編號開始，未另算跨沉積位點交集。[來源題](modalities/studies/fab-first/receipt.json) · [後題](modalities/studies/fab-successor/receipt.json) |
 | 天然酵母 A/C | `gxr_01m8fdke95wxpbgs7j` → `gxr_01m8fdw087fqx283nq` | 各 3 真回合，1＋2 個 CPU Job。兩糖直接反應指派均為 0；較寬酶類成員為 2 和 5，明載對應催化底物的測定記錄分別為 0 和 11。後題採前題正式移交的原件與新材料；一步配方確實派工，另有一個讀親本的比較 Job。[原件、轉交、讀取與結題](enzyme/field/verification.json) |
+| 無附件文獻研究 | `gxr_01m8fd9bzcpwt0qr1n` | 9 個查詢窗合併為 160 篇，取得 9 篇原件。共址對照原文的日均 RMSE 從 6.00 下降到 1.605 µg/m³；Lead 據原件與子研究員回報，建議在本地共址驗證前，兩站只用於描述區域事件時間，暫緩街區濃度排名。原 Run 超過首個時窗後接回，新增 2 個回合、0 個 Job，事件 1612 決定、1613 結題。[文獻、讀段、交付與決定](literature/README.md) |
 | 精簡部署 | 肽 `gxr_01m8fdp0m22cmw5s8d`；酵母 `gxr_01m8fekb5gbjkvze1w` | 各自有新狀態。先在初裝發行跑肽；再在已整合候選把新任務卡交給真 Lead，跑酵母歸檔並實讀自己的 Job。兩題結題後重開都新增零回合、零 Job。[部署、命令與回執](deployment/README.md) |
 
 研發版 155 項定向回歸全部通過。範圍包含目錄更新、方法適用性、任務卡、來源、具名產物交接、配方、測量、歷史決策協定與恢復。另有 67 項精簡候選離線回歸及 10 項最終候選定向複驗，部分覆蓋相同案例。受控回呼的派生工具、分頁重播、來源准入與歷史回放，在各自證據中另列；實際模型結題以本表及各研究原始回執為準。[完整測試紀錄](evidence/integration-final.log) · [研發版複驗命令](evidence/verify.py) · [Skill 選讀與後續行動](cards/SKILL_FIELD.md) · [現場解碼錯誤修正](diagnostics/README.md)

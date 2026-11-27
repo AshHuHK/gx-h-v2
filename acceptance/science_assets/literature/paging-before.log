@@ -1,0 +1,53 @@
+test_cross_page_duplicate_does_not_exhaust (acceptance.science_assets.literature.test_scholarly_coverage.ScholarlyCoverage.test_cross_page_duplicate_does_not_exhaust) ... FAIL
+test_empty_failure_and_v1_partial_history (acceptance.science_assets.literature.test_scholarly_coverage.ScholarlyCoverage.test_empty_failure_and_v1_partial_history) ... ERROR
+test_missing_totals_and_stalled_cursor (acceptance.science_assets.literature.test_scholarly_coverage.ScholarlyCoverage.test_missing_totals_and_stalled_cursor) ... FAIL
+test_sources_and_article_access_are_separate (acceptance.science_assets.literature.test_scholarly_coverage.ScholarlyCoverage.test_sources_and_article_access_are_separate) ... ERROR
+
+======================================================================
+ERROR: test_empty_failure_and_v1_partial_history (acceptance.science_assets.literature.test_scholarly_coverage.ScholarlyCoverage.test_empty_failure_and_v1_partial_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/literature/test_scholarly_coverage.py", line 80, in test_empty_failure_and_v1_partial_history
+    self.assertFalse(replay["sources"][1]["history_complete"])
+                     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'history_complete'
+
+======================================================================
+ERROR: test_sources_and_article_access_are_separate (acceptance.science_assets.literature.test_scholarly_coverage.ScholarlyCoverage.test_sources_and_article_access_are_separate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/literature/test_scholarly_coverage.py", line 53, in test_sources_and_article_access_are_separate
+    self.assertEqual([2,2],[s["new_unique"] for s in page["sources"]])
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/literature/test_scholarly_coverage.py", line 53, in <listcomp>
+    self.assertEqual([2,2],[s["new_unique"] for s in page["sources"]])
+                            ~^^^^^^^^^^^^^^
+KeyError: 'new_unique'
+
+======================================================================
+FAIL: test_cross_page_duplicate_does_not_exhaust (acceptance.science_assets.literature.test_scholarly_coverage.ScholarlyCoverage.test_cross_page_duplicate_does_not_exhaust)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/literature/test_scholarly_coverage.py", line 36, in test_cross_page_duplicate_does_not_exhaust
+    self.assertNotEqual("exhausted",again["sources"][1]["coverage"])
+AssertionError: 'exhausted' == 'exhausted'
+
+======================================================================
+FAIL: test_missing_totals_and_stalled_cursor (acceptance.science_assets.literature.test_scholarly_coverage.ScholarlyCoverage.test_missing_totals_and_stalled_cursor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/science_assets/literature/test_scholarly_coverage.py", line 63, in test_missing_totals_and_stalled_cursor
+    self.assertEqual(("hits",None,True), (s["status"],s["provider_hits"],s["has_more"]))
+AssertionError: Tuples differ: ('hits', None, True) != ('unavailable', None, None)
+
+First differing element 0:
+'hits'
+'unavailable'
+
+- ('hits', None, True)
++ ('unavailable', None, None)
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.003s
+
+FAILED (failures=2, errors=2)

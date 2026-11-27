@@ -8,7 +8,7 @@ from ..capabilities import shipped
 from ..domain import ids
 from ..errors import GxError, SchemaInvalid
 from ..persistence import store
-from . import intent
+from . import intent, method_health
 
 
 def _refuse(reason, message, **facts):
@@ -118,6 +118,7 @@ def prepare_runtime(launch, bundle, env, resources, preflight):
     """Freeze filesystem-backed source and interpreter observations before the Job writer."""
     capability = launch["capability_version"]
     return {"source": _source(launch, bundle), "runtime": _runtime(env, resources, preflight),
+            "deployment_environment": method_health.deployment_environment(env),
             "pinned_method": capability in shipped.MANIFESTS and shipped.portable_digest(bundle) == shipped.pin(capability)}
 
 
@@ -197,6 +198,12 @@ def admit(conn, job_id, *, launch, bundle, inputs, resources, prepared):
             doc["goal_capability"] = {"revision":revision["revision"], "view_sha256":revision["digest"],
                                       **{key:entry[key] for key in ("portable_sha256","plugin","provider_closure")
                                          if key in entry}}
+        else:
+            from ..plugins import goal
+            entry = next((item for item in goal.catalog(conn, run_id) if item["capability_version"] == cap), {})
+        if context := prepared.get("deployment_environment"):
+            doc["execution_observation"] = {"deployment_environment": context,
+                                            "provider_sha256": (entry.get("plugin") or {}).get("sha256")}
     conn.execute("INSERT INTO p0_execution_manifests(job_id,admission_json,admission_sha256) VALUES(?,?,?)",
                  (job_id, ids.canonical_json(doc), ids.sha256_of_obj(doc)))
 

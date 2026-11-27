@@ -1,0 +1,1 @@
+A public structural specimen and a coordinate excerpt are supplied. Does a fresh calculation with these materials support a conclusion about agreement across the whole specimen? Use the comparable evidence and its limits to decide what to do next. Use an applicable workflow from the preceding study if it is available.

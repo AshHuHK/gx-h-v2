@@ -157,7 +157,9 @@ def _stage(conn, module, task, identity, payload, evidence, *, attempt):
               "schema": SCHEMA, "version": 1, "author": binds, "base": json.loads(task["base_json"]),
               "status": payload["status"], "findings": payload["findings"], "sources": checked,
               "gaps": payload["gaps"], "artifact_refs": payload["artifact_refs"], "next_steps": payload["next_steps"]}
-    from . import v621_metrics, v621_policy
+    from . import research_handoff, v621_metrics, v621_policy
+    if research_handoff.active(conn, module["run_id"]):
+        bundle["researcher_statement"] = research_handoff.author_statement(payload) if identity else {}
     if v621_policy.enabled(conn, module["run_id"]):
         v621_metrics.render_report(conn, module["run_id"], bundle, current=v621_policy.current(conn, module["run_id"]),
                                    auto_endpoints=auto_endpoints, metric_refs=payload.get("metric_refs", ()),
@@ -477,7 +479,11 @@ def _excerpt(text, limit=240):
 def _index_entry(bundle, ref):
     # All released counterevidence and its original citation links remain discoverable by
     # the Lead, even when the native packet cannot fit one summary per report.
+    from . import research_handoff
     entry = {**_base(bundle, ref)}
+    if (authored := research_handoff.message_preview(bundle)) is not None:
+        entry["researcher_message"] = authored
+        entry["gx_facts"] = research_handoff.execution_facts(bundle)
     counters = [{"text": ("A named measurement was flagged for review." if finding.get("metric_refs")
                           else _excerpt(finding["text"])), "source_refs": finding["source_refs"],
                  **({"evidence_status": finding["evidence_status"]} if "evidence_status" in finding else {})}
@@ -517,6 +523,9 @@ def _preview(bundle, index, limit):
     for field in (*proof_fields, "qualitative_notes"):
         if bundle.get(field):
             full[field] = bundle[field]
+    if "researcher_message" in index:
+        full["researcher_message"] = index["researcher_message"]
+        full["gx_facts"] = index["gx_facts"]
     if index.get("counterevidence"):
         full["counterevidence"] = index["counterevidence"]
     if _size(full) <= limit:
@@ -551,6 +560,12 @@ def _preview(bundle, index, limit):
                     break
             if not preview[field]:
                 del preview[field]
+    if "researcher_message" in index:
+        preview["researcher_message"] = index["researcher_message"]
+        if _size(preview) > limit:
+            preview["researcher_message"] = {"author_kind": index["researcher_message"]["author_kind"], "read_full_report": True}
+            if _size(preview) > limit:
+                del preview["researcher_message"]
     for key, value in base.items():
         if key not in preview:
             preview[key] = value

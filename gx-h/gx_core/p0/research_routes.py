@@ -259,7 +259,13 @@ def _handoffs(conn, rid, modules, roots, decisions, turns, directory):
                     turn = turns.get((thread,tid),{})
                     read_call = turn.get('report_reads',{}).get(ref)
                     summaries = [x for x in packet.get('module_reports', []) if x.get('report_ref') == ref]
-                    in_brief = bool(ref in materials or cites.intersection(materials) or summaries or any(x.get('report_ref') == ref for x in packet.get('module_report_index', [])))
+                    indexed = [x for x in packet.get('module_report_index', []) if x.get('report_ref') == ref]
+                    messages = [x['researcher_message'] for x in (*summaries, *indexed) if x.get('researcher_message')]
+                    authored = any(message.get('author_kind') == 'MODULE' and
+                                   (message.get('finding', {}).get('text') or message.get('gaps') or message.get('next_steps'))
+                                   for message in messages)
+                    brief_content = authored or any(x.get('findings') or x.get('endpoint_rows') for x in summaries)
+                    in_brief = bool(ref in materials or cites.intersection(materials) or summaries or indexed)
                     read = [r[0] for r in conn.execute('''SELECT e.event_id FROM events e WHERE e.run_id=? AND e.kind='v623.endpoints.received'
                         AND e.actor=? AND json_extract(e.payload_json,'$.turn_id')=? AND json_extract(e.payload_json,'$.task_id')=?
                         AND EXISTS (SELECT 1 FROM json_each(e.payload_json,'$.endpoints') ep WHERE json_extract(ep.value,'$.source_ref')=?)
@@ -269,7 +275,7 @@ def _handoffs(conn, rid, modules, roots, decisions, turns, directory):
                     entry = dict(base, receiver_scope=scope,thread_id=thread,turn_id=tid,
                                  handoff_kind="MODULE_TO_LEAD" if scope == "run" else "MODULE_TO_MODULE",
                                  delivery_receipt=ack[1]['event_id'] if in_brief else None,endpoint_delivery_events=read,
-                                 received_content=bool(read or read_call or any(x.get('findings') or x.get('endpoint_rows') for x in summaries)),
+                                 received_content=bool(read or read_call or brief_content),
                                  received_read_call=read_call[0] if read_call else None, receiver_classification=turn.get('classification','UNVERIFIED'),
                                  status='DELIVERED',decision_ref=None,effects=[])
                     d = decisions.get((thread,tid))
@@ -278,7 +284,7 @@ def _handoffs(conn, rid, modules, roots, decisions, turns, directory):
                         observed_before = any(event < d['event_id'] for event in read)
                         decision_line = turn.get('tool_call_lines',{}).get(d['call_id'])
                         read_before = bool(read_call and decision_line and read_call[1] < decision_line)
-                        if read_before or observed_before or any(x.get('findings') or x.get('endpoint_rows') for x in summaries):
+                        if read_before or observed_before or brief_content:
                             report = read_report(ref)
                             cited_findings = {ref} | cites.intersection(_finding_sources(report))
                             effects = (_effects(conn,rid,d,cited_findings,report,m['branch_id'],lineage,decisions.values())

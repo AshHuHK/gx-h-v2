@@ -187,6 +187,14 @@ def exhausted(conn, module):
     for line in meter_limits.scopes(conn, rid, ref):
         if line["hard_tokens"] is not None and line["settled_tokens"] >= line["hard_tokens"]:
             return "settled usage exhausted the " + line["scope"] + " token ceiling"
+        # A terminated thread can later disclose usage outside its settled turns.
+        # When that local exposure consumes all headroom, admission cannot resume.
+        # Return the work already done; keep the charged and unattributed amounts distinct.
+        if (line["scope"] == ref and line["hard_tokens"] is not None
+                and line["active_root_count"] == 0 and line["reserved_tokens"] == 0
+                and line["unfunded_closed_thread_tokens"] > 0
+                and line["settled_tokens"] + line["unfunded_closed_thread_tokens"] >= line["hard_tokens"]):
+            return "closed-thread usage exposure prevents another turn within the module token ceiling"
     for error in budgets._project_reservation_errors(conn, ref, {"api_calls": 1, "tokens": 1}):
         for line in error.details.get("shortfalls", [error.details]):
             if line.get("limit") is not None and line["limit"] - line["spent"] < 1:

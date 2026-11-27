@@ -34,13 +34,29 @@ def tool_specs():
     return [contracts.native_goal_tool_spec(name) for name in TOOL_NAMES]
 
 
+def source_spec(name, *, searchable=False):
+    spec = contracts.native_goal_tool_spec(name)
+    if name != READ or not searchable:
+        return spec
+    schema = spec["inputSchema"]
+    return {**spec, "description": spec["description"] +
+            " For a long original, list matching paragraph locators using query (a literal word or phrase), "
+            "then read a selected segment_id for its exact words and receipt.",
+            "inputSchema": {**schema, "properties": {**schema["properties"],
+                "query": {"type":"string","minLength":1,"maxLength":160}}}}
+
+
 def _sha(text):
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
 
-def _blocks(raw, fmt):
+def _blocks(raw, fmt, *, metadata=None):
     if fmt == 'jats':
         root = published_documents.jats_article(raw)
+        if metadata is not None:
+            identifiers = published_documents.article_identifiers(root)
+            if identifiers:
+                metadata["publication_identifiers"] = sorted(identifiers)
         def name(node):
             return node.tag.rsplit('}', 1)[-1]
         blocks = []
@@ -113,9 +129,9 @@ def document_index(raw, fmt):
     elif fmt == 'json':
         coverage, blocks, details = published_documents.json_blocks(raw)
     else:
-        coverage, blocks = _blocks(raw, fmt)
         details = ({'scope': 'JATS article text; figures and supplementary files require separate reads.'}
                    if fmt == 'jats' else {})
+        coverage, blocks = _blocks(raw, fmt, metadata=details)
     segments = []
     for paragraph, (kind, label, text) in enumerate(blocks, 1):
         start, part = 0, 1
@@ -241,6 +257,18 @@ def _pin(src):
 
 def _read(conn, src, args, identity):
     sid = src['source_id']
+    if 'query' in args:
+        if 'segment_id' in args:
+            raise SchemaInvalid('query finds candidate paragraphs; read a named segment separately')
+        start = min(args.get('start', 0), src['segments_count'])
+        sql = """SELECT segment_id,label,kind,char_count,ordinal FROM source_segments WHERE source_id=?
+            AND ordinal>=? AND (instr(lower(label),lower(?))>0 OR instr(lower(text),lower(?))>0)
+            ORDER BY ordinal LIMIT ?"""
+        needle = args['query'].strip()
+        rows = conn.execute(sql, (sid,start,needle,needle,PAGE+1)).fetchall()
+        return {**_pin(src), 'query':needle, 'segments':[{k:r[k] for k in ('segment_id','label','kind','char_count','ordinal')}
+            for r in rows[:PAGE]], 'segments_count':src['segments_count'],
+            'next_start':rows[PAGE]['ordinal'] if len(rows)>PAGE else None}
     if 'segment_id' not in args:
         start = min(args.get('start', 0), src['segments_count'])
         rows = conn.execute('SELECT segment_id,label,kind,char_count FROM source_segments '
@@ -504,7 +532,9 @@ def call_tool(conn, tool, payload, *, run_id, task_id, lease_id, thread_id, turn
     from ..errors import OutcomeUnknown
     if tool not in TOOL_NAMES:
         raise SchemaInvalid('Unknown source-evidence tool')
-    errors = schema.validate(payload, contracts.native_goal_tool_spec(tool)['inputSchema'])
+    from . import research_handoff
+    searchable = isinstance(payload, dict) and 'query' in payload and research_handoff.active(conn, run_id)
+    errors = schema.validate(payload, source_spec(tool, searchable=searchable)['inputSchema'])
     if errors:
         raise SchemaInvalid(', '.join(errors[:4]))
     if any(isinstance(v, str) and not v.strip() or type(v) is int and v < 0 for v in payload.values()):

@@ -9,7 +9,7 @@ from ..artifacts import ArtifactService
 from ..domain import clock, ids, machines
 from ..errors import ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, StaleRevision, VersionImmutable
 from ..persistence import records, store
-from . import intent, research_dialogue, research_window
+from . import catalog_survey, intent, research_dialogue, research_window
 
 INSTANCE_ID = "gx.v6.instance"
 ACTOR = "gx-v6"
@@ -37,6 +37,7 @@ def cli_spec(args):
         "input_files",
         "capabilities",
         "capability_options",
+        "capability_collections",
         "plugins",
         "workspace",
         "intent_items",
@@ -79,6 +80,9 @@ def cli_spec(args):
         if "capabilities" in raw:
             raise SchemaInvalid("Select capabilities in the config or on the command line")
         spec["capabilities"] = args.capability
+    if getattr(args, "command", None) == "research" and not spec.get("historical_replay"):
+        from .capability_views import DISCOVERY_POLICY
+        spec["discovery_policy"] = DISCOVERY_POLICY
     return spec
 
 
@@ -137,15 +141,19 @@ def start(conn, spec, *, run_key, current):
     from . import v62_catalog, v621_policy
 
     from . import capability_views
-    capability_views.options(spec)
+    method_scope = capability_views.freeze_scope(spec)
     policy = v621_policy.admit(spec)
-    research_catalog = v62_catalog.for_start(spec)
+    catalog_spec = ({**spec, **method_scope, "discovery_policy": capability_views.DISCOVERY_POLICY}
+                    if method_scope is not None else spec)
+    research_catalog = v62_catalog.for_start(catalog_spec)
     public, composition = goal_plugins.for_start(ctx, requested or [], spec.get("plugins", []),
                                                  module_catalog=research_catalog)
     if "prospective_opening" in spec:
         from . import v6_prospective
         v6_prospective.validate_opening(spec, public)
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
+    if method_scope is not None:
+        inputs.update(method_scope=method_scope, discovery_policy=capability_views.DISCOVERY_POLICY)
     inputs["evidence_policy"] = policy
     if spec.get("historical_replay"):
         inputs["study_class"] = "historical_replay"
@@ -342,7 +350,7 @@ def _events(conn, rid, after, budget_ref=None):
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
                                   'v6.claim.adopted','v6.decision.superseded','v6.prospective.opening_wait','v62.round.settled',
                                   'v62.claim.reassessed','v62.module.wake','v62.module.invalidated','v621.material.assigned',
-                                  'research.pi.feedback','research.pi.answered','research.capabilities.changed') OR
+                                  'research.pi.feedback','research.pi.answered','research.capabilities.changed','research.catalog.updated') OR
           (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
           OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
@@ -483,6 +491,8 @@ def _run_wakes(conn, rid, prior, events):
         payload = store.loads(row, "payload_json")
         if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
             continue
+        if prior["survey_cursor"] is not None and row["kind"] in catalog_survey.UPDATES:
+            return True
         if (row["kind"] in {research_dialogue.FEEDBACK, research_dialogue.ANSWER, "v6.intent.changed", "research.capabilities.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
                 or row["kind"] == "v6.decision.superseded" and payload.get("scope") == "run"
                 or row["kind"] == "v62.round.settled" and payload.get("reconsider")
@@ -503,7 +513,8 @@ def _open(conn, rid):
 
 def _latest(conn, rid):
     return conn.execute(
-        "SELECT d.decision_ref,d.request_json,d.receipt_json,c.event_cursor,c.version FROM v6_decisions d "
+        "SELECT d.decision_ref,d.request_json,d.receipt_json,c.event_cursor,c.version, "
+        "json_extract(c.snapshot_json,'$.catalog_discovery.through_event') AS survey_cursor FROM v6_decisions d "
         "JOIN research_contexts c USING(context_ref) JOIN v6_decision_tasks t USING(task_id) "
         "WHERE d.run_id=? AND t.scope='run' ORDER BY d.rowid DESC LIMIT 1",
         (rid,),
@@ -513,7 +524,7 @@ def _latest(conn, rid):
 def _brief(conn, run, goal, head, events, cursor, prior):
     from ..jobs import diagnostics
     from ..plugins import goal as goal_plugins
-    from . import v6_claims
+    from . import v6_claims, v6_jobs
 
     rid = run["run_id"]
     data = store.loads(run, "inputs_json")
@@ -528,7 +539,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     observations = []
     refs = [f["artifact_ref"] for f in files]
     for row in events:
-        if row["kind"] in {research_dialogue.ANSWER, research_dialogue.FEEDBACK, "v621.material.assigned", "v6.prospective.opening_wait"}:
+        if row["kind"] in {research_dialogue.ANSWER, research_dialogue.FEEDBACK, "v621.material.assigned", "v6.prospective.opening_wait", catalog_survey.INVENTORY}:
             continue  # Assignment already has an acquisition. An opening wait supplies no evidence.
         p = store.loads(row, "payload_json")
         ref = p.get("result_ref") or p.get("artifact_ref")
@@ -609,6 +620,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     from . import v62_catalog, v62_lead
     research = data["inputs"].get("research_catalog")
     module_branches = v62_lead.branch_ids(conn, rid) if research else set()
+    recipe_decisions = []
     for node in nodes:
         spec = json.loads(node.pop("spec_json"))
         wait = node.pop("wait_json")
@@ -622,6 +634,13 @@ def _brief(conn, run, goal, head, events, cursor, prior):
             node["commission"] = {
                 k: spec[k] for k in ("capability", "inputs", "input_ports", "depends_on", "parameters", "question") if k in spec
             }
+            if spec.get("recipe_decision") and node["status"] in v6_jobs.NODE_TERMINAL:
+                from . import v6_recipes
+                point = v6_recipes.settled_decision(conn, rid, node, spec)
+                if point:
+                    recipe_decisions.append(point)
+                    if point["evidence"]:
+                        refs.append(point["evidence"]["artifact_ref"])
             diagnostics.attach_to_node(conn, rid, node)
             if node["result_ref"]:
                 refs.append(node["result_ref"])
@@ -636,6 +655,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         branch["spec"] = ({"module_instance_id": spec["module_instance_id"]}
                           if branch["branch_id"] in module_branches else spec)
     # Previous observations stay available for citation and scoped reads on continuation.
+    observed_inputs = {}
     for older in conn.execute(
         "SELECT subject_id,json_extract(payload_json,'$.artifact_ref') AS ref, "
         "json_extract(payload_json,'$.scope') AS scope "
@@ -644,6 +664,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     ):
         if older["scope"] not in module_branches and not str(older["scope"]).startswith("module:"):
             refs.extend([older["subject_id"], older["ref"]])
+            if older["ref"]:
+                observed_inputs[older["ref"]] = older["subject_id"]
     catalog = [
         {k: v for k, v in row.items() if k != "content_artifact_ref"}
         for row in goal_plugins.catalog(conn, rid)
@@ -717,10 +739,16 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     }
     from . import capability_views
     revision = capability_views.latest(conn, rid)
-    method_options = capability_views.options(grant)
+    method_options = capability_views.goal_options(data.get("inputs", {}))
     if revision or method_options:
-        brief["capability_view"] = {"revision":revision["revision"] if revision else 0,
-                                    "available_options":list(method_options)}
+        view = {"revision": revision["revision"] if revision else 0}
+        if data["inputs"].get("discovery_policy") == capability_views.DISCOVERY_POLICY:
+            # The first survey ranks these options against the question. Listing every
+            # unselected method twice also crowds the researcher's evidence out of the brief.
+            view["option_count"] = len(method_options)
+        else:
+            view["available_options"] = list(method_options)
+        brief["capability_view"] = view
         if revision:
             brief["capability_view"].update(digest=revision["digest"], enabled=revision["enabled"],
                                             disabled=revision["disabled"])
@@ -747,9 +775,11 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         brief["study_class"] = data["inputs"]["study_class"]
     if data["inputs"].get("evidence_policy") in v621_policy.TYPED:
         brief["evidence_policy"] = data["inputs"]["evidence_policy"]
+    catalog_sources = {}
     if research:
         brief = v62_catalog.project(conn, rid, brief)
-        v62_lead.attach_reports(conn, brief, cursor, research["policy"])
+        released = v62_lead.attach_reports(conn, brief, cursor, research["policy"])
+        catalog_sources.update(dict.fromkeys(released, "released_module_source"))
     if data["inputs"].get("research_evidence_version"):
         from . import v62_outputs, v62_rounds
         brief["research_evidence_version"] = data["inputs"]["research_evidence_version"]
@@ -761,11 +791,13 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         visible = dict.fromkeys(brief["evidence_refs"])
         # Module reads and drafts become shared only through A's report owner.
         # Direct Lead reviews may be cited again on later frozen turns.
-        visible.update(dict.fromkeys(r[0] for r in conn.execute(
-            "SELECT subject_id FROM events WHERE run_id=? AND event_id<=? "
+        source_evidence = dict(conn.execute(
+            "SELECT subject_id,kind FROM events WHERE run_id=? AND event_id<=? "
             "AND kind IN ('v62.source.extracted','v62.source.reviewed') "
-            "AND json_extract(payload_json,'$.scope')='run'", (rid, cursor)
-        )))
+            "AND json_extract(payload_json,'$.scope')='run' ORDER BY event_id", (rid, cursor)
+        ))
+        visible.update(dict.fromkeys(source_evidence))
+        catalog_sources.update(source_evidence)
         for node in brief["nodes"]:
             if node["result_ref"] and node["status"] in ("SUCCEEDED", "REUSED"):
                 node["outputs"] = v62_outputs.published_outputs(conn, rid, node["job_id"])
@@ -791,7 +823,13 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     dialogue = research_dialogue.packet(conn, rid, "run", goal["goal_version"], through=cursor)
     if dialogue:
         brief["pi_dialogue"] = dialogue
+    if recipe_decisions:
+        brief["recipe_decisions"] = recipe_decisions
     v62_lead.describe_refresh(conn, brief, events)
+    if data["inputs"].get("discovery_policy") == catalog_survey.POLICY:
+        brief.setdefault("research_effort", "quick")
+        brief["catalog_discovery"] = catalog_survey.describe(conn, brief, prior, observed_inputs,
+                                                            catalog_sources=catalog_sources)
     return brief
 
 
@@ -805,7 +843,10 @@ def ensure_task(conn, run_id):
         return None
     if research_dialogue.blocked(conn, run_id, scope="run"):
         return None
-    if store.loads(run, "inputs_json")["inputs"].get("research_evidence_version"):
+    inputs = store.loads(run, "inputs_json")["inputs"]
+    if inputs.get("discovery_policy") == catalog_survey.POLICY:
+        catalog_survey.sync_inventory(conn, run_id)
+    if inputs.get("research_evidence_version"):
         from . import v62_maturity, v62_rounds
         v62_maturity.reassess(conn, run_id)
         v62_rounds.reconcile(conn, run_id)
@@ -1097,8 +1138,9 @@ def waiting_for(conn, rid):
         version = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]
         events = _events(conn, rid, prior["event_cursor"])
         watches = store.loads(prior, "receipt_json")["reconsider_when"]
-        if _run_wakes(conn, rid, prior, events) or _branch_watch_hits(conn, rid, version, events):
-            return {"kind": "research_event", "through_cursor": events[-1]["event_id"],
+        if (_run_wakes(conn, rid, prior, events) or _branch_watch_hits(conn, rid, version, events)
+                or prior["survey_cursor"] is not None and catalog_survey.inventory_changed(conn, rid)):
+            return {"kind": "research_event", "through_cursor": events[-1]["event_id"] if events else prior["event_cursor"],
                     "decision_ref": prior["decision_ref"], "watches": watches, "continue_with": "gx-p0 run"}
         return {
             "kind": "operator",

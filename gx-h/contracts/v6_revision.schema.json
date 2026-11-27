@@ -179,6 +179,12 @@
                       "$ref": "#/$defs/text"
                     }
                   },
+                  "recipe_decision": {
+                    "description": "Reopen this saved question using the settled named output in the current Goal.",
+                    "type": "object", "additionalProperties": false, "required": ["recipe", "digest", "step"],
+                    "properties": {"recipe": {"$ref": "#/$defs/text"}, "digest": {"$ref": "#/$defs/digest"}, "step": {"$ref": "#/$defs/text"}}
+                  },
+                  "independent_repeat": {"type": "boolean", "description": "Commission a new independent Job for this node even if equivalent results exist."},
                   "input_ports": {
                     "description": "Select a declared scientific output of an upstream node at a zero-based position in inputs. Omit a selector to use the historical primary result.",
                     "type": "array",

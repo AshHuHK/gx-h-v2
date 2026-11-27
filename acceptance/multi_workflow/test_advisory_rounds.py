@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from acceptance.multi_workflow.test_pcna_native import INTERFACE, MATERIALS, PLUGIN
 from acceptance.v62a.interleavings_fixture import PRODUCT, branch, draft
-from acceptance.v622.test_close import CloseStudy, actual_packet, close_decision
+from acceptance.v622.test_close import SurveyedStudy, actual_packet, close_decision
 from gx_core.artifacts import ArtifactService
 from gx_core.errors import BudgetExceeded, GxError, ScopeDenied
 from gx_core.p0 import cli, v6_goal, v62_catalog, v62_rounds
@@ -38,7 +38,7 @@ class RoundStudy(unittest.TestCase):
             self.assertEqual(cli.main(["research", "--state", str(self.work / "state"), "--run-key", "pcna-stagnation",
                 "--goal", "Assess whether the first deposited PCNA pair contains a measurable interface.",
                 "--goal-config", str(grant)]), 0)
-        self.s = self.enterContext(CloseStudy(self.work, reopen=True))
+        self.s = self.enterContext(SurveyedStudy(self.work, reopen=True))
         self.s.next_actor("run")
         self.source, = self.s.materials
         worker = self.s.open("initial-inventory", inputs=[self.source], caps=[])
@@ -116,7 +116,7 @@ class AdvisoryRounds(RoundStudy):
         decide["convergence"] = {"spec_version": "interface-qc/1", "candidates": ["deposited-interface"]}
         receipt = self.decide("enter-convergence", decide)
         self.s.stack.close()
-        with CloseStudy(self.work, reopen=True) as resumed:
+        with SurveyedStudy(self.work, reopen=True) as resumed:
             progress = v62_rounds.brief(resumed.conn, resumed.run_id, None)["research_progress"]
             self.assertEqual(progress["convergence"], receipt["convergence"])
             self.assertEqual(progress["phase"], "converging")

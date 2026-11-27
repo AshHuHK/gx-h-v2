@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from acceptance.v62a.interleavings_fixture import PRODUCT, draft
-from acceptance.v622.test_close import CloseStudy
+from acceptance.v622.test_close import SurveyedStudy
 from acceptance.v623 import test_close_metrics
 from gx_core.artifacts import ArtifactService
 from gx_core.p0 import cli, manifest, v621_metrics
@@ -69,7 +69,7 @@ class NativePCNA(unittest.TestCase):
                 self.assertEqual(cli.main(["research", "--state", str(work / "state"), "--run-key", "known-calibration",
                                            "--goal", "Measure the registered endpoint on deposited human PCNA.",
                                            "--goal-config", str(grant)]), 0)
-            s = stack.enter_context(CloseStudy(work, reopen=True))
+            s = stack.enter_context(SurveyedStudy(work, reopen=True))
             s.next_actor("run")
             source, = s.materials
             claim = prediction(source, entry, capability, output, metric, unit, parameters)

@@ -1,0 +1,1 @@
+Two channels were monitored during a second two-hour trial. During times when both channels were observed, did West deliver more water than East? Give the duration and the paired volumes if these can be determined. Decide whether the result justifies scheduling a channel-specific follow-up and identify exactly what additional observation would change your conclusion.

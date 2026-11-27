@@ -105,10 +105,15 @@ def _spec(conn, directory, parent, close, mid, text, options):
     context = store.loads(parent, "inputs_json")
     grant = context["inputs"]["p0_spec"]
     spec = {k: v for k, v in grant.items() if k in {
-        "project", "workspace", "budget_profile", "turn_token_budget", "workspace_budget",
+        "project", "workspace", "budget_profile", "turn_token_budget",
         "research_effort", "research_modules", "module_policy", "branch_delegation", "initial_job_limit",
         "capabilities", "plugins", "max_parallel_roots"
     }}
+    # New studies inherit the live workspace budget; the parent bootstrap may predate a funded extension.
+    from . import capability_views
+    if context["inputs"].get("discovery_policy") == capability_views.DISCOVERY_POLICY:
+        spec["discovery_policy"] = capability_views.DISCOVERY_POLICY
+        spec["capability_options"] = list(capability_views.goal_options(context["inputs"]).values())
     if "parent_method_options" in options:
         from ..plugins import goal
         choices = options["parent_method_options"]
@@ -124,6 +129,8 @@ def _spec(conn, directory, parent, close, mid, text, options):
             option = {"method": name, "digest": row["portable_sha256"]}
             if owner := row.get("plugin"):
                 option["provider"] = owner["id"] + "@" + owner["version"]
+                if "discovery_policy" in spec:
+                    option["provider_digest"] = owner["sha256"]
             options_for_lead.append(option)
         spec["capability_options"] = options_for_lead
     if "research_effort" in options:

@@ -9,6 +9,7 @@ from ..persistence import store
 from ..plugins import goal
 
 EVENT = "research.capabilities.changed"
+DISCOVERY_POLICY = "gx.catalog/1"
 
 
 def latest(conn, run_id):
@@ -56,7 +57,7 @@ def options(spec):
         raise SchemaInvalid("capability_options must be a list of exact method choices")
     result = {}
     for item in items:
-        if (not isinstance(item, dict) or set(item) - {"method", "provider", "digest"} or
+        if (not isinstance(item, dict) or set(item) - {"method", "provider", "digest", "provider_digest"} or
                 not isinstance(item.get("method"), str) or
                 not re.fullmatch("[0-9a-f]{64}", str(item.get("digest", "")))):
             raise SchemaInvalid("Each capability option needs an exact method and portable SHA-256 digest")
@@ -65,11 +66,84 @@ def options(spec):
         if ref in result or ("provider" in item and
                 (not isinstance(item["provider"], str) or item["provider"].count("@") != 1)):
             raise SchemaInvalid("Declare each method option once with an exact provider id@version")
+        if "provider_digest" in item and ("provider" not in item or
+                not re.fullmatch("[0-9a-f]{64}", str(item["provider_digest"]))):
+            raise SchemaInvalid("A provider digest needs an exact provider and package SHA-256")
         result[ref] = item
     return result
 
 
-def change(conn, run_id, *, enable=None, disable=None, provider=None, expected_digest=None,
+def goal_options(inputs):
+    """The installation can change after admission. Read the Goal's saved choices."""
+    return options(inputs.get("method_scope", inputs.get("p0_spec", {})))
+
+
+def freeze_scope(spec):
+    """Expand authorized collections once, without attaching or enabling a method."""
+    explicit = options(spec)
+    policy = spec.get("discovery_policy")
+    if policy not in (None, DISCOVERY_POLICY):
+        raise SchemaInvalid("Unknown method discovery policy")
+    if spec.get("historical_replay"):
+        if policy or "capability_collections" in spec:
+            raise SchemaInvalid("Historical replay uses the original method scope")
+        return None
+    if policy is None and "capability_collections" not in spec:
+        return None
+    names = spec.get("capability_collections")
+    if "capability_collections" not in spec:
+        names = [] if "capabilities" in spec or "capability_options" in spec else ["public_sources"]
+    if not isinstance(names, list) or not all(isinstance(name, str) and name for name in names):
+        raise SchemaInvalid("capability_collections must be a list of collection names")
+    from . import catalog_index
+    installed = catalog_index.installed_methods() if explicit or names else ()
+    choices = {}
+    unresolved = []
+    for ref, choice in explicit.items():
+        matching = [r for r in installed if r["capability_version"] == ref and
+                    r["portable_sha256"] == choice["digest"] and
+                    ("provider" not in choice or r.get("provider") == choice["provider"])]
+        if len(matching) > 1:
+            raise SchemaInvalid(f"Multiple providers offer {ref}; specify its provider in capability_options")
+        if not matching:
+            if not choice.get("provider_digest"):
+                unresolved.append(dict(choice))
+                continue
+            # A successor can retain an exact package pin while its deployment is unavailable.
+            choices[ref] = dict(choice)
+        elif provider := matching[0].get("provider"):
+            digest = matching[0]["provider_sha256"]
+            choices[ref] = {"provider": provider, "provider_digest": digest, **choice}
+        else:
+            choices[ref] = dict(choice)
+    if names:
+        from .. import config
+
+        release = json.loads((config.CONFIG_DIR / "workflow_packages.json").read_text())
+        collections = release.get("research_method_collections", {})
+        known = {"public_sources", "public_databases", "cpu_analysis", "archived_structure"} | collections.keys()
+        if len(set(names)) != len(names) or set(names) - known:
+            raise SchemaInvalid("Choose distinct capability_collections from " + ", ".join(sorted(known)))
+        for row in installed:
+            ref, provider = row["capability_version"], row.get("provider")
+            if ref in explicit:
+                continue
+            labels = row.get("collections", ())
+            if not any((name in labels or ref in collections.get(name, {}).get(provider, ()))
+                       and (name != "cpu_analysis" or row.get("cost_class") == "local_cpu") for name in names):
+                continue
+            pin = {"method": ref, "digest": row["portable_sha256"]}
+            if provider:
+                pin["provider"] = provider
+                pin["provider_digest"] = row["provider_sha256"]
+            if ref in choices and choices[ref] != pin:
+                raise SchemaInvalid(f"Multiple providers offer {ref} in this scope; pin one in capability_options")
+            choices[ref] = pin
+    return {"capability_collections": names, "capability_options": [choices[ref] for ref in sorted(choices)],
+            **({"unavailable_options": unresolved} if unresolved else {})}
+
+
+def change(conn, run_id, *, enable=None, disable=None, provider=None, expected_digest=None, expected_provider_digest=None,
            expected_revision, request_id, actor="operator", authority=None):
     """Prepare immutable bytes outside SQLite and atomically change one selected method."""
     from . import intent
@@ -83,6 +157,8 @@ def change(conn, run_id, *, enable=None, disable=None, provider=None, expected_d
     manifest.parse_capability_version(ref)
     key = "goal.capabilities:" + ids.sha256_of_obj([run_id, request_id])
     request = dict(enable=enable, disable=disable, provider=provider, digest=expected_digest, revision=expected_revision)
+    if expected_provider_digest is not None:
+        request["provider_digest"] = expected_provider_digest
     replay = lookup_replay(conn, key, request)
     if replay is not None:
         return replay
@@ -105,13 +181,16 @@ def change(conn, run_id, *, enable=None, disable=None, provider=None, expected_d
             if provider and (not owner or provider != owner["id"]+"@"+owner["version"]):
                 raise VersionImmutable("Selected capability already binds a different provider")
         else:
-            rows, _ = goal.for_start(context(conn), [ref], [provider] if provider else [], module_catalog={"methods":True})
+            rows, _ = goal.for_start(context(conn), [ref], [provider] if provider else [], module_catalog={"methods":True},
+                                     required_providers={ref: expected_provider_digest})
             selected = rows[0]
             if not selected.get("plugin") and ref not in shipped.MANIFESTS:
                 raise ScopeDenied("Selecting a new method requires an installed package or a shipped release pin")
             prior.append(selected)
         if expected_digest is not None and selected["portable_sha256"] != expected_digest:
             raise VersionImmutable("Requested digest differs from installed method")
+        if expected_provider_digest is not None and selected.get("plugin", {}).get("sha256") != expected_provider_digest:
+            raise VersionImmutable("Installed provider differs from the package frozen for this Goal")
         active[ref] = selected["portable_sha256"]
     else:
         if ref not in active:

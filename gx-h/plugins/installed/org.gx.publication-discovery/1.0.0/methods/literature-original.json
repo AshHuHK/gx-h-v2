@@ -1,0 +1,77 @@
+{
+  "manifest": {
+    "capability_id": "literature-original",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "original",
+        "--base",
+        "{data.0}",
+        "--pages",
+        "{data.1}",
+        "--out",
+        "{out.dir}",
+        "--source",
+        "{in.candidates}",
+        "--pmcid",
+        "{param.pmcid}"
+      ]
+    },
+    "method_card": {
+      "family": "public_literature_acquisition",
+      "objective": "Read an open paper in full with its methods, measurement conditions and original paragraph/table locations.",
+      "mechanism": "Use one named candidates.json and parameter pmcid selected from its fetchable_pmcids. Fetch the corresponding Europe PMC JATS, verify accession and article body, and use gx_read_source for specific sections.",
+      "estimator": "article.xml is the original article. acquisition.json records PMCID, source URL, retrieval time and a content-addressed version for the exact bytes.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.publication-discovery/1.0.0/methods/publications.py",
+      "sha256": "43412c1a4c0e42dd3db31822e8db756833a0f68bb4e3605fe1905da3ff1117e8"
+    },
+    "licence": "GX release source. Original materials retain their respective licences.",
+    "licence_basis": "Europe PMC and Crossref public metadata and Open Access JATS terms; intake records retain original source rights.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/scholarly.py",
+      "{harness}/plugins/installed/org.gx.scholarly-pages/1.0.0/methods/windows.py"
+    ],
+    "outputs": [
+      {
+        "name": "article.xml",
+        "kind": "file:journal_article",
+        "nature": "observed",
+        "source_roles": [
+          "candidates"
+        ],
+        "required": true,
+        "media_type": "application/xml",
+        "acquired_material": {
+          "metadata_output": "acquisition.json",
+          "role": "paper"
+        }
+      },
+      {
+        "name": "acquisition.json",
+        "kind": "file:acquisition_descriptor",
+        "nature": "analysis",
+        "source_roles": [
+          "candidates"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original."
+  },
+  "entry_script": "methods/publications.py"
+}

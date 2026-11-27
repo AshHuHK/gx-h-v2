@@ -1,0 +1,73 @@
+{
+  "manifest": {
+    "capability_id": "literature-page",
+    "version": "1",
+    "kind": "SCIENTIFIC_TOOL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "page",
+        "--base",
+        "{data.0}",
+        "--pages",
+        "{data.1}",
+        "--out",
+        "{out.dir}",
+        "--source",
+        "{in.snapshot}",
+        "--action",
+        "{param.action}"
+      ]
+    },
+    "method_card": {
+      "family": "public_literature_search",
+      "objective": "Follow catalogue pages of an earlier query or reproduce a page from its saved bytes.",
+      "mechanism": "Use one named search-snapshot.json and parameter action=next or replay. The snapshot supplies the exact query. Next requests the available provider cursors. Replay uses the archived responses offline.",
+      "estimator": "Per-source page, returned count, hit count, continuation cursor and acquisition state; deduplicated publication identifiers on this page plus exact response bytes.",
+      "training_data_lineage": "Public catalogue and original-source records; no trained model."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.publication-discovery/1.0.0/methods/publications.py",
+      "sha256": "43412c1a4c0e42dd3db31822e8db756833a0f68bb4e3605fe1905da3ff1117e8"
+    },
+    "licence": "GX release source. Original materials retain their respective licences.",
+    "licence_basis": "Europe PMC and Crossref public metadata and Open Access JATS terms; intake records retain original source rights.",
+    "resources": {
+      "cpu_threads": 1,
+      "wall_seconds": 90
+    },
+    "weights": [],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.scholarly-sources/1.0.0/methods/scholarly.py",
+      "{harness}/plugins/installed/org.gx.scholarly-pages/1.0.0/methods/windows.py"
+    ],
+    "outputs": [
+      {
+        "name": "candidates.json",
+        "kind": "file:scholarly_candidates",
+        "nature": "analysis",
+        "source_roles": [
+          "snapshot"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      },
+      {
+        "name": "search-snapshot.json",
+        "kind": "file:scholarly_snapshot",
+        "nature": "analysis",
+        "source_roles": [
+          "snapshot"
+        ],
+        "required": true,
+        "media_type": "application/json"
+      }
+    ],
+    "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples."
+  },
+  "entry_script": "methods/publications.py"
+}

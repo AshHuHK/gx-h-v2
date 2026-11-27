@@ -203,6 +203,9 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         return saved
     root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                         thread_id=thread_id, turn_id=turn_id)
+    if task["scope"] == "run":
+        from . import catalog_survey
+        catalog_survey.required(conn, json.loads(task["snapshot_json"]))
     from . import v621_policy, v623_endpoint_use
     execution = v621_policy.science_execution(conn, run_id)
     science = v621_policy.live_science(conn, run_id)

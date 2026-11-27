@@ -272,7 +272,7 @@ def page(result):
                                  f"完整记录保留 {revisions} 个后续登记版本及逐次评估。")])
         lines.append("")
     else:
-        lines.extend([tr("No registered prediction was recorded.", "本题未登记预测。"), ""])
+        lines.extend([tr("No prospective scientific prediction was registered.", "本题未预先登记科学预测。"), ""])
 
     actions = result["post_read_actions"]
     if actions:

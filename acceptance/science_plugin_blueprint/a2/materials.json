@@ -1,0 +1,28 @@
+{
+  "run_key": "skyglow-a2-first",
+  "question_sha256": "a9c35e7bbbe4a2a004e7c1b12858a3c4ae75724a32fede79dc06bb0335e7525d",
+  "criteria_sha256": "257394952cfb5846f8acdc13b0ce99f4f4af187b9785405e626b95b199be3033",
+  "materials": [
+    {
+      "name": "atlas.xml",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=4928945",
+      "sha256": "c957778e0a2527f4a059df94f60330e9f1062f8f6f22fb4418a6dcabc766e636",
+      "arrival": "initial",
+      "transform": "article element extracted from NCBI XML envelope (ElementTree UTF-8)"
+    },
+    {
+      "name": "index-record.txt",
+      "url": "https://api.crossref.org/works/10.1126/sciadv.1600377",
+      "sha256": "9222607777969fb1a4233f8e80c4333525e8bb64abd914bb93ee5826ce25876f",
+      "arrival": "initial",
+      "transform": "title, DOI, text of depositor abstract"
+    },
+    {
+      "name": "trend.xml",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=5699900",
+      "sha256": "6f3e2528ce96d95830d2e8ff842b8d4312ee001af35ad47fa945da13095b850f",
+      "arrival": "after_first_read",
+      "transform": "article element extracted from NCBI XML envelope (ElementTree UTF-8)"
+    }
+  ]
+}

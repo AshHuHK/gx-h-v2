@@ -1,12 +1,16 @@
 """Turn a completed analytical subgraph into portable, pinned Goal operations."""
+from collections import Counter
 import json
 import re
 
 from ..artifacts import ArtifactService
+from ..capabilities import manifest as capabilities
 from ..capabilities import registry, shipped
 from ..domain import ids
 from ..errors import SchemaInvalid, ScopeDenied, VersionImmutable
+from ..jobs.service import JobService
 from ..persistence import store
+from ..plugins import goal as goal_plugins
 from . import manifest, v6_jobs, v62_outputs
 
 SAVE = "gx_save_recipe"
@@ -27,12 +31,20 @@ def _mapping(rows, key, value):
     return result
 
 
+def provider_pin(entry):
+    """Pin the Goal adapter and its dependency closure as well as the executable bundle."""
+    if not entry.get("plugin"):
+        return None
+    return {"plugin": entry["plugin"], "closure": entry.get("provider_closure", [entry["plugin"]])}
+
+
 def _card(reference, digest, definition):
     return {"kind": "recipe", "reference": reference, "digest": digest, "title": definition["title"],
             "id_alignment": definition["id_alignment"], "missing_values": definition["missing_values"],
             "units": definition["units"], "inputs": definition["inputs"], "methods": {s["slot"]: s["capability"] for s in definition["steps"]},
             "method_pins": {s["capability"]: s["method_digest"] for s in definition["steps"]},
-            "outputs": {s["slot"]: s["outputs"] for s in definition["steps"]}}
+            "outputs": {s["slot"]: s["outputs"] for s in definition["steps"]},
+            **{key: definition[key] for key in ("decision_point", "calibration", "provider_pins") if key in definition}}
 
 
 def cards(conn):
@@ -48,6 +60,8 @@ def prepare(conn, run_id, arguments):
     bindings = _mapping(arguments["inputs"], "name", "artifact_ref")
     external = {ref: slot for slot, ref in bindings.items()}
     node_slots = {nid: slot for slot, nid in slots.items()}
+    portable_natures = {"analysis", "observed", "model_prediction"}
+    enriched = "decision_point" in arguments or "calibration" in arguments
     proofs = {}
     for slot, nid in slots.items():
         node = v6_jobs._node(conn, run_id, nid)
@@ -59,12 +73,30 @@ def prepare(conn, run_id, arguments):
         proof = manifest.read_manifest(conn, node["job_id"])
         v6_jobs.confirmed_result_identity(conn, nid, proof)
         decls = proof["admission"].get("output_declarations") or []
-        if not decls or any(d.get("nature") not in {"analysis", "observed"} for d in decls):
-            raise SchemaInvalid("Recipes support declared read-only analysis and observed outputs")
-        proofs[nid] = (spec, node, proof, v62_outputs.recorded_outputs(
-            conn, run_id, node["job_id"], record=proof, check_publications=True)[0])
+        scientific = {d["name"] for d in decls if d.get("nature") in portable_natures}
+        if not scientific or any(d.get("nature") and d["nature"] not in portable_natures for d in decls):
+            raise SchemaInvalid("Recipes require outputs declared as analysis, observed or model_prediction")
+        enriched |= any(d.get("nature") == "model_prediction" for d in decls)
+        inventory = v62_outputs.recorded_outputs(conn, run_id, node["job_id"], record=proof, check_publications=True)[0]
+        # License/notice files stay in every Job's manifest. They are not
+        # scientific evidence and cannot be a recipe's decision or data port.
+        outputs = [out for out in inventory if out["declaration_name"] in scientific]
+        if not outputs:
+            raise SchemaInvalid("The selected Job produced no declared scientific output")
+        proofs[nid] = (spec, node, proof, outputs)
 
-    steps, sources, required = [], {}, {}
+    # A Lead may have inspected the producer before opening the consumer. This
+    # ordinary path names the published artifact directly in the consumer Job.
+    # Restore that data edge when both Jobs form part of a portable recipe.
+    produced = {}
+    for producer_id, (_, _, _, inventory) in proofs.items():
+        for output in inventory:
+            produced.setdefault(output["artifact_ref"], []).append((producer_id, output["output_name"]))
+    steps, sources, required, provider_pins = [], {}, {}, {}
+    # Jobs without a scope revision used the immutable opening catalogue. Later
+    # revisions carry the exact provider in the Job admission itself.
+    initial = json.loads(conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)).fetchone()[0])
+    opening = {m["capability_version"]: m for m in initial["inputs"]["capability_catalog"]}
     assets = ArtifactService(conn)
     for slot, nid in sorted(slots.items()):
         spec, node, proof, outputs = proofs[nid]
@@ -73,8 +105,13 @@ def prepare(conn, run_id, arguments):
         if view["manifest_sha256"] != pinned["sha256"]:
             raise SchemaInvalid("The installed method differs from the one used in the source Job")
         portable = shipped.portable_digest(view["bundle"])
+        source_grant = proof["admission"].get("goal_capability") or opening.get(spec["capability"])
+        if source_grant is None:
+            raise SchemaInvalid("The source Job has no frozen method grant")
+        provider_pins[spec["capability"]] = provider_pin(source_grant)
         ports = v6_jobs._ports(spec)
         selected = []
+        dependencies = {node_slots[dep] for dep in spec["depends_on"]}
         for index, ref in enumerate(spec["inputs"]):
             if ref in node_slots:
                 _, producer, _, inventory = proofs[ref]
@@ -87,6 +124,13 @@ def prepare(conn, run_id, arguments):
                 if not any(row["output_name"] == name for row in inventory):
                     raise SchemaInvalid("Source graph used an unavailable named output")
                 selected.append({"step": node_slots[ref], "output": name})
+            elif enriched and (upstream := [pair for pair in produced.get(ref, []) if pair[0] != nid]):
+                candidates = [pair for pair in upstream if pair[0] in spec["depends_on"]] or upstream
+                if len(candidates) != 1:
+                    raise SchemaInvalid("A shared historical output needs an unambiguous producing dependency")
+                producer_id, name = candidates[0]
+                dependencies.add(node_slots[producer_id])
+                selected.append({"step": node_slots[producer_id], "output": name})
             else:
                 if ref not in external:
                     raise SchemaInvalid("Name each external input of the selected subgraph")
@@ -96,17 +140,41 @@ def prepare(conn, run_id, arguments):
                 key = external[ref]
                 required[key] = {"kind": meta["kind"], "media_type": meta["media_type"]}
                 selected.append({"input": key})
+        if any(row["nature"] not in portable_natures for row in outputs):
+            raise SchemaInvalid("Cannot register a recipe with unverified scientific output provenance")
         steps.append({"slot": slot, "capability": spec["capability"], "method_digest": portable,
                       "inputs": selected, "outputs": sorted(
-                          ({"name": row["output_name"], "kind": row["kind"]} for row in outputs),
+                          ({"name": row["output_name"], "kind": row["kind"],
+                            **({"nature": row["nature"], "source_roles": [i["role"] for i in row["source_inputs"]]}
+                               if enriched else {})} for row in outputs),
                           key=lambda o: o["name"]),
-                      "depends_on": sorted(node_slots[dep] for dep in spec["depends_on"]),
-                      "parameters": spec["parameters"], "question": spec["question"]})
+                      "depends_on": sorted(dependencies),
+                      "parameters": spec["parameters"], "question": (
+                          f"Apply {spec['capability']} to the named inputs of this Goal."
+                          if enriched else spec["question"])})
         sources[slot] = {"node_id": nid, "job_id": node["job_id"], "completion_sha256": proof["manifest_hash"]}
     if required.keys() != bindings.keys():
         raise SchemaInvalid("The named inputs must match exactly the external inputs of the subgraph")
     definition = {"schema": "gx.research-recipe/1", "reference": reference,
                   "inputs": required, "steps": steps}
+    previous = conn.execute("SELECT definition_json FROM v6_saved_recipes WHERE reference=?", (reference,)).fetchone()
+    if not previous or "provider_pins" in json.loads(previous[0]):
+        definition["provider_pins"] = provider_pins
+    if enriched:
+        definition["schema"] = "gx.research-recipe/2"
+    by_slot = {step["slot"]: step for step in steps}
+    if point := arguments.get("decision_point"):
+        step = by_slot.get(point["step"])
+        if not step or point["output"] not in {out["name"] for out in step["outputs"]}:
+            raise SchemaInvalid("A recipe decision needs a named scientific output of one selected step")
+        definition["decision_point"] = {**point, "role": "run_lead", "event": "job_settled"}
+    if calibration := arguments.get("calibration"):
+        slot = calibration["step"]
+        step = by_slot.get(slot)
+        if (not step or len(steps) < 2 or step["depends_on"] or (point and point["step"] == slot)
+                or any(src.get("step") == slot for other in steps for src in other["inputs"])):
+            raise SchemaInvalid("Select an independent calibration step whose output is not a science input or decision trigger")
+        definition["calibration"] = calibration
     for key in ("title", "units", "id_alignment", "missing_values"):
         if not isinstance(arguments[key], str) or not arguments[key].strip():
             raise SchemaInvalid(f"A reusable recipe needs {key}")
@@ -130,9 +198,86 @@ def save(conn, run_id, arguments):
     return publish(conn, run_id, *prepare(conn, run_id, arguments))
 
 
+def decision_for(conn, spec, *, run_id=None):
+    marker = spec["recipe_decision"]
+    row = conn.execute("SELECT definition_json FROM v6_saved_recipes WHERE reference=? AND digest=?",
+                       (marker["recipe"], marker["digest"])).fetchone()
+    definition = json.loads(row[0]) if row else {}
+    point = definition.get("decision_point")
+    step = next((s for s in definition.get("steps", ()) if s["slot"] == marker["step"]), None)
+    if not point or point["step"] != marker["step"] or not step or step["capability"] != spec["capability"]:
+        raise SchemaInvalid("The recipe decision must reference its saved method and evidence step")
+    if run_id is not None:
+        cap = spec["capability"]
+        grant = next((g for g in goal_plugins.catalog(conn, run_id) if g["capability_version"] == cap), {})
+        if grant.get("portable_sha256") != step["method_digest"] or (
+                cap in definition.get("provider_pins", {}) and provider_pin(grant) != definition["provider_pins"][cap]):
+            raise ScopeDenied("The recipe decision's method or provider differs from the saved procedure")
+        if step["parameters"] != spec.get("parameters", {}):
+            raise SchemaInvalid("The recipe decision's method parameters differ from the saved procedure")
+    return point
+
+
+def settled_decision(conn, run_id, node, spec):
+    point = decision_for(conn, spec)
+    outputs = v62_outputs.published_outputs(conn, run_id, node["job_id"]) if node["result_ref"] else []
+    evidence = next((out for out in outputs if out["output_name"] == point["output"]), None)
+    if evidence:
+        state = "read_and_decide"
+        # A later accepted Lead decision handles this point when its own frozen
+        # brief contained this node and it cited this particular new artifact.
+        handled = conn.execute("""SELECT 1 FROM v6_decisions d JOIN research_contexts c USING(context_ref)
+            JOIN json_each(c.snapshot_json,'$.recipe_decisions') p
+            JOIN json_each(d.request_json,'$.decision.evidence_refs') e
+            WHERE d.run_id=? AND json_extract(p.value,'$.node_id')=? AND e.value=? LIMIT 1""",
+            (run_id, node["node_id"], evidence["artifact_ref"])).fetchone()
+        if handled:
+            return None
+    else:
+        state = "missing_named_output" if node["result_ref"] else "job_" + node["status"].lower()
+    return {**spec["recipe_decision"], **point, "job_id": node["job_id"], "node_id": node["node_id"],
+            "state": state, "evidence": evidence}
+
+
+def _calibration_match(conn, run_id, step, bindings, source):
+    cap = step["capability"]
+    method = registry.candidate(conn, cap)
+    proof = manifest.read_manifest(conn, source["job_id"])
+    if proof["manifest_hash"] != source["completion_sha256"]:
+        return False
+    v6_jobs.confirmed_result_identity(conn, source["node_id"], proof)
+    if method["manifest"].get("weights"):
+        return False  # A model Job is a new measurement unless its full calibration environment can be compared.
+    original = json.loads(conn.execute("SELECT identity_json FROM v6_job_attempts WHERE node_id=?",
+                                       (source["node_id"],)).fetchone()[0])
+    original.pop("independent_node", None)
+    if shipped.portable_digest(method["bundle"]) != step["method_digest"]:
+        return False
+    for part in ("entry_script", "parser"):
+        if script := method["bundle"].get(part):
+            capabilities.script_path(script)
+    assets = ArtifactService(conn)
+    entries = []
+    refs = [bindings[port["input"]] for port in step["inputs"]]
+    try:
+        inputs, params = v6_jobs.bind_inputs(conn, run_id, cap, method, refs, step["parameters"], writable=False)
+    except ScopeDenied:
+        # A binder that must publish a derived input can materialize it in a fresh Job.
+        return False
+    for role, ref in inputs.items():
+        verified = assets.verify(ref)
+        if not verified["ok"]:
+            raise SchemaInvalid("Target calibration input differs from its published bytes")
+        entries.append({"role": role, "sha256": verified["observed_sha256"]})
+    identity = v6_jobs.method_identity(conn, run_id, cap, method, entries, params)
+    if identity != original or identity.get("required_data_sha256", {}) is None:
+        return False
+    return all(assets.verify(output["artifact_ref"])["ok"] for output in proof["completion"]["outputs"])
+
+
 def instantiate(conn, run_id, arguments):
     reference = arguments["recipe"]
-    row = conn.execute("SELECT digest,definition_json FROM v6_saved_recipes WHERE reference=?", (reference,)).fetchone()
+    row = conn.execute("SELECT digest,definition_json,source_run,sources_json FROM v6_saved_recipes WHERE reference=?", (reference,)).fetchone()
     if not row or arguments["digest"] != row[0]:
         raise SchemaInvalid("Recipe reference or digest does not match the saved workflow")
     definition = json.loads(row[1])
@@ -149,10 +294,39 @@ def instantiate(conn, run_id, arguments):
         if any(item[key] != value for key, value in definition["inputs"][name].items()):
             raise SchemaInvalid(f"Input {name} does not match the saved artifact kind and media type")
     grants = json.loads(conn.execute("SELECT capabilities_json FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()[0])
+    target_providers = {g["capability_version"]: provider_pin(g) for g in goal_plugins.catalog(conn, run_id)}
+    for cap, pin in definition.get("provider_pins", {}).items():
+        if cap not in target_providers or target_providers[cap] != pin:
+            raise ScopeDenied(f"The target Goal needs the saved provider and dependencies for {cap}")
     prefix = _name(arguments["prefix"])
     alias = {s["slot"]: f"local:{prefix}-{s['slot']}" for s in definition["steps"]}
+    calibration = definition.get("calibration")
+    point = definition.get("decision_point")
+    repeat = arguments.get("independent_repeat", False)
+    skipped = None
+    receipt = None
+    steps = definition["steps"]
+    if not calibration and ("calibration_scope" in arguments or "calibration_parameters" in arguments):
+        raise SchemaInvalid("This recipe has no registered calibration step")
+    if calibration:
+        slot = calibration["step"]
+        steps = [dict(step, parameters=arguments.get("calibration_parameters", step["parameters"]))
+                 if step["slot"] == slot else step for step in steps]
+        step = next(item for item in steps if item["slot"] == slot)
+        if grants.get(step["capability"]) != step["method_digest"]:
+            raise ScopeDenied("The target Goal must have the pinned calibration method")
+        source = json.loads(row["sources_json"])[slot]
+        if (not repeat and arguments.get("calibration_scope") == calibration["scope"]
+                and _calibration_match(conn, run_id, step, bindings, source)):
+            skipped = slot
+            receipt = {"step": slot, "status": "referenced", "source_run": row["source_run"], **source,
+                       "scope": calibration["scope"]}
+        else:
+            receipt = {"step": slot, "status": "run_on_target", "scope": arguments.get("calibration_scope")}
     ops = []
-    for step in definition["steps"]:
+    for step in steps:
+        if step["slot"] == skipped:
+            continue
         cap = step["capability"]
         if grants.get(cap) != step["method_digest"]:
             raise ScopeDenied(f"The target Goal needs the saved method {cap} at its exact release digest")
@@ -165,9 +339,27 @@ def instantiate(conn, run_id, arguments):
                 ports.append({"index": index, "output": src["output"]})
         ops.append({"op": "add_node", "node": alias[step["slot"]], "branch": arguments["branch"],
                     "capability": cap, "parameters": step["parameters"], "inputs": inputs,
-                    "depends_on": [alias[d] for d in step["depends_on"]], "question": step["question"],
+                    "depends_on": [alias[d] for d in step["depends_on"] if d != skipped], "question": step["question"],
+                    **({"independent_repeat": True} if repeat or (calibration and step["slot"] == calibration["step"]) else {}),
+                    **({"recipe_decision": {"recipe": reference, "digest": row[0], "step": step["slot"]}}
+                       if point and point["step"] == step["slot"] else {}),
                     **({"input_ports": ports} if ports else {})})
-    return {"recipe": reference, "digest": row[0], "ops": ops}
+    answer = {"recipe": reference, "digest": row[0], "ops": ops,
+              **({"decision_point": point} if point else {}), **({"calibration": receipt} if receipt else {})}
+    if definition["schema"] == "gx.research-recipe/2" and arguments["branch"].startswith("local:"):
+        from . import v6_graph
+        contracts = v6_graph.decision_schema()["properties"]["ops"]["items"]["oneOf"]
+        opening = next(kind for kind in contracts if kind["properties"]["op"]["const"] == "open_branch")
+        minimum = Counter()
+        for op in ops:
+            method = registry.candidate(conn, op["capability"])["manifest"]
+            minimum.update(JobService._budget_amounts(capabilities.effective_resources(method, {})))
+        answer["submission"] = {
+            "tool": "gx_decide_revision", "branch": arguments["branch"],
+            "instructions": "Prepend one open_branch operation to these add_node operations. "
+                            "Fill the scientific fields for this Goal and fund the expanded Jobs.",
+            "required_open_branch_fields": opening["required"], "minimum_budget_limits": dict(minimum)}
+    return answer
 
 
 def authorize(conn, identity, tool, args):

@@ -33,6 +33,12 @@ PARAMS = {"source_quote": "an asynchronous job API service to map the identifier
 
 class DerivedMethod(unittest.TestCase):
     def test_authored_method_reaches_same_goal_job_and_cited_decision(self):
+        self.exercise_recipe(change_calibration=False)
+
+    def test_changed_calibration_runs_a_fresh_job(self):
+        self.exercise_recipe(change_calibration=True)
+
+    def exercise_recipe(self, change_calibration):
         work = Path(self.enterContext(tempfile.TemporaryDirectory()))
         release = work / "release/gx-h"
         shutil.copytree(config.HARNESS_ROOT, release, ignore=shutil.ignore_patterns("var", "__pycache__", ".venv", "tests"))
@@ -85,6 +91,7 @@ class DerivedMethod(unittest.TestCase):
         actor = s.next_actor("run")
         measured = s.node(actor, "audit", inputs["cohort"], branch_id=adopted["aliases"]["local:records"], capability=method)
         measured["inputs"].append(inputs["evidence"])
+        measured["depends_on"] = [first["node_id"]]
         dispatched = s.call(actor, "gx_decide_revision", {"decision": fx.draft(measured, evidence=[inputs["cohort"]],
                      watches=[{"event":"job_settled","subject_ref":"local:audit"}])}, "audit")
         job = s.settle(dispatched["aliases"]["local:audit"])
@@ -96,8 +103,13 @@ class DerivedMethod(unittest.TestCase):
         self.assertEqual(read["denominator"], 3)
         saved = s.call(actor, "gx_save_recipe", {
             "recipe_id": "accession-evidence-coverage", "version": "1", "title": "Located papers per accession",
-            "nodes": [{"slot": "coverage", "node_id": job["node_id"]}],
-            "inputs": [{"name": role, "artifact_ref": inputs[role]} for role in ("cohort", "evidence")],
+            "decision_point": {"step": "coverage", "output": v62_outputs.published_outputs(s.conn, s.run_id, job["job_id"])[0]["output_name"],
+                               "question": "Which sources can resolve the remaining evidence gap?",
+                               "actions": ["inspect linked papers", "seek independent originals"],
+                               "stop_condition": "The available cohort has been accounted for."},
+            "calibration": {"step": "setup", "scope": "Accession-level source coverage; case-sensitive identifiers"},
+            "nodes": [{"slot": "coverage", "node_id": job["node_id"]}, {"slot": "setup", "node_id": first["node_id"]}],
+            "inputs": [{"name": role, "artifact_ref": inputs[role]} for role in ("cohort", "evidence", "method_source")],
             "units": "Fraction of unique cohort accessions", "id_alignment": "Case-sensitive Swiss-Prot accession",
             "missing_values": "A null pointer or absent match stays in the population."}, "save")
         decision = close_decision([published])
@@ -133,18 +145,44 @@ class DerivedMethod(unittest.TestCase):
         card = s.call(actor, "gx_query_catalog", {"kind": "recipe", "reference": saved["reference"]}, "find-recipe")
         self.assertEqual(saved["digest"], card["spec"]["digest"])
         params = {"recipe": saved["reference"], "digest": saved["digest"], "branch": "local:sucrose", "prefix": "sucrose",
-                  "inputs": {role: child_inputs[role] for role in ("cohort", "evidence")}}
+                  "calibration_scope": saved["calibration"]["scope"],
+                  "inputs": {role: child_inputs[role] for role in ("cohort", "evidence", "method_source")}}
+        calibration_asset = release / "plugins/installed/org.gx.record-method-builder/1.0.0/template/coverage.py"
+        original_bytes = calibration_asset.read_bytes()
+        calibration_asset.write_bytes(original_bytes + b"\n# Changed calibration environment.\n")
+        try:
+            changed_asset = s.call(actor, "gx_instantiate_recipe", params, "changed-environment")
+            self.assertEqual("run_on_target", changed_asset["calibration"]["status"])
+        finally:
+            calibration_asset.write_bytes(original_bytes)
+        if change_calibration:
+            params["calibration_parameters"] = {**PARAMS, "source_quote": "an asynchronous job API service"}
+        alternatives = s.call(actor, "gx_instantiate_recipe", dict(params, calibration_scope="new assay"), "different-scope")
+        self.assertEqual("run_on_target", alternatives["calibration"]["status"])
+        repeat = s.call(actor, "gx_instantiate_recipe", dict(params, independent_repeat=True), "independent")
+        self.assertTrue(all(op["independent_repeat"] for op in repeat["ops"]))
         expansion = s.call(actor, "gx_instantiate_recipe", params, "reuse")
+        self.assertEqual("coverage", expansion["ops"][0]["recipe_decision"]["step"])
+        self.assertEqual(1 + int(change_calibration), len(expansion["ops"]))
+        self.assertEqual("run_on_target" if change_calibration else "referenced", expansion["calibration"]["status"])
+        if not change_calibration:
+            self.assertEqual(first["job_id"], expansion["calibration"]["job_id"])
         branch = fx.branch("sucrose")
-        branch["budget_limits"]["cpu_seconds"] = 30
+        branch["budget_limits"].update(cpu_seconds=60, job_submissions=2)
         child = s.call(actor, "gx_decide_revision", {"decision": fx.draft(branch, *expansion["ops"],
                     evidence=[child_inputs["cohort"]], watches=[{"event":"job_settled",
                     "subject_ref":expansion["ops"][0]["node"]}])}, "measure-again")
+        if change_calibration:
+            recalibrated = s.settle(child["aliases"][expansion["ops"][1]["node"]])
+            self.assertNotEqual(first["job_id"], recalibrated["job_id"])
         child_job = s.settle(child["aliases"][expansion["ops"][0]["node"]])
         out = v62_outputs.published_outputs(s.conn, s.run_id, child_job["job_id"])[0]["artifact_ref"]
         second = ArtifactService(s.conn).read_json(out)
         self.assertEqual((second["numerator"], second["denominator"], second["matched_without_value"]), (0, 1, ["P00724"]))
         actor = s.next_actor("run")
+        checkpoint = s.brief(actor)["recipe_decisions"][0]
+        self.assertEqual((out, child_job["job_id"]), (checkpoint["evidence"]["artifact_ref"], checkpoint["job_id"]))
+        self.assertNotIn(published, json.dumps(checkpoint))
         s.call(actor, "gx_read_artifact", {"ref": out}, "read-sucrose")
         close = close_decision([out])
         endpoint = endpoint_fixture.EndpointClose.read_page(self, s, actor, out, 0, "read-sucrose-endpoint")
@@ -153,11 +191,12 @@ class DerivedMethod(unittest.TestCase):
         adopted = s.call(actor, "gx_decide_revision", {"decision": close}, "close-sucrose")
         s.advance()
         self.assertEqual("CLOSED", s.conn.execute("SELECT status FROM v6_goals WHERE run_id=?", (s.run_id,)).fetchone()[0])
-        self.assertEqual(1, len(record_method.report(s.conn, s.run_id)["jobs"]))
+        self.assertEqual(1 + int(change_calibration), len(record_method.report(s.conn, s.run_id)["jobs"]))
         proof["saved_recipe"] = saved
         proof["successor"] = {"run_id": s.run_id, "job_id": child_job["job_id"], "reading": second, "output_ref": out,
+                              "decision_point": checkpoint, "calibration": expansion["calibration"],
                               "cited_decision_ref": adopted["decision_ref"], "recipe_digest": card["spec"]["digest"]}
-        if path := os.environ.get("GX_RECORD_METHOD_RECEIPT"):
+        if path := os.environ.get("GX_CHANGED_CALIBRATION_RECEIPT" if change_calibration else "GX_RECORD_METHOD_RECEIPT"):
             Path(path).write_text(json.dumps(proof, indent=2, ensure_ascii=False) + "\n")
 
     def test_missing_keys_are_never_dropped_from_a_denominator_and_foreign_ids_do_not_count(self):

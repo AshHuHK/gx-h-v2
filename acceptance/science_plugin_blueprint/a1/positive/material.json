@@ -1,0 +1,19 @@
+{
+  "schema": "gx.hydrometry/1",
+  "source": "GX independent-author synthetic two-channel logger exercise; data generated for this trial, not a measurement of a real stream",
+  "trial": "APR-17",
+  "window_minutes": [0, 120],
+  "channels": ["West", "East"],
+  "units": {"time": "minutes from trial start", "flow": "litres per second"},
+  "calibration": "Each valid interval reports a constant rate with an absolute error at most err_L_s; no independence assumption. A rejected or absent interval does not report a usable rate or bound.",
+  "intervals": [
+    {"channel":"West","start":0,"end":10,"q_L_s":1.2,"err_L_s":0.1,"valid":true},
+    {"channel":"West","start":10,"end":70,"q_L_s":4.1,"err_L_s":0.2,"valid":true},
+    {"channel":"West","start":70,"end":90,"q_L_s":0.3,"err_L_s":0.2,"valid":false},
+    {"channel":"West","start":90,"end":120,"q_L_s":2.6,"err_L_s":0.1,"valid":true},
+    {"channel":"East","start":0,"end":35,"q_L_s":2.5,"err_L_s":0.1,"valid":true},
+    {"channel":"East","start":35,"end":50,"q_L_s":9.9,"err_L_s":0.2,"valid":false},
+    {"channel":"East","start":50,"end":100,"q_L_s":2.0,"err_L_s":0.1,"valid":true},
+    {"channel":"East","start":100,"end":120,"q_L_s":2.4,"err_L_s":0.2,"valid":true}
+  ]
+}

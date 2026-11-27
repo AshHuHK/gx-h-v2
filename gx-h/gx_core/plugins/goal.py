@@ -82,7 +82,7 @@ def _discover(requested, references, *, module_providers=()):
     return provided
 
 
-def for_start(ctx, requested, references, *, module_catalog=None):
+def for_start(ctx, requested, references, *, module_catalog=None, required_providers=None):
     """Attach approved bytes, then persist the composition with Run creation before Job admission."""
     owners = [_pin(m["plugin"]) for m in (module_catalog or {}).get("modules", [])]
     providers = _discover(requested, references, module_providers=[(p.id, p.version) for p in owners])
@@ -93,6 +93,9 @@ def for_start(ctx, requested, references, *, module_catalog=None):
     for cap in requested:
         manifest.parse_capability_version(cap)
         package, ref = providers.get(cap, (None, cap))
+        required = (required_providers or {}).get(cap)
+        if required and (not package or package.pin.digest != required):
+            raise VersionImmutable("Installed provider differs from the package frozen for this Goal")
         receipt = shipped.attach(ctx, ref, package=package)
         view = registry.candidate(ctx.conn, cap)
         method = view["manifest"]

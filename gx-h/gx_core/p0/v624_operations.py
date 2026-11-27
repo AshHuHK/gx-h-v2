@@ -23,15 +23,19 @@ def _choice(field, message, options=()):
                                           "field": field, "options": sorted(options)})
 
 
-def _single_job_budget(conn, goal, node):
-    """Use the Job owner's reservation calculation and the shipped single-CPU-Job profile."""
+def _job_requirements(conn, goal, node):
     capability = node.get("capability")
     if not isinstance(capability, str):
         raise SchemaInvalid("Specify the measurement's pinned capability in ops[].capability")
     if capability not in json.loads(goal["capabilities_json"]):
         raise ScopeDenied("Capability is outside the Run's pinned catalog")
     method = registry.candidate(conn, capability)["manifest"]
-    minimum = JobService._budget_amounts(manifest.effective_resources(method, {}))
+    return method, JobService._budget_amounts(manifest.effective_resources(method, {}))
+
+
+def _single_job_budget(conn, goal, node):
+    """Use the Job owner's reservation calculation and the shipped single-CPU-Job profile."""
+    method, minimum = _job_requirements(conn, goal, node)
     single = config.limits()["budget_profiles"]["native_mvp"]
     if (method["kind"] == manifest.STDIO_KIND or "gpu_jobs" in minimum
             or any(required > single.get(unit, 0) for unit, required in minimum.items())):
@@ -88,8 +92,15 @@ def normalize(conn, task, goal, body, *, module=None):
         for job in jobs:
             if "branch" not in job:
                 if len(candidates) != 1:
-                    msg = ("Choose the measurement branch from options" if candidates else
-                           "Open an explicit funded branch for this measurement")
+                    if candidates:
+                        msg = "Choose the measurement branch from options"
+                    else:
+                        _, needed = _job_requirements(conn, goal, job)
+                        msg = ("Open an explicit funded branch for this measurement. Include open_branch "
+                               "and add_node in the same ops list. Supply your hypothesis, method_family, "
+                               "alternative, discriminating_observation and stop_condition as text. Give the "
+                               "branch and node distinct local: names and use the branch name in add_node.branch. "
+                               "This Job requires budget_limits of at least " + json.dumps(needed, sort_keys=True))
                     raise _choice("ops[].branch", msg, candidates)
                 job["branch"] = candidates[0]
         for op in opens:
@@ -97,7 +108,11 @@ def normalize(conn, task, goal, body, *, module=None):
                 same_branch = [job for job in jobs if job["branch"] == op["branch"]]
                 minimum = _single_job_budget(conn, goal, same_branch[0]) if len(jobs) == len(same_branch) == 1 else None
                 if minimum is None:
-                    raise _choice("ops[].budget_limits", "Set budget_limits for this branch's work")
+                    msg = "Set budget_limits for this branch's work"
+                    if len(same_branch) == 1:
+                        _, needed = _job_requirements(conn, goal, same_branch[0])
+                        msg += ". The attached Job requires at least " + json.dumps(needed, sort_keys=True)
+                    raise _choice("ops[].budget_limits", msg)
                 op["budget_limits"] = minimum
     if "reconsider_when" not in decision:
         watches = [{"event": "job_settled", "subject_ref": job["node"]} for job in jobs]

@@ -1,0 +1,81 @@
+{
+  "manifest": {
+    "capability_id": "archived-fold-calibration",
+    "version": "1",
+    "kind": "SCIENTIFIC_MODEL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--specimen",
+        "{in.specimen}",
+        "--weight",
+        "{weights.0}",
+        "--mount",
+        "{harness}/var/archival-af3",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "archival_fold_calibration",
+      "mechanism": "Run local AlphaFold 3 on the immutable published Top7 1QYS calibration input.",
+      "objective": "Predict the observed fragment for comparison with a separately supplied reference.",
+      "estimator": "Single GPU inference; seed 1, 10 recycles, 1 diffusion sample, empty MSA and templates, 128 bucket.",
+      "training_data_lineage": "Public AF3 parameters; Top7 predates training cutoffs. This tests deployment reproducibility only."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.archival-fold-calibration/1.0.0/job-scripts/predict.py",
+      "sha256": "d96992732b084d786e564c522bd69c08108c72b1ef6fcf8b81b8735c09adac84"
+    },
+    "licence": "GX wrapper; AlphaFold 3 code and weights subject to their local upstream terms. Outputs include model terms.",
+    "licence_basis": "Mounted AF3 source LICENSE, parameter and output terms (included with every model result).",
+    "resources": {
+      "cpu_threads": 2,
+      "wall_seconds": 540,
+      "gpu": {
+        "scope": "archival_fold_calibration",
+        "memory_mib": 16384
+      }
+    },
+    "weights": [
+      {
+        "path": "{harness}/var/archival-af3/weights/af3.bin.zst",
+        "sha256": "74d0258616917cd122f5eab6d076afe4a8930e96823851e65e4f777dfb1f33ff",
+        "bytes": 1020545840,
+        "load_mode": "NATIVE_FORMAT"
+      }
+    ],
+    "required_data": [],
+    "outputs": [
+      {
+        "name": "model.cif",
+        "kind": "file:predicted_mmcif",
+        "required": true,
+        "nature": "model_prediction",
+        "source_roles": [
+          "specimen"
+        ]
+      },
+      {
+        "name": "inference.json",
+        "kind": "file:model_execution",
+        "required": true,
+        "nature": "model_prediction",
+        "source_roles": [
+          "specimen"
+        ]
+      },
+      {
+        "name": "TERMS_OF_USE.md",
+        "kind": "file:model_output_terms",
+        "required": true
+      }
+    ],
+    "limitations": "Only the archived byte-identified specimen is accepted. Predictions are computed coordinates."
+  },
+  "entry_script": "job-scripts/predict.py"
+}

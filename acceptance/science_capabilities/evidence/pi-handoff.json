@@ -128,6 +128,12 @@
         "ts": "2026-11-27T02:05:36.004Z",
         "kind": "p0.conversation.replied",
         "subject_id": "pi-metadata-source-check"
+      },
+      {
+        "event_id": 93,
+        "ts": "2026-11-27T04:14:49.060Z",
+        "kind": "research.pi.disposition",
+        "subject_id": "pif_dc3347a8403ebe820b90ae7432f5209b"
       }
     ],
     "authorized_host": {
@@ -171,9 +177,52 @@
         "text": "请在元数据阅读路线核对：比较这两份记录时，哪些字段能直接说明采样来源，哪些地方还需要原件才能确定？",
         "event_id": 35,
         "disclosed_at": "2026-11-27T02:04:49.802Z",
-        "deliveries": [],
-        "disposition": null,
-        "status": "PENDING"
+        "deliveries": [
+          {
+            "task_id": "gxt_01m8dkagm3bbzdep3n",
+            "thread_id": "01a21b35-42a8-75e3-bd20-a2f0ae2cd804",
+            "scope": "run",
+            "turn_id": "01a21b35-42e0-7371-b920-944782a6ce1f",
+            "delivery_event_id": "start:bd630c6e-42ad-40de-a046-46808d9d8642"
+          }
+        ],
+        "disposition": {
+          "decision_ref": "gxa_907f8ea90cec88045541630d61c8d577fac8494730bd280dcc45c3b98a39201c",
+          "delivery_event_id": "start:bd630c6e-42ad-40de-a046-46808d9d8642",
+          "delivery_turn_id": "01a21b35-42e0-7371-b920-944782a6ce1f",
+          "effects": [],
+          "evidence_refs": [
+            "gxa_233b7b214ce0fdbb385d96aceb2643b15f74c84f58b68b4b6b3fb5c58468c82f",
+            "gxa_01m8dbxfpfwv3yp1xc",
+            "gxa_01m8dbxfpyp5dkamzy",
+            "gxa_01m8dbxfqdezy7nn00"
+          ],
+          "feedback_id": "pif_dc3347a8403ebe820b90ae7432f5209b",
+          "goal_version": 1,
+          "outcome": "adopt",
+          "product_event_id": 92,
+          "product_ref": "gxa_907f8ea90cec88045541630d61c8d577fac8494730bd280dcc45c3b98a39201c",
+          "reason": "已将采样来源及证据边界纳入独立核对。qualification.json（gxa_01m8dbxfqdezy7nn00）记载来源物种，1VYM.json（gxa_01m8dbxfpfwv3yp1xc）和 9VGW.json（gxa_01m8dbxfpyp5dkamzy）提供档案来源和文献指针，sample、sampling、acquisition 和 processing 均为空。",
+          "scope": "run",
+          "task_id": "gxt_01m8dkagm3bbzdep3n",
+          "thread_id": "01a21b35-42a8-75e3-bd20-a2f0ae2cd804",
+          "turn_id": "01a21b35-42e0-7371-b920-944782a6ce1f",
+          "event_id": 93
+        },
+        "status": "DISPOSED",
+        "follow_up_nodes": [],
+        "module_report_ref": "gxa_233b7b214ce0fdbb385d96aceb2643b15f74c84f58b68b4b6b3fb5c58468c82f",
+        "lead_decisions": [
+          {
+            "decision_ref": "gxa_907f8ea90cec88045541630d61c8d577fac8494730bd280dcc45c3b98a39201c",
+            "event_id": 92,
+            "rationale": "首轮报告留下了三份材料的读取凭据，但额度耗尽，findings 为空。两张卡给出特定坐标原件的版本、地址和校验值，资格表还记载来源物种和沉积标题。已为第二轮单人独立核对分配充足额度，待收到逐份注明出处的报告再作结论。",
+            "cited_refs": [
+              "gxa_233b7b214ce0fdbb385d96aceb2643b15f74c84f58b68b4b6b3fb5c58468c82f"
+            ],
+            "effects": []
+          }
+        ]
       }
     ],
     "jobs": [],
@@ -182,10 +231,48 @@
         "module_id": "investigation",
         "scope": "module:module_713c7595d16b12fbac58c02b5d6b721d",
         "branch_id": "branch_0c22255b77d4ec71a7ea6b962fb4d585",
-        "status": "OPEN",
-        "report_ref": null,
-        "report_event_id": null,
-        "report_time": null
+        "status": "PARTIAL",
+        "report_ref": "gxa_233b7b214ce0fdbb385d96aceb2643b15f74c84f58b68b4b6b3fb5c58468c82f",
+        "report_event_id": 64,
+        "report_time": "2026-11-27T04:13:24.961Z",
+        "author": {
+          "context_ref": "gxcx_01m8dbyfkn36p13rnv",
+          "kind": "GX",
+          "task_id": "gxt_01m8dbyfkndf4cmes5"
+        },
+        "round": 1,
+        "source_refs": [
+          "gxa_01m8dbxfpfwv3yp1xc",
+          "gxa_01m8dbxfpyp5dkamzy",
+          "gxa_01m8dbxfqdezy7nn00"
+        ],
+        "wake_event_id": 65
+      },
+      {
+        "module_id": "investigation",
+        "scope": "module:module_32b5ff0f49d94eece4b16aca5a9cd312",
+        "branch_id": "branch_25149847952d1ef8bb17904623776858",
+        "status": "COMPLETE",
+        "report_ref": "gxa_9ea92d1f3bf079c58325a9e3e069ebd15a293f7a8b260fca784aed76a1287d81",
+        "report_event_id": 102,
+        "report_time": "2026-11-27T04:17:24.205Z",
+        "author": {
+          "call_id": "call_16a9faa1583d4029b330299c258aa4ba",
+          "context_ref": "gxcx_01m8dkbk1ks3cv14v5",
+          "kind": "MODULE",
+          "lease_id": "gxl_01m8dkbk3jvgj69gev",
+          "run_id": "gxr_01m8dbxfnk6ae4gm61",
+          "task_id": "gxt_01m8dkbk1kmc5x3wh5",
+          "thread_id": "01a21b35-cc86-7781-9c15-59e5095d7a85",
+          "turn_id": "01a21b35-cca8-7cd3-b924-e03b211b0029"
+        },
+        "round": 2,
+        "source_refs": [
+          "gxa_01m8dbxfpfwv3yp1xc",
+          "gxa_01m8dbxfpyp5dkamzy",
+          "gxa_01m8dbxfqdezy7nn00"
+        ],
+        "wake_event_id": 103
       }
     ],
     "official_turns": [
@@ -212,20 +299,105 @@
         "turn_id": "01a21abf-423b-7eb2-8fcb-bc467f62f652",
         "task_id": null,
         "terminal_status": "completed"
+      },
+      {
+        "role": "planner",
+        "scope": "module:module_713c7595d16b12fbac58c02b5d6b721d",
+        "thread_id": "01a21abf-3eda-7813-8d80-ef58ccfefdbb",
+        "turn_id": "01a21b30-25ea-7bd1-97b2-ffd580ff74a6",
+        "task_id": "gxt_01m8dbyfkndf4cmes5",
+        "terminal_status": "interrupted"
+      },
+      {
+        "role": "planner",
+        "scope": "module:module_713c7595d16b12fbac58c02b5d6b721d",
+        "thread_id": "01a21b32-5499-7391-820a-02e1b9c20bb8",
+        "turn_id": "01a21b32-5543-76d1-b879-acca2c99ca00",
+        "task_id": "gxt_01m8dbyfkndf4cmes5",
+        "terminal_status": "interrupted"
+      },
+      {
+        "role": "planner",
+        "scope": "run",
+        "thread_id": "01a21b35-42a8-75e3-bd20-a2f0ae2cd804",
+        "turn_id": "01a21b35-42e0-7371-b920-944782a6ce1f",
+        "task_id": "gxt_01m8dkagm3bbzdep3n",
+        "terminal_status": "interrupted"
+      },
+      {
+        "role": "planner",
+        "scope": "module:module_32b5ff0f49d94eece4b16aca5a9cd312",
+        "thread_id": "01a21b35-cc86-7781-9c15-59e5095d7a85",
+        "turn_id": "01a21b35-cca8-7cd3-b924-e03b211b0029",
+        "task_id": "gxt_01m8dkbk1kmc5x3wh5",
+        "terminal_status": "interrupted"
+      },
+      {
+        "role": "planner",
+        "scope": "run",
+        "thread_id": "01a21b38-e94c-7e53-9e57-80795b4adb6f",
+        "turn_id": "01a21b38-e97b-7ce3-a3f3-6728d4fbac95",
+        "task_id": "gxt_01m8dkht96dkpbzakr",
+        "terminal_status": "interrupted"
       }
     ],
     "snapshot": {
-      "goal_status": "OPEN",
-      "through_event": 48,
-      "last_event_at": "2026-11-27T02:10:39.960Z"
+      "goal_status": "CLOSED",
+      "through_event": 126,
+      "last_event_at": "2026-11-27T04:19:24.994Z"
     },
     "last_provider_window": {
-      "observed_at": "2026-11-27T02:10:09.594Z",
-      "used_percent": 100,
-      "reported_reset_utc": "2026-12-02T01:41:19+00:00"
+      "observed_at": "2026-11-27T04:19:24.946Z",
+      "used_percent": 2,
+      "reported_reset_utc": "2026-12-04T03:59:18+00:00"
     },
     "cold_export": {
-      "status": "PENDING"
+      "status": "VERIFIED",
+      "action": "export_closed",
+      "added": {
+        "jobs": 0,
+        "host_turns": 0
+      },
+      "original_report_sha256": "9c84cf2c8c3dd59e793d8926e05600a38f4e3843967947730e26fbbe0fda61e1",
+      "reexport_report_sha256": "9c84cf2c8c3dd59e793d8926e05600a38f4e3843967947730e26fbbe0fda61e1",
+      "same_final_decision": true
+    },
+    "closure": {
+      "goal_version": 1,
+      "decision_ref": "gxa_1fa9b5e0049108f2c7ba3c9d6ece0c202c5f46e6c4060a797d6b0799322fcedb",
+      "op_digest": "5ceac5b5a4b537b86467c17b2256a406e8cbbf97a07c48de27d3e9cac180812d",
+      "requested_event": 117,
+      "committed_event": 122,
+      "closed_event": 124,
+      "closed_utc": "2026-11-27T04:19:24.979Z",
+      "operation": {
+        "claim_refs": [
+          "gxa_01m8dkm6qdeka9348r"
+        ],
+        "op": "close_run",
+        "reason": "独立研究者已逐份注明出处，来源卡与资格表的对照足以指定比较原件及 PCNA 链范围。",
+        "unresolved": [
+          "实际坐标文件的字节校验需取得原件。现有证据仅能核对记录中登记的校验值。",
+          "样品、采样、实验采集和处理字段均为空。具体构建体、逐链配体占据情况及坐标差异需要随包记录以外的证据。"
+        ]
+      }
+    },
+    "final_decision": {
+      "decision_ref": "gxa_1fa9b5e0049108f2c7ba3c9d6ece0c202c5f46e6c4060a797d6b0799322fcedb",
+      "thread_id": "01a21b38-e94c-7e53-9e57-80795b4adb6f",
+      "turn_id": "01a21b38-e97b-7ce3-a3f3-6728d4fbac95",
+      "reason": "独立研究者已逐份注明出处，来源卡与资格表的对照足以指定比较原件及 PCNA 链范围。",
+      "unresolved": [
+        "实际坐标文件的字节校验需取得原件。现有证据仅能核对记录中登记的校验值。",
+        "样品、采样、实验采集和处理字段均为空。具体构建体、逐链配体占据情况及坐标差异需要随包记录以外的证据。"
+      ],
+      "evidence_refs": [
+        "gxa_01m8dbxfpfwv3yp1xc",
+        "gxa_01m8dbxfpyp5dkamzy",
+        "gxa_01m8dbxfqdezy7nn00",
+        "gxa_9ea92d1f3bf079c58325a9e3e069ebd15a293f7a8b260fca784aed76a1287d81"
+      ],
+      "used_endpoints": []
     },
     "metadata": [
       {
@@ -241,6 +413,72 @@
         "sha256": "f08b899324f91ab34f600e8a6a8b1275a502c7dcbc55a960bf891465caf34669"
       }
     ],
-    "goal": "两份随包的天然人源 PCNA 沉积记录，对选择结构比较原件提供了哪些可核对的来源依据？请委派一名独立阅读研究者逐份核对随附的元数据，标明记录出处，再由 Lead 根据其报告做一个简短结论。范围为这几份已经提供的记录。"
+    "goal": "两份随包的天然人源 PCNA 沉积记录，对选择结构比较原件提供了哪些可核对的来源依据？请委派一名独立阅读研究者逐份核对随附的元数据，标明记录出处，再由 Lead 根据其报告做一个简短结论。范围为这几份已经提供的记录。",
+    "report_counts": {
+      "native_researcher_complete": 1,
+      "gx_partial_fallback": 1
+    },
+    "metadata_findings": {
+      "entries": [
+        {
+          "entry": "1VYM",
+          "title": "NATIVE HUMAN PCNA",
+          "card_source": "wwPDB:1VYM/revision/1.4",
+          "qualified_revision": "1.4",
+          "source_taxon": "Homo sapiens (9606)",
+          "model": "1",
+          "entity": "1",
+          "label_chains": [
+            "A",
+            "B",
+            "C"
+          ],
+          "registered_coordinate_sha256": "22b94186ce87e4d0b4a8e48c47ed129cea5b9900d5f6b4f9820833e879490b02",
+          "publication": "https://doi.org/10.1073/PNAS.0406540102",
+          "unpopulated": [
+            "acquisition",
+            "sample",
+            "processing",
+            "sampling"
+          ]
+        },
+        {
+          "entry": "9VGW",
+          "title": "Crystal structure of human PCNA in complex with REV1 PIP-box",
+          "card_source": "wwPDB:9VGW/revision/1.1",
+          "qualified_revision": "1.1",
+          "source_taxon": "Homo sapiens (9606)",
+          "model": "1",
+          "entity": "1",
+          "label_chains": [
+            "A",
+            "B",
+            "C"
+          ],
+          "registered_coordinate_sha256": "df8fc2854bae2a8b047ed9f09d6e1c436b116ba13a0b19959544dfeb783ee8dd",
+          "publication": "https://doi.org/10.1093/jb/mvaf054",
+          "unpopulated": [
+            "acquisition",
+            "sample",
+            "processing",
+            "sampling"
+          ]
+        }
+      ],
+      "coordinate_bytes_verified_by_this_run": false,
+      "jobs": 0,
+      "report_evidence_refs": [
+        "gxa_01m8dbxfpfwv3yp1xc",
+        "gxa_01m8dbxfpyp5dkamzy",
+        "gxa_01m8dbxfqdezy7nn00",
+        "gxa_9ea92d1f3bf079c58325a9e3e069ebd15a293f7a8b260fca784aed76a1287d81"
+      ]
+    },
+    "turn_counts": {
+      "main": 1,
+      "lead": 3,
+      "module": 4,
+      "total": 8
+    }
   }
 }

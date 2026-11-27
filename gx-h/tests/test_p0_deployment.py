@@ -17,6 +17,12 @@ def profile_environment(**values):
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_native_app_server_uses_installed_codex_or_explicit_command(self):
+        with profile_environment():
+            self.assertEqual(profiles.app_server_argv(provider="openai")[0], "codex")
+        with profile_environment(GX_P0_CODEX="/opt/gx/bin/official-codex"):
+            self.assertEqual(profiles.app_server_argv(provider="openai")[0], "/opt/gx/bin/official-codex")
+
     def test_roles_and_task_classes(self):
         expected = {
             "main": "ultra", "role.coordinator": "ultra", "team-lead": "ultra",

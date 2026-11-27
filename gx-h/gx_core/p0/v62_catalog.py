@@ -100,7 +100,11 @@ def for_start(spec):
         modules.append({**{k: declaration[k] for k in _COMMON}, "plugin": goal._document(plugin.pin),
                         "provider_closure": [goal._document(p) for p in pins],
                         "declaration_sha256": ids.sha256_of_obj(declaration)})
+    from . import capability_views
+    options = capability_views.options(spec)
+    choices = _choice_cards(loaded, options) if options else []
     return {"policy": settings, "modules": modules,
+            **({"choices": choices} if choices else {}),
             **({"branch_delegation": False} if not branch_delegation else {}),
             **({"source_tools": sorted(lead_source_tools)} if lead_source_tools else {}),
             **({"lead_method_cards": True} if independent_science_access else {}),
@@ -129,6 +133,29 @@ def _release_method_cards():
             "method": method["method_card"], "inputs": manifest.input_roles(method), "outputs": method["outputs"],
             "limitations": method.get("limitations"), "cost_class": "gpu" if method["resources"].get("gpu") else "local_cpu"}))
     return cards
+
+
+def _choice_cards(loaded, options):
+    """Describe PI-listed alternatives from verified package bytes without granting execution."""
+    cards = {row["capability_version"]: row for row in _release_method_cards()
+             if row["capability_version"] in options}
+    for pkg in loaded.plugins.values():
+        owner = pkg.pin.id + "@" + pkg.pin.version
+        for cap, ref in goal._methods(pkg).items():
+            choice = options.get(cap)
+            if not choice or choice.get("provider", owner) != owner or ref == cap:
+                continue
+            bundle = shipped._package_bundle(pkg, ref)
+            digest = shipped.portable_digest(bundle)
+            if digest != choice["digest"]:
+                continue
+            method = bundle["manifest"]
+            cards[cap] = _public_card({
+                "capability_version":cap, "portable_sha256":digest, "method":method["method_card"],
+                "inputs":manifest.input_roles(method), "outputs":method["outputs"], "limitations":method.get("limitations"),
+                "cost_class":"gpu" if method["resources"].get("gpu") else "local_cpu"})
+    return [dict(card, status="selectable") for cap, card in sorted(cards.items())
+            if card["portable_sha256"] == options[cap]["digest"]]
 
 
 def _public_card(row, *, metric_contract=False):
@@ -309,19 +336,28 @@ def query(conn, run_id, brief, args):
     inputs = _inputs(conn, run_id)
     catalog = inputs.get("research_catalog")
     if not catalog:
-        raise ScopeDenied("Research catalog query requires a module-enabled Run")
+        if kind == "recipe" and brief.get("scope") == "run" and conn.execute(
+                "SELECT 1 FROM v6_saved_recipes LIMIT 1").fetchone():
+            from . import catalog_resources
+            return catalog_resources.query(conn, run_id, brief, kind, args, _methods(conn, run_id, inputs), ())
+        raise ScopeDenied("Research catalog query requires a module-enabled Run or a saved recipe")
     scope = brief.get("scope")
     module_scope = isinstance(scope, str) and scope.startswith("module:")
     if scope != "run" and not module_scope:
         raise ScopeDenied("This task has no module catalog grant")
     reference = args.get("reference")
+    choices = []
+    if scope == "run" and catalog.get("choices"):
+        bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
+        choices = [r for r in catalog["choices"] if not intent.forbidden_capability(
+            *r["capability_version"].rsplit("@", 1), bans)]
     if kind in ("database", "research", "skill", "recipe"):
         from . import catalog_resources
-        return catalog_resources.query(conn, run_id, brief, kind, args, _methods(conn, run_id, inputs))
+        return catalog_resources.query(conn, run_id, brief, kind, args, _methods(conn, run_id, inputs), choices)
     if kind == "method":
         rows = _methods(conn, run_id, inputs)
         survey = module_scope and brief.get("catalog_access") == "public_methods"
-        public_lead = scope == "run" and catalog.get("lead_method_cards")
+        public_lead = scope == "run" and bool(catalog.get("lead_method_cards") or choices)
         if survey:
             from .v62_modules import require_active
             grant = json.loads(require_active(conn, run_id, scope)["grant_json"])
@@ -331,6 +367,7 @@ def query(conn, run_id, brief, args):
             bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
             cards = {r["capability_version"]: r for r in catalog.get("public_methods", ())
                      if not intent.forbidden_capability(*r["capability_version"].rsplit("@", 1), bans)}
+            cards.update({r["capability_version"]:r for r in choices})
             granted = {r["capability_version"] for r in rows}
             cards.update({r["capability_version"]: r if public_lead else _public_card(r) for r in rows})
             rows = [cards[k] for k in sorted(cards)]
@@ -350,7 +387,9 @@ def query(conn, run_id, brief, args):
         entries = [_method_summary(row) for row in rows]
         if public_lead:
             for item in entries:
-                item["execution_granted"] = item["capability_version"] in granted
+                cap = item["capability_version"]
+                item["execution_granted"] = cap in granted
+                item["status"] = "available" if cap in granted else cards[cap].get("status", "catalog_only")
     else:
         rows = catalog["modules"]
         if module_scope:

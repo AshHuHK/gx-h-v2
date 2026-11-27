@@ -9,8 +9,8 @@ import unittest
 from unittest.mock import patch
 
 from gx_core.artifacts import ArtifactService
-from gx_core.errors import SchemaInvalid
-from gx_core.p0 import manifest, v6_decisions, v6_graph, v6_jobs
+from gx_core.errors import SchemaInvalid, VersionImmutable
+from gx_core.p0 import manifest, v6_decisions, v6_jobs, v6_native, v6_recipes, v621_policy, v62_catalog, v62_outputs
 from gx_core.persistence import store
 from tests import test_v62_outputs as series
 from tests.test_v6_decisions import bind_native_fixture, branch, draft
@@ -69,25 +69,58 @@ class NamedOutputs(unittest.TestCase):
         v6_jobs.advance(self.conn, self.run)
         self.conn.close()
         with closing(store.open_store(self.db)) as db:
-            original = manifest.read_manifest
-
-            def reverse_output_inventory(conn, job_id, **opts):
-                receipt = original(conn, job_id, **opts)
-                if receipt and receipt["completion"]:
-                    receipt["completion"]["outputs"].reverse()
-                return receipt
-
-            with patch.object(manifest, "read_manifest", side_effect=reverse_output_inventory):
+            # The Job writer seals the reordered publication list normally, including its digest.
+            publish = v62_outputs.bind_published
+            def reverse_output_inventory(admission, outputs):
+                outputs.reverse()
+                publish(admission, outputs)
+            with patch.object(v62_outputs, "bind_published", side_effect=reverse_output_inventory):
                 rows = self.settle(nodes.values(), db)
+            proof = manifest.read_manifest(db, rows[nodes["split"]]["job_id"])
+            self.assertNotEqual([out["output_name"] for out in proof["completion"]["outputs"]],
+                                [out["name"] for out in proof["admission"]["output_declarations"]])
             for slot, expected in (("second", 1), ("third", 5)):
                 row = rows[nodes[slot]]
                 self.assertEqual(row["status"], "SUCCEEDED")
-                selected, = original(db, row["job_id"])["admission"]["inputs"]
+                selected, = manifest.read_manifest(db, row["job_id"])["admission"]["inputs"]
                 self.assertEqual(json.loads(ArtifactService(db).read_bytes(selected["artifact_ref"])),
                                  {"readings": [expected]})
             self.assertEqual(v6_decisions.adopt(db, **self.call, decision=body)["decision_id"], answer["decision_id"])
             v6_jobs.advance(db, self.run)
             self.assertEqual(db.execute("SELECT count(*) FROM jobs WHERE run_id=?", (self.run,)).fetchone()[0], 3)
+
+    def test_saved_recipe_pins_materials_ports_and_dependencies(self):
+        change = self.graph([("second", "next.json"), ("third", "optional.json")])
+        graph = v6_decisions.adopt(self.conn, **self.call, decision=change)
+        slots = [{"slot": slot, "node_id": graph["aliases"]["local:" + slot]}
+                 for slot in ("split", "second", "third")]
+        self.settle([row["node_id"] for row in slots], self.conn)
+        fields = {"recipe_id": "bounds", "version": "1", "title": "Detector series bounds",
+                  "id_alignment": "Use the admitting sample identity.", "missing_values": "Reject missing series.",
+                  "units": "Instrument counts", "nodes": slots,
+                  "inputs": [{"name": "series", "artifact_ref": self.raw}]}
+        card = v6_recipes.save(self.conn, self.run, fields)
+        quick = {"scope": "run", "run_id": self.run, "evidence_policy": v621_policy.VERSION}
+        menu = {t["name"] for t in v6_native.tool_specs([], quick, conn=self.conn, run_id=self.run)}
+        self.assertTrue({"gx_instantiate_recipe", "gx_query_catalog"} <= menu)
+        discovered = v62_catalog.query(self.conn, self.run, quick, {"kind": "recipe", "reference": card["reference"]})
+        self.assertEqual(discovered["spec"]["units"], fields["units"])
+        reorder = v6_recipes.save(self.conn, self.run, dict(fields, nodes=list(reversed(slots))))
+        self.assertEqual(reorder["digest"], card["digest"])
+        with self.assertRaises(VersionImmutable):
+            v6_recipes.save(self.conn, self.run, dict(fields, units="milliseconds"))
+        args = {"recipe": card["reference"], "digest": card["digest"], "branch": "local:next",
+                "inputs": {"series": self.raw}, "prefix": "qc"}
+        steps = {s["node"]: s for s in v6_recipes.instantiate(self.conn, self.run, args)["ops"]}
+        for label, name in (("second", "next.json"), ("third", "optional.json")):
+            op = steps["local:qc-" + label]
+            self.assertEqual(op["inputs"], op["depends_on"])
+            self.assertEqual(op["inputs"], ["local:qc-split"])
+            self.assertEqual(op["input_ports"], [{"index": 0, "output": name}])
+        with self.assertRaisesRegex(SchemaInvalid, "digest"):
+            v6_recipes.instantiate(self.conn, self.run, dict(args, digest="0" * 64))
+        with self.assertRaisesRegex(SchemaInvalid, "every named"):
+            v6_recipes.instantiate(self.conn, self.run, dict(args, inputs={}))
 
     def test_unknown_output_rejected_before_graph_or_job(self):
         with self.assertRaisesRegex(SchemaInvalid, "declared.*output|output.*declared"):

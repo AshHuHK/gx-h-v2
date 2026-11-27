@@ -179,6 +179,41 @@ def _observations(prediction, assessment, output_labels, materials, zh):
     return "无合格读数" if zh else "No qualifying reading"
 
 
+def complete_decision(result):
+    """Display the entire rendered closing decision with the readings that decision used."""
+    decision = result["final_decision"]
+    rendered = decision["rendered"]
+    language = result.get("presentation", {}).get("language")
+    chinese = language == "zh" if language else bool(re.search(r"[\u3400-\u9fff]", result["goal"]))
+    def label(en, zh):
+        return zh if chinese else en
+    lines = [label("# Closing decision", "# 完整结题决定"), "",
+             rendered["reason"], "", rendered["rationale"], ""]
+    if rendered["unresolved"]:
+        lines.extend([label("## Limitations", "## 适用范围与未决问题"), "",
+                      *("- " + item for item in rendered["unresolved"]), ""])
+    readings = decision.get("used_endpoints", [])
+    if readings:
+        lines.extend([label("## Cited readings", "## 决定引用的读数"), ""])
+        for item in readings:
+            reading = item["reading"]
+            metric = reading.get("metric_id") or reading["observable"]
+            value = reading.get("display")
+            if value is None:
+                value = " ".join(str(x) for x in (reading["value"], reading.get("unit")) if x is not None)
+            lines.append(f"- {metric} · {value} · "
+                         f"{reading.get('output_name') or item['source_ref']} · "
+                         f"{label('delivery event', '送达事件')} {item['event_id']}")
+        lines.append("")
+    if decision.get("evidence_refs"):
+        lines.extend([label("## Evidence", "## 依据"), "",
+                      *("- " + ref for ref in decision["evidence_refs"]), ""])
+    lines.extend([f"{label('Decision', '决定')} {decision['decision_ref']} · "
+                  f"{label('closed at event', '结题事件')} {result['closure']['closed_event']}",
+                  "", label("[Scientific record](result.json)", "[原始研究记录](result.json)")])
+    return "\n".join(lines) + "\n"
+
+
 def page(result):
     language = result.get("presentation", {}).get("language")
     zh = language == "zh" if language else bool(re.search(r"[\u3400-\u9fff]", result["goal"]))

@@ -147,6 +147,8 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
         if any(n.get("result_ref") for n in brief.get("nodes", [])):
             catalog.append(contracts.native_goal_tool_spec(v6_recipes.SAVE))
         if conn is not None and conn.execute("SELECT 1 FROM v6_saved_recipes LIMIT 1").fetchone():
+            if not any(tool["name"] == v62_native.QUERY for tool in catalog):
+                catalog.append(contracts.native_goal_tool_spec(v62_native.QUERY))
             catalog.append(contracts.native_goal_tool_spec(v6_recipes.INSTANTIATE))
 
     return catalog

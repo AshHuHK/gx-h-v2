@@ -29,7 +29,8 @@ def _mapping(rows, key, value):
 
 def _card(reference, digest, definition):
     return {"kind": "recipe", "reference": reference, "digest": digest, "title": definition["title"],
-            "inputs": definition["inputs"], "methods": {s["slot"]: s["capability"] for s in definition["steps"]},
+            "id_alignment": definition["id_alignment"], "missing_values": definition["missing_values"],
+            "units": definition["units"], "inputs": definition["inputs"], "methods": {s["slot"]: s["capability"] for s in definition["steps"]},
             "method_pins": {s["capability"]: s["method_digest"] for s in definition["steps"]},
             "outputs": {s["slot"]: s["outputs"] for s in definition["steps"]}}
 

@@ -1,6 +1,7 @@
 """Offline readers for publisher documents and accessioned, immutable database records."""
 from datetime import datetime
 from html.parser import HTMLParser
+from io import BytesIO
 import json
 import re
 from urllib.parse import urlsplit
@@ -115,28 +116,37 @@ def pdf_blocks(raw):
     if not raw.lstrip().startswith(b'%PDF-'):
         raise SchemaInvalid('The registered PDF is missing its file signature')
     try:
-        import pymupdf
+        import pypdf
+        from pypdf.errors import PyPdfError
     except ImportError as exc:
-        raise SchemaInvalid('PDF page text extraction requires PyMuPDF in the GX environment') from exc
+        raise SchemaInvalid('Install the pinned PDF reader from release-assets/python/requirements.lock') from exc
     blocks = []
     extracted = []
+    unreadable = []
     try:
-        with pymupdf.open(stream=raw, filetype='pdf') as doc:
-            total = len(doc)
-            if doc.needs_pass:
-                raise SchemaInvalid('The registered PDF is encrypted')
-            for number, page in enumerate(doc, 1):
-                found = False
-                for i, block in enumerate(page.get_text('blocks', sort=True), 1):
-                    if block[6] == 0 and (text := block[4].strip()):
-                        blocks.append(('page_text', f'page {number} block {i}', text))
-                        found = True
-                if found:
-                    extracted.append(number)
-    except (RuntimeError, ValueError) as exc:
+        doc = pypdf.PdfReader(BytesIO(raw))
+        if doc.is_encrypted:
+            raise SchemaInvalid('The registered PDF is encrypted')
+        total = len(doc.pages)
+        labels = doc.page_labels
+        for number, page in enumerate(doc.pages, 1):
+            try:
+                text = (page.extract_text() or '').strip()
+            except (PyPdfError, ValueError, NotImplementedError) as exc:
+                unreadable.append({'page': number, 'error': type(exc).__name__})
+                continue
+            if text:
+                extracted.append(number)
+                label = labels[number - 1]
+                locator = f'page {number}'
+                if label != str(number):
+                    locator += f' [{label}]'
+                blocks.append(('page_text', locator, text))
+    except (PyPdfError, ValueError, RecursionError) as exc:
         raise SchemaInvalid('The registered PDF could not be parsed') from exc
     return ('PARTIAL_TEXT' if extracted else 'UNAVAILABLE'), blocks, {
-        'extractor': 'PyMuPDF ' + pymupdf.VersionBind, 'page_count': total, 'pages_with_text': extracted,
+        'extractor': 'pypdf ' + pypdf.__version__, 'page_count': total, 'pages_with_text': extracted,
+        'page_errors': unreadable,
         'scope': 'Embedded text only. Figures, reading order, table layout and image-only pages require inspection.'}
 
 

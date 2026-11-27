@@ -93,7 +93,7 @@ def _prior_descriptor(conn, rid, ref):
 def _spec(conn, directory, parent, close, mid, text, options):
     rid = parent["run_id"]
     if not isinstance(options, dict) or set(options) - {
-        "parent_material_refs", "input_files", "research_effort", "include_message_attachments"
+        "parent_material_refs", "input_files", "research_effort", "include_message_attachments", "parent_method_options"
     }:
         raise SchemaInvalid("Select prior material references, new input files or message attachments for the successor")
     prior = options.get("parent_material_refs", [])
@@ -109,6 +109,23 @@ def _spec(conn, directory, parent, close, mid, text, options):
         "research_effort", "research_modules", "module_policy", "branch_delegation", "initial_job_limit",
         "capabilities", "plugins", "max_parallel_roots"
     }}
+    if "parent_method_options" in options:
+        from ..plugins import goal
+        choices = options["parent_method_options"]
+        if (not isinstance(choices, list) or not all(isinstance(name, str) for name in choices)
+                or len(set(choices)) != len(choices)):
+            raise SchemaInvalid("Select distinct, exact parent method references")
+        active = {row["capability_version"]: row for row in goal.catalog(conn, rid)}
+        if set(choices) - active.keys():
+            raise SchemaInvalid("A successor method option must be active in the sealed parent")
+        options_for_lead = []
+        for name in choices:
+            row = active[name]
+            option = {"method": name, "digest": row["portable_sha256"]}
+            if owner := row.get("plugin"):
+                option["provider"] = owner["id"] + "@" + owner["version"]
+            options_for_lead.append(option)
+        spec["capability_options"] = options_for_lead
     if "research_effort" in options:
         if options["research_effort"] not in ("quick", "medium", "deep"):
             raise SchemaInvalid("Choose quick, medium or deep research effort")

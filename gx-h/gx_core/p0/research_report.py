@@ -185,7 +185,7 @@ def export(conn, rid, directory, invocation):
     from ..native_release import write_native_bytes
     from .intent import read_item
     from .research_evidence import evidence
-    from .research_page import page
+    from .research_page import complete_decision, page
     from .research_routes import routes
     conn.execute("SAVEPOINT research_report")
     try:
@@ -216,7 +216,7 @@ def export(conn, rid, directory, invocation):
             "parent_run_id", "parent_decision_ref", "parent_goal_version", "request_message_id", "selected_materials")}
     out = directory/"research"/rid
     out.mkdir(parents=True, exist_ok=True)
-    files = {"REPORT.md": page(result), "result.json": json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False)+"\n"}
+    files = {"REPORT.md": page(result), "DECISION.md": complete_decision(result), "result.json": json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False)+"\n"}
     readers = []
     for row in conn.execute("""SELECT c.value FROM events e, json_each(e.payload_json,'$.clauses') c
             WHERE e.run_id=? AND e.event_id>? AND e.kind='pi.message.routed'
@@ -242,4 +242,4 @@ def export(conn, rid, directory, invocation):
         encoded = data.encode()
         if not target.is_file() or target.read_bytes() != encoded:
             write_native_bytes(target, encoded)
-    return {**({"readers": readers} if readers else {}), "report":str(out/"REPORT.md"), "result":str(out/"result.json"), "invocation":invocation}
+    return {**({"readers": readers} if readers else {}), "report":str(out/"REPORT.md"), "decision":str(out/"DECISION.md"), "result":str(out/"result.json"), "invocation":invocation}

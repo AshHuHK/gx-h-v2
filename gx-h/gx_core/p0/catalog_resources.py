@@ -1,5 +1,8 @@
 """Cards for installed analytical databases, source readers, research skills and runnable recipes."""
-from .. import contracts
+from functools import lru_cache
+import json
+
+from .. import config, contracts
 from ..domain import ids
 from ..errors import ScopeDenied
 from . import v62_sources
@@ -11,7 +14,7 @@ def _method_kinds(row):
     kind = set()
     if row.get("catalog_kind") in {"database", "research"}:
         kind.add(row["catalog_kind"])
-    if ("archive" in family or "database" in family or any(isinstance(o, dict) and
+    if ("archive" in family or "database" in family or family == "yeast_enzyme_evidence" or any(isinstance(o, dict) and
             o.get("acquired_material") for o in row.get("outputs", []))):
         kind.add("database")
     if any(word in family for word in ("literature", "bibliographic", "source_reading", "community_source")):
@@ -19,7 +22,27 @@ def _method_kinds(row):
     return kind
 
 
-def query(conn, run_id, brief, kind, args, methods):
+@lru_cache(maxsize=4)
+def _reference_index(path, modified_ns):
+    return json.loads(path.read_bytes())["cards"]
+
+
+def _references(kind, occupied):
+    path = config.CONFIG_DIR / "research_asset_cards.json"
+    if not path.is_file():
+        return []
+    result = []
+    for card in _reference_index(path, path.stat().st_mtime_ns):
+        if card["kind"] != kind or card["reference"] in occupied:
+            continue
+        # These are source locations and descriptions. Their presence cannot
+        # choose a Job provider or turn an old workflow description into a recipe.
+        result.append({**card, "status":"reference_only", "execution_granted":False})
+        occupied.add(card["reference"])
+    return result
+
+
+def query(conn, run_id, brief, kind, args, methods, choices):
     from . import v62_catalog, v6_recipes
     from ..plugins import development
     module = brief["scope"].startswith("module:")
@@ -49,18 +72,22 @@ def query(conn, run_id, brief, kind, args, methods):
                              digest=ids.sha256_of_obj([contracts.native_goal_tool_spec(n) for n in stages]),
                              status="available"))
     else:
-        for method in visible:
+        available = {r["capability_version"] for r in visible}
+        for method in [*visible, *(r for r in choices if r["capability_version"] not in available)]:
             if kind not in _method_kinds(method):
                 continue
             card = v62_catalog._public_card(method, metric_contract=True)
-            rows.append(dict(card, reference=method["capability_version"], digest=method["portable_sha256"],
-                             status="available", kind=kind, **v62_catalog._method_summary(method)))
+            rows.append({**v62_catalog._method_summary(method), **card, "reference":method["capability_version"],
+                         "digest":method["portable_sha256"], "kind":kind,
+                         "status":"available" if method["capability_version"] in available else "selectable"})
         if kind == "research":
             for tool in sorted(tools.intersection(v62_sources.TOOL_NAMES)):
                 spec = contracts.native_goal_tool_spec(tool)
                 rows.append({"reference":tool+"@1", "kind":kind, "category":"source_reading", "status":"available",
                              "purpose":spec["description"], "handler":tool, "inputs":spec["inputSchema"],
                              "digest":ids.sha256_of_obj(spec), "outputs":["source or evidence receipt"]})
+    if not module:
+        rows.extend(_references(kind, {row["reference"] for row in rows}))
     reference = args.get("reference")
     if reference:
         for card in rows:
@@ -75,6 +102,13 @@ def query(conn, run_id, brief, kind, args, methods):
         if search and search not in ids.canonical_json(row).casefold():
             continue
         summary = {key:row[key] for key in ("reference","kind","category","status","purpose","digest")}
+        if row["status"] == "reference_only":
+            summary["execution_granted"] = False
+        if isinstance(row.get("inputs"), list):
+            summary["input_roles"] = row["inputs"]
+        if isinstance(row.get("outputs"), list):
+            summary["output_names"] = [o if isinstance(o,str) else o["name"] for o in row["outputs"]
+                                       if isinstance(o,str) or isinstance(o,dict) and "name" in o]
         summary["version"] = row["reference"].rsplit("@",1)[-1]
         matches.append(summary)
     start = args.get("offset", 0)

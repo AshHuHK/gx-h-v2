@@ -545,6 +545,8 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         }
         if p.get("condition") and row["kind"] == "v6.node.settled":
             facts["condition"] = p["condition"]
+        if p.get("dependency") and row["kind"] == "v6.node.settled":
+            facts["dependency"] = p["dependency"]
         if p.get("failure") and row["kind"] == "v6.node.settled":
             facts["failure"] = p["failure"]
         if ref:
@@ -571,7 +573,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                         if provider and provider.project:
                             content = provider.project(content)
                     facts["observation"] = content
-                except (ArtifactHashMismatch, ArtifactNotFound, OSError, SchemaInvalid) as exc:
+                except (ArtifactHashMismatch, ArtifactNotFound, OSError, SchemaInvalid, VersionImmutable) as exc:
                     if not current_policy:
                         raise
                     facts["unavailable"] = {"reason": getattr(exc, "code", "IO_ERROR"),

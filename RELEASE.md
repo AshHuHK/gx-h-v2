@@ -17,7 +17,7 @@ python3 -B scripts/release_assets.py all
 ./bin/gx-p0 --help
 ```
 
-运行随附的 2RE9 项目还需要给启动 GX 的 Python 安装独立复算库。在解包目录创建本机虚拟环境，后续各个终端使用此环境启动、运行和恢复项目。
+坐标独立复算和科研 PDF 阅读使用随附的离线 wheel。在解包目录创建本机虚拟环境，后续各个终端使用此环境启动、运行和恢复项目。
 
 ```bash
 python3.11 -m venv .venv
@@ -28,11 +28,17 @@ python3.11 -m venv .venv
 .venv/bin/python bin/gx-p0 run --state ./var/tl1a-study
 ```
 
+从发布根目录运行 PDF 阅读验收。测试用普通 Goal 开题，并经受控原生回合读取带页标的 PDF。第一页空白，第二页的原始页标为 `S-8`。输出含文字层覆盖、原件摘要、页标与本次读取回执。随附 pypdf 7.2.0 通用 wheel 为 428449 字节，SHA-256 为 `5edb9b033dd55cecead9303370e6854c1a3b979669bde1c46024cde0228405b1`。[PyPI 发行页](https://pypi.org/project/pypdf/7.2.0/)
+
+```bash
+PYTHONPATH=gx-h:. .venv/bin/python -B -m acceptance.science_capabilities.pdf_source_release
+```
+
 安装器校验上游源码归档中的 Git commit、10,235 个文件和链接、源码许可、Schema 逐文件清单、npm 发行包的 SHA-512 与原生可执行文件的 SHA-256。完整 Linux npm 包保留官方辅助程序和各组件许可证。GX 可直接使用已安装的官方客户端。有明确部署需要时，使用 `GX_P0_CODEX` 指定相同版本的可执行文件。[Codex 许可证](release-assets/licenses/codex/LICENSE) · [上游 NOTICE](release-assets/licenses/codex/NOTICE) · [协议文件摘要](acceptance/runs/schema/schema.sha256) · [项目启动、授权与恢复](DEPLOYMENT.md)
 
 ## 一次离线复验
 
-从解压后的目录运行以下命令。输出目录必须尚未存在。验证会安装附件中的资产，在临时空 venv 内从 wheel 安装 Biopython 1.88 和 NumPy 1.26.4，用同一份候选代码运行迁移、回退、Cordis、真实坐标 CPU 计算和独立数值复算。官方 App Server 使用回环 Responses 服务验证握手、冷恢复及公开 CLI 的三轮合成项目。每条命令保留退出码和日志。正式 OAuth 科研结果单独使用项目自己的验收记录。
+从解压后的目录运行以下命令。输出目录必须尚未存在。验证会安装附件中的资产，在临时空 venv 内从 wheel 安装 Biopython 1.88 和 NumPy 1.26.4 以及 pypdf 7.2.0，用同一份候选代码运行迁移、回退、Cordis、真实坐标 CPU 计算和独立数值复算。官方 App Server 使用回环 Responses 服务验证握手、冷恢复及公开 CLI 的三轮合成项目。每条命令保留退出码和日志。正式 OAuth 科研结果单独使用项目自己的验收记录。
 
 ```bash
 python3 -B scripts/smoke_release.py --archive ../gx-codex-p0-acc1-linux-x86_64.tar \

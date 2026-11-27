@@ -5,8 +5,6 @@ import json
 import os
 from pathlib import Path
 import shutil
-import subprocess
-import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -15,8 +13,12 @@ from acceptance.v62a import interleavings_fixture as fx
 from gx_core import config
 from gx_core.artifacts import ArtifactService
 from gx_core.capabilities import manifest
-from gx_core.errors import GxError
-from gx_core.p0 import capability_views, cli, v6_goal, v62_outputs
+from gx_core.p0 import capability_views, cli, conversation, conversation_delivery, v62_outputs
+from gx_core.p0.roots import Roots
+from gx_core.errors import SchemaInvalid
+from acceptance.science_capabilities import record_method
+from acceptance.v622.test_close import CloseStudy, close_decision
+from acceptance.v623 import test_close_metrics as endpoint_fixture
 from gx_core.plugins import development
 from gx_core.plugins.catalog import package_digest
 from gx_core.plugins.cli import _install
@@ -54,7 +56,7 @@ class DerivedMethod(unittest.TestCase):
         with redirect_stdout(output):
             self.assertEqual(0, cli.main(["start", "--state", str(state), "--run-key", "develop-record-method",
                         "--goal", (EXAMPLE / "trehalose/question.md").read_text(), "--goal-config", str(cfg)]), output.getvalue())
-        s = self.enterContext(fx.Scenario(state.parent, reopen=True))
+        s = self.enterContext(CloseStudy(state.parent, reopen=True))
         actor = s.next_actor("run")
         # Use material roles; presentation order is independent of argv order.
         files = json.loads(s.conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (s.run_id,)).fetchone()[0])["files"]
@@ -68,11 +70,15 @@ class DerivedMethod(unittest.TestCase):
         first = s.settle(adopted["aliases"]["local:derive"])
         spec_ref = v62_outputs.published_outputs(s.conn, s.run_id, first["job_id"])[0]["artifact_ref"]
         actor = s.next_actor("run")
+        with self.assertRaisesRegex(SchemaInvalid, "original Job output"):
+            s.call(actor, "gx_install_record_method", {"build_ref": inputs["cohort"], "expected_revision": 0},
+                   "untrusted-input")
         install_args = {"build_ref": spec_ref, "expected_revision": 0}
         installed = s.call(actor, "gx_install_record_method", install_args, "install")
         self.assertEqual(installed, s.call(actor, "gx_install_record_method", install_args, "install"))
         method = installed["capability_version"]
         self.assertEqual(1, capability_views.current(s.conn, s.run_id)["revision"])
+        self.assertEqual(installed, s.call(actor, "gx_install_record_method", install_args, "same-build-new-call"))
         self.assertEqual(method, development.skills(s.conn, s.run_id)[0]["reference"])
         # Freeze a new brief after the view changed, and commission the developed method there.
         s.call(actor, "gx_decide_revision", {"decision": fx.draft(evidence=[spec_ref])}, "read-build")
@@ -88,12 +94,82 @@ class DerivedMethod(unittest.TestCase):
         actor = s.next_actor("run")
         read = s.call(actor, "gx_read_artifact", {"ref": published}, "read-coverage")
         self.assertEqual(read["denominator"], 3)
-        decision = fx.draft(evidence=[published])
+        saved = s.call(actor, "gx_save_recipe", {
+            "recipe_id": "accession-evidence-coverage", "version": "1", "title": "Located papers per accession",
+            "nodes": [{"slot": "coverage", "node_id": job["node_id"]}],
+            "inputs": [{"name": role, "artifact_ref": inputs[role]} for role in ("cohort", "evidence")],
+            "units": "Fraction of unique cohort accessions", "id_alignment": "Case-sensitive Swiss-Prot accession",
+            "missing_values": "A null pointer or absent match stays in the population."}, "save")
+        decision = close_decision([published])
+        endpoint = endpoint_fixture.EndpointClose.read_page(self, s, actor, published, 0, "read-coverage-endpoint")
+        decision["metric_refs"] = [published + "#" + endpoint["endpoint_rows"][0]["key"]]
         decision["rationale"] = "Prioritize the two entries with paper pointers for source review; the other entry remains unclassified."
         accepted = s.call(actor, "gx_decide_revision", {"decision": decision}, "cite-readout")
         proof = dict(run_id=s.run_id, provider="scripted_native_transport", model_calls=0, source=installed["source"],
                      method=method, plugin=installed["plugin"], builder_job=first["job_id"], build_ref=spec_ref,
                      execution_job=job["job_id"], measurement_ref=published, reading=result,
                      cited_decision_ref=accepted["decision_ref"], calibration=installed["calibration"])
+        s.advance()
+        parent = s.run_id
+        self.assertEqual(record_method.report(s.conn, parent)["lead_decisions_citing_coverage"][0]["decision_ref"],
+                         accepted["decision_ref"])
+        options = record_method.followup(s.conn, parent)
+        question = (EXAMPLE / "sucrose/question.md").read_text()
+        conversation.send(s.conn, parent, question, "sucrose-followup-01", successor=options)
+        recorded = s.conn.execute("SELECT successor_json FROM p0_conversation_messages WHERE message_id=?",
+                                  ("sucrose-followup-01",)).fetchone()[0]
+        s.run_id = conversation_delivery.start_successor(s.conn, state, parent, "sucrose-followup-01", question,
+                                                         json.loads(recorded), native_owner=True)["run_id"]
+        client = s.roots.client
+        s.roots = Roots(s.conn, run_id=s.run_id, cwd=state, token_budget=10)
+        s.roots.client = client
+        actor = s.next_actor("run")
+        selected = s.call(actor, "gx_select_capability", {"method": method, "action": "enable", "revision": 0}, "select")
+        self.assertEqual(1, selected["revision"])
+        s.call(actor, "gx_decide_revision", {"decision": fx.draft()}, "wait-for-view")
+        actor = s.next_actor("run")
+        files = json.loads(s.conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (s.run_id,)).fetchone()[0])["files"]
+        child_inputs = {f["role"]: f["artifact_ref"] for f in files}
+        card = s.call(actor, "gx_query_catalog", {"kind": "recipe", "reference": saved["reference"]}, "find-recipe")
+        self.assertEqual(saved["digest"], card["spec"]["digest"])
+        params = {"recipe": saved["reference"], "digest": saved["digest"], "branch": "local:sucrose", "prefix": "sucrose",
+                  "inputs": {role: child_inputs[role] for role in ("cohort", "evidence")}}
+        expansion = s.call(actor, "gx_instantiate_recipe", params, "reuse")
+        branch = fx.branch("sucrose")
+        branch["budget_limits"]["cpu_seconds"] = 30
+        child = s.call(actor, "gx_decide_revision", {"decision": fx.draft(branch, *expansion["ops"],
+                    evidence=[child_inputs["cohort"]], watches=[{"event":"job_settled",
+                    "subject_ref":expansion["ops"][0]["node"]}])}, "measure-again")
+        child_job = s.settle(child["aliases"][expansion["ops"][0]["node"]])
+        out = v62_outputs.published_outputs(s.conn, s.run_id, child_job["job_id"])[0]["artifact_ref"]
+        second = ArtifactService(s.conn).read_json(out)
+        self.assertEqual((second["numerator"], second["denominator"], second["matched_without_value"]), (0, 1, ["P00724"]))
+        actor = s.next_actor("run")
+        s.call(actor, "gx_read_artifact", {"ref": out}, "read-sucrose")
+        close = close_decision([out])
+        endpoint = endpoint_fixture.EndpointClose.read_page(self, s, actor, out, 0, "read-sucrose-endpoint")
+        close["metric_refs"] = [out + "#" + endpoint["endpoint_rows"][0]["key"]]
+        close["rationale"] = "The lone sucrose accession has no experimental paper pointer here; look for outside sources."
+        adopted = s.call(actor, "gx_decide_revision", {"decision": close}, "close-sucrose")
+        s.advance()
+        self.assertEqual("CLOSED", s.conn.execute("SELECT status FROM v6_goals WHERE run_id=?", (s.run_id,)).fetchone()[0])
+        self.assertEqual(1, len(record_method.report(s.conn, s.run_id)["jobs"]))
+        proof["saved_recipe"] = saved
+        proof["successor"] = {"run_id": s.run_id, "job_id": child_job["job_id"], "reading": second, "output_ref": out,
+                              "cited_decision_ref": adopted["decision_ref"], "recipe_digest": card["spec"]["digest"]}
         if path := os.environ.get("GX_RECORD_METHOD_RECEIPT"):
             Path(path).write_text(json.dumps(proof, indent=2, ensure_ascii=False) + "\n")
+
+    def test_missing_keys_are_never_dropped_from_a_denominator_and_foreign_ids_do_not_count(self):
+        import runpy
+        pkg = ROOT / "gx-h/plugins/installed/org.gx.record-method-builder/1.0.0"
+        calculate = runpy.run_path(str(pkg / "template/coverage.py"))["measure"]
+        fields = {"cohort_rows": "$", "cohort_id": "key", "evidence_rows": "$",
+                  "evidence_id": "accession", "evidence_value": "reading"}
+        with self.assertRaisesRegex(ValueError, "identifier"):
+            calculate([{"key": "A"}, {"key": None}], [{"accession": "A", "reading": "ok"}], fields)
+        with self.assertRaisesRegex(ValueError, "identifier cannot"):
+            calculate([{"key": "A"}], [{"accession": "A"}], dict(fields, evidence_value="accession"))
+        actual = calculate([{"key":"A"}, {"key":"a"}], [{"accession":"A", "reading":0},
+                           {"accession":"B", "reading":17}, {"accession":"a", "reading":"  "}], fields)
+        self.assertEqual((actual["numerator"], actual["denominator"], actual["outside_cohort_ids"]), (1, 2, ["B"]))

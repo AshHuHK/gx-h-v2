@@ -1,0 +1,169 @@
+{
+  "cards": [
+    {
+      "reference": "gx-understand@legacy",
+      "kind": "skill",
+      "category": "evidence",
+      "title": "GX2Understand",
+      "purpose": "Locate the primary passage behind a claim, qualify the evidence, and retain disagreements.",
+      "digest": "cfa6161ac65eb8fa77b1a07c8069cefb55aac51d992c91afe0e598e81763f295",
+      "source": {
+        "workspace": "ash_proj",
+        "path": "GX-harness/.agents/skills/gx2understand/SKILL.md",
+        "sha256": "cfa6161ac65eb8fa77b1a07c8069cefb55aac51d992c91afe0e598e81763f295"
+      },
+      "inputs": [
+        "primary source"
+      ],
+      "outputs": [
+        "reading note"
+      ],
+      "related_methods": "gx_read_source, gx_extract_evidence, gx_review_evidence"
+    },
+    {
+      "reference": "paper-to-skill@legacy",
+      "kind": "skill",
+      "category": "evidence",
+      "title": "Paper2Skill",
+      "purpose": "Trace a published method to a reusable methodological note with scope and an independent check.",
+      "digest": "6f61af39948a7b45aabbe6c2642092403a5ab44dc491334bbbe39635a08c7939",
+      "source": {
+        "workspace": "ash_proj",
+        "path": "GX-harness/.agents/skills/paper2skill/SKILL.md",
+        "sha256": "6f61af39948a7b45aabbe6c2642092403a5ab44dc491334bbbe39635a08c7939"
+      },
+      "inputs": [
+        "paper",
+        "method reference"
+      ],
+      "outputs": [
+        "method note"
+      ],
+      "related_methods": "derive-record-coverage@1 covers record-coverage methods"
+    },
+    {
+      "reference": "paper-to-agent@legacy",
+      "kind": "skill",
+      "category": "evidence",
+      "title": "Paper2Agent",
+      "purpose": "Track source, author material and reference examples for a scoped analytical operation.",
+      "digest": "174713c2478686e9dd74eda18802bde0103f8c581c90e63c0140649251188e6d",
+      "source": {
+        "workspace": "ash_proj",
+        "path": "GX-harness/.agents/skills/gx-paper2agent/SKILL.md",
+        "sha256": "174713c2478686e9dd74eda18802bde0103f8c581c90e63c0140649251188e6d"
+      },
+      "inputs": [
+        "paper",
+        "author reference"
+      ],
+      "outputs": [
+        "tool specification"
+      ],
+      "related_methods": "derive-record-coverage@1 covers record-coverage methods"
+    },
+    {
+      "reference": "reading-package@legacy",
+      "kind": "recipe",
+      "category": "workflow",
+      "title": "Paper2Agent deepread",
+      "purpose": "Package passages, coverage and locators for independent reading.",
+      "digest": "fd7d06ad4835ae70979313c273423f9cab4f050bbc3084729a0ef136f89b9544",
+      "source": {
+        "workspace": "ash_proj",
+        "path": "gx-auto/gxdesign-harness/releases/science-native-v2/gx_core/synthesis/paper_bundle/VENDORED.json",
+        "sha256": "fd7d06ad4835ae70979313c273423f9cab4f050bbc3084729a0ef136f89b9544"
+      },
+      "inputs": [
+        "source document"
+      ],
+      "outputs": [
+        "reading package"
+      ],
+      "related_methods": "source-evidence-review@1"
+    },
+    {
+      "reference": "wechat-public-sources@legacy",
+      "kind": "research",
+      "category": "community_source",
+      "title": "WeChat / 微信公众号",
+      "purpose": "Use a public WeChat article link or an authorized export as a lead and locate the primary evidence.",
+      "digest": "8744ef14132c65f4178a220c93c045c18a35e3767ede9628b046d374eafc755a",
+      "source": {
+        "workspace": "ash_proj",
+        "path": "GX-harness/integrations/wechat_article/README.md",
+        "sha256": "8744ef14132c65f4178a220c93c045c18a35e3767ede9628b046d374eafc755a"
+      },
+      "inputs": [
+        "public link",
+        "authorized export"
+      ],
+      "outputs": [
+        "source lead"
+      ],
+      "related_methods": "social-source-intake@1"
+    },
+    {
+      "reference": "xiaohongshu-sources@legacy",
+      "kind": "research",
+      "category": "community_source",
+      "title": "Xiaohongshu / 小红书",
+      "purpose": "Record the public lead or authorized export and distinguish body text from a link-only record.",
+      "digest": "039b8129e36ac8a7c8162e61e2697dbea35b3d05f9cbec987dcb17336255744c",
+      "source": {
+        "workspace": "ash_proj",
+        "path": "GX-harness/integrations/xhs_research/README.md",
+        "sha256": "039b8129e36ac8a7c8162e61e2697dbea35b3d05f9cbec987dcb17336255744c"
+      },
+      "inputs": [
+        "public link",
+        "authorized export"
+      ],
+      "outputs": [
+        "source lead"
+      ],
+      "related_methods": "social-source-intake@1"
+    },
+    {
+      "reference": "academic-search@legacy",
+      "kind": "research",
+      "category": "source_reading",
+      "title": "Academic search",
+      "purpose": "Search bibliographic sources; compare identifiers, returned records and full-text availability.",
+      "digest": "f26073ea995eb2482403f2f39d68804ae6ee0d2b254b570de9f253176a1ffed3",
+      "source": {
+        "workspace": "ash_proj",
+        "path": "GX-harness/integrations/academic_search/README.md",
+        "sha256": "f26073ea995eb2482403f2f39d68804ae6ee0d2b254b570de9f253176a1ffed3"
+      },
+      "inputs": [
+        "query"
+      ],
+      "outputs": [
+        "publication candidates"
+      ],
+      "related_methods": "scholarly-search@1, scholarly-fetch@1"
+    },
+    {
+      "reference": "swissprot-rhea-snapshot@legacy",
+      "kind": "database",
+      "category": "database",
+      "title": "Swiss-Prot × Rhea",
+      "purpose": "Locate the deployment’s read-only curated annotation index. Evidence coverage and reaction direction depend on its release.",
+      "digest": "4c7bd2ff8a8e50e33cec8362ff9163ebd5ceb7f568be5c29ec85be1eb15ba85f",
+      "source": {
+        "workspace": "ash_proj",
+        "path": "gx-auto/gxdesign-harness/releases/science-native-v2/var/enzyme-assets/ec-lookup-verification.json",
+        "sha256": "4c7bd2ff8a8e50e33cec8362ff9163ebd5ceb7f568be5c29ec85be1eb15ba85f"
+      },
+      "inputs": [
+        "substrate",
+        "taxon"
+      ],
+      "outputs": [
+        "annotation rows"
+      ],
+      "related_methods": "yeast-reaction-index@2"
+    }
+  ]
+}

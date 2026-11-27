@@ -1,6 +1,7 @@
 """Read immutable publication versions and quote only the views actually extracted."""
 import hashlib
-from importlib.util import find_spec
+from io import BytesIO
+from pathlib import Path
 import json
 import unittest
 
@@ -60,19 +61,17 @@ class DocumentReaders(unittest.TestCase):
         self.assertEqual(reader.document_index(b'<article><section id="abstract"><p>Overview.</p></section></article>',
                                               'html')[0], 'ABSTRACT_ONLY')
 
-    @unittest.skipUnless(find_spec('pymupdf'), 'PyMuPDF text-layer extractor unavailable')
     def test_pdf_reports_original_page_numbers_and_readable_coverage(self):
-        import pymupdf
-        with pymupdf.open() as doc:
-            doc.new_page()
-            doc.new_page().insert_text((20, 50), 'Published observation on page two.')
-            raw = doc.tobytes()
+        import pypdf
+        raw = (Path(__file__).parent / 'fixtures/labelled-source.pdf').read_bytes()
         coverage, segments, details = reader.document_index(raw, 'pdf')
         self.assertEqual((coverage, details['page_count'], details['pages_with_text']), ('PARTIAL_TEXT', 2, [2]))
-        self.assertEqual(segments[0][3:5], ('page 2 block 1', 'Published observation on page two.'))
-        with pymupdf.open() as doc:
-            doc.new_page()
-            coverage, segments, details = reader.document_index(doc.tobytes(), 'pdf')
+        self.assertEqual(segments[0][3:5], ('page 2 [S-8]', 'Published observation on page two.'))
+        with pypdf.PdfWriter() as doc:
+            doc.add_blank_page(width=100, height=100)
+            buf = BytesIO()
+            doc.write(buf)
+        coverage, segments, details = reader.document_index(buf.getvalue(), 'pdf')
         self.assertEqual((coverage, segments, details['pages_with_text']), ('UNAVAILABLE', [], []))
 
 

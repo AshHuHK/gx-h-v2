@@ -48,7 +48,7 @@ def _goal(conn, rid):
     return conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (rid,)).fetchone()
 
 
-def _assert_sources(conn, run_id, goal_version, grant, snapshot, *, for_projection=False):
+def _assert_sources(conn, run_id, goal_version, grant, snapshot, *, for_projection=False, opening=False):
     from .manifest import check_capability
 
     goal = _goal(conn, run_id)
@@ -83,7 +83,7 @@ def _assert_sources(conn, run_id, goal_version, grant, snapshot, *, for_projecti
     v62b_handoff.require_claims(conn, run_id, snapshot.get("target_claims", ()))
     from . import capability_views
     for cap, pin in snapshot["method_pins"].items():
-        if cap not in live_methods and capability_views.latest(conn, run_id):
+        if not opening and cap not in live_methods and capability_views.latest(conn, run_id):
             # A disabled method closes future admission. The module can still read
             # an already admitted result, report it, or use its other granted methods.
             continue
@@ -458,7 +458,7 @@ def commit_open(conn, plan):
         v62_rounds.require_exploration(tx, rid)
         if parent["context_ref"] != plan.context_ref:
             raise StaleRevision("The delegating context changed")
-        _assert_sources(tx, rid, plan.goal_version, plan.grant, plan.snapshot)
+        _assert_sources(tx, rid, plan.goal_version, plan.grant, plan.snapshot, opening=True)
         version = v621_goal_scope.active(tx, rid)
         if (
             tx.execute(

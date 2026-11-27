@@ -237,7 +237,13 @@ def perform_read(roots, row, params, packet, execute):
             # This tool includes current reservations. Reusing a *different* call would freeze old costs.
             operation = ids.sha256_of_obj([params["threadId"], params["callId"]])
         else:
-            operation = ids.sha256_of_obj([tool, args])
+            inputs = [tool, args]
+            if tool == QUERY:
+                from . import capability_views
+                revision = capability_views.current(roots.conn, row["run_id"])["revision"]
+                if revision:
+                    inputs.append(revision)
+            operation = ids.sha256_of_obj(inputs)
     key = "v62.module.tool:" + ids.sha256_of_obj([row["run_id"], module_id, operation])
     request = {"tool": tool, "arguments": args, "source_sha256": source_sha}
     entry = store.begin_idempotent(roots.conn, key, "v62.module.tool", request)

@@ -87,14 +87,16 @@ def runtime(root, work, *, python, node, env, pins):
 def inspect_python(venv, env, version, wheels):
     child = venv / "bin/python"
     measurement = json.loads(versions([child, "-I", "-c", """
-import Bio, json, numpy, platform, site, sqlite3, sys
+import importlib, json, platform, site, sqlite3, sys
 from pathlib import Path
-modules = {name: {"version": module.__version__, "file": str(Path(module.__file__).resolve())}
-           for name, module in (("biopython", Bio), ("numpy", numpy))}
+modules = {}
+for name in json.loads(sys.argv[1]):
+    module = importlib.import_module("Bio" if name == "biopython" else name)
+    modules[name] = {"version": module.__version__, "file": str(Path(module.__file__).resolve())}
 print(json.dumps({"version": platform.python_version(), "sqlite": sqlite3.sqlite_version,
                   "base_prefix": sys.base_prefix, "prefix": sys.prefix, "user_site": site.ENABLE_USER_SITE,
                   "modules": modules, "sys_path": sys.path}))
-"""], env))
+""", json.dumps(list(wheels))], env))
     check_version("venv Python", measurement["version"], version)
     if Path(measurement["prefix"]) != venv or measurement["base_prefix"] == measurement["prefix"] or measurement["user_site"]:
         raise ValueError("test Python must be a private isolated virtualenv")

@@ -152,7 +152,10 @@ class Driver:
         goal = conn.execute("SELECT 1 FROM v6_goals WHERE run_id=?", (self.rid,)).fetchone()
         if goal and tool == "gx_route_pi_message" and set(args) == {"clauses"}:
             from . import pi_clauses
-            return pi_clauses.process(conn, self.rid, envelope["thread_id"], envelope["turn_id"], args["clauses"])
+            receipt = pi_clauses.process(conn, self.rid, envelope["thread_id"], envelope["turn_id"], args["clauses"])
+            if any(part.get("feedback_id") for part in receipt.get("clauses", ())):
+                return {**receipt, "main_action": "reply_now"}
+            return receipt
         if tool != "gx_project_state" or set(args) - {"goal_version","branch_id","decision_ref","before_event"}:
             raise SchemaInvalid("Unknown project state request")
         run = project(conn, self.rid)

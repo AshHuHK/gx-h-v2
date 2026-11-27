@@ -565,6 +565,14 @@ class Roots:
         params = {"modelProvider":row["provider"] or host_policy.p0_provider_for_run(self.run),"cwd":row["cwd"], "sandbox":"read-only", "approvalPolicy":"never", "model":row["model"],
                   "config":config, "developerInstructions":row["brief"] if main else
                   instructions+"\n"+worker_context}
+        if main and self.mode is run_mode.GOAL:
+            # Both thread/start and thread/resume get the current PI conversation behavior.
+            params["developerInstructions"] += (
+                " When GX routes a PI request to a researcher, reply now with the handoff and any answer "
+                "supported by currently published evidence, then end this Main turn. GX handles waiting for "
+                "new research results. If the PI asks for a final result that is pending, say what remains "
+                "open and use the project's completion report or a later conversation turn for the finding. "
+                "Do not sleep or poll for future evidence in this conversation turn.")
         if lead:
             packet = v6_native.brief(row)
             if v62_native.module_scope(packet):

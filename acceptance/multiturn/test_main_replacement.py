@@ -17,6 +17,7 @@ class NativeMain:
         self.sent = []
         self.missing = set()
         self.disappear_on_send = set()
+        self.thread_instructions = []
 
     def request(self, method, args):
         thread = args.get("threadId")
@@ -26,6 +27,7 @@ class NativeMain:
             raise AppServerResponseError(ReceivedMessage(1, {"id": 42, "error": {
                 "code": -32600, "message": f"thread not found: {thread}"}}))
         if method in ("thread/start", "thread/resume"):
+            self.thread_instructions.append((method, args["developerInstructions"]))
             if method == "thread/start":
                 thread = "physical-" + str(len(self.threads) + 1)
                 self.threads[thread] = {"id":thread, "cwd":args["cwd"], "source":"appServer",
@@ -72,6 +74,53 @@ class NativeMain:
 
 
 class MainReplacement(unittest.TestCase):
+    def test_delegated_handoff_can_reply_while_the_result_is_pending_then_resume_for_questions(self):
+        original = "请在文献路线核对原始测量，其它路线继续。"
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            host = NativeMain()
+            with Scenario(work) as run:
+                route = run.open("literature")
+                other = run.open("independent")
+                driver = host.attach(run)
+                conversation.send(run.conn, run.run_id, original, "assay", branch_id=route["branch_id"])
+                driver.messages()
+                thread, = host.threads
+                run.roots.active_turns[thread] = "turn-assay"
+                routed = run.roots._call({"threadId": thread, "turnId": "turn-assay", "callId": "handoff",
+                    "tool": "gx_route_pi_message", "arguments": {"clauses": [
+                        {"kind": "feedback", "quote": "请在文献路线核对原始测量", "branch_id": route["branch_id"]},
+                        {"kind": "discussion", "quote": "其它路线继续"}]}})
+                self.assertEqual(routed.get("main_action"), "reply_now")
+                self.assertIn("end this Main turn", host.thread_instructions[0][1])
+                run.roots.active_turns.pop(thread)
+                host.complete(run, driver, thread, "assay", "文献路线已收到核对请求，实测结论待回。", meter=True)
+                msg, = [m for m in conversation.timeline(run.conn, run.run_id)["messages"] if m["message_id"] == "assay"]
+                self.assertEqual((msg["text"], msg["status"], msg["feedback"][0]["status"]),
+                                 (original, "answered", "PENDING"))
+                self.assertEqual(run.rows("SELECT status FROM tasks WHERE task_id=?", other["task_id"]),
+                                 [{"status": "READY"}])
+            with Scenario(work, reopen=True) as cold:
+                driver = host.attach(cold)
+                question = "现在有最终的测量结果吗？"
+                conversation.send(cold.conn, cold.run_id, question, "followup", reply_to="assay")
+                driver.messages()
+                self.assertEqual(host.sent, [(thread, "assay"), (thread, "followup")])
+                method, instructions = host.thread_instructions[-1]
+                self.assertEqual(method, "thread/resume")
+                self.assertIn("end this Main turn", instructions)
+                cold.roots.active_turns[thread] = "turn-followup"
+                envelope = {"threadId": thread, "turnId": "turn-followup"}
+                state = cold.roots._call({**envelope, "tool": "gx_project_state", "callId": "read", "arguments": {}})
+                self.assertEqual(state["feedback"][0]["status"], "PENDING")
+                q = cold.roots._call({**envelope, "tool": "gx_route_pi_message", "callId": "question",
+                                      "arguments": {"clauses": [{"kind": "question", "quote": question}]}})
+                self.assertNotIn("main_action", q)
+                cold.roots.active_turns.pop(thread)
+                host.complete(cold, driver, thread, "followup", "当前尚无最终测量。")
+                self.assertEqual(len(cold.rows("SELECT event_id FROM events WHERE kind='research.pi.feedback'")), 1)
+                self.assertEqual(cold.rows("SELECT COUNT(*) AS n FROM jobs"), [{"n": 0}])
+
     def test_delivered_main_survives_loss_and_idle_upgrade(self):
         for reason in ("missing", "upgrade"):
             with self.subTest(reason=reason), tempfile.TemporaryDirectory() as temp:

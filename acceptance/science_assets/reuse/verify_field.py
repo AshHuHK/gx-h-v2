@@ -65,7 +65,7 @@ def main():
                 for item in a["native_worker_overlaps"]), "No measured overlap between A's researchers")
     require(any(item.get("real_model_handoff") and item.get("status") == "ENACTED" for item in a["handoffs"]),
             "No enacted native report handoff")
-    print("2 closed native studies; 2 distinct CPU Jobs and assay readouts; matched independent PDB calculations; "
+    print("2 closed native studies; 2 distinct CPU Jobs and coordinate readouts; matched independent PDB calculations; "
           "saved recipe, discovered and acted on new results; overlapping native researchers and a verified handoff.")
 
 

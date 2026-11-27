@@ -4,6 +4,8 @@ GX 追蹤每項量測何時首次可得、哪位研究者實際收到，以及�
 
 ## 科研能力插件
 
+已接入的實際科研資產涵蓋文獻、天然酵母酶、已發表蛋白、肽及 Fab。各類卡的使用時機、普通 Goal 啟動命令、跨題配方和新 Job 的現場回執見[科研資產與部署](acceptance/science_assets/README.md)。
+
 Lead 可檢索論文原件、查詢酵母糖水解資料庫，並把有來源的計量與已執行的工作流留給後繼問題。[啟動、實例與驗收](acceptance/science_capabilities/README.md)
 
 本版的插件登記、Lead 選法、七個研究 Run 及已知缺口收錄於[科研能力與插件架構審閱](acceptance/science_capabilities/GX-H_Science_Capabilities_and_Plugin_Architecture_Review_zh-TW.md)。目前的[精簡原始碼分支](https://github.com/AshHuHK/gx-h-v2/tree/release/science-capabilities)直接接上已配置的 Codex；安裝與接口見[部署說明](https://github.com/AshHuHK/gx-h-v2/blob/release/science-capabilities/RELEASE.md)。

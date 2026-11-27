@@ -6,6 +6,8 @@ GX 追蹤每項量測何時首次可得、哪位研究者實際收到，以及�
 
 Lead 可檢索論文原件、查詢酵母糖水解資料庫，並把有來源的計量與已執行的工作流留給後繼問題。[啟動、實例與驗收](acceptance/science_capabilities/README.md)
 
+本版的插件登記、Lead 選法、七個研究 Run 及已知缺口收錄於[科研能力與插件架構審閱](acceptance/science_capabilities/GX-H_Science_Capabilities_and_Plugin_Architecture_Review_zh-TW.md)。部署請使用[精簡版本分支](https://github.com/AshHuHK/gx-h-v2/tree/release/science-capabilities)或[附 Linux 依賴的發行版](https://github.com/AshHuHK/gx-h-v2/releases/tag/science-capabilities-2026-11-27)。
+
 ## 與研究團隊多輪對話
 
 研究進行中，PI 可從網頁或 CLI 追問先前決定、回覆研究者的問題，或把新資料送給指定路線。兩個入口共用同一份訊息紀錄。結題後可引用父題證據，並在同一對話中用新材料開啟後繼研究。[啟動、附著與恢復步驟](acceptance/unified_multiturn/README.md)

@@ -14,6 +14,10 @@ INSTANCE = "gx.v6.instance"
 decision_schema = v6_graph.decision_schema
 
 
+class GraphAdvanced(Exception):
+    """Another decision won the graph CAS. Recompile the original draft after rollback."""
+
+
 def head(conn, run_id):
     row = conn.execute("SELECT version,sha256 FROM v6_graph_versions WHERE run_id=? "
                        "ORDER BY version DESC LIMIT 1", (run_id,)).fetchone()
@@ -544,14 +548,25 @@ def commit(conn, plan):
         from . import capability_views
         cap_revision = capability_views.current(conn, run_id)["revision"]
         config = (goal["capabilities_json"], goal["materials_json"], cap_revision)
+        if module is not None:
+            config = (module["grant_json"], module["snapshot_json"], module["budget_json"], cap_revision)
+        if config != plan.config_pin:
+            raise StaleRevision("The approved materials, scope or decision premises changed")
+        if _capability_pins(conn, plan.capability_pins) != plan.capability_pins:
+            raise StaleRevision("A capability approval or content pin changed before adoption")
+        if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
+            raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
         if task["scope"] == "run":
             base = head(conn, run_id)
             if base != request["base"]:
+                if harness_policy.current(conn, run_id):
+                    raise GraphAdvanced()
                 raise StaleRevision("The graph moved during preparation; retry the decision on the current graph")
         if module is not None:
-            config = (module["grant_json"], module["snapshot_json"], module["budget_json"], cap_revision)
             actual = head(conn, run_id)
             if base != request["original_base"] or actual != request["base"]:
+                if base == request["original_base"] and harness_policy.current(conn, run_id):
+                    raise GraphAdvanced()
                 raise StaleRevision("The graph moved after module preparation; obtain a fresh decision",
                                     details={"reason": "module_graph_conflict", "current_head": actual})
             if plan.module_dependencies:
@@ -559,18 +574,13 @@ def commit(conn, plan):
             if plan.module_demand:
                 v62_graph.require_budget(conn, module, plan.module_demand)
             base = actual
-        if ((base, task["goal_version"], task["context_ref"], task["scope"]) !=
-                (request["base"], request["goal_version"], request["context_ref"], request["scope"]) or
-                plan.config_pin != config):
+        if (base, task["goal_version"], task["context_ref"], task["scope"]) != (
+                request["base"], request["goal_version"], request["context_ref"], request["scope"]):
             raise StaleRevision("The approved materials, scope or decision premises changed")
-        if _capability_pins(conn, plan.capability_pins) != plan.capability_pins:
-            raise StaleRevision("A capability approval or content pin changed before adoption")
         v6_routes.recheck_bindings(conn, request, plan.resolved_ops)
         _check_bans(conn, run_id, plan.resolved_ops)
-        if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
-            raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
         if close_context is not None:
-            from . import harness_policy, research_closeout
+            from . import research_closeout
             if harness_policy.active(conn, run_id) and (fact := research_closeout.maybe_prompt(conn, task, decision)):
                 return fact
         decision_ref, = delivery.register_manifest(ArtifactService(conn), plan.manifest, actor=plan.thread_id)
@@ -687,8 +697,11 @@ def reconsider_module_conflict(conn, identity, error):
 
 
 def adopt(conn, **native_call):
-    try:
-        return commit(conn, prepare(conn, **native_call))
-    except StaleRevision as exc:
-        reconsider_module_conflict(conn, native_call, exc)
-        raise
+    while True:
+        try:
+            return commit(conn, prepare(conn, **native_call))
+        except GraphAdvanced:
+            continue
+        except StaleRevision as exc:
+            reconsider_module_conflict(conn, native_call, exc)
+            raise

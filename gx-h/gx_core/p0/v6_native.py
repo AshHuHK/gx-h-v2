@@ -337,8 +337,15 @@ def saved_result(receipt, turn, request_sha):
 @registry.native_goal_tool(STAGE)
 @registry.native_goal_tool(DELEGATE)
 def call(roots, p):
+    from .v6_decisions import GraphAdvanced
     try:
-        return _call(roots, p)
+        while True:
+            try:
+                return _call(roots, p)
+            except GraphAdvanced:
+                # The SQLite writer has rolled back. Revalidate the very same native
+                # call against the new graph, including subject and evidence conflicts.
+                continue
     except (BudgetExceeded, HoldActive, LeaseExpired, ResourceDenied, SchemaInvalid, ScopeDenied, StaleRevision) as error:
         if p["tool"] != DECIDE or not v621_policy.science_execution(roots.conn, roots.run_id):
             raise

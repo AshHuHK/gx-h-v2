@@ -5,7 +5,7 @@ from . import meter_limits, metering
 
 UNITS = {"job_submissions": "submissions", "cpu_seconds": "CPU seconds",
          "gpu_jobs": "GPU jobs", "gpu_minutes": "GPU minutes", "tokens": "tokens",
-         "api_calls": "calls", "worker_tasks": "tasks", "wall_hours": "wall hours"}
+         "paid_api_calls": "booked external call slots", "api_calls": "calls", "worker_tasks": "tasks", "wall_hours": "wall hours"}
 
 
 def resource_report(conn, run_id, *, meter=None):

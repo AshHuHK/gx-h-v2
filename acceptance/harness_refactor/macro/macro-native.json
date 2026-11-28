@@ -1,0 +1,302 @@
+{
+  "transport": "SCRIPTED_CALLBACK",
+  "entry": "bin/gx-p0 research",
+  "live_model_calls": 0,
+  "source": {
+    "run_id": "gxr_01m8fqtk7asrncgqr0",
+    "material": "gxa_01m8fqtk7ne327rt0q",
+    "module": "module_3611594421bc7715725d088369a0e0b9",
+    "report": "gxa_685e231be03dab72b49490f455f21e72ba2ba062f60e75715f52e642647fe7a7",
+    "provenance": {
+      "macro": {
+        "join_key": "both",
+        "join_revision": 1,
+        "modules": {
+          "audit": {
+            "module_instance_id": "module_2a4a506a03d4dbb5085942eb6ff3b6ea",
+            "report_ref": "gxa_3dc2cdd2da3893a372c6f83e3928130f242da40cb8208e9c63562894b07fbc32"
+          },
+          "clock": {
+            "module_instance_id": "module_3611594421bc7715725d088369a0e0b9",
+            "report_ref": "gxa_685e231be03dab72b49490f455f21e72ba2ba062f60e75715f52e642647fe7a7"
+          }
+        },
+        "outcome_event": 79,
+        "registered_event": 62
+      },
+      "steps": {}
+    }
+  },
+  "recipe": {
+    "kind": "recipe",
+    "reference": "clock-study@1",
+    "digest": "19bf266b11529e6c89ffae581a13bd21a90a0c16e447428af362b6b4a40afb3f",
+    "title": "Check archived gauge chronology",
+    "id_alignment": "station and date",
+    "missing_values": "unresolved",
+    "units": "minutes",
+    "inputs": {
+      "log": {
+        "kind": "run_input",
+        "media_type": null
+      }
+    },
+    "methods": {},
+    "method_pins": {},
+    "outputs": {},
+    "provider_pins": {},
+    "macro": {
+      "modules": [
+        {
+          "slot": "audit",
+          "module_id": "ad_hoc",
+          "module_version": "1",
+          "declaration_sha256": "812ef6d4839853ea74815ff65a8ffeefdec4b369d4e6c20a569da403beea4665",
+          "provider": null,
+          "provider_closure": [],
+          "question": "Review the clock report.",
+          "expected_delivery": "Assess whether its source supports the recorded clock condition.",
+          "inputs": [
+            {
+              "module": "clock",
+              "output": "report"
+            }
+          ],
+          "capabilities": [
+            "artifact-analysis@1"
+          ],
+          "method_pins": {
+            "artifact-analysis@1": "8f5d384b5b11773ef7570f85418d349dc514103a18560c2908ffa37929ab4fc5"
+          },
+          "method_providers": {
+            "artifact-analysis@1": null
+          },
+          "method_options": {},
+          "tools": [
+            "gx_decide_revision",
+            "gx_read_artifact",
+            "gx_submit_module_report"
+          ],
+          "sub_budget": {
+            "api_calls": 2,
+            "tokens": 2000,
+            "worker_tasks": 2
+          },
+          "wake_on": []
+        },
+        {
+          "slot": "clock",
+          "module_id": "ad_hoc",
+          "module_version": "1",
+          "declaration_sha256": "812ef6d4839853ea74815ff65a8ffeefdec4b369d4e6c20a569da403beea4665",
+          "provider": null,
+          "provider_closure": [],
+          "question": "Read the station log.",
+          "expected_delivery": "Quote the local clock annotations.",
+          "inputs": [
+            {
+              "input": "log"
+            }
+          ],
+          "capabilities": [
+            "artifact-analysis@1"
+          ],
+          "method_pins": {
+            "artifact-analysis@1": "8f5d384b5b11773ef7570f85418d349dc514103a18560c2908ffa37929ab4fc5"
+          },
+          "method_providers": {
+            "artifact-analysis@1": null
+          },
+          "method_options": {},
+          "tools": [
+            "gx_decide_revision",
+            "gx_read_artifact",
+            "gx_submit_module_report"
+          ],
+          "sub_budget": {
+            "api_calls": 2,
+            "tokens": 2000,
+            "worker_tasks": 2
+          },
+          "wake_on": []
+        }
+      ],
+      "join": {
+        "mode": "all",
+        "ports": [
+          {
+            "slot": "clock",
+            "required": false,
+            "alternatives": [
+              {
+                "module": "clock",
+                "output_name": "report"
+              }
+            ]
+          },
+          {
+            "slot": "audit",
+            "required": false,
+            "alternatives": [
+              {
+                "module": "audit",
+                "output_name": "report"
+              }
+            ]
+          }
+        ]
+      },
+      "decision_point": {
+        "event": "join_outcome",
+        "role": "run_lead",
+        "question": "Do the station records distinguish a timing offset from a flow change?",
+        "inspect": [
+          "clock",
+          "audit"
+        ]
+      }
+    }
+  },
+  "target": {
+    "run_id": "gxr_01m8fqtkzybs3gj2kn",
+    "material": "gxa_01m8fqtm076wjz2qnb",
+    "module": "module_5dca6a3f5d93d60dd7596f6acf2720bb",
+    "report": "gxa_d9c13b1f18871ebae918d13fa9405a09d517f52613fc82388e2bc013f9f1bc0c",
+    "audit_report": "gxa_9f89367d1591d58305bf30e60d156c75641d45466e51024b996bcc002b3756f8",
+    "audit_module": "module_fdadfdc0ef8296fd03f4802da225bdef",
+    "join": {
+      "deadline": null,
+      "goal_version": 1,
+      "key": "recipe-13ce0c55164540ede0ba68a1",
+      "revision": 1,
+      "scope": "run",
+      "spec": {
+        "key": "recipe-13ce0c55164540ede0ba68a1",
+        "mode": "all",
+        "ports": [
+          {
+            "alternatives": [
+              {
+                "module_instance_id": "module_5dca6a3f5d93d60dd7596f6acf2720bb",
+                "output_name": "report"
+              }
+            ],
+            "required": false,
+            "slot": "clock"
+          },
+          {
+            "alternatives": [
+              {
+                "module_instance_id": "module_fdadfdc0ef8296fd03f4802da225bdef",
+                "output_name": "report"
+              }
+            ],
+            "required": false,
+            "slot": "audit"
+          }
+        ],
+        "question": "Do the station records distinguish a timing offset from a flow change?"
+      },
+      "registration_event": 132,
+      "outcome_event": 149,
+      "state": "SATISFIED",
+      "outcome": {
+        "needed": 2,
+        "ports": [
+          {
+            "counted_artifact_ref": "gxa_d9c13b1f18871ebae918d13fa9405a09d517f52613fc82388e2bc013f9f1bc0c",
+            "evidence": [
+              {
+                "artifact_ref": "gxa_d9c13b1f18871ebae918d13fa9405a09d517f52613fc82388e2bc013f9f1bc0c",
+                "module_instance_id": "module_5dca6a3f5d93d60dd7596f6acf2720bb",
+                "output_name": "report",
+                "report_ref": "gxa_d9c13b1f18871ebae918d13fa9405a09d517f52613fc82388e2bc013f9f1bc0c",
+                "source_digests": {
+                  "gxa_01m8fqtm076wjz2qnb": "cf0ab203c7c54a02137180446fa23f05ed9e4b1bd1a97a833a1c2c69a0390855"
+                },
+                "source_refs": [
+                  "gxa_01m8fqtm076wjz2qnb"
+                ]
+              }
+            ],
+            "required": false,
+            "slot": "clock",
+            "sources": [
+              {
+                "module_instance_id": "module_5dca6a3f5d93d60dd7596f6acf2720bb",
+                "module_status": "COMPLETE",
+                "output_name": "report",
+                "report_ref": "gxa_d9c13b1f18871ebae918d13fa9405a09d517f52613fc82388e2bc013f9f1bc0c",
+                "state": "AVAILABLE"
+              }
+            ],
+            "state": "AVAILABLE"
+          },
+          {
+            "counted_artifact_ref": "gxa_9f89367d1591d58305bf30e60d156c75641d45466e51024b996bcc002b3756f8",
+            "evidence": [
+              {
+                "artifact_ref": "gxa_9f89367d1591d58305bf30e60d156c75641d45466e51024b996bcc002b3756f8",
+                "module_instance_id": "module_fdadfdc0ef8296fd03f4802da225bdef",
+                "output_name": "report",
+                "report_ref": "gxa_9f89367d1591d58305bf30e60d156c75641d45466e51024b996bcc002b3756f8",
+                "source_digests": {
+                  "gxa_d9c13b1f18871ebae918d13fa9405a09d517f52613fc82388e2bc013f9f1bc0c": "7ec47c8e5472f43f5334c1738bf668ceb05d5b4dcc2f35ad9f8006e2a11f4964"
+                },
+                "source_refs": [
+                  "gxa_d9c13b1f18871ebae918d13fa9405a09d517f52613fc82388e2bc013f9f1bc0c"
+                ]
+              }
+            ],
+            "required": false,
+            "slot": "audit",
+            "sources": [
+              {
+                "module_instance_id": "module_fdadfdc0ef8296fd03f4802da225bdef",
+                "module_status": "COMPLETE",
+                "output_name": "report",
+                "report_ref": "gxa_9f89367d1591d58305bf30e60d156c75641d45466e51024b996bcc002b3756f8",
+                "state": "AVAILABLE"
+              }
+            ],
+            "state": "AVAILABLE"
+          }
+        ],
+        "question": "Do the station records distinguish a timing offset from a flow change?",
+        "satisfied_count": 2,
+        "state": "SATISFIED",
+        "still_possible_count": 0
+      }
+    },
+    "scientific_decision": {
+      "rationale": "This station log records no timing offset. Compare the contemporaneous flows.",
+      "evidence_refs": [
+        "gxa_d9c13b1f18871ebae918d13fa9405a09d517f52613fc82388e2bc013f9f1bc0c"
+      ],
+      "ops": [
+        {
+          "op": "open_branch",
+          "branch": "local:flow",
+          "method_family": "archival comparison",
+          "hypothesis": "A flow change could explain the discrepancy.",
+          "alternative": "Station timing could still differ outside this window.",
+          "discriminating_observation": "Compare the overlapping calibrated gauge readings.",
+          "stop_condition": "End with a bound on overlap.",
+          "budget_limits": {
+            "job_submissions": 1,
+            "cpu_seconds": 10
+          }
+        }
+      ],
+      "mode": "amend",
+      "reconsider_when": [
+        {
+          "event": "evidence_added",
+          "subject_ref": "run"
+        }
+      ]
+    },
+    "accepted_decision": "gxa_d46bc79156b21ca71628ff4b28ea159830d724bff0dba4c7ff6f81af3328e62b",
+    "committed_branch": "branch_6a7d349af509ee5c4ea8e9c01116a3ff"
+  }
+}

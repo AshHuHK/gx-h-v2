@@ -103,7 +103,8 @@ def reference_rows(kind, occupied, *, files=REFERENCE_FILES):
 
 
 def rows_for_kind(conn, run_id, brief, kind, methods, choices, *, current_reading=False, include_references=True):
-    from . import v62_catalog, v6_recipes
+    from . import harness_policy, v62_catalog, v6_macro_recipes, v6_recipes
+    from ..errors import ScopeDenied, VersionImmutable
     from ..plugins import development
     module = brief["scope"].startswith("module:")
     allowed_methods = set(brief.get("allowed_method_ids", [])) if module else None
@@ -115,9 +116,16 @@ def rows_for_kind(conn, run_id, brief, kind, methods, choices, *, current_readin
             pins = {r["capability_version"]:r["portable_sha256"] for r in visible}
             providers = {r["capability_version"]: v6_recipes.provider_pin(r) for r in visible}
             for card in v6_recipes.cards(conn):
+                if "macro" in card and not harness_policy.enabled(brief):
+                    continue
                 row = dict(card, category="workflow", purpose=card["title"])
                 matches = (all(pins.get(ref) == value for ref, value in card["method_pins"].items())
                            and all(providers.get(ref) == value for ref, value in card.get("provider_pins", {}).items()))
+                if matches and "macro" in card:
+                    try:
+                        v6_macro_recipes.require_target(conn, run_id, card["macro"])
+                    except (ScopeDenied, VersionImmutable):
+                        matches = False
                 row["status"] = "available" if matches else "requires_method"
                 rows.append(row)
     elif kind == "skill":

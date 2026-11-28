@@ -46,6 +46,10 @@ def evidence_tool(name, version):
         # Historical native menus predate reusable nodes and named upstream outputs.
         for variant in fields["decision"]["properties"]["ops"]["items"]["oneOf"]:
             op = variant["properties"]
+            if op["op"]["const"] == "open_branch":
+                units = op["budget_limits"]["propertyNames"]["enum"]
+                if "paid_api_calls" in units:
+                    units.remove("paid_api_calls")
             if op["op"]["const"] == "add_node":
                 for field in ("recipe_decision", "independent_repeat", "input_ports"):
                     op.pop(field)
@@ -99,6 +103,15 @@ def module_instructions(brief):
                             "source_ref and segment_id, compare the literal span [char_start,char_end), then use your "
                             "own passage receipt with the matching quote_sha256 in gx_review_evidence. Cite the "
                             "returned review_ref with your reasons.")
+    from . import harness_policy
+    if harness_policy.enabled(brief) and brief.get("researcher_handoff"):
+        instructions.append("Choose a shared research topic when colleagues can change their work with your findings. "
+                            "Use gx_send_research_hint to subscribe or publish, including when peers are still being "
+                            "assigned. Read research_topics via gx_task_context after a notification. Cite parents for "
+                            "corrections or syntheses; original sources and researchers' interpretations are separate.")
+    if brief.get("subscribed_topics"):
+        instructions.append("Read your subscribed topics in gx_task_context when resuming this assignment. "
+                            "Continue with another read when has_more is true.")
     if "gx_read_artifact" in tools:
         instructions.append("Inspect sources through gx_read_artifact. Use operation_key to reuse a completed inspection.")
     if QUERY in tools:
@@ -106,9 +119,17 @@ def module_instructions(brief):
             instructions.append("Use gx_query_catalog to survey public method cards. An exact method query returns a citeable source_ref.")
         else:
             instructions.append("Use gx_query_catalog for details of a granted method.")
+    if "gx_select_capability" in tools:
+        instructions.append("Decide which evidence your question still needs. Existing findings can suffice. "
+                            "If another method would help, gx_query_catalog shows eligible options and "
+                            "gx_select_capability binds one to this assignment using module_method_revision "
+                            "(initially 0). You can commission its Job in this turn or revisit the choice "
+                            "as new observations arrive.")
     if "gx_decide_revision" in tools:
-        instructions.append("Use gx_decide_revision to add a bounded Job to your assigned branch using a listed "
-                            "capability and authorized inputs. A following decision can use the confirmed output.")
+        wording = ("For a computation you choose, use" if "gx_select_capability" in tools else "Use")
+        instructions.append(wording + " gx_decide_revision to add a bounded Job to your assigned branch "
+                            "using a listed capability and authorized inputs. A following decision "
+                            "can use the confirmed output.")
     instructions.append("Use gx_submit_module_report with findings, exact source references, gaps and next steps. "
                         "Preserve contrary observations and report PARTIAL when work is incomplete.")
     from . import v621_policy
@@ -160,25 +181,63 @@ def module_tools(read_tools, brief, decide):
             available.append(tool)
     report = evidence_tool(REPORT, brief.get("evidence_policy"))
     available.extend((decide, report, query_tool(brief)))
-    available.extend(source_spec(name, searchable=brief.get("researcher_handoff")) for name in SOURCE_TOOLS if name in allowed)
+    if "gx_select_capability" in allowed:
+        choice = contracts.native_goal_tool_spec("gx_select_capability")
+        available.append({**choice, "description": "Enable or release one of this module's eligible methods. "
+                          "Use its module_method_revision or the revision from your latest selection receipt. "
+                          "The selection applies only to new work in this module."})
+    from . import harness_policy
+    searchable = brief.get("researcher_handoff") or harness_policy.enabled(brief)
+    available.extend(source_spec(name, searchable=searchable) for name in SOURCE_TOOLS if name in allowed)
     menu = [tool for tool in available if tool["name"] in allowed]
     if brief.get("researcher_handoff") and "gx_task_context" in allowed:
         from . import research_handoff
-        menu.append(research_handoff.HINT_SPEC)
+        menu.append(research_handoff.hint_spec(brief))
     return menu
+
+
+def open_tool(brief):
+    from . import harness_policy
+    spec = contracts.native_goal_tool_spec(OPEN)
+    if not harness_policy.enabled(brief):
+        return spec
+    fields = dict(spec["inputSchema"]["properties"])
+    if brief.get("ad_hoc_delegation"):
+        fields["module_id"] = {**fields["module_id"], "description":
+            "Installed module identity, or ad_hoc for a researcher with this focus and delivery (version 1)."}
+    fields.update(
+        researcher={"type": "string", "minLength": 1, "description": "Responsible researcher or role for this assignment."},
+        method_choices={"type": "array", "uniqueItems": True, "items": {"type":"string", "minLength":1},
+                        "description":"Optional ceiling on the methods this instance may select. Inherits its eligible choices when omitted."},
+        communication={"enum":["shared", "isolated"], "description":"Use isolated for a blind assessment without peer messages."},
+        route_intent={"type":"string", "minLength":1, "description":"Existing open route intent this assignment serves."})
+    description = spec["description"] + (
+        " You can commission a researcher with module_id ad_hoc, module_version 1, your own focus, "
+        "expected_delivery and sub_budget. capabilities may be empty; the researcher can select their own eligible methods."
+        if brief.get("ad_hoc_delegation") else "")
+    return {**spec, "description": description, "inputSchema": {**spec["inputSchema"], "properties": fields}}
 
 
 def lead_tools(brief):
     if brief.get("scope") != "run":
         return []
-    if brief.get("research_effort") not in ("medium", "deep"):
+    from . import harness_policy
+    if not harness_policy.enabled(brief) and brief.get("research_effort") not in ("medium", "deep"):
         return [query_tool(brief)] if brief.get("catalog_discovery") else []
     names = []
     if brief.get("module_catalog") or brief.get("module_catalog_available"):
         names.extend((OPEN, CANCEL))
-    if brief.get("research_effort") == "deep":
+    if harness_policy.enabled(brief) or brief.get("research_effort") == "deep":
         names.extend(name for name in SOURCE_TOOLS if name in brief.get("source_tools", ()))
-    return [query_tool(brief), *(contracts.native_goal_tool_spec(name) for name in names)]
+    specs = [query_tool(brief)]
+    for name in names:
+        if name == OPEN:
+            specs.append(open_tool(brief))
+        elif name in SOURCE_TOOLS:
+            specs.append(source_spec(name, searchable=harness_policy.enabled(brief)))
+        else:
+            specs.append(contracts.native_goal_tool_spec(name))
+    return specs
 
 
 def register_tools(native_owner):
@@ -194,7 +253,9 @@ def authorize_source(roots, row, params):
     if module_scope(packet):
         authorize_read(roots.conn, row, packet, tool, turn)
         return
-    if packet.get("scope") != "run" or packet.get("research_effort") != "deep" or tool not in packet.get("source_tools", ()):
+    from . import harness_policy
+    if (packet.get("scope") != "run" or tool not in packet.get("source_tools", ()) or
+            (not harness_policy.enabled(packet) and packet.get("research_effort") != "deep")):
         raise ScopeDenied("This decision has no delegated source evidence tool")
     _, task, _, _ = v6_decisions.authority(roots.conn, run_id=row["run_id"], task_id=row["task_id"],
                                           lease_id=row["lease_id"], thread_id=params["threadId"], turn_id=turn)
@@ -282,10 +343,17 @@ def perform_read(roots, row, params, packet, execute):
         else:
             inputs = [tool, args]
             if tool == QUERY:
-                from . import capability_views
+                from . import capability_views, harness_policy
+                if harness_policy.enabled(packet):
+                    # Site readiness can change between calls. Native replay still deduplicates
+                    # the exact callback; an explicit operation key still requests reuse.
+                    inputs.extend([params["threadId"], params["callId"]])
                 revision = capability_views.current(roots.conn, row["run_id"])["revision"]
                 if revision:
                     inputs.append(revision)
+                local_revision = json.loads(instance["grant_json"]).get("local_binding_revision", 0)
+                if local_revision:
+                    inputs.append(["module_revision", local_revision])
             operation = ids.sha256_of_obj(inputs)
     key = "v62.module.tool:" + ids.sha256_of_obj([row["run_id"], module_id, operation])
     request = {"tool": tool, "arguments": args, "source_sha256": source_sha}
@@ -299,6 +367,9 @@ def perform_read(roots, row, params, packet, execute):
         answer = json.loads(stored["result_json"])
         if ids.sha256_of_obj(answer) != first["result_sha256"]:
             raise OutcomeUnknown("The recorded module operation and native receipt disagree")
+        if tool in ("gx_task_context",research_handoff.HINT):
+            from . import research_topics
+            return research_topics.check_receipt(roots.conn,instance,tool,answer)
         return answer
     if not entry.fresh:
         raise OutcomeUnknown("Await reconciliation of the original module tool operation")
@@ -306,6 +377,10 @@ def perform_read(roots, row, params, packet, execute):
     if packet.get("researcher_handoff") and tool == "gx_task_context":
         answer.update(open_peers=research_handoff.peers(roots.conn, row["run_id"], instance["scope"]),
                       peer_hints=research_handoff.inbox(roots.conn, row["run_id"], instance["scope"]))
+    if tool == "gx_task_context":
+        from . import harness_policy, research_topics
+        if harness_policy.enabled(packet):
+            answer.update(research_topics.context(roots.conn, instance))
     sources = [ref] if ref else []
     artifacts = list(sources)
     pins = {}

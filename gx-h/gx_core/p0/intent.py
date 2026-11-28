@@ -18,7 +18,7 @@ from ..errors import ArtifactNotFound, IdempotencyConflict, PermissionDenied, Sc
 from ..persistence import store
 
 BAN_TYPES = {"hard_constraint", "method_ban"}
-RESOURCE_KEYS = {"job_submissions", "cpu_seconds", "gpu_minutes", "gpu_jobs", "worker_tasks", "api_calls", "tokens"}
+RESOURCE_KEYS = {"job_submissions", "cpu_seconds", "gpu_minutes", "gpu_jobs", "worker_tasks", "api_calls", "paid_api_calls", "tokens"}
 NATIVE_UNITS = {"api_calls": "gx_calls", "tokens": "reserved_tokens"}
 ITEM_TYPES = BAN_TYPES | {"resource_limit", "objective", "soft_preference", "optimization_target",
                           "priority", "evaluation_spec", "data_source"}

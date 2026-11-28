@@ -1,0 +1,76 @@
+{
+  "kind": "CONTROLLED_NATIVE",
+  "transport": "controlled native transport; real GX and local CPU runner",
+  "run": "gxr_01m8fqhph2n77y4ghn",
+  "goal": "Check the numerical instrument archive.",
+  "events": [
+    {
+      "event_id": 28,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_9c852bcd60fecf10be40b4c49d2b359c",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhpjfz9b6ztkh",
+        "decision_ref": "gxa_c8a17cc0274b5ebe45c89699d82454bc02a23dff26bec005ba4dba04ff88c5a4",
+        "goal_version": 1,
+        "graph_version": 1,
+        "needs_decision": false,
+        "op": "open_intent",
+        "revision": 1,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 29,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_3ef42914bd66755999e5a3c2abcbbc88",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhpjfz9b6ztkh",
+        "decision_ref": "gxa_c8a17cc0274b5ebe45c89699d82454bc02a23dff26bec005ba4dba04ff88c5a4",
+        "goal_version": 1,
+        "graph_version": 1,
+        "needs_decision": true,
+        "op": "open_intent",
+        "revision": 1,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 40,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_3ef42914bd66755999e5a3c2abcbbc88",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhppd3jfbfmhw",
+        "decision_ref": "gxa_1b614b9f69ffbfeae7aa847bbfdcc4ff2445292a9d2ff758b587efab8fa8dbfb",
+        "goal_version": 1,
+        "graph_version": 2,
+        "op": "resolve_intent",
+        "revision": 2,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 54,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_9c852bcd60fecf10be40b4c49d2b359c",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhpq73wrmxaha",
+        "decision_ref": "gxa_85d1e7e81bf1110fea22ee22e626e781577b437ea095f984f5d53ae9bd9486d8",
+        "goal_version": 1,
+        "graph_version": 3,
+        "op": "resolve_intent",
+        "revision": 2,
+        "scope": "run"
+      }
+    }
+  ],
+  "original_watch": {
+    "event": "evidence_added",
+    "subject_ref": "run"
+  },
+  "final_watches": [
+    {
+      "event": "job_settled",
+      "subject_ref": "run"
+    }
+  ]
+}

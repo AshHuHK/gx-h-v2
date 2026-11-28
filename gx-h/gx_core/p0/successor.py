@@ -169,7 +169,7 @@ def _spec(conn, directory, parent, close, mid, text, options):
     spec = {k: v for k, v in grant.items() if k in {
         "project", "workspace", "budget_profile", "turn_token_budget",
         "research_effort", "research_modules", "module_policy", "branch_delegation", "initial_job_limit",
-        "capabilities", "plugins", "max_parallel_roots"
+        "capabilities", "plugins", "max_parallel_roots", "harness_policy"
     }}
     # New studies inherit the live workspace budget; the parent bootstrap may predate a funded extension.
     from . import capability_views

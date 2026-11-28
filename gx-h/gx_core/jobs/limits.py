@@ -160,6 +160,10 @@ def switch_findings(resources: Mapping[str, Any], *, kind: str | None = None,
     """
     document = config.limits() if limits is None else limits
     found: list[GxError] = []
+    if resources.get("paid_api_calls"):
+        refused = switch_finding(document, "paid_external_services", None)
+        if refused is not None:
+            found.append(refused)
     gpu = resources.get("gpu")
     if gpu is not None:
         refused = switch_finding(document, GPU_SWITCH, gpu.get("scope"))

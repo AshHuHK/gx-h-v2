@@ -1,0 +1,1 @@
+For USGS station 01651000 in the supplied archive, which pair of consecutive days had the largest absolute change in daily mean discharge? Report the dates, both readings, direction, and magnitude with units. What does this record establish about a trend at the station?

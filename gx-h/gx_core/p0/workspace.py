@@ -168,7 +168,9 @@ def attach_run(conn, run_id, *, project_ref, run_key, profile_name, spec, actor)
     cap = _root_cap(spec)
     if run_key is None and not (root_limits or run_limits):
         # The v2 allocation, run ID and idempotency record retain their original meaning.
-        return budgets.create_root(conn, run_id=run_id, profile_name=profile_name, actor=actor)
+        limits = dict(budgets.profile(profile_name)["limits"])
+        limits.pop("paid_api_calls", None)
+        return budgets.create_root(conn, run_id=run_id, profile_name=profile_name, limits=limits, actor=actor)
     if run_key is not None:
         _check_key(run_key)
     group = conn.execute("SELECT * FROM p0_workspace WHERE singleton=1").fetchone()
@@ -180,8 +182,12 @@ def attach_run(conn, run_id, *, project_ref, run_key, profile_name, spec, actor)
             root, anchor_id = legacy["budget_ref"], legacy["run_id"]
             cap = _root_cap(store.loads(legacy, "inputs_json")["inputs"].get("p0_spec", {}))
         else:
+            limits = dict(budgets.profile(profile_name)["limits"])
+            # Paid-call credits require an explicit PI grant, even where an operator
+            # permits paid adapters and supplies a maximum in the site profile.
+            limits.pop("paid_api_calls", None)
             root = budgets.create_root(conn, run_id=None, profile_name=profile_name, actor=actor,
-                                       limits={**budgets.profile(profile_name)["limits"], **root_limits})
+                                       limits={**limits, **root_limits})
             anchor_id = run_id
         conn.execute("INSERT INTO p0_workspace(singleton,workspace_id,project_ref,budget_ref,intent_run_id,"
                      "max_parallel_roots) VALUES(1,?,?,?,?,?)", (project_ref, project_ref, root, anchor_id, cap))
@@ -220,7 +226,9 @@ def attach_run(conn, run_id, *, project_ref, run_key, profile_name, spec, actor)
         available = {key: math.ceil(value / 2) if isinstance(value, int) else value / 2
                      for key, value in available.items()}
     # A run with a tighter profile cannot draw beyond that profile even if the project can.
-    profile = budgets.profile(profile_name)["limits"]
+    profile = dict(budgets.profile(profile_name)["limits"])
+    if "paid_api_calls" not in run_limits:
+        profile.pop("paid_api_calls", None)
     if any(key not in profile or value > profile[key] for key, value in run_limits.items()):
         raise SchemaInvalid("run_budget must fit within this run's budget profile")
     allotment = {key: min(value, profile[key]) for key, value in available.items() if key in profile}

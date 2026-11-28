@@ -12,7 +12,7 @@ from acceptance.multi_workflow.test_pcna_native import INTERFACE, MATERIALS, PLU
 from acceptance.v62a.interleavings_fixture import PRODUCT, branch, draft
 from acceptance.v622.test_close import SurveyedStudy, actual_packet, close_decision
 from gx_core.artifacts import ArtifactService
-from gx_core.errors import BudgetExceeded, GxError, ScopeDenied
+from gx_core.errors import GxError, ScopeDenied
 from gx_core.p0 import cli, v6_goal, v62_catalog, v62_rounds
 
 
@@ -101,10 +101,15 @@ class AdvisoryRounds(RoundStudy):
         tight = dict(self.route_spec, branch="local:smaller", budget_limits={"job_submissions": 1, "cpu_seconds": 1})
         node = self.s.node(self.s.lead, "too-expensive", self.source, branch_id=tight["branch"], capability=INTERFACE,
                            parameters={"pair": "12", "block_index": -1})
-        with self.assertRaises(BudgetExceeded):
-            self.decide("outside-pi-resources", draft(tight, node, evidence=[self.source, self.report]))
+        self.decide("outside-pi-resources", draft(tight, node, evidence=[self.source, self.report]))
+        self.s.advance()
         self.assertFalse(self.s.rows("SELECT job_id FROM jobs"))
-        self.assertFalse(self.s.rows("SELECT node_id FROM v6_nodes"))
+        self.assertFalse(self.s.rows("SELECT reservation_ref FROM budget_reservations WHERE subject_kind='job'"))
+        wait, = self.s.rows("SELECT wait_json FROM v6_node_waits JOIN v6_nodes USING(node_id) WHERE status='PENDING'")
+        gap, = json.loads(wait["wait_json"])["details"]["shortfalls"]
+        self.assertEqual((gap["key"], gap["available"], gap["short_by"]),
+                         ("cpu_seconds", 1, gap["requested"] - 1))
+        self.assertGreater(gap["short_by"], 0)
 
     def test_wait_for_new_evidence_without_outstanding_jobs(self):
         self.decide("await-new-source", draft(evidence=[self.report]))

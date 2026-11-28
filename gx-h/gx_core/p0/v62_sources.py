@@ -549,7 +549,7 @@ def call_tool(conn, tool, payload, *, run_id, task_id, lease_id, thread_id, turn
     from ..errors import OutcomeUnknown
     if tool not in TOOL_NAMES:
         raise SchemaInvalid('Unknown source-evidence tool')
-    from . import research_handoff
+    from . import harness_policy, research_handoff
     searchable = isinstance(payload, dict) and 'query' in payload and research_handoff.active(conn, run_id)
     errors = schema.validate(payload, source_spec(tool, searchable=searchable)['inputSchema'])
     if errors:
@@ -575,7 +575,8 @@ def call_tool(conn, tool, payload, *, run_id, task_id, lease_id, thread_id, turn
                 raise ScopeDenied('This tool is outside the active module grant')
             visible &= {m['artifact_ref'] for m in packet['materials']}
             permitted_targets = set(grant.get('target_claim_refs', ()))
-        elif scope != 'run' or packet.get('research_effort') != 'deep' or tool not in packet.get('source_tools', ()):
+        elif (scope != 'run' or tool not in packet.get('source_tools', ())
+              or (packet.get('research_effort') != 'deep' and not harness_policy.enabled(packet))):
             raise ScopeDenied('This decision has no delegated source evidence tool')
         extract = None
         if tool == REVIEW:

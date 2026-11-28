@@ -27,7 +27,7 @@ NATIVE_WAIT = "p0.native.wait"
 OFFLINE = "GX_CODEX_OFFLINE"
 _DEFERRED = object()
 _LOCAL_TOPICS = ("p0.intent.reevaluate", "p0.intent.cancel_job", "p0.supplement.review")
-_NATIVE_TOPICS = ("p0.intent.notification", "p0.compute.notice")
+_NATIVE_TOPICS = ("p0.intent.notification", "p0.compute.notice", "research.topic.notice")
 
 
 def native_waits(conn, rid):
@@ -508,6 +508,18 @@ class Driver:
                     from . import compute
                     if self._native_call("outbox", oid, lambda native: compute.deliver_notice(native, payload)) is _DEFERRED:
                         continue
+                elif row["topic"] == "research.topic.notice":
+                    from . import research_topics
+                    if research_topics.notice_due(self.conn, payload):
+                        thread = thread_for_lease(self.conn,self.rid,payload["task_id"],payload["lease_id"])
+                        if not thread:
+                            # A current task can hold its lease before Codex returns a thread ID.
+                            self._retry_at[oid] = time.monotonic() + 0.25
+                            continue
+                        if self._native_call("outbox",oid,lambda native: native.deliver(
+                                thread,"A subscribed research topic changed. Read gx_task_context for the current "
+                                "visible evidence and decide whether it affects your work.",event_id=str(oid))) is _DEFERRED:
+                            continue
                 elif row["topic"] == "p0.intent.reevaluate":
                     service.hooks_for_run(self.conn, self.rid).reevaluate(self.conn, payload)
                 elif row["topic"] == "p0.supplement.review":
@@ -624,8 +636,9 @@ class Driver:
         for at in (lease, *(w.get("next_retry_at") for w in self._waits.values())):
             if at and at > checked_at:
                 due.append(time.monotonic() - clock.age_seconds(at))
-        from . import operator_usage
+        from . import operator_usage, research_joins
         for owner, args in ((JobService.next_poll_seconds, (self.conn, self.rid, checked_at)),
+                            (research_joins.next_deadline_seconds, (self.conn, self.rid)),
                             (metering.next_deadline_seconds, (self.conn, self.rid)),
                             (operator_usage.next_alert_seconds, (self.conn, self.rid))):
             sampled_at = time.monotonic()

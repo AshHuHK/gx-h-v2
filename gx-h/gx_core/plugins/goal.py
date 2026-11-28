@@ -104,7 +104,7 @@ def for_start(ctx, requested, references, *, module_catalog=None, required_provi
         if method.get("applicable_domain"):
             descriptor["applicable_domain"] = method["applicable_domain"]
         if module_catalog:
-            descriptor["cost_class"] = "gpu" if method["resources"].get("gpu") else "local_cpu"
+            descriptor.update(manifest.cost_card(method["resources"]))
             descriptor["family"] = method["method_card"]["family"]
             descriptor["output_summary"] = [{k: v for k, v in item.items() if k in ("name", "kind", "nature")}
                                             for item in method["outputs"]]
@@ -152,8 +152,9 @@ def catalog(conn, run_id):
     return json.loads(row[0]).get("inputs", {}).get("capability_catalog", ()) if row else ()
 
 
-def method(conn, run_id, capability, *, historical=False):
-    for row in catalog(conn, run_id):
+def method(conn, run_id, capability, *, historical=False, module_binding=None):
+    rows = [module_binding["descriptor"]] if module_binding else catalog(conn, run_id)
+    for row in rows:
         if row["capability_version"] == capability:
             plugin = _provider(row)
             return plugin.contributions.goal_methods.get(capability) if plugin else None

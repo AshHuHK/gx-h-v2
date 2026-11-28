@@ -69,12 +69,13 @@ def _assert_sources(conn, run_id, goal_version, grant, snapshot, *, for_projecti
         conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)).fetchone()[0]
     )["inputs"]
     catalog = inputs.get("research_catalog") or {}
+    from . import v62_catalog
     if not any(
         r["module_id"] == snapshot["module_id"]
         and r["version"] == snapshot["module_version"]
         and r["plugin"] == grant["plugin"]
         and r["declaration_sha256"] == grant["declaration_sha256"]
-        for r in catalog.get("modules", [])
+        for r in v62_catalog.module_choices(catalog)
     ):
         raise StaleRevision("The research module declaration is no longer in this Run's grant")
     live_inputs = set(json.loads(goal["materials_json"]))
@@ -241,6 +242,9 @@ def _brief(conn, row, nodes, proofs):
         "goal_version",
     )
     module = {k: row[k] for k in fields}
+    for field in ("researcher", "route_intent", "communication"):
+        if field in grant:
+            module[field] = grant[field]
     funds = budgets.state(conn, row["budget_ref"])
     operations = _operations(conn, row)
     # A new decision receives confirmed references and field summaries, never another scope's materials.
@@ -249,10 +253,21 @@ def _brief(conn, row, nodes, proofs):
     from . import capability_views
     revision = capability_views.latest(conn, row["run_id"])
     methods = [c for c in grant["capabilities"] if revision is None or c in revision["active"]]
+    summaries = [c for c in snapshot["capabilities"] if c["capability_version"] in methods]
+    binding = {}
+    if "method_options" in grant:
+        from . import module_methods, v62_catalog
+        methods = list(module_methods.pins(conn, row["run_id"], row["scope"]))
+        summaries = [v62_catalog._method_summary(item) for item in module_methods.catalog(conn, row["run_id"], row["scope"])]
+        binding = {"module_method_revision": module_methods.revision(conn, row["run_id"], row["scope"])}
     dialogue = research_dialogue.packet(conn, row["run_id"], row["scope"], row["goal_version"])
-    from . import research_handoff
-    handoff = research_handoff.active(conn, row["run_id"])
+    from . import harness_policy, research_handoff, research_topics
+    handoff = research_handoff.active(conn, row["run_id"]) and grant.get("communication") != "isolated"
+    modern = harness_policy.active(conn, row["run_id"])
+    subscriptions = research_topics.subscribed_topics(conn,row) if modern and handoff else []
     return {
+        **({"harness_policy": harness_policy.VERSION} if modern else {}),
+        **({"subscribed_topics": subscriptions} if subscriptions else {}),
         **({"pi_dialogue": dialogue} if dialogue else {}),
         **({"researcher_handoff": True, "peer_hints": research_handoff.inbox(conn, row["run_id"], row["scope"])}
            if handoff else {}),
@@ -273,7 +288,8 @@ def _brief(conn, row, nodes, proofs):
         "materials": [{k: v for k, v in item.items() if k != "publication"} for item in
                       [*snapshot["materials"], *v621_assignment.for_module(conn, row)]],
         **({"catalog_access": grant["catalog_access"]} if "catalog_access" in grant else {}),
-        "capabilities": [c for c in snapshot["capabilities"] if c["capability_version"] in methods],
+        "capabilities": summaries,
+        **binding,
         **({"capability_view":{"revision":revision["revision"], "digest":revision["digest"]}} if revision else {}),
         "budget": {k: funds[k] for k in ("limits", "spent", "reserved", "available")},
         "branches": [{"branch_id": row["branch_id"], "status": "OPEN", "budget_limits": funds["limits"]}],
@@ -287,6 +303,21 @@ def _brief(conn, row, nodes, proofs):
     }
 
 
+def _pending_input(conn, row, task):
+    from . import harness_policy, research_topics
+    if not task or not harness_policy.active(conn,row["run_id"]):
+        return False
+    cursor = conn.execute("SELECT event_cursor FROM research_contexts WHERE context_ref=?",
+                          (task["context_ref"],)).fetchone()
+    if not cursor:
+        return False
+    if research_topics.pending(conn, row, after=cursor[0]):
+        return True
+    return conn.execute("SELECT 1 FROM events WHERE run_id=? AND event_id>? AND kind='v6.node.waiting' "
+                        "AND json_extract(payload_json,'$.funding_scope')=? LIMIT 1",
+                        (row["run_id"], cursor[0], row["scope"])).fetchone() is not None
+
+
 def _new_task(tx, row, *, previous=None, verified_nodes=None, proofs=()):
     rid, scope = row["run_id"], row["scope"]
     if research_dialogue.blocked(tx, rid, scope=scope):
@@ -295,11 +326,18 @@ def _new_task(tx, row, *, previous=None, verified_nodes=None, proofs=()):
     if current and (current["status"] in v6_goal.ACTIVE_TASKS or current["task_id"] != previous):
         return None
     nodes = _nodes(tx, row)
-    if any(n["status"] not in v6_jobs.NODE_TERMINAL for n in nodes):
+    if any(n["status"] not in v6_jobs.NODE_TERMINAL for n in nodes) and not _pending_input(tx, row, current):
         return None
     if verified_nodes is not None and verified_nodes != nodes:
         return None
     brief = _brief(tx, row, nodes, proofs)
+    gaps = tx.execute("SELECT w.node_id,w.wait_json FROM v6_node_waits w JOIN v6_nodes n USING(node_id) "
+                      "WHERE n.run_id=? AND n.branch_id=? AND n.status='PENDING' "
+                      "AND json_extract(w.wait_json,'$.code')='BUDGET_EXCEEDED' ORDER BY w.node_id",
+                      (rid, row["branch_id"])).fetchall()
+    if gaps and brief.get("harness_policy"):
+        brief["funding_shortfalls"] = [{"node_id": gap["node_id"], **json.loads(gap["wait_json"])}
+                                      for gap in gaps]
     brief["verified_jobs"] = list(proofs)
     cursor = tx.execute("SELECT coalesce(max(event_id),0) FROM events WHERE run_id=?", (rid,)).fetchone()[0]
     key = "v62.task:" + ids.sha256_of_obj([row["module_instance_id"], previous])
@@ -348,11 +386,43 @@ def _open_authority(conn, identity, key, digest):
     return receipt, task, goal
 
 
+def delegation_options(conn, run_id, declaration):
+    """Intersect the template's research methods with frozen site/PI choices and current bans."""
+    from . import capability_views, catalog_index, intent, v62_catalog
+
+    tools = list(declaration["tools"])
+    if "gx_read_artifact" in tools and "gx_read_source" not in tools:
+        tools.append("gx_read_source")
+    if "gx_decide_revision" not in tools:
+        return tools, {}
+    choices = capability_views.goal_options(v62_catalog._inputs(conn, run_id))
+    bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
+    choices = {cap: pin for cap, pin in choices.items()
+               if not intent.forbidden_capability(*cap.rsplit("@", 1), bans)}
+    if declaration["module_id"] != "ad_hoc":
+        profiles = declaration.get("method_profiles")
+        if profiles:
+            eligible = {m["capability_version"] for m in catalog_index.installed_methods()
+                        if (choice := choices.get(m["capability_version"]))
+                        and m["portable_sha256"] == choice["digest"]
+                        and (not choice.get("provider_digest") or m.get("provider_sha256") == choice["provider_digest"])
+                        and v62_catalog._fits_profile(m, profiles)}
+        else:
+            eligible = set(declaration.get("declared_capabilities", declaration["capabilities"]))
+        choices = {cap: pin for cap, pin in choices.items() if cap in eligible}
+    if choices and "gx_select_capability" not in tools:
+        tools.append("gx_select_capability")
+    return tools, choices
+
+
 def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, payload):
     from . import v62_catalog, v62_rounds
 
     if conn.in_transaction:
         raise RuntimeError("Prepare module inputs and provider declaration before acquiring the writer")
+    from . import harness_policy
+    autonomous = harness_policy.active(conn, run_id)
+    extra = {"researcher", "method_choices", "communication", "route_intent"} if autonomous else set()
     required = {
         "module_id",
         "module_version",
@@ -367,10 +437,13 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
     if (
         not isinstance(payload, dict)
         or not required <= payload.keys()
-        or payload.keys() - required - {"wake_on", "tools", "target_claim_refs"}
+        or payload.keys() - required - {"wake_on", "tools", "target_claim_refs"} - extra
     ):
         raise SchemaInvalid("Invalid fields for a module delegation")
     _strings(payload, ["module_id", "module_version", "focus", "expected_delivery", "operation_key"])
+    _strings(payload, [k for k in ("researcher", "route_intent") if k in payload])
+    if payload.get("communication", "shared") not in ("shared", "isolated"):
+        raise SchemaInvalid("communication must be shared or isolated")
     refs = _list(payload["input_refs"], "input_refs")
     caps = _list(payload["capabilities"], "capabilities")
     target_refs = _list(payload.get("target_claim_refs", []), "target_claim_refs")
@@ -385,13 +458,25 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
     prior, task, goal = _open_authority(conn, ident, payload["operation_key"], sha)
     if prior is not None:
         return prior
-    v62_rounds.require_exploration(conn, run_id)
+    exploration = {"route_intent": payload["route_intent"]} if "route_intent" in payload else {}
+    v62_rounds.require_exploration(conn, run_id, **exploration)
     policy = v62_catalog.policy(conn, run_id)
-    if policy["effort"] == "quick" or payload["round"] > policy["max_rounds"]:
+    round_limited = not autonomous or policy.get("explicit_round_limit")
+    if not policy["max_parallel"] or (round_limited and payload["round"] > policy["max_rounds"]):
         raise ScopeDenied("This research effort does not grant this module round")
     decl = v62_catalog.resolve(conn, run_id, payload["module_id"], payload["module_version"])
-    tools = _list(payload["tools"], "tools") if "tools" in payload else decl["tools"]
-    if set(tools) - set(decl["tools"]):
+    available_tools = list(decl["tools"])
+    local_choices = {}
+    if autonomous:
+        available_tools, eligible = delegation_options(conn, run_id, decl)
+        selected = _list(payload["method_choices"], "method_choices") if "method_choices" in payload else eligible
+        if set(selected) - eligible.keys():
+            raise ScopeDenied("Requested method choices exceed the site, PI or local role grant")
+        local_choices = {cap: eligible[cap] for cap in sorted(selected)}
+        if not local_choices and "gx_select_capability" in available_tools:
+            available_tools.remove("gx_select_capability")
+    tools = _list(payload["tools"], "tools") if "tools" in payload else available_tools
+    if set(tools) - set(available_tools):
         raise ScopeDenied("The delegated module requests a tool outside its declaration")
     if "gx_submit_module_report" not in tools:
         raise SchemaInvalid("A delegated research worker requires its report submission route")
@@ -418,6 +503,11 @@ def prepare_open(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id
         plugin=decl["plugin"],
         declaration_sha256=decl["declaration_sha256"],
     )
+    if autonomous and refs != grant["input_refs"]:
+        grant["commission_inputs"] = refs  # Preserve explicit ports when a released report expands to its sources.
+    if local_choices and "gx_select_capability" in tools:
+        grant["method_options"] = local_choices
+    grant.update({k:payload[k] for k in ("researcher", "communication", "route_intent") if k in payload})
     if decl.get("method_profiles"):
         grant["method_profiles"] = decl["method_profiles"]
     if decl.get("catalog_access") == "public_methods" and "gx_query_catalog" in tools:
@@ -462,7 +552,8 @@ def commit_open(conn, plan):
         prior, parent, goal = _open_authority(tx, ident, p["operation_key"], plan.request_sha)
         if prior is not None:
             return prior
-        v62_rounds.require_exploration(tx, rid)
+        exploration = {"route_intent": p["route_intent"]} if "route_intent" in p else {}
+        v62_rounds.require_exploration(tx, rid, **exploration)
         if parent["context_ref"] != plan.context_ref:
             raise StaleRevision("The delegating context changed")
         _assert_sources(tx, rid, plan.goal_version, plan.grant, plan.snapshot, opening=True)
@@ -475,14 +566,15 @@ def commit_open(conn, plan):
             >= plan.policy["max_parallel"]
         ):
             raise BudgetExceeded("The maximum concurrent module count was reached")
-        latest = tx.execute(
-            "SELECT round,parent_task_id FROM v62_modules WHERE run_id=? AND (? IS NULL OR goal_version=?) "
-            "ORDER BY round DESC LIMIT 1",
-            (rid, version, version),
-        ).fetchone()
-        if latest and (p["round"] < latest["round"] or
-                       (p["round"] == latest["round"] and ident["task_id"] != latest["parent_task_id"])):
-            raise StaleRevision("This module round has already been sealed")
+        from . import harness_policy
+        if not harness_policy.active(tx, rid):
+            latest = tx.execute(
+                "SELECT round,parent_task_id FROM v62_modules WHERE run_id=? AND (? IS NULL OR goal_version=?) "
+                "ORDER BY round DESC LIMIT 1", (rid, version, version)
+            ).fetchone()
+            if latest and (p["round"] < latest["round"] or
+                           (p["round"] == latest["round"] and ident["task_id"] != latest["parent_task_id"])):
+                raise StaleRevision("This module round has already been sealed")
         instance = "module_" + ids.sha256_of_obj([rid, p["operation_key"]])[:32]
         scope, branch = "module:" + instance, "branch_" + ids.sha256_of_obj([rid, instance])[:32]
         account = v62_budget.open_child(tx, rid, instance, p["sub_budget"], ident["thread_id"])
@@ -535,6 +627,7 @@ def commit_open(conn, plan):
             call_id=call_id,
             budget_ref=account,
             effective_grant=plan.grant,
+            **exploration,
             request_sha256=plan.request_sha,
         )
         tx.execute(
@@ -658,7 +751,8 @@ def _progress(conn, row):
     reason = v62_budget.exhausted(conn, row) or v62_reports.exhausted_report_repairs(conn, task)
     if not reason and task and task["status"] in v6_goal.ACTIVE_TASKS:
         return False
-    if not reason and any(n["status"] not in v6_jobs.NODE_TERMINAL for n in _nodes(conn, row)):
+    if (not reason and any(n["status"] not in v6_jobs.NODE_TERMINAL for n in _nodes(conn, row))
+            and not _pending_input(conn, row, task)):
         return False
     if not reason and v62_budget.remaining(conn, row["budget_ref"]).get("worker_tasks", 0) < 1:
         reason = "module worker task allowance exhausted"

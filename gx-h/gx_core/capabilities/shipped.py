@@ -175,7 +175,7 @@ def attach(ctx: Ctx, reference: str, *, package=None) -> dict:
             "manifest_sha256": asset["content_sha256"], "content_artifact_ref": asset["content_artifact_ref"]}
 
 
-def participates(conn, run_id, capability):
+def participates(conn, run_id, capability, *, module_binding=None):
     """A package-owned method is available to Runs holding its exact workspace receipt."""
     row = conn.execute(
         "SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)
@@ -199,6 +199,8 @@ def participates(conn, run_id, capability):
     if revision is not None:
         catalog = revision["catalog"]
     grant = None
+    if module_binding is not None:
+        catalog = [module_binding["descriptor"]]
     if catalog is not None:
         grant = next((entry for entry in catalog if entry["capability_version"] == capability), None)
         if grant is None:
@@ -216,7 +218,7 @@ def participates(conn, run_id, capability):
         if (grant.get("content_artifact_ref") != asset["content_artifact_ref"] or
                 grant.get("manifest_sha256") != asset["content_sha256"]):
             return False
-        if recorded_goal and revision is None:
+        if recorded_goal and revision is None and module_binding is None:
             fields = ("capability_version", "portable_sha256", "manifest_sha256", "content_artifact_ref")
             receipt = {field: grant.get(field) for field in fields}
             if receipt not in binding["capabilities"] or (grant.get("plugin") and grant["plugin"] not in binding["packages"]):

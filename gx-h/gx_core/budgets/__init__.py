@@ -167,7 +167,7 @@ def _available(limits: Mapping[str, Any], spent: Mapping[str, Any], reserved: Ma
 # ----------------------------------------------------------------------- project phases
 
 _BASE_PROJECT_LINES = ("job_submissions", "gpu_jobs", "gpu_minutes", "cpu_seconds", "worker_tasks")
-PROJECT_LINES = (*_BASE_PROJECT_LINES, "api_calls", "tokens")
+PROJECT_LINES = (*_BASE_PROJECT_LINES, "api_calls", "tokens", "paid_api_calls")
 _PHASE_EVENT = "budget.project_phase"
 
 
@@ -176,7 +176,7 @@ def check_project_limits(raw: Any) -> dict[str, int]:
     if (not isinstance(raw, Mapping) or not set(_BASE_PROJECT_LINES) <= set(raw)
             or not set(raw) <= set(PROJECT_LINES)):
         raise SchemaInvalid("project budget requires " + ", ".join(_BASE_PROJECT_LINES)
-                            + "; optional resources are api_calls and tokens")
+                            + "; optional resources are api_calls, tokens and paid_api_calls")
     for key in raw:
         if type(raw[key]) is not int or raw[key] < 0:
             raise SchemaInvalid(f"project budget {key} must be a nonnegative integer")
@@ -512,8 +512,32 @@ def _funding_state(conn: sqlite3.Connection, budget_ref: str) -> str | None:
     return None if row is None else row["status"]
 
 
+def held_details(conn, budget_ref, lines):
+    """Identify only this account's outstanding holds on the deficient units."""
+    result = []
+    for row in conn.execute("SELECT reservation_ref,subject_kind,subject_id,amounts_json "
+                            "FROM budget_reservations WHERE budget_ref=? AND status='HELD' "
+                            "ORDER BY reservation_ref", (budget_ref,)):
+        amounts = {k: v for k, v in store.loads(row, "amounts_json", {}).items() if k in lines and v}
+        if amounts:
+            result.append({"reservation_ref": row["reservation_ref"], "subject_kind": row["subject_kind"],
+                           "subject_id": row["subject_id"], "amounts": amounts})
+    return result
+
+
+def check_job_room(conn, budget_ref, job_id, amounts):
+    """Read the admission snapshot without taking a writer or allocating an external Job."""
+    conn.execute("SAVEPOINT job_budget_snapshot")
+    try:
+        _reserve(conn, _row(conn, budget_ref), reservation_ref=None, subject_kind="job",
+                 subject_id=job_id, amounts=check_amounts(amounts), actor="jobs", check_only=True)
+    finally:
+        conn.execute("RELEASE job_budget_snapshot")
+
+
 def _reserve(conn: sqlite3.Connection, budget: sqlite3.Row, *, reservation_ref: str | None,
-             subject_kind: str, subject_id: str, amounts: Mapping[str, Any], actor: str) -> dict[str, Any]:
+             subject_kind: str, subject_id: str, amounts: Mapping[str, Any], actor: str,
+             check_only: bool = False) -> dict[str, Any]:
     budget_ref = budget["budget_ref"]
     if not subject_kind or not subject_id:
         raise SchemaInvalid("a reservation names its subject", details={})
@@ -585,13 +609,29 @@ def _reserve(conn: sqlite3.Connection, budget: sqlite3.Row, *, reservation_ref: 
         else:
             message = (f"budget {budget_ref}: {first['key']}={first['requested']} requested, "
                        f"{first['available']} left of {first['limit']}")
-        raise BudgetExceeded(message, details={"budget_ref": budget_ref, "shortfalls": shortfalls,
-                                               "subject": [subject_kind, subject_id]})
+        details = {"budget_ref": budget_ref, "shortfalls": shortfalls, "subject": [subject_kind, subject_id]}
+        if subject_kind == "job":
+            for item in shortfalls:
+                item.setdefault("available", 0)
+                item.setdefault("spent", spent.get(item["key"], 0))
+                item.setdefault("reserved", reserved.get(item["key"], 0))
+                item["short_by"] = _clean(item["requested"] - item["available"])
+            details["held_reservations"] = held_details(conn, budget_ref, {s["key"] for s in shortfalls})
+        raise BudgetExceeded(message, details=details)
 
     if reservation_ref is None and not native:
         refusal = next(_project_reservation_errors(conn, budget_ref, amounts), None)
         if refusal:
+            if subject_kind == "job":
+                detail = refusal.details
+                lines = detail.get("shortfalls", [dict(detail)])
+                for item in lines:
+                    item["short_by"] = _clean(item["requested"] - item["available"])
+                detail.update(shortfalls=lines, budget_ref=budget_ref,
+                              held_reservations=held_details(conn, budget_ref, {s["key"] for s in lines}))
             raise refusal
+    if check_only:
+        return {}
     for key, requested in amounts.items():
         reserved[key] = _clean(reserved.get(key, 0) + requested)
     _write(conn, budget_ref, reserved=reserved)

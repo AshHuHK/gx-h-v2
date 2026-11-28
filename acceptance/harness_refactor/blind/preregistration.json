@@ -1,0 +1,43 @@
+{
+  "series": "public-archive-denominator-1",
+  "baseline": "50d31f5792a178529a817ffd93f66ef9cbbb0be4",
+  "inputs": {
+    "question": "8b6d302e289bad40014f1cc3a7986aeb1092b61f13c855bb93481296ad168da9",
+    "initial": "64152e9093d30a556bfcfd559e27485ff875795f4d6a02d669d39f0e90e89605",
+    "late": "86027948366acd73893ad81ac770a00997e8ca72548f5aebbbea4db1880afd01",
+    "rubric": "5e41370408d6cc1be1f24f03bcdb003aecfcea6122533ca16eef2278f83be38b",
+    "origins": "184dd3912f941dc4d3a3b4a870da2e41dac0c25961ff6716bc2f627497adcab9"
+  },
+  "model": "gpt-6.2-astra",
+  "effort": "max",
+  "arms": [
+    "stock",
+    "baseline",
+    "revised"
+  ],
+  "arms_per_question": 1,
+  "blind_score_denominator": 7,
+  "included_oauth_only": true,
+  "effective_science_tools": [
+    "read supplied immutable initial archive JSON E1",
+    "receive late publisher extraction E2"
+  ],
+  "trial_controls": {
+    "external_jobs": 0,
+    "tool_network": false,
+    "additional_paid_usd": 0,
+    "wall_seconds_per_arm_including_recovery": 900
+  },
+  "interruption": "Kill the arm driver and its descendants after the official App Server records the completed read of the exact E1 content for the same tool call, thread and turn. Resume the original native thread or GX Run, deliver the publisher return once and preserve the first outcome.",
+  "evidence_scope": "Frozen public observations about natural yeast enzymes and curatorial provenance only.",
+  "judge": "Independent same-model reader, blinded report IDs randomly assigned after all original attempts. No tools.",
+  "adoption_time": "Independent blinded reader selects the first post-delivery accepted scientific statement that changes or maintains the published interpretation in light of E2. Timings stay private until the annotation is frozen. Unobserved adoption is null.",
+  "study_software": {
+    "build_materials.py": "e8a172043969e449fc410bb2d28ee3fcd4163ece85d7efca827f760326666f19",
+    "common.py": "46ad35c75c38ad725f2e64194cc11eb8ff8f1b7595c23568b419f5c86fbd691d",
+    "native.py": "e527112adc74f123a91d83e5935029524a3d024acb62cd9ad9eed82fd038ce48",
+    "probe.py": "a8f5fd660798ac828102155e967815917faaeb1121b2c42e3439faa1c1ec03ec",
+    "score.py": "f2468caaf072e95ab31cad4ec041605412e9add321f63a58679cd85ee921cd8f",
+    "trial.py": "9d17f72f6cb3b871f71fb43cba55914dac0d31b40ab0a9e66cb0d98ec4142c73"
+  }
+}

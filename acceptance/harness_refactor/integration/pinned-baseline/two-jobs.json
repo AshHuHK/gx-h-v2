@@ -1,0 +1,84 @@
+{
+  "type": "SCRIPTED_CALLBACK",
+  "run_id": "gxr_01m8fqxtc29yk5wknz",
+  "decision_event": 31,
+  "input": "gxa_01m8fqxtcc3yzzh2s4",
+  "operations": [
+    {
+      "branch": "local:measurement-branch",
+      "budget_limits": {
+        "cpu_seconds": 30,
+        "job_submissions": 2
+      },
+      "op": "open_branch"
+    },
+    {
+      "branch": "local:measurement-branch",
+      "capability": "instrument-series@1",
+      "depends_on": [],
+      "inputs": [
+        "gxa_01m8fqxtcc3yzzh2s4"
+      ],
+      "node": "local:read",
+      "op": "add_node",
+      "parameters": {},
+      "question": "What mean does this record give?"
+    },
+    {
+      "branch": "local:measurement-branch",
+      "capability": "instrument-series@1",
+      "depends_on": [
+        "local:read"
+      ],
+      "independent_repeat": true,
+      "input_ports": [
+        {
+          "index": 0,
+          "output": "readings.json"
+        }
+      ],
+      "inputs": [
+        "local:read"
+      ],
+      "node": "local:measurement",
+      "op": "add_node",
+      "parameters": {},
+      "question": "What mean does this record give?"
+    }
+  ],
+  "source_job": "gxj_01m8fqxtjywzqdqtpx",
+  "consuming_job": "gxj_01m8fqxv07fywtmqnv",
+  "selected_output": {
+    "artifact_ref": "gxa_01m8fqxtysntv7nc9t",
+    "sha256": "c7354dca281e73fe03980e68be9409a0f8c4a5ee19174331df94ee193a7564b2",
+    "output_name": "readings.json",
+    "kind": "instrument_summary",
+    "nature": "analysis"
+  },
+  "consumed": {
+    "artifact_ref": "gxa_01m8fqxtysntv7nc9t",
+    "bytes": 19,
+    "role": "readings",
+    "sha256": "c7354dca281e73fe03980e68be9409a0f8c4a5ee19174331df94ee193a7564b2"
+  },
+  "final_output": {
+    "artifact_ref": "gxa_01m8fqxvb6jjss7a70",
+    "sha256": "c7354dca281e73fe03980e68be9409a0f8c4a5ee19174331df94ee193a7564b2",
+    "output_name": "readings.json",
+    "kind": "instrument_summary",
+    "nature": "analysis"
+  },
+  "readbacks": [
+    {
+      "readings": [
+        6.0
+      ]
+    },
+    {
+      "readings": [
+        6.0
+      ]
+    }
+  ],
+  "replayed_job_count": 2
+}

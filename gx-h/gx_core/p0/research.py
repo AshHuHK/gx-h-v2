@@ -67,9 +67,10 @@ def _task_goal(card, *, indent_continuations=True):
 
 
 def _same_goal(saved, requested):
-    if "discovery_policy" not in saved and "discovery_policy" in requested:
-        # Reissuing an old research command must preserve that Goal's original policy.
-        requested = {key: value for key, value in requested.items() if key != "discovery_policy"}
+    # New CLI defaults never upgrade the frozen contract when the original command is replayed.
+    for policy in ("discovery_policy", "harness_policy"):
+        if policy not in saved and policy in requested:
+            requested = {key: value for key, value in requested.items() if key != policy}
     if "task_card" not in saved and "task_card" in requested:
         # Earlier releases stored only the rendered terms. Keep that exact Goal resumable.
         card = requested["task_card"]

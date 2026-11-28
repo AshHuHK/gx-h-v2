@@ -6,6 +6,7 @@ identities and selection criteria survive a later reinterpretation of the same b
 from __future__ import annotations
 
 import json
+import re
 
 from .. import contracts
 from ..artifacts.service import ArtifactService
@@ -25,6 +26,98 @@ def tool_spec():
 
 LEVELS = tuple(tool_spec()["inputSchema"]["properties"]["level"]["enum"])
 REQUIRED = tuple(tool_spec()["inputSchema"]["required"])
+
+
+EVIDENCE_CHECK = {
+    "description": ("Optional factual grade. A body-method check cites its original and paragraph read receipt. "
+                    "A model execution cites its actual named prediction. A model evaluation also cites "
+                    "the comparison output and observed reference. Scientific direction is graded separately."),
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["grade", "source_ref"],
+    "properties": {
+        "grade": {"enum": ["body_method_checked", "model_executed", "model_evaluation_checked"]},
+        **{key: {"type": "string", "minLength": 1} for key in ("source_ref", "receipt_id", "evaluation_ref", "reference_ref")},
+    },
+}
+
+
+def _method_passage(conn, row, receipt):
+    location = row["label"].partition(" characters [")[0].split("/")
+    if not set(location).intersection(("p", "td", "th")):
+        return False
+    section = "/".join(location[:2]) if len(location) > 2 else ""
+    headings = conn.execute("SELECT text FROM source_segments WHERE source_id=? AND label=?",
+                            (row["source_id"], section + "/title"))
+    names = [location[1], *(text for (text,) in headings)]
+    if any(re.search(r"\b(?:methods?|methodology|experimental procedures)\b|實驗方法|实验方法|材料[和及與与]方法",
+                     name, re.IGNORECASE) for name in names):
+        return True
+    return bool(conn.execute("""SELECT 1 FROM evidence WHERE source_id=? AND anchored_segment_id=?
+        AND receipt_id=? AND anchor_status='VERBATIM' AND claim_grain='METHOD_DETAIL'""",
+                             (row["source_id"],row["segment_id"],receipt)).fetchone())
+
+
+def evidence_grade(conn, task, claim):
+    from .. import schema
+    from . import v62_outputs
+
+    check = claim["evidence_check"]
+    errors = schema.validate(check, EVIDENCE_CHECK)
+    if errors:
+        raise SchemaInvalid("Invalid evidence check: " + ", ".join(errors))
+    label, ref = check["grade"], check["source_ref"]
+    required = {
+        "body_method_checked": {"receipt_id"}, "model_executed": set(),
+        "model_evaluation_checked": {"evaluation_ref", "reference_ref"},
+    }[label]
+    if set(check) != {"grade", "source_ref"} | required:
+        raise SchemaInvalid(f"{label} requires exactly {sorted(required)} in addition to its source_ref")
+    refs = {value for field, value in check.items() if field.endswith("_ref")}
+    if not refs.issubset(claim["evidence_refs"]):
+        raise SchemaInvalid("Cite each original named in the evidence grade")
+    rid = task["run_id"]
+    if label == "body_method_checked":
+        row = conn.execute("""SELECT s.blob_sha256,r.segment_id,r.text_sha256,seg.label,s.source_id
+            FROM source_reads r JOIN sources s USING(source_id)
+            JOIN source_segments seg ON seg.source_id=s.source_id AND seg.segment_id=r.segment_id
+              AND seg.text_sha256=r.text_sha256 AND seg.kind='body'
+            JOIN v6_decision_tasks t ON t.task_id=r.task_id AND t.scope=? AND t.run_id=s.namespace
+            WHERE r.receipt_id=? AND s.namespace=? AND s.blob_artifact_ref=? AND s.text_coverage='FULL_TEXT'
+              AND s.status='PARSED' AND s.retraction_status IS NOT 'RETRACTED'""",
+                           (task["scope"], check["receipt_id"], rid, ref)).fetchone()
+        if not row or not _method_passage(conn, row, check["receipt_id"]):
+            raise SchemaInvalid("Body-method grade requires a delivered body passage in a method section "
+                                "or its exact anchored method-detail extraction",
+                                details={"field":"evidence_check.receipt_id"})
+        return {**check, "source_sha256":row["blob_sha256"], "segment_id":row["segment_id"],
+                "text_sha256":row["text_sha256"], "locator":row["label"]}
+    def classify(artifact):
+        return v62_outputs.classify(conn, rid, artifact, scope=task["scope"], through_event=task["event_cursor"])
+    prediction = classify(ref)
+    if prediction["record_kind"] != "job_output" or prediction["nature"] != "model_prediction":
+        raise SchemaInvalid("Model grade requires a real completed prediction Job in this study",
+                            details={"field":"evidence_check.source_ref"})
+    capability = prediction["capability"]
+    if not conn.execute("""SELECT 1 FROM capabilities WHERE capability_id=? AND version=?
+            AND manifest_sha256=? AND kind='SCIENTIFIC_MODEL'""",
+            (capability["id"], capability["version"], capability["sha256"])).fetchone():
+        raise SchemaInvalid("This result was not produced by a pinned scientific model")
+    proof = {**check, "prediction_job":prediction["job_id"], "prediction_sha256":prediction["sha256"]}
+    if label == "model_executed":
+        return proof
+    evaluation, reference = classify(check["evaluation_ref"]), classify(check["reference_ref"])
+    if (evaluation["record_kind"] != "job_output" or evaluation["nature"] != "analysis" or
+            evaluation["job_id"] == prediction["job_id"] or reference["nature"] != "observed" or
+            reference["record_kind"] == "test_fixture" or reference["sha256"] == prediction["sha256"]):
+        raise SchemaInvalid("An evaluation requires a separate analysis Job and observed reference")
+    record = manifest.read_manifest(conn, evaluation["job_id"])
+    result = next(item for item in record["completion"]["outputs"] if item["artifact_ref"] == check["evaluation_ref"])
+    compared = {(pin["artifact_ref"], pin["sha256"]) for pin in result.get("source_inputs", ())}
+    if not {(ref,prediction["sha256"]), (check["reference_ref"],reference["sha256"])} <= compared:
+        raise SchemaInvalid("The named score did not compare this prediction and observed reference")
+    return {**proof, "evaluation_job":evaluation["job_id"], "evaluation_sha256":evaluation["sha256"],
+            "reference_sha256":reference["sha256"]}
 
 
 def _validate(payload):
@@ -200,7 +293,9 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
                   and v621_policy.science_execution(conn, run_id))
     if bind_scope and 'scope' not in payload:
         payload = {**payload, 'scope': MATERIAL_SCOPE}
-    _validate(payload)
+    from . import harness_policy
+    explicit_grade = isinstance(payload, dict) and "evidence_check" in payload and harness_policy.active(conn, run_id)
+    _validate({k:v for k,v in payload.items() if k != "evidence_check"} if explicit_grade else payload)
     if payload['scope'] == MATERIAL_SCOPE and not bind_scope and v621_policy.science_execution(conn, run_id):
         raise SchemaInvalid('The material scope placeholder requires a predicted method and original data_refs.',
                             details={'field': 'scope'})
@@ -220,6 +315,7 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
         raise ScopeDenied('claim cites evidence outside the presented context')
     brief = json.loads(task['snapshot_json'])
     sources = [_ground(conn, run_id, ref, brief.get('observations', []), task) for ref in payload['evidence_refs']]
+    check_receipt = evidence_grade(conn, task, payload) if explicit_grade else None
     enriched = v62_maturity.enrolled(conn, run_id)
     pins = method_pin = scope_feedback = None
     if 'prediction' in payload:
@@ -284,6 +380,8 @@ def stage(conn, run_id, task_id, lease_id, context_ref, payload, *, allowed_refs
                                          'scope': payload['scope'], 'evidence_refs': payload['evidence_refs']})
     draft = dict(schema=SCHEMA, **binding, decision_scope=task['scope'], event_cursor=task['event_cursor'],
                  claim=payload, sources=sources)
+    if check_receipt is not None:
+        draft['evidence_grade_receipt'] = check_receipt
     if metrics or any(payload[key] != value for key, value in rendered.items()):
         draft['rendered_claim_fields'] = rendered
         draft['metrics'] = metrics
@@ -457,6 +555,8 @@ def adopt(conn, run_id, task_id, lease_id, context_ref, decision_ref, decision):
                        context_ref=draft['context_ref'], event_cursor=draft['event_cursor'],
                        criteria_sha256=ids.sha256_of_obj(claim['criteria']), source_records=draft['sources'],
                        science=science, **claim)
+        if 'evidence_grade_receipt' in draft:
+            receipt['evidence_grade_receipt'] = draft['evidence_grade_receipt']
         if 'scope_feedback' in draft:
             receipt['scope_feedback'] = draft['scope_feedback']
         event_id = store.append_event(conn, run_id=run_id, kind='v6.claim.adopted', actor=principal, subject_kind='hypothesis',

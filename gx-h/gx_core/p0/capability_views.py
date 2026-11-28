@@ -2,6 +2,8 @@
 import json
 import re
 
+from .. import config
+from . import harness_policy
 from ..capabilities import manifest, shipped
 from ..domain import ids
 from ..errors import DependencyUnmet, SchemaInvalid, ScopeDenied, StaleRevision, VersionImmutable
@@ -78,6 +80,17 @@ def goal_options(inputs):
     return options(inputs.get("method_scope", inputs.get("p0_spec", {})))
 
 
+# Only literal, unquoted instructions can narrow the operator default. Scientific
+# titles, mentions of a method and claims made by cited authors confer no authority.
+_QUOTATION = re.compile(r'```.*?```|`[^`]*`|“[^”]*”|「[^」]*」|『[^』]*』|《[^》]*》|"[^"]*"|'
+                        r"(?<!\w)'[^'\n]*'(?!\w)", re.S)
+_LITERATURE_ONLY = re.compile(
+    r"(?:^|[。.!！?？;；\n])\s*(?:(?:本題|本题|本次研究|本次|本研究)\s*[,，:]?\s*)?(?:請|请)?"
+    r"(?:只查|僅查|仅查|限查|只用)(?:閱|阅)?(?:公開|公开)?(?:文獻|文献|論文|论文)(?=\s*(?:$|[，,。.!！;；\n]))"
+    r"|(?:^|[.!?;\n])\s*(?:for this (?:study|question)[,:]?\s*)?(?:please\s+)?(?:(?:use|search|consult|review)"
+    r"\s+only\s+(?:the\s+)?(?:published\s+)?literature|literature[- ]only)(?=\s*(?:$|[,.!;\n]))", re.I)
+
+
 def freeze_scope(spec):
     """Expand authorized collections once, without attaching or enabling a method."""
     explicit = options(spec)
@@ -91,7 +104,12 @@ def freeze_scope(spec):
     if policy is None and "capability_collections" not in spec:
         return None
     names = spec.get("capability_collections")
-    if "capability_collections" not in spec:
+    default_site = (harness_policy.enabled(spec) and names is None and
+                    not any(k in spec for k in ("capability_collections", "capabilities", "capability_options")))
+    if default_site:
+        site = json.loads((config.CONFIG_DIR / "science_site_access.json").read_text())
+        names = ["public_sources"] if _LITERATURE_ONLY.search(_QUOTATION.sub(" ", spec.get("objective", ""))) else list(site)
+    elif "capability_collections" not in spec:
         names = [] if "capabilities" in spec or "capability_options" in spec else ["public_sources"]
     if not isinstance(names, list) or not all(isinstance(name, str) and name for name in names):
         raise SchemaInvalid("capability_collections must be a list of collection names")
@@ -117,10 +135,8 @@ def freeze_scope(spec):
         else:
             choices[ref] = dict(choice)
     if names:
-        from .. import config
-
         release = json.loads((config.CONFIG_DIR / "workflow_packages.json").read_text())
-        collections = release.get("research_method_collections", {})
+        collections = site if default_site else release.get("research_method_collections", {})
         known = {"public_sources", "public_databases", "cpu_analysis", "archived_structure"} | collections.keys()
         if len(set(names)) != len(names) or set(names) - known:
             raise SchemaInvalid("Choose distinct capability_collections from " + ", ".join(sorted(known)))
@@ -128,7 +144,7 @@ def freeze_scope(spec):
             ref, provider = row["capability_version"], row.get("provider")
             if ref in explicit:
                 continue
-            labels = row.get("collections", ())
+            labels = () if default_site else row.get("collections", ())
             if not any((name in labels or ref in collections.get(name, {}).get(provider, ()))
                        and (name != "cpu_analysis" or row.get("cost_class") == "local_cpu") for name in names):
                 continue

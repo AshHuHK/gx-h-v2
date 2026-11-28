@@ -25,7 +25,7 @@ class GoalMethodCollections(unittest.TestCase):
             with closing(store.open_store(state / "gx.db")) as conn:
                 inputs = json.loads(conn.execute("SELECT inputs_json FROM runs").fetchone()[0])["inputs"]
                 self.assertEqual(inputs["discovery_policy"], views.DISCOVERY_POLICY)
-                self.assertEqual(inputs["method_scope"]["capability_collections"], ["public_sources"])
+                self.assertIn("public_databases", inputs["method_scope"]["capability_collections"])
                 choice = views.goal_options(inputs)["scholarly-search@1"]
                 self.assertEqual(choice["provider"], "org.gx.scholarly-sources@1.0.0")
                 self.assertRegex(choice["provider_digest"], "^[0-9a-f]{64}$")

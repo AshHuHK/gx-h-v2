@@ -1,0 +1,85 @@
+test_adhoc_with_a_named_researcher_inherits_only_selected_choices (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_adhoc_with_a_named_researcher_inherits_only_selected_choices) ... ERROR
+test_append_to_a_prior_round_without_displacing_existing_modules (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_append_to_a_prior_round_without_displacing_existing_modules) ... ERROR
+test_medium_plugin_can_declare_a_new_knowledge_focus (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_medium_plugin_can_declare_a_new_knowledge_focus) ... ERROR
+test_quick_and_medium_have_the_original_source_tools_without_delegation (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_quick_and_medium_have_the_original_source_tools_without_delegation) ... 
+  test_quick_and_medium_have_the_original_source_tools_without_delegation (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_quick_and_medium_have_the_original_source_tools_without_delegation) (effort='quick') ... ERROR
+  test_quick_and_medium_have_the_original_source_tools_without_delegation (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_quick_and_medium_have_the_original_source_tools_without_delegation) (effort='medium') ... ERROR
+
+======================================================================
+ERROR: test_adhoc_with_a_named_researcher_inherits_only_selected_choices (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_adhoc_with_a_named_researcher_inherits_only_selected_choices)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/modules/test_autonomy.py", line 48, in test_adhoc_with_a_named_researcher_inherits_only_selected_choices
+    s = self.world()
+        ^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/modules/test_autonomy.py", line 18, in world
+    return self.enterContext(Scenario(Path(self.enterContext(tempfile.TemporaryDirectory())), spec_updates=case))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/unittest/case.py", line 454, in enterContext
+    return _enter_context(cm, self.addCleanup)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/unittest/case.py", line 115, in _enter_context
+    result = enter(cm)
+             ^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 90, in __enter__
+    self._start_goal()
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 133, in _start_goal
+    raise RuntimeError(f"Public start failed: {outcome.stderr} {outcome.stdout}")
+RuntimeError: Public start failed: SchemaInvalid: SCHEMA_INVALID: Goal config accepts only branch_delegation, budget_profile, capabilities, capability_collections, capability_options, evidence_policy, historical_replay, initial_job_limit, input_files, intent_items, max_parallel_roots, module_policy, plugins, project, prospective_opening, research_effort, research_modules, research_window, run_budget, turn_token_budget, workspace, workspace_budget
+ 
+
+======================================================================
+ERROR: test_append_to_a_prior_round_without_displacing_existing_modules (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_append_to_a_prior_round_without_displacing_existing_modules)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/modules/test_autonomy.py", line 63, in test_append_to_a_prior_round_without_displacing_existing_modules
+    s = self.world()
+        ^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/modules/test_autonomy.py", line 18, in world
+    return self.enterContext(Scenario(Path(self.enterContext(tempfile.TemporaryDirectory())), spec_updates=case))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/unittest/case.py", line 454, in enterContext
+    return _enter_context(cm, self.addCleanup)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/unittest/case.py", line 115, in _enter_context
+    result = enter(cm)
+             ^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 90, in __enter__
+    self._start_goal()
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 133, in _start_goal
+    raise RuntimeError(f"Public start failed: {outcome.stderr} {outcome.stdout}")
+RuntimeError: Public start failed: SchemaInvalid: SCHEMA_INVALID: Goal config accepts only branch_delegation, budget_profile, capabilities, capability_collections, capability_options, evidence_policy, historical_replay, initial_job_limit, input_files, intent_items, max_parallel_roots, module_policy, plugins, project, prospective_opening, research_effort, research_modules, research_window, run_budget, turn_token_budget, workspace, workspace_budget
+ 
+
+======================================================================
+ERROR: test_medium_plugin_can_declare_a_new_knowledge_focus (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_medium_plugin_can_declare_a_new_knowledge_focus)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/modules/test_autonomy.py", line 28, in test_medium_plugin_can_declare_a_new_knowledge_focus
+    modules.register(module_id="archive_reader", version="1", purpose="compare sources",
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/plugins/author_api.py", line 260, in register
+    raise ValueError("medium supports data, model, workflow and evaluation inventory")
+ValueError: medium supports data, model, workflow and evaluation inventory
+
+======================================================================
+ERROR: test_quick_and_medium_have_the_original_source_tools_without_delegation (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_quick_and_medium_have_the_original_source_tools_without_delegation) (effort='quick')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/modules/test_autonomy.py", line 40, in test_quick_and_medium_have_the_original_source_tools_without_delegation
+    self.assertIn("gx_read_source", declaration["source_tools"])
+                                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_quick_and_medium_have_the_original_source_tools_without_delegation (acceptance.harness_refactor.modules.test_autonomy.ModuleAutonomy.test_quick_and_medium_have_the_original_source_tools_without_delegation) (effort='medium')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/modules/test_autonomy.py", line 40, in test_quick_and_medium_have_the_original_source_tools_without_delegation
+    self.assertIn("gx_read_source", declaration["source_tools"])
+                                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'source_tools'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.890s
+
+FAILED (errors=5)

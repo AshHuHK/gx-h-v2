@@ -1,0 +1,97 @@
+test_correction_retraction_and_native_delivery_are_idempotent (acceptance.harness_refactor.topics.test_topic_handoff.TopicStudy.test_correction_retraction_and_native_delivery_are_idempotent) ... ERROR
+test_late_subscriber_cold_cursor_and_distinct_lineage (acceptance.harness_refactor.topics.test_topic_handoff.TopicStudy.test_late_subscriber_cold_cursor_and_distinct_lineage) ... ERROR
+test_legacy_and_isolated_roles (acceptance.harness_refactor.topics.test_topic_handoff.TopicStudy.test_legacy_and_isolated_roles) ... ERROR
+test_visibility_even_for_summary_and_inherited_sources (acceptance.harness_refactor.topics.test_topic_handoff.TopicStudy.test_visibility_even_for_summary_and_inherited_sources) ... ERROR
+
+======================================================================
+ERROR: test_correction_retraction_and_native_delivery_are_idempotent (acceptance.harness_refactor.topics.test_topic_handoff.TopicStudy.test_correction_retraction_and_native_delivery_are_idempotent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/topics/test_topic_handoff.py", line 80, in test_correction_retraction_and_native_delivery_are_idempotent
+    self.hint(b,"subscribe","sub")
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/topics/test_topic_handoff.py", line 28, in hint
+    return self.call(actor, "gx_send_research_hint", {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/tests/test_v62_sources.py", line 85, in call
+    return self.roots._call(envelope)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1220, in _call
+    answer = v62_native.perform_read(self, row, p, packet, read)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v62_native.py", line 305, in perform_read
+    answer = (research_handoff.send(roots.conn, instance, args, params) if tool == research_handoff.HINT else execute(args))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/research_handoff.py", line 118, in send
+    raise SchemaInvalid("A peer hint needs a recipient scope, short text and one to four shared originals")
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: A peer hint needs a recipient scope, short text and one to four shared originals
+
+======================================================================
+ERROR: test_late_subscriber_cold_cursor_and_distinct_lineage (acceptance.harness_refactor.topics.test_topic_handoff.TopicStudy.test_late_subscriber_cold_cursor_and_distinct_lineage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/topics/test_topic_handoff.py", line 33, in test_late_subscriber_cold_cursor_and_distinct_lineage
+    first = self.hint(a,"publish","question",question="Does the field window cover noon?")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/topics/test_topic_handoff.py", line 28, in hint
+    return self.call(actor, "gx_send_research_hint", {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/tests/test_v62_sources.py", line 85, in call
+    return self.roots._call(envelope)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1220, in _call
+    answer = v62_native.perform_read(self, row, p, packet, read)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v62_native.py", line 305, in perform_read
+    answer = (research_handoff.send(roots.conn, instance, args, params) if tool == research_handoff.HINT else execute(args))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/research_handoff.py", line 118, in send
+    raise SchemaInvalid("A peer hint needs a recipient scope, short text and one to four shared originals")
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: A peer hint needs a recipient scope, short text and one to four shared originals
+
+======================================================================
+ERROR: test_legacy_and_isolated_roles (acceptance.harness_refactor.topics.test_topic_handoff.TopicStudy.test_legacy_and_isolated_roles)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/topics/test_topic_handoff.py", line 102, in test_legacy_and_isolated_roles
+    isolated=self.call(self.lead,"gx_open_module",{
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/tests/test_v62_sources.py", line 85, in call
+    return self.roots._call(envelope)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1137, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 266, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 329, in _call
+    raise SchemaInvalid("Invalid arguments to " + tool + ": " + ", ".join(failures), details=details)
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Invalid arguments to gx_open_module: $: property 'communication' is not allowed
+
+======================================================================
+ERROR: test_visibility_even_for_summary_and_inherited_sources (acceptance.harness_refactor.topics.test_topic_handoff.TopicStudy.test_visibility_even_for_summary_and_inherited_sources)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/topics/test_topic_handoff.py", line 62, in test_visibility_even_for_summary_and_inherited_sources
+    restricted = self.hint(a,"publish","limited",interpretation="Only the western station was sampled.",
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/topics/test_topic_handoff.py", line 28, in hint
+    return self.call(actor, "gx_send_research_hint", {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/tests/test_v62_sources.py", line 85, in call
+    return self.roots._call(envelope)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1220, in _call
+    answer = v62_native.perform_read(self, row, p, packet, read)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v62_native.py", line 305, in perform_read
+    answer = (research_handoff.send(roots.conn, instance, args, params) if tool == research_handoff.HINT else execute(args))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/research_handoff.py", line 118, in send
+    raise SchemaInvalid("A peer hint needs a recipient scope, short text and one to four shared originals")
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: A peer hint needs a recipient scope, short text and one to four shared originals
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.158s
+
+FAILED (errors=4)

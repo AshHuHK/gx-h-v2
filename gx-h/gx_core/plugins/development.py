@@ -42,7 +42,8 @@ def skills(conn, run_id):
     from . import goal
     cards = []
     for row in goal.catalog(conn, run_id):
-        if (row.get("method") or {}).get("family") != "record_evidence_coverage":
+        method = row.get("method")
+        if not isinstance(method, dict) or method.get("family") != "record_evidence_coverage":
             continue
         provider = goal._provider(row)
         if provider is None:

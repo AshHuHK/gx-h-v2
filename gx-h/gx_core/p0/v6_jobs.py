@@ -27,7 +27,7 @@ from ..jobs import diagnostics
 from ..jobs.service import JobService, PURPOSE_WORKFLOW, TERMINAL
 from ..persistence import store
 from . import manifest as execution
-from . import research_window, v6_method_context, v6_prospective, v62_evidence
+from . import module_methods, research_window, v6_method_context, v6_prospective, v62_evidence
 from ..plugins import goal as goal_plugins
 
 NODE_TERMINAL = {"SUCCEEDED", "FAILED", "CANCELLED", "REUSED", "BLOCKED"}
@@ -54,14 +54,16 @@ def _roles(method, count):
 def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
     """Check the declared call before adoption. The decision owner checks reference visibility."""
     capability = spec["capability"]
-    execution.check_capability(conn, run_id, capability)
+    local = module_methods.for_spec(conn, run_id, spec)
+    execution.check_capability(conn, run_id, capability, module_binding=local)
     view = registry.candidate(conn, capability)
     method = view["manifest"]
     goal = conn.execute("SELECT capabilities_json FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
     catalog = json.loads(goal[0]) if goal else {}
-    if not isinstance(catalog, dict) or catalog.get(capability) != shipped.portable_digest(view["bundle"]):
+    expected = local["descriptor"]["portable_sha256"] if local else catalog.get(capability)
+    if expected != shipped.portable_digest(view["bundle"]):
         raise SchemaInvalid("Capability differs from this Goal's granted content pin")
-    registry.active_view(conn, view, run_id=run_id)
+    registry.active_view(conn, view, run_id=run_id, module_binding=local)
     producers = dict(node_ids)
     ports = _ports(spec)
     for index, name in ports.items():
@@ -88,7 +90,7 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
         if meta["run_id"] != run_id or not assets.verify(ref)["ok"]:
             raise SchemaInvalid("Input is not an intact artifact in this Run")
     parameters = manifest.effective_parameters(method, spec["parameters"])
-    provider = goal_plugins.method(conn, run_id, capability)
+    provider = goal_plugins.method(conn, run_id, capability, module_binding=local)
     if provider and provider.validate:
         ctx = v6_method_context.MethodContext(conn, run_id, spec["inputs"])
         try:
@@ -112,7 +114,7 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
             input_domain.require(domains, available, input_domain.InputFacts(assets, run_id), resolved=len(available) == len(bindings))
         elif not any(ref in producers for ref in spec["inputs"]):
             try:
-                bind_inputs(conn, run_id, capability, view, spec["inputs"], parameters, writable=False)
+                bind_inputs(conn, run_id, capability, view, spec["inputs"], parameters, writable=False, module_binding=local)
             except ScopeDenied as error:
                 if error.details.get("reason") != "binding_needs_materialization":
                     raise
@@ -124,7 +126,8 @@ def validate_node(conn, run_id, spec, *, node_ids=(), limits=None):
         has_other_producer = any(
             name != spec["node"] and cap == capability for name, cap in producers.items()
         )
-        if short and not has_other_producer:
+        from . import harness_policy
+        if short and not has_other_producer and not harness_policy.active(conn, run_id):
             raise BudgetExceeded(
                 "Branch ceiling cannot fund the proposed capability's minimum Job reservation",
                 details={
@@ -184,6 +187,7 @@ def confirmed_result_identity(conn, node_id, proof, *, verify_inputs=False):
     if (ids.sha256_of_obj(identity) != attempt["attempt_key"] or attempt["attempt_key"] != attempt["exec_key"]
             or attempt["exec_key"] != owner.get("exec_key")
             or identity["capability"] != f"{method['id']}@{method['version']}"
+            or identity.get("module_provider") != admission.get("module_capability", {}).get("plugin")
             or identity["manifest_sha256"] != method["sha256"] or identity["roles"] != roles
             or identity["parameters"] != admission["parameters"]
             or _runtime_identity(identity["runtime"]) != environment):
@@ -285,7 +289,7 @@ def _small_data_pins(paths):
     return pins
 
 
-def method_identity(conn, run_id, cap, method, entries, params):
+def method_identity(conn, run_id, cap, method, entries, params, *, module_binding=None):
     runtime = environments.require_ready(conn, method["env_id"])
     resources = manifest.effective_resources(method["manifest"], {})
     env = execution._runtime(runtime, resources, {})
@@ -295,16 +299,17 @@ def method_identity(conn, run_id, cap, method, entries, params):
         "manifest_sha256": method["manifest_sha256"],
         "roles": [[entry["role"], entry["sha256"]] for entry in entries],
         "parameters": params,
+        **({"module_provider": module_binding["descriptor"].get("plugin")} if module_binding else {}),
         "runtime": env,
-        "method_dependencies": v6_method_context.dependencies(conn, run_id, cap, runtime["python_executable"]),
+        "method_dependencies": v6_method_context.dependencies(conn, run_id, cap, runtime["python_executable"], module_binding=module_binding),
         **({"required_data_sha256": _small_data_pins(method["manifest"]["required_data"])}
            if method["manifest"].get("required_data") else {}),
     }
 
 
-def bind_inputs(conn, run_id, cap, method, refs, parameters, *, writable):
+def bind_inputs(conn, run_id, cap, method, refs, parameters, *, writable, module_binding=None):
     params = manifest.effective_parameters(method["manifest"], parameters)
-    provider = goal_plugins.method(conn, run_id, cap)
+    provider = goal_plugins.method(conn, run_id, cap, module_binding=module_binding)
     if provider and provider.bind:
         ctx = v6_method_context.MethodContext(conn, run_id, refs, writable=writable)
         bound, params = v6_method_context.invoke(provider.bind, ctx, cap, refs, params)
@@ -321,14 +326,15 @@ def _compile(conn, node, refs):
     spec = json.loads(node["spec_json"])
     cap = spec["capability"]
     method = registry.candidate(conn, cap)
-    inputs, params = bind_inputs(conn, node["run_id"], cap, method, refs, spec["parameters"], writable=True)
+    local = module_methods.for_spec(conn, node["run_id"], spec)
+    inputs, params = bind_inputs(conn, node["run_id"], cap, method, refs, spec["parameters"], writable=True, module_binding=local)
     artifacts = storage.artifact_service(conn)
     entries = [{"role": key, "artifact_ref": ref} for key, ref in inputs.items()]
     inputs_ref = artifacts.make_input_manifest(
         namespace=f"{node['run_id']}/v6/inputs", run_id=node["run_id"], entries=entries
     ).artifact_ref
     entries = artifacts.read_input_manifest(inputs_ref)["entries"]
-    identity = method_identity(conn, node["run_id"], cap, method, entries, params)
+    identity = method_identity(conn, node["run_id"], cap, method, entries, params, module_binding=local)
     if spec.get("independent_repeat"):
         identity["independent_node"] = node["node_id"]
     exec_key = ids.sha256_of_obj(identity)
@@ -377,45 +383,49 @@ def _compile(conn, node, refs):
         )
 
 
-def branch_exposure(conn, branch_id):
-    """Booked usage and held maximum from original JobService reservations in this branch."""
+def _branch_usage(conn, branch_id):
     rows = conn.execute(
-        "SELECT r.amounts_json,r.status,e.payload_json FROM v6_nodes n "
+        "SELECT r.reservation_ref,r.subject_id,r.amounts_json,r.status,e.payload_json FROM v6_nodes n "
         "JOIN v6_job_attempts a ON a.node_id=n.node_id AND a.reused_from IS NULL "
         "JOIN jobs j ON j.job_id=n.job_id JOIN budget_reservations r ON r.reservation_ref=j.reservation_ref "
         "LEFT JOIN events e ON e.kind='budget.settled' AND e.subject_kind='budget' AND e.subject_id=r.budget_ref "
         "AND json_extract(e.payload_json,'$.reservation_ref')=r.reservation_ref "
-        "WHERE n.branch_id=?",
-        (branch_id,),
-    )
-    used = Counter()
+        "WHERE n.branch_id=? ORDER BY r.reservation_ref", (branch_id,))
+    spent, held, reservations = Counter(), Counter(), []
     for row in rows:
-        if row["status"] == "RELEASED":
-            continue
-        exposure = (
-            json.loads(row["payload_json"])["actual"]
-            if row["payload_json"]
-            else json.loads(row["amounts_json"])
-        )
-        used.update(exposure)
-    return used
+        if row["status"] == "HELD":
+            amounts = json.loads(row["amounts_json"])
+            held.update(amounts)
+            reservations.append({"reservation_ref": row["reservation_ref"], "subject_kind": "job",
+                                 "subject_id": row["subject_id"], "amounts": amounts})
+        elif row["status"] == "SETTLED":
+            spent.update(json.loads(row["payload_json"])["actual"] if row["payload_json"]
+                         else json.loads(row["amounts_json"]))
+    return spent, held, reservations
+
+
+def branch_exposure(conn, branch_id):
+    """Booked usage and held maximum from original JobService reservations in this branch."""
+    spent, held, _ = _branch_usage(conn, branch_id)
+    return spent + held
 
 
 def _branch_room(conn, node, amounts):
-    used = branch_exposure(conn, node["branch_id"])
+    spent, held, reservations = _branch_usage(conn, node["branch_id"])
     limits = json.loads(node["branch_spec"])["budget_limits"]
+    shortfalls = []
     for key, amount in amounts.items():
-        if used[key] + amount > limits.get(key, 0):
-            raise BudgetExceeded(
-                "Branch allowance cannot fund this Job",
-                details={
-                    "branch_id": node["branch_id"],
-                    "line": key,
-                    "held_or_spent": used[key],
-                    "needed": amount,
-                    "limit": limits.get(key, 0),
-                },
-            )
+        available = limits.get(key, 0) - spent[key] - held[key]
+        if amount > available:
+            shortfalls.append({"key": key, "requested": amount, "limit": limits.get(key, 0),
+                               "available": available, "spent": spent[key], "reserved": held[key],
+                               "short_by": amount - available})
+    if shortfalls:
+        first = shortfalls[0]
+        raise BudgetExceeded("Branch allowance cannot fund this Job", details={
+            "branch_id": node["branch_id"], "line": first["key"], "needed": first["requested"],
+            "limit": first["limit"], "held_or_spent": first["reserved"] + first["spent"],
+            "shortfalls": shortfalls, "held_reservations": reservations})
 
 
 def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, method_dependencies, required_data):
@@ -427,7 +437,8 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
     if research_dialogue.blocked(conn, node["run_id"], branch_id=node["branch_id"]):
         raise HoldActive("This branch is waiting for a PI answer")
     from . import capability_views
-    capability_views.require_for_node(conn, node["run_id"], request["capability_version"])
+    if not module_methods.for_request(conn, request):
+        capability_views.require_for_node(conn, node["run_id"], request["capability_version"])
     _prospective(conn, request)
     _module_grant(conn, node, json.loads(node["spec_json"]))
     run_status = conn.execute("SELECT status FROM runs WHERE run_id=?", (request["run_id"],)).fetchone()[0]
@@ -492,7 +503,18 @@ def _module_grant(conn, node, spec):
     if "module_instance_id" in branch:
         from . import v62_modules
         module = v62_modules.require_active(conn, node["run_id"], "module:" + branch["module_instance_id"])
-        if module["branch_id"] != node["branch_id"] or spec["capability"] not in json.loads(module["grant_json"])["capabilities"]:
+        grant = json.loads(module["grant_json"])
+        event = spec.get("module_method_event")
+        if event is not None:
+            if node["job_id"] is None:
+                module_methods.require_available(conn, node["run_id"], spec["capability"])
+                if grant.get("local_bindings", {}).get(spec["capability"]) != event:
+                    raise DependencyUnmet("The module changed this selection before Job admission",
+                                          details={"reason": "capability_disabled", "capability": spec["capability"]})
+            allowed = True
+        else:
+            allowed = spec["capability"] in grant["capabilities"]
+        if module["branch_id"] != node["branch_id"] or not allowed:
             from ..errors import ScopeDenied
             raise ScopeDenied("This module Job lost its capability grant")
 
@@ -548,7 +570,8 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
             _live(current, "PENDING")
             attempt = tx.execute("SELECT request_json FROM v6_job_attempts WHERE node_id=?", (node["node_id"],)).fetchone()
             from . import capability_views
-            capability_views.require_for_node(tx, node["run_id"], json.loads(attempt[0])["capability_version"])
+            if not module_methods.for_request(tx, json.loads(attempt[0])):
+                capability_views.require_for_node(tx, node["run_id"], json.loads(attempt[0])["capability_version"])
             _prospective(tx, json.loads(attempt[0]))
             spec = json.loads(current["spec_json"])
             _module_grant(tx, current, spec)
@@ -599,6 +622,12 @@ def _record_wait(conn, node, error):
     # Keep volatile queue sampling out of the durable deduplication identity.
     wait = {k: reason[k] for k in ("code", "message")}
     details = reason["details"]
+    from . import harness_policy
+    funding_wait = isinstance(error, BudgetExceeded) and harness_policy.active(conn, node["run_id"])
+    if funding_wait:
+        # Preflight uses a provisional Job ID. Only durable reservations belong in
+        # a Lead's brief and in the identity that suppresses duplicate wait events.
+        wait = reason = {**reason, "details": {k: v for k, v in details.items() if k != "subject"}}
     if details.get("reason") in {"evidence_pending", "evidence_invalid"}:
         from . import v621_policy
         if v621_policy.enabled(conn, node["run_id"]):
@@ -620,6 +649,12 @@ def _record_wait(conn, node, error):
         )
         if not changed.rowcount:
             return
+        if funding_wait:
+            account = tx.execute(
+                "SELECT scope FROM v62_modules WHERE run_id=? AND branch_id=?",
+                (node["run_id"], cur["branch_id"])).fetchone()
+            reason = {**reason, "funding_scope": account["scope"] if account else "run",
+                      "decision_ref": cur["decision_ref"]}
         event = store.append_event(
             tx,
             kind="v6.node.waiting",
@@ -698,7 +733,8 @@ def _run_node(conn, node, service, window):
     research_window.require_open(window)
     spec = json.loads(node["spec_json"])
     from . import capability_views
-    capability_views.require_for_node(conn, node["run_id"], spec["capability"])
+    if "module_method_event" not in spec:
+        capability_views.require_for_node(conn, node["run_id"], spec["capability"])
     _module_grant(conn, node, spec)
     from . import v621_policy
     fixed_conditions = v621_policy.enabled(conn, node["run_id"])
@@ -745,7 +781,8 @@ def _run_node(conn, node, service, window):
             identity["manifest_sha256"] != method["manifest_sha256"]
             or identity["runtime"] != current
             or identity.get("method_dependencies", {})
-            != v6_method_context.dependencies(conn, node["run_id"], spec["capability"], active["python_executable"])
+            != v6_method_context.dependencies(conn, node["run_id"], spec["capability"], active["python_executable"],
+                                              module_binding=module_methods.for_spec(conn, node["run_id"], spec))
         ):
             raise SchemaInvalid("Compiled attempt is incompatible with the currently installed method")
         # Hash the original bytes outside a write transaction; adoption retains the original Job identity.

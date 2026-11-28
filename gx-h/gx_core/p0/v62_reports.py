@@ -255,6 +255,20 @@ def release_parent_rounds(conn, run_id, task_id):
 
 def reconcile_rounds(conn, run_id):
     """Recover unpublished reports when a delegating task terminated by another path."""
+    from . import harness_policy
+    if harness_policy.active(conn, run_id):
+        # Each completed instance is delivered to the Lead in the publication transaction.
+        # This recovery scan also covers previously persisted reports without their wake.
+        missing = conn.execute("""SELECT m.run_id,m.goal_version,m.round,r.module_instance_id,r.report_ref
+            FROM v62_module_reports r JOIN v62_modules m USING(run_id,module_instance_id)
+            WHERE m.run_id=? AND NOT EXISTS(SELECT 1 FROM v62_module_wakes w
+                WHERE w.run_id=m.run_id AND w.wake_key='module:'||m.module_instance_id)""", (run_id,)).fetchall()
+        if not missing:
+            return False
+        with store.transaction(conn, transaction_owner="ResearchModule", operation="recover_module_delivery", run_id=run_id):
+            for member in missing:
+                _wake(conn, member, "module:" + member["module_instance_id"], "report_delivered", [member])
+        return True
     active = ",".join("?" for _ in v6_goal.ACTIVE_TASKS)
     from . import v621_policy
     scoped = v621_policy.enabled(conn, run_id)
@@ -281,8 +295,12 @@ def release_round(conn, module, *, publishing=None):
     """Called under the publication/cancellation transaction once a member changes status."""
     if not conn.in_transaction:
         raise RuntimeError("Release the round in the member's state-change transaction")
-    from . import v621_policy
+    from . import harness_policy, v621_policy
     rid, number = module["run_id"], module["round"]
+    if harness_policy.active(conn, rid):
+        if publishing:
+            return _wake(conn, module, "module:" + publishing["module_instance_id"], "report_delivered", [publishing])
+        return None
     version = module["goal_version"] if v621_policy.enabled(conn, rid) else None
     # The Lead may be about to delegate another member of this round. Its durable task
     # yields membership with its decision even across native reconnects or GX restart.
@@ -407,7 +425,7 @@ def commit_report(conn, plan):
             receipt["pi_dispositions"] = research_dialogue.dispose(conn, rid, root, identity["turn_id"], task,
                 payload["pi_dispositions"], product_ref=ref, product_kind="report", event_id=receipt["event_id"],
                 evidence_refs=receipt["source_refs"], effects=[])
-        # Completing the last member releases all remaining reports together, even if this member has a watch.
+        # Current research delivers each report as it arrives. Frozen legacy studies retain their round barrier.
         wake = release_round(conn, module, publishing=receipt)
         reason = _early_reason(module, plan.bundle)
         if wake is None and not reason:

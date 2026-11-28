@@ -1,8 +1,10 @@
 """Turn a completed analytical subgraph into portable, pinned Goal operations."""
 from collections import Counter
+from copy import deepcopy
 import json
 import re
 
+from .. import contracts
 from ..artifacts import ArtifactService
 from ..capabilities import manifest as capabilities
 from ..capabilities import registry, shipped
@@ -15,7 +17,19 @@ from . import manifest, v6_jobs, v62_outputs
 
 SAVE = "gx_save_recipe"
 INSTANTIATE = "gx_instantiate_recipe"
+WATCH = "gx_watch_join"
 _NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,95}")
+
+
+def save_tool(modern):
+    spec = contracts.native_goal_tool_spec(SAVE)
+    if modern:
+        spec = deepcopy(spec)
+        spec["description"] += " A macro may select performed modules and computations, the named evidence join and an open decision question for a fresh Goal."
+        return spec
+    original = deepcopy(spec)
+    original["inputSchema"]["properties"].pop("macro")
+    return original
 
 
 def _name(value):
@@ -44,7 +58,7 @@ def _card(reference, digest, definition):
             "units": definition["units"], "inputs": definition["inputs"], "methods": {s["slot"]: s["capability"] for s in definition["steps"]},
             "method_pins": {s["capability"]: s["method_digest"] for s in definition["steps"]},
             "outputs": {s["slot"]: s["outputs"] for s in definition["steps"]},
-            **{key: definition[key] for key in ("decision_point", "calibration", "provider_pins") if key in definition}}
+            **{key: definition[key] for key in ("decision_point", "calibration", "provider_pins", "macro") if key in definition}}
 
 
 def cards(conn):
@@ -55,13 +69,16 @@ def cards(conn):
 def prepare(conn, run_id, arguments):
     reference = _name(arguments["recipe_id"]) + "@" + _name(arguments["version"])
     slots = _mapping(arguments["nodes"], "slot", "node_id")
-    if not slots:
+    macro = "macro" in arguments
+    if macro and ("calibration" in arguments or "decision_point" in arguments):
+        raise SchemaInvalid("A macro decision uses its named join and fresh upstream evidence")
+    if not slots and not macro:
         raise SchemaInvalid("Select at least one completed analytical node")
     bindings = _mapping(arguments["inputs"], "name", "artifact_ref")
     external = {ref: slot for slot, ref in bindings.items()}
     node_slots = {nid: slot for slot, nid in slots.items()}
     portable_natures = {"analysis", "observed", "model_prediction"}
-    enriched = "decision_point" in arguments or "calibration" in arguments
+    enriched = macro or "decision_point" in arguments or "calibration" in arguments
     proofs = {}
     for slot, nid in slots.items():
         node = v6_jobs._node(conn, run_id, nid)
@@ -153,6 +170,9 @@ def prepare(conn, run_id, arguments):
                           f"Apply {spec['capability']} to the named inputs of this Goal."
                           if enriched else spec["question"])})
         sources[slot] = {"node_id": nid, "job_id": node["job_id"], "completion_sha256": proof["manifest_hash"]}
+    if macro:
+        from . import v6_macro_recipes
+        strategy, macro_proof = v6_macro_recipes.capture(conn, run_id, arguments, node_slots, external, produced, required)
     if required.keys() != bindings.keys():
         raise SchemaInvalid("The named inputs must match exactly the external inputs of the subgraph")
     definition = {"schema": "gx.research-recipe/1", "reference": reference,
@@ -162,6 +182,9 @@ def prepare(conn, run_id, arguments):
         definition["provider_pins"] = provider_pins
     if enriched:
         definition["schema"] = "gx.research-recipe/2"
+    if macro:
+        definition.update(schema="gx.research-recipe/3", macro=strategy)
+        sources = {"steps": sources, "macro": macro_proof}
     by_slot = {step["slot"]: step for step in steps}
     if point := arguments.get("decision_point"):
         step = by_slot.get(point["step"])
@@ -205,9 +228,14 @@ def decision_for(conn, spec, *, run_id=None):
     definition = json.loads(row[0]) if row else {}
     point = definition.get("decision_point")
     step = next((s for s in definition.get("steps", ()) if s["slot"] == marker["step"]), None)
-    if not point or point["step"] != marker["step"] or not step or step["capability"] != spec["capability"]:
+    macro = definition.get("macro")
+    if (not step or step["capability"] != spec["capability"]
+            or (not macro and (not point or point["step"] != marker["step"]))):
         raise SchemaInvalid("The recipe decision must reference its saved method and evidence step")
     if run_id is not None:
+        from . import harness_policy
+        if macro and not harness_policy.active(conn, run_id):
+            raise ScopeDenied("This archived Goal has no macro research policy")
         cap = spec["capability"]
         grant = next((g for g in goal_plugins.catalog(conn, run_id) if g["capability_version"] == cap), {})
         if grant.get("portable_sha256") != step["method_digest"] or (
@@ -220,6 +248,8 @@ def decision_for(conn, spec, *, run_id=None):
 
 def settled_decision(conn, run_id, node, spec):
     point = decision_for(conn, spec)
+    if point is None:
+        return None  # A macro watches its joined evidence at the registered decision point.
     outputs = v62_outputs.published_outputs(conn, run_id, node["job_id"]) if node["result_ref"] else []
     evidence = next((out for out in outputs if out["output_name"] == point["output"]), None)
     if evidence:
@@ -275,7 +305,7 @@ def _calibration_match(conn, run_id, step, bindings, source):
     return all(assets.verify(output["artifact_ref"])["ok"] for output in proof["completion"]["outputs"])
 
 
-def instantiate(conn, run_id, arguments):
+def instantiate(conn, run_id, arguments, *, visible_refs=None):
     reference = arguments["recipe"]
     row = conn.execute("SELECT digest,definition_json,source_run,sources_json FROM v6_saved_recipes WHERE reference=?", (reference,)).fetchone()
     if not row or arguments["digest"] != row[0]:
@@ -300,7 +330,7 @@ def instantiate(conn, run_id, arguments):
             raise ScopeDenied(f"The target Goal needs the saved provider and dependencies for {cap}")
     prefix = _name(arguments["prefix"])
     branch = arguments["branch"]
-    if definition["schema"] == "gx.research-recipe/2" and not branch.startswith("local:"):
+    if definition["schema"] in ("gx.research-recipe/2","gx.research-recipe/3") and definition["steps"] and not branch.startswith("local:"):
         existing = conn.execute("SELECT 1 FROM v6_branches WHERE run_id=? AND branch_id=?",
                                 (run_id, branch)).fetchone()
         if not existing:
@@ -353,11 +383,11 @@ def instantiate(conn, run_id, arguments):
                     "depends_on": [alias[d] for d in step["depends_on"] if d != skipped], "question": step["question"],
                     **({"independent_repeat": True} if repeat or (calibration and step["slot"] == calibration["step"]) else {}),
                     **({"recipe_decision": {"recipe": reference, "digest": row[0], "step": step["slot"]}}
-                       if point and point["step"] == step["slot"] else {}),
+                       if definition.get("macro") or (point and point["step"] == step["slot"]) else {}),
                     **({"input_ports": ports} if ports else {})})
     answer = {"recipe": reference, "digest": row[0], "ops": ops,
               **({"decision_point": point} if point else {}), **({"calibration": receipt} if receipt else {})}
-    if definition["schema"] == "gx.research-recipe/2" and branch.startswith("local:"):
+    if definition["schema"] in ("gx.research-recipe/2","gx.research-recipe/3") and definition["steps"] and branch.startswith("local:"):
         from . import v6_graph
         contracts = v6_graph.decision_schema()["properties"]["ops"]["items"]["oneOf"]
         opening = next(kind for kind in contracts if kind["properties"]["op"]["const"] == "open_branch")
@@ -370,6 +400,11 @@ def instantiate(conn, run_id, arguments):
             "instructions": "Prepend one open_branch operation to these add_node operations. "
                             "Fill the scientific fields for this Goal and fund the expanded Jobs.",
             "required_open_branch_fields": opening["required"], "minimum_budget_limits": dict(minimum)}
+    if "macro" in definition:
+        from . import harness_policy, v6_macro_recipes
+        if not harness_policy.active(conn, run_id):
+            raise ScopeDenied("This archived Goal has no macro research policy")
+        return v6_macro_recipes.expand(conn, run_id, definition, row[0], arguments, answer, visible_refs=visible_refs)
     return answer
 
 
@@ -379,7 +414,14 @@ def authorize(conn, identity, tool, args):
     if task["scope"] != "run":
         raise ScopeDenied("Only the Goal Lead can publish or instantiate a workspace recipe")
     visible = set(json.loads(task["visible_refs_json"]))
+    if tool == WATCH:
+        return task
     if tool == SAVE:
+        if "macro" in args:
+            from . import harness_policy, v6_macro_recipes
+            if not harness_policy.active(conn, identity["run_id"]):
+                raise ScopeDenied("This archived Goal has no macro research policy")
+            v6_macro_recipes.visible_source(conn, identity["run_id"], args, task)
         nodes = json.loads(task["snapshot_json"]).get("nodes", [])
         released = {node["node_id"] for node in nodes
                     if node.get("result_ref") and node.get("status") in ("SUCCEEDED", "REUSED")}
@@ -390,3 +432,4 @@ def authorize(conn, identity, tool, args):
         refs = list(args["inputs"].values())
     if any(not isinstance(ref, str) or ref not in visible for ref in refs):
         raise ScopeDenied("Recipe inputs must be visible in this Lead brief")
+    return task

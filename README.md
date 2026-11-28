@@ -1,5 +1,7 @@
 # GX-H 科研 Harness
 
+新研究的 Lead 可自行選法、委派與局部重開路線，並以具名證據喚醒後續決策。普通入口、舊 Run 相容及各類回執見[Harness 重構與研究分工](acceptance/harness_refactor/README.md)。
+
 GX 把一個研究問題保存為 Goal。Lead 可查方法卡及插件目錄、選擇量測、建立多條 Workflow 並委派工作。GX 負責執行 Job、保存具名輸出、將證據送回 Lead，並從同一 Run 的狀態繼續下一輪。
 
 | 內容 | 程式入口 |

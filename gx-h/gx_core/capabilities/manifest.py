@@ -370,6 +370,8 @@ def _resources_problems(resources: Mapping[str, Any]) -> list[str]:
         found.append("resources.cpu_threads must be at least 1")
     if resources["wall_seconds"] < 1:
         found.append("resources.wall_seconds must be at least 1")
+    if resources.get("paid_api_calls") is not None and resources["paid_api_calls"] < 1:
+        found.append("resources.paid_api_calls must be positive when declared")
     memory = resources.get("memory_mib")
     if memory is not None and memory < 1:
         found.append("resources.memory_mib must be positive when given")
@@ -647,6 +649,16 @@ def coerce_parameter(name: str, value: Any, *, whole_token: bool) -> str:
     return text
 
 
+def cost_card(resources):
+    """Describe the declared compute and paid-call exposure before any Job is requested."""
+    cost = {"cost_class": "gpu" if resources.get("gpu") else "local_cpu"}
+    if resources.get("paid_api_calls"):
+        if not resources.get("gpu"):
+            cost["cost_class"] = "paid_api"
+        cost["paid_api_calls"] = resources["paid_api_calls"]
+    return cost
+
+
 def effective_resources(manifest: Mapping[str, Any], tighten: Mapping[str, Any] | None) -> dict[str, Any]:
     """The manifest's resources with a request's tightening applied.
 
@@ -662,6 +674,8 @@ def effective_resources(manifest: Mapping[str, Any], tighten: Mapping[str, Any] 
         "gpu": {"memory_mib": int(gpu["memory_mib"]), "scope": gpu["scope"]} if gpu else None,
         "tightened": {},
     }
+    if resources.get("paid_api_calls") is not None:
+        out["paid_api_calls"] = resources["paid_api_calls"]
     for key, value in dict(tighten or {}).items():
         if key not in TIGHTENABLE:
             raise SchemaInvalid(

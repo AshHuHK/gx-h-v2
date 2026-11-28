@@ -13,7 +13,7 @@ from ..domain import ids
 from ..errors import BY_CODE, BudgetExceeded, HoldActive, LeaseExpired, ResourceDenied, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
 from ..plugins import goal as goal_plugins
-from . import v6_recipes, v621_policy, v6_claims, v6_delegation, v6_method_context, v62_native
+from . import harness_policy, research_closeout, v6_recipes, v621_policy, v6_claims, v6_delegation, v6_method_context, v62_native
 
 
 DECIDE = "gx_decide_revision"
@@ -78,6 +78,26 @@ COMPACT_INSTRUCTIONS = (
 )
 
 
+
+RESEARCH_INSTRUCTIONS = (
+    "You lead this research. The PI sets the question, constraints and explicit commitments. "
+    "Choose how to decompose the question, what existing evidence can settle, what to investigate, "
+    "and when each route is ready to advance. Parallel researchers may exchange findings directly. "
+    "Choose the people and methods the question warrants. Revisit a local decision when its premise changes. "
+    "The catalog offers resources; inspect selected entries and re-search as the question warrants. "
+    "Use the available native tools to record your decisions. A research intent can name an open question "
+    "before a method is chosen. For a computation identify the scientific question, method, inputs when "
+    "ambiguous and output-affecting settings. GX tracks dependencies, funds, results and wake conditions. "
+    "For an established method or recipe, bind this study's own inputs and judge its outputs anew. "
+    "Read released researcher statements and consequential originals. Distinguish published observations, "
+    "predictions, interpretations and technical failures. Repeated references to one sample remain one sample. "
+    "Where independent testing matters, register the endpoint and criterion before revealing new material. "
+    "Use gx_decide_revision for the action or justified stop and cite the supporting evidence. "
+    "Use metric_refs when acting on delivered measurements. Formal claims can be staged separately. "
+    "You can leave uncertainty explicit and close. If GX returns a field or scope error, correct the "
+    "same request on the current brief. Only an accepted decision changes the research graph."
+)
+
 def decision_tool():
     return contracts.native_goal_tool_spec(DECIDE)
 
@@ -111,6 +131,29 @@ def assigned(row):
     return DECIDE in names or v62_native.REPORT in names
 
 
+def _research_decision_tool(spec, brief):
+    if not harness_policy.enabled(brief):
+        return spec
+    projected = deepcopy(spec)
+    fields = projected["inputSchema"]["properties"]
+    body = harness_policy.inferable_inputs(fields["decision"])
+    if brief.get("scope") == "run":
+        from . import v6_routes
+        body = v6_routes.with_operations(body)
+    fields["decision"] = body
+    return projected
+
+
+def has_open_branch(brief, modern):
+    return bool(modern and brief.get("open_branch_available")) or any(
+        branch["status"] == "OPEN" for branch in brief.get("branches", ()))
+
+
+def has_recipe_source(brief, modern):
+    return any(n.get("result_ref") for n in brief.get("nodes", ())) or bool(modern and (
+        brief.get("recipe_source_available") or brief.get("module_reports") or brief.get("module_report_index")))
+
+
 def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
     """Select grants when freezing the Root. Resume reuses its persisted tool names."""
     if brief and brief.get("evidence_policy") in v621_policy.LIVE_SCIENCE:
@@ -129,14 +172,27 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
             decision["description"] = ("Submit a scientific reason and a permitted operation on this module's assigned "
                 "branch. For a local Job provide its granted capability, input refs and scientific question. "
                 "GX supplies unique branch/node fields and wakes on the result.")
-        return v62_native.module_tools(read_tools, brief, decision)
+        catalog = v62_native.module_tools(read_tools, brief, _research_decision_tool(decision, brief))
+        return catalog + ([contracts.native_goal_tool_spec(research_closeout.LINK)] if harness_policy.enabled(brief) else [])
     catalog = [spec for spec in read_tools if spec["name"] in ("gx_read_artifact", "gx_task_context")]
+    if harness_policy.enabled(brief or {}) and brief.get("scope","run") == "run":
+        catalog = deepcopy(catalog)
+        context = next((spec for spec in catalog if spec["name"] == "gx_task_context"),None)
+        if context:
+            context["description"] += (" Read the current peer findings, including folded forwards and original sources. "
+                "For earlier findings pass before_topic_event with the oldest displayed event_id, optionally research_topic.")
+            context["inputSchema"]["properties"].update(before_topic_event={"type":"integer","minimum":1},
+                                                        research_topic={"type":"string","minLength":1,"maxLength":128})
     evidence_run = bool(brief and brief.get("research_evidence_version"))
     version = (brief or {}).get("evidence_policy")
-    catalog.extend((v62_native.evidence_tool(DECIDE, version), v62_native.evidence_tool(STAGE, version))
-                   if evidence_run else _legacy_goal_tools(version))
+    decision, claim = ((v62_native.evidence_tool(DECIDE, version), v62_native.evidence_tool(STAGE, version))
+                       if evidence_run else _legacy_goal_tools(version))
+    if harness_policy.enabled(brief):
+        claim = deepcopy(claim)
+        claim["inputSchema"]["properties"]["evidence_check"] = v6_claims.EVIDENCE_CHECK
+    catalog.extend((_research_decision_tool(decision, brief), claim))
     if brief is None or (brief.get("scope", "run") == "run" and brief.get("branch_delegation", True) and
-                         any(b["status"] == "OPEN" for b in brief.get("branches", []))):
+                         has_open_branch(brief, harness_policy.enabled(brief))):
         catalog.append(v6_delegation.TOOL)
     if conn is not None:
         extras = goal_plugins.tools(conn, run_id)
@@ -148,13 +204,19 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
         catalog.append(contracts.native_goal_tool_spec("gx_select_capability"))
     catalog.extend(v62_native.lead_tools(brief or {}))
     if brief and brief.get("scope", "run") == "run" and version == v621_policy.VERSION:
-        if any(n.get("result_ref") for n in brief.get("nodes", [])):
-            catalog.append(contracts.native_goal_tool_spec(v6_recipes.SAVE))
-        if conn is not None and conn.execute("SELECT 1 FROM v6_saved_recipes LIMIT 1").fetchone():
+        modern = harness_policy.enabled(brief)
+        if modern:
+            catalog.append(contracts.native_goal_tool_spec(v6_recipes.WATCH))
+        if has_recipe_source(brief, modern):
+            catalog.append(v6_recipes.save_tool(modern))
+        if conn is not None and conn.execute("""SELECT 1 FROM v6_saved_recipes WHERE ?
+                OR json_extract(definition_json,'$.schema') != 'gx.research-recipe/3' LIMIT 1""", (modern,)).fetchone():
             if not any(tool["name"] == v62_native.QUERY for tool in catalog):
                 catalog.append(v62_native.query_tool(brief))
             catalog.append(contracts.native_goal_tool_spec(v6_recipes.INSTANTIATE))
 
+    if harness_policy.enabled(brief):
+        catalog.append(contracts.native_goal_tool_spec(research_closeout.LINK))
     return catalog
 
 
@@ -206,7 +268,7 @@ def acknowledged_brief(conn, root, turn_id):
     return None
 
 
-def current_context(conn, row):
+def current_context(conn, row, *, topic_page=None):
     packet = brief(row)
     scope = packet.get("scope", "run")
     if v62_native.module_scope(packet):
@@ -221,6 +283,17 @@ def current_context(conn, row):
     else:
         account = budgets.state(conn, budgets.budget_for(conn, run_id=row["run_id"]))
         current = {k: account[k] for k in ("limits", "spent", "reserved", "available")}
+    if scope == "run":
+        from . import harness_policy, research_topics
+        if harness_policy.enabled(packet):
+            page = topic_page or {}
+            before, topic = page.get("before_topic_event"), page.get("research_topic")
+            if (set(page)-{"before_topic_event","research_topic"} or
+                    (before is not None and (type(before) is not int or before < 1)) or
+                    (topic is not None and (not isinstance(topic,str) or not 1<=len(topic)<=128))):
+                raise SchemaInvalid("Select a research_topic and/or a positive before_topic_event")
+            packet["research_topic_findings"] = research_topics.lead_preview(
+                conn,row["run_id"],packet["goal_version"],task_refs(conn,row),before_event=before,topic=topic)
     return {**packet, "current_budget": current}
 
 
@@ -251,6 +324,8 @@ def saved_result(receipt, turn, request_sha):
     return result
 
 
+@registry.native_goal_tool(research_closeout.LINK)
+@registry.native_goal_tool(v6_recipes.WATCH)
 @registry.native_goal_tool(v6_recipes.SAVE)
 @registry.native_goal_tool(v6_recipes.INSTANTIATE)
 @registry.native_goal_tool(v62_native.OPEN)
@@ -296,7 +371,7 @@ def _call(roots, p):
     receipt = roots.conn.execute("SELECT * FROM p0_root_calls WHERE thread_id=? AND call_id=?",
                                  (thread, call_id)).fetchone()
     request_sha = ids.sha256_of_obj([tool, args])
-    if receipt and tool in (DECIDE, DELEGATE, v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL):
+    if receipt and tool in (research_closeout.LINK, DECIDE, DELEGATE, v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL):
         return saved_result(receipt, turn, request_sha)
     # Delegations and reports may be redelivered with a new call ID after
     # release. Their owners verify the original task, lease, thread, turn and
@@ -320,9 +395,11 @@ def _call(roots, p):
                     thread_id=thread, turn_id=turn, call_id=call_id)
     if roots.conn.in_transaction:
         raise RuntimeError("Prepare scientific decisions outside the GX writer")
-    if tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE, v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY):
+    if tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE, v6_recipes.WATCH, v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY):
         spec = (v62_native.evidence_tool(tool, brief(row).get("evidence_policy"))
                 if tool == v62_native.REPORT else contracts.native_goal_tool_spec(tool))
+        if tool == v62_native.OPEN:
+            spec = v62_native.open_tool(brief(row))
         failures = schema.validate(args, spec["inputSchema"])
         if failures:
             details = {"category": "module_report_structure"} if tool == v62_native.REPORT else {}
@@ -339,22 +416,26 @@ def _call(roots, p):
     if tool == "gx_select_capability":
         from . import capability_views
         packet = brief(row)
-        chosen = capability_views.goal_options(json.loads(roots.conn.execute(
-            "SELECT inputs_json FROM runs WHERE run_id=?", (roots.run_id,)
-        ).fetchone()[0])["inputs"])
         failures = schema.validate(args, contracts.native_goal_tool_spec(tool)["inputSchema"])
         if failures:
             raise SchemaInvalid("Invalid capability selection: " + ", ".join(failures))
-        if packet.get("scope") != "run" or args["method"] not in chosen:
-            raise ScopeDenied("This method selection exceeds the PI's choices for this Goal")
-        choice = chosen[args["method"]]
-        answer = capability_views.change(roots.conn, roots.run_id, **{args["action"]:args["method"]},
-            provider=choice.get("provider"), expected_digest=choice["digest"], expected_revision=args["revision"],
-            expected_provider_digest=choice.get("provider_digest"),
-            request_id=ids.sha256_of_obj([thread, turn, call_id]), actor=thread,
-            authority=lambda: v6_claims.active_context(roots.conn, roots.run_id, row["task_id"], row["lease_id"],
-                roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?",
-                                   (row["task_id"],)).fetchone()[0], thread, turn))
+        if v62_native.module_scope(packet):
+            from . import module_methods
+            selected_descriptor = module_methods.prepare(roots.conn, identity, args, packet, row)
+        else:
+            chosen = capability_views.goal_options(json.loads(roots.conn.execute(
+                "SELECT inputs_json FROM runs WHERE run_id=?", (roots.run_id,)
+            ).fetchone()[0])["inputs"])
+            if packet.get("scope") != "run" or args["method"] not in chosen:
+                raise ScopeDenied("This method selection exceeds the PI's choices for this Goal")
+            choice = chosen[args["method"]]
+            answer = capability_views.change(roots.conn, roots.run_id, **{args["action"]:args["method"]},
+                provider=choice.get("provider"), expected_digest=choice["digest"], expected_revision=args["revision"],
+                expected_provider_digest=choice.get("provider_digest"),
+                request_id=ids.sha256_of_obj([thread, turn, call_id]), actor=thread,
+                authority=lambda: v6_claims.active_context(roots.conn, roots.run_id, row["task_id"], row["lease_id"],
+                    roots.conn.execute("SELECT context_ref FROM v6_decision_tasks WHERE task_id=?",
+                                       (row["task_id"],)).fetchone()[0], thread, turn))
     elif tool == DECIDE:
         try:
             prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
@@ -377,12 +458,21 @@ def _call(roots, p):
     elif tool == v62_native.REPORT:
         from . import v62_reports
         prepared = v62_reports.prepare_report(roots.conn, **identity, payload=args)
-    elif tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE):
+    elif tool == v6_recipes.WATCH:
         v6_recipes.authorize(roots.conn, identity, tool, args)
+    elif tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE):
+        recipe_task = v6_recipes.authorize(roots.conn, identity, tool, args)
         if tool == v6_recipes.SAVE:
             prepared = v6_recipes.prepare(roots.conn, roots.run_id, args)
         else:
-            answer = v6_recipes.instantiate(roots.conn, roots.run_id, args)
+            answer = v6_recipes.instantiate(roots.conn, roots.run_id, args,
+                visible_refs=set(json.loads(recipe_task["visible_refs_json"])))
+    elif tool == research_closeout.LINK:
+        failures = schema.validate(args, contracts.native_goal_tool_spec(research_closeout.LINK)["inputSchema"])
+        if failures:
+            raise SchemaInvalid("Invalid core material nomination: " + ", ".join(failures))
+        _, task, _, _ = v6_decisions.authority(roots.conn, **{k:v for k,v in identity.items() if k != "call_id"})
+        nomination = research_closeout.prepare_nomination(roots.conn, task, args)
     elif tool == DELEGATE:
         prepared = v6_delegation.prepare(roots.conn, **identity, payload=args)
     elif tool == STAGE:
@@ -407,11 +497,21 @@ def _call(roots, p):
             research_window.require_completion(window)
             if tool == DECIDE:
                 answer = v6_decisions.commit(roots.conn, prepared)
-                roots.terminal_products.record(thread, turn, call_id, "GX_ACCEPTED")
-                if v621_policy.science_execution(roots.conn, roots.run_id):
-                    _submission_event(roots, p, accepted=answer["event_id"])
+                if answer.get("outcome") != "core_evidence_available":
+                    roots.terminal_products.record(thread, turn, call_id, "GX_ACCEPTED")
+                    if v621_policy.science_execution(roots.conn, roots.run_id):
+                        _submission_event(roots, p, accepted=answer["event_id"])
+            elif tool == research_closeout.LINK:
+                _, task, _, _ = v6_decisions.authority(roots.conn, **{k:v for k,v in identity.items() if k != "call_id"})
+                answer = research_closeout.nominate(roots.conn, task, thread, nomination)
+            elif tool == "gx_select_capability" and v62_native.module_scope(packet):
+                answer = module_methods.commit(roots.conn, identity, args, packet, row, selected_descriptor)
             elif tool == v62_native.OPEN:
                 answer = v62_modules.commit_open(roots.conn, prepared)
+            elif tool == v6_recipes.WATCH:
+                from . import research_joins
+                v6_recipes.authorize(roots.conn, identity, tool, args)
+                answer = research_joins.register(roots.conn, roots.run_id, args)
             elif tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE):
                 v6_recipes.authorize(roots.conn, identity, tool, args)
                 if tool == v6_recipes.SAVE:

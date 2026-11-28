@@ -92,6 +92,35 @@ def _applicable_metrics(conn, task, binding, inventory):
             if row["key"] in keys}
 
 
+def independent_choice(conn, task, body, packet):
+    """Check independent, delivered selections while another part of the draft awaits clarification."""
+    if (len(packet.get("comparisons", ())) < 2 or body.get("metric_refs") or
+            body.get("comparison_plan") or body.get("comparison_id")):
+        return None
+    frozen = json.loads(task["snapshot_json"])
+    branches = {b["branch_id"] for b in frozen["branches"] if b["status"] == "OPEN"}
+    visible = set(json.loads(task["visible_refs_json"]))
+    pins = {c["capability_version"] for c in frozen["capabilities"]}
+    commissions = {n["node_id"] for n in frozen["nodes"] if n.get("commission")}
+    ops = []
+    for op in body["ops"]:
+        if op["op"] == "cancel_node" and op["node"] in commissions:
+            ops.append(op)
+        if op.get("branch") not in branches:
+            continue
+        if op["op"] == "stop_branch" or (op["op"] == "add_node" and op["capability"] in pins and
+                op.get("inputs") and set(op["inputs"]) <= visible):
+            ops.append(op)
+    if not ops:
+        return None
+    try:
+        normalize(conn, task, dict(body, ops=ops), {}, {}, packet=packet)
+    except SchemaInvalid as exc:
+        if exc.details.get("reason") == "comparison_choice_required":
+            return exc
+    return None
+
+
 def normalize(conn, task, body, inventory, received, *, packet):
     """Return an explicit action only when grounded by this actor's operation and received evidence."""
     chosen = body.get("comparison_id")

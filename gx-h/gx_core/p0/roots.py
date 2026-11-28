@@ -22,7 +22,7 @@ from ..scheduling import dispatch as scheduler, snapshot
 from ..teams import recovery
 from ..teams.service import TeamService, default_lease_seconds
 from . import compute
-from . import profiles, v6_native, v62_native, v621_policy
+from . import harness_policy, profiles, v6_native, v62_native, v621_policy
 from ..orchestration.service import hooks_for_run
 from . import activity, terminal_products, waits
 
@@ -578,6 +578,8 @@ class Roots:
             if v62_native.module_scope(packet):
                 v62_native.check_workspace(row)
                 params["developerInstructions"] = v62_native.module_instructions(packet)
+            elif harness_policy.enabled(packet):
+                params["developerInstructions"] = v6_native.RESEARCH_INSTRUCTIONS
             else:
                 params["developerInstructions"] = (v6_native.COMPACT_INSTRUCTIONS
                     if packet.get("evidence_policy") == v621_policy.VERSION else v6_native.INSTRUCTIONS)
@@ -596,7 +598,8 @@ class Roots:
                     params["developerInstructions"] += v6_native.EVIDENCE_INSTRUCTIONS
             if "catalog_discovery" in packet:
                 from . import catalog_survey
-                params["developerInstructions"] += " " + catalog_survey.INSTRUCTION
+                guidance = catalog_survey.OPENING_INSTRUCTION if harness_policy.enabled(packet) else catalog_survey.INSTRUCTION
+                params["developerInstructions"] += " " + guidance
             if packet.get("evidence_policy") in v621_policy.GOVERNED:
                 params["developerInstructions"] += (
                     " For a numbered finding from a measurement with declared metrics, cite its output and "
@@ -1082,6 +1085,9 @@ class Roots:
                 if suppress:
                     return NO_TOOL_RESPONSE
                 return {"success": False, "contentItems": [{"type": "inputText", "text": ids.canonical_json(out)}]}
+            if (p.get("tool") == v6_native.DECIDE and isinstance(out, dict)
+                    and out.get("outcome") == "core_evidence_available"):
+                return {"success": True, "contentItems": [{"type": "inputText", "text": ids.canonical_json(out)}]}
             if p.get("tool") in self.mode.decision_tools:
                 status = "ACCEPTED"
                 suppress = True
@@ -1186,6 +1192,7 @@ class Roots:
                 if receipt["turn_id"]!=turn or receipt["request_sha"]!=digest:
                     raise ScopeDenied("conflicting root callback identifier")
                 requires_live_task = (tool in self._plugin_tools or tool in ("gx_read_artifact", "gx_task_context")
+                                      or (tool == "gx_send_research_hint" and "action" in args)
                                       or self.terminal_products and tool != "gx_submit_product")
                 if row["task_id"] is None or not requires_live_task:
                     return json.loads(receipt["result_json"])
@@ -1204,7 +1211,10 @@ class Roots:
                 module = v62_native.module_scope(packet)
                 if receipt:
                     if module:
-                        v62_native.authorize_read(self.conn, row, packet, tool, turn, args.get("ref"))
+                        instance = v62_native.authorize_read(self.conn, row, packet, tool, turn, args.get("ref"))
+                        if tool in ("gx_task_context","gx_send_research_hint"):
+                            from . import research_topics
+                            return research_topics.check_receipt(self.conn,instance,tool,json.loads(receipt["result_json"]))
                     if tool == "gx_read_artifact":
                         self._artifact_access(row, args["ref"])
                     return json.loads(receipt["result_json"])
@@ -1218,8 +1228,9 @@ class Roots:
                             raise SchemaInvalid("gx_task_context accepts no arguments")
                         return v6_native.current_context(self.conn, row)
                     answer = v62_native.perform_read(self, row, p, packet, read)
-                elif lead and tool == "gx_task_context" and not args:
-                    answer = v6_native.current_context(self.conn, row)
+                elif lead and tool == "gx_task_context" and (not args or (
+                        packet.get("scope","run") == "run" and harness_policy.enabled(packet))):
+                    answer = v6_native.current_context(self.conn, row, topic_page=args)
                 elif tool == "gx_task_context" and not args:
                     answer = hooks_for_run(self.conn, self.run_id).build_task_context(
                         self.conn, self.run_id, row["task_id"], row["attempt"])

@@ -46,7 +46,7 @@ def _claims(conn, rid):
                       "utc": r["ts"] or r["created_at"], "event_id": r["event_id"], "event": r["kind"],
                       "author": r["author_principal"]}
         details = _fields(claim, "hypothesis_id statement scope criteria decision_scope limitations "
-                          "lead_interpretation evidence_refs decision_delivery source_records study_class")
+                          "lead_interpretation evidence_refs decision_delivery source_records study_class evidence_grade_receipt")
         if not reg:
             exploratory.append({**details, **assessment, "goal_version": r["goal_version"],
                                 "classification": "unregistered_interpretation"})

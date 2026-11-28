@@ -1,0 +1,42 @@
+test_complete_sourced_report_matches_its_exact_commission (__main__.ModuleFacts.test_complete_sourced_report_matches_its_exact_commission) ... ERROR
+test_partial_report_released_before_one_assignment_advisory (__main__.ModuleFacts.test_partial_report_released_before_one_assignment_advisory) ... ERROR
+
+======================================================================
+ERROR: test_complete_sourced_report_matches_its_exact_commission (__main__.ModuleFacts.test_complete_sourced_report_matches_its_exact_commission)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_module_facts.py", line 61, in test_complete_sourced_report_matches_its_exact_commission
+    staged = s.call(lead,"gx_stage_claim",claim,"grounded")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v6_native.py", line 341, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v6_native.py", line 480, in _call
+    answer = v6_claims.stage(roots.conn, **identity, context_ref=task[0], payload=args,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v6_claims.py", line 318, in stage
+    check_receipt = evidence_grade(conn, task, payload) if explicit_grade else None
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v6_claims.py", line 68, in evidence_grade
+    raise SchemaInvalid("Invalid evidence check: " + ", ".join(errors))
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Invalid evidence check: $.grade: 'delivery_completed' is not one of ['body_method_checked', 'model_executed', 'model_evaluation_checked'], $: property 'module_instance_id' is not allowed
+
+======================================================================
+ERROR: test_partial_report_released_before_one_assignment_advisory (__main__.ModuleFacts.test_partial_report_released_before_one_assignment_advisory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_module_facts.py", line 44, in test_partial_report_released_before_one_assignment_advisory
+    self.assertEqual(reply["delivery_advisory"]["materials"][0]["ref"], s.materials[0])
+                     ~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'delivery_advisory'
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.861s
+
+FAILED (errors=2)

@@ -47,3 +47,18 @@ export PYTHONPATH=.:gx-h:gx-h/tests
 .venv/bin/python -B acceptance/harness_refactor/closing/candidate_states.py ../gx-science/asset-live/literature/state
 .venv/bin/python -B acceptance/harness_refactor/closing/model_grade_replay.py ../gx-science/science-plugin-blueprint-b0-release/state
 ```
+
+## 三組現場提交的格式回歸
+
+`field-format-refusals.json` 摘錄原生回調的操作名、欄位和拒收原因。三組來源為公開追試、公開水文接續，以及第一次三臂試驗的修訂組。盲題的材料、回答和評分均未納入。正式試驗的原始拒收及首次結果保留。
+
+普通 Goal 現在允許唯一的 `close_run` 沿用決策中已寫明的 `rationale`。明寫的 `reason` 優先；`unresolved` 必須由 Lead 提交。如普通收尾或等待誤帶正式比較欄位，GX 會指明要修的欄位。當 PI 回饋處置也有問題時，回覆同時給出欄位與合法枚舉。未送達的報告、正式比較的科學處置、指向科學缺口的有效引用仍按原規則核對。
+
+定向案例從普通 `research` 起題並使用受控模型回調。`field-format-before.log` 使用獨立暫存的 `git archive 5904a4f`；`field-format-after.log` 使用後繼候選。可從產品目錄重跑：
+
+```sh
+PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a python3 -B -m unittest -v \
+  acceptance.harness_refactor.closing.test_field_format acceptance.harness_refactor.closing.test_closeout \
+  acceptance.v624.test_native_decision_wire acceptance.v624.test_comparison_inference \
+  acceptance.harness_refactor.routes.test_routes acceptance.harness_refactor.integration.test_native_contract
+```

@@ -1,5 +1,7 @@
 # 官方 Codex 現場研究
 
+[逐案實際結果與未達行為](interpretation.md)
+
 三份題面均從 `bin/gx-p0 research` 進場。酵母題沒有附件，水文題附上 USGS 原始回應及可供既有工具讀取的區間記錄。PI 只給問題、材料與研究強度。站點配置決定可供選用的能力，Codex 決定是否查閱、局部啟用與採用各方法。兩個水文插件的版本列在 [部署回執](hydro/deployment.json)。[題面、輸入摘要和事前評分](preregistered.json)
 
 ## 啟動或恢復
@@ -29,3 +31,5 @@
 .venv/bin/python -B acceptance/harness_refactor/field/hydro/preflight.py ../harness-refactor-live/hydro/release
 PYTHONPATH=gx-h:. .venv/bin/python -B -m unittest -v acceptance.harness_refactor.field.test_literal_archive
 ```
+
+冷重導可用 `cold_export.py {a,b,yeast} WORK RUN_ID` 核對已封存 Goal 的輸出和執行數量。

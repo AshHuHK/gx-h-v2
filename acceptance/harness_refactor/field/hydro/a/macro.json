@@ -1,0 +1,507 @@
+{
+  "digest": "9e42621326774cb2b0eebac0c4144aef597065b8ec204e3a770248341ce2188e",
+  "id_alignment": "Bind the fresh USGS daily-values response and its derived interval record by source digest. Match agency and site ID, parameter 00060 and statistic 00003, then pair whole local calendar days using each site's time zone and actual elapsed boundaries. Set the first designated station as left and the second as right. Verify station order, dates, unique rows, units, qualifiers and the approved-day validity mask before interpreting the sign. Have the reviewers share any correction to the common dates, units, sign or bounds during the parallel review.",
+  "inputs": {
+    "record": {
+      "kind": "run_input",
+      "media_type": null
+    },
+    "upstream_original": {
+      "kind": "run_input",
+      "media_type": null
+    }
+  },
+  "kind": "recipe",
+  "macro": {
+    "decision_point": {
+      "event": "join_outcome",
+      "inspect": [
+        "audit",
+        "volume",
+        "computed"
+      ],
+      "question": "After both reviews and the paired computation, do the verified IDs, units and whole common dates warrant an ordering for the new records? For positive common duration, publish left greater if the lower bound is positive or right greater if the upper bound is negative. If zero falls in the interval, report the nominal difference and uncertainty in its sign. Withhold the ordering if source alignment or common coverage is unresolved.",
+      "role": "run_lead"
+    },
+    "join": {
+      "mode": "all",
+      "ports": [
+        {
+          "alternatives": [
+            {
+              "module": "audit",
+              "output_name": "marginal.json"
+            }
+          ],
+          "required": true,
+          "slot": "audit"
+        },
+        {
+          "alternatives": [
+            {
+              "module": "volume",
+              "output_name": "paired.json"
+            }
+          ],
+          "required": true,
+          "slot": "volume"
+        },
+        {
+          "alternatives": [
+            {
+              "output_name": "paired.json",
+              "step": "computed"
+            }
+          ],
+          "required": true,
+          "slot": "computed"
+        }
+      ]
+    },
+    "modules": [
+      {
+        "capabilities": [],
+        "communication": "shared",
+        "declaration_sha256": "812ef6d4839853ea74815ff65a8ffeefdec4b369d4e6c20a569da403beea4665",
+        "expected_delivery": "Source-referenced audit of each series, actual day lengths, excluded dates, conversions and assigned error bounds, plus a separate per-station total and duration check. Share any issue affecting pairing or integration directly with the volume reviewer.",
+        "inputs": [
+          {
+            "input": "record"
+          },
+          {
+            "input": "upstream_original"
+          }
+        ],
+        "method_options": {
+          "archival-fab-coverage@1": {
+            "digest": "8e1487c13c151ef95283923a5e61f182cda0fec8973b9aef14be1d99fc8916e4",
+            "method": "archival-fab-coverage@1",
+            "provider": "org.gx.archival-molecule-qc@1.0.0",
+            "provider_digest": "fa885b80ccec69fd928a2223f9b809648367d925d6547a146163c41d0aeeb1b8"
+          },
+          "archival-peptide-coverage@1": {
+            "digest": "7d9a96083503601eebed6e923e5e192ca55ae7740ba63a21588a00560af5fa8f",
+            "method": "archival-peptide-coverage@1",
+            "provider": "org.gx.archival-molecule-qc@1.0.0",
+            "provider_digest": "fa885b80ccec69fd928a2223f9b809648367d925d6547a146163c41d0aeeb1b8"
+          },
+          "arxiv-fetch@1": {
+            "digest": "a7077a6eb3edb0e905a8181038448fd4efa9aae354fe877314fe890a7674266f",
+            "method": "arxiv-fetch@1",
+            "provider": "org.gx.arxiv-sources@1.0.0",
+            "provider_digest": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5"
+          },
+          "arxiv-search@1": {
+            "digest": "4b83a31f276d8e83e2d0c506e6275542ac57b183e9aafe4588e766b204fff2c7",
+            "method": "arxiv-search@1",
+            "provider": "org.gx.arxiv-sources@1.0.0",
+            "provider_digest": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5"
+          },
+          "deposited-backbone-qc@1": {
+            "digest": "2e93f4d6cb3c175f00c3183d5615980e2635fabb30e5c6d0585b10b517dd1ee9",
+            "method": "deposited-backbone-qc@1",
+            "provider": "org.gx.deposited-structure-qc@1.0.0",
+            "provider_digest": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336"
+          },
+          "deposited-block-influence@2": {
+            "digest": "d07c6a75837b506a695db18340af43bdd918a3a98171355082b8a9463bc626f8",
+            "method": "deposited-block-influence@2",
+            "provider": "org.gx.block-influence@2.0.0",
+            "provider_digest": "d936e8612734080c800140d995b8d205c649eddfc317a6e17448189668ca7516"
+          },
+          "deposited-block-signed@1": {
+            "digest": "0ad355138c40104db552a5344e80a6ae5cdb5c1b0d1fc412d43d12a4e34341f7",
+            "method": "deposited-block-signed@1",
+            "provider": "org.gx.block-signed@1.0.0",
+            "provider_digest": "a73661055f24780dac17ad7031a792f6a96975d9557dfb0b453ddb379b3a8475"
+          },
+          "deposited-chain-geometry@2": {
+            "digest": "741e860f87822bb1b1b204cd18e6cb3035b5da35c7bded3f5cb1e97ada23ee1f",
+            "method": "deposited-chain-geometry@2",
+            "provider": "org.gx.protein@0.3.0",
+            "provider_digest": "f5f2c9169d1a6ff82d39fc260a491f8c4053f54f98a543c2ea4b7e42f390a6ad"
+          },
+          "deposited-macrocycle-qc@1": {
+            "digest": "dc54109e81b0d8fefcad5b14d136d81bc8fafdbbff1f1946c47fe3bad4e55617",
+            "method": "deposited-macrocycle-qc@1",
+            "provider": "org.gx.deposited-structure-qc@1.0.0",
+            "provider_digest": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336"
+          },
+          "discharge-concurrent@1": {
+            "digest": "848fedd7e6f5c3dc2edadd62499ed28a4584e05f4c9a0d7e4d482964988239c5",
+            "method": "discharge-concurrent@1",
+            "provider": "org.gx.hydro-concurrent@1.0.0",
+            "provider_digest": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729"
+          },
+          "discharge-marginal@1": {
+            "digest": "8e79974d92aa366880220fa64665783089c8b1514d3f3726c3a8869e04a232b2",
+            "method": "discharge-marginal@1",
+            "provider": "org.gx.hydro-marginal@1.0.0",
+            "provider_digest": "0ca1e652d43b890280a4b44887bf035935e354e02fbe8bd91fdb87d16afad3cd"
+          },
+          "literature-original@2": {
+            "digest": "8ce91c1afe7843b6dab5be3fcd48e94acda24d887501107b49933d4e8e574f9c",
+            "method": "literature-original@2",
+            "provider": "org.gx.publication-discovery@1.1.0",
+            "provider_digest": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4"
+          },
+          "literature-page@2": {
+            "digest": "f7e1da94675b804e14f17e4802eff9dee1ddbed455f79ac8d8b514d080903852",
+            "method": "literature-page@2",
+            "provider": "org.gx.publication-discovery@1.1.0",
+            "provider_digest": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4"
+          },
+          "literature-query@2": {
+            "digest": "6fb2861f0543a756ca6ff63fa4b2f053c80ad56f8418dd1ad7a0f37bc13b2d03",
+            "method": "literature-query@2",
+            "provider": "org.gx.publication-discovery@1.1.0",
+            "provider_digest": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4"
+          },
+          "pcna-archive-fetch@1": {
+            "digest": "6f9db9f276d3adb9c8137f0f9be5f77f9b048c8d625f4db8a475c3b6a9830a3b",
+            "method": "pcna-archive-fetch@1",
+            "provider": "org.gx.pcna-archive@1.0.0",
+            "provider_digest": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5"
+          },
+          "pcna-archive-search@1": {
+            "digest": "4a33b0378204a772c23a2229825fcb60060262e4ff860ddf1ce0ce0747d99c6a",
+            "method": "pcna-archive-search@1",
+            "provider": "org.gx.pcna-archive@1.0.0",
+            "provider_digest": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5"
+          },
+          "pcna-interface@1": {
+            "digest": "aa9d3831593dd600d9a9b8392ff0b5d63ebc0e4b6d2772074d6536640dc4b9e4",
+            "method": "pcna-interface@1",
+            "provider": "org.gx.pcna-structure@1.0.0",
+            "provider_digest": "d6762ca59370426f8ec2932e4bfa6d2b48adaf5c6cf9cef183584883842f472d"
+          },
+          "pcna-local-geometry@1": {
+            "digest": "4645231ae266832e4f70de758fe7904fac7220ae10a41e56bf7a549aae018fc9",
+            "method": "pcna-local-geometry@1",
+            "provider": "org.gx.pcna-structure@1.0.0",
+            "provider_digest": "d6762ca59370426f8ec2932e4bfa6d2b48adaf5c6cf9cef183584883842f472d"
+          },
+          "scholarly-fetch@1": {
+            "digest": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+            "method": "scholarly-fetch@1",
+            "provider": "org.gx.scholarly-sources@1.0.0",
+            "provider_digest": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c"
+          },
+          "scholarly-page-fetch@2": {
+            "digest": "10943c467b6cc136d5d5309dce490c04f58e597f184a895c43322cef74daf61d",
+            "method": "scholarly-page-fetch@2",
+            "provider": "org.gx.scholarly-pages@1.1.0",
+            "provider_digest": "6854b19b66618cd0e94014919f2ac0b55afc7a4534a7ca040f31982525e0bc66"
+          },
+          "scholarly-page-search@2": {
+            "digest": "12c44e675b2813870485f11d4ebe872d6a2745d095de4b9dd6bc3fb8085285a0",
+            "method": "scholarly-page-search@2",
+            "provider": "org.gx.scholarly-pages@1.1.0",
+            "provider_digest": "6854b19b66618cd0e94014919f2ac0b55afc7a4534a7ca040f31982525e0bc66"
+          },
+          "scholarly-search@1": {
+            "digest": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+            "method": "scholarly-search@1",
+            "provider": "org.gx.scholarly-sources@1.0.0",
+            "provider_digest": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c"
+          },
+          "yeast-archive-compare@1": {
+            "digest": "dab3adf688901bbd9a3edb1aedfb7b1b4479ac12113eebed7c3d21f717e7d7c1",
+            "method": "yeast-archive-compare@1",
+            "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+            "provider_digest": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6"
+          },
+          "yeast-archive-lookup@1": {
+            "digest": "aef7e787ba570664443ebac48d60acec7b6d9ba65fce72f101b3059b75d84695",
+            "method": "yeast-archive-lookup@1",
+            "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+            "provider_digest": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6"
+          },
+          "yeast-archive-lookup@2": {
+            "digest": "ecb9e7130a8ef3709e092a32b524d7dcc155a7d07d110f8bcc7f3dc566b44666",
+            "method": "yeast-archive-lookup@2",
+            "provider": "org.gx.yeast-enzyme-archive@1.1.0",
+            "provider_digest": "6cc3449f5bf2f055c0030a9f8f257789adfe8874d8a152fefe529f669e39ba81"
+          }
+        },
+        "method_pins": {},
+        "method_providers": {},
+        "module_id": "ad_hoc",
+        "module_version": "1",
+        "provider": null,
+        "provider_closure": [],
+        "question": "How well does the fresh interval record reproduce the original daily means, qualifiers, units and dates? Which complete dates and station IDs are comparable?",
+        "slot": "audit",
+        "sub_budget": {
+          "api_calls": 10,
+          "cpu_seconds": 120,
+          "job_submissions": 3,
+          "tokens": 400000,
+          "worker_tasks": 3
+        },
+        "tools": [
+          "gx_decide_revision",
+          "gx_extract_evidence",
+          "gx_query_catalog",
+          "gx_read_artifact",
+          "gx_read_source",
+          "gx_review_evidence",
+          "gx_select_capability",
+          "gx_submit_module_report",
+          "gx_task_context"
+        ],
+        "wake_on": []
+      },
+      {
+        "capabilities": [
+          "discharge-concurrent@1"
+        ],
+        "communication": "shared",
+        "declaration_sha256": "812ef6d4839853ea74815ff65a8ffeefdec4b369d4e6c20a569da403beea4665",
+        "expected_delivery": "Common and excluded duration, paired station volumes, signed difference and opposite-extreme bounds, with a native-unit check. Use the auditor's findings and communicate discrepancies before delivering the report.",
+        "inputs": [
+          {
+            "input": "record"
+          },
+          {
+            "input": "upstream_original"
+          }
+        ],
+        "method_options": {
+          "archival-fab-coverage@1": {
+            "digest": "8e1487c13c151ef95283923a5e61f182cda0fec8973b9aef14be1d99fc8916e4",
+            "method": "archival-fab-coverage@1",
+            "provider": "org.gx.archival-molecule-qc@1.0.0",
+            "provider_digest": "fa885b80ccec69fd928a2223f9b809648367d925d6547a146163c41d0aeeb1b8"
+          },
+          "archival-peptide-coverage@1": {
+            "digest": "7d9a96083503601eebed6e923e5e192ca55ae7740ba63a21588a00560af5fa8f",
+            "method": "archival-peptide-coverage@1",
+            "provider": "org.gx.archival-molecule-qc@1.0.0",
+            "provider_digest": "fa885b80ccec69fd928a2223f9b809648367d925d6547a146163c41d0aeeb1b8"
+          },
+          "arxiv-fetch@1": {
+            "digest": "a7077a6eb3edb0e905a8181038448fd4efa9aae354fe877314fe890a7674266f",
+            "method": "arxiv-fetch@1",
+            "provider": "org.gx.arxiv-sources@1.0.0",
+            "provider_digest": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5"
+          },
+          "arxiv-search@1": {
+            "digest": "4b83a31f276d8e83e2d0c506e6275542ac57b183e9aafe4588e766b204fff2c7",
+            "method": "arxiv-search@1",
+            "provider": "org.gx.arxiv-sources@1.0.0",
+            "provider_digest": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5"
+          },
+          "deposited-backbone-qc@1": {
+            "digest": "2e93f4d6cb3c175f00c3183d5615980e2635fabb30e5c6d0585b10b517dd1ee9",
+            "method": "deposited-backbone-qc@1",
+            "provider": "org.gx.deposited-structure-qc@1.0.0",
+            "provider_digest": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336"
+          },
+          "deposited-block-influence@2": {
+            "digest": "d07c6a75837b506a695db18340af43bdd918a3a98171355082b8a9463bc626f8",
+            "method": "deposited-block-influence@2",
+            "provider": "org.gx.block-influence@2.0.0",
+            "provider_digest": "d936e8612734080c800140d995b8d205c649eddfc317a6e17448189668ca7516"
+          },
+          "deposited-block-signed@1": {
+            "digest": "0ad355138c40104db552a5344e80a6ae5cdb5c1b0d1fc412d43d12a4e34341f7",
+            "method": "deposited-block-signed@1",
+            "provider": "org.gx.block-signed@1.0.0",
+            "provider_digest": "a73661055f24780dac17ad7031a792f6a96975d9557dfb0b453ddb379b3a8475"
+          },
+          "deposited-chain-geometry@2": {
+            "digest": "741e860f87822bb1b1b204cd18e6cb3035b5da35c7bded3f5cb1e97ada23ee1f",
+            "method": "deposited-chain-geometry@2",
+            "provider": "org.gx.protein@0.3.0",
+            "provider_digest": "f5f2c9169d1a6ff82d39fc260a491f8c4053f54f98a543c2ea4b7e42f390a6ad"
+          },
+          "deposited-macrocycle-qc@1": {
+            "digest": "dc54109e81b0d8fefcad5b14d136d81bc8fafdbbff1f1946c47fe3bad4e55617",
+            "method": "deposited-macrocycle-qc@1",
+            "provider": "org.gx.deposited-structure-qc@1.0.0",
+            "provider_digest": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336"
+          },
+          "discharge-concurrent@1": {
+            "digest": "848fedd7e6f5c3dc2edadd62499ed28a4584e05f4c9a0d7e4d482964988239c5",
+            "method": "discharge-concurrent@1",
+            "provider": "org.gx.hydro-concurrent@1.0.0",
+            "provider_digest": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729"
+          },
+          "discharge-marginal@1": {
+            "digest": "8e79974d92aa366880220fa64665783089c8b1514d3f3726c3a8869e04a232b2",
+            "method": "discharge-marginal@1",
+            "provider": "org.gx.hydro-marginal@1.0.0",
+            "provider_digest": "0ca1e652d43b890280a4b44887bf035935e354e02fbe8bd91fdb87d16afad3cd"
+          },
+          "literature-original@2": {
+            "digest": "8ce91c1afe7843b6dab5be3fcd48e94acda24d887501107b49933d4e8e574f9c",
+            "method": "literature-original@2",
+            "provider": "org.gx.publication-discovery@1.1.0",
+            "provider_digest": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4"
+          },
+          "literature-page@2": {
+            "digest": "f7e1da94675b804e14f17e4802eff9dee1ddbed455f79ac8d8b514d080903852",
+            "method": "literature-page@2",
+            "provider": "org.gx.publication-discovery@1.1.0",
+            "provider_digest": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4"
+          },
+          "literature-query@2": {
+            "digest": "6fb2861f0543a756ca6ff63fa4b2f053c80ad56f8418dd1ad7a0f37bc13b2d03",
+            "method": "literature-query@2",
+            "provider": "org.gx.publication-discovery@1.1.0",
+            "provider_digest": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4"
+          },
+          "pcna-archive-fetch@1": {
+            "digest": "6f9db9f276d3adb9c8137f0f9be5f77f9b048c8d625f4db8a475c3b6a9830a3b",
+            "method": "pcna-archive-fetch@1",
+            "provider": "org.gx.pcna-archive@1.0.0",
+            "provider_digest": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5"
+          },
+          "pcna-archive-search@1": {
+            "digest": "4a33b0378204a772c23a2229825fcb60060262e4ff860ddf1ce0ce0747d99c6a",
+            "method": "pcna-archive-search@1",
+            "provider": "org.gx.pcna-archive@1.0.0",
+            "provider_digest": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5"
+          },
+          "pcna-interface@1": {
+            "digest": "aa9d3831593dd600d9a9b8392ff0b5d63ebc0e4b6d2772074d6536640dc4b9e4",
+            "method": "pcna-interface@1",
+            "provider": "org.gx.pcna-structure@1.0.0",
+            "provider_digest": "d6762ca59370426f8ec2932e4bfa6d2b48adaf5c6cf9cef183584883842f472d"
+          },
+          "pcna-local-geometry@1": {
+            "digest": "4645231ae266832e4f70de758fe7904fac7220ae10a41e56bf7a549aae018fc9",
+            "method": "pcna-local-geometry@1",
+            "provider": "org.gx.pcna-structure@1.0.0",
+            "provider_digest": "d6762ca59370426f8ec2932e4bfa6d2b48adaf5c6cf9cef183584883842f472d"
+          },
+          "scholarly-fetch@1": {
+            "digest": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+            "method": "scholarly-fetch@1",
+            "provider": "org.gx.scholarly-sources@1.0.0",
+            "provider_digest": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c"
+          },
+          "scholarly-page-fetch@2": {
+            "digest": "10943c467b6cc136d5d5309dce490c04f58e597f184a895c43322cef74daf61d",
+            "method": "scholarly-page-fetch@2",
+            "provider": "org.gx.scholarly-pages@1.1.0",
+            "provider_digest": "6854b19b66618cd0e94014919f2ac0b55afc7a4534a7ca040f31982525e0bc66"
+          },
+          "scholarly-page-search@2": {
+            "digest": "12c44e675b2813870485f11d4ebe872d6a2745d095de4b9dd6bc3fb8085285a0",
+            "method": "scholarly-page-search@2",
+            "provider": "org.gx.scholarly-pages@1.1.0",
+            "provider_digest": "6854b19b66618cd0e94014919f2ac0b55afc7a4534a7ca040f31982525e0bc66"
+          },
+          "scholarly-search@1": {
+            "digest": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+            "method": "scholarly-search@1",
+            "provider": "org.gx.scholarly-sources@1.0.0",
+            "provider_digest": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c"
+          },
+          "yeast-archive-compare@1": {
+            "digest": "dab3adf688901bbd9a3edb1aedfb7b1b4479ac12113eebed7c3d21f717e7d7c1",
+            "method": "yeast-archive-compare@1",
+            "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+            "provider_digest": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6"
+          },
+          "yeast-archive-lookup@1": {
+            "digest": "aef7e787ba570664443ebac48d60acec7b6d9ba65fce72f101b3059b75d84695",
+            "method": "yeast-archive-lookup@1",
+            "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+            "provider_digest": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6"
+          },
+          "yeast-archive-lookup@2": {
+            "digest": "ecb9e7130a8ef3709e092a32b524d7dcc155a7d07d110f8bcc7f3dc566b44666",
+            "method": "yeast-archive-lookup@2",
+            "provider": "org.gx.yeast-enzyme-archive@1.1.0",
+            "provider_digest": "6cc3449f5bf2f055c0030a9f8f257789adfe8874d8a152fefe529f669e39ba81"
+          }
+        },
+        "method_pins": {
+          "discharge-concurrent@1": "848fedd7e6f5c3dc2edadd62499ed28a4584e05f4c9a0d7e4d482964988239c5"
+        },
+        "method_providers": {
+          "discharge-concurrent@1": {
+            "closure": [
+              {
+                "id": "org.gx.hydro-concurrent",
+                "sha256": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729",
+                "version": "1.0.0"
+              }
+            ],
+            "plugin": {
+              "id": "org.gx.hydro-concurrent",
+              "sha256": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729",
+              "version": "1.0.0"
+            }
+          }
+        },
+        "module_id": "ad_hoc",
+        "module_version": "1",
+        "provider": null,
+        "provider_closure": [],
+        "question": "For the fresh accepted common days, what are the two volumes and signed difference, and which orderings remain possible under the stated rate bounds?",
+        "slot": "volume",
+        "sub_budget": {
+          "api_calls": 14,
+          "cpu_seconds": 300,
+          "job_submissions": 5,
+          "tokens": 600000,
+          "worker_tasks": 5
+        },
+        "tools": [
+          "gx_decide_revision",
+          "gx_extract_evidence",
+          "gx_query_catalog",
+          "gx_read_artifact",
+          "gx_read_source",
+          "gx_review_evidence",
+          "gx_select_capability",
+          "gx_submit_module_report",
+          "gx_task_context"
+        ],
+        "wake_on": []
+      }
+    ]
+  },
+  "method_pins": {
+    "discharge-concurrent@1": "848fedd7e6f5c3dc2edadd62499ed28a4584e05f4c9a0d7e4d482964988239c5"
+  },
+  "methods": {
+    "computed": "discharge-concurrent@1"
+  },
+  "missing_values": "Exclude unapproved, missing, sentinel or invalid daily values from both sides of the paired calculation for that date. Count excluded duration and report the actual common dates. Resolve conflicting duplicates, overlaps, unknown units or time boundaries before integration. If day boundaries differ, use only comparable complete supports or obtain finer observations. Never substitute zero for a missing rate. An empty common span leaves the order unresolved. With missing error bounds withhold the scenario ordering until they are supplied.",
+  "outputs": {
+    "computed": [
+      {
+        "kind": "hydrometric_concurrent",
+        "name": "paired.json",
+        "nature": "analysis",
+        "source_roles": [
+          "record"
+        ]
+      }
+    ]
+  },
+  "provider_pins": {
+    "discharge-concurrent@1": {
+      "closure": [
+        {
+          "id": "org.gx.hydro-concurrent",
+          "sha256": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729",
+          "version": "1.0.0"
+        }
+      ],
+      "plugin": {
+        "id": "org.gx.hydro-concurrent",
+        "sha256": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729",
+        "version": "1.0.0"
+      }
+    }
+  },
+  "reference": "daily-gauge-volume-review@1",
+  "title": "Review of paired USGS daily discharge volumes",
+  "units": "Verify native discharge in ft\u00b3/s and convert using 28.316846592 L/ft\u00b3. The prepared record uses L/s, absolute rate error in L/s, and elapsed minutes. Multiply a daily mean by the actual duration in seconds. Report common and excluded time in minutes and both volumes and left minus right in litres. Check in native cubic feet. Where the editor specifies independent \u00b125% bounds, set the absolute error on each accepted mean to 0.25 times that rate. Use the fresh record's stated scenario for the new review."
+}

@@ -1,0 +1,631 @@
+{
+  "registration": {
+    "adoption_time": "Independent blinded reader selects the first post-delivery accepted scientific statement that changes or maintains the published interpretation in light of E2. Timings stay private until the annotation is frozen. Unobserved adoption is null.",
+    "arms": [
+      "stock",
+      "baseline",
+      "revised"
+    ],
+    "arms_per_question": 1,
+    "baseline": "50d31f5792a178529a817ffd93f66ef9cbbb0be4",
+    "blind_score_denominator": 7,
+    "effective_science_tools": [
+      "read supplied immutable initial archive JSON E1",
+      "receive late publisher extraction E2"
+    ],
+    "effort": "max",
+    "evidence_scope": "Frozen public observations about natural yeast enzymes and curatorial provenance only.",
+    "included_oauth_only": true,
+    "inputs": {
+      "initial": "64152e9093d30a556bfcfd559e27485ff875795f4d6a02d669d39f0e90e89605",
+      "late": "86027948366acd73893ad81ac770a00997e8ca72548f5aebbbea4db1880afd01",
+      "origins": "184dd3912f941dc4d3a3b4a870da2e41dac0c25961ff6716bc2f627497adcab9",
+      "question": "8b6d302e289bad40014f1cc3a7986aeb1092b61f13c855bb93481296ad168da9",
+      "rubric": "5e41370408d6cc1be1f24f03bcdb003aecfcea6122533ca16eef2278f83be38b"
+    },
+    "interruption": "Kill the arm driver and its descendants after the official App Server records the completed read of the exact E1 content for the same tool call, thread and turn. Resume the original native thread or GX Run, deliver the publisher return once and preserve the first outcome.",
+    "judge": "Independent same-model reader, blinded report IDs randomly assigned after all original attempts. No tools.",
+    "model": "gpt-6.2-astra",
+    "series": "public-archive-denominator-1",
+    "study_software": {
+      "build_materials.py": "e8a172043969e449fc410bb2d28ee3fcd4163ece85d7efca827f760326666f19",
+      "common.py": "46ad35c75c38ad725f2e64194cc11eb8ff8f1b7595c23568b419f5c86fbd691d",
+      "native.py": "e527112adc74f123a91d83e5935029524a3d024acb62cd9ad9eed82fd038ce48",
+      "probe.py": "a8f5fd660798ac828102155e967815917faaeb1121b2c42e3439faa1c1ec03ec",
+      "score.py": "f2468caaf072e95ab31cad4ec041605412e9add321f63a58679cd85ee921cd8f",
+      "trial.py": "9d17f72f6cb3b871f71fb43cba55914dac0d31b40ab0a9e66cb0d98ec4142c73"
+    },
+    "trial_controls": {
+      "additional_paid_usd": 0,
+      "external_jobs": 0,
+      "tool_network": false,
+      "wall_seconds_per_arm_including_recovery": 900
+    }
+  },
+  "arms": [
+    {
+      "arm": "stock",
+      "blind_id": "study-1",
+      "run_or_native_thread": "01a21f96-dc5b-7021-84fd-d8a37bf26ce4",
+      "outcome": "finished",
+      "field_turns": [
+        {
+          "thread": "01a21f96-dc5b-7021-84fd-d8a37bf26ce4",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-31-01a21f96-dc5b-7021-84fd-d8a37bf26ce4.jsonl",
+          "session_sha256": "178077adfc8d41c1d3ad34d1b5348d8de4ea2c54d7cb7fd167fc601241c3c66e",
+          "id": "01a21f96-e174-7780-b470-c4f46838594e",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:38:47.110Z"
+        },
+        {
+          "thread": "01a21f96-dc5b-7021-84fd-d8a37bf26ce4",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-31-01a21f96-dc5b-7021-84fd-d8a37bf26ce4.jsonl",
+          "session_sha256": "178077adfc8d41c1d3ad34d1b5348d8de4ea2c54d7cb7fd167fc601241c3c66e",
+          "id": "01a21f97-43ef-7b33-8c4d-e1bfa85f9ca3",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:38:58.242Z"
+        }
+      ],
+      "commit": "5904a4fdac3b0267a80fc7b59d3c00427a4871d4",
+      "wall_seconds": 77.24,
+      "external_jobs": [],
+      "external_jobs_added_after_interrupt": 0,
+      "interrupted_at_first_read": true,
+      "source_read": {
+        "archive_sha256": "64152e9093d30a556bfcfd559e27485ff875795f4d6a02d669d39f0e90e89605",
+        "call_id": "exec-db56d693-0c63-4ba5-954e-d89bd72a9155",
+        "official_time": "2026-11-28T00:38:50.045Z",
+        "receipt_line": 16,
+        "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-31-01a21f96-dc5b-7021-84fd-d8a37bf26ce4.jsonl",
+        "thread_id": "01a21f96-dc5b-7021-84fd-d8a37bf26ce4",
+        "time": 1795826330.2370436,
+        "turn_id": "01a21f96-e174-7780-b470-c4f46838594e"
+      },
+      "publisher_submission": {
+        "at": 1795826330.2699502,
+        "route": "same native thread/resume",
+        "source_sha256": "86027948366acd73893ad81ac770a00997e8ca72548f5aebbbea4db1880afd01"
+      },
+      "verified_lead_delivery": {
+        "utc": "2026-11-28T00:38:58.254Z",
+        "at": 1795826338.254,
+        "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-31-01a21f96-dc5b-7021-84fd-d8a37bf26ce4.jsonl",
+        "line": 23,
+        "thread": "01a21f96-dc5b-7021-84fd-d8a37bf26ce4",
+        "turn": "01a21f97-43ef-7b33-8c4d-e1bfa85f9ca3",
+        "item": "01a21f97-49cb-7471-877a-76758afafeea",
+        "source": "official UserMessage"
+      },
+      "premature_close_check": {
+        "raw_reminders": null,
+        "close_attempts": null,
+        "opportunities": null,
+        "supported_reminders": null,
+        "qualification": "Raw GX scientific reminder and material linkage; if one occurs, independent review is required to mark support. Stock has no GX close-op/reminder."
+      },
+      "events": [],
+      "critical_sources_examined": {
+        "denominator": 2,
+        "archive_read": true,
+        "paper_use_supported_by_judge": true
+      },
+      "earliest_adoption_supported_by_blind_reader": {
+        "label": "D1",
+        "statement": "Publish one result: “Saccharomyces cerevisiae Ima3p (BRENDA-linked accession P0CW40) had a specific activity of 3.9 μmol min⁻¹ mg⁻¹ on 5 mM 4-nitrophenyl α-D-glucopyranoside (α-pNPG) at pH 7.0 and 30 °C (mean of five experiments). Its relative velocity was 54% of that on isomaltose (7.2 μmol min⁻¹ mg⁻¹ = 100%).”\n\nKeep 3.9 as the absolute value; its units come from the paper’s table heading, not the archive export. Relabel the worksheet’s 54 as a percentage. Both entries refer to the same published α-pNPG mean, so the worksheet adds no independent measurement.\n\nLeave the enzyme-source strain unknown. S288c is the genome discussed, not an established source strain for this result. Record CEN.PK113-5D separately as the expression host.\n\nLocators: BRENDA 2026.1, 3.2.1.10/specific_activity/59. Deng et al., FEBS Open Bio 4 (2014), 200–212, DOI 10.1016/j.fob.2014.02.004, PMID 24649402, PMCID PMC3953731: Table 2 (JATS t0010), Ima3p column, α-pNPG “3.9 (54)” and Isomaltose “7.2 (100),” with heading and table note; Introduction (s0005) for S288c; Experimental procedures (s0080) for the expression host.",
+        "seconds_from_submission": 53.864,
+        "seconds_from_verified_lead_delivery": 45.88
+      },
+      "seconds_from_verified_lead_delivery_to_accepted_final_use_upper_bound": 46.3,
+      "human_scientific_interventions_excluding_preregistered_delivery": 0,
+      "grade": {
+        "criteria": {
+          "conditions": {
+            "mark": "pass",
+            "reason": "All three conditions match the table note, and the 5 mM concentration is assigned to α-pNPG.",
+            "report_support": "“on 5 mM 4-nitrophenyl α-D-glucopyranoside (α-pNPG) at pH 7.0 and 30 °C”",
+            "source_locator": "E2, Table 2 (JATS t0010), table note: pNPG_mM = 5, pH = 7, temperature_C = 30."
+          },
+          "counterevidence": {
+            "mark": "pass",
+            "reason": "The heading supplies the units for 3.9; the note defines the parenthetical 54 as a percentage. W1 cites the same cell, not another measurement.",
+            "report_support": "“Keep 3.9 as the absolute value; its units come from the paper’s table heading, not the archive export. Relabel the worksheet’s 54 as a percentage. Both entries refer to the same published α-pNPG mean, so the worksheet adds no independent measurement.”",
+            "source_locator": "E1: archived value “3.9”, units_on_this_export_row = null. W1 cites “Deng et al. (2014), Table 2, Ima3p”. E2, Table 2, Ima3p: α-pNPG “3.9 (54)”, heading “μmol/min/mg”, bracket note “relative velocity in percent of that enzyme's isomaltose velocity”."
+          },
+          "locator": {
+            "mark": "pass",
+            "reason": "The report identifies the exact archive row and the linked paper, table, column and rows.",
+            "report_support": "“BRENDA 2026.1, 3.2.1.10/specific_activity/59” and “PMCID PMC3953731: Table 2 (JATS t0010), Ima3p column, α-pNPG ‘3.9 (54)’ and Isomaltose ‘7.2 (100)’”",
+            "source_locator": "E1, BRENDA 2026.1, 3.2.1.10/specific_activity/59, linked PMID 24649402; E2, Deng et al., FEBS Open Bio 4 (2014), 200–212, DOI 10.1016/j.fob.2014.02.004, Table 2 (t0010)."
+          },
+          "protein": {
+            "mark": "pass",
+            "reason": "The report takes the protein name from the paper’s column and attributes the accession specifically to BRENDA.",
+            "report_support": "“Saccharomyces cerevisiae Ima3p (BRENDA-linked accession P0CW40)”",
+            "source_locator": "E1, organism_field “Saccharomyces cerevisiae”, accessions [“P0CW40”]; E2, Table 2 (t0010), Ima3p column, α-pNPG row."
+          },
+          "strain": {
+            "mark": "pass",
+            "reason": "Neither the genome discussion nor the host designation establishes an enzyme-source strain. Leaving it unknown is justified.",
+            "report_support": "“Leave the enzyme-source strain unknown. S288c is the genome discussed, not an established source strain for this result. Record CEN.PK113-5D separately as the expression host.”",
+            "source_locator": "E1, strain_field = null; E2, Introduction (s0005): S288c genome; Experimental procedures (s0080): CEN.PK113-5D expression host."
+          },
+          "substrate": {
+            "mark": "pass",
+            "reason": "The report identifies α-pNPG as the substrate for 3.9 and Ima3p’s isomaltose velocity as the denominator for 54%.",
+            "report_support": "“on 5 mM 4-nitrophenyl α-D-glucopyranoside (α-pNPG)” and “Its relative velocity was 54% of that on isomaltose (7.2 μmol min⁻¹ mg⁻¹ = 100%).”",
+            "source_locator": "E2, Table 2 (t0010), Ima3p column: α-pNPG “3.9 (54)” and Isomaltose “7.2 (100)”; table note defines isomaltose velocity as the reference."
+          },
+          "uncertainty": {
+            "mark": "pass",
+            "reason": "Five experiments contributed to one published mean. The report neither counts them as five independently sourced records nor infers individual values.",
+            "report_support": "“mean of five experiments” and “Both entries refer to the same published α-pNPG mean, so the worksheet adds no independent measurement.”",
+            "source_locator": "E2, Table 2 (t0010), Ima3p α-pNPG cell and table note “mean of five experiments”; E1 links PMID 24649402, and W1 cites that paper’s Table 2, Ima3p."
+          }
+        },
+        "denominator": 7,
+        "first_adoption": "D1",
+        "packet_sha256": "cf3efbd96363bb0c506b8b7a2ad0527bfd1b3a4dfc31f0afba906ab254df8116",
+        "passed": 7,
+        "turn": "01a21f9f-4af9-7211-9075-4779bd57e02d"
+      },
+      "judge_sessions": [
+        {
+          "thread": "01a21f9f-413e-72c3-9023-442fe34559b1",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-47-42-01a21f9f-413e-72c3-9023-442fe34559b1.jsonl",
+          "session_sha256": "902bd728559a3f2a7747780e87067ea1011c5a08192215fafa23112f4bfbccf7",
+          "id": "01a21f9f-4af9-7211-9075-4779bd57e02d",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:47:46.051Z"
+        }
+      ],
+      "anonymous_packet_sha256": "cf3efbd96363bb0c506b8b7a2ad0527bfd1b3a4dfc31f0afba906ab254df8116"
+    },
+    {
+      "arm": "baseline",
+      "blind_id": "study-2",
+      "run_or_native_thread": "gxr_01m8fsdq8s2h5kryxn",
+      "outcome": "finished",
+      "field_turns": [
+        {
+          "thread": "01a21f96-f27c-74a2-9445-805223e25f05",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-35-01a21f96-f27c-74a2-9445-805223e25f05.jsonl",
+          "session_sha256": "ba9f40459e98fe048011eed1a039cc2284a91bc04841c418940f23fbd21cb42a",
+          "id": "01a21f96-f2b6-7c90-a5c1-9a408c27eb56",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:38:38.499Z"
+        },
+        {
+          "thread": "01a21f96-f27c-74a2-9445-805223e25f05",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-35-01a21f96-f27c-74a2-9445-805223e25f05.jsonl",
+          "session_sha256": "ba9f40459e98fe048011eed1a039cc2284a91bc04841c418940f23fbd21cb42a",
+          "id": "01a21f97-961f-7550-87ce-f1d00f88bc3f",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:39:18.385Z"
+        },
+        {
+          "thread": "01a21f97-20d2-7e21-b750-482a3f0e212c",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-47-01a21f97-20d2-7e21-b750-482a3f0e212c.jsonl",
+          "session_sha256": "c5e9a7effdcf0f976cf8aa6f6d84937cdc3cd9fd058cacf8bcf5707f716d9120",
+          "id": "01a21f97-2108-79b3-a5e8-345bb63e6c7d",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:38:49.354Z"
+        },
+        {
+          "thread": "01a21f98-49c6-7113-bb90-737c40550dbc",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-40-03-01a21f98-49c6-7113-bb90-737c40550dbc.jsonl",
+          "session_sha256": "e05ca5914e9a9907961a90fe8ab1672e147d863cfc4d57f493d06b50fcbf90db",
+          "id": "01a21f98-49ec-74a2-ab2c-2fb438c88c23",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:40:08.191Z"
+        }
+      ],
+      "commit": "50d31f5792a178529a817ffd93f66ef9cbbb0be4",
+      "wall_seconds": 211.27,
+      "external_jobs": [],
+      "external_jobs_added_after_interrupt": 0,
+      "interrupted_at_first_read": true,
+      "source_read": {
+        "archive_sha256": "64152e9093d30a556bfcfd559e27485ff875795f4d6a02d669d39f0e90e89605",
+        "artifact_ref": "gxa_01m8fsdq9jx9586x0t",
+        "call_id": "exec-58a1207a-fe9a-498e-85e6-4bf173e8a848",
+        "official_time": "2026-11-28T00:38:43.811Z",
+        "receipt_line": 15,
+        "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-35-01a21f96-f27c-74a2-9445-805223e25f05.jsonl",
+        "thread_id": "01a21f96-f27c-74a2-9445-805223e25f05",
+        "time": 1795826323.8335192,
+        "turn_id": "01a21f96-f2b6-7c90-a5c1-9a408c27eb56"
+      },
+      "publisher_submission": {
+        "at": 1795826324.9794877,
+        "receipt": {
+          "conversation_id": "conversation:public-archive-curation",
+          "goal_version": 1,
+          "message_id": "gate4-publisher-response",
+          "run_id": "gxr_01m8fsdq8s2h5kryxn",
+          "status": "received"
+        },
+        "source_sha256": "86027948366acd73893ad81ac770a00997e8ca72548f5aebbbea4db1880afd01"
+      },
+      "verified_lead_delivery": {
+        "utc": "2026-11-28T00:40:08.216Z",
+        "at": 1795826408.216,
+        "session": "sessions/2026/11/28/rollout-2026-11-28T00-40-03-01a21f98-49c6-7113-bb90-737c40550dbc.jsonl",
+        "line": 10,
+        "thread": "01a21f98-49c6-7113-bb90-737c40550dbc",
+        "turn": "01a21f98-49ec-74a2-ab2c-2fb438c88c23",
+        "item": "01a21f98-5b11-7191-b552-c20a3c91e0c7",
+        "source": "official UserMessage"
+      },
+      "premature_close_check": {
+        "raw_reminders": [],
+        "close_attempts": [
+          {
+            "thread_id": "01a21f98-49c6-7113-bb90-737c40550dbc",
+            "turn_id": "01a21f98-49ec-74a2-ab2c-2fb438c88c23",
+            "call_id": "call_f1b8ce9d37a54c84a0c08fbe5c2c4938"
+          }
+        ],
+        "opportunities": 1,
+        "supported_reminders": 0,
+        "qualification": "Raw GX scientific reminder and material linkage; if one occurs, independent review is required to mark support. Stock has no GX close-op/reminder."
+      },
+      "events": [
+        {
+          "event_id": 38,
+          "kind": "v6.decision.committed",
+          "ts": "2026-11-28T00:40:03.643Z"
+        },
+        {
+          "event_id": 54,
+          "kind": "v6.decision.committed",
+          "ts": "2026-11-28T00:41:59.496Z"
+        },
+        {
+          "event_id": 56,
+          "kind": "v6.run.closed",
+          "ts": "2026-11-28T00:41:59.544Z"
+        }
+      ],
+      "critical_sources_examined": {
+        "denominator": 2,
+        "archive_read": true,
+        "paper_use_supported_by_judge": true
+      },
+      "earliest_adoption_supported_by_blind_reader": {
+        "label": "D2",
+        "statement": "Correct W1 and count one published α-pNPG result. BRENDA 2026.1, entry 3.2.1.10/specific_activity/59 (E1), records 3.9 for Saccharomyces cerevisiae, accession P0CW40, and links PMID 24649402. The archive unit and strain fields are blank. Deng et al., FEBS Open Bio 4 (2014), 200–212, DOI 10.1016/j.fob.2014.02.004, PMCID PMC3953731, Table 2 (JATS t0010), Ima3p column, gives “3.9 (54)” for α-pNPG and “7.2 (100)” for isomaltose. The heading supplies μmol/min/mg. The note defines relative velocity, and 100 × 3.9/7.2 rounds to 54%. Both entries trace to that same α-pNPG mean of five experiments at 5 mM 4-nitrophenyl α-D-glucopyranoside, pH 7.0 and 30 °C. Keep Ima3p and the archive accession. Leave source strain unknown. The Introduction (s0005) discusses the S288c genome and Experimental procedures (s0080) identifies CEN.PK113-5D as the expression host. Publish 3.9 μmol/min/mg as the specific activity of S. cerevisiae Ima3p (P0CW40) on 5 mM α-pNPG at pH 7.0 and 30 °C, mean of five experiments. Publish 54% as its velocity relative to Ima3p on isomaltose (7.2 μmol/min/mg, 100%). Link both fields to one published α-pNPG result. Record CEN.PK113-5D as the expression host.",
+        "seconds_from_submission": 194.517,
+        "seconds_from_verified_lead_delivery": 111.28
+      },
+      "seconds_from_verified_lead_delivery_to_accepted_final_use_upper_bound": 111.33,
+      "human_scientific_interventions_excluding_preregistered_delivery": 0,
+      "grade": {
+        "criteria": {
+          "conditions": {
+            "mark": "pass",
+            "reason": "The report ties the substrate concentration, pH and temperature to the α-pNPG measurement.",
+            "report_support": "“at 5 mM 4-nitrophenyl α-D-glucopyranoside, pH 7.0 and 30 °C”",
+            "source_locator": "E2, Table 2 (JATS t0010), table note: pNPG_mM = 5, pH = 7, temperature_C = 30. E1 assay_annotation also specifies pH 7.0 and 30°C."
+          },
+          "counterevidence": {
+            "mark": "pass",
+            "reason": "The bracketed 54 expresses the 3.9 μmol/min/mg result as a percentage, not a second independent specific activity.",
+            "report_support": "“The heading supplies μmol/min/mg. The note defines relative velocity, and 100 × 3.9/7.2 rounds to 54%.” “Correct W1 and count one published α-pNPG result.”",
+            "source_locator": "E2, Table 2 (JATS t0010), heading “μmol/min/mg”; Ima3p cells α-pNPG “3.9 (54)” and Isomaltose “7.2 (100)”; note: “relative velocity in percent of that enzyme's isomaltose velocity”. This contradicts W1's label “second independent specific-activity measurement for S288C”."
+          },
+          "locator": {
+            "mark": "pass",
+            "reason": "The report identifies the exact archive row and the corresponding paper, table and column.",
+            "report_support": "“BRENDA 2026.1, entry 3.2.1.10/specific_activity/59 (E1)” and “Deng et al., FEBS Open Bio 4 (2014), 200–212, DOI 10.1016/j.fob.2014.02.004, PMCID PMC3953731, Table 2 (JATS t0010), Ima3p column”",
+            "source_locator": "E1, 3.2.1.10/specific_activity/59, linked PMID 24649402; E2, PMID 24649402, DOI 10.1016/j.fob.2014.02.004, Table 2 (JATS t0010), Ima3p column."
+          },
+          "protein": {
+            "mark": "pass",
+            "reason": "Ima3p is the published column label; P0CW40 is the accession retained from the archive.",
+            "report_support": "“specific activity of S. cerevisiae Ima3p (P0CW40)” and “Table 2 (JATS t0010), Ima3p column”",
+            "source_locator": "E2, Table 2 (JATS t0010), Ima3p column, α-pNPG row: “3.9 (54)”; E1, 3.2.1.10/specific_activity/59, accession P0CW40."
+          },
+          "strain": {
+            "mark": "pass",
+            "reason": "The report records the expression host without treating it or the genome reference as evidence of the protein's strain of origin.",
+            "report_support": "“Leave source strain unknown. The Introduction (s0005) discusses the S288c genome and Experimental procedures (s0080) identifies CEN.PK113-5D as the expression host.”",
+            "source_locator": "E1, strain_field: null. E2, Introduction (s0005): “S288c is the genome discussed.” Experimental procedures (s0080): “The reported expression host is CEN.PK113-5D.”"
+          },
+          "substrate": {
+            "mark": "pass",
+            "reason": "α-pNPG is the measured substrate; the denominator is Ima3p's velocity on isomaltose.",
+            "report_support": "“on 5 mM α-pNPG” and “Publish 54% as its velocity relative to Ima3p on isomaltose (7.2 μmol/min/mg, 100%).”",
+            "source_locator": "E1, assay_annotation: “substrate 4-nitrophenyl alpha-D-glucopyranoside”; E2, Table 2 (JATS t0010), Ima3p column, α-pNPG and Isomaltose rows; table note defines the isomaltose reference."
+          },
+          "uncertainty": {
+            "mark": "pass",
+            "reason": "Five experiments contribute to one published α-pNPG mean. The report infers no individual experiment values.",
+            "report_support": "“mean of five experiments” and “Link both fields to one published α-pNPG result.”",
+            "source_locator": "E2, Table 2 (JATS t0010), Ima3p/α-pNPG cell “3.9 (54)”; table note summary: “mean of five experiments”."
+          }
+        },
+        "denominator": 7,
+        "first_adoption": "D2",
+        "packet_sha256": "b063cf045f51d54d6231626951c94331ef5fe5ec7a9408fbaad162badcb43ae2",
+        "passed": 7,
+        "turn": "01a21fa0-20c4-7f40-82cc-50f39b5560b0"
+      },
+      "judge_sessions": [
+        {
+          "thread": "01a21fa0-193a-7a71-8a58-f0d43bf5ee58",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-48-37-01a21fa0-193a-7a71-8a58-f0d43bf5ee58.jsonl",
+          "session_sha256": "a61bdc3c72011ca30d55cd6a0fbce176617ddca27e04e335d3ba74ea48a0b984",
+          "id": "01a21fa0-20c4-7f40-82cc-50f39b5560b0",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:48:40.139Z"
+        }
+      ],
+      "anonymous_packet_sha256": "b063cf045f51d54d6231626951c94331ef5fe5ec7a9408fbaad162badcb43ae2"
+    },
+    {
+      "arm": "revised",
+      "blind_id": "study-3",
+      "run_or_native_thread": "gxr_01m8fsdqey1ay7j4q9",
+      "outcome": "finished",
+      "field_turns": [
+        {
+          "thread": "01a21f96-e548-7c81-b836-9dc91616cd9b",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-32-01a21f96-e548-7c81-b836-9dc91616cd9b.jsonl",
+          "session_sha256": "5e219604e8437aede295e3f5a8f63c97f29eae33ef109dbc7a342e4b7b828c47",
+          "id": "01a21f96-e582-7f52-a54c-ec8191a2f7bd",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:38:35.611Z"
+        },
+        {
+          "thread": "01a21f96-e548-7c81-b836-9dc91616cd9b",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-32-01a21f96-e548-7c81-b836-9dc91616cd9b.jsonl",
+          "session_sha256": "5e219604e8437aede295e3f5a8f63c97f29eae33ef109dbc7a342e4b7b828c47",
+          "id": "01a21f97-8ed6-7440-a33d-04ef3fe8dbb6",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:39:18.684Z"
+        },
+        {
+          "thread": "01a21f97-1989-72a2-afeb-f74f8d88a95f",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-45-01a21f97-1989-72a2-afeb-f74f8d88a95f.jsonl",
+          "session_sha256": "698faec9f50464d2b118e0b409bf17aab967d1038c06f7837d73acb9387914c6",
+          "id": "01a21f97-19bf-7e03-9d7f-f4e740fc9722",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:38:50.247Z"
+        },
+        {
+          "thread": "01a21f98-5712-7fe0-b9eb-d460b73b774a",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-40-07-01a21f98-5712-7fe0-b9eb-d460b73b774a.jsonl",
+          "session_sha256": "de6012cbc9374221664c7eae35f2c84dc999f26435426fab351f89ef610a379c",
+          "id": "01a21f98-5743-7992-9f69-6c5505ed4718",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:40:09.283Z"
+        },
+        {
+          "thread": "01a21f98-e72c-7751-abaf-0ae2c394bac2",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-40-44-01a21f98-e72c-7751-abaf-0ae2c394bac2.jsonl",
+          "session_sha256": "e3d40d494987dc125f13ce265a293158e57dc5bbc1cc62f5a508f1fb9a5f5270",
+          "id": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:40:46.629Z"
+        },
+        {
+          "thread": "01a21f9b-3864-7e13-8568-26ae658daa05",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-43-15-01a21f9b-3864-7e13-8568-26ae658daa05.jsonl",
+          "session_sha256": "5cbc6efb668ff48a96d89b5eb04f6326fc0da62655834c0b26d44c8bf5242971",
+          "id": "01a21f9b-38e1-7983-bffc-c18d78091375",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:43:18.647Z"
+        }
+      ],
+      "commit": "5904a4fdac3b0267a80fc7b59d3c00427a4871d4",
+      "wall_seconds": 501.13,
+      "external_jobs": [],
+      "external_jobs_added_after_interrupt": 0,
+      "interrupted_at_first_read": true,
+      "source_read": {
+        "archive_sha256": "64152e9093d30a556bfcfd559e27485ff875795f4d6a02d669d39f0e90e89605",
+        "artifact_ref": "gxa_01m8fsdqfnkexahwfq",
+        "call_id": "exec-34846702-628c-4c0b-8379-8d2344f4dbda",
+        "official_time": "2026-11-28T00:38:41.144Z",
+        "receipt_line": 17,
+        "session": "sessions/2026/11/28/rollout-2026-11-28T00-38-32-01a21f96-e548-7c81-b836-9dc91616cd9b.jsonl",
+        "thread_id": "01a21f96-e548-7c81-b836-9dc91616cd9b",
+        "time": 1795826321.1670322,
+        "turn_id": "01a21f96-e582-7f52-a54c-ec8191a2f7bd"
+      },
+      "publisher_submission": {
+        "at": 1795826322.1214128,
+        "receipt": {
+          "conversation_id": "conversation:public-archive-curation",
+          "goal_version": 1,
+          "message_id": "gate4-publisher-response",
+          "run_id": "gxr_01m8fsdqey1ay7j4q9",
+          "status": "received"
+        },
+        "source_sha256": "86027948366acd73893ad81ac770a00997e8ca72548f5aebbbea4db1880afd01"
+      },
+      "verified_lead_delivery": {
+        "utc": "2026-11-28T00:40:46.658Z",
+        "at": 1795826446.658,
+        "session": "sessions/2026/11/28/rollout-2026-11-28T00-40-44-01a21f98-e72c-7751-abaf-0ae2c394bac2.jsonl",
+        "line": 10,
+        "thread": "01a21f98-e72c-7751-abaf-0ae2c394bac2",
+        "turn": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+        "item": "01a21f98-f139-78e0-b9e6-ee744d4bbeed",
+        "source": "official UserMessage"
+      },
+      "premature_close_check": {
+        "raw_reminders": [],
+        "close_attempts": [
+          {
+            "thread_id": "01a21f98-e72c-7751-abaf-0ae2c394bac2",
+            "turn_id": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+            "call_id": "call_bc29f0d3af984a20abef17ec93967dc2"
+          },
+          {
+            "thread_id": "01a21f98-e72c-7751-abaf-0ae2c394bac2",
+            "turn_id": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+            "call_id": "call_6a635c0e984a45fca83b54a31841a28e"
+          },
+          {
+            "thread_id": "01a21f98-e72c-7751-abaf-0ae2c394bac2",
+            "turn_id": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+            "call_id": "call_f6c64b80e7a1443e9659e7f913b58a91"
+          },
+          {
+            "thread_id": "01a21f98-e72c-7751-abaf-0ae2c394bac2",
+            "turn_id": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+            "call_id": "call_b2210a9110a343edb0f3bf0d9f9c94f0"
+          },
+          {
+            "thread_id": "01a21f9b-3864-7e13-8568-26ae658daa05",
+            "turn_id": "01a21f9b-38e1-7983-bffc-c18d78091375",
+            "call_id": "call_81aecfdd0d8e404d8887b1e8d83ebeb9"
+          },
+          {
+            "thread_id": "01a21f9b-3864-7e13-8568-26ae658daa05",
+            "turn_id": "01a21f9b-38e1-7983-bffc-c18d78091375",
+            "call_id": "call_796d43e2ba534739add15bd9b8ab985f"
+          },
+          {
+            "thread_id": "01a21f9b-3864-7e13-8568-26ae658daa05",
+            "turn_id": "01a21f9b-38e1-7983-bffc-c18d78091375",
+            "call_id": "call_8cf1e68c052f41db8e22b0dad13f3530"
+          },
+          {
+            "thread_id": "01a21f9b-3864-7e13-8568-26ae658daa05",
+            "turn_id": "01a21f9b-38e1-7983-bffc-c18d78091375",
+            "call_id": "call_db5605f49a3c4f1eb4a97b4e1edbf622"
+          },
+          {
+            "thread_id": "01a21f9b-3864-7e13-8568-26ae658daa05",
+            "turn_id": "01a21f9b-38e1-7983-bffc-c18d78091375",
+            "call_id": "call_0d34c6f7776941f496d118033b0ee566"
+          },
+          {
+            "thread_id": "01a21f9b-3864-7e13-8568-26ae658daa05",
+            "turn_id": "01a21f9b-38e1-7983-bffc-c18d78091375",
+            "call_id": "call_0b8e68a680404cb083d7b8a47b4ff1ec"
+          },
+          {
+            "thread_id": "01a21f9b-3864-7e13-8568-26ae658daa05",
+            "turn_id": "01a21f9b-38e1-7983-bffc-c18d78091375",
+            "call_id": "call_f4eb17b870c1461f8f90c09c4e097fc5"
+          }
+        ],
+        "opportunities": 11,
+        "supported_reminders": 0,
+        "qualification": "Raw GX scientific reminder and material linkage; if one occurs, independent review is required to mark support. Stock has no GX close-op/reminder."
+      },
+      "events": [
+        {
+          "event_id": 57,
+          "kind": "v6.decision.committed",
+          "ts": "2026-11-28T00:40:43.904Z"
+        },
+        {
+          "event_id": 107,
+          "kind": "v6.decision.committed",
+          "ts": "2026-11-28T00:46:49.746Z"
+        },
+        {
+          "event_id": 110,
+          "kind": "v6.run.closed",
+          "ts": "2026-11-28T00:46:49.847Z"
+        }
+      ],
+      "critical_sources_examined": {
+        "denominator": 2,
+        "archive_read": true,
+        "paper_use_supported_by_judge": true
+      },
+      "earliest_adoption_supported_by_blind_reader": {
+        "label": "D2",
+        "statement": "BRENDA 2026.1 row 3.2.1.10/specific_activity/59 gives 3.9 for the yeast enzyme on α-pNPG at pH 7 and 30 °C and links PMID 24649402. Its unit and strain fields are blank. Publisher return E2 for Deng et al., FEBS Open Bio 4 (2014), 200–212, DOI 10.1016/j.fob.2014.02.004, PMCID PMC3953731, Table 2 (JATS t0010), gives “3.9 (54)” and “7.2 (100)” in the Ima3p column for α-pNPG and isomaltose. The heading supplies μmol/min/mg. The note identifies the denominator, conditions and mean of five experiments. The ratio 100 × 3.9/7.2 rounds to 54%. The Introduction (s0005) identifies S288c as genome context. Experimental procedures (s0080) identify CEN.PK113-5D as expression host. Publish a single α-pNPG result. Saccharomyces cerevisiae Ima3p (archive accession P0CW40) had a mean specific activity of 3.9 μmol/min/mg with 5 mM 4-nitrophenyl α-D-glucopyranoside at pH 7.0 and 30 °C (five experiments). Retain W1’s 54 as relative velocity in percent of the same enzyme’s isomaltose value (7.2 μmol/min/mg = 100%). W1 adds zero independent measurements. Remove the S288C strain assignment, leave the source strain unknown and record CEN.PK113-5D in the expression-host field.",
+        "seconds_from_submission": 487.625,
+        "seconds_from_verified_lead_delivery": 363.088
+      },
+      "seconds_from_verified_lead_delivery_to_accepted_final_use_upper_bound": 363.19,
+      "human_scientific_interventions_excluding_preregistered_delivery": 0,
+      "grade": {
+        "criteria": {
+          "conditions": {
+            "mark": "pass",
+            "reason": "All three conditions match the α-pNPG assay.",
+            "report_support": "“with 5 mM 4-nitrophenyl α-D-glucopyranoside at pH 7.0 and 30 °C”",
+            "source_locator": "E2, Table 2 (JATS t0010), table_note: pNPG_mM = 5, pH = 7, temperature_C = 30. E1, assay_annotation, also specifies “pH 7.0, 30°C”."
+          },
+          "counterevidence": {
+            "mark": "pass",
+            "reason": "The table heading gives the unit for 3.9; the note defines the bracketed 54 as a percentage. Since 100 × 3.9/7.2 rounds to 54, W1 repeats the same result on a relative scale.",
+            "report_support": "“a mean specific activity of 3.9 μmol/min/mg” and “Retain W1’s 54 as relative velocity in percent of the same enzyme’s isomaltose value (7.2 μmol/min/mg = 100%). W1 adds zero independent measurements.”",
+            "source_locator": "W1 cites “Deng et al. (2014), Table 2, Ima3p”. E2, Table 2 (t0010), Ima3p: α-pNPG “3.9 (54)”, Isomaltose “7.2 (100)”; heading “μmol/min/mg”; bracket note “relative velocity in percent of that enzyme's isomaltose velocity”."
+          },
+          "locator": {
+            "mark": "pass",
+            "reason": "The report identifies the exact archive row and the table in its linked paper.",
+            "report_support": "“BRENDA 2026.1 row 3.2.1.10/specific_activity/59” and “Deng et al., FEBS Open Bio 4 (2014), 200–212, DOI 10.1016/j.fob.2014.02.004, PMCID PMC3953731, Table 2 (JATS t0010)”",
+            "source_locator": "E1, BRENDA 2026.1, 3.2.1.10/specific_activity/59, linked_pubmed 24649402; E2, PMID 24649402, DOI 10.1016/j.fob.2014.02.004, Table 2 (JATS t0010), Ima3p column."
+          },
+          "protein": {
+            "mark": "pass",
+            "reason": "The report attributes the measurement to the paper’s Ima3p column and the accession to the archive.",
+            "report_support": "“Saccharomyces cerevisiae Ima3p (archive accession P0CW40)” and “in the Ima3p column for α-pNPG and isomaltose”",
+            "source_locator": "E1, 3.2.1.10/specific_activity/59: organism_field “Saccharomyces cerevisiae”, accession P0CW40. E2, Table 2 (t0010), Ima3p column, α-pNPG row: “3.9 (54)”."
+          },
+          "strain": {
+            "mark": "pass",
+            "reason": "Neither the genome discussed nor the expression host establishes the protein’s native source strain.",
+            "report_support": "“The Introduction (s0005) identifies S288c as genome context.” “Remove the S288C strain assignment, leave the source strain unknown and record CEN.PK113-5D in the expression-host field.”",
+            "source_locator": "E1, strain_field: null. E2, Introduction / s0005: “S288c is the genome discussed.” Experimental procedures / s0080: “The reported expression host is CEN.PK113-5D.”"
+          },
+          "substrate": {
+            "mark": "pass",
+            "reason": "The report identifies α-pNPG as the substrate for 3.9 and the same enzyme’s isomaltose velocity as the denominator for 54%.",
+            "report_support": "“Publish a single α-pNPG result.” The report names “4-nitrophenyl α-D-glucopyranoside” and specifies “the same enzyme’s isomaltose value (7.2 μmol/min/mg = 100%).”",
+            "source_locator": "E1, assay_annotation: “substrate 4-nitrophenyl alpha-D-glucopyranoside”. E2, Table 2 (t0010), Ima3p: α-pNPG “3.9 (54)”, Isomaltose “7.2 (100)”; the bracket note specifies “that enzyme's isomaltose velocity”."
+          },
+          "uncertainty": {
+            "mark": "pass",
+            "reason": "Five is the number of experiments summarized by the one published α-pNPG mean, not the number of independently sourced result records. No individual experiment values are inferred.",
+            "report_support": "“Publish a single α-pNPG result.” The report calls 3.9 a “mean specific activity” from “five experiments” and states “W1 adds zero independent measurements.”",
+            "source_locator": "E2, Table 2 (t0010), Ima3p α-pNPG cell “3.9 (54)”; table_note.summary: “mean of five experiments”. E1 links the same paper (PMID 24649402), and W1 cites its Table 2, Ima3p column."
+          }
+        },
+        "denominator": 7,
+        "first_adoption": "D2",
+        "packet_sha256": "b55355c23d6b7614e527b35232411a7257867122269db60ff8ad5ca7b366cd57",
+        "passed": 7,
+        "turn": "01a21fa1-53c9-77c1-a805-3098d8869a4d"
+      },
+      "judge_sessions": [
+        {
+          "thread": "01a21fa1-4f28-7870-9089-91d53e76ae70",
+          "session": "sessions/2026/11/28/rollout-2026-11-28T00-49-56-01a21fa1-4f28-7870-9089-91d53e76ae70.jsonl",
+          "session_sha256": "95d7b263998a988d756b4aba32841a5346742f0a7e64e9ad66ac184cf1aa1750",
+          "id": "01a21fa1-53c9-77c1-a805-3098d8869a4d",
+          "model": "gpt-6.2-astra",
+          "effort": "max",
+          "started": "2026-11-28T00:49:59.690Z"
+        }
+      ],
+      "anonymous_packet_sha256": "b55355c23d6b7614e527b35232411a7257867122269db60ff8ad5ca7b366cd57"
+    }
+  ],
+  "limits": "One paired archival question; independent scientific support uses blind judgement. Elapsed-to-close is an upper bound on first adoption. A fact not witnessed remains null.",
+  "candidate": "5904a4fdac3b0267a80fc7b59d3c00427a4871d4"
+}

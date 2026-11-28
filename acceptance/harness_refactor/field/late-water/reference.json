@@ -1,0 +1,100 @@
+{
+  "archive": "../hydro/a/usgs.json",
+  "archive_sha256": "03c1879879b8c2fdff492ae438cc0c3f3f968d186f30b6c30db533b44a7bd336",
+  "archived_query": "http://waterservices.usgs.gov/nwis/dv/format=json&sites=01646500,01651000&parameterCd=00060&startDT=2023-04-01&endDT=2023-04-03&statCd=00003&siteStatus=all",
+  "reference_design": "Only the pinned raw archive supplies measurements. Canonical JSON comparison checks the entire timeSeries subtree of each separately serialized attachment.",
+  "statistic": "Percent decrease = 100 × (first daily mean − last daily mean) / first daily mean; three daily means span two day-to-day intervals.",
+  "stations": {
+    "01646500": {
+      "station_name": "POTOMAC RIVER NEAR WASH, DC LITTLE FALLS PUMP STA",
+      "unit": "ft3/s",
+      "parameter_code": "00060",
+      "statistic_code": "00003",
+      "attachment": "first-station.json",
+      "attachment_sha256": "4fe03052c201cd429d89fd29150c747099f72045efbbd65be5c2f68c144b279c",
+      "raw_json_pointer": "/value/timeSeries/0",
+      "canonical_timeSeries_sha256": "ec3f623707a388f1fa3bcd6913113d8dafa827730fa4905a2f5e820992ed6d02",
+      "observations_from_archive": [
+        {
+          "value": "9980",
+          "qualifiers": [
+            "A"
+          ],
+          "dateTime": "2023-04-01T00:00:00.000"
+        },
+        {
+          "value": "9230",
+          "qualifiers": [
+            "A"
+          ],
+          "dateTime": "2023-04-02T00:00:00.000"
+        },
+        {
+          "value": "8630",
+          "qualifiers": [
+            "A"
+          ],
+          "dateTime": "2023-04-03T00:00:00.000"
+        }
+      ],
+      "qualifier_A_definition": "Approved for publication -- Processing and review completed.",
+      "daily_changes_ft3_s": [
+        "-750",
+        "-600"
+      ],
+      "signed_change_ft3_s": "-1350",
+      "drop_percent_exact": "6750/499",
+      "drop_percent": "13.527054"
+    },
+    "01651000": {
+      "station_name": "NORTHWEST BR ANACOSTIA RIVER NR HYATTSVILLE, MD",
+      "unit": "ft3/s",
+      "parameter_code": "00060",
+      "statistic_code": "00003",
+      "attachment": "later-station.json",
+      "attachment_sha256": "d6720b5bf2a6885d47f20d11898e196ecdb2be8c4e5e56f62b5810989e898287",
+      "raw_json_pointer": "/value/timeSeries/1",
+      "canonical_timeSeries_sha256": "c3808399dc739d0cae79ceec7c0299ed09b7fb9c0029916637769ef0300450c0",
+      "observations_from_archive": [
+        {
+          "value": "60.9",
+          "qualifiers": [
+            "A"
+          ],
+          "dateTime": "2023-04-01T00:00:00.000"
+        },
+        {
+          "value": "40.7",
+          "qualifiers": [
+            "A"
+          ],
+          "dateTime": "2023-04-02T00:00:00.000"
+        },
+        {
+          "value": "25.9",
+          "qualifiers": [
+            "A"
+          ],
+          "dateTime": "2023-04-03T00:00:00.000"
+        }
+      ],
+      "qualifier_A_definition": "Approved for publication -- Processing and review completed.",
+      "daily_changes_ft3_s": [
+        "-20.2",
+        "-14.8"
+      ],
+      "signed_change_ft3_s": "-35.0",
+      "drop_percent_exact": "5000/87",
+      "drop_percent": "57.471264"
+    }
+  },
+  "larger_proportional_decrease_site": "01651000",
+  "larger_absolute_decrease_site": "01646500",
+  "difference_percentage_points_exact": "1907750/43413",
+  "difference_percentage_points": "43.944210",
+  "limitations": [
+    "Both stations have approved daily means. The qualifier supplies no numerical uncertainty interval.",
+    "Three daily aggregates do not determine subdaily trajectories or event timing.",
+    "These descriptive changes do not establish runoff causes, statistical significance or a general recession law."
+  ]
+}

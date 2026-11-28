@@ -1,0 +1,207 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8frjb04ng1edrvg",
+  "goal": "For USGS station 01651000 in the supplied archive, which pair of consecutive days had the largest absolute change in daily mean discharge? Report the dates, both readings, direction, and magnitude with units. What does this record establish about a trend at the station?\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_1cf70c5fc59e1d7a3a40777203ae0d898c1c94fdeba35f3a09df23e5bc5480f0",
+    "op_digest": "3384607af0a42440e43cb45c78700cf35a89a5209f8b481f310ffecf8259decb",
+    "requested_event": 26,
+    "committed_event": 31,
+    "closed_event": 33,
+    "closed_utc": "2026-11-28T00:25:08.020Z",
+    "operation": {
+      "claim_refs": [
+        "gxa_01m8frmgdvqrx9czx9"
+      ],
+      "op": "close_run",
+      "reason": "Both consecutive-day changes in the supplied archive have been compared, and its temporal scope has been assessed.",
+      "unresolved": [
+        "The three days of observations are insufficient to establish a long-term discharge trend at this station."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_1cf70c5fc59e1d7a3a40777203ae0d898c1c94fdeba35f3a09df23e5bc5480f0",
+    "task_id": "gxt_01m8frjb3584974c79",
+    "thread_id": "01a21f89-3332-72b0-8cac-c8121f8ed6e9",
+    "turn_id": "01a21f89-3368-7490-8918-9f7c0d46ce1f",
+    "rationale": "At USGS station 01651000, daily mean discharge fell from 60.9 ft³/s on April 1 to 40.7 ft³/s on April 2, 2023, a decrease of 20.2 ft³/s. It then fell by 14.8 ft³/s to 25.9 ft³/s on April 3. The first decrease was the largest in the archive.",
+    "reason": "Both consecutive-day changes in the supplied archive have been compared, and its temporal scope has been assessed.",
+    "unresolved": [
+      "The three days of observations are insufficient to establish a long-term discharge trend at this station."
+    ],
+    "claim_refs": [
+      "gxa_01m8frmgdvqrx9czx9"
+    ],
+    "evidence_refs": [
+      "gxa_01m8frjb0y7pntay8a"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [],
+    "rendered": {
+      "reason": "Both consecutive-day changes in the supplied archive have been compared, and its temporal scope has been assessed.",
+      "rationale": "At USGS station 01651000, daily mean discharge fell from 60.9 ft³/s on April 1 to 40.7 ft³/s on April 2, 2023, a decrease of 20.2 ft³/s. It then fell by 14.8 ft³/s to 25.9 ft³/s on April 3. The first decrease was the largest in the archive.",
+      "unresolved": [
+        "The three days of observations are insufficient to establish a long-term discharge trend at this station."
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8frjb0y7pntay8a",
+      "sha256": "03c1879879b8c2fdff492ae438cc0c3f3f968d186f30b6c30db533b44a7bd336",
+      "bytes": 4535,
+      "role": "observation"
+    }
+  ],
+  "predictions": [],
+  "exploratory_claims": [
+    {
+      "hypothesis_id": "gxh_01m8frn7m7659qyc82",
+      "statement": "The supplied station record is too short to establish a long-term trend in daily mean discharge.",
+      "scope": "The archived Northwest Branch Anacostia River series near Hyattsville, Maryland.",
+      "criteria": "A long-term trend requires observations over a time span sufficient to distinguish sustained change from short-term fluctuations.",
+      "decision_scope": "run",
+      "limitations": "The comparison describes the observed dates only.",
+      "lead_interpretation": {
+        "proposal_ref": "gxa_01m8frmgdvqrx9czx9",
+        "proposed_level": "insufficient",
+        "rationale": "Daily mean discharge decreased across both adjacent-day intervals, with the larger drop in the first interval. All observations come from one brief period."
+      },
+      "evidence_refs": [
+        "gxa_01m8frjb0y7pntay8a"
+      ],
+      "decision_delivery": {
+        "brief_sha256": "6b640152ea059d10fa85bc90c5ce8e212f77ff3558cb838ba7b2854a9b37b383",
+        "brief_turn_id": "01a21f89-3368-7490-8918-9f7c0d46ce1f",
+        "context_ref": "gxcx_01m8frjb35ftg7bcdm",
+        "delivery_receipt": "start:262e7de9-24f8-4b11-ad23-dbcef652f721",
+        "metric_refs": [],
+        "observations": [],
+        "snapshot_cursor": 14,
+        "state": "acknowledged",
+        "thread_id": "01a21f89-3332-72b0-8cac-c8121f8ed6e9",
+        "turn_id": "01a21f89-3368-7490-8918-9f7c0d46ce1f"
+      },
+      "source_records": [
+        {
+          "artifact_ref": "gxa_01m8frjb0y7pntay8a",
+          "kind": "run_input",
+          "output_provenance": {
+            "applicability_scopes": [],
+            "artifact_ref": "gxa_01m8frjb0y7pntay8a",
+            "data_refs": [],
+            "dependencies": {
+              "acquisition": [],
+              "data": [],
+              "processing": [],
+              "publication": [],
+              "sample": [],
+              "sampling": [],
+              "source": []
+            },
+            "first_event_id": 5,
+            "independence_complete": false,
+            "job_id": null,
+            "nature": "unclassified",
+            "original_inputs_grounded": false,
+            "original_observations": [],
+            "reason": "No pinned declaration or original acquisition receipt",
+            "record_kind": "unclassified",
+            "sha256": "03c1879879b8c2fdff492ae438cc0c3f3f968d186f30b6c30db533b44a7bd336",
+            "unknown_dependencies": [
+              "data",
+              "acquisition",
+              "sample",
+              "source",
+              "publication",
+              "processing",
+              "sampling"
+            ],
+            "upstream_natures": []
+          },
+          "record_nature": "unclassified",
+          "ref": "gxa_01m8frjb0y7pntay8a",
+          "sha256": "03c1879879b8c2fdff492ae438cc0c3f3f968d186f30b6c30db533b44a7bd336",
+          "source_class": "input"
+        }
+      ],
+      "claim_revision_id": "gxh_01m8frn7m7659qyc82@1",
+      "decision_id": "gxa_1cf70c5fc59e1d7a3a40777203ae0d898c1c94fdeba35f3a09df23e5bc5480f0",
+      "assessment_cursor": 14,
+      "availability_cursor": 25,
+      "level": "insufficient",
+      "stage": "idea",
+      "direction": "undetermined",
+      "results": [],
+      "gaps": [],
+      "preexisting_result": false,
+      "supporting_refs": [],
+      "opposing_refs": [],
+      "reviewed_evidence": [],
+      "disputed_extractions": [],
+      "replication": [],
+      "reasons": [
+        "No applicable independently reviewed evidence or classified scientific result is cited."
+      ],
+      "utc": "2026-11-28T00:25:07.976Z",
+      "event_id": 25,
+      "event": "v6.claim.adopted",
+      "author": "01a21f89-3332-72b0-8cac-c8121f8ed6e9",
+      "goal_version": 1,
+      "classification": "unregistered_interpretation"
+    }
+  ],
+  "comparison_plans": [],
+  "jobs": [],
+  "deliveries": [],
+  "routes": {
+    "modules": [],
+    "real_turn_overlaps": [],
+    "job_turn_overlaps": [],
+    "handoffs": []
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[0].reason",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "b913a9cf6d460efe6fc170c340aa0a003bd824db791ac92fd9dbfb49f2714672",
+      "event_id": 22,
+      "corrected_decision_event": 31
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "ops",
+      "previous_rejections": 1,
+      "reason": "comparison_action_ambiguous",
+      "submission": "4ad66b8252d8bb27c784a726307f568935b24c30f9b11112ce8b183ea3342275",
+      "event_id": 23,
+      "corrected_decision_event": 31
+    }
+  ],
+  "invocation": {
+    "action": "export_closed",
+    "before": {
+      "jobs": 0,
+      "host_turns": 1
+    },
+    "after": {
+      "jobs": 0,
+      "host_turns": 1
+    },
+    "added": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "command": "gx-v-6/science-assets-slim/bin/gx-p0 research --state gx-v-6/harness-refactor-live/slim-streamflow-observation/state --run-id gxr_01m8frjb04ng1edrvg --timeout 90.0"
+  }
+}

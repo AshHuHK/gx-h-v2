@@ -1,0 +1,299 @@
+{
+  "schema": "gx.field.module_slot_after_material/1",
+  "run_id": "gxr_01m8fsxs8ntscbmg1m",
+  "snapshot": {
+    "event_id": 95,
+    "ts": "2026-11-28T00:50:58.045Z",
+    "kind": "budget.settled"
+  },
+  "run_status": {
+    "run_status": "ACTIVE",
+    "goal_status": "OPEN"
+  },
+  "recipient": {
+    "module_instance_id": "module_9be3a61d84ebd7893bb95196aacc5c71",
+    "budget_ref": "gxb_01m8fsz1hh1z8zbs36",
+    "task_id": "gxt_01m8fsz1hkpn4c1myz",
+    "status": "CANCELLED",
+    "attempt": 2,
+    "attempts_consumed": 1,
+    "max_attempts": 3
+  },
+  "evidence_ledger": [
+    {
+      "event_id": 30,
+      "ts": "2026-11-28T00:47:58.001Z",
+      "kind": "budget.child_opened",
+      "subject_id": "gxb_01m8fsz1hh1z8zbs36",
+      "limits": {
+        "api_calls": 6,
+        "cpu_seconds": 60,
+        "job_submissions": 1,
+        "tokens": 131072,
+        "worker_tasks": 1
+      }
+    },
+    {
+      "event_id": 31,
+      "ts": "2026-11-28T00:47:58.004Z",
+      "kind": "task.created",
+      "subject_id": "gxt_01m8fsz1hkpn4c1myz",
+      "new_state": "PENDING"
+    },
+    {
+      "event_id": 33,
+      "ts": "2026-11-28T00:47:58.005Z",
+      "kind": "budget.reserved",
+      "subject_id": "gxb_01m8fsz1hh1z8zbs36",
+      "new_state": "HELD",
+      "reservation_ref": "rsv_01m8fsz1hn81pfb4av",
+      "amounts": {
+        "worker_tasks": 1
+      }
+    },
+    {
+      "event_id": 34,
+      "ts": "2026-11-28T00:47:58.005Z",
+      "kind": "budget.settled",
+      "subject_id": "gxb_01m8fsz1hh1z8zbs36",
+      "prev_state": "HELD",
+      "new_state": "SETTLED",
+      "reservation_ref": "rsv_01m8fsz1hn81pfb4av",
+      "actual": {
+        "worker_tasks": 1
+      }
+    },
+    {
+      "event_id": 51,
+      "ts": "2026-11-28T00:49:15.340Z",
+      "kind": "task.transition",
+      "subject_id": "gxt_01m8fsz1hkpn4c1myz",
+      "prev_state": "CLAIMED",
+      "new_state": "READY",
+      "reason": "GX module report contract reached 2 distinct structural failures in this attempt; 1 of 3 attempts consumed, the next is open"
+    },
+    {
+      "event_id": 54,
+      "ts": "2026-11-28T00:49:15.580Z",
+      "kind": "budget.settled",
+      "subject_id": "gxb_01m8fsz1hh1z8zbs36",
+      "prev_state": "HELD",
+      "new_state": "SETTLED",
+      "confidence": "PROVIDER_CONFIRMED",
+      "actual": {
+        "api_calls": 1,
+        "tokens": 59535
+      }
+    },
+    {
+      "event_id": 55,
+      "ts": "2026-11-28T00:49:15.630Z",
+      "kind": "budget.reserved",
+      "subject_id": "gxb_01m8fsz1hh1z8zbs36",
+      "new_state": "HELD",
+      "reservation_ref": "rsv_01m8ft1dbevjtwn7jm",
+      "amounts": {
+        "api_calls": 1,
+        "tokens": 65536
+      }
+    },
+    {
+      "event_id": 64,
+      "ts": "2026-11-28T00:49:33.346Z",
+      "kind": "v62.module.reported",
+      "subject_id": "module_66a5d57d2e500d09b5205221b47e53a2",
+      "status": "COMPLETE",
+      "report_ref": "gxa_c83c1b9f88838bc8c91374e2d2a24a7344349d77fdd630284f2642ef23df8074"
+    },
+    {
+      "event_id": 72,
+      "ts": "2026-11-28T00:49:53.505Z",
+      "kind": "v621.module.material_granted",
+      "subject_id": "module_9be3a61d84ebd7893bb95196aacc5c71",
+      "scope": "module:module_9be3a61d84ebd7893bb95196aacc5c71",
+      "previous_task_id": "gxt_01m8fsz1hkpn4c1myz",
+      "artifact_ref": "gxa_01m8ft206mp9d6msve",
+      "sha256": "d6720b5bf2a6885d47f20d11898e196ecdb2be8c4e5e56f62b5810989e898287"
+    },
+    {
+      "event_id": 73,
+      "ts": "2026-11-28T00:49:53.505Z",
+      "kind": "task.transition",
+      "subject_id": "gxt_01m8fsz1hkpn4c1myz",
+      "prev_state": "CLAIMED",
+      "new_state": "CANCELLED",
+      "reason": "The PI assigned a new scoped material"
+    },
+    {
+      "event_id": 74,
+      "ts": "2026-11-28T00:49:53.506Z",
+      "kind": "research.pi.feedback",
+      "subject_id": "pif_a889421d59ab9d5626b56237c660382c",
+      "scope": "module:module_9be3a61d84ebd7893bb95196aacc5c71",
+      "artifact_refs": [
+        "gxa_01m8ft206mp9d6msve"
+      ],
+      "feedback_id": "pif_a889421d59ab9d5626b56237c660382c"
+    },
+    {
+      "event_id": 80,
+      "ts": "2026-11-28T00:50:08.292Z",
+      "kind": "budget.settled",
+      "subject_id": "gxb_01m8fsz1hh1z8zbs36",
+      "prev_state": "HELD",
+      "new_state": "SETTLED",
+      "confidence": "ESTIMATED",
+      "actual": {
+        "api_calls": 1,
+        "tokens": 65536
+      },
+      "reservation_ref": "rsv_01m8ft1dbevjtwn7jm"
+    },
+    {
+      "event_id": 82,
+      "ts": "2026-11-28T00:50:08.453Z",
+      "kind": "v62.module.reported",
+      "subject_id": "module_9be3a61d84ebd7893bb95196aacc5c71",
+      "report_ref": "gxa_bb829db6a7e1865126bf4314ab04ccf13af5d20bd6cee82a66e41f612f999acd",
+      "report_sha256": "d2d0604bbd474f8d0ee0344b8b20da434979ffd3490e57ac3808ad0a87b0289f",
+      "status": "PARTIAL",
+      "author": {
+        "context_ref": "gxcx_01m8fsz1hksj3k52xs",
+        "kind": "GX",
+        "task_id": "gxt_01m8fsz1hkpn4c1myz"
+      },
+      "source_refs": [
+        "gxa_01m8fsxs9pbtyh29ev"
+      ]
+    },
+    {
+      "event_id": 84,
+      "ts": "2026-11-28T00:50:08.454Z",
+      "kind": "budget.released",
+      "subject_id": "gxb_01m8fsxs8vvp6dswct",
+      "prev_state": "HELD",
+      "new_state": "SETTLED",
+      "reason": "Module closed and its original reservations settled",
+      "charged": {
+        "api_calls": 2,
+        "tokens": 125071,
+        "worker_tasks": 1
+      },
+      "held": {
+        "api_calls": 6,
+        "cpu_seconds": 60,
+        "job_submissions": 1,
+        "tokens": 131072,
+        "worker_tasks": 1
+      }
+    },
+    {
+      "event_id": 93,
+      "ts": "2026-11-28T00:50:27.871Z",
+      "kind": "v6.decision.committed",
+      "subject_id": "gxa_a0291063fe995c677c558c2d5c103628e48078a98922923744354a5db5a5a8ff"
+    },
+    {
+      "event_id": 94,
+      "ts": "2026-11-28T00:50:27.872Z",
+      "kind": "research.pi.question",
+      "subject_id": "piq_89689de7f1b64f10f2c19c8596faa1f3",
+      "blocking": true,
+      "question_id": "piq_89689de7f1b64f10f2c19c8596faa1f3"
+    },
+    {
+      "event_id": 95,
+      "ts": "2026-11-28T00:50:58.045Z",
+      "kind": "budget.settled",
+      "subject_id": "gxb_01m8fsxs8vvp6dswct",
+      "prev_state": "HELD",
+      "new_state": "SETTLED",
+      "confidence": "ESTIMATED",
+      "actual": {
+        "api_calls": 1,
+        "tokens": 65536
+      }
+    }
+  ],
+  "partial_report_reason": [
+    "module worker task allowance exhausted"
+  ],
+  "observation": {
+    "author": "GX",
+    "worker_tasks_debit_count": 1,
+    "successor_tasks_created_for_recipient": 0,
+    "jobs": 0,
+    "child_budget_at_closure": {
+      "tokens": {
+        "limit": 131072,
+        "spent": 125071,
+        "reserved": 0,
+        "remaining": 6001
+      },
+      "api_calls": {
+        "limit": 6,
+        "spent": 2,
+        "reserved": 0,
+        "remaining": 4
+      },
+      "worker_tasks": {
+        "limit": 1,
+        "spent": 1,
+        "reserved": 0,
+        "remaining": 0
+      }
+    },
+    "run_ledger_at_snapshot": {
+      "tokens": {
+        "limit": 4503599627370496,
+        "spent": 768642,
+        "reserved": 0,
+        "remaining": 4503599626601854
+      },
+      "api_calls": {
+        "limit": 64,
+        "spent": 6,
+        "reserved": 0,
+        "remaining": 58
+      },
+      "worker_tasks": {
+        "limit": 60,
+        "spent": 2,
+        "reserved": 0,
+        "remaining": 58
+      }
+    },
+    "run_and_child_held_reservations": 0,
+    "parent_workspace_run_envelope_held": 1,
+    "nonempty_task_holds": 0,
+    "not_ended_attempt_wait_markers": [
+      {
+        "wait_id": 2,
+        "reason": "metering",
+        "wait_key": "rsv_01m8ft1dbevjtwn7jm",
+        "started_at": "2026-11-28T00:49:38.253Z",
+        "ready_at": null,
+        "task_id": "gxt_01m8fsz1hkpn4c1myz",
+        "task_status": "CANCELLED",
+        "linked_reservation_status": "SETTLED"
+      },
+      {
+        "wait_id": 4,
+        "reason": "metering",
+        "wait_key": "resume:01a21fa0-b57f-7f40-8d2c-89cb9c980c8f",
+        "started_at": "2026-11-28T00:49:38.491Z",
+        "ready_at": null,
+        "task_id": "gxt_01m8fsz1hkpn4c1myz",
+        "task_status": "CANCELLED",
+        "linked_reservation_status": null
+      }
+    ],
+    "pi_blocking_question": {
+      "event_id": 94,
+      "question_id": "piq_89689de7f1b64f10f2c19c8596faa1f3",
+      "question": "Please attach the promised second station archive when available to complete the comparison in this study.",
+      "blocking": true
+    }
+  },
+  "interpretation": "One worker-task debit funded the initial task. The later PI material cancelled it and the child had zero worker-task room for a new decision. The module published a GX-authored partial. Token/API amounts are accounting entries, including the estimated second turn. No native or Job reservation remains held in the Run or its child accounts. The parent still holds the open Run envelope. Two metering wait markers refer to a cancelled task; the remaining scientific Run wait is the blocking PI question."
+}

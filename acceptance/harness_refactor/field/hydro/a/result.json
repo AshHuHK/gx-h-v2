@@ -1,0 +1,2712 @@
+{
+  "schema": "gx.research-result/1",
+  "run_id": "gxr_01m8fr62qda3k7sf0x",
+  "goal": "A water-resources editor needs to decide whether a three-day station comparison supports an ordered discharge-volume statement. Assess the integrity of the daily records and the volume comparison in parallel. If one researcher sees something that changes how the other should compare the gauges, have them communicate directly while the work is in progress. Decide what the observations and the stated measurement-error scenario actually support. Give a checkable volume difference with units, the observed time span, and any limits on a public conclusion. Preserve a reusable way to repeat this review with fresh observations and make a new decision when the data arrive.\n",
+  "goal_status": "CLOSED",
+  "goal_version": 1,
+  "closure": {
+    "goal_version": 1,
+    "decision_ref": "gxa_b048099af130949333c0c6795332a4af36d2c635f7486655be48088bb66b30a4",
+    "op_digest": "3a11d1ade8bd6aa5251a122093534280e0425580097026cbee0e95b8c635d116",
+    "requested_event": 282,
+    "committed_event": 287,
+    "closed_event": 289,
+    "closed_utc": "2026-11-28T00:29:10.412Z",
+    "operation": {
+      "claim_refs": [],
+      "op": "close_run",
+      "reason": "The common-day integration and the range established under the specified error scenario settle the scoped editorial question. The parallel review and fresh decision are saved as a reusable recipe.",
+      "unresolved": [
+        "A probability or confidence level for the difference would require station-specific error evidence beyond the editor’s assumed bounds. The public comparison applies to integrated volume at these two gauges over the three common days. Subdaily ordering and typical or longer-term flow require observations at those time scales."
+      ]
+    }
+  },
+  "final_decision": {
+    "decision_ref": "gxa_b048099af130949333c0c6795332a4af36d2c635f7486655be48088bb66b30a4",
+    "task_id": "gxt_01m8frjyh2pvndwsmr",
+    "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+    "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+    "rationale": "Publish the three-day ordering. Both USGS series report approved daily mean discharge in ft³/s for April 1–3, 2023. All six means match the prepared record. The auditor communicated the full final day and the construction of the error bounds to the volume analyst. Midnight April 1 to midnight April 4 EDT gives {{metric:gxa_01m8frajqnvs8knbdt:common_minutes}} in common and {{metric:gxa_01m8frajqnvs8knbdt:outside_common_minutes}} excluded. The Potomac at Little Falls integrated to {{metric:gxa_01m8frajqnvs8knbdt:left_L}} and Northwest Branch near Hyattsville to {{metric:gxa_01m8frajqnvs8knbdt:right_L}}, giving Potomac minus Northwest Branch of +{{metric:gxa_01m8frajqnvs8knbdt:difference_L}}. The auditor’s station totals agree on the original common dates, and a separate integration of the same record reproduces the same signed difference. Multiplying each station’s summed daily means by 86,400 s checks the result in cubic feet. Under the editor’s independent ±25% bounds, low Potomac minus high Northwest Branch gives +{{metric:gxa_01m8frajqnvs8knbdt:difference_low_L}}, and the opposite extremes give +{{metric:gxa_01m8frajqnvs8knbdt:difference_high_L}}. The minimum stays positive. The saved daily-gauge-volume-review@1 recipe requires fresh source and volume reviews and a new decision on their joined evidence.",
+    "reason": "The common-day integration and the range established under the specified error scenario settle the scoped editorial question. The parallel review and fresh decision are saved as a reusable recipe.",
+    "unresolved": [
+      "A probability or confidence level for the difference would require station-specific error evidence beyond the editor’s assumed bounds. The public comparison applies to integrated volume at these two gauges over the three common days. Subdaily ordering and typical or longer-term flow require observations at those time scales."
+    ],
+    "claim_refs": [],
+    "evidence_refs": [
+      "gxa_01m8fr62srb8p3b7zm",
+      "gxa_01m8fr62s21kjesqsy",
+      "gxa_01m8fr8d96ky1t45a0",
+      "gxa_01m8frajqnvs8knbdt",
+      "gxa_01m8frbp1g20yp0v17",
+      "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+      "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+    ],
+    "stop_reason": null,
+    "used_endpoints": [
+      {
+        "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5",
+        "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+        "event_id": 272,
+        "reading": {
+          "admission_sha256": "230ce990e1f7c8cf1aad0ea04d57eb284a46738a52d3071f523785cc1bf026a8",
+          "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+          "display": "311938382.06 L",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8fraj9201wcgt44",
+          "manifest_sha256": "3af9772392b595562779dd8753b3aa7817da71886717d3860d67f6bfd365743c",
+          "method": {
+            "id": "discharge-concurrent",
+            "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+            "version": "1"
+          },
+          "metric_id": "right_L",
+          "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5",
+          "op": "decimal/1",
+          "output_name": "paired.json",
+          "places": 2,
+          "provenance_cursor": 127,
+          "raw_value": "311938382.057472",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/right_L"
+          },
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "unit": "L",
+          "value": 311938382.057472
+        }
+      },
+      {
+        "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590",
+        "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+        "event_id": 272,
+        "reading": {
+          "admission_sha256": "230ce990e1f7c8cf1aad0ea04d57eb284a46738a52d3071f523785cc1bf026a8",
+          "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+          "display": "67800724806.02 L",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8fraj9201wcgt44",
+          "manifest_sha256": "3af9772392b595562779dd8753b3aa7817da71886717d3860d67f6bfd365743c",
+          "method": {
+            "id": "discharge-concurrent",
+            "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+            "version": "1"
+          },
+          "metric_id": "difference_L",
+          "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590",
+          "op": "decimal/1",
+          "output_name": "paired.json",
+          "places": 2,
+          "provenance_cursor": 127,
+          "raw_value": "67800724806.02112",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/difference_L"
+          },
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "unit": "L",
+          "value": 67800724806.02112
+        }
+      },
+      {
+        "metric_ref": "metric_1ed80c81335b8c4045f13fdfd1e396d5f9b246c3165a347729a10a0a4d83b1cb",
+        "source_ref": "gxa_01m8fr8d96ky1t45a0",
+        "event_id": 278,
+        "reading": {
+          "metric_id": "difference_L",
+          "artifact_ref": "gxa_01m8fr8d96ky1t45a0",
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "job_id": "gxj_01m8fr8cvr1454bfvx",
+          "output_name": "paired.json",
+          "method": {
+            "id": "discharge-concurrent",
+            "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+            "version": "1"
+          },
+          "admission_sha256": "5cdd1f8f6f7e831e626280ea65ed6b8f8f9613d6a44d75f63b0a14a4ee637a21",
+          "manifest_sha256": "9d3b54faa97def3e7770a2dfbde856aeb2f5a1a2c256b05e78e5005cd8fa40c9",
+          "provenance_cursor": 66,
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "schema": "gx.verified_metric/1",
+          "op": "decimal/1",
+          "reader": "json/1",
+          "unit": "L",
+          "places": 2,
+          "selectors": {
+            "pointer": "/difference_L"
+          },
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "value": 67800724806.02112,
+          "raw_value": "67800724806.02112",
+          "display": "67800724806.02 L",
+          "metric_ref": "metric_1ed80c81335b8c4045f13fdfd1e396d5f9b246c3165a347729a10a0a4d83b1cb"
+        }
+      },
+      {
+        "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255",
+        "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+        "event_id": 274,
+        "reading": {
+          "admission_sha256": "230ce990e1f7c8cf1aad0ea04d57eb284a46738a52d3071f523785cc1bf026a8",
+          "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+          "display": "84906875198.56 L",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8fraj9201wcgt44",
+          "manifest_sha256": "3af9772392b595562779dd8753b3aa7817da71886717d3860d67f6bfd365743c",
+          "method": {
+            "id": "discharge-concurrent",
+            "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+            "version": "1"
+          },
+          "metric_id": "difference_high_L",
+          "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255",
+          "op": "decimal/1",
+          "output_name": "paired.json",
+          "places": 2,
+          "provenance_cursor": 127,
+          "raw_value": "84906875198.55513",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/difference_high_L"
+          },
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "unit": "L",
+          "value": 84906875198.55513
+        }
+      },
+      {
+        "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344",
+        "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+        "event_id": 271,
+        "reading": {
+          "admission_sha256": "419102c76a6f36685aaaec85c261f7d1a7a081b7d0aef366dbcd72c08e5fe6e5",
+          "artifact_ref": "gxa_01m8frbp1g20yp0v17",
+          "display": "311938382.06 L",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8frbncq7b9qbsrz",
+          "manifest_sha256": "de12234942c01c07d6404ebb21980cbaa566e0e22818528b8fc17440aa09451c",
+          "method": {
+            "id": "discharge-marginal",
+            "sha256": "b019b97569d1d81cc7ea407a67a8d79b040a65cfea7d57e84215aa29e2531eda",
+            "version": "1"
+          },
+          "metric_id": "right_L",
+          "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344",
+          "op": "decimal/1",
+          "output_name": "marginal.json",
+          "places": 2,
+          "provenance_cursor": 170,
+          "raw_value": "311938382.057472",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/right_L"
+          },
+          "sha256": "dab650336fcdbec50ef7ea7a99ce1ae85a33b69218e6eb7b84d20831358b3482",
+          "unit": "L",
+          "value": 311938382.057472
+        }
+      },
+      {
+        "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e",
+        "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+        "event_id": 270,
+        "reading": {
+          "admission_sha256": "230ce990e1f7c8cf1aad0ea04d57eb284a46738a52d3071f523785cc1bf026a8",
+          "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+          "display": "4320.00 min",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8fraj9201wcgt44",
+          "manifest_sha256": "3af9772392b595562779dd8753b3aa7817da71886717d3860d67f6bfd365743c",
+          "method": {
+            "id": "discharge-concurrent",
+            "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+            "version": "1"
+          },
+          "metric_id": "common_minutes",
+          "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e",
+          "op": "decimal/1",
+          "output_name": "paired.json",
+          "places": 2,
+          "provenance_cursor": 127,
+          "raw_value": "4320.0",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/common_minutes"
+          },
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "unit": "min",
+          "value": 4320
+        }
+      },
+      {
+        "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1",
+        "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+        "event_id": 271,
+        "reading": {
+          "admission_sha256": "419102c76a6f36685aaaec85c261f7d1a7a081b7d0aef366dbcd72c08e5fe6e5",
+          "artifact_ref": "gxa_01m8frbp1g20yp0v17",
+          "display": "68112663188.08 L",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8frbncq7b9qbsrz",
+          "manifest_sha256": "de12234942c01c07d6404ebb21980cbaa566e0e22818528b8fc17440aa09451c",
+          "method": {
+            "id": "discharge-marginal",
+            "sha256": "b019b97569d1d81cc7ea407a67a8d79b040a65cfea7d57e84215aa29e2531eda",
+            "version": "1"
+          },
+          "metric_id": "left_L",
+          "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1",
+          "op": "decimal/1",
+          "output_name": "marginal.json",
+          "places": 2,
+          "provenance_cursor": 170,
+          "raw_value": "68112663188.07859",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/left_L"
+          },
+          "sha256": "dab650336fcdbec50ef7ea7a99ce1ae85a33b69218e6eb7b84d20831358b3482",
+          "unit": "L",
+          "value": 68112663188.07859
+        }
+      },
+      {
+        "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929",
+        "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+        "event_id": 271,
+        "reading": {
+          "admission_sha256": "419102c76a6f36685aaaec85c261f7d1a7a081b7d0aef366dbcd72c08e5fe6e5",
+          "artifact_ref": "gxa_01m8frbp1g20yp0v17",
+          "display": "4320.00 min",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8frbncq7b9qbsrz",
+          "manifest_sha256": "de12234942c01c07d6404ebb21980cbaa566e0e22818528b8fc17440aa09451c",
+          "method": {
+            "id": "discharge-marginal",
+            "sha256": "b019b97569d1d81cc7ea407a67a8d79b040a65cfea7d57e84215aa29e2531eda",
+            "version": "1"
+          },
+          "metric_id": "left_minutes",
+          "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929",
+          "op": "decimal/1",
+          "output_name": "marginal.json",
+          "places": 2,
+          "provenance_cursor": 170,
+          "raw_value": "4320.0",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/left_minutes"
+          },
+          "sha256": "dab650336fcdbec50ef7ea7a99ce1ae85a33b69218e6eb7b84d20831358b3482",
+          "unit": "min",
+          "value": 4320
+        }
+      },
+      {
+        "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf",
+        "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+        "event_id": 272,
+        "reading": {
+          "admission_sha256": "230ce990e1f7c8cf1aad0ea04d57eb284a46738a52d3071f523785cc1bf026a8",
+          "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+          "display": "50694574413.49 L",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8fraj9201wcgt44",
+          "manifest_sha256": "3af9772392b595562779dd8753b3aa7817da71886717d3860d67f6bfd365743c",
+          "method": {
+            "id": "discharge-concurrent",
+            "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+            "version": "1"
+          },
+          "metric_id": "difference_low_L",
+          "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf",
+          "op": "decimal/1",
+          "output_name": "paired.json",
+          "places": 2,
+          "provenance_cursor": 127,
+          "raw_value": "50694574413.48711",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/difference_low_L"
+          },
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "unit": "L",
+          "value": 50694574413.48711
+        }
+      },
+      {
+        "metric_ref": "metric_a266e6d133f6ed7e872d84f827599542b762484b146fb2e8f524508dd84f956b",
+        "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+        "event_id": 273,
+        "reading": {
+          "admission_sha256": "419102c76a6f36685aaaec85c261f7d1a7a081b7d0aef366dbcd72c08e5fe6e5",
+          "artifact_ref": "gxa_01m8frbp1g20yp0v17",
+          "display": "4320.00 min",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8frbncq7b9qbsrz",
+          "manifest_sha256": "de12234942c01c07d6404ebb21980cbaa566e0e22818528b8fc17440aa09451c",
+          "method": {
+            "id": "discharge-marginal",
+            "sha256": "b019b97569d1d81cc7ea407a67a8d79b040a65cfea7d57e84215aa29e2531eda",
+            "version": "1"
+          },
+          "metric_id": "right_minutes",
+          "metric_ref": "metric_a266e6d133f6ed7e872d84f827599542b762484b146fb2e8f524508dd84f956b",
+          "op": "decimal/1",
+          "output_name": "marginal.json",
+          "places": 2,
+          "provenance_cursor": 170,
+          "raw_value": "4320.0",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/right_minutes"
+          },
+          "sha256": "dab650336fcdbec50ef7ea7a99ce1ae85a33b69218e6eb7b84d20831358b3482",
+          "unit": "min",
+          "value": 4320
+        }
+      },
+      {
+        "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b",
+        "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+        "event_id": 270,
+        "reading": {
+          "admission_sha256": "230ce990e1f7c8cf1aad0ea04d57eb284a46738a52d3071f523785cc1bf026a8",
+          "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+          "display": "0.00 min",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8fraj9201wcgt44",
+          "manifest_sha256": "3af9772392b595562779dd8753b3aa7817da71886717d3860d67f6bfd365743c",
+          "method": {
+            "id": "discharge-concurrent",
+            "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+            "version": "1"
+          },
+          "metric_id": "outside_common_minutes",
+          "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b",
+          "op": "decimal/1",
+          "output_name": "paired.json",
+          "places": 2,
+          "provenance_cursor": 127,
+          "raw_value": "0.0",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/outside_common_minutes"
+          },
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "unit": "min",
+          "value": 0
+        }
+      },
+      {
+        "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01",
+        "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+        "event_id": 270,
+        "reading": {
+          "admission_sha256": "230ce990e1f7c8cf1aad0ea04d57eb284a46738a52d3071f523785cc1bf026a8",
+          "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+          "display": "68112663188.08 L",
+          "inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "job_id": "gxj_01m8fraj9201wcgt44",
+          "manifest_sha256": "3af9772392b595562779dd8753b3aa7817da71886717d3860d67f6bfd365743c",
+          "method": {
+            "id": "discharge-concurrent",
+            "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+            "version": "1"
+          },
+          "metric_id": "left_L",
+          "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01",
+          "op": "decimal/1",
+          "output_name": "paired.json",
+          "places": 2,
+          "provenance_cursor": 127,
+          "raw_value": "68112663188.07859",
+          "reader": "json/1",
+          "schema": "gx.verified_metric/1",
+          "scope": {
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+          },
+          "selectors": {
+            "pointer": "/left_L"
+          },
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "unit": "L",
+          "value": 68112663188.07859
+        }
+      }
+    ],
+    "rendered": {
+      "reason": "The common-day integration and the range established under the specified error scenario settle the scoped editorial question. The parallel review and fresh decision are saved as a reusable recipe.",
+      "rationale": "Publish the three-day ordering. Both USGS series report approved daily mean discharge in ft³/s for April 1–3, 2023. All six means match the prepared record. The auditor communicated the full final day and the construction of the error bounds to the volume analyst. Midnight April 1 to midnight April 4 EDT gives 4320.00 min in common and 0.00 min excluded. The Potomac at Little Falls integrated to 68112663188.08 L and Northwest Branch near Hyattsville to 311938382.06 L, giving Potomac minus Northwest Branch of +67800724806.02 L. The auditor’s station totals agree on the original common dates, and a separate integration of the same record reproduces the same signed difference. Multiplying each station’s summed daily means by 86,400 s checks the result in cubic feet. Under the editor’s independent ±25% bounds, low Potomac minus high Northwest Branch gives +50694574413.49 L, and the opposite extremes give +84906875198.56 L. The minimum stays positive. The saved daily-gauge-volume-review@1 recipe requires fresh source and volume reviews and a new decision on their joined evidence.",
+      "unresolved": [
+        "A probability or confidence level for the difference would require station-specific error evidence beyond the editor’s assumed bounds. The public comparison applies to integrated volume at these two gauges over the three common days. Subdaily ordering and typical or longer-term flow require observations at those time scales."
+      ]
+    },
+    "gap_questions": {}
+  },
+  "materials": [
+    {
+      "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+      "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+      "bytes": 1966,
+      "role": "record"
+    },
+    {
+      "artifact_ref": "gxa_01m8fr62srb8p3b7zm",
+      "sha256": "03c1879879b8c2fdff492ae438cc0c3f3f968d186f30b6c30db533b44a7bd336",
+      "bytes": 4535,
+      "role": "upstream_original"
+    }
+  ],
+  "predictions": [],
+  "exploratory_claims": [],
+  "comparison_plans": [],
+  "jobs": [
+    {
+      "job_id": "gxj_01m8fr8cvr1454bfvx",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "discharge-concurrent",
+        "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+          "bytes": 1966,
+          "role": "record",
+          "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:f66d395b337421cd22b9c608f788ee188cc357b5304491874098db6b57f6fa8a",
+        "branch_id": "branch_06e83c682b7d83574351eb827b577a53",
+        "decision_ref": "gxa_4b668b4097445f9cf52ac80dfc432c7326dc3a59b35b0248a9ece8a76ac2b2d7",
+        "exec_key": "3490de57585d7bd9d8857df8a258fff35256e1d074d74cfb1009e9cad7f50da4",
+        "kind": "graph_node",
+        "node_id": "node_141b14356f9463d4aa5327cf7db3e05c",
+        "operation_key": "v6.node:f66d395b337421cd22b9c608f788ee188cc357b5304491874098db6b57f6fa8a",
+        "plan_key": "46b2db46e2444479586e6c7f2a920e1094c7c50906989cea54fe2c3e268aadd3",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "1"
+      },
+      "manifest_sha256": "9d3b54faa97def3e7770a2dfbde856aeb2f5a1a2c256b05e78e5005cd8fa40c9",
+      "outputs": [
+        {
+          "output_name": "paired.json",
+          "artifact_ref": "gxa_01m8fr8d96ky1t45a0",
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "bytes": 852,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fr62qda3k7sf0x/jobs/gxj_01m8fr8cvr1454bfvx",
+            "rel_path": "files/paired.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "common_minutes",
+              "metric_ref": "metric_2225bc688a5caa99a5b44ba2e480ca8f49fe832f3b9b637a350bce678549d71f",
+              "value": 4320,
+              "raw_value": "4320.0",
+              "display": "4320.00 min",
+              "unit": "min",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                278
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "difference_L",
+              "metric_ref": "metric_1ed80c81335b8c4045f13fdfd1e396d5f9b246c3165a347729a10a0a4d83b1cb",
+              "value": 67800724806.02112,
+              "raw_value": "67800724806.02112",
+              "display": "67800724806.02 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                278
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "difference_high_L",
+              "metric_ref": "metric_21acca3832a02c565f39b0a5e7c56e69ae04d79897eb3269d914dca2e8f7cdb4",
+              "value": 84906875198.55513,
+              "raw_value": "84906875198.55513",
+              "display": "84906875198.56 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                278
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "difference_low_L",
+              "metric_ref": "metric_65653b7ffbed41a9ad0be3f20f79b556e4e6b5fff4c936f33270ccdb412db980",
+              "value": 50694574413.48711,
+              "raw_value": "50694574413.48711",
+              "display": "50694574413.49 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                279
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "left_L",
+              "metric_ref": "metric_9981117cbb156d0878f3f9fc7e9f4d7515bf34a86daea35b0dbe2dc7975a470c",
+              "value": 68112663188.07859,
+              "raw_value": "68112663188.07859",
+              "display": "68112663188.08 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                279
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "outside_common_minutes",
+              "metric_ref": "metric_bc178068a0f36f3b5ce1ceed4fce12438f59e398b3974fb9885b76e2469c518c",
+              "value": 0,
+              "raw_value": "0.0",
+              "display": "0.00 min",
+              "unit": "min",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                279
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "right_L",
+              "metric_ref": "metric_473d1f25c6b7c6a13a176dfdaaac55004825fdc2f5223cbf6e18e44285345979",
+              "value": 311938382.057472,
+              "raw_value": "311938382.057472",
+              "display": "311938382.06 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                280
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.hydrometry-paired/1",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03",
+            "channels": [
+              "01646500",
+              "01651000"
+            ],
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "common_minutes": 4320.0,
+            "outside_common_minutes": 0.0,
+            "left_L": 68112663188.07859,
+            "right_L": 311938382.057472,
+            "difference_L": 67800724806.02112,
+            "difference_low_L": 50694574413.48711,
+            "difference_high_L": 84906875198.55513,
+            "left_mean_L_s": 262780.33637376,
+            "right_mean_L_s": 1203.46598016,
+            "support": "positive_duration",
+            "scope": "Volumes integrate over valid simultaneous intervals only. An empty support has zero duration and integrated volume; the mean and ordering there are unknown."
+          },
+          "denominators": {},
+          "lead_delivery_event_ids": [
+            232,
+            278,
+            279,
+            280
+          ]
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8fraj9201wcgt44",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "discharge-concurrent",
+        "sha256": "f9d0cecd18e7019b90eb0abf0db8fe9834d9a8357707970e0261c16616559707",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+          "bytes": 1966,
+          "role": "record",
+          "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:ce70bb87fd57d8a5bf535bb4216e1426dd0787244ef49da93fdcdf6ea80d951a",
+        "branch_id": "branch_0267e0481b4ca17a364560e7ccbcf630",
+        "decision_ref": "gxa_8f7832be689c0ae26111360e6d280b833c76e197ed17caa670e661905d7ad900",
+        "exec_key": "562f86caea912744097f29ac3c3bf21fc1b03281f7bf5f28eb5df141afda019c",
+        "kind": "graph_node",
+        "node_id": "node_8f060563274c750111d1ee8adbe8e51e",
+        "operation_key": "v6.node:ce70bb87fd57d8a5bf535bb4216e1426dd0787244ef49da93fdcdf6ea80d951a",
+        "plan_key": "07bfa7e6b12d3e0ebceed83af7f2295a40a90cb01e4fcc2e89ff473c8027b0e3",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "2"
+      },
+      "manifest_sha256": "3af9772392b595562779dd8753b3aa7817da71886717d3860d67f6bfd365743c",
+      "outputs": [
+        {
+          "output_name": "paired.json",
+          "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+          "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+          "bytes": 852,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fr62qda3k7sf0x/jobs/gxj_01m8fraj9201wcgt44",
+            "rel_path": "files/paired.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "common_minutes",
+              "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e",
+              "value": 4320,
+              "raw_value": "4320.0",
+              "display": "4320.00 min",
+              "unit": "min",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                266,
+                270
+              ],
+              "module_delivery_event_ids": [
+                163
+              ]
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "difference_L",
+              "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590",
+              "value": 67800724806.02112,
+              "raw_value": "67800724806.02112",
+              "display": "67800724806.02 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                266,
+                272
+              ],
+              "module_delivery_event_ids": [
+                163
+              ]
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "difference_high_L",
+              "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255",
+              "value": 84906875198.55513,
+              "raw_value": "84906875198.55513",
+              "display": "84906875198.56 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                266,
+                274
+              ],
+              "module_delivery_event_ids": [
+                163
+              ]
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "difference_low_L",
+              "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf",
+              "value": 50694574413.48711,
+              "raw_value": "50694574413.48711",
+              "display": "50694574413.49 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                266,
+                272
+              ],
+              "module_delivery_event_ids": [
+                191
+              ]
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "left_L",
+              "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01",
+              "value": 68112663188.07859,
+              "raw_value": "68112663188.07859",
+              "display": "68112663188.08 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                266,
+                270
+              ],
+              "module_delivery_event_ids": [
+                191
+              ]
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "outside_common_minutes",
+              "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b",
+              "value": 0,
+              "raw_value": "0.0",
+              "display": "0.00 min",
+              "unit": "min",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                266,
+                270
+              ],
+              "module_delivery_event_ids": [
+                191
+              ]
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "right_L",
+              "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5",
+              "value": 311938382.057472,
+              "raw_value": "311938382.057472",
+              "display": "311938382.06 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                266,
+                272
+              ],
+              "module_delivery_event_ids": [
+                204
+              ]
+            }
+          ],
+          "summary": {
+            "schema": "gx.hydrometry-paired/1",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03",
+            "channels": [
+              "01646500",
+              "01651000"
+            ],
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "common_minutes": 4320.0,
+            "outside_common_minutes": 0.0,
+            "left_L": 68112663188.07859,
+            "right_L": 311938382.057472,
+            "difference_L": 67800724806.02112,
+            "difference_low_L": 50694574413.48711,
+            "difference_high_L": 84906875198.55513,
+            "left_mean_L_s": 262780.33637376,
+            "right_mean_L_s": 1203.46598016,
+            "support": "positive_duration",
+            "scope": "Volumes integrate over valid simultaneous intervals only. An empty support has zero duration and integrated volume; the mean and ordering there are unknown."
+          },
+          "denominators": {},
+          "lead_delivery_event_ids": [
+            266,
+            270,
+            272,
+            274
+          ]
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8frbncq7b9qbsrz",
+      "status": "SUCCEEDED",
+      "method": {
+        "id": "discharge-marginal",
+        "sha256": "b019b97569d1d81cc7ea407a67a8d79b040a65cfea7d57e84215aa29e2531eda",
+        "version": "1"
+      },
+      "parameters": {},
+      "inputs": [
+        {
+          "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+          "bytes": 1966,
+          "role": "record",
+          "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+        }
+      ],
+      "owner": {
+        "attempt_id": "v6.node:09f8aaf3888f95bb6792963d0dd6b94f39e41a95258a395b68f542e968bfc2a9",
+        "branch_id": "branch_4f24740ecec07f5a9c77d5035c54722c",
+        "decision_ref": "gxa_c1c289457defa18705d7b6349dc48a38d6760d96d9782cf26484b16d78b3b2b4",
+        "exec_key": "b80be0badfc57b57c4607b9eb70d129f94362940319357f9c897a9e9375f6be8",
+        "kind": "graph_node",
+        "node_id": "node_8a847a865c7ef8b6c13e538901e4592f",
+        "operation_key": "v6.node:09f8aaf3888f95bb6792963d0dd6b94f39e41a95258a395b68f542e968bfc2a9",
+        "plan_key": "fc14d73c8ab9ac2f590a56f76b81c8f48ac0b507cfe020668e9bbb3a64f23d80",
+        "task_id": null,
+        "workflow_id": "gx.v6.instance",
+        "workflow_version": "3"
+      },
+      "manifest_sha256": "de12234942c01c07d6404ebb21980cbaa566e0e22818528b8fc17440aa09451c",
+      "outputs": [
+        {
+          "output_name": "marginal.json",
+          "artifact_ref": "gxa_01m8frbp1g20yp0v17",
+          "sha256": "dab650336fcdbec50ef7ea7a99ce1ae85a33b69218e6eb7b84d20831358b3482",
+          "bytes": 479,
+          "nature": "analysis",
+          "source_inputs": [
+            {
+              "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+              "bytes": 1966,
+              "role": "record",
+              "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+            }
+          ],
+          "location": {
+            "namespace": "gxr_01m8fr62qda3k7sf0x/jobs/gxj_01m8frbncq7b9qbsrz",
+            "rel_path": "files/marginal.json"
+          },
+          "metrics": [
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "left_L",
+              "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1",
+              "value": 68112663188.07859,
+              "raw_value": "68112663188.07859",
+              "display": "68112663188.08 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                266,
+                271
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "left_minutes",
+              "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929",
+              "value": 4320,
+              "raw_value": "4320.0",
+              "display": "4320.00 min",
+              "unit": "min",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                266,
+                271
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "right_L",
+              "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344",
+              "value": 311938382.057472,
+              "raw_value": "311938382.057472",
+              "display": "311938382.06 L",
+              "unit": "L",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                266,
+                271
+              ],
+              "module_delivery_event_ids": []
+            },
+            {
+              "schema": "gx.verified_metric/1",
+              "metric_id": "right_minutes",
+              "metric_ref": "metric_a266e6d133f6ed7e872d84f827599542b762484b146fb2e8f524508dd84f956b",
+              "value": 4320,
+              "raw_value": "4320.0",
+              "display": "4320.00 min",
+              "unit": "min",
+              "scope": {
+                "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+                "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03"
+              },
+              "lead_delivery_event_ids": [
+                232,
+                266,
+                273
+              ],
+              "module_delivery_event_ids": []
+            }
+          ],
+          "summary": {
+            "schema": "gx.hydrometry-marginals/1",
+            "trial": "USGS 01646500/01651000 2023-04-01..2023-04-03",
+            "channels": [
+              "01646500",
+              "01651000"
+            ],
+            "input_sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23",
+            "left_L": 68112663188.07859,
+            "right_L": 311938382.057472,
+            "left_minutes": 4320.0,
+            "right_minutes": 4320.0,
+            "scope": "Each station has its own support. Marginal coverage alone does not give simultaneous duration, volumes, or the sign of a paired difference."
+          },
+          "denominators": {},
+          "lead_delivery_event_ids": [
+            232,
+            266,
+            271,
+            273
+          ]
+        }
+      ]
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e",
+          "source_ref": "gxa_01m8frajqnvs8knbdt"
+        },
+        {
+          "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590",
+          "source_ref": "gxa_01m8frajqnvs8knbdt"
+        },
+        {
+          "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255",
+          "source_ref": "gxa_01m8frajqnvs8knbdt"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "633aa2a22952",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_01m8frajqnvs8knbdt",
+          "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "193fff234a53",
+            "unit": "L",
+            "value": "67800724806.02 L"
+          },
+          "source_ref": "gxa_01m8frajqnvs8knbdt",
+          "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "3a0daa3de6c3",
+            "unit": "L",
+            "value": "84906875198.56 L"
+          },
+          "source_ref": "gxa_01m8frajqnvs8knbdt",
+          "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255"
+        }
+      ],
+      "lease_id": "gxl_01m8frajvzft5erhvs",
+      "receipt": "exec-1f6df4ff-211f-49ba-93ec-e73aeefbe3e0",
+      "task_id": "gxt_01m8frajv2gekszwmd",
+      "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+      "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+      "scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+      "event_id": 163,
+      "utc": "2026-11-28T00:19:48.157Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf",
+          "source_ref": "gxa_01m8frajqnvs8knbdt"
+        },
+        {
+          "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01",
+          "source_ref": "gxa_01m8frajqnvs8knbdt"
+        },
+        {
+          "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b",
+          "source_ref": "gxa_01m8frajqnvs8knbdt"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "a195d1792e57",
+            "unit": "L",
+            "value": "50694574413.49 L"
+          },
+          "source_ref": "gxa_01m8frajqnvs8knbdt",
+          "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "cebeb5f80f06",
+            "unit": "L",
+            "value": "68112663188.08 L"
+          },
+          "source_ref": "gxa_01m8frajqnvs8knbdt",
+          "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "cdbd39e3f09f",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8frajqnvs8knbdt",
+          "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b"
+        }
+      ],
+      "lease_id": "gxl_01m8frajvzft5erhvs",
+      "receipt": "exec-49d5d0df-80bb-4c34-b65e-d390e772f855",
+      "task_id": "gxt_01m8frajv2gekszwmd",
+      "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+      "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+      "scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+      "event_id": 191,
+      "utc": "2026-11-28T00:20:06.676Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5",
+          "source_ref": "gxa_01m8frajqnvs8knbdt"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "0097474567bd",
+            "unit": "L",
+            "value": "311938382.06 L"
+          },
+          "source_ref": "gxa_01m8frajqnvs8knbdt",
+          "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5"
+        }
+      ],
+      "lease_id": "gxl_01m8frajvzft5erhvs",
+      "receipt": "exec-74933659-c4aa-44ca-b378-f71c3a6441c8",
+      "task_id": "gxt_01m8frajv2gekszwmd",
+      "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+      "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+      "scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+      "event_id": 204,
+      "utc": "2026-11-28T00:20:11.469Z"
+    },
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "6ee01ff24936",
+            "unit": "L",
+            "value": "68112663188.08 L"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1"
+        },
+        {
+          "row": {
+            "id": "left_minutes",
+            "key": "8fe7fa261208",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "50e3265ba174",
+            "unit": "L",
+            "value": "311938382.06 L"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344"
+        },
+        {
+          "row": {
+            "id": "right_minutes",
+            "key": "a266e6d133f6",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_a266e6d133f6ed7e872d84f827599542b762484b146fb2e8f524508dd84f956b"
+        },
+        {
+          "metric_ref": "metric_2225bc688a5caa99a5b44ba2e480ca8f49fe832f3b9b637a350bce678549d71f",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_1ed80c81335b8c4045f13fdfd1e396d5f9b246c3165a347729a10a0a4d83b1cb",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_21acca3832a02c565f39b0a5e7c56e69ae04d79897eb3269d914dca2e8f7cdb4",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_65653b7ffbed41a9ad0be3f20f79b556e4e6b5fff4c936f33270ccdb412db980",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_9981117cbb156d0878f3f9fc7e9f4d7515bf34a86daea35b0dbe2dc7975a470c",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_bc178068a0f36f3b5ce1ceed4fce12438f59e398b3974fb9885b76e2469c518c",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_473d1f25c6b7c6a13a176dfdaaac55004825fdc2f5223cbf6e18e44285345979",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "2225bc688a5c",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_2225bc688a5caa99a5b44ba2e480ca8f49fe832f3b9b637a350bce678549d71f"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "1ed80c81335b",
+            "unit": "L",
+            "value": "67800724806.02 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_1ed80c81335b8c4045f13fdfd1e396d5f9b246c3165a347729a10a0a4d83b1cb"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "21acca3832a0",
+            "unit": "L",
+            "value": "84906875198.56 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_21acca3832a02c565f39b0a5e7c56e69ae04d79897eb3269d914dca2e8f7cdb4"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "65653b7ffbed",
+            "unit": "L",
+            "value": "50694574413.49 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_65653b7ffbed41a9ad0be3f20f79b556e4e6b5fff4c936f33270ccdb412db980"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "9981117cbb15",
+            "unit": "L",
+            "value": "68112663188.08 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_9981117cbb156d0878f3f9fc7e9f4d7515bf34a86daea35b0dbe2dc7975a470c"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "bc178068a0f3",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_bc178068a0f36f3b5ce1ceed4fce12438f59e398b3974fb9885b76e2469c518c"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "473d1f25c6b7",
+            "unit": "L",
+            "value": "311938382.06 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_473d1f25c6b7c6a13a176dfdaaac55004825fdc2f5223cbf6e18e44285345979"
+        }
+      ],
+      "lease_id": "gxl_01m8frdvwcwj976vyb",
+      "receipt": "start:3688d806-4844-4f17-8e1e-1443548b5f33",
+      "task_id": "gxt_01m8frdvw1x844ef1n",
+      "thread_id": "01a21f86-efa6-72b1-8c92-d14293c189be",
+      "turn_id": "01a21f86-efd5-7da1-a1c5-5e36d10ce4e7",
+      "scope": "run",
+      "event_id": 232,
+      "utc": "2026-11-28T00:21:06.648Z"
+    },
+    {
+      "delivery_kind": "brief",
+      "endpoints": [
+        {
+          "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "6ee01ff24936",
+            "unit": "L",
+            "value": "68112663188.08 L"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1"
+        },
+        {
+          "row": {
+            "id": "left_minutes",
+            "key": "8fe7fa261208",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "50e3265ba174",
+            "unit": "L",
+            "value": "311938382.06 L"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344"
+        },
+        {
+          "row": {
+            "id": "right_minutes",
+            "key": "a266e6d133f6",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_a266e6d133f6ed7e872d84f827599542b762484b146fb2e8f524508dd84f956b"
+        },
+        {
+          "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "633aa2a22952",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "cdbd39e3f09f",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "cebeb5f80f06",
+            "unit": "L",
+            "value": "68112663188.08 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "0097474567bd",
+            "unit": "L",
+            "value": "311938382.06 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "193fff234a53",
+            "unit": "L",
+            "value": "67800724806.02 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "a195d1792e57",
+            "unit": "L",
+            "value": "50694574413.49 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "3a0daa3de6c3",
+            "unit": "L",
+            "value": "84906875198.56 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "start:e661b25e-97c8-488f-91b0-ee840dd4ca08",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 266,
+      "utc": "2026-11-28T00:23:53.210Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "633aa2a22952",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "cdbd39e3f09f",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "cebeb5f80f06",
+            "unit": "L",
+            "value": "68112663188.08 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "exec-4660afcb-dffc-4936-9d67-cd49e19b7a84",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 270,
+      "utc": "2026-11-28T00:26:12.620Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "6ee01ff24936",
+            "unit": "L",
+            "value": "68112663188.08 L"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_6ee01ff24936ad2fd4f8fde831cfbfdd1922b203375b2a1449b466c6cd04d7a1"
+        },
+        {
+          "row": {
+            "id": "left_minutes",
+            "key": "8fe7fa261208",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_8fe7fa261208300f06d2f46c131d7ca49ddfef4c73d8b11208b69388846d8929"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "50e3265ba174",
+            "unit": "L",
+            "value": "311938382.06 L"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_50e3265ba17434d75f996fdbd13aaea0bfd2cd3061bd7813e9532cad81339344"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "exec-16ff8d13-c874-46a4-9075-fa0dd616d013",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 271,
+      "utc": "2026-11-28T00:26:12.631Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "0097474567bd",
+            "unit": "L",
+            "value": "311938382.06 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "193fff234a53",
+            "unit": "L",
+            "value": "67800724806.02 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "a195d1792e57",
+            "unit": "L",
+            "value": "50694574413.49 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "exec-f6b31daf-c692-4043-bc8c-f6918bcacceb",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 272,
+      "utc": "2026-11-28T00:26:17.930Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_a266e6d133f6ed7e872d84f827599542b762484b146fb2e8f524508dd84f956b",
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f"
+        },
+        {
+          "row": {
+            "id": "right_minutes",
+            "key": "a266e6d133f6",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "metric_ref": "metric_a266e6d133f6ed7e872d84f827599542b762484b146fb2e8f524508dd84f956b"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "exec-99fe16ee-c89e-423a-9cff-443c0ecba9a4",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 273,
+      "utc": "2026-11-28T00:26:17.935Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255",
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "3a0daa3de6c3",
+            "unit": "L",
+            "value": "84906875198.56 L"
+          },
+          "source_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "exec-84a5b37b-da3d-4bcd-8b1c-31f94de76d83",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 274,
+      "utc": "2026-11-28T00:26:20.902Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_2225bc688a5caa99a5b44ba2e480ca8f49fe832f3b9b637a350bce678549d71f",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_1ed80c81335b8c4045f13fdfd1e396d5f9b246c3165a347729a10a0a4d83b1cb",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_21acca3832a02c565f39b0a5e7c56e69ae04d79897eb3269d914dca2e8f7cdb4",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "row": {
+            "id": "common_minutes",
+            "key": "2225bc688a5c",
+            "unit": "min",
+            "value": "4320.00 min"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_2225bc688a5caa99a5b44ba2e480ca8f49fe832f3b9b637a350bce678549d71f"
+        },
+        {
+          "row": {
+            "id": "difference_L",
+            "key": "1ed80c81335b",
+            "unit": "L",
+            "value": "67800724806.02 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_1ed80c81335b8c4045f13fdfd1e396d5f9b246c3165a347729a10a0a4d83b1cb"
+        },
+        {
+          "row": {
+            "id": "difference_high_L",
+            "key": "21acca3832a0",
+            "unit": "L",
+            "value": "84906875198.56 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_21acca3832a02c565f39b0a5e7c56e69ae04d79897eb3269d914dca2e8f7cdb4"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "exec-4a6abb50-d2e0-45a5-900a-fda1000b0a54",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 278,
+      "utc": "2026-11-28T00:28:47.337Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_65653b7ffbed41a9ad0be3f20f79b556e4e6b5fff4c936f33270ccdb412db980",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_9981117cbb156d0878f3f9fc7e9f4d7515bf34a86daea35b0dbe2dc7975a470c",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "metric_ref": "metric_bc178068a0f36f3b5ce1ceed4fce12438f59e398b3974fb9885b76e2469c518c",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "row": {
+            "id": "difference_low_L",
+            "key": "65653b7ffbed",
+            "unit": "L",
+            "value": "50694574413.49 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_65653b7ffbed41a9ad0be3f20f79b556e4e6b5fff4c936f33270ccdb412db980"
+        },
+        {
+          "row": {
+            "id": "left_L",
+            "key": "9981117cbb15",
+            "unit": "L",
+            "value": "68112663188.08 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_9981117cbb156d0878f3f9fc7e9f4d7515bf34a86daea35b0dbe2dc7975a470c"
+        },
+        {
+          "row": {
+            "id": "outside_common_minutes",
+            "key": "bc178068a0f3",
+            "unit": "min",
+            "value": "0.00 min"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_bc178068a0f36f3b5ce1ceed4fce12438f59e398b3974fb9885b76e2469c518c"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "exec-96c3e251-b84f-4950-acca-cd09e0a7662e",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 279,
+      "utc": "2026-11-28T00:28:51.227Z"
+    },
+    {
+      "delivery_kind": "artifact_read",
+      "endpoints": [
+        {
+          "metric_ref": "metric_473d1f25c6b7c6a13a176dfdaaac55004825fdc2f5223cbf6e18e44285345979",
+          "source_ref": "gxa_01m8fr8d96ky1t45a0"
+        },
+        {
+          "row": {
+            "id": "right_L",
+            "key": "473d1f25c6b7",
+            "unit": "L",
+            "value": "311938382.06 L"
+          },
+          "source_ref": "gxa_01m8fr8d96ky1t45a0",
+          "metric_ref": "metric_473d1f25c6b7c6a13a176dfdaaac55004825fdc2f5223cbf6e18e44285345979"
+        }
+      ],
+      "lease_id": "gxl_01m8frjyhgpwyvt1bq",
+      "receipt": "exec-0d81a96f-89b2-4e6f-8b6b-f395acca9b5c",
+      "task_id": "gxt_01m8frjyh2pvndwsmr",
+      "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+      "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+      "scope": "run",
+      "event_id": 280,
+      "utc": "2026-11-28T00:28:51.265Z"
+    }
+  ],
+  "routes": {
+    "modules": [
+      {
+        "module_instance_id": "module_f5d5eb79b737358a19649881c1b5414e",
+        "scope": "module:module_f5d5eb79b737358a19649881c1b5414e",
+        "branch_id": "branch_4f24740ecec07f5a9c77d5035c54722c",
+        "focus": "Audit the daily station records against the archived USGS original and the prepared record. Verify site and variable/statistic identifiers, qualifiers, native values and units, dates/time support, conversions and error provenance or discrepancies. During the review send the volume analyst a direct peer finding as soon as any source or interval detail affects how to pair, integrate or bound the comparison (including the local daily-mean and approval semantics). Use the research-topic communication mechanism while the volume review is active. Acknowledge consequential findings received.",
+        "module_id": "ad_hoc",
+        "module_version": "1",
+        "round": 1,
+        "parent_task_id": "gxt_01m8fr62w8rvmr3qgv",
+        "goal_version": 1,
+        "status": "PARTIAL",
+        "threads": [
+          {
+            "thread_id": "01a21f83-b5b7-7281-a2e6-a682facb3950",
+            "task_id": "gxt_01m8fr7darsy3zt6fv",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21f83-b5d9-76e1-b7e3-73f8e27c7cc0",
+                "thread_id": "01a21f83-b5b7-7281-a2e6-a682facb3950",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-28T00:17:35.199Z",
+                "end": "2026-11-28T00:19:55.320Z"
+              }
+            ]
+          },
+          {
+            "thread_id": "01a21f85-d8c0-7d83-90dd-6f33430f52d8",
+            "task_id": "gxt_01m8frbp3ppkqw20d5",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21f85-d8f7-7bd1-aa98-6ad131c74a5b",
+                "thread_id": "01a21f85-d8c0-7d83-90dd-6f33430f52d8",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-28T00:19:55.260Z",
+                "end": "2026-11-28T00:20:08.311Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {},
+        "nodes": [
+          {
+            "node_id": "node_8a847a865c7ef8b6c13e538901e4592f",
+            "job_id": "gxj_01m8frbncq7b9qbsrz",
+            "status": "SUCCEEDED",
+            "job_status": "SUCCEEDED",
+            "decision_ref": "gxa_c1c289457defa18705d7b6349dc48a38d6760d96d9782cf26484b16d78b3b2b4",
+            "capability": "discharge-marginal@1",
+            "parameters": {},
+            "result_ref": "gxa_01m8frbp1g20yp0v17",
+            "outputs": [
+              {
+                "artifact_ref": "gxa_01m8frbp1g20yp0v17",
+                "bytes": 479,
+                "declaration_name": "marginal.json",
+                "kind": "hydrometric_marginal",
+                "nature": "analysis",
+                "output_name": "marginal.json",
+                "runner_sha256": "dab650336fcdbec50ef7ea7a99ce1ae85a33b69218e6eb7b84d20831358b3482",
+                "sha256": "dab650336fcdbec50ef7ea7a99ce1ae85a33b69218e6eb7b84d20831358b3482",
+                "source_inputs": [
+                  {
+                    "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+                    "bytes": 1966,
+                    "role": "record",
+                    "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+                  }
+                ],
+                "validated": false
+              }
+            ],
+            "start": "2026-11-28T00:19:54.824Z",
+            "end": "2026-11-28T00:19:55.081Z"
+          }
+        ],
+        "report": {
+          "artifact_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "author": {
+            "context_ref": "gxcx_01m8frbp3nzdtgs83n",
+            "kind": "GX",
+            "task_id": "gxt_01m8frbp3ppkqw20d5"
+          },
+          "base": {
+            "sha256": "a19950c9af0c3d9e912339909abe133051e18a7d4ffedfab1ff7a55eaa769770",
+            "version": 3
+          },
+          "event_id": 198,
+          "goal_version": 1,
+          "module_id": "ad_hoc",
+          "module_instance_id": "module_f5d5eb79b737358a19649881c1b5414e",
+          "module_version": "1",
+          "operation_key": "gx.partial:module_f5d5eb79b737358a19649881c1b5414e",
+          "report_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+          "report_sha256": "8b91092146d4dd6fa9e0406f31ce1c7bd534529759093e57ede816a22664e0e5",
+          "round": 1,
+          "run_id": "gxr_01m8fr62qda3k7sf0x",
+          "scope": "module:module_f5d5eb79b737358a19649881c1b5414e",
+          "source_refs": [
+            "gxa_01m8fr62s21kjesqsy",
+            "gxa_01m8fr62srb8p3b7zm",
+            "gxa_01m8fr8k3a4ekxrttd",
+            "gxa_01m8frb31a2jybkf8t",
+            "gxa_01m8frbp1g20yp0v17"
+          ],
+          "status": "PARTIAL",
+          "version": 1,
+          "wake_event_id": 199,
+          "released_event": 199
+        },
+        "delegated_reports": [],
+        "decisions": [
+          {
+            "decision_ref": "gxa_c1c289457defa18705d7b6349dc48a38d6760d96d9782cf26484b16d78b3b2b4",
+            "scope": "module:module_f5d5eb79b737358a19649881c1b5414e",
+            "event_id": 169,
+            "thread_id": "01a21f83-b5b7-7281-a2e6-a682facb3950",
+            "turn_id": "01a21f83-b5d9-76e1-b7e3-73f8e27c7cc0",
+            "call_id": "call_b84da2e5c253444aa0728126a8c6e1eb",
+            "rationale": "The six approved USGS daily means and their converted rates match row by row. A station-specific aggregation of the prepared record will verify each gauge’s accepted duration and integrated volume against an independent sum in native units. The volume analyst is measuring their joint support and signed bounds.",
+            "evidence_refs": [
+              "gxa_01m8fr62srb8p3b7zm",
+              "gxa_01m8fr62s21kjesqsy",
+              "gxa_01m8frb31a2jybkf8t"
+            ],
+            "used_metric_refs": [],
+            "outcome": "adopted",
+            "operations": [
+              "add_node"
+            ]
+          }
+        ]
+      },
+      {
+        "module_instance_id": "module_43806dc0ccffc1870bd9589ec1043b93",
+        "scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+        "branch_id": "branch_0267e0481b4ca17a364560e7ccbcf630",
+        "focus": "Evaluate the signed Potomac (01646500) minus Northwest Branch Anacostia (01651000) integrated volume on the common valid support. Independently check the daily-mean integration, sign, time and unit conversions and the editor's stated rate-error scenario. Use the paired method if appropriate. Monitor the shared research topic and engage the Daily-record auditor directly during work about date support, quality flags or how the scenario affects endpoints. Send a comparison-relevant finding or request to the auditor, and apply material peer findings to the calculation.",
+        "module_id": "ad_hoc",
+        "module_version": "1",
+        "round": 1,
+        "parent_task_id": "gxt_01m8fr62w8rvmr3qgv",
+        "goal_version": 1,
+        "status": "COMPLETE",
+        "threads": [
+          {
+            "thread_id": "01a21f83-b6a3-7602-9488-a5e576179177",
+            "task_id": "gxt_01m8fr7ddwqa8t0qjs",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21f83-b6db-7921-9a0d-36844e2b923e",
+                "thread_id": "01a21f83-b6a3-7602-9488-a5e576179177",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-28T00:17:35.456Z",
+                "end": "2026-11-28T00:19:18.736Z"
+              }
+            ]
+          },
+          {
+            "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+            "task_id": "gxt_01m8frajv2gekszwmd",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+                "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-28T00:19:19.118Z",
+                "end": "2026-11-28T00:21:54.756Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [
+          {
+            "event_id": 163,
+            "utc": "2026-11-28T00:19:48.157Z",
+            "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+            "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+            "endpoints": [
+              {
+                "metric_ref": "metric_633aa2a229524940ba022c09c3c902e5363e555e8aa0c88629c88ba3efe0982e",
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "metric_ref": "metric_193fff234a5339aeb48267a84b3fbe0f7871d3a68fe010cfabd2a478bd01c590",
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "metric_ref": "metric_3a0daa3de6c388c6bc30ba03f0f03a6753b3f4a8f8e99ec1a1cb013c157ce255",
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "row": {
+                  "id": "common_minutes",
+                  "key": "633aa2a22952",
+                  "unit": "min",
+                  "value": "4320.00 min"
+                },
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "row": {
+                  "id": "difference_L",
+                  "key": "193fff234a53",
+                  "unit": "L",
+                  "value": "67800724806.02 L"
+                },
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "row": {
+                  "id": "difference_high_L",
+                  "key": "3a0daa3de6c3",
+                  "unit": "L",
+                  "value": "84906875198.56 L"
+                },
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              }
+            ]
+          },
+          {
+            "event_id": 191,
+            "utc": "2026-11-28T00:20:06.676Z",
+            "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+            "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+            "endpoints": [
+              {
+                "metric_ref": "metric_a195d1792e57d644b0d31146a276b96674b689b1dc8ce7204460538aae71b9cf",
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "metric_ref": "metric_cebeb5f80f06338c95da72addc1935221cf16a41259d2ee8a528326e32753d01",
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "metric_ref": "metric_cdbd39e3f09ffa84c2a74da8cba2dd17864f4783ae7d52df8aab3f7d81467d3b",
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "row": {
+                  "id": "difference_low_L",
+                  "key": "a195d1792e57",
+                  "unit": "L",
+                  "value": "50694574413.49 L"
+                },
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "row": {
+                  "id": "left_L",
+                  "key": "cebeb5f80f06",
+                  "unit": "L",
+                  "value": "68112663188.08 L"
+                },
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "row": {
+                  "id": "outside_common_minutes",
+                  "key": "cdbd39e3f09f",
+                  "unit": "min",
+                  "value": "0.00 min"
+                },
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              }
+            ]
+          },
+          {
+            "event_id": 204,
+            "utc": "2026-11-28T00:20:11.469Z",
+            "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+            "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+            "endpoints": [
+              {
+                "metric_ref": "metric_0097474567bdad2f8392dfb0b322a8bab57101d1fe33070dbf105fda39db96b5",
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              },
+              {
+                "row": {
+                  "id": "right_L",
+                  "key": "0097474567bd",
+                  "unit": "L",
+                  "value": "311938382.06 L"
+                },
+                "source_ref": "gxa_01m8frajqnvs8knbdt"
+              }
+            ]
+          }
+        ],
+        "report_materials": {},
+        "nodes": [
+          {
+            "node_id": "node_8f060563274c750111d1ee8adbe8e51e",
+            "job_id": "gxj_01m8fraj9201wcgt44",
+            "status": "SUCCEEDED",
+            "job_status": "SUCCEEDED",
+            "decision_ref": "gxa_8f7832be689c0ae26111360e6d280b833c76e197ed17caa670e661905d7ad900",
+            "capability": "discharge-concurrent@1",
+            "parameters": {},
+            "result_ref": "gxa_01m8frajqnvs8knbdt",
+            "outputs": [
+              {
+                "artifact_ref": "gxa_01m8frajqnvs8knbdt",
+                "bytes": 852,
+                "declaration_name": "paired.json",
+                "kind": "hydrometric_concurrent",
+                "nature": "analysis",
+                "output_name": "paired.json",
+                "runner_sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+                "sha256": "0d90d1ca13b76c2eee3b07a8baae02d07e2db35975299d2599735bbdf9b262ec",
+                "source_inputs": [
+                  {
+                    "artifact_ref": "gxa_01m8fr62s21kjesqsy",
+                    "bytes": 1966,
+                    "role": "record",
+                    "sha256": "fdafa3b194960c449af0239dbd6d1bd4a059927299adf93c4d47697f605bce23"
+                  }
+                ],
+                "validated": false
+              }
+            ],
+            "start": "2026-11-28T00:19:18.651Z",
+            "end": "2026-11-28T00:19:18.925Z"
+          }
+        ],
+        "report": {
+          "artifact_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "author": {
+            "call_id": "call_62f284489b4a49ab886a8273dfc1474c",
+            "context_ref": "gxcx_01m8frajv0ep1w8fbt",
+            "kind": "MODULE",
+            "lease_id": "gxl_01m8frajvzft5erhvs",
+            "run_id": "gxr_01m8fr62qda3k7sf0x",
+            "task_id": "gxt_01m8frajv2gekszwmd",
+            "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+            "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559"
+          },
+          "base": {
+            "sha256": "f4b90d7a0320ec13feaba3488611519355e08ea7ee71f33535a6aabb6b1d3615",
+            "version": 2
+          },
+          "event_id": 239,
+          "goal_version": 1,
+          "module_id": "ad_hoc",
+          "module_instance_id": "module_43806dc0ccffc1870bd9589ec1043b93",
+          "module_version": "1",
+          "operation_key": "volume_common_support_final_report",
+          "report_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+          "report_sha256": "e0a15ea9eaa86e3f9bbfe3bc20c5bcdaa6cd53c1f859b1cfabcd4aa67a60e35d",
+          "round": 1,
+          "run_id": "gxr_01m8fr62qda3k7sf0x",
+          "scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+          "source_refs": [
+            "gxa_01m8fr62s21kjesqsy",
+            "gxa_01m8fr62srb8p3b7zm",
+            "gxa_01m8fr8k3a4ekxrttd",
+            "gxa_01m8frajqnvs8knbdt"
+          ],
+          "status": "COMPLETE",
+          "version": 1,
+          "wake_event_id": 240,
+          "released_event": 240
+        },
+        "delegated_reports": [],
+        "decisions": [
+          {
+            "decision_ref": "gxa_8f7832be689c0ae26111360e6d280b833c76e197ed17caa670e661905d7ad900",
+            "scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+            "event_id": 126,
+            "thread_id": "01a21f83-b6a3-7602-9488-a5e576179177",
+            "turn_id": "01a21f83-b6db-7921-9a0d-36844e2b923e",
+            "call_id": "call_a0cab464db5e4be38ec9544dd0ec4e52",
+            "rationale": "The original USGS series and the daily-record auditor agree on April 1, 2 and 3, 2023 as three complete local days. Each carries an approved daily mean at each site. Multiplying each native rate by 86,400 seconds yields a signed difference of +2,394,360,000 ft³. The prepared record matches the original digest and supplies per-interval litre-per-second rates, flags, and absolute error bounds. The paired calculation will verify the integrated volumes, duration and sign over those dates and furnish versioned readings for a repeat analysis.",
+            "evidence_refs": [
+              "gxa_01m8fr62s21kjesqsy",
+              "gxa_01m8fr62srb8p3b7zm",
+              "gxa_01m8fr8k3a4ekxrttd"
+            ],
+            "used_metric_refs": [],
+            "outcome": "adopted",
+            "operations": [
+              "add_node"
+            ]
+          }
+        ]
+      },
+      {
+        "module_instance_id": "module_4757fc82baf37111faa693dbd485ee72",
+        "scope": "module:module_4757fc82baf37111faa693dbd485ee72",
+        "branch_id": "branch_849c1cc435ecf9644e8be3b721db8280",
+        "focus": "Write a reusable, input-parameterized station comparison procedure as a signed GX report for future reviews. Use the original and prepared file schemas as examples. Declare replaceable input roles upstream_original and record, station order and requested local-date window. Specify original-to-prepared audit, validity and duration rules, peer exchange of consequential discrepancies while parallel reviews are open, time and volume units, error provenance, deterministic extrema and independent native-unit arithmetic. Pin discharge-concurrent@1, its no-parameter contract, and the paired.json metrics. Define a fresh lead decision when the new record, audit and volume evidence arrive, including incomplete or zero common coverage, an absent or inapplicable error model, or a zero-crossing interval. Describe a fresh evidence-triggered review, without hardcoding source digests, dates, result values or direction. This is the portable procedure deliverable; no new scientific Job or search is needed.",
+        "module_id": "ad_hoc",
+        "module_version": "1",
+        "round": 1,
+        "parent_task_id": "gxt_01m8fr8d0nf3j1razb",
+        "goal_version": 1,
+        "status": "PARTIAL",
+        "threads": [
+          {
+            "thread_id": "01a21f86-4992-7981-92d8-bf69b1ba5af9",
+            "task_id": "gxt_01m8frcj8s6e6ka9mf",
+            "state": "bound",
+            "turns": [
+              {
+                "turn_id": "01a21f86-49d6-7c33-8bff-f646ff54756c",
+                "thread_id": "01a21f86-4992-7981-92d8-bf69b1ba5af9",
+                "provider": "openai",
+                "model": "gpt-6.2-astra",
+                "classification": "NATIVE_MODEL",
+                "terminal_status": "interrupted",
+                "start": "2026-11-28T00:20:24.156Z",
+                "end": "2026-11-28T00:22:47.634Z"
+              }
+            ]
+          }
+        ],
+        "deliveries": [],
+        "report_materials": {},
+        "nodes": [],
+        "report": {
+          "artifact_ref": "gxa_3d320dd2d83357a523e550507ee9dd6341b6bca1d96c811206670f01f0e223c3",
+          "author": {
+            "context_ref": "gxcx_01m8frcj8s920xy0s1",
+            "kind": "GX",
+            "task_id": "gxt_01m8frcj8s6e6ka9mf"
+          },
+          "base": {
+            "sha256": "a19950c9af0c3d9e912339909abe133051e18a7d4ffedfab1ff7a55eaa769770",
+            "version": 3
+          },
+          "event_id": 249,
+          "goal_version": 1,
+          "module_id": "ad_hoc",
+          "module_instance_id": "module_4757fc82baf37111faa693dbd485ee72",
+          "module_version": "1",
+          "operation_key": "gx.partial:module_4757fc82baf37111faa693dbd485ee72",
+          "report_ref": "gxa_3d320dd2d83357a523e550507ee9dd6341b6bca1d96c811206670f01f0e223c3",
+          "report_sha256": "b1ffe7aa8601adbbb0aa9eec7dba5f61d5b73983d4a7e7e18295026997a57911",
+          "round": 1,
+          "run_id": "gxr_01m8fr62qda3k7sf0x",
+          "scope": "module:module_4757fc82baf37111faa693dbd485ee72",
+          "source_refs": [
+            "gxa_01m8fr62s21kjesqsy",
+            "gxa_01m8fr62srb8p3b7zm",
+            "gxa_01m8fr8k3a4ekxrttd"
+          ],
+          "status": "PARTIAL",
+          "version": 1,
+          "wake_event_id": 250,
+          "released_event": 250
+        },
+        "delegated_reports": [],
+        "decisions": []
+      }
+    ],
+    "real_turn_overlaps": [
+      {
+        "left_scope": "module:module_f5d5eb79b737358a19649881c1b5414e",
+        "right_scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+        "left_turn": "01a21f83-b5d9-76e1-b7e3-73f8e27c7cc0",
+        "right_turn": "01a21f83-b6db-7921-9a0d-36844e2b923e",
+        "left_thread": "01a21f83-b5b7-7281-a2e6-a682facb3950",
+        "right_thread": "01a21f83-b6a3-7602-9488-a5e576179177",
+        "seconds": 103.28
+      },
+      {
+        "left_scope": "module:module_f5d5eb79b737358a19649881c1b5414e",
+        "right_scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+        "left_turn": "01a21f83-b5d9-76e1-b7e3-73f8e27c7cc0",
+        "right_turn": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+        "left_thread": "01a21f83-b5b7-7281-a2e6-a682facb3950",
+        "right_thread": "01a21f85-4b94-7182-9624-46336f42944c",
+        "seconds": 36.202
+      },
+      {
+        "left_scope": "module:module_f5d5eb79b737358a19649881c1b5414e",
+        "right_scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+        "left_turn": "01a21f85-d8f7-7bd1-aa98-6ad131c74a5b",
+        "right_turn": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+        "left_thread": "01a21f85-d8c0-7d83-90dd-6f33430f52d8",
+        "right_thread": "01a21f85-4b94-7182-9624-46336f42944c",
+        "seconds": 13.051
+      },
+      {
+        "left_scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+        "right_scope": "module:module_4757fc82baf37111faa693dbd485ee72",
+        "left_turn": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+        "right_turn": "01a21f86-49d6-7c33-8bff-f646ff54756c",
+        "left_thread": "01a21f85-4b94-7182-9624-46336f42944c",
+        "right_thread": "01a21f86-4992-7981-92d8-bf69b1ba5af9",
+        "seconds": 90.6
+      }
+    ],
+    "job_turn_overlaps": [
+      {
+        "job_id": "gxj_01m8frbncq7b9qbsrz",
+        "job_scope": "module:module_f5d5eb79b737358a19649881c1b5414e",
+        "turn_id": "01a21f85-4bc8-75e1-b68e-aa63c9cbd559",
+        "thread_id": "01a21f85-4b94-7182-9624-46336f42944c",
+        "turn_scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+        "seconds": 0.257
+      },
+      {
+        "job_id": "gxj_01m8fraj9201wcgt44",
+        "job_scope": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+        "turn_id": "01a21f83-b5d9-76e1-b7e3-73f8e27c7cc0",
+        "thread_id": "01a21f83-b5b7-7281-a2e6-a682facb3950",
+        "turn_scope": "module:module_f5d5eb79b737358a19649881c1b5414e",
+        "seconds": 0.274
+      }
+    ],
+    "handoffs": [
+      {
+        "publisher": "module:module_f5d5eb79b737358a19649881c1b5414e",
+        "report_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+        "published_event": 198,
+        "released_event": 199,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21f86-efa6-72b1-8c92-d14293c189be",
+        "turn_id": "01a21f86-efd5-7da1-a1c5-5e36d10ce4e7",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:3688d806-4844-4f17-8e1e-1443548b5f33",
+        "endpoint_delivery_events": [
+          232
+        ],
+        "received_content": true,
+        "received_read_call": "exec-a0528a84-b3b3-4828-95ce-b0bc6868b722",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      },
+      {
+        "publisher": "module:module_f5d5eb79b737358a19649881c1b5414e",
+        "report_ref": "gxa_638c9eb8957a960919113cb19f636b994193893fdf20ba0d6b6f1b968b39751f",
+        "published_event": 198,
+        "released_event": 199,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+        "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:e661b25e-97c8-488f-91b0-ee840dd4ca08",
+        "endpoint_delivery_events": [
+          266,
+          271,
+          273
+        ],
+        "received_content": true,
+        "received_read_call": "exec-c601e909-e641-4195-be8f-ad2559929cc6",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_b048099af130949333c0c6795332a4af36d2c635f7486655be48088bb66b30a4",
+        "effects": [],
+        "decision_event": 287,
+        "rationale": "Publish the three-day ordering. Both USGS series report approved daily mean discharge in ft³/s for April 1–3, 2023. All six means match the prepared record. The auditor communicated the full final day and the construction of the error bounds to the volume analyst. Midnight April 1 to midnight April 4 EDT gives {{metric:gxa_01m8frajqnvs8knbdt:common_minutes}} in common and {{metric:gxa_01m8frajqnvs8knbdt:outside_common_minutes}} excluded. The Potomac at Little Falls integrated to {{metric:gxa_01m8frajqnvs8knbdt:left_L}} and Northwest Branch near Hyattsville to {{metric:gxa_01m8frajqnvs8knbdt:right_L}}, giving Potomac minus Northwest Branch of +{{metric:gxa_01m8frajqnvs8knbdt:difference_L}}. The auditor’s station totals agree on the original common dates, and a separate integration of the same record reproduces the same signed difference. Multiplying each station’s summed daily means by 86,400 s checks the result in cubic feet. Under the editor’s independent ±25% bounds, low Potomac minus high Northwest Branch gives +{{metric:gxa_01m8frajqnvs8knbdt:difference_low_L}}, and the opposite extremes give +{{metric:gxa_01m8frajqnvs8knbdt:difference_high_L}}. The minimum stays positive. The saved daily-gauge-volume-review@1 recipe requires fresh source and volume reviews and a new decision on their joined evidence."
+      },
+      {
+        "publisher": "module:module_43806dc0ccffc1870bd9589ec1043b93",
+        "report_ref": "gxa_2f0af65ad01a8fb637be7a68ee03eae508adb32072e2a15b062fe193df864398",
+        "published_event": 239,
+        "released_event": 240,
+        "publisher_classification": "NATIVE_MODEL",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+        "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:e661b25e-97c8-488f-91b0-ee840dd4ca08",
+        "endpoint_delivery_events": [
+          266,
+          270,
+          272,
+          274
+        ],
+        "received_content": true,
+        "received_read_call": "exec-83ea2bf3-78bd-4b1c-bb46-2f0943554b4b",
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "CITED",
+        "decision_ref": "gxa_b048099af130949333c0c6795332a4af36d2c635f7486655be48088bb66b30a4",
+        "effects": [],
+        "decision_event": 287,
+        "rationale": "Publish the three-day ordering. Both USGS series report approved daily mean discharge in ft³/s for April 1–3, 2023. All six means match the prepared record. The auditor communicated the full final day and the construction of the error bounds to the volume analyst. Midnight April 1 to midnight April 4 EDT gives {{metric:gxa_01m8frajqnvs8knbdt:common_minutes}} in common and {{metric:gxa_01m8frajqnvs8knbdt:outside_common_minutes}} excluded. The Potomac at Little Falls integrated to {{metric:gxa_01m8frajqnvs8knbdt:left_L}} and Northwest Branch near Hyattsville to {{metric:gxa_01m8frajqnvs8knbdt:right_L}}, giving Potomac minus Northwest Branch of +{{metric:gxa_01m8frajqnvs8knbdt:difference_L}}. The auditor’s station totals agree on the original common dates, and a separate integration of the same record reproduces the same signed difference. Multiplying each station’s summed daily means by 86,400 s checks the result in cubic feet. Under the editor’s independent ±25% bounds, low Potomac minus high Northwest Branch gives +{{metric:gxa_01m8frajqnvs8knbdt:difference_low_L}}, and the opposite extremes give +{{metric:gxa_01m8frajqnvs8knbdt:difference_high_L}}. The minimum stays positive. The saved daily-gauge-volume-review@1 recipe requires fresh source and volume reviews and a new decision on their joined evidence."
+      },
+      {
+        "publisher": "module:module_4757fc82baf37111faa693dbd485ee72",
+        "report_ref": "gxa_3d320dd2d83357a523e550507ee9dd6341b6bca1d96c811206670f01f0e223c3",
+        "published_event": 249,
+        "released_event": 250,
+        "publisher_classification": "UNVERIFIED",
+        "real_model_handoff": false,
+        "receiver_scope": "run",
+        "thread_id": "01a21f89-7a4b-7c02-8398-5b920c9c13a0",
+        "turn_id": "01a21f89-7a77-75c1-9a1e-2c2043527115",
+        "handoff_kind": "MODULE_TO_LEAD",
+        "delivery_receipt": "start:e661b25e-97c8-488f-91b0-ee840dd4ca08",
+        "endpoint_delivery_events": [],
+        "received_content": false,
+        "received_read_call": null,
+        "receiver_classification": "NATIVE_MODEL",
+        "status": "DELIVERED",
+        "decision_ref": null,
+        "effects": []
+      }
+    ]
+  },
+  "post_read_actions": [],
+  "rejected_decisions": [
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[0].op",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "876c1f727525306c4628c7aca4e95b0c8d14ef4d0e57745810025cf8c9512108",
+      "event_id": 146,
+      "corrected_decision_event": 225
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[0].op",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "e3bf8110b7aa91f1330e8eaf3d92ce82fbeaefc8e9451e08793fb756f0663040",
+      "event_id": 189,
+      "corrected_decision_event": 225
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "ops",
+      "previous_rejections": 2,
+      "reason": "comparison_action_ambiguous",
+      "submission": "3a487c793c35df3f0f30089c9d9c3e2adca3fd1c92f0d47197787ef71451f106",
+      "event_id": 218,
+      "corrected_decision_event": 225
+    },
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "ops",
+      "previous_rejections": 0,
+      "reason": "comparison_action_ambiguous",
+      "submission": "c407737e03574ff171d989ee4b9c681c7fee35e2e7a92a325b2b6980793173af",
+      "event_id": 253,
+      "corrected_decision_event": 260
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "ops",
+      "previous_rejections": 1,
+      "reason": "comparison_action_ambiguous",
+      "submission": "57dce3c09500e14c51e762f8b3eec8b9e42a59454d472094d470b5e70a40e739",
+      "event_id": 254,
+      "corrected_decision_event": 260
+    },
+    {
+      "attempt": 1,
+      "code": "SCHEMA_INVALID",
+      "field": "ops[0].reason",
+      "previous_rejections": 0,
+      "reason": "SCHEMA_INVALID",
+      "submission": "711cb956cfe6dcfc24551ffa40706bf6e0d1f1477d105dfc7f2f0b2b129c5718",
+      "event_id": 275,
+      "corrected_decision_event": 287
+    },
+    {
+      "attempt": 2,
+      "code": "SCHEMA_INVALID",
+      "field": "decision",
+      "previous_rejections": 1,
+      "reason": "SCHEMA_INVALID",
+      "submission": "da87496c7f3ad315a15cdbfac5edd456f7f07c809ead84dc8fe030f8f3ae9848",
+      "event_id": 276,
+      "corrected_decision_event": 287
+    },
+    {
+      "attempt": 3,
+      "code": "SCHEMA_INVALID",
+      "field": "evidence_refs[2]",
+      "previous_rejections": 2,
+      "reason": "endpoint_use_unspecified",
+      "submission": "b648c2a6a635139bbcfac61f3372d4ecd2014e4c76e4a9ed323c22e9be2bf2ed",
+      "event_id": 277,
+      "corrected_decision_event": 287
+    }
+  ],
+  "invocation": {
+    "action": "export_closed",
+    "before": {
+      "jobs": 3,
+      "host_turns": 9
+    },
+    "after": {
+      "jobs": 3,
+      "host_turns": 9
+    },
+    "added": {
+      "jobs": 0,
+      "host_turns": 0
+    },
+    "command": "gx-v-6/harness-refactor-live/hydro/release/bin/gx-p0 research --state gx-v-6/harness-refactor-live/hydro/state --run-key discharge-field-april-first --goal-file gx-v-6/product-multi-workflow/acceptance/harness_refactor/field/hydro/a/question.md --goal-config gx-v-6/product-multi-workflow/acceptance/harness_refactor/field/hydro/a/goal.json --timeout 1.0"
+  }
+}

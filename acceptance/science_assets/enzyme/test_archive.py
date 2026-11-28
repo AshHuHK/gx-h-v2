@@ -1,17 +1,16 @@
 """Check a deployed archive against known positive, zero and error controls."""
-import importlib.util
+import runpy
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 
 HERE = Path(__file__).resolve().parent
 PRODUCT = HERE.parents[2]
 PACKAGE = PRODUCT / "gx-h/plugins/installed/org.gx.yeast-enzyme-archive/1.0.0"
 MOUNT = PRODUCT / "gx-h/var/science-assets/yeast-archive"
-spec = importlib.util.spec_from_file_location("food_archive", PACKAGE / "archive.py")
-archive = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(archive)
+archive = SimpleNamespace(**runpy.run_path(str(PACKAGE / "archive.py")))
 
 
 def query(substrate, **changes):

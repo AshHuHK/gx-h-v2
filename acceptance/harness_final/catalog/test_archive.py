@@ -9,6 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from acceptance.harness_final.catalog import archive_snapshots
+from acceptance.harness_final.catalog.evaluate import unrestricted_opening
 from acceptance.harness_refactor.catalog import test_open_discovery
 from gx_core.capabilities import manifest
 
@@ -18,6 +19,7 @@ class ArchiveHealth(unittest.TestCase):
 
     def test_installation_without_mount_has_no_scientific_result(self):
         study, lead = self.admit("Which archived records support this annotation?")
+        study.call(lead, "gx_query_catalog", {"kind":"all", **unrestricted_opening(study,lead)}, "opening")
         real_path = manifest.resolve_path
         root = Path(self.enterContext(tempfile.TemporaryDirectory()))
         def disconnect(template, **kwargs):
@@ -59,3 +61,22 @@ class ArchiveHealth(unittest.TestCase):
                 self.assertNotEqual(error.returncode, 0)
                 self.assertIn("FileNotFoundError" if status == "missing" else "registered archive version", error.stderr)
                 self.assertEqual(list(out.iterdir()), [])
+
+    def test_inspecting_archive_with_default_python_keeps_registered_package_bytes(self):
+        # Run the actual source-site acceptance import in a private package copy.
+        # Enabling ordinary Python cache writes would invalidate both installed providers.
+        import shutil
+        from gx_core.plugins.catalog import package_digest
+        temp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        relative = Path("gx-h/plugins/installed/org.gx.yeast-enzyme-archive/1.0.0")
+        bundle = temp/relative
+        shutil.copytree(archive_snapshots.PROVIDER/"1.0.0", bundle)
+        relative_test = Path("acceptance/science_assets/enzyme/test_archive.py")
+        reader_test = temp/relative_test
+        reader_test.parent.mkdir(parents=True)
+        shutil.copy2(archive_snapshots.HERE.parent/relative_test, reader_test)
+        pin = package_digest(bundle)
+        child = subprocess.run([sys.executable, "-E", "-c", "import runpy,sys; runpy.run_path(sys.argv[1])",
+                                str(reader_test)], capture_output=True, text=True)
+        self.assertEqual(child.returncode, 0, child.stderr)
+        self.assertEqual(package_digest(bundle), pin)

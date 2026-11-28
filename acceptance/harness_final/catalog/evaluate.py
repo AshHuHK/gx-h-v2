@@ -6,6 +6,13 @@ from pathlib import Path
 import sys
 
 
+def unrestricted_opening(study, lead):
+    """The public fixture Goal has no PI method constraint. Old frozen contracts omit the field."""
+    if study.brief(lead).get("pi_method_scope", {}).get("status") == "pending":
+        return {"pi_method_scope":[]}
+    return {}
+
+
 def evaluate(repo, cases, *, kind="all"):
     # One invocation targets one release and thus imports only that release's CLI and fixtures.
     repo = repo.resolve()
@@ -15,8 +22,10 @@ def evaluate(repo, cases, *, kind="all"):
     results = []
     try:
         study, lead = control.admit("Which public methods fit the supplied records?")
-        for case in cases:
-            result = study.call(lead, "gx_query_catalog", {"query":case["query"], "kind":kind, "limit":5}, case["id"])
+        first = unrestricted_opening(study, lead)
+        for position, case in enumerate(cases):
+            result = study.call(lead, "gx_query_catalog", {"query":case["query"], "kind":kind, "limit":5,
+                               **(first if position == 0 else {})}, case["id"])
             hits = []
             for item in result["items"]:
                 facts = item.get("capability_facts", {})

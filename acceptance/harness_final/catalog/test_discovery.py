@@ -3,6 +3,7 @@ import json
 from types import SimpleNamespace
 import unittest
 
+from acceptance.harness_final.catalog.evaluate import unrestricted_opening
 from acceptance.harness_refactor.catalog import test_open_discovery
 from gx_core.p0 import catalog_index, catalog_terms
 
@@ -12,6 +13,7 @@ class BilingualDiscovery(unittest.TestCase):
 
     def test_bilingual_and_reference_only(self):
         study, lead = self.admit("What do these public records address?")
+        study.call(lead, "gx_query_catalog", {"kind":"all", **unrestricted_opening(study,lead)}, "opening")
         for term, expected in (("環肽", "deposited-macrocycle-qc@1"), ("cyclic peptide", "deposited-macrocycle-qc@1"),
                                ("乳糖", "yeast-archive-lookup@2"), ("lactose", "yeast-archive-lookup@2")):
             with self.subTest(term=term):

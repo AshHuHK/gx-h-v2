@@ -669,6 +669,13 @@ def commit_open(conn, plan):
             **exploration,
             request_sha256=plan.request_sha,
         )
+        if p["sub_budget"].get("api_calls", 0) == 0 and harness_policy.current(tx, rid):
+            qualifier = "omitted" if "api_calls" not in p["sub_budget"] else "explicitly zero"
+            answer["api_calls_notice"] = (
+                f"api_calls is {qualifier}. This module has no native Codex turn and GX returns a PARTIAL report. "
+                "If a new child investigation is needed, open it with a new operation_key and allocate api_calls "
+                "from the remaining budget."
+            )
         tx.execute(
             "UPDATE v62_modules SET receipt_json=? WHERE module_instance_id=?", (store._j(answer), instance)
         )

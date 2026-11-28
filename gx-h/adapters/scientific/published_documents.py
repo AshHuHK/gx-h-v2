@@ -219,3 +219,68 @@ def html_blocks(raw):
     kinds = {kind for kind, _, _ in parser.results}
     coverage = 'ABSTRACT_ONLY' if kinds == {'abstract'} else 'PARTIAL_TEXT' if kinds else 'UNAVAILABLE'
     return coverage, parser.results, {'scope': 'Visible paragraphs, headings and table cells; scripts and figures excluded.'}
+
+
+def jats_citation_patterns(raw, sha256):
+    """Match explicit citation components of this article, using its own publisher front matter."""
+    article = jats_article(raw)
+    front = article.find('{*}front')
+    if front is None:
+        return []
+    meta = front.find('{*}article-meta')
+    if meta is None:
+        return []
+
+    def value(node):
+        return ' '.join(''.join(node.itertext()).split()) if node is not None else ''
+
+    def literal(node):
+        return re.escape(value(node)).replace(r'\ ', r'\s+')
+
+    patterns = [r'SHA[-‐]256\s*(?:is\s+|[:=]\s*)' + re.escape(sha256)]
+    years = {value(node) for node in meta.findall('{*}pub-date/{*}year') if re.fullmatch(r'\d{4}', value(node))}
+    dates = '|'.join(sorted(years))
+    author = meta.find("{*}contrib-group/{*}contrib[@contrib-type='author']/{*}name/{*}surname")
+    if dates and value(author):
+        patterns.append(literal(author) + r'\s+et\s+al\.?,?\s*\((?:' + dates + r')\)')
+    title = front.find('{*}journal-meta/{*}journal-title-group/{*}journal-title')
+    volume, start, end = (meta.find('{*}'+name) for name in ('volume', 'fpage', 'lpage'))
+    if dates and value(title) and value(volume):
+        pages = ''
+        if value(start) and value(end):
+            pages = r'(?:,\s*' + literal(start) + r'\s*[-–—]\s*' + literal(end) + ')?'
+        patterns.append(literal(title) + r'\s+' + literal(volume) + r'\s*\((?:' + dates + r')\)' + pages)
+    prefixes = {'pmid': (r'PMID\s*:?\s*', r'\d+'), 'doi': (r'DOI\s*:?\s*', r'10\.\d{4,9}/\S+'),
+                'pmcid': (r'(?:PMCID\s*:?\s*)?', r'PMC\d+')}
+    for node in meta.findall('{*}article-id'):
+        kind = node.get('pub-id-type')
+        if kind in prefixes and re.fullmatch(prefixes[kind][1], value(node), re.I):
+            patterns.append(prefixes[kind][0] + literal(node))
+    for label in (label for region in ('body','floats-group') for tag in ('fig','table-wrap')
+                  for label in article.findall('{*}'+region+'//{*}'+tag+'/{*}label')):
+        # A locator identifies the table/figure. It never certifies any value in its body.
+        if re.fullmatch(r'(?:Table|Figure|Fig\.?)\s+[A-Za-z]?\d+[A-Za-z]?', value(label), re.I):
+            patterns.append(literal(label))
+    return [(re.compile(r'(?<!\w)(?:'+expression+r')(?!\w)', re.I), value(author))
+            for expression in dict.fromkeys(patterns)]
+
+
+def cited_bibliography_spans(text, documents):
+    """Resolve adjoining citation fields against at least one common cited original."""
+    matches = {}
+    for ref, patterns in documents:
+        for pattern, first_author in patterns:
+            for match in pattern.finditer(text):
+                byline = re.search(r"([\w’'’-]+)\s+et\s+al\.?,?\s*$", text[:match.start()], re.I)
+                if byline and byline[1].casefold() != first_author.casefold():
+                    continue
+                matches.setdefault(match.span(), set()).add(ref)
+    group = []
+    for span in sorted(matches):
+        if group and not re.fullmatch(r'[\s,()]*', text[group[-1][1]:span[0]]):
+            if set.intersection(*(matches[item] for item in group)):
+                yield from group
+            group = []
+        group.append(span)
+    if group and set.intersection(*(matches[item] for item in group)):
+        yield from group

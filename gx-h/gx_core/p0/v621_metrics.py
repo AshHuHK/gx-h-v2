@@ -406,6 +406,23 @@ def _report_source_spans(conn, rid, bundle, metrics, *, live):
     allowed = None
     documents = {}
 
+    # Only this finding's authorized references may supply its publication metadata.
+    from . import harness_policy
+    cite_originals = live and harness_policy.current(conn, rid)
+    bibliography = {}
+    def bibliography_spans(text, refs):
+        from adapters.scientific import published_documents
+        for ref in refs:
+            if ref not in bibliography:
+                bibliography[ref] = []
+                source = conn.execute("""SELECT blob_sha256 FROM sources WHERE namespace=? AND blob_artifact_ref=?
+                        AND kind='jats' AND status='PARSED' AND version=blob_sha256 AND retraction_status IS NOT 'RETRACTED'
+                        LIMIT 1""", (rid, ref)).fetchone()
+                if source:
+                    raw = ArtifactService(conn).read_bytes(ref, expected_sha256=source[0])
+                    bibliography[ref] = published_documents.jats_citation_patterns(raw, source[0])
+        yield from published_documents.cited_bibliography_spans(text, ((r,bibliography[r]) for r in refs))
+
     def spans(text, source_refs, pointer):
         nonlocal allowed
         if not live:
@@ -430,6 +447,8 @@ def _report_source_spans(conn, rid, bundle, metrics, *, live):
                                     "category": "module_report_structure"})
         proven = _scope_coordinates(text, source_refs, metrics)
         proven.update(match.span() for match in matches)
+        if cite_originals and NUMBER.search(text):
+            proven.update(bibliography_spans(text, source_refs))
         for locator in JSON_LOCATOR.finditer(text):
             if not any(ch.isdigit() for ch in locator[0]):
                 continue

@@ -160,7 +160,7 @@ def start(conn, spec, *, run_key, current):
         v6_prospective.validate_opening(spec, public)
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
     if harness_policy.enabled(spec):
-        inputs["harness_policy"] = harness_policy.VERSION
+        inputs["harness_policy"] = spec["harness_policy"]
     if method_scope is not None:
         inputs.update(method_scope=method_scope, discovery_policy=capability_views.DISCOVERY_POLICY)
     inputs["evidence_policy"] = policy
@@ -775,7 +775,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     }
     from . import capability_views
     if harness_policy.enabled(data["inputs"]):
-        brief["harness_policy"] = harness_policy.VERSION
+        brief["harness_policy"] = data["inputs"]["harness_policy"]
         from . import research_joins
         research_joins.attach(conn, rid, cursor, brief)
     if harness_policy.enabled(data["inputs"]) and head:

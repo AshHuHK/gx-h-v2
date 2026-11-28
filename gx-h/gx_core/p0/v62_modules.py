@@ -263,10 +263,11 @@ def _brief(conn, row, nodes, proofs):
     dialogue = research_dialogue.packet(conn, row["run_id"], row["scope"], row["goal_version"])
     from . import harness_policy, research_handoff, research_topics
     handoff = research_handoff.active(conn, row["run_id"]) and grant.get("communication") != "isolated"
-    modern = harness_policy.active(conn, row["run_id"])
+    marker = harness_policy.version(conn, row["run_id"])
+    modern = marker in (harness_policy.LEGACY_VERSION, harness_policy.VERSION)
     subscriptions = research_topics.subscribed_topics(conn,row) if modern and handoff else []
     return {
-        **({"harness_policy": harness_policy.VERSION} if modern else {}),
+        **({"harness_policy": marker} if modern else {}),
         **({"subscribed_topics": subscriptions} if subscriptions else {}),
         **({"pi_dialogue": dialogue} if dialogue else {}),
         **({"researcher_handoff": True, "peer_hints": research_handoff.inbox(conn, row["run_id"], row["scope"])}

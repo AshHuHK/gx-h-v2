@@ -1,0 +1,295 @@
+{
+  "arms": [
+    {
+      "arm": "candidate",
+      "arm_id": "gxr_01m8g13cqej2zc3fs1",
+      "blind_grade": {
+        "marks": {
+          "areas": {
+            "mark": "pass",
+            "reason": "Both values match the drainage-area field for the stated station IDs and use the correct units.",
+            "report_support": "Assigns 11,560 mi² to the Potomac gauge and 49.4 mi² to the Northwest Branch gauge.",
+            "source_locator": "original_area: USGS Site File, drain_area_va column, rows keyed by site_no 01646500 and 01651000."
+          },
+          "normalized": {
+            "mark": "pass",
+            "reason": "The Potomac-to-Northwest Branch yield ratio is the volume ratio multiplied by 49.4/11,560, giving 1.814. The Potomac yielded more per square mile, but not ten times as much.",
+            "report_support": "Reports monthly yields of 72.67 and 40.07 million L/mi², respectively, and rejects the tenfold yield claim.",
+            "source_locator": "original_daily.value.timeSeries[0] and [1], May discharge values; original_area, drain_area_va for the corresponding site_no rows."
+          },
+          "provenance_and_limits": {
+            "mark": "pass",
+            "reason": "The flow and area inputs are separately traceable. The report confines its conclusions to May 2023 without proposing a hydrological cause or generalizing to other months.",
+            "report_support": "Identifies the USGS daily means by gauge IDs and May dates, and separately attributes the drainage areas to the USGS inventory field drain_area_va.",
+            "source_locator": "original_daily.value.queryInfo and timeSeries[*].name identify the daily records; original_area identifies the separate USGS Site File and its drain_area_va field."
+          },
+          "raw_claim": {
+            "mark": "pass",
+            "reason": "Potomac volume divided by Northwest Branch volume gives 343,380/809.0 = 424.45, well above the tenfold threshold.",
+            "report_support": "Gives a Potomac-to-Northwest Branch volume ratio of 424.45 and recommends publishing the first claim.",
+            "source_locator": "original_daily.value.timeSeries: May daily discharge values for USGS:01646500:00060:00003 and USGS:01651000:00060:00003."
+          },
+          "sensitivity": {
+            "mark": "pass",
+            "reason": "Opposite changes at the two stations give the extreme multipliers 0.95/1.05 and 1.05/0.95 for either ratio. Even the minimum volume ratio exceeds ten, while the maximum yield ratio remains below ten.",
+            "report_support": "Labels the changes as the desk’s independent ±5% scenario, holds areas fixed, and reports ranges of 384.03–469.13 for volume and 1.641–2.005 for yield.",
+            "source_locator": "question: desk ±5% station-flow scenario; original_daily.value.timeSeries[0] and [1] and original_area station drainage areas."
+          },
+          "sites_time": {
+            "mark": "pass",
+            "reason": "Each gauge has one A-qualified daily mean on each of the same 31 dates, confirming the reported 44,640 common minutes.",
+            "report_support": "Identifies the Potomac at Little Falls (01646500) and Northwest Branch Anacostia near Hyattsville (01651000), with approved daily means on May 1–31, 2023.",
+            "source_locator": "original_daily.value.timeSeries[0] and [1]: sourceInfo.siteCode, variable.options, and values[0].value[*] dates and qualifiers."
+          },
+          "volume": {
+            "mark": "pass",
+            "reason": "Integrating the daily means gives 343,380 and 809.0 cfs-days, respectively. Converting with 86,400 s/day and 28.316846592 L/ft³ reproduces both litre totals to the reported rounding.",
+            "report_support": "Reports 840,105,110,830.55 L for the Potomac and 1,979,279,616.35 L for the Northwest Branch.",
+            "source_locator": "original_daily.value.timeSeries[0] and [1]: variable.unit.unitCode and values[0].value[*].value."
+          }
+        },
+        "packet_sha256": "45618b31bd81e19171923dd90a2c785a8b3909bf093aedba0dccc85db6fc89a4",
+        "score": [
+          7,
+          7
+        ],
+        "thread": "01a22019-d8d9-7dc3-885c-f418b6bf3e11",
+        "turn": "01a22019-ec94-7d92-a3a7-a462630f832e"
+      },
+      "control_or_other_observed_gap_seconds": 12.742,
+      "end_to_end_takeover_verified": true,
+      "extra_launches_for_same_provider_request": 0,
+      "interruption": {
+        "at": 1795834413.4164424,
+        "controller_pid": 2004776,
+        "controller_returncode": -9,
+        "host_pids": [
+          2006442,
+          2004790
+        ],
+        "original_job": {
+          "job_id": "gxj_01m8g1505ckz2bg1vg",
+          "runner_pid": 2011273,
+          "runner_started": "3015387609",
+          "tool_pid": 2011275,
+          "tool_started": "3015387612"
+        },
+        "physical_start_ticks_after_signal": {
+          "runner": "3015387609",
+          "tool": "3015387612"
+        },
+        "qualified_at_cut": true
+      },
+      "label": "7241216d6ec223f407f9",
+      "logical": {
+        "identity": "GX admission rows; shared subscriptions separately shown where present",
+        "in_flight_sharing_implemented": true,
+        "node_requests": [
+          {
+            "branch_id": "branch_55ff75e29354d34ed4311d6fe99465dc",
+            "exec_key": "cb1d1c4807499fbc8fcda05f897b21eed6dc1b3d5ee9b7a82adb56b5fb40c14e",
+            "identity_version": 2,
+            "independent_node": "node_b6570fdb36209a816d0f5264775cb6c2",
+            "job_id": "gxj_01m8g1505ckz2bg1vg",
+            "node_id": "node_b6570fdb36209a816d0f5264775cb6c2",
+            "operation_key": "v6.node:348fc379e136a40a984956e63136466bc4ba6355bd4080c6b466468769f6eb5f",
+            "private_branch": null,
+            "public_inputs": null,
+            "randomness": "[{\"mode\":\"unknown\"}]",
+            "result_ref": "gxa_01m8g151v3vnntxgxh",
+            "reused_from": null,
+            "status": "SUCCEEDED"
+          }
+        ],
+        "public_duplicate_eligible_requests": 0,
+        "public_equivalent_groups_with_multiple_requests": {},
+        "requests": [
+          {
+            "capability_id": "discharge-concurrent",
+            "capability_version": "1",
+            "created_at": "2026-11-28T02:53:33.300Z",
+            "idempotency_key": "job:gxr_01m8g13cqej2zc3fs1:v6.node:348fc379e136a40a984956e63136466bc4ba6355bd4080c6b466468769f6eb5f",
+            "job_id": "gxj_01m8g1505ckz2bg1vg",
+            "submitted_at": "2026-11-28T02:53:33.375Z",
+            "task_id": null
+          }
+        ],
+        "subscribe_and_settle_events": [
+          {
+            "event_id": 51,
+            "job_id": "gxj_01m8g1505ckz2bg1vg",
+            "kind": "v6.node.settled",
+            "physical_owner": null,
+            "subject_id": "node_b6570fdb36209a816d0f5264775cb6c2",
+            "ts": "2026-11-28T02:53:35.112Z"
+          }
+        ]
+      },
+      "measurement_execution_union_seconds": 0.242,
+      "official": {
+        "accounting": "largest observed official cumulative value per thread; approximate. Interrupted tails can be missing. No additional payment.",
+        "complete_turn_intervals": 4,
+        "lead_received_inventory": null,
+        "model_turn_active_union_seconds_observed": 518.811,
+        "observed_token_subtotals_by_thread": {
+          "01a22011-c7ae-7233-94f3-b0ddf7aa871f": 114571,
+          "01a22012-960d-74d0-9ad0-5dda51696d8a": 109921,
+          "01a22012-96b3-7f41-adf6-691fa66752a9": 1006041,
+          "01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3": 309009
+        },
+        "observed_tokens_sum": 1539542,
+        "turn_intervals_expected": 4,
+        "turns": [
+          {
+            "effort": "max",
+            "end": "2026-11-28T02:53:33.124Z",
+            "first_context": "2026-11-28T02:52:51.984Z",
+            "model": "gpt-6.2-astra",
+            "start": "2026-11-28T02:52:45.942Z",
+            "thread": "01a22011-c7ae-7233-94f3-b0ddf7aa871f",
+            "turn": "01a22011-c7ed-7c81-aa9a-e6899ff53b6b"
+          },
+          {
+            "effort": "max",
+            "end": "2026-11-28T02:55:07.339Z",
+            "first_context": "2026-11-28T02:53:44.179Z",
+            "model": "gpt-6.2-astra",
+            "start": "2026-11-28T02:53:38.802Z",
+            "thread": "01a22012-960d-74d0-9ad0-5dda51696d8a",
+            "turn": "01a22012-966c-7fc1-9be9-f3b753e79d67"
+          },
+          {
+            "effort": "max",
+            "end": "2026-11-28T02:59:52.544Z",
+            "first_context": "2026-11-28T02:53:45.152Z",
+            "model": "gpt-6.2-astra",
+            "start": "2026-11-28T02:53:38.925Z",
+            "thread": "01a22012-96b3-7f41-adf6-691fa66752a9",
+            "turn": "01a22012-96e6-7cf3-96c9-e568f0ce247f"
+          },
+          {
+            "effort": "max",
+            "end": "2026-11-28T03:01:30.431Z",
+            "first_context": "2026-11-28T02:57:25.267Z",
+            "model": "gpt-6.2-astra",
+            "start": "2026-11-28T02:57:22.090Z",
+            "thread": "01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3",
+            "turn": "01a22015-fea5-76a3-9ce5-88bc69dee52c"
+          }
+        ]
+      },
+      "outcome": {
+        "arm": "candidate",
+        "elapsed_seconds": 531.795,
+        "facts": {
+          "goal": {
+            "run_id": "gxr_01m8g13cqej2zc3fs1",
+            "status": "CLOSED"
+          },
+          "jobs": [
+            {
+              "job_id": "gxj_01m8g1505ckz2bg1vg",
+              "status": "SUCCEEDED"
+            }
+          ],
+          "last_event": 91,
+          "turns": [
+            {
+              "thread_id": "01a22012-960d-74d0-9ad0-5dda51696d8a",
+              "turn_id": "01a22012-966c-7fc1-9be9-f3b753e79d67"
+            },
+            {
+              "thread_id": "01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3",
+              "turn_id": "01a22015-fea5-76a3-9ce5-88bc69dee52c"
+            },
+            {
+              "thread_id": "01a22012-96b3-7f41-adf6-691fa66752a9",
+              "turn_id": "01a22012-96e6-7cf3-96c9-e568f0ce247f"
+            },
+            {
+              "thread_id": "01a22011-c7ae-7233-94f3-b0ddf7aa871f",
+              "turn_id": "01a22011-c7ed-7c81-aa9a-e6899ff53b6b"
+            }
+          ]
+        },
+        "outcome": "finished"
+      },
+      "physical": [
+        {
+          "input_sha256": {
+            "record": "0b464958363949558765ee47b38c60bf10f61e3c4ad39552d7aab95f422972d0"
+          },
+          "job_id": "gxj_01m8g1505ckz2bg1vg",
+          "launch_at": "2026-11-28T02:53:33.367Z",
+          "launch_to_execution_seconds": 0.029,
+          "method": "discharge-concurrent@1",
+          "provider": {
+            "at": "2026-11-28T02:53:33.385Z",
+            "job_id": "gxj_01m8g1505ckz2bg1vg",
+            "runner_pid": 2011273,
+            "runner_started": "3015387609",
+            "schema": "gx.job_runner/2"
+          },
+          "provider_receipt": {
+            "cpu_system_seconds": 0.004,
+            "cpu_user_seconds": 0.031,
+            "exit_code": 0,
+            "files": [
+              {
+                "bytes": 2067,
+                "path": "paired.json",
+                "sha256": "231291156e18541f791deaa94e328679e7251d800a5517c9cea8fb3ccd0ddd6b"
+              }
+            ],
+            "finished_at": "2026-11-28T02:53:33.638Z",
+            "result": "exited",
+            "runner_pid": 2011273,
+            "runner_started": "3015387609",
+            "signal": null,
+            "started_at": "2026-11-28T02:53:33.396Z",
+            "tool_pid": 2011275,
+            "tool_started": "3015387612",
+            "wall_seconds": 0.228
+          },
+          "request_sha256": "04e38e7578e659caa02c7dd36d20c8f3956353d698a987b7123d7ce8438c2e52",
+          "tool_output_paths": [
+            "paired.json"
+          ]
+        }
+      ],
+      "physical_continuity_verified": true,
+      "physical_launches": 1,
+      "pin": {
+        "core_tree": "7803a22a0ef3a3a512228495e6728e63adba8e30",
+        "plugins": {
+          "org.gx.hydro-concurrent@1.0.0": "b949664445594f47337a80cc5c52cdc7f9640d3afde39d5c70f37843bd3e7729",
+          "org.gx.hydro-marginal@1.0.0": "0ca1e652d43b890280a4b44887bf035935e354e02fbe8bd91fdb87d16afad3cd"
+        },
+        "revision": "6077e26cf0cdbebcf771f7da385d3340976e9516",
+        "site_sha256": "fb539ef3cc9426bfe80b0498dc517f99cf7ded98af88d23d8b9c5c98cab5e71d"
+      },
+      "resumed_controller_adoption_evidence": [
+        {
+          "consumed_at": "2026-11-28T02:53:35.044Z",
+          "created_at": "2026-11-28T02:53:34.980Z",
+          "idempotency_key": "job.terminal:gxj_01m8g1505ckz2bg1vg",
+          "original_job_id": "gxj_01m8g1505ckz2bg1vg",
+          "outbox_id": 2,
+          "topic": "job.terminal",
+          "type": "GX Job terminal outbox"
+        }
+      ],
+      "timing_definition": "Measured role intervals may overlap. Turn duration includes synchronous tools; residual is controller, queue and transport jointly, not a pure controller CPU estimate."
+    }
+  ],
+  "followup_protocol_sha256": "f23382487a0b3cb2c0503daf084ed71b6a829e201d563fdb7515d3a2b44d1eab",
+  "general_effect_size": null,
+  "n": 1,
+  "series": {
+    "baseline": "4b6aa93ad5bf638d06bed7004c26c27d030a59ea",
+    "candidate": "6077e26cf0cdbebcf771f7da385d3340976e9516",
+    "native_binary_sha256": "b452ca20f838a8855a88a41050ee4a694033fff4ea3ecdad5633e6e0e8d13f2b",
+    "registration_sha256": "a2fd1162851ba271313d228540aa509d79fb500a4acb67ebf94e2cef3e963508"
+  },
+  "study": "post-fix original follow-up"
+}

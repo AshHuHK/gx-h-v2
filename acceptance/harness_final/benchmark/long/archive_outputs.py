@@ -6,6 +6,46 @@ from decimal import Decimal
 from pathlib import Path
 from support import HERE, METHODS, P, read, registered, sha
 from routing import receipt
+from run import instant
+
+
+def measured_timing(folder, arm):
+    start = read(folder / "began.json")["at"]
+    cut = arm["interruption"]["at"] if arm["interruption"] else None
+    resume = (
+        read(folder / "second-launch.json")["at"] if (folder / "second-launch.json").exists() else None
+    )
+    starts = []
+    study_intervals = []
+    censored = []
+    for t in arm["official"]["turns"]:
+        if not t["start"]:
+            continue
+        a = instant(t["start"])
+        starts.append(a)
+        if t["end"]:
+            study_intervals.append((a, instant(t["end"])))
+        elif cut is not None and a <= cut:
+            study_intervals.append((a, cut))
+            censored.append(t["turn"])
+    # Run intervals overlap when Codex delegates; count overlapping wall time only once.
+    from assessment import union
+
+    wall = arm["outcome"]["elapsed_seconds"]
+    return {
+        "elapsed_seconds": wall,
+        "cli_launch_to_first_official_turn_seconds": round(min(starts) - start, 3) if starts else None,
+        "interruption_to_resume_launch_seconds": (
+            round(resume - cut, 3) if resume is not None and cut is not None else None
+        ),
+        "official_turn_active_union_seconds_including_interrupted_prefix": union(study_intervals),
+        "interrupted_turn_ids_censored_at_controller_cut": censored,
+        "turn_interval_coverage": [len(study_intervals), len(arm["official"]["turns"])],
+        "measured_provider_startup_seconds": [j["launch_to_execution_seconds"] for j in arm["physical"]],
+        "measurement_execution_union_seconds": arm["measurement_execution_union_seconds"],
+        "external_gpu_queue_seconds": 0,
+        "interpretation": "Official turn intervals include transport, model service, reasoning and synchronous tools. Startup and recovery gaps are real control-path wall intervals. Service-side model queue and exclusive controller CPU cannot be separated from these receipts.",
+    }
 
 
 def archive(work, field):
@@ -69,7 +109,10 @@ def archive(work, field):
         "projected_flow_sha256": sha(P / "record.json"),
         "reference_sha256": sha(P / "reference.json"),
         "outputs": outputs,
-        "late_source_route": {arm["arm"]:receipt(work/arm["arm"],arm["arm"]) for arm in summary["arms"]},
+        "timing": {arm["arm"]: measured_timing(work / arm["arm"], arm) for arm in summary["arms"]},
+        "late_source_route": {
+            arm["arm"]: receipt(work / arm["arm"], arm["arm"]) for arm in summary["arms"]
+        },
     }
     dest = field / "output-verification.json"
     text = json.dumps(verification, ensure_ascii=False, indent=2) + "\n"

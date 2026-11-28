@@ -25,21 +25,33 @@ def followup(work, candidate, out):
         save(label_path, {"label": secrets.token_hex(10)})
     label = read(label_path)["label"]
     score = blind_judge(work / "anonymous" / label, answer) if answer else None
-    entry = {"label":label,"blind_grade":score,**arm_result(work,"candidate")}
-    out.mkdir(parents=True,exist_ok=True)
+    entry = {"label": label, "blind_grade": score, **arm_result(work, "candidate")}
+    out.mkdir(parents=True, exist_ok=True)
     if answer:
         (out / "candidate.md").write_text(answer + "\n")
-    save(out / "results.json", {"study":"post-fix original follow-up","series":read(work/"series.json"),
-            "followup_protocol_sha256":sha(registration),"arms":[entry],"n":1,"general_effect_size":None})
-    archive(work,out)
-    return {"outcome":outcome["outcome"],"score":score and score.get("score"),
-            "in_flight_recovery":entry["end_to_end_takeover_verified"]}
+    save(
+        out / "results.json",
+        {
+            "study": "post-fix original follow-up",
+            "series": read(work / "series.json"),
+            "followup_protocol_sha256": sha(registration),
+            "arms": [entry],
+            "n": 1,
+            "general_effect_size": None,
+        },
+    )
+    archive(work, out)
+    return {
+        "outcome": outcome["outcome"],
+        "score": score and score.get("score"),
+        "in_flight_recovery": entry["end_to_end_takeover_verified"],
+    }
 
 
-if __name__=="__main__":
-    p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("work",type=Path)
+if __name__ == "__main__":
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("work", type=Path)
     p.add_argument("candidate")
-    p.add_argument("--out",type=Path,default=HERE/"followup")
-    args=p.parse_args()
-    print(json.dumps(followup(args.work.resolve(),args.candidate,args.out)))
+    p.add_argument("--out", type=Path, default=HERE / "followup")
+    args = p.parse_args()
+    print(json.dumps(followup(args.work.resolve(), args.candidate, args.out)))

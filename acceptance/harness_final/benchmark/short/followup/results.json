@@ -1,0 +1,262 @@
+{
+  "blind_science": {
+    "denominator": 7,
+    "marks": {
+      "conditions": {
+        "mark": "pass",
+        "reason": "All three conditions match the table note. E1 also confirms the pH and temperature.",
+        "report_support": "“5 mM α-pNPG, pH 7.0, 30 °C”",
+        "source_locator": "E2, Table 2 (t0010), assay note; E1, assay_annotation."
+      },
+      "counterevidence": {
+        "mark": "pass",
+        "reason": "The specific activity is 3.9 μmol/min/mg; relative to the isomaltose activity of 7.2 μmol/min/mg, it is 54%. W1 therefore adds no independent measurement.",
+        "report_support": "“Publish one α-pNPG result.” The report takes μmol/min/mg from the heading and identifies 54 as a percentage.",
+        "source_locator": "E1, assay_value_as_archived (3.9) and units_on_this_export_row (null); E2, Table 2 (t0010), unit heading, Ima3p cells “3.9 (54)” and “7.2 (100),” and bracket note."
+      },
+      "locator": {
+        "mark": "pass",
+        "reason": "Both the archive row and the original table column are identifiable, and the PMID links them.",
+        "report_support": "The report cites “BRENDA 2026.1, 3.2.1.10/specific_activity/59” and “Deng et al., FEBS Open Bio 4 (2014), 200–212, Table 2 (JATS t0010), Ima3p column.”",
+        "source_locator": "E1, BRENDA 2026.1, 3.2.1.10/specific_activity/59, linked PMID 24649402; E2, Deng et al., FEBS Open Bio 4 (2014), 200–212, DOI 10.1016/j.fob.2014.02.004, Table 2 (t0010)."
+      },
+      "protein": {
+        "mark": "pass",
+        "reason": "The protein name comes from the published column and the accession from the linked archive entry.",
+        "report_support": "“Saccharomyces cerevisiae Ima3p (E1 accession P0CW40)”",
+        "source_locator": "E2, Table 2 (t0010), Ima3p column; E1, organism_field (Saccharomyces cerevisiae) and accessions (P0CW40)."
+      },
+      "strain": {
+        "mark": "pass",
+        "reason": "The host is documented; neither the host designation nor the genome discussion establishes an enzyme source strain.",
+        "report_support": "“Remove W1’s S288C attribution and leave enzyme source strain unknown.” The report identifies CEN.PK113-5D as the expression host and S288c as the genome discussed.",
+        "source_locator": "E1, strain_field (null); E2, Introduction (s0005), S288c genome, and Experimental procedures (s0080), CEN.PK113-5D expression host."
+      },
+      "substrate": {
+        "mark": "pass",
+        "reason": "It distinguishes the measured substrate, α-pNPG, from isomaltose, whose velocity supplies the denominator.",
+        "report_support": "The report places “3.9 (54)” on α-pNPG and identifies 54 as “percent of Ima3p’s isomaltose velocity.”",
+        "source_locator": "E1, assay_annotation (4-nitrophenyl alpha-D-glucopyranoside); E2, Table 2 (t0010), Ima3p column, α-pNPG and Isomaltose rows and bracket note."
+      },
+      "uncertainty": {
+        "mark": "pass",
+        "reason": "Five experiments underlie one published summary. The report counts that summary once and does not infer individual experiment values.",
+        "report_support": "The report calls for “one α-pNPG result” and describes it as “a mean of five experiments.”",
+        "source_locator": "E2, Table 2 (t0010), Ima3p α-pNPG cell and note (“mean of five experiments”); E1, linked_pubmed 24649402; W1, citation to the same Table 2 column."
+      }
+    },
+    "packet_sha256": "15831b4bae7f53e8e44a1c5a43788eea819f1208556a41e4082c7eb29ef431af",
+    "passed": 7,
+    "session": [
+      {
+        "effort": "max",
+        "id": "01a22016-f100-7270-90a4-8141923d1df9",
+        "model": "gpt-6.2-astra",
+        "session": "sessions/2026/11/28/rollout-2026-11-28T02-58-24-01a22016-dddb-78f2-9747-8f37ab9d82b9.jsonl",
+        "session_sha256": "d3aa7b04c350ba9726a94f80f961ea0900d8a12dff176eb85faeb232043edcb5",
+        "started": "2026-11-28T02:58:28.133Z",
+        "thread": "01a22016-dddb-78f2-9747-8f37ab9d82b9"
+      }
+    ],
+    "turn": "01a22016-f100-7270-90a4-8141923d1df9"
+  },
+  "friction": {
+    "by_class": {
+      "other_or_indeterminate": 1,
+      "scientific_or_PI_disposition_choice": 1
+    },
+    "calls": [
+      {
+        "accepted": false,
+        "call": "call_cd16c0eff516400a9bd984efed848985",
+        "classification": "other_or_indeterminate",
+        "close": false,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "ops[0].expected_delivery",
+            "operation": "open_intent",
+            "public_field": "ops[0]"
+          },
+          "evidence_ref": null,
+          "message": "open_intent at $.ops[0].expected_delivery: property 'expected_delivery' is not allowed",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22013-bf66-7372-b0c3-c4d52e8d582c"
+      },
+      {
+        "accepted": true,
+        "call": "call_c5de40c55490401b9e272328c715b7ef",
+        "classification": null,
+        "close": false,
+        "refusal": {},
+        "turn": "01a22013-bf66-7372-b0c3-c4d52e8d582c"
+      },
+      {
+        "accepted": false,
+        "call": "call_1b45b30903cf47139268d0a92db59461",
+        "classification": "scientific_or_PI_disposition_choice",
+        "close": true,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "pi_dispositions[0].outcome"
+          },
+          "evidence_ref": null,
+          "message": "$.pi_dispositions[0].outcome: missing required property 'outcome'; $.pi_dispositions[0].reason: missing required property 'reason'; $.pi_dispositions[0].disposition: property 'disposition' is not allowed; $.pi_dispositions[0].rationale: property 'rationale' is not allowed. Supply pi_dispositions[0].feedback_id, pi_dispositions[0].outcome (one of adopt, maintain, measure, defer) and pi_dispositions[0].reason. Supply ops[0].unresolved; use [] only if you judge that no issues remain. For ordinary Run closure, omit top-level disposition and affected_scope. Keep stop_reason if it describes why the Run ended.",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22014-d11f-76c3-8156-d10374060bcc"
+      },
+      {
+        "accepted": true,
+        "call": "call_fb02e20f54d8443b8404e7fc533a2b48",
+        "classification": null,
+        "close": true,
+        "refusal": {},
+        "turn": "01a22014-d11f-76c3-8156-d10374060bcc"
+      }
+    ],
+    "close_submissions": 2,
+    "first_close": {
+      "accepted": 0,
+      "denominator": 1
+    },
+    "rejections": 2
+  },
+  "frozen_candidate": "6077e26cf0cdbebcf771f7da385d3340976e9516",
+  "late_delivery": {
+    "at": 1795834569.874,
+    "item": "01a22014-e48b-7bd0-ab25-91ddbaf40b43",
+    "line": 10,
+    "session": "sessions/2026/11/28/rollout-2026-11-28T02-56-04-01a22014-d0eb-70b1-a34a-3f9ddafb7ab3.jsonl",
+    "source": "official UserMessage",
+    "thread": "01a22014-d0eb-70b1-a34a-3f9ddafb7ab3",
+    "turn": "01a22014-d11f-76c3-8156-d10374060bcc",
+    "utc": "2026-11-28T02:56:09.874Z"
+  },
+  "official_fault": {
+    "at": 1795834459.5187685,
+    "before": {
+      "goal": {
+        "run_id": "gxr_01m8g15z1x8rjmec38",
+        "status": "OPEN"
+      },
+      "jobs": [],
+      "last_event": 20,
+      "turns": [
+        {
+          "thread_id": "01a22013-0c09-7543-a71a-d0dfb0dbfdf8",
+          "turn_id": "01a22013-0c40-7ec0-96f2-7b4142f96fdc"
+        }
+      ]
+    },
+    "checkpoint": {
+      "archive_sha256": "64152e9093d30a556bfcfd559e27485ff875795f4d6a02d669d39f0e90e89605",
+      "artifact_ref": "gxa_01m8g15z2pw84rkzyt",
+      "call_id": "exec-70e04d92-7424-40c2-b99e-5a3efd4499b1",
+      "official_time": "2026-11-28T02:54:19.457Z",
+      "receipt_line": 17,
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-54-08-01a22013-0c09-7543-a71a-d0dfb0dbfdf8.jsonl",
+      "thread_id": "01a22013-0c09-7543-a71a-d0dfb0dbfdf8",
+      "time": 1795834459.4924657,
+      "turn_id": "01a22013-0c40-7ec0-96f2-7b4142f96fdc"
+    },
+    "driver_returncode": -9,
+    "logical_event": "first successful E1 read before close",
+    "processes_signalled": 3,
+    "signal": "SIGKILL"
+  },
+  "official_turns": [
+    {
+      "effort": "max",
+      "id": "01a22013-0c40-7ec0-96f2-7b4142f96fdc",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-54-08-01a22013-0c09-7543-a71a-d0dfb0dbfdf8.jsonl",
+      "session_sha256": "6deb037a3109808d8633acf4ac4572823ea90347c36b614b1a378f28ede53607",
+      "started": "2026-11-28T02:54:12.258Z",
+      "thread": "01a22013-0c09-7543-a71a-d0dfb0dbfdf8"
+    },
+    {
+      "effort": "max",
+      "id": "01a22013-bf66-7372-b0c3-c4d52e8d582c",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-54-08-01a22013-0c09-7543-a71a-d0dfb0dbfdf8.jsonl",
+      "session_sha256": "6deb037a3109808d8633acf4ac4572823ea90347c36b614b1a378f28ede53607",
+      "started": "2026-11-28T02:54:56.529Z",
+      "thread": "01a22013-0c09-7543-a71a-d0dfb0dbfdf8"
+    },
+    {
+      "effort": "max",
+      "id": "01a22013-4a46-7651-8d85-1c77e98d372a",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-54-24-01a22013-4a08-7b11-bee0-8a0f810478e5.jsonl",
+      "session_sha256": "7d78474ff6d226b48442fd876bf568d5886ebe3180346ea37b5500abb87c14be",
+      "started": "2026-11-28T02:54:29.098Z",
+      "thread": "01a22013-4a08-7b11-bee0-8a0f810478e5"
+    },
+    {
+      "effort": "max",
+      "id": "01a22014-d11f-76c3-8156-d10374060bcc",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-56-04-01a22014-d0eb-70b1-a34a-3f9ddafb7ab3.jsonl",
+      "session_sha256": "3749632d38272348fd72786391514e053368316286d7149f163063c89d8607a5",
+      "started": "2026-11-28T02:56:09.846Z",
+      "thread": "01a22014-d0eb-70b1-a34a-3f9ddafb7ab3"
+    }
+  ],
+  "previous": {
+    "actual_turns": 6,
+    "candidate": "5904a4fdac3b0267a80fc7b59d3c00427a4871d4",
+    "close_submissions": 11,
+    "first_close": {
+      "accepted": 0,
+      "denominator": 1
+    },
+    "rejections": 14,
+    "score": [
+      7,
+      7
+    ],
+    "seconds": 501.13
+  },
+  "registration_sha256": "2962260353a35e957c53ecc4bd6e7dc651d22f52fde33131955c8ca5f234df66",
+  "run": {
+    "arm": "revised",
+    "elapsed_seconds": 253.43,
+    "facts": {
+      "goal": {
+        "run_id": "gxr_01m8g15z1x8rjmec38",
+        "status": "CLOSED"
+      },
+      "jobs": [],
+      "last_event": 64,
+      "turns": [
+        {
+          "thread_id": "01a22013-4a08-7b11-bee0-8a0f810478e5",
+          "turn_id": "01a22013-4a46-7651-8d85-1c77e98d372a"
+        },
+        {
+          "thread_id": "01a22013-0c09-7543-a71a-d0dfb0dbfdf8",
+          "turn_id": "01a22013-bf66-7372-b0c3-c4d52e8d582c"
+        },
+        {
+          "thread_id": "01a22014-d0eb-70b1-a34a-3f9ddafb7ab3",
+          "turn_id": "01a22014-d11f-76c3-8156-d10374060bcc"
+        },
+        {
+          "thread_id": "01a22013-0c09-7543-a71a-d0dfb0dbfdf8",
+          "turn_id": "01a22013-0c40-7ec0-96f2-7b4142f96fdc"
+        }
+      ]
+    },
+    "finish": 1795834696.8252423,
+    "outcome": "finished"
+  },
+  "turns_delta_vs_original_native": 2,
+  "turns_delta_vs_previous_GX": -2
+}

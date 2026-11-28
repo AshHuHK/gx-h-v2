@@ -86,10 +86,16 @@ A separate read-only check opens an earlier field archive's genuine saved macro 
 
 完整版的既有 92 項套件首次有一個測例在 2 秒時讀到仍在 RUNNING 的 CPU 節點。修正後的測具反覆用正常入口恢復相同 Run，當指定節點到達終態再核對原 Job ID 與授權，總耗時以 20 秒為限。兩個部署的既有套件最終均為 92/92，首次輸出及修後觀察均已保存。[修後逐站回執](receipts/followup-tests.json) · [修後產品檔與登錄差異](receipts/followup-parity.json)
 
-## 書目引用的最終產品
+## 書目引用修復版
 
 完整版 `e8140c6c` 與精簡版 `569657ae` 包含限定具名 JATS 原件、作者或引用鍵的書目核對。各自安裝的 `gx-h/adapters` tree 是 `bd5cce6eb84b4336d562e026449d78e9210628bb` 與 `5400b8b75f38d7407e7e0594464cbc199b6f32d0`。精簡站的科學解析器採三方合併並比對原始 bytes。唯一的解析器差異是本站的 PDF 依賴提示指向 `requirements.txt`。
 
 這次把完整的 adapters 路徑納入逐檔產品比較，對原凍結、修正排序、晚到 PI、書目修正四個世代分別補記摘要，保留先前命名範圍較窄的原有文件。最終兩站對原起點共有 54 個變更的交付檔，其中 52 個 blob 完全相同，另兩個為站點插件登錄表、科學文件解析器。新檢查也驗證其餘原有跨站差異沒有擴大。[四世代原場回溯對照](receipts/formal-parity-including-adapters.json) · [排序修正版](receipts/release-parity-including-adapters.json) · [晚到 PI 修復版](receipts/followup-parity-including-adapters.json) · [最終逐檔差異](receipts/bibliography-parity-including-adapters.json)
 
 書目最終版的兩個部署分別通過歷史 121/121、既有 Harness 92/92、新增套件 67/67，書目、既有科學讀數及真資料庫邊界定向 16/16。乾淨無掛載的兩個檢出分別為新版 67/67、既有套件 90 通過及 2 個要求授權資料的明示跳過。精簡站一開始缺少舊版已選數值行測具，加入完整版同一檔案後重新實跑。原題首次把書目卷號與年份視為需要科學量測的數字而拒絕提交，該拒絕與事後重播分別保存。最終站點的舊 Run 冷重開均為 0 個額外 Job、0 個原生回合。[最終測試與首輪缺少測具的紀錄](receipts/bibliography-tests.json)
+
+## Lead 補引與研究交接的最終產品
+
+完整產品 `1525adbce1d3b699b6b5594d686f18a36d7e9e8e` 與精簡產品 `fdfa87f319649705d831d5602639134a3f43d90f` 區分兩種被拒後的動作。若同一 Lead 已收到審查，只漏了在結題決定引用，錯誤回執列出其可見的缺項，該席可立即補正。若新任務已接手，舊席的回執告知交接，控制器保持現有接手權。真實 A′ 原場保留其當時收到的指令。[原場與受控補正回執](../close_corrections/README.md)
+
+末輪兩站掛載現場各自通過歷史 121/121、既有 Harness 92/92、新版 69/69，另有當前席補正、原席交接與書目定向 10/10。兩個無掛載獨立檢出的新版結果也各為 69/69，既有套件各 90 通過、2 個授權資料案例明示跳過。兩站共通核心與 adapters 逐檔比對，54 個對原起點有修改的交付檔包含 52 個完全相同的 blob，加上各自的 registry 及 PDF 安裝提示。原場 /2 Run 的報告及外部 Job 核對仍為 0 額外 Job、0 回合。[最終雙部署產品差異](receipts/supersession-parity.json) · [末輪逐站測試與實際分母](receipts/supersession-tests.json)

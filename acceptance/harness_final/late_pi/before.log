@@ -1,0 +1,31 @@
+test_branch_private_material_omits_body_and_does_not_refresh_lead (__main__.LatePI.test_branch_private_material_omits_body_and_does_not_refresh_lead) ... ok
+test_disclosed_and_disposed_feedback_or_main_only_discussion_do_not_block_close (__main__.LatePI.test_disclosed_and_disposed_feedback_or_main_only_discussion_do_not_block_close) ... ok
+test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts (__main__.LatePI.test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts) ...
+  test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts (__main__.LatePI.test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts) (when='after_ack') ... FAIL
+  test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts (__main__.LatePI.test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts) (when='after_prepare') ... FAIL
+test_previous_goal_feedback_cannot_block_or_enter_current_goal (__main__.LatePI.test_previous_goal_feedback_cannot_block_or_enter_current_goal) ... ok
+
+======================================================================
+FAIL: test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts (__main__.LatePI.test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts) (when='after_ack')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/late_pi/test_late_feedback.py", line 53, in test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts
+    self.check_delivery_boundary(when)
+  File "acceptance/harness_final/late_pi/test_late_feedback.py", line 77, in check_delivery_boundary
+    self.fail(json.dumps({"accepted_obsolete_close":old_receipt["decision_ref"],
+AssertionError: {"accepted_obsolete_close": "gxa_04fcb20cf5438b79a93213861f31c40df66991e28965e4f6d47e23fb5e1e2ebb", "run_id": "gxr_01m8g106b3a6zw7hjz", "frozen_cursor": 14, "late_feedback_events": [22, 25], "state": "CLOSING"}
+
+======================================================================
+FAIL: test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts (__main__.LatePI.test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts) (when='after_prepare')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/late_pi/test_late_feedback.py", line 53, in test_earlier_lead_cannot_close_after_two_late_main_feedback_receipts
+    self.check_delivery_boundary(when)
+  File "acceptance/harness_final/late_pi/test_late_feedback.py", line 77, in check_delivery_boundary
+    self.fail(json.dumps({"accepted_obsolete_close":old_receipt["decision_ref"],
+AssertionError: {"accepted_obsolete_close": "gxa_4d73fe123c956cef969bd0b9c525fe13959448e575c4065ef87a3f0b2ebcdbff", "run_id": "gxr_01m8g108pva0p1yy1q", "frozen_cursor": 14, "late_feedback_events": [22, 25], "state": "CLOSING"}
+
+----------------------------------------------------------------------
+Ran 4 tests in 15.828s
+
+FAILED (failures=2)

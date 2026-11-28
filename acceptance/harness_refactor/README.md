@@ -2,6 +2,8 @@
 
 PI 提供問題、材料、明示約束和預算。新開的普通 Goal 由 Codex Lead 決定怎麼拆題、哪些原件值得讀、要請誰協作、何時值得計算，以及何時已經可以帶著不確定性結案。GX 保存每項承諾、綁定、加入或撤回的線索、實際執行與回報。兩者的交界可以從同一份 SQLite 及具名產物複查。
 
+完整簽收狀態、三臂的科學得分與提交成本，以及每條未完整成立的研究行為均列在[本次驗收總表](ACCEPTANCE.md)。
+
 ## 開題、繼續與取回結果
 
 在發行目錄使用已配置的官方 Codex OAuth 宿主，普通命令如下。題面可以只寫科學問題。已有材料時，在 `--goal-config` 的 `input_files` 登記角色與檔案；有明確禁用方法或資料源的研究，保留其顯式範圍。
@@ -40,6 +42,6 @@ bin/gx-p0 research --state ./study-state --run-id <run_id> --timeout 600
 
 新普通 Goal 在建立時固定 `gx.harness/2`。舊 Goal 保存舊策略，包括原來明示的空範圍。未引入新的 SQLite DDL。更新或回退前應保留資料目錄和精確的發行版本，並在沒有 Driver 寫入時備份；在原部署路徑啟動可以接回原帳本。若需回到基線，舊版 Goal 可在相應的基線代碼與相容備份恢復。已使用新意圖或宏觀配方的 Run 應以固定本版代碼繼續，或用升級前備份恢復到升級前的研究點，避免舊版誤解新動作。
 
-完整版的普通入口驗收涵蓋三批新操作；實際產品與精簡版的 63 個共同變更檔案逐一比對，精簡站點原有的插件註冊另行核對。測試種類和實際科學鏈分開記錄。[部署檔案摘要](deployment/release-comparison.json) · [精簡版原生回合及冷重導](deployment/slim-streamflow-observation/README.md)
+完整版的普通入口驗收涵蓋三批新操作。最終產品與精簡版的 65 個共同變更檔案逐一比對，精簡站點原有的插件註冊另行核對。測試種類和實際科學鏈分開記錄。[最終部署檔案摘要](deployment/release-comparison-249d4b6.json) · [精簡版原生回合及冷重導](deployment/slim-streamflow-observation/README.md)
 
 [起始版本與十一題拒絕記錄](integration/baseline.json) · [舊 Goal 冷恢復](integration/cold-upgrade.json) · [PM2.5 原案收尾重放](closing/pm25-replay.json) · [匿名三臂協議](blind/README.md)

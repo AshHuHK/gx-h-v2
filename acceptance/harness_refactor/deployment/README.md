@@ -1,6 +1,6 @@
 # 精簡版部署與獨立驗收
 
-完整產品候選為 `5904a4f`，精簡部署提交為 `75174ed`。完整線與精簡線各用自己的 Python、普通 CLI、站點插件註冊和研究狀態。兩線的共同變更涵蓋 63 個逐位元相同的產品檔案，另外核對精簡線原有的註冊項及這次加入的提供者。兩份安裝計算出的契約摘要一致，SQLite DDL 摘要維持原值。[逐檔比對](release-comparison.json)
+第一次盲評時的完整產品候選為 `5904a4f`，精簡部署提交為 `75174ed`。完整線與精簡線各用自己的 Python、普通 CLI、站點插件註冊和研究狀態。兩線的共同變更涵蓋 63 個逐位元相同的產品檔案，另外核對精簡線原有的註冊項及這次加入的提供者。兩份安裝計算出的契約摘要一致，SQLite DDL 摘要維持原值。[逐檔比對](release-comparison.json)
 
 | 檢查 | 實際結果 |
 |---|---|
@@ -17,3 +17,7 @@
 .venv/bin/python -B acceptance/harness_refactor/integration/deployment_check.py \
   . ../science-assets-slim 5904a4fdac3b0267a80fc7b59d3c00427a4871d4
 ```
+
+## 現場修補後的部署
+
+精簡產品提交為 `30b41cab6a2f4167ea90cb6a7a3c9dcc422f9c61`，對應的完整產品提交為 `249d4b6dea96c6200380bc30cba814eaa4336a9a`。包括定向晚件、同一研究任務的席位延用及結題格式指引。可將上面比對命令最後的提交換成此 SHA 重算。第一次盲評和原先部署的檢查保留其各自版本。[最終逐檔與契約比對](release-comparison-249d4b6.json) · [精簡線最終回歸](slim-regressions-249d4b6.log) · [用最終版本冷重開原單站 Run](slim-cold-249d4b6.json)

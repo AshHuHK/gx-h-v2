@@ -1,0 +1,168 @@
+{
+  "type": "READ_ONLY_PROJECTION_OF_FIRST_LIVE_TRIAL",
+  "candidate": "362157ae2a6c6f723376dc476b2d5f6c2b001548",
+  "run": "gxr_01m8g0b9dfdm3empcn",
+  "ledger": "harness-final-benchmark-live/first/short/revised/state/gx.db",
+  "rollout": "sessions/2026/11/28/rollout-2026-11-28T02-39-34-01a22005-b61a-79b0-80ca-4b0b05dd151c.jsonl",
+  "native_schema": {
+    "namespace": "gx",
+    "name": "gx_decide_revision",
+    "description": "Submit the scientific reason and the operation to enact. Select delivered measurements by their exact row keys in metric_refs. GX binds their sources and the matching registered comparison, fills unique branch fields and wakes on Job results. With multiple matches, select from the comparison_id options in the reply. Legacy explicit fields remain valid. Example: {\"decision\":{\"rationale\":\"The calibration residual leaves the drift estimate uncertain; measure the second standard.\",\"metric_refs\":[\"<delivered row key>\"],\"ops\":[{\"op\":\"add_node\",\"capability\":\"<listed method@version>\",\"inputs\":[\"<second calibration standard ref>\"],\"parameters\":{\"channel\":\"<method-supported channel>\"},\"question\":\"Does drift persist on the second standard?\"}]}}",
+    "required": [
+      "rationale",
+      "ops"
+    ],
+    "mode": {
+      "enum": [
+        "amend",
+        "resolve"
+      ]
+    },
+    "reconsider_when": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event",
+          "subject_ref"
+        ],
+        "properties": {
+          "event": {
+            "enum": [
+              "goal_changed",
+              "evidence_added",
+              "claim_changed",
+              "job_settled",
+              "budget_changed",
+              "operator_reopened",
+              "module_report"
+            ]
+          },
+          "subject_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "first_research_turn_calls": [
+    {
+      "call": "call_d8ac438119f241d58a23f499b1822b61",
+      "thread": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+      "turn": "01a22006-60a8-71e2-b514-08db54c4a37b",
+      "gx_request_sha256": "a1e0b656838001800d80376d0511b5a8dfb858de3565fee64edef97dddf34fa3",
+      "gx_result_sha256": "ddba0b2c89936b4b446c53891b6bd08cf0304385d67c778070ed8141320ac375",
+      "mode": "amend",
+      "operations": [],
+      "reconsider_when": null,
+      "disposition": null,
+      "accepted": false,
+      "error": {
+        "field": "mode",
+        "reason": "Use mode=resolve for empty ops, or mode=amend with the intended graph operations. You can omit mode when ops already expresses your decision."
+      }
+    },
+    {
+      "call": "call_95342bbf5eca47e3b8c4e5d7711c0b1b",
+      "thread": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+      "turn": "01a22006-60a8-71e2-b514-08db54c4a37b",
+      "gx_request_sha256": "333fd014c57ce304ef2b4f0c9d646d37cbe386e73de44c8347beb44be83a79e5",
+      "gx_result_sha256": "0669c26ea34a66e0feb3b7ac7e8ac54690438eaec3a3500e0a99312a293ffe7b",
+      "mode": "resolve",
+      "operations": [],
+      "reconsider_when": [
+        "A publisher return supplies the cited table headings, assay method or material provenance for W1 and E1."
+      ],
+      "disposition": "MAINTAIN",
+      "accepted": false,
+      "error": {
+        "field": "reconsider_when[0]",
+        "reason": "$.reconsider_when[0]: expected object, got string"
+      }
+    },
+    {
+      "call": "call_e29a1f290239493c9831d197571c3117",
+      "thread": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+      "turn": "01a22006-60a8-71e2-b514-08db54c4a37b",
+      "gx_request_sha256": "b20d7467e71efc37bf969577a4d314df967f83eb7d54b32578e48845e02271cf",
+      "gx_result_sha256": "9bfb2c2963d4f1d39c0f9e2e59757e32e198359f3d016fdd87cc316f0e954801",
+      "mode": "resolve",
+      "operations": [],
+      "reconsider_when": [
+        {
+          "description": "A publisher return supplies the cited table headings, assay method or material provenance for W1 and E1."
+        }
+      ],
+      "disposition": "MAINTAIN",
+      "accepted": false,
+      "error": {
+        "field": "reconsider_when[0].event",
+        "reason": "$.reconsider_when[0].event: missing required property 'event'; $.reconsider_when[0].subject_ref: missing required property 'subject_ref'; $.reconsider_when[0].description: property 'description' is not allowed"
+      }
+    },
+    {
+      "call": "call_1b0b250428cc40988eaa6b2427895d8f",
+      "thread": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+      "turn": "01a22006-60a8-71e2-b514-08db54c4a37b",
+      "gx_request_sha256": "d49825a79cdab46a199af0942e84f05be99172215ca79bb2d026c3afeb46d3d0",
+      "gx_result_sha256": "ea6f0ed50c4394a4e3638df476d5cdaa861b48ba362bc4dc1aee2269984cfacc",
+      "mode": "resolve",
+      "operations": [],
+      "reconsider_when": [
+        {
+          "event": "research.catalog.updated",
+          "subject_ref": "gxr_01m8g0b9dfdm3empcn"
+        }
+      ],
+      "disposition": "MAINTAIN",
+      "accepted": false,
+      "error": {
+        "field": "reconsider_when[0].event",
+        "reason": "$.reconsider_when[0].event: 'research.catalog.updated' is not one of ['goal_changed', 'evidence_added', 'claim_changed', 'job_settled', 'budget_changed', 'operator_reopened', 'module_report']"
+      }
+    },
+    {
+      "call": "call_c533712cb4554a4f8654e2b8138d12db",
+      "thread": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+      "turn": "01a22006-60a8-71e2-b514-08db54c4a37b",
+      "gx_request_sha256": "f39f1c420e339a6248b9382723b57cc013eb6d6cd112afb69693ab50dead8973",
+      "gx_result_sha256": "1e7ffdbdaf9e0902bf2e46cbc770f535b75acaeaa602550e2c9f411c0c939273",
+      "mode": "resolve",
+      "operations": [],
+      "reconsider_when": [
+        {
+          "event": "evidence_added",
+          "subject_ref": "gxr_01m8g0b9dfdm3empcn"
+        }
+      ],
+      "disposition": "MAINTAIN",
+      "accepted": false,
+      "error": {
+        "field": "ops",
+        "reason": "For a decision about the Run, remove these top-level comparison fields: disposition, affected_scope. An empty ops list waits (mode=resolve or omitted). This brief has no active registered comparison."
+      }
+    },
+    {
+      "call": "call_0be1ff12bd6147fbabbd98315d37baa8",
+      "thread": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+      "turn": "01a22006-60a8-71e2-b514-08db54c4a37b",
+      "gx_request_sha256": "d91b0f7bb10ed4ed2c89bd2ca78f7faec375486a5a3ca3b293fb682884d1ba1f",
+      "gx_result_sha256": "27f27791e671f15e40a875c972ad03979f7da4f6898e24e8bfaef982a240aa71",
+      "mode": "resolve",
+      "operations": [],
+      "reconsider_when": [
+        {
+          "event": "evidence_added",
+          "subject_ref": "gxr_01m8g0b9dfdm3empcn"
+        }
+      ],
+      "disposition": null,
+      "accepted": true,
+      "event_id": 44
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+test_missing_own_review_corrects_in_same_native_turn (__main__.ReviewRetry.test_missing_own_review_corrects_in_same_native_turn) ... FAIL
+test_pi_disclosure_between_correction_and_retry_requires_fresh_lead (__main__.ReviewRetry.test_pi_disclosure_between_correction_and_retry_requires_fresh_lead) ... FAIL
+
+======================================================================
+FAIL: test_missing_own_review_corrects_in_same_native_turn (__main__.ReviewRetry.test_missing_own_review_corrects_in_same_native_turn)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close_corrections/test_review_retry.py", line 95, in test_missing_own_review_corrects_in_same_native_turn
+    notice = self.assert_repair()
+             ^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/harness_final/close_corrections/test_review_retry.py", line 82, in assert_repair
+    self.assertEqual(notice.get("code"),"SCHEMA_INVALID",notice)
+AssertionError: 'STALE_REVISION' != 'SCHEMA_INVALID'
+- STALE_REVISION
++ SCHEMA_INVALID
+ : {'error': 'STALE_REVISION: New research evidence arrived after the delivered brief; reconsider before closing. The refreshed Lead can cite the listed review refs in decision.evidence_refs', 'code': 'STALE_REVISION', 'reason': 'close_context_changed'}
+
+======================================================================
+FAIL: test_pi_disclosure_between_correction_and_retry_requires_fresh_lead (__main__.ReviewRetry.test_pi_disclosure_between_correction_and_retry_requires_fresh_lead)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close_corrections/test_review_retry.py", line 109, in test_pi_disclosure_between_correction_and_retry_requires_fresh_lead
+    notice = self.assert_repair()
+             ^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/harness_final/close_corrections/test_review_retry.py", line 82, in assert_repair
+    self.assertEqual(notice.get("code"),"SCHEMA_INVALID",notice)
+AssertionError: 'STALE_REVISION' != 'SCHEMA_INVALID'
+- STALE_REVISION
++ SCHEMA_INVALID
+ : {'error': 'STALE_REVISION: New research evidence arrived after the delivered brief; reconsider before closing. The refreshed Lead can cite the listed review refs in decision.evidence_refs', 'code': 'STALE_REVISION', 'reason': 'close_context_changed'}
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.790s
+
+FAILED (failures=2)

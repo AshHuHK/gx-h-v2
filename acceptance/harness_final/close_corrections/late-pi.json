@@ -1,0 +1,78 @@
+{
+  "run_id": "gxr_01m8g3j6z2c65es6ny",
+  "old_task": "gxt_01m8g3j765v0b9p3gb",
+  "old_turn": "turn-gxl_01m8g3j7694ncqq1m8",
+  "first_notice": {
+    "error": "SCHEMA_INVALID: The closing decision omits reviews received by this Lead.",
+    "code": "SCHEMA_INVALID",
+    "reason": "uncited_own_reviews",
+    "field": "decision.evidence_refs",
+    "retryable": true,
+    "suggested_recovery": "Add the listed review references to decision.evidence_refs and submit the corrected decision with a new call ID from this Lead.",
+    "uncited_review_refs": [
+      "gxa_01m8g3j7798kqhatc0"
+    ]
+  },
+  "corrected_old_callback": {
+    "error": "STALE_REVISION: New research evidence arrived after the delivered brief; reconsider before closing",
+    "code": "STALE_REVISION",
+    "reason": "close_context_changed",
+    "retryable": false,
+    "suggested_recovery": "End this turn. GX retired this task and will continue the same Run through its authorized Lead with a refreshed brief.",
+    "handoff_event": 47
+  },
+  "review_refs": [
+    "gxa_01m8g3j774pyp5t38c",
+    "gxa_01m8g3j7798kqhatc0"
+  ],
+  "acknowledged_pi": {
+    "artifact_refs": [],
+    "branch_id": null,
+    "event_id": 44,
+    "feedback_id": "pif_5ba1e7f8beb09d55b2e48718ba604e82",
+    "goal_version": 1,
+    "kind": "feedback",
+    "scope": "run",
+    "source_kind": "information",
+    "source_message_id": "new-clock-record",
+    "text": "The two instruments share a reference clock. Keep sampling independence unresolved."
+  },
+  "fresh_task": "gxt_01m8g3j7wtbkxk2z3x",
+  "fresh_turn": "turn-gxl_01m8g3j7wycq4zfwgy",
+  "fresh_sha256": "8309b3ebb59e3057da7bbe8d66e4b4922226012e25548d03e87f13aaae92ed92",
+  "accepted_decision": "gxa_d4545815674d013e5b6d4aa16e817807041f859798e70bbf3d34a06bdaffd036",
+  "dispositions": [
+    {
+      "decision_ref": "gxa_d4545815674d013e5b6d4aa16e817807041f859798e70bbf3d34a06bdaffd036",
+      "delivery_event_id": "start:ed2ece24-7721-496f-b71f-27958287f930",
+      "delivery_turn_id": "turn-gxl_01m8g3j7wycq4zfwgy",
+      "effects": [
+        {
+          "claim_refs": [],
+          "op": "close_run",
+          "reason": "Record the known coverage at closure.",
+          "unresolved": [
+            "Sampling independence remains unknown."
+          ]
+        }
+      ],
+      "event_id": 62,
+      "evidence_refs": [
+        "gxa_01m8g3j774pyp5t38c",
+        "gxa_01m8g3j7798kqhatc0"
+      ],
+      "feedback_id": "pif_5ba1e7f8beb09d55b2e48718ba604e82",
+      "goal_version": 1,
+      "outcome": "maintain",
+      "product_event_id": 61,
+      "product_ref": "gxa_d4545815674d013e5b6d4aa16e817807041f859798e70bbf3d34a06bdaffd036",
+      "reason": "Restrict the comparison to the two calibrated sources.",
+      "scope": "run",
+      "task_id": "gxt_01m8g3j7wtbkxk2z3x",
+      "thread_id": "script-gxl_01m8g3j7wycq4zfwgy",
+      "turn_id": "turn-gxl_01m8g3j7wycq4zfwgy"
+    }
+  ],
+  "jobs": 0,
+  "host": "controlled official wire"
+}

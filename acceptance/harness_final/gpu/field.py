@@ -1,8 +1,9 @@
 """Observe a normal GX study, restart its driver during inference, then release frozen references."""
 from contextlib import closing
 import csv
+import fcntl
 from datetime import datetime, timezone
-from hashlib import sha256
+from hashlib import sha1, sha256
 from pathlib import Path
 import argparse
 import json
@@ -39,6 +40,41 @@ def ticks(pid):
         return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
     except FileNotFoundError:
         return None
+
+
+def deployment_pin(release, candidate):
+    # Compare the runnable installation with the selected git object; only these
+    # two documented site-specific GPU configuration files are overlaid.
+    sha = subprocess.check_output(["git","rev-parse","--verify",candidate + "^{commit}"], cwd=ROOT, text=True).strip()
+    tree = subprocess.check_output(["git","ls-tree","-rz",sha,"--","bin","gx-h"], cwd=ROOT)
+    checked = 0
+    for record in tree.split(b"\0"):
+        if not record:
+            continue
+        head, rawname = record.split(b"\t",1)
+        mode, kind, oid = head.split()
+        name = os.fsdecode(rawname)
+        if name in {"gx-h/config/limits.json","gx-h/config/approvals.json"}:
+            continue
+        file = release / name
+        body = os.fsencode(os.readlink(file)) if mode == b"120000" else file.read_bytes()
+        blob = b"blob " + str(len(body)).encode() + b"\0" + body
+        if kind != b"blob" or sha1(blob).hexdigest() != oid.decode():
+            raise ValueError(f"Deployment differs from the field candidate at {name}.")
+        checked += 1
+    return {"commit":sha, "verified_source_files":checked, "limits_sha256":digest(release/"gx-h/config/limits.json"),
+            "approval_policy_sha256":digest(release/"gx-h/config/approvals.json")}
+
+
+def owns_driver_lock(state, pid):
+    target = state / ".native.lock"
+    for fd in Path(f"/proc/{pid}/fd").glob("*"):
+        try:
+            if fd.samefile(target) and "FLOCK" in Path(f"/proc/{pid}/fdinfo/{fd.name}").read_text():
+                return True
+        except FileNotFoundError:
+            continue
+    return False
 
 
 def stock_driver(base, invocation, work, label):
@@ -147,6 +183,7 @@ def observe(opts):
     work, vault = opts.work.resolve(), opts.vault.resolve()
     work.mkdir(mode=0o700, parents=True, exist_ok=True)
     state = work / "state"
+    pin = deployment_pin(opts.release.resolve(), opts.candidate)
     base = [sys.executable, str(STOCK), str(opts.release.resolve()), str(opts.binary.resolve()), str(work)]
     frozen = json.loads((HERE / "preregistration.json").read_bytes())
     descriptor_fix = json.loads((HERE / "preflight-addendum.json").read_bytes())
@@ -156,12 +193,12 @@ def observe(opts):
             raise ValueError("Registered material bytes differ from the frozen field series.")
     condition = work / "field-condition.json"
     if condition.exists():
-        if json.loads(condition.read_bytes())["candidate"] != opts.candidate:
+        if json.loads(condition.read_bytes())["candidate"] != pin["commit"]:
             raise ValueError("Resume the original frozen candidate.")
     else:
         if snapshot(state):
             raise ValueError("Refuse to relabel a previously admitted Run.")
-        write(condition, dict(candidate=opts.candidate, utc=datetime.now(timezone.utc).isoformat(),
+        write(condition, dict(candidate=pin["commit"], deployment=pin, utc=datetime.now(timezone.utc).isoformat(),
                               preregistration=digest(HERE / "preregistration.json"),
                               deadline=time.time() + frozen["engineering"]["deadline_s"]))
     deadline = json.loads(condition.read_bytes())["deadline"]
@@ -202,6 +239,16 @@ def observe(opts):
             write(restore_proof, dict(run_id=current["run_id"], old_driver=before, new_driver=driver.pid,
                                       at_kill=receipt, after_reopen_ticks=ticks(receipt["provider"]["pid"])))
             log(work, "reopened_same_run", old_driver=before, driver=driver.pid, job_id=job["job_id"])
+        post = work / "running-after-restore.json"
+        if restore_proof.exists() and not post.exists() and owns_driver_lock(state, driver.pid):
+            before = json.loads(restore_proof.read_bytes())
+            prior = before["at_kill"]
+            job = next((j for j in current.get("jobs", []) if j["job_id"] == prior["job_id"]), None)
+            if job:
+                after = physical(state, job)
+                if after and (after["scheduler_ref"],after["provider"]) == (prior["scheduler_ref"],prior["provider"]):
+                    write(post, dict(run_id=current["run_id"], actual_driver=driver.pid, flock_observed=True,
+                                     current_job=after, utc=datetime.now(timezone.utc).isoformat()))
         if current.get("published") and not current["assignments"]:
             release_materials(base, state, work, vault, current, vault_digests)
         if current.get("status") == "CLOSED" or driver.poll() is not None:
@@ -223,4 +270,8 @@ if __name__ == "__main__":
     for key in ("release", "binary", "work", "vault"):
         p.add_argument("--" + key, type=Path, required=True)
     p.add_argument("--candidate", required=True, help="Frozen integrated product commit used for this deployment")
-    print(json.dumps(observe(p.parse_args()), ensure_ascii=False, indent=2))
+    args = p.parse_args()
+    args.work.mkdir(parents=True, mode=0o700, exist_ok=True)
+    with (args.work / ".field-observer.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        print(json.dumps(observe(args), ensure_ascii=False, indent=2))

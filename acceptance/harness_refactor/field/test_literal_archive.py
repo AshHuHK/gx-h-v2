@@ -2,6 +2,7 @@
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -20,6 +21,14 @@ PROVIDER = "org.gx.yeast-enzyme-archive@1.1.0"
 
 class LiteralArchive(unittest.TestCase):
     def test_real_job_without_query_file(self):
+        from acceptance.harness_final.catalog.archive_snapshots import PROVIDER as installed, declarations, require_archive
+        from gx_core.plugins.catalog import package_digest
+        require_archive(self)
+        pins = {row["path"].split("/")[-1]:row["sha256"] for row in
+                json.loads((installed.parents[2]/"config/workflow_packages.json").read_text())["plugins"]
+                if row["path"].startswith(installed.name + "/")}
+        self.assertEqual(set(pins), {"1.0.0","1.1.0"})
+        self.assertEqual({v:package_digest(installed/v) for v in pins}, pins)
         with tempfile.TemporaryDirectory() as tmp:
             work = Path(tmp)
             grant = {"project": "literal-archive-control", "research_effort": "medium",
@@ -55,7 +64,18 @@ class LiteralArchive(unittest.TestCase):
                 self.assertEqual(result["counts"]["exact_accessions"], 0)
                 self.assertEqual(result["query"]["taxid"], 559292)
                 self.assertEqual(result["query"]["substrate"], "lactose")
-                self.assertEqual(len(result["source_digests"]), 4)
+                self.assertEqual(result["source_digests"], {role:pin for role,(_,pin) in declarations().items()})
+                self.assertEqual({v:package_digest(installed/v) for v in pins}, pins)
+                if output_path := os.environ.get("GX_FINAL_ARCHIVE_RECEIPT"):
+                    receipt = {"transport":"SCRIPTED_CALLBACK", "run_id":study.run_id, "job_id":settled["job_id"],
+                               "node_id":settled["node_id"], "template_parameters":result["query"],
+                               "named_output":completion["outputs"][0], "counts":result["counts"],
+                               "source_digests":result["source_digests"], "releases":result["releases"],
+                               "provider_pins_unchanged_after_job":pins}
+                    target = Path(output_path)
+                    target.with_name("parent-records.json").write_bytes(
+                        ArtifactService(study.conn).read_bytes(completion["outputs"][0]["artifact_ref"]))
+                    target.write_text(json.dumps(receipt, indent=2)+"\n")
 
     def test_missing_snapshot_fails_without_scientific_output(self):
         import subprocess

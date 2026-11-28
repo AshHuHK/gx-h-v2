@@ -118,6 +118,8 @@ class OpenDiscovery(unittest.TestCase):
             self.assertEqual(other.conn.execute("SELECT COUNT(*) FROM events WHERE kind='research.catalog.surveyed'").fetchone()[0], 1)
 
     def test_method_facts_separate_deployment_and_scientific_execution(self):
+        from acceptance.harness_final.catalog.archive_snapshots import require_archive
+        require_archive(self)
         sample = Path(self.enterContext(tempfile.TemporaryDirectory())) / "query.json"
         sample.write_text(json.dumps({"schema":"gx.yeast-archive-query/1","taxid":559292,"substrate":"lactose"}))
         s, lead = self.admit("Which yeast records are present?", {"input_files":[{"path":str(sample),"role":"query"}]})

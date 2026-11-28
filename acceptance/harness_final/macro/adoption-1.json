@@ -1,0 +1,49 @@
+{
+  "transport": "SCRIPTED_CALLBACK",
+  "controller_exit": -9,
+  "run_id": "gxr_01m8fzexb4qrdw526f",
+  "source": "archive-review@1",
+  "digest": "5d4e04353961f2af0aa08655807456b6639e804841177d5d35c25a4ad614633d",
+  "events": {
+    "research.join.ready": 1,
+    "research.join.registered": 1
+  },
+  "outcome": {
+    "needed": 1,
+    "ports": [
+      {
+        "evidence": [],
+        "required": false,
+        "slot": "audit",
+        "sources": [
+          {
+            "output_name": "report",
+            "planned_module": true,
+            "reason": "prerequisite_unreachable",
+            "recipe_slot": "audit",
+            "state": "MISSING",
+            "waiting_on": [
+              {
+                "module_instance_id": "module_c65a08aaf05c0c70becbb065fa46c3fe",
+                "module_status": "CANCELLED",
+                "output_name": "report",
+                "reason": "module_closed_without_report",
+                "slot": "clock",
+                "state": "MISSING"
+              }
+            ]
+          }
+        ],
+        "state": "MISSING"
+      }
+    ],
+    "question": "Can an independent reading support the archive chronology?",
+    "satisfied_count": 0,
+    "state": "UNREACHABLE",
+    "still_possible_count": 0
+  },
+  "target_modules": 1,
+  "target_jobs": 0,
+  "receiving_lead_task": "gxt_01m8fzexkwsge4cpq1",
+  "delivered_event": 113
+}

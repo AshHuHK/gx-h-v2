@@ -1,0 +1,42 @@
+FF
+======================================================================
+FAIL: test_explicit_logical_adoption_precedes_any_physical_commission (__main__.AdoptedRecipe.test_explicit_logical_adoption_precedes_any_physical_commission)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "{probe}/acceptance/harness_final/macro/test_adoption.py", line 110, in test_explicit_logical_adoption_precedes_any_physical_commission
+    self.verify_restart(True)
+  File "{probe}/acceptance/harness_final/macro/test_adoption.py", line 82, in verify_restart
+    self.assertEqual(proc.returncode,-signal.SIGKILL,proc.stderr+proc.stdout)
+AssertionError: 1 != -9 : Traceback (most recent call last):
+  File "{probe}/acceptance/harness_final/macro/test_adoption.py", line 114, in <module>
+    cancel_in_process(Path(sys.argv[2]),Path(sys.argv[3]),bool(int(sys.argv[4])))
+  File "{probe}/acceptance/harness_final/macro/test_adoption.py", line 60, in cancel_in_process
+    study.call(study.lead,"gx_instantiate_recipe",dict(request,adopt=True),"adopt")
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v6_native.py", line 341, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v6_native.py", line 406, in _call
+    raise SchemaInvalid("Invalid arguments to " + tool + ": " + ", ".join(failures), details=details)
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Invalid arguments to gx_instantiate_recipe: $: property 'adopt' is not allowed
+
+
+======================================================================
+FAIL: test_first_actual_commission_registers_gate_before_crash (__main__.AdoptedRecipe.test_first_actual_commission_registers_gate_before_crash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "{probe}/acceptance/harness_final/macro/test_adoption.py", line 107, in test_first_actual_commission_registers_gate_before_crash
+    self.verify_restart(False)
+  File "{probe}/acceptance/harness_final/macro/test_adoption.py", line 84, in verify_restart
+    self.assertEqual(len(before["rows"]),1,"Accepted recipe lost its logical Join before the new controller opened")
+AssertionError: 0 != 1 : Accepted recipe lost its logical Join before the new controller opened
+
+----------------------------------------------------------------------
+Ran 2 tests in 6.927s
+
+FAILED (failures=2)

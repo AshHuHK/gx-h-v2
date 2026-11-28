@@ -131,6 +131,25 @@ def assigned(row):
     return DECIDE in names or v62_native.REPORT in names
 
 
+def _save_recipe_tool(packet):
+    spec = v6_recipes.save_tool(harness_policy.enabled(packet))
+    if (packet or {}).get("harness_policy") != harness_policy.VERSION:
+        fields = spec["inputSchema"]["properties"]
+        for name in ("decision_points", "evaluation", "children"):
+            fields.pop(name, None)
+    return spec
+
+
+def _instantiate_tool(packet):
+    tool = contracts.native_goal_tool_spec(v6_recipes.INSTANTIATE)
+    if (packet or {}).get("harness_policy") != harness_policy.VERSION:
+        return tool
+    spec = deepcopy(tool)
+    spec["inputSchema"]["properties"]["adopt"] = {"type":"boolean","description":
+        "For a macro, adopt its logical dependencies now, ahead of any Jobs or modules. Omit for a read-only preview."}
+    return spec
+
+
 def _research_decision_tool(spec, brief):
     if not harness_policy.enabled(brief):
         return spec
@@ -208,12 +227,14 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
         if modern:
             catalog.append(contracts.native_goal_tool_spec(v6_recipes.WATCH))
         if has_recipe_source(brief, modern):
-            catalog.append(v6_recipes.save_tool(modern))
-        if conn is not None and conn.execute("""SELECT 1 FROM v6_saved_recipes WHERE ?
-                OR json_extract(definition_json,'$.schema') != 'gx.research-recipe/3' LIMIT 1""", (modern,)).fetchone():
+            catalog.append(_save_recipe_tool(brief))
+        if conn is not None and conn.execute("""SELECT 1 FROM v6_saved_recipes WHERE
+                (json_extract(definition_json,'$.schema') != 'gx.research-recipe/3' OR ?)
+                AND (json_extract(definition_json,'$.schema') != 'gx.research-recipe/4' OR ?) LIMIT 1""",
+                (modern, brief.get("harness_policy") == harness_policy.VERSION)).fetchone():
             if not any(tool["name"] == v62_native.QUERY for tool in catalog):
                 catalog.append(v62_native.query_tool(brief))
-            catalog.append(contracts.native_goal_tool_spec(v6_recipes.INSTANTIATE))
+            catalog.append(_instantiate_tool(brief))
 
     if harness_policy.enabled(brief):
         catalog.append(contracts.native_goal_tool_spec(research_closeout.LINK))
@@ -407,6 +428,10 @@ def _call(roots, p):
                 if tool == v62_native.REPORT else contracts.native_goal_tool_spec(tool))
         if tool == v62_native.OPEN:
             spec = v62_native.open_tool(brief(row))
+        elif tool == v6_recipes.INSTANTIATE:
+            spec = _instantiate_tool(brief(row))
+        elif tool == v6_recipes.SAVE:
+            spec = _save_recipe_tool(brief(row))
         failures = schema.validate(args, spec["inputSchema"])
         if failures:
             details = {"category": "module_report_structure"} if tool == v62_native.REPORT else {}
@@ -494,6 +519,20 @@ def _call(roots, p):
             and not isinstance(prepared, dict) and roots.active_turns.get(thread) != turn):
         raise ScopeDenied("A new delegation or report requires the active official Root turn")
 
+    adoptions = []
+    recipe_action = (
+        (tool == v62_native.OPEN and args["operation_key"].startswith("recipe-"))
+        or (tool == DECIDE and any(op.get("recipe_decision") for op in args["decision"].get("ops", [])))
+        or (tool == v6_recipes.INSTANTIATE and args.get("adopt"))
+    )
+    if recipe_action and harness_policy.current(roots.conn, roots.run_id):
+        from . import recipe_instances
+        version = brief(row)["goal_version"]
+        if tool == v6_recipes.INSTANTIATE:
+            adoptions = [recipe_instances.prepare(roots.conn, roots.run_id, version, args)]
+        elif tool == v62_native.OPEN or not v62_native.module_scope(brief(row)):
+            adoptions = recipe_instances.pending_adoptions(roots.conn,roots.run_id,version,tool,args)
+
     try:
         with store.transaction(roots.conn, transaction_owner="ScientificLead", operation="native_receipt", run_id=roots.run_id):
             # A second connection may have landed the same official call during preparation.
@@ -556,6 +595,11 @@ def _call(roots, p):
                                                  row["lease_id"], thread, turn)
                 if answer["evaluation_ref"] in refs:
                     roots._allow_refs(row["root_key"], answer["evaluation_ref"])
+            if adoptions and (tool != DECIDE or answer.get("task_status") == "ACCEPTED"):
+                for adoption in adoptions:
+                    joined = recipe_instances.adopt(roots.conn,roots.run_id,adoption)
+                    if tool == v6_recipes.INSTANTIATE:
+                        answer["logical_join"] = {k:joined[k] for k in ("key","revision","state","registration_event","outcome_event")}
             record_call(roots.conn, p)
             roots.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                                (thread, call_id, turn, request_sha, ids.canonical_json(answer)))

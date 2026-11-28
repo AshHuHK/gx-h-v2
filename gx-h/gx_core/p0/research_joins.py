@@ -146,7 +146,11 @@ def register(conn, run_id, spec):
         previous = lookup(conn, run_id, key)
         revision = spec.get("revision", previous["revision"] if previous else 1)
         exact = lookup(conn, run_id, key, revision) if previous else None
-        if not (exact and exact["goal_version"] == goal["goal_version"] and normal == exact["spec"]):
+        same_spec = exact and exact["spec"] == normal
+        if exact and exact.get("instance") and not same_spec:
+            from .recipe_instances import Producers
+            same_spec = Producers(conn,run_id,exact).physical_spec(exact["spec"]) == normal
+        if not (exact and exact["goal_version"] == goal["goal_version"] and same_spec):
             if revision != (previous["revision"] + 1 if previous else 1):
                 raise SchemaInvalid("Changing an evidence join requires the next explicit revision")
             for port in normal["ports"]:
@@ -238,9 +242,10 @@ def _assign(ports, *, allow_pending):
         if allow_pending:
             for source in port["sources"]:
                 if source["state"] == "PENDING":
-                    producer = source.get("node_id") or source["module_instance_id"]
+                    producer = source.get("node_id") or source.get("module_instance_id") or source["recipe_slot"]
                     # An open module can report multiple Jobs with the same named output.
-                    capacity = port["slot"] if "node_id" not in source and source["output_name"] != "report" else None
+                    multiple_jobs = "node_id" not in source and ("module_instance_id" in source or source.get("planned_module"))
+                    capacity = port["slot"] if multiple_jobs and source["output_name"] != "report" else None
                     choices.append((producer, source["output_name"], capacity))
         candidates.append(choices)
     assigned = {}
@@ -288,13 +293,20 @@ def _evaluate(conn, rid, row, now, *, verify=False):
     ports = []
     cache = {}
     checks = {}
+    producers = None
     for port in spec["ports"]:
         sources = []
         for alt in port["alternatives"]:
             source = tuple(sorted(alt.items()))
             if source not in cache:
                 try:
-                    result = _source_result(conn, rid, alt)
+                    if row.get("instance"):
+                        if producers is None:
+                            from .recipe_instances import Producers
+                            producers = Producers(conn, rid, row)
+                        result = producers.observe(alt["recipe_slot"], alt["output_name"])
+                    else:
+                        result = _source_result(conn, rid, alt)
                     if verify and result.get("evidence"):
                         _check_deliveries(ArtifactService(conn), result, checks)
                 except (GxError, OSError) as error:

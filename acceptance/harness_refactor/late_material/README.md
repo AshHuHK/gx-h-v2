@@ -25,3 +25,14 @@ PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a python -B -m unittest -v \
 以 PI 原件的授予和中止同一任務的轉移事件識別此次交接，將新 brief 發給原委派；後繼任務回執 `v62.module.worker_task_continued` 指向原任務和授權事件。每次實際原生 turn 仍獨立預留 API、token 並結算。真正完成一項決策後再要求新任務仍需要 worker 名額。
 
 普通研究離線控制在同樣 1 個 worker、6 次 API、131072 token 額度及 125071 已結算用量下重現過「No active decision for module」。修後發出含第二份原件的原生 brief，該回合僅預留剩下的 6001 token 和一次 API。兩次輪詢後仍只有一次 worker 扣款，一份後繼回執，沒有新 Job；舊短任務與其計量等待仍可追溯。後繼完成科學決策，再申請真正的新任務時 GX 如實交回名額耗盡。上述四個控制通過。兩次原生呼叫的用量由測試宿主回執提供。
+
+## 已讀私件和公開報告
+
+在 `48dfdb0` 的正式 Run `gxr_01m8fthqsy7h6t5z5x`，同一名研究員讀取晚件的回執 82、96、124、133 均已入帳。提交 `call_6daf0eb139f64d788d1a3a386033d37c` 及 `call_8447f064b48247b1afa26672a8cb7b98` 把晚件原件列在公開引用內。`call_807201cab22e483aa0b47fdd7d394bc1` 移除頂層引用後，個別 finding 仍引用同一私件。GX 先前一律提示「須讀取」，導致反覆讀取。原報告回執均保留。
+
+修後，受領人引用自己已實讀的私件或其登記摘錄，會收到 `SCOPE_DENIED` 及原因 `branch_private_report_source`。公開報告會把引用帶給其他研究員。需要公開核驗時，可透過決策的 `pi_questions` 請 PI 另供可共享的原件；若仍缺合法來源，可提交記錄出版缺口的部分報告。獨立研究員猜測私件 ID 時仍只看到普通的未具備來源回執訊息。研究員可引用其已讀的公開來源，支持該來源實際涵蓋的判斷。
+
+```sh
+PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a python -B -m unittest -v \
+  acceptance.harness_refactor.late_material.test_report_visibility
+```

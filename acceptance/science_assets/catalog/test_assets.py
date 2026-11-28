@@ -49,6 +49,7 @@ class AssetCatalog(unittest.TestCase):
             lead = study.next_actor("run")
             for kind in ("all", "method"):
                 first = study.call(lead, "gx_query_catalog", {"kind": kind, "query": "天空校準", "limit": 1,
+                                   **({"pi_method_scope": []} if kind == "all" else {}),
                                    "required_outputs": ["sky.json"]}, f"list-{kind}")
                 self.assertEqual(first["total"], 2)
                 self.assertEqual(first["next_offset"], 1)
@@ -77,7 +78,7 @@ class AssetCatalog(unittest.TestCase):
         self.extra.write_text(json.dumps({"cards": [archived()]}))
         with CloseStudy(self.workspace, reopen=True) as study:
             lead = study.next_actor("run")
-            study.call(lead, "gx_query_catalog", {"kind": "all"}, "first-survey")
+            study.call(lead, "gx_query_catalog", {"kind": "all", "pi_method_scope": []}, "first-survey")
             opening = {**study.open_args("survey", inputs=[], caps=[]), "module_id": "method_workflow_survey",
                        "focus": "model"}
             declared = study.call(lead, "gx_open_module", opening, "request-survey")
@@ -94,7 +95,7 @@ class AssetCatalog(unittest.TestCase):
         decision = {"decision": draft(watches=[{"event": "goal_changed", "subject_ref": "run"}])}
         with CloseStudy(self.workspace, reopen=True) as study:
             first = study.next_actor("run")
-            self.assertEqual(study.call(first, "gx_query_catalog", args, "not-added")["total"], 0)
+            self.assertEqual(study.call(first, "gx_query_catalog", {**args, "pi_method_scope": []}, "not-added")["total"], 0)
             study.call(first, "gx_decide_revision", decision, "wait")
             self.extra.write_text(json.dumps({"cards": [archived()]}))
             self.assertEqual(v6_goal.waiting_for(study.conn, study.run_id)["kind"], "research_event")
@@ -121,7 +122,7 @@ class AssetCatalog(unittest.TestCase):
         self.extra.write_text("{invalid")
         with CloseStudy(self.workspace, reopen=True) as study:
             lead = study.next_actor("run")
-            result = study.call(lead, "gx_query_catalog", {"kind": "all", "query": "Crossref"}, "corrupt")
+            result = study.call(lead, "gx_query_catalog", {"kind": "all", "query": "Crossref", "pi_method_scope": []}, "corrupt")
             self.assertTrue(result["items"])
             self.assertTrue(result["unavailable_asset_metadata"])
             self.extra.write_text(json.dumps({"cards": [None, {"kind": "method"}, archived()]}))

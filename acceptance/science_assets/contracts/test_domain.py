@@ -74,6 +74,7 @@ class MethodDomain(unittest.TestCase):
         self.assertEqual(status, 0, log.getvalue())
         self.s = self.enterContext(CloseStudy(self.work, reopen=True))
         self.actor = self.s.next_actor("run")
+        self.s.call(self.actor, "gx_query_catalog", {"kind":"all", "pi_method_scope":[]}, "interpret-goal")
         answer = self.s.call(self.actor, "gx_query_catalog", {"reference":CAP}, "exact")
         summary = self.s.call(self.actor, "gx_query_catalog", {"kind":"method","query":CAP}, "summary")
         self.assertEqual(answer["input_coverage"], summary["items"][0]["input_coverage"])

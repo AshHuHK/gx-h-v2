@@ -47,7 +47,10 @@ def control(work):
                 WHERE d.scope='run' AND t.state='acknowledged' ORDER BY t.rowid LIMIT 1""").fetchone()
             s.lead = Actor(*matched)
             s.roots.active_turns[s.lead.thread] = s.lead.turn
-        s.call(s.lead,"gx_query_catalog",{"kind":"all"},"inspect")
+        overview = {"kind":"all"}
+        if "pi_method_scope" in s.brief(s.lead):
+            overview["pi_method_scope"] = []
+        s.call(s.lead,"gx_query_catalog",overview,"inspect")
         node={"op":"add_node", "branch":"local:qa", "node":"local:read", "capability":cap,
               "parameters":{},"inputs":[s.materials[0]],"depends_on":[],
               "question":"Can this provider measure all deposited backbone positions?"}

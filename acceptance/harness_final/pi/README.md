@@ -20,3 +20,5 @@ PYTHONPATH=gx-h:. PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest -q acce
 ```
 
 同一探針在舊版 checkout 下執行時，使用候選中的 probe.py 路徑並省略 `--classified`。設 `GX_PI_SCOPE_STATES` 可保留每個獨立實驗的 SQLite。上述組合實測 23 項全過，含正常 Job 與中斷恢復。
+
+科學資產與舊版目錄的 21 個鄰接回歸亦已通過。受控 Lead 的中性 Goal 在既有首查明示空條款，保留原測試對翻頁、重播、輸入領域與實際 CPU 計算的斷言。

@@ -5,6 +5,8 @@
 | 回執 | 可重查的行為 |
 |---|---|
 | `pinned-full.log`、`pinned-slim.log` | 在完整站 `4b6aa93` 和精簡站 `6ec604d` 執行同一份七例。兩站均出現提早結題、接受未知／歧義題目及併發交錯等失敗。舊站缺少回執新欄位也以原始錯誤呈現。日誌省略檢出目錄前綴。 |
+| `old-full.log`、`old-slim.log` | 保留第一輪三例基線原始結果，之後再加入並發、換題與原件釋出場景。 |
+| `scope-facts.log` | 五份讀數中只漏一份核心原件時確實提示。原件已授予子席，Lead 私下理由仍留在自己的作用域。六個停止情境保留原科學措辭，含區間跨零、對照失效、前提不成立及三種行政結束理由。 |
 | `question-receipts.json` | 六個具名場景保存實際 Run、事件、產物和裁決。三種根問題寫法、同時提出的收尾、未在報告釋出的子席原件共五次應提醒均命中。子席已讀同一論文的等價段落，且將該原件正式交給 Lead，這次正常結題。這六個場景觀察到零漏提醒與零誤提醒。 |
 | `candidate-questions.log` | 七例包含同名意圖的可見 ID 選擇、未釋出的兄弟席題名、同 Run 改 Goal／重啟／新提名，以及回執重送。併發用兩次已準備好的普通回調排出最短交錯；兩者共用一個提示事件，GX 保持 OPEN，之後一筆新裁決生效。 |
 | `candidate-combined.log` | 同一次執行涵蓋新案例、舊收尾行為、欄位糾正及關題新鮮度。 |
@@ -17,7 +19,8 @@
 
 ```sh
 PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a GX_CODEX_OFFLINE=1 python -B -m unittest -v \
-  acceptance.harness_final.close.test_questions acceptance.harness_final.close.test_module_facts \
+  acceptance.harness_final.close.test_questions acceptance.harness_final.close.test_scope_facts \
+  acceptance.harness_final.close.test_module_facts \
   acceptance.harness_refactor.closing.test_closeout acceptance.harness_refactor.closing.test_field_format \
   acceptance.v622.test_close
 ```

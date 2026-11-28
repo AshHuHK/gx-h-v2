@@ -366,6 +366,10 @@ def deliver(conn, brief, limit):
                 break
     for item in brief.get("core_materials", []):
         facts = {k:item[k] for k in ("question", "question_id", "goal_version", "ref", "state") if k in item}
+        # Preserve the ref and the observed incomplete status under a tight
+        # packet budget. The full provider windows remain on the named artifact.
+        if item.get("query_record") and append("core_materials", {**facts, "query_record":item["query_record"]}):
+            continue
         if not append("core_materials", facts):
             break
     if brief.get("recipe_decisions"):

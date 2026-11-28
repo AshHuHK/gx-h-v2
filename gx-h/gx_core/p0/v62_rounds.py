@@ -531,7 +531,7 @@ def brief(conn, rid, cursor):
 
 def late_evidence(conn, rid, cursor):
     """The normal Lead event view excludes historical Goals, private workers and accounting."""
-    from . import v6_goal, v62_lead, v621_policy
+    from . import harness_policy, research_dialogue, v6_goal, v62_lead, v621_policy
     private = v62_lead.branch_ids(conn, rid)
     for row in v6_goal._events(conn, rid, cursor):
         kind = row["kind"]
@@ -541,6 +541,14 @@ def late_evidence(conn, rid, cursor):
                 return row["event_id"]
         if kind == "v621.material.assigned" and v621_policy.current(conn, rid):
             return row["event_id"]
+        if kind in (research_dialogue.FEEDBACK, research_dialogue.ANSWER) and harness_policy.current(conn, rid):
+            pi = store.loads(row, "payload_json")
+            # Main's receipt is independent of the deciding Lead's acknowledged
+            # brief. Only an input routed to this recipient can refresh it.
+            if pi["scope"] == "run" and (kind == research_dialogue.ANSWER or not conn.execute(
+                    "SELECT 1 FROM events WHERE run_id=? AND subject_id=? AND kind=? LIMIT 1",
+                    (rid, row["subject_id"], research_dialogue.DISPOSE)).fetchone()):
+                return row["event_id"]
     return None
 
 

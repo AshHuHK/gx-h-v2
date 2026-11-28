@@ -1,0 +1,43 @@
+test_conflicting_mode_offers_an_ordinary_wait_without_choosing_it (__main__.WaitRefusal.test_conflicting_mode_offers_an_ordinary_wait_without_choosing_it) ... FAIL
+test_module_retains_its_original_validation_surface (__main__.WaitRefusal.test_module_retains_its_original_validation_surface) ... ok
+test_text_description_and_unregistered_watch_offer_the_actual_schema (__main__.WaitRefusal.test_text_description_and_unregistered_watch_offer_the_actual_schema) ...
+  test_text_description_and_unregistered_watch_offer_the_actual_schema (__main__.WaitRefusal.test_text_description_and_unregistered_watch_offer_the_actual_schema) (condition=0) ... FAIL
+  test_text_description_and_unregistered_watch_offer_the_actual_schema (__main__.WaitRefusal.test_text_description_and_unregistered_watch_offer_the_actual_schema) (condition=1) ... FAIL
+  test_text_description_and_unregistered_watch_offer_the_actual_schema (__main__.WaitRefusal.test_text_description_and_unregistered_watch_offer_the_actual_schema) (condition=2) ... FAIL
+
+======================================================================
+FAIL: test_conflicting_mode_offers_an_ordinary_wait_without_choosing_it (__main__.WaitRefusal.test_conflicting_mode_offers_an_ordinary_wait_without_choosing_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/watch_diagnostics/test_wait_refusal.py", line 26, in test_conflicting_mode_offers_an_ordinary_wait_without_choosing_it
+    self.assertIn("reconsider_when",conflict.exception.message)
+AssertionError: 'reconsider_when' not found in 'Use mode=resolve for empty ops, or mode=amend with the intended graph operations. You can omit mode when ops already expresses your decision.'
+
+======================================================================
+FAIL: test_text_description_and_unregistered_watch_offer_the_actual_schema (__main__.WaitRefusal.test_text_description_and_unregistered_watch_offer_the_actual_schema) (condition=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/watch_diagnostics/test_wait_refusal.py", line 51, in test_text_description_and_unregistered_watch_offer_the_actual_schema
+    self.assertEqual(error.details.get("allowed_events"),events)
+AssertionError: None != ['goal_changed', 'evidence_added', 'claim[76 chars]ort']
+
+======================================================================
+FAIL: test_text_description_and_unregistered_watch_offer_the_actual_schema (__main__.WaitRefusal.test_text_description_and_unregistered_watch_offer_the_actual_schema) (condition=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/watch_diagnostics/test_wait_refusal.py", line 51, in test_text_description_and_unregistered_watch_offer_the_actual_schema
+    self.assertEqual(error.details.get("allowed_events"),events)
+AssertionError: None != ['goal_changed', 'evidence_added', 'claim[76 chars]ort']
+
+======================================================================
+FAIL: test_text_description_and_unregistered_watch_offer_the_actual_schema (__main__.WaitRefusal.test_text_description_and_unregistered_watch_offer_the_actual_schema) (condition=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/watch_diagnostics/test_wait_refusal.py", line 51, in test_text_description_and_unregistered_watch_offer_the_actual_schema
+    self.assertEqual(error.details.get("allowed_events"),events)
+AssertionError: None != ['goal_changed', 'evidence_added', 'claim[76 chars]ort']
+
+----------------------------------------------------------------------
+Ran 3 tests in 5.007s
+
+FAILED (failures=4)

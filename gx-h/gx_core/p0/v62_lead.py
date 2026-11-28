@@ -103,11 +103,16 @@ def describe_refresh(conn, brief, events):
             item.update(source_ref=row["source_ref"], segment_id=row["segment_id"])
         if row["target"]:
             item["target_claim_ref"] = row["target"]
+    late_kind = next((r["kind"] for r in events if r["event_id"] == cause.get("event_id")), None)
+    if late_kind in ("research.pi.feedback", "research.pi.answered"):
+        read_with = "Read the newly routed PI input in pi_dialogue when reconsidering this decision."
+    else:
+        read_with = ("Read review_ref via gx_read_artifact and its source with gx_read_source. "
+                     "Use claim_revision_id for the resulting claim version.")
     brief["trigger"]["refresh"] = {
         "reason": cause["reason"], "after_cursor": after, "superseded_event": marker["event_id"],
         "first_late_event": cause.get("event_id"),
-        "read_with": "Read review_ref via gx_read_artifact and its source with gx_read_source. "
-                     "Use claim_revision_id for the resulting claim version.",
+        "read_with": read_with,
     }
 
 

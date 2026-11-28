@@ -497,6 +497,8 @@ def _call(roots, p, original=None):
         except (BudgetExceeded, SchemaInvalid) as exc:
             if not v621_policy.science_execution(roots.conn, roots.run_id):
                 remember_refusal(roots, p, request_sha, exc)
+            elif isinstance(exc, SchemaInvalid):
+                _explain_wait_refusal(row, args["decision"], exc)
             raise
     elif tool == v62_native.OPEN:
         from . import v62_modules
@@ -646,6 +648,31 @@ def _call(roots, p, original=None):
 
 
 v62_native.register_tools(call)
+
+
+def _explain_wait_refusal(row, decision, error):
+    field = error.details.get("field", "")
+    invalid_watch = re.fullmatch(r"reconsider_when\[\d+\](?:\.event)?", field)
+    empty_amend = field == "mode" and decision.get("mode") == "amend" and decision.get("ops") == []
+    if not (empty_amend or invalid_watch):
+        return
+    packet = brief(row)
+    if packet.get("harness_policy") != harness_policy.VERSION or packet.get("scope") != "run":
+        return
+    if empty_amend:
+        error.message += (" To wait, keep your rationale and evidence refs, use ops=[] and omit mode and "
+                          "reconsider_when. GX wakes on new evidence and budget changes. To change planned work, "
+                          "include the intended operation.")
+    else:
+        from . import v6_graph
+        watch = v6_graph.decision_schema()["properties"]["reconsider_when"]["items"]
+        error.details["allowed_events"] = watch["properties"]["event"]["enum"]
+        error.message += (' Keep the scientific condition in rationale. Omit reconsider_when for default wakes '
+                          'on new evidence, budget changes and Jobs submitted here. To select a custom wake, '
+                          'supply an array of event/subject objects, e.g. [{"event":"evidence_added","subject_ref":"run"}].')
+        if decision.get("disposition") and not decision.get("comparison_id"):
+            error.message += (" For an ordinary Run wait, omit disposition and affected_scope. These fields record "
+                              "an action on a registered comparison.")
 
 
 def _submission_event(roots, params, *, error=None, accepted=None):

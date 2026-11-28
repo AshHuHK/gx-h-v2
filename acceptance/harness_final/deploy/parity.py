@@ -6,8 +6,9 @@ import subprocess
 
 FULL_BASE = "4b6aa93ad5bf638d06bed7004c26c27d030a59ea"
 LEAN_BASE = "6ec604d176d307c27b3c4f7d3e7ee02e37325bce"
-SCOPE = ("bin", "gx-h/gx_core", "gx-h/config", "gx-h/contracts", "gx-h/plugins")
+SCOPE = ("bin", "gx-h/gx_core", "gx-h/config", "gx-h/contracts", "gx-h/plugins", "gx-h/adapters")
 REGISTRY = "gx-h/config/workflow_packages.json"
+READER = "gx-h/adapters/scientific/published_documents.py"
 
 
 def git(repo, *args):
@@ -34,8 +35,16 @@ def compare(repo, full, lean):
     if current != prior:
         raise ValueError(f"Changed cross-site packaging differences: {sorted(current ^ prior)}")
     unique = change & current
-    if unique != {REGISTRY}:
+    if REGISTRY not in unique or unique - {REGISTRY, READER}:
         raise ValueError(f"Changed product files requiring site-specific review: {sorted(unique)}")
+    if READER in unique:
+        original_hint = b"PDF reader from release-assets/python/requirements.lock"
+        lean_hint = b"PDF reader from requirements.txt"
+        for source, destination in ((FULL_BASE, LEAN_BASE), (full, lean)):
+            shared, local = [subprocess.check_output(["git", "-C", repo, "show", revision + ":" + READER])
+                             for revision in (source, destination)]
+            if shared.count(original_hint) != 1 or shared.replace(original_hint, lean_hint) != local:
+                raise ValueError("Unexpected scientific reader difference in the lean release.")
 
     full_config, full_pins = registry(repo, full)
     lean_config, lean_pins = registry(repo, lean)
@@ -52,6 +61,9 @@ def compare(repo, full, lean):
     return {
         "full": full, "lean": lean, "full_base": FULL_BASE, "lean_base": LEAN_BASE,
         "scope": SCOPE, "changed_product_files": len(change), "identical_changed_blobs": files,
+        "adapters_trees": {name: git(repo, "rev-parse", rev + ":gx-h/adapters")
+                           for name, rev in (("full", full), ("lean", lean))},
+        "changed_site_specific_files": sorted(unique),
         "preserved_site_specific_files": sorted(current), "lean_only_plugin_pins": old_extra,
         "registry_settings_match": True, "full_plugin_count": len(full_pins), "lean_plugin_count": len(lean_pins),
     }

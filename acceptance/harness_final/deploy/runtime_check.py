@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-PRODUCT_PATHS=("gx-h/gx_core","gx-h/config","gx-h/contracts","gx-h/plugins","bin")
+PRODUCT_PATHS=("gx-h/gx_core","gx-h/config","gx-h/contracts","gx-h/plugins","gx-h/adapters","bin")
 ARCHIVE_MAP={
     "reactions":"indexes/reaction-names/rhea139-142.sqlite",
     "rhea":"indexes/rhea142-sprot2026_03/lookup.sqlite",

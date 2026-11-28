@@ -25,3 +25,7 @@ python -B acceptance/harness_refactor/field/late-water/check_receipt.py
 ```
 
 [題面](question.md) · [預登記](preregistered.json) · [首輪正式回執](receipt.json) · [獨立數值參照](reference.json) · [部署逐檔對照](deployment-comparison.json)
+
+## 後續工程復驗
+
+同題共做兩次具獨立部署及 Run 的工程復驗。第一次已正確取消過時任務，但 GX 把同席位的系統刷新算為另一個 worker task。第二次修復後，原研究員在冷恢復後第一個可用回合看見 PI 原話，實讀 3,400 bytes 並算對兩站比較。因私件不能隨報告公開，Lead 最終維持首站結論、正式向 PI 請求共享。三次 Run 各自保留。詳見[第一次修補實跑](repair/README.md)與[同席刷新修補實跑](one-slot/README.md)。

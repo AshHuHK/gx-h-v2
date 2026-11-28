@@ -13,7 +13,7 @@ from ..errors import SchemaInvalid, ScopeDenied, VersionImmutable
 from ..jobs.service import JobService
 from ..persistence import store
 from ..plugins import goal as goal_plugins
-from . import manifest, v6_jobs, v62_outputs
+from . import manifest, recipe_stages, v6_jobs, v62_outputs
 
 SAVE = "gx_save_recipe"
 INSTANTIATE = "gx_instantiate_recipe"
@@ -28,7 +28,8 @@ def save_tool(modern):
         spec["description"] += " A macro may select performed modules and computations, the named evidence join and an open decision question for a fresh Goal."
         return spec
     original = deepcopy(spec)
-    original["inputSchema"]["properties"].pop("macro")
+    for field in ("macro", *recipe_stages.FIELDS):
+        original["inputSchema"]["properties"].pop(field, None)
     return original
 
 
@@ -53,12 +54,13 @@ def provider_pin(entry):
 
 
 def _card(reference, digest, definition):
-    return {"kind": "recipe", "reference": reference, "digest": digest, "title": definition["title"],
+    return {**({"schema": recipe_stages.SCHEMA} if definition["schema"] == recipe_stages.SCHEMA else {}),
+            "kind": "recipe", "reference": reference, "digest": digest, "title": definition["title"],
             "id_alignment": definition["id_alignment"], "missing_values": definition["missing_values"],
             "units": definition["units"], "inputs": definition["inputs"], "methods": {s["slot"]: s["capability"] for s in definition["steps"]},
             "method_pins": {s["capability"]: s["method_digest"] for s in definition["steps"]},
             "outputs": {s["slot"]: s["outputs"] for s in definition["steps"]},
-            **{key: definition[key] for key in ("decision_point", "calibration", "provider_pins", "macro") if key in definition}}
+            **{key: definition[key] for key in ("decision_point", "calibration", "provider_pins", "macro", *recipe_stages.FIELDS) if key in definition}}
 
 
 def cards(conn):
@@ -78,14 +80,17 @@ def prepare(conn, run_id, arguments):
     external = {ref: slot for slot, ref in bindings.items()}
     node_slots = {nid: slot for slot, nid in slots.items()}
     portable_natures = {"analysis", "observed", "model_prediction"}
-    enriched = macro or "decision_point" in arguments or "calibration" in arguments
+    staged = any(field in arguments for field in recipe_stages.FIELDS)
+    enriched = staged or macro or "decision_point" in arguments or "calibration" in arguments
     proofs = {}
     for slot, nid in slots.items():
         node = v6_jobs._node(conn, run_id, nid)
         if not node or node["status"] not in ("SUCCEEDED", "REUSED"):
             raise SchemaInvalid(f"Recipe step {slot} needs a completed Job on this Goal")
         spec = json.loads(node["spec_json"])
-        if spec.get("evidence_gate") or set(spec["depends_on"]) - node_slots.keys():
+        if spec.get("evidence_gate"):
+            staged = enriched = True
+        if set(spec["depends_on"]) - node_slots.keys():
             raise SchemaInvalid("Include the whole dependency or save a subgraph without an external condition")
         proof = manifest.read_manifest(conn, node["job_id"])
         v6_jobs.confirmed_result_identity(conn, nid, proof)
@@ -169,6 +174,8 @@ def prepare(conn, run_id, arguments):
                       "parameters": spec["parameters"], "question": (
                           f"Apply {spec['capability']} to the named inputs of this Goal."
                           if enriched else spec["question"])})
+        if gate := spec.get("evidence_gate"):
+            steps[-1]["evidence_gate"] = recipe_stages.capture_gate(gate, proofs, node_slots, external)
         sources[slot] = {"node_id": nid, "job_id": node["job_id"], "completion_sha256": proof["manifest_hash"]}
     if macro:
         from . import v6_macro_recipes
@@ -202,6 +209,9 @@ def prepare(conn, run_id, arguments):
         if not isinstance(arguments[key], str) or not arguments[key].strip():
             raise SchemaInvalid(f"A reusable recipe needs {key}")
         definition[key] = arguments[key]
+    if staged:
+        recipe_stages.require_current(conn, run_id)
+        recipe_stages.capture(conn, definition, arguments, bindings, assets)
     return definition, sources
 
 
@@ -228,12 +238,17 @@ def decision_for(conn, spec, *, run_id=None):
     definition = json.loads(row[0]) if row else {}
     point = definition.get("decision_point")
     step = next((s for s in definition.get("steps", ()) if s["slot"] == marker["step"]), None)
+    staged = definition.get("schema") == recipe_stages.SCHEMA
+    if staged:
+        point = next((p for p in definition.get("decision_points", ()) if p["step"] == marker["step"]), None)
     macro = definition.get("macro")
     if (not step or step["capability"] != spec["capability"]
-            or (not macro and (not point or point["step"] != marker["step"]))):
+            or (not macro and not staged and (not point or point["step"] != marker["step"]))):
         raise SchemaInvalid("The recipe decision must reference its saved method and evidence step")
     if run_id is not None:
         from . import harness_policy
+        if staged:
+            recipe_stages.require_current(conn, run_id)
         if macro and not harness_policy.active(conn, run_id):
             raise ScopeDenied("This archived Goal has no macro research policy")
         cap = spec["capability"]
@@ -323,6 +338,9 @@ def instantiate(conn, run_id, arguments, *, visible_refs=None):
             raise ScopeDenied("A recipe must read inputs from its target Goal")
         if any(item[key] != value for key, value in definition["inputs"][name].items()):
             raise SchemaInvalid(f"Input {name} does not match the saved artifact kind and media type")
+    staged = definition["schema"] == recipe_stages.SCHEMA
+    if staged:
+        recipe_stages.validate_target(conn, run_id, definition, bindings, assets)
     grants = json.loads(conn.execute("SELECT capabilities_json FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()[0])
     target_providers = {g["capability_version"]: provider_pin(g) for g in goal_plugins.catalog(conn, run_id)}
     for cap, pin in definition.get("provider_pins", {}).items():
@@ -330,7 +348,7 @@ def instantiate(conn, run_id, arguments, *, visible_refs=None):
             raise ScopeDenied(f"The target Goal needs the saved provider and dependencies for {cap}")
     prefix = _name(arguments["prefix"])
     branch = arguments["branch"]
-    if definition["schema"] in ("gx.research-recipe/2","gx.research-recipe/3") and definition["steps"] and not branch.startswith("local:"):
+    if definition["schema"] in ("gx.research-recipe/2","gx.research-recipe/3",recipe_stages.SCHEMA) and definition["steps"] and not branch.startswith("local:"):
         existing = conn.execute("SELECT 1 FROM v6_branches WHERE run_id=? AND branch_id=?",
                                 (run_id, branch)).fetchone()
         if not existing:
@@ -381,13 +399,16 @@ def instantiate(conn, run_id, arguments, *, visible_refs=None):
         ops.append({"op": "add_node", "node": alias[step["slot"]], "branch": branch,
                     "capability": cap, "parameters": step["parameters"], "inputs": inputs,
                     "depends_on": [alias[d] for d in step["depends_on"] if d != skipped], "question": step["question"],
-                    **({"independent_repeat": True} if repeat or (calibration and step["slot"] == calibration["step"]) else {}),
+                    **({"independent_repeat": True} if repeat or definition.get("evaluation",{}).get("step") == step["slot"] or (calibration and step["slot"] == calibration["step"]) else {}),
                     **({"recipe_decision": {"recipe": reference, "digest": row[0], "step": step["slot"]}}
-                       if definition.get("macro") or (point and point["step"] == step["slot"]) else {}),
+                       if staged or definition.get("macro") or (point and point["step"] == step["slot"]) else {}),
                     **({"input_ports": ports} if ports else {})})
+        if gate := step.get("evidence_gate"):
+            ops[-1]["evidence_gate"] = {"producer_node": alias[gate["producer_step"]], "producer_version": 1,
+                "source_ref": bindings[gate["source_input"]], **{k:gate[k] for k in ("output_name","pointer","equals","require_lead_review")}}
     answer = {"recipe": reference, "digest": row[0], "ops": ops,
               **({"decision_point": point} if point else {}), **({"calibration": receipt} if receipt else {})}
-    if definition["schema"] in ("gx.research-recipe/2","gx.research-recipe/3") and definition["steps"] and branch.startswith("local:"):
+    if definition["schema"] in ("gx.research-recipe/2","gx.research-recipe/3",recipe_stages.SCHEMA) and definition["steps"] and branch.startswith("local:"):
         from . import v6_graph
         contracts = v6_graph.decision_schema()["properties"]["ops"]["items"]["oneOf"]
         opening = next(kind for kind in contracts if kind["properties"]["op"]["const"] == "open_branch")
@@ -400,6 +421,9 @@ def instantiate(conn, run_id, arguments, *, visible_refs=None):
             "instructions": "Prepend one open_branch operation to these add_node operations. "
                             "Fill the scientific fields for this Goal and fund the expanded Jobs.",
             "required_open_branch_fields": opening["required"], "minimum_budget_limits": dict(minimum)}
+    if staged:
+        answer.update({k:definition[k] for k in recipe_stages.FIELDS if k in definition})
+        recipe_stages.bound_ops(conn, run_id, definition, row[0], arguments, answer)
     if "macro" in definition:
         from . import harness_policy, v6_macro_recipes
         if not harness_policy.active(conn, run_id):

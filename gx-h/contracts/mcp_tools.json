@@ -940,6 +940,25 @@
               ],
               "description": "Save already delivered module commissions and their registered join. State portable questions for fresh materials. Source reports, results and past choices stay in the source Goal."
             },
+            "decision_points": {
+              "type": "array", "minItems": 1,
+              "description": "Questions for fresh Lead decisions at the named outputs of distinct performed stages.",
+              "items": {"type": "object", "additionalProperties": false, "required": ["step", "output", "question"],
+                "properties": {"step": {"type": "string"}, "output": {"type": "string"}, "question": {"type": "string", "minLength": 1}}}
+            },
+            "evaluation": {
+              "type": "object", "additionalProperties": false, "required": ["step", "holdout_input"],
+              "description": "Name the evaluation step and separate held-out material slot. Each target commissions a fresh evaluation.",
+              "properties": {"step": {"type": "string"}, "holdout_input": {"type": "string"}}
+            },
+            "children": {
+              "type": "array", "minItems": 1,
+              "description": "Reference completed computational subrecipes at immutable digests. Map each child step and input slot to its performed parent slot.",
+              "items": {"type": "object", "additionalProperties": false, "required": ["recipe", "digest", "steps", "inputs"],
+                "properties": {"recipe": {"type": "string"}, "digest": {"type": "string"},
+                  "steps": {"type": "object", "additionalProperties": {"type": "string"}},
+                  "inputs": {"type": "object", "additionalProperties": {"type": "string"}}}}
+            },
             "decision_point": {
               "type": "object", "additionalProperties": false,
               "required": ["step", "output", "question", "actions", "stop_condition"],

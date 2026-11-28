@@ -174,6 +174,8 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
             v6_recipes.decision_for(conn, spec, run_id=run_id)
         if op == "add_node" and "evidence_gate" in spec:
             gate = dict(spec["evidence_gate"])
+            if "output_name" in gate and not harness_policy.current(conn, run_id):
+                raise ScopeDenied("This archived Goal has no named filter output contract")
             gate["producer_node"] = aliases.get(gate["producer_node"], gate["producer_node"])
             if gate["source_ref"] not in visible_refs or gate["producer_node"] not in spec["depends_on"]:
                 raise ScopeDenied("A conditional Job needs a visible source and a declared producing dependency")
@@ -241,6 +243,9 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
                 raise ScopeDenied("Node input was not granted in this decision context", details={
                     "node": spec["node"], "input_index": index,
                     "correction": "Use a visible artifact reference or a declared upstream node."})
+        if "recipe_decision" in spec:
+            from . import recipe_stages
+            recipe_stages.verify_commission(conn, run_id, spec, nodes)
         try:
             minimum = v6_jobs.validate_node(conn, run_id, spec, node_ids=producers,
                                             limits=branches[spec["branch"]]["budget_limits"])

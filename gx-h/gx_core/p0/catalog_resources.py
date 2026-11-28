@@ -116,6 +116,8 @@ def rows_for_kind(conn, run_id, brief, kind, methods, choices, *, current_readin
             pins = {r["capability_version"]:r["portable_sha256"] for r in visible}
             providers = {r["capability_version"]: v6_recipes.provider_pin(r) for r in visible}
             for card in v6_recipes.cards(conn):
+                if card.get("schema") == "gx.research-recipe/4" and brief.get("harness_policy") != harness_policy.VERSION:
+                    continue
                 if "macro" in card and not harness_policy.enabled(brief):
                     continue
                 row = dict(card, category="workflow", purpose=card["title"])

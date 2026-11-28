@@ -63,6 +63,15 @@ def _observation(conn, run_id, gate, consumer):
         _invalid(conn, run_id, gate, "producer revision differs", "Commission a node for the intended producer version")
     if not record["job_id"] or not record["result_ref"] or not record["result_sha"]:
         _invalid(conn, run_id, gate, "missing immutable producer output", "Restore the original Job completion and output")
+    if "output_name" in gate:
+        from . import v62_outputs
+        outputs, _ = v62_outputs.recorded_outputs(conn, run_id, record["job_id"], check_publications=True)
+        matches = [o for o in outputs if o["output_name"] == gate["output_name"]
+                   and o["nature"] in {"analysis", "observed", "model_prediction"}
+                   and any(i["artifact_ref"] == gate["source_ref"] for i in o["source_inputs"])]
+        if len(matches) != 1:
+            _invalid(conn, run_id, gate, "named output lacks the measured source", "Check the frozen method and named output")
+        record = dict(record, result_ref=matches[0]["artifact_ref"], result_sha=matches[0]["sha256"])
     _visible_result(conn, run_id, consumer, record, gate)
     if gate["source_ref"] not in json.loads(record["spec_json"])["inputs"]:
         _invalid(conn, run_id, gate, "unrelated source assignment", "Revise the assignment to cite the actual measured input")

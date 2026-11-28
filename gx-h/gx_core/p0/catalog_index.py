@@ -62,7 +62,7 @@ def _installed(root, directory, revisions):
             terms = local_terms.get((provider, cap)) or translations.get((provider, cap, card["portable_sha256"]), {})
             rows.append(dict(card, provider=provider, provider_sha256=package.pin.digest,
                              aliases=[*aliases, *terms.get("aliases", ())], collections=collections,
-                             **({"names": terms["names"]} if terms else {}),
+                             **({"names": terms["names"], "_prior_aliases": aliases} if terms else {}),
                              **({"catalog_kind": declared_kind} if declared_kind in ("research", "database") else {})))
             provided.add(cap)
     rows.extend(dict(card, provider=None, collections=[], aliases=[])
@@ -175,6 +175,10 @@ def _method_rows(conn, run_id, brief, inputs, active_rows):
     bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
     files = {}
     for (cap, digest, provider), card in cards.items():
+        # Runs opened before bilingual discovery retain their original text and ranking.
+        if "_prior_aliases" in card and inputs.get("harness_policy") != harness_policy.VERSION:
+            card = {k:v for k,v in card.items() if k != "names"}
+            card["aliases"] = card["_prior_aliases"]
         if intent.forbidden_capability(*cap.rsplit("@", 1), bans):
             continue
         key = (cap, digest, provider)
@@ -392,7 +396,8 @@ def query(conn, run_id, brief, args, inputs):
         scope_priority = {"available": 0, "selectable": 1, "catalog_only": 2}.get(row["status"], 3)
         domain_fit = summary.get("input_coverage", {}).get("domain", {}).get("status")
         # Prefer an exact authored name/alias to incidental occurrences in background prose.
-        alias_match = bool(words) and any(_fold(alias) == _fold(query_text).strip() for alias in row.get("aliases", ()))
+        alias_match = (inputs.get("harness_policy") == harness_policy.VERSION and bool(words)
+                       and any(_fold(alias) == _fold(query_text).strip() for alias in row.get("aliases", ())))
         rank = (not exact, len(missing), domain_fit == "unsupported", not alias_match, -len(matches), scope_priority if words else 0,
                 -len(context_matches), scope_priority,
                 row["reference"], row.get("provider") or "")

@@ -40,3 +40,9 @@ python -B acceptance/harness_final/catalog/inventory.py
 python -B acceptance/harness_final/catalog/archive_snapshots.py
 python -B -m unittest -v acceptance.harness_final.catalog.test_discovery acceptance.harness_final.catalog.test_archive acceptance.harness_refactor.field.test_literal_archive acceptance.harness_refactor.catalog.test_open_discovery
 ```
+
+### 已保存 Goal 的版本相容性
+
+正式候選 `362157a` 跑既有 121 項測試時，有一個無 harness 版本標記的早期 Goal 在「文獻／文献」前十五項找不到 `scholarly-fetch@1`。首次失敗見 `first-legacy-ranking.log`。原因包括新翻譯欄位及精確別名排序加權均套用到了舊 Goal。修補沿建立時保存的 Goal 版本投影這兩項變動，保留 /2 及無標記 Goal 的原始方法別名和排序。
+
+`cold-catalog-compatibility.json` 的每個版本分別從其原始普通 Goal 開題。停止程序後，以同一 source 和 state 目錄冷開並查詢。4b6aa93 的 /2 與 362157a 的 /3 各驗六題；前十五項的識別碼、類型、provider、狀態與匹配原因全數相同。兩個 Goal 的查詢結果分別與各自版本在修補前的回執對照。原 121 項中失敗的案例及六個相鄰測例亦重驗通過。後續修補不影響已在跑的 /3 研究。

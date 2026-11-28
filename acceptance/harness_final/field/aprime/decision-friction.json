@@ -1,0 +1,989 @@
+{
+  "run_id": "gxr_01m8g22y65r8zxbfqw",
+  "source_sql": "join p0_v6_native_calls and p0_root_calls on thread_id,turn_id,call_id; join events by sha256(canonical_json([thread_id,turn_id,call_id])) stored in payload.submission",
+  "observed": [
+    {
+      "event_id": 253,
+      "task_id": "gxt_01m8g22yar2sxqztmg",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05"
+            ],
+            "ops": [
+              {
+                "key": "catalogue-correction-evidence",
+                "op": "await_join"
+              }
+            ],
+            "rationale": "The older Table 2 gives a stationary-phase neutral extract activity in CEN.PK derivatives. Its relevance to reference and wine yeasts depends on the newer study’s original strain-by-genotype comparisons and measured endpoint. I have commissioned that original and a check of the older table."
+          }
+        },
+        "callId": "call_145aa57fa5444607b43a4ab1aba2a924",
+        "namespace": "gx",
+        "threadId": "01a22021-86ca-7a32-aa9a-36136564307d",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22022-8622-7573-a09a-73fa7bd3ccf5"
+      },
+      "lookup_sha256": "7734f72fc9477b8281fc3ba7edea16b152c0c3ecb60e9355669fec7baac0f31f",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops[0].op"
+        },
+        "evidence_ref": null,
+        "message": "$.ops[0].op: Unknown graph operation 'await_join'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-09-57-01a22021-86ca-7a32-aa9a-36136564307d.jsonl",
+        "line": 322,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: $.ops[0].op: Unknown graph operation 'await_join'",
+          "code": "SCHEMA_INVALID",
+          "field": "ops[0].op"
+        }
+      }
+    },
+    {
+      "event_id": 316,
+      "task_id": "gxt_01m8g22yar2sxqztmg",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05"
+            ],
+            "mode": "amend",
+            "ops": [],
+            "rationale": "Retain the older extract measurement under CEN.PK, YPD and stationary phase. Defer the cross-background entry until the commissioned newer original and the two source readings establish the endpoint and within-background controls."
+          }
+        },
+        "callId": "call_96cdb6fa507347d087d964d6bc1cff27",
+        "namespace": "gx",
+        "threadId": "01a22021-86ca-7a32-aa9a-36136564307d",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22022-8622-7573-a09a-73fa7bd3ccf5"
+      },
+      "lookup_sha256": "a61e1599a5dfeb8fb6a9e363d2c694323c857c541a1a406d25c16f741249ae4a",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "mode",
+          "options": [
+            "resolve",
+            "amend"
+          ]
+        },
+        "evidence_ref": null,
+        "message": "Use mode=resolve for empty ops, or mode=amend with the intended graph operations. You can omit mode when ops already expresses your decision.",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-09-57-01a22021-86ca-7a32-aa9a-36136564307d.jsonl",
+        "line": 329,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: Use mode=resolve for empty ops, or mode=amend with the intended graph operations. You can omit mode when ops already expresses your decision.",
+          "code": "SCHEMA_INVALID",
+          "field": "mode",
+          "options": [
+            "resolve",
+            "amend"
+          ]
+        }
+      }
+    },
+    {
+      "event_id": 327,
+      "task_id": "gxt_01m8g22yar2sxqztmg",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "disposition": "MAINTAIN",
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05"
+            ],
+            "mode": "resolve",
+            "ops": [],
+            "rationale": "Table 2 already places the residual enzyme activity in stationary-phase CEN.PK extracts. The outstanding original-source reports will establish the strain, genetic contrast and endpoint of Figure 2a before a quantitative transfer is accepted."
+          }
+        },
+        "callId": "call_7bca042c6fd04bbbad0f8d3621381d9c",
+        "namespace": "gx",
+        "threadId": "01a22021-86ca-7a32-aa9a-36136564307d",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22022-8622-7573-a09a-73fa7bd3ccf5"
+      },
+      "lookup_sha256": "e5cc994d18e353d20a0578eef0125100d3d7aa66601a32a76e5d777ede7a6aed",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops",
+          "options": [],
+          "ordinary_run_omit": [
+            "disposition"
+          ],
+          "reason": "comparison_action_ambiguous"
+        },
+        "evidence_ref": null,
+        "message": "For a decision about the Run, remove these top-level comparison fields: disposition. An empty ops list waits (mode=resolve or omitted). This brief has no active registered comparison.",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-09-57-01a22021-86ca-7a32-aa9a-36136564307d.jsonl",
+        "line": 336,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: For a decision about the Run, remove these top-level comparison fields: disposition. An empty ops list waits (mode=resolve or omitted). This brief has no active registered comparison.",
+          "code": "SCHEMA_INVALID",
+          "reason": "comparison_action_ambiguous",
+          "field": "ops",
+          "options": []
+        }
+      }
+    },
+    {
+      "event_id": 388,
+      "task_id": "gxt_01m8g22yar2sxqztmg",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05"
+            ],
+            "mode": "resolve",
+            "ops": [],
+            "rationale": "Table 2 places the residual enzyme activity in stationary-phase CEN.PK extracts. The commissioned source readings will establish the strain, genetic contrast and endpoint of Figure 2a before the catalogue entry is finalized."
+          }
+        },
+        "callId": "call_61f9a076b6f84f0cada9ddd9e2004c77",
+        "namespace": "gx",
+        "threadId": "01a22021-86ca-7a32-aa9a-36136564307d",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22022-8622-7573-a09a-73fa7bd3ccf5"
+      },
+      "lookup_sha256": "924c20dcf6234c011f90e3030d5caa6a2ba026159f82247f7252ab40e6a59615",
+      "gx_persisted_receipt": {
+        "event_id": 387,
+        "outcome": "maintained",
+        "decision_ref": "gxa_d1953b089fd7970a6ceb90203ec7c6b67f9fdf8459820ebde24472c33bc25f55"
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-09-57-01a22021-86ca-7a32-aa9a-36136564307d.jsonl",
+        "line": 341,
+        "official_function_call_output": "dynamic tool call was cancelled before receiving a response"
+      }
+    },
+    {
+      "event_id": 570,
+      "task_id": "gxt_01m8g2ccangbyjcb5k",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "disposition": "MAINTAIN",
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26ysft1pqr38h",
+              "gxa_01m8g26zgkrxpt1nd9",
+              "gxa_01m8g26zjq8h2zrqff",
+              "gxa_01m8g26zn4gw0vyhas",
+              "gxa_01m8g28ezar0hrncjw",
+              "gxa_01m8g28f1zjaz1e57r",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_01m8g2nw9pw7mseecg"
+            ],
+            "mode": "resolve",
+            "ops": [],
+            "rationale": "The CEN.PK double-deletion control identifies NTH2-dependent residual hydrolysis in the older assay. The newer Results and methods identify an intracellular trehalose pool measured against isogenic wild types. These observations support a qualitative role for Nth2 across the tested strains and leave a common activity fraction undetermined. The pending source assessments can verify the wording and scope of both catalogue citations.",
+            "reconsider_when": [
+              {
+                "event": "evidence_added",
+                "subject_ref": "run"
+              },
+              {
+                "event": "budget_changed",
+                "subject_ref": "run"
+              }
+            ]
+          }
+        },
+        "callId": "call_e07e59565e534a51b2025e08366441d0",
+        "namespace": "gx",
+        "threadId": "01a22026-3173-73a2-9dd0-b85ab3e48e5c",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22028-c646-71e3-a11f-64381bca85d6"
+      },
+      "lookup_sha256": "38b44fde8512bf8f1d51c6f12b27b163a9e857c0798d29fbbec7a48c3892f1e6",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops",
+          "options": [],
+          "ordinary_run_omit": [
+            "disposition"
+          ],
+          "reason": "comparison_action_ambiguous"
+        },
+        "evidence_ref": null,
+        "message": "For a decision about the Run, remove these top-level comparison fields: disposition. An empty ops list waits (mode=resolve or omitted). This brief has no active registered comparison.",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-15-03-01a22026-3173-73a2-9dd0-b85ab3e48e5c.jsonl",
+        "line": 252,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: For a decision about the Run, remove these top-level comparison fields: disposition. An empty ops list waits (mode=resolve or omitted). This brief has no active registered comparison.",
+          "code": "SCHEMA_INVALID",
+          "reason": "comparison_action_ambiguous",
+          "field": "ops",
+          "options": []
+        }
+      }
+    },
+    {
+      "event_id": 571,
+      "task_id": "gxt_01m8g2ccangbyjcb5k",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26ysft1pqr38h",
+              "gxa_01m8g26zgkrxpt1nd9",
+              "gxa_01m8g26zjq8h2zrqff",
+              "gxa_01m8g26zn4gw0vyhas",
+              "gxa_01m8g28ezar0hrncjw",
+              "gxa_01m8g28f1zjaz1e57r",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_01m8g2nw9pw7mseecg"
+            ],
+            "mode": "resolve",
+            "ops": [],
+            "rationale": "The CEN.PK double-deletion control identifies NTH2-dependent residual hydrolysis in the older assay. The newer Results and methods identify an intracellular trehalose pool measured against isogenic wild types. These observations support a qualitative role for Nth2 across the tested strains and leave a common activity fraction undetermined. The pending source assessments can verify the wording and scope of the two catalogue citations.",
+            "reconsider_when": [
+              {
+                "event": "evidence_added",
+                "subject_ref": "run"
+              },
+              {
+                "event": "budget_changed",
+                "subject_ref": "run"
+              }
+            ]
+          }
+        },
+        "callId": "call_0ef61bbc213a4dcf85213597ef1d218d",
+        "namespace": "gx",
+        "threadId": "01a22026-3173-73a2-9dd0-b85ab3e48e5c",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22028-c646-71e3-a11f-64381bca85d6"
+      },
+      "lookup_sha256": "06781a04060c43da87827d27e132f35617c93376db54f5a35556ff2931d43519",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "evidence_ref": null,
+        "message": "an adopted claim must cite its original evidence in this decision",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-15-03-01a22026-3173-73a2-9dd0-b85ab3e48e5c.jsonl",
+        "line": 257,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: an adopted claim must cite its original evidence in this decision",
+          "code": "SCHEMA_INVALID"
+        }
+      }
+    },
+    {
+      "event_id": 579,
+      "task_id": "gxt_01m8g2ccangbyjcb5k",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26ysft1pqr38h",
+              "gxa_01m8g26zgkrxpt1nd9",
+              "gxa_01m8g26zjq8h2zrqff",
+              "gxa_01m8g26zn4gw0vyhas",
+              "gxa_01m8g26ztg37ks1t0r",
+              "gxa_01m8g28ezar0hrncjw",
+              "gxa_01m8g28f1zjaz1e57r",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_01m8g2nw9pw7mseecg"
+            ],
+            "mode": "resolve",
+            "ops": [],
+            "rationale": "The CEN.PK double-deletion control identifies NTH2-dependent residual hydrolysis in the older assay. The newer Results and methods identify an intracellular trehalose pool measured against isogenic wild types. These observations support a qualitative role for Nth2 across the tested strains and leave a common activity fraction undetermined. The pending source assessments can verify the wording and scope of the two catalogue citations.",
+            "reconsider_when": [
+              {
+                "event": "evidence_added",
+                "subject_ref": "run"
+              },
+              {
+                "event": "budget_changed",
+                "subject_ref": "run"
+              }
+            ]
+          }
+        },
+        "callId": "call_9635447c2dbf4f17b081952cf4c5f5a7",
+        "namespace": "gx",
+        "threadId": "01a22026-3173-73a2-9dd0-b85ab3e48e5c",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22028-c646-71e3-a11f-64381bca85d6"
+      },
+      "lookup_sha256": "8f12e1561b1bb85215ee2eff07a60df454b5f141675215b2bbf6568d15c716da",
+      "gx_persisted_receipt": {
+        "event_id": 578,
+        "outcome": "maintained",
+        "decision_ref": "gxa_bdbd4fa648b7aaef999f5cfcce144fbb758ad00eba874956d641a201abab1afa"
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-15-03-01a22026-3173-73a2-9dd0-b85ab3e48e5c.jsonl",
+        "line": 263,
+        "official_function_call_output": "dynamic tool call was cancelled before receiving a response"
+      }
+    },
+    {
+      "event_id": 601,
+      "task_id": "gxt_01m8g2re1wt21kd411",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "disposition": "STOP",
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_a8a794645a03809d5d3728ed6724a1b6f4a00ba87455a02843035a044a94ffcb",
+              "gxa_1bd774071764d5d77b64aaf4e7f0e7876e7db4c081f304e7e932c21469567ebb",
+              "gxa_01m8g2pm3nr46z4rek",
+              "gxa_01m8g2pm6ebcgvxdjf",
+              "gxa_01m8g2q5e73vrj8n79",
+              "gxa_01m8g2q5h49q9k1wx1",
+              "gxa_01m8g2q5k7xxnjd743",
+              "gxa_01m8g2jeq66gt2t4ma",
+              "gxa_01m8g2jet83nfwa282",
+              "gxa_01m8g2jezpy785p94c",
+              "gxa_01m8g2zy7mj9dxm1am"
+            ],
+            "mode": "resolve",
+            "ops": [
+              {
+                "claim_refs": [
+                  "gxa_01m8g2zy7mj9dxm1am"
+                ],
+                "op": "close_run"
+              }
+            ],
+            "rationale": "Keep the published residual neutral trehalase rate with the YPD-grown CEN.PK nth1 deletion strain. The matched wild-type rate gives a descriptive denominator for that extract assay, and the double deletion identifies the residual as NTH2-dependent. Chen and colleagues found higher cellular trehalose after NTH2 deletion in every tested background, including the S288C derivative, Simi White and CSM. The increase was smaller than after NTH1 deletion, and the double deletion accumulated the most. Their assay used added trehalase to quantify stored carbohydrate. These observations support a secondary role for Nth2 in trehalose breakdown while leaving its absolute activity and fraction of turnover in each reference or wine background undetermined.",
+            "stop_reason": "SCIENTIFIC_COMPLETION"
+          }
+        },
+        "callId": "call_200b72434a2d46b3a781021b1ec99442",
+        "namespace": "gx",
+        "threadId": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "tool": "gx_decide_revision",
+        "turnId": "01a2202c-3894-73c2-b554-13cb3abdcc14"
+      },
+      "lookup_sha256": "868e1ebc58f5176537780e3e7dd2a645d2d13db9b6e2b58d44af7299ecbf3c8b",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops[0].unresolved",
+          "operation": "close_run"
+        },
+        "evidence_ref": null,
+        "message": "close_run at $.ops[0].unresolved: missing required property 'unresolved'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-21-38-01a2202c-3863-7c13-a286-6dfc9d78cb79.jsonl",
+        "line": 187,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: close_run at $.ops[0].unresolved: missing required property 'unresolved'",
+          "code": "SCHEMA_INVALID",
+          "field": "ops[0].unresolved"
+        }
+      }
+    },
+    {
+      "event_id": 602,
+      "task_id": "gxt_01m8g2re1wt21kd411",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "disposition": "STOP",
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_a8a794645a03809d5d3728ed6724a1b6f4a00ba87455a02843035a044a94ffcb",
+              "gxa_1bd774071764d5d77b64aaf4e7f0e7876e7db4c081f304e7e932c21469567ebb",
+              "gxa_01m8g2pm3nr46z4rek",
+              "gxa_01m8g2pm6ebcgvxdjf",
+              "gxa_01m8g2q5e73vrj8n79",
+              "gxa_01m8g2q5h49q9k1wx1",
+              "gxa_01m8g2q5k7xxnjd743",
+              "gxa_01m8g2jeq66gt2t4ma",
+              "gxa_01m8g2jet83nfwa282",
+              "gxa_01m8g2jezpy785p94c",
+              "gxa_01m8g2zy7mj9dxm1am"
+            ],
+            "mode": "resolve",
+            "ops": [
+              {
+                "claim_refs": [
+                  "gxa_01m8g2zy7mj9dxm1am"
+                ],
+                "op": "close_run",
+                "unresolved": [
+                  "Absolute Nth2 activity and its share of neutral hydrolysis or intact-cell trehalose turnover in each reference and wine background require matched strain-specific measurements.",
+                  "The older table reports means without dispersion and leaves the detection limit for the double-deletion row unspecified.",
+                  "The newer Results establish the ordering of the trehalose pools. The acquired text leaves individual bar values and their numerical uncertainties unverified."
+                ]
+              }
+            ],
+            "rationale": "Keep the published residual neutral trehalase rate with the YPD-grown CEN.PK nth1 deletion strain. The matched wild-type rate gives a descriptive denominator for that extract assay, and the double deletion identifies the residual as NTH2-dependent. Chen and colleagues found higher cellular trehalose after NTH2 deletion in every tested background, including the S288C derivative, Simi White and CSM. The increase was smaller than after NTH1 deletion, and the double deletion accumulated the most. Their assay used added trehalase to quantify stored carbohydrate. These observations support a secondary role for Nth2 in trehalose breakdown while leaving its absolute activity and fraction of turnover in each reference or wine background undetermined.",
+            "stop_reason": "SCIENTIFIC_COMPLETION"
+          }
+        },
+        "callId": "call_b54b2328e4e849c29d515dd5b4cc9b69",
+        "namespace": "gx",
+        "threadId": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "tool": "gx_decide_revision",
+        "turnId": "01a2202c-3894-73c2-b554-13cb3abdcc14"
+      },
+      "lookup_sha256": "dc7cbe74d82f821e800978b423b3a5db22cb382f604c5551b5f5f204dc6521ad",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops",
+          "options": [],
+          "ordinary_run_omit": [
+            "disposition"
+          ],
+          "reason": "comparison_action_ambiguous"
+        },
+        "evidence_ref": null,
+        "message": "For ordinary Run closure with close_run, remove these top-level comparison fields: disposition. This brief has no active registered comparison.",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-21-38-01a2202c-3863-7c13-a286-6dfc9d78cb79.jsonl",
+        "line": 194,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: For ordinary Run closure with close_run, remove these top-level comparison fields: disposition. This brief has no active registered comparison.",
+          "code": "SCHEMA_INVALID",
+          "reason": "comparison_action_ambiguous",
+          "field": "ops",
+          "options": []
+        }
+      }
+    },
+    {
+      "event_id": 605,
+      "task_id": "gxt_01m8g2re1wt21kd411",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_a8a794645a03809d5d3728ed6724a1b6f4a00ba87455a02843035a044a94ffcb",
+              "gxa_1bd774071764d5d77b64aaf4e7f0e7876e7db4c081f304e7e932c21469567ebb",
+              "gxa_01m8g2pm3nr46z4rek",
+              "gxa_01m8g2pm6ebcgvxdjf",
+              "gxa_01m8g2q5e73vrj8n79",
+              "gxa_01m8g2q5h49q9k1wx1",
+              "gxa_01m8g2q5k7xxnjd743",
+              "gxa_01m8g2jeq66gt2t4ma",
+              "gxa_01m8g2jet83nfwa282",
+              "gxa_01m8g2jezpy785p94c",
+              "gxa_01m8g2zy7mj9dxm1am"
+            ],
+            "mode": "resolve",
+            "ops": [
+              {
+                "claim_refs": [
+                  "gxa_01m8g2zy7mj9dxm1am"
+                ],
+                "op": "close_run",
+                "unresolved": [
+                  "Absolute Nth2 activity and its share of neutral hydrolysis or intact-cell trehalose turnover in each reference and wine background require matched strain-specific measurements.",
+                  "The older table reports means without dispersion and leaves the detection limit for the double-deletion row unspecified.",
+                  "The newer Results establish the ordering of the trehalose pools. The acquired text leaves individual bar values and their numerical uncertainties unverified."
+                ]
+              }
+            ],
+            "rationale": "Keep the published residual neutral trehalase rate with the YPD-grown CEN.PK nth1 deletion strain. The matched wild-type rate gives a descriptive denominator for that extract assay, and the double deletion identifies the residual as NTH2-dependent. Chen and colleagues found higher cellular trehalose after NTH2 deletion in every tested background, including the S288C derivative, Simi White and CSM. The increase was smaller than after NTH1 deletion, and the double deletion accumulated the most. Their assay used added trehalase to quantify stored carbohydrate. These observations support a secondary role for Nth2 in trehalose breakdown while leaving its absolute activity and fraction of turnover in each reference or wine background undetermined.",
+            "stop_reason": "SCIENTIFIC_COMPLETION"
+          }
+        },
+        "callId": "call_a308712646334fd3b7383b04f460b1f6",
+        "namespace": "gx",
+        "threadId": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "tool": "gx_decide_revision",
+        "turnId": "01a2202c-3894-73c2-b554-13cb3abdcc14"
+      },
+      "lookup_sha256": "03132ebcb4e5ae29db017e749df9f579e5b77923241ef3001d9460e105d7d8fd",
+      "gx_persisted_receipt": {
+        "code": "STALE_REVISION",
+        "details": {
+          "brief_cursor": 573,
+          "context_ref": "gxcx_01m8g2re1sz47bjyze",
+          "event_id": 588,
+          "goal_version": 1,
+          "reason": "close_context_changed",
+          "uncited_review_refs": [
+            "gxa_01m8g2vb86p9z1dgaz",
+            "gxa_01m8g2vbb0e71mpd5d",
+            "gxa_01m8g2vbd0aynyby48",
+            "gxa_01m8g2vbfsr007pajk",
+            "gxa_01m8g2x2tqnabk1tt3"
+          ]
+        },
+        "evidence_ref": null,
+        "message": "New research evidence arrived after the delivered brief; reconsider before closing. The refreshed Lead can cite the listed review refs in decision.evidence_refs",
+        "retryable": true,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Re-read gx_run_status and resubmit with the current revision."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-21-38-01a2202c-3863-7c13-a286-6dfc9d78cb79.jsonl",
+        "line": 201,
+        "official_function_call_output": {
+          "error": "STALE_REVISION: New research evidence arrived after the delivered brief; reconsider before closing. The refreshed Lead can cite the listed review refs in decision.evidence_refs",
+          "code": "STALE_REVISION",
+          "reason": "close_context_changed"
+        }
+      }
+    },
+    {
+      "event_id": 612,
+      "task_id": "gxt_01m8g2re1wt21kd411",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_a8a794645a03809d5d3728ed6724a1b6f4a00ba87455a02843035a044a94ffcb",
+              "gxa_1bd774071764d5d77b64aaf4e7f0e7876e7db4c081f304e7e932c21469567ebb",
+              "gxa_01m8g2pm3nr46z4rek",
+              "gxa_01m8g2pm6ebcgvxdjf",
+              "gxa_01m8g2q5e73vrj8n79",
+              "gxa_01m8g2q5h49q9k1wx1",
+              "gxa_01m8g2q5k7xxnjd743",
+              "gxa_01m8g2jeq66gt2t4ma",
+              "gxa_01m8g2jet83nfwa282",
+              "gxa_01m8g2jezpy785p94c",
+              "gxa_01m8g2vb86p9z1dgaz",
+              "gxa_01m8g2vbb0e71mpd5d",
+              "gxa_01m8g2vbd0aynyby48",
+              "gxa_01m8g2vbfsr007pajk",
+              "gxa_01m8g2x2tqnabk1tt3",
+              "gxa_01m8g2zy7mj9dxm1am"
+            ],
+            "mode": "resolve",
+            "ops": [
+              {
+                "claim_refs": [
+                  "gxa_01m8g2zy7mj9dxm1am"
+                ],
+                "op": "close_run",
+                "unresolved": [
+                  "Each strain's native Nth2 hydrolysis rate and fraction of intact-cell turnover require matched measurements. Variation around the older extract means and the double-deletion detection limit are unspecified.",
+                  "The directional comparison comes from the newer Results and figure legend. Individual bar heights and numerical uncertainties were outside the acquired text."
+                ]
+              }
+            ],
+            "rationale": "The reviewed newer Methods and Results confirm that the S288C derivative, Simi White and CSM share the direction of a stationary-phase trehalose phenotype. Added trehalase measured the stored substrate. The reviewed older YPD rows assign residual neutral hydrolysis specifically to NTH2 in the CEN.PK nth1 mutant. Keep that rate and its wild-type denominator with the older extract assay. The references support a functional role across the tested strains and leave a shared magnitude undetermined.",
+            "stop_reason": "SCIENTIFIC_COMPLETION"
+          }
+        },
+        "callId": "call_578af7f80d194ef2846032604c762045",
+        "namespace": "gx",
+        "threadId": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "tool": "gx_decide_revision",
+        "turnId": "01a2202c-3894-73c2-b554-13cb3abdcc14"
+      },
+      "lookup_sha256": "520b21b4f4934574e9cf21754f80c3233694059944030e57702a24293a876668",
+      "gx_persisted_receipt": {
+        "code": "SCOPE_DENIED",
+        "evidence_ref": null,
+        "message": "this root no longer owns the current task attempt",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "The query or URI falls outside the approved project/namespace scope."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-21-38-01a2202c-3863-7c13-a286-6dfc9d78cb79.jsonl",
+        "line": 230,
+        "official_function_call_output": {
+          "error": "SCOPE_DENIED: this root no longer owns the current task attempt",
+          "code": "SCOPE_DENIED"
+        }
+      }
+    },
+    {
+      "event_id": 620,
+      "task_id": "gxt_01m8g32ah80wfekxwc",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "disposition": "STOP",
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_01m8g2pm3nr46z4rek",
+              "gxa_01m8g2pm6ebcgvxdjf",
+              "gxa_01m8g2q5e73vrj8n79",
+              "gxa_01m8g2q5h49q9k1wx1",
+              "gxa_01m8g2q5k7xxnjd743",
+              "gxa_01m8g2vbfsr007pajk",
+              "gxa_01m8g2x2tqnabk1tt3",
+              "gxa_01m8g2vb86p9z1dgaz",
+              "gxa_01m8g2vbb0e71mpd5d",
+              "gxa_01m8g2vbd0aynyby48",
+              "gxa_01m8g26zn4gw0vyhas",
+              "gxa_01m8g2b7fn0y00sd3v",
+              "gxa_a8a794645a03809d5d3728ed6724a1b6f4a00ba87455a02843035a044a94ffcb",
+              "gxa_1bd774071764d5d77b64aaf4e7f0e7876e7db4c081f304e7e932c21469567ebb"
+            ],
+            "mode": "resolve",
+            "ops": [
+              {
+                "claim_refs": [
+                  "gxa_01m8g38ge4snmhzjxv",
+                  "gxa_01m8g386kfapt38mv5",
+                  "gxa_01m8g38w49jf205hvw"
+                ],
+                "op": "close_run"
+              }
+            ],
+            "rationale": "Record Nth2 as a functional cytosolic neutral trehalase and leave its numerical contribution in the S288C derivative, Simi White and CSM undetermined. Jules et al. measured NTH2-dependent residual hydrolysis in stationary-phase YPD extracts of a CEN.PK113-7D nth1 deletion strain. Its comparison with the untreated wild type is specific to that assay. Chen et al. report that deleting NTH2 raised the intracellular trehalose pool less than deleting NTH1 within each of five backgrounds, with the highest pool in the double deletion. Their assay quantified stored carbohydrate using added trehalase. Even exact pool differences would leave the native Nth2 rate unidentified. The original passages and reviewed table entries settle the catalogue correction. Sources are Jules et al. (2008), Table 2 and enzyme-assay Methods, doi:10.1128/AEM.00557-07, and Chen et al. (2024), Figure 2a and trehalose measurement Methods, doi:10.1093/g3journal/jkae215.",
+            "reconsider_when": [
+              "Comparable Nth2-dependent hydrolysis rates and isogenic wild-type denominators with uncertainty are available in each named background at matched growth and assay conditions."
+            ],
+            "stop_reason": "SCIENTIFIC_COMPLETION"
+          }
+        },
+        "callId": "call_b3f298116a2147d4a8327aa78bef0859",
+        "namespace": "gx",
+        "threadId": "01a22031-2a52-7a71-bc23-14cbac57491d",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22031-2a99-7b13-a9e1-7779d7fa76a6"
+      },
+      "lookup_sha256": "8182fde23d962dbc90152a29f37895fad106cad271d32d1bc82d903efa277885",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "reconsider_when[0]"
+        },
+        "evidence_ref": null,
+        "message": "$.reconsider_when[0]: expected object, got string",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-27-02-01a22031-2a52-7a71-bc23-14cbac57491d.jsonl",
+        "line": 182,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: $.reconsider_when[0]: expected object, got string",
+          "code": "SCHEMA_INVALID",
+          "field": "reconsider_when[0]"
+        }
+      }
+    },
+    {
+      "event_id": 621,
+      "task_id": "gxt_01m8g32ah80wfekxwc",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "disposition": "STOP",
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_01m8g2pm3nr46z4rek",
+              "gxa_01m8g2pm6ebcgvxdjf",
+              "gxa_01m8g2q5e73vrj8n79",
+              "gxa_01m8g2q5h49q9k1wx1",
+              "gxa_01m8g2q5k7xxnjd743",
+              "gxa_01m8g2vbfsr007pajk",
+              "gxa_01m8g2x2tqnabk1tt3",
+              "gxa_01m8g2vb86p9z1dgaz",
+              "gxa_01m8g2vbb0e71mpd5d",
+              "gxa_01m8g2vbd0aynyby48",
+              "gxa_01m8g26zn4gw0vyhas",
+              "gxa_01m8g2b7fn0y00sd3v",
+              "gxa_a8a794645a03809d5d3728ed6724a1b6f4a00ba87455a02843035a044a94ffcb",
+              "gxa_1bd774071764d5d77b64aaf4e7f0e7876e7db4c081f304e7e932c21469567ebb"
+            ],
+            "mode": "resolve",
+            "ops": [
+              {
+                "claim_refs": [
+                  "gxa_01m8g38ge4snmhzjxv",
+                  "gxa_01m8g386kfapt38mv5",
+                  "gxa_01m8g38w49jf205hvw"
+                ],
+                "op": "close_run"
+              }
+            ],
+            "rationale": "Record Nth2 as a functional cytosolic neutral trehalase and leave its numerical contribution in the S288C derivative, Simi White and CSM undetermined. Jules et al. measured NTH2-dependent residual hydrolysis in stationary-phase YPD extracts of a CEN.PK113-7D nth1 deletion strain. Its comparison with the untreated wild type is specific to that assay. Chen et al. report that deleting NTH2 raised the intracellular trehalose pool less than deleting NTH1 within each of five backgrounds, with the highest pool in the double deletion. Their assay quantified stored carbohydrate using added trehalase. Strain-specific fractions would require matched Nth2-resolved rates, wild-type denominators and uncertainty estimates. The two reports settle the catalogue correction. Sources are Jules et al. (2008), Table 2, doi:10.1128/AEM.00557-07, and Chen et al. (2024), Figure 2a, doi:10.1093/g3journal/jkae215.",
+            "stop_reason": "SCIENTIFIC_COMPLETION"
+          }
+        },
+        "callId": "call_0e17c4e06cc547479e26058203347002",
+        "namespace": "gx",
+        "threadId": "01a22031-2a52-7a71-bc23-14cbac57491d",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22031-2a99-7b13-a9e1-7779d7fa76a6"
+      },
+      "lookup_sha256": "8118cb228f6302f589716e404afb05139b4820a5c11f35a9419d9342083d0925",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops[0].unresolved",
+          "operation": "close_run"
+        },
+        "evidence_ref": null,
+        "message": "close_run at $.ops[0].unresolved: missing required property 'unresolved'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-27-02-01a22031-2a52-7a71-bc23-14cbac57491d.jsonl",
+        "line": 189,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: close_run at $.ops[0].unresolved: missing required property 'unresolved'",
+          "code": "SCHEMA_INVALID",
+          "field": "ops[0].unresolved"
+        }
+      }
+    },
+    {
+      "event_id": 622,
+      "task_id": "gxt_01m8g32ah80wfekxwc",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "disposition": "STOP",
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_01m8g2pm3nr46z4rek",
+              "gxa_01m8g2pm6ebcgvxdjf",
+              "gxa_01m8g2q5e73vrj8n79",
+              "gxa_01m8g2q5h49q9k1wx1",
+              "gxa_01m8g2q5k7xxnjd743",
+              "gxa_01m8g2vbfsr007pajk",
+              "gxa_01m8g2x2tqnabk1tt3",
+              "gxa_01m8g2vb86p9z1dgaz",
+              "gxa_01m8g2vbb0e71mpd5d",
+              "gxa_01m8g2vbd0aynyby48",
+              "gxa_01m8g26zn4gw0vyhas",
+              "gxa_01m8g2b7fn0y00sd3v",
+              "gxa_a8a794645a03809d5d3728ed6724a1b6f4a00ba87455a02843035a044a94ffcb",
+              "gxa_1bd774071764d5d77b64aaf4e7f0e7876e7db4c081f304e7e932c21469567ebb"
+            ],
+            "mode": "resolve",
+            "ops": [
+              {
+                "claim_refs": [
+                  "gxa_01m8g38ge4snmhzjxv",
+                  "gxa_01m8g386kfapt38mv5",
+                  "gxa_01m8g38w49jf205hvw"
+                ],
+                "op": "close_run",
+                "unresolved": [
+                  "Native Nth2 activity, its fraction of total neutral activity and its share of intact-cell turnover in each reference and commercial wine background require matched rate measurements. The older table also leaves dispersion and the double-deletion detection limit unspecified."
+                ]
+              }
+            ],
+            "rationale": "Jules et al. (2008), Table 2, localize the NTH2-dependent residual to stationary-phase YPD extracts of a CEN.PK113-7D nth1 deletion strain. Chen et al. (2024), Figure 2a, establish the direction of the stationary-phase trehalose phenotype in each of five backgrounds. Their assay of stored carbohydrate leaves native enzyme rates unmeasured. Record Nth2's functional contribution and leave the numerical field undetermined for the S288C derivative, Simi White and CSM.",
+            "stop_reason": "SCIENTIFIC_COMPLETION"
+          }
+        },
+        "callId": "call_eca7a4ac8a9b4c5f8bf36984dcc1355c",
+        "namespace": "gx",
+        "threadId": "01a22031-2a52-7a71-bc23-14cbac57491d",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22031-2a99-7b13-a9e1-7779d7fa76a6"
+      },
+      "lookup_sha256": "5d848deb998cca127df858d253287ea88d9076d550efe7811f1126e0f033a596",
+      "gx_persisted_receipt": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops",
+          "options": [],
+          "ordinary_run_omit": [
+            "disposition"
+          ],
+          "reason": "comparison_action_ambiguous"
+        },
+        "evidence_ref": null,
+        "message": "For ordinary Run closure with close_run, remove these top-level comparison fields: disposition. This brief has no active registered comparison.",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-27-02-01a22031-2a52-7a71-bc23-14cbac57491d.jsonl",
+        "line": 196,
+        "official_function_call_output": {
+          "error": "SCHEMA_INVALID: For ordinary Run closure with close_run, remove these top-level comparison fields: disposition. This brief has no active registered comparison.",
+          "code": "SCHEMA_INVALID",
+          "reason": "comparison_action_ambiguous",
+          "field": "ops",
+          "options": []
+        }
+      }
+    },
+    {
+      "event_id": 633,
+      "task_id": "gxt_01m8g32ah80wfekxwc",
+      "native_request": {
+        "arguments": {
+          "decision": {
+            "evidence_refs": [
+              "gxa_01m8g22y7c519prnmr",
+              "gxa_01m8g22y8579y23m05",
+              "gxa_01m8g26gvm8hkzt1n0",
+              "gxa_01m8g2pm3nr46z4rek",
+              "gxa_01m8g2pm6ebcgvxdjf",
+              "gxa_01m8g2q5e73vrj8n79",
+              "gxa_01m8g2q5h49q9k1wx1",
+              "gxa_01m8g2q5k7xxnjd743",
+              "gxa_01m8g2vbfsr007pajk",
+              "gxa_01m8g2x2tqnabk1tt3",
+              "gxa_01m8g2vb86p9z1dgaz",
+              "gxa_01m8g2vbb0e71mpd5d",
+              "gxa_01m8g2vbd0aynyby48",
+              "gxa_01m8g26zn4gw0vyhas",
+              "gxa_01m8g2b7fn0y00sd3v",
+              "gxa_a8a794645a03809d5d3728ed6724a1b6f4a00ba87455a02843035a044a94ffcb",
+              "gxa_1bd774071764d5d77b64aaf4e7f0e7876e7db4c081f304e7e932c21469567ebb"
+            ],
+            "ops": [
+              {
+                "claim_refs": [
+                  "gxa_01m8g38ge4snmhzjxv",
+                  "gxa_01m8g386kfapt38mv5",
+                  "gxa_01m8g38w49jf205hvw"
+                ],
+                "op": "close_run",
+                "unresolved": [
+                  "Native Nth2 activity, its fraction of total neutral activity and its share of intact-cell turnover in each reference and commercial wine background require matched rate measurements. The older table also leaves dispersion and the double-deletion detection limit unspecified."
+                ]
+              }
+            ],
+            "rationale": "Jules et al. (2008), Table 2, localize the NTH2-dependent residual to stationary-phase YPD extracts of a CEN.PK113-7D nth1 deletion strain. Chen et al. (2024), Figure 2a, establish the direction of the stationary-phase trehalose phenotype in each of five backgrounds. Their assay of stored carbohydrate leaves native enzyme rates unmeasured. Record Nth2's functional contribution and leave the numerical field undetermined for the S288C derivative, Simi White and CSM.",
+            "stop_reason": "SCIENTIFIC_COMPLETION"
+          }
+        },
+        "callId": "call_702cfea4e78448f69aa5222a686ab1cf",
+        "namespace": "gx",
+        "threadId": "01a22031-2a52-7a71-bc23-14cbac57491d",
+        "tool": "gx_decide_revision",
+        "turnId": "01a22031-2a99-7b13-a9e1-7779d7fa76a6"
+      },
+      "lookup_sha256": "67fc903da9383603595b81f40a580b029358f91ed1601a398ee00830d254e5d8",
+      "gx_persisted_receipt": {
+        "event_id": 632,
+        "outcome": "adopted",
+        "decision_ref": "gxa_3d3da5da13a4f60aa1e7492f0cf036a5e112394fcc201a4cef318583f3580252"
+      },
+      "model_visible_callback": {
+        "file": "2026/11/28/rollout-2026-11-28T03-27-02-01a22031-2a52-7a71-bc23-14cbac57491d.jsonl",
+        "line": 203,
+        "official_function_call_output": "dynamic tool call was cancelled before receiving a response"
+      }
+    }
+  ],
+  "interpretation": {
+    "253": "Model proposed await_join as graph op; waiting is an existing native tool/action.",
+    "316": "Model selected amend on empty graph ops.",
+    "327,570,602": "Dispositions were comparison-only under this frozen candidate. Lead used them on ordinary Run, including with close_run.",
+    "571": "An adopted claim omitted cited evidence required by its original proposal.",
+    "601": "Close operation omitted its required unresolved list.",
+    "605": "The original attempted closure omitted five reviews made by the same Lead in the same turn after brief cursor 573. GX superseded the old task at 604 and re-enqueued a new authorized one. The official callback referenced a list of review refs while omitting the actual list; the complete list and internal retry classification are present only in GX persistence.",
+    "612": "The superseded thread retried with all five review refs. GX correctly denied its revoked attempt. The internal persisted receipt recommends retry via gx_run_status; the official callback instead described a refreshed Lead and listed review refs but contained no IDs, owner decision or recovery tool instruction. Causality between the internal suggestion and model behavior cannot be inferred.",
+    "620": "Refreshed Lead submitted a string for reconsider_when[0]; the field expects an object.",
+    "621": "Refreshed Lead again omitted required close_run.unresolved.",
+    "622": "Closure again included a comparison-only top-level disposition.",
+    "633": "After these refusals the new authorised Lead submitted a compatible decision with its evidence. Event 632 committed close_run; 634 sealed, 635 transitioned the Run. All refused calls above retain their original payload and receipt."
+  },
+  "handoff": {
+    "all_uncited_authors": [
+      {
+        "thread_id": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "turn_id": "01a2202c-3894-73c2-b554-13cb3abdcc14",
+        "call_id": "exec-a5a99a73-aa05-43b1-b37d-94ff7b5652a2",
+        "review_ref": "gxa_01m8g2vb86p9z1dgaz"
+      },
+      {
+        "thread_id": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "turn_id": "01a2202c-3894-73c2-b554-13cb3abdcc14",
+        "call_id": "exec-467b7113-0e2e-4281-9f44-d6ff69a13a18",
+        "review_ref": "gxa_01m8g2vbb0e71mpd5d"
+      },
+      {
+        "thread_id": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "turn_id": "01a2202c-3894-73c2-b554-13cb3abdcc14",
+        "call_id": "exec-999bdf57-df4c-4f14-8b98-7c433d461e79",
+        "review_ref": "gxa_01m8g2vbd0aynyby48"
+      },
+      {
+        "thread_id": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "turn_id": "01a2202c-3894-73c2-b554-13cb3abdcc14",
+        "call_id": "exec-50bcac2b-7e61-446e-b5af-9e76b88c5f1b",
+        "review_ref": "gxa_01m8g2vbfsr007pajk"
+      },
+      {
+        "thread_id": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+        "turn_id": "01a2202c-3894-73c2-b554-13cb3abdcc14",
+        "call_id": "exec-3fde8707-c6fe-4938-aae7-59e7fefd012e",
+        "review_ref": "gxa_01m8g2x2tqnabk1tt3"
+      }
+    ],
+    "same_author_thread_and_turn": true,
+    "first_ref_count": 14,
+    "retry_ref_count": 19,
+    "retry_includes_every_original_uncited_ref": true,
+    "new_task_claim_event": 609,
+    "effective_closing_decision": 632,
+    "sealed": 634
+  }
+}

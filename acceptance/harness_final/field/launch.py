@@ -142,6 +142,21 @@ def run(args):
                     identity = successor[0][0]
                 elif independent:
                     identity = independent[0][0]
+                elif ((private/"study-independent-aprime/state/gx.db").exists()
+                      or (parent_status != "CLOSED" and args.independent_after_hold)):
+                    # A still owns its project Goal. Isolate the independent question so the
+                    # ordinary workspace owner cannot modify or resume A on its behalf.
+                    study = private/"study-independent-aprime"
+                    study.mkdir(mode=0o700,exist_ok=True)
+                    state = study/"state"
+                    start[-1] = str(study)
+                    if (state/"gx.db").exists():
+                        with closing(sqlite3.connect((state/"gx.db").as_uri()+"?mode=ro",uri=True)) as prior:
+                            ids = prior.execute("SELECT run_id FROM v6_goals WHERE trim(goal,char(9,10,13,32))=?",
+                                                ((HERE/"aprime/question.md").read_text().strip(),)).fetchall()
+                        if len(ids)>1:
+                            raise ValueError("Independent A-prime has multiple identities")
+                        identity = ids[0][0] if ids else None
                 elif parent_status == "CLOSED":
                     cfg = private/"incoming/aprime/successor.json"
                     write(cfg,{"input_files":goal["input_files"],"research_effort":goal["research_effort"]})

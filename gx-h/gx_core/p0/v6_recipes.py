@@ -231,7 +231,7 @@ def save(conn, run_id, arguments):
     return publish(conn, run_id, *prepare(conn, run_id, arguments))
 
 
-def decision_for(conn, spec, *, run_id=None):
+def decision_for(conn, spec, *, run_id=None, with_material_history=False, with_definition=False):
     marker = spec["recipe_decision"]
     row = conn.execute("SELECT definition_json FROM v6_saved_recipes WHERE reference=? AND digest=?",
                        (marker["recipe"], marker["digest"])).fetchone()
@@ -258,11 +258,15 @@ def decision_for(conn, spec, *, run_id=None):
             raise ScopeDenied("The recipe decision's method or provider differs from the saved procedure")
         if step["parameters"] != spec.get("parameters", {}):
             raise SchemaInvalid("The recipe decision's method parameters differ from the saved procedure")
-    return point
+    if (with_material_history and point and (evaluation := definition.get("evaluation"))
+            and evaluation["step"] == step["slot"]):
+        index = step["inputs"].index({"input":evaluation["holdout_input"]})
+        point = dict(point, evaluation_material=recipe_stages.evaluation_material(conn, definition, spec["inputs"][index]))
+    return (point, definition) if with_definition else point
 
 
 def settled_decision(conn, run_id, node, spec):
-    point = decision_for(conn, spec)
+    point = decision_for(conn, spec, with_material_history=True)
     if point is None:
         return None  # A macro watches its joined evidence at the registered decision point.
     outputs = v62_outputs.published_outputs(conn, run_id, node["job_id"]) if node["result_ref"] else []
@@ -405,7 +409,7 @@ def instantiate(conn, run_id, arguments, *, visible_refs=None):
                     **({"input_ports": ports} if ports else {})})
         if gate := step.get("evidence_gate"):
             ops[-1]["evidence_gate"] = {"producer_node": alias[gate["producer_step"]], "producer_version": 1,
-                "source_ref": bindings[gate["source_input"]], **{k:gate[k] for k in ("output_name","pointer","equals","require_lead_review")}}
+                "source_ref": bindings[gate["source_input"]], **{k:gate[k] for k in ("output_name","pointer","equals","require_lead_review","source_role")}}
     answer = {"recipe": reference, "digest": row[0], "ops": ops,
               **({"decision_point": point} if point else {}), **({"calibration": receipt} if receipt else {})}
     if definition["schema"] in ("gx.research-recipe/2","gx.research-recipe/3",recipe_stages.SCHEMA) and definition["steps"] and branch.startswith("local:"):
@@ -423,6 +427,9 @@ def instantiate(conn, run_id, arguments, *, visible_refs=None):
             "required_open_branch_fields": opening["required"], "minimum_budget_limits": dict(minimum)}
     if staged:
         answer.update({k:definition[k] for k in recipe_stages.FIELDS if k in definition})
+        if evaluation := definition.get("evaluation"):
+            answer["evaluation"] = dict(evaluation, material_history=recipe_stages.evaluation_material(
+                conn, definition, bindings[evaluation["holdout_input"]]))
         recipe_stages.bound_ops(conn, run_id, definition, row[0], arguments, answer)
     if "macro" in definition:
         from . import harness_policy, v6_macro_recipes

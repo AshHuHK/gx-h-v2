@@ -23,7 +23,8 @@ def capture_gate(gate, proofs, slots, external):
                 "output_name" in gate else o["artifact_ref"] == node["result_ref"])]
     if len(selected) != 1 or node["version"] != gate["producer_version"]:
         raise SchemaInvalid("A portable filter needs one named verified output of its actual producer revision")
-    roles = [i["role"] for i in selected[0]["source_inputs"] if i["artifact_ref"] == gate["source_ref"]]
+    roles = [i["role"] for i in selected[0]["source_inputs"] if i["artifact_ref"] == gate["source_ref"]
+             and i["role"] == gate.get("source_role",i["role"])]
     if len(roles) != 1 or gate["source_ref"] not in spec["inputs"]:
         raise SchemaInvalid("The filter source must be an attributable measured input of that named output")
     return {"producer_step": slots[producer], "source_input": external[gate["source_ref"]],
@@ -172,16 +173,9 @@ def bound_ops(conn, run_id, doc, digest, args, answer):
     answer.pop("submission",None)
 
 
-def verify_commission(conn, run_id, spec, nodes):
+def verify_commission(conn, run_id, definition, spec, nodes):
     """A citation to an immutable recipe carries its actual procedure on native submission."""
     mark = spec["recipe_decision"]
-    row = conn.execute("SELECT definition_json FROM v6_saved_recipes WHERE reference=? AND digest=?",
-                       (mark["recipe"], mark["digest"])).fetchone()
-    if not row:
-        raise SchemaInvalid("Unknown recipe revision")
-    definition = json.loads(row[0])
-    if definition["schema"] != SCHEMA:
-        return
     steps = {s["slot"]:s for s in definition["steps"]}
     step = steps[mark["step"]]
     parents = {}
@@ -208,8 +202,10 @@ def verify_commission(conn, run_id, spec, nodes):
         sources = [nodes[producer]["inputs"][i] for i,p in enumerate(steps[template["producer_step"]]["inputs"])
                    if p.get("input") == template["source_input"]]
         existing = conn.execute("SELECT version FROM v6_nodes WHERE run_id=? AND node_id=?", (run_id,producer)).fetchone()
+        if not sources or len(set(sources)) != 1:
+            raise SchemaInvalid("Bind the portable filter to one attributable source input")
         expected = {"producer_node":producer,"producer_version":existing[0] if existing else 1,
-                    "source_ref":sources[0],**{k:template[k] for k in ("pointer","equals","require_lead_review","output_name")}}
+                    "source_ref":sources[0],**{k:template[k] for k in ("pointer","equals","require_lead_review","output_name","source_role")}}
         if ids.canonical_json(gate) != ids.canonical_json(expected):
             raise SchemaInvalid("The adopted filter must preserve the typed value, named producer output and material role")
     evaluation = definition.get("evaluation")
@@ -237,3 +233,24 @@ def verify_commission(conn, run_id, spec, nodes):
         work.extend(participant["depends_on"])
     from ..artifacts import ArtifactService
     check_holdout(evaluation, bindings, ArtifactService(conn))
+
+
+def evaluation_material(conn, definition, ref):
+    """Describe reuse of the original evaluation bytes without granting access to its result."""
+    evaluation = definition["evaluation"]
+    step = next(s for s in definition["steps"] if s["slot"] == evaluation["step"])
+    index = step["inputs"].index({"input":evaluation["holdout_input"]})
+    receipt = conn.execute("SELECT sources_json FROM v6_saved_recipes WHERE reference=?",
+                           (definition["reference"],)).fetchone()
+    sources = json.loads(receipt[0])
+    if "macro" in definition:
+        sources = sources["steps"]
+    previous = conn.execute("""SELECT a.sha256 FROM v6_nodes n
+        JOIN artifacts a ON a.artifact_ref=json_extract(n.spec_json,?) WHERE n.node_id=?""",
+        (f"$.inputs[{index}]",sources[step["slot"]]["node_id"])).fetchone()
+    current = conn.execute("SELECT sha256 FROM artifacts WHERE artifact_ref=?", (ref,)).fetchone()
+    if not previous or not current:
+        return "source_comparison_unknown"
+    if previous[0] == current[0]:
+        return "same_as_source_evaluation"
+    return "differs_from_source_evaluation"

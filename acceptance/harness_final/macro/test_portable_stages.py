@@ -76,6 +76,8 @@ class PortableStages(unittest.TestCase):
         for role, duration, volume in (("development",minutes,11),("holdout",62,87)):
             path = self.folder / (case+"-"+role+".json")
             record(path,duration,volume)
+            if case=="short" and role=="holdout":
+                path.write_bytes((self.folder/"source-holdout.json").read_bytes())
             materials.append({"role":role,"path":str(path)})
         budget={"job_submissions":8,"cpu_seconds":480,"api_calls":20,"tokens":40000,"worker_tasks":20,"wall_hours":1}
         cfg=self.folder/(case+".json")
@@ -152,8 +154,11 @@ class PortableStages(unittest.TestCase):
                 with self.assertRaisesRegex(SchemaInvalid,"distinct bytes"):
                     s.call(s.lead,"gx_instantiate_recipe",dict(replay,inputs={"development":s.materials[0],"holdout":s.materials[0]}),"contaminated")
                 preview=s.call(s.lead,"gx_instantiate_recipe",replay,"expand")
+                expected_history = "same_as_source_evaluation" if case=="short" else "differs_from_source_evaluation"
+                self.assertEqual(preview["evaluation"]["material_history"], expected_history)
                 self.assertFalse(s.rows("SELECT job_id FROM jobs WHERE run_id=?",target))
                 by_slot={item["recipe_decision"]["step"]:item for item in preview["ops"]}
+                self.assertEqual(by_slot["evaluate"]["evidence_gate"]["source_role"], "record")
                 changed=deepcopy(by_slot["evaluate"])
                 changed["evidence_gate"]["equals"]=True
                 with self.assertRaisesRegex(SchemaInvalid,"typed value"):
@@ -203,7 +208,7 @@ class PortableStages(unittest.TestCase):
                                      [{"status":"BLOCKED","job_id":None}])
                 traces.append({"run_id":target,"condition_minutes":minutes,"jobs":s.rows("SELECT job_id,status FROM jobs WHERE run_id=?",target),
                     "recovery_after_first_decision":"SIGKILL/reopen/same-receipt" if minutes==60 else None,
-                    "observed":observation,"inputs":s.materials,"first_decision":first["decision_id"],"second_decision":final["decision_id"] if minutes==60 else None})
+                    "evaluation_material_history":expected_history,"observed":observation,"inputs":s.materials,"first_decision":first["decision_id"],"second_decision":final["decision_id"] if minutes==60 else None})
         if path:=os.getenv("GX_PORTABLE_STAGES_PROOF"):
             Path(path).write_text(json.dumps({"source_run":rid,"recipe":saved["reference"],"digest":saved["digest"],"target_runs":traces},indent=2)+"\n")
 

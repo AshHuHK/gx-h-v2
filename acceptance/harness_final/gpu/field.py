@@ -184,7 +184,10 @@ def observe(opts):
     work.mkdir(mode=0o700, parents=True, exist_ok=True)
     state = work / "state"
     pin = deployment_pin(opts.release.resolve(), opts.candidate)
-    base = [sys.executable, str(STOCK), str(opts.release.resolve()), str(opts.binary.resolve()), str(work)]
+    sys.path.insert(0, str(ROOT))
+    from acceptance.v623.oauth.host import _pin
+    official_binary, pin["official_codex_sha256"] = _pin(opts.binary)
+    base = [sys.executable, str(STOCK), str(opts.release.resolve()), str(official_binary), str(work)]
     frozen = json.loads((HERE / "preregistration.json").read_bytes())
     descriptor_fix = json.loads((HERE / "preflight-addendum.json").read_bytes())
     vault_digests = dict(frozen["custody"]["vault_digests"], **{descriptor_fix["file"]: descriptor_fix["replacement_sha256"]})

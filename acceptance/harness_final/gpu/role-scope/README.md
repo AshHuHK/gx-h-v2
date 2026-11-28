@@ -22,3 +22,14 @@
 ```bash
 .venv/bin/python -B acceptance/harness_final/gpu/role-scope/replay.py
 ```
+
+## 原版 evaluator 的因果重放
+
+隔離重放以 SQLite 唯讀連線呼叫 `362157ae` 的原 evaluator。只綁定 reference 角色時仍為 `out_of_scientific_scope`。只按 reference 投影適用範圍時，下一項拒絕是 `no_individual_material_attribution`。兩項同時調整時，留下 `missing_original_acquisition`。第一份命題在四個條件下的完整結果一致。這些觀察說明，僅調整配對文字或角色仍不足以讓原 evaluator 簽收。程式只在記憶體中改變單項判斷，每次離開對照條件就解除變更。[四組原始輸出](ablation.json)
+
+保管者可在持有原 Run 的機器指定凍結產品目錄及原狀態目錄重放，公開座標案例則可用上方的 `replay.py` 執行。
+
+```bash
+.venv/bin/python -B acceptance/harness_final/gpu/role-scope/ablation.py \
+  --release "$GX_FROZEN_RELEASE" --state "$GX_ORIGINAL_RUN_STATE"
+```

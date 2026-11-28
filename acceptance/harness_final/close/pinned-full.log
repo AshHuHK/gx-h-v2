@@ -1,0 +1,101 @@
+test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) ...
+  test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias='Which neighborhood comparisons are supported?') ... FAIL
+  test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias='goal') ... ERROR
+  test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias=None) ... ERROR
+test_hint_for_unknown_id_omits_a_siblings_unreleased_question (__main__.CoreQuestions.test_hint_for_unknown_id_omits_a_siblings_unreleased_question) ... ERROR
+test_researcher_read_requires_released_report_citing_the_same_original (__main__.CoreQuestions.test_researcher_read_requires_released_report_citing_the_same_original) ...
+  test_researcher_read_requires_released_report_citing_the_same_original (__main__.CoreQuestions.test_researcher_read_requires_released_report_citing_the_same_original) (released=True) ... FAIL
+test_revision_new_material_and_cold_restart_do_not_reset_run_notice (__main__.CoreQuestions.test_revision_new_material_and_cold_restart_do_not_reset_run_notice) ... ERROR
+test_same_text_for_two_intents_requires_visible_identity (__main__.CoreQuestions.test_same_text_for_two_intents_requires_visible_identity) ... FAIL
+test_two_prepared_native_closes_receive_one_notice_then_a_fresh_close_commits (__main__.CoreQuestions.test_two_prepared_native_closes_receive_one_notice_then_a_fresh_close_commits) ... FAIL
+test_unknown_text_cannot_remove_the_root_check (__main__.CoreQuestions.test_unknown_text_cannot_remove_the_root_check) ... FAIL
+
+======================================================================
+ERROR: test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias='goal')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 24, in test_exact_pi_text_matches_same_core_source_as_goal
+    self.assertEqual((response["question_id"],core["ref"]), (core["question_id"],s.materials[0]))
+                      ~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'question_id'
+
+======================================================================
+ERROR: test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 24, in test_exact_pi_text_matches_same_core_source_as_goal
+    self.assertEqual((response["question_id"],core["ref"]), (core["question_id"],s.materials[0]))
+                      ~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'question_id'
+
+======================================================================
+ERROR: test_hint_for_unknown_id_omits_a_siblings_unreleased_question (__main__.CoreQuestions.test_hint_for_unknown_id_omits_a_siblings_unreleased_question)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 80, in test_hint_for_unknown_id_omits_a_siblings_unreleased_question
+    s.call(peer,"gx_link_core_material",{"ref":s.materials[0],"question":private["question_id"],
+                                                                         ~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'question_id'
+
+======================================================================
+ERROR: test_revision_new_material_and_cold_restart_do_not_reset_run_notice (__main__.CoreQuestions.test_revision_new_material_and_cold_restart_do_not_reset_run_notice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 64, in test_revision_new_material_and_cold_restart_do_not_reset_run_notice
+    self.assertEqual(nom["goal_version"],2)
+                     ~~~^^^^^^^^^^^^^^^^
+KeyError: 'goal_version'
+
+======================================================================
+FAIL: test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias='Which neighborhood comparisons are supported?')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 22, in test_exact_pi_text_matches_same_core_source_as_goal
+    self.assertEqual(response["outcome"], "core_evidence_available")
+AssertionError: 'adopted' != 'core_evidence_available'
+- adopted
++ core_evidence_available
+
+
+======================================================================
+FAIL: test_researcher_read_requires_released_report_citing_the_same_original (__main__.CoreQuestions.test_researcher_read_requires_released_report_citing_the_same_original) (released=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 140, in test_researcher_read_requires_released_report_citing_the_same_original
+    self.assertIn("decision_ref", answer)
+AssertionError: 'decision_ref' not found in {'outcome': 'core_evidence_available', 'question': 'goal', 'materials': [{'ref': 'gxa_01m8fzngjb7v1t8eby', 'state': 'acquired_unread', 'linked_by': 'run', 'reason': 'The comparison depends on the readout method.', 'segment_id': 'p2'}], 'material_count': 1, 'event_id': 58, 'next': 'Inspect a relevant original, use equivalent evidence, or submit your closing decision with the remaining limitation.'}
+
+======================================================================
+FAIL: test_same_text_for_two_intents_requires_visible_identity (__main__.CoreQuestions.test_same_text_for_two_intents_requires_visible_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 44, in test_same_text_for_two_intents_requires_visible_identity
+    with self.assertRaises(SchemaInvalid) as error:
+AssertionError: SchemaInvalid not raised
+
+======================================================================
+FAIL: test_two_prepared_native_closes_receive_one_notice_then_a_fresh_close_commits (__main__.CoreQuestions.test_two_prepared_native_closes_receive_one_notice_then_a_fresh_close_commits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 98, in test_two_prepared_native_closes_receive_one_notice_then_a_fresh_close_commits
+    self.assertEqual(overlaps, [original])
+AssertionError: Lists differ: [{'outcome': 'core_evidence_available', 'que[273 chars]n.'}] != [{'run_id': 'gxr_01m8fznn3yc2z543ve', 'task_[1929 chars] 27}]
+
+First differing element 0:
+{'outcome': 'core_evidence_available', 'que[272 chars]on.'}
+{'run_id': 'gxr_01m8fznn3yc2z543ve', 'task_[1928 chars]: 27}
+
+Diff is 3037 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_unknown_text_cannot_remove_the_root_check (__main__.CoreQuestions.test_unknown_text_cannot_remove_the_root_check)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 31, in test_unknown_text_cannot_remove_the_root_check
+    with self.assertRaises(SchemaInvalid) as error:
+AssertionError: SchemaInvalid not raised
+
+----------------------------------------------------------------------
+Ran 7 tests in 13.282s
+
+FAILED (failures=5, errors=4)

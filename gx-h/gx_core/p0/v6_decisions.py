@@ -76,6 +76,7 @@ class Prepared:
     endpoint_inventory: tuple | None
     comparison_registration: dict | None
     selected_receipts: dict | None
+    observed_close_prompt: bool | None = None
 
 
 def authority(conn, *, run_id, task_id, lease_id, thread_id, turn_id):
@@ -210,6 +211,11 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         return saved
     root, task, goal, base, module = _authority(conn, run_id=run_id, task_id=task_id, lease_id=lease_id,
                                         thread_id=thread_id, turn_id=turn_id)
+    observed_prompt = None
+    if (isinstance(decision, dict) and decision.get("stop_reason") in ("INSUFFICIENT_DATA", "UNREAD_EVIDENCE")
+            and task["scope"] == "run" and harness_policy.current(conn, run_id)):
+        from . import research_closeout
+        observed_prompt = research_closeout.observed_prompt(conn, run_id)
     if task["scope"] == "run":
         from . import catalog_survey
         catalog_survey.required(conn, json.loads(task["snapshot_json"]))
@@ -356,7 +362,8 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         if inventory is None and (declared or any(op["op"] == "close_run" for op in decision["ops"])):
             inventory = v623_endpoint_use.prepare(conn, task)
     return Prepared(request, thread_id, turn_id, call_id, manifest, ids.canonical_json(graph), result, ops,
-                    aliases, watches, funding, terms, config_pin, cap_pins, costs, dependencies, inventory, comparison, selected)
+                    aliases, watches, funding, terms, config_pin, cap_pins, costs, dependencies, inventory,
+                    comparison, selected, observed_prompt)
 
 
 def _revoke(conn, run_id, where, key):
@@ -587,7 +594,8 @@ def commit(conn, plan):
         _check_bans(conn, run_id, plan.resolved_ops)
         if close_context is not None:
             from . import research_closeout
-            if harness_policy.active(conn, run_id) and (fact := research_closeout.maybe_prompt(conn, task, decision)):
+            if harness_policy.active(conn, run_id) and (fact := research_closeout.maybe_prompt(
+                    conn, task, decision, already_observed=plan.observed_close_prompt)):
                 return fact
         decision_ref, = delivery.register_manifest(ArtifactService(conn), plan.manifest, actor=plan.thread_id)
         from . import v62_rounds

@@ -359,13 +359,14 @@ def deliver(conn, brief, limit):
                     break
     if brief.get("research_joins"):
         for row in reversed(brief["research_joins"]):
-            summary = {k: row[k] for k in ("key", "state", "question", "outcome_event")}
+            summary = {k: row[k] for k in ("key", "state", "question", "outcome_event", "question_id") if k in row}
             if row.get("outcome"):
                 summary.update({k: row["outcome"][k] for k in ("needed", "satisfied_count", "still_possible_count")})
             if not append("research_joins", summary):
                 break
     for item in brief.get("core_materials", []):
-        if not append("core_materials", {"question":item["question"], "ref":item["ref"]}):
+        facts = {k:item[k] for k in ("question", "question_id", "goal_version", "ref", "state") if k in item}
+        if not append("core_materials", facts):
             break
     if brief.get("recipe_decisions"):
         for point in reversed(brief["recipe_decisions"]):

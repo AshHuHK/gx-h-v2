@@ -144,7 +144,7 @@ def _method_rows(conn, run_id, brief, inputs, active_rows):
     scope = brief["scope"]
     survey = False
     allowed = None
-    options = capability_views.goal_options(inputs) if scope == "run" else {}
+    options = capability_views.active_options(conn, run_id, inputs) if scope == "run" else {}
     if scope != "run":
         from . import v62_modules
         record = v62_modules.require_active(conn, run_id, scope)

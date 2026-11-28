@@ -159,6 +159,11 @@ def module_scope(brief):
 
 def query_tool(brief):
     spec = contracts.native_goal_tool_spec(QUERY)
+    if brief.get("scope") == "run" and brief.get("pi_method_scope"):
+        from . import pi_method_scope
+        spec = deepcopy(spec)
+        spec["inputSchema"]["properties"]["pi_method_scope"] = pi_method_scope.FIELD
+        spec["description"] += " At opening interpret the PI's method clauses in pi_method_scope; [] means none."
     if not (brief.get("catalog_discovery") or brief.get("researcher_handoff")):
         spec = deepcopy(spec)
         fields = spec["inputSchema"]["properties"]

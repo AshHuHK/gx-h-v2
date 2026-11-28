@@ -178,7 +178,7 @@ def lead_query(conn, packet, arguments, identity, query):
     if not survey or arguments.get("reference"):
         return query(arguments)
     # A method selected during this turn immediately changes the choice shown to the same caller.
-    revision, = conn.execute("SELECT max(event_id) FROM events WHERE run_id=? AND kind='research.capabilities.changed'",
+    revision, = conn.execute("SELECT max(event_id) FROM events WHERE run_id=? AND kind IN ('research.capabilities.changed','research.pi.method_scope')",
                              (identity["run_id"],)).fetchone()
     request = {"kind": "all", "offset": 0, "limit": 15, **arguments}
     cache_key = "catalog.query:" + ids.sha256_of_obj([survey["state_key"], inventory(conn), revision, request])

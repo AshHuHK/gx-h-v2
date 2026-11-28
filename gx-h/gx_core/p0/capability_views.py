@@ -80,15 +80,11 @@ def goal_options(inputs):
     return options(inputs.get("method_scope", inputs.get("p0_spec", {})))
 
 
-# Only literal, unquoted instructions can narrow the operator default. Scientific
-# titles, mentions of a method and claims made by cited authors confer no authority.
-_QUOTATION = re.compile(r'```.*?```|`[^`]*`|“[^”]*”|「[^」]*」|『[^』]*』|《[^》]*》|"[^"]*"|'
-                        r"(?<!\w)'[^'\n]*'(?!\w)", re.S)
-_LITERATURE_ONLY = re.compile(
-    r"(?:^|[。.!！?？;；\n])\s*(?:(?:本題|本题|本次研究|本次|本研究)\s*[,，:]?\s*)?(?:請|请)?"
-    r"(?:只查|僅查|仅查|限查|只用)(?:閱|阅)?(?:公開|公开)?(?:文獻|文献|論文|论文)(?=\s*(?:$|[，,。.!！;；\n]))"
-    r"|(?:^|[.!?;\n])\s*(?:for this (?:study|question)[,:]?\s*)?(?:please\s+)?(?:(?:use|search|consult|review)"
-    r"\s+only\s+(?:the\s+)?(?:published\s+)?literature|literature[- ]only)(?=\s*(?:$|[,.!;\n]))", re.I)
+def active_options(conn, rid, inputs):
+    from . import pi_method_scope
+    choices = goal_options(inputs)
+    allowed = pi_method_scope.ceiling(conn, rid)
+    return choices if allowed is None else {cap: pin for cap,pin in choices.items() if cap in allowed}
 
 
 def freeze_scope(spec):
@@ -108,7 +104,7 @@ def freeze_scope(spec):
                     not any(k in spec for k in ("capability_collections", "capabilities", "capability_options")))
     if default_site:
         site = json.loads((config.CONFIG_DIR / "science_site_access.json").read_text())
-        names = ["public_sources"] if _LITERATURE_ONLY.search(_QUOTATION.sub(" ", spec.get("objective", ""))) else list(site)
+        names = list(site)
     elif "capability_collections" not in spec:
         names = [] if "capabilities" in spec or "capability_options" in spec else ["public_sources"]
     if not isinstance(names, list) or not all(isinstance(name, str) and name for name in names):
@@ -227,6 +223,9 @@ def change(conn, run_id, *, enable=None, disable=None, provider=None, expected_d
         status = conn.execute("SELECT status,goal_version FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
         if status["status"] != "OPEN":
             raise ScopeDenied("A closed Goal cannot select new capabilities")
+        if enable:
+            from . import pi_method_scope
+            pi_method_scope.require(conn, run_id, ref)
         if enable and intent.forbidden_capability(*ref.rsplit("@", 1), intent.active_items(conn, run_id, intent.BAN_TYPES)):
             raise ScopeDenied("Current human intent forbids the requested method")
         if active == actual["active"]:

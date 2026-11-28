@@ -219,7 +219,8 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
         extras = goal_plugins.tools_for_catalog((brief or {}).get("capabilities", []))
     catalog.extend(tool.as_spec() for tool in extras.values())
     view = (brief or {}).get("capability_view", {})
-    if (brief or {}).get("scope") == "run" and (view.get("option_count") or view.get("available_options")):
+    if (brief or {}).get("scope") == "run" and (
+            view.get("option_count") or view.get("available_options") or view.get("options_after_pi_interpretation")):
         catalog.append(contracts.native_goal_tool_spec("gx_select_capability"))
     catalog.extend(v62_native.lead_tools(brief or {}))
     if brief and brief.get("scope", "run") == "run" and version == v621_policy.VERSION:
@@ -426,6 +427,10 @@ def _call(roots, p):
     if tool in (v6_recipes.SAVE, v6_recipes.INSTANTIATE, v6_recipes.WATCH, v62_native.OPEN, v62_native.REPORT, v62_native.CANCEL, v62_native.QUERY):
         spec = (v62_native.evidence_tool(tool, brief(row).get("evidence_policy"))
                 if tool == v62_native.REPORT else contracts.native_goal_tool_spec(tool))
+        if tool == v62_native.QUERY and "pi_method_scope" in args:
+            if brief(row).get("scope") != "run":
+                raise ScopeDenied("Only the Run Lead interprets the PI method scope")
+            spec = v62_native.query_tool(brief(row))
         if tool == v62_native.OPEN:
             spec = v62_native.open_tool(brief(row))
         elif tool == v6_recipes.INSTANTIATE:
@@ -455,7 +460,7 @@ def _call(roots, p):
             from . import module_methods
             selected_descriptor = module_methods.prepare(roots.conn, identity, args, packet, row)
         else:
-            chosen = capability_views.goal_options(json.loads(roots.conn.execute(
+            chosen = capability_views.active_options(roots.conn, roots.run_id, json.loads(roots.conn.execute(
                 "SELECT inputs_json FROM runs WHERE run_id=?", (roots.run_id,)
             ).fetchone()[0])["inputs"])
             if packet.get("scope") != "run" or args["method"] not in chosen:
@@ -576,11 +581,27 @@ def _call(roots, p):
                     snapshot, = roots.conn.execute("SELECT c.snapshot_json FROM research_contexts c "
                         "JOIN v6_decision_tasks t USING(context_ref) WHERE t.task_id=?", (row["task_id"],)).fetchone()
                     packet["catalog_discovery"] = json.loads(snapshot)["catalog_discovery"]
+                from . import pi_method_scope
+                interpret = "pi_method_scope" in args
+                overview = args.get("kind", "all") == "all" and not args.get("offset") and not args.get("reference")
+                if (overview and not interpret and packet.get("pi_method_scope", {}).get("status") == "pending"
+                        and pi_method_scope.description(roots.conn, roots.run_id)["status"] == "pending"):
+                    raise SchemaInvalid("Include pi_method_scope in the opening overview. Read the PI's Goal, quote "
+                                        "its method clauses, or use [] when it places no method conditions.",
+                                        details={"reason": "PI_METHOD_INTERPRETATION_REQUIRED"})
+                if interpret:
+                    if not overview:
+                        raise SchemaInvalid("Interpret PI method scope in the opening overview (kind=all)")
+                    v6_decisions.authority(roots.conn, **{k: v for k, v in identity.items() if k != "call_id"})
+                    pi_method_scope.record(roots.conn, packet, args["pi_method_scope"], identity)
+                    args = {k: v for k, v in args.items() if k != "pi_method_scope"}
                 def query(arguments):
                     return v62_catalog.query(roots.conn, roots.run_id, packet, arguments)
                 answer = (v62_native.perform_read(roots, row, p, packet, query)
                           if v62_native.module_scope(packet) else
                           catalog_survey.lead_query(roots.conn, packet, args, identity, query))
+                if packet.get("pi_method_scope") and packet.get("scope") == "run":
+                    answer["pi_method_scope"] = pi_method_scope.description(roots.conn, roots.run_id)
                 if (packet.get("scope") == "run" and
                         answer.get("kind") == "method" and "execution_granted" in answer and args.get("reference")
                         and answer.get("status") != "reference_only"):

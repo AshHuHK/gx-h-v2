@@ -136,6 +136,9 @@ def deliver(conn, brief, limit):
         packet["catalog_discovery"] = {k: survey[k] for k in ("state_key", "through_event", "survey_event", "opening_survey_event") if k in survey}
     if brief.get("ad_hoc_delegation"):
         packet["ad_hoc_delegation"] = True
+    if "pi_method_scope" in brief:
+        scope = brief["pi_method_scope"]
+        packet["pi_method_scope"] = {k:scope[k] for k in ("status","collections") if k in scope}
     if "capability_view" in brief:
         packet["capability_view"] = brief["capability_view"]
     if brief.get("branch_delegation") is False:

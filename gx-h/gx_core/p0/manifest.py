@@ -17,6 +17,8 @@ def _refuse(reason, message, **facts):
 
 def check_capability(conn, run_id, capability, *, review_probe=False, module_binding=None):
     """GX checks the concrete capability, including hard constraints added after planning."""
+    from . import pi_method_scope
+    pi_method_scope.require(conn,run_id,capability)
     if not review_probe and not shipped.participates(conn, run_id, capability, module_binding=module_binding):
         _refuse("run_composition", f"{capability} is outside this Run composition", capability=capability)
     cap_id, version = capability.rsplit("@", 1)

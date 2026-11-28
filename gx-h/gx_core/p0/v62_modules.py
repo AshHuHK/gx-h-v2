@@ -265,6 +265,9 @@ def _brief(conn, row, nodes, proofs):
     handoff = research_handoff.active(conn, row["run_id"]) and grant.get("communication") != "isolated"
     marker = harness_policy.version(conn, row["run_id"])
     modern = marker in (harness_policy.LEGACY_VERSION, harness_policy.VERSION)
+    from . import pi_method_scope
+    if guidance := pi_method_scope.guidance(conn, row["run_id"]):
+        module["pi_method_guidance"] = guidance
     subscriptions = research_topics.subscribed_topics(conn,row) if modern and handoff else []
     return {
         **({"harness_policy": marker} if modern else {}),
@@ -431,7 +434,7 @@ def delegation_options(conn, run_id, declaration):
         tools.append("gx_read_source")
     if "gx_decide_revision" not in tools:
         return tools, {}
-    choices = capability_views.goal_options(v62_catalog._inputs(conn, run_id))
+    choices = capability_views.active_options(conn, run_id, v62_catalog._inputs(conn, run_id))
     bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
     choices = {cap: pin for cap, pin in choices.items()
                if not intent.forbidden_capability(*cap.rsplit("@", 1), bans)}

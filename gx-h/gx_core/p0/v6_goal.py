@@ -161,6 +161,9 @@ def start(conn, spec, *, run_key, current):
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
     if harness_policy.enabled(spec):
         inputs["harness_policy"] = spec["harness_policy"]
+    if spec.get("harness_policy") == harness_policy.VERSION and method_scope is not None:
+        from . import pi_method_scope
+        inputs["pi_method_groups"] = pi_method_scope.freeze_groups(method_scope["capability_options"], public)
     if method_scope is not None:
         inputs.update(method_scope=method_scope, discovery_policy=capability_views.DISCOVERY_POLICY)
     inputs["evidence_policy"] = policy
@@ -784,13 +787,20 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         if routes:
             brief["research_intents"] = routes
     revision = capability_views.latest(conn, rid)
-    method_options = capability_views.goal_options(data.get("inputs", {}))
-    if revision or method_options:
+    method_options = capability_views.active_options(conn, rid, data.get("inputs", {}))
+    if "pi_method_groups" in data["inputs"]:
+        from . import pi_method_scope
+        brief["pi_method_scope"] = pi_method_scope.description(conn, rid)
+    pending_choices = (brief.get("pi_method_scope", {}).get("status") == "pending"
+                       and capability_views.goal_options(data["inputs"]))
+    if revision or method_options or pending_choices:
         view = {"revision": revision["revision"] if revision else 0}
         if data["inputs"].get("discovery_policy") == capability_views.DISCOVERY_POLICY:
             # The first survey ranks these options against the question. Listing every
             # unselected method twice also crowds the researcher's evidence out of the brief.
             view["option_count"] = len(method_options)
+            if pending_choices:
+                view["options_after_pi_interpretation"] = True
         else:
             view["available_options"] = list(method_options)
         brief["capability_view"] = view

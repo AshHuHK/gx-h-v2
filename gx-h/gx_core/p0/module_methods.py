@@ -23,7 +23,10 @@ def _available(conn, run, choices):
         AND NOT EXISTS (SELECT 1 FROM events newer WHERE newer.run_id=e.run_id AND newer.kind=e.kind
                         AND newer.subject_id=e.subject_id AND newer.event_id>e.event_id)""",
         (run, capability_views.EVENT))}
-    return {ref: value for ref, value in choices.items() if ref not in withdrawn}
+    from . import pi_method_scope
+    allowed = pi_method_scope.ceiling(conn,run)
+    return {ref: value for ref, value in choices.items()
+            if ref not in withdrawn and (allowed is None or ref in allowed)}
 
 
 def options(conn, run, scope):
@@ -81,11 +84,13 @@ def pins(conn, run, scope):
     active = capability_views.current(conn, run)["active"]
     inherited = {k: active[k] for k in grant.get("capabilities", ()) if k in active}
     inherited.update({r["capability_version"]: r["portable_sha256"] for r in catalog(conn, run, scope)})
-    return inherited
+    return _available(conn, run, inherited)
 
 
 def require_available(conn, run, cap):
     """A Run-wide withdrawal also stops unadmitted local work for the same method."""
+    from . import pi_method_scope
+    pi_method_scope.require(conn,run,cap)
     latest = conn.execute("""SELECT json_extract(payload_json,'$.disabled') FROM events
                  WHERE run_id=? AND kind=? AND subject_id=? ORDER BY event_id DESC LIMIT 1""",
                           (run, capability_views.EVENT, cap)).fetchone()

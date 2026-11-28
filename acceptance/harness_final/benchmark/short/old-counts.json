@@ -1,0 +1,285 @@
+{
+  "first_close": {
+    "denominator": 1,
+    "accepted": 0
+  },
+  "close_submissions": 11,
+  "rejections": 14,
+  "by_class": {
+    "scientific_or_PI_disposition_choice": 6,
+    "other_or_indeterminate": 2,
+    "uniquely_mechanical": 1,
+    "mixed_format_and_unspecified_scientific_field": 2,
+    "permission_or_evidence_visibility": 3
+  },
+  "calls": [
+    {
+      "call": "call_8ed0c28d5bb74c169733f63c9c45719d",
+      "turn": "01a21f97-8ed6-7440-a33d-04ef3fe8dbb6",
+      "close": false,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops",
+          "options": [],
+          "reason": "comparison_action_ambiguous"
+        },
+        "evidence_ref": null,
+        "message": "Choose an operation on the comparison, or omit its action fields.",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "scientific_or_PI_disposition_choice"
+    },
+    {
+      "call": "call_126fd1a4e159423e9553ff39d6bde80a",
+      "turn": "01a21f97-8ed6-7440-a33d-04ef3fe8dbb6",
+      "close": false,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "evidence_ref": null,
+        "message": "An amendment requires operations; a resolve carries an empty list",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "other_or_indeterminate"
+    },
+    {
+      "call": "call_b0552c1c23ec4e9a800f58dff5cb3fcf",
+      "turn": "01a21f97-8ed6-7440-a33d-04ef3fe8dbb6",
+      "close": false,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops[0].intent",
+          "operation": "open_intent"
+        },
+        "evidence_ref": null,
+        "message": "open_intent at $.ops[0].intent: missing required property 'intent'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "uniquely_mechanical"
+    },
+    {
+      "call": "call_9b492ee04e1c4910beb6b70f7004c7bc",
+      "turn": "01a21f97-8ed6-7440-a33d-04ef3fe8dbb6",
+      "close": false,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "evidence_ref": null,
+        "message": "New graph subjects require distinct local: names",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "other_or_indeterminate"
+    },
+    {
+      "call": "call_c7c7bb0ae77c43948d04458d77bbb711",
+      "turn": "01a21f97-8ed6-7440-a33d-04ef3fe8dbb6",
+      "close": false,
+      "accepted": true,
+      "refusal": {},
+      "classification": null
+    },
+    {
+      "call": "call_bc29f0d3af984a20abef17ec93967dc2",
+      "turn": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "pi_dispositions[0].outcome"
+        },
+        "evidence_ref": null,
+        "message": "$.pi_dispositions[0].outcome: missing required property 'outcome'; $.pi_dispositions[0].reason: missing required property 'reason'; $.pi_dispositions[0].disposition: property 'disposition' is not allowed; $.pi_dispositions[0].rationale: property 'rationale' is not allowed",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "scientific_or_PI_disposition_choice"
+    },
+    {
+      "call": "call_6a635c0e984a45fca83b54a31841a28e",
+      "turn": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "pi_dispositions[0].outcome"
+        },
+        "evidence_ref": null,
+        "message": "$.pi_dispositions[0].outcome: 'incorporated' is not one of ['adopt', 'maintain', 'measure', 'defer']",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "scientific_or_PI_disposition_choice"
+    },
+    {
+      "call": "call_f6c64b80e7a1443e9659e7f913b58a91",
+      "turn": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops[0].reason",
+          "operation": "close_run"
+        },
+        "evidence_ref": null,
+        "message": "close_run at $.ops[0].reason: missing required property 'reason'; $.ops[0].unresolved: missing required property 'unresolved'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "mixed_format_and_unspecified_scientific_field"
+    },
+    {
+      "call": "call_b2210a9110a343edb0f3bf0d9f9c94f0",
+      "turn": "01a21f98-e75c-7b71-bd6c-6d26e66b11d5",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "STALE_REVISION",
+        "details": {
+          "brief_cursor": 52,
+          "module_instance_id": "module_80d2326b1c31293bc8fc4f467bde4761",
+          "reason": "unseen_module_report"
+        },
+        "evidence_ref": null,
+        "message": "A completed module report needs a fresh Lead decision before closure",
+        "retryable": true,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Re-read gx_run_status and resubmit with the current revision."
+      },
+      "classification": "permission_or_evidence_visibility"
+    },
+    {
+      "call": "call_81aecfdd0d8e404d8887b1e8d83ebeb9",
+      "turn": "01a21f9b-38e1-7983-bffc-c18d78091375",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "pi_dispositions[0].outcome"
+        },
+        "evidence_ref": null,
+        "message": "$.pi_dispositions[0].outcome: missing required property 'outcome'; $.pi_dispositions[0].reason: missing required property 'reason'; $.pi_dispositions[0].disposition: property 'disposition' is not allowed; $.pi_dispositions[0].rationale: property 'rationale' is not allowed",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "scientific_or_PI_disposition_choice"
+    },
+    {
+      "call": "call_796d43e2ba534739add15bd9b8ab985f",
+      "turn": "01a21f9b-38e1-7983-bffc-c18d78091375",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "pi_dispositions[0].outcome"
+        },
+        "evidence_ref": null,
+        "message": "$.pi_dispositions[0].outcome: 'incorporated' is not one of ['adopt', 'maintain', 'measure', 'defer']",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "scientific_or_PI_disposition_choice"
+    },
+    {
+      "call": "call_8cf1e68c052f41db8e22b0dad13f3530",
+      "turn": "01a21f9b-38e1-7983-bffc-c18d78091375",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops[0].reason",
+          "operation": "close_run"
+        },
+        "evidence_ref": null,
+        "message": "close_run at $.ops[0].reason: missing required property 'reason'; $.ops[0].unresolved: missing required property 'unresolved'",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "mixed_format_and_unspecified_scientific_field"
+    },
+    {
+      "call": "call_db5605f49a3c4f1eb4a97b4e1edbf622",
+      "turn": "01a21f9b-38e1-7983-bffc-c18d78091375",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops",
+          "options": [],
+          "reason": "comparison_action_ambiguous"
+        },
+        "evidence_ref": null,
+        "message": "Choose an operation on the comparison, or omit its action fields.",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "classification": "scientific_or_PI_disposition_choice"
+    },
+    {
+      "call": "call_0d34c6f7776941f496d118033b0ee566",
+      "turn": "01a21f9b-38e1-7983-bffc-c18d78091375",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCOPE_DENIED",
+        "evidence_ref": null,
+        "message": "Use gap evidence released into this Lead brief",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "The query or URI falls outside the approved project/namespace scope."
+      },
+      "classification": "permission_or_evidence_visibility"
+    },
+    {
+      "call": "call_0b8e68a680404cb083d7b8a47b4ff1ec",
+      "turn": "01a21f9b-38e1-7983-bffc-c18d78091375",
+      "close": true,
+      "accepted": false,
+      "refusal": {
+        "code": "SCOPE_DENIED",
+        "evidence_ref": null,
+        "message": "The requested gap must be open in this frozen Lead brief",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "The query or URI falls outside the approved project/namespace scope."
+      },
+      "classification": "permission_or_evidence_visibility"
+    },
+    {
+      "call": "call_f4eb17b870c1461f8f90c09c4e097fc5",
+      "turn": "01a21f9b-38e1-7983-bffc-c18d78091375",
+      "close": true,
+      "accepted": true,
+      "refusal": {},
+      "classification": null
+    }
+  ],
+  "run": "gxr_01m8fsdqey1ay7j4q9",
+  "label": "Historical controlled comparison; measured again from original 5904a4f field database",
+  "source": "acceptance/harness_refactor/blind/field/results.json"
+}

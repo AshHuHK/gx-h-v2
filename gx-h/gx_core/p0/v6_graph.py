@@ -154,6 +154,7 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
         if own_branch not in branches and any(op["op"] == "add_node" for op in decision["ops"]):
             branches[own_branch] = dict(v62_graph.branch_spec(module), state="OPEN")
     resolved_ops = []
+    staged_definitions = {}
     changed = set()
     for index, source in enumerate(decision["ops"]):
         spec = dict(source)
@@ -171,9 +172,13 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
             from . import v6_recipes
             if scope != "run":
                 raise ScopeDenied("Only the Run Lead may commission a reusable Lead decision point")
-            v6_recipes.decision_for(conn, spec, run_id=run_id)
+            _, definition = v6_recipes.decision_for(conn, spec, run_id=run_id, with_definition=True)
+            if definition["schema"] == v6_recipes.recipe_stages.SCHEMA:
+                staged_definitions[spec["node"]] = definition
         if op == "add_node" and "evidence_gate" in spec:
             gate = dict(spec["evidence_gate"])
+            if ("output_name" in gate or "source_role" in gate) and not harness_policy.current(conn, run_id):
+                raise ScopeDenied("This archived Goal has no named filter output contract")
             gate["producer_node"] = aliases.get(gate["producer_node"], gate["producer_node"])
             if gate["source_ref"] not in visible_refs or gate["producer_node"] not in spec["depends_on"]:
                 raise ScopeDenied("A conditional Job needs a visible source and a declared producing dependency")
@@ -241,6 +246,9 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
                 raise ScopeDenied("Node input was not granted in this decision context", details={
                     "node": spec["node"], "input_index": index,
                     "correction": "Use a visible artifact reference or a declared upstream node."})
+        if spec["node"] in staged_definitions:
+            from . import recipe_stages
+            recipe_stages.verify_commission(conn, run_id, staged_definitions[spec["node"]], spec, nodes)
         try:
             minimum = v6_jobs.validate_node(conn, run_id, spec, node_ids=producers,
                                             limits=branches[spec["branch"]]["budget_limits"])
@@ -328,6 +336,30 @@ def funding_pin(conn, run_id):
         FROM budgets b JOIN runs r USING(budget_ref) WHERE r.run_id=?""",
         (run_id,)).fetchone()
     return tuple(row) if row else None
+
+
+def funding_terms(conn, run_id, resources):
+    """Describe the actual funding premises of this branch, outside the graph writer."""
+    keys = tuple(sorted(key for key, amount in resources.items() if amount > 0))
+    budget = conn.execute("""SELECT r.project_ref,b.* FROM runs r JOIN budgets b USING(budget_ref)
+                            WHERE r.run_id=?""", (run_id,)).fetchone()
+    if not budget or not keys:
+        return None
+    project = budget["project_ref"]
+    def lines(values):
+        return tuple((key, values[key]) for key in keys if key in values)
+    project_limits = tuple(sorted((item["item_id"], item["version"], ids.canonical_json(item["value"]))
+                                  for item in budgets._formal_project_limits(conn, project)
+                                  if item["value"]["resource"] in keys))
+    phase = budgets._current_phase(conn, project) or {}
+    phase_limits = lines(phase.get("limits", {}))
+    workspace = conn.execute("""SELECT b.limits_json FROM p0_workspace w JOIN budgets b USING(budget_ref)
+                                WHERE w.project_ref=?""", (project,)).fetchone()
+    workspace_limits = lines(json.loads(workspace[0])) if workspace else ()
+    used, held = budgets._project_usage(conn, project, lines=set(keys))
+    return (keys, *(lines(json.loads(budget[column])) for column in ("limits_json", "spent_json", "reserved_json")),
+            project_limits, workspace_limits, (phase.get("phase_id"), phase_limits) if phase_limits else (),
+            lines(used), lines(held))
 
 
 def check_funding(conn, run_id, demand):

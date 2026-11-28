@@ -1,0 +1,3811 @@
+{
+  "registered_cards": 50,
+  "localized_cards": 48,
+  "nonlocalized": [
+    "artifact-analysis@1",
+    "fixture-grid@1"
+  ],
+  "cards": [
+    {
+      "provider": "org.gx.archival-molecule-qc@1.0.0",
+      "provider_sha256": "fa885b80ccec69fd928a2223f9b809648367d925d6547a146163c41d0aeeb1b8",
+      "capability_version": "archival-fab-coverage@1",
+      "portable_sha256": "8e1487c13c151ef95283923a5e61f182cda0fec8973b9aef14be1d99fc8916e4",
+      "names": {
+        "en": "Deposited Fab CDR coverage",
+        "zh-Hant": "抗體片段互補決定區座標覆蓋",
+        "zh-Hans": "抗体片段互补决定区坐标覆盖"
+      },
+      "aliases": [
+        "Deposited Fab CDR coverage",
+        "抗體片段互補決定區座標覆蓋",
+        "抗体片段互补决定区坐标覆盖",
+        "抗體",
+        "抗体",
+        "抗原結合片段",
+        "抗原结合片段",
+        "重鏈",
+        "轻链",
+        "輕鏈",
+        "重轻链",
+        "互補決定區",
+        "互补决定区",
+        "座標覆蓋",
+        "坐标覆盖",
+        "antibody",
+        "Fab",
+        "CDR",
+        "IMGT",
+        "heavy chain",
+        "light chain"
+      ],
+      "inputs": [
+        "numbering",
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "fab_coverage.json",
+          "kind": "file:archival_fab_coverage",
+          "nature": "analysis",
+          "metric_specs": {
+            "mapped_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/mapped_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256",
+                "numbering_sha256": "/numbering_sha256"
+              }
+            },
+            "matched_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/matched_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256",
+                "numbering_sha256": "/numbering_sha256"
+              }
+            }
+          },
+          "source_roles": [
+            "structure",
+            "numbering"
+          ]
+        }
+      ],
+      "limitations": "Requires compatible, source-attributed IMGT mapping and the corresponding deposited chains. Coverage is restricted to the declared pair and model. No binding, affinity or specificity estimate.",
+      "applicable_domain": null,
+      "purpose": "Assess the observability of complementary regions of the supplied heavy/light variable domains in one public Fab deposition."
+    },
+    {
+      "provider": "org.gx.archival-molecule-qc@1.0.0",
+      "provider_sha256": "fa885b80ccec69fd928a2223f9b809648367d925d6547a146163c41d0aeeb1b8",
+      "capability_version": "archival-peptide-coverage@1",
+      "portable_sha256": "7d9a96083503601eebed6e923e5e192ca55ae7740ba63a21588a00560af5fa8f",
+      "names": {
+        "en": "Deposited linear peptide coverage",
+        "zh-Hant": "沉積線性肽殘基覆蓋",
+        "zh-Hans": "沉积线性肽残基覆盖"
+      },
+      "aliases": [
+        "Deposited linear peptide coverage",
+        "沉積線性肽殘基覆蓋",
+        "沉积线性肽残基覆盖",
+        "線性胜肽",
+        "线性肽",
+        "線性肽",
+        "多肽",
+        "端基",
+        "殘基覆蓋",
+        "残基覆盖",
+        "linear peptide",
+        "terminal groups"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "peptide-qc.json",
+          "kind": "file:archival_peptide_coverage",
+          "nature": "analysis",
+          "metric_specs": {
+            "declared_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/declared_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256"
+              }
+            },
+            "observed_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/observed_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256"
+              }
+            },
+            "backbone_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/backbone_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256"
+              }
+            },
+            "model_count": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/model_count",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256"
+              }
+            },
+            "peptide_residue_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/peptide_residue_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256"
+              }
+            },
+            "declared_modified_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/declared_modified_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "entry": "/entry",
+                "input_sha256": "/input_sha256"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        }
+      ],
+      "limitations": "Experimental coordinate archive only. One labeled peptide chain. Coverage describes the selected model and deposited scope. No conformation prediction, biological activity or confidence calibration.",
+      "applicable_domain": null,
+      "purpose": "Quantify completeness across public peptide deposits and distinguish polymer positions from annotated amino acids and terminal components."
+    },
+    {
+      "provider": "org.gx.archival-fold-calibration@1.0.0",
+      "provider_sha256": "c3e1753f0d21267ad3e3b485435d9ba9079500cc24d0b423cba3aa892bbb0585",
+      "capability_version": "archived-fold-calibration@1",
+      "portable_sha256": "a6c47ec541c39c089d46bf4173d7dd7bfd60a193fbbe3cd778695c01f4aa0be7",
+      "names": {
+        "en": "Published fragment fold calibration",
+        "zh-Hant": "已發表片段結構預測校準",
+        "zh-Hans": "已发表片段结构预测校准"
+      },
+      "aliases": [
+        "Published fragment fold calibration",
+        "已發表片段結構預測校準",
+        "已发表片段结构预测校准",
+        "校準",
+        "校准",
+        "校準蛋白",
+        "结构预测",
+        "結構預測",
+        "prediction calibration",
+        "Top7"
+      ],
+      "inputs": [
+        "specimen"
+      ],
+      "outputs": [
+        {
+          "name": "model.cif",
+          "kind": "file:predicted_mmcif",
+          "nature": "model_prediction"
+        },
+        {
+          "name": "inference.json",
+          "kind": "file:model_execution",
+          "nature": "model_prediction"
+        },
+        {
+          "name": "TERMS_OF_USE.md",
+          "kind": "file:model_output_terms"
+        }
+      ],
+      "limitations": "Only the archived byte-identified specimen is accepted. Predictions are computed coordinates.",
+      "applicable_domain": null,
+      "purpose": "Predict the observed fragment for comparison with a separately supplied reference."
+    },
+    {
+      "provider": null,
+      "provider_sha256": null,
+      "capability_version": "artifact-analysis@1",
+      "portable_sha256": "8f5d384b5b11773ef7570f85418d349dc514103a18560c2908ffa37929ab4fc5",
+      "names": null,
+      "aliases": [],
+      "inputs": [
+        "spec"
+      ],
+      "outputs": [
+        {
+          "name": "result.json",
+          "kind": "file:artifact_analysis_result"
+        }
+      ],
+      "limitations": "Linux with libseccomp.so.2; up to eight JSON inputs, 1 MiB total, 32 KiB result.",
+      "applicable_domain": null,
+      "purpose": "Summarize or compare JSON measurements."
+    },
+    {
+      "provider": "org.gx.arxiv-sources@1.0.0",
+      "provider_sha256": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5",
+      "capability_version": "arxiv-fetch@1",
+      "portable_sha256": "a7077a6eb3edb0e905a8181038448fd4efa9aae354fe877314fe890a7674266f",
+      "names": {
+        "en": "Fetch revision-pinned arXiv PDF",
+        "zh-Hant": "取得指定版本預印本原文",
+        "zh-Hans": "获取指定版本预印本原文"
+      },
+      "aliases": [
+        "Fetch revision-pinned arXiv PDF",
+        "取得指定版本預印本原文",
+        "获取指定版本预印本原文",
+        "預印本",
+        "预印本",
+        "原文下載",
+        "原文下载",
+        "arXiv",
+        "preprint",
+        "PDF"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "article.pdf",
+          "kind": "file:preprint",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition_descriptor",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Versioned PDF links from the selected search only, up to 32 MiB. Embedded-text page extraction can miss figures or reading order. Snapshot binding does not establish scientific validity or publication review.",
+      "applicable_domain": null,
+      "purpose": "Read the exact PDF revision that the indexed arXiv search returned."
+    },
+    {
+      "provider": "org.gx.arxiv-sources@1.0.0",
+      "provider_sha256": "924d11769c5250dcac68ea0d09cbf08203fcd7aa634364b0702c233b7b4ec4b5",
+      "capability_version": "arxiv-search@1",
+      "portable_sha256": "4b83a31f276d8e83e2d0c506e6275542ac57b183e9aafe4588e766b204fff2c7",
+      "names": {
+        "en": "Search arXiv preprint index",
+        "zh-Hant": "預印本文獻檢索",
+        "zh-Hans": "预印本文献检索"
+      },
+      "aliases": [
+        "Search arXiv preprint index",
+        "預印本文獻檢索",
+        "预印本文献检索",
+        "預印本",
+        "预印本",
+        "文獻檢索",
+        "文献检索",
+        "arXiv",
+        "preprint",
+        "index search"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:scholarly_candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "search-snapshot.json",
+          "kind": "file:scholarly_snapshot",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "First ranked page of at most eight records. Missing fields, a valid empty feed and an unavailable upstream are distinct. A metadata hit supports discovery only.",
+      "applicable_domain": null,
+      "purpose": "Locate publications in the public arXiv catalogue using investigator-selected field queries."
+    },
+    {
+      "provider": "org.gx.published-kinetics@1.0.0",
+      "provider_sha256": "240ed76966614cfd91ff948e047cf022f4205b0aa5c9eb100ab30ebea92803dc",
+      "capability_version": "bglb-retrospective@1",
+      "portable_sha256": "746ea82c08978e7702bdb645fd1109381ab42f4913136d5cb37e465081419087",
+      "names": {
+        "en": "Published enzyme score retrospective",
+        "zh-Hant": "已發表酶動力學評分回顧",
+        "zh-Hans": "已发表酶动力学评分回顾"
+      },
+      "aliases": [
+        "Published enzyme score retrospective",
+        "已發表酶動力學評分回顧",
+        "已发表酶动力学评分回顾",
+        "催化效率",
+        "歷史測量",
+        "历史测量",
+        "kinetics",
+        "retrospective"
+      ],
+      "inputs": [
+        "conservation",
+        "kinetics"
+      ],
+      "outputs": [
+        {
+          "name": "summary.json",
+          "kind": "file:bglb_summary",
+          "nature": "analysis",
+          "metric_specs": {
+            "holdout_score_pairs": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/holdout_score_pairs",
+              "unit": "variants",
+              "places": 0,
+              "scope": {
+                "s1_sha256": "/input_sha256/kinetics",
+                "s3_sha256": "/input_sha256/conservation",
+                "partition_rule": "/partition_rule",
+                "substrate": "/substrate"
+              }
+            },
+            "holdout_count": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/holdout_count",
+              "unit": "variants",
+              "places": 0,
+              "scope": {
+                "s1_sha256": "/input_sha256/kinetics",
+                "s3_sha256": "/input_sha256/conservation",
+                "partition_rule": "/partition_rule",
+                "substrate": "/substrate"
+              }
+            },
+            "holdout_exact": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/holdout_exact",
+              "unit": "variants",
+              "places": 0,
+              "scope": {
+                "s1_sha256": "/input_sha256/kinetics",
+                "s3_sha256": "/input_sha256/conservation",
+                "partition_rule": "/partition_rule",
+                "substrate": "/substrate"
+              }
+            },
+            "holdout_spearman": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/holdout_spearman",
+              "unit": "1",
+              "places": 6,
+              "scope": {
+                "s1_sha256": "/input_sha256/kinetics",
+                "s3_sha256": "/input_sha256/conservation",
+                "partition_rule": "/partition_rule",
+                "substrate": "/substrate"
+              }
+            },
+            "paired_wt_median_absolute_log10_error": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/paired_wt_median_absolute_log10_error",
+              "unit": "log10",
+              "places": 6,
+              "scope": {
+                "s1_sha256": "/input_sha256/kinetics",
+                "s3_sha256": "/input_sha256/conservation",
+                "partition_rule": "/partition_rule",
+                "substrate": "/substrate"
+              }
+            }
+          },
+          "source_roles": [
+            "kinetics",
+            "conservation"
+          ]
+        },
+        {
+          "name": "records.json",
+          "kind": "file:bglb_records",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Original BglB pNPG panel; S3 covers a selected subset. Holdout is a repeatable retrospective partition of public data, with no external validation.",
+      "applicable_domain": null,
+      "purpose": "Evaluate the rank and coverage of a fixed archived score against published pNPG catalytic efficiencies."
+    },
+    {
+      "provider": "org.gx.deposited-structure-qc@1.0.0",
+      "provider_sha256": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336",
+      "capability_version": "deposited-backbone-qc@1",
+      "portable_sha256": "2e93f4d6cb3c175f00c3183d5615980e2635fabb30e5c6d0585b10b517dd1ee9",
+      "names": {
+        "en": "Deposited protein backbone coordinate coverage",
+        "zh-Hant": "沉積蛋白質主鏈座標質控",
+        "zh-Hans": "沉积蛋白质主链坐标质控"
+      },
+      "aliases": [
+        "Deposited protein backbone coordinate coverage",
+        "沉積蛋白質主鏈座標質控",
+        "沉积蛋白质主链坐标质控",
+        "主鏈",
+        "主链",
+        "骨架",
+        "主鏈覆蓋",
+        "主链覆盖",
+        "座標缺失",
+        "坐标缺失",
+        "蛋白結構",
+        "蛋白结构",
+        "protein backbone",
+        "missing residues"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "qc.json",
+          "kind": "file:deposited_backbone_qc",
+          "nature": "analysis",
+          "metric_specs": {
+            "declared_residues": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/declared_residues",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "observed_residues": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/observed_residues",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "complete_backbones": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/complete_backbones",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "ca_count": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/ca_count",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "ca_radius_of_gyration_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/ca_radius_of_gyration_A",
+              "unit": "angstrom",
+              "places": 3,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "coordinate_coverage": {
+              "reader": "json/1",
+              "op": "ratio/1",
+              "numerator": "/observed_residues",
+              "denominator": "/declared_residues",
+              "unit": "1",
+              "places": 4,
+              "bounds": [
+                0,
+                1
+              ],
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "model": "/model",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        }
+      ],
+      "limitations": "Single polypeptide label chain; no microheterogeneity or alternate coordinates. Geometry describes deposited models. A missing coordinate does not establish an absent residue.",
+      "applicable_domain": null,
+      "purpose": "Describe topology or coordinate representation in one known deposited chain."
+    },
+    {
+      "provider": "org.gx.block-influence@1.0.0",
+      "provider_sha256": "48545f2fef0d89179b60c90713d5b2d8db2278589a496beb87a1d51eb510ef53",
+      "capability_version": "deposited-block-influence@1",
+      "portable_sha256": "0e88a493cfa80d50b6b6fe1a9ceaeb6b8eafc4ba95b7aa2a32d802903bb436d7",
+      "names": {
+        "en": "Local segment influence on chain geometry",
+        "zh-Hant": "區段對鏈幾何的影響",
+        "zh-Hans": "区段对链几何的影响"
+      },
+      "aliases": [
+        "Local segment influence on chain geometry",
+        "區段對鏈幾何的影響",
+        "区段对链几何的影响",
+        "局部區段",
+        "局部区段",
+        "鏈對",
+        "链对",
+        "均方根偏差",
+        "旋角",
+        "座標",
+        "坐标",
+        "RMSD",
+        "rotation",
+        "segment influence"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "block-influence.json",
+          "kind": "file:block_influence",
+          "nature": "analysis",
+          "metric_specs": {
+            "coverage": {
+              "reader": "json/1",
+              "op": "ratio/1",
+              "numerator": "/selected_residues",
+              "denominator": "/observed_union_residues",
+              "unit": "1",
+              "places": 3,
+              "bounds": [
+                0,
+                1
+              ],
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry"
+              }
+            },
+            "eligible_blocks": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/eligible_blocks",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry"
+              }
+            },
+            "max_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/summary/angle_deg/max",
+              "unit": "deg",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "pair": "/summary/angle_deg/pair",
+                "block_index": "/summary/angle_deg/block_index"
+              }
+            },
+            "max_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/summary/rmsd_A/max",
+              "unit": "Å",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "pair": "/summary/rmsd_A/pair",
+                "block_index": "/summary/rmsd_A/block_index"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        }
+      ],
+      "limitations": "Descriptive sensitivity on common observed positions only. Fits with insufficient data or non-unique rotations have no numeric value. Geometric sensitivity alone does not establish function, frequency, causation or cross-deposition correspondence.",
+      "applicable_domain": null,
+      "purpose": "Quantify within-mask influence on reported chain-pair geometry."
+    },
+    {
+      "provider": "org.gx.block-influence@2.0.0",
+      "provider_sha256": "d936e8612734080c800140d995b8d205c649eddfc317a6e17448189668ca7516",
+      "capability_version": "deposited-block-influence@2",
+      "portable_sha256": "d07c6a75837b506a695db18340af43bdd918a3a98171355082b8a9463bc626f8",
+      "names": {
+        "en": "Local segment influence on chain geometry",
+        "zh-Hant": "區段對鏈幾何的影響",
+        "zh-Hans": "区段对链几何的影响"
+      },
+      "aliases": [
+        "Local segment influence on chain geometry",
+        "區段對鏈幾何的影響",
+        "区段对链几何的影响",
+        "局部區段",
+        "局部区段",
+        "鏈對",
+        "链对",
+        "均方根偏差",
+        "旋角",
+        "座標",
+        "坐标",
+        "RMSD",
+        "rotation",
+        "segment influence"
+      ],
+      "inputs": [
+        "mapping",
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "segment.json",
+          "kind": "file:mapped_segment",
+          "nature": "analysis",
+          "metric_specs": {
+            "pair12_before_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair12/angle_deg/before",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair12/chains"
+              }
+            },
+            "pair12_after_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair12/angle_deg/after",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair12/chains"
+              }
+            },
+            "pair12_delta_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair12/angle_deg/delta",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair12/chains"
+              }
+            },
+            "pair12_before_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair12/rmsd_A/before",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair12/chains"
+              }
+            },
+            "pair12_after_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair12/rmsd_A/after",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair12/chains"
+              }
+            },
+            "pair12_delta_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair12/rmsd_A/delta",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair12/chains"
+              }
+            },
+            "pair13_before_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair13/angle_deg/before",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair13/chains"
+              }
+            },
+            "pair13_after_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair13/angle_deg/after",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair13/chains"
+              }
+            },
+            "pair13_delta_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair13/angle_deg/delta",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair13/chains"
+              }
+            },
+            "pair13_before_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair13/rmsd_A/before",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair13/chains"
+              }
+            },
+            "pair13_after_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair13/rmsd_A/after",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair13/chains"
+              }
+            },
+            "pair13_delta_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair13/rmsd_A/delta",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair13/chains"
+              }
+            },
+            "pair23_before_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair23/angle_deg/before",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair23/chains"
+              }
+            },
+            "pair23_after_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair23/angle_deg/after",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair23/chains"
+              }
+            },
+            "pair23_delta_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/pair23/angle_deg/delta",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair23/chains"
+              }
+            },
+            "pair23_before_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair23/rmsd_A/before",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair23/chains"
+              }
+            },
+            "pair23_after_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair23/rmsd_A/after",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair23/chains"
+              }
+            },
+            "pair23_delta_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/pair23/rmsd_A/delta",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/pair23/chains"
+              }
+            },
+            "median_before_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/median/angle_deg/before",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/median/chains"
+              }
+            },
+            "median_after_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/median/angle_deg/after",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/median/chains"
+              }
+            },
+            "median_delta_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "deg",
+              "places": 4,
+              "pointer": "/rows/median/angle_deg/delta",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/median/chains"
+              }
+            },
+            "median_before_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/median/rmsd_A/before",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/median/chains"
+              }
+            },
+            "median_after_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/median/rmsd_A/after",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/median/chains"
+              }
+            },
+            "median_delta_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "unit": "Å",
+              "places": 4,
+              "pointer": "/rows/median/rmsd_A/delta",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity",
+                "pair": "/rows/median/chains"
+              }
+            },
+            "selected_residues": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "unit": "residues",
+              "places": 0,
+              "pointer": "/selected_residues",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity"
+              }
+            },
+            "retained_residues": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "unit": "residues",
+              "places": 0,
+              "pointer": "/retained_residues",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity"
+              }
+            },
+            "observed_union_residues": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "unit": "residues",
+              "places": 0,
+              "pointer": "/observed_union_residues",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity"
+              }
+            },
+            "omitted_residues": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "unit": "residues",
+              "places": 0,
+              "pointer": "/omitted_residues",
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "entry": "/entry",
+                "interval": "/interval",
+                "endpoint": "/endpoint",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/entity"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        }
+      ],
+      "limitations": "Descriptive sensitivity on common observed positions only. Fits with insufficient data or non-unique rotations have no numeric value. Geometric sensitivity alone does not establish function, frequency, causation or cross-deposition correspondence.",
+      "applicable_domain": null,
+      "purpose": "Test whether one local interval changes individual or representative geometry."
+    },
+    {
+      "provider": "org.gx.block-influence@1.0.0",
+      "provider_sha256": "48545f2fef0d89179b60c90713d5b2d8db2278589a496beb87a1d51eb510ef53",
+      "capability_version": "deposited-block-reading@1",
+      "portable_sha256": "7be588a3e9d0126886fe20dfe8ee8d6a40f217c4ae0028d10684bb093daef6bb",
+      "names": {
+        "en": "Read prior local segment statistics",
+        "zh-Hant": "已存區段統計表讀取",
+        "zh-Hans": "已存区段统计表读取"
+      },
+      "aliases": [
+        "Read prior local segment statistics",
+        "已存區段統計表讀取",
+        "已存区段统计表读取",
+        "讀取區段",
+        "读取区段",
+        "沉積結構",
+        "沉积结构",
+        "existing block table"
+      ],
+      "inputs": [
+        "table"
+      ],
+      "outputs": [
+        {
+          "name": "cell.json",
+          "kind": "file:block_reading",
+          "nature": "analysis",
+          "metric_specs": {
+            "baseline_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/baseline_angle_deg",
+              "unit": "deg",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "after_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/after_angle_deg",
+              "unit": "deg",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "delta_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/delta_angle_deg",
+              "unit": "deg",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "median_delta_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/median_delta_angle_deg",
+              "unit": "deg",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "control_max_angle_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/control_max_angle_deg",
+              "unit": "deg",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "baseline_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/baseline_rmsd_A",
+              "unit": "Å",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "after_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/after_rmsd_A",
+              "unit": "Å",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "delta_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/delta_rmsd_A",
+              "unit": "Å",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "median_delta_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/median_delta_rmsd_A",
+              "unit": "Å",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "control_max_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/control_max_rmsd_A",
+              "unit": "Å",
+              "places": 4,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "entry": "/entry",
+                "material_sha256": "/material_sha256",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            }
+          },
+          "source_roles": [
+            "table"
+          ]
+        }
+      ],
+      "limitations": "Descriptive sensitivity on common observed positions only. Fits with insufficient data or non-unique rotations have no numeric value. Geometric sensitivity alone does not establish function, frequency, causation or cross-deposition correspondence.",
+      "applicable_domain": null,
+      "purpose": "Quantify within-mask influence on reported chain-pair geometry."
+    },
+    {
+      "provider": "org.gx.block-signed@1.0.0",
+      "provider_sha256": "a73661055f24780dac17ad7031a792f6a96975d9557dfb0b453ddb379b3a8475",
+      "capability_version": "deposited-block-signed@1",
+      "portable_sha256": "0ad355138c40104db552a5344e80a6ae5cdb5c1b0d1fc412d43d12a4e34341f7",
+      "names": {
+        "en": "Signed chain-pair segment effects",
+        "zh-Hant": "鏈對區段帶符號效應",
+        "zh-Hans": "链对区段带符号效应"
+      },
+      "aliases": [
+        "Signed chain-pair segment effects",
+        "鏈對區段帶符號效應",
+        "链对区段带符号效应",
+        "鏈對",
+        "链对",
+        "區段差異",
+        "区段差异",
+        "中位數",
+        "中位数",
+        "signed effects",
+        "chain pair"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "signed-summary.json",
+          "kind": "file:signed_summary",
+          "nature": "analysis",
+          "metric_specs": {
+            "missed_present": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/missed_present",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "model": "/model",
+                "label_entity": "/label_entity",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              },
+              "bounds": [
+                0,
+                1
+              ]
+            },
+            "blocks_total": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_total",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "model": "/model",
+                "label_entity": "/label_entity",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            },
+            "blocks_eligible": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_eligible",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "model": "/model",
+                "label_entity": "/label_entity",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            },
+            "blocks_evaluable": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_evaluable",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "model": "/model",
+                "label_entity": "/label_entity",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            },
+            "blocks_unmeasured": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_unmeasured",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "model": "/model",
+                "label_entity": "/label_entity",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            },
+            "blocks_missed_observed": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_missed_observed",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "model": "/model",
+                "label_entity": "/label_entity",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        },
+        {
+          "name": "signed-blocks.json",
+          "kind": "file:signed_blocks",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Static geometry of observed coordinates only. Three chain pairs share chains. Rotation differences describe the unsigned fitted angle scalar. Pair and median differences refer to the same deposition, interval, endpoint and atom selection. Eligibility and missing fits limit negative conclusions.",
+      "applicable_domain": null,
+      "purpose": "Does the three-pair median miss a local chain-pair change in this deposition, mask, and physical endpoint?"
+    },
+    {
+      "provider": "org.gx.protein@0.2.0",
+      "provider_sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+      "capability_version": "deposited-chain-geometry@1",
+      "portable_sha256": "91840fdb7cac9024e0e8b9374e36afc94b7149e100da3b0bfd4278c08a754249",
+      "names": {
+        "en": "Deposited chain coordinate alignment",
+        "zh-Hant": "沉積蛋白鏈座標比對",
+        "zh-Hans": "沉积蛋白链坐标比对"
+      },
+      "aliases": [
+        "Deposited chain coordinate alignment",
+        "沉積蛋白鏈座標比對",
+        "沉积蛋白链坐标比对",
+        "鏈間差異",
+        "链间差异",
+        "原子選擇",
+        "原子选择",
+        "骨架比對",
+        "骨架比对",
+        "蛋白結構",
+        "蛋白结构",
+        "均方根偏差",
+        "旋角",
+        "RMSD",
+        "rotation",
+        "superposition"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "geometry.json",
+          "kind": "file:deposited_chain_geometry"
+        }
+      ],
+      "limitations": "Comparisons within the asymmetric unit of two deposited structures from one crystallographic study; the method does not estimate population variance or functional properties.",
+      "applicable_domain": null,
+      "purpose": "Describe the effect of atom selection on observed chain-pair geometry."
+    },
+    {
+      "provider": "org.gx.protein@0.3.0",
+      "provider_sha256": "f5f2c9169d1a6ff82d39fc260a491f8c4053f54f98a543c2ea4b7e42f390a6ad",
+      "capability_version": "deposited-chain-geometry@2",
+      "portable_sha256": "741e860f87822bb1b1b204cd18e6cb3035b5da35c7bded3f5cb1e97ada23ee1f",
+      "names": {
+        "en": "Deposited chain coordinate alignment",
+        "zh-Hant": "沉積蛋白鏈座標比對",
+        "zh-Hans": "沉积蛋白链坐标比对"
+      },
+      "aliases": [
+        "Deposited chain coordinate alignment",
+        "沉積蛋白鏈座標比對",
+        "沉积蛋白链坐标比对",
+        "鏈間差異",
+        "链间差异",
+        "原子選擇",
+        "原子选择",
+        "骨架比對",
+        "骨架比对",
+        "蛋白結構",
+        "蛋白结构",
+        "均方根偏差",
+        "旋角",
+        "RMSD",
+        "rotation",
+        "superposition"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "geometry.json",
+          "kind": "file:deposited_chain_geometry",
+          "nature": "analysis",
+          "metric_specs": {
+            "coverage": {
+              "reader": "json/1",
+              "op": "ratio/1",
+              "numerator": "/selected_residues",
+              "denominator": "/observed_union_residues",
+              "unit": "1",
+              "places": 3,
+              "bounds": [
+                0,
+                1
+              ],
+              "scope": {
+                "mask": "/mask",
+                "model": "/model",
+                "entity": "/label_entity",
+                "chains": "/chains",
+                "input_sha256": "/input_sha256"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        }
+      ],
+      "limitations": "One asymmetric unit per measurement. Alternate locations and ambiguous backbone assignments are unsupported. Absence of a selected position is a coverage limitation. The measurement does not establish sampling independence or population-level properties.",
+      "applicable_domain": null,
+      "purpose": "Describe the effect of atom selection on observed chain-pair geometry."
+    },
+    {
+      "provider": "org.gx.deposited-structure-qc@1.0.0",
+      "provider_sha256": "d7347328e6ef1d9fef3212bca59dc0c3c08a0020b51952cf168e515a48ba5336",
+      "capability_version": "deposited-macrocycle-qc@1",
+      "portable_sha256": "dc54109e81b0d8fefcad5b14d136d81bc8fafdbbff1f1946c47fe3bad4e55617",
+      "names": {
+        "en": "Deposited cyclic peptide topology",
+        "zh-Hant": "沉積環肽共價閉環質控",
+        "zh-Hans": "沉积环肽共价闭环质控"
+      },
+      "aliases": [
+        "Deposited cyclic peptide topology",
+        "沉積環肽共價閉環質控",
+        "沉积环肽共价闭环质控",
+        "環肽",
+        "环肽",
+        "環狀胜肽",
+        "环状肽",
+        "環狀肽",
+        "環化肽",
+        "环化肽",
+        "環狀多肽",
+        "環化",
+        "环化",
+        "首尾成環",
+        "首尾成环",
+        "共價閉環",
+        "共价闭环",
+        "環肽閉合",
+        "cyclic peptide",
+        "cyclopeptide",
+        "macrocyclic peptide",
+        "head-to-tail cyclization",
+        "closure"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "qc.json",
+          "kind": "file:deposited_macrocycle_qc",
+          "nature": "analysis",
+          "metric_specs": {
+            "declared_closure": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/declared_closure",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "mapped_models": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/mapped_models",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "model_count": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/model_count",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "declared_residues": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/declared_residues",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            },
+            "model_1_distance_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/model_1_distance_A",
+              "unit": "angstrom",
+              "places": 3,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "chain": "/chain",
+                "entity": "/entity",
+                "entry": "/entry"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        }
+      ],
+      "limitations": "Single polypeptide label chain; no microheterogeneity or alternate coordinates. Geometry describes deposited models. Up to 64 residues; tests intra-chain head-to-tail topology only. No prediction, steric refinement or experimental folding claim.",
+      "applicable_domain": null,
+      "purpose": "Describe topology or coordinate representation in one known deposited chain."
+    },
+    {
+      "provider": "org.gx.record-method-builder@1.0.0",
+      "provider_sha256": "bd50dc3cce08e0c33689458b06b075b67857f4c4e20ee985fe56f6a5a6ac9eaf",
+      "capability_version": "derive-record-coverage@1",
+      "portable_sha256": "107a5d091ed872380a05f7f1fb311ee99cdf171d6d1970746a33431080f469b4",
+      "names": {
+        "en": "Build an accession coverage method",
+        "zh-Hant": "依來源建立條目覆蓋分析",
+        "zh-Hans": "依来源建立条目覆盖分析"
+      },
+      "aliases": [
+        "Build an accession coverage method",
+        "依來源建立條目覆蓋分析",
+        "依来源建立条目覆盖分析",
+        "條目覆蓋",
+        "条目覆盖",
+        "建立方法",
+        "建立工具",
+        "record coverage"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "method-spec.json",
+          "kind": "file:derived_record_method",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Analytical method authoring is limited to a documented distinct-key evidence join. ID proximity, homology, sampling independence and semantic annotation correctness are outside scope.",
+      "applicable_domain": null,
+      "purpose": "Develop a missing read-only CPU method for evidence coverage by accession, for use later in the same Goal."
+    },
+    {
+      "provider": null,
+      "provider_sha256": null,
+      "capability_version": "fixture-grid@1",
+      "portable_sha256": "b69193d4546b42225261484872718eb475478c5836377de6cacd6b8c38b9f12f",
+      "names": null,
+      "aliases": [],
+      "inputs": [
+        "grid"
+      ],
+      "outputs": [
+        {
+          "name": "observations.json",
+          "kind": "file:synthetic_grid"
+        }
+      ],
+      "limitations": "Only synthetic tests of persistence and orchestration.",
+      "applicable_domain": null,
+      "purpose": "Compare two synthetic predictions."
+    },
+    {
+      "provider": "org.gx.publication-discovery@1.0.0",
+      "provider_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+      "capability_version": "literature-original@1",
+      "portable_sha256": "6a8f42ae73f778be21b6078c6de9f166a4426eb1f87312b001a71bb9a38c46b1",
+      "names": {
+        "en": "Fetch article original",
+        "zh-Hant": "取得論文全文原件",
+        "zh-Hans": "获取论文全文原件"
+      },
+      "aliases": [
+        "Fetch article original",
+        "取得論文全文原件",
+        "获取论文全文原件",
+        "全文",
+        "正文",
+        "原文",
+        "開放取用",
+        "开放获取",
+        "期刊文章",
+        "論文",
+        "论文",
+        "JATS",
+        "full text",
+        "article XML"
+      ],
+      "inputs": [
+        "candidates"
+      ],
+      "outputs": [
+        {
+          "name": "article.xml",
+          "kind": "file:journal_article",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition_descriptor",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+      "applicable_domain": null,
+      "purpose": "Read an open paper in full with its methods, measurement conditions and original paragraph/table locations."
+    },
+    {
+      "provider": "org.gx.publication-discovery@1.1.0",
+      "provider_sha256": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4",
+      "capability_version": "literature-original@2",
+      "portable_sha256": "8ce91c1afe7843b6dab5be3fcd48e94acda24d887501107b49933d4e8e574f9c",
+      "names": {
+        "en": "Fetch article original",
+        "zh-Hant": "取得論文全文原件",
+        "zh-Hans": "获取论文全文原件"
+      },
+      "aliases": [
+        "Fetch article original",
+        "取得論文全文原件",
+        "获取论文全文原件",
+        "全文",
+        "正文",
+        "原文",
+        "開放取用",
+        "开放获取",
+        "期刊文章",
+        "論文",
+        "论文",
+        "JATS",
+        "full text",
+        "article XML"
+      ],
+      "inputs": [
+        "candidates"
+      ],
+      "outputs": [
+        {
+          "name": "article.xml",
+          "kind": "file:journal_article",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition_descriptor",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+      "applicable_domain": null,
+      "purpose": "Read an open paper in full with its methods, measurement conditions and original paragraph/table locations."
+    },
+    {
+      "provider": "org.gx.publication-discovery@1.0.0",
+      "provider_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+      "capability_version": "literature-page@1",
+      "portable_sha256": "16052aa3d1cc9bb48fb38eb39a84f6b03ba434323776ddb518f774d95a0dc987",
+      "names": {
+        "en": "Continue an existing literature search",
+        "zh-Hant": "文獻搜尋快照翻頁",
+        "zh-Hans": "文献搜索快照翻页"
+      },
+      "aliases": [
+        "Continue an existing literature search",
+        "文獻搜尋快照翻頁",
+        "文献搜索快照翻页",
+        "後續頁",
+        "后续页",
+        "翻頁",
+        "翻页",
+        "下一頁",
+        "下一页",
+        "延續搜尋",
+        "续查",
+        "文獻",
+        "文献",
+        "pagination",
+        "cursor",
+        "next page"
+      ],
+      "inputs": [
+        "snapshot"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:scholarly_candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "search-snapshot.json",
+          "kind": "file:scholarly_snapshot",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples.",
+      "applicable_domain": null,
+      "purpose": "Follow catalogue pages of an earlier query or reproduce a page from its saved bytes."
+    },
+    {
+      "provider": "org.gx.publication-discovery@1.1.0",
+      "provider_sha256": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4",
+      "capability_version": "literature-page@2",
+      "portable_sha256": "f7e1da94675b804e14f17e4802eff9dee1ddbed455f79ac8d8b514d080903852",
+      "names": {
+        "en": "Continue an existing literature search",
+        "zh-Hant": "文獻搜尋快照翻頁",
+        "zh-Hans": "文献搜索快照翻页"
+      },
+      "aliases": [
+        "Continue an existing literature search",
+        "文獻搜尋快照翻頁",
+        "文献搜索快照翻页",
+        "後續頁",
+        "后续页",
+        "翻頁",
+        "翻页",
+        "下一頁",
+        "下一页",
+        "延續搜尋",
+        "续查",
+        "文獻",
+        "文献",
+        "pagination",
+        "cursor",
+        "next page"
+      ],
+      "inputs": [
+        "snapshot"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:scholarly_candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "search-snapshot.json",
+          "kind": "file:scholarly_snapshot",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples.",
+      "applicable_domain": null,
+      "purpose": "Follow catalogue pages of an earlier query or reproduce a page from its saved bytes."
+    },
+    {
+      "provider": "org.gx.publication-discovery@1.0.0",
+      "provider_sha256": "7f616435f05aa59689eee59a3919fc68a14e93b8b8ab0be3c986dfff226de90d",
+      "capability_version": "literature-query@1",
+      "portable_sha256": "a46da20db15ab8ec3b573da3b0af601f328a49c461df8d5efc9f358b0f844cf6",
+      "names": {
+        "en": "Search publication records",
+        "zh-Hant": "檢索學術文獻書目",
+        "zh-Hans": "检索学术文献书目"
+      },
+      "aliases": [
+        "Search publication records",
+        "檢索學術文獻書目",
+        "检索学术文献书目",
+        "文獻",
+        "文献",
+        "期刊",
+        "論文",
+        "论文",
+        "書目",
+        "书目",
+        "文獻檢索",
+        "文献检索",
+        "搜尋論文",
+        "搜索论文",
+        "DOI",
+        "Crossref",
+        "Europe PMC",
+        "bibliography",
+        "literature search"
+      ],
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:scholarly_candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "search-snapshot.json",
+          "kind": "file:scholarly_snapshot",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples.",
+      "applicable_domain": null,
+      "purpose": "Discover relevant papers from the scientific question alone, even when no materials or search snapshot exist."
+    },
+    {
+      "provider": "org.gx.publication-discovery@1.1.0",
+      "provider_sha256": "6280dff8f08bc68ad3e3cc6d4c140d23570deb176fedb3fd1a774f6fda6098b4",
+      "capability_version": "literature-query@2",
+      "portable_sha256": "6fb2861f0543a756ca6ff63fa4b2f053c80ad56f8418dd1ad7a0f37bc13b2d03",
+      "names": {
+        "en": "Search publication records",
+        "zh-Hant": "檢索學術文獻書目",
+        "zh-Hans": "检索学术文献书目"
+      },
+      "aliases": [
+        "Search publication records",
+        "檢索學術文獻書目",
+        "检索学术文献书目",
+        "文獻",
+        "文献",
+        "期刊",
+        "論文",
+        "论文",
+        "書目",
+        "书目",
+        "文獻檢索",
+        "文献检索",
+        "搜尋論文",
+        "搜索论文",
+        "DOI",
+        "Crossref",
+        "Europe PMC",
+        "bibliography",
+        "literature search"
+      ],
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:scholarly_candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "search-snapshot.json",
+          "kind": "file:scholarly_snapshot",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples.",
+      "applicable_domain": null,
+      "purpose": "Discover relevant papers from the scientific question alone, even when no materials or search snapshot exist."
+    },
+    {
+      "provider": "org.gx.archival-fold-calibration@1.0.0",
+      "provider_sha256": "c3e1753f0d21267ad3e3b485435d9ba9079500cc24d0b423cba3aa892bbb0585",
+      "capability_version": "mapped-structure-agreement@1",
+      "portable_sha256": "66f4741f70fb552aa9ebefb9194752620c043074ba14a482dc6d1f5febec2167",
+      "names": {
+        "en": "Evaluate predicted and reference coordinates",
+        "zh-Hant": "預測與參照結構座標獨立比對",
+        "zh-Hans": "预测与参照结构坐标独立比对"
+      },
+      "aliases": [
+        "Evaluate predicted and reference coordinates",
+        "預測與參照結構座標獨立比對",
+        "预测与参照结构坐标独立比对",
+        "雙輸入",
+        "双输入",
+        "殘基映射",
+        "残基映射",
+        "獨立評估",
+        "独立评估",
+        "均方根偏差",
+        "RMSD",
+        "structure agreement"
+      ],
+      "inputs": [
+        "mapping",
+        "prediction",
+        "reference"
+      ],
+      "outputs": [
+        {
+          "name": "agreement.json",
+          "kind": "file:mapped_structure_agreement",
+          "nature": "analysis",
+          "metric_specs": {
+            "mapped_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/mapped_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "reference_sha256": "/reference_sha256",
+                "prediction_chain": "/prediction_chain",
+                "reference_chain": "/reference_chain",
+                "model": "/model"
+              }
+            },
+            "matched_positions": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/matched_positions",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "reference_sha256": "/reference_sha256",
+                "prediction_chain": "/prediction_chain",
+                "reference_chain": "/reference_chain",
+                "model": "/model"
+              }
+            },
+            "calpha_rmsd_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/calpha_rmsd_A",
+              "unit": "angstrom",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "mapping_sha256": "/mapping_sha256",
+                "reference_sha256": "/reference_sha256",
+                "prediction_chain": "/prediction_chain",
+                "reference_chain": "/reference_chain",
+                "model": "/model"
+              }
+            }
+          },
+          "source_roles": [
+            "prediction",
+            "reference",
+            "mapping"
+          ]
+        }
+      ],
+      "limitations": "Equal-weight structural similarity over mapped positions only. Ambiguous sites cause an error. Missing coordinates reduce coverage.",
+      "applicable_domain": null,
+      "purpose": "Measure model-1 C-alpha coordinate agreement with the supplied reference."
+    },
+    {
+      "provider": "org.gx.pcna-archive@1.0.0",
+      "provider_sha256": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5",
+      "capability_version": "pcna-archive-fetch@1",
+      "portable_sha256": "6f9db9f276d3adb9c8137f0f9be5f77f9b048c8d625f4db8a475c3b6a9830a3b",
+      "names": {
+        "en": "Fetch original PCNA deposition",
+        "zh-Hant": "取得指定 PCNA 原始結構檔",
+        "zh-Hans": "获取指定 PCNA 原始结构档"
+      },
+      "aliases": [
+        "Fetch original PCNA deposition",
+        "取得指定 PCNA 原始結構檔",
+        "获取指定 PCNA 原始结构档",
+        "原始結構",
+        "原始结构",
+        "沉積檔案",
+        "沉积档案",
+        "PDB",
+        "mmCIF",
+        "PCNA deposition"
+      ],
+      "inputs": [
+        "archive"
+      ],
+      "outputs": [
+        {
+          "name": "structure.cif",
+          "kind": "file:structure",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition_descriptor",
+          "nature": "analysis"
+        },
+        {
+          "name": "structure-context.json",
+          "kind": "file:structure_context",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Requires a public human P12004 deposition with three model-1 polypeptide chains in a shared deposited assembly operation. Co-deposited ligands and other polymers do not establish direct binding, apo state, function or geometry.",
+      "applicable_domain": null,
+      "purpose": "Acquire the selected PDB deposition of a human PCNA trimer as an immutable original."
+    },
+    {
+      "provider": "org.gx.pcna-archive@1.0.0",
+      "provider_sha256": "f8007c94a4812678491aca02f83d79e78442676c14888c2f47d93918e4dac4d5",
+      "capability_version": "pcna-archive-search@1",
+      "portable_sha256": "4a33b0378204a772c23a2229825fcb60060262e4ff860ddf1ce0ce0747d99c6a",
+      "names": {
+        "en": "Search PCNA structural archive",
+        "zh-Hant": "檢索 PCNA 結構存檔",
+        "zh-Hans": "检索 PCNA 结构存档"
+      },
+      "aliases": [
+        "Search PCNA structural archive",
+        "檢索 PCNA 結構存檔",
+        "检索 PCNA 结构存档",
+        "結構資料庫",
+        "结构数据库",
+        "沉積索引",
+        "沉积索引",
+        "PDB",
+        "PCNA structures"
+      ],
+      "inputs": [
+        "archive"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:archive_candidates",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "The UniProt P12004 cross-reference list reflects its specific release. Unannotated resolution, chain coverage, partners and apo status remain unknown.",
+      "applicable_domain": null,
+      "purpose": "Find PDB entries cross-referenced by the human PCNA UniProt record P12004."
+    },
+    {
+      "provider": "org.gx.pcna-structure@1.0.0",
+      "provider_sha256": "d6762ca59370426f8ec2932e4bfa6d2b48adaf5c6cf9cef183584883842f472d",
+      "capability_version": "pcna-interface@1",
+      "portable_sha256": "aa9d3831593dd600d9a9b8392ff0b5d63ebc0e4b6d2772074d6536640dc4b9e4",
+      "names": {
+        "en": "Deposited PCNA chain interface",
+        "zh-Hant": "沉積 PCNA 蛋白鏈介面",
+        "zh-Hans": "沉积 PCNA 蛋白链接口"
+      },
+      "aliases": [
+        "Deposited PCNA chain interface",
+        "沉積 PCNA 蛋白鏈介面",
+        "沉积 PCNA 蛋白链接口",
+        "接觸面",
+        "接触面",
+        "鏈間介面",
+        "链间界面",
+        "接觸距離",
+        "接触距离",
+        "chain interface",
+        "contact distance"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "interface.json",
+          "kind": "file:pcna_interface",
+          "nature": "analysis",
+          "metric_specs": {
+            "n_contact_residue_pairs": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/n_contact_residue_pairs",
+              "unit": "pairs",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "entity": "/label_entity",
+                "model": "/model",
+                "pair": "/pair",
+                "left": "/chain_left",
+                "right": "/chain_right",
+                "block_index": "/block_index"
+              }
+            },
+            "buried_area_A2": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/buried_area_A2",
+              "unit": "Å²",
+              "places": 2,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "entity": "/label_entity",
+                "model": "/model",
+                "pair": "/pair",
+                "left": "/chain_left",
+                "right": "/chain_right",
+                "block_index": "/block_index"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        },
+        {
+          "name": "interface-table.json",
+          "kind": "file:pcna_interface_table",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Observed asymmetric-unit contacts and pairwise surface burial depend on model completeness and selected conformers. Small SASA differences depend on sphere discretization. Contact entries in distinct windows may overlap. These measurements do not estimate binding energy or establish a causal effect of a partner.",
+      "applicable_domain": null,
+      "purpose": "Compare the three PCNA subunit interfaces, locate local contacts and solvent-accessible area buried in the deposited coordinates."
+    },
+    {
+      "provider": "org.gx.pcna-structure@1.0.0",
+      "provider_sha256": "d6762ca59370426f8ec2932e4bfa6d2b48adaf5c6cf9cef183584883842f472d",
+      "capability_version": "pcna-local-geometry@1",
+      "portable_sha256": "4645231ae266832e4f70de758fe7904fac7220ae10a41e56bf7a549aae018fc9",
+      "names": {
+        "en": "Local deposited PCNA geometry",
+        "zh-Hant": "沉積 PCNA 局部幾何",
+        "zh-Hans": "沉积 PCNA 局部几何"
+      },
+      "aliases": [
+        "Local deposited PCNA geometry",
+        "沉積 PCNA 局部幾何",
+        "沉积 PCNA 局部几何",
+        "主鏈",
+        "主链",
+        "局部幾何",
+        "局部几何",
+        "鏈對",
+        "链对",
+        "local geometry"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "geometry.json",
+          "kind": "file:pcna_geometry",
+          "nature": "analysis",
+          "metric_specs": {
+            "missed_present": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/missed_present",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              },
+              "bounds": [
+                0,
+                1
+              ]
+            },
+            "noise_resolved_missed_present": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/noise_resolved_missed_present",
+              "unit": "1",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              },
+              "bounds": [
+                0,
+                1
+              ]
+            },
+            "blocks_eligible": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_eligible",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint"
+              }
+            },
+            "blocks_evaluable": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_evaluable",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint"
+              }
+            },
+            "blocks_missed": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_missed",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            },
+            "blocks_noise_resolved_missed": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_noise_resolved_missed",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            },
+            "blocks_noise_uncertain": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_noise_uncertain",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            },
+            "blocks_threshold_boundary": {
+              "reader": "json/1",
+              "op": "integer/1",
+              "pointer": "/blocks_threshold_boundary",
+              "unit": "blocks",
+              "places": 0,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "effect_minimum": "/effect_minimum",
+                "zero_limit": "/zero_limit",
+                "minimum_evaluable": "/minimum_evaluable"
+              }
+            },
+            "baseline_pair_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/baseline_pair_deg",
+              "unit": "deg",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "pair_delta_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/pair_delta_deg",
+              "unit": "deg",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "median_delta_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/median_delta_deg",
+              "unit": "deg",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "control_max_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/control_max_deg",
+              "unit": "deg",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "effect_margin_deg": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/effect_margin_deg",
+              "unit": "deg",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index",
+                "effect_minimum": "/effect_minimum"
+              }
+            },
+            "baseline_pair_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/baseline_pair_A",
+              "unit": "Å",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "pair_delta_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/pair_delta_A",
+              "unit": "Å",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "median_delta_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/median_delta_A",
+              "unit": "Å",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "control_max_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/control_max_A",
+              "unit": "Å",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index"
+              }
+            },
+            "effect_margin_A": {
+              "reader": "json/1",
+              "op": "decimal/1",
+              "pointer": "/effect_margin_A",
+              "unit": "Å",
+              "places": 6,
+              "scope": {
+                "input_sha256": "/input_sha256",
+                "entry": "/entry",
+                "accession": "/accession",
+                "entity": "/entity",
+                "model": "/model",
+                "chains": "/chains",
+                "mask": "/mask",
+                "endpoint": "/endpoint",
+                "pair": "/pair",
+                "block_index": "/block_index",
+                "effect_minimum": "/effect_minimum"
+              }
+            }
+          },
+          "source_roles": [
+            "structure"
+          ]
+        },
+        {
+          "name": "geometry-table.json",
+          "kind": "file:pcna_geometry_table",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Static observed asymmetric-unit coordinates and deposited label windows. Alignment ranges in the table support cross-entry comparison. Assembly mates, other chains, ligands, absent residues and HETATM modifications are outside the selection. Controls and reproducibility margins measure coordinate sensitivity; they are not experimental error estimates or independent biological replicates.",
+      "applicable_domain": null,
+      "purpose": "Localize pairwise directional asymmetry and decide whether it survives equal-size dispersed deletions in this structure. Match its original material, named chain roles and label interval with pcna-interface@1."
+    },
+    {
+      "provider": "org.gx.scholarly-sources@1.0.0",
+      "provider_sha256": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c",
+      "capability_version": "scholarly-fetch@1",
+      "portable_sha256": "11b36d3096684d693482ed4d0fa83875694dc0cb7e021e96cfde1583f250ae04",
+      "names": {
+        "en": "Fetch Europe PMC article original",
+        "zh-Hant": "取回開放文獻原文",
+        "zh-Hans": "取回开放文献原文"
+      },
+      "aliases": [
+        "Fetch Europe PMC article original",
+        "取回開放文獻原文",
+        "取回开放文献原文",
+        "全文",
+        "期刊文章",
+        "原始論文",
+        "原始论文",
+        "JATS",
+        "article XML",
+        "full text"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "article.xml",
+          "kind": "file:journal_article",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition_descriptor",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+      "applicable_domain": null,
+      "purpose": "Acquire the exact open article original for reading at a specific body location."
+    },
+    {
+      "provider": "org.gx.scholarly-pages@1.0.0",
+      "provider_sha256": "1ed6a7b520ac439b092fb80940500e69b5d07a6c263d5ec541c445c64f5264be",
+      "capability_version": "scholarly-page-fetch@1",
+      "portable_sha256": "ad58b8a82d4605b5775ab50945aec32d9761191a6901fdf39e84a32c127e5ce5",
+      "names": {
+        "en": "Fetch indexed open article",
+        "zh-Hant": "取回翻頁索引中的全文",
+        "zh-Hans": "取回翻页索引中的全文"
+      },
+      "aliases": [
+        "Fetch indexed open article",
+        "取回翻頁索引中的全文",
+        "取回翻页索引中的全文",
+        "正文",
+        "全文",
+        "原文",
+        "期刊",
+        "JATS",
+        "full text",
+        "original source"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "article.xml",
+          "kind": "file:journal_article",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition_descriptor",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+      "applicable_domain": null,
+      "purpose": "Acquire the exact open article original for reading at a specific body location."
+    },
+    {
+      "provider": "org.gx.scholarly-pages@1.1.0",
+      "provider_sha256": "6854b19b66618cd0e94014919f2ac0b55afc7a4534a7ca040f31982525e0bc66",
+      "capability_version": "scholarly-page-fetch@2",
+      "portable_sha256": "10943c467b6cc136d5d5309dce490c04f58e597f184a895c43322cef74daf61d",
+      "names": {
+        "en": "Fetch indexed open article",
+        "zh-Hant": "取回翻頁索引中的全文",
+        "zh-Hans": "取回翻页索引中的全文"
+      },
+      "aliases": [
+        "Fetch indexed open article",
+        "取回翻頁索引中的全文",
+        "取回翻页索引中的全文",
+        "正文",
+        "全文",
+        "原文",
+        "期刊",
+        "JATS",
+        "full text",
+        "original source"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "article.xml",
+          "kind": "file:journal_article",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition_descriptor",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Requires accessible open JATS with a body and matching accession. An abstract-only hit or a provider error cannot supply the original.",
+      "applicable_domain": null,
+      "purpose": "Acquire the exact open article original for reading at a specific body location."
+    },
+    {
+      "provider": "org.gx.scholarly-pages@1.0.0",
+      "provider_sha256": "1ed6a7b520ac439b092fb80940500e69b5d07a6c263d5ec541c445c64f5264be",
+      "capability_version": "scholarly-page-search@1",
+      "portable_sha256": "486c9c24aa8148e9a0bba29e7bc06480f78c7ed47c28a60e3f89a64dd891f042",
+      "names": {
+        "en": "Paged scholarly source search",
+        "zh-Hant": "學術來源分頁檢索",
+        "zh-Hans": "学术来源分页检索"
+      },
+      "aliases": [
+        "Paged scholarly source search",
+        "學術來源分頁檢索",
+        "学术来源分页检索",
+        "論文",
+        "论文",
+        "文獻",
+        "文献",
+        "翻頁",
+        "翻页",
+        "期刊",
+        "文獻檢索",
+        "文献检索",
+        "書目",
+        "书目",
+        "Crossref",
+        "Europe PMC",
+        "paged search"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:scholarly_candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "search-snapshot.json",
+          "kind": "file:scholarly_snapshot",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples.",
+      "applicable_domain": null,
+      "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page."
+    },
+    {
+      "provider": "org.gx.scholarly-pages@1.1.0",
+      "provider_sha256": "6854b19b66618cd0e94014919f2ac0b55afc7a4534a7ca040f31982525e0bc66",
+      "capability_version": "scholarly-page-search@2",
+      "portable_sha256": "12c44e675b2813870485f11d4ebe872d6a2745d095de4b9dd6bc3fb8085285a0",
+      "names": {
+        "en": "Paged scholarly source search",
+        "zh-Hant": "學術來源分頁檢索",
+        "zh-Hans": "学术来源分页检索"
+      },
+      "aliases": [
+        "Paged scholarly source search",
+        "學術來源分頁檢索",
+        "学术来源分页检索",
+        "論文",
+        "论文",
+        "文獻",
+        "文献",
+        "翻頁",
+        "翻页",
+        "期刊",
+        "文獻檢索",
+        "文献检索",
+        "書目",
+        "书目",
+        "Crossref",
+        "Europe PMC",
+        "paged search"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:scholarly_candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "search-snapshot.json",
+          "kind": "file:scholarly_snapshot",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "One bounded page per provider per Job. Coverage is per query and provider; unknown/missing continuation or a network failure cannot support a global scientific negative. Matching publications can share experiments and samples.",
+      "applicable_domain": null,
+      "purpose": "Search successive pages of bibliographic evidence in Europe PMC and Crossref, including publications beyond the first page."
+    },
+    {
+      "provider": "org.gx.scholarly-sources@1.0.0",
+      "provider_sha256": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c",
+      "capability_version": "scholarly-search@1",
+      "portable_sha256": "829a85f6a732d3a9b1b7941a26f9eeadc93608fb62d871dabee8c638fae3c81a",
+      "names": {
+        "en": "Search indexed scholarly sources",
+        "zh-Hant": "搜尋已索引的學術文獻",
+        "zh-Hans": "搜索已索引的学术文献"
+      },
+      "aliases": [
+        "Search indexed scholarly sources",
+        "搜尋已索引的學術文獻",
+        "搜索已索引的学术文献",
+        "論文",
+        "论文",
+        "文獻",
+        "文献",
+        "書目",
+        "书目",
+        "文獻檢索",
+        "文献检索",
+        "期刊",
+        "Crossref",
+        "Europe PMC",
+        "scholarly search",
+        "bibliography"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:scholarly_candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "search-snapshot.json",
+          "kind": "file:scholarly_snapshot",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Covers one ranked page per provider. Empty and unavailable sources have different statuses. Bibliographic matches are leads, not experimental observations. The catalogues can index the same publication.",
+      "applicable_domain": null,
+      "purpose": "Find indexed publications with an investigator-selected query and identify open full-text candidates."
+    },
+    {
+      "provider": "org.gx.scholarly-sources@1.0.0",
+      "provider_sha256": "50db61ffc59454433b574882596c852b5e8fa865ec907ee01f9a9be0f0000c5c",
+      "capability_version": "social-source-intake@1",
+      "portable_sha256": "4e2c3cdd0bd1cb6473333985ed2b3f3a717a0c1da717fb121104f02fe1e9a4be",
+      "names": {
+        "en": "Register a public community source",
+        "zh-Hant": "登記公共社群來源",
+        "zh-Hans": "登记公共社群来源"
+      },
+      "aliases": [
+        "Register a public community source",
+        "登記公共社群來源",
+        "登记公共社群来源",
+        "微信公眾號",
+        "微信公众号",
+        "小紅書",
+        "小红书",
+        "社群資料",
+        "社群资料",
+        "WeChat",
+        "Xiaohongshu"
+      ],
+      "inputs": [
+        "source"
+      ],
+      "outputs": [
+        {
+          "name": "community-lead.json",
+          "kind": "file:community_lead",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Link-only input has no observed text. Community content can motivate follow-up and cannot substantiate an experiment independently.",
+      "applicable_domain": null,
+      "purpose": "Register a PI-supplied WeChat article or Xiaohongshu note as a community lead."
+    },
+    {
+      "provider": "org.gx.protein@0.1.0-v6.1",
+      "provider_sha256": "ac5b5d5cf96e942bfc57dc8492aa56b77ad9ecee0716735a3e6338463630fce9",
+      "capability_version": "tl1a-coordinate-quality@1",
+      "portable_sha256": "56512d72069745836e1dae0100ff2fc5fe1e0db5224140eb00169c2830f69474",
+      "names": {
+        "en": "Published coordinate coverage checks",
+        "zh-Hant": "已發表座標覆蓋檢查",
+        "zh-Hans": "已发表坐标覆盖检查"
+      },
+      "aliases": [
+        "Published coordinate coverage checks",
+        "已發表座標覆蓋檢查",
+        "已发表坐标覆盖检查",
+        "主鏈",
+        "主链",
+        "座標覆蓋",
+        "坐标覆盖",
+        "backbone coverage"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "quality.json",
+          "kind": "file:coordinate_inventory"
+        }
+      ],
+      "limitations": "Single deposited TL1A crystal model 2RE9, label entity 1, chains A/B/C. Monomer mapping and relative rotations describe observed coordinates. No solution assembly, binding or functional estimates.",
+      "applicable_domain": null,
+      "purpose": "Quantify sensitivity of pairwise geometry to observed atom selection in the deposited 2RE9 crystal coordinates."
+    },
+    {
+      "provider": "org.gx.protein@0.2.0",
+      "provider_sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+      "capability_version": "tl1a-coordinate-quality@1",
+      "portable_sha256": "56512d72069745836e1dae0100ff2fc5fe1e0db5224140eb00169c2830f69474",
+      "names": {
+        "en": "Published coordinate coverage checks",
+        "zh-Hant": "已發表座標覆蓋檢查",
+        "zh-Hans": "已发表坐标覆盖检查"
+      },
+      "aliases": [
+        "Published coordinate coverage checks",
+        "已發表座標覆蓋檢查",
+        "已发表坐标覆盖检查",
+        "主鏈",
+        "主链",
+        "座標覆蓋",
+        "坐标覆盖",
+        "backbone coverage"
+      ],
+      "inputs": [
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "quality.json",
+          "kind": "file:coordinate_inventory"
+        }
+      ],
+      "limitations": "Single deposited TL1A crystal model 2RE9, label entity 1, chains A/B/C. Monomer mapping and relative rotations describe observed coordinates. No solution assembly, binding or functional estimates.",
+      "applicable_domain": null,
+      "purpose": "Quantify sensitivity of pairwise geometry to observed atom selection in the deposited 2RE9 crystal coordinates."
+    },
+    {
+      "provider": "org.gx.protein@0.1.0-v6.1",
+      "provider_sha256": "ac5b5d5cf96e942bfc57dc8492aa56b77ad9ecee0716735a3e6338463630fce9",
+      "capability_version": "tl1a-geometry@1",
+      "portable_sha256": "4f9392a97a6c17cac2225e3662fc8a17471986c4e98f552ac69602c7e333be81",
+      "names": {
+        "en": "Chain-pair geometry in deposited coordinates",
+        "zh-Hant": "沉積座標鏈對幾何",
+        "zh-Hans": "沉积坐标链对几何"
+      },
+      "aliases": [
+        "Chain-pair geometry in deposited coordinates",
+        "沉積座標鏈對幾何",
+        "沉积坐标链对几何",
+        "鏈對齊",
+        "链对齐",
+        "原子配對",
+        "原子配对",
+        "chain-pair alignment"
+      ],
+      "inputs": [
+        "criteria",
+        "selection",
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "geometry.json",
+          "kind": "file:tl1a_geometry"
+        }
+      ],
+      "limitations": "Single deposited TL1A crystal model 2RE9, label entity 1, chains A/B/C. Monomer mapping and relative rotations describe observed coordinates. No solution assembly, binding or functional estimates.",
+      "applicable_domain": null,
+      "purpose": "Quantify sensitivity of pairwise geometry to observed atom selection in the deposited 2RE9 crystal coordinates."
+    },
+    {
+      "provider": "org.gx.protein@0.2.0",
+      "provider_sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+      "capability_version": "tl1a-geometry@1",
+      "portable_sha256": "4f9392a97a6c17cac2225e3662fc8a17471986c4e98f552ac69602c7e333be81",
+      "names": {
+        "en": "Chain-pair geometry in deposited coordinates",
+        "zh-Hant": "沉積座標鏈對幾何",
+        "zh-Hans": "沉积坐标链对几何"
+      },
+      "aliases": [
+        "Chain-pair geometry in deposited coordinates",
+        "沉積座標鏈對幾何",
+        "沉积坐标链对几何",
+        "鏈對齊",
+        "链对齐",
+        "原子配對",
+        "原子配对",
+        "chain-pair alignment"
+      ],
+      "inputs": [
+        "criteria",
+        "selection",
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "geometry.json",
+          "kind": "file:tl1a_geometry"
+        }
+      ],
+      "limitations": "Single deposited TL1A crystal model 2RE9, label entity 1, chains A/B/C. Monomer mapping and relative rotations describe observed coordinates. No solution assembly, binding or functional estimates.",
+      "applicable_domain": null,
+      "purpose": "Quantify sensitivity of pairwise geometry to observed atom selection in the deposited 2RE9 crystal coordinates."
+    },
+    {
+      "provider": "org.gx.protein@0.1.0-v6.1",
+      "provider_sha256": "ac5b5d5cf96e942bfc57dc8492aa56b77ad9ecee0716735a3e6338463630fce9",
+      "capability_version": "tl1a-review@1",
+      "portable_sha256": "0c1af12404169b7f2759675cd17f0f7bd0ef78a1f616b091219844183ccf8e46",
+      "names": {
+        "en": "Independent coordinate fit review",
+        "zh-Hant": "座標擬合獨立覆核",
+        "zh-Hans": "坐标拟合独立复核"
+      },
+      "aliases": [
+        "Independent coordinate fit review",
+        "座標擬合獨立覆核",
+        "坐标拟合独立复核",
+        "獨立複算",
+        "独立复算",
+        "座標擬合",
+        "坐标拟合",
+        "independent numerical review"
+      ],
+      "inputs": [
+        "criteria",
+        "observations",
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "checks.json",
+          "kind": "file:geometry_review_batch"
+        }
+      ],
+      "limitations": "Single deposited TL1A crystal model 2RE9, label entity 1, chains A/B/C. Monomer mapping and relative rotations describe observed coordinates. No solution assembly, binding or functional estimates.",
+      "applicable_domain": null,
+      "purpose": "Compare the frozen original measurements with independent proper least-squares SVD fits."
+    },
+    {
+      "provider": "org.gx.protein@0.2.0",
+      "provider_sha256": "f0a8dac2f226aea8a69e19c39e9070f0ac2c16c76507b26f9bb92848369fa5bd",
+      "capability_version": "tl1a-review@1",
+      "portable_sha256": "0c1af12404169b7f2759675cd17f0f7bd0ef78a1f616b091219844183ccf8e46",
+      "names": {
+        "en": "Independent coordinate fit review",
+        "zh-Hant": "座標擬合獨立覆核",
+        "zh-Hans": "坐标拟合独立复核"
+      },
+      "aliases": [
+        "Independent coordinate fit review",
+        "座標擬合獨立覆核",
+        "坐标拟合独立复核",
+        "獨立複算",
+        "独立复算",
+        "座標擬合",
+        "坐标拟合",
+        "independent numerical review"
+      ],
+      "inputs": [
+        "criteria",
+        "observations",
+        "structure"
+      ],
+      "outputs": [
+        {
+          "name": "checks.json",
+          "kind": "file:geometry_review_batch"
+        }
+      ],
+      "limitations": "Single deposited TL1A crystal model 2RE9, label entity 1, chains A/B/C. Monomer mapping and relative rotations describe observed coordinates. No solution assembly, binding or functional estimates.",
+      "applicable_domain": null,
+      "purpose": "Compare the frozen original measurements with independent proper least-squares SVD fits."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+      "provider_sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+      "capability_version": "yeast-archive-compare@1",
+      "portable_sha256": "dab3adf688901bbd9a3edb1aedfb7b1b4479ac12113eebed7c3d21f717e7d7c1",
+      "names": {
+        "en": "Compare archived yeast sugar assay coverage",
+        "zh-Hant": "比對酵母糖類測定的收錄範圍",
+        "zh-Hans": "比对酵母糖类测定的收录范围"
+      },
+      "aliases": [
+        "archived yeast",
+        "麦芽糖",
+        "麥芽糖",
+        "異麥芽糖",
+        "异麦芽糖",
+        "酵母",
+        "酶",
+        "酵素",
+        "Rhea",
+        "Swiss-Prot",
+        "EC",
+        "BRENDA",
+        "SABIO-RK",
+        "maltase",
+        "isomaltase",
+        "Compare archived yeast sugar assay coverage",
+        "比對酵母糖類測定的收錄範圍",
+        "比对酵母糖类测定的收录范围",
+        "乳糖",
+        "海藻糖",
+        "異麥芽糖",
+        "异麦芽糖",
+        "註釋",
+        "注释",
+        "菌株",
+        "比較來源",
+        "比较来源",
+        "底物",
+        "S288C",
+        "disaccharide assay",
+        "lactose",
+        "trehalose"
+      ],
+      "inputs": [
+        "prior_records",
+        "query"
+      ],
+      "outputs": [
+        {
+          "name": "comparison.json",
+          "kind": "file:yeast_archive_comparison",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "S. cerevisiae S288C only; four disaccharide archive queries. The target-specific observation depends on exact assay substrate and conditions. Class associations and records shared by multiple proteins cannot establish individual measured activity.",
+      "applicable_domain": {
+        "schema": "gx.science-domain/1",
+        "inputs": {
+          "query": {
+            "json_fields": {
+              "schema": {
+                "one_of": [
+                  "gx.yeast-archive-query/1"
+                ]
+              }
+            }
+          },
+          "prior_records": {
+            "json_fields": {
+              "schema": {
+                "one_of": [
+                  "gx.yeast-archive-parents/1"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "purpose": "Compare a new archived yeast query with a previous parent-records.json, verifying source and residue sequence identity."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-archive@1.0.0",
+      "provider_sha256": "826f8604c13df559737834134e896f7b96d456c2318ac82f3c18a8dd035d1ad6",
+      "capability_version": "yeast-archive-lookup@1",
+      "portable_sha256": "aef7e787ba570664443ebac48d60acec7b6d9ba65fce72f101b3059b75d84695",
+      "names": {
+        "en": "Read archived yeast annotations and assays",
+        "zh-Hant": "查閱酵母糖類註釋與測定存檔",
+        "zh-Hans": "查阅酵母糖类注释与测定存档"
+      },
+      "aliases": [
+        "archived yeast",
+        "麦芽糖",
+        "麥芽糖",
+        "異麥芽糖",
+        "异麦芽糖",
+        "酵母",
+        "酶",
+        "酵素",
+        "Rhea",
+        "Swiss-Prot",
+        "EC",
+        "BRENDA",
+        "SABIO-RK",
+        "maltase",
+        "isomaltase",
+        "Read archived yeast annotations and assays",
+        "查閱酵母糖類註釋與測定存檔",
+        "查阅酵母糖类注释与测定存档",
+        "乳糖",
+        "海藻糖",
+        "異麥芽糖",
+        "异麦芽糖",
+        "菌株",
+        "註釋",
+        "注释",
+        "反應資料庫",
+        "反应数据库",
+        "條目歸屬",
+        "条目归属",
+        "底物",
+        "反應",
+        "反应",
+        "S288C",
+        "disaccharide",
+        "lactose",
+        "trehalose"
+      ],
+      "inputs": [
+        "query"
+      ],
+      "outputs": [
+        {
+          "name": "parent-records.json",
+          "kind": "file:yeast_archive_records",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "S. cerevisiae S288C only; four disaccharide archive queries. The target-specific observation depends on exact assay substrate and conditions. Class associations and records shared by multiple proteins cannot establish individual measured activity.",
+      "applicable_domain": {
+        "schema": "gx.science-domain/1",
+        "inputs": {
+          "query": {
+            "json_fields": {
+              "schema": {
+                "one_of": [
+                  "gx.yeast-archive-query/1"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "purpose": "Query reaction-specific and enzyme-class annotations, documented assays and natural yeast parent identities."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-archive@1.1.0",
+      "provider_sha256": "6cc3449f5bf2f055c0030a9f8f257789adfe8874d8a152fefe529f669e39ba81",
+      "capability_version": "yeast-archive-lookup@2",
+      "portable_sha256": "ecb9e7130a8ef3709e092a32b524d7dcc155a7d07d110f8bcc7f3dc566b44666",
+      "names": {
+        "en": "Read archived yeast annotations and assays",
+        "zh-Hant": "查閱酵母糖類註釋與測定存檔",
+        "zh-Hans": "查阅酵母糖类注释与测定存档"
+      },
+      "aliases": [
+        "archived yeast",
+        "麦芽糖",
+        "麥芽糖",
+        "異麥芽糖",
+        "异麦芽糖",
+        "酵母",
+        "酶",
+        "酵素",
+        "Rhea",
+        "Swiss-Prot",
+        "EC",
+        "BRENDA",
+        "SABIO-RK",
+        "maltase",
+        "isomaltase",
+        "Read archived yeast annotations and assays",
+        "查閱酵母糖類註釋與測定存檔",
+        "查阅酵母糖类注释与测定存档",
+        "乳糖",
+        "海藻糖",
+        "異麥芽糖",
+        "异麦芽糖",
+        "菌株",
+        "註釋",
+        "注释",
+        "反應資料庫",
+        "反应数据库",
+        "條目歸屬",
+        "条目归属",
+        "底物",
+        "反應",
+        "反应",
+        "S288C",
+        "disaccharide",
+        "lactose",
+        "trehalose"
+      ],
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "parent-records.json",
+          "kind": "file:yeast_archive_records",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "S. cerevisiae S288C only; four disaccharide archive queries. The target-specific observation depends on exact assay substrate and conditions. Class associations and records shared by multiple proteins cannot establish individual measured activity.",
+      "applicable_domain": null,
+      "purpose": "Query reaction-specific and enzyme-class annotations, documented assays and natural yeast parent identities."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+      "provider_sha256": "cb22fa0ee07e98c1d3bd64d1ea7c990b745aec880455a036cb146403e7f1b4f4",
+      "capability_version": "yeast-enzyme-mcp@1",
+      "portable_sha256": "f18168f6a31a30f0bf930258f8833ddb8ec2322b00056ae6bb7f63587c18bdba",
+      "names": {
+        "en": "Read UniProt yeast records via MCP",
+        "zh-Hant": "透過 MCP 查閱酵母蛋白紀錄",
+        "zh-Hans": "通过 MCP 查阅酵母蛋白记录"
+      },
+      "aliases": [
+        "Read UniProt yeast records via MCP",
+        "透過 MCP 查閱酵母蛋白紀錄",
+        "通过 MCP 查阅酵母蛋白记录",
+        "資料庫",
+        "数据库",
+        "蛋白質條目",
+        "蛋白质条目",
+        "酵母",
+        "MCP",
+        "UniProt accession"
+      ],
+      "inputs": [
+        "candidates"
+      ],
+      "outputs": [
+        {
+          "name": "mcp-readback.json",
+          "kind": "file:mcp_readback",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+      "applicable_domain": null,
+      "purpose": "Read a selected yeast record through the original MacromNex UniProt MCP."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+      "provider_sha256": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+      "capability_version": "yeast-enzyme-mcp@2",
+      "portable_sha256": "617517c098908017aac55771077c80912fcfa66f7d6568ac3fe6c9f37b4d9a00",
+      "names": {
+        "en": "Read UniProt yeast records via MCP",
+        "zh-Hant": "透過 MCP 查閱酵母蛋白紀錄",
+        "zh-Hans": "通过 MCP 查阅酵母蛋白记录"
+      },
+      "aliases": [
+        "Read UniProt yeast records via MCP",
+        "透過 MCP 查閱酵母蛋白紀錄",
+        "通过 MCP 查阅酵母蛋白记录",
+        "資料庫",
+        "数据库",
+        "蛋白質條目",
+        "蛋白质条目",
+        "酵母",
+        "MCP",
+        "UniProt accession"
+      ],
+      "inputs": [
+        "candidates"
+      ],
+      "outputs": [
+        {
+          "name": "mcp-readback.json",
+          "kind": "file:mcp_readback",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+      "applicable_domain": null,
+      "purpose": "Read a selected yeast record through the original MacromNex UniProt MCP."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+      "provider_sha256": "cb22fa0ee07e98c1d3bd64d1ea7c990b745aec880455a036cb146403e7f1b4f4",
+      "capability_version": "yeast-reaction-index@1",
+      "portable_sha256": "1556ea2cbc36ead801211cb4ea49e995a3ece0681a6e1b6ed480ba6e8ba9cbea",
+      "names": {
+        "en": "Search archived yeast reaction annotations",
+        "zh-Hant": "查閱酵母反應註釋索引",
+        "zh-Hans": "查阅酵母反应注释索引"
+      },
+      "aliases": [
+        "Search archived yeast reaction annotations",
+        "查閱酵母反應註釋索引",
+        "查阅酵母反应注释索引",
+        "海藻糖",
+        "蔗糖",
+        "酵母",
+        "反應索引",
+        "反应索引",
+        "審定條目",
+        "审定条目",
+        "reviewed annotations",
+        "S288C"
+      ],
+      "inputs": [
+        "scope"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "homology.json",
+          "kind": "file:homology",
+          "nature": "analysis"
+        },
+        {
+          "name": "blast.tsv",
+          "kind": "file:blast",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+      "applicable_domain": null,
+      "purpose": "Search reviewed S288C yeast hydrolysis annotations and sequence homologs for trehalose or sucrose."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+      "provider_sha256": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+      "capability_version": "yeast-reaction-index@2",
+      "portable_sha256": "30ce7d9abae575572373314848a82f43a9adee42c522ce6107504a2e2d17c0a4",
+      "names": {
+        "en": "Search archived yeast reaction annotations",
+        "zh-Hant": "查閱酵母反應註釋索引",
+        "zh-Hans": "查阅酵母反应注释索引"
+      },
+      "aliases": [
+        "Search archived yeast reaction annotations",
+        "查閱酵母反應註釋索引",
+        "查阅酵母反应注释索引",
+        "海藻糖",
+        "蔗糖",
+        "酵母",
+        "反應索引",
+        "反应索引",
+        "審定條目",
+        "审定条目",
+        "reviewed annotations",
+        "S288C"
+      ],
+      "inputs": [
+        "scope"
+      ],
+      "outputs": [
+        {
+          "name": "candidates.json",
+          "kind": "file:candidates",
+          "nature": "analysis"
+        },
+        {
+          "name": "homology.json",
+          "kind": "file:homology",
+          "nature": "analysis"
+        },
+        {
+          "name": "blast.tsv",
+          "kind": "file:blast",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+      "applicable_domain": null,
+      "purpose": "Search reviewed S288C yeast hydrolysis annotations and sequence homologs for trehalose or sucrose."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-evidence@1.0.0",
+      "provider_sha256": "cb22fa0ee07e98c1d3bd64d1ea7c990b745aec880455a036cb146403e7f1b4f4",
+      "capability_version": "yeast-uniprot-record@1",
+      "portable_sha256": "96aa0054f44db72f8046b3e33a98bc20b5af714c04749d2eb5e973298cda6a5a",
+      "names": {
+        "en": "Retrieve original reviewed yeast protein entry",
+        "zh-Hant": "取得已審定酵母蛋白原始條目",
+        "zh-Hans": "获取已审定酵母蛋白原始条目"
+      },
+      "aliases": [
+        "Retrieve original reviewed yeast protein entry",
+        "取得已審定酵母蛋白原始條目",
+        "获取已审定酵母蛋白原始条目",
+        "條目",
+        "条目",
+        "歸屬",
+        "归属",
+        "蛋白序列",
+        "酵母",
+        "UniProt accession",
+        "reviewed protein",
+        "original record"
+      ],
+      "inputs": [
+        "candidates"
+      ],
+      "outputs": [
+        {
+          "name": "uniprot.json",
+          "kind": "file:uniprot",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition",
+          "nature": "analysis"
+        },
+        {
+          "name": "record-summary.json",
+          "kind": "file:record_summary",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+      "applicable_domain": null,
+      "purpose": "Acquire the original current reviewed UniProt entry for a selected yeast candidate."
+    },
+    {
+      "provider": "org.gx.yeast-enzyme-evidence@1.0.1",
+      "provider_sha256": "339353651824251a87d12821b08b664b70745e10c6e0dd4190c0492b05c6a01a",
+      "capability_version": "yeast-uniprot-record@2",
+      "portable_sha256": "8c43c764c98a0802bb79a11d6d09ecaf7c5c31fc7306b88bbea6604c1680c198",
+      "names": {
+        "en": "Retrieve original reviewed yeast protein entry",
+        "zh-Hant": "取得已審定酵母蛋白原始條目",
+        "zh-Hans": "获取已审定酵母蛋白原始条目"
+      },
+      "aliases": [
+        "Retrieve original reviewed yeast protein entry",
+        "取得已審定酵母蛋白原始條目",
+        "获取已审定酵母蛋白原始条目",
+        "條目",
+        "条目",
+        "歸屬",
+        "归属",
+        "蛋白序列",
+        "酵母",
+        "UniProt accession",
+        "reviewed protein",
+        "original record"
+      ],
+      "inputs": [
+        "candidates"
+      ],
+      "outputs": [
+        {
+          "name": "uniprot.json",
+          "kind": "file:uniprot",
+          "nature": "observed"
+        },
+        {
+          "name": "acquisition.json",
+          "kind": "file:acquisition",
+          "nature": "analysis"
+        },
+        {
+          "name": "record-summary.json",
+          "kind": "file:record_summary",
+          "nature": "analysis"
+        }
+      ],
+      "limitations": "Only reviewed yeast S288C and the two named sugar hydrolysis queries. Database and homology evidence cannot establish activity or direction on their own.",
+      "applicable_domain": null,
+      "purpose": "Acquire the original current reviewed UniProt entry for a selected yeast candidate."
+    }
+  ]
+}

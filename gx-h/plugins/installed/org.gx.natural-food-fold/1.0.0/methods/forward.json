@@ -1,0 +1,94 @@
+{
+  "manifest": {
+    "capability_id": "natural-food-fold",
+    "version": "1",
+    "kind": "SCIENTIFIC_MODEL",
+    "env_id": "control-plane-python",
+    "entry": {
+      "argv_template": [
+        "{env.python}",
+        "-I",
+        "-B",
+        "{entry_script}",
+        "--specimen",
+        "{in.specimen}",
+        "--collection",
+        "{data.0}",
+        "--runner",
+        "{data.1}",
+        "--python",
+        "{data.2}",
+        "--weight",
+        "{weights.0}",
+        "--out",
+        "{out.dir}"
+      ]
+    },
+    "method_card": {
+      "family": "natural_food_protein_forward_structure",
+      "mechanism": "Use AlphaFold 3 on a registered natural mature food protein, with one JSON specimen containing accession and sequence. The versioned registry lists supported proteins.",
+      "objective": "Produce new predicted coordinates and confidence estimates for an independently sourced evaluation.",
+      "estimator": "Template-free, empty-MSA monomer, seed 1, 10 recycles, one diffusion sample. Native mature chain, without added ions or ligands.",
+      "training_data_lineage": "Mounted AF3 parameters. Prior training exposure to particular public coordinates is unknown; input contains no templates."
+    },
+    "source": {
+      "path": "{harness}/plugins/installed/org.gx.natural-food-fold/1.0.0/job-scripts/predict.py",
+      "sha256": "cfddf557242baa408564b51f3d0620fd4ac37034477f5197a42a88cf74aade0e"
+    },
+    "licence": "GX wrapper; AlphaFold 3 code and weights subject to their local upstream terms. Outputs include model terms.",
+    "licence_basis": "Mounted AF3 source LICENSE, parameter and output terms (included with every model result).",
+    "resources": {
+      "cpu_threads": 2,
+      "wall_seconds": 540,
+      "gpu": {
+        "scope": "natural_food_structure",
+        "memory_mib": 16384
+      }
+    },
+    "weights": [
+      {
+        "path": "{harness}/var/archival-af3/weights/af3.bin.zst",
+        "sha256": "74d0258616917cd122f5eab6d076afe4a8930e96823851e65e4f777dfb1f33ff",
+        "bytes": 1020545840,
+        "load_mode": "NATIVE_FORMAT"
+      }
+    ],
+    "required_data": [
+      "{harness}/plugins/installed/org.gx.natural-food-fold/1.0.0/specimens.json",
+      "{harness}/var/archival-af3/source/run_alphafold.py",
+      "{harness}/var/archival-af3/env/bin/python"
+    ],
+    "outputs": [
+      {
+        "name": "model.cif",
+        "kind": "file:predicted_mmcif",
+        "required": true,
+        "nature": "model_prediction",
+        "source_roles": [
+          "specimen"
+        ]
+      },
+      {
+        "name": "inference.json",
+        "kind": "file:model_execution",
+        "required": true,
+        "nature": "model_prediction",
+        "source_roles": [
+          "specimen"
+        ]
+      },
+      {
+        "name": "TERMS_OF_USE.md",
+        "kind": "file:model_output_terms",
+        "required": true
+      },
+      {
+        "name": "provider-events.jsonl",
+        "kind": "file:provider_log",
+        "required": true
+      }
+    ],
+    "limitations": "Only naturally occurring registered mature food chains. No sequence design, change of residues, ligand/cofactor inference, experimental evidence, or activity prediction."
+  },
+  "entry_script": "job-scripts/predict.py"
+}

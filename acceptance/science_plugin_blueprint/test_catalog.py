@@ -55,7 +55,7 @@ class CatalogDiscovery(unittest.TestCase):
                 self.assertEqual(status, 0, output.getvalue())
                 with CloseStudy(directory, reopen=True) as s:
                     lead = s.next_actor("run")
-                    found = s.call(lead, "gx_query_catalog", {"kind":"all", "query":"Crossref"}, "publications")
+                    found = s.call(lead, "gx_query_catalog", {"kind":"all", "query":"Crossref", "pi_method_scope":[]}, "publications")
                     self.assertIn("scholarly-search@1", {r["reference"] for r in found["items"]})
                     self.assertIn("fixture-grid@1", found["unavailable_installed_metadata"])
                     with self.assertRaises(ScopeDenied):

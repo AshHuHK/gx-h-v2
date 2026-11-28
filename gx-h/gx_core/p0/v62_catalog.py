@@ -302,8 +302,10 @@ def _methods(conn, run_id, inputs):
     goals = conn.execute("SELECT capabilities_json FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
     granted = json.loads(goals[0]) if goals else {}
     bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
+    from . import pi_method_scope
+    allowed = pi_method_scope.ceiling(conn, run_id)
     return [row for row in goal.catalog(conn, run_id)
-            if granted.get(row["capability_version"]) == row["portable_sha256"]
+            if (allowed is None or row["capability_version"] in allowed) and granted.get(row["capability_version"]) == row["portable_sha256"]
             and not intent.forbidden_capability(*row["capability_version"].rsplit("@", 1), bans)]
 
 

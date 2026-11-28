@@ -71,6 +71,9 @@ def _same_goal(saved, requested):
     for policy in ("discovery_policy", "harness_policy"):
         if policy not in saved and policy in requested:
             requested = {key: value for key, value in requested.items() if key != policy}
+    from . import harness_policy
+    if saved.get("harness_policy") == harness_policy.LEGACY_VERSION and requested.get("harness_policy") == harness_policy.VERSION:
+        requested = {**requested, "harness_policy": saved["harness_policy"]}
     if "task_card" not in saved and "task_card" in requested:
         # Earlier releases stored only the rendered terms. Keep that exact Goal resumable.
         card = requested["task_card"]

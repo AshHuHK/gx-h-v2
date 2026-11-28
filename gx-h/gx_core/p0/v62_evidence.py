@@ -63,6 +63,18 @@ def _observation(conn, run_id, gate, consumer):
         _invalid(conn, run_id, gate, "producer revision differs", "Commission a node for the intended producer version")
     if not record["job_id"] or not record["result_ref"] or not record["result_sha"]:
         _invalid(conn, run_id, gate, "missing immutable producer output", "Restore the original Job completion and output")
+    if "output_name" in gate or "source_role" in gate:
+        from . import v62_outputs
+        inventory = v62_outputs.recorded_outputs(conn, run_id, record["job_id"], check_publications=True)
+        outputs = inventory[0] if inventory else ()
+        matches = [o for o in outputs if (o["output_name"] == gate["output_name"] if "output_name" in gate
+                                          else o["artifact_ref"] == record["result_ref"])
+                   and o["nature"] in {"analysis", "observed", "model_prediction"}
+                   and any(i["artifact_ref"] == gate["source_ref"] and i["role"] == gate.get("source_role",i["role"])
+                           for i in o["source_inputs"])]
+        if len(matches) != 1:
+            _invalid(conn, run_id, gate, "named output lacks the measured source", "Check the frozen method and named output")
+        record = dict(record, result_ref=matches[0]["artifact_ref"], result_sha=matches[0]["sha256"])
     _visible_result(conn, run_id, consumer, record, gate)
     if gate["source_ref"] not in json.loads(record["spec_json"])["inputs"]:
         _invalid(conn, run_id, gate, "unrelated source assignment", "Revise the assignment to cite the actual measured input")
@@ -98,7 +110,8 @@ def _source_pin(conn, run_id, gate, observation):
     if v621_policy.enabled(conn, run_id):
         from .v6_jobs import confirmed_result_identity
         confirmed_result_identity(conn, gate["producer_node"], proof)
-    source = next((i for i in proof["admission"]["inputs"] if i["artifact_ref"] == gate["source_ref"]), None)
+    source = next((i for i in proof["admission"]["inputs"] if i["artifact_ref"] == gate["source_ref"]
+                   and i["role"] == gate.get("source_role",i["role"])), None)
     result = next((i for i in (proof["completion"] or {}).get("outputs", [])
                    if i["artifact_ref"] == observation["result_ref"]), None)
     if (proof["admission"]["run_id"] != run_id or not source or not result

@@ -130,8 +130,9 @@ def _restore(install_root, catalog_path, owner, closure, adapter):
     held = _load([owner], closure)
     package = held.get(owner.id, owner.version, owner.digest)
     if adapter:
-        package = _load([adapter]).get(adapter.id, adapter.version, adapter.digest)
-    return package
+        held = _load([adapter])
+        package = held.get(adapter.id, adapter.version, adapter.digest)
+    return package, held
 
 
 def _provider(row):
@@ -140,7 +141,35 @@ def _provider(row):
     owner = _pin(row["plugin"])
     closure = tuple(_pin(p) for p in row.get("provider_closure", ()))
     adapter = _compatibility().get(owner)
-    return _restore(config.HARNESS_ROOT, config.CONFIG_DIR, owner, closure or None, adapter)
+    return _restore(config.HARNESS_ROOT, config.CONFIG_DIR, owner, closure or None, adapter)[0]
+
+
+@lru_cache(maxsize=128)
+def _effective_provider(install_root, catalog_path, owner, frozen, adapter):
+    # Include only packages used by this provider. A seat may have unrelated plugins installed.
+    package, loaded = _restore(install_root, catalog_path, owner, frozen or None, adapter)
+    seen = set()
+    def visit(plugin):
+        if plugin.pin in seen:
+            return
+        seen.add(plugin.pin)
+        for dep in plugin.manifest.dependencies:
+            candidate = next((p for p in loaded.plugins.values()
+                              if p.pin.id == dep.id and p.pin.version == dep.version), None)
+            if candidate:
+                visit(candidate)
+    visit(package)
+    return {"provider": _document(package.pin), "dependencies":
+            [_document(pin) for pin in sorted(seen - {package.pin}, key=lambda p: (p.id, p.version, p.digest))]}
+
+
+def effective_provider(row):
+    if not row.get("plugin"):
+        return None
+    owner = _pin(row["plugin"])
+    return _effective_provider(config.HARNESS_ROOT, config.CONFIG_DIR, owner,
+                               tuple(_pin(p) for p in row.get("provider_closure", ())),
+                               _compatibility().get(owner))
 
 
 def catalog(conn, run_id):

@@ -15,7 +15,7 @@ LIST = {"type": "array", "items": TEXT, "uniqueItems": True, "minItems": 1}
 REVISION = {"type": "integer", "minimum": 1}
 
 
-def with_operations(body):
+def with_operations(body, *, reinterpretation=False):
     """Extend only a newly pinned Run Lead's private copy of the decision schema."""
     body = deepcopy(body)
     props = body["properties"]
@@ -34,6 +34,9 @@ def with_operations(body):
          ["revision"], {"revision": REVISION, "evidence_refs": LIST, "feedback_id": TEXT}),
     ]
     for op, description, required, fields in specifications:
+        if op == "reopen_intent" and reinterpretation:
+            description += (" Or cite an already visible original that this route did not use and explain in "
+                            "the decision rationale which previous conclusion changes and why.")
         variants.append({"type": "object", "description": description, "additionalProperties": False,
                          "required": ["op", "intent", *required],
                          "properties": {"op": {"const": op}, "intent": TEXT, **fields}})
@@ -77,10 +80,22 @@ def _evidence_ref(conn, rid, ref):
     return None if kind and kind[0] in ("research_brief", "research_decision") else ref
 
 
+def _source_identities(conn, rid, refs):
+    """Compare the underlying bytes of artifact and observation aliases at a frozen decision."""
+    return {row[0] for row in conn.execute("""SELECT DISTINCT a.sha256 FROM json_each(?) selected
+        LEFT JOIN events e ON e.subject_kind='source' AND e.subject_id=selected.value
+          AND e.run_id=? AND e.kind='v6.observation.added'
+        JOIN artifacts a ON a.artifact_ref=coalesce(json_extract(e.payload_json,'$.artifact_ref'),selected.value)
+          AND a.run_id=? AND a.kind NOT IN ('research_brief','research_decision')""",
+        (json.dumps(sorted(refs)),rid,rid))}
+
+
 def _new_basis(conn, request, route, spec):
+    from . import harness_policy
     rid, basis = request["run_id"], route["last_context_ref"]
     if basis == request["context_ref"]:
         raise SchemaInvalid("A reopened route needs evidence received after its settled revision")
+    policy = harness_policy.current(conn, rid)
     if feedback := spec.get("feedback_id"):
         current = conn.execute("SELECT snapshot_json FROM research_contexts WHERE run_id=? AND context_ref=?",
                                (rid, request["context_ref"])).fetchone()
@@ -90,18 +105,34 @@ def _new_basis(conn, request, route, spec):
                             AND subject_id=? AND kind='v6.route.revised' ORDER BY event_id DESC LIMIT 1""",
                             (rid, route["intent"])).fetchone()
         if delivered and last and delivered["event_id"] > last[0]:
-            return
+            return {"kind":"pi_feedback","feedback_id":feedback} if policy else None
         raise ScopeDenied("Reopening requires new PI feedback delivered to this Lead after the route decision")
-    prior = conn.execute("""SELECT t.visible_refs_json,d.request_json FROM v6_decision_tasks t
+    prior = conn.execute("""SELECT t.visible_refs_json,d.request_json,d.decision_ref FROM v6_decision_tasks t
                          JOIN v6_decisions d ON d.task_id=t.task_id WHERE t.run_id=? AND t.context_ref=?""",
                          (rid, basis)).fetchone()
     if not prior:
         raise StaleRevision("The settled route's original decision is unavailable")
-    seen = set(json.loads(prior[0])) | set(json.loads(prior[1])["decision"]["evidence_refs"])
-    new_refs = {_evidence_ref(conn, rid, ref) for ref in spec.get("evidence_refs", ())} - {None}
-    if new_refs - seen:
-        return
-    raise SchemaInvalid("Cite new evidence or identify new PI feedback for this route")
+    previous = json.loads(prior["request_json"])["decision"]
+    seen = set(json.loads(prior["visible_refs_json"])) | set(previous["evidence_refs"])
+    references = spec.get("evidence_refs", [])
+    if not policy:
+        new_refs = {_evidence_ref(conn, rid, ref) for ref in references} - {None}
+        if new_refs - seen:
+            return None
+        raise SchemaInvalid("Cite new evidence or identify new PI feedback for this route")
+    cited = _source_identities(conn,rid,references)
+    previous_sources = route.get("evidence_refs", [])
+    reason = request["decision"]["rationale"]
+    if cited - _source_identities(conn,rid,seen):
+        kind = "new_evidence"
+    elif (cited - _source_identities(conn,rid,previous_sources)
+          and reason.split() != previous["rationale"].split()):
+        kind = "reinterpretation"
+    else:
+        raise SchemaInvalid("Cite new evidence or a previously visible source unused by this route, "
+                            "and explain how its interpretation changes the settled conclusion.")
+    return {"kind":kind, "prior_revision":route["revision"], "prior_decision_ref":prior["decision_ref"],
+            "prior_evidence_refs":previous_sources, "change_reason":reason}
 
 
 def compile_intents(conn, request, graph, ops, aliases):
@@ -172,7 +203,10 @@ def compile_intents(conn, request, graph, ops, aliases):
             if refs and not any(_evidence_ref(conn, request["run_id"], ref) for ref in refs):
                 raise SchemaInvalid("Cite an original material, observation, report or scientific finding")
             if op == "reopen_intent":
-                _new_basis(conn, request, route, spec)
+                basis = _new_basis(conn, request, route, spec)
+                if basis:
+                    route["reopen_basis"] = basis
+                    item["reopen_basis"] = basis
             route["phase"] = {"resolve_intent": "RESOLVED", "converge_intent": "CONVERGED", "reopen_intent": "OPEN"}[op]
             route["evidence_refs"] = refs
             if "feedback_id" in spec:
@@ -191,6 +225,8 @@ def record(conn, plan, item, decision_ref):
     payload = {"scope": "run", "goal_version": plan.request["goal_version"], "context_ref": plan.request["context_ref"],
                "op": spec["op"], "revision": spec.get("revision", 0) + 1, "decision_ref": decision_ref,
                "graph_version": plan.result_head["version"]}
+    if "reopen_basis" in item:
+        payload["reopen_basis"] = item["reopen_basis"]
     if "needs_decision" in item:
         payload["needs_decision"] = item["needs_decision"]
     store.append_event(conn, run_id=plan.request["run_id"], kind="v6.route.revised", actor=plan.thread_id,

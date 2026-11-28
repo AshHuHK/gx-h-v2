@@ -600,6 +600,14 @@ class Roots:
                 from . import catalog_survey
                 guidance = catalog_survey.OPENING_INSTRUCTION if harness_policy.enabled(packet) else catalog_survey.INSTRUCTION
                 params["developerInstructions"] += " " + guidance
+                if packet.get("pi_method_scope", {}).get("status") == "pending":
+                    params["developerInstructions"] += (
+                        " In that same opening gx_query_catalog(kind=all), supply pi_method_scope interpreting the "
+                        "immutable PI Goal (read full_brief_ref if clipped). Use [] for no method clauses. "
+                        "Separate explicit whole-study boundaries, stage order and preferences; a quoted author's "
+                        "position is not a PI instruction. For genuine ambiguity hold only the affected methods. "
+                        "On PI updates inspect inherited clauses before proposing an explicit release."
+                    )
             if packet.get("evidence_policy") in v621_policy.GOVERNED:
                 params["developerInstructions"] += (
                     " For a numbered finding from a measurement with declared metrics, cite its output and "
@@ -1090,6 +1098,12 @@ class Roots:
                 return {"success": True, "contentItems": [{"type": "inputText", "text": ids.canonical_json(out)}]}
             if p.get("tool") in self.mode.decision_tools:
                 status = "ACCEPTED"
+                if (p["tool"] == v62_native.REPORT and out.get("delivery_advisory")
+                        and out["author"].get("call_id") == p["callId"]):
+                    # This signed report is already terminal and released. Deliver its
+                    # single scoped advisory to the original callback; the terminal
+                    # owner can interrupt immediately without waiting on an unanswered call.
+                    return {"success":True,"contentItems":[{"type":"inputText","text":ids.canonical_json(out)}]}
                 suppress = True
                 return NO_TOOL_RESPONSE
             if p.get("tool") == "gx_submit_product" and isinstance(out, dict):

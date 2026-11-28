@@ -56,9 +56,13 @@ class SurveyedStudy(CloseStudy):
     def bind(self, task_id):
         actor = super().bind(task_id)
         if actor.scope == "run":
-            survey = self.brief(actor).get("catalog_discovery")
-            if survey and not survey.get("survey_event"):
-                self.call(actor, "gx_query_catalog", {"kind": "all"}, "scripted-catalog-survey")
+            brief = self.brief(actor)
+            survey = brief.get("catalog_discovery")
+            pending = brief.get("pi_method_scope", {}).get("status") == "pending"
+            if survey and (not survey.get("survey_event") or pending):
+                # This fixture's neutral Goal has no PI method clauses.
+                args = {"kind": "all", **({"pi_method_scope": []} if pending else {})}
+                self.call(actor, "gx_query_catalog", args, "scripted-catalog-survey")
         return actor
 
 

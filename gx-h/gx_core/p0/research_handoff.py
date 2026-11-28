@@ -31,7 +31,9 @@ def hint_spec(brief):
                   "source_refs":{"type":"array","maxItems":8,"uniqueItems":True,"items":{"type":"string"}}}
     return {**HINT_SPEC, "description":"Share a direct peer hint, or exchange research on a topic within this Goal. "
             "Subscribe to see past and new findings. Publish a question, interpretation and/or original source refs. "
-            "For synthesis cite all parent_hint_ids. Forward, correct, retract or read revision history by parent_hint_ids. "
+            + ("Synthesize parent_hint_ids from any topics of this Goal; recipients must be able to read every parent. "
+               if brief.get("harness_policy") == harness_policy.VERSION else "For synthesis cite all parent_hint_ids. ")
+            + "Forward, correct, retract or read revision history by parent_hint_ids. "
             "gx_task_context returns available topics and unread changes. Interpretations require independent source checks.",
             "inputSchema":{**original,"required":["operation_key"],"properties":properties}}
 

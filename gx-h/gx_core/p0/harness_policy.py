@@ -1,16 +1,25 @@
 """Freeze the research control contract independently of scientific evidence grading."""
-VERSION = "gx.harness/2"
+LEGACY_VERSION = "gx.harness/2"
+VERSION = "gx.harness/3"
 
 
 def enabled(snapshot):
-    return (snapshot or {}).get("harness_policy") == VERSION
+    return (snapshot or {}).get("harness_policy") in (LEGACY_VERSION, VERSION)
 
 
-def active(conn, run_id):
+def version(conn, run_id):
     row = conn.execute(
         "SELECT json_extract(inputs_json, '$.inputs.harness_policy') FROM runs WHERE run_id=?", (run_id,)
     ).fetchone()
-    return row is not None and row[0] == VERSION
+    return row[0] if row is not None else None
+
+
+def active(conn, run_id):
+    return version(conn, run_id) in (LEGACY_VERSION, VERSION)
+
+
+def current(conn, run_id):
+    return version(conn, run_id) == VERSION
 
 
 def inferable_fields(decision_body):

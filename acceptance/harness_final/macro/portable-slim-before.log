@@ -1,0 +1,26 @@
+test_two_new_materials_filter_decisions_no_old_approval (test_portable_stages.PortableStages.test_two_new_materials_filter_decisions_no_old_approval) ... ERROR
+
+======================================================================
+ERROR: test_two_new_materials_filter_decisions_no_old_approval (test_portable_stages.PortableStages.test_two_new_materials_filter_decisions_no_old_approval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/gxh-final-portable/acceptance/harness_final/macro/test_portable_stages.py", line 127, in test_two_new_materials_filter_decisions_no_old_approval
+    saved=s.call(lead,"gx_save_recipe",args,"save")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-deploy-slim/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-deploy-slim/gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-deploy-slim/gx-h/gx_core/p0/v6_native.py", line 341, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-deploy-slim/gx-h/gx_core/p0/v6_native.py", line 406, in _call
+    raise SchemaInvalid("Invalid arguments to " + tool + ": " + ", ".join(failures), details=details)
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Invalid arguments to gx_save_recipe: $: property 'decision_points' is not allowed, $: property 'evaluation' is not allowed
+
+----------------------------------------------------------------------
+Ran 1 test in 6.001s
+
+FAILED (errors=1)

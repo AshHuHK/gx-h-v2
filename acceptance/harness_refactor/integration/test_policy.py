@@ -12,7 +12,7 @@ from contextlib import closing
 from gx_core.p0.research import _same_goal
 
 ROOT = Path(__file__).resolve().parents[3]
-POLICY = "gx.harness/2"
+POLICY = "gx.harness/3"
 
 
 class ResearchPolicy(unittest.TestCase):
@@ -40,4 +40,5 @@ class ResearchPolicy(unittest.TestCase):
         old = {"objective": "Report a supported comparison.", "capabilities": [], "discovery_policy": "gx.catalog/1"}
         current = {**old, "harness_policy": POLICY}
         self.assertTrue(_same_goal(old, current))
+        self.assertTrue(_same_goal({**old, "harness_policy": "gx.harness/2"}, current))
         self.assertFalse(_same_goal(old, {**current, "objective": "A different question."}))

@@ -25,6 +25,11 @@ def capture(conn, run_id, args, node_slots, external, produced, required):
     if not record or not record["outcome_event"]:
         raise SchemaInvalid("Save the join after it has woken the Lead on its actual upstream outcomes")
     spec = record["spec"]
+    if record.get("instance"):
+        from .recipe_instances import Producers
+        spec = Producers(conn,run_id,record).physical_spec(spec)
+        if not spec:
+            raise SchemaInvalid("Select a Join with actual producers when saving performed work")
     material = ArtifactService(conn)
     inputs = v62_catalog._inputs(conn, run_id)
     source_catalog = inputs.get("research_catalog", {})
@@ -224,7 +229,9 @@ def expand(conn, run_id, definition, digest, arguments, answer, *, visible_refs=
         answer.pop("submission", None)
     version = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()[0]
     # The prefix names one instance across the transition from local branch alias to durable branch ID.
-    identity = ids.sha256_of_obj([definition["reference"], digest, version, prefix, bindings])[:24]
+    from . import harness_policy, recipe_instances
+    identity = recipe_instances.identity(conn, run_id, definition["reference"], digest, version, prefix, bindings, branch)
+    modern = harness_policy.current(conn,run_id)
     keys = {m["slot"]:"recipe-" + identity + "-" + m["slot"] for m in macro["modules"]}
     aliases = {s:"module_" + ids.sha256_of_obj([run_id, key])[:32] for s,key in keys.items()}
     reports = {}
@@ -271,12 +278,15 @@ def expand(conn, run_id, definition, digest, arguments, answer, *, visible_refs=
                     "operation_key": key, "round": number,
                     "focus": module["question"], "expected_delivery": module["expected_delivery"],
                     "input_refs": selected, "capabilities": module["capabilities"], "tools": tools,
-                    "sub_budget": module["sub_budget"], "wake_on": module["wake_on"]}
+                    "wake_on": module["wake_on"]}
+            if "sub_budget" in module:
+                args["sub_budget"] = module["sub_budget"]
             if "gx_decide_revision" in tools:
                 args["method_choices"] = options
             if "communication" in module:
                 args["communication"] = module["communication"]
             calls.append({"tool":"gx_open_module", "arguments":args, "slot":slot,
+                          **({"needed_arguments":["sub_budget"]} if "sub_budget" not in args else {}),
                           "module_instance_id":mid, "opened":False})
     gate = macro["join"]
     ports, missing = [], []
@@ -307,4 +317,13 @@ def expand(conn, run_id, definition, digest, arguments, answer, *, visible_refs=
     answer["adoption"] = ("Submit the chosen computation ops and module_calls on this Goal. When computations feed "
                           "a module or join, re-expand with the same prefix and new material bindings. Register "
                           "join_call after its producers exist. Decide from this Goal's resulting evidence.")
+    if modern:
+        from . import research_joins
+        answer["instance_key"] = "recipe-" + identity
+        existing = research_joins.lookup(conn,run_id,answer["instance_key"])
+        if existing:
+            answer["logical_join"] = {key:existing[key] for key in ("key","revision","state","registration_event","outcome_event")}
+        answer["instructions"] = answer["adoption"] = ("Previewing is read-only. Adopt with adopt=true or submit an issued module commission "
+                              "or computation. GX then watches the named dependencies even for producers not yet born. "
+                              "Set each commission's sub_budget from this Goal. Continue with the same branch, prefix and bindings.")
     return answer

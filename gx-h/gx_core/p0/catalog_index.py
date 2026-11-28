@@ -10,7 +10,7 @@ from ..artifacts import ArtifactService
 from ..capabilities import input_domain, manifest, shipped
 from ..errors import GxError, SchemaInvalid, ScopeDenied
 from ..plugins import goal, loader
-from . import capability_views, catalog_facts, catalog_resources, harness_policy, intent, method_health, module_methods, v62_catalog
+from . import capability_views, catalog_facts, catalog_resources, catalog_terms, harness_policy, intent, method_health, module_methods, v62_catalog
 
 
 def installed_methods():
@@ -32,6 +32,7 @@ def _installed(root, directory, revisions):
     builtins = {c["capability_version"]: c for c in v62_catalog._release_method_cards(unavailable=unavailable, with_dependencies=True)}
     rows = []
     provided = set()
+    local_terms, translations = catalog_terms.declarations(packages.plugins.values(), unavailable)
     for package in packages.plugins.values():
         labels = package.manifest.labels
         collections = [t.strip() for t in labels.get("gx_capability_collections", "").split(",") if t.strip()]
@@ -58,8 +59,10 @@ def _installed(root, directory, revisions):
                 except (GxError, KeyError, TypeError, ValueError, OSError):
                     unavailable.append(f"{provider} / {cap}")
                     continue
+            terms = local_terms.get((provider, cap)) or translations.get((provider, cap, card["portable_sha256"]), {})
             rows.append(dict(card, provider=provider, provider_sha256=package.pin.digest,
-                             aliases=aliases, collections=collections,
+                             aliases=[*aliases, *terms.get("aliases", ())], collections=collections,
+                             **({"names": terms["names"]} if terms else {}),
                              **({"catalog_kind": declared_kind} if declared_kind in ("research", "database") else {})))
             provided.add(cap)
     rows.extend(dict(card, provider=None, collections=[], aliases=[])
@@ -141,7 +144,7 @@ def _method_rows(conn, run_id, brief, inputs, active_rows):
     scope = brief["scope"]
     survey = False
     allowed = None
-    options = capability_views.goal_options(inputs) if scope == "run" else {}
+    options = capability_views.active_options(conn, run_id, inputs) if scope == "run" else {}
     if scope != "run":
         from . import v62_modules
         record = v62_modules.require_active(conn, run_id, scope)
@@ -204,6 +207,8 @@ def _method_rows(conn, run_id, brief, inputs, active_rows):
         detail = {k: v for k, v in card.items() if not k.startswith("_")}
         if granted and scope == "run":
             detail = {k: v for k, v in active[key].items() if k not in ("content_artifact_ref", "provider_closure")}
+        if card.get("names"):
+            detail = dict(detail, names=card["names"], aliases=card["aliases"])
         summary = v62_catalog._method_summary(card)
         row = {**card, "reference": cap, "kind": "method", "category": summary["category"], "purpose": summary["purpose"],
                "provider": provider, "digest": digest, "execution_granted": granted, "status": status,
@@ -386,7 +391,9 @@ def query(conn, run_id, brief, args, inputs):
                 summary["execution_health"] = observations.get(row["reference"], {"status": "unobserved"})
         scope_priority = {"available": 0, "selectable": 1, "catalog_only": 2}.get(row["status"], 3)
         domain_fit = summary.get("input_coverage", {}).get("domain", {}).get("status")
-        rank = (not exact, len(missing), domain_fit == "unsupported", -len(matches), scope_priority if words else 0,
+        # Prefer an exact authored name/alias to incidental occurrences in background prose.
+        alias_match = bool(words) and any(_fold(alias) == _fold(query_text).strip() for alias in row.get("aliases", ()))
+        rank = (not exact, len(missing), domain_fit == "unsupported", not alias_match, -len(matches), scope_priority if words else 0,
                 -len(context_matches), scope_priority,
                 row["reference"], row.get("provider") or "")
         results.append((rank, summary, row))

@@ -55,7 +55,7 @@ class SurveySources(unittest.TestCase):
         lead_evidence = extract(lead, "The original records a dry station.")
         private = extract(author, "An alternative interpretation awaits independent verification.")
         shared = extract(author, "The second station remained dry.")
-        self.call(lead, "gx_query_catalog", {})
+        self.call(lead, "gx_query_catalog", {"pi_method_scope": []})
         self.call(lead, "gx_decide_revision", {"decision": draft()})
         finding = {"kind": "counterevidence", "text": "The second station remained dry.",
                    "source_refs": [paper, shared]}

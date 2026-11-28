@@ -1,0 +1,37 @@
+test_method_facts_separate_deployment_and_scientific_execution (acceptance.harness_refactor.catalog.test_open_discovery.OpenDiscovery.test_method_facts_separate_deployment_and_scientific_execution) ... FAIL
+test_real_job_without_query_file (acceptance.harness_refactor.field.test_literal_archive.LiteralArchive.test_real_job_without_query_file) ... FAIL
+
+======================================================================
+FAIL: test_method_facts_separate_deployment_and_scientific_execution (acceptance.harness_refactor.catalog.test_open_discovery.OpenDiscovery.test_method_facts_separate_deployment_and_scientific_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/gxh-final-catalog/acceptance/harness_refactor/catalog/test_open_discovery.py", line 126, in test_method_facts_separate_deployment_and_scientific_execution
+    self.assertEqual(hit["capability_facts"], {"reference_only":False,"installed":True,"dependency_ready":True,"executed_in_run":False})
+AssertionError: {'ref[29 chars]ed': True, 'dependency_ready': False, 'executed_in_run': False} != {'ref[29 chars]ed': True, 'dependency_ready': True, 'executed_in_run': False}
+- {'dependency_ready': False,
+?                      ^^^^
+
++ {'dependency_ready': True,
+?                      ^^^
+
+   'executed_in_run': False,
+   'installed': True,
+   'reference_only': False}
+
+======================================================================
+FAIL: test_real_job_without_query_file (acceptance.harness_refactor.field.test_literal_archive.LiteralArchive.test_real_job_without_query_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/gxh-final-catalog/acceptance/harness_refactor/field/test_literal_archive.py", line 51, in test_real_job_without_query_file
+    settled = study.settle(reply["aliases"]["local:lookup"])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-catalog/acceptance/v62a/interleavings_fixture.py", line 244, in settle
+    check(row["status"] in {"SUCCEEDED","REUSED"}, f"Job {node_id} reached {row['status']}")
+  File "/tmp/gxh-final-catalog/acceptance/v62a/interleavings_fixture.py", line 46, in check
+    raise AssertionError(message)
+AssertionError: Job node_820ed935e35c624ebf68693b70c3281f reached FAILED
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.366s
+
+FAILED (failures=2)

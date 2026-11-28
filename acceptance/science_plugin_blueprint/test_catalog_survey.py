@@ -43,7 +43,7 @@ class CatalogSurvey(unittest.TestCase):
             self.assertEqual(cli.main(["research", "--state", str(directory / "state"), "--run-key", "rain-compare",
                                        "--goal", goal, "--goal-config", str(config)]), 0)
 
-        query = {"kind": "all", "query": "quuxnomatchingmethodzz"}
+        query = {"kind":"all", "query":"quuxnomatchingmethodzz", "pi_method_scope":[]}
         watches = [{"event": "goal_changed", "subject_ref": "run"}]
         def keep_plan(s, lead):
             return s.call(lead, "gx_decide_revision", {"decision": draft(watches=watches)}, "maintain")
@@ -149,7 +149,7 @@ class CatalogSurvey(unittest.TestCase):
             decision = {"decision": draft(watches=[{"event": "goal_changed", "subject_ref": "run"}])}
             args = {"kind": "all", "query": "pluviométrie"}
             opening = study.next_actor("run")
-            self.assertEqual(study.call(opening, "gx_query_catalog", args, "initial")["total"], 0)
+            self.assertEqual(study.call(opening, "gx_query_catalog", {**args, "pi_method_scope":[]}, "initial")["total"], 0)
             study.call(opening, "gx_decide_revision", decision, "initial-decision")
             assets = conf / "research_asset_cards.json"
             cards = json.loads(assets.read_bytes())

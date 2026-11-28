@@ -42,6 +42,18 @@ EVIDENCE_CHECK = {
 }
 
 
+def evidence_check_spec(current=False):
+    if not current:
+        return EVIDENCE_CHECK
+    fields = EVIDENCE_CHECK["properties"]
+    return {**EVIDENCE_CHECK, "description": EVIDENCE_CHECK["description"] +
+            " delivery_completed cites a commissioned report and the actual named outputs of its required "
+            "ports. Without a named output or a committed port this attests only report_received. For a "
+            "specific output include output_ref. Prediction or evaluation requires its own Job grade.",
+            "properties": {**fields, "grade":{"enum":[*fields["grade"]["enum"], "delivery_completed"]},
+                           "module_instance_id":fields["source_ref"], "output_ref":fields["source_ref"]}}
+
+
 def _method_passage(conn, row, receipt):
     location = row["label"].partition(" characters [")[0].split("/")
     if not set(location).intersection(("p", "td", "th")):
@@ -60,16 +72,17 @@ def _method_passage(conn, row, receipt):
 
 def evidence_grade(conn, task, claim):
     from .. import schema
-    from . import v62_outputs
+    from . import harness_policy, v62_outputs
 
     check = claim["evidence_check"]
-    errors = schema.validate(check, EVIDENCE_CHECK)
+    errors = schema.validate(check, evidence_check_spec(harness_policy.current(conn, task["run_id"])))
     if errors:
         raise SchemaInvalid("Invalid evidence check: " + ", ".join(errors))
     label, ref = check["grade"], check["source_ref"]
     required = {
         "body_method_checked": {"receipt_id"}, "model_executed": set(),
         "model_evaluation_checked": {"evaluation_ref", "reference_ref"},
+        "delivery_completed": {"module_instance_id"} | ({"output_ref"} if "output_ref" in check else set()),
     }[label]
     if set(check) != {"grade", "source_ref"} | required:
         raise SchemaInvalid(f"{label} requires exactly {sorted(required)} in addition to its source_ref")
@@ -77,20 +90,26 @@ def evidence_grade(conn, task, claim):
     if not refs.issubset(claim["evidence_refs"]):
         raise SchemaInvalid("Cite each original named in the evidence grade")
     rid = task["run_id"]
+    if label == "delivery_completed":
+        from . import research_report_facts
+        return research_report_facts.completed_delivery(conn, task, check, refs=claim["evidence_refs"])
     if label == "body_method_checked":
-        row = conn.execute("""SELECT s.blob_sha256,r.segment_id,r.text_sha256,seg.label,s.source_id
+        from .research_closeout import read_authority_sql
+        cited_reports = claim["evidence_refs"] if task["scope"] == "run" and harness_policy.current(conn, rid) else []
+        row = conn.execute(f"""SELECT s.blob_sha256,r.segment_id,r.text_sha256,seg.label,s.source_id,t.scope AS reader_scope
             FROM source_reads r JOIN sources s USING(source_id)
             JOIN source_segments seg ON seg.source_id=s.source_id AND seg.segment_id=r.segment_id
               AND seg.text_sha256=r.text_sha256 AND seg.kind='body'
-            JOIN v6_decision_tasks t ON t.task_id=r.task_id AND t.scope=? AND t.run_id=s.namespace
-            WHERE r.receipt_id=? AND s.namespace=? AND s.blob_artifact_ref=? AND s.text_coverage='FULL_TEXT'
+            JOIN v6_decision_tasks t ON t.task_id=r.task_id AND t.run_id=s.namespace
+            WHERE {read_authority_sql('s.blob_artifact_ref')} AND r.receipt_id=? AND s.namespace=? AND s.blob_artifact_ref=? AND s.text_coverage='FULL_TEXT'
               AND s.status='PARSED' AND s.retraction_status IS NOT 'RETRACTED'""",
-                           (task["scope"], check["receipt_id"], rid, ref)).fetchone()
+                           (task["scope"], json.dumps(cited_reports), check["receipt_id"], rid, ref)).fetchone()
         if not row or not _method_passage(conn, row, check["receipt_id"]):
             raise SchemaInvalid("Body-method grade requires a delivered body passage in a method section "
                                 "or its exact anchored method-detail extraction",
                                 details={"field":"evidence_check.receipt_id"})
-        return {**check, "source_sha256":row["blob_sha256"], "segment_id":row["segment_id"],
+        author = {"reader_scope":row["reader_scope"]} if row["reader_scope"] != task["scope"] else {}
+        return {**check, **author, "source_sha256":row["blob_sha256"], "segment_id":row["segment_id"],
                 "text_sha256":row["text_sha256"], "locator":row["label"]}
     def classify(artifact):
         return v62_outputs.classify(conn, rid, artifact, scope=task["scope"], through_event=task["event_cursor"])

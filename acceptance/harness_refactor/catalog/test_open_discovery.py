@@ -50,8 +50,11 @@ class OpenDiscovery(unittest.TestCase):
                 ("只查文獻。有哪些公開測量？", None, True), ("Use only the literature. Which studies have paired data?", None, True),
                 ("What evidence exists?", {"capability_collections":[]}, False)]:
             with self.subTest(question=question):
-                self.admit(question, options)
-                choices = capability_views.goal_options(self.inputs)
+                s, lead = self.admit(question, options)
+                clauses = [{"kind":"only", "quote":question.split("。")[0].split(".")[0],
+                            "targets":["public_sources"]}] if expected else []
+                s.call(lead, "gx_query_catalog", {"kind":"all","pi_method_scope":clauses}, "overview")
+                choices = capability_views.active_options(s.conn, s.run_id, self.inputs)
                 self.assertNotIn(LOOKUP, choices)
                 self.assertEqual("scholarly-search@1" in choices, expected)
 
@@ -63,8 +66,10 @@ class OpenDiscovery(unittest.TestCase):
                 ("只查文獻？這種方法會漏掉什麼？", False),
                 ("Literature and archival databases report different coverage. Why?", False)):
             with self.subTest(question=question):
-                self.admit(question)
-                self.assertEqual(LOOKUP in capability_views.goal_options(self.inputs), not scoped)
+                s, lead = self.admit(question)
+                clauses = [{"kind":"only","quote":"本題只查文獻，不要另查","targets":["public_sources"]}] if scoped else []
+                s.call(lead, "gx_query_catalog", {"kind":"all","pi_method_scope":clauses}, "overview")
+                self.assertEqual(LOOKUP in capability_views.active_options(s.conn, s.run_id, self.inputs), not scoped)
 
     def test_project_method_ban_is_checked_against_the_actual_requested_version(self):
         grant = {"intent_items": [{"item_id": "methods", "item_type": "method_ban",
@@ -89,7 +94,7 @@ class OpenDiscovery(unittest.TestCase):
         ref = "tl1a-coordinate-quality@1"
         s, lead = self.admit("What is the quality of these deposited coordinates?",
                              {"plugins": ["org.gx.protein@0.2.0"], "capabilities": [ref]})
-        answer = s.call(lead, "gx_query_catalog", {"kind": "all", "query": ref}, "overview")
+        answer = s.call(lead, "gx_query_catalog", {"kind": "all", "query": ref, "pi_method_scope": []}, "overview")
         self.assertTrue(any(item["reference"] == ref and item["execution_granted"] for item in answer["items"]))
         self.assertIn("survey_event", answer)
 
@@ -98,7 +103,7 @@ class OpenDiscovery(unittest.TestCase):
         with self.assertRaises(SchemaInvalid) as denied:
             s.call(lead, "gx_decide_revision", {"decision": draft(watches=WATCH)}, "before-survey")
         self.assertEqual(denied.exception.details["reason"], "CATALOG_SURVEY_REQUIRED")
-        s.call(lead, "gx_query_catalog", {"query":"quuxnomatchqzx"}, "initial")
+        s.call(lead, "gx_query_catalog", {"query":"quuxnomatchqzx", "pi_method_scope":[]}, "initial")
         s.call(lead, "gx_decide_revision", {"decision":draft(watches=WATCH)}, "wait")
         ref = ArtifactService(s.conn).publish_bytes(namespace=s.run_id + "/sources", kind="operator_source",
                 rel_path="paired.json", data=b'{"note":"paired"}', run_id=s.run_id, media_type="application/json",
@@ -118,10 +123,12 @@ class OpenDiscovery(unittest.TestCase):
             self.assertEqual(other.conn.execute("SELECT COUNT(*) FROM events WHERE kind='research.catalog.surveyed'").fetchone()[0], 1)
 
     def test_method_facts_separate_deployment_and_scientific_execution(self):
+        from acceptance.harness_final.catalog.archive_snapshots import require_archive
+        require_archive(self)
         sample = Path(self.enterContext(tempfile.TemporaryDirectory())) / "query.json"
         sample.write_text(json.dumps({"schema":"gx.yeast-archive-query/1","taxid":559292,"substrate":"lactose"}))
         s, lead = self.admit("Which yeast records are present?", {"input_files":[{"path":str(sample),"role":"query"}]})
-        survey = s.call(lead, "gx_query_catalog", {"query":"酵母反應", "required_outputs":["parent-records.json"]}, "initial")
+        survey = s.call(lead, "gx_query_catalog", {"query":"酵母反應", "pi_method_scope":[], "required_outputs":["parent-records.json"]}, "initial")
         hit = next(item for item in survey["items"] if item["reference"]==LOOKUP)
         self.assertEqual(hit["capability_facts"], {"reference_only":False,"installed":True,"dependency_ready":True,"executed_in_run":False})
         archived = s.call(lead, "gx_query_catalog", {"reference":"gx-understand@legacy"}, "history")

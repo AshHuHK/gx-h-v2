@@ -136,6 +136,9 @@ def deliver(conn, brief, limit):
         packet["catalog_discovery"] = {k: survey[k] for k in ("state_key", "through_event", "survey_event", "opening_survey_event") if k in survey}
     if brief.get("ad_hoc_delegation"):
         packet["ad_hoc_delegation"] = True
+    if "pi_method_scope" in brief:
+        scope = brief["pi_method_scope"]
+        packet["pi_method_scope"] = {k:scope[k] for k in ("status","collections") if k in scope}
     if "capability_view" in brief:
         packet["capability_view"] = brief["capability_view"]
     if brief.get("branch_delegation") is False:
@@ -356,13 +359,18 @@ def deliver(conn, brief, limit):
                     break
     if brief.get("research_joins"):
         for row in reversed(brief["research_joins"]):
-            summary = {k: row[k] for k in ("key", "state", "question", "outcome_event")}
+            summary = {k: row[k] for k in ("key", "state", "question", "outcome_event", "question_id") if k in row}
             if row.get("outcome"):
                 summary.update({k: row["outcome"][k] for k in ("needed", "satisfied_count", "still_possible_count")})
             if not append("research_joins", summary):
                 break
     for item in brief.get("core_materials", []):
-        if not append("core_materials", {"question":item["question"], "ref":item["ref"]}):
+        facts = {k:item[k] for k in ("question", "question_id", "goal_version", "ref", "state") if k in item}
+        # Preserve the ref and the observed incomplete status under a tight
+        # packet budget. The full provider windows remain on the named artifact.
+        if item.get("query_record") and append("core_materials", {**facts, "query_record":item["query_record"]}):
+            continue
+        if not append("core_materials", facts):
             break
     if brief.get("recipe_decisions"):
         for point in reversed(brief["recipe_decisions"]):

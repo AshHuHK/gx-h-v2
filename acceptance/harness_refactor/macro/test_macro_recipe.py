@@ -53,7 +53,10 @@ class NativeMacro(TestCase):
         materials = s.conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (rid,)).fetchone()[0]
         s.materials = [m["artifact_ref"] for m in json.loads(materials)["files"]]
         s.lead = s.next_actor("run")
-        s.call(s.lead, "gx_query_catalog", {"kind":"all"}, "overview")
+        overview = {"kind":"all"}
+        if "pi_method_scope" in s.brief(s.lead):
+            overview["pi_method_scope"] = []
+        s.call(s.lead, "gx_query_catalog", overview, "overview")
 
     def test_native_commission_save_and_rebind(self):
         from tempfile import TemporaryDirectory

@@ -1,0 +1,29 @@
+test_worker_amendment_between_lead_prepare_and_adoption (__main__.ConcurrentDecision.test_worker_amendment_between_lead_prepare_and_adoption) ... ERROR
+
+======================================================================
+ERROR: test_worker_amendment_between_lead_prepare_and_adoption (__main__.ConcurrentDecision.test_worker_amendment_between_lead_prepare_and_adoption)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<full-release>/acceptance/harness_final/concurrency/test_adoption.py", line 46, in test_worker_amendment_between_lead_prepare_and_adoption
+    adopted = lead_study.call(lead, v6_native.DECIDE, {"decision":lead_draft}, "lead-write")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<baseline-release>/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<baseline-release>/gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "<baseline-release>/gx-h/gx_core/p0/v6_native.py", line 341, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "<baseline-release>/gx-h/gx_core/p0/v6_native.py", line 499, in _call
+    answer = v6_decisions.commit(roots.conn, prepared)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<baseline-release>/gx-h/gx_core/p0/v6_decisions.py", line 550, in commit
+    raise StaleRevision("The graph moved during preparation; retry the decision on the current graph")
+gx_core.errors.StaleRevision: STALE_REVISION: The graph moved during preparation; retry the decision on the current graph
+
+----------------------------------------------------------------------
+Ran 1 test in 1.535s
+
+FAILED (errors=1)

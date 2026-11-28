@@ -134,6 +134,9 @@ class EvidenceGates(unittest.TestCase):
         with Scenario(study) as s:
             src = s.materials[0]
             opened = s.open("worker", inputs=[src])
+            # Release the opening Lead before the worker creates its private node.
+            # The observation below can then wake a fresh Lead at that graph revision.
+            s.call(s.lead, "gx_decide_revision", {"decision": draft()}, "await-private-producer")
             worker = s.bind(opened["task_id"])
             produced = s.submit_node(worker, "measurement", src)
             inv = produced["aliases"]["local:measurement"]

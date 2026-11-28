@@ -1,0 +1,218 @@
+{
+  "run_id": "gxr_01m8g03m6vk1wg6nqs",
+  "module": "module_0fb285b3937032bb4e2591f6c8dec390",
+  "source_mode": "controlled snapshots, network disabled, actual GX replay Jobs",
+  "author": {
+    "kind": "MODULE",
+    "task_id": "gxt_01m8g03nr24wfdep0f",
+    "context_ref": "gxcx_01m8g03nr11265zxfs",
+    "run_id": "gxr_01m8g03m6vk1wg6nqs",
+    "lease_id": "gxl_01m8g03nrbccf2dewt",
+    "thread_id": "script-gxl_01m8g03nrbccf2dewt",
+    "turn_id": "turn-gxl_01m8g03nrbccf2dewt",
+    "call_id": "report"
+  },
+  "report_ref": "gxa_eeb5eb166573bebcd6b01593ae97972ee07e3a0e7187d374681bb354138789aa",
+  "readings": [
+    {
+      "job_id": "gxj_01m8g03mfjgc35hgzr",
+      "query": "DOI:\"10.1234/example\"",
+      "sha256": "964f27d73bb816369bb1ecc12033a787208333bae6520820a5347e9e8b9af93a",
+      "source_mode": "snapshot_replay",
+      "source_ref": "gxa_01m8g03mtb52d4tg8q",
+      "sources": [
+        {
+          "coverage": "exhausted",
+          "has_more": false,
+          "next_cursor": null,
+          "offset_before": 0,
+          "page": 1,
+          "provider": "europepmc",
+          "provider_hits": 0,
+          "retrieved_at": "2026-11-28T02:35:18.632993+00:00",
+          "returned": 0,
+          "sha256": "692f971ff0ab272c5219dafbc9fe88bf16eb1d1c86a7d0341d25dc589fbc6f4e",
+          "status": "empty"
+        },
+        {
+          "coverage": "unknown",
+          "error": "controlled timeout",
+          "has_more": null,
+          "next_cursor": null,
+          "offset_before": 0,
+          "page": 1,
+          "provider": "crossref",
+          "provider_hits": null,
+          "retrieved_at": "2026-11-28T02:35:18.633143+00:00",
+          "returned": 0,
+          "status": "unavailable"
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8g03mwvdh0hy6mm",
+      "query": "field instrument comparison",
+      "sha256": "3e31da2213ed208aba3b2c66533e0a1f4e9e30d38c552ca39eca362f26d989d4",
+      "source_mode": "snapshot_replay",
+      "source_ref": "gxa_01m8g03n90739x1ras",
+      "sources": [
+        {
+          "coverage": "exhausted",
+          "has_more": false,
+          "next_cursor": null,
+          "offset_before": 0,
+          "page": 1,
+          "provider": "europepmc",
+          "provider_hits": 0,
+          "retrieved_at": "2026-11-28T02:35:18.633399+00:00",
+          "returned": 0,
+          "sha256": "692f971ff0ab272c5219dafbc9fe88bf16eb1d1c86a7d0341d25dc589fbc6f4e",
+          "status": "empty"
+        },
+        {
+          "coverage": "partial",
+          "has_more": true,
+          "next_cursor": "page_two",
+          "offset_before": 0,
+          "page": 1,
+          "provider": "crossref",
+          "provider_hits": 2,
+          "retrieved_at": "2026-11-28T02:35:18.633474+00:00",
+          "returned": 1,
+          "sha256": "1501050120dcf3d20e3464be2209fad2fe6848d7ddb14fb677c92b1ea60e91eb",
+          "status": "hits"
+        }
+      ]
+    },
+    {
+      "job_id": "gxj_01m8g03nbdvcq6zqg9",
+      "query": "DOI:\"10.1234/no-record\"",
+      "sha256": "8ff02b4a1bf960fe8c2d5db90ddbcd51cd6a2cc4305c19145c739cc361fc05ac",
+      "source_mode": "snapshot_replay",
+      "source_ref": "gxa_01m8g03nq5hb2nf495",
+      "sources": [
+        {
+          "coverage": "exhausted",
+          "has_more": false,
+          "next_cursor": null,
+          "offset_before": 0,
+          "page": 1,
+          "provider": "europepmc",
+          "provider_hits": 0,
+          "retrieved_at": "2026-11-28T02:35:18.633759+00:00",
+          "returned": 0,
+          "sha256": "692f971ff0ab272c5219dafbc9fe88bf16eb1d1c86a7d0341d25dc589fbc6f4e",
+          "status": "empty"
+        },
+        {
+          "coverage": "exhausted",
+          "has_more": false,
+          "next_cursor": null,
+          "offset_before": 0,
+          "page": 1,
+          "provider": "crossref",
+          "provider_hits": 0,
+          "retrieved_at": "2026-11-28T02:35:18.633842+00:00",
+          "returned": 0,
+          "sha256": "d778da1593f2cf5de1a356240850034d4bdfd32a6a55e0aa745677343e8478af",
+          "status": "empty"
+        }
+      ]
+    }
+  ],
+  "lead_task": "gxt_01m8g03nsfnppst37b",
+  "close_advisory": {
+    "question": "goal",
+    "question_id": "q_bc4c90284939fa0a657b7290c594eb56",
+    "goal_version": 1,
+    "materials": [
+      {
+        "ref": "gxa_01m8g03mtb52d4tg8q",
+        "state": "query_incomplete",
+        "linked_by": "run",
+        "reason": "Unresolved coverage can change the catalog comparison.",
+        "query_record": {
+          "job_id": "gxj_01m8g03mfjgc35hgzr",
+          "query": "DOI:\"10.1234/example\"",
+          "sha256": "964f27d73bb816369bb1ecc12033a787208333bae6520820a5347e9e8b9af93a",
+          "source_mode": "snapshot_replay",
+          "source_ref": "gxa_01m8g03mtb52d4tg8q",
+          "sources": [
+            {
+              "coverage": "exhausted",
+              "has_more": false,
+              "next_cursor": null,
+              "offset_before": 0,
+              "page": 1,
+              "provider": "europepmc",
+              "provider_hits": 0,
+              "retrieved_at": "2026-11-28T02:35:18.632993+00:00",
+              "returned": 0,
+              "sha256": "692f971ff0ab272c5219dafbc9fe88bf16eb1d1c86a7d0341d25dc589fbc6f4e",
+              "status": "empty"
+            },
+            {
+              "coverage": "unknown",
+              "error": "controlled timeout",
+              "has_more": null,
+              "next_cursor": null,
+              "offset_before": 0,
+              "page": 1,
+              "provider": "crossref",
+              "provider_hits": null,
+              "retrieved_at": "2026-11-28T02:35:18.633143+00:00",
+              "returned": 0,
+              "status": "unavailable"
+            }
+          ]
+        }
+      },
+      {
+        "ref": "gxa_01m8g03n90739x1ras",
+        "state": "query_incomplete",
+        "linked_by": "run",
+        "reason": "Unresolved coverage can change the catalog comparison.",
+        "query_record": {
+          "job_id": "gxj_01m8g03mwvdh0hy6mm",
+          "query": "field instrument comparison",
+          "sha256": "3e31da2213ed208aba3b2c66533e0a1f4e9e30d38c552ca39eca362f26d989d4",
+          "source_mode": "snapshot_replay",
+          "source_ref": "gxa_01m8g03n90739x1ras",
+          "sources": [
+            {
+              "coverage": "exhausted",
+              "has_more": false,
+              "next_cursor": null,
+              "offset_before": 0,
+              "page": 1,
+              "provider": "europepmc",
+              "provider_hits": 0,
+              "retrieved_at": "2026-11-28T02:35:18.633399+00:00",
+              "returned": 0,
+              "sha256": "692f971ff0ab272c5219dafbc9fe88bf16eb1d1c86a7d0341d25dc589fbc6f4e",
+              "status": "empty"
+            },
+            {
+              "coverage": "partial",
+              "has_more": true,
+              "next_cursor": "page_two",
+              "offset_before": 0,
+              "page": 1,
+              "provider": "crossref",
+              "provider_hits": 2,
+              "retrieved_at": "2026-11-28T02:35:18.633474+00:00",
+              "returned": 1,
+              "sha256": "1501050120dcf3d20e3464be2209fad2fe6848d7ddb14fb677c92b1ea60e91eb",
+              "status": "hits"
+            }
+          ]
+        }
+      }
+    ],
+    "outcome": "core_evidence_available",
+    "material_count": 2,
+    "event_id": 134,
+    "next": "Inspect a relevant original, use equivalent evidence, or submit your closing decision with the remaining limitation."
+  },
+  "effective_close": "gxa_a0cd2b7db6fdc91ade3d404732e764f390e375e1a15f5c1d4cc1d76cf04d3eb7"
+}

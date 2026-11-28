@@ -1,0 +1,56 @@
+test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) ...
+  test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias='Which neighborhood comparisons are supported?') ... FAIL
+  test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias='goal') ... ERROR
+  test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias=None) ... ERROR
+test_same_text_for_two_intents_requires_visible_identity (__main__.CoreQuestions.test_same_text_for_two_intents_requires_visible_identity) ... FAIL
+test_unknown_text_cannot_remove_the_root_check (__main__.CoreQuestions.test_unknown_text_cannot_remove_the_root_check) ... FAIL
+
+======================================================================
+ERROR: test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias='goal')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 25, in test_exact_pi_text_matches_same_core_source_as_goal
+    self.assertEqual((response["question_id"],core["ref"]), (core["question_id"],s.materials[0]))
+                      ~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'question_id'
+
+======================================================================
+ERROR: test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 25, in test_exact_pi_text_matches_same_core_source_as_goal
+    self.assertEqual((response["question_id"],core["ref"]), (core["question_id"],s.materials[0]))
+                      ~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'question_id'
+
+======================================================================
+FAIL: test_exact_pi_text_matches_same_core_source_as_goal (__main__.CoreQuestions.test_exact_pi_text_matches_same_core_source_as_goal) (alias='Which neighborhood comparisons are supported?')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 23, in test_exact_pi_text_matches_same_core_source_as_goal
+    self.assertEqual(response["outcome"], "core_evidence_available")
+AssertionError: 'adopted' != 'core_evidence_available'
+- adopted
++ core_evidence_available
+
+
+======================================================================
+FAIL: test_same_text_for_two_intents_requires_visible_identity (__main__.CoreQuestions.test_same_text_for_two_intents_requires_visible_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 45, in test_same_text_for_two_intents_requires_visible_identity
+    with self.assertRaises(SchemaInvalid) as error:
+AssertionError: SchemaInvalid not raised
+
+======================================================================
+FAIL: test_unknown_text_cannot_remove_the_root_check (__main__.CoreQuestions.test_unknown_text_cannot_remove_the_root_check)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/close/test_questions.py", line 32, in test_unknown_text_cannot_remove_the_root_check
+    with self.assertRaises(SchemaInvalid) as error:
+AssertionError: SchemaInvalid not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 5.990s
+
+FAILED (failures=3, errors=2)

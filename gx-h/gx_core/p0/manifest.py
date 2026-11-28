@@ -17,6 +17,8 @@ def _refuse(reason, message, **facts):
 
 def check_capability(conn, run_id, capability, *, review_probe=False, module_binding=None):
     """GX checks the concrete capability, including hard constraints added after planning."""
+    from . import pi_method_scope
+    pi_method_scope.require(conn,run_id,capability)
     if not review_probe and not shipped.participates(conn, run_id, capability, module_binding=module_binding):
         _refuse("run_composition", f"{capability} is outside this Run composition", capability=capability)
     cap_id, version = capability.rsplit("@", 1)
@@ -207,6 +209,9 @@ def admit(conn, job_id, *, launch, bundle, inputs, resources, prepared):
         else:
             from ..plugins import goal
             entry = next((item for item in goal.catalog(conn, run_id) if item["capability_version"] == cap), {})
+        if "execution_provider" in prepared:
+            doc["execution_provider"] = prepared["execution_provider"]
+            doc["program_sha256"] = prepared["program_sha256"]
         if context := prepared.get("deployment_environment"):
             doc["execution_observation"] = {"deployment_environment": context,
                                             "provider_sha256": (entry.get("plugin") or {}).get("sha256")}

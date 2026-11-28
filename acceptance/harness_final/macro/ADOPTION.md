@@ -6,11 +6,13 @@
 
 `computation.json` 的受控 Lead 將配方步驟提交給實際 CPU Job。修改為未綁定的輸入時，該交易未建立節點或 Join；Lead 使用新問題、保持原先綁定後，一次提交同時建立計算與監看。下一個 Lead 收到本題 Job 的具名輸出。
 
+[組合結果](macro-suite.log) 記錄 17/17 通過，包含兩階段配方與原有 Join 測例。受控回調只驗證工具、派工及恢復行為。
+
 從部署根目錄執行
 
 ```bash
 PYTHONPATH="$PWD:$PWD/gx-h:$PWD/gx-h/tests:$PWD/acceptance/v62a" \
 GX_CODEX_OFFLINE=1 GX_ADOPTION_RECEIPT="$PWD/acceptance/harness_final/macro/adoption" \
 .venv/bin/python -B -m unittest -v acceptance.harness_final.macro.test_adoption acceptance.harness_final.macro.test_adopt_computation \
-  acceptance.harness_refactor.macro.test_macro_recipe acceptance.harness_refactor.macro.test_joins
+  acceptance.harness_final.macro.test_portable_stages acceptance.harness_refactor.macro.test_macro_recipe acceptance.harness_refactor.macro.test_joins
 ```

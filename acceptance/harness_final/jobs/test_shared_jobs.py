@@ -5,6 +5,8 @@ from copy import deepcopy
 import json
 import os
 from pathlib import Path
+import signal
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -22,6 +24,7 @@ from gx_core.capabilities import registry
 from gx_core.domain import ids
 from gx_core.jobs import executor
 from gx_core.jobs.service import JobService
+from gx_core.native_release import native_state
 from gx_core.p0 import manifest, v6_jobs, v6_native, v62_modules
 from gx_core.plugins import goal as goal_plugins
 from gx_core.persistence import store
@@ -214,6 +217,34 @@ class SharedJob(unittest.TestCase):
             self.assertNotEqual(outcome["job_id"], failed["job_id"])
             self.assertEqual(s.conn.execute("SELECT count(*) FROM events WHERE kind='v6.node.subscribed'").fetchone()[0], 0)
 
+    def test_sigkill_after_external_cpu_acceptance_fresh_driver_recovers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            s, _, (a,b) = self.start(tmp)
+            def invoke(action):
+                return subprocess.run([sys.executable,"-B","-m","acceptance.harness_final.jobs.test_shared_jobs",
+                    action,str(s.state),s.run_id,a,b], cwd=PRODUCT, env={**os.environ,"GX_CODEX_OFFLINE":"1"},
+                    capture_output=True, text=True, timeout=40)
+            # Relinquish the actual workspace lease before the first standalone driver enters.
+            s.stack.close()
+            interrupted = invoke("--die-after-launch")
+            self.assertEqual(interrupted.returncode, -signal.SIGKILL, interrupted.stderr)
+            with closing(sqlite3.connect((s.state / "gx.db").as_uri() + "?mode=ro", uri=True)) as observed:
+                self.assertEqual(observed.execute("SELECT status FROM jobs").fetchone()[0], "SUBMITTING")
+                self.assertEqual(observed.execute("SELECT count(*) FROM budget_reservations WHERE subject_kind='job' "
+                                                  "AND status='HELD'").fetchone()[0], 1)
+            recovery = invoke("--reconcile-only")
+            self.assertEqual(recovery.returncode, 0, recovery.stderr)
+            receipt = json.loads(recovery.stdout)
+            self.assertEqual(len({r["job_id"] for r in receipt["nodes"]}), 1)
+            self.assertEqual(len({r["result_ref"] for r in receipt["nodes"]}), 1)
+            self.assertCountEqual([r["status"] for r in receipt["nodes"]], ["REUSED","SUCCEEDED"])
+            self.assertEqual(receipt["job_settlements"], 1)
+            if trace := os.getenv("GX_SHARED_PROCESS_TRACE"):
+                external = json.loads((s.state / "observed-real-launch.json").read_text())
+                Path(trace).write_text(json.dumps({"run_id":s.run_id,"exit_code":interrupted.returncode,
+                    "state_at_exit":"SUBMITTING","reservations_held_at_exit":1,
+                    "executor":external, **receipt}, indent=2)+"\n")
+
     def test_execution_key_distinguishes_seed_weights_private_or_independent_work(self):
         with tempfile.TemporaryDirectory() as tmp:
             s, _, (a,b) = self.start(tmp)
@@ -267,5 +298,35 @@ class SharedJob(unittest.TestCase):
             self.assertEqual(len({r["job_id"] for r in rows}), 2)
 
 
+def driver_process(action, state, rid, a, b):
+    with native_state(Path(state)), closing(store.open_store(Path(state) / "gx.db")) as conn:
+        if action == "--die-after-launch":
+            launch = executor.launch
+            def interrupted(directory):
+                receipt = launch(directory)
+                (Path(state) / "observed-real-launch.json").write_text(json.dumps(
+                    {"runner_pid":receipt["runner_pid"],"interrupted_driver_pid":os.getpid()}))
+                os.kill(os.getpid(), signal.SIGKILL)
+            with patch.object(executor, "launch", interrupted):
+                v6_jobs._run_node(conn, v6_jobs._node(conn, rid, a), JobService(conn), None)
+            raise AssertionError("The acceptance boundary never reached the real CPU executor")
+        with patch.object(executor, "launch", side_effect=AssertionError("duplicate external submission")):
+            deadline = time.monotonic() + 30
+            while time.monotonic() < deadline:
+                v6_jobs.advance(conn, rid)
+                rows = [dict(row) for row in conn.execute("SELECT node_id,job_id,status,result_ref FROM v6_nodes "
+                                                          "WHERE node_id IN (?,?) ORDER BY rowid", (a,b))]
+                if all(row["status"] in v6_jobs.NODE_TERMINAL for row in rows):
+                    count = conn.execute("SELECT count(*) FROM budget_reservations WHERE "
+                                         "subject_kind='job' AND status='SETTLED'").fetchone()[0]
+                    print(json.dumps({"recovering_driver_pid":os.getpid(),"nodes":rows,"job_settlements":count}))
+                    return
+                time.sleep(.05)
+            raise TimeoutError("The recovered external execution did not settle")
+
+
 if __name__ == "__main__":
-    unittest.main()
+    if len(sys.argv) == 6 and sys.argv[1] in {"--die-after-launch","--reconcile-only"}:
+        driver_process(*sys.argv[1:])
+    else:
+        unittest.main()

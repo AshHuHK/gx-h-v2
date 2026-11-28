@@ -16,6 +16,8 @@ decision_schema = v6_graph.decision_schema
 
 class GraphAdvanced(Exception):
     """Another decision won the graph CAS. Recompile the original draft after rollback."""
+    def __init__(self, funding_terms):
+        self.funding_terms = funding_terms
 
 
 def head(conn, run_id):
@@ -66,6 +68,7 @@ class Prepared:
     aliases: dict
     watches: list
     funding_pin: tuple | None
+    funding_terms: tuple | None
     config_pin: tuple
     capability_pins: dict
     module_demand: dict
@@ -337,6 +340,7 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
     demand = v6_graph.branch_demand(graph, ops)
     _check_bans(conn, run_id, ops)
     funding = v6_graph.funding_pin(conn, run_id) if demand[1] else None
+    terms = v6_graph.funding_terms(conn, run_id, demand[1]) if funding and harness_policy.current(conn, run_id) else None
     v6_graph.check_funding(conn, run_id, demand)
     manifest = _decision_artifact(conn, request, root, dict(identity, context_ref=task["context_ref"],
                                                              lease_id=lease_id, base=base))
@@ -352,7 +356,7 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         if inventory is None and (declared or any(op["op"] == "close_run" for op in decision["ops"])):
             inventory = v623_endpoint_use.prepare(conn, task)
     return Prepared(request, thread_id, turn_id, call_id, manifest, ids.canonical_json(graph), result, ops,
-                    aliases, watches, funding, config_pin, cap_pins, costs, dependencies, inventory, comparison, selected)
+                    aliases, watches, funding, terms, config_pin, cap_pins, costs, dependencies, inventory, comparison, selected)
 
 
 def _revoke(conn, run_id, where, key):
@@ -555,18 +559,20 @@ def commit(conn, plan):
         if _capability_pins(conn, plan.capability_pins) != plan.capability_pins:
             raise StaleRevision("A capability approval or content pin changed before adoption")
         if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
+            if plan.funding_terms is not None:
+                raise GraphAdvanced(plan.funding_terms)
             raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
         if task["scope"] == "run":
             base = head(conn, run_id)
             if base != request["base"]:
                 if harness_policy.current(conn, run_id):
-                    raise GraphAdvanced()
+                    raise GraphAdvanced(plan.funding_terms)
                 raise StaleRevision("The graph moved during preparation; retry the decision on the current graph")
         if module is not None:
             actual = head(conn, run_id)
             if base != request["original_base"] or actual != request["base"]:
                 if base == request["original_base"] and harness_policy.current(conn, run_id):
-                    raise GraphAdvanced()
+                    raise GraphAdvanced(plan.funding_terms)
                 raise StaleRevision("The graph moved after module preparation; obtain a fresh decision",
                                     details={"reason": "module_graph_conflict", "current_head": actual})
             if plan.module_dependencies:
@@ -696,12 +702,20 @@ def reconsider_module_conflict(conn, identity, error):
                                     "current_head": head(conn, run_id), **error.details})
 
 
+def check_reprepared(plan, original_terms):
+    if original_terms is not None and isinstance(plan, Prepared) and plan.funding_terms != original_terms:
+        raise StaleRevision("Funding changed for a resource committed by this decision")
+
+
 def adopt(conn, **native_call):
+    terms = None
     while True:
         try:
-            return commit(conn, prepare(conn, **native_call))
-        except GraphAdvanced:
-            continue
+            plan = prepare(conn, **native_call)
+            check_reprepared(plan, terms)
+            return commit(conn, plan)
+        except GraphAdvanced as advanced:
+            terms = advanced.funding_terms
         except StaleRevision as exc:
             reconsider_module_conflict(conn, native_call, exc)
             raise

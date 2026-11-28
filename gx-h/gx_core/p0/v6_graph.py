@@ -335,6 +335,30 @@ def funding_pin(conn, run_id):
     return tuple(row) if row else None
 
 
+def funding_terms(conn, run_id, resources):
+    """Describe the actual funding premises of this branch, outside the graph writer."""
+    keys = tuple(sorted(key for key, amount in resources.items() if amount > 0))
+    budget = conn.execute("""SELECT r.project_ref,b.* FROM runs r JOIN budgets b USING(budget_ref)
+                            WHERE r.run_id=?""", (run_id,)).fetchone()
+    if not budget or not keys:
+        return None
+    project = budget["project_ref"]
+    def lines(values):
+        return tuple((key, values[key]) for key in keys if key in values)
+    project_limits = tuple(sorted((item["item_id"], item["version"], ids.canonical_json(item["value"]))
+                                  for item in budgets._formal_project_limits(conn, project)
+                                  if item["value"]["resource"] in keys))
+    phase = budgets._current_phase(conn, project) or {}
+    phase_limits = lines(phase.get("limits", {}))
+    workspace = conn.execute("""SELECT b.limits_json FROM p0_workspace w JOIN budgets b USING(budget_ref)
+                                WHERE w.project_ref=?""", (project,)).fetchone()
+    workspace_limits = lines(json.loads(workspace[0])) if workspace else ()
+    used, held = budgets._project_usage(conn, project, lines=set(keys))
+    return (keys, *(lines(json.loads(budget[column])) for column in ("limits_json", "spent_json", "reserved_json")),
+            project_limits, workspace_limits, (phase.get("phase_id"), phase_limits) if phase_limits else (),
+            lines(used), lines(held))
+
+
 def check_funding(conn, run_id, demand):
     active, additional = demand
     if not additional:

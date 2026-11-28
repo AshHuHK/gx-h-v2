@@ -40,3 +40,40 @@ For the lean installation substitute `6ec604d` as the base. For an existing clos
 ```bash
 .venv/bin/python -B acceptance/harness_final/deploy/cold_reopen.py . /absolute/path/to/original/state gxr_...
 ```
+
+A separate read-only check opens an earlier field archive's genuine saved macro recipe and re-evaluates the original successor's recorded adoption arguments against the closed state. The baseline and candidate projections must have the same card, body and expansion SHA. This check performs zero writes. The original native model work remains attributed to its original installation.
+
+```bash
+.venv/bin/python -B acceptance/harness_final/deploy/archive_recipe.py . /absolute/path/to/hydro/state daily-gauge-volume-review@1
+```
+
+## 實際發行與現場釘選
+
+| 用途 | 完整版 | 精簡版 |
+|---|---|---|
+| 原場研究的凍結產品 | `362157ae` | `e9e41838` |
+| 修復舊 Goal 檢索回歸後的發行產品 | `fd1aa75c` | `8759016c` |
+
+首次整合保留兩條紅色紀錄。兩站的 121 項歷史回歸均在舊 Goal 上失去「文獻」查詢第一頁的 `scholarly-fetch@1`，其餘 120 項通過。修復後舊合同沿用原有排序。精簡站的新證據測項首次因缺少既有來源測試夾具而無法載入，補入完整版既有的同一個檔案後，精簡站可獨立走完官方回調測例。現場科研的凍結版本與後續修正版分列。
+
+兩版自原產品起點共修改 50 個交付檔案。49 個共通檔案的 Git blob 完全相同，另 1 個為站點插件登錄表。精簡站保有唯一的原有 record-coverage 登錄及相同摘要。兩個產品間原先不同的 10 個路徑均保留，包括兩個不同的 CLI 部署入口。發行站逐一從安裝目錄計算 32／33 個插件的位元組摘要，分別驗證 4 組模型與 effort 角色投影及 4 份授權資料庫檔。原資料庫 schema 摘要保持一致，兩版目前合同內容摘要均為 `c22a981602c3fe6a8e0972fc18382a0353e58132bb49da5fd1e01b18c6fe15a2`。
+
+| 歷史科學 Run | 核對後的在庫工作 | 冷開新增 |
+|---|---|---|
+| 完整版 `gxr_01m8fq45p3rfgk2cv5` | /2，514 個 Run 事件，3 個外部 Job、11 份具名原件逐檔核對。 | 0 個 Job、0 個模型回合 |
+| 精簡版 `gxr_01m8frjb04ng1edrvg` | /2，32 個 Run 事件、原場沒有外部 Job。 | 0 個 Job、0 個模型回合 |
+| 精簡版 `gxr_01m8fekb5gbjkvze1w` | 舊版未標記政策，74 個 Run 事件，1 個外部 Job、3 份具名原件。 | 0 個 Job、0 個模型回合 |
+
+另外在每站固定路徑上分別以歷史無標記版本、本站 /2 版本建立並封存有顯式空 scope 的 Goal，再原地升級。四案均保留原 Run、25 個事件及同一報告 SHA，新增工作為零。完整版與精簡版各有一次獨立啟動 CLI 的回執，使用原生研究入口和極短時限檢查安裝。兩次都已開出新 Run，回傳 75 表示到時退出。這兩項是啟動測試。
+
+原水文研究的 `daily-gauge-volume-review@1` 內容摘要為 `9e42621326774cb2b0eebac0c4144aef597065b8ec204e3a770248341ce2188e`。兩個舊版與兩個新站以唯讀方式重播後繼題記錄的原始採納要求，recipe 卡、來源綁定與展開回覆逐位元一致。新舊版本都辨認出已存在的 `computed` 節點，沒有寫入舊實驗。
+
+| 最終測試組 | 完整版 | 精簡版 |
+|---|---:|---:|
+| 掛載站歷史相容 | 121/121 | 121/121 |
+| 掛載站既有 Harness | 92/92 | 92/92 |
+| 掛載站本輪新測（含前版冷開） | 55/55 | 55/55 |
+| 獨立乾淨檢出、確實缺少授權掛載、既有 Harness | 90 通過、2 明示跳過 | 90 通過、2 明示跳過 |
+| 同一乾淨檢出、本輪新測 | 55/55 | 55/55 |
+
+逐案計數、耗時及 SHA 收錄於 [tests.json](receipts/tests.json)。[兩站差異逐檔對照](receipts/release-parity.json) · [現場產品原凍結對照](receipts/formal-parity.json) · [歷史水文配方](receipts/baseF-recipe.json) · [雙語保留集](../holdout/README.md)

@@ -1,0 +1,44 @@
+test_private_producer_cannot_leak_its_scalar_to_another_branch (acceptance.v621.test_evidence_gate.EvidenceGates.test_private_producer_cannot_leak_its_scalar_to_another_branch) ... ERROR
+
+======================================================================
+ERROR: test_private_producer_cannot_leak_its_scalar_to_another_branch (acceptance.v621.test_evidence_gate.EvidenceGates.test_private_producer_cannot_leak_its_scalar_to_another_branch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v6_native.py", line 341, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v6_native.py", line 441, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v6_decisions.py", line 309, in prepare
+    v62_graph.require_compatible(v62_graph.graph_at(conn, run_id, original), previous,
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v62_graph.py", line 53, in require_compatible
+    raise StaleRevision("A graph subject used by this decision changed after its frozen brief",
+gx_core.errors.StaleRevision: STALE_REVISION: A graph subject used by this decision changed after its frozen brief
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/acceptance/v621/test_evidence_gate.py", line 145, in test_private_producer_cannot_leak_its_scalar_to_another_branch
+    receipt = s.call(founder, "gx_decide_revision", {"decision":draft(b, op)}, "preplan")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v6_native.py", line 353, in call
+    replay = remember_refusal(roots, p, key, error, publish=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v6_native.py", line 600, in remember_refusal
+    return saved_result(existing, turn, request_sha) if publish or conflicted_lead is not None else None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/science-assets-slim/gx-h/gx_core/p0/v6_native.py", line 323, in saved_result
+    raise BY_CODE[refusal["code"]](refusal["message"], details=refusal.get("details"))
+gx_core.errors.StaleRevision: STALE_REVISION: A graph subject used by this decision changed after its frozen brief
+
+----------------------------------------------------------------------
+Ran 1 test in 1.361s
+
+FAILED (errors=1)

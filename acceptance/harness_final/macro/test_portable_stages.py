@@ -170,19 +170,23 @@ class PortableStages(unittest.TestCase):
                 lead=s.next_actor("run")
                 points=s.brief(lead)["recipe_decisions"]
                 self.assertTrue(any(q["evidence"]["artifact_ref"]==observation and q["step"]=="screen" for q in points if q.get("evidence")))
+                reading=s.call(lead,"gx_read_artifact",{"ref":observation},"inspect-filter-input")
+                proceed=reading["left_minutes"]==portable_gate["equals"]
+                self.assertEqual(reading["left_minutes"],minutes)
                 decision=draft(evidence=[observation],watches=[{"event":"job_settled","subject_ref":ids["evaluate"]}])
-                if minutes==60:
+                if proceed:
                     decision["approve_nodes"]=[ids["evaluate"]]
                 before = s.rows("SELECT job_id FROM jobs WHERE run_id=?",target)
                 self.assertEqual(len(before), 1)
                 key = "use-this-observation"
-                if minutes==60:
+                if proceed:
                     path=self.folder/"controller-input.json"
                     path.write_text(json.dumps({"work":str(self.folder),"run_id":target,"actor":asdict(lead),"decision":decision,"key":key}))
                     owner=s
                     owner.stack.close()
+                    child_env=dict(os.environ, PYTHONPATH=os.pathsep.join(str(Path(p).resolve()) for p in sys.path))
                     killed=subprocess.run([sys.executable,"-B",str(Path(__file__).resolve()),str(path)],cwd=self.folder,
-                                          text=True,capture_output=True,timeout=30)
+                                          env=child_env,text=True,capture_output=True,timeout=30)
                     self.assertEqual(killed.returncode,-signal.SIGKILL,killed.stderr)
                     first=json.loads(killed.stdout)
                     s=owner.stack.enter_context(Scenario(self.folder,reopen=True))
@@ -194,12 +198,15 @@ class PortableStages(unittest.TestCase):
                     self.assertEqual(first["decision_id"],resumed["decision_id"])
                 else:
                     first=s.call(lead,"gx_decide_revision",{"decision":decision},key)
-                if minutes==60:
+                if proceed:
                     progress=s.settle(ids["evaluate"])
                     self.assertIsNotNone(progress["job_id"])
                     last=s.next_actor("run")
                     self.assertTrue(any(q.get("evidence",{}).get("artifact_ref")==progress["result_ref"]
                         for q in s.brief(last)["recipe_decisions"] if q.get("evidence")))
+                    evaluation_ref=progress["result_ref"]
+                    evaluated=s.call(last,"gx_read_artifact",{"ref":evaluation_ref},"inspect-holdout")
+                    self.assertEqual(evaluated["left_minutes"],62)
                     final=s.call(last,"gx_decide_revision",{"decision":draft(evidence=[progress["result_ref"]])},"interpret-independent")
                     self.assertNotEqual(first["decision_id"],final["decision_id"])
                 else:
@@ -207,8 +214,12 @@ class PortableStages(unittest.TestCase):
                     self.assertEqual(s.rows("SELECT status,job_id FROM v6_nodes WHERE node_id=?",ids["evaluate"]),
                                      [{"status":"BLOCKED","job_id":None}])
                 traces.append({"run_id":target,"condition_minutes":minutes,"jobs":s.rows("SELECT job_id,status FROM jobs WHERE run_id=?",target),
-                    "recovery_after_first_decision":"SIGKILL/reopen/same-receipt" if minutes==60 else None,
-                    "evaluation_material_history":expected_history,"observed":observation,"inputs":s.materials,"first_decision":first["decision_id"],"second_decision":final["decision_id"] if minutes==60 else None})
+                    "recovery_after_first_decision":"SIGKILL/reopen/same-receipt" if proceed else None,
+                    "filter_response":reading,"independent_response":evaluated if proceed else None,
+                    "evaluation_ref":evaluation_ref if proceed else None,"nodes":ids,
+                    "events":s.rows("SELECT event_id,kind,subject_id FROM events WHERE run_id=? AND kind IN ('v62.node.evidence_approved','v6.node.settled','v6.decision.committed') ORDER BY event_id",target),
+                    "turns":[lead.turn]+([last.turn] if proceed else []),
+                    "evaluation_material_history":expected_history,"observed":observation,"inputs":s.materials,"first_decision":first["decision_id"],"second_decision":final["decision_id"] if proceed else None})
         if path:=os.getenv("GX_PORTABLE_STAGES_PROOF"):
             Path(path).write_text(json.dumps({"source_run":rid,"recipe":saved["reference"],"digest":saved["digest"],"target_runs":traces},indent=2)+"\n")
 

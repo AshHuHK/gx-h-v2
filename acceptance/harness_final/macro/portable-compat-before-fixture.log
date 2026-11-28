@@ -1,0 +1,60 @@
+test_calibration_with_an_ordinary_read_only_binder (acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_calibration_with_an_ordinary_read_only_binder) ... ok
+test_changed_data_before_first_job_admission (acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_changed_data_before_first_job_admission) ... ok
+test_parked_measurement_detects_changed_calibration_asset (acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_parked_measurement_detects_changed_calibration_asset) ... ok
+test_same_method_manifest_different_registered_provider (acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_same_method_manifest_different_registered_provider) ... ok
+test_unfingerprinted_data_runs_a_fresh_scientific_job (acceptance.science_plugin_blueprint.test_recipe_binding.RecipeProviders.test_unfingerprinted_data_runs_a_fresh_scientific_job) ... ok
+test_fixed_negative_settles_once_blocks_dependents_and_last_route_closes (acceptance.v621.test_evidence_gate.EvidenceGates.test_fixed_negative_settles_once_blocks_dependents_and_last_route_closes) ... ok
+test_original_policy_reopens_with_its_original_wait_behavior (acceptance.v621.test_evidence_gate.EvidenceGates.test_original_policy_reopens_with_its_original_wait_behavior) ... ok
+test_private_producer_cannot_leak_its_scalar_to_another_branch (acceptance.v621.test_evidence_gate.EvidenceGates.test_private_producer_cannot_leak_its_scalar_to_another_branch) ... ERROR
+test_unreadable_producer_before_first_wake_yields_actionable_brief (acceptance.v621.test_evidence_gate.EvidenceGates.test_unreadable_producer_before_first_wake_yields_actionable_brief) ... ok
+test_wait_damage_repair_cited_review_and_once_only_dispatch (acceptance.v621.test_evidence_gate.EvidenceGates.test_wait_damage_repair_cited_review_and_once_only_dispatch) ... ok
+test_prediction_rebinds_new_material_and_controlled_repeat_survives_restart (tests.test_v6_named_ports.ModelRecipe.test_prediction_rebinds_new_material_and_controlled_repeat_survives_restart) ... ok
+test_named_outputs_recover_and_preserve_original_job (tests.test_v6_named_ports.NamedOutputs.test_named_outputs_recover_and_preserve_original_job) ... ok
+test_saved_recipe_pins_materials_ports_and_dependencies (tests.test_v6_named_ports.NamedOutputs.test_saved_recipe_pins_materials_ports_and_dependencies) ... ok
+test_unknown_output_rejected_before_graph_or_job (tests.test_v6_named_ports.NamedOutputs.test_unknown_output_rejected_before_graph_or_job) ... ok
+test_join_is_registered_and_save_can_select_real_modules (acceptance.harness_refactor.macro.test_macro_recipe.MacroWire.test_join_is_registered_and_save_can_select_real_modules) ... ok
+test_resume_joins_the_bound_target_graph_and_never_resubmits_accepted_steps (acceptance.harness_refactor.macro.test_macro_recipe.NamedPortMacro.test_resume_joins_the_bound_target_graph_and_never_resubmits_accepted_steps) ... ok
+test_native_commission_save_and_rebind (acceptance.harness_refactor.macro.test_macro_recipe.NativeMacro.test_native_commission_save_and_rebind) ... ok
+
+======================================================================
+ERROR: test_private_producer_cannot_leak_its_scalar_to_another_branch (acceptance.v621.test_evidence_gate.EvidenceGates.test_private_producer_cannot_leak_its_scalar_to_another_branch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/gxh-final-portable/gx-h/gx_core/p0/v6_native.py", line 341, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-portable/gx-h/gx_core/p0/v6_native.py", line 441, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-portable/gx-h/gx_core/p0/v6_decisions.py", line 309, in prepare
+    v62_graph.require_compatible(v62_graph.graph_at(conn, run_id, original), previous,
+  File "/tmp/gxh-final-portable/gx-h/gx_core/p0/v62_graph.py", line 53, in require_compatible
+    raise StaleRevision("A graph subject used by this decision changed after its frozen brief",
+gx_core.errors.StaleRevision: STALE_REVISION: A graph subject used by this decision changed after its frozen brief
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/gxh-final-portable/acceptance/v621/test_evidence_gate.py", line 145, in test_private_producer_cannot_leak_its_scalar_to_another_branch
+    receipt = s.call(founder, "gx_decide_revision", {"decision":draft(b, op)}, "preplan")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-portable/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-portable/gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-portable/gx-h/gx_core/p0/v6_native.py", line 353, in call
+    replay = remember_refusal(roots, p, key, error, publish=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-portable/gx-h/gx_core/p0/v6_native.py", line 600, in remember_refusal
+    return saved_result(existing, turn, request_sha) if publish or conflicted_lead is not None else None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/gxh-final-portable/gx-h/gx_core/p0/v6_native.py", line 323, in saved_result
+    raise BY_CODE[refusal["code"]](refusal["message"], details=refusal.get("details"))
+gx_core.errors.StaleRevision: STALE_REVISION: A graph subject used by this decision changed after its frozen brief
+
+----------------------------------------------------------------------
+Ran 17 tests in 23.413s
+
+FAILED (errors=1)

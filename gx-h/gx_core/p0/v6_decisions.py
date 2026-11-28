@@ -503,6 +503,16 @@ def _require_close_context(conn, run_id, task, root, turn_id, decision):
         if late is not None:
             delivered_reviews = _own_close_reviews(conn, task, root, turn_id, decision)
             missing = delivered_reviews.difference(decision["evidence_refs"])
+            if missing and harness_policy.current(conn, run_id):
+                # Every late fact is an untargeted review already delivered to
+                # this author. No external result or Job changed its premises.
+                error = SchemaInvalid("The closing decision omits reviews received by this Lead.",
+                    details={"reason":"uncited_own_reviews", "field":"decision.evidence_refs",
+                             "uncited_review_refs":sorted(missing)})
+                error.retryable = True
+                error.suggested_recovery = ("Add the listed review references to decision.evidence_refs and submit "
+                                            "the corrected decision with a new call ID from this Lead.")
+                raise error
             if not delivered_reviews or missing:
                 details = {"reason": "close_context_changed", "event_id": late, "goal_version": version,
                            "brief_cursor": cursor, "context_ref": task["context_ref"]}

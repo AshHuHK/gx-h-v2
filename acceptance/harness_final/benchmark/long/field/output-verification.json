@@ -1,0 +1,384 @@
+{
+  "comparison_scope": "Recorded physical outputs compared with the independent original USGS daily-value calculation",
+  "original_flow_sha256": "611703c8b39d98ec08f695bfe73de10f805ec49db675da8811591936bfa28c93",
+  "projected_flow_sha256": "0b464958363949558765ee47b38c60bf10f61e3c4ad39552d7aab95f422972d0",
+  "reference_sha256": "aaf14cf4e08e4a4725c37ac7d6a1266fb272c00602d658a3a4ecfb994cf307e1",
+  "outputs": [
+    {
+      "arm": "candidate",
+      "job_id": "gxj_01m8g0cm6xj8mqh315",
+      "method": "discharge-concurrent@1",
+      "path": "outputs/candidate/gxj_01m8g0cm6xj8mqh315/paired.json",
+      "sha256": "231291156e18541f791deaa94e328679e7251d800a5517c9cea8fb3ccd0ddd6b",
+      "volume_relative_error": {
+        "01646500": "6.6658325581E-17",
+        "01651000": "0"
+      },
+      "within_registered_tolerance": true
+    },
+    {
+      "arm": "baseline",
+      "job_id": "gxj_01m8g0cawz76s7qywe",
+      "method": "discharge-concurrent@1",
+      "path": "outputs/baseline/gxj_01m8g0cawz76s7qywe/paired.json",
+      "sha256": "231291156e18541f791deaa94e328679e7251d800a5517c9cea8fb3ccd0ddd6b",
+      "volume_relative_error": {
+        "01646500": "6.6658325581E-17",
+        "01651000": "0"
+      },
+      "within_registered_tolerance": true
+    },
+    {
+      "arm": "stock",
+      "job_id": "native-e78d784e1d8d20e0f1aa30",
+      "method": "discharge-concurrent@1",
+      "path": "outputs/stock/native-e78d784e1d8d20e0f1aa30/paired.json",
+      "sha256": "231291156e18541f791deaa94e328679e7251d800a5517c9cea8fb3ccd0ddd6b",
+      "volume_relative_error": {
+        "01646500": "6.6658325581E-17",
+        "01651000": "0"
+      },
+      "within_registered_tolerance": true
+    }
+  ],
+  "timing": {
+    "candidate": {
+      "elapsed_seconds": 290.908,
+      "cli_launch_to_first_official_turn_seconds": 7.23,
+      "interruption_to_resume_launch_seconds": 0.853,
+      "official_turn_active_union_seconds_including_interrupted_prefix": 278.575,
+      "interrupted_turn_ids_censored_at_controller_cut": [],
+      "turn_interval_coverage": [
+        3,
+        3
+      ],
+      "measured_provider_startup_seconds": [
+        0.044
+      ],
+      "measurement_execution_union_seconds": 0.24,
+      "external_gpu_queue_seconds": 0,
+      "interpretation": "Official turn intervals include transport, model service, reasoning and synchronous tools. Startup and recovery gaps are real control-path wall intervals. Service-side model queue and exclusive controller CPU cannot be separated from these receipts."
+    },
+    "baseline": {
+      "elapsed_seconds": 900.04,
+      "cli_launch_to_first_official_turn_seconds": 7.307,
+      "interruption_to_resume_launch_seconds": 1.737,
+      "official_turn_active_union_seconds_including_interrupted_prefix": 196.613,
+      "interrupted_turn_ids_censored_at_controller_cut": [],
+      "turn_interval_coverage": [
+        3,
+        3
+      ],
+      "measured_provider_startup_seconds": [
+        0.042
+      ],
+      "measurement_execution_union_seconds": 0.234,
+      "external_gpu_queue_seconds": 0,
+      "interpretation": "Official turn intervals include transport, model service, reasoning and synchronous tools. Startup and recovery gaps are real control-path wall intervals. Service-side model queue and exclusive controller CPU cannot be separated from these receipts."
+    },
+    "stock": {
+      "elapsed_seconds": 99.865,
+      "cli_launch_to_first_official_turn_seconds": 7.463,
+      "interruption_to_resume_launch_seconds": 0.027,
+      "official_turn_active_union_seconds_including_interrupted_prefix": 83.66,
+      "interrupted_turn_ids_censored_at_controller_cut": [
+        "01a22005-ad62-70a2-828e-0e4b8b220890"
+      ],
+      "turn_interval_coverage": [
+        2,
+        2
+      ],
+      "measured_provider_startup_seconds": [
+        0.044
+      ],
+      "measurement_execution_union_seconds": 0.236,
+      "external_gpu_queue_seconds": 0,
+      "interpretation": "Official turn intervals include transport, model service, reasoning and synchronous tools. Startup and recovery gaps are real control-path wall intervals. Service-side model queue and exclusive controller CPU cannot be separated from these receipts."
+    }
+  },
+  "late_source_route": {
+    "candidate": {
+      "intake": 1795833614.787523,
+      "intake_source_sha256": "85b04c53281af46020279253e140a6349f7e91a0d7fe93d06de669a647f34bca",
+      "scientific_lead_threads": [
+        "01a22005-c37c-7901-aee8-922f3f5b002f",
+        "01a22006-6250-7df3-8c08-8d4c46f8ee7c"
+      ],
+      "effective_feedback_and_closure_events": [
+        {
+          "event_id": 60,
+          "kind": "research.pi.feedback",
+          "ts": "2026-11-28T02:42:47.930Z",
+          "feedback_id": "pif_42ce2582299c7625fda123bfb96ae2c2"
+        },
+        {
+          "event_id": 61,
+          "kind": "research.pi.feedback",
+          "ts": "2026-11-28T02:42:47.931Z",
+          "feedback_id": "pif_7f74b9e87d92efef7d44e6e810289242"
+        },
+        {
+          "event_id": 62,
+          "kind": "pi.message.routed",
+          "ts": "2026-11-28T02:42:47.931Z",
+          "feedback_id": null
+        },
+        {
+          "event_id": 81,
+          "kind": "research.pi.question",
+          "ts": "2026-11-28T02:44:21.436Z",
+          "feedback_id": null
+        },
+        {
+          "event_id": 83,
+          "kind": "v6.run.closed",
+          "ts": "2026-11-28T02:44:21.547Z",
+          "feedback_id": null
+        }
+      ],
+      "accepted_decisions_with_input_cursors": [
+        {
+          "event_id": 38,
+          "ts": "2026-11-28T02:40:14.376Z",
+          "event_cursor": 25,
+          "context_utc": "2026-11-28T02:39:32.771Z",
+          "decision_ref": "gxa_5be76fee3a9d293aef9a026cc5df3946024787f8716a9a29ef33b42e3bb4c10f",
+          "thread_id": "01a22005-c37c-7901-aee8-922f3f5b002f",
+          "turn_id": "01a22005-c3b4-7622-bdeb-e985cb24b14d",
+          "call_id": "call_a146ac99c7494ccc8191755c87f98f66"
+        },
+        {
+          "event_id": 80,
+          "ts": "2026-11-28T02:44:21.436Z",
+          "event_cursor": 52,
+          "context_utc": "2026-11-28T02:40:16.513Z",
+          "decision_ref": "gxa_cb3a28516ad9a084029f6e52c69a772a4fb8e7abb2f4a97f8f247b86bb89726e",
+          "thread_id": "01a22006-6250-7df3-8c08-8d4c46f8ee7c",
+          "turn_id": "01a22006-6282-7950-924e-08e812721e86",
+          "call_id": "call_9acbc0d44553456ea78ec8f5a5248a2e"
+        }
+      ],
+      "official_items": [
+        {
+          "utc": "2026-11-28T02:40:22.479Z",
+          "thread": "01a22006-61c0-79b3-b5e5-8821c9deaeb6",
+          "turn": "01a22006-6203-7b21-b6b3-119ee837a2bc",
+          "item": "01a22006-6fcc-7eb2-882b-6269d0aaa369",
+          "kind": "UserMessage",
+          "tool": null,
+          "line": 11,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-40-18-01a22006-61c0-79b3-b5e5-8821c9deaeb6.jsonl",
+          "scientific_lead": false,
+          "entire_original": true,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:42:47.938Z",
+          "thread": "01a22006-61c0-79b3-b5e5-8821c9deaeb6",
+          "turn": "01a22006-6203-7b21-b6b3-119ee837a2bc",
+          "item": "exec-4817ebfc-5106-45b1-9141-5a940eec2daa",
+          "kind": "DynamicToolCall",
+          "tool": "gx_route_pi_message",
+          "line": 74,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-40-18-01a22006-61c0-79b3-b5e5-8821c9deaeb6.jsonl",
+          "scientific_lead": false,
+          "entire_original": false,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": false
+        }
+      ],
+      "lead_received_entire_inventory": false,
+      "lead_received_both_original_rows": false,
+      "lead_saw_domain_and_both_rows": false
+    },
+    "baseline": {
+      "intake": 1795833605.228762,
+      "intake_source_sha256": "85b04c53281af46020279253e140a6349f7e91a0d7fe93d06de669a647f34bca",
+      "scientific_lead_threads": [
+        "01a22005-b301-75e0-90e5-5f6750eaf4f4",
+        "01a22006-43ee-70c2-b19e-e7b1080b19bd"
+      ],
+      "effective_feedback_and_closure_events": [
+        {
+          "event_id": 59,
+          "kind": "research.pi.feedback",
+          "ts": "2026-11-28T02:41:31.095Z",
+          "feedback_id": "pif_f9ae44b066adee3bb19f42650cfc7921"
+        },
+        {
+          "event_id": 60,
+          "kind": "pi.message.routed",
+          "ts": "2026-11-28T02:41:31.095Z",
+          "feedback_id": null
+        },
+        {
+          "event_id": 75,
+          "kind": "research.pi.question",
+          "ts": "2026-11-28T02:42:57.024Z",
+          "feedback_id": null
+        }
+      ],
+      "accepted_decisions_with_input_cursors": [
+        {
+          "event_id": 37,
+          "ts": "2026-11-28T02:40:04.843Z",
+          "event_cursor": 25,
+          "context_utc": "2026-11-28T02:39:28.447Z",
+          "decision_ref": "gxa_89868d4325859d19e466f4c92857a6afe4f50213cd5eb065c0f60c5bcab69a90",
+          "thread_id": "01a22005-b301-75e0-90e5-5f6750eaf4f4",
+          "turn_id": "01a22005-b337-7e13-941d-20bdd6637c73",
+          "call_id": "call_455c71a1902f4d958ca5c95ebf9488b5"
+        },
+        {
+          "event_id": 74,
+          "ts": "2026-11-28T02:42:57.023Z",
+          "event_cursor": 51,
+          "context_utc": "2026-11-28T02:40:07.901Z",
+          "decision_ref": "gxa_317777abfba6e29979b02dc75a5ec47ee7d543c1fcd038e27b542bda386f3c04",
+          "thread_id": "01a22006-43ee-70c2-b19e-e7b1080b19bd",
+          "turn_id": "01a22006-441e-7650-a09f-4a9155b33e13",
+          "call_id": "call_8c5401419cf248f9aa267913ae842e69"
+        }
+      ],
+      "official_items": [
+        {
+          "utc": "2026-11-28T02:40:13.373Z",
+          "thread": "01a22006-4366-7a22-a6c1-8b4dcd7970a9",
+          "turn": "01a22006-43a6-7bb1-8b25-ba3948cdf4df",
+          "item": "01a22006-4c3a-7ae0-8e21-eaa26b39aef2",
+          "kind": "UserMessage",
+          "tool": null,
+          "line": 11,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-40-11-01a22006-4366-7a22-a6c1-8b4dcd7970a9.jsonl",
+          "scientific_lead": false,
+          "entire_original": true,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:41:31.104Z",
+          "thread": "01a22006-4366-7a22-a6c1-8b4dcd7970a9",
+          "turn": "01a22006-43a6-7bb1-8b25-ba3948cdf4df",
+          "item": "exec-686c9097-ad9a-48de-954f-ec3850dda821",
+          "kind": "DynamicToolCall",
+          "tool": "gx_route_pi_message",
+          "line": 41,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-40-11-01a22006-4366-7a22-a6c1-8b4dcd7970a9.jsonl",
+          "scientific_lead": false,
+          "entire_original": false,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:41:51.287Z",
+          "thread": "01a22006-4366-7a22-a6c1-8b4dcd7970a9",
+          "turn": "01a22006-43a6-7bb1-8b25-ba3948cdf4df",
+          "item": "exec-9c66af3b-5668-4721-8351-8c429441b541",
+          "kind": "DynamicToolCall",
+          "tool": "gx_project_state",
+          "line": 50,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-40-11-01a22006-4366-7a22-a6c1-8b4dcd7970a9.jsonl",
+          "scientific_lead": false,
+          "entire_original": false,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        }
+      ],
+      "lead_received_entire_inventory": false,
+      "lead_received_both_original_rows": false,
+      "lead_saw_domain_and_both_rows": false
+    },
+    "stock": {
+      "intake": 1795833585.8440022,
+      "intake_source_sha256": "85b04c53281af46020279253e140a6349f7e91a0d7fe93d06de669a647f34bca",
+      "scientific_lead_threads": [
+        "01a22005-99ac-75b2-9580-c40e84f85e4e"
+      ],
+      "effective_feedback_and_closure_events": [],
+      "accepted_decisions_with_input_cursors": [],
+      "official_items": [
+        {
+          "utc": "2026-11-28T02:39:57.314Z",
+          "thread": "01a22005-99ac-75b2-9580-c40e84f85e4e",
+          "turn": "01a22006-01c2-7c92-aa84-59bd423d0640",
+          "item": "01a22006-0d7e-7b12-92e0-70e8bd183b5b",
+          "kind": "UserMessage",
+          "tool": null,
+          "line": 33,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-39-32-01a22005-99ac-75b2-9580-c40e84f85e4e.jsonl",
+          "scientific_lead": true,
+          "entire_original": true,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:40:26.882Z",
+          "thread": "01a22005-99ac-75b2-9580-c40e84f85e4e",
+          "turn": "01a22006-01c2-7c92-aa84-59bd423d0640",
+          "item": "exec-5778f735-0073-474b-b820-6bc6a3dc0232",
+          "kind": "DynamicToolCall",
+          "tool": "read_record",
+          "line": 52,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-39-32-01a22005-99ac-75b2-9580-c40e84f85e4e.jsonl",
+          "scientific_lead": true,
+          "entire_original": true,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        }
+      ],
+      "lead_received_entire_inventory": true,
+      "lead_received_both_original_rows": true,
+      "lead_saw_domain_and_both_rows": true
+    }
+  }
+}

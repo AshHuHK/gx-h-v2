@@ -366,15 +366,15 @@ def saved_result(receipt, turn, request_sha):
 @registry.native_goal_tool(DELEGATE)
 def call(roots, p):
     from .v6_decisions import GraphAdvanced
-    terms = None
+    original = None
     try:
         while True:
             try:
-                return _call(roots, p, terms)
+                return _call(roots, p, original)
             except GraphAdvanced as advanced:
                 # The SQLite writer has rolled back. Revalidate the very same native
                 # call against the new graph, including subject and evidence conflicts.
-                terms = advanced.funding_terms
+                original = original or advanced.original
     except (BudgetExceeded, HoldActive, LeaseExpired, ResourceDenied, SchemaInvalid, ScopeDenied, StaleRevision) as error:
         if p["tool"] != DECIDE or not v621_policy.science_execution(roots.conn, roots.run_id):
             raise
@@ -392,7 +392,7 @@ def call(roots, p):
         raise
 
 
-def _call(roots, p, original_terms=None):
+def _call(roots, p, original=None):
     from . import v6_decisions
     from .roots import require_binding
 
@@ -483,7 +483,7 @@ def _call(roots, p, original_terms=None):
     elif tool == DECIDE:
         try:
             prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
-            v6_decisions.check_reprepared(prepared, original_terms)
+            prepared = v6_decisions.preserve_premises(prepared, original)
         except StaleRevision as exc:
             if exc.details.get("reason") == "lead_graph_conflict":
                 replay = remember_refusal(roots, p, request_sha, exc, conflicted_lead=identity,

@@ -1,5 +1,5 @@
 """Adopt an authenticated Scientific Lead decision and its dispatch intents atomically."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import json
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -16,8 +16,8 @@ decision_schema = v6_graph.decision_schema
 
 class GraphAdvanced(Exception):
     """Another decision won the graph CAS. Recompile the original draft after rollback."""
-    def __init__(self, funding_terms):
-        self.funding_terms = funding_terms
+    def __init__(self, plan):
+        self.original = plan
 
 
 def head(conn, run_id):
@@ -567,19 +567,19 @@ def commit(conn, plan):
             raise StaleRevision("A capability approval or content pin changed before adoption")
         if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
             if plan.funding_terms is not None:
-                raise GraphAdvanced(plan.funding_terms)
+                raise GraphAdvanced(plan)
             raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
         if task["scope"] == "run":
             base = head(conn, run_id)
             if base != request["base"]:
                 if harness_policy.current(conn, run_id):
-                    raise GraphAdvanced(plan.funding_terms)
+                    raise GraphAdvanced(plan)
                 raise StaleRevision("The graph moved during preparation; retry the decision on the current graph")
         if module is not None:
             actual = head(conn, run_id)
             if base != request["original_base"] or actual != request["base"]:
                 if base == request["original_base"] and harness_policy.current(conn, run_id):
-                    raise GraphAdvanced(plan.funding_terms)
+                    raise GraphAdvanced(plan)
                 raise StaleRevision("The graph moved after module preparation; obtain a fresh decision",
                                     details={"reason": "module_graph_conflict", "current_head": actual})
             if plan.module_dependencies:
@@ -710,20 +710,24 @@ def reconsider_module_conflict(conn, identity, error):
                                     "current_head": head(conn, run_id), **error.details})
 
 
-def check_reprepared(plan, original_terms):
-    if original_terms is not None and isinstance(plan, Prepared) and plan.funding_terms != original_terms:
+def preserve_premises(plan, original):
+    if original is None or not isinstance(plan, Prepared):
+        return plan
+    if original.funding_terms != plan.funding_terms:
         raise StaleRevision("Funding changed for a resource committed by this decision")
+    # A callback already in flight cannot have seen a closeout reminder issued
+    # while its graph was being recompiled.
+    return replace(plan, observed_close_prompt=original.observed_close_prompt)
 
 
 def adopt(conn, **native_call):
-    terms = None
+    original = None
     while True:
         try:
             plan = prepare(conn, **native_call)
-            check_reprepared(plan, terms)
-            return commit(conn, plan)
+            return commit(conn, preserve_premises(plan, original))
         except GraphAdvanced as advanced:
-            terms = advanced.funding_terms
+            original = original or advanced.original
         except StaleRevision as exc:
             reconsider_module_conflict(conn, native_call, exc)
             raise

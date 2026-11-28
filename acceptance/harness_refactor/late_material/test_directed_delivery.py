@@ -10,7 +10,11 @@ import unittest
 
 from acceptance.harness_refactor.modules.research_study import ResearchStudy
 from acceptance.v622.test_close import actual_packet
+from gx_core import budgets
 from gx_core.errors import GxError
+from gx_core.persistence import store
+from gx_core.p0 import metering, waits
+from acceptance.v62a.interleavings_fixture import draft
 from gx_core.p0 import conversation, intent, pi_materials, research_dialogue, v62_modules, v6_jobs
 from gx_core.p0.driver import Driver
 
@@ -33,8 +37,8 @@ def route(study, scope, mid, attachment):
     return ref,response["clauses"][0]
 
 
-def researcher(study, key, methods=()):
-    args = study.open_args(key,caps=[],inputs=study.materials)
+def researcher(study, key, methods=(), *, limits=None):
+    args = study.open_args(key,caps=[],inputs=study.materials,limits=limits)
     args.update(module_id="ad_hoc",focus="Read the dated samples",communication="isolated",
                 expected_delivery="State which dates are supported.",method_choices=list(methods))
     rec = study.call(study.lead,"gx_open_module",args,"open-"+key)
@@ -54,7 +58,7 @@ class DirectedLateMaterial(unittest.TestCase):
 
     def test_cold_same_run_fences_stale_report_and_delivers_private_original_once(self):
         with ResearchStudy(self.directory,spec_updates=self.spec) as old:
-            keeper,reader=researcher(old,"records")
+            keeper,reader=researcher(old,"records",limits={"worker_tasks":1})
             control,peer=researcher(old,"independent")
             old.call(reader,"gx_read_artifact",{"ref":old.materials[0]},"initial-reading")
             previous=actual_packet(old,reader)
@@ -112,6 +116,70 @@ class DirectedLateMaterial(unittest.TestCase):
                     "new_brief_sha256":ack["text_sha256"],"report":report["report_ref"],
                     "feedback_id":first_feedback,"feedback_status":handled["status"],"outcome":handled["disposition"]["outcome"],
                     "failure_counter_change":stopped["attempts_consumed"]-original_counter,"sibling_tasks":1,"job_count":0},indent=2)+"\n")
+
+    def test_one_worker_refresh_uses_only_remaining_model_allowance_then_new_work_stops(self):
+        parent = {"job_submissions":10, "worker_tasks":12, "cpu_seconds":400, "api_calls":24,
+                  "tokens":500000, "gpu_jobs":0, "gpu_minutes":0, "wall_hours":2}
+        spec = {**self.spec, "run_budget":parent, "workspace_budget":parent, "turn_token_budget":65536}
+        with ResearchStudy(self.directory, spec_updates=spec) as study:
+            study.roots.token_budget = spec["turn_token_budget"]  # Match Driver config at the controlled host boundary.
+            limits = {"worker_tasks":1, "api_calls":6, "tokens":131072}
+            rec, reader = researcher(study, "one-worker", limits=limits)
+            module = v62_modules._module(study.conn, study.run_id, rec["scope"])
+            budget = module["budget_ref"]
+
+            def terminal_receipt(actor, amount):
+                reservation = study.rows("SELECT reservation_ref FROM p0_root_deliveries WHERE thread_id=? "
+                                         "AND turn_id=?", actor.thread, actor.turn)[0]["reservation_ref"]
+                with store.transaction(study.conn, transaction_owner="LateMaterialAcceptance",
+                                       operation="settle_scripted_usage", run_id=study.run_id):
+                    study.conn.execute("INSERT INTO p0_root_turn_usage(thread_id,turn_id,terminal_status,total_tokens) "
+                                       "VALUES(?,?,'completed',?)", (actor.thread, actor.turn, amount))
+                    waits.meter_pending(study.conn, actor.thread, actor.turn)
+                return reservation
+
+            def confirm(reservation, amount):
+                with store.transaction(study.conn, transaction_owner="LateMaterialAcceptance",
+                                       operation="apply_scripted_usage", run_id=study.run_id):
+                    metering.confirm(study.conn, reservation, amount)
+
+            initial_hold = terminal_receipt(reader, 125071)
+            first, _ = route(study, rec["scope"], "gauge-b", {"name":"b.txt","text":"Second gauge."})
+            confirm(initial_hold, 125071)
+            prior_waits = study.rows("SELECT wait_id,root_key FROM p0_attempt_waits WHERE wait_key=?", initial_hold)
+            self.assertEqual(len(prior_waits), 1)
+            before = budgets.state(study.conn, budget)
+            self.assertEqual((before["spent"]["worker_tasks"], before["available"]["tokens"]), (1,6001))
+            v62_modules.advance(study.conn, study.run_id)
+            successor = study.next_actor(rec["scope"])
+            self.assertIn(first, json.dumps(actual_packet(study,successor)["packet"]["materials"]))
+            admitted = budgets.state(study.conn, budget)
+            self.assertEqual(admitted["limits"], before["limits"])
+            self.assertEqual((admitted["spent"]["worker_tasks"], admitted["reserved"]["api_calls"],
+                              admitted["reserved"]["tokens"]), (1,1,6001))
+            self.assertEqual(len([r for r in admitted["reservations"] if r["subject_kind"]=="task"]),1)
+            self.assertEqual(len(study.rows("SELECT event_id FROM events WHERE kind='v62.module.worker_task_continued' "
+                                            "AND subject_id=?", successor.task_id)), 1)
+            for _ in range(2):
+                v62_modules.advance(study.conn, study.run_id)
+            self.assertEqual(budgets.state(study.conn,budget), admitted)
+            self.assertEqual(study.rows("SELECT wait_id,root_key FROM p0_attempt_waits WHERE wait_key=?", initial_hold),
+                             prior_waits)
+            self.assertFalse(study.rows("SELECT job_id FROM jobs WHERE run_id=?", study.run_id))
+
+            # A completed scientific decision has used its slot; a genuinely new task needs a new one.
+            study.call(successor, "gx_decide_revision", {"decision":draft()}, "completed-work")
+            confirm(terminal_receipt(successor, 12), 12)
+            v62_modules.advance(study.conn, study.run_id)
+            self.assertEqual([r["status"] for r in owner_tasks(study, rec["scope"])], ["CANCELLED","ACCEPTED"])
+            from gx_core.artifacts import ArtifactService
+            ref, = study.conn.execute("SELECT report_ref FROM v62_module_reports WHERE module_instance_id=?",
+                                      (rec["module_instance_id"],)).fetchone()
+            report = ArtifactService(study.conn).read_json(ref)
+            self.assertEqual(report["gaps"], ["module worker task allowance exhausted"])
+            final = budgets.state(study.conn, budget)
+            self.assertEqual((final["spent"]["worker_tasks"], final["spent"]["api_calls"],
+                              final["spent"]["tokens"]), (1,2,125083))
 
     def test_new_original_wakes_while_prior_cpu_job_continues_and_other_report_is_fixed(self):
         root=Path(__file__).resolve().parents[3]

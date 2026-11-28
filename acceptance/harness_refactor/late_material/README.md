@@ -16,3 +16,12 @@ PYTHONPATH=.:gx-h:gx-h/tests:acceptance/v62a python -B -m unittest -v \
 ```
 
 [基線重現](before.log)和[修後三項驗收](three-controls.log)使用可控原生模型回呼與真實本機 Job。正式模型在修後版本的判讀，須由後續 Run 的實際回執另行確認。
+
+
+## 一個已領研究任務收到晚件
+
+正式復驗 `gxr_01m8fsxs8ntscbmg1m` 在 `b5545e5` 新增授權 72、取消 73 及回饋 74 均成功。資料員的唯一 worker 名額在 33／34 已扣，82 由 GX 產生 PARTIAL；該資料員沒有處理晚件。該模組帳面已結算 125071 token（含 65536 估算），額度仍有 6001 token、4 次 API。84 已將模組剩餘預留退回。這個已封存的結果保持原判。[事件與預留核對](one-slot-live-baseline.json)
+
+以 PI 原件的授予和中止同一任務的轉移事件識別此次交接，將新 brief 發給原委派；後繼任務回執 `v62.module.worker_task_continued` 指向原任務和授權事件。每次實際原生 turn 仍獨立預留 API、token 並結算。真正完成一項決策後再要求新任務仍需要 worker 名額。
+
+普通研究離線控制在同樣 1 個 worker、6 次 API、131072 token 額度及 125071 已結算用量下重現過「No active decision for module」。修後發出含第二份原件的原生 brief，該回合僅預留剩下的 6001 token 和一次 API。兩次輪詢後仍只有一次 worker 扣款，一份後繼回執，沒有新 Job；舊短任務與其計量等待仍可追溯。後繼完成科學決策，再申請真正的新任務時 GX 如實交回名額耗盡。上述四個控制通過。兩次原生呼叫的用量由測試宿主回執提供。

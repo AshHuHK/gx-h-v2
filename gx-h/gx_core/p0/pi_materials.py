@@ -9,6 +9,7 @@ from ..persistence import store
 from . import harness_policy, v621_assignment
 
 
+ASSIGNMENT_REFRESH = "The PI assigned a new scoped material"
 REGISTERED = "pi.attachment.registered"
 BRANCH_GRANTED = "pi.branch.material_granted"
 
@@ -155,7 +156,7 @@ def grant(conn, run_id, message_id, *, clause_id, branch_id, artifact_refs):
     if missing:
         from . import v6_goal
         if prior["status"] in v6_goal.ACTIVE_TASKS:
-            v6_goal.cancel_decision(conn, run_id, prior["task_id"], reason="The PI assigned a new scoped material")
+            v6_goal.cancel_decision(conn, run_id, prior["task_id"], reason=ASSIGNMENT_REFRESH)
     receipt = {**request, "grant_event_ids": events}
     store.complete_idempotent(conn, key, receipt)
     return receipt

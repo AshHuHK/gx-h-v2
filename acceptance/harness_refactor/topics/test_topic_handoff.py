@@ -169,6 +169,11 @@ class TopicStudy(unittest.TestCase):
         ref = pi_materials.for_message(self.conn,self.run,"report-17")[0]["artifact_ref"]
         with store.transaction(self.conn,transaction_owner="TopicStudy",operation="route_pi_material",run_id=self.run) as tx:
             pi_materials.grant(tx,self.run,"report-17",clause_id="clause-r",branch_id=target,artifact_refs=[ref])
+        from gx_core.p0 import v62_modules
+        v62_modules.advance(self.conn,self.run)
+        successor=self.conn.execute("SELECT task_id FROM v6_decision_tasks WHERE run_id=? AND scope=? ORDER BY rowid DESC LIMIT 1",
+                                    (self.run,target)).fetchone()[0]
+        author=self.bind(successor)
         correction = self.hint(author,"correct","limited",parent_hint_ids=[first["hint_id"]],
                                interpretation="The original scope was too broad.")
         self.assertEqual(self.call(reader,"gx_task_context",{})["research_topics"][0]["entries"],

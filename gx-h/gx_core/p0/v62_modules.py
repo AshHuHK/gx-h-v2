@@ -313,6 +313,11 @@ def _pending_input(conn, row, task):
         return False
     if research_topics.pending(conn, row, after=cursor[0]):
         return True
+    from . import v621_assignment
+    if conn.execute("""SELECT 1 FROM events WHERE subject_kind='module' AND subject_id=?
+            AND run_id=? AND kind=? AND event_id>? AND json_extract(payload_json,'$.previous_task_id')=? LIMIT 1""",
+            (row["module_instance_id"], row["run_id"], v621_assignment.GRANTED, cursor[0], task["task_id"])).fetchone():
+        return True
     return conn.execute("SELECT 1 FROM events WHERE run_id=? AND event_id>? AND kind='v6.node.waiting' "
                         "AND json_extract(payload_json,'$.funding_scope')=? LIMIT 1",
                         (row["run_id"], cursor[0], row["scope"])).fetchone() is not None

@@ -151,11 +151,17 @@ def _instantiate_tool(packet):
 
 
 def _research_decision_tool(spec, brief):
-    if not harness_policy.enabled(brief):
-        return spec
     projected = deepcopy(spec)
     fields = projected["inputSchema"]["properties"]
     body = fields["decision"]
+    if (brief or {}).get("harness_policy") != harness_policy.VERSION:
+        for variant in body["properties"]["ops"]["items"]["oneOf"]:
+            gate = variant["properties"].get("evidence_gate")
+            if gate:
+                for name in ("output_name", "source_role"):
+                    gate["properties"].pop(name, None)
+    if not harness_policy.enabled(brief):
+        return projected
     if brief.get("scope") == "run":
         from . import v6_routes
         body = v6_routes.with_operations(body, reinterpretation=brief.get("harness_policy") == harness_policy.VERSION)
@@ -618,7 +624,8 @@ def _call(roots, p):
                     roots._allow_refs(row["root_key"], answer["evaluation_ref"])
             if adoptions and (tool != DECIDE or answer.get("task_status") == "ACCEPTED"):
                 for adoption in adoptions:
-                    joined = recipe_instances.adopt(roots.conn,roots.run_id,adoption)
+                    joined = recipe_instances.adopt(roots.conn, roots.run_id, adoption,
+                                                    answer.get("aliases") if tool == DECIDE else None)
                     if tool == v6_recipes.INSTANTIATE:
                         answer["logical_join"] = {k:joined[k] for k in ("key","revision","state","registration_event","outcome_event")}
             record_call(roots.conn, p)

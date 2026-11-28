@@ -230,7 +230,7 @@ def expand(conn, run_id, definition, digest, arguments, answer, *, visible_refs=
     version = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()[0]
     # The prefix names one instance across the transition from local branch alias to durable branch ID.
     from . import harness_policy, recipe_instances
-    identity = recipe_instances.identity(definition["reference"],digest,version,prefix,bindings)
+    identity = recipe_instances.identity(conn, run_id, definition["reference"], digest, version, prefix, bindings, branch)
     modern = harness_policy.current(conn,run_id)
     keys = {m["slot"]:"recipe-" + identity + "-" + m["slot"] for m in macro["modules"]}
     aliases = {s:"module_" + ids.sha256_of_obj([run_id, key])[:32] for s,key in keys.items()}
@@ -278,12 +278,15 @@ def expand(conn, run_id, definition, digest, arguments, answer, *, visible_refs=
                     "operation_key": key, "round": number,
                     "focus": module["question"], "expected_delivery": module["expected_delivery"],
                     "input_refs": selected, "capabilities": module["capabilities"], "tools": tools,
-                    "sub_budget": module["sub_budget"], "wake_on": module["wake_on"]}
+                    "wake_on": module["wake_on"]}
+            if "sub_budget" in module:
+                args["sub_budget"] = module["sub_budget"]
             if "gx_decide_revision" in tools:
                 args["method_choices"] = options
             if "communication" in module:
                 args["communication"] = module["communication"]
             calls.append({"tool":"gx_open_module", "arguments":args, "slot":slot,
+                          **({"needed_arguments":["sub_budget"]} if "sub_budget" not in args else {}),
                           "module_instance_id":mid, "opened":False})
     gate = macro["join"]
     ports, missing = [], []
@@ -322,5 +325,5 @@ def expand(conn, run_id, definition, digest, arguments, answer, *, visible_refs=
             answer["logical_join"] = {key:existing[key] for key in ("key","revision","state","registration_event","outcome_event")}
         answer["instructions"] = answer["adoption"] = ("Previewing is read-only. Adopt with adopt=true or submit an issued module commission "
                               "or computation. GX then watches the named dependencies even for producers not yet born. "
-                              "Use the same prefix and bindings to continue; decide from this study's outputs.")
+                              "Set each commission's sub_budget from this Goal. Continue with the same branch, prefix and bindings.")
     return answer

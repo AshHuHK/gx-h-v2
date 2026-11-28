@@ -3,11 +3,44 @@ import json
 
 from ..domain import clock, ids
 from ..errors import SchemaInvalid, ScopeDenied
-from . import research_joins, v6_macro_recipes
+from . import harness_policy, research_joins, v6_macro_recipes
 
 
-def identity(reference, digest, version, prefix, inputs):
-    return ids.sha256_of_obj([reference, digest, version, prefix, inputs])[:24]
+def _branches(conn, rid, branch):
+    if not branch.startswith("local:"):
+        return {branch}
+    return {row[0] for row in conn.execute("""SELECT b.branch_id FROM v6_branches b
+        JOIN v6_decisions d USING(run_id,decision_ref)
+        JOIN json_each(d.receipt_json,'$.aliases') alias ON alias.value=b.branch_id
+        WHERE b.run_id=? AND alias.key=?""", (rid, branch))}
+
+
+def _same_branch(conn, rid, previous, branch, target):
+    if previous.get("branch_id"):
+        return previous["branch_id"] in target
+    return branch == previous["branch"] or bool(target and _branches(conn, rid, previous["branch"]) == target)
+
+
+def identity(conn, rid, reference, digest, version, prefix, inputs, branch):
+    parts = [reference, digest, version, prefix, inputs]
+    if not harness_policy.current(conn, rid):
+        return ids.sha256_of_obj(parts)[:24]
+    target = _branches(conn, rid, branch)
+    if len(target) > 1:
+        raise SchemaInvalid("This branch alias has multiple bindings. Select a durable branch ID.")
+    # A draft can name a local branch before the first graph commit assigns its ID.
+    # Recover the original instance if this is its durable spelling.
+    for row in conn.execute("""SELECT payload_json FROM events WHERE run_id=? AND
+            subject_kind='research_join' AND kind=? AND json_extract(payload_json,'$.goal_version')=? AND
+            json_extract(payload_json,'$.instance.recipe')=? AND json_extract(payload_json,'$.instance.prefix')=?""",
+            (rid, research_joins.REGISTERED, version, reference, prefix)):
+        accepted = json.loads(row[0])
+        instance = accepted["instance"]
+        if instance["digest"] != digest or instance["inputs"] != inputs:
+            continue
+        if _same_branch(conn, rid, instance, branch, target):
+            return accepted["key"].removeprefix("recipe-")
+    return ids.sha256_of_obj(parts + [next(iter(target), branch)])[:24]
 
 
 def pending_adoptions(conn, rid, version, tool, args):
@@ -33,18 +66,31 @@ def pending_adoptions(conn, rid, version, tool, args):
         ORDER BY c.rowid DESC""", (rid,version,parameter))
     selected = {}
     matches = {}
+    issued_commission = False
     for row in proposals:
         proposal = json.loads(row["result_json"])
         key = proposal.get("instance_key")
         if not key:
             continue
         if tool == "gx_open_module":
-            matched = [args["operation_key"]] if any(item.get("arguments") == args for item in proposal["module_calls"]) else []
+            matched = []
+            for item in proposal["module_calls"]:
+                issued = item.get("arguments")
+                if issued is None or issued["operation_key"] != args["operation_key"]:
+                    continue
+                issued_commission = True
+                # The allowance funds this new study. The role, inputs and privacy
+                # identify the producer whose named delivery the Join will observe.
+                if all(issued.get(field) == args.get(field) for field in
+                       ("module_id", "module_version", "input_refs", "communication")):
+                    matched.append(args["operation_key"])
         else:
             matched = [op["node"] for op in nodes if op in proposal["ops"]]
         for name in matched:
             matches.setdefault(name, set()).add(key)
             selected.setdefault(key, json.loads(row["request_json"])["arguments"])
+    if issued_commission and not matches:
+        raise SchemaInvalid("The recipe's commission has different module, input or audience bindings. Use a new operation key for independent work.")
     adopted_keys = set()
     for keys in matches.values():
         if len(keys) > 1:
@@ -64,7 +110,7 @@ def prepare(conn, rid, version, args):
     macro = definition.get("macro")
     if not macro:
         raise SchemaInvalid("Explicit logical Join adoption requires a macro recipe")
-    key = "recipe-" + identity(args["recipe"],args["digest"],version,args["prefix"],args["inputs"])
+    key = "recipe-" + identity(conn, rid, args["recipe"], args["digest"], version, args["prefix"], args["inputs"], args["branch"])
     modules = {m["slot"]:m for m in macro["modules"]}
     steps = {s["slot"]:s for s in definition["steps"]}
     dependencies = {}
@@ -90,17 +136,24 @@ def prepare(conn, rid, version, args):
     return dict(scope="run",key=key,goal_version=version,revision=1,spec=spec,instance=instance)
 
 
-def adopt(conn, rid, plan):
+def adopt(conn, rid, plan, aliases=None):
     """The native callback commits this registration with the first accepted commission."""
     latest = research_joins.lookup(conn,rid,plan["key"])
     if latest:
         original = research_joins.lookup(conn,rid,plan["key"],1)
         if original and original.get("instance"):
             previous = original["instance"]
-            if (previous["recipe"], previous["digest"], previous["inputs"], previous["prefix"]) == (
-                plan["instance"]["recipe"], plan["instance"]["digest"], plan["instance"]["inputs"], plan["instance"]["prefix"]):
+            instance = plan["instance"]
+            branch = instance["branch"]
+            if (all(previous[field] == instance[field] for field in ("recipe", "digest", "inputs", "prefix"))
+                    and _same_branch(conn, rid, previous, branch, _branches(conn, rid, branch))):
                 return latest
         raise SchemaInvalid("The recipe's Join key is already used by another watch; choose another instance prefix")
+    instance = plan["instance"]
+    branch = instance["branch"]
+    bound = (aliases or {}).get(branch) or next(iter(_branches(conn, rid, branch)), None)
+    if bound:
+        instance["branch_id"] = bound
     delay = plan["spec"].get("timeout_seconds")
     deadline = clock.now().timestamp()+delay if delay else None
     event = research_joins._emit(conn,rid,research_joins.REGISTERED,dict(plan,deadline=deadline))
@@ -119,7 +172,7 @@ class Producers:
         definition = json.loads(pinned[0])
         steps = {s["slot"]:s for s in definition["steps"]}
         self.nodes = v6_macro_recipes._bound_nodes(conn,rid,instance["recipe"],instance["digest"],instance["prefix"],
-                                                  instance["branch"],steps,instance["inputs"])
+                                                  instance.get("branch_id", instance["branch"]),steps,instance["inputs"])
         self.cache = {}
 
     def location(self, slot):
@@ -138,6 +191,8 @@ class Producers:
 
     def _observe(self, slot, output):
         where = self.location(slot)
+        if where and output is None and "module_instance_id" in where:
+            output = "report"
         if where and output is None:
             node = research_joins._node(self.conn,self.rid,where["node_id"])
             status = node["status"]

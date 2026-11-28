@@ -55,3 +55,7 @@ CPU 評分 Job `gxj_01m8g0v91xknqrv75g` 得到 **122/123 個可比 Cα 位置、
 完整站產品 `e8140c6c6efe5277bfb5aed4e70ab9ec175aae6b`，精簡站產品 `569657aed3faa72c12e0a7944c7e9dcfd849c3af`。兩站各有 54 個交付檔相對原版本改變；52 個改動後的 Git blob 相同，另兩個保留精簡站的專屬插件登記與 PDF 安裝提示。原場另發現的文獻卷號與年份誤拒，已用當時有權引用的 JATS 原件重放。書目可發表，實際數值仍需引證，未替先前的兩個完整報告補簽。模型給子席零次原生調用時，原回執會說明原委派無法開工及如何另開有預算的工作。[雙站完整部署樹](release-installations.json) · [逐檔差異](deploy/receipts/bibliography-parity-including-adapters.json) · [原回呼重放](evidence/bibliography-replay.json) · [真場子席零回合](delegation/README.md)
 
 各站實際掛載的發行結果為 **歷史 121/121、前版 Harness 92/92、本輪 67/67**。乾淨無掛載環境各有 **67/67** 項本輪測試通過，前版測試各 90 通過、2 個授權快照測試跳過。四組角色與歸檔資料摘要由各站實測。原近期 /2 Goal 從原部署冷開後，模型回合與 Job 的增量皆為 0。[逐站測試分母與日誌索引](deploy/receipts/bibliography-tests.json)
+
+### A · 食用酵母的歸屬問題
+
+`gxr_01m8g0a3qevpds66cg` 在首試 30 分鐘上限保存為 `OPEN`。23 個官方回合、12 個 Job（11 成功、1 逾時），到點時沒有在途 Job。Lead 已讀兩篇文章的相應表格，區分了 RNA 表達、純化製備的底物讀數與參考菌株的家族註釋，並採納分列、不合併的編目決定。庫查出了具名結果，但有效決策未完整解釋其覆蓋。截止前可核對 4/5 項科學判據，正式終稿 0/1。三位子席交回一份研究員簽署報告及兩份 GX 部分報告；沒有觀察到跨席線索使其他席改路，或 A 自行保存配方。[截止時的證據與恢復命令](field/a/FINDINGS_AT_CUTOFF.md) · [研究行為回執](field/a/behavior.json)

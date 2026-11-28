@@ -46,7 +46,7 @@ def collect(work, run=RUN):
         raw = evidence.bytes_for(db, state, rec["report_ref"], rec["report_sha256"])
         body = json.loads(raw) if raw else {}
         author = rec["author"]
-        official = host.get((author["thread_id"], author["turn_id"]), {}).get("provider") == "openai"
+        official = host.get((author.get("thread_id"), author.get("turn_id")), {}).get("provider") == "openai"
         reports.append({**evidence.pick(rec, "event_id wake_event_id scope report_ref report_sha256 author status source_refs"),
                         "whole_report_verified": bool(raw), "official_worker": official,
                         **evidence.pick(body, "researcher_statement findings gaps next_steps endpoint_state")})
@@ -100,7 +100,7 @@ def collect(work, run=RUN):
             body = json.loads(row["payload_json"])
             timeline.append({**evidence.pick(row,"event_id kind ts subject_id"),
                              "receipt":evidence.pick(body,"branch_id scope module_instance_id event_id goal_version message_id "
-                                "status feedback_id source_message_id text artifact_ref artifact_refs report_ref hint_id sender_scope "
+                                "status feedback_id source_message_id text artifact_ref artifact_refs report_ref previous_task_id hint_id sender_scope "
                                 "recipient_scope topic action op intent revision phase decision_ref evidence_refs outcome reason")})
     turns = evidence.turns(db,run,host,set(documents))
     for entry in turns:

@@ -324,8 +324,20 @@ def proofset(case, all_data):
         outputs = {f["artifact_ref"] for j in eligible for f in j["outputs"] if f["verified_bytes"]}
         adoption = [d["decision_ref"] for d in own_decisions if d.get("reports_cited") and
                     outputs.intersection(d.get("report_backed_outputs",[]))]
+        review_file = HERE/"yeast-followup/scientific-review.json"
+        reviewed = []
+        if review_file.is_file():
+            review = json.loads(review_file.read_bytes())
+            reference = (HERE/"yeast-followup/reference.json").read_bytes()
+            if (review["run_id"] == e["run_id"] and review["assessment"] == "supported" and
+                    hashlib.sha256(reference).hexdigest() == review["reference_sha256"] and
+                    any(f["artifact_ref"]==review["job_output_ref"] and f["sha256"]==review["job_output_sha256"]
+                        for j in eligible for f in j["outputs"] if f["verified_bytes"]) and
+                    any(r["report_ref"]==review["report_ref"] and r["report_sha256"]==review["report_sha256"]
+                        and r["verified_bytes"] and r["official_worker_submission"] for r in e["reports"])):
+                reviewed = [{"report":review["report_ref"],"source_comparison_sha256":review["reference_sha256"]}]
         return [(bool(target_reads),[r["receipt_id"] for r in target_reads]),(bool(first_ordered),first_ordered),
-                (bool(eligible),[j["job_id"] for j in eligible]),(bool(adoption),adoption),(False,[])], {
+                (bool(eligible),[j["job_id"] for j in eligible]),(bool(adoption),adoption),(bool(reviewed),reviewed)], {
                     "first_assigned_scope":first_assigned, "later_or_first_observed_chains":ordered,
                     "selections":[pick(c,"seq event_id caller_scope call_id") for c in choices],
                     "delegations":[{"scope":o["scope"],"seq":o["seq"],"arguments":o["arguments"],
@@ -404,8 +416,9 @@ def proofset(case, all_data):
                         j.get("outcome_event") == evt["event_id"] for j in turn["joins"]):
                     continue
                 for d in e["lead_decisions"]:
-                    if d["task_id"] == turn["task_id"] and d["event_id"] > evt["event_id"] and d["effects"]:
-                        joined.append({"event_id":evt["event_id"],"turn_id":turn["turn_id"],"decision":d["decision_ref"]})
+                    if d["task_id"] == turn["task_id"] and d["event_id"] > evt["event_id"]:
+                        joined.append({"event_id":evt["event_id"],"turn_id":turn["turn_id"],
+                                       "decision":d["decision_ref"],"outcome":d["outcome"],"effects":d["effects"]})
         macros = [r["reference"] for r in e["recipes"] if r["is_macro"] and r["has_modules_join_decision"]]
         return [(bool(overlaps),overlaps),(False,hints),(bool(bound),bound),(bool(joined),joined),
                 (bool(macros),macros)], {"hint_action_review":"A later query alone cannot establish causation. Compare the receiver's earlier search, delivered words and ensuing action."}
@@ -465,6 +478,10 @@ def collect(base, case):
                   "explicit_method_choices":{k:conf[k] for k in ("capability_options","capability_collections","capabilities") if k in conf},
                   "predecessor":conf.get("predecessor",{}),
                   "inputs":[pick(f, "role artifact_ref sha256") for f in data["files"]]}
+        result["receipted_native_calls_by_tool"] = {r[0]:r[1] for r in db.execute("""
+           SELECT json_extract(n.request_json, '$.tool'),COUNT(*) FROM p0_v6_native_calls n
+           JOIN p0_root_calls c USING(thread_id,turn_id,call_id) JOIN p0_roots rt USING(thread_id)
+           WHERE rt.run_id=? GROUP BY 1""",(run,))}
         result["events"] = events(db, run)
         result["jobs"] = jobs(db, state, run)
         refs = {f["artifact_ref"] for j in result["jobs"] for f in j["outputs"] if f["verified_bytes"]}

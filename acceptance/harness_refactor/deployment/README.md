@@ -1,0 +1,19 @@
+# 精簡版部署與獨立驗收
+
+完整產品候選為 `5904a4f`，精簡部署提交為 `75174ed`。完整線與精簡線各用自己的 Python、普通 CLI、站點插件註冊和研究狀態。兩線的共同變更涵蓋 63 個逐位元相同的產品檔案，另外核對精簡線原有的註冊項及這次加入的提供者。兩份安裝計算出的契約摘要一致，SQLite DDL 摘要維持原值。[逐檔比對](release-comparison.json)
+
+| 檢查 | 實際結果 |
+|---|---|
+| 現役精簡安裝，新 Harness 套件 | 80/80。首輪的故障注入假件少了 runner 觀測中的 state，已補回實際契約欄位，重跑整組通過。[首輪紀錄](slim-first-regressions.log) · [修正後](slim-harness-regressions.log) |
+| 現役精簡安裝，受影響的舊入口 | 121/121，含普通 research、重開、資料來源、配方和具名輸出。[回歸紀錄](slim-legacy.log) |
+| 獨立精簡原始碼匯出與既有回歸 | 288/288，無跳過。該次分母採用匯出當下的測試集合，與上述兩組有重疊。[獨立輸出](slim-export-regressions.log) |
+| 真實官方訂閱與精簡 CLI | USGS 單站題一個 Lead 回合結題，兩個日間差值均與獨立 Decimal 計算相符。冷重開新增 Run 事件、Job 和模型回合各 0。[啟動、原件、報告及冷重導](slim-streamflow-observation/README.md) |
+
+使用者部署時提供官方宿主二進位、登入資料及本站已登記的選用資料庫。套件內的 USGS JSON 可直接作為輸入。歷史酵母可查閱四個具名、帶摘要的資料庫快照。個人 OAuth 憑據及 operator 的工作目錄留在各自部署環境。[可攜夾具、宿主支援與資料摘要](portable-fixtures.json)
+
+要從兩個工作樹重算目前部署比對，可在完整研發根目錄執行
+
+```bash
+.venv/bin/python -B acceptance/harness_refactor/integration/deployment_check.py \
+  . ../science-assets-slim 5904a4fdac3b0267a80fc7b59d3c00427a4871d4
+```

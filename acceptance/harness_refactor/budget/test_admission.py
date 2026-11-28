@@ -99,7 +99,7 @@ class Admission(unittest.TestCase):
 
                 with patch.object(budgets, "check_job_room", coincide), patch.object(
                         executor, "launch", drop_ack), patch.object(executor, "observe",
-                        return_value={"deferred": True}), ThreadPoolExecutor(2) as pool:
+                        return_value={"state": executor.UNKNOWN, "runner_alive": None, "deferred": True}), ThreadPoolExecutor(2) as pool:
                     self.assertCountEqual(pool.map(dispatch, nodes), [True, False])
                 winner, job = study.conn.execute("SELECT node_id,job_id FROM v6_nodes WHERE job_id IS NOT NULL").fetchone()
                 loser = next(nid for nid in nodes if nid != winner)

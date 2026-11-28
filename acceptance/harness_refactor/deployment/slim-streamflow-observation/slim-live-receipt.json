@@ -1,0 +1,76 @@
+{
+  "schema": "gx.slim-study-receipt/1",
+  "run_id": "gxr_01m8frjb04ng1edrvg",
+  "question": "For USGS station 01651000 in the supplied archive, which pair of consecutive days had the largest absolute change in daily mean discharge? Report the dates, both readings, direction, and magnitude with units. What does this record establish about a trend at the station?\n",
+  "goal_version": 1,
+  "status": "CLOSED",
+  "material_refs": [
+    "gxa_01m8frjb0y7pntay8a"
+  ],
+  "lead_turns": [
+    {
+      "thread_id": "01a21f89-3332-72b0-8cac-c8121f8ed6e9",
+      "turn_id": "01a21f89-3368-7490-8918-9f7c0d46ce1f",
+      "official_model_observed": true,
+      "provider": "openai",
+      "model": "gpt-6.2-astra",
+      "rollout": "rollout-2026-11-28T00-23-34-01a21f89-3332-72b0-8cac-c8121f8ed6e9.jsonl",
+      "start": "2026-11-28T00:23:35.023Z",
+      "end": "2026-11-28T00:25:08.381Z"
+    }
+  ],
+  "official_lead_turns_observed": 1,
+  "lead_reads_verified": [
+    {
+      "thread_id": "01a21f89-3332-72b0-8cac-c8121f8ed6e9",
+      "turn_id": "01a21f89-3368-7490-8918-9f7c0d46ce1f",
+      "call_id": "exec-a6e60084-60c5-49fb-8443-4d2f978265dd",
+      "rollout_line": 16,
+      "artifact_ref": "gxa_01m8frjb0y7pntay8a",
+      "sha256": "03c1879879b8c2fdff492ae438cc0c3f3f968d186f30b6c30db533b44a7bd336",
+      "input_material": true,
+      "job_id": null,
+      "type": "complete_json"
+    }
+  ],
+  "adopted_lead_decisions": [
+    {
+      "decision_ref": "gxa_1cf70c5fc59e1d7a3a40777203ae0d898c1c94fdeba35f3a09df23e5bc5480f0",
+      "event_id": 31,
+      "thread_id": "01a21f89-3332-72b0-8cac-c8121f8ed6e9",
+      "turn_id": "01a21f89-3368-7490-8918-9f7c0d46ce1f",
+      "call_id": "call_afba978931854711be0c413e3522d4a6",
+      "rollout_line": 89,
+      "evidence_refs": [
+        "gxa_01m8frjb0y7pntay8a"
+      ],
+      "verified_same_turn_read_calls": [
+        "exec-a6e60084-60c5-49fb-8443-4d2f978265dd"
+      ],
+      "rationale": "At USGS station 01651000, daily mean discharge fell from 60.9 ft³/s on April 1 to 40.7 ft³/s on April 2, 2023, a decrease of 20.2 ft³/s. It then fell by 14.8 ft³/s to 25.9 ft³/s on April 3. The first decrease was the largest in the archive.",
+      "operations": [
+        "close_run"
+      ],
+      "prior_lead_turn_read_calls": []
+    }
+  ],
+  "closure": {
+    "decision_ref": "gxa_1cf70c5fc59e1d7a3a40777203ae0d898c1c94fdeba35f3a09df23e5bc5480f0",
+    "requested_event": 26,
+    "committed_event": 31,
+    "closed_event": 33,
+    "closed_utc": "2026-11-28T00:25:08.020Z"
+  },
+  "final_result": {
+    "evidence_refs": [
+      "gxa_01m8frjb0y7pntay8a"
+    ],
+    "reason": "Both consecutive-day changes in the supplied archive have been compared, and its temporal scope has been assessed.",
+    "rationale": "At USGS station 01651000, daily mean discharge fell from 60.9 ft³/s on April 1 to 40.7 ft³/s on April 2, 2023, a decrease of 20.2 ft³/s. It then fell by 14.8 ft³/s to 25.9 ft³/s on April 3. The first decrease was the largest in the archive.",
+    "unresolved": [
+      "The three days of observations are insufficient to establish a long-term discharge trend at this station."
+    ]
+  },
+  "job_count": 0,
+  "jobs": []
+}

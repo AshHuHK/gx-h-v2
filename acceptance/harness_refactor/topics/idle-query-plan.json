@@ -1,0 +1,19 @@
+{
+  "unchanged_poll_full_history_loads": 0,
+  "correction_delivered": true,
+  "source_events": 45,
+  "plan": [
+    {
+      "query": "SELECT kind,payload_json FROM events WHERE run_id='gxr_01m8frbg5xetw6vma8' AND subject_kind='research_topic' AND subject_id='module:module_d130b138fe2a4372c99abf8df84fb33a' AND kind IN ('research.topic.subscribed','research.topic.consumed') AND json_extract(payload_json,'$.goal_version')=1 ORDER BY event_id",
+      "plan": [
+        "SEARCH events USING INDEX idx_events_subject (subject_kind=? AND subject_id=?)"
+      ]
+    },
+    {
+      "query": "SELECT 1 FROM events WHERE subject_kind='research_topic' AND subject_id='station coverage' AND event_id>38 AND run_id='gxr_01m8frbg5xetw6vma8' AND kind='research.topic.message' AND json_extract(payload_json,'$.goal_version')=1 LIMIT 1",
+      "plan": [
+        "SEARCH events USING INDEX idx_events_subject (subject_kind=? AND subject_id=? AND rowid>?)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "run_id": "gxr_01m8g22y65r8zxbfqw",
+  "deciding_task": "gxt_01m8g2re1wt21kd411",
+  "thread": "01a2202c-3863-7c13-a286-6dfc9d78cb79",
+  "turn": "01a2202c-3894-73c2-b554-13cb3abdcc14",
+  "source_cursor": 573,
+  "before_retirement_event": 603,
+  "retirement_event": 604,
+  "original_refusals": {
+    "call_a308712646334fd3b7383b04f460b1f6": {
+      "code": "STALE_REVISION",
+      "details": {
+        "brief_cursor": 573,
+        "context_ref": "gxcx_01m8g2re1sz47bjyze",
+        "event_id": 588,
+        "goal_version": 1,
+        "reason": "close_context_changed",
+        "uncited_review_refs": [
+          "gxa_01m8g2vb86p9z1dgaz",
+          "gxa_01m8g2vbb0e71mpd5d",
+          "gxa_01m8g2vbd0aynyby48",
+          "gxa_01m8g2vbfsr007pajk",
+          "gxa_01m8g2x2tqnabk1tt3"
+        ]
+      },
+      "evidence_ref": null,
+      "message": "New research evidence arrived after the delivered brief; reconsider before closing. The refreshed Lead can cite the listed review refs in decision.evidence_refs",
+      "retryable": true,
+      "side_effect_status": "NONE",
+      "suggested_recovery": "Re-read gx_run_status and resubmit with the current revision."
+    },
+    "call_578af7f80d194ef2846032604c762045": {
+      "code": "SCOPE_DENIED",
+      "evidence_ref": null,
+      "message": "this root no longer owns the current task attempt",
+      "retryable": false,
+      "side_effect_status": "NONE",
+      "suggested_recovery": "The query or URI falls outside the approved project/namespace scope."
+    }
+  },
+  "actual_original_tool_outputs": {
+    "call_a308712646334fd3b7383b04f460b1f6": {
+      "error": "STALE_REVISION: New research evidence arrived after the delivered brief; reconsider before closing. The refreshed Lead can cite the listed review refs in decision.evidence_refs",
+      "code": "STALE_REVISION",
+      "reason": "close_context_changed"
+    },
+    "call_578af7f80d194ef2846032604c762045": {
+      "error": "SCOPE_DENIED: this root no longer owns the current task attempt",
+      "code": "SCOPE_DENIED"
+    }
+  },
+  "own_delivered_reviews": [
+    "gxa_01m8g2vb86p9z1dgaz",
+    "gxa_01m8g2vbb0e71mpd5d",
+    "gxa_01m8g2vbd0aynyby48",
+    "gxa_01m8g2vbfsr007pajk",
+    "gxa_01m8g2x2tqnabk1tt3"
+  ],
+  "first_close_with_this_code": {
+    "code": "SCHEMA_INVALID",
+    "message": "The closing decision omits reviews received by this Lead.",
+    "retryable": true,
+    "side_effect_status": "NONE",
+    "evidence_ref": null,
+    "suggested_recovery": "Add the listed review references to decision.evidence_refs and submit the corrected decision with a new call ID from this Lead.",
+    "details": {
+      "reason": "uncited_own_reviews",
+      "field": "decision.evidence_refs",
+      "uncited_review_refs": [
+        "gxa_01m8g2vb86p9z1dgaz",
+        "gxa_01m8g2vbb0e71mpd5d",
+        "gxa_01m8g2vbd0aynyby48",
+        "gxa_01m8g2vbfsr007pajk",
+        "gxa_01m8g2x2tqnabk1tt3"
+      ]
+    }
+  },
+  "corrected_close_at_same_prefix_passes_freshness": true,
+  "external_calls": 0,
+  "writes_to_research_run": 0
+}

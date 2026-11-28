@@ -67,6 +67,7 @@ def pending_adoptions(conn, rid, version, tool, args):
     selected = {}
     matches = {}
     issued_commission = False
+    proposed_nodes = set()
     for row in proposals:
         proposal = json.loads(row["result_json"])
         key = proposal.get("instance_key")
@@ -79,18 +80,32 @@ def pending_adoptions(conn, rid, version, tool, args):
                 if issued is None or issued["operation_key"] != args["operation_key"]:
                     continue
                 issued_commission = True
-                # The allowance funds this new study. The role, inputs and privacy
-                # identify the producer whose named delivery the Join will observe.
-                if all(issued.get(field) == args.get(field) for field in
-                       ("module_id", "module_version", "input_refs", "communication")):
+                # Money and presentation round belong to this study. Keep the
+                # requested research, input bindings and audience of the logical slot.
+                local = {"sub_budget", "round"}
+                if {k:v for k,v in args.items() if k not in local} == {k:v for k,v in issued.items() if k not in local}:
                     matched.append(args["operation_key"])
         else:
-            matched = [op["node"] for op in nodes if op in proposal["ops"]]
+            matched = []
+            by_node = {candidate["node"]: candidate for candidate in proposal["ops"]}
+            for op in nodes:
+                name = op["node"]
+                candidate = by_node.get(name)
+                if (not candidate or op["branch"] != candidate["branch"]
+                        or op["recipe_decision"] != candidate["recipe_decision"]):
+                    continue
+                proposed_nodes.add(name)
+                # The present Lead chooses its question; input ports and executable
+                # settings identify the same step that will satisfy the Join.
+                if dict(candidate, question=op.get("question")) == dict(op, question=op.get("question")):
+                    matched.append(name)
         for name in matched:
             matches.setdefault(name, set()).add(key)
             selected.setdefault(key, json.loads(row["request_json"])["arguments"])
     if issued_commission and not matches:
-        raise SchemaInvalid("The recipe's commission has different module, input or audience bindings. Use a new operation key for independent work.")
+        raise SchemaInvalid("The recipe's commission has different scientific or audience bindings. Use a new operation key for independent work.")
+    if proposed_nodes - matches.keys():
+        raise SchemaInvalid("This node differs from the proposed recipe stage. Rebind the recipe or commission an independent node without its recipe marker.")
     adopted_keys = set()
     for keys in matches.values():
         if len(keys) > 1:

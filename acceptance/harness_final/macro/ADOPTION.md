@@ -4,11 +4,13 @@
 
 `baseline-full.log`（4b6aa93）及 `baseline-slim.log`（6ec604d）保留最初探針的兩個失敗。`adoption-0.json` 為實際委派，`adoption-1.json` 為明示採納。驗收使用受控原生回調，不計入 OAuth 科研實場。
 
+`computation.json` 的受控 Lead 將配方步驟提交給實際 CPU Job。修改為未綁定的輸入時，該交易未建立節點或 Join；Lead 使用新問題、保持原先綁定後，一次提交同時建立計算與監看。下一個 Lead 收到本題 Job 的具名輸出。
+
 從部署根目錄執行
 
 ```bash
 PYTHONPATH="$PWD:$PWD/gx-h:$PWD/gx-h/tests:$PWD/acceptance/v62a" \
 GX_CODEX_OFFLINE=1 GX_ADOPTION_RECEIPT="$PWD/acceptance/harness_final/macro/adoption" \
-.venv/bin/python -B -m unittest -v acceptance.harness_final.macro.test_adoption \
+.venv/bin/python -B -m unittest -v acceptance.harness_final.macro.test_adoption acceptance.harness_final.macro.test_adopt_computation \
   acceptance.harness_refactor.macro.test_macro_recipe acceptance.harness_refactor.macro.test_joins
 ```

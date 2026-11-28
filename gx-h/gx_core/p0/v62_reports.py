@@ -11,7 +11,7 @@ from ..domain import ids
 from ..errors import ArtifactHashMismatch, IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
 from . import manifest as execution
-from . import v6_decisions, v6_goal, v6_jobs
+from . import harness_policy, v6_decisions, v6_goal, v6_jobs
 
 SCHEMA = "gx.v62.module_report_bundle.1"
 _FIELDS = {"operation_key", "status", "findings", "artifact_refs", "gaps", "next_steps"}
@@ -79,13 +79,15 @@ def _module_evidence(conn, module):
     from .v62_native import operation_receipts
     rid = module["run_id"]
     from . import pi_materials
-    proofs, private = {}, pi_materials.private_originals(conn, rid)
+    proofs, restricted_reads = {}, set()
+    private = pi_materials.private_originals(conn, rid)
     for op in operation_receipts(conn, rid, module["module_instance_id"]):
         refs = set(op.get("source_refs", ())) | set(op.get("artifact_refs", ()))
         # Released reports grant their cited sources to peers. Do not release a private
         # PI original or its extracted quotation through that otherwise public path.
         if private.intersection(refs):
             private.update(op.get("artifact_refs", ()))
+            restricted_reads.update(refs & private)
             continue
         for ref in refs:
             proofs.setdefault(ref, []).append({"tool": op["tool"], "operation_key": op["operation_key"],
@@ -107,14 +109,22 @@ def _module_evidence(conn, module):
                 **{k: output[k] for k in ("output_name", "nature") if k in output},
                 output_sha256=output["sha256"], admission_sha256=manifest["admission_hash"],
                 manifest_sha256=manifest["manifest_hash"]))
-    return proofs
+    return proofs, restricted_reads
 
 
-def _sources(conn, module, refs, evidence):
+def _sources(conn, module, refs, evidence, restricted_reads):
     service = ArtifactService(conn)
     sources = []
     for ref in sorted(refs):
         if ref not in evidence:
+            if ref in restricted_reads and harness_policy.active(conn, module["run_id"]):
+                raise ScopeDenied(
+                    "This module already accessed the branch-private PI source or its extract. A released report "
+                    "shares cited sources with other researchers. For a verifiable public finding, ask the PI "
+                    "to provide an original authorized for that audience (use pi_questions when available). "
+                    "You can also report the publication gap while keeping the restricted data private.",
+                    details={"reason": "branch_private_report_source", "artifact_ref": ref},
+                )
             raise ScopeDenied("The module must read the cited artifact or complete its producing Job")
         meta = service.describe(ref)
         if meta["run_id"] != module["run_id"]:
@@ -139,7 +149,7 @@ class Report:
     manifest: delivery.PreparedManifest
 
 
-def _stage(conn, module, task, identity, payload, evidence, *, attempt):
+def _stage(conn, module, task, identity, payload, evidence, restricted_reads, *, attempt):
     binds = {"kind": "MODULE" if identity else "GX", "task_id": task["task_id"],
              "context_ref": task["context_ref"], **(identity or {})}
     sources = set(payload["artifact_refs"])
@@ -151,7 +161,7 @@ def _stage(conn, module, task, identity, payload, evidence, *, attempt):
     if auto_endpoints:
         sources.update(ref for ref, proofs in evidence.items() if any(
             proof.get("job_id") and proof.get("output_name") for proof in proofs))
-    checked = _sources(conn, module, sources, evidence)
+    checked = _sources(conn, module, sources, evidence, restricted_reads)
     bundle = {**{k: module[k] for k in ("module_instance_id", "module_id", "module_version", "round",
                                          "run_id", "scope", "goal_version", "parent_context_ref")},
               "schema": SCHEMA, "version": 1, "author": binds, "base": json.loads(task["base_json"]),
@@ -206,7 +216,8 @@ def prepare_report(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_
     if saved:
         return saved
     root, task = _report_authority(conn, identity, module)
-    return _stage(conn, module, task, dict(identity, call_id=call_id), payload, _module_evidence(conn, module),
+    evidence, restricted_reads = _module_evidence(conn, module)
+    return _stage(conn, module, task, dict(identity, call_id=call_id), payload, evidence, restricted_reads,
                   attempt=root["attempt"])
 
 
@@ -397,7 +408,7 @@ def commit_report(conn, plan):
         if not identity and _partial_reason(conn, current) != payload["gaps"][0]:
             return None  # New work, evidence or funding arrived during GX's preparation.
         # Tool receipts and completion manifests are durable. Recheck source and output identities under the fence.
-        evidence = _module_evidence(conn, current)
+        evidence, _ = _module_evidence(conn, current)
         if not identity and set(evidence) != {source["artifact_ref"] for source in plan.bundle["sources"]}:
             return None
         for source in plan.bundle["sources"]:
@@ -459,11 +470,12 @@ def partial(conn, module, reason):
                         "WHERE d.run_id=? AND d.scope=? ORDER BY d.rowid DESC LIMIT 1", (rid, module["scope"])).fetchone()
     if not task:
         raise SchemaInvalid("GX partial must reference the module's frozen decision task")
-    evidence = _module_evidence(conn, module)
+    evidence, restricted_reads = _module_evidence(conn, module)
     refs = sorted(evidence)
     payload = dict(operation_key="gx.partial:" + mid, status="PARTIAL", findings=[], artifact_refs=refs,
                    gaps=[reason], next_steps=[])
-    return commit_report(conn, _stage(conn, module, task, None, payload, evidence, attempt=task["attempt"]))
+    return commit_report(conn, _stage(conn, module, task, None, payload, evidence, restricted_reads,
+                                      attempt=task["attempt"]))
 
 
 def _size(value):

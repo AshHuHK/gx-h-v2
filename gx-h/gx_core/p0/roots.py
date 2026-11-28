@@ -1098,6 +1098,12 @@ class Roots:
                 return {"success": True, "contentItems": [{"type": "inputText", "text": ids.canonical_json(out)}]}
             if p.get("tool") in self.mode.decision_tools:
                 status = "ACCEPTED"
+                if (p["tool"] == v62_native.REPORT and out.get("delivery_advisory")
+                        and out["author"].get("call_id") == p["callId"]):
+                    # This signed report is already terminal and released. Deliver its
+                    # single scoped advisory to the original callback; the terminal
+                    # owner can interrupt immediately without waiting on an unanswered call.
+                    return {"success":True,"contentItems":[{"type":"inputText","text":ids.canonical_json(out)}]}
                 suppress = True
                 return NO_TOOL_RESPONSE
             if p.get("tool") == "gx_submit_product" and isinstance(out, dict):

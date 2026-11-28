@@ -174,6 +174,12 @@ def _stage(conn, module, task, identity, payload, evidence, restricted_reads, *,
         v621_metrics.render_report(conn, module["run_id"], bundle, current=v621_policy.current(conn, module["run_id"]),
                                    auto_endpoints=auto_endpoints, metric_refs=payload.get("metric_refs", ()),
                                    qualitative_notes=payload.get("qualitative_notes", ()))
+    if harness_policy.current(conn, module["run_id"]):
+        from . import research_report_facts
+        bundle["commission"] = {"module_instance_id":module["module_instance_id"], "scope":module["scope"]}
+        query_records = research_report_facts.query_records(conn, module["run_id"], checked)
+        if query_records:
+            bundle["query_records"] = query_records
     if payload.get("pi_dispositions"):
         bundle["pi_dispositions"] = payload["pi_dispositions"]
     if "gap_criteria" in payload:
@@ -446,6 +452,13 @@ def commit_report(conn, plan):
         if wake is None and reason and mid not in _released(conn, rid, module["round"]):
             wake = _wake(conn, module, "early:" + mid, reason, [receipt])
         receipt["wake_event_id"] = wake
+        if identity and harness_policy.current(conn, rid):
+            from . import research_report_facts
+            advisory = research_report_facts.module_advisory(conn, plan.task, current, ref)
+            if advisory:
+                # Only the submitting native binding gets this scoped callback. The
+                # report/wake above contain the public product and no private material.
+                receipt["delivery_advisory"] = advisory
         conn.execute("INSERT INTO v62_module_reports(module_instance_id,run_id,report_ref,operation_key,"
                      "request_sha256,receipt_json) VALUES(?,?,?,?,?,?)", (mid, rid, ref, key, plan.request_sha, store._j(receipt)))
         v62_budget.close_if_settled(conn, current["budget_ref"])
@@ -514,7 +527,13 @@ def _index_entry(bundle, ref):
     entry = {**_base(bundle, ref)}
     if (authored := research_handoff.message_preview(bundle)) is not None:
         entry["researcher_message"] = authored
+    if authored is not None or "commission" in bundle:
         entry["gx_facts"] = research_handoff.execution_facts(bundle)
+    if "commission" in bundle:
+        facts = entry["gx_facts"]
+        facts.update(commission=bundle["commission"], author_kind=bundle["author"]["kind"], status=bundle["status"])
+        if bundle.get("query_records"):
+            facts["query_records"] = bundle["query_records"]
     counters = [{"text": ("A named measurement was flagged for review." if finding.get("metric_refs")
                           else _excerpt(finding["text"])), "source_refs": finding["source_refs"],
                  **({"evidence_status": finding["evidence_status"]} if "evidence_status" in finding else {})}
@@ -679,6 +698,12 @@ def report_views(conn, run_id, *, per_report_bytes=4096, total_bytes=16384, thro
         except StaleRevision:
             bundle["applicability"] = "historical_revalidation_required"
         index = _index_entry(bundle, ref)
+        if "commission" in bundle:
+            # The commissioning Lead owns the instructions. Keep their wording out
+            # of the broadly released artifact and other researchers' receipts.
+            question_id = json.loads(module["grant_json"]).get("route_intent") or module["module_instance_id"]
+            index["gx_facts"]["commission"] = {**bundle["commission"], "question_id":question_id,
+                                               "question":module["focus"], "expected_delivery":module["expected_delivery"]}
         if comparisons and bundle.get("verified_metrics"):
             from .v623_endpoints import comparison_keys
             preferred = comparison_keys(conn, bundle["verified_metrics"], comparisons)

@@ -214,7 +214,8 @@ def tool_specs(read_tools, brief=None, *, conn=None, run_id=None):
                        if evidence_run else _legacy_goal_tools(version))
     if harness_policy.enabled(brief):
         claim = deepcopy(claim)
-        claim["inputSchema"]["properties"]["evidence_check"] = v6_claims.EVIDENCE_CHECK
+        claim["inputSchema"]["properties"]["evidence_check"] = v6_claims.evidence_check_spec(
+            brief.get("harness_policy") == harness_policy.VERSION)
     catalog.extend((_research_decision_tool(decision, brief), claim))
     if brief is None or (brief.get("scope", "run") == "run" and brief.get("branch_delegation", True) and
                          has_open_branch(brief, harness_policy.enabled(brief))):

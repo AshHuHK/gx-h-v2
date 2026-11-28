@@ -225,15 +225,17 @@ def attach(conn, brief, files, terms, cursor):
             if k in item} for item in items]
 
 
-def _reads(conn, rid, scope, ref, segment, visible):
-    """Only credit another author's located read when their signed delivery released that source."""
-    releases = json.dumps(sorted(visible)) if scope == "run" else "[]"
-    def authorized(column):
-        return f"""(t.scope=? OR EXISTS (SELECT 1 FROM v62_module_reports mr
+def read_authority_sql(column):
+    return f"""(t.scope=? OR EXISTS (SELECT 1 FROM v62_module_reports mr
             JOIN v62_modules m USING(run_id,module_instance_id)
             WHERE mr.run_id=t.run_id AND m.scope=t.scope AND mr.report_ref IN (SELECT value FROM json_each(?))
               AND json_extract(mr.receipt_json,'$.author.kind')='MODULE'
               AND EXISTS (SELECT 1 FROM json_each(mr.receipt_json,'$.source_refs') refs WHERE refs.value={column})))"""
+
+
+def _reads(conn, rid, scope, ref, segment, visible):
+    """Only credit another author's located read when their signed delivery released that source."""
+    releases = json.dumps(sorted(visible)) if scope == "run" else "[]"
     digest = conn.execute("SELECT sha256 FROM artifacts WHERE artifact_ref=? AND run_id=?", (ref,rid)).fetchone()
     if not digest:
         return False
@@ -241,7 +243,7 @@ def _reads(conn, rid, scope, ref, segment, visible):
         JOIN v6_decision_tasks t ON t.task_id=r.task_id AND t.run_id=s.namespace
         JOIN source_segments seg ON seg.source_id=r.source_id AND seg.segment_id=r.segment_id
             AND seg.text_sha256=r.text_sha256
-        WHERE {authorized('s.blob_artifact_ref')} AND s.namespace=? AND s.blob_sha256=? AND (r.segment_id=? OR (? IS NULL AND
+        WHERE {read_authority_sql('s.blob_artifact_ref')} AND s.namespace=? AND s.blob_sha256=? AND (r.segment_id=? OR (? IS NULL AND
             (s.text_coverage!='FULL_TEXT' OR seg.kind='body'))) LIMIT 1""",
                                 (scope, releases, rid, digest[0], segment, segment)).fetchone()
     if segment_read:
@@ -253,7 +255,7 @@ def _reads(conn, rid, scope, ref, segment, visible):
             JOIN source_segments seen ON seen.source_id=r.source_id AND seen.segment_id=r.segment_id
               AND seen.text_sha256=wanted.text_sha256 AND seen.kind=wanted.kind
             JOIN v6_decision_tasks t ON t.task_id=r.task_id AND t.run_id=read.namespace
-            WHERE {authorized('read.blob_artifact_ref')} AND original.namespace=? AND original.blob_artifact_ref=?
+            WHERE {read_authority_sql('read.blob_artifact_ref')} AND original.namespace=? AND original.blob_artifact_ref=?
               AND EXISTS (SELECT 1 FROM json_each(original.provenance_json,'$.parsing.publication_identifiers') a
                 JOIN json_each(read.provenance_json,'$.parsing.publication_identifiers') b ON a.value=b.value)
             LIMIT 1""", (segment,scope,releases,rid,ref)).fetchone():
@@ -270,7 +272,7 @@ def _reads(conn, rid, scope, ref, segment, visible):
         FROM p0_root_calls c JOIN p0_v6_native_calls n USING(thread_id,turn_id,call_id)
         JOIN p0_roots p USING(thread_id) JOIN v6_decision_tasks t ON t.task_id=p.task_id
         JOIN artifacts a ON a.artifact_ref=json_extract(n.request_json,'$.arguments.ref') AND a.run_id=t.run_id
-        WHERE {authorized('a.artifact_ref')} AND t.run_id=? AND a.sha256=? AND json_extract(n.request_json,'$.tool')='gx_read_artifact'
+        WHERE {read_authority_sql('a.artifact_ref')} AND t.run_id=? AND a.sha256=? AND json_extract(n.request_json,'$.tool')='gx_read_artifact'
           AND json_type(n.request_json,'$.arguments.endpoint_offset') IS NULL)
         SELECT scope,bytes,full_json,CASE WHEN NOT full_json THEN json_extract(page,'$.metadata.offset') END,
             CASE WHEN NOT full_json THEN json_extract(page,'$.metadata.returned_bytes') END FROM reads""",

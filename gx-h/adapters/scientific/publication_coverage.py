@@ -42,6 +42,24 @@ def _keys(pages):
     return {key: root(key) for key in parent}
 
 
+def query_record(document):
+    """Expose the exact observed search scope, including unsuccessful pages and continuation."""
+    if not isinstance(document, dict) or document.get("schema") != "gx.scholarly-candidates/1":
+        raise ValueError("Unknown search record")
+    if (not isinstance(document.get("query"), str) or not document["query"].strip()
+            or not isinstance(document.get("sources"), list) or not document["sources"]):
+        raise ValueError("Missing query or provider windows")
+    sources = []
+    for window in document["sources"]:
+        if (not isinstance(window, dict) or not isinstance(window.get("provider"), str)
+                or window.get("status") not in ("hits","empty","unavailable","not_queried")):
+            raise ValueError("Missing provider or recorded status")
+        sources.append({key:window[key] for key in (
+            "provider","page","status","coverage","offset_before","returned","provider_hits","has_more",
+            "next_cursor","error","retrieved_at","sha256") if key in window})
+    return {"query":document["query"], "source_mode":document.get("source_mode"), "sources":sources}
+
+
 def summarize(pages, originals):
     keys = _keys(pages)
     linked = defaultdict(list)

@@ -11,6 +11,35 @@ class ScopedFacts(unittest.TestCase):
     def setUp(self):
         self.work = Path(self.enterContext(tempfile.TemporaryDirectory()))
 
+    def test_lead_must_cite_the_actual_handoff_to_grade_a_researchers_located_method(self):
+        from acceptance.v62a.interleavings_fixture import draft
+        from gx_core.artifacts import ArtifactService
+        from gx_core.errors import SchemaInvalid
+        doc = self.work / "methods.xml"
+        doc.write_text("<article><body><sec id='methods'><title>Methods</title>"
+                       "<p>The readouts were recorded at the same time.</p></sec></body></article>")
+        cfg = {"research_modules":["data_inventory@1"], "capabilities":["tl1a-coordinate-quality@1"],
+               "plugins":["org.gx.protein@0.2.0"], "input_files":[{"role":"methods","path":str(doc)}]}
+        with Study(self.work, spec_updates=cfg) as s:
+            source = s.materials[0]
+            actor = s.bind(s.open("method",inputs=[source],caps=[])["task_id"])
+            doc = s.call(actor,"gx_read_source",{"source_ref":source},"list")
+            segment = next(seg["segment_id"] for seg in doc["segments"] if seg["label"].endswith("methods/p"))
+            read = s.call(actor,"gx_read_source",{"source_ref":source,"segment_id":segment},"inspect")
+            s.call(s.lead,"gx_decide_revision",{"decision":draft()},"await")
+            report = s.report(actor,source,text="The paper describes a paired readout.")
+            lead = s.next_actor("run")
+            claim = {"statement":"A paired readout is described.","scope":"The report's one study",
+                     "criteria":"Method paragraph verified.","limitations":"One protocol.","level":"insufficient",
+                     "rationale":"The investigator inspected the source.",
+                     "evidence_check":{"grade":"body_method_checked","receipt_id":read["receipt_id"],"source_ref":source}}
+            with self.assertRaises(SchemaInvalid):
+                s.call(lead,"gx_stage_claim",{**claim,"evidence_refs":[source]},"uncited")
+            staged = s.call(lead,"gx_stage_claim",{**claim,"evidence_refs":[source,report["report_ref"]]},"cited")
+            grade = ArtifactService(s.conn).read_json(staged["claim_ref"])["evidence_grade_receipt"]
+            self.assertEqual((grade["reader_scope"],grade["text_sha256"],grade["segment_id"]),
+                             (actor.scope,read["text_sha256"],segment))
+
     def test_only_delegated_visible_reference_may_reach_child_delivery(self):
         cfg = {"research_modules":["data_inventory@1"], "capabilities":["tl1a-coordinate-quality@1"],
                "plugins":["org.gx.protein@0.2.0"]}

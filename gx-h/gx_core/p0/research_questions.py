@@ -19,6 +19,8 @@ class Questions:
         if module := brief.get("module"):
             self.labels[module.get("route_intent") or module["module_instance_id"]] = module["focus"]
         for report in brief.get("module_report_index", ()):
+            if report.get("goal_version") != brief["goal_version"]:
+                continue
             commission = report.get("gx_facts", {}).get("commission", {})
             if commission.get("question_id") and commission.get("question"):
                 self.labels.setdefault(commission["question_id"], commission["question"])

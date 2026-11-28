@@ -1,0 +1,223 @@
+{
+  "comparison_scope": "Recorded physical outputs compared with the independent original USGS daily-value calculation",
+  "original_flow_sha256": "611703c8b39d98ec08f695bfe73de10f805ec49db675da8811591936bfa28c93",
+  "projected_flow_sha256": "0b464958363949558765ee47b38c60bf10f61e3c4ad39552d7aab95f422972d0",
+  "reference_sha256": "aaf14cf4e08e4a4725c37ac7d6a1266fb272c00602d658a3a4ecfb994cf307e1",
+  "outputs": [
+    {
+      "arm": "candidate",
+      "job_id": "gxj_01m8g1505ckz2bg1vg",
+      "method": "discharge-concurrent@1",
+      "path": "outputs/candidate/gxj_01m8g1505ckz2bg1vg/paired.json",
+      "sha256": "231291156e18541f791deaa94e328679e7251d800a5517c9cea8fb3ccd0ddd6b",
+      "volume_relative_error": {
+        "01646500": "6.6658325581E-17",
+        "01651000": "0"
+      },
+      "within_registered_tolerance": true
+    }
+  ],
+  "timing": {
+    "candidate": {
+      "elapsed_seconds": 531.795,
+      "cli_launch_to_first_official_turn_seconds": 6.91,
+      "interruption_to_resume_launch_seconds": 0.812,
+      "official_turn_active_union_seconds_including_interrupted_prefix": 518.811,
+      "interrupted_turn_ids_censored_at_controller_cut": [],
+      "turn_interval_coverage": [
+        4,
+        4
+      ],
+      "measured_provider_startup_seconds": [
+        0.029
+      ],
+      "measurement_execution_union_seconds": 0.242,
+      "external_gpu_queue_seconds": 0,
+      "interpretation": "Official turn intervals include transport, model service, reasoning and synchronous tools. Startup and recovery gaps are real control-path wall intervals. Service-side model queue and exclusive controller CPU cannot be separated from these receipts."
+    }
+  },
+  "late_source_route": {
+    "candidate": {
+      "intake": 1795834413.4340289,
+      "intake_source_sha256": "85b04c53281af46020279253e140a6349f7e91a0d7fe93d06de669a647f34bca",
+      "scientific_lead_threads": [
+        "01a22011-c7ae-7233-94f3-b0ddf7aa871f",
+        "01a22012-96b3-7f41-adf6-691fa66752a9",
+        "01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3"
+      ],
+      "effective_feedback_and_closure_events": [
+        {
+          "event_id": 60,
+          "kind": "research.pi.feedback",
+          "ts": "2026-11-28T02:54:34.816Z",
+          "feedback_id": "pif_0c910e1c568e867964b7ff6e9d5507a8"
+        },
+        {
+          "event_id": 61,
+          "kind": "pi.message.routed",
+          "ts": "2026-11-28T02:54:34.817Z",
+          "feedback_id": null
+        },
+        {
+          "event_id": 89,
+          "kind": "v6.run.closed",
+          "ts": "2026-11-28T03:01:30.461Z",
+          "feedback_id": null
+        }
+      ],
+      "accepted_decisions_with_input_cursors": [
+        {
+          "event_id": 38,
+          "ts": "2026-11-28T02:53:33.058Z",
+          "event_cursor": 25,
+          "context_utc": "2026-11-28T02:52:40.699Z",
+          "decision_ref": "gxa_91a669d60d7c1ba3b66f6ba1785f607869c3e380c352aae5c8fde96f0e8b62d4",
+          "thread_id": "01a22011-c7ae-7233-94f3-b0ddf7aa871f",
+          "turn_id": "01a22011-c7ed-7c81-aa9a-e6899ff53b6b",
+          "call_id": "call_e818d644edbb424c82dff1cc4888627e"
+        },
+        {
+          "event_id": 87,
+          "ts": "2026-11-28T03:01:30.357Z",
+          "event_cursor": 70,
+          "context_utc": "2026-11-28T02:57:22.002Z",
+          "decision_ref": "gxa_f362b5a75f1d3665b9c3b527a56a36702ac1ed1a3f9db3d3d15cad1079c87d7d",
+          "thread_id": "01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3",
+          "turn_id": "01a22015-fea5-76a3-9ce5-88bc69dee52c",
+          "call_id": "call_707bb57f0e5149e0b2fd38102a8d836a"
+        }
+      ],
+      "official_items": [
+        {
+          "utc": "2026-11-28T02:53:44.195Z",
+          "thread": "01a22012-960d-74d0-9ad0-5dda51696d8a",
+          "turn": "01a22012-966c-7fc1-9be9-f3b753e79d67",
+          "item": "01a22012-ab80-7310-9e51-72566c5a7f6f",
+          "kind": "UserMessage",
+          "tool": null,
+          "line": 11,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-53-38-01a22012-960d-74d0-9ad0-5dda51696d8a.jsonl",
+          "scientific_lead": false,
+          "entire_original": true,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:54:34.825Z",
+          "thread": "01a22012-960d-74d0-9ad0-5dda51696d8a",
+          "turn": "01a22012-966c-7fc1-9be9-f3b753e79d67",
+          "item": "exec-b3c0a83f-397b-4faf-8634-d41f7048d395",
+          "kind": "DynamicToolCall",
+          "tool": "gx_route_pi_message",
+          "line": 30,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-53-38-01a22012-960d-74d0-9ad0-5dda51696d8a.jsonl",
+          "scientific_lead": false,
+          "entire_original": false,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:54:38.895Z",
+          "thread": "01a22012-960d-74d0-9ad0-5dda51696d8a",
+          "turn": "01a22012-966c-7fc1-9be9-f3b753e79d67",
+          "item": "exec-c9fea896-889d-4bc0-b1f4-330764f43016",
+          "kind": "DynamicToolCall",
+          "tool": "gx_project_state",
+          "line": 36,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-53-38-01a22012-960d-74d0-9ad0-5dda51696d8a.jsonl",
+          "scientific_lead": false,
+          "entire_original": false,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:54:50.533Z",
+          "thread": "01a22012-960d-74d0-9ad0-5dda51696d8a",
+          "turn": "01a22012-966c-7fc1-9be9-f3b753e79d67",
+          "item": "exec-965530ed-474c-446b-9294-9800e68ff0ba",
+          "kind": "DynamicToolCall",
+          "tool": "gx_project_state",
+          "line": 50,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-53-38-01a22012-960d-74d0-9ad0-5dda51696d8a.jsonl",
+          "scientific_lead": false,
+          "entire_original": false,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:57:25.300Z",
+          "thread": "01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3",
+          "turn": "01a22015-fea5-76a3-9ce5-88bc69dee52c",
+          "item": "01a22016-0b2a-7b83-ad49-ca5fd7d14382",
+          "kind": "UserMessage",
+          "tool": null,
+          "line": 10,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-57-22-01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3.jsonl",
+          "scientific_lead": true,
+          "entire_original": false,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        },
+        {
+          "utc": "2026-11-28T02:57:54.002Z",
+          "thread": "01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3",
+          "turn": "01a22015-fea5-76a3-9ce5-88bc69dee52c",
+          "item": "exec-f38add21-4d61-4f92-a4c1-23349bccc8da",
+          "kind": "DynamicToolCall",
+          "tool": "gx_task_context",
+          "line": 16,
+          "session": "sessions/2026/11/28/rollout-2026-11-28T02-57-22-01a22015-fe7d-75d1-b0f0-1c1ca6d4a3b3.jsonl",
+          "scientific_lead": true,
+          "entire_original": false,
+          "original_rows_through_area": [
+            "01646500",
+            "01651000"
+          ],
+          "cooccurring_site_and_value": [
+            "01646500",
+            "01651000"
+          ],
+          "area_field_or_units_in_body": true
+        }
+      ],
+      "lead_received_entire_inventory": false,
+      "lead_received_both_original_rows": true,
+      "lead_saw_domain_and_both_rows": true
+    }
+  }
+}

@@ -15,6 +15,50 @@ ev = importlib.util.module_from_spec(helper)
 helper.loader.exec_module(ev)
 
 
+def host_submissions(study, threads, committed):
+    """Direct decision/report attempts include structural errors that GX never commits."""
+    records = []
+    for file in sorted((study/"codex/sessions").rglob("*.jsonl")):
+        thread = turn = None
+        pending = {}
+        with file.open() as source:
+            for line in source:
+                try:
+                    item = json.loads(line)
+                except json.JSONDecodeError:
+                    if not line.endswith("\n"):
+                        break
+                    raise
+                r = item.get("payload",{})
+                if item.get("type") == "session_meta":
+                    thread = r.get("id")
+                    if thread not in threads or r.get("model_provider") != "openai":
+                        break
+                if item.get("type") == "turn_context":
+                    turn = r.get("turn_id")
+                if thread not in threads or item.get("type") != "response_item":
+                    continue
+                cid = r.get("call_id")
+                if r.get("type") == "function_call" and r.get("name") in (
+                        "gx_decide_revision","gx_submit_module_report"):
+                    attempt = {"thread_id":thread,"turn_id":turn,"call_id":cid,"tool":r["name"],
+                               "at_utc":item.get("timestamp"),"arguments_sha256":hashlib.sha256(
+                                   r.get("arguments","").encode()).hexdigest(),
+                               "gx_native_row":(thread,turn,cid) in committed,"feedback":None}
+                    pending[cid] = attempt
+                    records.append(attempt)
+                if r.get("type") == "function_call_output" and cid in pending:
+                    output = r.get("output")
+                    try:
+                        result = json.loads(output)
+                    except (TypeError,ValueError):
+                        result = None
+                    pending[cid]["feedback"] = (ev.pick(result,
+                        "code category error pointer failure_count max_failures terminal outcome event_id report_ref")
+                        if isinstance(result,dict) else str(output)[:400])
+    return records
+
+
 def export(study, run):
     state = study / "state"
     host = ev.rollouts(study)
@@ -29,6 +73,13 @@ def export(study, run):
         spec = config["inputs"]["p0_spec"]
         inputs = [ev.pick(x, "role artifact_ref sha256") for x in config["files"]]
         jobs = ev.jobs(db, state, run)
+        for item in jobs:
+            manifest = db.execute("SELECT completion_json FROM p0_execution_manifests WHERE job_id=?",
+                                  (item["job_id"],)).fetchone()
+            if manifest and manifest[0]:
+                done = json.loads(manifest[0])
+                if done.get("failure"):
+                    item["failure"] = done["failure"]
         output_refs = {f["artifact_ref"] for j in jobs for f in j["outputs"] if f["verified_bytes"]}
         decisions = ev.decisions(db, run)
         known = {f["artifact_ref"] for f in inputs} | output_refs | {x for v in decisions for x in v["evidence_refs"]}
@@ -81,6 +132,19 @@ def export(study, run):
             if c["tool"] == "gx_decide_revision":
                 c["decision_ops_as_submitted"] = req.get("decision",{}).get("ops",[])
             c["official"] = c["official"] and (c["thread_id"],c["turn_id"]) in real
+        extractions = []
+        for row in db.execute("""SELECT n.thread_id,n.turn_id,n.call_id,n.rowid AS seq,n.request_json,c.result_json,
+                t.scope,rt.task_id FROM p0_v6_native_calls n JOIN p0_roots rt USING(thread_id)
+                JOIN v6_decision_tasks t USING(task_id) JOIN p0_root_calls c USING(thread_id,turn_id,call_id)
+                WHERE rt.run_id=? AND json_extract(n.request_json,'$.tool')
+                IN ('gx_extract_evidence','gx_review_evidence') ORDER BY n.rowid""",(run,)):
+            req = json.loads(row["request_json"])
+            out = json.loads(row["result_json"])
+            args = req["arguments"]
+            extractions.append({**ev.pick(row,"thread_id turn_id call_id task_id scope seq"),"tool":req["tool"],
+                "official":(row["thread_id"],row["turn_id"]) in real,
+                "arguments":ev.pick(args,"claim applicability limitations source_ref receipt_id segment_id evidence_ref verdict"),
+                "receipt":ev.pick(out,"accepted artifact_ref evidence_ref evidence_id quote_sha256 scope found_in anchor_status verdict")})
         receipts = {x["receipt_id"]:x for x in actions if x.get("receipt_id")}
         reads = []
         for row in db.execute("""SELECT r.receipt_id,s.blob_artifact_ref source_ref,s.blob_sha256,
@@ -118,7 +182,8 @@ def export(study, run):
         return {"run_id":run,"goal_text_sha256":hashlib.sha256(goal["goal"].strip().encode()).hexdigest(),
                 **ev.pick(goal,"status stop_decision_ref"),"inputs":inputs, "predecessor":spec.get("predecessor",{}),
                 "research_effort":spec.get("research_effort"),"turns":turns,"calls":actions,"jobs":jobs,
-                "reports":reports,"original_reads":reads,"decisions":decisions,"research_access":access,
+                "reports":reports,"original_reads":reads,"decisions":decisions,"research_access":access,"source_evidence_actions":extractions,
+                "official_direct_submissions":host_submissions(study,{t["thread_id"] for t in turns},request_index),
                 "lead_effects":ev.compare_decisions(db,run,goal,decisions,turns,actions,reports,output_refs,derived),
                 "recipes":recipes,"events":ev.events(db,run),"event_locator":index}
 

@@ -1,0 +1,13 @@
+{
+  "query": "SELECT e.event_id,e.ts,e.subject_id AS artifact_ref,a.job_id,a.sha256,a.rel_path FROM events e JOIN artifacts a ON a.artifact_ref=e.subject_id AND a.run_id=e.run_id\n WHERE e.kind='artifact.published' AND a.published=1 AND a.kind='mapped_structure_agreement' ORDER BY e.event_id",
+  "events": [
+    {
+      "event_id": 128,
+      "ts": "2026-11-28T02:48:15.520Z",
+      "artifact_ref": "gxa_01m8g0v9x00tph5xwy",
+      "job_id": "gxj_01m8g0v91xknqrv75g",
+      "sha256": "711264059e29aa2de5006ac8b4c26b1d4790a645c7ccb311d9c818c87e91b9f2",
+      "rel_path": "files/agreement.json"
+    }
+  ]
+}

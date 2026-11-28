@@ -1,0 +1,223 @@
+{
+  "transport": "SCRIPTED_CALLBACK",
+  "official_model_calls": 0,
+  "cpu_jobs": "real",
+  "science_case": "Independent engineering control on a different food-yeast cohort",
+  "candidate": "6077e26cf0cdbebcf771f7da385d3340976e9516",
+  "question": "In the supplied S. cerevisiae S288C glucan 1,3-beta-glucosidase records, what fraction of distinct accessions has an experimental citation in its catalytic activity annotation, and which accessions require follow-up? What can these records establish?",
+  "run_id": "gxr_01m8g2aj9bq8m0mpth",
+  "original_recipe": {
+    "run_id": "gxr_01m8d9xyaych3h1z2b",
+    "status": "CLOSED",
+    "goal_version": 1,
+    "decision_ref": "gxa_ca07558d5defbbafe5fc110a01e4c06aae186305750acee079da6a26f753796f",
+    "recipe": "accession-pmid-coverage@1",
+    "recipe_digest": "74d6d077301821523c0178e9ef5d2ae4ff03871f19ced4eec3c5bd3ee0cf7a58",
+    "jobs": 2,
+    "host_turns": 6,
+    "methods": {
+      "derive-record-coverage@1": "107a5d091ed872380a05f7f1fb311ee99cdf171d6d1970746a33431080f469b4",
+      "record-coverage-8902880ed9d712bf6baa5899@1": "cf45433b267480075c90d0ff8a5d24eee8d0c79c9e514a6a2a5529bdd5e53981"
+    }
+  },
+  "original_unchanged": true,
+  "provider": "org.gx.record-coverage-8902880ed9d712bf6baa5899@1.0.0",
+  "plugin_sha256": "b4bcef57d78bf4ed151427e647f95394a8e8314c77b1e1c1998fdfe55a92dd2d",
+  "source_index_sha256": "59fdb6f554e756a19873e45bb3f1bde66fc2d86d4fa8c94bb144382b0e4aa09e",
+  "target_inputs": {
+    "cohort": {
+      "ref": "gxa_01m8g2aj9msx3p6jzf",
+      "sha256": "26d9cffa2e6a95514f66802a671e90aecd49689603ccd5ff6f14c2d44797a1a0"
+    },
+    "evidence": {
+      "ref": "gxa_01m8g2aj9p3b98z6x0",
+      "sha256": "41d4b969cac516ef6c2926ef557f759db9a9fd7192a50e42be38c32ba17e2ffc"
+    },
+    "method_source": {
+      "ref": "gxa_01m8g2aj9r7d8sqtdp",
+      "sha256": "f23a87f93ecbf754d3448ac1370a6b959d41ee6048ad9c0013de0165ec36b615"
+    }
+  },
+  "target_jobs": {
+    "local:glucan-derive_method": {
+      "node_id": "node_e4e2166141b3fdde19e1e316ca751a96",
+      "job_id": "gxj_01m8g2bfxebzep7tcj",
+      "result_ref": "gxa_01m8g2bg9pn7jj7nq0",
+      "status": "SUCCEEDED"
+    },
+    "local:glucan-measure_coverage": {
+      "node_id": "node_812e40aefa0031e0958747cb3fc1ff65",
+      "job_id": "gxj_01m8g2bgcjbnfqv5w7",
+      "result_ref": "gxa_01m8g2bgxw3ekq34v3",
+      "status": "SUCCEEDED"
+    }
+  },
+  "published_output": {
+    "artifact_ref": "gxa_01m8g2bgxw3ekq34v3",
+    "sha256": "bee6e4e04c776b7fda8c89b26bd383cfd373cb2b8081355d178b64d7b86e9cee",
+    "kind": "record_coverage",
+    "rel_path": "files/coverage.json"
+  },
+  "reading": {
+    "cohort_rows": 4,
+    "cohort_sha256": "26d9cffa2e6a95514f66802a671e90aecd49689603ccd5ff6f14c2d44797a1a0",
+    "coverage": 0.25,
+    "covered_ids": [
+      "P15703"
+    ],
+    "denominator": 4,
+    "evidence_rows": 4,
+    "evidence_sha256": "41d4b969cac516ef6c2926ef557f759db9a9fd7192a50e42be38c32ba17e2ffc",
+    "matched_without_value": [
+      "P23776",
+      "P32603",
+      "P52911"
+    ],
+    "method": "record-coverage-8902880ed9d712bf6baa5899@1",
+    "numerator": 1,
+    "outside_cohort_ids": [],
+    "schema": "gx.record-coverage/1",
+    "source": {
+      "char_offset": 356,
+      "line": 3,
+      "quote": "an asynchronous job API service to map the identifiers of one database to another",
+      "sha256": "f23a87f93ecbf754d3448ac1370a6b959d41ee6048ad9c0013de0165ec36b615"
+    },
+    "unit": "fraction of unique cohort IDs",
+    "unmatched_ids": []
+  },
+  "received_endpoints": [
+    {
+      "key": "b55278d283b3",
+      "id": "coverage",
+      "value": "1/4 (0.250)",
+      "unit": "1"
+    }
+  ],
+  "used_metric_refs": [
+    "gxa_01m8g2bgxw3ekq34v3#b55278d283b3"
+  ],
+  "independent_join": {
+    "covered": [
+      "P15703"
+    ],
+    "follow_up": [
+      "P23776",
+      "P32603",
+      "P52911"
+    ]
+  },
+  "accepted_decision": "gxa_339380e08919367cacd66319c11dcae4f715d240ab423ea9eaa95bce88f0c5db",
+  "decision_turn": "turn-gxl_01m8g2bgyeyhmvhvrs",
+  "reason": "The supplied annotation has experimental PMID pointers for 1/4 distinct accessions. Prioritize source review for P23776, P32603, P52911. The pointer count alone cannot establish substrate activity or absence of activity.",
+  "events": [
+    {
+      "event_id": 179,
+      "kind": "v6.decision.committed",
+      "subject_id": "gxa_2cb12dd8683e16d9490b312a64a0137011f6cb9a1a8f20c9408600bf96c00830",
+      "reason": null
+    },
+    {
+      "event_id": 188,
+      "kind": "v6.decision.committed",
+      "subject_id": "gxa_940f5d67ff404197e6b5aa2c13e71f3a41ed6638da271f86e8643e93f5937e9a",
+      "reason": null
+    },
+    {
+      "event_id": 200,
+      "kind": "v6.node.settled",
+      "subject_id": "node_e4e2166141b3fdde19e1e316ca751a96",
+      "reason": null
+    },
+    {
+      "event_id": 212,
+      "kind": "v6.node.settled",
+      "subject_id": "node_812e40aefa0031e0958747cb3fc1ff65",
+      "reason": null
+    },
+    {
+      "event_id": 216,
+      "kind": "v624.decision.rejected",
+      "subject_id": "c5ce33a0ab02a0d189f8e103b35f2942c25e2233f8598c5bb872d665e1a06ba8",
+      "reason": null
+    },
+    {
+      "event_id": 219,
+      "kind": "v6.run.close_requested",
+      "subject_id": "gxr_01m8g2aj9bq8m0mpth",
+      "reason": null
+    },
+    {
+      "event_id": 224,
+      "kind": "v6.decision.committed",
+      "subject_id": "gxa_339380e08919367cacd66319c11dcae4f715d240ab423ea9eaa95bce88f0c5db",
+      "reason": null
+    },
+    {
+      "event_id": 225,
+      "kind": "v624.decision.corrected",
+      "subject_id": "c5ce33a0ab02a0d189f8e103b35f2942c25e2233f8598c5bb872d665e1a06ba8",
+      "reason": null
+    },
+    {
+      "event_id": 228,
+      "kind": "v6.run.closed",
+      "subject_id": "gxr_01m8g2aj9bq8m0mpth",
+      "reason": null
+    }
+  ],
+  "call_receipts": [
+    {
+      "thread": "script-gxl_01m8g2ak35xcbbn74q",
+      "call_id": "inspect-optional-method",
+      "turn": "turn-gxl_01m8g2ak35xcbbn74q"
+    },
+    {
+      "thread": "script-gxl_01m8g2ak35xcbbn74q",
+      "call_id": "select-saved-method",
+      "turn": "turn-gxl_01m8g2ak35xcbbn74q"
+    },
+    {
+      "thread": "script-gxl_01m8g2ak35xcbbn74q",
+      "call_id": "wait-for-view",
+      "turn": "turn-gxl_01m8g2ak35xcbbn74q"
+    },
+    {
+      "thread": "script-gxl_01m8g2bfvhx6cdqdkq",
+      "call_id": "read-saved-recipe",
+      "turn": "turn-gxl_01m8g2bfvhx6cdqdkq"
+    },
+    {
+      "thread": "script-gxl_01m8g2bfvhx6cdqdkq",
+      "call_id": "expand",
+      "turn": "turn-gxl_01m8g2bfvhx6cdqdkq"
+    },
+    {
+      "thread": "script-gxl_01m8g2bfvhx6cdqdkq",
+      "call_id": "adopt-pinned-steps",
+      "turn": "turn-gxl_01m8g2bfvhx6cdqdkq"
+    },
+    {
+      "thread": "script-gxl_01m8g2bgyeyhmvhvrs",
+      "call_id": "read-this-coverage",
+      "turn": "turn-gxl_01m8g2bgyeyhmvhvrs"
+    },
+    {
+      "thread": "script-gxl_01m8g2bgyeyhmvhvrs",
+      "call_id": "decide-from-new-material",
+      "turn": "turn-gxl_01m8g2bgyeyhmvhvrs"
+    },
+    {
+      "thread": "script-gxl_01m8g2bgyeyhmvhvrs",
+      "call_id": "receive-coverage-endpoints-0",
+      "turn": "turn-gxl_01m8g2bgyeyhmvhvrs"
+    },
+    {
+      "thread": "script-gxl_01m8g2bgyeyhmvhvrs",
+      "call_id": "decide-from-received-endpoints",
+      "turn": "turn-gxl_01m8g2bgyeyhmvhvrs"
+    }
+  ],
+  "state": "CLOSED",
+  "report_sha256": "3b2f93bc0c3edb0cb1056b0122a3a1a4bf1f33b85edecb9176499c629207bfbc"
+}

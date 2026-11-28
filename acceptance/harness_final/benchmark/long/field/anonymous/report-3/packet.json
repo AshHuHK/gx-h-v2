@@ -1,0 +1,753 @@
+{
+  "anonymous_report": "**Publish the tenfold claim for total volume, not for yield per square mile.** During May 1–31, 2023, the Potomac at Little Falls carried **424.45 times** as much water as the Northwest Branch Anacostia near Hyattsville. Its drainage area was about 234 times as large, so its gauged volume per square mile was only **1.81 times** that of the Northwest Branch.\n\n| USGS gauge | May volume (billion L) | Drainage area (mi²) | May yield (million L/mi²) |\n|---|---:|---:|---:|\n| Potomac River at Little Falls Pump Station (01646500) | 840.105 | 11,560 | 72.67 |\n| Northwest Branch Anacostia River near Hyattsville (01651000) | 1.97928 | 49.4 | 40.07 |\n\nBoth gauges had approved USGS daily mean discharge values on **all 31 dates**, with no gaps. Each monthly volume is the sum of those daily means multiplied by 86,400 seconds per day and converted to liters. Yield is that volume divided by the station inventory’s reported drainage area (`drain_area_va`).\n\n**Neither verdict changes under the desk’s ±5% flow scenario.** With drainage areas fixed, lowering Potomac flow by 5% and raising Northwest Branch flow by 5% gives the minimum ratio; reversing the changes gives the maximum. The total-volume ratio ranges from **384.03 to 469.13**, always above ten. The per-square-mile ratio ranges from **1.641 to 2.005**, always below ten. These are sensitivity bounds, not USGS error estimates.",
+  "criteria": {
+    "areas": "Uses both NWIS drainage areas with the correct units and matches them to the right station IDs.",
+    "normalized": "Computes the larger-to-smaller area-specific ratio within 1% and correctly disposes of the second tenfold claim.",
+    "provenance_and_limits": "Cites daily-value and station-area records separately; bounds conclusion to the observed month and avoids unsupported hydrological causes or long-term generalization.",
+    "raw_claim": "Evaluates the draft’s tenfold raw-volume threshold with the correct numerator, denominator, ratio and direction.",
+    "sensitivity": "Evaluates independent ±5% flow perturbations for both ratios or supplies mathematically equivalent limits, and labels this a desk scenario.",
+    "sites_time": "Identifies both records, directions and the May 1–31 2023 common window (31 approved daily means each).",
+    "volume": "Monthly common-support totals for both stations match the original records and declared units within 1%."
+  },
+  "independent_decimal_reference": {
+    "area_mi2": {
+      "01646500": "11560.0",
+      "01651000": "49.4"
+    },
+    "area_normalized_ratio": "1.813825860453975817040987849",
+    "authority": {
+      "area": "https://waterservices.usgs.gov/nwis/site/?format=rdb&sites=01646500,01651000&siteOutput=expanded&siteStatus=all",
+      "flow": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=01646500,01651000&parameterCd=00060&startDT=2023-05-01&endDT=2023-05-31&statCd=00003&siteStatus=all"
+    },
+    "common_minutes": 44640,
+    "dates": [
+      "2023-05-01",
+      "2023-05-31"
+    ],
+    "matched_days": 31,
+    "normalized_ratio_bounds": [
+      "1.641080540410740024941846150",
+      "2.004754898396499587255828675"
+    ],
+    "numerical_tolerance": "Rounding within 1% acceptable; factors/units and interval conclusions must agree.",
+    "raw_ratio": "424.4499381953028430160692213",
+    "raw_ratio_bounds": [
+      "384.0261345576549532050150097",
+      "469.1288790579663001756554552"
+    ],
+    "sites": [
+      "01646500",
+      "01651000"
+    ],
+    "volume_L": {
+      "01646500": "840105110830.546944000",
+      "01651000": "1979279616.3489792000"
+    }
+  },
+  "original_area": "#\n#\n# US Geological Survey\n# retrieved: 2026-11-27 21:17:56 -05:00\t(caas01)\n#\n# The Site File stores location and general information about groundwater,\n# surface water, and meteorological sites\n# for sites in USA.\n#\n# File-format description:  http://help.waterdata.usgs.gov/faq/about-tab-delimited-output\n# Automated-retrieval info: http://waterservices.usgs.gov/rest/Site-Service.html\n#\n# Contact:   gs-w_support_nwisweb@usgs.gov\n#\n# The following selected fields are included in this output:\n#\n#  agency_cd       -- Agency\n#  site_no         -- Site identification number\n#  station_nm      -- Site name\n#  site_tp_cd      -- Site type\n#  lat_va          -- DMS latitude\n#  long_va         -- DMS longitude\n#  dec_lat_va      -- Decimal latitude\n#  dec_long_va     -- Decimal longitude\n#  coord_meth_cd   -- Latitude-longitude method\n#  coord_acy_cd    -- Latitude-longitude accuracy\n#  coord_datum_cd  -- Latitude-longitude datum\n#  dec_coord_datum_cd -- Decimal Latitude-longitude datum\n#  district_cd     -- District code\n#  state_cd        -- State code\n#  county_cd       -- County code\n#  country_cd      -- Country code\n#  land_net_ds     -- Land net location description\n#  map_nm          -- Name of location map\n#  map_scale_fc    -- Scale of location map\n#  alt_va          -- Altitude of Gage/land surface\n#  alt_meth_cd     -- Method altitude determined\n#  alt_acy_va      -- Altitude accuracy\n#  alt_datum_cd    -- Altitude datum\n#  huc_cd          -- Hydrologic unit code\n#  basin_cd        -- Drainage basin code\n#  topo_cd         -- Topographic setting code\n#  instruments_cd  -- Flags for instruments at site\n#  construction_dt -- Date of first construction\n#  inventory_dt    -- Date site established or inventoried\n#  drain_area_va   -- Drainage area\n#  contrib_drain_area_va -- Contributing drainage area\n#  tz_cd           -- Time Zone abbreviation\n#  local_time_fg   -- Site honors Daylight Savings Time\n#  reliability_cd  -- Data reliability code\n#  gw_file_cd      -- Data-other GW files\n#  nat_aqfr_cd     -- National aquifer code\n#  aqfr_cd         -- Local aquifer code\n#  aqfr_type_cd    -- Local aquifer type code\n#  well_depth_va   -- Well depth\n#  hole_depth_va   -- Hole depth\n#  depth_src_cd    -- Source of depth data\n#  project_no      -- Project number\n#\nagency_cd\tsite_no\tstation_nm\tsite_tp_cd\tlat_va\tlong_va\tdec_lat_va\tdec_long_va\tcoord_meth_cd\tcoord_acy_cd\tcoord_datum_cd\tdec_coord_datum_cd\tdistrict_cd\tstate_cd\tcounty_cd\tcountry_cd\tland_net_ds\tmap_nm\tmap_scale_fc\talt_va\talt_meth_cd\talt_acy_va\talt_datum_cd\thuc_cd\tbasin_cd\ttopo_cd\tinstruments_cd\tconstruction_dt\tinventory_dt\tdrain_area_va\tcontrib_drain_area_va\ttz_cd\tlocal_time_fg\treliability_cd\tgw_file_cd\tnat_aqfr_cd\taqfr_cd\taqfr_type_cd\twell_depth_va\thole_depth_va\tdepth_src_cd\tproject_no\n5s\t15s\t50s\t7s\t16s\t16s\t16s\t16s\t1s\t1s\t10s\t10s\t3s\t2s\t3s\t2s\t23s\t20s\t7s\t8s\t1s\t3s\t10s\t16s\t2s\t1s\t30s\t8s\t8s\t8s\t8s\t6s\t1s\t1s\t30s\t10s\t8s\t1s\t8s\t8s\t1s\t12s\nUSGS\t01646500\tPOTOMAC RIVER NEAR WASH, DC LITTLE FALLS PUMP STA\tST\t385659.2\t0770739.5\t38.94977778\t-77.12763889\tG\tS\tNAD83\tNAD83\t24\t24\t031\tUS\t\tFalls Church\t24000\t37.04\tX\t0.1\tNAVD88\t020700081005\t\t\tYNNNYNYNNYNNNNNNNNNNNNNNNNNNNN\t\t\t11560.0\t\tEST\tY\t\tNNNNNNNNNNNNNNNNNNNN\t\t\t\t\t\t\t442400100\nUSGS\t01651000\tNORTHWEST BR ANACOSTIA RIVER NR HYATTSVILLE, MD\tST\t385709.2\t0765754.5\t38.95255556\t-76.96513889\tN\t1\tNAD83\tNAD83\t24\t24\t033\tUS\t\tWASHINGTON EAST, DC\t24000\t 16.35\tL\t.06\tNAVD88\t02070010\t\t\tNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\t\t\t49.4\t\tEST\tY\t\tNNNNNNNN\t\t\t\t\t\t\t\n",
+  "original_daily": {
+    "declaredType": "org.cuahsi.waterml.TimeSeriesResponseType",
+    "globalScope": true,
+    "name": "ns1:timeSeriesResponseType",
+    "nil": false,
+    "scope": "javax.xml.bind.JAXBElement$GlobalScope",
+    "typeSubstituted": false,
+    "value": {
+      "queryInfo": {
+        "criteria": {
+          "locationParam": "[ALL:01646500, ALL:01651000]",
+          "parameter": [],
+          "timeParam": {
+            "beginDateTime": "2023-05-01T00:00:00.000",
+            "endDateTime": "2023-05-31T00:00:00.000"
+          },
+          "variableParam": "[00060]"
+        },
+        "note": [
+          {
+            "title": "filter:sites",
+            "value": "[ALL:01646500, ALL:01651000]"
+          },
+          {
+            "title": "filter:timeRange",
+            "value": "[mode=RANGE, modifiedSince=null] interval={INTERVAL[2023-05-01T00:00:00.000-04:00/2023-05-31T00:00:00.000-04:00]}"
+          },
+          {
+            "title": "filter:methodId",
+            "value": "methodIds=[ALL]"
+          },
+          {
+            "title": "requestDT",
+            "value": "2026-11-28T02:17:56.422Z"
+          },
+          {
+            "title": "requestId",
+            "value": "eca09f50-ead1-11f1-ac85-005056beda50"
+          },
+          {
+            "title": "disclaimer",
+            "value": "Provisional data are subject to revision. Go to http://waterdata.usgs.gov/nwis/help/?provisional for more information."
+          },
+          {
+            "title": "server",
+            "value": "caas01"
+          }
+        ],
+        "queryURL": "http://waterservices.usgs.gov/nwis/dv/format=json&sites=01646500,01651000&parameterCd=00060&startDT=2023-05-01&endDT=2023-05-31&statCd=00003&siteStatus=all"
+      },
+      "timeSeries": [
+        {
+          "name": "USGS:01646500:00060:00003",
+          "sourceInfo": {
+            "geoLocation": {
+              "geogLocation": {
+                "latitude": 38.94977778,
+                "longitude": -77.12763889,
+                "srs": "EPSG:4326"
+              },
+              "localSiteXY": []
+            },
+            "note": [],
+            "siteCode": [
+              {
+                "agencyCode": "USGS",
+                "network": "NWIS",
+                "value": "01646500"
+              }
+            ],
+            "siteName": "POTOMAC RIVER NEAR WASH, DC LITTLE FALLS PUMP STA",
+            "siteProperty": [
+              {
+                "name": "siteTypeCd",
+                "value": "ST"
+              },
+              {
+                "name": "hucCd",
+                "value": "020700081005"
+              },
+              {
+                "name": "stateCd",
+                "value": "24"
+              },
+              {
+                "name": "countyCd",
+                "value": "24031"
+              }
+            ],
+            "siteType": [],
+            "timeZoneInfo": {
+              "daylightSavingsTimeZone": {
+                "zoneAbbreviation": "EDT",
+                "zoneOffset": "-04:00"
+              },
+              "defaultTimeZone": {
+                "zoneAbbreviation": "EST",
+                "zoneOffset": "-05:00"
+              },
+              "siteUsesDaylightSavingsTime": true
+            }
+          },
+          "values": [
+            {
+              "censorCode": [],
+              "method": [
+                {
+                  "methodDescription": "",
+                  "methodID": 68478
+                }
+              ],
+              "offset": [],
+              "qualifier": [
+                {
+                  "network": "NWIS",
+                  "qualifierCode": "A",
+                  "qualifierDescription": "Approved for publication -- Processing and review completed.",
+                  "qualifierID": 0,
+                  "vocabulary": "uv_rmk_cd"
+                }
+              ],
+              "qualityControlLevel": [],
+              "sample": [],
+              "source": [],
+              "value": [
+                {
+                  "dateTime": "2023-05-01T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "21100"
+                },
+                {
+                  "dateTime": "2023-05-02T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "27300"
+                },
+                {
+                  "dateTime": "2023-05-03T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "25800"
+                },
+                {
+                  "dateTime": "2023-05-04T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "20600"
+                },
+                {
+                  "dateTime": "2023-05-05T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "17700"
+                },
+                {
+                  "dateTime": "2023-05-06T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "17700"
+                },
+                {
+                  "dateTime": "2023-05-07T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "16500"
+                },
+                {
+                  "dateTime": "2023-05-08T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "14100"
+                },
+                {
+                  "dateTime": "2023-05-09T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "12100"
+                },
+                {
+                  "dateTime": "2023-05-10T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "11300"
+                },
+                {
+                  "dateTime": "2023-05-11T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "12100"
+                },
+                {
+                  "dateTime": "2023-05-12T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "18800"
+                },
+                {
+                  "dateTime": "2023-05-13T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "15600"
+                },
+                {
+                  "dateTime": "2023-05-14T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "12900"
+                },
+                {
+                  "dateTime": "2023-05-15T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "11000"
+                },
+                {
+                  "dateTime": "2023-05-16T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "9620"
+                },
+                {
+                  "dateTime": "2023-05-17T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "9430"
+                },
+                {
+                  "dateTime": "2023-05-18T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "8360"
+                },
+                {
+                  "dateTime": "2023-05-19T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "7550"
+                },
+                {
+                  "dateTime": "2023-05-20T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "6630"
+                },
+                {
+                  "dateTime": "2023-05-21T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "6080"
+                },
+                {
+                  "dateTime": "2023-05-22T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "5370"
+                },
+                {
+                  "dateTime": "2023-05-23T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "4940"
+                },
+                {
+                  "dateTime": "2023-05-24T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "4560"
+                },
+                {
+                  "dateTime": "2023-05-25T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "4200"
+                },
+                {
+                  "dateTime": "2023-05-26T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "3920"
+                },
+                {
+                  "dateTime": "2023-05-27T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "3690"
+                },
+                {
+                  "dateTime": "2023-05-28T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "3920"
+                },
+                {
+                  "dateTime": "2023-05-29T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "3910"
+                },
+                {
+                  "dateTime": "2023-05-30T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "3470"
+                },
+                {
+                  "dateTime": "2023-05-31T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "3130"
+                }
+              ]
+            }
+          ],
+          "variable": {
+            "noDataValue": -999999.0,
+            "note": [],
+            "oid": "45807197",
+            "options": {
+              "option": [
+                {
+                  "name": "Statistic",
+                  "optionCode": "00003",
+                  "value": "Mean"
+                }
+              ]
+            },
+            "unit": {
+              "unitCode": "ft3/s"
+            },
+            "valueType": "Derived Value",
+            "variableCode": [
+              {
+                "default": true,
+                "network": "NWIS",
+                "value": "00060",
+                "variableID": 45807197,
+                "vocabulary": "NWIS:UnitValues"
+              }
+            ],
+            "variableDescription": "Discharge, cubic feet per second",
+            "variableName": "Streamflow, ft&#179;/s",
+            "variableProperty": []
+          }
+        },
+        {
+          "name": "USGS:01651000:00060:00003",
+          "sourceInfo": {
+            "geoLocation": {
+              "geogLocation": {
+                "latitude": 38.95255556,
+                "longitude": -76.96513889,
+                "srs": "EPSG:4326"
+              },
+              "localSiteXY": []
+            },
+            "note": [],
+            "siteCode": [
+              {
+                "agencyCode": "USGS",
+                "network": "NWIS",
+                "value": "01651000"
+              }
+            ],
+            "siteName": "NORTHWEST BR ANACOSTIA RIVER NR HYATTSVILLE, MD",
+            "siteProperty": [
+              {
+                "name": "siteTypeCd",
+                "value": "ST"
+              },
+              {
+                "name": "hucCd",
+                "value": "02070010"
+              },
+              {
+                "name": "stateCd",
+                "value": "24"
+              },
+              {
+                "name": "countyCd",
+                "value": "24033"
+              }
+            ],
+            "siteType": [],
+            "timeZoneInfo": {
+              "daylightSavingsTimeZone": {
+                "zoneAbbreviation": "EDT",
+                "zoneOffset": "-04:00"
+              },
+              "defaultTimeZone": {
+                "zoneAbbreviation": "EST",
+                "zoneOffset": "-05:00"
+              },
+              "siteUsesDaylightSavingsTime": true
+            }
+          },
+          "values": [
+            {
+              "censorCode": [],
+              "method": [
+                {
+                  "methodDescription": "",
+                  "methodID": 68647
+                }
+              ],
+              "offset": [],
+              "qualifier": [
+                {
+                  "network": "NWIS",
+                  "qualifierCode": "A",
+                  "qualifierDescription": "Approved for publication -- Processing and review completed.",
+                  "qualifierID": 0,
+                  "vocabulary": "uv_rmk_cd"
+                }
+              ],
+              "qualityControlLevel": [],
+              "sample": [],
+              "source": [],
+              "value": [
+                {
+                  "dateTime": "2023-05-01T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "74.3"
+                },
+                {
+                  "dateTime": "2023-05-02T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "35.9"
+                },
+                {
+                  "dateTime": "2023-05-03T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "29.2"
+                },
+                {
+                  "dateTime": "2023-05-04T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "25.7"
+                },
+                {
+                  "dateTime": "2023-05-05T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "24.4"
+                },
+                {
+                  "dateTime": "2023-05-06T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "22.2"
+                },
+                {
+                  "dateTime": "2023-05-07T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "21.0"
+                },
+                {
+                  "dateTime": "2023-05-08T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "22.4"
+                },
+                {
+                  "dateTime": "2023-05-09T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "22.0"
+                },
+                {
+                  "dateTime": "2023-05-10T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "20.0"
+                },
+                {
+                  "dateTime": "2023-05-11T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "18.7"
+                },
+                {
+                  "dateTime": "2023-05-12T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "18.5"
+                },
+                {
+                  "dateTime": "2023-05-13T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "23.3"
+                },
+                {
+                  "dateTime": "2023-05-14T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "24.1"
+                },
+                {
+                  "dateTime": "2023-05-15T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "18.6"
+                },
+                {
+                  "dateTime": "2023-05-16T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "17.2"
+                },
+                {
+                  "dateTime": "2023-05-17T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "17.1"
+                },
+                {
+                  "dateTime": "2023-05-18T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "15.7"
+                },
+                {
+                  "dateTime": "2023-05-19T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "15.3"
+                },
+                {
+                  "dateTime": "2023-05-20T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "24.1"
+                },
+                {
+                  "dateTime": "2023-05-21T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "35.9"
+                },
+                {
+                  "dateTime": "2023-05-22T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "18.1"
+                },
+                {
+                  "dateTime": "2023-05-23T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "15.2"
+                },
+                {
+                  "dateTime": "2023-05-24T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "14.8"
+                },
+                {
+                  "dateTime": "2023-05-25T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "13.9"
+                },
+                {
+                  "dateTime": "2023-05-26T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "13.3"
+                },
+                {
+                  "dateTime": "2023-05-27T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "13.4"
+                },
+                {
+                  "dateTime": "2023-05-28T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "12.9"
+                },
+                {
+                  "dateTime": "2023-05-29T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "104"
+                },
+                {
+                  "dateTime": "2023-05-30T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "60.0"
+                },
+                {
+                  "dateTime": "2023-05-31T00:00:00.000",
+                  "qualifiers": [
+                    "A"
+                  ],
+                  "value": "17.8"
+                }
+              ]
+            }
+          ],
+          "variable": {
+            "noDataValue": -999999.0,
+            "note": [],
+            "oid": "45807197",
+            "options": {
+              "option": [
+                {
+                  "name": "Statistic",
+                  "optionCode": "00003",
+                  "value": "Mean"
+                }
+              ]
+            },
+            "unit": {
+              "unitCode": "ft3/s"
+            },
+            "valueType": "Derived Value",
+            "variableCode": [
+              {
+                "default": true,
+                "network": "NWIS",
+                "value": "00060",
+                "variableID": 45807197,
+                "vocabulary": "NWIS:UnitValues"
+              }
+            ],
+            "variableDescription": "Discharge, cubic feet per second",
+            "variableName": "Streamflow, ft&#179;/s",
+            "variableProperty": []
+          }
+        }
+      ]
+    }
+  },
+  "question": "The district water bulletin needs a defensible comparison of flow at the two gauges during May 2023. A draft headline claims that the larger river carried at least ten times as much water, and that its basin also yielded at least ten times as much water per square mile. Which parts of that headline can we publish? Please give the relevant common dates, comparable monthly volumes and ratio, distinguish the area-normalized result, and tell us how sensitive either judgement is to a ±5 percent change in each station's flow. This is the desk's sensitivity scenario, not an agency error estimate. The daily archive is attached. The USGS site-office extract for drainage area has been requested separately; a supported interim judgement or a documented outstanding question is welcome if it has not arrived.\n"
+}

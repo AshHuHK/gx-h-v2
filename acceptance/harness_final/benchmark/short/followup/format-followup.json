@@ -1,0 +1,83 @@
+{
+  "all_calls": [
+    {
+      "accepted": false,
+      "call": "call_cd16c0eff516400a9bd984efed848985",
+      "classification": "other_or_indeterminate",
+      "close": false,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "ops[0].expected_delivery",
+          "operation": "open_intent",
+          "public_field": "ops[0]"
+        },
+        "evidence_ref": null,
+        "message": "open_intent at $.ops[0].expected_delivery: property 'expected_delivery' is not allowed",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "turn": "01a22013-bf66-7372-b0c3-c4d52e8d582c"
+    },
+    {
+      "accepted": true,
+      "call": "call_c5de40c55490401b9e272328c715b7ef",
+      "classification": null,
+      "close": false,
+      "refusal": {},
+      "turn": "01a22013-bf66-7372-b0c3-c4d52e8d582c"
+    },
+    {
+      "accepted": false,
+      "call": "call_1b45b30903cf47139268d0a92db59461",
+      "classification": "scientific_or_PI_disposition_choice",
+      "close": true,
+      "refusal": {
+        "code": "SCHEMA_INVALID",
+        "details": {
+          "field": "pi_dispositions[0].outcome"
+        },
+        "evidence_ref": null,
+        "message": "$.pi_dispositions[0].outcome: missing required property 'outcome'; $.pi_dispositions[0].reason: missing required property 'reason'; $.pi_dispositions[0].disposition: property 'disposition' is not allowed; $.pi_dispositions[0].rationale: property 'rationale' is not allowed. Supply pi_dispositions[0].feedback_id, pi_dispositions[0].outcome (one of adopt, maintain, measure, defer) and pi_dispositions[0].reason. Supply ops[0].unresolved; use [] only if you judge that no issues remain. For ordinary Run closure, omit top-level disposition and affected_scope. Keep stop_reason if it describes why the Run ended.",
+        "retryable": false,
+        "side_effect_status": "NONE",
+        "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+      },
+      "turn": "01a22014-d11f-76c3-8156-d10374060bcc"
+    },
+    {
+      "accepted": true,
+      "call": "call_fb02e20f54d8443b8404e7fc533a2b48",
+      "classification": null,
+      "close": true,
+      "refusal": {},
+      "turn": "01a22014-d11f-76c3-8156-d10374060bcc"
+    }
+  ],
+  "candidate": "6077e26cf0cdbebcf771f7da385d3340976e9516",
+  "close": {
+    "accepted": 0,
+    "denominator": 1
+  },
+  "first_candidate": "362157ae2a6c6f723376dc476b2d5f6c2b001548",
+  "matching_watch_refusal_ids": [],
+  "original_close": {
+    "accepted": 0,
+    "denominator": 1
+  },
+  "original_matching_watch_refusal_ids": [
+    "call_95342bbf5eca47e3b8c4e5d7711c0b1b",
+    "call_e29a1f290239493c9831d197571c3117",
+    "call_1b0b250428cc40988eaa6b2427895d8f"
+  ],
+  "original_score": [
+    7,
+    7
+  ],
+  "score": [
+    7,
+    7
+  ],
+  "within_same_turn_watch_repairs": []
+}

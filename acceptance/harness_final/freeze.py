@@ -7,7 +7,8 @@ from pathlib import Path
 import subprocess
 
 
-PRODUCT = ("bin", "gx-h/gx_core", "gx-h/config", "gx-h/contracts", "gx-h/plugins")
+PRODUCT = ("bin", "release-assets", "gx-h", "gx-h/gx_core", "gx-h/adapters",
+           "gx-h/config", "gx-h/contracts", "gx-h/plugins")
 SITE = ("gx-h/contracts/CONTRACT_SHA", "gx-h/config/workflow_packages.json",
         "gx-h/config/science_site_access.json", "gx-h/config/codex_project_role_pins.json")
 PROTOCOLS = ("field/preregistered.json", "field/materials.json", "field/readiness.json",

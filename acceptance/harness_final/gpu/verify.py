@@ -1,10 +1,12 @@
 """Independently compare one new natural food-protein prediction and the frozen experiment."""
 import argparse
+import gzip
 from contextlib import closing
 from pathlib import Path
 import hashlib
 import json
 import sqlite3
+from tempfile import TemporaryDirectory
 
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from Bio.PDB.qcprot import QCPSuperimposer
@@ -108,9 +110,48 @@ def verify(state, vault):
     return result
 
 
+def published():
+    """Replay the released experiment and prediction without access to the original station."""
+    directory = Path(__file__).resolve().parent
+    frozen = json.loads((directory / "preregistration.json").read_bytes())
+    inputs, products = directory / "released-originals", directory / "first-run"
+    with TemporaryDirectory() as scratch:
+        tmp = Path(scratch)
+        for name in ("1F6S.pdb","1F6S.cif","P00711.json"):
+            path = tmp / name
+            path.write_bytes(gzip.decompress((inputs / (name + ".gz")).read_bytes()))
+            expected = (frozen["uniprot"]["record_sha256"] if name == "P00711.json" else
+                        frozen["custody"]["vault_digests"][name])
+            if sha(path) != expected:
+                raise ValueError("The released original differs from the registered content hash.")
+        mapping = tmp / "mapping.json"
+        mapping.write_bytes((inputs / "mapping.json").read_bytes())
+        if sha(mapping) != frozen["custody"]["vault_digests"]["mapping.json"]:
+            raise ValueError("Released residue map differs from the pre-registered pairs.")
+        measurement = recompute(products / "model.cif", tmp)
+        metadata = json.loads((products / "inference.json").read_bytes())
+        if (measurement["coordinate_sha256"] != metadata["model_sha256"]
+                or metadata["input_sha256"] != frozen["visible"]["materials/P00711.json"]):
+            raise ValueError("Released coordinates differ from the new inference.")
+        result = {"independent_QCP": measurement, "published_scorer": "not_available"}
+        if (products / "agreement.json").exists():
+            job = json.loads((products / "agreement.json").read_bytes())
+            if (job["input_sha256"] != sha(products/"model.cif") or job["reference_sha256"] != sha(tmp/"1F6S.cif")
+                    or job["mapping_sha256"] != sha(mapping)):
+                raise ValueError("Incompatible published evaluation inputs.")
+            delta = abs(job["calpha_rmsd_A"] - measurement["calpha_rmsd_A"])
+            counts = job["matched_positions"] == measurement["comparable"] and job["mapped_positions"] == measurement["mapped"]
+            result.update(published_scorer="PASS" if delta <= 1e-5 and counts else "DISAGREE", difference_A=delta)
+        return result
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("state", type=Path)
-    p.add_argument("vault", type=Path)
+    p.add_argument("--released", action="store_true", help="Recompute from the bundled original and prediction files.")
+    p.add_argument("state", type=Path, nargs="?")
+    p.add_argument("vault", type=Path, nargs="?")
     args = p.parse_args()
-    print(json.dumps(verify(args.state, args.vault), indent=2))
+    if not (args.released and args.state is None and args.vault is None or
+            not args.released and args.state is not None and args.vault is not None):
+        p.error("Use --released alone, or supply both the Run state and its original-material directory.")
+    print(json.dumps(published() if args.released else verify(args.state, args.vault), indent=2))

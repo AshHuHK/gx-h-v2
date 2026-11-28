@@ -11,7 +11,7 @@ from ..domain import ids
 from ..errors import ArtifactHashMismatch, IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
 from . import manifest as execution
-from . import v6_decisions, v6_goal, v6_jobs
+from . import harness_policy, v6_decisions, v6_goal, v6_jobs
 
 SCHEMA = "gx.v62.module_report_bundle.1"
 _FIELDS = {"operation_key", "status", "findings", "artifact_refs", "gaps", "next_steps"}
@@ -117,7 +117,7 @@ def _sources(conn, module, refs, evidence, restricted_reads):
     sources = []
     for ref in sorted(refs):
         if ref not in evidence:
-            if ref in restricted_reads:
+            if ref in restricted_reads and harness_policy.active(conn, module["run_id"]):
                 raise ScopeDenied(
                     "This module already accessed the branch-private PI source or its extract. A released report "
                     "shares cited sources with other researchers. For a verifiable public finding, ask the PI "

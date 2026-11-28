@@ -59,8 +59,11 @@ class PIMaterials(unittest.TestCase):
         self.assertIn(ref, [m["artifact_ref"] for m in w.brief(receiver)["materials"]])
         read = w.call(receiver, "gx_read_artifact", {"ref": ref}, "a-received")
         self.assertIn(body, json.dumps(read))
-        with self.assertRaises(ScopeDenied):
+        with self.assertRaises(ScopeDenied) as denied:
             w.report(receiver, ref, key="a-private-in-public-report")
+        self.assertEqual(denied.exception.code, "SCOPE_DENIED")
+        self.assertEqual(denied.exception.message, "The module must read the cited artifact or complete its producing Job")
+        self.assertEqual(denied.exception.details, {})
         w.call(actor_b, "gx_read_artifact", {"ref": w.materials[0]}, "b-original")
         self.assertEqual(w.report(actor_b, w.materials[0], key="finish-b")["status"], "COMPLETE")
         self.assertFalse(w.conn.execute("SELECT 1 FROM jobs WHERE run_id=?", (w.run_id,)).fetchone())

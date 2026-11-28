@@ -13,6 +13,8 @@ Each question made one `gx_query_catalog` call through a newly admitted ordinary
 | Lean field product e9e4183 | 4/4 | 4/4 | 4/4 | 1/1 | 1/1 |
 | Full legacy-compatibility release fd1aa75 | 4/4 | 4/4 | 4/4 | 1/1 | 1/1 |
 | Lean legacy-compatibility release 8759016 | 4/4 | 4/4 | 4/4 | 1/1 | 1/1 |
+| Full late-PI follow-up 6077e26 | 4/4 | 4/4 | 4/4 | 1/1 | 1/1 |
+| Lean late-PI follow-up ccd0513 | 4/4 | 4/4 | 4/4 | 1/1 | 1/1 |
 
 The JSON receipt from each source records all returned references with their positions and deployment facts. The candidate and baseline receipts retain the first observations. Repeats use the original frozen questions and count as regressions. Receipt commit IDs include acceptance-only follow-ups where the installed product tree matches the listed product. The category, provider, named output and activation knobs were left unset. The research turn used controlled callbacks. The field studies supply separate evidence of actual model behavior.
 

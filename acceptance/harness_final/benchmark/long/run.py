@@ -74,7 +74,9 @@ def stop_controller(p, job=None):
             pass
     physical_after = None
     if job is not None:
-        physical_after = {name: procs.process_start_ticks(job[name + "_pid"]) for name in ("runner", "tool")}
+        physical_after = {
+            name: procs.process_start_ticks(job[name + "_pid"]) for name in ("runner", "tool")
+        }
     p.wait(timeout=10)
     return {
         "at": when,
@@ -160,8 +162,13 @@ def drive(folder, arm, release, env, phase, deadline):
                     terminal = folder / "state/jobs" / job["job_id"] / "outcome.json"
                     after = killed["physical_start_ticks_after_signal"]
                     alive_after_signal = all(after[k] == job[k + "_started"] for k in ("runner", "tool"))
-                    eligible = alive_after_signal and p.returncode == -signal.SIGKILL and (
-                        not terminal.exists() or instant(read(terminal)["finished_at"]) > killed["at"]
+                    eligible = (
+                        alive_after_signal
+                        and p.returncode == -signal.SIGKILL
+                        and (
+                            not terminal.exists()
+                            or instant(read(terminal)["finished_at"]) > killed["at"]
+                        )
                     )
                     save(
                         folder / "interruption.json",
@@ -177,7 +184,11 @@ def drive(folder, arm, release, env, phase, deadline):
             term = read(folder / (phase + "-terminal.json"))
             if term["status"] != "completed":
                 return "native_" + term["status"]
-            if phase == "first" and (folder / "late-delivery.json").exists() and not (folder / "native-steer-acknowledged.json").exists():
+            if (
+                phase == "first"
+                and (folder / "late-delivery.json").exists()
+                and not (folder / "native-steer-acknowledged.json").exists()
+            ):
                 return "original_followup"
             return "finished" if term["answer"] else "no_report"
         g = gx_facts(folder, required=False)["goal"]

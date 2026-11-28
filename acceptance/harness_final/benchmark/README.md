@@ -1,6 +1,6 @@
 # Final harness comparison
 
-The short field reuses the earlier archive question and the late publisher reply. The long field asks whether two claims about May 2023 river discharge can be published. It uses the original USGS daily records from the Potomac near Washington and Rock Creek at Sherrill Drive, plus a separately delivered USGS station inventory. Daily values and site metadata have different producers and retrieval endpoints. The independent Decimal calculation multiplies archived daily means by the duration of each day. Neither the numerical reference nor the rubric is available through a participant tool. [USGS daily values](https://waterservices.usgs.gov/nwis/dv/?format=json&sites=01646500,01651000&parameterCd=00060&startDT=2023-05-01&endDT=2023-05-31&statCd=00003&siteStatus=all) · [USGS station inventory](https://waterservices.usgs.gov/nwis/site/?format=rdb&sites=01646500,01651000&siteOutput=expanded&siteStatus=all)
+The short field reuses the earlier archive question and the late publisher reply. The long field asks whether two claims about May 2023 river discharge can be published. It uses the original USGS daily records from the Potomac near Washington and the Northwest Branch Anacostia River near Hyattsville, plus a separately delivered USGS station inventory. Daily values and site metadata have different producers and retrieval endpoints. The independent Decimal calculation multiplies archived daily means by the duration of each day. Neither the numerical reference nor the rubric is available through a participant tool. [USGS daily values](https://waterservices.usgs.gov/nwis/dv/?format=json&sites=01646500,01651000&parameterCd=00060&startDT=2023-05-01&endDT=2023-05-31&statCd=00003&siteStatus=all) · [USGS station inventory](https://waterservices.usgs.gov/nwis/site/?format=rdb&sites=01646500,01651000&siteOutput=expanded&siteStatus=all)
 
 | Field | Frozen comparison | Observable outcome |
 |---|---|---|
@@ -23,6 +23,7 @@ python=.venv/bin/python
 "$python" -B "$bench/long/run.py" "$work/long" baseline "$candidate"
 "$python" -B "$bench/long/run.py" "$work/long" candidate "$candidate"
 "$python" -B "$bench/long/assessment.py" "$work/long"
+"$python" -B "$bench/long/archive_outputs.py" "$work/long"
 ```
 
 Pass the same private path to inspect an existing attempt. The long runner's `began.json`, phase receipts and `outcome.json` distinguish an untouched slot, an interrupted original and a completed trial. A started phase without an outcome requires inspecting that process or its original Run before dispatch. The active account and raw OAuth sessions remain in the deployment's private store. All outbound traffic uses the deployment's loopback Clash proxies. The model is `gpt-6.2-astra` at `max` on the existing official subscription.

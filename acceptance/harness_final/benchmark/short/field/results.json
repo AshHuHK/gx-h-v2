@@ -1,0 +1,378 @@
+{
+  "blind_science": {
+    "denominator": 7,
+    "marks": {
+      "conditions": {
+        "mark": "pass",
+        "reason": "All three conditions match the table note, and the concentration is assigned specifically to pNPG.",
+        "report_support": "“5 mM 4-nitrophenyl α-D-glucopyranoside at pH 7.0 and 30 °C”",
+        "source_locator": "E1, assay_annotation (pH 7.0, 30 °C); E2, Table 2 (t0010), assay note (pH 7, 30 °C, 5 mM pNPG)."
+      },
+      "counterevidence": {
+        "mark": "pass",
+        "reason": "The heading supplies the unit for 3.9. The note defines 54 as a percentage, consistent with 3.9/7.2 ≈ 54%, so W1 is not a second specific-activity measurement.",
+        "report_support": "“Keep 3.9 μmol/min/mg”; “Attach it to the same result, with zero additional independent measurements.”",
+        "source_locator": "W1, column_label and number; E2, Table 2 (t0010), unit heading, Ima3p cells “3.9 (54)” and “7.2 (100),” and bracket note."
+      },
+      "locator": {
+        "mark": "pass",
+        "reason": "The locators identify the exact archive row and the paper cells used to interpret it.",
+        "report_support": "The report gives “3.2.1.10/specific_activity/59,” cites PMID 24649402 and the paper DOI, and specifies “Table 2 (JATS t0010), Ima3p column,” with both row names.",
+        "source_locator": "E1, BRENDA 2026.1, 3.2.1.10/specific_activity/59, PMID 24649402; E2, Deng et al. (2014), DOI 10.1016/j.fob.2014.02.004, Table 2 (JATS t0010)."
+      },
+      "protein": {
+        "mark": "pass",
+        "reason": "It attributes the accession to the archive and the protein name to the paper’s measured column.",
+        "report_support": "The report identifies “Saccharomyces cerevisiae (P0CW40)” in E1 and locates “3.9 (54)” in the published “Ima3p column.”",
+        "source_locator": "E1, accessions (P0CW40) and linked_pubmed (24649402); E2, Table 2 (t0010), α-pNPG row, Ima3p column."
+      },
+      "strain": {
+        "mark": "pass",
+        "reason": "The report identifies the expression host without treating it as the donor strain or attributing the assay to an S288C culture.",
+        "report_support": "“S288c is the genome discussed in the Introduction (s0005). CEN.PK113-5D is the expression host in Experimental procedures (s0080).” The report leaves the donor or native strain unspecified.",
+        "source_locator": "E1, strain_field (null); E2, Introduction (s0005) and Experimental procedures (s0080)."
+      },
+      "substrate": {
+        "mark": "pass",
+        "reason": "α-pNPG is the substrate for the 3.9 result; the Ima3p velocity on isomaltose is the denominator for the percentage.",
+        "report_support": "The report names “4-nitrophenyl α-D-glucopyranoside” as the assay substrate and describes 54 as “54% of the same enzyme's isomaltose velocity.”",
+        "source_locator": "E1, assay_annotation; E2, Table 2 (t0010), Ima3p column, α-pNPG and Isomaltose rows and relative-velocity note."
+      },
+      "uncertainty": {
+        "mark": "pass",
+        "reason": "Five experiments contributed to one published mean. The report does not count the archive or worksheet as independent confirmation and does not infer individual experiment values.",
+        "report_support": "“Publish one α-pNPG specific-activity result” and “mean of five experiments.”",
+        "source_locator": "E2, Table 2 (t0010), Ima3p α-pNPG cell and note stating “mean of five experiments”; E1, linked_pubmed; W1, source_supplied_by_curator."
+      }
+    },
+    "packet_sha256": "0e5f64d131d54a59a9e87690baca1cb247ac347392ca1f33deb936232bf76c10",
+    "passed": 7,
+    "session": [
+      {
+        "effort": "max",
+        "id": "01a2200b-83b4-7741-b3a9-c9be7e9a4eb2",
+        "model": "gpt-6.2-astra",
+        "session": "sessions/2026/11/28/rollout-2026-11-28T02-45-55-01a2200b-8385-76c2-a532-afb49eb3e658.jsonl",
+        "session_sha256": "bc1a89fd7d11176c8d433d3d6b88f614e7cc2ef6ecb23b866b9bf072ceecd1d0",
+        "started": "2026-11-28T02:46:01.457Z",
+        "thread": "01a2200b-8385-76c2-a532-afb49eb3e658"
+      }
+    ],
+    "turn": "01a2200b-83b4-7741-b3a9-c9be7e9a4eb2"
+  },
+  "friction": {
+    "by_class": {
+      "other_or_indeterminate": 4,
+      "scientific_or_PI_disposition_choice": 3
+    },
+    "calls": [
+      {
+        "accepted": false,
+        "call": "call_d8ac438119f241d58a23f499b1822b61",
+        "classification": "other_or_indeterminate",
+        "close": false,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "mode",
+            "options": [
+              "resolve",
+              "amend"
+            ]
+          },
+          "evidence_ref": null,
+          "message": "Use mode=resolve for empty ops, or mode=amend with the intended graph operations. You can omit mode when ops already expresses your decision.",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22006-60a8-71e2-b514-08db54c4a37b"
+      },
+      {
+        "accepted": false,
+        "call": "call_95342bbf5eca47e3b8c4e5d7711c0b1b",
+        "classification": "other_or_indeterminate",
+        "close": false,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "reconsider_when[0]"
+          },
+          "evidence_ref": null,
+          "message": "$.reconsider_when[0]: expected object, got string",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22006-60a8-71e2-b514-08db54c4a37b"
+      },
+      {
+        "accepted": false,
+        "call": "call_e29a1f290239493c9831d197571c3117",
+        "classification": "other_or_indeterminate",
+        "close": false,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "reconsider_when[0].event"
+          },
+          "evidence_ref": null,
+          "message": "$.reconsider_when[0].event: missing required property 'event'; $.reconsider_when[0].subject_ref: missing required property 'subject_ref'; $.reconsider_when[0].description: property 'description' is not allowed",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22006-60a8-71e2-b514-08db54c4a37b"
+      },
+      {
+        "accepted": false,
+        "call": "call_1b0b250428cc40988eaa6b2427895d8f",
+        "classification": "other_or_indeterminate",
+        "close": false,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "reconsider_when[0].event"
+          },
+          "evidence_ref": null,
+          "message": "$.reconsider_when[0].event: 'research.catalog.updated' is not one of ['goal_changed', 'evidence_added', 'claim_changed', 'job_settled', 'budget_changed', 'operator_reopened', 'module_report']",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22006-60a8-71e2-b514-08db54c4a37b"
+      },
+      {
+        "accepted": false,
+        "call": "call_c533712cb4554a4f8654e2b8138d12db",
+        "classification": "scientific_or_PI_disposition_choice",
+        "close": false,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "ops",
+            "options": [],
+            "ordinary_run_omit": [
+              "disposition",
+              "affected_scope"
+            ],
+            "reason": "comparison_action_ambiguous"
+          },
+          "evidence_ref": null,
+          "message": "For a decision about the Run, remove these top-level comparison fields: disposition, affected_scope. An empty ops list waits (mode=resolve or omitted). This brief has no active registered comparison.",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22006-60a8-71e2-b514-08db54c4a37b"
+      },
+      {
+        "accepted": true,
+        "call": "call_0be1ff12bd6147fbabbd98315d37baa8",
+        "classification": null,
+        "close": false,
+        "refusal": {},
+        "turn": "01a22006-60a8-71e2-b514-08db54c4a37b"
+      },
+      {
+        "accepted": false,
+        "call": "call_b5699034183c44aab97ca4352c481144",
+        "classification": "scientific_or_PI_disposition_choice",
+        "close": true,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "pi_dispositions[0].outcome"
+          },
+          "evidence_ref": null,
+          "message": "$.pi_dispositions[0].outcome: missing required property 'outcome'; $.pi_dispositions[0].reason: missing required property 'reason'; $.pi_dispositions[0].disposition: property 'disposition' is not allowed; $.pi_dispositions[0].rationale: property 'rationale' is not allowed. Supply pi_dispositions[0].feedback_id, pi_dispositions[0].outcome (one of adopt, maintain, measure, defer) and pi_dispositions[0].reason. Supply ops[0].unresolved; use [] only if you judge that no issues remain.",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22009-7201-7a41-b09e-9941e33cad69"
+      },
+      {
+        "accepted": false,
+        "call": "call_9db7c59094df4e8ca5cfe4720d1147b0",
+        "classification": "scientific_or_PI_disposition_choice",
+        "close": true,
+        "refusal": {
+          "code": "SCHEMA_INVALID",
+          "details": {
+            "field": "ops",
+            "options": [],
+            "ordinary_run_omit": [
+              "disposition"
+            ],
+            "reason": "comparison_action_ambiguous"
+          },
+          "evidence_ref": null,
+          "message": "For ordinary Run closure with close_run, remove these top-level comparison fields: disposition. This brief has no active registered comparison.",
+          "retryable": false,
+          "side_effect_status": "NONE",
+          "suggested_recovery": "Fix the request against contracts/mcp_tools.json or contracts/bundles.json. A format error is not a scientific failure."
+        },
+        "turn": "01a22009-7201-7a41-b09e-9941e33cad69"
+      },
+      {
+        "accepted": true,
+        "call": "call_07fa5bdf6b4c46daa1b40ef08ae19da0",
+        "classification": null,
+        "close": true,
+        "refusal": {},
+        "turn": "01a22009-7201-7a41-b09e-9941e33cad69"
+      }
+    ],
+    "close_submissions": 3,
+    "first_close": {
+      "accepted": 0,
+      "denominator": 1
+    },
+    "rejections": 7
+  },
+  "frozen_candidate": "362157ae2a6c6f723376dc476b2d5f6c2b001548",
+  "late_delivery": {
+    "at": 1795833719.06,
+    "item": "01a22007-e90c-71b2-bbfd-9681518aeb75",
+    "line": 10,
+    "session": "sessions/2026/11/28/rollout-2026-11-28T02-41-56-01a22007-e01b-75a1-b81b-e58af0b30a69.jsonl",
+    "source": "official UserMessage",
+    "thread": "01a22007-e01b-75a1-b81b-e58af0b30a69",
+    "turn": "01a22007-e050-73f1-9808-fe7867f5fe82",
+    "utc": "2026-11-28T02:41:59.060Z"
+  },
+  "official_fault": {
+    "at": 1795833584.089888,
+    "before": {
+      "goal": {
+        "run_id": "gxr_01m8g0b9dfdm3empcn",
+        "status": "OPEN"
+      },
+      "jobs": [],
+      "last_event": 20,
+      "turns": [
+        {
+          "thread_id": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+          "turn_id": "01a22005-b64d-72c1-b89b-8590c2c56308"
+        }
+      ]
+    },
+    "checkpoint": {
+      "archive_sha256": "64152e9093d30a556bfcfd559e27485ff875795f4d6a02d669d39f0e90e89605",
+      "artifact_ref": "gxa_01m8g0b9ekp52hy976",
+      "call_id": "exec-29616301-7083-482a-834b-d928b03d3b55",
+      "official_time": "2026-11-28T02:39:44.038Z",
+      "receipt_line": 17,
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-39-34-01a22005-b61a-79b0-80ca-4b0b05dd151c.jsonl",
+      "thread_id": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+      "time": 1795833584.0641565,
+      "turn_id": "01a22005-b64d-72c1-b89b-8590c2c56308"
+    },
+    "driver_returncode": -9,
+    "logical_event": "first successful E1 read before close",
+    "processes_signalled": 3,
+    "signal": "SIGKILL"
+  },
+  "official_turns": [
+    {
+      "effort": "max",
+      "id": "01a22005-b64d-72c1-b89b-8590c2c56308",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-39-34-01a22005-b61a-79b0-80ca-4b0b05dd151c.jsonl",
+      "session_sha256": "01d64ae4362e434aa8fe93524451b5eb23c84ff011662c5e16b459c25c84b348",
+      "started": "2026-11-28T02:39:37.502Z",
+      "thread": "01a22005-b61a-79b0-80ca-4b0b05dd151c"
+    },
+    {
+      "effort": "max",
+      "id": "01a22006-60a8-71e2-b514-08db54c4a37b",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-39-34-01a22005-b61a-79b0-80ca-4b0b05dd151c.jsonl",
+      "session_sha256": "01d64ae4362e434aa8fe93524451b5eb23c84ff011662c5e16b459c25c84b348",
+      "started": "2026-11-28T02:40:19.787Z",
+      "thread": "01a22005-b61a-79b0-80ca-4b0b05dd151c"
+    },
+    {
+      "effort": "max",
+      "id": "01a22005-eb85-7473-9826-40f02793af31",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-39-48-01a22005-eb4f-7812-9758-f5246379ee6a.jsonl",
+      "session_sha256": "7146836e5ea09822d3214f38bb2434c3e105918be825264ac8a932dfee538096",
+      "started": "2026-11-28T02:39:51.345Z",
+      "thread": "01a22005-eb4f-7812-9758-f5246379ee6a"
+    },
+    {
+      "effort": "max",
+      "id": "01a22007-e050-73f1-9808-fe7867f5fe82",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-41-56-01a22007-e01b-75a1-b81b-e58af0b30a69.jsonl",
+      "session_sha256": "ba1474584f3002e62425762f2c23ae70c82b96decaff99f62946d59b8d5d5c14",
+      "started": "2026-11-28T02:41:59.032Z",
+      "thread": "01a22007-e01b-75a1-b81b-e58af0b30a69"
+    },
+    {
+      "effort": "max",
+      "id": "01a22009-7201-7a41-b09e-9941e33cad69",
+      "model": "gpt-6.2-astra",
+      "session": "sessions/2026/11/28/rollout-2026-11-28T02-41-56-01a22007-e01b-75a1-b81b-e58af0b30a69.jsonl",
+      "session_sha256": "ba1474584f3002e62425762f2c23ae70c82b96decaff99f62946d59b8d5d5c14",
+      "started": "2026-11-28T02:43:40.458Z",
+      "thread": "01a22007-e01b-75a1-b81b-e58af0b30a69"
+    }
+  ],
+  "previous": {
+    "actual_turns": 6,
+    "candidate": "5904a4fdac3b0267a80fc7b59d3c00427a4871d4",
+    "close_submissions": 11,
+    "first_close": {
+      "accepted": 0,
+      "denominator": 1
+    },
+    "rejections": 14,
+    "score": [
+      7,
+      7
+    ],
+    "seconds": 501.13
+  },
+  "registration_sha256": "2962260353a35e957c53ecc4bd6e7dc651d22f52fde33131955c8ca5f234df66",
+  "run": {
+    "arm": "revised",
+    "elapsed_seconds": 377.28,
+    "facts": {
+      "goal": {
+        "run_id": "gxr_01m8g0b9dfdm3empcn",
+        "status": "CLOSED"
+      },
+      "jobs": [],
+      "last_event": 73,
+      "turns": [
+        {
+          "thread_id": "01a22005-eb4f-7812-9758-f5246379ee6a",
+          "turn_id": "01a22005-eb85-7473-9826-40f02793af31"
+        },
+        {
+          "thread_id": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+          "turn_id": "01a22006-60a8-71e2-b514-08db54c4a37b"
+        },
+        {
+          "thread_id": "01a22007-e01b-75a1-b81b-e58af0b30a69",
+          "turn_id": "01a22009-7201-7a41-b09e-9941e33cad69"
+        },
+        {
+          "thread_id": "01a22007-e01b-75a1-b81b-e58af0b30a69",
+          "turn_id": "01a22007-e050-73f1-9808-fe7867f5fe82"
+        },
+        {
+          "thread_id": "01a22005-b61a-79b0-80ca-4b0b05dd151c",
+          "turn_id": "01a22005-b64d-72c1-b89b-8590c2c56308"
+        }
+      ]
+    },
+    "finish": 1795833946.8127913,
+    "outcome": "finished"
+  },
+  "turns_delta_vs_original_native": 3,
+  "turns_delta_vs_previous_GX": -1
+}

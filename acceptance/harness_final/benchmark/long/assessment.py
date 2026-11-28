@@ -339,15 +339,46 @@ def arm_result(work, arm):
                 folder,
                 "SELECT job_id,task_id,idempotency_key,capability_id,capability_version,created_at,submitted_at FROM jobs",
             ),
-            "node_requests": sql(folder, """SELECT n.node_id,n.branch_id,n.operation_key,n.status,n.job_id,
-                   n.result_ref,a.exec_key,a.reused_from FROM v6_job_attempts a
-                   JOIN v6_nodes n USING(node_id) ORDER BY n.rowid"""),
-            "subscribe_and_settle_events": sql(folder,"""SELECT event_id,ts,kind,subject_id,
+            "node_requests": sql(
+                folder,
+                """SELECT n.node_id,n.branch_id,n.operation_key,n.status,n.job_id,
+                   n.result_ref,a.exec_key,a.reused_from,
+                   json_extract(a.identity_json,'$.version') AS identity_version,
+                   json_extract(a.identity_json,'$.randomness') AS randomness,
+                   json_extract(a.identity_json,'$.independent_node') AS independent_node,
+                   json_extract(a.identity_json,'$.private_branch') AS private_branch,
+                   json_extract(a.identity_json,'$.public_inputs') AS public_inputs
+                   FROM v6_job_attempts a
+                   JOIN v6_nodes n USING(node_id) ORDER BY n.rowid""",
+            ),
+            "subscribe_and_settle_events": sql(
+                folder,
+                """SELECT event_id,ts,kind,subject_id,
                    json_extract(payload_json,'$.job_id') AS job_id,
                    json_extract(payload_json,'$.physical_owner') AS physical_owner
-                   FROM events WHERE kind IN ('v6.node.subscribed','v6.node.settled') ORDER BY event_id"""),
-            "in_flight_sharing_implemented":arm == "candidate",
+                   FROM events WHERE kind IN ('v6.node.subscribed','v6.node.settled') ORDER BY event_id""",
+            ),
+            "in_flight_sharing_implemented": arm == "candidate",
         }
+        shareable = [
+            n
+            for n in logical["node_requests"]
+            if n["identity_version"] == 2
+            and n["public_inputs"] is not None
+            and not n["independent_node"]
+            and not n["private_branch"]
+        ]
+        by_key = {}
+        for node in shareable:
+            by_key.setdefault(node["exec_key"], []).append(node["node_id"])
+        logical["public_equivalent_groups_with_multiple_requests"] = {
+            key: nodes for key, nodes in by_key.items() if len(nodes) > 1
+        }
+        logical["public_duplicate_eligible_requests"] = (
+            sum(len(nodes) for nodes in by_key.values() if len(nodes) > 1)
+            if arm == "candidate"
+            else None
+        )
     counts, model_times = sessions(folder, runs)
     interruption = (
         read(folder / "interruption.json") if (folder / "interruption.json").exists() else None

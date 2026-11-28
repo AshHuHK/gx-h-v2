@@ -61,7 +61,9 @@ TOOLS = [
 
 def submit(folder, release, method, *, replicate=None):
     label = next(k for k, v in METHODS.items() if v[0] == method)
-    request_sha = hashlib.sha256((method + sha(P / "record.json") + (replicate or "")).encode()).hexdigest()
+    request_sha = hashlib.sha256(
+        (method + sha(P / "record.json") + (replicate or "")).encode()
+    ).hexdigest()
     job_id = "native-" + request_sha[:22]
     root = folder / "state/jobs"
     root.mkdir(parents=True, exist_ok=True)
@@ -266,7 +268,8 @@ def operate(folder, phase, release):
             terminal = client.run_until(
                 lambda item: item.message.get("method") == "turn/completed"
                 and item.message["params"]["turn"]["id"] == turn,
-                timeout=900, poll_interval=0.3,
+                timeout=900,
+                poll_interval=0.3,
             )
             if terminal is not None or phase != "first" or tried_steer:
                 continue
@@ -276,14 +279,19 @@ def operate(folder, phase, release):
             # An ordinary late arrival can be delivered on an active native turn outside callbacks.
             # If the turn finished in the intervening instants, the same native thread gets one follow-up.
             try:
-                response = client.request("turn/steer", {
-                    "threadId": thread, "expectedTurnId": turn, "clientUserMessageId": "original-station-inventory",
-                    "input": [{"type":"text","text":late,"text_elements":[]}],
-                })
+                response = client.request(
+                    "turn/steer",
+                    {
+                        "threadId": thread,
+                        "expectedTurnId": turn,
+                        "clientUserMessageId": "original-station-inventory",
+                        "input": [{"type": "text", "text": late, "text_elements": []}],
+                    },
+                )
             except AppServerError as error:
-                save(folder/"native-steer-refusal.json",{"turn":turn,"error":str(error)})
+                save(folder / "native-steer-refusal.json", {"turn": turn, "error": str(error)})
             else:
-                save(folder/"native-steer-acknowledged.json",{"turn":turn,"receipt":response})
+                save(folder / "native-steer-acknowledged.json", {"turn": turn, "receipt": response})
         record = next(
             t
             for t in client.request("thread/read", {"threadId": thread, "includeTurns": True})["thread"][

@@ -1,0 +1,31 @@
+{
+  "study": "USGS monthly volume and specific discharge, first trials",
+  "baseline": "4b6aa93ad5bf638d06bed7004c26c27d030a59ea",
+  "registered_science_files": {
+    "packet/question.txt": "33d1b2b984e7b1eb2c82c36e53bb008054c4c4c715cf4e44c22bbd7c1700bd93",
+    "packet/daily.json": "611703c8b39d98ec08f695bfe73de10f805ec49db675da8811591936bfa28c93",
+    "packet/record.json": "0b464958363949558765ee47b38c60bf10f61e3c4ad39552d7aab95f422972d0",
+    "packet/sites.rdb": "85b04c53281af46020279253e140a6349f7e91a0d7fe93d06de669a647f34bca",
+    "packet/reference.json": "aaf14cf4e08e4a4725c37ac7d6a1266fb272c00602d658a3a4ecfb994cf307e1",
+    "packet/prepare.py": "e619ae9b5e9089d787559d9467469a67324d7c791a96a1aa6ba9d4ac9264bc1c",
+    "rubric.json": "9098b26b342ddc29c7e748d4bd4ab98c48505a44acde1f523435b53951f2aad9"
+  },
+  "arms": [
+    "stock",
+    "baseline",
+    "candidate"
+  ],
+  "model": "gpt-6.2-astra",
+  "effort": "max",
+  "payment": "existing ChatGPT subscription only",
+  "seconds_per_arm": 900,
+  "max_physical_jobs": 4,
+  "cpu_threads_per_job": 1,
+  "wall_seconds_per_job": 30,
+  "no_inference_before_candidate_freeze": true,
+  "arms_and_interface": "One isolated Codex workspace, official session spool and physical output area per arm. Both installed discharge methods, the exact same versioned worker and detached runner, both source documents, the same ability to submit, observe and read previous physical receipts. Stock retains native subagents and resume. GX uses normal research and JobService. No cross-arm scientific results or receipt caches.",
+  "causal_injection": "When the first genuine physical tool process is running, preserve runner PID/start and tool PID/start with a monotonic/UTC timestamp and SIGKILL only its controller and model hosts, leaving detached computation alive. Terminal-before-kill, missing PID receipts, already-finished or same logical job with a different physical process do not pass adoption.",
+  "late": "After the recorded interruption and before restarting the original thread/Run, deliver the unedited USGS station-inventory RDB, including units/field glossary. If no in-flight physical process has been seen by 240 seconds, deliver the same material to an open Run/thread by natural continuation, marking the interruption gate unobserved. If sealed before E2, record that first outcome; no new Run.",
+  "blind": "Prospective seven-item rubric and numeric reference. Random labels after the runs; one fresh official session per available report with no access to group/latency/dispatch identities; unavailable final report recorded separately. Allow a justified number-free abstention when material actually unavailable, as not demonstrated on its numerical fields. n=1 per arm.",
+  "counters": "Report logical requests, observed launches and post-interrupt provider PID identities. Distinguish another legitimate new scientific task from a repeated launch on the same request and method/input. Cost missing is unknown. Queue and time categories may overlap; same machine and cache status do not imply identical warm cache."
+}

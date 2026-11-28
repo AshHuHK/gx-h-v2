@@ -29,14 +29,14 @@ def close_old(folder):
         old.advance()
 
 
-def check():
+def check(base=BASE, expected_policy=None):
     with tempfile.TemporaryDirectory() as tmp:
         folder = Path(tmp)
         app, work = folder / "release", folder / "project"
         app.mkdir()
         work.mkdir()
         with tempfile.TemporaryFile() as archive:
-            subprocess.run(["git", "archive", BASE, "bin", "gx-h", "acceptance/v62a", "acceptance/v621", "acceptance/v622"], cwd=ROOT, stdout=archive, check=True)
+            subprocess.run(["git", "archive", base, "bin", "gx-h", "acceptance/v62a", "acceptance/v621", "acceptance/v622"], cwd=ROOT, stdout=archive, check=True)
             archive.seek(0)
             with tarfile.open(fileobj=archive) as snapshot:
                 snapshot.extractall(app, filter="data")
@@ -70,18 +70,20 @@ def check():
         reopened = invoke(0)
         assert started["run_id"] == original["run_id"] == reopened["run_id"]
         assert old_hash == report(reopened)
-        assert old_counts == counts() and old_counts[1:] == (None, [])
+        assert old_counts == counts() and old_counts[1:] == (expected_policy, [])
         assert reopened["invocation"]["added"] == {"host_turns":0, "jobs":0}
-        return {"base":BASE, "run_id":started["run_id"], "phase":"CLOSED", "level":"SCRIPTED_CALLBACK",
-                "same_report_sha256":old_hash,"same_run_events":old_counts[0],"old_harness_policy":None,
+        return {"base":base, "run_id":started["run_id"], "phase":"CLOSED", "level":"SCRIPTED_CALLBACK",
+                "same_report_sha256":old_hash,"same_run_events":old_counts[0],"old_harness_policy":old_counts[1],
                 "old_capability_catalog":[], "reopen_added":reopened["invocation"]["added"]}
 
 
 if __name__ == "__main__":
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--close-old",type=Path)
+    p.add_argument("--base", default=BASE, help="Git revision used to author the closed Goal.")
+    p.add_argument("--expected-policy", help="Policy recorded by the baseline release; omitted for legacy Goals.")
     args=p.parse_args()
     if args.close_old:
         close_old(args.close_old)
     else:
-        print(json.dumps(check(),indent=2))
+        print(json.dumps(check(args.base, args.expected_policy),indent=2))

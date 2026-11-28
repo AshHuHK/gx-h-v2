@@ -1,0 +1,21 @@
+{
+  "schema": "gx.catalog.heldout/1",
+  "frozen_from": "4b6aa93ad5bf638d06bed7004c26c27d030a59ea",
+  "ordinary_goal": "Which catalogued capabilities suit these research questions?",
+  "query_kind": "all",
+  "top": 5,
+  "eligible_execution_status": ["available", "selectable"],
+  "rule": "For each positive query issue one ordinary native gx_query_catalog textual request with no forced inputs, named outputs, provider, category or activation. Inspect the first five entries actually returned, including reference cards. Score once if at least one named acceptable reference is installed and selectable or already active in this ordinary Goal. Look up technical readiness on detail cards separately; this is retrieval and no execution claim. Score both languages separately with their raw denominators. Record all raw top-five references/statuses, reference-only hits, empty pages and paired success. Historical target is expected as reference_only, never executable. A true absent method needs an empty result, not simply absence of the named target."
+  ,"cases":[
+    {"id":"f1-zh","lang":"zh","kind":"method","query":"只有一個沉積結構和編號對照表，如何核對抗體重鏈及輕鏈的互補決定區究竟覆蓋了哪些位置？","relevant":["archival-fab-coverage@1"]},
+    {"id":"f1-en","lang":"en","kind":"method","query":"Which antibody heavy- and light-chain CDR positions are actually represented in a deposited structure and a supplied numbering map?","relevant":["archival-fab-coverage@1"]},
+    {"id":"f2-zh","lang":"zh","kind":"method","query":"我要對照一篇開放論文的方法段與原表，怎樣取得可定位全文？","relevant":["literature-original@2","scholarly-fetch@1","scholarly-page-fetch@2"]},
+    {"id":"f2-en","lang":"en","kind":"method","query":"How can I fetch the full text of an open article and locate its original methods and tables?","relevant":["literature-original@2","scholarly-fetch@1","scholarly-page-fetch@2"]},
+    {"id":"f3-zh","lang":"zh","kind":"method","query":"人類 PCNA 的已發表結構有哪些？想從蛋白質的資料庫交叉引用找出沉積條目。","relevant":["pcna-archive-search@1"]},
+    {"id":"f3-en","lang":"en","kind":"method","query":"Which human PCNA structure accessions are cross-referenced in the protein archive?","relevant":["pcna-archive-search@1"]},
+    {"id":"f4-zh","lang":"zh","kind":"method","query":"查釀酒酵母天然親本的某種底物，資料庫裡哪些是反應註釋、哪些有底物實測？","relevant":["yeast-archive-lookup@1","yeast-archive-lookup@2"]},
+    {"id":"f4-en","lang":"en","kind":"method","query":"Which archived measurements document a substrate assay for the natural baker’s yeast parent, and which records only annotate the enzyme class?","relevant":["yeast-archive-lookup@1","yeast-archive-lookup@2"]},
+    {"id":"h1","lang":"zh","kind":"reference_only","query":"我想閱讀舊版 gx-understand 的方法說明。","relevant":["gx-understand@legacy"]},
+    {"id":"z1","lang":"zh","kind":"zero","query":"玄武岩鋯石鈾鉛定年","relevant":[]}
+  ]
+}
